@@ -88,6 +88,6 @@ public class PemKeyPair
 		if (certificate == null)
 			return "Empty PemKeyPair";
 		
-		return SSecurity.readCertificateFromPEM(certificate).getSubject().toString();
+		return SSecurity.getCommonName(SSecurity.readCertificateFromPEM(certificate).getSubject());
 	}
 }

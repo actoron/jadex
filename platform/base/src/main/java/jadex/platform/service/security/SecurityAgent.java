@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
+import org.bouncycastle.cert.X509CertificateHolder;
+
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -43,6 +45,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.security.SSecurity;
 import jadex.commons.transformation.traverser.SCloner;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -122,7 +125,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected AbstractX509PemSecret platformnamecertificate;
 	
 	/** Trusted authorities for certifying platform names. */
-	protected Set<AbstractX509PemSecret> nameauthorities = new HashSet<>();
+	protected Set<X509CertificateHolder> nameauthorities = new HashSet<>();
 	
 	/** Available crypt suites. */
 	protected Map<String, Class<?>> allowedcryptosuites = new LinkedHashMap<String, Class<?>>();
@@ -185,7 +188,15 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						if (split[i].length() > 0)
 						{
-							nameauthorities.add((AbstractX509PemSecret) AbstractAuthenticationSecret.fromString((String) args.get("platformnamecertificate"), true));
+							try
+							{
+								X509CertificateHolder cert = SSecurity.readCertificateFromPEM(split[i]);
+								nameauthorities.add(cert);
+							}
+							catch (Exception e)
+							{
+								e.printStackTrace();
+							}
 						}
 					}
 				}
@@ -710,19 +721,20 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** 
 	 *  Adds an authority for authenticating platform names.
 	 *  
-	 *  @param secret The secret, only X.509 secrets allowed.
+	 *  @param pemcertificate The pem-encoded certificate.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> addNameAuthority(final String secret)
+	public IFuture<Void> addNameAuthority(String pemcertificate)
 	{
-		final AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
-		if (!(asecret instanceof AbstractX509PemSecret))
-			return new Future<>(new IllegalArgumentException("Only X509 secrets allowed as name authorities"));
+//		final AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
+//		if (!(asecret instanceof AbstractX509PemSecret))
+//			return new Future<>(new IllegalArgumentException("Only X509 secrets allowed as name authorities"));
+		final X509CertificateHolder cert = SSecurity.readCertificateFromPEM(pemcertificate);
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				nameauthorities.add((AbstractX509PemSecret) asecret);
+				nameauthorities.add(cert);
 				
 				return IFuture.DONE;
 			}
@@ -764,8 +776,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			public IFuture<Set<String>> execute(IInternalAccess ia)
 			{
 				Set<String> ret = new HashSet<>();
-				for (AbstractX509PemSecret secret : SUtil.safeSet(nameauthorities))
-					ret.add(secret.toString());
+				for (X509CertificateHolder cert : SUtil.safeSet(nameauthorities))
+					ret.add(SSecurity.writeCertificateAsPEM(cert));
 				return new Future<>(ret);
 			}
 		});
@@ -999,7 +1011,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Gets the name authorities.
 	 */
-	public Set<AbstractX509PemSecret> getInternalNameAuthorities()
+	public Set<X509CertificateHolder> getInternalNameAuthorities()
 	{
 		return nameauthorities;
 	}

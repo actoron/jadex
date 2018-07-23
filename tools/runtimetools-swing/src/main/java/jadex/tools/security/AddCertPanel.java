@@ -179,11 +179,12 @@ public class AddCertPanel extends JPanel
 		PemKeyPair ret = null;
 		String cert = ((JTextArea) certarea.getViewport().getView()).getText();
 		String key = ((JTextArea) keyarea.getViewport().getView()).getText();
-		if (cert != null && cert.length() > 0 && key != null && key.length() > 0)
+		if (cert != null && cert.length() > 0)
 		{
 			ret = new PemKeyPair();
 			ret.setCertificate(cert);
-			ret.setKey(key);
+			if (key != null && key.length() > 0)
+				ret.setKey(key);
 		}
 		return ret;
 	}
@@ -569,7 +570,8 @@ public class AddCertPanel extends JPanel
 					try
 					{
 						boolean check = SSecurity.readCertificateChainFromPEM(((JTextArea) certarea.getViewport().getView()).getText()) != null;
-						check &= SSecurity.readPrivateKeyFromPEM(((JTextArea) keyarea.getViewport().getView()).getText()) != null;
+						if (((JTextArea) keyarea.getViewport().getView()).getText().length() > 0)
+							check &= SSecurity.readPrivateKeyFromPEM(((JTextArea) keyarea.getViewport().getView()).getText()) != null;
 						
 						if (!check)
 							throw new IllegalArgumentException();

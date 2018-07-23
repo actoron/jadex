@@ -51,6 +51,7 @@ public class SCertStore
 							basename = basename.substring(ENCODED_NAME_PREFIX.length());
 							basename = new String(Base64.decodeNoPadding(basename.getBytes(SUtil.UTF8)), SUtil.UTF8);
 						}
+						
 						PemKeyPair keypair = ret.get(basename);
 						if (keypair == null)
 						{
@@ -102,7 +103,7 @@ public class SCertStore
 			
 			for (PemKeyPair cert : certs)
 			{
-				String name = SSecurity.readCertificateFromPEM(cert.getCertificate()).getSubject().toString();
+				String name = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert.getCertificate()).getSubject());
 				
 				if (!SUtil.ASCII.newEncoder().canEncode(name) || name.contains("/") || name.contains("."))
 					name = ENCODED_NAME_PREFIX + new String(Base64.encodeNoPadding(name.getBytes(SUtil.UTF8)), SUtil.UTF8);

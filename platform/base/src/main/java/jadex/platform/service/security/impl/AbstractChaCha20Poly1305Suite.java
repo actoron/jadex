@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.crypto.engines.ChaChaEngine;
 import org.bouncycastle.crypto.generators.Poly1305KeyGenerator;
@@ -31,6 +32,7 @@ import jadex.platform.service.security.auth.AuthToken;
 import jadex.platform.service.security.auth.Blake2bX509AuthenticationSuite;
 import jadex.platform.service.security.auth.IAuthenticationSuite;
 import jadex.platform.service.security.auth.X509AuthToken;
+import jadex.platform.service.security.auth.X509PemStringsSecret;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 
@@ -433,26 +435,29 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	/**
 	 *  Verifies a token verifying the platform name.
 	 */
-	public boolean verifyPlatformNameSignature(byte[] key, AuthToken platformnamesig, Set<AbstractX509PemSecret> nameauthorities, String platformname)
+	public boolean verifyPlatformNameSignature(byte[] key, AuthToken platformnamesig, Set<X509CertificateHolder> nameauthorities, String platformname)
 	{
 		boolean ret = false;
-		if (platformnamesig instanceof X509AuthToken)
+		try
 		{
-			X509AuthToken sig = (X509AuthToken) platformnamesig;
-			for (AbstractX509PemSecret nameauthority : nameauthorities)
+			if (platformnamesig instanceof X509AuthToken)
 			{
-				boolean verified = verifyKey(challenge, key, nameauthority, sig);
-				if (verified)
+				X509AuthToken sig = (X509AuthToken) platformnamesig;
+				for (X509CertificateHolder nameauthority : nameauthorities)
 				{
-					String subjectid = SSecurity.getSubjectId(SSecurity.readCertificateFromPEM(sig.getCertificate()));
-					if (subjectid.startsWith("CN="))
+					X509PemStringsSecret nasecret = new X509PemStringsSecret(SSecurity.writeCertificateAsPEM(nameauthority), null, null);
+					boolean verified = verifyKey(challenge, key, nasecret, sig);
+					if (verified)
 					{
-						ret = platformname.equals(subjectid.substring(3));
+						ret = SSecurity.checkEntity(SSecurity.readCertificateFromPEM(sig.getCertificate()), platformname);
 						if (ret)
 							break;
 					}
 				}
 			}
+		}
+		catch (Exception e)
+		{
 		}
 		return ret;
 	}

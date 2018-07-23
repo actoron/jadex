@@ -22,11 +22,17 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.ECPrivateKey;
+import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -576,9 +582,77 @@ public class SSecurity
 	 *  @param cert The certificate.
 	 *  @return The subject ID.
 	 */
-	public static final String getSubjectId(X509CertificateHolder cert)
+//	public static final X500Name getSubjectName(X509CertificateHolder cert)
+//	{
+//		return cert.getSubject();
+//	}
+	
+	public static String getCommonName(X500Name name)
 	{
-		return cert.getSubject().toString();
+		String ret = null;
+	    RDN[] rdns = name.getRDNs(BCStyle.CN);
+	    if (rdns != null && rdns.length > 0)
+	    {
+	        RDN rdn = rdns[0];
+	        if (rdn.isMultiValued())
+	        {
+	            for (AttributeTypeAndValue m : rdn.getTypesAndValues())
+	            {
+	                if (m.getType().equals(BCStyle.CN))
+	                {
+	                    ret = IETFUtils.valueToString(m.getValue());
+	                    break;
+	                }
+	            }
+	        }
+	        else
+	        {
+	        	ret = IETFUtils.valueToString(rdn.getFirst().getValue());
+	        }
+	    }
+	    return ret;
+	}
+	
+	/**
+	 *  Check whether a certificate belongs to an entity,
+	 *  either as common name or as alt name.
+	 *  
+	 *  @param cert The certificate.
+	 *  @param entityname The entity name.
+	 *  @return True, if the certificate belongs, false otherwise.
+	 */
+	public static final boolean checkEntity(X509CertificateHolder cert, String entityname)
+	{
+		if (cert == null || entityname == null)
+			return false;
+		
+		String cn = getCommonName(cert.getSubject());
+		if (cn.equals(entityname))
+			return true;
+		
+		//Extension san = cert.getExtension(Extension.subjectAlternativeName);
+		try
+		{
+			GeneralNames gnames = GeneralNames.fromExtensions(cert.getExtensions(), Extension.subjectAlternativeName);
+			if (gnames != null)
+			{
+				GeneralName[] names = gnames.getNames();
+				if (names != null)
+				{
+					for (GeneralName name : names)
+					{
+						String strname = IETFUtils.valueToString(name.getName());
+						if (entityname.equals(strname))
+							return true;
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+		}
+//		String val = IETFUtils.valueToString(san.getParsedValue());
+		return false;
 	}
 	
 	/**
@@ -1136,12 +1210,12 @@ public class SSecurity
 		}
 	}
 	
-	/**
-	 *  Main for testing.
-	 */
-	public static void main(String[] args)
-	{
-		System.out.println(getSecureRandom().nextInt());
-//		SecureRandom sec = new SecureRandom();
-	}
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+//		System.out.println(getSecureRandom().nextInt());
+////		SecureRandom sec = new SecureRandom();
+//	}
 }

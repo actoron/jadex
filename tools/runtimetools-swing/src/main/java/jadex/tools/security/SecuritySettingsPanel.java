@@ -696,7 +696,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 				adddialog.getContentPane().setLayout(new BorderLayout());
 				
 				CertTree nacerttree = new CertTree();
-				certtree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+				nacerttree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
 				
 				adddialog.getContentPane().add(nacerttree, BorderLayout.CENTER);
 				
@@ -712,10 +712,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						adddialog.dispose();
 						if (keypair != null)
 						{
-							X509PemStringsSecret secret = new X509PemStringsSecret(keypair.getCertificate(), keypair.getCertificate(), keypair.getKey());
-							System.out.println(secret.toString());
-							System.out.println(AbstractAuthenticationSecret.fromString(secret.toString(), true));
-							secservice.addNameAuthority(secret.toString()).get();
+							secservice.addNameAuthority(keypair.getCertificate()).get();
 						}
 						refreshNameAuthorities();
 					}
@@ -751,16 +748,16 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 				int[] rows = nwtable.getSelectedRows();
 				if (rows != null && rows.length > 0)
 				{
-					final String[] nasecrets = new String[rows.length];
+					final String[] nacerts = new String[rows.length];
 					for (int i = 0; i < rows.length; ++i)
-						nasecrets[i] = (String) nwtable.getModel().getValueAt(rows[i], 1);
+						nacerts[i] = (String) nwtable.getModel().getValueAt(rows[i], 1);
 					
 					jccaccess.scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							for (int i = 0; i < nasecrets.length; ++i)
-								secservice.removeNameAuthority(nasecrets[i]).get();
+							for (int i = 0; i < nacerts.length; ++i)
+								secservice.removeNameAuthority(nacerts[i]).get();
 							refreshNameAuthorities();
 							return IFuture.DONE;
 						};
@@ -771,6 +768,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		
 		JButton refresh = new JButton(new AbstractAction("Refresh")
 		{
+
+			private static final long serialVersionUID = 1342352352317L;
 
 			public void actionPerformed(ActionEvent e)
 			{
@@ -1028,17 +1027,13 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 							table = new String[nas.size()][2];
 							
 							int i = 0;
-							for (String nasecret : nas)
+							for (String cert : nas)
 							{
-								AbstractX509PemSecret pemsecret = null;
 								String subjectid = null;
 								InputStream is = null;
 								try
 								{
-									pemsecret = (AbstractX509PemSecret) AbstractAuthenticationSecret.fromString(nasecret, true);
-									is = pemsecret.openCertificate();
-									String cert = new String(SUtil.readStream(is), SUtil.UTF8);
-									subjectid = SSecurity.getSubjectId(SSecurity.readCertificateFromPEM(cert));
+									subjectid = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert).getSubject());
 								}
 								catch (Exception e)
 								{
@@ -1051,7 +1046,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 								if (subjectid != null)
 								{
 									table[i][0] = subjectid;
-									table[i][1] = nasecret;
+									table[i][1] = cert;
 								}
 								else
 								{
@@ -1066,7 +1061,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						}
 						
 						StringArrayTableModel model = new StringArrayTableModel(table);
-						model.setColumnNames(new String[] { "Subject ID", "Secret" });
+						model.setColumnNames(new String[] { "Subject Common Name", "Certificate" });
 						natable.setModel(model);
 						
 					}
