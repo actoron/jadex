@@ -110,7 +110,8 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	public boolean handleHandshake(SecurityAgent agent, BasicSecurityMessage incomingmessage)
 	{
 		secinf = new SecurityInfo();
-		secinf.setPlatformAuthenticated(true);
+//		secinf.setPlatformAuthenticated(true);
+		secinf.setTrustedPlatform(true);
 		secinf.setAdminPlatform(true);
 		secinf.setNetworks(agent.getInternalNetworks().keySet().toArray(new String[agent.getInternalNetworks().size()]));
 		

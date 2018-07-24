@@ -111,7 +111,7 @@ public interface ISecurityService
 	 *  @param secret The secret, only X.509 secrets allowed.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> addNameAuthority(String secret);
+	public IFuture<Void> addNameAuthority(String cert);
 	
 	/** 
 	 *  Remvoes an authority for authenticating platform names.
@@ -119,7 +119,29 @@ public interface ISecurityService
 	 *  @param secret The secret, only X.509 secrets allowed.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> removeNameAuthority(String secret);
+	public IFuture<Void> removeNameAuthority(String cert);
+	
+	/** 
+	 *  Adds a name of an authenticated platform to allow access.
+	 *  
+	 *  @param name The platform name, name must be authenticated with certificate.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addTrustedPlatformName(String name);
+	
+	/** 
+	 *  Adds a name of an authenticated platform to allow access.
+	 *  
+	 *  @param name The platform name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeTrustedPlatformName(String name);
+	
+	/**
+	 *  Gets the trusted platform names. 
+	 *  @return The trusted platform names.
+	 */
+	public IFuture<Set<String>> getTrustedPlatformNames();
 	
 	/** 
 	 *  Adds an authority for authenticating platform names.

@@ -16,18 +16,18 @@ public interface ISecurityInfo
 	public boolean isAuthenticated();
 	
 	/**
-	 *  Gets if the platform is authenticated.
-	 *
-	 *  @return True if authenticated.
-	 */
-	public boolean isPlatformAuthenticated();
-	
-	/**
 	 *  Returns the authenticated platform name.
 	 *
 	 *  @return The authenticated platform name, null if not authenticated.
 	 */
 	public String getAuthenticatedPlatformName();
+	
+	/**
+	 *  Checks if the sender platform name is authenticated and trusted.
+	 *
+	 *  @return True, if trusted.
+	 */
+	public boolean isTrustedPlatform();
 	
 	/**
 	 *  Gets the ID of the sender platform if it is trusted, null otherwise.

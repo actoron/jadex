@@ -124,6 +124,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** The platform name certificate if available. */
 	protected AbstractX509PemSecret platformnamecertificate;
 	
+	/** The platform names that are trusted. */
+	protected Set<String> trustedplatformnames = new HashSet<>();
+	
 	/** Trusted authorities for certifying platform names. */
 	protected Set<X509CertificateHolder> nameauthorities = new HashSet<>();
 	
@@ -203,6 +206,24 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				else
 				{
 					nameauthorities = getProperty("nameauthorities", args, settings, nameauthorities);
+				}
+				
+				if (args.get("trustedplatforms") != null)
+				{
+					nameauthorities = new HashSet<>();
+					String authstr = (String) args.get("trustedplatforms");
+					String[] split = authstr.split(",");
+					for (int i = 0; i < split.length; ++i)
+					{
+						if (split[i].length() > 0)
+						{
+							trustedplatformnames.add(split[i]);
+						}
+					}
+				}
+				else
+				{
+					trustedplatformnames = getProperty("trustedplatforms", args, settings, trustedplatformnames);
 				}
 				
 				if (args.get("platformsecret") != null)
@@ -736,6 +757,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				nameauthorities.add(cert);
 				
+				saveSettings();
+				
 				return IFuture.DONE;
 			}
 		});
@@ -747,16 +770,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param secret The secret, only X.509 secrets allowed.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> removeNameAuthority(String secret)
+	public IFuture<Void> removeNameAuthority(String pemcertificate)
 	{
-		final AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
-		if (!(asecret instanceof AbstractX509PemSecret))
-			return new Future<>(new IllegalArgumentException("Only X509 secrets allowed as name authorities"));
+		final X509CertificateHolder cert = SSecurity.readCertificateFromPEM(pemcertificate);
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				nameauthorities.remove((AbstractX509PemSecret) asecret);
+				nameauthorities.remove(cert);
+				
+				saveSettings();
 				
 				return IFuture.DONE;
 			}
@@ -812,7 +835,70 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Set<String>> getNetworkNames()
 	{
-		return new Future<Set<String>>(networknames);
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Set<String>>()
+		{
+			public IFuture<Set<String>> execute(IInternalAccess ia)
+			{
+				return new Future<Set<String>>(new HashSet<>(networknames));
+			}
+		});
+	}
+	
+	/** 
+	 *  Adds a name of an authenticated platform to allow access.
+	 *  
+	 *  @param name The platform name, name must be authenticated with certificate.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addTrustedPlatformName(final String name)
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				trustedplatformnames.add(name);
+				
+				saveSettings();
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/** 
+	 *  Adds a name of an authenticated platform to allow access.
+	 *  
+	 *  @param name The platform name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeTrustedPlatformName(String name)
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				trustedplatformnames.remove(name);
+				
+				saveSettings();
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Gets the trusted platform names. 
+	 *  @return The trusted platform names.
+	 */
+	public IFuture<Set<String>> getTrustedPlatformNames()
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Set<String>>()
+		{
+			public IFuture<Set<String>> execute(IInternalAccess ia)
+			{
+				return new Future<Set<String>>(new HashSet<>(trustedplatformnames));
+			}
+		});
 	}
 	
 	/**
@@ -1014,6 +1100,14 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public Set<X509CertificateHolder> getInternalNameAuthorities()
 	{
 		return nameauthorities;
+	}
+	
+	/**
+	 *  Gets the trusted platform names.
+	 */
+	public Set<String> getInternalTrustedPlatformNames()
+	{
+		return trustedplatformnames;
 	}
 	
 	/**
@@ -1315,6 +1409,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			settings.put("platformnamecertificate", platformnamecertificate);
 		if (nameauthorities != null && nameauthorities.size() > 0)
 			settings.put("nameauthorities", nameauthorities);
+		if (trustedplatformnames != null && trustedplatformnames.size() > 0)
+			settings.put("trustedplatforms", trustedplatformnames);
 		
 		getSettingsService().saveState(PROPERTIES_ID, settings);
 		
@@ -1605,7 +1701,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				{
 					ISecurityInfo suiteinfos = expsuite.getFirstEntity().getSecurityInfos();
 					
-					if (!suiteinfos.isPlatformAuthenticated() || (suiteinfos.isPlatformAuthenticated() == secinfos.isPlatformAuthenticated()))
+					if ((secinfos.isAdminPlatform() || (suiteinfos.isAdminPlatform() == secinfos.isAdminPlatform())) &&
+						(secinfos.isTrustedPlatform() || (suiteinfos.isTrustedPlatform() == secinfos.isTrustedPlatform())) && 
+						(SUtil.equals(secinfos.getAuthenticatedPlatformName(), suiteinfos.getAuthenticatedPlatformName()) || (suiteinfos.getAuthenticatedPlatformName() == null && secinfos.getAuthenticatedPlatformName() != null)))
+						
 					{
 						Set<String> msgnets = new HashSet<String>(Arrays.asList(secinfos.getNetworks()));
 						if (msgnets.containsAll(Arrays.asList(suiteinfos.getNetworks())))
