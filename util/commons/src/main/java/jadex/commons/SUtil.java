@@ -478,7 +478,7 @@ public class SUtil
 						Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
 						SECURE_RANDOM = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
 					}
-					catch (Exception e)
+					catch (Throwable t)
 					{
 						SECURE_RANDOM = getJavaDefaultSecureRandom();
 					}

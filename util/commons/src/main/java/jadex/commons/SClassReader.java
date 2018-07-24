@@ -218,7 +218,7 @@ public class SClassReader
 		String type = decodeModifiedUtf8(strings.get(typeref));
 //		if (type == null)
 //			continue;
-		type = type.substring(1, type.length() - 1).replace('/', '.');
+		type = convertTypeName(type);
 		AnnotationInfos ret = new AnnotationInfos(type);
 		
 		for (int i = 0; i < paircount; ++i)
@@ -269,9 +269,12 @@ public class SClassReader
 	        case 'S':
 	        case 'Z':
 	        case 'c':
+	        {
 	        	skip(is, 2);
 	        	break;
+	        }
 	        case 's':
+	        {
 	        	int strind = is.readUnsignedShort();
 	        	byte[] enc = strings.get(strind);
 	        	if (enc != null)
@@ -281,18 +284,33 @@ public class SClassReader
 	        			ret = decodeModifiedUtf8(enc);
 	        	}
 	        	break;
+	        }
 	        case 'e':
-	            skip(is, 4);
+	        {
+	        	int ind = is.readUnsignedShort();
+	        	byte[] enc = strings.get(ind);
+	        	String enumtype = enc != null ? decodeModifiedUtf8(enc) : null;
+	        	enumtype = convertTypeName(enumtype);
+	        	ind = is.readUnsignedShort();
+	        	enc = strings.get(ind);
+	        	String enumval = enc != null ? decodeModifiedUtf8(enc) : null;
+	        	ret = new EnumInfo(enumtype, enumval);
+//	            skip(is, 4);
 	            break;
+	        }
 	        case '@':
+	        {
 	            ret = readAnnotation(is, strings);
 	            break;
+	        }
 	        case '[':
+	        {
 				int count = is.readUnsignedShort();
 				ret = new Object[count];
 	            for (int i = 0; i < count; ++i)
 	            	((Object[]) ret)[i] = readAnnotationValue(is, strings);
 	            break;
+	        }
 	        default:
 	            throw new RuntimeException("Unknown Annotation tag: " + tag);
         }
@@ -324,6 +342,18 @@ public class SClassReader
     {
     	while (len > 0)
     		len -= is.skip(len);
+    }
+    
+    /**
+     *  Converts a type name to Java style.
+     *  @param type Internal name.
+     *  @return Converted name.
+     */
+    protected static final String convertTypeName(String type)
+    {
+    	if (type == null)
+    		return null;
+    	return type.substring(1, type.length() - 1).replace('/', '.');
     }
     
     /**
@@ -506,4 +536,46 @@ public class SClassReader
 			return "AnnotationInfos [type=" + type + ", values=" + values + "]";
 		}
     }
+    
+    /**
+     *  Info object for an enum.
+     *
+     */
+    public static class EnumInfo
+    {
+    	/** The enum type. */
+    	protected String type;
+    	
+    	/** The enum value. */
+    	protected String value;
+    	
+    	/**
+    	 *  Create enum info.
+    	 */
+    	public EnumInfo(String type, String value)
+		{
+    		this.type = type;
+    		this.value = value;
+		}
+    	
+    	/**
+    	 *  Gets the type.
+    	 *  @return Enum type.
+    	 */
+		public String getType()
+		{
+			return type;
+		}
+		
+		/**
+		 *  Gets the enum value.
+		 *  @return The value.
+		 */
+		public String getValue()
+		{
+			return value;
+		}
+    }
+    
+    
 }
