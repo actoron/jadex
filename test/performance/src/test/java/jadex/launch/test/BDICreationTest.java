@@ -7,11 +7,11 @@ import java.util.Map;
 import org.junit.Test;
 
 import jadex.base.Starter;
+import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -33,17 +33,21 @@ public class BDICreationTest //extends TestCase
 	public void	testBDICreation()
 	{
 		long timeout	= -1;//BasicService.getLocalDefaultTimeout();
-		String projectroot = new String("jadex-integration-performance-test");
+//		String projectroot = new String("jadex-integration-performance-test");
 //		System.out.println(resdir);
-		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
-//			"-kernels", "\"micro\"",
-//			"-logging", "true",
-			"-libpath", SUtil.getOutputDirsExpression(projectroot, true),
-			"-awareness", "false",	// otherwise influences performance measure
-			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
-//			"-componentfactory", "jadex.component.ComponentComponentFactory",
-//			"-conf", "jadex.standalone.Platform.component.xml",
-			"-printpass", "false"}).get(timeout);
+		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(STest.getDefaultTestConfig(),
+			new String[]{
+//				"-platformname", "benchmarks_*", 
+////			"-kernels", "\"micro\"",
+			"-logging", "true",
+//			"-libpath", SUtil.getOutputDirsExpression(projectroot, true),
+//			"-awareness", "false",	// otherwise influences performance measure
+//			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
+////			"-componentfactory", "jadex.component.ComponentComponentFactory",
+////			"-conf", "jadex.standalone.Platform.component.xml",
+//			"-printpass", "false"
+			}
+			).get(timeout);
 		IComponentManagementService cms = (IComponentManagementService)platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
