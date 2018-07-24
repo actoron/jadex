@@ -34,7 +34,7 @@ public interface ISecurityInfo
 	 *
 	 *  @return The ID of the sender platform if it is trusted, null otherwise.
 	 */
-	public boolean isTrustedPlatform();
+	public boolean isAdminPlatform();
 	
 	/**
 	 *  Gets the authenticated networks of the sender.

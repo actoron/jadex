@@ -14,8 +14,8 @@ public class SecurityInfo implements ISecurityInfo
 	/** Flag if the platform secret could be authenticated. */
 	protected boolean platformauth;
 	
-	/** Flag if the platform is trusted. */
-	protected boolean trustedplatform;
+	/** Flag if the platform is an admin platform. */
+	protected boolean adminplatform;
 	
 	/** Platform name if authenticated. */
 	protected String platformname;
@@ -88,9 +88,9 @@ public class SecurityInfo implements ISecurityInfo
 	 *
 	 *  @return True, if trusted.
 	 */
-	public boolean isTrustedPlatform()
+	public boolean isAdminPlatform()
 	{
-		return trustedplatform;
+		return adminplatform;
 	}
 
 	/**
@@ -98,9 +98,9 @@ public class SecurityInfo implements ISecurityInfo
 	 *
 	 *  @param trustedplatform The ID of the sender platform if it is trusted, null otherwise.
 	 */
-	public void setTrustedPlatform(boolean trustedplatform)
+	public void setAdminPlatform(boolean adminplatform)
 	{
-		this.trustedplatform = trustedplatform;
+		this.adminplatform = adminplatform;
 	}
 
 	/**
@@ -148,6 +148,6 @@ public class SecurityInfo implements ISecurityInfo
 	 */
 	public String toString()
 	{
-		return "Authenticated: " + platformauth + ", Trusted: " + trustedplatform + ", Networks: " + Arrays.toString(networks); 
+		return "Authenticated: " + platformauth + ", Admin: " + adminplatform + ", Networks: " + Arrays.toString(networks); 
 	}
 }
