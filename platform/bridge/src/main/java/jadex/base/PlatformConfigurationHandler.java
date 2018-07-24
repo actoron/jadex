@@ -287,7 +287,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		{
 			checkReadOnly();
 			values.put(getKeyForMethodname(mname, 3), args[0]);
-			System.out.println("setting: "+getKeyForMethodname(mname, 3)+" "+args[0]);
+//			System.out.println("setting: "+getKeyForMethodname(mname, 3)+" "+args[0]);
 		}
 		else if(mname.startsWith("add"))
 		{

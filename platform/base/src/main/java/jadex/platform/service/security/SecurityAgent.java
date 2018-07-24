@@ -776,7 +776,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			public IFuture<Set<String>> execute(IInternalAccess ia)
 			{
 				Set<String> ret = new HashSet<>();
-				for (X509CertificateHolder cert : SUtil.safeSet(nameauthorities))
+				for (X509CertificateHolder cert : SUtil.notNull(nameauthorities))
 					ret.add(SSecurity.writeCertificateAsPEM(cert));
 				return new Future<>(ret);
 			}

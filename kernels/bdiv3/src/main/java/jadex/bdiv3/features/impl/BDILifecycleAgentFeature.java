@@ -597,7 +597,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			
 			// Send initial messages
 			// Throw initial internal events
-			for(MConfigParameterElement cpe: SUtil.safeList(cevents))
+			for(MConfigParameterElement cpe: SUtil.notNull(cevents))
 			{
 				MInternalEvent mievent = mcapa.getInternalEvent(cpe.getRef());
 				if(mievent!=null)
@@ -902,7 +902,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 //										System.out.println("parameter update: "+event);
 										
 										RCapability capa = BDIAgentFeature.getCapability(component);
-										for(RGoal goal: SUtil.safeCollection(capa.getGoals(mgoal)))
+										for(RGoal goal: SUtil.notNull(capa.getGoals(mgoal)))
 										{
 											if(!mparam.isMulti(component.getClassLoader()))
 											{
@@ -943,7 +943,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 														System.out.println("parameter updaterate: "+mparam.getUpdaterateValue(component));
 														
 														RCapability capa = BDIAgentFeature.getCapability(component);
-														for(RGoal goal: SUtil.safeCollection(capa.getGoals(mgoal)))
+														for(RGoal goal: SUtil.notNull(capa.getGoals(mgoal)))
 														{
 															if(!mparam.isMulti(component.getClassLoader()))
 															{
