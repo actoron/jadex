@@ -7,6 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.df.IDF;
 
 
 /**
@@ -14,6 +19,12 @@ import jadex.bridge.IComponentIdentifier;
  */
 public abstract class Creature extends WorldObject
 {
+//	IInternalAccess	$component	= null;
+//	Object o	= 					((IDF)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))).createDFComponentDescription(
+//		$component.getId(), ((IDF)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)))
+//		.createDFServiceDescription("environment-service", "hunter-prey environment", "University of Hamburg",
+//				new String[]{"JADEX_XML"}, new String[]{"hunterprey"}, new String[]{"fipa-request"}, null));
+	
 	//-------- constants --------
 
 	/** All possible directions. */
