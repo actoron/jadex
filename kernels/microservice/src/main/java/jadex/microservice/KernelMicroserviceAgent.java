@@ -13,7 +13,6 @@ import jadex.micro.annotation.ProvidedServices;
  *  Microservice kernel.
  */
 @Properties({
-	@NameValue(name="system", value="true"),
 	@NameValue(name="kernel.types", value="new String[] {\".class\"}")
 })
 @ProvidedServices({

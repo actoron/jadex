@@ -3,6 +3,7 @@ package jadex.bdiv3.benchmarks;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
@@ -35,7 +36,7 @@ import jadex.micro.annotation.Description;
 /**
  *  Agent creation benchmark BDI V3.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Description("This agents benchmarks BDI V3 agent creation and termination.")
 @Arguments(
 {
