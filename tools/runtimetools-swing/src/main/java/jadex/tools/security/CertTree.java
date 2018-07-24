@@ -657,7 +657,7 @@ public class CertTree extends JTree implements TreeModel
 	 */
 	protected void deleteCertNode(CertTreeNode node, Map<String, PemKeyPair> certmodel)
 	{
-		for (CertTreeNode cnode : SUtil.safeList(node.getChildren()))
+		for (CertTreeNode cnode : SUtil.notNull(node.getChildren()))
 			deleteCertNode(cnode, certmodel);
 		certmodel.remove(node.getSubjectId());
 	}
