@@ -9,7 +9,7 @@ import jadex.platform.service.address.TransportAddressAgent;
 import jadex.platform.service.transport.AbstractTransportAgent;
 import jadex.platform.service.transport.ITransport;
 
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="tcp", predecessors=TransportAddressAgent.class))
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="tcp", predecessors="jadex.platform.service.address.TransportAddressAgent"))
 public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 {
 	//-------- abstract methods to be provided by concrete transport --------
