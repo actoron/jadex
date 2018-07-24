@@ -169,8 +169,8 @@
 				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)$component.getIdentifier(.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))).createDFComponentDescription($component.getIdentifier(,
-								((IDF)$component.getIdentifier(.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)))
+							((IDF)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))).createDFComponentDescription($component.getId(),
+								((IDF)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)))
 								.createDFServiceDescription("sell", "service_seller", "UniHH"),
 								20000)
  						</value>
