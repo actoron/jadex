@@ -2,6 +2,7 @@ package jadex.commons.security;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.CharsetEncoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -105,7 +106,7 @@ public class SCertStore
 			{
 				String name = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert.getCertificate()).getSubject());
 				
-				if (!SUtil.ASCII.newEncoder().canEncode(name) || name.contains("/") || name.contains("."))
+				if (!allowPlain(name))
 					name = ENCODED_NAME_PREFIX + new String(Base64.encodeNoPadding(name.getBytes(SUtil.UTF8)), SUtil.UTF8);
 				
 				ZipEntry entry = new ZipEntry(name + ".crt");
@@ -122,6 +123,7 @@ public class SCertStore
 				}
 			}
 			
+			SUtil.close(zos);
 			ret = baos.toByteArray();
 		}
 		catch (Exception e)
@@ -135,6 +137,42 @@ public class SCertStore
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Check if plain name encoding is allowed.
+	 *  
+	 *  @param name Name.
+	 *  
+	 *  @return True, if allowed.
+	 */
+	protected static final boolean allowPlain(String name)
+	{
+		int codepointcount = name.codePointCount(0, name.length());
+		CharsetEncoder asciiencoder = SUtil.ASCII.newEncoder();
+		for (int i = 0; i < codepointcount; ++i)
+		{
+			int codepoint = name.codePointAt(i);
+			
+			char[] cpchars = Character.toChars(codepoint);
+			if (cpchars.length == 1 && asciiencoder.canEncode(cpchars[0]) && !Character.isISOControl(codepoint))
+			{
+				if ('/' == cpchars[0])
+					return false;
+				
+				if ('\\' == cpchars[0])
+					return false;
+				
+				continue;
+			}
+			
+			if (Character.isLetterOrDigit(codepoint))
+				continue;
+			
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
