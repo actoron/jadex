@@ -71,7 +71,7 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
 /**
  *  Agent that provides the security service.
  */
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, predecessors=ClockAgent.class))
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, predecessors="jadex.platform.service.clock.ClockAgent"))
 @Arguments(value={
 	@Argument(name="usesecret", clazz=Boolean.class, defaultvalue="null"),
 	@Argument(name="printsecret", clazz=Boolean.class, defaultvalue="null"),
@@ -799,7 +799,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			public IFuture<Set<String>> execute(IInternalAccess ia)
 			{
 				Set<String> ret = new HashSet<>();
-				for (X509CertificateHolder cert : SUtil.safeSet(nameauthorities))
+				for (X509CertificateHolder cert : SUtil.notNull(nameauthorities))
 					ret.add(SSecurity.writeCertificateAsPEM(cert));
 				return new Future<>(ret);
 			}

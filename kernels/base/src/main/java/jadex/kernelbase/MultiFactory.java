@@ -687,7 +687,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
 		q.setExcludeOwner(true);
-		return SUtil.safeCollection(ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(q));
+		return SUtil.notNull(ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(q));
 	}
 	
 	/**

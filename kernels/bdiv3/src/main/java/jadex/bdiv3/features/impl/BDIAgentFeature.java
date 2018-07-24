@@ -2096,7 +2096,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					Object pojo = rpe.getPojoElement();
 					MGoal mgoal = (MGoal)rpe.getModelElement();
 					List<MParameter> params = mgoal.getParameters();
-					for(MParameter param: SUtil.safeList(params))
+					for(MParameter param: SUtil.notNull(params))
 					{
 						Object val = param.getValue(pojo, component.getClassLoader());
 						vals.add(val);

@@ -302,19 +302,19 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			List<EventType> events = new ArrayList<EventType>();
 			
-			for(String belname: SUtil.safeList(wqtr.getFactAddeds()))
+			for(String belname: SUtil.notNull(wqtr.getFactAddeds()))
 			{
 				events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
 			}
-			for(String belname: SUtil.safeList(wqtr.getFactRemoveds()))
+			for(String belname: SUtil.notNull(wqtr.getFactRemoveds()))
 			{
 				events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
 			}
-			for(String belname: SUtil.safeList(wqtr.getFactChangeds()))
+			for(String belname: SUtil.notNull(wqtr.getFactChangeds()))
 			{
 				events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}));
 			}			
-			for(MGoal goal: SUtil.safeList(wqtr.getGoalFinisheds()))
+			for(MGoal goal: SUtil.notNull(wqtr.getGoalFinisheds()))
 			{
 				events.add(new EventType(new String[]{ChangeEvent.GOALDROPPED, goal.getName()}));
 			}
@@ -338,12 +338,12 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				rplan.internalSetupEventsRule(events);
 			}
 			
-			for(MInternalEvent mevent: SUtil.safeList(wqtr.getInternalEvents()))
+			for(MInternalEvent mevent: SUtil.notNull(wqtr.getInternalEvents()))
 			{
 				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
 				wa.addModelElement(mevent);
 			}
-			for(MMessageEvent mevent: SUtil.safeList(wqtr.getMessageEvents()))
+			for(MMessageEvent mevent: SUtil.notNull(wqtr.getMessageEvents()))
 			{
 				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
 				wa.addModelElement(mevent);

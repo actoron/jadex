@@ -503,7 +503,7 @@ public class SClassReader
     	 */
     	public Object getValue(String name)
 		{
-    		return SUtil.safeMap(values).get(name);
+    		return SUtil.notNull(values).get(name);
 		}
     	
     	/**

@@ -2642,33 +2642,6 @@ public class SUtil
 		throw convertToRuntimeException(e);
 	}
 
-	/**
-	 * Main method for testing. / public static void main(String[] args) {
-	 * String res1 = getRelativePath("c:/a/b/c", "c:/a/d"); String res2 =
-	 * getRelativePath("c:/a/b/c", "c:/a/b/c"); //String res2 =
-	 * getRelativePath("c:/a/b/c", "d:/a/d"); String res3 =
-	 * getRelativePath("c:/a/b/c", "c:/a/b/c/d/e"); //String tst =
-	 * "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
-	 * ; //System.out.println(tst); //System.out.println(SUtil.wrapText(tst));
-	 * /*String[] a = new String[]{"a1", "a2", "a3"}; Integer[] b = new
-	 * Integer[]{Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3)};
-	 * System.out.println(arrayToString(joinArbitraryArrays(new Object[]{a,
-	 * b})));
-	 */
-
-	/*
-	 * try { URL target = new URL("file:///C:/projects/jadex/lib/examples.jar");
-	 * DynamicURLClassLoader loader = new DynamicURLClassLoader(new URL[0]); try
-	 * { Class clazz = loader.loadClass("jadex.examples.ping.PingPlan");
-	 * System.out.println("Loaded class: "+clazz); }
-	 * catch(ClassNotFoundException e){System.out.println(e);}
-	 * loader.addURL(target); try { Class clazz =
-	 * loader.loadClass("jadex.examples.ping.PingPlan");
-	 * System.out.println("Loaded class: "+clazz); }
-	 * catch(ClassNotFoundException e){System.out.println(e);} } catch(Exception
-	 * e) { System.out.println(e); } }
-	 */
-	
 	public static void main(String[] args)
 	{
 //		String res = SUtil.makeConform("uniique-dialogservice.de/ues4/rc?f=https://plus.google.com/+targobank?koop_id=mar_vermoegen18");
@@ -5629,7 +5602,7 @@ public class SUtil
 	/**
 	 *  Helper method to allow iterating over possibly null lists.
 	 */
-	public static <T> List<T>	safeList(List<T> list)
+	public static <T> List<T>	notNull(List<T> list)
 	{
 		if(list!=null)
 		{
@@ -5644,7 +5617,7 @@ public class SUtil
 	/**
 	 *  Helper method to allow iterating over possibly null collections.
 	 */
-	public static <T> Collection<T>	safeCollection(Collection<T> coll)
+	public static <T> Collection<T>	notNull(Collection<T> coll)
 	{
 		if(coll!=null)
 		{
@@ -5659,7 +5632,7 @@ public class SUtil
 	/**
 	 *  Helper method to allow iterating over possibly null sets.
 	 */
-	public static <T> Set<T>	safeSet(Set<T> set)
+	public static <T> Set<T>	notNull(Set<T> set)
 	{
 		if(set!=null)
 		{
@@ -5674,7 +5647,7 @@ public class SUtil
 	/**
 	 *  Helper method to allow iterating over possibly null maps.
 	 */
-	public static <K, E> Map<K, E>	safeMap(Map<K, E> map)
+	public static <K, E> Map<K, E>	notNull(Map<K, E> map)
 	{
 		if(map!=null)
 		{
@@ -5683,6 +5656,21 @@ public class SUtil
 		else
 		{
 			return Collections.emptyMap();
+		}
+	}
+	
+	/**
+	 *  Helper method to allow iterating over possibly null array.
+	 */
+	public static <T> T[] notNull(T[] array)
+	{
+		if(array!=null)
+		{
+			return array;
+		}
+		else
+		{
+			return (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
 		}
 	}
 	

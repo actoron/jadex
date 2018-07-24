@@ -526,7 +526,14 @@ public class Starter
 
 					Map<String, Object> argsmap = config==null? new HashMap<String, Object>(): config.getValues();
 					if(args!=null)
-						argsmap.putAll(args);
+					{
+						for(Map.Entry<String, Object> arg: args.entrySet())
+						{
+							argsmap.put(arg.getKey(), arg.getValue());
+						}
+						// Must not use putAll() here because special map overrides put() to add also namemapped entries
+//						argsmap.putAll(args);
+					}
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, argsmap);
 					ComponentCreationInfo cci = new ComponentCreationInfo(model, config.getConfigurationName(), argsmap, desc, null, null);
 					Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();

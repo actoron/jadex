@@ -320,7 +320,7 @@ public class Indexer<T>
 					keys.add("null");
 				}	
 				
-				for(String key: SUtil.safeSet(keys))
+				for(String key: SUtil.notNull(keys))
 				{
 					// Fetch the set of indexed elements for this key value and add the value
 					Set<T> valset = entry.getValue().get(key);
