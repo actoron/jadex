@@ -1262,7 +1262,7 @@ public class BDIClassReader extends MicroClassReader
 	 */
 	protected void	initBDIModelAfterClassLoading(BDIModel model, ClassLoader cl)
 	{
-		for(MBelief bel: SUtil.safeList(model.getCapability().getBeliefs()))
+		for(MBelief bel: SUtil.notNull(model.getCapability().getBeliefs()))
 		{
 			bel.initEvents(model, cl);
 		}

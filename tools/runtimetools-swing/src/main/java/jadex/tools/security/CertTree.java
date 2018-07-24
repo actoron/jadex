@@ -308,6 +308,7 @@ public class CertTree extends JTree implements TreeModel
 						public void actionPerformed(ActionEvent e)
 						{
 							PemKeyPair cert = getSelectedCert();
+							
 							if (cert == null)
 								return;
 							cert.setKey(null);
@@ -322,11 +323,18 @@ public class CertTree extends JTree implements TreeModel
 
 						public void actionPerformed(ActionEvent e)
 						{
-							PemKeyPair cert = getSelectedCert();
-							if (cert == null)
+							Object onode = getSelectionModel().getSelectionPath().getLastPathComponent();
+							if (onode == root)
 								return;
-							String name = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert.getCertificate()).getSubject());
-							certmodel.remove(name);
+							CertTreeNode node = (CertTreeNode) onode;
+							
+							deleteCertNode(node, certmodel);
+							
+//							PemKeyPair cert = getSelectedCert();
+//							if (cert == null)
+//								return;
+//							String name = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert.getCertificate()).getSubject());
+//							certmodel.remove(name);
 							
 							updateAndSave();
 						}
@@ -485,6 +493,22 @@ public class CertTree extends JTree implements TreeModel
 		nodelookup.clear();
 		clearToggledPaths();
 		
+		for (Map.Entry<String, PemKeyPair> entry : certmodel.entrySet())
+		{
+			List<X509CertificateHolder> certchain = SSecurity.readCertificateChainFromPEM(entry.getValue().getCertificate());
+			for (int i = 0; i < certchain.size(); ++i)
+			{
+				X509CertificateHolder cert = certchain.get(i);
+				String cn = SSecurity.getCommonName(cert.getSubject());
+				if (!certmodel.containsKey(cn))
+				{
+					PemKeyPair kp = new PemKeyPair();
+					kp.setCertificate(SSecurity.writeCertificateAsPEM(cert));
+					certmodel.put(cn, kp);
+				}
+			}
+		}
+		
 		synchronized(certmodel)
 		{
 			for (Map.Entry<String, PemKeyPair> entry : certmodel.entrySet())
@@ -626,6 +650,16 @@ public class CertTree extends JTree implements TreeModel
 				return subjectid;
 			}
 		};
+	}
+	
+	/**
+	 *  Deletes a cert node.
+	 */
+	protected void deleteCertNode(CertTreeNode node, Map<String, PemKeyPair> certmodel)
+	{
+		for (CertTreeNode cnode : SUtil.notNull(node.getChildren()))
+			deleteCertNode(cnode, certmodel);
+		certmodel.remove(node.getSubjectId());
 	}
 	
 	/**

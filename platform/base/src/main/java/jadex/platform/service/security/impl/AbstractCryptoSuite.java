@@ -86,12 +86,16 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	protected void setupSecInfos(IComponentIdentifier remoteid, List<String> authnets, boolean platformauth, String authenticatedplatformname, SecurityAgent agent)
 	{
 		secinf = new SecurityInfo();
-		secinf.setPlatformAuthenticated(platformauth);
-		if (platformauth)
+//		secinf.setPlatformAuthenticated(platformauth);
+		if (authenticatedplatformname == null && platformauth)
 			secinf.setAuthenticatedPlatformName(remoteid.toString());
-		secinf.setTrustedPlatform(false);
+		else
+			secinf.setAuthenticatedPlatformName(authenticatedplatformname);
+		secinf.setAdminPlatform(platformauth);
 		secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
-		secinf.setAuthenticatedPlatformName(authenticatedplatformname);
+		
+		if (authenticatedplatformname != null && agent.getInternalTrustedPlatformNames().contains(authenticatedplatformname))
+			secinf.setTrustedPlatform(true);
 		
 		Map<String, Set<String>> rolemap = agent.getInternalRoles();
 		Set<String> roles = new HashSet<String>();

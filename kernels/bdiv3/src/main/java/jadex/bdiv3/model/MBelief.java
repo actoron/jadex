@@ -905,7 +905,7 @@ public class MBelief extends MElement
 	 */
 	public List<EventType> getEvents()
 	{
-		return SUtil.safeList(events);
+		return SUtil.notNull(events);
 	}
 	
 	/**

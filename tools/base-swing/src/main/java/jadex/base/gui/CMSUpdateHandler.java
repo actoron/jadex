@@ -54,7 +54,7 @@ public class CMSUpdateHandler
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
-		for(Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>, Integer> tup: SUtil.safeMap(listeners).values())
+		for(Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>, Integer> tup: SUtil.notNull(listeners).values())
 		{
 			tup.getFirstEntity().terminate();
 		}

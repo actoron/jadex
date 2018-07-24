@@ -18,6 +18,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -83,6 +84,9 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	/** Name authorities panel. */
 	protected JTable natable;
 	
+	/** Trusted names panel. */
+	protected JTable trustedtable;
+	
 	/** Role table. */
 	protected JTable roletable;
 	
@@ -134,6 +138,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						main.add("Roles", createRolePanel());
 						
 						main.add("Name Authorities", createNameAuthoritiesPanel());
+						
+						main.add("Trusted Platform Names", createTrustedNamesPanel());
 						
 						certtree = new CertTree();
 						certtree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
@@ -681,6 +687,10 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		return rolepanel;
 	}
 	
+	/**
+	 *  Creates panel for name authorities.
+	 * @return Panel for name authorities.
+	 */
 	protected JPanel createNameAuthoritiesPanel()
 	{
 		natable = new JTable();
@@ -758,10 +768,11 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						{
 							for (int i = 0; i < nacerts.length; ++i)
 								secservice.removeNameAuthority(nacerts[i]).get();
-							refreshNameAuthorities();
 							return IFuture.DONE;
 						};
-					});
+					}).get();
+					
+					refreshNameAuthorities();
 				}
 			}
 		});
@@ -818,9 +829,124 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		l.setHorizontalGroup(ohgroup);
 		l.setVerticalGroup(ovgroup);
 		
-		refreshNetworks();
+		refreshNameAuthorities();
 		
 		return napanel;
+	}
+	
+	/**
+	 *  Creates panel for name authorities.
+	 * @return Panel for name authorities.
+	 */
+	protected JPanel createTrustedNamesPanel()
+	{
+		trustedtable = new JTable();
+		JScrollPane scroll = new JScrollPane(trustedtable);
+		
+		JButton add = new JButton(new AbstractAction("Add...")
+		{
+			private static final long serialVersionUID = -18130117751292609L;
+
+			public void actionPerformed(ActionEvent e)
+			{
+				final String res = JOptionPane.showInputDialog(trustedtable, "Add trusted platform name", "Add Trusted Platform Name", JOptionPane.PLAIN_MESSAGE);
+				if (res != null)
+				{
+					jccaccess.scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							return secservice.addTrustedPlatformName(res);
+						}
+					}).get();
+					refreshTrustedPlatforms();
+				}
+			}
+		});
+		
+		JButton remove = new JButton(new AbstractAction("Remove")
+		{
+			private static final long serialVersionUID = 724762329907080898L;
+
+			public void actionPerformed(ActionEvent e)
+			{
+				int[] rows = trustedtable.getSelectedRows();
+				if (rows != null && rows.length > 0)
+				{
+					final String[] names = new String[rows.length];
+					for (int i = 0; i < rows.length; ++i)
+						names[i] = (String) trustedtable.getModel().getValueAt(rows[i], 0);
+					
+					jccaccess.scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							for (int i = 0; i < names.length; ++i)
+								secservice.removeTrustedPlatformName(names[i]).get();
+							
+							return IFuture.DONE;
+						};
+					}).get();
+					refreshTrustedPlatforms();
+				}
+			}
+		});
+		
+		JButton refresh = new JButton(new AbstractAction("Refresh")
+		{
+
+			private static final long serialVersionUID = 1342352354352317L;
+
+			public void actionPerformed(ActionEvent e)
+			{
+				refreshTrustedPlatforms();
+			}
+		});
+		
+		JPanel buttonpanel = new JPanel();
+		GroupLayout l = new GroupLayout(buttonpanel);
+		buttonpanel.setLayout(l);
+		l.setAutoCreateGaps(true);
+		SequentialGroup hgroup = l.createSequentialGroup();
+		
+		ParallelGroup vgroup = l.createParallelGroup();
+		
+		for (JComponent comp : new JComponent[] { add, remove, refresh })
+		{
+			vgroup.addComponent(comp);
+			hgroup.addComponent(comp);
+		}
+		l.linkSize(SwingConstants.VERTICAL, add, remove, refresh);
+		
+		l.setVerticalGroup(vgroup);
+		l.setHorizontalGroup(hgroup);
+		
+		JPanel trustedpanel = new JPanel();
+		
+		l = new GroupLayout(trustedpanel);
+		trustedpanel.setLayout(l);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		
+		l = new GroupLayout(trustedpanel);
+		trustedpanel.setLayout(l);
+		l.setAutoCreateContainerGaps(true);
+		l.setAutoCreateGaps(true);
+		ParallelGroup ohgroup = l.createParallelGroup();
+		SequentialGroup ovgroup = l.createSequentialGroup();
+		
+		for (JComponent comp : new JComponent[] { scroll, buttonpanel })
+		{
+			ovgroup.addComponent(comp);
+			ohgroup.addComponent(comp);
+		}
+		
+		l.setHorizontalGroup(ohgroup);
+		l.setVerticalGroup(ovgroup);
+		
+		refreshTrustedPlatforms();
+		
+		return trustedpanel;
 	}
 	
 	/**
@@ -1053,6 +1179,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 									table[i][0] = "Unavailable";
 									table[i][1] = "Unavailable";
 								}
+								++i;
 							}
 						}
 						else
@@ -1063,6 +1190,57 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						StringArrayTableModel model = new StringArrayTableModel(table);
 						model.setColumnNames(new String[] { "Subject Common Name", "Certificate" });
 						natable.setModel(model);
+						
+					}
+				});
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Refreshes the networks.
+	 */
+	protected void refreshTrustedPlatforms()
+	{
+		jccaccess.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				final Set<String> tpn = secservice.getTrustedPlatformNames().get();
+				
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						String[][] table = null;
+						if (tpn != null && tpn.size() > 0)
+						{
+							table = new String[tpn.size()][1];
+							
+							int i = 0;
+							for (String tname : tpn)
+							{
+								if (tname != null)
+								{
+									table[i][0] = tname;
+								}
+								else
+								{
+									table[i][0] = "Unavailable";
+								}
+								++i;
+							}
+						}
+						else
+						{
+							table = new String[0][0];
+						}
+						
+						StringArrayTableModel model = new StringArrayTableModel(table);
+						model.setColumnNames(new String[] { "Trusted Platform Name" });
+						trustedtable.setModel(model);
 						
 					}
 				});

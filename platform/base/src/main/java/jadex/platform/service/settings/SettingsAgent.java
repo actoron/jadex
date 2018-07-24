@@ -40,7 +40,7 @@ import jadex.transformation.jsonserializer.JsonTraverser;
 /**
  *  Agent that provides the settings service.
  */
-@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE, predecessors=ContextAgent.class))
+@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE, predecessors="jadex.platform.service.context.ContextAgent"))
 public class SettingsAgent	implements ISettingsService
 {
 	// -------- constants --------

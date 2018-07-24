@@ -342,7 +342,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					if(cmd instanceof AbstractInternalRemoteCommand)
 					{
 						// Create new hashmap to prevent remote manipulation of the map object
-						Map<String, Object>	nonfunc	= new HashMap<>(SUtil.safeMap(((AbstractInternalRemoteCommand)cmd).getProperties()));
+						Map<String, Object>	nonfunc	= new HashMap<>(SUtil.notNull(((AbstractInternalRemoteCommand)cmd).getProperties()));
 //						if(nonfunc==null)
 //							nonfunc = new HashMap<String, Object>();
 						nonfunc.put(ServiceCall.SECURITY_INFOS, secinfos);
@@ -481,7 +481,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						if(msg instanceof AbstractInternalRemoteCommand)
 						{
 							// Create new hashmap to prevent remote manipulation of the map object
-							Map<String, Object>	nonfunc	= new HashMap(SUtil.safeMap(((AbstractInternalRemoteCommand)msg).getProperties()));
+							Map<String, Object>	nonfunc	= new HashMap(SUtil.notNull(((AbstractInternalRemoteCommand)msg).getProperties()));
 							nonfunc.put(ServiceCall.SECURITY_INFOS, secinfos);
 							ServiceCall sc = ServiceCall.getLastInvocation();
 							if(sc==null)
@@ -551,8 +551,8 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		{
 			boolean	trusted	= false;
 			
-			// Trusted platforms (i.e. in possession  of our platform key) can do anything.
-			if(secinfos.isTrustedPlatform())
+			// Admin platforms (i.e. in possession  of our platform key) can do anything.
+			if(secinfos.isAdminPlatform())
 			{
 				trusted	= true;
 			}

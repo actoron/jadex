@@ -131,7 +131,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	@Override
 	public IFuture<Void> shutdown()
 	{
-		for(SubscriptionIntermediateFuture<MessageEvent> sub: SUtil.safeSet(subscriptions))
+		for(SubscriptionIntermediateFuture<MessageEvent> sub: SUtil.notNull(subscriptions))
 		{
 			sub.setFinished();
 		}

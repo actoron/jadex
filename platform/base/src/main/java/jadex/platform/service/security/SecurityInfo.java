@@ -11,10 +11,10 @@ import jadex.bridge.service.types.security.ISecurityInfo;
  */
 public class SecurityInfo implements ISecurityInfo
 {
-	/** Flag if the platform secret could be authenticated. */
-	protected boolean platformauth;
+	/** Flag if the platform is an admin platform. */
+	protected boolean adminplatform;
 	
-	/** Flag if the platform is trusted. */
+	/** Flag if the platform has a trusted name. */
 	protected boolean trustedplatform;
 	
 	/** Platform name if authenticated. */
@@ -40,7 +40,7 @@ public class SecurityInfo implements ISecurityInfo
 	 */
 	public boolean isAuthenticated()
 	{
-		return platformauth || (networks != null && networks.length > 0);
+		return trustedplatform || adminplatform || (networks != null && networks.length > 0);
 	}
 	
 	/**
@@ -48,20 +48,20 @@ public class SecurityInfo implements ISecurityInfo
 	 *
 	 *  @return True if authenticated.
 	 */
-	public boolean isPlatformAuthenticated()
-	{
-		return platformauth;
-	}
+//	public boolean isPlatformAuthenticated()
+//	{
+//		return platformauth;
+//	}
 	
 	/**
 	 *  Sets if the sender is authenticated.
 	 *
 	 *  @param platformauth True if authenticated.
 	 */
-	public void setPlatformAuthenticated(boolean platformauth)
-	{
-		this.platformauth = platformauth;
-	}
+//	public void setPlatformAuthenticated(boolean platformauth)
+//	{
+//		this.platformauth = platformauth;
+//	}
 	
 	/**
 	 *  Returns the authenticated platform name.
@@ -88,15 +88,35 @@ public class SecurityInfo implements ISecurityInfo
 	 *
 	 *  @return True, if trusted.
 	 */
-	public boolean isTrustedPlatform()
+	public boolean isAdminPlatform()
 	{
-		return trustedplatform;
+		return adminplatform;
 	}
 
 	/**
 	 *  Sets the ID of the sender platform if it is trusted, null otherwise.
 	 *
 	 *  @param trustedplatform The ID of the sender platform if it is trusted, null otherwise.
+	 */
+	public void setAdminPlatform(boolean adminplatform)
+	{
+		this.adminplatform = adminplatform;
+	}
+	
+	/**
+	 *  Checks if the sender platform name is authenticated and trusted.
+	 *
+	 *  @return True, if trusted.
+	 */
+	public boolean isTrustedPlatform()
+	{
+		return trustedplatform;
+	}
+
+	/**
+	 *  Sets if the sender platform name is authenticated and trusted.
+	 *
+	 *  @param trustedplatform True, if trusted.
 	 */
 	public void setTrustedPlatform(boolean trustedplatform)
 	{
@@ -148,6 +168,6 @@ public class SecurityInfo implements ISecurityInfo
 	 */
 	public String toString()
 	{
-		return "Authenticated: " + platformauth + ", Trusted: " + trustedplatform + ", Networks: " + Arrays.toString(networks); 
+		return "Authenticated: " + isAuthenticated() + ", Trusted: " + trustedplatform + ", Admin: " + adminplatform + ", Networks: " + Arrays.toString(networks); 
 	}
 }

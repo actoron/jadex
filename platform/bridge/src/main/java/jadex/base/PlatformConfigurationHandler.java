@@ -208,11 +208,13 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		else if(mname.equals("setValue"))
 		{
 			checkReadOnly();
-			values.put((String)args[0], args[1]);
+			String name = getKeyForMethodname((String)args[0], 0);
+			values.put(name, args[1]);
 		}
 		else if(mname.equals("getValue"))
 		{
-			ret = values.get(args[0]);
+			String name = getKeyForMethodname((String)args[0], 0);
+			ret = values.get(name);
 		}
 //		else if(mname.equals("parseArg"))
 //		{
@@ -221,7 +223,16 @@ public class PlatformConfigurationHandler implements InvocationHandler
 //		}
 		else if(mname.equals("getValues"))
 		{
-			ret = new HashMap<String, Object>(values);
+			ret = new HashMap<String, Object>(values)
+			{
+				public Object put(String key, Object value) 
+				{
+					Object ret = super.put(key, value);
+					if(namemappings.containsKey(key))
+						super.put(namemappings.get(key), value);
+					return ret;
+				}
+			};
 			String[] kernels = (String[])values.get("kernels");
 			if(kernels!=null)
 			{
@@ -230,6 +241,13 @@ public class PlatformConfigurationHandler implements InvocationHandler
 					((Map<String, Object>)ret).put("kernel_"+kernel, Boolean.TRUE);
 				}
 			}
+			
+//			for(Map.Entry<String, String> entry: namemappings.entrySet())
+//			{
+//				Map<String, Object> retmap = (Map<String, Object>)ret;
+//				if(retmap.containsKey(entry.getKey()))
+//					retmap.put(entry.getValue(), retmap.get(entry.getKey()));
+//			}
 		}
 		else if(mname.equals("enhanceWith"))
 		{
@@ -269,6 +287,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		{
 			checkReadOnly();
 			values.put(getKeyForMethodname(mname, 3), args[0]);
+//			System.out.println("setting: "+getKeyForMethodname(mname, 3)+" "+args[0]);
 		}
 		else if(mname.startsWith("add"))
 		{

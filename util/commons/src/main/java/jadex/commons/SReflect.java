@@ -575,7 +575,7 @@ public class SReflect
 	 *	Get inner class name.
 	 *  @return The inner class's name (without declaring class).
 	 */
-	public static String	getInnerClassName(Class clazz)
+	public static String getInnerClassName(Class<?> clazz)
 	{
 		String	classname	= (String)innerclassnamecache.get(clazz);
 		if(classname==null)
@@ -595,7 +595,7 @@ public class SReflect
 	 *	Get the package of a class.
 	 *  @return The name of the package.
 	 */
-	public static String	getPackageName(Class clazz)
+	public static String getPackageName(Class<?> clazz)
 	{
 		String	classname	= clazz.getName();
 		StringTokenizer	stok	= new StringTokenizer(classname,".");

@@ -24,9 +24,12 @@ import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.Boolean3;
 import jadex.commons.IFilter;
 import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.AnnotationInfos;
 import jadex.commons.SClassReader.ClassInfo;
+import jadex.commons.SClassReader.EnumInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
@@ -97,8 +100,9 @@ public class PlatformAgent
 //		System.out.println("Start scanning...");
 		long start = System.currentTimeMillis();
 		
-		Map<Class<?>, String> names = new HashMap<Class<?>, String>();
-		DependencyResolver<Class<?>> dr = new DependencyResolver<Class<?>>();
+		// Class name -> instance name
+		Map<String, String> names = new HashMap<String, String>();
+		DependencyResolver<String> dr = new DependencyResolver<String>();
 
 		URL[] urls = new URL[0];
 		ClassLoader classloader = PlatformAgent.class.getClassLoader();
@@ -109,24 +113,38 @@ public class PlatformAgent
 		{
 			public boolean filter(ClassInfo ci)
 			{
-				return ci.hasAnnotation(Agent.class.getName());
+				boolean ret = false;
+				AnnotationInfos ai = ci.getAnnotation(Agent.class.getName());
+				if(ai!=null)
+				{
+					AnnotationInfos aai = (AnnotationInfos)ai.getValue("autostart");
+					if(aai!=null)
+					{
+						EnumInfo ei = (EnumInfo)aai.getValue("value");
+						String val = ei.getValue();
+//						if(val.toBoolean()!=null)
+//							ret = val.toBoolean().booleanValue();
+						ret = val==null? false: "true".equals(val.toLowerCase()) || "false".equals(val.toLowerCase()); // include all which define the value (false can be overrided from args)
+					}
+				}
+				return ret;
 			}
 		});
 		
 		for(ClassInfo ci: cis)
 		{
 //			System.out.println("Found: "+ci.getClassname());
-			Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
-			if(clazz==null)
-				agent.getLogger().warning("Could not load agent class: "+ci.getClassname());
-			else
-				addComponentToLevels(dr, clazz, names);
+//			Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
+//			if(clazz==null)
+//				agent.getLogger().warning("Could not load agent class: "+ci.getClassname());
+//			else
+				addComponentToLevels(dr, ci, names);
 		}
 		
 //		System.out.println("cls: "+files.size()+" "+components.size());
 //		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
 		
-		Collection<Set<Class<?>>> levels = dr.resolveDependenciesWithLevel();
+		Collection<Set<String>> levels = dr.resolveDependenciesWithLevel();
 		
 		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
 		
@@ -137,32 +155,42 @@ public class PlatformAgent
 	 *  Add a components to the dependency resolver to build start levels.
 	 *  Components of the same level can be started in parallel.
 	 */
-	protected void addComponentToLevels(DependencyResolver<Class<?>> dr, Class<?> cl, Map<Class<?>, String> names)
+	protected void addComponentToLevels(DependencyResolver<String> dr, ClassInfo ci, Map<String, String> names)
 	{
 		try
 		{
 //			System.out.println("Found Agent annotation on class: "+ cl.getName());
-			Agent aan = cl.getAnnotation(Agent.class);
-			Autostart autostart = aan.autostart();
-			if(autostart.value().toBoolean()!=null)
-			{		
-				Map<String, Object> argsmap = (Map<String, Object>)Starter.getPlatformValue(agent.getId(), IPlatformConfiguration.PLATFORMARGS);
+//			Agent aan = cl.getAnnotation(Agent.class);
+//			Autostart autostart = aan.autostart();
+//			if(autostart.value().toBoolean()!=null)
+//			{		
+				AnnotationInfos ai = ci.getAnnotation(Agent.class.getName());
+				AnnotationInfos autostart = (AnnotationInfos)ai.getValue("autostart");
 				
-				String name = autostart.name().length()==0? null: autostart.name();
+				String name = autostart.getValue("name")==null || ((String)autostart.getValue("name")).length()==0? null: (String)autostart.getValue("name");
+//				String name = autostart.name().length()==0? null: autostart.name();
 				
-				boolean ok = autostart.value().toBoolean().booleanValue();
+				AnnotationInfos aai = (AnnotationInfos)ai.getValue("autostart");
+				
+				EnumInfo ei = (EnumInfo)aai.getValue("value");
+				String val = ei.getValue();
+				boolean ok = "true".equals(val.toLowerCase()); 
 				if(name!=null)
 				{
-					if(argsmap.containsKey(name))
-						ok = (boolean)argsmap.get(name);
+					Boolean start = getAgentStart(name);
+					if(start!=null)
+						ok = start.booleanValue();
 				}
 				else
 				{
 					// check classname as parameter
-					name = SReflect.getInnerClassName(cl);
-					if(argsmap.containsKey(name.toLowerCase()))
+//					name = SReflect.getInnerClassName(cl);
+					name = SReflect.getUnqualifiedTypeName(ci.getClassname());
+					
+					if(getAgentStart(name.toLowerCase())!=null)
 					{	
-						ok = (boolean)argsmap.get(name.toLowerCase());
+						
+						ok = getAgentStart(name.toLowerCase());
 					}
 					else
 					{
@@ -171,9 +199,9 @@ public class PlatformAgent
 						if(suf>0)
 						{
 							name = name.substring(0, suf).toLowerCase();
-							if(argsmap.containsKey(name))
+							if(getAgentStart(name)!=null)
 							{	
-								ok = (boolean)argsmap.get(name);
+								ok = getAgentStart(name);
 							}
 						}
 					}
@@ -181,27 +209,37 @@ public class PlatformAgent
 				
 				if(ok)
 				{
-					dr.addNode(cl);
-					for(Class<?> pre: autostart.predecessors())
+					String cname = ci.getClassname();
+					dr.addNode(cname);
+					Object[] pres = (Object[])autostart.getValue("predecessors");
+					if(pres!=null)
 					{
-						// Object as placeholder for no deps, because no entries should not mean no deps
-						if(!Object.class.equals(pre))
-							dr.addDependency(cl, pre);
+						for(Object pre: pres)
+						{
+							// Object as placeholder for no deps, because no entries should not mean no deps
+							if(!Object.class.getName().equals(pre))
+								dr.addDependency(cname, (String)pre);
+						}
 					}
-					for(Class<?> suc: autostart.successors())
-						dr.addDependency(suc, cl);
+					
+					Object[] sucs = (Object[])autostart.getValue("successors");
+					if(sucs!=null)
+					{
+						for(Object suc: sucs)
+							dr.addDependency((String)suc, cname);
+					}
 					
 					// if no predecessors are defined add SecurityAgent
-					if(autostart.predecessors().length==0)
-						dr.addDependency(cl, SecurityAgent.class);
+					if(pres==null || pres.length==0)
+						dr.addDependency(cname, SecurityAgent.class.getName());
 					
-					names.put(cl, name);
+					names.put(cname, name);
 				}
 				else
 				{
 //					System.out.println("Not starting: "+name);
 				}
-			}
+//			}
 		}
 		catch(Exception e)
 		{
@@ -210,16 +248,37 @@ public class PlatformAgent
 	}
 	
 	/**
+	 *  Get the config/argument value of an agent name.
+	 */
+	protected Boolean getAgentStart(String name)
+	{		
+//		Boolean ret = null;
+//		IPlatformConfiguration config = (IPlatformConfiguration)Starter.getPlatformValue(agent.getId().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
+//		if(config.getValue(name, agent.getModel())!=null)
+//			ret = (boolean)config.getValue(name, agent.getModel());
+//		
+//		if(name.indexOf("jcc")!=-1)
+//			System.out.println("getAgentStart: "+name+" "+ret);
+//		
+//		return ret;
+		
+		Map<String, Object> argsmap = (Map<String, Object>)Starter.getPlatformValue(agent.getId(), IPlatformConfiguration.PLATFORMARGS);
+		if(argsmap.containsKey(name))
+			return (Boolean)argsmap.get(name);
+		return null;
+	}
+	
+	/**
 	 *  Start components in levels.
 	 */
-	protected IFuture<Void> startComponents(IComponentManagementService cms, Iterator<Set<Class<?>>> levels, Map<Class<?>, String> names)
+	protected IFuture<Void> startComponents(IComponentManagementService cms, Iterator<Set<String>> levels, Map<String, String> names)
 	{
 		final Future<Void> ret = new Future<>();
 		
 		if(levels.hasNext())
 		{
 //			System.out.println("---------- LEVEL --------------");
-			Set<Class<?>> level = levels.next();
+			Set<String> level = levels.next();
 			CounterResultListener<Void> lis = new CounterResultListener<>(level.size(), new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
@@ -233,15 +292,15 @@ public class PlatformAgent
 					startComponents(cms, levels, names).addResultListener(new DelegationResultListener<>(ret));
 				}
 			});
-			for(Class<?> c: level)
+			for(String c: level)
 			{
 				//ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(names.get(c), c.getName()+".class", (CreationInfo)null);
 				//fut.addTuple2ResultListener(res -> {lis.resultAvailable(null);}, res -> {});
 				
-				IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c.getName()+".class", null, null);
+				IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c+".class", null, null);
 				fut.addResultListener(
 					res -> {lis.resultAvailable(null);},
-					exception -> {lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c.getName()+".class", exception));});
+					exception -> {lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c+".class", exception));});
 				
 //				System.out.println("Auto starting: "+names.get(c));
 			}
