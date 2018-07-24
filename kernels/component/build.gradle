@@ -7,5 +7,6 @@ dependencies
 	api project(':platform:bridge')
 	api project(':serialization:xml')
 	api project(':kernels:base')
+	api project(':kernels:micro') // only to specify the kernel for the multifactory
 }
 

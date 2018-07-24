@@ -1,4 +1,4 @@
-package jadex.micro;
+package jadex.application;
 
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.factory.IComponentFactory;

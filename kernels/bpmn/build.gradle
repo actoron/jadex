@@ -9,4 +9,5 @@ dependencies
 	api project(':serialization:xml')
 	api project(':kernels:base')
 	api project(':kernels:model-bpmn')
+	api project(':kernels:micro') // only to specify the kernel for the multifactory
 }
