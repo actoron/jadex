@@ -41,7 +41,7 @@
     <jadex:contextvariables>
       <jadex:contextvariable name="msg" type="IMessageAdapter"/>
       <jadex:contextvariable name="convid" type="String">
-        <jadex:value>SUtil.createUniqueId($component.getIdentifier(.getName())</jadex:value>
+        <jadex:value>SUtil.createUniqueId($component.getId().getName())</jadex:value>
       </jadex:contextvariable>
     </jadex:contextvariables>
     <jadex:configurations>

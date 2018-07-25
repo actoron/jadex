@@ -43,7 +43,7 @@
       <semantic:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
         <jadex:parameter direction="in" name="name" type="Object">&quot;proposal&quot;</jadex:parameter>
-        <jadex:parameter direction="in" name="value" type="Object">&quot;Proposal from &quot;+$component.getIdentifier(.getParent().getLocalName()</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Object">&quot;Proposal from &quot;+$component.getId().getParent().getLocalName()</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:task name="No Proposal" id="_cpWuIVm8Ed-CVtZr0hfiVg">

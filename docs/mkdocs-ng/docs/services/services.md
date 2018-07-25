@@ -181,7 +181,7 @@ You can also access the required services of a component by using the RequiredSe
 
 ```java
 @AgentFeature
-private IRequiredServiceFeature reqFeat;
+private IRequiredServicesFeature reqFeat;
 ...
 {
     ISumService sum = reqFeat.getService("sumService").get();

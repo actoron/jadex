@@ -25,7 +25,7 @@ import jadex.commons.future.TerminableIntermediateDelegationFuture;
 
 /**
  *  Static helper class for searching services.
- *  Has the same search and query methods like IRequiredServiceFeature,
+ *  Has the same search and query methods like IRequiredServicesFeature,
  *  but requires an external access.
  */
 public class SServiceProvider
