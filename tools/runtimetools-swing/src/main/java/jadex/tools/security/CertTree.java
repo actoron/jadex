@@ -663,7 +663,7 @@ public class CertTree extends JTree implements TreeModel
 	}
 	
 	/**
-	 *  Tests of a node represents a CA certficate.
+	 *  Tests of a node represents a CA certificate.
 	 *  
 	 *  @param node The node.
 	 *  @return True, if CA.
