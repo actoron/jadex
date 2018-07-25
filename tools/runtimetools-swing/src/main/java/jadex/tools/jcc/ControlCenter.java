@@ -3,8 +3,10 @@ package jadex.tools.jcc;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,7 +32,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
-import jadex.xml.PropertiesXMLHelper;
+import jadex.platform.service.settings.SettingsAgent;
 
 /**
  *  The global control center.
@@ -40,7 +42,7 @@ public class ControlCenter
 	// -------- constants --------
 
 	/** The filename extension for GUI settings. */
-	public static final String	SETTINGS_EXTENSION	= ".settings.xml";
+	public static final String	SETTINGS_EXTENSION	= ".settings.json";
 
 	/** Auto-shutdown on exit. */
 	public static final String	JCC_EXIT_SHUTDOWN	= "shutdown";
@@ -143,65 +145,46 @@ public class ControlCenter
 	public IFuture<Void>	loadSettings(final File file)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		
-		// Read project properties
-//		jccaccess.getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-//			.addResultListener(new SwingDelegationResultListener(ret)
-//		{
-//			public void customResultAvailable(Object result)
+		Properties	props;
+		try
+		{
+			String	read	= new String(Files.readAllBytes(Paths.get(file.toURI())), StandardCharsets.UTF_8);
+			props	= (Properties)SettingsAgent.fromJson(read);
+			
+			Properties windowprops = props.getSubproperty("window");
+			if(windowprops != null)
 			{
-				getPCC().getClassLoader(null).addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Void>(ret)
-				{
-					public void customResultAvailable(ClassLoader cl)
-					{
-						Properties	props;
-						try
-						{
-//							ClassLoader cl = ((ILibraryService)result).getClassLoader();
-//							ClassLoader cl = getPCC().getClassLoader(null);
-							FileInputStream fis = new FileInputStream(file);
-							props	= (Properties)PropertiesXMLHelper.read(fis, cl);
-							fis.close();
-							
-							Properties windowprops = props.getSubproperty("window");
-							if(windowprops != null)
-							{
-								int w = windowprops.getIntProperty("width");
-								int h = windowprops.getIntProperty("height");
-								int x = windowprops.getIntProperty("x");
-								int y = windowprops.getIntProperty("y");
-								window.setBounds(x, y, w, h);
-					
-								window.setVisible(true); // otherwise it will not be extended (jdk5)
-								int es = windowprops.getIntProperty("extendedState");
-								window.setExtendedState(es);
-					
-								jccexit = windowprops.getStringProperty("jccexit");
-								
-								// Do not override saveonexit agent argument to true by loaded properties.
-								saveonexit = saveonexit && windowprops.getBooleanProperty("saveonexit");
-							}
-						}
-						catch(Exception e)
-						{
-							// Use default values when settings cannot be loaded.
-							props	= new Properties();
-							
-							Dimension	screendim = Toolkit.getDefaultToolkit().getScreenSize();
-							// 60% of screen but not smaller than 800x650 but not exceeding screen.
-							Dimension	windim	= new Dimension(
-								Math.min(Math.max((int)(screendim.width * 0.6), 800), screendim.width),
-								Math.min(Math.max((int)(screendim.height * 0.6), 650), screendim.height));
-							window.setSize(windim);
-							window.setLocation(SGUI.calculateMiddlePosition(window));
-						}
-						
-						pcc.setProperties(props).addResultListener(new SwingDelegationResultListener<Void>(ret));
-					}
-				});
+				int w = windowprops.getIntProperty("width");
+				int h = windowprops.getIntProperty("height");
+				int x = windowprops.getIntProperty("x");
+				int y = windowprops.getIntProperty("y");
+				window.setBounds(x, y, w, h);
+	
+				window.setVisible(true); // otherwise it will not be extended (jdk5)
+				int es = windowprops.getIntProperty("extendedState");
+				window.setExtendedState(es);
+	
+				jccexit = windowprops.getStringProperty("jccexit");
+				
+				// Do not override saveonexit agent argument to true by loaded properties.
+				saveonexit = saveonexit && windowprops.getBooleanProperty("saveonexit");
 			}
-//		});
+		}
+		catch(Exception e)
+		{
+			// Use default values when settings cannot be loaded.
+			props	= new Properties();
+			
+			Dimension	screendim = Toolkit.getDefaultToolkit().getScreenSize();
+			// 60% of screen but not smaller than 800x650 but not exceeding screen.
+			Dimension	windim	= new Dimension(
+				Math.min(Math.max((int)(screendim.width * 0.6), 800), screendim.width),
+				Math.min(Math.max((int)(screendim.height * 0.6), 650), screendim.height));
+			window.setSize(windim);
+			window.setLocation(SGUI.calculateMiddlePosition(window));
+		}
 		
+		pcc.setProperties(props).addResultListener(new SwingDelegationResultListener<Void>(ret));
 		return ret;
 	}
 
@@ -266,12 +249,11 @@ public class ControlCenter
 			
 			// Get properties of latest platform panel.
 	//		pcc.getProperties().addResultListener(new TimeoutResultListener<Properties>(5000, jccaccess, new SwingDelegationResultListener(ret)
-			pcc.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+			pcc.getProperties().addResultListener(new SwingExceptionDelegationResultListener<Properties, Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Properties props)	throws Exception
 				{
 	//				System.out.println("Fetched JCC properties.");
-					final Properties	props	= (Properties)result;
 				
 					// Store window appearance
 					Properties windowprops = new Properties();
@@ -286,29 +268,10 @@ public class ControlCenter
 					props.removeSubproperties("window");
 					props.addSubproperties("window", windowprops);
 					
-					getPCC().getClassLoader(null).addResultListener(new SwingDelegationResultListener(ret)
-					{
-						public void customResultAvailable(Object result)
-						{
-							ClassLoader cl = (ClassLoader)result;
-							try
-							{
-	//							System.out.println("Writing properties.");
-								FileOutputStream os = new FileOutputStream(file);
-	//							PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
-	//							PropertiesXMLHelper.getPropertyWriter().write(props, os, getPCC().getClassLoader(null), null);
-								PropertiesXMLHelper.write(props, os, cl);
-								os.close();
-								window.getStatusBar().setText("Settings saved successfully: "+ file.getAbsolutePath());
-								ret.setResult(null);
-							}
-							catch(Exception e)
-							{
-	//							e.printStackTrace();
-								throw new RuntimeException(e);
-							}
-						}
-					});
+					String	write	= SettingsAgent.toJson(props);
+					Files.write(Paths.get(file.toURI()), write.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+					window.getStatusBar().setText("Settings saved successfully: "+ file.getAbsolutePath());
+					ret.setResult(null);
 				}
 			});
 		}
