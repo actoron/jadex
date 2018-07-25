@@ -478,15 +478,8 @@ public class SettingsAgent	implements ISettingsService
 			try
 			{
 				tmpfile = File.createTempFile(file.getName(), ".tmp");
-				ArrayList<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>(JsonTraverser.writeprocs.size() + 1);
-				procs.addAll(JsonTraverser.writeprocs);
-				procs.add(procs.size() - 1, new JsonAuthenticationSecretProcessor());
-				String json = JsonTraverser.objectToString(state,
-											 getClass().getClassLoader(),
-											 true, false,
-											 null, null,
-											 procs);
-				json = JsonTraverser.prettifyJson(json);
+				
+				String json = toJson(state);
 				
 				os = new FileOutputStream(tmpfile);
 				os.write(json.getBytes(SUtil.UTF8));
@@ -522,11 +515,8 @@ public class SettingsAgent	implements ISettingsService
 		
 		try
 		{
-			ArrayList<ITraverseProcessor> rprocs = new ArrayList<ITraverseProcessor>(JsonTraverser.readprocs.size() + 1);
-			rprocs.addAll(JsonTraverser.readprocs);
-			rprocs.add(rprocs.size() - 2, new JsonAuthenticationSecretProcessor());
 			String json = new String(SUtil.readFile(file), SUtil.UTF8);
-			Object state = JsonTraverser.objectFromString(json, getClass().getClassLoader(), null, null, rprocs);
+			Object state = fromJson(json);
 			ret.setResult(state);
 		}
 		catch (Exception e)
@@ -595,6 +585,41 @@ public class SettingsAgent	implements ISettingsService
 		{
 			ret.setResult(null);
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Converts object to JSON.
+	 * 
+	 *  @param object Object.
+	 *  @return JSON string.
+	 */
+	public static final String toJson(Object object)
+	{
+		ArrayList<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>(JsonTraverser.writeprocs.size() + 1);
+		procs.addAll(JsonTraverser.writeprocs);
+		procs.add(procs.size() - 1, new JsonAuthenticationSecretProcessor());
+		String json = JsonTraverser.objectToString(object,
+									 SettingsAgent.class.getClassLoader(),
+									 true, false,
+									 null, null,
+									 procs);
+		json = JsonTraverser.prettifyJson(json);
+		return json;
+	}
+	
+	/**
+	 *  Converts JSON to object.
+	 * 
+	 *  @param json JSON.
+	 *  @return Object.
+	 */
+	public static final Object fromJson(String json)
+	{
+		ArrayList<ITraverseProcessor> rprocs = new ArrayList<ITraverseProcessor>(JsonTraverser.readprocs.size() + 1);
+		rprocs.addAll(JsonTraverser.readprocs);
+		rprocs.add(rprocs.size() - 2, new JsonAuthenticationSecretProcessor());
+		Object ret = JsonTraverser.objectFromString(json, SettingsAgent.class.getClassLoader(), null, null, rprocs);
 		return ret;
 	}
 }
