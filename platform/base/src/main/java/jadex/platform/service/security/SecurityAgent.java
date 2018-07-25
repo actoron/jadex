@@ -261,6 +261,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					
 					if (tst != null && tsf != null)
 					{
+						JcaPEMWriter jpw = null;
 						try
 						{
 							KeyStore ks = KeyStore.getInstance(tst);
@@ -313,7 +314,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							
 							ByteArrayOutputStream baos = new ByteArrayOutputStream();
 							OutputStreamWriter osw = new OutputStreamWriter(baos);
-							JcaPEMWriter jpw = new JcaPEMWriter(osw);
+							jpw = new JcaPEMWriter(osw);
 							while (aliases.hasMoreElements())
 							{
 								try
@@ -343,6 +344,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 						catch (Exception e)
 						{
+						}
+						finally
+						{
+							SUtil.close(jpw);
 						}
 					}
 				}
