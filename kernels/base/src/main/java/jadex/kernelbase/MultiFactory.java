@@ -496,11 +496,16 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 
 		Future<Boolean> ret = new Future<>();
 		
-		getFactoryForModel(model, imports, rid, null).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
+		getFactoryForModel(model, imports, rid, null).addResultListener(new IResultListener<IComponentFactory>()
 		{
-			public void customResultAvailable(IComponentFactory fac) throws Exception
+			public void resultAvailable(IComponentFactory fac)
 			{
 				fac.isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(false);
 			}
 		});
 		
@@ -522,11 +527,16 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 
 		Future<Boolean> ret = new Future<>();
 		
-		getFactoryForModel(model, imports, rid, null).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, Boolean>(ret)
+		getFactoryForModel(model, imports, rid, null).addResultListener(new IResultListener<IComponentFactory>()
 		{
-			public void customResultAvailable(IComponentFactory fac) throws Exception
+			public void resultAvailable(IComponentFactory fac)
 			{
 				fac.isStartable(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(false);
 			}
 		});
 		
