@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,6 +84,9 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	
 	/** Name authorities panel. */
 	protected JTable natable;
+	
+	/** Name authority certificates (dn to cert). */
+	protected Map<String, String> nacerts = new HashMap<>();
 	
 	/** Trusted names panel. */
 	protected JTable trustedtable;
@@ -758,16 +762,16 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 				int[] rows = nwtable.getSelectedRows();
 				if (rows != null && rows.length > 0)
 				{
-					final String[] nacerts = new String[rows.length];
+					final String[] nacertstrs = new String[rows.length];
 					for (int i = 0; i < rows.length; ++i)
-						nacerts[i] = (String) nwtable.getModel().getValueAt(rows[i], 1);
+						nacertstrs[i] = nacerts.get((String) nwtable.getModel().getValueAt(rows[i], 1));
 					
 					jccaccess.scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							for (int i = 0; i < nacerts.length; ++i)
-								secservice.removeNameAuthority(nacerts[i]).get();
+							for (int i = 0; i < nacertstrs.length; ++i)
+								secservice.removeNameAuthority(nacertstrs[i]).get();
 							return IFuture.DONE;
 						};
 					}).get();
@@ -1142,6 +1146,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final Set<String> nas = secservice.getNameAuthorities().get();
+				final Set<String> custom = secservice.getCustomNameAuthorities().get();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -1150,16 +1155,19 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						String[][] table = null;
 						if (nas != null && nas.size() > 0)
 						{
-							table = new String[nas.size()][2];
+							table = new String[nas.size()][3];
+							nacerts.clear();
 							
 							int i = 0;
 							for (String cert : nas)
 							{
 								String subjectid = null;
+								String dn = null;
 								InputStream is = null;
 								try
 								{
 									subjectid = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert).getSubject());
+									dn = SSecurity.readCertificateFromPEM(cert).getSubject().toString();
 								}
 								catch (Exception e)
 								{
@@ -1169,16 +1177,11 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 									SUtil.close(is);
 								}
 								
-								if (subjectid != null)
-								{
-									table[i][0] = subjectid;
-									table[i][1] = cert;
-								}
-								else
-								{
-									table[i][0] = "Unavailable";
-									table[i][1] = "Unavailable";
-								}
+								nacerts.put(dn, cert);
+								
+								table[i][0] = subjectid != null ? subjectid : "";
+								table[i][1] = dn != null ? dn : "";
+								table[i][2] = custom.contains(cert) ? "Custom CA" : "Java CA";
 								++i;
 							}
 						}
@@ -1188,7 +1191,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						}
 						
 						StringArrayTableModel model = new StringArrayTableModel(table);
-						model.setColumnNames(new String[] { "Subject Common Name", "Certificate" });
+						model.setColumnNames(new String[] { "Subject Common Name", "Subject Distinguished Name", "Type" });
 						natable.setModel(model);
 						
 					}

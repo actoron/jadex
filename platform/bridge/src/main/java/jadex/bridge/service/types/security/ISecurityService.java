@@ -144,12 +144,18 @@ public interface ISecurityService
 	public IFuture<Set<String>> getTrustedPlatformNames();
 	
 	/** 
-	 *  Adds an authority for authenticating platform names.
+	 *  Gets all authorities for authenticating platform names.
 	 *  
-	 *  @param secret The secret, only X.509 secrets allowed.
-	 *  @return Null, when done.
+	 *  @return List of all name authorities.
 	 */
 	public IFuture<Set<String>> getNameAuthorities();
+	
+	/** 
+	 *  Gets all authorities not defined in the Java trust store for authenticating platform names.
+	 *  
+	 *  @return List of name authorities.
+	 */
+	public IFuture<Set<String>> getCustomNameAuthorities();
 	
 	/**
 	 *  Gets the secret of a platform if available.
