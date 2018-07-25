@@ -697,12 +697,9 @@ public class SComponentFactory
 	protected static IFuture<IComponentFactory> getFactory(final FactoryFilter filter, IInternalAccess ia)
 	{
 		Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
-		
-		facs = excludeMultiFactory(facs);
-		
 		if(facs!=null && facs.size()>0)
 		{
-			return filterFactory(filter, facs.iterator());
+			return doFindFactory(facs.iterator(), filter, null);
 		}
 		else
 		{
@@ -710,57 +707,77 @@ public class SComponentFactory
 		}
 	}
 	
-	protected static IFuture<IComponentFactory>	filterFactory(FactoryFilter filter, Iterator<IComponentFactory> it)
+	/**
+	 *  Find a matching factory in the given iterator.
+	 */
+	protected static IFuture<IComponentFactory>	doFindFactory(Iterator<IComponentFactory> facs, FactoryFilter filter, IComponentFactory multi)
 	{
-		if(it.hasNext())
+		if(facs.hasNext())
 		{
-			IComponentFactory	fac	= it.next();
-			Future<IComponentFactory>	ret	= new Future<>();
-			filter.filter(fac).addResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(ret)
+			IComponentFactory	fac	= facs.next();
+			IFuture<Boolean>	match	= filter.filter(fac);
+			if(match.isDone())
 			{
-				@Override
-				public void customResultAvailable(Boolean result) throws Exception
+				// Synchronous version
+				if(match.get())
 				{
-					if(result)
+					Map<String, Object> ps = fac.getProperties(null);
+					if(ps==null || !ps.containsKey("multifactory"))
 					{
-						ret.setResult(fac);
-					}
+						return new Future<>(fac);
+					}					
 					else
 					{
-						filterFactory(filter, it).addResultListener(new DelegationResultListener<>(ret));
+						// Found fac is multi -> remember and continue search to prefer other factories
+						return doFindFactory(facs, filter, fac);						
 					}
 				}
-			});
-			
-			return ret;
+				else
+				{
+					return doFindFactory(facs, filter, multi);
+				}
+			}
+			else
+			{
+				// Asynchronous version
+				Future<IComponentFactory>	ret	= new Future<>();
+				match.addResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(ret)
+				{
+					@Override
+					public void customResultAvailable(Boolean result) throws Exception
+					{
+						if(result)
+						{
+							Map<String, Object> ps = fac.getProperties(null);
+							if(ps==null || !ps.containsKey("multifactory"))
+							{
+								ret.setResult(fac);
+							}					
+							else
+							{
+								// Found fac is multi -> remember and continue search to prefer other factories
+								doFindFactory(facs, filter, multi)
+									.addResultListener(new DelegationResultListener<>(ret));
+							}
+						}
+						else
+						{
+							doFindFactory(facs, filter, multi)
+								.addResultListener(new DelegationResultListener<>(ret));
+						}
+					}
+				});
+				return ret;
+			}
+		}
+		else if(multi!=null)
+		{
+			return new Future<>(multi);
 		}
 		else
 		{
-			return new Future<IComponentFactory>(new ServiceNotFoundException(""+filter));			
+			return new Future<>(new ServiceNotFoundException(""+filter));
 		}
-	}
-	
-	/**
-	 *  Exclude the multifactory from a collection.
-	 *  @param facs The factories.
-	 *  @return cleaned collection.
-	 */
-	protected static Collection<IComponentFactory> excludeMultiFactory(Collection<IComponentFactory> facs)
-	{
-		Collection<IComponentFactory> ret = facs;
-		if(facs!=null && facs.size()>1)
-		{
-			ret = new ArrayList<IComponentFactory>();
-			for(IComponentFactory tmp: facs)
-			{
-				Map<String, Object> ps = tmp.getProperties(null);
-				if(ps==null || !ps.containsKey("multifactory"))
-				{
-					ret.add(tmp);
-				}
-			}
-		}
-		return ret;
 	}
 	
 	/**
