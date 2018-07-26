@@ -699,7 +699,7 @@ public class SComponentFactory
 		Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
 		if(facs!=null && facs.size()>0)
 		{
-			return doFindFactory(facs.iterator(), filter, null);
+			return doFindFactory(reorderMultiFactory(facs).iterator(), filter);
 		}
 		else
 		{
@@ -710,7 +710,7 @@ public class SComponentFactory
 	/**
 	 *  Find a matching factory in the given iterator.
 	 */
-	protected static IFuture<IComponentFactory>	doFindFactory(Iterator<IComponentFactory> facs, FactoryFilter filter, IComponentFactory multi)
+	protected static IFuture<IComponentFactory>	doFindFactory(Iterator<IComponentFactory> facs, FactoryFilter filter)
 	{
 		if(facs.hasNext())
 		{
@@ -721,20 +721,11 @@ public class SComponentFactory
 				// Synchronous version
 				if(match.get())
 				{
-					Map<String, Object> ps = fac.getProperties(null);
-					if(ps==null || !ps.containsKey("multifactory"))
-					{
-						return new Future<>(fac);
-					}					
-					else
-					{
-						// Found fac is multi -> remember and continue search to prefer other factories
-						return doFindFactory(facs, filter, fac);						
-					}
+					return new Future<>(fac);
 				}
 				else
 				{
-					return doFindFactory(facs, filter, multi);
+					return doFindFactory(facs, filter);
 				}
 			}
 			else
@@ -748,31 +739,17 @@ public class SComponentFactory
 					{
 						if(result)
 						{
-							Map<String, Object> ps = fac.getProperties(null);
-							if(ps==null || !ps.containsKey("multifactory"))
-							{
-								ret.setResult(fac);
-							}					
-							else
-							{
-								// Found fac is multi -> remember and continue search to prefer other factories
-								doFindFactory(facs, filter, multi)
-									.addResultListener(new DelegationResultListener<>(ret));
-							}
+							ret.setResult(fac);
 						}
 						else
 						{
-							doFindFactory(facs, filter, multi)
+							doFindFactory(facs, filter)
 								.addResultListener(new DelegationResultListener<>(ret));
 						}
 					}
 				});
 				return ret;
 			}
-		}
-		else if(multi!=null)
-		{
-			return new Future<>(multi);
 		}
 		else
 		{
