@@ -514,7 +514,15 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void resultAvailable(IComponentFactory fac)
 			{
-				fac.isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+				fac.isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret));
+//				{
+//					public void customResultAvailable(Boolean result)
+//					{
+//						super.customResultAvailable(result);
+//						if(model.indexOf("Block")!=-1)
+//							System.out.println("model: "+result);
+//					}
+//				});
 			}
 			
 			public void exceptionOccurred(Exception exception)

@@ -236,6 +236,10 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			{
 				ClassLoader cl = getClass().getClassLoader();
 				IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
+				
+				if(model.indexOf("Block")!=-1)
+					System.out.println("model2: "+mi);
+				
 				ret.setResult(mi);
 			}
 			catch(Exception e)

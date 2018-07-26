@@ -14,7 +14,6 @@ import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -29,7 +28,7 @@ import android.util.Log;
  */
 @Description("Sample Android Agent.")
 @RequiredServices({
-		@RequiredService(name="androidcontext", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+		@RequiredService(name="androidcontext", type=IContextService.class)
 })
 @Agent
 public class AndroidAgent
