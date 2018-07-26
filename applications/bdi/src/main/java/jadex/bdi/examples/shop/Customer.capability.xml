@@ -58,10 +58,10 @@
 	
 	<services>
 		<requiredservice name="localshopservices" class="IShopService" multiple="true">
-			<binding dynamic="true" scope="platform"/>
+			<binding scope="platform"/>
 		</requiredservice>
 		<requiredservice name="remoteshopservices" class="IShopService" multiple="true">
-			<binding dynamic="true" scope="global"/>
+			<binding scope="global"/>
 		</requiredservice>
 	</services>
 	
