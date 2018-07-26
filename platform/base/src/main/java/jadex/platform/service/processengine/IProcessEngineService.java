@@ -12,7 +12,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  This monitoring service can be used to start bpmn processes
  *  according to its defined start events (currently time, rule).
  */
-@Service
+@Service(system=true)
 public interface IProcessEngineService
 {
 	/**

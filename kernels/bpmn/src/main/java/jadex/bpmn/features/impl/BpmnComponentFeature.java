@@ -220,7 +220,6 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		
 		if(!evtsubstarts.isEmpty())
 		{
-			IInternalProcessEngineService	ipes	= getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
 			final CounterResultListener<String> crl = new CounterResultListener<String>(evtsubstarts.size(), new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
@@ -234,52 +233,60 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 			{
 				for(MActivity mact: evtsubentry.getValue())
 				{
-					String[] eventtypes = (String[])mact.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
-					UnparsedExpression	upex	= mact.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
-					Map<String, Object>	params	= null; 
-					if(upex!=null)
+					if(mact.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES)!=null)
 					{
-						IParsedExpression	exp	= SJavaParser.parseExpression(upex, getComponent().getModel().getAllImports(), getComponent().getClassLoader());
-						for(String param: exp.getParameters())
+						String[] eventtypes = (String[])mact.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+						UnparsedExpression	upex	= mact.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
+						Map<String, Object>	params	= null; 
+						if(upex!=null)
 						{
-							if(hasContextVariable(param))
+							IParsedExpression	exp	= SJavaParser.parseExpression(upex, getComponent().getModel().getAllImports(), getComponent().getClassLoader());
+							for(String param: exp.getParameters())
 							{
-								Object	val	= getContextVariable(param);
-								if(val!=null)	// omit null values (also excludes '$event')
+								if(hasContextVariable(param))
 								{
-									if(params==null)
+									Object	val	= getContextVariable(param);
+									if(val!=null)	// omit null values (also excludes '$event')
 									{
-										params	= new LinkedHashMap<String, Object>();
+										if(params==null)
+										{
+											params	= new LinkedHashMap<String, Object>();
+										}
+										params.put(param, val);
 									}
-									params.put(param, val);
 								}
 							}
 						}
-					}
-					
-					final Tuple2<MSubProcess, MActivity> fevtsubentry = new Tuple2<MSubProcess, MActivity>(evtsubentry.getKey(), mact);
-					final IExternalAccess exta = getComponent().getExternalAccess();
-					IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getComponent().getModel().getAllImports(), params, false, new IResultCommand<IFuture<Void>, Object>()
-					{
-						public IFuture<Void> execute(final Object event)
+						
+						final Tuple2<MSubProcess, MActivity> fevtsubentry = new Tuple2<MSubProcess, MActivity>(evtsubentry.getKey(), mact);
+						final IExternalAccess exta = getComponent().getExternalAccess();
+						IInternalProcessEngineService	ipes	= getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
+						IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getComponent().getModel().getAllImports(), params, false, new IResultCommand<IFuture<Void>, Object>()
 						{
-							return exta.scheduleStep(new IComponentStep<Void>()
+							public IFuture<Void> execute(final Object event)
 							{
-								public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
+								return exta.scheduleStep(new IComponentStep<Void>()
 								{
-//											BpmnInterpreter ip = (BpmnInterpreter)ia;
-									IInternalBpmnComponentFeature feat = (IInternalBpmnComponentFeature)ia.getFeature(IBpmnComponentFeature.class);
-									ProcessThread thread = new ProcessThread(fevtsubentry.getFirstEntity(), feat.getTopLevelThread(), ia, true);
-									feat.getTopLevelThread().addThread(thread);
-									ProcessThread subthread = new ProcessThread(fevtsubentry.getSecondEntity(), thread, ia);
-									thread.addThread(subthread);
-									subthread.setOrCreateParameterValue("$event", event);
-									return IFuture.DONE;
-								}
-							});
-						}
-					});
-					fut.addResultListener(crl);
+									public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
+									{
+	//											BpmnInterpreter ip = (BpmnInterpreter)ia;
+										IInternalBpmnComponentFeature feat = (IInternalBpmnComponentFeature)ia.getFeature(IBpmnComponentFeature.class);
+										ProcessThread thread = new ProcessThread(fevtsubentry.getFirstEntity(), feat.getTopLevelThread(), ia, true);
+										feat.getTopLevelThread().addThread(thread);
+										ProcessThread subthread = new ProcessThread(fevtsubentry.getSecondEntity(), thread, ia);
+										thread.addThread(subthread);
+										subthread.setOrCreateParameterValue("$event", event);
+										return IFuture.DONE;
+									}
+								});
+							}
+						});
+						fut.addResultListener(crl);
+					}
+					else
+					{
+						crl.resultAvailable("");
+					}
 				}
 			}
 		}

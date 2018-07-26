@@ -23,7 +23,7 @@
       <semantic:outgoing>_Gh4vMSgbEeK-VrV1qXeZuQ</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-        <jadex:parameter direction="in" name="text" type="String">&quot;Process started B1: &quot;+$event+&quot; &quot;+$component.getIdentifier(</jadex:parameter>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Process started B1: &quot;+$event+&quot; &quot;+$component.getId()</jadex:parameter>
         <jadex:parameter direction="out" name="act" type="String">&quot;b1&quot;</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
@@ -32,7 +32,7 @@
       <semantic:outgoing>_G1uRMSgbEeK-VrV1qXeZuQ</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-        <jadex:parameter direction="in" name="text" type="String">&quot;Process started B2: &quot;+$event+&quot; &quot;+$component.getIdentifier(</jadex:parameter>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Process started B2: &quot;+$event+&quot; &quot;+$component.getId()</jadex:parameter>
         <jadex:parameter direction="out" name="act" type="String">&quot;b2&quot;</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
@@ -41,7 +41,7 @@
       <semantic:outgoing>_MEdcYSgaEeKVjbAWuDmuDw</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-        <jadex:parameter direction="in" name="text" type="String">&quot;Process started A1: &quot;+$event+&quot; &quot;+$component.getIdentifier(</jadex:parameter>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Process started A1: &quot;+$event+&quot; &quot;+$component.getId()</jadex:parameter>
         <jadex:parameter direction="out" name="act" type="String">&quot;a1&quot;</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
@@ -50,7 +50,7 @@
       <semantic:outgoing>_GI4ZUCgbEeK-VrV1qXeZuQ</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-        <jadex:parameter direction="in" name="text" type="String">&quot;Process started A2: &quot;+$event+&quot; &quot;+$component.getIdentifier(</jadex:parameter>
+        <jadex:parameter direction="in" name="text" type="String">&quot;Process started A2: &quot;+$event+&quot; &quot;+$component.getId()</jadex:parameter>
         <jadex:parameter direction="out" name="act" type="String">&quot;a2&quot;</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>

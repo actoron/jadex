@@ -55,7 +55,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dC_r6gRPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dC_r6wRPEeCnwcpWvxOwkg" key="0:1" value="SFipa.INFORM"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dC_r7ARPEeCnwcpWvxOwkg" key="1:0" value="receivers"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dC_r7QRPEeCnwcpWvxOwkg" key="1:1" value="new IComponentIdentifier[]{$component.getIdentifier(}"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dC_r7QRPEeCnwcpWvxOwkg" key="1:1" value="new IComponentIdentifier[]{$component.getId()}"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dC_r7gRPEeCnwcpWvxOwkg" key="2:0" value="content"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dC_r7wRPEeCnwcpWvxOwkg" key="2:1" value="&quot;message&quot;+i"/>
       </eAnnotations>

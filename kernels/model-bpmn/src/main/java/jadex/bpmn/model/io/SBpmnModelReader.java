@@ -1456,15 +1456,15 @@ public class SBpmnModelReader
 	{
 		if(cl != null)
 		{
-			try
-			{
+//			try
+//			{
 				SJavaParser.parseExpression(exp, imports, cl);
-			}
-			catch(Exception e)
-			{
-				System.err.println("Error parsing expression, name="+exp.getName()+", expstring="+exp.getValue());
-				throw new RuntimeException(e);
-			}
+//			}
+//			catch(Exception e)
+//			{
+//				System.err.println("Error parsing expression, name="+exp.getName()+", expstring="+exp.getValue());
+//				throw new RuntimeException(e);
+//			}
 		}
 		return exp;
 	}
