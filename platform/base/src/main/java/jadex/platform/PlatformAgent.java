@@ -109,7 +109,7 @@ public class PlatformAgent
 		if(classloader instanceof URLClassLoader)
 			urls = ((URLClassLoader)classloader).getURLs();
 		
-		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, classloader, null, new IFilter<SClassReader.ClassInfo>()
+		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, new IFilter<SClassReader.ClassInfo>()
 		{
 			public boolean filter(ClassInfo ci)
 			{
