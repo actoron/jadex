@@ -1773,7 +1773,7 @@ public class SReflect
 	/**
 	 *  Scan for component classes in the classpath.
 	 */
-	public static Set<ClassInfo> scanForClassInfos(URL[] urls, ClassLoader classloader, IFilter<Object> filefilter, IFilter<ClassInfo> classfilter)
+	public static Set<ClassInfo> scanForClassInfos(URL[] urls, IFilter<Object> filefilter, IFilter<ClassInfo> classfilter)
 	{
 		Set<ClassInfo> ret = new HashSet<ClassInfo>();
 			

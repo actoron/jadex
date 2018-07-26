@@ -52,8 +52,6 @@ import jadex.javaparser.SJavaParser;
 
 /**
  *  Multi factory for dynamically loading kernels.
- *  
- *  todo: fetch new classpath urls after lib service changes
  */
 @Service
 public class MultiFactory implements IComponentFactory, IMultiKernelNotifierService
@@ -63,7 +61,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	
 	/** The internal access. */
 	@ServiceComponent
-	protected IInternalAccess ia;
+	protected IInternalAccess agent;
 	
 	/** The listeners. */
 	protected List<IMultiKernelListener> listeners = new ArrayList<>();
@@ -110,8 +108,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		// Rescan on any changes in the library service
 		
-		ILibraryService libservice= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
-		final IExternalAccess exta = ia.getExternalAccess();
+		ILibraryService libservice= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		final IExternalAccess exta = agent.getExternalAccess();
 		ILibraryServiceListener liblistener = new ILibraryServiceListener()
 		{
 			public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier parid, final IResourceIdentifier rid)
@@ -250,7 +248,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			}
 		}
 		
-		IComponentManagementService cms	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+		IComponentManagementService cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 
 		final Iterator<Tuple2<String, Set<String>>> it = found.iterator();
 		
@@ -270,7 +268,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					{	
 						kernels.put(f.getFirstEntity(), null);
 						
-						CreationInfo ci = new CreationInfo(ia.getId());
+						CreationInfo ci = new CreationInfo(agent.getId());
 						
 						cms.createComponent(null, f.getFirstEntity()+".class", ci, new IResultListener<Collection<Tuple2<String, Object>>>()
 						{
@@ -294,7 +292,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 								
 								ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
 								q.setProvider(cid);
-								IComponentFactory fac = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
+								IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
 								
 								// If this is a new kernel, gather types and icons
 								final String[] types = fac.getComponentTypes();
@@ -363,24 +361,26 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  Scan files for kernel components.
 	 *  @return (suffix -> classname)
 	 */
-	protected static Map<String, Collection<Tuple2<String, Set<String>>>> scanForKernels()
+	protected Map<String, Collection<Tuple2<String, Set<String>>>> scanForKernels()
 	{
 //		System.out.println("scan");
 		
 		MultiCollection<String, Tuple2<String, Set<String>>> ret = new MultiCollection<>();
 		
-		List<URL> urls = new ArrayList<URL>();
-		
+//		List<URL> urls = new ArrayList<URL>();
 		// Add base classpath
-		ClassLoader basecl = MultiFactory.class.getClassLoader();
-		for(URL url: SUtil.getClasspathURLs(basecl, true))
-		{
-			// Hack to avoid at least some Java junk.
-			if(!url.toString().contains("jre/lib/ext"))
-			{
-				urls.add(url);
-			}
-		}
+//		ClassLoader basecl = MultiFactory.class.getClassLoader();
+//		for(URL url: SUtil.getClasspathURLs(basecl, true))
+//		{
+//			// Hack to avoid at least some Java junk.
+//			if(!url.toString().contains("jre/lib/ext"))
+//			{
+//				urls.add(url);
+//			}
+//		}
+		
+		ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ILibraryService.class);
+		List<URL> urls = ls.getAllURLs().get();
 		
 		FileFilter ff = new FileFilter("$", false, ".class");
 		ff.addFilenameFilter(new IFilter<String>()
@@ -392,7 +392,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		});
 		
 //		System.out.println("urls: "+urls);
-		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls.toArray(new URL[urls.size()]), basecl, ff, new IFilter<ClassInfo>()
+		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls.toArray(new URL[urls.size()]), ff, new IFilter<ClassInfo>()
 		{
 			public boolean filter(ClassInfo ci) 
 			{
@@ -697,29 +697,29 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
 		q.setExcludeOwner(true);
-		return SUtil.notNull(ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(q));
+		return SUtil.notNull(agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(q));
 	}
 	
-	/**
-	 *  Main for testing.
-	 */
-	public static void main(String[] args)
-	{
-		FileFilter ff = new FileFilter("$", false, ".class");
-		ff.addFilenameFilter(new IFilter<String>()
-		{
-			public boolean filter(String fn)
-			{
-				int idx = fn.lastIndexOf("/");
-				if(idx!=-1)
-					fn = fn.substring(idx+1);
-				return fn.startsWith("Kernel");
-			}
-		});
-		
-		ff.filter("hall/das/ist/Klasse.class");
-		
-		scanForKernels();
-	}
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+//		FileFilter ff = new FileFilter("$", false, ".class");
+//		ff.addFilenameFilter(new IFilter<String>()
+//		{
+//			public boolean filter(String fn)
+//			{
+//				int idx = fn.lastIndexOf("/");
+//				if(idx!=-1)
+//					fn = fn.substring(idx+1);
+//				return fn.startsWith("Kernel");
+//			}
+//		});
+//		
+//		ff.filter("hall/das/ist/Klasse.class");
+//		
+//		scanForKernels();
+//	}
 
 }

@@ -27,7 +27,7 @@
         <semantic:outgoing>qwHGugR/tHq5msQF</semantic:outgoing>
         <semantic:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;&quot;+$component.getIdentifier(+&quot; after event: &quot;+$event</jadex:parameter>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;&quot;+$component.getId()+&quot; after event: &quot;+$event</jadex:parameter>
         </semantic:extensionElements>
       </semantic:task>
       <semantic:endEvent id="BW619SMSOFSI8dGf">

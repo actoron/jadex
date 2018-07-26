@@ -282,7 +282,23 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	// todo: reuse code from MicroAgentFactory :-(
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		Future<Boolean> ret = new Future<Boolean>();
+		Future<Boolean> ret = new Future<>();
+		getLoadableType(model, imports, rid).addResultListener(new ExceptionDelegationResultListener<String, Boolean>(ret)
+		{
+			public void customResultAvailable(String result) throws Exception
+			{
+				ret.setResult(result==null? Boolean.FALSE: Boolean.TRUE);
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<String> getLoadableType(String model, String[] imports, IResourceIdentifier rid)
+	{
+		Future<String> ret = new Future<String>();
 		
 //		System.out.println("isLoadable (micro): "+model+" "+rid);
 		
@@ -292,7 +308,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			if(libservice!=null)
 			{
 				libservice.getClassLoader(rid)
-					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
+					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, String>(ret)
 				{
 					public void customResultAvailable(ClassLoader cl)
 					{
@@ -301,7 +317,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 							ResourceInfo ri = SUtil.getResourceInfo0(model, cl);
 							if(ri==null)
 							{
-								ret.setResult(Boolean.FALSE);
+								ret.setResult(null);
 							}
 							else
 							{
@@ -325,8 +341,11 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 											{
 												type = (String)vals.get("type");
 											}
-											ret.setResult(getTypeName().equals(type));
-											
+											if(getTypeName().equals(type))
+												ret.setResult("agent");
+											else
+												ret.setResult(null);
+												
 											//System.out.println("isLoad: "+model+" "+getTypeName().equals(type));
 											
 											// todo: remove
@@ -340,7 +359,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 										}
 										else if(Capability.class.getName().equals(ai.getType()))
 										{
-											ret.setResult(Boolean.TRUE);
+											ret.setResult("capability");
 										}
 									}
 								}
@@ -348,11 +367,11 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 						}
 						catch(Exception e)
 						{
-							ret.setResult(Boolean.FALSE);
+							ret.setResult(null);
 						}
 						
 						if(!ret.isDone())
-							ret.setResult(Boolean.FALSE);
+							ret.setResult(null);
 		
 						//System.out.println("isLoadable (micro): "+model+" "+ret.get());
 					}
@@ -360,12 +379,12 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			}
 			else
 			{
-				ret.setResult(Boolean.FALSE);
+				ret.setResult(null);
 			}
 		}
 		else
 		{
-			ret.setResult(Boolean.FALSE);
+			ret.setResult(null);
 		}
 		
 		return ret;
@@ -387,29 +406,39 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public IFuture<Boolean> isStartable(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
-		final Future<Boolean>	ret	= new Future<Boolean>();
-		isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
+		Future<Boolean> ret = new Future<>();
+		getLoadableType(model, imports, rid).addResultListener(new ExceptionDelegationResultListener<String, Boolean>(ret)
 		{
-			public void customResultAvailable(Boolean result)
+			public void customResultAvailable(String result) throws Exception
 			{
-				if(result.booleanValue())
-				{
-					loadModel(model, imports, rid)
-						.addResultListener(new ExceptionDelegationResultListener<IModelInfo, Boolean>(ret)
-					{
-						public void customResultAvailable(IModelInfo result)
-						{
-							ret.setResult(result.isStartable() ? Boolean.TRUE : Boolean.FALSE);
-						}
-					});
-				}
-				else
-				{
-					super.customResultAvailable(result);
-				}
+				ret.setResult("agent".equals(result)? Boolean.TRUE: Boolean.FALSE);
 			}
 		});
 		return ret;
+		
+//		final Future<Boolean>	ret	= new Future<Boolean>();
+//		isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
+//		{
+//			public void customResultAvailable(Boolean result)
+//			{
+//				if(result.booleanValue())
+//				{
+//					loadModel(model, imports, rid)
+//						.addResultListener(new ExceptionDelegationResultListener<IModelInfo, Boolean>(ret)
+//					{
+//						public void customResultAvailable(IModelInfo result)
+//						{
+//							ret.setResult(result.isStartable() ? Boolean.TRUE : Boolean.FALSE);
+//						}
+//					});
+//				}
+//				else
+//				{
+//					super.customResultAvailable(result);
+//				}
+//			}
+//		});
+//		return ret;
 	}
 
 	/**

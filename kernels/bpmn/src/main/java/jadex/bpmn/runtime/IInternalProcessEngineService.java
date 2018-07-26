@@ -11,7 +11,7 @@ import jadex.commons.future.IFuture;
  *  Services to be called from BPMN process instances
  *  to some super-ordinated process engine, if any.
  */
-@Service
+@Service(system=true)
 public interface IInternalProcessEngineService
 {
 	/**
