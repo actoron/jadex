@@ -73,6 +73,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	@SuppressWarnings("unchecked")
 	public IServiceIdentifier searchService(final ServiceQuery<?> query)
 	{
+		if(query.toString().indexOf("IEnvironment")!=-1)
+			System.out.println("sdgo");
+		
 		IServiceIdentifier ret = null;
 		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
@@ -644,26 +647,27 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
-	 *  Test if a service is included.
+	 *  Test if a service is visible, i.e. visible after init for all components or visible for subcomponents also during init.
+	 *  @param query The query.
 	 *  @param ser The service.
 	 *  @return True if is included.
 	 */
 	// read
-	protected boolean isIncluded(ServiceQuery<?> query, IServiceIdentifier ser)
+	protected boolean checkLifecycleVisibility(ServiceQuery<?> query, IServiceIdentifier ser)
 	{
-		boolean ret = true;
+		boolean inited;
+		IComponentIdentifier target = ser.getProviderId();
 		rwlock.readLock().lock();
 		try
 		{
-			IComponentIdentifier target = ser.getProviderId();
-			if(target!=null)
-				ret = getDotName(query.getOwner()).endsWith(getDotName(target));
+			inited	= excludedservices == null || !excludedservices.containsKey(target);
 		}
 		finally
 		{
 			rwlock.readLock().unlock();
 		}
-		return ret;
+		
+		return inited || getDotName(query.getOwner()).endsWith(getDotName(target));
 	}
 	
 	/**
@@ -728,9 +732,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected boolean checkRestrictions(ServiceQuery<?> query, final IServiceIdentifier ser)
 	{
-		boolean ret = checkSearchScope(query, ser) && checkPublicationScope(query, ser);
-		ret &= (excludedservices == null || !excludedservices.containsKey(ser.getProviderId())) || (query.getOwner().equals(ser.getProviderId()));
-		return ret;
+		return checkSearchScope(query, ser)
+			&& checkPublicationScope(query, ser)
+			&& checkLifecycleVisibility(query, ser);
 	}
 	
 	/**
