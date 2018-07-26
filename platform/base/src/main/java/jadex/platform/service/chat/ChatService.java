@@ -17,6 +17,7 @@ import java.util.Set;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
@@ -31,6 +32,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
@@ -1479,25 +1481,32 @@ public class ChatService implements IChatService, IChatGuiService
 		 */
 		public IFuture<Void> setProperties(Properties props)
 		{
-			String tmp = props.getStringProperty("nickname");
-			if(tmp!=null)
-				setNickName(tmp);
-			tmp = props.getStringProperty("image");
-			if(tmp!=null)
+			return agent.scheduleStep(new IComponentStep<Void>()
 			{
-				try
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					setImage(Base64.decode(tmp.getBytes("UTF-8")));
+					String tmp = props.getStringProperty("nickname");
+					if(tmp!=null)
+						setNickName(tmp);
+					tmp = props.getStringProperty("image");
+					if(tmp!=null)
+					{
+						try
+						{
+							setImage(Base64.decode(tmp.getBytes("UTF-8")));
+						}
+						catch(UnsupportedEncodingException e)
+						{
+							throw new RuntimeException(e);
+						}
+					}
+					
+					called.setResultIfUndone(null);
+					
+					return IFuture.DONE;
 				}
-				catch(UnsupportedEncodingException e)
-				{
-					throw new RuntimeException(e);
-				}
-			}
-			
-			called.setResultIfUndone(null);
-			
-			return IFuture.DONE;
+			});
 		}
 		
 		/**
