@@ -32,6 +32,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -435,7 +436,19 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				}
 				
 				networknames = (Set<String>)Starter.getPlatformValue(agent.getId(), Starter.DATA_NETWORKNAMESCACHE);
-				networknames.addAll(networks.keySet());
+//				networknames.addAll(networks.keySet());
+				// Only add network names the platform is a member of (secret can sign).
+				for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
+				{
+					for (AbstractAuthenticationSecret secret : entry.getValue())
+					{
+						if (secret.canSign())
+						{
+							networknames.add(entry.getKey());
+							break;
+						}
+					}
+				}
 				
 				// TODO: Make configurable
 				String[] cryptsuites = new String[] { NHCurve448ChaCha20Poly1305Suite.class.getCanonicalName() };
@@ -806,7 +819,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					return IFuture.DONE;
 				
 				networks.add(networkname, asecret);
-				networknames.add(networkname);
+				if (asecret.canSign())
+					networknames.add(networkname);
 				
 				saveSettings();
 				
@@ -846,6 +860,20 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						networks.remove(networkname);
 						networknames.remove(networkname);
 					}
+					else
+					{
+						boolean removename = true;
+						for (AbstractAuthenticationSecret secret : secrets)
+						{
+							if (secret.canSign())
+							{
+								removename = false;
+								break;
+							}
+						}
+						if (removename)
+							networknames.remove(networkname);
+					}
 				}
 				
 				saveSettings();
@@ -864,7 +892,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  
 	 *  @return The current networks and secrets.
 	 */
-	public IFuture<MultiCollection<String, String>> getNetworks()
+	public IFuture<MultiCollection<String, String>> getAllKnownNetworks()
 	{
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<MultiCollection<String, String>>()
 		{

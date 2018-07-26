@@ -1042,7 +1042,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				final MultiCollection<String, String> nws = secservice.getNetworks().get();
+				final MultiCollection<String, String> nws = secservice.getAllKnownNetworks().get();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{

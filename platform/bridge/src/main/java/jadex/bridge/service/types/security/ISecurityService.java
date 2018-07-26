@@ -99,11 +99,11 @@ public interface ISecurityService
 	public IFuture<Void> removeNetwork(String networkname, String secret);
 	
 	/**
-	 *  Gets the current networks and secrets. 
+	 *  Gets the current known networks and secrets. 
 	 *  
 	 *  @return The current networks and secrets.
 	 */
-	public IFuture<MultiCollection<String, String>> getNetworks();
+	public IFuture<MultiCollection<String, String>> getAllKnownNetworks();
 	
 	/** 
 	 *  Adds an authority for authenticating platform names.
