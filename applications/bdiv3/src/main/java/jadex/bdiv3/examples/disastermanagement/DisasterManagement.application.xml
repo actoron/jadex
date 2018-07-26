@@ -168,10 +168,10 @@
 	</extensiontypes>
 	
 	<componenttypes>
-		<componenttype name="FireBrigade" filename="firebrigade/FireBrigadeBDI.class"/>
-		<componenttype name="Commander" filename="commander/CommanderBDI.class"/>
+		<componenttype name="FireBrigade" filename="firebrigade/FireBrigadeAgent.class"/>
+		<componenttype name="Commander" filename="commander/CommanderAgent.class"/>
 		<!-- <componenttype name="Commander2" filename="commander2/Commander2.agent.xml"/> -->
-		<componenttype name="Ambulance" filename="ambulance/AmbulanceBDI.class"/>
+		<componenttype name="Ambulance" filename="ambulance/AmbulanceAgent.class"/>
 	</componenttypes>
 
 	<configurations>

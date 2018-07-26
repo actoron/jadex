@@ -38,7 +38,7 @@ public class SClassReader
 			
 			Map<Integer, byte[]> strings = readConstantPoolStrings(is);
 			
-			skip(is, 2);
+			ret.setAccessFlags(is.readUnsignedShort());
 			
 			int classnameindex = is.readUnsignedShort();
 			try
@@ -366,6 +366,9 @@ public class SClassReader
     	
     	/** The annotations. */
     	protected Collection<AnnotationInfos> annotations;
+    	
+    	/** Class access flags. */
+    	protected int accessflags;
 
     	/**
     	 *  Create a new classinfo.
@@ -417,6 +420,78 @@ public class SClassReader
 		public void setAnnotations(Collection<AnnotationInfos> annotations)
 		{
 			this.annotations = annotations;
+		}
+		
+		/**
+		 *  Get the access flags.
+		 *  @return the access flags
+		 */
+		public int getAccessFlags()
+		{
+			return accessflags;
+		}
+		
+		/**
+		 *  Set the access flags.
+		 *  @param accessflags the access flags to set
+		 */
+		public void setAccessFlags(int accessflags)
+		{
+			this.accessflags = accessflags;
+		}
+		
+		/**
+		 *  Tests if class is public.
+		 *  @return True, if public.
+		 */
+		public boolean isPublic()
+		{
+			return (accessflags & 0x00000001) != 0;
+		}
+		
+		/**
+		 *  Tests if class is final.
+		 *  @return True, if final.
+		 */
+		public boolean isFinal()
+		{
+			return (accessflags & 0x00000010) != 0;
+		}
+		
+		/**
+		 *  Tests if class is an interface.
+		 *  @return True, if an interface.
+		 */
+		public boolean isInterface()
+		{
+			return (accessflags & 0x00000200) != 0;
+		}
+		
+		/**
+		 *  Tests if class is an annotation.
+		 *  @return True, if an annotation.
+		 */
+		public boolean isAnnotation()
+		{
+			return (accessflags & 0x00002000) != 0;
+		}
+		
+		/**
+		 *  Tests if class is an enum.
+		 *  @return True, if an enum.
+		 */
+		public boolean isEnum()
+		{
+			return (accessflags & 0x00004000) != 0;
+		}
+		
+		/**
+		 *  Tests if class is abstract.
+		 *  @return True, if abstract.
+		 */
+		public boolean isAbstract()
+		{
+			return (accessflags & 0x00000400) != 0;
 		}
 		
 		/**
@@ -576,6 +651,4 @@ public class SClassReader
 			return value;
 		}
     }
-    
-    
 }

@@ -35,6 +35,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.commons.AbstractModelLoader;
 import jadex.commons.LazyResource;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SClassReader;
@@ -314,7 +315,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 					{
 						try
 						{
-							ResourceInfo ri = SUtil.getResourceInfo0(model, cl);
+							ResourceInfo ri = loader.getResourceInfo0(model, imports, cl);
 							if(ri==null)
 							{
 								ret.setResult(null);
