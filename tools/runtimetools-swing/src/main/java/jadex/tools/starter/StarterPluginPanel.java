@@ -26,7 +26,6 @@ import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.settings.ISettingsService;
@@ -41,6 +40,7 @@ import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
 /**
@@ -570,30 +570,28 @@ public class StarterPluginPanel extends JPanel
 	/**
 	 *  Load and apply the platform properties.
 	 */
-	public IFuture loadPlatformProperties()
+	public IFuture<Void> loadPlatformProperties()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<>();
 		jcc.getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new SwingDelegationResultListener(ret)
+			.addResultListener(new SwingExceptionDelegationResultListener<ISettingsService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(ISettingsService settings)
 			{
-				ISettingsService	settings	= (ISettingsService)result;
 				settings.getProperties("StarterServicePanel")
-					.addResultListener(new SwingDelegationResultListener(ret)
+					.addResultListener(new SwingExceptionDelegationResultListener<Properties, Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Properties props)
 					{
-						if(result!=null)
+						if(props!=null)
 						{
-							final Properties	props	= (Properties)result;
 							mpanel.setProperties(props.getSubproperty("mpanel"))
-								.addResultListener(new SwingDelegationResultListener(ret)
+								.addResultListener(new SwingDelegationResultListener<Void>(ret)
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(Void result)
 								{
 									spanel.setProperties(props.getSubproperty("spanel"))
-										.addResultListener(new DelegationResultListener(ret));
+										.addResultListener(new DelegationResultListener<Void>(ret));
 								}
 							});
 						}
