@@ -30,7 +30,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.micro.annotation.Binding;
 
 import java.io.File;
 import java.util.Collection;
@@ -381,7 +380,7 @@ public class AndroidChatService extends JadexPlatformService
 	private IFuture<Void> sendMessage(final String message)
 	{
 		final Future<Void> fut = new Future<Void>();
-		platform.searchService( new ServiceQuery<>( IChatGuiService.class, Binding.SCOPE_PLATFORM)).addResultListener(
+		platform.searchService( new ServiceQuery<>( IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
 				new DefaultResultListener<IChatGuiService>()
 				{
 					public void resultAvailable(IChatGuiService chat)
