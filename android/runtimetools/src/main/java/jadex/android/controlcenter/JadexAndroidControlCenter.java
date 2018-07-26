@@ -31,7 +31,6 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.SResultListener;
-import jadex.micro.annotation.Binding;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
