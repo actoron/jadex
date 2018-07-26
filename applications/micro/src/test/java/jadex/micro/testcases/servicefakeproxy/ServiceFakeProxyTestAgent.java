@@ -1,6 +1,5 @@
 package jadex.micro.testcases.servicefakeproxy;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -33,7 +32,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -44,8 +42,7 @@ import jadex.micro.testcases.RemoteTestBaseAgent;
  *  Test if service implementations can be omitted when the agent implements them.
  */
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 {

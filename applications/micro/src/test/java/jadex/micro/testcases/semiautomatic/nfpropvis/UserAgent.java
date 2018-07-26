@@ -47,7 +47,6 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
@@ -56,7 +55,7 @@ import jadex.micro.annotation.RequiredServices;
 /**
  *  Ranking of a requires services via an waitqueue ranker.
  */
-@RequiredServices(@RequiredService(name="aser", type=ICryptoService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="aser", type=ICryptoService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 //ranker="new AverageEvaluator(new WaitqueueEvaluator(new MethodInfo(ICryttoService.class.getMethod(\"encrypt\", new Class[]{String.class}))))"
 
 @Agent

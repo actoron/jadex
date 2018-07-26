@@ -174,7 +174,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 	/**
 	 *  Get transitive dependencies as flattened set (without duplicates).
 	 */
-	public Set<DelegationURLClassLoader>	getFlattenedDependencies()
+	public Set<DelegationURLClassLoader> getFlattenedDependencies()
 	{
 		if(dependencies==null)
 		{
@@ -187,6 +187,27 @@ public class DelegationURLClassLoader extends URLClassLoader
 			}
 		}
 		return dependencies;
+	}
+	
+	/**
+	 *  Get transitive dependencies as flattened set (without duplicates).
+	 */
+	public Set<URL> getALLURLs()
+	{
+		Set<URL> ret = new HashSet<>();
+		
+		URL[] myurls = getURLs();
+		for(URL url: myurls)
+			ret.add(url);
+		
+		DelegationURLClassLoader[] cls = SUtil.notNull(getDelegateClassLoaders());
+		
+		for(DelegationURLClassLoader cl: cls)
+		{
+			ret.addAll(cl.getALLURLs());
+		}
+		
+		return ret;
 	}
 	
 	/**

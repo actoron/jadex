@@ -12,7 +12,6 @@ import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -29,8 +28,8 @@ import jadex.micro.annotation.Results;
 @ProvidedServices(@ProvidedService(type=IBlockService.class))
 @RequiredServices(
 {
-	@RequiredService(name="myser", type=IBlockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY)),
-	@RequiredService(name="stepser", type=IStepService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
+	@RequiredService(name="myser", type=IBlockService.class, scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY),
+	@RequiredService(name="stepser", type=IStepService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
 })
 public class ReqServiceBlockAgent  extends JunitAgentTest implements IBlockService
 {

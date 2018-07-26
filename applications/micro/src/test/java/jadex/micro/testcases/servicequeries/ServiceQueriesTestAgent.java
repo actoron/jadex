@@ -3,7 +3,6 @@ package jadex.micro.testcases.servicequeries;
 import java.util.Collection;
 import java.util.Map;
 
-
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -25,7 +24,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -40,7 +38,7 @@ import jadex.micro.testcases.TestAgent;
 @Agent(keepalive=Boolean3.FALSE)
 @RequiredServices(
 {
-	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="cms", type=IComponentManagementService.class),
 	//@RequiredService(name="exaser", type=IExampleService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))

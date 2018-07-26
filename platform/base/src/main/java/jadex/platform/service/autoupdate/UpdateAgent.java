@@ -46,7 +46,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -65,11 +64,11 @@ import jadex.xml.writer.XMLWriterFactory;
 @Agent
 @RequiredServices(
 {	
-	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="chatser", type=IChatGuiService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="emailser", type=IEmailService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="depser", type=IDependencyService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="daeser", type=IDaemonService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="chatser", type=IChatGuiService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="emailser", type=IEmailService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="depser", type=IDependencyService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="daeser", type=IDaemonService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
 })
 @Arguments(
 {

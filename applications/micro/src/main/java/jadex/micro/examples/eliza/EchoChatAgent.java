@@ -16,7 +16,6 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -39,7 +38,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @RequiredServices({
 	@RequiredService(name="chat_intern", type=IChatGuiService.class),
-	@RequiredService(name="chat_extern", type=IChatGuiService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="chat_extern", type=IChatGuiService.class, scope=RequiredService.SCOPE_PLATFORM)
 })
 public class EchoChatAgent
 {

@@ -7,14 +7,13 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 @Description("This agent uses the clock service.")
 @Agent
-@RequiredServices(@RequiredService(name = "clockservice", type = IClockService.class, binding = @Binding(scope = Binding.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name = "clockservice", type = IClockService.class, scope = RequiredService.SCOPE_PLATFORM))
 public class ChatC1Agent
 {
 	@Agent

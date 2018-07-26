@@ -5,13 +5,11 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -21,7 +19,7 @@ import jadex.micro.annotation.Results;
  * Tests if agent required services can be inferred from field agentservice declarations.
  */
 @Agent
-@RequiredServices(@RequiredService(name="clock", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="clock", type=IClockService.class))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class RequiredServicesTestAgent extends JunitAgentTest
 {
@@ -32,7 +30,7 @@ public class RequiredServicesTestAgent extends JunitAgentTest
 	protected IClockService clockser;
 	
 	// todo: allow for omitting name=""
-	@AgentServiceSearch(lazy=false, requiredservice=@RequiredService(name="", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+	@AgentServiceSearch(lazy=false, requiredservice=@RequiredService(name="", type=IComponentManagementService.class))
 	protected IComponentManagementService cms;
 
 	/**

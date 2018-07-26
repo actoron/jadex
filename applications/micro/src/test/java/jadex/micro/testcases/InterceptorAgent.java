@@ -21,7 +21,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -39,7 +38,7 @@ import jadex.micro.annotation.Results;
 @ProvidedServices(@ProvidedService(name="aservice", type=IAService.class, implementation=
 	@Implementation(expression="$pojoagent", interceptors=@Value("$pojoagent.provinter"))))
 @RequiredServices(@RequiredService(name="aservice", type=IAService.class, 
-	binding=@Binding(scope=Binding.SCOPE_COMPONENT_ONLY, interceptors=@Value("$pojoagent.reqinter"))))
+	scope=RequiredService.SCOPE_COMPONENT_ONLY, interceptors=@Value("$pojoagent.reqinter")))
 @Service(IAService.class)
 @Agent
 public class InterceptorAgent extends JunitAgentTest implements IAService

@@ -51,7 +51,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Registry service for synchronization with remote platforms. 
@@ -1140,8 +1140,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				for(IService ser: event.getAddedServices())
 				{
 					String scope = ser.getId().getScope();
-					if(Binding.SCOPE_GLOBAL.equals(scope)
-						|| Binding.SCOPE_APPLICATION_GLOBAL.equals((scope)))
+					if(RequiredService.SCOPE_GLOBAL.equals(scope)
+						|| RequiredService.SCOPE_APPLICATION_GLOBAL.equals((scope)))
 					{
 						added.add(ser);
 					}
@@ -1155,8 +1155,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				for(IService ser: event.getRemovedServices())
 				{
 					String scope = ser.getId().getScope();
-					if(Binding.SCOPE_GLOBAL.equals(scope)
-						|| Binding.SCOPE_APPLICATION_GLOBAL.equals((scope)))
+					if(RequiredService.SCOPE_GLOBAL.equals(scope)
+						|| RequiredService.SCOPE_APPLICATION_GLOBAL.equals((scope)))
 					{
 						rem.add(ser);
 					}
@@ -1189,7 +1189,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		// If I am a level 0 superpeer, I inform others about all known level 1 registries
 		if(level==0)
 		{
-			ServiceQuery<IService> query = new ServiceQuery<IService>(ISuperpeerRegistrySynchronizationService.class, Binding.SCOPE_GLOBAL, component.getId(), null);
+			ServiceQuery<IService> query = new ServiceQuery<IService>(ISuperpeerRegistrySynchronizationService.class, RequiredService.SCOPE_GLOBAL, component.getId(), null);
 //			IMsgSecurityInfos secinfo = (IMsgSecurityInfos)ServiceCall.getCurrentInvocation().getProperty("securityinfo");
 			query.setNetworkNames(networknames);
 			

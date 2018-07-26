@@ -28,7 +28,6 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -43,10 +42,8 @@ import jadex.micro.annotation.RequiredServices;
 	@Plan(trigger=@Trigger(factaddeds="alarms", factremoveds="alarms"), body=@Body(SyncSettingsAlarmsPlan.class))
 })
 @RequiredServices({
-	@RequiredService(name="clockservice", type=IClockService.class, binding=
-		@Binding(scope=Binding.SCOPE_PLATFORM)),
-	@RequiredService(name="tpservice", type=IThreadPoolService.class, binding=
-		@Binding(scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="clockservice", type=IClockService.class),
+	@RequiredService(name="tpservice", type=IThreadPoolService.class)
 })
 public class AlarmclockAgent
 {

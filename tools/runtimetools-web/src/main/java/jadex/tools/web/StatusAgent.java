@@ -36,11 +36,11 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Publish;
+import jadex.micro.annotation.RequiredService;
 
 @ProvidedServices(
 	@ProvidedService(name="status", type=IStatusService.class, implementation=@Implementation(expression="$pojoagent"),
@@ -214,7 +214,7 @@ public class StatusAgent implements IStatusService
 	// No intermediate for easier REST?
 	public IFuture<Collection<Map<String, Object>>>	getMemInfo()
 	{
-		Collection<IMemstatService>	stats	= agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IMemstatService.class, Binding.SCOPE_PLATFORM));
+		Collection<IMemstatService>	stats	= agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IMemstatService.class, RequiredService.SCOPE_PLATFORM));
 		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();
 		for(IMemstatService stat: stats)
 		{

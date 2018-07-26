@@ -19,7 +19,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.RequiredService;
@@ -31,7 +30,7 @@ import jadex.micro.annotation.RequiredServices;
 @Agent
 @Service
 @ComponentTypes(@ComponentType(name="block", clazz=BlockAgent.class))
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 public class ShutdownAgent
 {
 	//-------- attributes --------

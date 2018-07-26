@@ -20,7 +20,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -29,8 +28,7 @@ import jadex.micro.testcases.TestAgent;
  *  Agent that provides a service with a stream.
  */
 @Agent
-@RequiredServices(@RequiredService(name="ss", type=IStreamService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)))
+@RequiredServices(@RequiredService(name="ss", type=IStreamService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL))
 public class StreamUserAgent extends TestAgent
 {
 	/**

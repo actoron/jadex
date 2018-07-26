@@ -43,7 +43,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -54,7 +53,7 @@ import jadex.micro.annotation.RequiredServices;
 @RequiredServices(
 {
 	@RequiredService(name="buyservice", type=IBuyBookService.class, multiple=true),
-	@RequiredService(name="clockser", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="clockser", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
 })
 @Arguments(@Argument(name="initial_orders", clazz=Order[].class))
 public class BuyerAgent implements INegotiationAgent

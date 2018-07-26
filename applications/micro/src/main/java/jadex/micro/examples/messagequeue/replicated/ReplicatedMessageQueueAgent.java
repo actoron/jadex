@@ -23,7 +23,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -41,9 +40,10 @@ import jadex.micro.examples.messagequeue.Event;
 @Service
 @ProvidedServices({@ProvidedService(type = IMessageQueueReplicableService.class, implementation = @Implementation(expression = "$pojoagent")),
 	@ProvidedService(type = IMessageQueueReplicationService.class, implementation = @Implementation(expression = "$pojoagent")) })
-@RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, multiple = true, binding = @Binding(scope = Binding.SCOPE_GLOBAL), name = "replication"))
+@RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, multiple = true, scope = RequiredService.SCOPE_GLOBAL, name = "replication"))
 @Arguments(@Argument(name = "searchinterval", clazz = Integer.class, defaultvalue = "1000"))
-public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableService, IMessageQueueReplicationService {
+public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableService, IMessageQueueReplicationService 
+{
 
 	/** The agent. */
 	@Agent

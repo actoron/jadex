@@ -16,14 +16,12 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 @Agent
 @Service
-@RequiredServices(@RequiredService(name="aser", type=IAService.class, multiple=true, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM),
+@RequiredServices(@RequiredService(name="aser", type=IAService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM,
 	nfprops=@NFRProperty(value=ExecutionTimeProperty.class, methodname="test")))
 public class UserAgent
 {

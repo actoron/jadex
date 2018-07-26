@@ -9,7 +9,6 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cron.CronJob;
@@ -29,7 +28,6 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -45,8 +43,7 @@ import jadex.micro.annotation.Results;
  */
 @RequiredServices(
 {
-	@RequiredService(name="clock", type=IClockService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="clock", type=IClockService.class),
 	@RequiredService(name="crons", type=ICronService.class),
 })
 @ComponentTypes(@ComponentType(name="cronagent", clazz=CronAgent.class))

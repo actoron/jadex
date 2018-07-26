@@ -6,7 +6,6 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
@@ -19,7 +18,7 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Agent
 @Imports("jadex.micro.*")
-@RequiredServices(@RequiredService(name="local", type=ILocalService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)))
+@RequiredServices(@RequiredService(name="local", type=ILocalService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL))
 @ProvidedServices(@ProvidedService(type=ISearchService.class, implementation=@Implementation(expression="$pojoagent")))
 @Service
 public class SearchServiceProviderAgent implements ISearchService

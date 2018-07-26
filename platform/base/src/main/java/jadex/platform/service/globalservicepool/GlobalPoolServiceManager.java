@@ -37,7 +37,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 import jadex.platform.service.servicepool.PoolServiceInfo;
 import jadex.platform.service.servicepool.ServicePoolAgent;
 
@@ -305,7 +305,7 @@ public class GlobalPoolServiceManager
 //		{
 			
 			//SServiceProvider.getServices(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-			component.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(Binding.SCOPE_GLOBAL)))
+			component.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(RequiredService.SCOPE_GLOBAL)))
 				.addResultListener(new IntermediateDelegationResultListener<IComponentManagementService>(ret)
 			{
 				public void customIntermediateResultAvailable(IComponentManagementService cms) 

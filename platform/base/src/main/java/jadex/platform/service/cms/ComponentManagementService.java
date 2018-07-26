@@ -90,7 +90,7 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.IBootstrapFactory;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Abstract default implementation of component management service.
@@ -2784,7 +2784,7 @@ public class ComponentManagementService implements IComponentManagementService
 //		open.add(fut);
 		if(remote)
 		{
-			IFuture<Collection<IComponentManagementService>> futi = agent.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(Binding.SCOPE_GLOBAL)));
+			IFuture<Collection<IComponentManagementService>> futi = agent.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(RequiredService.SCOPE_GLOBAL)));
 			futi.addResultListener(createResultListener(new IResultListener<Collection<IComponentManagementService>>()
 			{
 				public void resultAvailable(Collection<IComponentManagementService> result)
@@ -3268,7 +3268,7 @@ public class ComponentManagementService implements IComponentManagementService
 //		});
 //		return ret;
 
-		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, Binding.SCOPE_GLOBAL);
+		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, RequiredService.SCOPE_GLOBAL);
 		sq.setPlatform(cid.getRoot());
 		return agent.getFeature(IRequiredServicesFeature.class).searchService(sq);
 	}

@@ -19,7 +19,6 @@ import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -28,7 +27,7 @@ import jadex.micro.annotation.Results;
 @Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"copy.copy\""))
 @Results(@Result(name="filesize", clazz=long.class))
 @RequiredServices({
-	@RequiredService(name="contextService", type=IContextService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="contextService", type=IContextService.class)
 })
 @Agent
 public class ReceiverAgent

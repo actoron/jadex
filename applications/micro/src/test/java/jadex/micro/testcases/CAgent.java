@@ -23,7 +23,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -36,7 +35,7 @@ import jadex.micro.annotation.Results;
  *  Simple test agent with one service for testing parameter and result copying.
  */
 @ProvidedServices(@ProvidedService(type=ICService.class, implementation=@Implementation(expression="$pojoagent")))
-@RequiredServices(@RequiredService(name="cservice", type=ICService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY)))
+@RequiredServices(@RequiredService(name="cservice", type=ICService.class, scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Service(ICService.class)
 @Agent

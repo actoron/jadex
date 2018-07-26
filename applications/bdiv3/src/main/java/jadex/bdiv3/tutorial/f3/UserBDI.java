@@ -29,7 +29,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -38,8 +37,7 @@ import jadex.micro.annotation.RequiredServices;
  *  via goal delegation to the translation agent.
  */
 @Agent(type=BDIAgentFactory.TYPE)
-@RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 @Goals(@Goal(clazz=TranslationGoal.class))
 @Plans(@Plan(trigger=@Trigger(goals=TranslationGoal.class), body=@Body(service=@ServicePlan(name="transser"))))
 public class UserBDI

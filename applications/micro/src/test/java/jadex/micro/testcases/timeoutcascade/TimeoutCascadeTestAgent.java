@@ -9,7 +9,6 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -26,7 +25,7 @@ import jadex.micro.annotation.Results;
  */
 @Agent
 @RequiredServices(@RequiredService(name = "ser1", type=IService1.class, 
-	binding = @Binding(scope = Binding.SCOPE_PLATFORM)))
+	scope = RequiredService.SCOPE_PLATFORM))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @ComponentTypes(
 {

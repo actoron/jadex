@@ -15,12 +15,10 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -28,8 +26,7 @@ import jadex.micro.annotation.RequiredServices;
  * 
  */
 @Agent(type=BDIAgentFactory.TYPE)
-@RequiredServices(@RequiredService(name="getser", type=IPaintMoneyService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="getser", type=IPaintMoneyService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 @Plans(@Plan(trigger=@Trigger(goals=GetOneEuro.class), body=@Body(service=@ServicePlan(name="getser"))))
 public class RichAgent
 {

@@ -24,7 +24,6 @@ import jadex.examples.presentationtimer.display.ui.ConfigureFrame;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -37,7 +36,7 @@ import jadex.micro.annotation.RequiredServices;
 }
 )
 @RequiredServices({
-	@RequiredService(type= IComponentManagementService.class, name = "cms", binding=@Binding(scope="platform"))
+	@RequiredService(type= IComponentManagementService.class, name = "cms", scope=RequiredService.SCOPE_PLATFORM)
 })
 public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 

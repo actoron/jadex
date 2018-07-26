@@ -12,7 +12,6 @@ import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
@@ -23,9 +22,9 @@ import jadex.micro.annotation.Results;
 /**
  *  Test if binding of required service info can be overridden in configuration.
  */
-@RequiredServices(@RequiredService(name="as", type=IAService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="as", type=IAService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 @Configurations({
-	@Configuration(name="a", requiredservices=@RequiredService(name="as", type=IAService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY))),
+	@Configuration(name="a", requiredservices=@RequiredService(name="as", type=IAService.class, scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY)),
 	@Configuration(name="b")
 })
 @Results(@Result(name="testresults", clazz=Testcase.class)) 

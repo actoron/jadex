@@ -19,7 +19,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -32,9 +31,9 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Description("This agent offers a helpline for getting information about missing persons.")
 @RequiredServices({
-	@RequiredService(name="clockservice", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_NETWORK)),
-	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="clockservice", type=IClockService.class),
+	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_NETWORK),
+	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM)
 })
 @ProvidedServices(@ProvidedService(type=IHelpline.class, implementation=@Implementation(HelplineService.class), scope=RequiredServiceInfo.SCOPE_NETWORK))
 @GuiClass(HelplineViewerPanel.class)

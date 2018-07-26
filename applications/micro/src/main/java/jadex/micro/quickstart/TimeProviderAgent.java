@@ -19,9 +19,9 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  The time provider periodically sends out time values to all subscribers.
@@ -29,7 +29,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITimeService.class, scope=Binding.SCOPE_GLOBAL))
+@ProvidedServices(@ProvidedService(type=ITimeService.class, scope=RequiredService.SCOPE_GLOBAL))
 public class TimeProviderAgent	implements ITimeService
 {
 	//-------- attributes --------

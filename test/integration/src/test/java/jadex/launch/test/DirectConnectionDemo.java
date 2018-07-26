@@ -11,7 +11,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Create a direct connection between to another platform without awareness.
@@ -58,7 +58,7 @@ public class DirectConnectionDemo
 		Map<String, Object>	args = new HashMap<String, Object>();
 		args.put("component", remote_cid);
 		CreationInfo ci = new CreationInfo(args);
-		IComponentManagementService	cms	= platform.searchService( new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM)).get();
+		IComponentManagementService	cms	= platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredService.SCOPE_PLATFORM)).get();
 		cms.createComponent("jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
 	}
 	

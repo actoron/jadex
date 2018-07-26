@@ -6,7 +6,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -17,8 +16,7 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Agent(autoprovide=Boolean3.TRUE)
 @Service
-@RequiredServices({@RequiredService(name = "ser2", type=IService2.class, 
-	binding = @Binding(scope = Binding.SCOPE_PLATFORM))})
+@RequiredServices({@RequiredService(name = "ser2", type=IService2.class, scope = RequiredService.SCOPE_PLATFORM)})
 public class Service1Agent implements IService1
 {
 	@Agent

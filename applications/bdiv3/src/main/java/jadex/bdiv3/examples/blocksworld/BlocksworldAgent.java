@@ -21,7 +21,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
@@ -37,7 +36,7 @@ import jadex.micro.annotation.RequiredServices;
 	@Plan(body=@Body(ConfigureBlocksPlan.class), trigger=@Trigger(goals=BlocksworldAgent.ConfigureGoal.class)),
 	@Plan(body=@Body(BenchmarkPlan.class))
 })
-@RequiredServices(@RequiredService(name="clock", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="clock", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 @Configurations({
 	@Configuration(name="gui"),
 	@Configuration(name="benchmark(runs=10/goals=10)"),
