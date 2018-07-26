@@ -201,7 +201,7 @@
 	
 	<!-- <properties>
 		<property name="clock" class="IFuture">
-			$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature).searchService( new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchService( new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 		</property>
 	</properties>-->
