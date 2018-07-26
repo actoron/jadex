@@ -3,7 +3,6 @@ package jadex.micro.tutorial;
 import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -20,10 +19,8 @@ import jadex.micro.annotation.RequiredServices;
 	implementation=@Implementation(value=ChatServiceD4.class, 
 	interceptors=@Value(clazz=SpamInterceptorD4.class))))
 @RequiredServices({
-	@RequiredService(name="clockservice", type=IClockService.class, 
-		binding=@Binding(scope=Binding.SCOPE_PLATFORM)),
-	@RequiredService(name="chatservices", type=IExtendedChatService.class, multiple=true,
-		binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="clockservice", type=IClockService.class),
+	@RequiredService(name="chatservices", type=IExtendedChatService.class, multiple=true, scope=RequiredService.SCOPE_PLATFORM)
 })
 public class ChatD4Agent
 {

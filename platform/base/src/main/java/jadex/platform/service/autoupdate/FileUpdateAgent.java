@@ -28,7 +28,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -48,7 +47,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @RequiredServices(
 {
-	@RequiredService(name="libservice", type=ILibraryService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="libservice", type=ILibraryService.class)//, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @Agent
 public class FileUpdateAgent extends UpdateAgent

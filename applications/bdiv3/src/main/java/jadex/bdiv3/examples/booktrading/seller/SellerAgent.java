@@ -30,7 +30,6 @@ import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
@@ -42,7 +41,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -51,7 +49,7 @@ import jadex.micro.annotation.RequiredServices;
 @Agent(type=BDIAgentFactory.TYPE)
 @Service
 @ProvidedServices(@ProvidedService(type=IBuyBookService.class))
-@RequiredServices(@RequiredService(name="clockser", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="clockser", type=IClockService.class))
 @Arguments(@Argument(name="initial_orders", clazz=Order[].class))
 public class SellerAgent implements IBuyBookService, INegotiationAgent
 {

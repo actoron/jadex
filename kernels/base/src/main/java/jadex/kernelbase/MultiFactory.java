@@ -280,14 +280,14 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								System.out.println("Killed kernel: " + f+", "+exception);
+//								System.out.println("Killed kernel: " + f+", "+exception);
 								kernels.remove(f.getFirstEntity());
 							}
 						}).addResultListener(new IResultListener<IComponentIdentifier>()
 						{
 							public void resultAvailable(IComponentIdentifier cid)
 							{
-								System.out.println("started factory: "+cid);
+//								System.out.println("started factory: "+cid);
 								kernels.put(f.getFirstEntity(), cid);
 								
 								ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
@@ -363,12 +363,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected Map<String, Collection<Tuple2<String, Set<String>>>> scanForKernels()
 	{
-//		System.out.println("scan");
-		
 		MultiCollection<String, Tuple2<String, Set<String>>> ret = new MultiCollection<>();
 		
 //		List<URL> urls = new ArrayList<URL>();
-		// Add base classpath
 //		ClassLoader basecl = MultiFactory.class.getClassLoader();
 //		for(URL url: SUtil.getClasspathURLs(basecl, true))
 //		{
@@ -378,9 +375,26 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //				urls.add(url);
 //			}
 //		}
+//		System.out.println(urls.size());
 		
 		ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ILibraryService.class);
-		List<URL> urls = ls.getAllURLs().get();
+		List<URL> urls2 = ls.getAllURLs().get();
+
+//		System.out.println("urls: "+urls2.size());
+//		for(URL u: urls2)
+//			System.out.println(u);
+		for(Iterator<URL> it=urls2.iterator(); it.hasNext(); )
+		{
+			String u = it.next().toString();
+			if(u.indexOf("jre/lib/ext")!=-1
+			//	|| u.indexOf("jadex")==-1
+				|| u.indexOf("SYSTEMCPRID")!=-1)
+			{
+				it.remove();
+			}
+		}
+		
+		//System.out.println("scan: "+urls2.size());
 		
 		FileFilter ff = new FileFilter("$", false, ".class");
 		ff.addFilenameFilter(new IFilter<String>()
@@ -392,7 +406,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		});
 		
 //		System.out.println("urls: "+urls);
-		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls.toArray(new URL[urls.size()]), ff, new IFilter<ClassInfo>()
+		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls2.toArray(new URL[urls2.size()]), ff, new IFilter<ClassInfo>()
 		{
 			public boolean filter(ClassInfo ci) 
 			{

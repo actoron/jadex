@@ -19,9 +19,9 @@
 	autoshutdown="true">
 	
 	<componenttypes>
-		<componenttype name="Shop" filename="jadex/bdi/examples/shop/ShopAgent.class"/>
-		<componenttype name="Customer" filename="jadex/bdi/examples/shop/CustomerAgent.class"/>
-		<componenttype name="ShopAndCustomer" filename="jadex/bdi/examples/shop/ShopAndCustomerAgent.class"/>
+		<componenttype name="Shop" filename="jadex/bdiv3/examples/shop/ShopAgent.class"/>
+		<componenttype name="Customer" filename="jadex/bdiv3/examples/shop/CustomerAgent.class"/>
+		<componenttype name="ShopAndCustomer" filename="jadex/bdiv3/examples/shop/ShopAndCustomerAgent.class"/>
 	</componenttypes>
 	
 	<configurations>

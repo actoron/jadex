@@ -35,9 +35,9 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Super peer collects services from client and answers search requests and queries.
@@ -46,8 +46,8 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 @Service
 @ProvidedServices(replace=true,
-	value={@ProvidedService(type=ISuperpeerService.class, scope=Binding.SCOPE_GLOBAL),
-		   @ProvidedService(type=ISuperpeerCollaborationService.class, scope=Binding.SCOPE_GLOBAL),
+	value={@ProvidedService(type=ISuperpeerService.class, scope=RequiredService.SCOPE_GLOBAL),
+		   @ProvidedService(type=ISuperpeerCollaborationService.class, scope=RequiredService.SCOPE_GLOBAL),
 		   @ProvidedService(type=ISuperpeerStatusService.class)})
 public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerCollaborationService, ISuperpeerStatusService
 {

@@ -8,7 +8,6 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentFeature;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -18,8 +17,7 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Description("This agent uses the component management service.")
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
-	binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 public class ChatC3Agent
 {
 	/** The required services feature. */

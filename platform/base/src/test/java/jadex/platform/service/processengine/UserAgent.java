@@ -9,7 +9,6 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -19,7 +18,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -36,8 +34,7 @@ import jadex.rules.eca.Event;
  */
 @RequiredServices(
 {
-	@RequiredService(name="libs", type=ILibraryService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="libs", type=ILibraryService.class),
 	@RequiredService(name="engine", type=IProcessEngineService.class),
 //	@RequiredService(name="rules", type=IRuleService.class)
 })

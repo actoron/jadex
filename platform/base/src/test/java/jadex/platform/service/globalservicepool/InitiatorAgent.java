@@ -31,7 +31,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.TupleResult;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -44,10 +43,9 @@ import jadex.platform.service.servicepool.PoolServiceInfo;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)),
-	@RequiredService(name="aser", type=ITestService.class, multiple=true,
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL),
+	@RequiredService(name="cms", type=IComponentManagementService.class),
+	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL),
+	@RequiredService(name="aser", type=ITestService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL,
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))
 })
 // Test requires starting/stopping multiple platforms and many test calls  -> increase test timeout

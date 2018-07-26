@@ -2,7 +2,6 @@ package jadex.platform.service.cron;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cron.ICronService;
@@ -12,7 +11,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -25,8 +23,7 @@ import jadex.platform.service.cron.jobs.CreateComponentJob;
 
 @RequiredServices(
 {
-	@RequiredService(name="libs", type=ILibraryService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="libs", type=ILibraryService.class),
 	@RequiredService(name="crons", type=ICronService.class)
 })
 @ComponentTypes(@ComponentType(name="cronagent", filename="jadex/platform/service/cron/CronAgent.class"))

@@ -20,7 +20,7 @@ import jadex.micro.annotation.Arguments;
 @Agent(type=BDIAgentFactory.TYPE)
 @Arguments(
 {
-	@Argument(name="catalog", clazz=List.class, defaultvalue="ShopBDI.getDefaultCatalog()"), 
+	@Argument(name="catalog", clazz=List.class, defaultvalue="ShopAgent.getDefaultCatalog()"), 
 	@Argument(name="shopname", clazz=String.class, defaultvalue="jadex.commons.SUtil.createPlainRandomId(\"Shop\",2)")
 })
 public class ShopAndCustomerAgent

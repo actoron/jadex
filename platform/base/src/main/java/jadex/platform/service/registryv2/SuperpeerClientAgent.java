@@ -52,7 +52,7 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Autostart;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  The super peer client agent is responsible for managing connections to super peers for each network.
@@ -490,7 +490,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 			
 			// Also finds and adds locally available super peers -> locaL registry only contains local services, (local/remote) super peer manages separate registry
 			ISubscriptionIntermediateFuture<ISuperpeerService>	queryfut	= agent.getFeature(IRequiredServicesFeature.class)
-				.addQuery(new ServiceQuery<>(ISuperpeerService.class, Binding.SCOPE_GLOBAL).setNetworkNames(networkname));
+				.addQuery(new ServiceQuery<>(ISuperpeerService.class, RequiredService.SCOPE_GLOBAL).setNetworkNames(networkname));
 			superpeerquery	= queryfut;	// Remember current query.
 			queryfut.addResultListener(new IntermediateDefaultResultListener<ISuperpeerService>()
 			{

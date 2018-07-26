@@ -15,7 +15,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Plan to handle protocol abortion according to FIPA cancel meta protocol
@@ -97,7 +97,7 @@ public class CMInitiatorPlan extends Plan
 //							System.out.println("cancel retry checking if exists: "+arec);
 							try
 							{
-								getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM))
+								getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredService.SCOPE_PLATFORM))
 									.getComponentDescription((IComponentIdentifier)it.next()).get(10000);
 //								System.out.println("cancel retry not removed: "+arec);
 							}

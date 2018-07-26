@@ -62,7 +62,6 @@ import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Autostart;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -82,8 +81,7 @@ import jadex.platform.service.processengine.EventMapper.ModelDetails;
 @Service
 @RequiredServices(
 {
-	@RequiredService(name="libs", type=ILibraryService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="libs", type=ILibraryService.class),
 	@RequiredService(name="crons", type=ICronService.class),
 })
 @ComponentTypes(

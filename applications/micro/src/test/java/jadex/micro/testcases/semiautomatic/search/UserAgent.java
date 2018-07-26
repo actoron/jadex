@@ -9,7 +9,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
@@ -17,13 +16,11 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 @Agent
-@RequiredServices({@RequiredService(name = "testService", type = ITestService.class, multiple = true, 
-	binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)) })
+@RequiredServices({@RequiredService(name = "testService", type = ITestService.class, multiple = true, scope=RequiredServiceInfo.SCOPE_PLATFORM)})
 public class UserAgent
 {
     @Agent

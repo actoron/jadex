@@ -22,7 +22,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
@@ -44,7 +43,7 @@ import jadex.micro.testcases.ProvidedServiceConfigurationsAgent.MyAService;
 @Description("Extended base description")
 @Imports({"eb1", "eb2"})
 @Properties({@NameValue(name="a", value="\"eba\""), @NameValue(name="b", value="\"ebb\"")})
-@RequiredServices(@RequiredService(name="clock", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY)))
+@RequiredServices(@RequiredService(name="clock", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY))
 @ProvidedServices(@ProvidedService(name="myservice", type=IAService.class, implementation=@Implementation(MyAService.class)))
 @Arguments(@Argument(name="arg1", defaultvalue="\"ebval\"", clazz=String.class))
 @Results({@Result(name="res1", defaultvalue="\"ebres\"", clazz=String.class), @Result(name="testresults", clazz=Testcase.class)})

@@ -37,15 +37,15 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Autostart;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Agent that provides the security service.
  */
 @Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE, name="address"))
-@ProvidedServices(@ProvidedService(type=ITransportAddressService.class, scope=Binding.SCOPE_PLATFORM))
+@ProvidedServices(@ProvidedService(type=ITransportAddressService.class, scope=RequiredService.SCOPE_PLATFORM))
 @Service(system=true)
 public class TransportAddressAgent implements ITransportAddressService
 {
@@ -421,7 +421,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		List<TransportAddress> ret = null;
 		try
 		{
-			ServiceQuery<ITransportAddressService> query = new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, Binding.SCOPE_COMPONENT, platformid, null);
+			ServiceQuery<ITransportAddressService> query = new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, RequiredService.SCOPE_COMPONENT, platformid, null);
 			
 			ITransportAddressService rtas = agent.getFeature(IRequiredServicesFeature.class).searchService(query).get();
 			if (rtas != null)
@@ -512,7 +512,7 @@ public class TransportAddressAgent implements ITransportAddressService
 			return null;
 		
 		final Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
-		ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(Binding.SCOPE_GLOBAL);
+		ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(RequiredService.SCOPE_GLOBAL);
 		final ITerminableIntermediateFuture<ITransportAddressService> fut = agent.getFeature(IRequiredServicesFeature.class).searchServices(query);
 		fut.addIntermediateResultListener(new IIntermediateResultListener<ITransportAddressService>()
 		{

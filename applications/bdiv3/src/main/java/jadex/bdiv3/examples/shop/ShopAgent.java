@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
@@ -16,10 +17,10 @@ import jadex.micro.annotation.Arguments;
 /**
  *  Shop bdi agent.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Arguments(
 {
-	@Argument(name="catalog", clazz=List.class, defaultvalue="ShopBDI.getDefaultCatalog()"), 
+	@Argument(name="catalog", clazz=List.class, defaultvalue="ShopAgent.getDefaultCatalog()"), 
 	@Argument(name="shopname", clazz=String.class, defaultvalue="jadex.commons.SUtil.createPlainRandomId(\"Shop\",2)")
 })
 public class ShopAgent

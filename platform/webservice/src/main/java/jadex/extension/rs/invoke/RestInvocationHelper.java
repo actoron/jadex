@@ -36,7 +36,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 
 /** Simple API for calling JSON-based REST services. */
 @Agent
@@ -115,7 +114,7 @@ public class RestInvocationHelper
 			restargs.put("inurlparams", inurlparams);
 			CreationInfo info = new CreationInfo();
 			info.addArgument("restargs", restargs);
-			IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
+			IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			cms.createComponent(null, "jadex.extension.rs.invoke.RestInvocationAgent.class", info, new IResultListener<Collection<Tuple2<String,Object>>>()
 			{
 				public void resultAvailable(Collection<Tuple2<String, Object>> result)

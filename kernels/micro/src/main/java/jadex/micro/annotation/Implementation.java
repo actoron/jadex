@@ -39,10 +39,10 @@ public @interface Implementation
 	 */
 	public String expression() default "";
 
-	/**
-	 *  The binding for forwarding service calls to another component.
-	 */
-	public Binding binding() default @Binding(name=BINDING_NULL);
+//	/**
+//	 *  The binding for forwarding service calls to another component.
+//	 */
+//	public Binding binding() default @Binding(name=BINDING_NULL);
 	
 	/**
 	 *  The interceptors.

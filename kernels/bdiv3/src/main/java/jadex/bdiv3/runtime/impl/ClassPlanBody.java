@@ -21,6 +21,7 @@ import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
 import jadex.rules.eca.ChangeInfo;
 
 /**
@@ -293,17 +294,9 @@ public class ClassPlanBody extends AbstractPlanBody
 			{
 				throw new PlanFailureException("Could not create plan "+getRPlan(), t);
 			}
-			else if(t instanceof Error)
-			{
-				throw (Error)t;
-			}
-			else if(t instanceof RuntimeException)
-			{
-				throw (RuntimeException)t;
-			}
 			else
 			{
-				throw new RuntimeException(t);
+				throw SUtil.throwUnchecked(t);
 			}
 		}
 	}

@@ -28,7 +28,6 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -53,7 +52,7 @@ import jadex.micro.annotation.RequiredServices;
 		name="interval", clazz=long.class, defaultvalue=""+1000*60*60*24)
 })
 @RequiredServices(
-	@RequiredService(name="tp", type=IDaemonThreadPoolService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="tp", type=IDaemonThreadPoolService.class)//, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 )
 public class DirectoryDownloaderAgent
 {

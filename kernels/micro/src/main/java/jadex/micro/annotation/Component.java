@@ -70,8 +70,8 @@ public @interface Component
 	 */
 	public NameValue[] arguments() default {};
 	
-	/**
-	 *  The argument values.
-	 */
-	public Binding[] bindings() default {};
+//	/**
+//	 *  The argument values.
+//	 */
+//	public Binding[] bindings() default {};
 }

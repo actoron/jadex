@@ -12,7 +12,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.examples.messagequeue.Event;
@@ -22,7 +21,7 @@ import jadex.micro.examples.messagequeue.Event;
  * 
  */
 @Agent
-@RequiredServices(@RequiredService(name = "mq", type = IMessageQueueReplicableService.class, binding = @Binding(scope = Binding.SCOPE_APPLICATION)))
+@RequiredServices(@RequiredService(name = "mq", type = IMessageQueueReplicableService.class))
 @Arguments(@Argument(name = "topic", clazz = String.class, defaultvalue = "\"default_topic\""))
 public class UserAgent
 {

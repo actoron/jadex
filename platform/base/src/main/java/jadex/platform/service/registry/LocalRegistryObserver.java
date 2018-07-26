@@ -15,7 +15,7 @@ import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.commons.collection.IDelayRunner;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Observe the local registry for changes and notify interested observers.
@@ -135,7 +135,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 	public RegistryEvent getCurrentStateEvent(IComponentIdentifier owner)
 	{
 		// Is the scope correct?! global should impose no scope restrictions. owner dictates which services
-		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_GLOBAL, owner==null? cid: owner, null);
+		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, RequiredService.SCOPE_GLOBAL, owner==null? cid: owner, null);
 //		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, owner==null? cid: owner, null);
 		Collection<IService> added = component.getFeature(IRequiredServicesFeature.class).searchLocalServices(query);
 		

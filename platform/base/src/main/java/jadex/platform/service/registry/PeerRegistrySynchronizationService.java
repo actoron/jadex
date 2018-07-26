@@ -34,7 +34,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.micro.annotation.Binding;
 
 /**
  *  Service for normal peers to send local changes to a selected superpeer.

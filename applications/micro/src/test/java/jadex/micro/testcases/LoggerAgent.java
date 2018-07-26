@@ -22,7 +22,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.Properties;
@@ -38,8 +37,7 @@ import jadex.micro.testcases.LoggerAgent.TestLogHandler;
 @Imports({"java.util.logging.*"})
 @Description("Tests the logger.")
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
-@RequiredServices({@RequiredService(name="clockservice", type=IClockService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))})
+@RequiredServices({@RequiredService(name="clockservice", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)})
 @Properties({
 	@NameValue(name="logging.level", value="Level.FINEST"),
 //	@NameValue(name="logging.useParentHandlers", value="true"),

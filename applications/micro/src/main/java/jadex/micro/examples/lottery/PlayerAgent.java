@@ -10,12 +10,11 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 @Agent
-@RequiredServices(@RequiredService(name="ls", type=ILotteryService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)))
+@RequiredServices(@RequiredService(name="ls", type=ILotteryService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL))
 public class PlayerAgent
 {
 	@Agent

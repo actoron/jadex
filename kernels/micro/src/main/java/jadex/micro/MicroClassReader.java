@@ -79,7 +79,6 @@ import jadex.micro.annotation.AgentServiceValue;
 import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
@@ -729,7 +728,7 @@ public class MicroClassReader
 										interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
 									}
 								}
-								RequiredServiceBinding bind = createBinding(im.binding());
+								RequiredServiceBinding bind = null;//createBinding(im.binding());
 								ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 									im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 								Publish p = provs[j].publish();
@@ -751,7 +750,7 @@ public class MicroClassReader
 						{
 							if(!configinfo.hasRequiredService(reqs[j].name()))
 							{
-								RequiredServiceBinding binding = createBinding(reqs[j].binding());
+								RequiredServiceBinding binding = createBinding(reqs[j]);
 								List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
 								RequiredServiceInfo rsi = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
 									binding, nfprops, Arrays.asList(reqs[j].tags()));
@@ -1151,7 +1150,7 @@ public class MicroClassReader
 	 */
 	protected RequiredServiceInfo createRequiredServiceInfo(RequiredService rs, ClassLoader cl)
 	{
-		RequiredServiceBinding binding = createBinding(rs.binding());
+		RequiredServiceBinding binding = createBinding(rs);
 		List<NFRPropertyInfo> nfprops = createNFRProperties(rs.nfprops());
 		
 		for(NFRProperty prop: rs.nfprops())
@@ -1709,19 +1708,29 @@ public class MicroClassReader
 			exp = "$pojoagent!=null? $pojoagent: $component";
 			System.out.println("Warning: ignoring implementation class because agent is service implementation");
 		}
-		return new ProvidedServiceImplementation(cl, exp, impl.proxytype(), createBinding(impl.binding()), 
+		return new ProvidedServiceImplementation(cl, exp, impl.proxytype(), null, //createBinding(impl.binding()), 
 			createUnparsedExpressions(impl.interceptors()));
 	}
+	
+//	/**
+//	 *  Create a service binding.
+//	 */
+//	public static RequiredServiceBinding createBinding(Binding bd)
+//	{
+//		return bd==null || Implementation.BINDING_NULL.equals(bd.name()) ? null: new RequiredServiceBinding(bd.name(), 
+//			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
+//			bd.scope().length()==0? null: bd.scope(), createUnparsedExpressions(bd.interceptors()),
+//			bd.proxytype());
+//	}
 	
 	/**
 	 *  Create a service binding.
 	 */
-	public static RequiredServiceBinding createBinding(Binding bd)
+	public static RequiredServiceBinding createBinding(RequiredService rq)
 	{
-		return bd==null || Implementation.BINDING_NULL.equals(bd.name()) ? null: new RequiredServiceBinding(bd.name(), 
-			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
-			bd.scope().length()==0? null: bd.scope(), createUnparsedExpressions(bd.interceptors()),
-			bd.proxytype());
+		return new RequiredServiceBinding(null, null, null,
+			rq.scope().length()==0? null: rq.scope(), createUnparsedExpressions(rq.interceptors()),
+			rq.proxytype());
 	}
 	
 	/**
@@ -1768,16 +1777,16 @@ public class MicroClassReader
 			ret.setArguments(exps);
 		}
 		
-		Binding[] binds = comp.bindings();
-		if(binds.length>0)
-		{
-			RequiredServiceBinding[] bds = new RequiredServiceBinding[binds.length];
-			for(int k=0; k<binds.length; k++)
-			{
-				bds[k] = createBinding(binds[k]);
-			}
-			ret.setBindings(bds);
-		}
+//		Binding[] binds = comp.bindings();
+//		if(binds.length>0)
+//		{
+//			RequiredServiceBinding[] bds = new RequiredServiceBinding[binds.length];
+//			for(int k=0; k<binds.length; k++)
+//			{
+//				bds[k] = createBinding(binds[k]);
+//			}
+//			ret.setBindings(bds);
+//		}
 		
 		return ret;
 	}

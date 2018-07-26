@@ -10,7 +10,6 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
@@ -24,10 +23,9 @@ import jadex.micro.annotation.RequiredServices;
 	@Configuration(name="self"),
 	@Configuration(name="platform")})
 @RequiredServices({
-	@RequiredService(name="sub", type=IAutoTerminateService.class,
-		binding=@Binding(scope=Binding.SCOPE_GLOBAL)),
-	@RequiredService(name="cms", type=IComponentManagementService.class,
-		binding=@Binding(scope=Binding.SCOPE_PLATFORM))})
+	@RequiredService(name="sub", type=IAutoTerminateService.class, scope=RequiredService.SCOPE_GLOBAL),
+	@RequiredService(name="cms", type=IComponentManagementService.class)
+})
 public class SubscriberAgent
 {
 	//-------- attributes --------

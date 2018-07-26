@@ -1,7 +1,6 @@
 package jadex.micro.examples.hunterprey.service.prey;
 
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.examples.hunterprey.service.IHunterPreyEnvironmentService;
@@ -11,8 +10,7 @@ import jadex.micro.examples.hunterprey.service.IHunterPreyEnvironmentService;
  *  A prey implemented using the EnvSupport service interface.
  */
 @Agent
-@RequiredServices(@RequiredService(name="env", type=IHunterPreyEnvironmentService.class,
-	binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="env", type=IHunterPreyEnvironmentService.class, scope=RequiredService.SCOPE_PLATFORM))
 public class ServicePreyAgent
 {
 //	//-------- attributes --------

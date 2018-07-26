@@ -18,7 +18,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.RequiredService;
@@ -27,8 +26,7 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class,
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 @ComponentTypes(@ComponentType(name="producer", clazz=ResultProducerAgent.class))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class SubResultsTestAgent extends JunitAgentTest

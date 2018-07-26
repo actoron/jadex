@@ -18,8 +18,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Properties;
+import jadex.micro.annotation.RequiredService;
 import jadex.micro.testcases.TestAgent;
 
 /**
@@ -58,7 +58,7 @@ public class ServiceCallbackTestAgent extends TestAgent	implements ICalledServic
 				local ? new CreationInfo(agent.getId()) : null);	// Start as subcomponent in local case
 			IComponentIdentifier	provider	= fut.getFirstResult();
 			ICallerService	service	= local ? agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class)).get()
-				: agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class, Binding.SCOPE_GLOBAL)).get(); // Search globally in remote case.
+				: agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class, RequiredService.SCOPE_GLOBAL)).get(); // Search globally in remote case.
 			service.doCall(this).get();
 			cms.destroyComponent(provider).get();
 			ret.get().setSucceeded(true);

@@ -56,11 +56,11 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Autostart;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
 import jadex.platform.service.transport.AbstractTransportAgent;
 
 /**
@@ -74,8 +74,8 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 	@Argument(name="addresses", clazz=String.class, defaultvalue="\"ws://ssp1@ngrelay1.actoron.com:80\""),	// TODO: wss, TODO: set in PlatformAgent???
 })
 @ProvidedServices({
-		@ProvidedService(type=ITransportService.class, scope=Binding.SCOPE_PLATFORM),
-		@ProvidedService(type=IRoutingService.class, name="routing", scope=Binding.SCOPE_GLOBAL)
+		@ProvidedService(type=ITransportService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+		@ProvidedService(type=IRoutingService.class, name="routing", scope=RequiredServiceInfo.SCOPE_GLOBAL)
 })
 @Features(additional=true, replace=true, value=@Feature(type=IMessageFeature.class, clazz=RelayMessageComponentFeature.class))
 @Service
@@ -702,7 +702,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						try
 						{
 //							Collection<IRoutingService> addrs = SServiceProvider.getServices(agent, IRoutingService.class, Binding.SCOPE_GLOBAL).get(MAX_ROUTING_SERVICE_DELAY, true);
-							Collection<IRoutingService> addrs = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IRoutingService.class, Binding.SCOPE_GLOBAL).setServiceTags(new String[]{"forwarding=true"})).get(MAX_ROUTING_SERVICE_DELAY, true);
+							Collection<IRoutingService> addrs = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IRoutingService.class, RequiredService.SCOPE_GLOBAL).setServiceTags(new String[]{"forwarding=true"})).get(MAX_ROUTING_SERVICE_DELAY, true);
 							for (IRoutingService rs : addrs)
 							{
 								IComponentIdentifier rsprov = ((IService) rs).getId().getProviderId();
@@ -785,7 +785,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		if (ret == null)
 		{
 			IComponentIdentifier relay = getRtComponent(relayplatform);
-			IServiceIdentifier si = BasicService.createServiceIdentifier(relay, new ClassInfo(IRoutingService.class), null, "routing", null, Binding.SCOPE_GLOBAL, null, true);
+			IServiceIdentifier si = BasicService.createServiceIdentifier(relay, new ClassInfo(IRoutingService.class), null, "routing", null, RequiredService.SCOPE_GLOBAL, null, true);
 			ret = (IRoutingService)RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, si);
 			routingservicecache.put(relayplatform, ret);
 		}

@@ -10,7 +10,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.webservice.examples.ws.banking.IBankingService;
@@ -20,8 +19,7 @@ import jadex.webservice.examples.ws.banking.client.gen.ProxyIWSBankingServiceSer
 import jadex.webservice.examples.ws.banking.client.gen.Request;
 
 @Agent
-@RequiredServices(@RequiredService(name="qs", type=IBankingService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="qs", type=IBankingService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 public class UserAgent
 {
 	//-------- attributes --------

@@ -22,13 +22,12 @@ import jadex.examples.presentationtimer.remotecontrol.ui.ClientFrame;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 
 @Agent
-@RequiredServices({@RequiredService(type = ICountdownService.class, name = "cds", binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL))})
+@RequiredServices({@RequiredService(type = ICountdownService.class, name = "cds", scope = RequiredServiceInfo.SCOPE_GLOBAL)})
 public class ClientAgent
 {
 

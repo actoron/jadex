@@ -7,7 +7,6 @@ import java.util.List;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -18,7 +17,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.ProvidedService;
@@ -35,8 +33,7 @@ import jadex.micro.annotation.RequiredServices;
  *  - the test service method is then recursively called of random component until level is reached 
  */
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 @Configurations({@Configuration(name="default"), @Configuration(name="created")})
 @ProvidedServices(@ProvidedService(type=ITestService.class))
 @Service

@@ -2,10 +2,8 @@ package jadex.extension.ws.invoke;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.RequiredService;
@@ -17,8 +15,7 @@ import jadex.micro.annotation.RequiredServices;
  *  in the same way as normal Jadex component services.
  */
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 @ComponentTypes(@ComponentType(name="invocation", filename="jadex/platform/service/ws/WebServiceInvocationAgent.class"))
 public class WebServiceAgent
 {

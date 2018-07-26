@@ -453,7 +453,7 @@ public class BDIClassReader extends MicroClassReader
 									interceptors[k] = new UnparsedExpression(null, inters[k].clazz().getName(), inters[k].value(), null);
 								}
 							}
-							RequiredServiceBinding bind = createBinding(im.binding());
+							RequiredServiceBinding bind = null;//createBinding(im.binding());
 							ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 							Publish p = provs[j].publish();
@@ -471,7 +471,8 @@ public class BDIClassReader extends MicroClassReader
 						RequiredServiceInfo[] rsis = new RequiredServiceInfo[reqs.length];
 						for(int j=0; j<reqs.length; j++)
 						{
-							RequiredServiceBinding binding = createBinding(reqs[j].binding());
+//							RequiredServiceBinding binding = createBinding(reqs[j].binding());
+							RequiredServiceBinding binding = createBinding(reqs[j]);
 							List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
 							rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
 								binding, nfprops, Arrays.asList(reqs[j].tags()));

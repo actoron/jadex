@@ -14,11 +14,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-
+import jadex.micro.annotation.RequiredService;
 
 /**
  * 
@@ -58,7 +57,7 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("Current service call after schedule internal has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
-		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM));
+		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredService.SCOPE_PLATFORM));
 		IExternalAccess	rootacc	= cms.getExternalAccess(agent.getId().getRoot()).get();
 		rootacc.scheduleStep(new IComponentStep<Void>() {
 			@Override
@@ -74,13 +73,13 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("Current service call after schedule external local has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
-		cms	= exta.searchService( new ServiceQuery<>( IComponentManagementService.class, Binding.SCOPE_PLATFORM)).get();
+		cms	= exta.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredService.SCOPE_PLATFORM)).get();
 		cms.getComponentDescription(exta.getId()).get();
 		if (ServiceCall.getCurrentInvocation() != sc) {
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote CMS call: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 		
-		ITestService	ts	= exta.searchService( new ServiceQuery<>( ITestService.class, Binding.SCOPE_COMPONENT_ONLY)).get();
+		ITestService	ts	= exta.searchService( new ServiceQuery<>( ITestService.class, RequiredService.SCOPE_COMPONENT_ONLY)).get();
 		ts.method(agent.getExternalAccess()).get();
 		if (ServiceCall.getCurrentInvocation() != sc) {
 			return new Future<Void>(new RuntimeException("Current service call has changed after remote callback: "+ServiceCall.getCurrentInvocation()+", "+sc));
