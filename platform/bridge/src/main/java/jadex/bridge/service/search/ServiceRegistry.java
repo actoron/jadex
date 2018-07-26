@@ -73,8 +73,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	@SuppressWarnings("unchecked")
 	public IServiceIdentifier searchService(final ServiceQuery<?> query)
 	{
-		if(query.toString().indexOf("IEnvironment")!=-1)
-			System.out.println("sdgo");
+//		if(query.toString().indexOf("IEnvironment")!=-1)
+//			System.out.println("sdgo");
 		
 		IServiceIdentifier ret = null;
 		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
