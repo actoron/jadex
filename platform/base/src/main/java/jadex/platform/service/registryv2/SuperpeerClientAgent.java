@@ -105,14 +105,15 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 			ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 			if(secser!=null)
 			{
-				secser.getNetworkNames().addResultListener(new ExceptionDelegationResultListener<Set<String>, Void>(ret)
+				// Use all networks to include networks with public key only, e.g. global network
+				secser.getAllKnownNetworks().addResultListener(new ExceptionDelegationResultListener<MultiCollection<String, String>, Void>(ret)
 				{
 					@Override
-					public void customResultAvailable(Set<String> networks) throws Exception
+					public void customResultAvailable(MultiCollection<String, String> networks) throws Exception
 					{
 						assert agent.getFeature(IExecutionFeature.class).isComponentThread();
 						
-						for(String network: networks)
+						for(String network: networks.keySet())
 						{
 							connections.put(network, new NetworkManager(network));
 							connections.get(network).startSuperpeerSearch();	// Start after put, because uses itself for superpeer search
@@ -121,10 +122,6 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 						ret.setResult(null);
 					}
 				});
-			}
-			else
-			{
-				// TODO: global network?
 			}
 		}
 		else

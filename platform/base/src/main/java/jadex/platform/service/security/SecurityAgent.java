@@ -1,9 +1,20 @@
 package jadex.platform.service.security;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,12 +25,14 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -57,7 +70,6 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.platform.service.clock.ClockAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.AbstractX509PemSecret;
 import jadex.platform.service.security.auth.KeySecret;
@@ -108,6 +120,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** Flag whether to refuse unauthenticated connections. */
 	protected boolean refuseunauth = false;
 	
+	/** Flag whether to use the default Java trust store. */
+	protected boolean loadjavatruststore = true;
+	
 	/** Local platform authentication secret. */
 	protected AbstractAuthenticationSecret platformsecret;
 	
@@ -124,8 +139,15 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** The platform name certificate if available. */
 	protected AbstractX509PemSecret platformnamecertificate;
 	
+	/** The platform names that are trusted. */
+	protected Set<String> trustedplatformnames = new HashSet<>();
+	
+	
 	/** Trusted authorities for certifying platform names. */
 	protected Set<X509CertificateHolder> nameauthorities = new HashSet<>();
+	
+	/** Custom (non-Java default) trusted authorities for certifying platform names. */
+	protected Set<X509CertificateHolder> customnameauthorities = new HashSet<>();
 	
 	/** Available crypt suites. */
 	protected Map<String, Class<?>> allowedcryptosuites = new LinkedHashMap<String, Class<?>>();
@@ -205,6 +227,150 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					nameauthorities = getProperty("nameauthorities", args, settings, nameauthorities);
 				}
 				
+				customnameauthorities.addAll(nameauthorities);
+				
+				if (loadjavatruststore)
+				{
+					String tst = System.getProperty("javax.net.ssl.trustStoreType");
+					String tsf = System.getProperty("javax.net.ssl.trustStore");
+					String tsp = System.getProperty("javax.net.ssl.trustStorePassword");
+					
+					if (tsf == null && tst == null)
+					{
+						String javahome = System.getProperty("java.home");
+						Path path = Paths.get(javahome, "lib", "security", "jssecacerts");
+			            if (!path.toFile().exists())
+			            {
+			            	path = Paths.get(javahome, "lib", "security", "cacerts");
+			            }
+						if (path.toFile().exists())
+						{
+							try
+							{
+								tsf = path.toFile().getCanonicalPath();
+							}
+							catch (IOException e)
+							{
+							}
+						}
+					}
+					
+					if (tsp == null)
+						tsp = "changeit";
+					if (tst == null)
+						tst = KeyStore.getDefaultType();
+					
+					if (tst != null && tsf != null)
+					{
+						JcaPEMWriter jpw = null;
+						try
+						{
+							KeyStore ks = KeyStore.getInstance(tst);
+							InputStream is = null;
+							try
+							{
+								is = new FileInputStream(tsf);
+								is = new BufferedInputStream(is);
+								ks.load(is, tsp.toCharArray());
+								SUtil.close(is);
+							}
+							catch (Exception e)
+							{
+							}
+							finally
+							{
+								SUtil.close(is);
+							}
+							
+							Enumeration<String> aliases = ks.aliases();
+//							System.out.println(SUtil.enumerationAsParallelStream(aliases).isParallel());
+//							long ts = System.currentTimeMillis();
+//							SUtil.enumerationAsParallelStream(aliases).forEach((alias) ->
+//							{
+//								try
+//								{
+//									Certificate cert = ks.getCertificate(alias);
+//									ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//									OutputStreamWriter osw = new OutputStreamWriter(baos);
+//									JcaPEMWriter jpw = new JcaPEMWriter(osw);
+//									jpw.writeObject(cert);
+//									SUtil.close(jpw);
+//									SUtil.close(baos);
+//									String pem = new String(baos.toByteArray(), SUtil.ASCII);
+//									try
+//									{
+//										synchronized(nameauthorities)
+//										{
+//											nameauthorities.add(SSecurity.readCertificateFromPEM(pem));
+//										}
+//									}
+//									catch (Exception e)
+//									{
+//									}
+//								}
+//								catch (Exception e)
+//								{
+//								}
+//							});
+							
+							ByteArrayOutputStream baos = new ByteArrayOutputStream();
+							OutputStreamWriter osw = new OutputStreamWriter(baos);
+							jpw = new JcaPEMWriter(osw);
+							while (aliases.hasMoreElements())
+							{
+								try
+								{
+									String alias = aliases.nextElement();
+									Certificate cert = ks.getCertificate(alias);
+									jpw.writeObject(cert);
+//									SUtil.close(jpw);
+//									SUtil.close(baos);
+									jpw.flush();
+									String pem = new String(baos.toByteArray(), SUtil.ASCII);
+									baos.reset();
+									try
+									{
+										nameauthorities.add(SSecurity.readCertificateFromPEM(pem));
+									}
+									catch (Exception e)
+									{
+									}
+								}
+								catch (Exception e)
+								{
+								}
+							}
+//							ts = System.currentTimeMillis() - ts;
+//							System.out.println("READING TOOK " + ts);
+						}
+						catch (Exception e)
+						{
+						}
+						finally
+						{
+							SUtil.close(jpw);
+						}
+					}
+				}
+				
+				if (args.get("trustedplatforms") != null)
+				{
+					trustedplatformnames = new HashSet<>();
+					String authstr = (String) args.get("trustedplatforms");
+					String[] split = authstr.split(",");
+					for (int i = 0; i < split.length; ++i)
+					{
+						if (split[i].length() > 0)
+						{
+							trustedplatformnames.add(split[i]);
+						}
+					}
+				}
+				else
+				{
+					trustedplatformnames = getProperty("trustedplatforms", args, settings, trustedplatformnames);
+				}
+				
 				if (args.get("platformsecret") != null)
 					platformsecret = AbstractAuthenticationSecret.fromString((String) args.get("platformsecret"), false);
 				else
@@ -270,7 +436,19 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				}
 				
 				networknames = (Set<String>)Starter.getPlatformValue(agent.getId(), Starter.DATA_NETWORKNAMESCACHE);
-				networknames.addAll(networks.keySet());
+//				networknames.addAll(networks.keySet());
+				// Only add network names the platform is a member of (secret can sign).
+				for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
+				{
+					for (AbstractAuthenticationSecret secret : entry.getValue())
+					{
+						if (secret.canSign())
+						{
+							networknames.add(entry.getKey());
+							break;
+						}
+					}
+				}
 				
 				// TODO: Make configurable
 				String[] cryptsuites = new String[] { NHCurve448ChaCha20Poly1305Suite.class.getCanonicalName() };
@@ -641,7 +819,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					return IFuture.DONE;
 				
 				networks.add(networkname, asecret);
-				networknames.add(networkname);
+				if (asecret.canSign())
+					networknames.add(networkname);
 				
 				saveSettings();
 				
@@ -681,6 +860,20 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						networks.remove(networkname);
 						networknames.remove(networkname);
 					}
+					else
+					{
+						boolean removename = true;
+						for (AbstractAuthenticationSecret secret : secrets)
+						{
+							if (secret.canSign())
+							{
+								removename = false;
+								break;
+							}
+						}
+						if (removename)
+							networknames.remove(networkname);
+					}
 				}
 				
 				saveSettings();
@@ -699,7 +892,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  
 	 *  @return The current networks and secrets.
 	 */
-	public IFuture<MultiCollection<String, String>> getNetworks()
+	public IFuture<MultiCollection<String, String>> getAllKnownNetworks()
 	{
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<MultiCollection<String, String>>()
 		{
@@ -735,6 +928,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				nameauthorities.add(cert);
+				customnameauthorities.add(cert);
+				
+				saveSettings();
 				
 				return IFuture.DONE;
 			}
@@ -747,16 +943,17 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param secret The secret, only X.509 secrets allowed.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> removeNameAuthority(String secret)
+	public IFuture<Void> removeNameAuthority(String pemcertificate)
 	{
-		final AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
-		if (!(asecret instanceof AbstractX509PemSecret))
-			return new Future<>(new IllegalArgumentException("Only X509 secrets allowed as name authorities"));
+		final X509CertificateHolder cert = SSecurity.readCertificateFromPEM(pemcertificate);
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				nameauthorities.remove((AbstractX509PemSecret) asecret);
+				if (customnameauthorities.remove(cert))
+					nameauthorities.remove(cert);
+				
+				saveSettings();
 				
 				return IFuture.DONE;
 			}
@@ -777,6 +974,25 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				Set<String> ret = new HashSet<>();
 				for (X509CertificateHolder cert : SUtil.notNull(nameauthorities))
+					ret.add(SSecurity.writeCertificateAsPEM(cert));
+				return new Future<>(ret);
+			}
+		});
+	}
+	
+	/** 
+	 *  Gets all authorities not defined in the Java trust store for authenticating platform names.
+	 *  
+	 *  @return List of name authorities.
+	 */
+	public IFuture<Set<String>> getCustomNameAuthorities()
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Set<String>>()
+		{
+			public IFuture<Set<String>> execute(IInternalAccess ia)
+			{
+				Set<String> ret = new HashSet<>();
+				for (X509CertificateHolder cert : SUtil.notNull(customnameauthorities))
 					ret.add(SSecurity.writeCertificateAsPEM(cert));
 				return new Future<>(ret);
 			}
@@ -812,7 +1028,70 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Set<String>> getNetworkNames()
 	{
-		return new Future<Set<String>>(networknames);
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Set<String>>()
+		{
+			public IFuture<Set<String>> execute(IInternalAccess ia)
+			{
+				return new Future<Set<String>>(new HashSet<>(networknames));
+			}
+		});
+	}
+	
+	/** 
+	 *  Adds a name of an authenticated platform to allow access.
+	 *  
+	 *  @param name The platform name, name must be authenticated with certificate.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addTrustedPlatformName(final String name)
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				trustedplatformnames.add(name);
+				
+				saveSettings();
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/** 
+	 *  Adds a name of an authenticated platform to allow access.
+	 *  
+	 *  @param name The platform name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeTrustedPlatformName(String name)
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				trustedplatformnames.remove(name);
+				
+				saveSettings();
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Gets the trusted platform names. 
+	 *  @return The trusted platform names.
+	 */
+	public IFuture<Set<String>> getTrustedPlatformNames()
+	{
+		return agent.getExternalAccess().scheduleStep(new IComponentStep<Set<String>>()
+		{
+			public IFuture<Set<String>> execute(IInternalAccess ia)
+			{
+				return new Future<Set<String>>(new HashSet<>(trustedplatformnames));
+			}
+		});
 	}
 	
 	/**
@@ -1014,6 +1293,14 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public Set<X509CertificateHolder> getInternalNameAuthorities()
 	{
 		return nameauthorities;
+	}
+	
+	/**
+	 *  Gets the trusted platform names.
+	 */
+	public Set<String> getInternalTrustedPlatformNames()
+	{
+		return trustedplatformnames;
 	}
 	
 	/**
@@ -1313,8 +1600,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			settings.put("roles", roles);
 		if (platformnamecertificate != null)
 			settings.put("platformnamecertificate", platformnamecertificate);
-		if (nameauthorities != null && nameauthorities.size() > 0)
-			settings.put("nameauthorities", nameauthorities);
+		if (customnameauthorities != null && customnameauthorities.size() > 0)
+			settings.put("nameauthorities", customnameauthorities);
+		if (trustedplatformnames != null && trustedplatformnames.size() > 0)
+			settings.put("trustedplatforms", trustedplatformnames);
 		
 		getSettingsService().saveState(PROPERTIES_ID, settings);
 		
@@ -1605,7 +1894,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				{
 					ISecurityInfo suiteinfos = expsuite.getFirstEntity().getSecurityInfos();
 					
-					if (!suiteinfos.isPlatformAuthenticated() || (suiteinfos.isPlatformAuthenticated() == secinfos.isPlatformAuthenticated()))
+					if ((secinfos.isAdminPlatform() || (suiteinfos.isAdminPlatform() == secinfos.isAdminPlatform())) &&
+						(secinfos.isTrustedPlatform() || (suiteinfos.isTrustedPlatform() == secinfos.isTrustedPlatform())) && 
+						(SUtil.equals(secinfos.getAuthenticatedPlatformName(), suiteinfos.getAuthenticatedPlatformName()) || (suiteinfos.getAuthenticatedPlatformName() == null && secinfos.getAuthenticatedPlatformName() != null)))
+						
 					{
 						Set<String> msgnets = new HashSet<String>(Arrays.asList(secinfos.getNetworks()));
 						if (msgnets.containsAll(Arrays.asList(suiteinfos.getNetworks())))

@@ -95,7 +95,7 @@
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
         <jadex:property name="mode">&quot;send&quot;</jadex:property>
-        <jadex:property name="message">new FipaMessage(FipaMessage.Performative.INFORM, &quot;content&quot;, $component.getIdentifier()</jadex:property>
+        <jadex:property name="message">new FipaMessage(FipaMessage.Performative.INFORM, &quot;content&quot;, $component.getId())</jadex:property>
       </semantic:extensionElements>
     </semantic:intermediateThrowEvent>
     <semantic:sequenceFlow sourceRef="_eQvvsRJgEd-3Ruc_856dPQ" targetRef="_2dIbMRJgEd-3Ruc_856dPQ" id="_2dIbOhJgEd-3Ruc_856dPQ">

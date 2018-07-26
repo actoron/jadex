@@ -99,11 +99,11 @@ public interface ISecurityService
 	public IFuture<Void> removeNetwork(String networkname, String secret);
 	
 	/**
-	 *  Gets the current networks and secrets. 
+	 *  Gets the current known networks and secrets. 
 	 *  
 	 *  @return The current networks and secrets.
 	 */
-	public IFuture<MultiCollection<String, String>> getNetworks();
+	public IFuture<MultiCollection<String, String>> getAllKnownNetworks();
 	
 	/** 
 	 *  Adds an authority for authenticating platform names.
@@ -111,7 +111,7 @@ public interface ISecurityService
 	 *  @param secret The secret, only X.509 secrets allowed.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> addNameAuthority(String secret);
+	public IFuture<Void> addNameAuthority(String cert);
 	
 	/** 
 	 *  Remvoes an authority for authenticating platform names.
@@ -119,15 +119,43 @@ public interface ISecurityService
 	 *  @param secret The secret, only X.509 secrets allowed.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> removeNameAuthority(String secret);
+	public IFuture<Void> removeNameAuthority(String cert);
 	
 	/** 
-	 *  Adds an authority for authenticating platform names.
+	 *  Adds a name of an authenticated platform to allow access.
 	 *  
-	 *  @param secret The secret, only X.509 secrets allowed.
+	 *  @param name The platform name, name must be authenticated with certificate.
 	 *  @return Null, when done.
 	 */
+	public IFuture<Void> addTrustedPlatformName(String name);
+	
+	/** 
+	 *  Adds a name of an authenticated platform to allow access.
+	 *  
+	 *  @param name The platform name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeTrustedPlatformName(String name);
+	
+	/**
+	 *  Gets the trusted platform names. 
+	 *  @return The trusted platform names.
+	 */
+	public IFuture<Set<String>> getTrustedPlatformNames();
+	
+	/** 
+	 *  Gets all authorities for authenticating platform names.
+	 *  
+	 *  @return List of all name authorities.
+	 */
 	public IFuture<Set<String>> getNameAuthorities();
+	
+	/** 
+	 *  Gets all authorities not defined in the Java trust store for authenticating platform names.
+	 *  
+	 *  @return List of name authorities.
+	 */
+	public IFuture<Set<String>> getCustomNameAuthorities();
 	
 	/**
 	 *  Gets the secret of a platform if available.

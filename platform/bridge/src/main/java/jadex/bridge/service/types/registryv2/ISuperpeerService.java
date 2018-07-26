@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.registryv2;
 
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -9,6 +10,8 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *
  */
 @Service(system=true)
+// TODO: change supersuperpeer to globalsuperpeer?
+@Security(roles="%{true.equals($platformargs.supersuperpeer)? jadex.bridge.service.annotation.Security.UNRESTRICTED: jadex.bridge.service.annotation.Security.DEFAULT}")
 public interface ISuperpeerService extends IRemoteRegistryService
 {
 	/**

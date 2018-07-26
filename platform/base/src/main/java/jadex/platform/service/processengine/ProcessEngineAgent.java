@@ -61,6 +61,7 @@ import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
@@ -77,7 +78,7 @@ import jadex.platform.service.processengine.EventMapper.ModelDetails;
 /**
  *  Agent that implements the bpmn monitoring starter interface.
  */
-@Agent(autoprovide=Boolean3.TRUE)
+@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE))
 @Service
 @RequiredServices(
 {

@@ -123,7 +123,7 @@ public abstract class SwingExceptionDelegationResultListener<E, T> implements IU
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 */
-	public abstract void customResultAvailable(E result);
+	public abstract void customResultAvailable(E result) throws Exception;
 //	{
 //		future.setResult(result);
 //	}

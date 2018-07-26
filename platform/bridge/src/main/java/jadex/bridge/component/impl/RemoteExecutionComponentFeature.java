@@ -551,8 +551,8 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		{
 			boolean	trusted	= false;
 			
-			// Trusted platforms (i.e. in possession  of our platform key) can do anything.
-			if(secinfos.isTrustedPlatform())
+			// Admin platforms (i.e. in possession  of our platform key) can do anything.
+			if(secinfos.isAdminPlatform())
 			{
 				trusted	= true;
 			}
