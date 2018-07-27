@@ -17,6 +17,7 @@
 		<import>java.util.*</import>
 		<import>jadex.bridge.service.types.clock.IClockService</import>
 		<import>jadex.bridge.service.search.*</import>
+		<import>jadex.bridge.service.component.*</import>
 		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.service.*</import>
 	</imports>
