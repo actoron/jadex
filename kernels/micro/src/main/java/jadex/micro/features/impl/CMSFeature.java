@@ -1,4 +1,4 @@
-package jadex.platform.service.cms;
+package jadex.micro.features.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,9 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
-
-import javax.security.auth.login.FailedLoginException;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
@@ -30,11 +27,13 @@ import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.ICMSFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
+import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.IInternalArgumentsResultsFeature;
-import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -42,25 +41,25 @@ import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSIntermediateResultEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.bridge.service.types.cms.InitInfo;
 import jadex.bridge.service.types.cms.LockEntry;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -73,9 +72,7 @@ import jadex.commons.SFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
-import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.collection.SCollection;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -95,113 +92,67 @@ import jadex.commons.future.Tuple2Future;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.kernelbase.IBootstrapFactory;
-import jadex.micro.annotation.RequiredService;
+import jadex.platform.service.cms.ComponentManagementService.CleanupCommand;
 
 /**
- *  Abstract default implementation of component management service.
+ *
  */
-@Service
-public class ComponentManagementService implements IComponentManagementService
+public class CMSFeature extends AbstractComponentFeature implements ICMSFeature
 {
-	//-------- attributes --------
-	
-	/** Flag to avoid double initialization. */
-	protected boolean	running;
-	
-	/** The agent. */
-	@ServiceComponent
-	protected IInternalAccess agent;
-	
-	@ServiceIdentifier
-	protected IServiceIdentifier sid;
-	
-	/** The platform access. */
-	protected IPlatformComponentAccess	access;
-	
-	/** The logger. */
-	protected Logger logger;
-
 	/** The components (id->component). */
 	protected Map<IComponentIdentifier, IPlatformComponentAccess> components;
 	
-	/** The cleanup commands for the components (component id -> cleanup command). */
-	protected Map<IComponentIdentifier, CleanupCommand> ccs;
-	
 	/** The cleanup futures for the components (component id -> cleanup future). */
 	protected Map<IComponentIdentifier, IFuture<Map<String, Object>>> cfs;
-	
-	/** The listeners. */
-	protected MultiCollection<IComponentIdentifier, SubscriptionIntermediateFuture<CMSStatusEvent>> listeners;
-	
-//	/** The execution service (cached to avoid using futures). */
-//	protected IExecutionService	exeservice;
-	
-//	/** The message service (cached to avoid using futures). */
-//	protected IMessageService	msgservice;
 	
 	/** The init adapters and descriptions, i.e. adapters and desc of initing components, 
 	 *  are only visible for the component and child components in their init. */
 	protected Map<IComponentIdentifier, InitInfo> initinfos;
 	
-	/** Number of non-daemon children for each autoshutdown component (cid->Integer). */
-	protected Map<IComponentIdentifier, Integer> childcounts;
+	/** The locked components (component are locked till init is finished,
+    i.e. if destroy is called during init it wait till lock is away). */
+	protected Map<IComponentIdentifier, LockEntry> lockentries;
 	
 	/**	The local filename cache (tuple(parent filename, child filename) -> local typename)*/
 	protected Map<Tuple, String> localtypes;
 	
-//	/** The cached factories. */
-//	protected Collection<IComponentFactory> factories;
+	/** The cid count (one last count for every model). */
+	protected Map<String, Integer> cidcounts;
 	
-	/** The bootstrap component factory. */
-	protected IBootstrapFactory componentfactory;
-	
-	/** The locked components (component are locked till init is finished,
-	    i.e. if destroy is called during init it wait till lock is away). */
-	protected Map<IComponentIdentifier, LockEntry> lockentries;
-	
-//	/** The time service. */
-//	protected IClockService clockservice;
+	/** The cleanup commands for the components (component id -> cleanup command). */
+	protected Map<IComponentIdentifier, CleanupCommand> ccs;
 	
 	/** Flag to enable unique id generation. */
 	// Todo: move to platform data ?
 	protected boolean uniqueids;
 	
-	/** The cid count. */
-	protected Map<String, Integer> cidcounts;
+	/** Number of non-daemon children for each autoshutdown component (cid->Integer). */
+	protected Map<IComponentIdentifier, Integer> childcounts;
 	
-    //-------- constructors --------
-
-    /**
-     *  Create a new component execution service.
-     *  @param exta	The service provider.
-     */
-    public ComponentManagementService(IPlatformComponentAccess access, IBootstrapFactory componentfactory, boolean uniqueids)
+	/**
+	 *  Create the feature.
+	 */
+	public CMSFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
-    	this.access	= access;
-		this.componentfactory = componentfactory;
-		this.uniqueids = uniqueids;
+		super(component, cinfo);
 		
-//		this.components = SCollection.createHashMap();
-		components = (Map<IComponentIdentifier, IPlatformComponentAccess>)Starter.getPlatformValue(access.getInternalAccess().getId(), Starter.DATA_COMPONENTMAP);
+		components = (Map<IComponentIdentifier, IPlatformComponentAccess>)Starter.getPlatformValue(getComponent().getId(), Starter.DATA_COMPONENTMAP);
 		
-//		Starter.putPlatformValue(access.getInternalAccess().getId(), Starter.DATA_COMPONENTMAP, components);
+		cfs = (Map<IComponentIdentifier, IFuture<Map<String, Object>)Starter.getPlatformValue(getComponent().getId(), Starter.DATA_KILLFUTURES);
+	
+		initinfos = (Map<IComponentIdentifier, InitInfo>)Starter.getPlatformValue(getComponent().getId(), Starter.DATA_KILLFUTURES);
+
+		localtypes = (Map<Tuple, String>)Starter.getPlatformValue(getComponent().getId(), Starter.DATA_LOCALTYPES);
+	
+		cidcounts = (Map<Tuple, String>)Starter.getPlatformValue(getComponent().getId(), Starter.DATA_CIDCOUNTS);
 		
-		this.ccs = SCollection.createLinkedHashMap();
-		this.cfs = SCollection.createLinkedHashMap();
-//		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(exta.getComponentIdentifier())+".cms");
-		this.listeners = SCollection.createMultiCollection();
-		this.initinfos = SCollection.createHashMap();
-		this.childcounts = SCollection.createHashMap();
-		this.localtypes	= new LRU<Tuple, String>(100);
-		this.lockentries = SCollection.createHashMap();
-		this.cidcounts = new HashMap<String, Integer>();
+		ccs = (Map<IComponentIdentifier, CleanupCommand>)Starter.getPlatformValue(getComponent().getId(), Starter.DATA_CLEANUPCOMMANDS);
 		
-		putInitInfo(access.getInternalAccess().getId(), new InitInfo(access, null, null));
+		childcounts = (Map<IComponentIdentifier, Integer>)Starter.getPlatformValue(getComponent().getId(), Starter.DATA_CHILDCOUNTS);
+		
+		uniqueids = true; // fetch from args/config?
 	}
-    
-    //-------- IComponentManagementService interface --------
-    
+	
 	/**
 	 *  Load a component model.
 	 *  @param name The component name.
@@ -221,8 +172,8 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 		else
 		{
-			ILibraryService	ls	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class));
-			Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM));
+			ILibraryService	ls	= getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class));
+			Collection<IComponentFactory> facs = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			FactoryFilter facfilter = new FactoryFilter(filename, null, rid);
 			
 			SFilter.applyFilter(facs, facfilter).addResultListener(new IResultListener<Collection<IComponentFactory>>()
@@ -269,7 +220,7 @@ public class ComponentManagementService implements IComponentManagementService
 	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(String name, final String model, CreationInfo info)
 	{
 //		final Tuple2Future<IComponentIdentifier, Map<String, Object>> ret = new Tuple2Future<IComponentIdentifier, Map<String,Object>>();
-		final Tuple2Future<IComponentIdentifier, Map<String, Object>> ret = (Tuple2Future<IComponentIdentifier, Map<String,Object>>)SFuture.getNoTimeoutFuture(Tuple2Future.class, agent);
+		final Tuple2Future<IComponentIdentifier, Map<String, Object>> ret = (Tuple2Future<IComponentIdentifier, Map<String,Object>>)SFuture.getNoTimeoutFuture(Tuple2Future.class, getComponent());
 		createComponent(name, model, info, new IResultListener<Collection<Tuple2<String,Object>>>()
 		{
 			public void resultAvailable(Collection<jadex.commons.Tuple2<String,Object>> result) 
@@ -309,7 +260,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponent(CreationInfo info, String name, String model)
 	{		
-		final SubscriptionIntermediateFuture<CMSStatusEvent> ret = (SubscriptionIntermediateFuture)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
+		final SubscriptionIntermediateFuture<CMSStatusEvent> ret = (SubscriptionIntermediateFuture)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getComponent());
 		
 		final IComponentIdentifier[] mycid = new IComponentIdentifier[1];
 		final boolean[] terminate = new boolean[1];
@@ -407,7 +358,7 @@ public class ComponentManagementService implements IComponentManagementService
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
-		final Cause curcause = sc==null? agent.getDescription().getCause(): sc.getCause();
+		final Cause curcause = sc==null? getComponent().getDescription().getCause(): sc.getCause();
 		
 //		if(modelname.indexOf("jadex.platform.service.message.transport.ssltcpmtp.ProviderAgent")!=-1)
 //			System.out.println("create: "+modelname);//+" "+info!=null? info.getResourceIdentifier(): "norid");
@@ -683,9 +634,7 @@ public class ComponentManagementService implements IComponentManagementService
 																			LockEntry kt = lockentries.get(cinfo.getParent());
 																			if(kt!=null)
 																			{
-																				if(kt.removeLocker(lockkey))
-																					destroyComponent(kt.getLocked(), kt.getKillFuture());
-																				
+																				kt.removeLocker(lockkey);
 																				if(kt.getLockerCount()==0)
 																				{
 																					lockentries.remove(cinfo.getParent());
@@ -703,7 +652,8 @@ public class ComponentManagementService implements IComponentManagementService
 																	cid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: lmodel.getNameHint()!=null? lmodel.getNameHint(): lmodel.getName(), paname);//, addresses);
 																	
 																	// Defer component services being found from registry
-																	ServiceRegistry.getRegistry(access.getInternalAccess()).addExcludedComponent(cid);
+//																	ServiceRegistry.getRegistry(access.getInternalAccess()).addExcludedComponent(cid);
+																	ServiceRegistry.getRegistry(getComponent()).addExcludedComponent(cid);
 																	
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
@@ -814,17 +764,18 @@ public class ComponentManagementService implements IComponentManagementService
 																	// or the parent is already running
 																	final boolean	doinit	= cinfo.getParent()==null || getInitInfo(cinfo.getParent())==null;
 																	
-																	logger.info("Starting component: "+cid.getName());
+																	getComponent().getLogger().info("Starting component: "+cid.getName());
 							//										System.err.println("Pre-Init: "+cid);
 																	
 																	resfut.addResultListener(createResultListener(new IResultListener<Void>()
 																	{
 																		public void resultAvailable(Void result)
 																		{
-																			logger.info("Started component: "+cid.getName());
+																			getComponent().getLogger().info("Started component: "+cid.getName());
 
-																			ServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
-																			
+																			ServiceRegistry.getRegistry(getComponent()).removeExcludedComponent(cid);
+//																			ServiceRegistry.getRegistry(access.getInternalAccess()).removeExcludedComponent(cid);
+																																		
 		//																	System.out.println("created: "+ad);
 																			
 																			// Init successfully finished. Add description and adapter.
@@ -917,7 +868,7 @@ public class ComponentManagementService implements IComponentManagementService
 																					}
 																					else
 																					{
-																						logger.info("Starting component failed: "+cid+", "+exception);
+																						getComponent().getLogger().info("Starting component failed: "+cid+", "+exception);
 																					}																					
 																				}
 																			}));								
@@ -925,7 +876,7 @@ public class ComponentManagementService implements IComponentManagementService
 																		
 																		public void exceptionOccurred(final Exception exception)
 																		{
-																			logger.info("Starting component failed: "+cid+", "+exception);
+																			getComponent().getLogger().info("Starting component failed: "+cid+", "+exception);
 																			
 																			IServiceRegistry	reg	= access!=null ? ServiceRegistry.getRegistry(access.getInternalAccess()) : null;
 																			if(reg!=null)	// TODO: why null? -> platform shutdown, superpeer fail?
@@ -1035,7 +986,7 @@ public class ComponentManagementService implements IComponentManagementService
 	{
 		final Future<Tuple2<String, ClassLoader>> ret = new Future<Tuple2<String, ClassLoader>>();
 		
-		ILibraryService libservice = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+		ILibraryService libservice = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 		// Hack!!! May be null on platform init
 		if(libservice!=null)
 		{
@@ -1149,139 +1100,78 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected IFuture<IComponentFactory> getComponentFactory(final String model, final CreationInfo cinfo, final IResourceIdentifier rid, final boolean searched, final boolean cachemiss)
 	{
-		Future<IComponentFactory> ret = new Future<>();
+		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
+
 		
-		FactoryFilter ff = new FactoryFilter(model, null, rid);
-		SComponentFactory.getFactory(ff, agent).addResultListener(new DelegationResultListener<IComponentFactory>(ret)
+		// Search, if no cache available or not found in cache
+		if((factories==null || cachemiss) && !searched)
 		{
-			@Override
-			public void customResultAvailable(IComponentFactory result)
-			{
-				System.out.println("found: "+model+" "+result);
-				// do not use fallback as soon as first real can be found
-//				if(!result.equals(componentfactory))
-//				{
-					componentfactory = null;
-//					System.out.println("deleting fallback factory: "+model);
-//				}
-				super.customResultAvailable(result);
-			}
+//			System.out.println("searching factories");
 			
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
-				if(componentfactory!=null)
+			Collection<IComponentFactory> facts = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+			if(!facts.isEmpty())
+			{						
+				// Reorder factories to assure that delegating multi loaders are last (if present).
+				if(facts.size()>1)
 				{
-					ff.filter(componentfactory).addResultListener(new IResultListener<Boolean>()
+					List<IComponentFactory>	singles	= new ArrayList<IComponentFactory>();
+					List<IComponentFactory>	multies	= new ArrayList<IComponentFactory>();
+					for(IComponentFactory fac: facts)
 					{
-						public void resultAvailable(Boolean result)
+//						if(fac.toString().toLowerCase().indexOf("multi")!=-1)
+						if(isMultiFactory(fac))
+//						if(((IService)fac).getId().getProviderId().getLocalName().indexOf("multi")!=-1)
 						{
-							if(result.booleanValue())
-								ret.setResult(componentfactory);
-							else
-								ret.setException(new ServiceNotFoundException("No component factory found for: "+model));
+							multies.add(fac);
 						}
-						
-						public void exceptionOccurred(Exception exception)
+						else
 						{
-							ret.setException(new ServiceNotFoundException("No component factory found for: "+model));
+							singles.add(fac);
+							// Remove fallback factory when first real factory is found.
+							componentfactory = null;
 						}
-					});
-				}
-				else
-				{
-					ret.setException(new ServiceNotFoundException("No component factory found for: "+model));
+					}
+					facts	= singles;
+					facts.addAll(multies);
 				}
 			}
-		});
+			factories = facts.isEmpty() ? null : facts;
+			
+			// Invoke again, now with up-to-date cache.
+			getComponentFactory(model, cinfo, rid, true, false).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
+		}
 		
+		// Cache available or recently searched.
+		else
+		{
+//			System.out.println("create start2: "+model+" "+cinfo.getParent());
+						
+			selectComponentFactory(factories==null? null: factories.iterator(), model, cinfo, rid)
+				.addResultListener(createResultListener(new DelegationResultListener<IComponentFactory>(ret)
+			{
+				public void exceptionOccurred(Exception exception)
+				{
+					// Todo: sometimes nullpointerexception is caused below (because agent is null???).
+					if(!(exception instanceof ComponentCreationException))
+						System.out.println("factory ex: "+exception+", "+getComponent());
+
+					// If not found in cache but not yet searched, invoke again to start fresh search due to cache miss.
+					if(!searched)
+					{
+						getComponentFactory(model, cinfo, rid, false, true)
+							.addResultListener(createResultListener(new DelegationResultListener<IComponentFactory>(ret)));
+					}
+					
+					// Otherwise give up.
+					else
+					{
+						super.exceptionOccurred(exception);
+					}
+				}
+			}));
+		}
 		return ret;
 	}
-	
-//	/**
-//	 *  Get a fitting component factory for a specific model.
-//	 *  Searches the cached factories for the one that fits
-//	 *  the model and returns it. Possibly reevaluates the
-//	 *  cache when no factory was found.
-//	 *  @param model The model file name.
-//	 *  @param cinfo The creaion info.
-//	 *  @param rid The resource identifier.
-//	 *  @param searched	True, when a search has already been done.
-//	 *  @return The component factory.
-//	 */
-//	protected IFuture<IComponentFactory> getComponentFactory(final String model, final CreationInfo cinfo, final IResourceIdentifier rid, final boolean searched, final boolean cachemiss)
-//	{
-//		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
-//
-//		// Search, if no cache available or not found in cache
-//		if((factories==null || cachemiss) && !searched)
-//		{
-////			System.out.println("searching factories");
-//			
-//			Collection<IComponentFactory> facts = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
-//			if(!facts.isEmpty())
-//			{						
-//				// Reorder factories to assure that delegating multi loaders are last (if present).
-//				if(facts.size()>1)
-//				{
-//					List<IComponentFactory>	singles	= new ArrayList<IComponentFactory>();
-//					List<IComponentFactory>	multies	= new ArrayList<IComponentFactory>();
-//					for(IComponentFactory fac: facts)
-//					{
-////						if(fac.toString().toLowerCase().indexOf("multi")!=-1)
-//						if(isMultiFactory(fac))
-////						if(((IService)fac).getId().getProviderId().getLocalName().indexOf("multi")!=-1)
-//						{
-//							multies.add(fac);
-//						}
-//						else
-//						{
-//							singles.add(fac);
-//							// Remove fallback factory when first real factory is found.
-//							componentfactory = null;
-//						}
-//					}
-//					facts	= singles;
-//					facts.addAll(multies);
-//				}
-//			}
-//			factories = facts.isEmpty() ? null : facts;
-//			
-//			// Invoke again, now with up-to-date cache.
-//			getComponentFactory(model, cinfo, rid, true, false).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
-//		}
-//		
-//		// Cache available or recently searched.
-//		else
-//		{
-////			System.out.println("create start2: "+model+" "+cinfo.getParent());
-//						
-//			selectComponentFactory(factories==null? null: factories.iterator(), model, cinfo, rid)
-//				.addResultListener(createResultListener(new DelegationResultListener<IComponentFactory>(ret)
-//			{
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					// Todo: sometimes nullpointerexception is caused below (because agent is null???).
-//					if(!(exception instanceof ComponentCreationException))
-//						System.out.println("factory ex: "+exception+", "+agent);
-//
-//					// If not found in cache but not yet searched, invoke again to start fresh search due to cache miss.
-//					if(!searched)
-//					{
-//						getComponentFactory(model, cinfo, rid, false, true)
-//							.addResultListener(createResultListener(new DelegationResultListener<IComponentFactory>(ret)));
-//					}
-//					
-//					// Otherwise give up.
-//					else
-//					{
-//						super.exceptionOccurred(exception);
-//					}
-//				}
-//			}));
-//		}
-//		return ret;
-//	}
 	
 	/**
 	 *  Test if factory is a multi factory.
@@ -1292,102 +1182,102 @@ public class ComponentManagementService implements IComponentManagementService
 		return ((IService)fac).getId().getProviderId().getLocalName().indexOf("multi")!=-1;
 	}
 	
-//	/**
-//	 *  Selects a component factory from a collection of factories.
-//	 *  Uses the isLoadable factory method to determine if the
-//	 *  model can be loaded.
-//	 *  @param factories The collection of factories.
-//	 *  @param model The model file name.
-//	 *  @param cinfo The creation info.
-//	 *  @param cl The classloader.
-//	 *  @return The component factory.
-//	 */
-//	protected IFuture<IComponentFactory> selectComponentFactory(final Iterator<IComponentFactory> factories, 
-//		final String model, final CreationInfo cinfo, final IResourceIdentifier rid)
-//	{
-////		System.out.println("select factory: "+model+", "+SUtil.arrayToString(factories));
-//		
-////		if(model.indexOf("boken")!=-1)
-////			System.out.println("sdfsdf");
-//		
-//		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
-//		
-//		if(factories!=null && factories.hasNext())
-//		{
-//			final IComponentFactory	factory	= factories.next();
-//			factory.isLoadable(model, cinfo.getImports(), rid)
-//				.addResultListener(createResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(ret)
-//			{
-//				public void customResultAvailable(Boolean res)
-//				{
-//					if(res.booleanValue())
-//					{
-//						// If multi factory, clear cache and invoke again to obtain real factory.
-////						if(factory.toString().toLowerCase().indexOf("multi")!=-1)
-//						if(isMultiFactory(factory))
-//						{
-//							ComponentManagementService.this.factories	= null;
-//							getComponentFactory(model, cinfo, rid, false, false)
-//								.addResultListener(new DelegationResultListener<IComponentFactory>(ret));
-//						}
-//						else
-//						{
-//							ret.setResult(factory);
-//						}
-//					}
-//					else if(factories.hasNext())
-//					{
-//						selectComponentFactory(factories, model, cinfo, rid)
-//							.addResultListener(new DelegationResultListener<IComponentFactory>(ret));
-//					}
-//					else
-//					{
-//						selectFallbackFactory(model, cinfo, rid).addResultListener(createResultListener(new DelegationResultListener<IComponentFactory>(ret)));
-//					}
-//				}		
-//			}));
-//		}
-//		else
-//		{
-//			selectFallbackFactory(model, cinfo, rid).addResultListener(createResultListener(new DelegationResultListener<IComponentFactory>(ret)));
-//		}
-//		
-//		return ret;
-//	}
-//	
-//	/**
-//	 *  Select the fallback factory.
-//	 */
-//	protected IFuture<IComponentFactory> selectFallbackFactory(final String model, final CreationInfo cinfo, final IResourceIdentifier rid)
-//	{
-////		System.out.println("fallback: "+model);
-//		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
-//		
-//		if(componentfactory!=null)
-//		{
-//			componentfactory.isLoadable(model, cinfo.getImports(), rid)
-//				.addResultListener(createResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(ret)
-//			{
-//				public void customResultAvailable(Boolean res)
-//				{
-//					if(res.booleanValue())
-//					{
-//						ret.setResult(componentfactory);
-//					}
-//					else
-//					{
-//						ret.setException(new ComponentCreationException("No factory found for: "+model, ComponentCreationException.REASON_NO_COMPONENT_FACTORY));
-//					}
-//				}
-//			}));
-//		}
-//		else
-//		{
-//			ret.setException(new ComponentCreationException("No factory found for: "+model, ComponentCreationException.REASON_NO_COMPONENT_FACTORY));
-//		}
-//		
-//		return ret;
-//	}
+	/**
+	 *  Selects a component factory from a collection of factories.
+	 *  Uses the isLoadable factory method to determine if the
+	 *  model can be loaded.
+	 *  @param factories The collection of factories.
+	 *  @param model The model file name.
+	 *  @param cinfo The creation info.
+	 *  @param cl The classloader.
+	 *  @return The component factory.
+	 */
+	protected IFuture<IComponentFactory> selectComponentFactory(final Iterator<IComponentFactory> factories, 
+		final String model, final CreationInfo cinfo, final IResourceIdentifier rid)
+	{
+//		System.out.println("select factory: "+model+", "+SUtil.arrayToString(factories));
+		
+//		if(model.indexOf("boken")!=-1)
+//			System.out.println("sdfsdf");
+		
+		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
+		
+		if(factories!=null && factories.hasNext())
+		{
+			final IComponentFactory	factory	= factories.next();
+			factory.isLoadable(model, cinfo.getImports(), rid)
+				.addResultListener(createResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(ret)
+			{
+				public void customResultAvailable(Boolean res)
+				{
+					if(res.booleanValue())
+					{
+						// If multi factory, clear cache and invoke again to obtain real factory.
+//						if(factory.toString().toLowerCase().indexOf("multi")!=-1)
+						if(isMultiFactory(factory))
+						{
+							ComponentManagementService.this.factories	= null;
+							getComponentFactory(model, cinfo, rid, false, false)
+								.addResultListener(new DelegationResultListener<IComponentFactory>(ret));
+						}
+						else
+						{
+							ret.setResult(factory);
+						}
+					}
+					else if(factories.hasNext())
+					{
+						selectComponentFactory(factories, model, cinfo, rid)
+							.addResultListener(new DelegationResultListener<IComponentFactory>(ret));
+					}
+					else
+					{
+						selectFallbackFactory(model, cinfo, rid).addResultListener(createResultListener(new DelegationResultListener<IComponentFactory>(ret)));
+					}
+				}		
+			}));
+		}
+		else
+		{
+			selectFallbackFactory(model, cinfo, rid).addResultListener(createResultListener(new DelegationResultListener<IComponentFactory>(ret)));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Select the fallback factory.
+	 */
+	protected IFuture<IComponentFactory> selectFallbackFactory(final String model, final CreationInfo cinfo, final IResourceIdentifier rid)
+	{
+//		System.out.println("fallback: "+model);
+		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
+		
+		if(componentfactory!=null)
+		{
+			componentfactory.isLoadable(model, cinfo.getImports(), rid)
+				.addResultListener(createResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(ret)
+			{
+				public void customResultAvailable(Boolean res)
+				{
+					if(res.booleanValue())
+					{
+						ret.setResult(componentfactory);
+					}
+					else
+					{
+						ret.setException(new ComponentCreationException("No factory found for: "+model, ComponentCreationException.REASON_NO_COMPONENT_FACTORY));
+					}
+				}
+			}));
+		}
+		else
+		{
+			ret.setException(new ComponentCreationException("No factory found for: "+model, ComponentCreationException.REASON_NO_COMPONENT_FACTORY));
+		}
+		
+		return ret;
+	}
 
 	/**
 	 *  Get the info of the parent component.
@@ -1438,7 +1328,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected boolean isRemoteComponent(IComponentIdentifier cid)
 	{
-		return !cid.getPlatformName().equals(agent.getId().getName());
+		return !cid.getPlatformName().equals(getComponent().getId().getName());
 	}
 	
 	/**
@@ -1576,7 +1466,7 @@ public class ComponentManagementService implements IComponentManagementService
 				{
 //					if(cid.toString().indexOf("Mandelbrot")!=-1)
 //						System.out.println("Queued component termination during init: "+cid.getName());
-					logger.info("Queued component termination during init: "+cid.getName());
+					getComponent().getLogger().info("Queued component termination during init: "+cid.getName());
 				}
 			}
 			
@@ -1584,7 +1474,7 @@ public class ComponentManagementService implements IComponentManagementService
 			else if(comp!=null)
 			{				
 				// Kill subcomponents
-				logger.info("Terminating component structure: "+cid.getName());
+				getComponent().getLogger().info("Terminating component structure: "+cid.getName());
 				final CMSComponentDescription	desc = (CMSComponentDescription)((PlatformComponent)comp).getDescription();
 				final IComponentIdentifier[] achildren = desc.getChildren();
 				
@@ -1622,7 +1512,7 @@ public class ComponentManagementService implements IComponentManagementService
 								
 								cc	= new CleanupCommand(cid);
 								ccs.put(cid, cc);
-								logger.info("Terminating component: "+cid.getName());
+								getComponent().getLogger().info("Terminating component: "+cid.getName());
 								fut = comp.shutdown();								
 							}
 							else
@@ -1743,7 +1633,7 @@ public class ComponentManagementService implements IComponentManagementService
 	/**
 	 *  Suspend the execution of an component.
 	 *  @param cid The component identifier.
-	 */
+	 * /
 	public IFuture<Void> suspendComponent(final IComponentIdentifier cid)
 	{
 		IFuture<Void>	ret;
@@ -1797,7 +1687,7 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Resume the execution of an component.
@@ -1954,7 +1844,7 @@ public class ComponentManagementService implements IComponentManagementService
 	/**
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
-	 */
+	 * /
 	public IFuture<Void> stepComponent(final IComponentIdentifier cid, final String stepinfo)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -1993,7 +1883,7 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 		
 		return ret;
-	}
+	}*/
 
 	/**
 	 *  Set breakpoints for a component.
@@ -2001,7 +1891,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
 	 *  @param cid The component identifier.
 	 *  @param breakpoints The new breakpoints (if any).
-	 */
+	 * /
 	public IFuture<Void> setComponentBreakpoints(final IComponentIdentifier cid, final String[] breakpoints)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -2028,24 +1918,24 @@ public class ComponentManagementService implements IComponentManagementService
 		}
 		
 		return ret;
-	}
+	}*/
 
 	//-------- listener methods --------
 	
 	/**
      *  Add a component listener for all components.
      *  The listener is registered for component changes.
-     */
+     * /
     public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToAll()
     {
     	return listenToComponent(null);
-    }
+    }*/
     
 	/**
      *  Add a component listener for a specific component.
      *  The listener is registered for component changes.
      *  @param cid	The component to be listened.
-     */
+     * /
     public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(final IComponentIdentifier cid)
     {
     	final SubscriptionIntermediateFuture<CMSStatusEvent>	ret	= new SubscriptionIntermediateFuture<IComponentManagementService.CMSStatusEvent>();
@@ -2070,7 +1960,7 @@ public class ComponentManagementService implements IComponentManagementService
     	});
     	
     	return ret;    	
-    }
+    }*/
     
     //-------- helper classes --------
 
@@ -2106,7 +1996,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			IComponentAdapter pad = null;
 			CMSComponentDescription desc;
 			Map<String, Object> results = null;
-			logger.info("Terminated component: "+cid.getName());
+			getComponent().getLogger().info("Terminated component: "+cid.getName());
 //			if(cid.getParent()==null)
 //				System.out.println("CleanupCommand: "+cid);
 //			boolean shutdown = false;
@@ -2126,7 +2016,7 @@ public class ComponentManagementService implements IComponentManagementService
 //				if(cid.getName().indexOf("Peer")==-1)
 //					System.out.println("removed adapter: "+adapter.getComponentIdentifier().getLocalName()+" "+cid+" "+adapters);
 			
-			desc	= (CMSComponentDescription)comp.getInternalAccess().getDescription();
+			desc = (CMSComponentDescription)comp.getInternalAccess().getDescription();
 			
 			IArgumentsResultsFeature	af	= comp.getInternalAccess().getFeature0(IArgumentsResultsFeature.class); 
 			results = af!=null ? af.getResults() : null;
@@ -2405,7 +2295,7 @@ public class ComponentManagementService implements IComponentManagementService
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
 			)
 		{
-			getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), true)
+			getExternalAccess(ci.getParent()==null? getComponent().getId(): ci.getParent(), true)
 				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IResourceIdentifier>(ret)
 			{
 				public void customResultAvailable(IExternalAccess ea)
@@ -2482,7 +2372,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IComponentIdentifier getParentIdentifier(CreationInfo ci)
 	{
-		IComponentIdentifier ret = ci!=null && ci.getParent()!=null ? ci.getParent() : agent.getId(); 
+		IComponentIdentifier ret = ci!=null && ci.getParent()!=null ? ci.getParent() : getComponent().getId(); 
 //		System.out.println("parent id: "+ret);
 		return ret;
 	}
@@ -2795,133 +2685,133 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	public IFuture<IComponentIdentifier> getRootIdentifier()
 	{
-		return new Future<IComponentIdentifier>(agent.getId());
+		return new Future<IComponentIdentifier>(getComponent().getId());
 	}
 	
-	/**
-	 *  Search for components matching the given description.
-	 *  @return An array of matching component descriptions.
-	 */
-	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con)
-	{
-		return searchComponents(adesc, con, false);
-	}
+//	/**
+//	 *  Search for components matching the given description.
+//	 *  @return An array of matching component descriptions.
+//	 */
+//	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con)
+//	{
+//		return searchComponents(adesc, con, false);
+//	}
 	
-	/**
-	 *  Search for components matching the given description.
-	 *  @return An array of matching component descriptions.
-	 */
-	public IFuture<IComponentDescription[]> searchComponents(final IComponentDescription adesc, final ISearchConstraints con, boolean remote)
-	{
-		final Future<IComponentDescription[]> fut = new Future<IComponentDescription[]>();
-		
-//		System.out.println("search: "+components);
-		final List<IComponentDescription> ret = new ArrayList<IComponentDescription>();
-
-		// If name is supplied, just lookup description.
-		if(adesc!=null && adesc.getName()!=null)
-		{
-			CMSComponentDescription ad = (CMSComponentDescription)getDescription(adesc.getName());
-			if(ad!=null && ad.getName().equals(adesc.getName()))
-			{
-				// Todo: addresses reuqired for interplatform comm.
-//				ad.setName(refreshComponentIdentifier(ad.getName()));
-				CMSComponentDescription	desc	= (CMSComponentDescription)ad.clone();
-				ret.add(desc);
-			}
-		}
-
-		// Otherwise search for matching descriptions.
-		else
-		{
-			for(Iterator<IPlatformComponentAccess> it=components.values().iterator(); it.hasNext(); )
-			{
-				CMSComponentDescription	test = (CMSComponentDescription)it.next().getInternalAccess().getDescription();
-				if(adesc==null ||
-					(adesc.getOwnership()==null || adesc.getOwnership().equals(test.getOwnership()))
-//						&& (adesc.getName().getParent()==null || adesc.getName().getParent().equals(test.getParent()))
-					&& (adesc.getType()==null || adesc.getType().equals(test.getType()))
-					&& (adesc.getState()==null || adesc.getState().equals(test.getState()))
-//						&& (adesc.getProcessingState()==null || adesc.getProcessingState().equals(test.getProcessingState()))
-					&& (adesc.getModelName()==null || adesc.getModelName().equals(test.getModelName())))					
-				{
-					ret.add(test);
-				}
-			}
-		}
-
-		//System.out.println("searched: "+ret);
-		
-//		System.out.println("Started search: "+ret);
-//		open.add(fut);
-		if(remote)
-		{
-			IFuture<Collection<IComponentManagementService>> futi = agent.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(RequiredService.SCOPE_GLOBAL)));
-			futi.addResultListener(createResultListener(new IResultListener<Collection<IComponentManagementService>>()
-			{
-				public void resultAvailable(Collection<IComponentManagementService> result)
-				{
-//					System.out.println("cms: "+coll);
-					// Ignore search failures of remote dfs
-					IResultListener<IComponentDescription[]> lis = createResultListener(new CollectionResultListener<IComponentDescription[]>(result.size(), true, 
-						new IResultListener<Collection<IComponentDescription[]>>()
-					{
-						public void resultAvailable(Collection<IComponentDescription[]> result)
-						{
-							// Add all services of all remote dfs
-							for(Iterator<IComponentDescription[]> it=result.iterator(); it.hasNext(); )
-							{
-								IComponentDescription[] res = it.next();
-								if(res!=null)
-								{
-									for(int i=0; i<res.length; i++)
-									{
-										ret.add(res[i]);
-									}
-								}
-							}
-//							open.remove(fut);
-//							System.out.println("Federated search: "+ret);//+" "+open);
-							fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-//							open.remove(fut);
-							fut.setException(exception);
-//							fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
-						}
-					}));
-					for(Iterator<IComponentManagementService> it=result.iterator(); it.hasNext(); )
-					{
-						IComponentManagementService remotecms = it.next();
-						if(remotecms!=ComponentManagementService.this)
-						{
-							remotecms.searchComponents(adesc, con, false).addResultListener(lis);
-						}
-						else
-						{
-							lis.resultAvailable(null);
-						}
-					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-//					open.remove(fut);
-					fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
-				}
-			}));
-		}
-		else
-		{
-//			open.remove(fut);
-//			System.out.println("Local search: "+ret+" "+open);
-			fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
-		}
-		
-		return fut;
-	}
+//	/**
+//	 *  Search for components matching the given description.
+//	 *  @return An array of matching component descriptions.
+//	 */
+//	public IFuture<IComponentDescription[]> searchComponents(final IComponentDescription adesc, final ISearchConstraints con, boolean remote)
+//	{
+//		final Future<IComponentDescription[]> fut = new Future<IComponentDescription[]>();
+//		
+////		System.out.println("search: "+components);
+//		final List<IComponentDescription> ret = new ArrayList<IComponentDescription>();
+//
+//		// If name is supplied, just lookup description.
+//		if(adesc!=null && adesc.getName()!=null)
+//		{
+//			CMSComponentDescription ad = (CMSComponentDescription)getDescription(adesc.getName());
+//			if(ad!=null && ad.getName().equals(adesc.getName()))
+//			{
+//				// Todo: addresses reuqired for interplatform comm.
+////				ad.setName(refreshComponentIdentifier(ad.getName()));
+//				CMSComponentDescription	desc	= (CMSComponentDescription)ad.clone();
+//				ret.add(desc);
+//			}
+//		}
+//
+//		// Otherwise search for matching descriptions.
+//		else
+//		{
+//			for(Iterator<IPlatformComponentAccess> it=components.values().iterator(); it.hasNext(); )
+//			{
+//				CMSComponentDescription	test = (CMSComponentDescription)it.next().getInternalAccess().getDescription();
+//				if(adesc==null ||
+//					(adesc.getOwnership()==null || adesc.getOwnership().equals(test.getOwnership()))
+////						&& (adesc.getName().getParent()==null || adesc.getName().getParent().equals(test.getParent()))
+//					&& (adesc.getType()==null || adesc.getType().equals(test.getType()))
+//					&& (adesc.getState()==null || adesc.getState().equals(test.getState()))
+////						&& (adesc.getProcessingState()==null || adesc.getProcessingState().equals(test.getProcessingState()))
+//					&& (adesc.getModelName()==null || adesc.getModelName().equals(test.getModelName())))					
+//				{
+//					ret.add(test);
+//				}
+//			}
+//		}
+//
+//		//System.out.println("searched: "+ret);
+//		
+////		System.out.println("Started search: "+ret);
+////		open.add(fut);
+//		if(remote)
+//		{
+//			IFuture<Collection<IComponentManagementService>> futi = getComponent().getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(RequiredServiceInfo.SCOPE_GLOBAL)));
+//			futi.addResultListener(createResultListener(new IResultListener<Collection<IComponentManagementService>>()
+//			{
+//				public void resultAvailable(Collection<IComponentManagementService> result)
+//				{
+////					System.out.println("cms: "+coll);
+//					// Ignore search failures of remote dfs
+//					IResultListener<IComponentDescription[]> lis = createResultListener(new CollectionResultListener<IComponentDescription[]>(result.size(), true, 
+//						new IResultListener<Collection<IComponentDescription[]>>()
+//					{
+//						public void resultAvailable(Collection<IComponentDescription[]> result)
+//						{
+//							// Add all services of all remote dfs
+//							for(Iterator<IComponentDescription[]> it=result.iterator(); it.hasNext(); )
+//							{
+//								IComponentDescription[] res = it.next();
+//								if(res!=null)
+//								{
+//									for(int i=0; i<res.length; i++)
+//									{
+//										ret.add(res[i]);
+//									}
+//								}
+//							}
+////							open.remove(fut);
+////							System.out.println("Federated search: "+ret);//+" "+open);
+//							fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+////							open.remove(fut);
+//							fut.setException(exception);
+////							fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+//						}
+//					}));
+//					for(Iterator<IComponentManagementService> it=result.iterator(); it.hasNext(); )
+//					{
+//						IComponentManagementService remotecms = it.next();
+//						if(remotecms!=ComponentManagementService.this)
+//						{
+//							remotecms.searchComponents(adesc, con, false).addResultListener(lis);
+//						}
+//						else
+//						{
+//							lis.resultAvailable(null);
+//						}
+//					}
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+////					open.remove(fut);
+//					fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
+//				}
+//			}));
+//		}
+//		else
+//		{
+////			open.remove(fut);
+////			System.out.println("Local search: "+ret+" "+open);
+//			fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
+//		}
+//		
+//		return fut;
+//	}
 	
 //	/**
 //	 *  Create a component identifier that is allowed on the platform.
@@ -2970,7 +2860,7 @@ public class ComponentManagementService implements IComponentManagementService
 		BasicComponentIdentifier ret = null;
 
 		if(platformname==null)
-			platformname = agent.getId().getName();
+			platformname = getComponent().getId().getName();
 		ret = new BasicComponentIdentifier(localname+"@"+platformname);
 		
 		if(uniqueids || components.containsKey(ret) || getInitInfo(ret)!=null)
@@ -2997,180 +2887,180 @@ public class ComponentManagementService implements IComponentManagementService
 		return ret;
 	}
 	
-	/**
-	 *  Set the state of a component (i.e. update the component description).
-	 *  Currently only switching between suspended/waiting is allowed.
-	 */
-	// hack???
-	public void	setComponentState(IComponentIdentifier comp, String state)
-	{
-		assert IComponentDescription.STATE_SUSPENDED.equals(state) : "wrong state: "+comp+", "+state;
-		
-		CMSComponentDescription	desc	= null;
-		desc	= (CMSComponentDescription)getDescription(comp);
-		desc.setState(state);			
-		
-		notifyListenersChanged(desc);
-	}
+//	/**
+//	 *  Set the state of a component (i.e. update the component description).
+//	 *  Currently only switching between suspended/waiting is allowed.
+//	 */
+//	// hack???
+//	public void	setComponentState(IComponentIdentifier comp, String state)
+//	{
+//		assert IComponentDescription.STATE_SUSPENDED.equals(state) : "wrong state: "+comp+", "+state;
+//		
+//		CMSComponentDescription	desc	= null;
+//		desc	= (CMSComponentDescription)getDescription(comp);
+//		desc.setState(state);			
+//		
+//		notifyListenersChanged(desc);
+//	}
 
 	//-------- IService interface --------
 	
-	/**
-	 *  Start the service.
-	 *  @return A future that is done when the service has completed starting.  
-	 */
-	@ServiceStart
-	public IFuture<Void> startService()
-	{
-		final Future<Void>	ret	= new Future<Void>();
-
-		if(!running)
-		{
-			// Avoid double initialization from persistence service.
-			running	= true;
-		
-			logger = agent.getLogger();
-			componentfactory.startService(agent, sid.getResourceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret)
-			{
-				public void customResultAvailable(Void result)
-				{
-					removeInitInfo(agent.getId());
-					components.put(agent.getId(), access);
-					
-					ret.setResult(null);
-//					agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-//						.addResultListener(createResultListener(new IResultListener<IMessageService>()
-//					{
-//						public void resultAvailable(IMessageService result)
-//						{
-//							msgservice	= result;
-//							cont();
-//						}
-//						
-//						public void exceptionOccurred(Exception exception)
-//						{
-//							cont();
-//						}
-//						
-//						protected void cont()
-//						{
-//							agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-//								.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
-//							{
-//								public void customResultAvailable(IClockService result)
-//								{
-//									clockservice	= result;
-							
-									// add root adapter and register root component
-//									getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
-//									{
-//										public void customResultAvailable(String[] addresses)
-//										{
-//											((ComponentIdentifier)agent.getComponentIdentifier()).setAddresses(addresses);
-//											initinfos.remove(agent.getComponentIdentifier());
-//											components.put(agent.getComponentIdentifier(), access);
-//											ret.setResult(null);
-//										}
-//									}));
-//								}
-//							});	
-//						}
-//					}));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Start the service.
+//	 *  @return A future that is done when the service has completed starting.  
+//	 */
+//	@ServiceStart
+//	public IFuture<Void> startService()
+//	{
+//		final Future<Void>	ret	= new Future<Void>();
+//
+//		if(!running)
+//		{
+//			// Avoid double initialization from persistence service.
+//			running	= true;
+//		
+//			logger = agent.getLogger();
+//			componentfactory.startService(agent, sid.getResourceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret)
+//			{
+//				public void customResultAvailable(Void result)
+//				{
+//					removeInitInfo(agent.getId());
+//					components.put(agent.getId(), access);
+//					
+//					ret.setResult(null);
+////					agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+////						.addResultListener(createResultListener(new IResultListener<IMessageService>()
+////					{
+////						public void resultAvailable(IMessageService result)
+////						{
+////							msgservice	= result;
+////							cont();
+////						}
+////						
+////						public void exceptionOccurred(Exception exception)
+////						{
+////							cont();
+////						}
+////						
+////						protected void cont()
+////						{
+////							agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+////								.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+////							{
+////								public void customResultAvailable(IClockService result)
+////								{
+////									clockservice	= result;
+//							
+//									// add root adapter and register root component
+////									getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+////									{
+////										public void customResultAvailable(String[] addresses)
+////										{
+////											((ComponentIdentifier)agent.getComponentIdentifier()).setAddresses(addresses);
+////											initinfos.remove(agent.getComponentIdentifier());
+////											components.put(agent.getComponentIdentifier(), access);
+////											ret.setResult(null);
+////										}
+////									}));
+////								}
+////							});	
+////						}
+////					}));
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setResult(null);
+//		}
+//		
+//		return ret;
+//	}
 	
-	/**
-	 *  Shutdown the service.
-	 *  @return A future that is done when the service has completed its shutdown.  
-	 */
-	@ServiceShutdown
-	public IFuture<Void>	shutdownService()
-	{
-//		System.out.println("shutdown cms: "+agent.getComponentIdentifier()+" "+adapters);
-		
-//		System.out.println(": "+this);
-//		this.adapters	= null;	// required for final cleanup command
-//		this.ccs	= null;	// required for final cleanup command
-//		this.cfs	= null;	// required for final cleanup command
-//		this.logger	= null;	// required for final cleanup command
-//		this.listeners	= null;	// required for final cleanup command
-//		this.killresultlisteners	= null;	// required for final cleanup command
-//		this.root	= null;	// required for final cleanup command
-//		this.initinfos	= null;	// required for final cleanup command
-		
-		this.childcounts	= null;
-		this.access	= null;
-		this.componentfactory	= null;
-//		this.exeservice	= null;
-		this.agent	= null;
+//	/**
+//	 *  Shutdown the service.
+//	 *  @return A future that is done when the service has completed its shutdown.  
+//	 */
+//	@ServiceShutdown
+//	public IFuture<Void>	shutdownService()
+//	{
+////		System.out.println("shutdown cms: "+agent.getComponentIdentifier()+" "+adapters);
+//		
+////		System.out.println(": "+this);
+////		this.adapters	= null;	// required for final cleanup command
+////		this.ccs	= null;	// required for final cleanup command
+////		this.cfs	= null;	// required for final cleanup command
+////		this.logger	= null;	// required for final cleanup command
+////		this.listeners	= null;	// required for final cleanup command
+////		this.killresultlisteners	= null;	// required for final cleanup command
+////		this.root	= null;	// required for final cleanup command
+////		this.initinfos	= null;	// required for final cleanup command
+//		
+//		this.childcounts	= null;
+//		this.access	= null;
+//		this.componentfactory	= null;
+////		this.exeservice	= null;
+//		this.agent	= null;
 //		this.factories	= null;
-		this.localtypes	= null;
-//		this.marshalservice	= null;
-//		this.msgservice	= null;
-		
-		/*final Future ret = new Future();
-		final  long shutdowntime = 10000; // todo: shutdowntime and MAX_SHUTDOWM_TIME
-		
-		// Step 1: Find existing components.
-		getComponentDescriptions().addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				// Step 2: Kill existing components excepts daemons.
-				final List comps = new ArrayList(Arrays.asList((IComponentDescription[])result));
-				for(int i=comps.size()-1; i>-1; i--)
-				{
-					if(((CMSComponentDescription)comps.get(i)).isDaemon())
-						comps.remove(i);
-				}
-				
-				killComponents(comps, shutdowntime, new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						// Step 3: Find remaining components.
-						getComponentDescriptions().addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object source, Object result)
-							{
-								// Step 4: Kill remaining components.
-								killComponents(Arrays.asList((IComponentDescription[])result), shutdowntime, new DelegationResultListener(ret));
-							}
-
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								ret.setException(exception);
-							}
-						});		
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						ret.setException(exception);
-					}
-				});
-			}
-
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-		
-		return ret;*/
-		
-//		Starter.removePlatformMemory(sid.getProviderId());
-		
-		return IFuture.DONE;
-	}
+//		this.localtypes	= null;
+////		this.marshalservice	= null;
+////		this.msgservice	= null;
+//		
+//		/*final Future ret = new Future();
+//		final  long shutdowntime = 10000; // todo: shutdowntime and MAX_SHUTDOWM_TIME
+//		
+//		// Step 1: Find existing components.
+//		getComponentDescriptions().addResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				// Step 2: Kill existing components excepts daemons.
+//				final List comps = new ArrayList(Arrays.asList((IComponentDescription[])result));
+//				for(int i=comps.size()-1; i>-1; i--)
+//				{
+//					if(((CMSComponentDescription)comps.get(i)).isDaemon())
+//						comps.remove(i);
+//				}
+//				
+//				killComponents(comps, shutdowntime, new IResultListener()
+//				{
+//					public void resultAvailable(Object source, Object result)
+//					{
+//						// Step 3: Find remaining components.
+//						getComponentDescriptions().addResultListener(new IResultListener()
+//						{
+//							public void resultAvailable(Object source, Object result)
+//							{
+//								// Step 4: Kill remaining components.
+//								killComponents(Arrays.asList((IComponentDescription[])result), shutdowntime, new DelegationResultListener(ret));
+//							}
+//
+//							public void exceptionOccurred(Object source, Exception exception)
+//							{
+//								ret.setException(exception);
+//							}
+//						});		
+//					}
+//					
+//					public void exceptionOccurred(Object source, Exception exception)
+//					{
+//						ret.setException(exception);
+//					}
+//				});
+//			}
+//
+//			public void exceptionOccurred(Object source, Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
+//		
+//		return ret;*/
+//		
+////		Starter.removePlatformMemory(sid.getProviderId());
+//		
+//		return IFuture.DONE;
+//	}
 	
 	/**
 	 *  Test if a component should be suspended after init is done.
@@ -3259,7 +3149,7 @@ public class ComponentManagementService implements IComponentManagementService
 	protected void notifyListenersRemoved(IComponentDescription desc, Map<String, Object> results)
 	{
 		Set<SubscriptionIntermediateFuture<CMSStatusEvent>>	slisteners	= new LinkedHashSet<SubscriptionIntermediateFuture<CMSStatusEvent>>(listeners.getCollection(null));
-		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	coll	= listeners.remove(desc.getName());	// remove(!) subscriptions for termination event
+		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	coll = listeners.remove(desc.getName());	// remove(!) subscriptions for termination event
 		if(coll!=null)
 			slisteners.addAll(coll);
 		
@@ -3274,7 +3164,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected <T> IResultListener<T> createResultListener(IResultListener<T> listener)
 	{
-		return agent==null? listener: agent.getFeature(IExecutionFeature.class).createResultListener(listener);
+		return getComponent()==null? listener: getComponent().getFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
 	/**
@@ -3340,9 +3230,9 @@ public class ComponentManagementService implements IComponentManagementService
 //		});
 //		return ret;
 
-		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, RequiredService.SCOPE_GLOBAL);
+		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
 		sq.setPlatform(cid.getRoot());
-		return agent.getFeature(IRequiredServicesFeature.class).searchService(sq);
+		return getComponent().getFeature(IRequiredServicesFeature.class).searchService(sq);
 	}
 	
 //	/**
@@ -3366,7 +3256,7 @@ public class ComponentManagementService implements IComponentManagementService
 	 */
 	protected IClockService getClockService0()
 	{
-		return agent.getFeature(IRequiredServicesFeature.class).searchLocalService(
+		return getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(
 			new ServiceQuery<>(IClockService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 	}
 	
@@ -3411,5 +3301,4 @@ public class ComponentManagementService implements IComponentManagementService
 	{
 		return (InitInfo)initinfos.remove(cid);
 	}
-
 }

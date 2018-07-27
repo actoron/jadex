@@ -450,6 +450,9 @@ public class Starter
 //					putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, args);
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMCONFIG, config);
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMMODEL, model);
+					
+					putPlatformValue(cid, Starter.DATA_COMPONENTMAP, Collections.synchronizedMap(new HashMap<IComponentIdentifier, IPlatformComponentAccess>()));
+					
 //					rootconf.setBootstrapFactory(cfac);
 //					config.setPlatformModel(model);
 					

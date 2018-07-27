@@ -694,7 +694,7 @@ public class SComponentFactory
 	/**
 	 * 
 	 */
-	protected static IFuture<IComponentFactory> getFactory(final FactoryFilter filter, IInternalAccess ia)
+	public static IFuture<IComponentFactory> getFactory(final FactoryFilter filter, IInternalAccess ia)
 	{
 		Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
 		if(facs!=null && facs.size()>0)
