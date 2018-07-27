@@ -190,7 +190,7 @@ public class AlarmSettingsDialog extends JDialog
 					@Classname("setTime")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IClockService	cs	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+						IClockService	cs	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 						final Date now = new Date(cs.getTime());
 						SwingUtilities.invokeLater(new Runnable()
 						{

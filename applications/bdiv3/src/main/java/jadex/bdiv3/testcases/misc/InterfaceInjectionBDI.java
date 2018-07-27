@@ -40,7 +40,7 @@ public abstract class InterfaceInjectionBDI implements IBDIAgent
 		TestReport tr2 = new TestReport("#2", "Test if platform access interface injection works.");
 		try
 		{
-			IComponentManagementService	cms	= this.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+			IComponentManagementService	cms	= this.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
 			if(cms!=null)
 			{
 				tr2.setSucceeded(true);

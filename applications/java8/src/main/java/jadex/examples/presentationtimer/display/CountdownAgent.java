@@ -36,7 +36,7 @@ import jadex.micro.annotation.RequiredServices;
 }
 )
 @RequiredServices({
-	@RequiredService(type= IComponentManagementService.class, name = "cms", scope=RequiredService.SCOPE_PLATFORM)
+	@RequiredService(type= IComponentManagementService.class, name = "cms")
 })
 public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 

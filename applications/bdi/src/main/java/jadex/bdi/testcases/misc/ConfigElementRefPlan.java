@@ -28,7 +28,7 @@ public class ConfigElementRefPlan extends Plan
 		
 		// Create worker agent (kills itself automatically).
 		IComponentManagementService	cms	= getAgent().getFeature(IRequiredServicesFeature.class)
-			.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+			.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
 		Map<String, Object> args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
 		cms.createComponent("/jadex/bdi/testcases/misc/ConfigElementRefWorker.agent.xml",

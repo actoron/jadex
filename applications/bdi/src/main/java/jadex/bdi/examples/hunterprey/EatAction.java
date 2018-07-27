@@ -74,19 +74,19 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 		if(target.getProperty(ISpaceObject.PROPERTY_OWNER) != null)
 		{
 			// System.err.println("Destroying: "+target.getProperty(ISpaceObject.PROPERTY_OWNER));
-			space.getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
-					new IResultListener()
+			space.getExternalAccess().searchService( new ServiceQuery<>(IComponentManagementService.class)).addResultListener(
+				new IResultListener()
+				{
+					public void resultAvailable(Object result)
 					{
-						public void resultAvailable(Object result)
-						{
-							IComponentManagementService cms = (IComponentManagementService)result;
-							cms.destroyComponent(((IComponentDescription)target.getProperty(ISpaceObject.PROPERTY_OWNER)).getName());
-						}
-
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					});
+						IComponentManagementService cms = (IComponentManagementService)result;
+						cms.destroyComponent(((IComponentDescription)target.getProperty(ISpaceObject.PROPERTY_OWNER)).getName());
+					}
+	
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				});
 		}
 
 		avatar.setProperty(PROPERTY_POINTS, points);

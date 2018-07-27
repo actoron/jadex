@@ -356,7 +356,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredService.SCOPE_PLATFORM))
+						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class))
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -494,7 +494,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredService.SCOPE_PLATFORM))
+						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class))
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -759,7 +759,7 @@ public class GuiPanel extends JPanel
 			// These orders are not added to the agent (see manager.agent.xml).
 			try
 			{
-				IClockService clock	= agent.searchService( new ServiceQuery<>( IClockService.class, RequiredService.SCOPE_PLATFORM)).get();
+				IClockService clock	= agent.searchService( new ServiceQuery<>(IClockService.class)).get();
 				if(buy)
 				{
 					orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));

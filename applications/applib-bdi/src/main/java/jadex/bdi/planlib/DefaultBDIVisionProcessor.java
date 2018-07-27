@@ -93,7 +93,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		if(invoke)
 		{
 			// HACK!!! todo
-			space.getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			space.getExternalAccess().searchService(new ServiceQuery<>(IComponentManagementService.class))
 				.addResultListener(new IResultListener<IComponentManagementService>()
 			{
 				public void resultAvailable(IComponentManagementService result)
