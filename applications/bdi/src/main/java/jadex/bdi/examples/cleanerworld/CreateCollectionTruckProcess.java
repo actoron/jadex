@@ -89,7 +89,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				final Map<String, Object> params = new HashMap<String, Object>();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
-				space.getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				space.getExternalAccess().searchService( new ServiceQuery<>(IComponentManagementService.class))
 					.addResultListener(new DefaultResultListener<IComponentManagementService>()
 				{
 					public void resultAvailable(final IComponentManagementService cms)

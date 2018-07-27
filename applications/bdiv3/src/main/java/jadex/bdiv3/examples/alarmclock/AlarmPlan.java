@@ -47,7 +47,7 @@ public class AlarmPlan
 		while(true)
 		{
 			// Check if there is an alarm to do.
-			long	time	= scope.getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
+			long	time	= scope.getAgent().getFeature(IRequiredServicesFeature.class).getLocalService(IClockService.class).getTime();
 			long alarmtime = goal.getAlarm().getAlarmtime(time);
 //			System.out.println("Alarm plan alarmtime: "+alarmtime);
 			if(alarmtime==Alarm.NO_ALARM)
