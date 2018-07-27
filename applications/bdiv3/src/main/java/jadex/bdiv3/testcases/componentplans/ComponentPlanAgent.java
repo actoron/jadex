@@ -1,6 +1,5 @@
 package jadex.bdiv3.testcases.componentplans;
 
-import jadex.bdiv3.BDIAgentFactory;
 import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -8,9 +7,9 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Parent;
 
 /**
- *  Plan implemented as component.
+ *  Plan implemented as micro agent component.
  */
-@Agent(type=BDIAgentFactory.TYPE, synchronous=Boolean3.TRUE)
+@Agent(synchronous=Boolean3.TRUE)
 public class ComponentPlanAgent
 {
 	//-------- attributes --------

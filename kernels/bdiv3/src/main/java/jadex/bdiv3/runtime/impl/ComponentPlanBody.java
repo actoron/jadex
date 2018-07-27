@@ -4,29 +4,23 @@ import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 
 /**
  *  Plan body implementation as a component.
  */
-public class ComponentPlanBody implements IPlanBody
+public class ComponentPlanBody extends AbstractPlanBody
 {
 	//-------- attributes --------
 	
 	/** The component to create. */
 	protected String	component;
-	
-	/** The internal access. */
-	protected IInternalAccess	ia;
-	
-	/** The plan element. */
-	protected RPlan	rplan;
 	
 	/** The created component. */
 	protected IComponentIdentifier	cid;
@@ -41,31 +35,40 @@ public class ComponentPlanBody implements IPlanBody
 	 */
 	public ComponentPlanBody(String component, IInternalAccess ia, RPlan rplan)
 	{
+		super(ia, rplan);
 		this.component	= component;
-		this.ia	= ia;
-		this.rplan	= rplan;
 	}
 	
-	//-------- IPlanBody interface --------
+	//-------- AbstractPlanBody template methods --------
 	
-	/**
-	 *  Get the plan body.
-	 */
-	public Object getBody()
+	@Override
+	public Class<?>[] getBodyParameterTypes()
 	{
-		return cid;
+		return null;
 	}
 	
-	/**
-	 *  Execute the plan body.
-	 */
-	public IFuture<Void> executePlan()
+	@Override
+	public Class< ? >[] getPassedParameterTypes()
 	{
-		final Future<Void>	ret	= new Future<Void>();
-
-		rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
-		// Todo: should also set processing state and RPLANS thread local?
-		
+		return null;
+	}
+	
+	@Override
+	public Class< ? >[] getFailedParameterTypes()
+	{
+		return null;
+	}
+	
+	@Override
+	public Class<?>[] getAbortedParameterTypes()
+	{
+		return null;
+	}
+	
+	@Override
+	public Object invokeBody(Object[] params) throws BodyAborted
+	{
+		Future<Void>	ret	= new Future<>();
 		IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		cms.createComponent(null, component, new CreationInfo(ia.getId()))
 			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
@@ -79,19 +82,42 @@ public class ComponentPlanBody implements IPlanBody
 			@Override
 			public void secondResultAvailable(Map<String, Object> result)
 			{
-				rplan.setLifecycleState(aborted ? RPlan.PlanLifecycleState.ABORTED : RPlan.PlanLifecycleState.PASSED);
 				ret.setResult(null);
 			}
 			
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILED);
 				ret.setException(exception);
 			}
 		});
-		
 		return ret;
+	}
+	
+	@Override
+	public Object invokePassed(Object[] params)
+	{
+		return null;
+	}
+	
+	@Override
+	public Object invokeFailed(Object[] params)
+	{
+		return null;
+	}
+	
+	@Override
+	public Object invokeAborted(Object[] params)
+	{
+		return null;
+	}
+	
+	/**
+	 *  Get the plan body.
+	 */
+	public Object getBody()
+	{
+		return cid;
 	}
 	
 	/**
@@ -102,8 +128,10 @@ public class ComponentPlanBody implements IPlanBody
 		if(cid!=null)
 		{
 			// todo: fix synchronous subcomponents!? may be called from inner or outer component.
-			IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			IComponentManagementService cms = ((IInternalRequiredServicesFeature)ia.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 			cms.destroyComponent(cid);
 		}
+		
+		super.abort();
 	}
 }
