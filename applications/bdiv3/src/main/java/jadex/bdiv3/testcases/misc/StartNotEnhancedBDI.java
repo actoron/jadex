@@ -36,7 +36,7 @@ public class StartNotEnhancedBDI	extends ConstructorsSuper
 	public void	body()
 	{
 		TestReport	tr	= new TestReport("#1", "Test if constructor calls work.");
-		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
 		try
 		{
 			Class<?> cl = NotEnhancedBDI.class;

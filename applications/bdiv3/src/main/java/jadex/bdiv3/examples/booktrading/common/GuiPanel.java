@@ -380,56 +380,49 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredService.SCOPE_PLATFORM))
-							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
+						IClockService cs = ia.getFeature(IRequiredServicesFeature.class).getLocalService(IClockService.class);
+						while(dia.requestInput(cs.getTime()))
 						{
-							public void customResultAvailable(Object result)
+							try
 							{
-								IClockService cs = (IClockService)result;
-								while(dia.requestInput(cs.getTime()))
+								String title = dia.title.getText();
+								int limit = Integer.parseInt(dia.limit.getText());
+								int start = Integer.parseInt(dia.start.getText());
+								Date deadline = dformat.parse(dia.deadline.getText());
+								final Order order = new Order(title, deadline, start, limit, buy, cs);
+								
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
-									try
+									@Classname("add")
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										String title = dia.title.getText();
-										int limit = Integer.parseInt(dia.limit.getText());
-										int start = Integer.parseInt(dia.start.getText());
-										Date deadline = dformat.parse(dia.deadline.getText());
-										final Order order = new Order(title, deadline, start, limit, buy, cs);
-										
-										agent.scheduleStep(new IComponentStep<Void>()
-										{
-											@Classname("add")
-											public IFuture<Void> execute(IInternalAccess ia)
-											{
-												INegotiationAgent ag = (INegotiationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
-												ag.createGoal(order);
-												return IFuture.DONE;
-											}
-										});
-	//									agent.createGoal(goalname).addResultListener(new DefaultResultListener()
-	//									{
-	//										public void resultAvailable(Object source, Object result)
-	//										{
-	//											IEAGoal purchase = (IEAGoal)result;
-	//											purchase.setParameterValue("order", order);
-	//											agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(purchase);
-	//										}
-	//									});
-										orders.add(order);
-										items.fireTableDataChanged();
-										break;
+										INegotiationAgent ag = (INegotiationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+										ag.createGoal(order);
+										return IFuture.DONE;
 									}
-									catch(NumberFormatException e1)
-									{
-										JOptionPane.showMessageDialog(GuiPanel.this, "Price limit must be integer.", "Input error", JOptionPane.ERROR_MESSAGE);
-									}
-									catch(ParseException e1)
-									{
-										JOptionPane.showMessageDialog(GuiPanel.this, "Wrong date format, use YYYY/MM/DD hh:mm.", "Input error", JOptionPane.ERROR_MESSAGE);
-									}
-								}
+								});
+//									agent.createGoal(goalname).addResultListener(new DefaultResultListener()
+//									{
+//										public void resultAvailable(Object source, Object result)
+//										{
+//											IEAGoal purchase = (IEAGoal)result;
+//											purchase.setParameterValue("order", order);
+//											agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(purchase);
+//										}
+//									});
+								orders.add(order);
+								items.fireTableDataChanged();
+								break;
 							}
-						});
+							catch(NumberFormatException e1)
+							{
+								JOptionPane.showMessageDialog(GuiPanel.this, "Price limit must be integer.", "Input error", JOptionPane.ERROR_MESSAGE);
+							}
+							catch(ParseException e1)
+							{
+								JOptionPane.showMessageDialog(GuiPanel.this, "Wrong date format, use YYYY/MM/DD hh:mm.", "Input error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
 						return IFuture.DONE;
 					}
 				});
@@ -516,87 +509,79 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredService.SCOPE_PLATFORM))
-							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
+						IClockService cs = ia.getFeature(IRequiredServicesFeature.class).getLocalService(IClockService.class);
+						int row = table.getSelectedRow();
+						if(row >= 0 && row < orders.size())
 						{
-							public void customResultAvailable(Object result)
+							final Order order = (Order)orders.get(row);
+							edit_dialog.title.setText(order.getTitle());
+							edit_dialog.limit.setText(Integer.toString(order.getLimit()));
+							edit_dialog.start.setText(Integer.toString(order.getStartPrice()));
+							edit_dialog.deadline.setText(dformat.format(order.getDeadline()));
+		
+							while(edit_dialog.requestInput(cs.getTime()))
 							{
-								IClockService cs = (IClockService)result;
-						
-								int row = table.getSelectedRow();
-								if(row >= 0 && row < orders.size())
+								try
 								{
-									final Order order = (Order)orders.get(row);
-									edit_dialog.title.setText(order.getTitle());
-									edit_dialog.limit.setText(Integer.toString(order.getLimit()));
-									edit_dialog.start.setText(Integer.toString(order.getStartPrice()));
-									edit_dialog.deadline.setText(dformat.format(order.getDeadline()));
-				
-									while(edit_dialog.requestInput(cs.getTime()))
+									String title = edit_dialog.title.getText();
+									int limit = Integer.parseInt(edit_dialog.limit.getText());
+									int start = Integer.parseInt(edit_dialog.start.getText());
+									Date deadline = dformat.parse(edit_dialog.deadline.getText());
+									order.setTitle(title);
+									order.setLimit(limit);
+									order.setStartPrice(start);
+									order.setDeadline(deadline);
+									items.fireTableDataChanged();
+									
+									agent.scheduleStep(new IComponentStep<Void>()
 									{
-										try
+										@Classname("drop")
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											String title = edit_dialog.title.getText();
-											int limit = Integer.parseInt(edit_dialog.limit.getText());
-											int start = Integer.parseInt(edit_dialog.start.getText());
-											Date deadline = dformat.parse(edit_dialog.deadline.getText());
-											order.setTitle(title);
-											order.setLimit(limit);
-											order.setStartPrice(start);
-											order.setDeadline(deadline);
-											items.fireTableDataChanged();
+											INegotiationAgent ag = (INegotiationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+											Collection<INegotiationGoal> goals = ag.getGoals();
 											
-											agent.scheduleStep(new IComponentStep<Void>()
+											for(INegotiationGoal goal: goals)
 											{
-												@Classname("drop")
-												public IFuture<Void> execute(IInternalAccess ia)
+												if(goal.getOrder().equals(order))
 												{
-													INegotiationAgent ag = (INegotiationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
-													Collection<INegotiationGoal> goals = ag.getGoals();
-													
-													for(INegotiationGoal goal: goals)
-													{
-														if(goal.getOrder().equals(order))
-														{
-															ag.getAgent().getFeature(IBDIAgentFeature.class).dropGoal(goal);
-														}
-													}
-													
-													ag.createGoal(order);
-													return IFuture.DONE;
+													ag.getAgent().getFeature(IBDIAgentFeature.class).dropGoal(goal);
 												}
-											});
-	//										agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
-	//										{
-	//											public void resultAvailable(Object source, Object result)
-	//											{
-	//												IEAGoal[] goals = (IEAGoal[])result;
-	//												dropGoal(goals, 0, order);
-	//											}
-	//										});
-	//										agent.createGoal(goalname).addResultListener(new DefaultResultListener()
-	//										{
-	//											public void resultAvailable(Object source, Object result)
-	//											{
-	//												IEAGoal goal = (IEAGoal)result;
-	//												goal.setParameterValue("order", order);
-	//												agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
-	//											}
-	//										});
-											break;
+											}
+											
+											ag.createGoal(order);
+											return IFuture.DONE;
 										}
-										catch(NumberFormatException e1)
-										{
-											JOptionPane.showMessageDialog(GuiPanel.this, "Price limit must be integer.", "Input error", JOptionPane.ERROR_MESSAGE);
-										}
-										catch(ParseException e1)
-										{
-											JOptionPane.showMessageDialog(GuiPanel.this, "Wrong date format, use YYYY/MM/DD hh:mm.", "Input error", JOptionPane.ERROR_MESSAGE);
-										}
-									}
+									});
+//										agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
+//										{
+//											public void resultAvailable(Object source, Object result)
+//											{
+//												IEAGoal[] goals = (IEAGoal[])result;
+//												dropGoal(goals, 0, order);
+//											}
+//										});
+//										agent.createGoal(goalname).addResultListener(new DefaultResultListener()
+//										{
+//											public void resultAvailable(Object source, Object result)
+//											{
+//												IEAGoal goal = (IEAGoal)result;
+//												goal.setParameterValue("order", order);
+//												agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal);
+//											}
+//										});
+									break;
+								}
+								catch(NumberFormatException e1)
+								{
+									JOptionPane.showMessageDialog(GuiPanel.this, "Price limit must be integer.", "Input error", JOptionPane.ERROR_MESSAGE);
+								}
+								catch(ParseException e1)
+								{
+									JOptionPane.showMessageDialog(GuiPanel.this, "Wrong date format, use YYYY/MM/DD hh:mm.", "Input error", JOptionPane.ERROR_MESSAGE);
 								}
 							}
-						});
+						}
 						return IFuture.DONE;
 					}
 				});
@@ -789,7 +774,7 @@ public class GuiPanel extends JPanel
 			// These orders are not added to the agent (see manager.agent.xml).
 			try
 			{
-				IClockService clock	= agent.searchService( new ServiceQuery<>( IClockService.class, RequiredService.SCOPE_PLATFORM)).get();
+				IClockService clock	= agent.searchService(new ServiceQuery<>(IClockService.class)).get();
 				if(buy)
 				{
 					orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));

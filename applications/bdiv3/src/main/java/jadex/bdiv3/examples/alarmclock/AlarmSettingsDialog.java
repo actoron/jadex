@@ -188,7 +188,7 @@ public class AlarmSettingsDialog extends JDialog
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 //						BDIAgent bia = (BDIAgent)ia;
-						long cur = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
+						long cur = ia.getFeature(IRequiredServicesFeature.class).getLocalService(IClockService.class).getTime();
 						Date now = new Date(cur);
 						date.setDate(now);
 						time.setValue(now);								
@@ -348,7 +348,7 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					long cur = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime();
+					long cur = ia.getFeature(IRequiredServicesFeature.class).getLocalService(IClockService.class).getTime();
 					al.setTime(new Time(new Date(cur)));
 					setAlarm(al);
 					return IFuture.DONE;

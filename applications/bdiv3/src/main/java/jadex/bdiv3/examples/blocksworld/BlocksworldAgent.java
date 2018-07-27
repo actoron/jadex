@@ -36,7 +36,7 @@ import jadex.micro.annotation.RequiredServices;
 	@Plan(body=@Body(ConfigureBlocksPlan.class), trigger=@Trigger(goals=BlocksworldAgent.ConfigureGoal.class)),
 	@Plan(body=@Body(BenchmarkPlan.class))
 })
-@RequiredServices(@RequiredService(name="clock", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="clock", type=IClockService.class))
 @Configurations({
 	@Configuration(name="gui"),
 	@Configuration(name="benchmark(runs=10/goals=10)"),

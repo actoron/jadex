@@ -28,7 +28,7 @@ public class EndStateAbortPlan extends Plan
 	{
 		// Create worker agent.
 		IComponentManagementService	cms	= getAgent().getFeature(IRequiredServicesFeature.class)
-			.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+			.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
 		IComponentIdentifier	worker	= cms.createComponent("/jadex/bdi/testcases/misc/EndStateAbortWorker.agent.xml",
 			new CreationInfo(getComponentIdentifier())).getFirstResult();
 		

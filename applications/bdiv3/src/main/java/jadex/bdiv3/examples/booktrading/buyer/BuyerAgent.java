@@ -53,7 +53,7 @@ import jadex.micro.annotation.RequiredServices;
 @RequiredServices(
 {
 	@RequiredService(name="buyservice", type=IBuyBookService.class, multiple=true),
-	@RequiredService(name="clockser", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
+	@RequiredService(name="clockser", type=IClockService.class)
 })
 @Arguments(@Argument(name="initial_orders", clazz=Order[].class))
 public class BuyerAgent implements INegotiationAgent

@@ -27,7 +27,7 @@ public class ArgumentsPlan extends Plan
 		try
 		{
 			IComponentManagementService	cms	= getAgent().getFeature(IRequiredServicesFeature.class)
-				.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+				.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
 			Map<String, Object> args = SCollection.createHashMap();
 			args.put("creator", getComponentIdentifier());
 			cms.createComponent("/jadex/bdi/testcases/misc/ArgumentsWorker.agent.xml",

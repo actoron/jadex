@@ -165,7 +165,7 @@ public class MovementCapability
 	 */
 	protected long getTime()
 	{
-		IClockService cs = capa.getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IClockService cs = capa.getAgent().getFeature(IRequiredServicesFeature.class).getLocalService(IClockService.class);
 		// todo: capa.getAgent().getComponentFeature().getService() does not work in init expressions only from plans :-(
 //		IClockService cs =  (IClockService)capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getService("clockser").get();
 		return cs.getTime();

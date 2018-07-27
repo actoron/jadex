@@ -18,7 +18,7 @@ public class ShutdownTesterPlan extends Plan
 	public void body()
 	{
 		IComponentManagementService	cms	= getAgent().getFeature(IRequiredServicesFeature.class)
-			.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+			.getLocalService(IComponentManagementService.class);
 		try
 		{
 			cms.destroyComponent(getComponentIdentifier().getRoot()).get();
