@@ -167,7 +167,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			for (Map.Entry<String, Object> entry : addheaderfields.entrySet())
 				header.addProperty(entry.getKey(), entry.getValue());
 		header.addProperty(IMsgHeader.SENDER, component.getId());
-		header.addProperty(IMsgHeader.RECEIVER, receiver!=null && receiver.length==1 ? receiver[0] : receiver);	// optimize send to one
+		if(receiver!=null && receiver.length>0)
+			header.addProperty(IMsgHeader.RECEIVER, receiver.length==1 ? receiver[0] : receiver);	// optimize send to one
 		
 		return sendMessage(header, message);
 	}
