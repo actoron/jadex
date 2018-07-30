@@ -60,8 +60,9 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	public IFuture<IServiceIdentifier> searchService(ServiceQuery<?> query)
 	{
 		IServiceIdentifier ret = null;
-		boolean localowner = query.getOwner().getRoot().equals(platformid);
-		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
+		// Scope check why?
+//		boolean localowner = query.getOwner().getRoot().equals(platformid);
+//		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
 		{
 			ret = serviceregistry.searchService(query);
 		}
@@ -79,11 +80,13 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	{
 		Set<IServiceIdentifier> ret = Collections.emptySet();
 		
-		boolean localowner = query.getOwner().getRoot().equals(platformid);
-		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
+		// Scope check why?
+//		boolean localowner = query.getOwner().getRoot().equals(platformid);
+//		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
 		{
 			ret = serviceregistry.searchServices(query);
 		}
+		
 		return new Future<>(ret);
 	}
 }

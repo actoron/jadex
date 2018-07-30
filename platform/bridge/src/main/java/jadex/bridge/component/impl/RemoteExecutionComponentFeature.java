@@ -77,7 +77,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		add(RemoteTerminationCommand.class);
 
 		// Conditional commands (throwing security exception in execute when not allowed).
-		add(RemoteSearchCommand.class);
+//		add(RemoteSearchCommand.class);
 		add(RemoteMethodInvocationCommand.class);
 	}});
 	
