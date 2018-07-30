@@ -11,17 +11,24 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
+import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Autostart;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
 /**
  *  Plain service access to a remote registry.
  *  See SuperpeerRegistryAgent for extended implementation supporting also persistent queries.
  */
-@Agent
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME))
+@ProvidedServices(@ProvidedService(type=IRemoteRegistryService.class, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME, scope=RequiredServiceInfo.SCOPE_NETWORK))
 public class RemoteRegistryAgent implements IRemoteRegistryService
 {
+	
+	
 	/** Component access. */
 	@Agent
 	protected IInternalAccess ia;

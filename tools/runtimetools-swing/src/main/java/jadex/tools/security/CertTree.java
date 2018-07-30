@@ -4,11 +4,8 @@ import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -34,7 +31,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -45,7 +41,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 
-import jadex.commons.FileWatcher;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -631,6 +626,42 @@ public class CertTree extends JTree implements TreeModel
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Gets the selected certificate chain.
+	 *  @return The selected certificate chain.
+	 */
+	protected String[] getSelectedCertChain()
+	{
+		List<String> certs = new ArrayList<>();
+		
+		if (getSelectionCount() > 0)
+		{
+			Object onode = getSelectionModel().getSelectionPath().getLastPathComponent();
+			if (onode == root)
+				return null;
+			CertTreeNode node = (CertTreeNode) onode;
+			String certstr = certmodel.get(node.getSubjectId()).getCertificate();
+			X509CertificateHolder cert = SSecurity.readCertificateFromPEM(certstr);
+			certs.add(certstr);
+			node = nodelookup.get(SSecurity.getCommonName(cert.getIssuer()).toString());
+			while (node != null)
+			{
+				certstr = certmodel.get(node.getSubjectId()).getCertificate();
+				cert = SSecurity.readCertificateFromPEM(certstr);
+				certs.add(certstr);
+				if (SSecurity.getCommonName(cert.getIssuer()).equals(SSecurity.getCommonName(cert.getSubject())))
+						node = null;
+				else
+					node = nodelookup.get(SSecurity.getCommonName(cert.getIssuer()).toString());
+			}
+		}
+		
+//		String ret = null;
+//		for (String cert : SUtil.notNull(certs))
+//			ret = ret == null ? cert : ret + cert;
+		return certs.size() == 0 ? null : certs.toArray(new String[certs.size()]);
 	}
 	
 	/**

@@ -10,24 +10,27 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.base.Starter;
+import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.IRemoteExecutionFeature;
-import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
 import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -59,7 +62,7 @@ import jadex.micro.annotation.RequiredService;
  */
 @Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(Boolean3.TRUE))
 @Service
-public class SuperpeerClientAgent	implements ISearchQueryManagerService
+public class SuperpeerClientAgent implements ISearchQueryManagerService
 {
 	//-------- constants --------
 	
@@ -151,9 +154,9 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	 *  @param query	The search query.
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> ITerminableFuture<T> searchService(ServiceQuery<T> query)
+	public <T> ITerminableFuture<IServiceIdentifier> searchService(ServiceQuery<T> query)
 	{
-		TerminableFuture<T>	ret	= new TerminableFuture<>();
+		TerminableFuture<IServiceIdentifier>	ret	= new TerminableFuture<>();
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
@@ -188,7 +191,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 						public void resultAvailable(IServiceIdentifier result)
 						{
 							// Forward result if first
-							ret.setResultIfUndone((T)result);
+							ret.setResultIfUndone(result);
 						}
 					});
 				}
@@ -204,10 +207,10 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		// awa fallback when no superpeers
 		if(!foundsuperpeer)
 		{
-			searchRemoteServices(query).addResultListener(new IntermediateDefaultResultListener<T>()
+			searchRemoteServices(query).addResultListener(new IntermediateDefaultResultListener<IServiceIdentifier>()
 			{
 				@Override
-				public void intermediateResultAvailable(T result)
+				public void intermediateResultAvailable(IServiceIdentifier result)
 				{
 					// Forward result if first
 					ret.setResultIfUndone(result);					
@@ -240,9 +243,9 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	 *  @param query	The search query.
 	 *  @return Each service as an intermediate result or a collection of services as final result.
 	 */
-	public <T>  ITerminableIntermediateFuture<T> searchServices(ServiceQuery<T> query)
+	public <T>  ITerminableIntermediateFuture<IServiceIdentifier> searchServices(ServiceQuery<T> query)
 	{
-		TerminableIntermediateFuture<T>	ret	= new TerminableIntermediateFuture<>();
+		TerminableIntermediateFuture<IServiceIdentifier> ret = new TerminableIntermediateFuture<>();
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
@@ -279,7 +282,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 							{
 								for(IServiceIdentifier sid: result)
 								{
-									ret.addIntermediateResultIfUndone((T)sid);
+									ret.addIntermediateResultIfUndone(sid);
 								}
 							}
 							
@@ -331,10 +334,10 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	/**
 	 *  Search for services on remote platforms using the polling fallback and awareness.
 	 */
-	protected <T> TerminableIntermediateFuture<T> searchRemoteServices(final ServiceQuery<T> query)
+	protected <T> TerminableIntermediateFuture<IServiceIdentifier> searchRemoteServices(final ServiceQuery<T> query)
 	{
 		// TODO: termination? currently not used
-		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+		final TerminableIntermediateFuture<IServiceIdentifier> ret = new TerminableIntermediateFuture<IServiceIdentifier>();
 		
 		// Check for awareness service
 		Collection<IPassiveAwarenessService>	pawas	= agent.getFeature(IRequiredServicesFeature.class)
@@ -357,22 +360,27 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 					if(!ret.isDone())
 					{
 						cnt.incrementAndGet();
+						
+						IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new BasicComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform), new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, RequiredService.SCOPE_NETWORK, null, true);
+						IRemoteRegistryService rrs = (IRemoteRegistryService) RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
+						final IFuture<Set<IServiceIdentifier>> remotesearch = rrs.searchServices(query);
 						// TODO: use remote registry service
-						final IFuture<Collection<T>> remotesearch =  ((IInternalRemoteExecutionFeature)agent.getFeature(IRemoteExecutionFeature.class))
-								.executeRemoteSearch(platform, query);
+//						final IFuture<Collection<T>> remotesearch =  ((IInternalRemoteExecutionFeature)agent.getFeature(IRemoteExecutionFeature.class))
+//								.executeRemoteSearch(platform, query);
 						
 //						System.out.println(agent + " searching remote platform3: "+platform+", "+query);
-						remotesearch.addResultListener(new IResultListener<Collection<T>>()
+						remotesearch.addResultListener(new IResultListener<Set<IServiceIdentifier>>()
 						{
-							public void resultAvailable(Collection<T> result)
+							public void resultAvailable(final Set<IServiceIdentifier> result)
 							{
 //								System.out.println(agent + " searched remote platform: "+platform+", "+result);
 								if(result != null)
 								{
-									for(Iterator<T> it = result.iterator(); it.hasNext(); )
+									for(Iterator<IServiceIdentifier> it = result.iterator(); it.hasNext(); )
 									{
-										T ser = it.next();
-										ret.addIntermediateResultIfUndone(ser);
+//										T ser = RemoteMethodInvocationHandler.createRemoteServiceProxy(localcomp, remotesvc)
+//										ret.addIntermediateResultIfUndone(ser);
+										ret.addIntermediateResultIfUndone(it.next());
 									}
 								}
 								doFinished();
@@ -899,13 +907,19 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 							
 							// Start current search
 							searchRemoteServices(query)
-								.addResultListener(new IIntermediateResultListener<T>()
+								.addResultListener(new IIntermediateResultListener<IServiceIdentifier>()
 							{
+								@SuppressWarnings({ "unchecked", "rawtypes" })
 								@Override
-								public void intermediateResultAvailable(T result)
+								public void intermediateResultAvailable(IServiceIdentifier result)
 								{
 									// Forward result to user query
-									retfut.addIntermediateResultIfUndone(result);
+									Object res = result;
+									if (ServiceEvent.CLASSINFO.equals(query.getReturnType()))
+										res = new ServiceEvent(result, ServiceEvent.SERVICE_ADDED);
+									
+									SubscriptionIntermediateFuture rawfut = retfut;
+									rawfut.addIntermediateResultIfUndone(res);
 								}
 								
 								@Override
@@ -921,7 +935,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 								}
 								
 								@Override
-								public void resultAvailable(Collection<T> result)
+								public void resultAvailable(Collection<IServiceIdentifier> result)
 								{
 									// Ignore
 								}

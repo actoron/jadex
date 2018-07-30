@@ -20,7 +20,7 @@ public interface IInternalRemoteExecutionFeature
 	 *  @param query	The search query
 	 *  @return	The result(s) of the query, if any.
 	 */
-	public <T> IFuture<Collection<T>>	executeRemoteSearch(IComponentIdentifier target, ServiceQuery<T> query);
+//	public <T> IFuture<Collection<T>>	executeRemoteSearch(IComponentIdentifier target, ServiceQuery<T> query);
 	
 	/**
 	 *  Invoke a method on a remote object.

@@ -29,6 +29,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
@@ -537,11 +538,14 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		// If not found -> try to find remotely
 		else if(isRemote(query))
 		{
-			ISearchQueryManagerService	sqms	= searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+			ISearchQueryManagerService sqms = searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 			if(sqms!=null)
 			{
-				ITerminableFuture<T>	fut	= sqms.searchService(query);
-				ret	= FutureFunctionality.getDelegationFuture(fut, new FutureFunctionality(getComponent().getLogger())
+				@SuppressWarnings("rawtypes")
+				ITerminableFuture fut = sqms.searchService(query);
+				@SuppressWarnings("unchecked")
+				ITerminableFuture<T> castedfut = (ITerminableFuture<T>) fut;
+				ret	= FutureFunctionality.getDelegationFuture(castedfut, new FutureFunctionality(getComponent().getLogger())
 				{
 					@Override
 					public Object handleResult(Object result) throws Exception
@@ -613,8 +617,11 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 			ISearchQueryManagerService	sqms	= searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 			if(sqms!=null)
 			{
-				ITerminableIntermediateFuture<T>	remotes	= sqms.searchServices(query);
-				Future<Collection<T>>	fut	= FutureFunctionality.getDelegationFuture(remotes, new FutureFunctionality(getComponent().getLogger())
+				@SuppressWarnings("rawtypes")
+				ITerminableIntermediateFuture remotes = sqms.searchServices(query);
+				@SuppressWarnings("unchecked")
+				ITerminableIntermediateFuture<T> castedremotes = (ITerminableIntermediateFuture<T>) remotes;
+				Future<Collection<T>>	fut	= FutureFunctionality.getDelegationFuture(castedremotes, new FutureFunctionality(getComponent().getLogger())
 				{
 					@Override
 					public Object handleIntermediateResult(Object result) throws Exception
@@ -821,8 +828,16 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	 *  Result may be service object, service identifier (local or remote), or event.
 	 *  User object is either event or service (with or without required proxy).
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected Object	createServiceProxy(Object service, RequiredServiceInfo info)
 	{
+		ServiceEvent event = null;
+		if (service instanceof ServiceEvent)
+		{
+			event = (ServiceEvent) service;
+			service = event.getService();
+		}
+		
 		// If service identifier -> find/create service object or proxy
 		if(service instanceof IServiceIdentifier)
 		{
@@ -877,6 +892,13 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 				}
 			}
 		}
+		
+		if (event != null)
+		{
+			event.setService(service);
+			service = event;
+		}
+		
 		return service;
 	}
 	
