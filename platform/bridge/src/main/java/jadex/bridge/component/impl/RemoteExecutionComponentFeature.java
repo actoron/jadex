@@ -77,7 +77,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		add(RemoteTerminationCommand.class);
 
 		// Conditional commands (throwing security exception in execute when not allowed).
-		add(RemoteSearchCommand.class);
+//		add(RemoteSearchCommand.class);
 		add(RemoteMethodInvocationCommand.class);
 	}});
 	
@@ -235,15 +235,15 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	 *  @return	The result(s) of the command, if any.
 	 */
 	// TODO: remove method and use remote registry service instead!!!
-	public <T> IFuture<Collection<T>>	executeRemoteSearch(IComponentIdentifier target, ServiceQuery<T> query)
-	{
-		Long timeout	= null;	// TODO: custom search timeout?
-		@SuppressWarnings({"rawtypes"})
-		Class	clazz	= query.getMultiplicity().getTo()!=-1
-			? IIntermediateFuture.class
-			: IFuture.class;
-		return execute(target, new RemoteSearchCommand<T>(query), clazz, timeout);
-	}
+//	public <T> IFuture<Collection<T>>	executeRemoteSearch(IComponentIdentifier target, ServiceQuery<T> query)
+//	{
+//		Long timeout	= null;	// TODO: custom search timeout?
+//		@SuppressWarnings({"rawtypes"})
+//		Class	clazz	= query.getMultiplicity().getTo()!=-1
+//			? IIntermediateFuture.class
+//			: IFuture.class;
+//		return execute(target, new RemoteSearchCommand<T>(query), clazz, timeout);
+//	}
 
 	/**
 	 *  Invoke a method on a remote object.
