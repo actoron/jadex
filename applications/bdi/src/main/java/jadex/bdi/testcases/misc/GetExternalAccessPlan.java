@@ -40,7 +40,7 @@ public class GetExternalAccessPlan extends Plan
 
 		// Create component.
 		IComponentManagementService ces = getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', '.'));
+		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker", getComponentIdentifier());
 		Map	args	= new HashMap();
 		args.put("future", wait);
 		IFuture init = ces.createComponent(cid.getLocalName(), "jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml",
@@ -71,6 +71,7 @@ public class GetExternalAccessPlan extends Plan
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("Got exceptions: "+exception);
 				// Expected on first call.
 			}
 		};
