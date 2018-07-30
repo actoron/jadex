@@ -2,7 +2,9 @@ package jadex.bdiv3x;
 
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -12,7 +14,7 @@ import jadex.micro.annotation.RequiredService;
 /**
  *  Component kernel for XML BDI agents.
  */
-@Agent
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="kernel_bdix"))
 @Properties({
 	@NameValue(name="kernel.types", value="new String[]{\"agent.xml\", \"capability.xml\"}")
 })

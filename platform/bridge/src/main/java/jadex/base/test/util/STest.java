@@ -39,8 +39,14 @@ public class STest {
     public static IPlatformConfiguration getDefaultTestConfig() 
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-		config.setValue("kernel_multi", true);
-		config.setValue("kernel_micro", false);
+        // Do not use multi factory as it is much too slow now :(
+//		config.setValue("kernel_multi", true);
+//		config.setValue("kernel_micro", false);
+		config.setValue("kernel_component", true);
+		config.setValue("kernel_application", true);
+		config.setValue("kernel_bpmn", true);
+		config.setValue("kernel_bdix", true);
+		config.setValue("kernel_bdi", true);
 		config.setNetworkNames(new String[] { testnetwork_name });
 		config.setNetworkSecrets(new String[] { testnetwork_pass });
 		
