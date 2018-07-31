@@ -13,6 +13,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -41,8 +42,15 @@ import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509ContentVerifierProviderBuilder;
 import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.cert.bc.BcX509v3CertificateBuilder;
+import org.bouncycastle.cert.path.CertPath;
+import org.bouncycastle.cert.path.CertPathValidation;
+import org.bouncycastle.cert.path.CertPathValidationResult;
+import org.bouncycastle.cert.path.validations.BasicConstraintsValidation;
+import org.bouncycastle.cert.path.validations.KeyUsageValidation;
+import org.bouncycastle.cert.path.validations.ParentCertIssuedValidation;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.digests.SHA512Digest;
@@ -66,6 +74,7 @@ import org.bouncycastle.crypto.prng.EntropySourceProvider;
 import org.bouncycastle.crypto.prng.SP800SecureRandomBuilder;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.crypto.util.PrivateKeyInfoFactory;
+import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
@@ -75,6 +84,7 @@ import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
@@ -356,39 +366,52 @@ public class SSecurity
 	 *  @param trustedpemcert The PEM certificate trust anchor.
 	 *  @return True, if the certificate chain and signature is valid.
 	 */
-	public static final boolean verifyWithPEM(byte[] msghash, byte[] token, String signingcert, InputStream trustedpemcert)
+	public static final boolean verifyWithPEM(byte[] msghash, byte[] token, String signingcert, LinkedHashSet<X509CertificateHolder> trustchain)
 	{
 		try
 		{
 			Date now = new Date();
-			X509CertificateHolder trustedcrtholder = readCertificateFromPEM(new String(SUtil.readStream(trustedpemcert), SUtil.UTF8));
-			trustedpemcert.close();
-			
-			if (!trustedcrtholder.isValidOn(now))
-				return false;
 			
 			List<X509CertificateHolder> certchain = readCertificateChainFromPEM(signingcert);
-			// Verify certificate chain
-			for (int i = 0; i < certchain.size() - 1; ++i)
-			{
-				X509CertificateHolder signedcert = certchain.get(i);
-				X509CertificateHolder signercert = certchain.get(i + 1);
-				if (!signedcert.isValidOn(now) || !signercert.isValidOn(now))
-					return false;
-				
-				BasicConstraints bc = BasicConstraints.fromExtensions(signercert.getExtensions());
-				if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < i))
-					return false;
-				
-				if (!signedcert.isSignatureValid(getVerifierProvider(signercert)))
-					return false;
-			}
+//			for (int i = 0; i < certchain.size() - 1; ++i)
+//			{
+//				X509CertificateHolder signedcert = certchain.get(i);
+//				X509CertificateHolder signercert = certchain.get(i + 1);
+//				if (!signedcert.isValidOn(now) || !signercert.isValidOn(now))
+//					return false;
+//				
+//				BasicConstraints bc = BasicConstraints.fromExtensions(signercert.getExtensions());
+//				if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < i))
+//					return false;
+//				
+//				if (!signedcert.isSignatureValid(getVerifierProvider(signercert)))
+//					return false;
+//			}
+//			
+//			// Verify the last chain link is signed by trust anchor.
+//			if (!certchain.get(certchain.size() - 1).isSignatureValid(getVerifierProvider(trustedcrtholder)))
+//				return false;
+//			BasicConstraints bc = BasicConstraints.fromExtensions(trustedcrtholder.getExtensions());
+//			if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < certchain.size() - 1))
+//				return false;
 			
-			// Verify the last chain link is signed by trust anchor.
-			if (!certchain.get(certchain.size() - 1).isSignatureValid(getVerifierProvider(trustedcrtholder)))
+			// Verify provided certificate chain
+			CertPath certpath = new CertPath(certchain.toArray(new X509CertificateHolder[certchain.size()]));
+			CertPathValidationResult result = certpath.validate(getChainValidationRules());
+			if (!result.isValid())
 				return false;
-			BasicConstraints bc = BasicConstraints.fromExtensions(trustedcrtholder.getExtensions());
-			if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < certchain.size() - 1))
+			
+			// Verify if at least one chain certificate is in trusted set.
+			boolean chaintrust = false;
+			for (X509CertificateHolder cert : certchain)
+			{
+				if (trustchain.contains(cert))
+				{
+					chaintrust = true;
+					break;
+				}
+			}
+			if (!chaintrust)
 				return false;
 			
 			// Verify signature
@@ -401,16 +424,6 @@ public class SSecurity
 		{
 			e.printStackTrace();
 			Logger.getLogger("authentication").info("Verification failed: " + e.toString());
-		}
-		finally
-		{
-			try
-			{
-				trustedpemcert.close();
-			}
-			catch (Exception e)
-			{
-			}
 		}
 		return false;
 	}
@@ -780,7 +793,17 @@ public class SSecurity
 	public static final String getCertSigAlg(X509CertificateHolder cert)
 	{
 		SubjectPublicKeyInfo spki = cert.getSubjectPublicKeyInfo();
-		
+		return getSigAlg(spki);
+	}
+	
+	/**
+	 *  Gets the signatures algorithm supported by the key.
+	 *  
+	 *  @param spki The subject key info.
+	 *  @return The signature algorithm.
+	 */
+	public static final String getSigAlg(SubjectPublicKeyInfo spki)
+	{
 		String ret = spki.getAlgorithm().getAlgorithm().getId();
 
 		if (X9ObjectIdentifiers.id_ecPublicKey.getId().equals(ret))
@@ -791,6 +814,34 @@ public class SSecurity
 			ret = "DSA";
 		
 		return ret;
+	}
+	
+	/**
+	 *  Gets the certificate chain validation rules.
+	 *  @return The rules.
+	 */
+	protected static final CertPathValidation[] getChainValidationRules()
+	{
+		List<CertPathValidation> ret = new ArrayList<>();
+		
+		ret.add(new BasicConstraintsValidation(true));
+		ret.add(new ParentCertIssuedValidation(new X509ContentVerifierProviderBuilder()
+		{
+
+			public ContentVerifierProvider build(SubjectPublicKeyInfo validatingkeyinfo) throws OperatorCreationException
+			{
+				return getVerifierProvider(validatingkeyinfo);
+			}
+
+			public ContentVerifierProvider build(X509CertificateHolder validatingkeyinfo) throws OperatorCreationException
+			{
+				return getVerifierProvider(validatingkeyinfo);
+			}
+			
+		}));
+		ret.add(new KeyUsageValidation(true));
+		
+		return ret.toArray(new CertPathValidation[ret.size()]);
 	}
 	
 	/**
@@ -1166,13 +1217,18 @@ public class SSecurity
 	 *  
 	 *  Gets a verifier provider based on a certificate to identify the algorithm.
 	 *  
-	 *  @param cert The certificate
+	 *  @param keyinfo The certificate or key info.
 	 *  @return The content verifier provider.
 	 */
-	protected static final ContentVerifierProvider getVerifierProvider(X509CertificateHolder cert)
+	protected static final ContentVerifierProvider getVerifierProvider(Object keyinfo)
 	{
-		String sigalg = getCertSigAlg(cert);
-		
+		String sigalg = null;
+		if (keyinfo instanceof X509CertificateHolder)
+			sigalg = getCertSigAlg((X509CertificateHolder) keyinfo);
+		else
+			sigalg = getSigAlg((SubjectPublicKeyInfo) keyinfo);
+			
+			
 		DefaultDigestAlgorithmIdentifierFinder digalgfinder = new DefaultDigestAlgorithmIdentifierFinder();
 		BcContentVerifierProviderBuilder verifierbuilder = null;
 		if ("ECDSA".equals(sigalg))
@@ -1184,7 +1240,10 @@ public class SSecurity
 		
 		try
 		{
-			return verifierbuilder.build(cert);
+			if (keyinfo instanceof X509CertificateHolder)
+				return verifierbuilder.build((X509CertificateHolder) keyinfo);
+			else
+				return verifierbuilder.build(PublicKeyFactory.createKey(((SubjectPublicKeyInfo) keyinfo)));
 		}
 		catch (Exception e)
 		{

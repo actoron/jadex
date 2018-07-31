@@ -16,7 +16,7 @@ public class X509PemStringsSecret extends AbstractX509PemSecret
 	public static final String PREFIX = "pem";
 	
 	/** The trust anchor file/ca cert. */
-	protected String cacert;
+//	protected String cacert;
 	
 	/** The local certificate. */
 	protected String cert;
@@ -28,14 +28,17 @@ public class X509PemStringsSecret extends AbstractX509PemSecret
 	{
 		String basestring = encodedstring.substring(PREFIX.length() + 1);
 		String[] toks = basestring.split(":");
-		if (toks.length != 1 && toks.length != 3)
+		if (toks.length != 1 && toks.length != 2)
 			throw new IllegalArgumentException("Could not decode pem file string: " +encodedstring);
 		
-		cacert = new String(Base64.decodeNoPadding(toks[0].getBytes(SUtil.UTF8)), SUtil.UTF8);
+		//cert = SUtil.unescapeLineBreaks(toks[0]);
+		cert = toks[0];
+//		cacert = new String(Base64.decodeNoPadding(toks[0].getBytes(SUtil.UTF8)), SUtil.UTF8);
 		if (toks.length > 1)
 		{
-			cert = new String(Base64.decodeNoPadding(toks[1].getBytes(SUtil.UTF8)), SUtil.UTF8);
-			key = new String(Base64.decodeNoPadding(toks[2].getBytes(SUtil.UTF8)), SUtil.UTF8);
+			//key = SUtil.unescapeLineBreaks(toks[1]);
+			key = toks[1];
+//			key = new String(Base64.decodeNoPadding(toks[2].getBytes(SUtil.UTF8)), SUtil.UTF8);
 		}
 	}
 	
@@ -46,9 +49,9 @@ public class X509PemStringsSecret extends AbstractX509PemSecret
 	 *  @param cert Path to the local certificate.
 	 *  @param key Path to the local certificate key.
 	 */
-	public X509PemStringsSecret(String cacert, String cert, String key)
+	public X509PemStringsSecret(String cert, String key)
 	{
-		this.cacert = cacert;
+//		this.cacert = cacert;
 		this.cert = cert;
 		this.key = key;
 	}
@@ -67,13 +70,13 @@ public class X509PemStringsSecret extends AbstractX509PemSecret
 	 *  
 	 *  @return Stream of the CA certificate.
 	 */
-	public InputStream openTrustAnchorCert()
-	{
-		if (cacert == null)
-			throw new RuntimeException("CA Certificate not available:" + toString());
-		
-		return new ByteArrayInputStream(cacert.getBytes(SUtil.UTF8));
-	}
+//	public InputStream openTrustAnchorCert()
+//	{
+//		if (cacert == null)
+//			throw new RuntimeException("CA Certificate not available:" + toString());
+//		
+//		return new ByteArrayInputStream(cacert.getBytes(SUtil.UTF8));
+//	}
 	
 	/**
 	 *  Opens the local certificate.
@@ -108,7 +111,7 @@ public class X509PemStringsSecret extends AbstractX509PemSecret
 	{
 		int ret = cert != null ? cert.hashCode() : 0;
 		ret = 31 * ret + key != null ? key.hashCode() : 0;
-		ret = 31 * ret + cacert != null ? cacert.hashCode() : 0;
+//		ret = 31 * ret + cacert != null ? cacert.hashCode() : 0;
 		return ret;
 	}
 	
@@ -120,8 +123,8 @@ public class X509PemStringsSecret extends AbstractX509PemSecret
 		if (obj instanceof X509PemStringsSecret)
 		{
 			X509PemStringsSecret other = (X509PemStringsSecret) obj;
-			return SUtil.equals(cacert, other.cacert) &&
-				   SUtil.equals(cert, other.cert) &&
+//			return SUtil.equals(cacert, other.cacert) &&
+			return SUtil.equals(cert, other.cert) &&
 				   SUtil.equals(key, other.key);
 		}
 		return false;
@@ -132,11 +135,16 @@ public class X509PemStringsSecret extends AbstractX509PemSecret
 	 */
 	public String toString()
 	{
-		String ret = PREFIX + ":" + new String(Base64.encodeNoPadding(cacert.getBytes(SUtil.UTF8)), SUtil.UTF8);
+//		String ret = PREFIX + ":" + new String(Base64.encodeNoPadding(cacert.getBytes(SUtil.UTF8)), SUtil.UTF8);
+//		String ret = PREFIX + ":" + new String(Base64.encodeNoPadding(cert.getBytes(SUtil.UTF8)), SUtil.UTF8);
+//		String ret = PREFIX + ":" + SUtil.escapeLineBreaks(cert);
+		String ret = PREFIX + ":" + cert.replace("\r", "").replace("\n", "");
 		if (canSign())
 		{
-			ret += ":" + new String(Base64.encodeNoPadding(cert.getBytes(SUtil.UTF8)), SUtil.UTF8);
-			ret += ":" + new String(Base64.encodeNoPadding(key.getBytes(SUtil.UTF8)), SUtil.UTF8);
+//			ret += ":" + new String(Base64.encodeNoPadding(cert.getBytes(SUtil.UTF8)), SUtil.UTF8);
+//			ret += ":" + new String(Base64.encodeNoPadding(key.getBytes(SUtil.UTF8)), SUtil.UTF8);
+//			ret += ":" + SUtil.escapeLineBreaks(key);
+			ret += key.replace("\r", "").replace("\n", "");
 		}
 		return ret;
 	}

@@ -445,7 +445,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 				X509AuthToken sig = (X509AuthToken) platformnamesig;
 				for (X509CertificateHolder nameauthority : nameauthorities)
 				{
-					X509PemStringsSecret nasecret = new X509PemStringsSecret(SSecurity.writeCertificateAsPEM(nameauthority), null, null);
+//					X509PemStringsSecret nasecret = new X509PemStringsSecret(SSecurity.writeCertificateAsPEM(nameauthority), null, null);
+					X509PemStringsSecret nasecret = new X509PemStringsSecret(SSecurity.writeCertificateAsPEM(nameauthority), null);
 					boolean verified = verifyKey(challenge, key, nasecret, sig);
 					if (verified)
 					{

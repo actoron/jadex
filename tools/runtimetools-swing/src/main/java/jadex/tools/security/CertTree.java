@@ -629,6 +629,32 @@ public class CertTree extends JTree implements TreeModel
 	}
 	
 	/**
+	 *  Gets the selected certificate.
+	 *  @return The selected certificate.
+	 */
+	protected PemKeyPair getSelectedCertChainPair()
+	{
+		PemKeyPair ret = null;
+		
+		if (getSelectionCount() > 0)
+		{
+			Object onode = getSelectionModel().getSelectionPath().getLastPathComponent();
+			if (onode == root)
+				return null;
+			CertTreeNode node = (CertTreeNode) onode;
+			String[] certchainarr = getSelectedCertChain();
+			String cert = "";
+			for (String certchaincomp : certchainarr)
+				cert += certchaincomp;
+			ret = new PemKeyPair();
+			ret.setCertificate(cert);
+			ret.setKey(certmodel.get(node.getSubjectId()).getKey());
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Gets the selected certificate chain.
 	 *  @return The selected certificate chain.
 	 */

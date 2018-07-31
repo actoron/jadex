@@ -10,7 +10,6 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,13 +18,10 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 
 import jadex.commons.Base64;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.gui.JPlaceholderTextField;
 import jadex.commons.gui.JWizard;
 import jadex.commons.gui.SGUI;
@@ -34,7 +30,7 @@ import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.KeySecret;
 import jadex.platform.service.security.auth.PasswordSecret;
 import jadex.platform.service.security.auth.SCryptParallel;
-import jadex.platform.service.security.auth.X509PemSecret;
+import jadex.platform.service.security.auth.X509PemStringsSecret;
 
 /**
  *  Wizard for selecting authentication secrets.
@@ -398,9 +394,9 @@ public class SecretWizard extends JWizard
 	 */
 	protected WizardNode createPasswordX509Node()
 	{
-		final CertTree trusttree = new CertTree();
+//		final CertTree trusttree = new CertTree();
 		final CertTree certtree = new CertTree();
-		trusttree.load(certstore);
+//		trusttree.load(certstore);
 		certtree.load(certstore);
 		
 		ICommand<byte[]> savecommand = new ICommand<byte[]>()
@@ -408,77 +404,80 @@ public class SecretWizard extends JWizard
 			public void execute(byte[] storedata)
 			{
 				certstore = storedata;
-				trusttree.load(storedata);
+//				trusttree.load(storedata);
 				certtree.load(storedata);
 			}
 		};
 		
-		trusttree.setSaveCommand(savecommand);
+//		trusttree.setSaveCommand(savecommand);
 		certtree.setSaveCommand(savecommand);
 		
-		JPanel trustpanel = new JPanel();
-		trustpanel.setBorder(BorderFactory.createTitledBorder("Trust Anchor"));
-		trustpanel.setLayout(new BorderLayout());
-		trustpanel.add(trusttree);
+//		JPanel trustpanel = new JPanel();
+//		trustpanel.setBorder(BorderFactory.createTitledBorder("Trust Anchor"));
+//		trustpanel.setLayout(new BorderLayout());
+//		trustpanel.add(trusttree);
 		
 		JPanel certpanel = new JPanel();
 		certpanel.setBorder(BorderFactory.createTitledBorder("Local Certificate"));
 		certpanel.setLayout(new BorderLayout());
 		certpanel.add(certtree);
 		
-		final JCheckBox validonly = new JCheckBox("Validation only");
-		validonly.addActionListener(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				certtree.setEnabled(!validonly.isSelected());
-//				if (certtree.isEnabled())
-//					certtree.updateExternalModel();
-			}
-		});
-		certpanel.add(validonly, BorderLayout.SOUTH);
+//		final JCheckBox validonly = new JCheckBox("Validation only");
+//		validonly.addActionListener(new AbstractAction()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				certtree.setEnabled(!validonly.isSelected());
+////				if (certtree.isEnabled())
+////					certtree.updateExternalModel();
+//			}
+//		});
+//		certpanel.add(validonly, BorderLayout.SOUTH);
 		
-		final AbstractAction validationaction = new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				boolean valid = trusttree.getSelectedCert() != null;
-				valid &= validonly.isSelected() | (certtree.getSelectedCert() != null && certtree.getSelectedCert().getKey() != null);
-				setEnableNext(valid);
-			}
-		};
-		TreeSelectionListener sellis = new TreeSelectionListener()
-		{
-			public void valueChanged(TreeSelectionEvent e)
-			{
-				validationaction.actionPerformed(null);
-			}
-		};
+//		final AbstractAction validationaction = new AbstractAction()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				boolean valid = trusttree.getSelectedCert() != null;
+//				valid &= validonly.isSelected() | (certtree.getSelectedCert() != null && certtree.getSelectedCert().getKey() != null);
+//				setEnableNext(valid);
+//			}
+//		};
+//		TreeSelectionListener sellis = new TreeSelectionListener()
+//		{
+//			public void valueChanged(TreeSelectionEvent e)
+//			{
+//				validationaction.actionPerformed(null);
+//			}
+//		};
 		
-		validonly.addActionListener(validationaction);
-		trusttree.addTreeSelectionListener(sellis);
-		certtree.addTreeSelectionListener(sellis);
+//		validonly.addActionListener(validationaction);
+//		trusttree.addTreeSelectionListener(sellis);
+//		certtree.addTreeSelectionListener(sellis);
 		
 		JPanel inner = new JPanel();
-		SGUI.createVerticalGroupLayout(inner, new JComponent[] { trustpanel, certpanel }, false);
+//		SGUI.createVerticalGroupLayout(inner, new JComponent[] { trustpanel, certpanel }, false);
+		SGUI.createVerticalGroupLayout(inner, new JComponent[] { certpanel }, false);
 		
 		WizardNode node = new WizardNode()
 		{
 			public void onShow()
 			{
-				validationaction.actionPerformed(null);
+//				validationaction.actionPerformed(null);
 			}
 			
 			protected void onNext()
 			{
-				PemKeyPair trust = trusttree.getSelectedCert();
-				PemKeyPair cert = certtree.getSelectedCert();
+//				PemKeyPair trust = trusttree.getSelectedCert();
+				PemKeyPair cert = certtree.getSelectedCertChainPair();
 				
-				X509PemSecret s = null;
-				if (validonly.isSelected())
-					s = new X509PemSecret(trust.getCertificate(), null, null);
-				else
-					s = new X509PemSecret(trust.getCertificate(), cert.getCertificate(), cert.getKey());
+				X509PemStringsSecret s = null;
+//				if (validonly.isSelected())
+//					s = new X509PemSecret(trust.getCertificate(), null, null);
+//				else
+//					s = new X509PemSecret(trust.getCertificate(), cert.getCertificate(), cert.getKey());
+				
+				s = new X509PemStringsSecret(cert.getCertificate(), cert.getKey());
 				
 				secret = s;
 			}

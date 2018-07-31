@@ -69,15 +69,15 @@ public class StandaloneCertTool extends JFrame
 					if (kp.getCertificate() != null)
 					{
 //						System.out.println("CERTCHAIN: \"" + chain.replace("\n", "\\n").replace("\r", "\\r") + "\"");
-						X509PemStringsSecret secret = new X509PemStringsSecret(chain[chain.length - 1], null, null);
-						System.out.println("TRUSTCERT: \"" + secret.toString() + "\"");
+						X509PemStringsSecret secret = new X509PemStringsSecret(chain[chain.length - 1], null);
+						System.out.println("Root Trust Cert: \"" + secret.toString() + "\"");
 					}
 					if (kp.getKey() != null)
 					{
 						String catchain = null;
 						for (String cert : SUtil.notNull(chain))
 							catchain = catchain == null ? cert : catchain + cert;
-						X509PemStringsSecret secret = new X509PemStringsSecret(chain[chain.length - 1], catchain, kp.getKey());
+						X509PemStringsSecret secret = new X509PemStringsSecret(catchain, kp.getKey());
 //						System.out.println("SECWITHKEY: \"" + kp.getKey().replace("\n", "\\n").replace("\r", "\\r") + "\"");
 						System.out.println("SECWITHKEY: \"" + secret.toString() + "\"");
 					}
