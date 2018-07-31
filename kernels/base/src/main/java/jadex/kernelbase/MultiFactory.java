@@ -96,12 +96,18 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		}
 	});
 	
+	boolean started;	// HACK: same object is used for two provided services.
+	
 	/**
 	 *  Starts the service.
 	 */
 	@ServiceStart
 	public IFuture<Void> startService()
 	{
+		if(started)
+			return IFuture.DONE;
+		started	= true;
+		
 		// add data for implicitly started micro factory
 		componenttypes.add(".class");
 		kernels.put("jadex.micro.KernelMicroAgent", null);
@@ -138,6 +144,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				return IFuture.DONE;
 			}
 		};
+
 		libservice.addLibraryServiceListener(liblistener);
 		
 		return IFuture.DONE;
