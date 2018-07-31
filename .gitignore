@@ -50,3 +50,5 @@ jadex-platform-standalone-launch/highscore.dmp
 /platform/base/testfile.txt
 /distributions/standard/highscore.dmp
 /distributions/standard/jcc.settings.json
+/applications/bdi/highscore.dmp
+/tools/runtimetools-swing/jcc.settings.json

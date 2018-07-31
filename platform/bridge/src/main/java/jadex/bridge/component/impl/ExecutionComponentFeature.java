@@ -618,9 +618,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Add to parent and wake up parent.
 			if(parenta==null)
 			{
-				// Todo w/o proxy???
-				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-//				IComponentManagementService cms = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false));
+				// raw because called from scheduleStep also on external thread.
+				IComponentManagementService cms = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 				cms.getExternalAccess(getComponent().getId().getParent())
 					.addResultListener(new DefaultResultListener<IExternalAccess>()
 				{

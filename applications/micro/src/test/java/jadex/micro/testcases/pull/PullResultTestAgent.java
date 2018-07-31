@@ -19,8 +19,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
@@ -236,10 +234,6 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				// Hack!!! TODO: use some internal/external access for fetching service???
-				@SuppressWarnings("unchecked")
-				IClockService	clock	= (IClockService)ServiceRegistry.getRegistry(root)
-					.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class).setNetworkNames(null)));
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //						System.out.println("Using rid: "+rid);
@@ -345,10 +339,6 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				// Hack!!! TODO: use some internal/external access for fetching service???
-				@SuppressWarnings("unchecked")
-				IClockService	clock	= (IClockService)ServiceRegistry.getRegistry(root)
-					.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class).setNetworkNames(null)));
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //						System.out.println("Using rid: "+rid);
