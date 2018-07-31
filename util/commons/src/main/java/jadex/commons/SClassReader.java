@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,7 +28,7 @@ public class SClassReader
 	 */
 	public static final ClassInfo getClassInfo(InputStream inputstream)
 	{
-		return getClassInfo(inputstream, false);
+		return getClassInfo(inputstream, false, false);
 	}
 	
 	/**
@@ -35,7 +37,7 @@ public class SClassReader
 	 *  @param inputstream The input stream of the class file. 
 	 *  @return The class infos.
 	 */
-	public static final ClassInfo getClassInfo(InputStream inputstream, boolean includemethods)
+	public static final ClassInfo getClassInfo(InputStream inputstream, boolean includefields, boolean includemethods)
 	{
 		ClassInfo ret = new ClassInfo();
 		
@@ -68,7 +70,10 @@ public class SClassReader
 			
 			skip(is, ifacecount << 1);
 			
-			skipFieldsOrMethods(is);
+			if (includefields)
+				ret.setFieldInfos(readFields(is, strings));
+			else
+				skipFieldsOrMethods(is);
 			
 			if (includemethods)
 				ret.setMethodInfos(readMethods(is, strings));
@@ -191,6 +196,44 @@ public class SClassReader
 		}
 	}
 	
+	/**
+	 *  Reads the class fields.
+	 *  
+	 *  @param is Inputstream.
+	 *  @param strings Strings from constant table.
+	 *  @return Fields.
+	 */
+	protected static final List<FieldInfo> readFields(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
+	{
+		List<FieldInfo> ret = new ArrayList<>();
+		int mcount = is.readUnsignedShort();
+		for (int i = 0; i < mcount; ++i)
+		{
+			FieldInfo fi = new FieldInfo();
+			fi.setAccessFlags(is.readUnsignedShort());
+			
+			int strind = is.readUnsignedShort();
+			byte[] rawstr = strings.get(strind);
+			fi.setFieldName(decodeModifiedUtf8(rawstr));
+			
+			strind = is.readUnsignedShort();
+			rawstr = strings.get(strind);
+			fi.setFieldDescriptor(decodeModifiedUtf8(rawstr));
+			
+			fi.setAnnotations(readVisibleAnnotations(is, strings, false));
+			
+			ret.add(fi);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Reads the class methods.
+	 *  
+	 *  @param is Inputstream.
+	 *  @param strings Strings from constant table.
+	 *  @return Methods.
+	 */
 	protected static final List<MethodInfo> readMethods(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
 	{
 		List<MethodInfo> ret = new ArrayList<>();
@@ -208,7 +251,6 @@ public class SClassReader
 			rawstr = strings.get(strind);
 			mi.setMethodDescriptor(decodeModifiedUtf8(rawstr));
 			
-//			skipAttributes(is);
 			mi.setAnnotations(readVisibleAnnotations(is, strings, false));
 			
 			ret.add(mi);
@@ -396,6 +438,11 @@ public class SClassReader
     	return type.substring(1, type.length() - 1).replace('/', '.');
     }
     
+    /**
+     *  Entity with optional annotations 
+     * @author jander
+     *
+     */
     public static class AnnotatedEntity
     {
     	/** The annotations. */
@@ -441,7 +488,7 @@ public class SClassReader
 		}
 		
 		/**
-		 *  Tests if class is public.
+		 *  Tests if entity is public.
 		 *  @return True, if public.
 		 */
 		public boolean isPublic()
@@ -450,7 +497,7 @@ public class SClassReader
 		}
 		
 		/**
-		 *  Tests if class is final.
+		 *  Tests if entity is final.
 		 *  @return True, if final.
 		 */
 		public boolean isFinal()
@@ -459,7 +506,16 @@ public class SClassReader
 		}
 		
 		/**
-		 *  Test if this class has an annotation.
+		 *  Tests if entity is synthetic.
+		 *  @return True, if synthetic.
+		 */
+		public boolean isSynthetic()
+		{
+			return (accessflags & 0x00001000) != 0;
+		}
+		
+		/**
+		 *  Test if this entity has an annotation.
 		 *  @param annname The annotation name.
 		 */
 		public boolean hasAnnotation(String anname)
@@ -480,7 +536,7 @@ public class SClassReader
 		}
 		
 		/**
-		 *  Test if this class has an annotation.
+		 *  Test if this entity has an annotation.
 		 *  @param annname The annotation name.
 		 */
 		public AnnotationInfo getAnnotation(String anname)
@@ -503,13 +559,122 @@ public class SClassReader
     
     /**
      *  Entity contained in a class.
+     */
+    public static class ClassEntity extends AnnotatedEntity
+    {
+    	/**
+		 *  Tests if entity is private.
+		 *  @return True, if private.
+		 */
+		public boolean isPrivate()
+		{
+			return (accessflags & 0x00000002) != 0;
+		}
+		
+		/**
+		 *  Tests if entity is protected.
+		 *  @return True, if protected.
+		 */
+		public boolean isProtected()
+		{
+			return (accessflags & 0x00000004) != 0;
+		}
+		
+		/**
+		 *  Tests if entity is static.
+		 *  @return True, if static.
+		 */
+		public boolean isStatic()
+		{
+			return (accessflags & 0x00000008) != 0;
+		}
+    }
+    
+    /**
+     *  Info object describing a field.
      *
      */
-//    public static class ClassEntity extends AnnotatedEntity
-//    {
-//    }
+    public static class FieldInfo extends ClassEntity
+    {
+    	/** The field name. */
+    	protected String fieldname;
+    	
+    	/** The field descriptor. */
+    	protected String fielddesc;
+    	
+    	protected FieldInfo()
+		{
+		}
+    	
+    	/**
+		 *  Get the field name.
+		 *  @return the field name.
+		 */
+    	public String getFieldName()
+		{
+			return fieldname;
+		}
+    	
+    	/**
+		 *  Get the field descriptor.
+		 *  @return the field descriptor.
+		 */
+    	public String getFieldDescriptor()
+		{
+			return fielddesc;
+		}
+    	
+    	/**
+		 *  Tests if field is volatile.
+		 *  @return True, if volatile.
+		 */
+		public boolean isVolatile()
+		{
+			return (accessflags & 0x00000040) != 0;
+		}
+		
+		/**
+		 *  Tests if field is transient.
+		 *  @return True, if transient.
+		 */
+		public boolean isTransient()
+		{
+			return (accessflags & 0x00000080) != 0;
+		}
+		
+		/**
+		 *  Tests if field is an enum.
+		 *  @return True, if an enum.
+		 */
+		public boolean isEnum()
+		{
+			return (accessflags & 0x00004000) != 0;
+		}
+    	
+    	/**
+		 *  Set the field name.
+		 *  @param fieldname the field name to set
+		 */
+    	protected void setFieldName(String fieldname)
+		{
+			this.fieldname = fieldname;
+		}
+    	
+    	/**
+		 *  Set the field descriptor.
+		 *  @param fielddesc the field descriptor to set
+		 */
+    	protected void setFieldDescriptor(String fielddesc)
+		{
+			this.fielddesc = fielddesc;
+		}
+    }
     
-    public static class MethodInfo extends AnnotatedEntity
+    /**
+     *  Info object describing a method.
+     *
+     */
+    public static class MethodInfo extends ClassEntity
     {
     	/** The method name. */
     	protected String methodname;
@@ -520,7 +685,7 @@ public class SClassReader
     	/**
     	 *  Create mew method info.
     	 */
-    	public MethodInfo()
+    	protected MethodInfo()
 		{
 		}
     	
@@ -553,11 +718,65 @@ public class SClassReader
     	
     	/**
 		 *  Set the method descriptor.
-		 *  @param methodname the method descriptor to set
+		 *  @param methoddesc the method descriptor to set
 		 */
     	protected void setMethodDescriptor(String methoddesc)
 		{
 			this.methoddesc = methoddesc;
+		}
+    	
+    	/**
+		 *  Tests if method is synchronized.
+		 *  @return True, if synchronized.
+		 */
+		public boolean isSynchronized()
+		{
+			return (accessflags & 0x00000020) != 0;
+		}
+		
+		/**
+		 *  Tests if method is a bridge method.
+		 *  @return True, if bridge method.
+		 */
+		public boolean isBridge()
+		{
+			return (accessflags & 0x00000040) != 0;
+		}
+		
+		/**
+		 *  Tests if method is a varargs method.
+		 *  @return True, if varargs method.
+		 */
+		public boolean isVarArgs()
+		{
+			return (accessflags & 0x00000080) != 0;
+		}
+		
+		/**
+		 *  Tests if method is a native method.
+		 *  @return True, if native method.
+		 */
+		public boolean isNative()
+		{
+			return (accessflags & 0x00000100) != 0;
+		}
+		
+		/**
+		 *  Tests if method is abstract.
+		 *  @return True, if abstract.
+		 */
+		public boolean isAbstract()
+		{
+			return (accessflags & 0x00000400) != 0;
+		}
+		
+		/**
+		 *  Tests if method is strict.
+		 *  @return True, if strict.
+		 */
+		public boolean isStrict()
+		{
+			return (accessflags & 0x00000800) != 0;
 		}
     }
     
@@ -569,13 +788,16 @@ public class SClassReader
     	/** The class name. */
     	protected String classname;
     	
+    	/** Field infos, if available. */
+    	protected List<FieldInfo> fieldinfos;
+    	
     	/** Method infos, if available. */
     	protected List<MethodInfo> methodinfos;
     	
     	/**
     	 *  Create a new classinfo.
     	 */
-		public ClassInfo()
+    	protected ClassInfo()
 		{
 		}
     	
@@ -595,6 +817,15 @@ public class SClassReader
 		public String getClassName()
 		{
 			return classname;
+		}
+		
+		/**
+		 *  Get the field infos.
+		 *  @return the field infos.
+		 */
+		public List<FieldInfo> getFieldInfos()
+		{
+			return fieldinfos;
 		}
 		
 		/**
@@ -652,6 +883,15 @@ public class SClassReader
 		}
 		
 		/**
+		 *  Set the field infos.
+		 *  @param fieldinfos the field infos to set
+		 */
+		protected void setFieldInfos(List<FieldInfo> fieldinfos)
+		{
+			this.fieldinfos = fieldinfos;
+		}
+		
+		/**
 		 *  Set the method infos.
 		 *  @param methodinfos the method infos to set
 		 */
@@ -685,7 +925,7 @@ public class SClassReader
     	 *  
     	 *  @param type Annotation type.
     	 */
-    	public AnnotationInfo(String type)
+    	protected AnnotationInfo(String type)
 		{
     		this.type = type;
 		}
@@ -751,7 +991,7 @@ public class SClassReader
     	/**
     	 *  Create enum info.
     	 */
-    	public EnumInfo(String type, String value)
+    	protected EnumInfo(String type, String value)
 		{
     		this.type = type;
     		this.value = value;
@@ -775,24 +1015,4 @@ public class SClassReader
 			return value;
 		}
     }
-    
-    public static void main(String[] args)
-	{
-    	String name = "jadex.micro.examples.fireflies.FireflyAgent".replace('.', '/') + ".class";
-    	ClassLoader syscl = ClassLoader.getSystemClassLoader();
-    	System.out.println(ClassLoader.getSystemClassLoader());
-//    	String name = "jadex.commons.SClassReader".replace('.', '/') + ".class";
-    	System.out.println(name);
-//    	InputStream is = SClassReader.class.getClassLoader().getResourceAsStream(name);
-    	InputStream is = SUtil.getResource0(name, ClassLoader.getSystemClassLoader());
-    	System.out.println(is);
-    	ClassInfo info = SClassReader.getClassInfo(is, true);
-    	
-    	for (MethodInfo mi : SUtil.notNull(info.getMethodInfos()))
-    	{
-    		System.out.println(mi.getMethodName());
-    		for (AnnotationInfo ai : SUtil.notNull(mi.getAnnotations()))
-    			System.out.println("\t" + ai.getType());
-    	}
-	}
 }
