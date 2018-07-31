@@ -427,9 +427,20 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 //		if(shutdowned)
 //			throw new ComponentTerminatedException(id);
-
-		return requiredserviceinfos==null? new RequiredServiceInfo[0]: 
-			requiredserviceinfos.values().toArray(new RequiredServiceInfo[requiredserviceinfos.size()]);
+		
+		// Convert to set to remove duplicate entries (name+type) and exclude marker.
+		Set<RequiredServiceInfo>	ret	= new LinkedHashSet<>();
+		if(requiredserviceinfos!=null)
+		{
+			for(RequiredServiceInfo info: requiredserviceinfos.values())
+			{
+				if(!DUPLICATE_SERVICE_TYPE_MARKER.equals(info))
+				{
+					ret.add(info);
+				}
+			}
+		}
+		return ret.toArray(new RequiredServiceInfo[ret.size()]);
 	}
 	
 	/**
