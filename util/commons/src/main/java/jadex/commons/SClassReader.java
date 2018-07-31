@@ -258,6 +258,9 @@ public class SClassReader
 		return ret;
 	}
 	
+	/**
+	 *  Read runtime visible annotations.
+	 */
 	protected static final List<AnnotationInfo> readVisibleAnnotations(DataInputStream is, Map<Integer, byte[]> strings, boolean cancelread) throws IOException
 	{
 		List<AnnotationInfo> ret = null;
@@ -281,6 +284,9 @@ public class SClassReader
 		return ret;
 	}
 	
+	/**
+	 *  Read a set of annotations.
+	 */
 	protected static final List<AnnotationInfo> readAnnotations(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
 	{
 		List<AnnotationInfo> ret = new ArrayList<>();
@@ -292,6 +298,9 @@ public class SClassReader
 		return ret;
 	}
 	
+	/**
+	 *  Read a specific annotation.
+	 */
 	protected final static AnnotationInfo readAnnotation(DataInputStream is,  Map<Integer, byte[]> strings) throws IOException
 	{
 		int typeref = is.readUnsignedShort();
@@ -420,6 +429,12 @@ public class SClassReader
     	}
     }
     
+    /**
+     *  Skips a number of bytes.
+     *  
+     *  @param is Inputstream.
+     *  @param len number of bytes skipped.
+     */
     protected static final void skip(DataInputStream is, int len) throws IOException
     {
     	while (len > 0)
