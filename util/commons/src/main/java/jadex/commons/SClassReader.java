@@ -56,7 +56,7 @@ public class SClassReader
 			{
 				String classname = decodeModifiedUtf8(strings.get(SUtil.bytesToShort(strings.get(classnameindex), 0) & 0xFFFF));
 				classname = classname.replace('/', '.');
-				ret.setClassname(classname);
+				ret.setClassName(classname);
 			}
 			catch (Exception e)
 			{
@@ -75,7 +75,7 @@ public class SClassReader
 			else
 				skipFieldsOrMethods(is);
 			
-			List<AnnotationInfos> annos = readVisibleAnnotations(is, strings, true);
+			List<AnnotationInfo> annos = readVisibleAnnotations(is, strings, true);
 			ret.setAnnotations(annos);
 		}
 		catch (Exception e)
@@ -216,9 +216,9 @@ public class SClassReader
 		return ret;
 	}
 	
-	protected static final List<AnnotationInfos> readVisibleAnnotations(DataInputStream is, Map<Integer, byte[]> strings, boolean cancelread) throws IOException
+	protected static final List<AnnotationInfo> readVisibleAnnotations(DataInputStream is, Map<Integer, byte[]> strings, boolean cancelread) throws IOException
 	{
-		List<AnnotationInfos> ret = null;
+		List<AnnotationInfo> ret = null;
 		int ac = is.readUnsignedShort();
 		for (int i = 0; i < ac; ++i)
 		{
@@ -239,9 +239,9 @@ public class SClassReader
 		return ret;
 	}
 	
-	protected static final List<AnnotationInfos> readAnnotations(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
+	protected static final List<AnnotationInfo> readAnnotations(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
 	{
-		List<AnnotationInfos> ret = new ArrayList<>();
+		List<AnnotationInfo> ret = new ArrayList<>();
 		int anocount = is.readUnsignedShort();
 		for (int i = 0; i < anocount; ++i)
 		{
@@ -250,7 +250,7 @@ public class SClassReader
 		return ret;
 	}
 	
-	protected final static AnnotationInfos readAnnotation(DataInputStream is,  Map<Integer, byte[]> strings) throws IOException
+	protected final static AnnotationInfo readAnnotation(DataInputStream is,  Map<Integer, byte[]> strings) throws IOException
 	{
 		int typeref = is.readUnsignedShort();
 		int paircount = is.readUnsignedShort();
@@ -259,7 +259,7 @@ public class SClassReader
 //		if (type == null)
 //			continue;
 		type = convertTypeName(type);
-		AnnotationInfos ret = new AnnotationInfos(type);
+		AnnotationInfo ret = new AnnotationInfo(type);
 		
 		for (int i = 0; i < paircount; ++i)
 		{
@@ -399,7 +399,7 @@ public class SClassReader
     public static class AnnotatedEntity
     {
     	/** The annotations. */
-    	protected Collection<AnnotationInfos> annotations;
+    	protected Collection<AnnotationInfo> annotations;
     	
     	/** Class access flags. */
     	protected int accessflags;
@@ -408,7 +408,7 @@ public class SClassReader
 		 *  Get the annotations.
 		 *  @return the annotations
 		 */
-		public Collection<AnnotationInfos> getAnnotations()
+		public Collection<AnnotationInfo> getAnnotations()
 		{
 			return annotations;
 		}
@@ -417,7 +417,7 @@ public class SClassReader
 		 *  Set the annotations.
 		 *  @param annotations the annotations to set
 		 */
-		protected void setAnnotations(Collection<AnnotationInfos> annotations)
+		protected void setAnnotations(Collection<AnnotationInfo> annotations)
 		{
 			this.annotations = annotations;
 		}
@@ -467,7 +467,7 @@ public class SClassReader
 			boolean ret = false;
 			if(annotations!=null)
 			{
-				for(AnnotationInfos ai: annotations)
+				for(AnnotationInfo ai: annotations)
 				{
 					if(anname.equals(ai.getType()))
 					{
@@ -483,12 +483,12 @@ public class SClassReader
 		 *  Test if this class has an annotation.
 		 *  @param annname The annotation name.
 		 */
-		public AnnotationInfos getAnnotation(String anname)
+		public AnnotationInfo getAnnotation(String anname)
 		{
-			AnnotationInfos ret = null;
+			AnnotationInfo ret = null;
 			if(annotations!=null)
 			{
-				for(AnnotationInfos ai: annotations)
+				for(AnnotationInfo ai: annotations)
 				{
 					if(anname.equals(ai.getType()))
 					{
@@ -582,7 +582,7 @@ public class SClassReader
     	/**
     	 *  Create a new classinfo.
     	 */
-		public ClassInfo(String classname, Collection<AnnotationInfos> annotations)
+		public ClassInfo(String classname, Collection<AnnotationInfo> annotations)
 		{
 			this.classname = classname;
 			this.annotations = annotations;
@@ -592,7 +592,7 @@ public class SClassReader
 		 *  Get the classname.
 		 *  @return the classname.
 		 */
-		public String getClassname()
+		public String getClassName()
 		{
 			return classname;
 		}
@@ -646,7 +646,7 @@ public class SClassReader
 		 *  Set the class name.
 		 *  @param classname the class name to set
 		 */
-		protected void setClassname(String classname)
+		protected void setClassName(String classname)
 		{
 			this.classname = classname;
 		}
@@ -672,7 +672,7 @@ public class SClassReader
     /**
      *  Class containing annotation infos.
      */
-    public static class AnnotationInfos
+    public static class AnnotationInfo
     {
     	/** Fully qualified type. */
     	protected String type;
@@ -685,7 +685,7 @@ public class SClassReader
     	 *  
     	 *  @param type Annotation type.
     	 */
-    	public AnnotationInfos(String type)
+    	public AnnotationInfo(String type)
 		{
     		this.type = type;
 		}
@@ -791,7 +791,7 @@ public class SClassReader
     	for (MethodInfo mi : SUtil.notNull(info.getMethodInfos()))
     	{
     		System.out.println(mi.getMethodName());
-    		for (AnnotationInfos ai : SUtil.notNull(mi.getAnnotations()))
+    		for (AnnotationInfo ai : SUtil.notNull(mi.getAnnotations()))
     			System.out.println("\t" + ai.getType());
     	}
 	}

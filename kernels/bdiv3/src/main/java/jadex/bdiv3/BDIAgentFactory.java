@@ -38,7 +38,7 @@ import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SClassReader;
-import jadex.commons.SClassReader.AnnotationInfos;
+import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
@@ -328,7 +328,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	public String getLoadableType(ClassInfo ci)
 	{
 		String	ret	= null;
-		AnnotationInfos ai	= ci.getAnnotation(Agent.class.getName());
+		AnnotationInfo ai	= ci.getAnnotation(Agent.class.getName());
 		if(ai!=null)
 		{
 			// Check type in agent annotation
