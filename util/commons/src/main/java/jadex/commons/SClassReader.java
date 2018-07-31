@@ -26,6 +26,17 @@ public class SClassReader
 	 */
 	public static final ClassInfo getClassInfo(InputStream inputstream)
 	{
+		return getClassInfo(inputstream, false);
+	}
+	
+	/**
+	 *  Get infos about a class.
+	 * 
+	 *  @param inputstream The input stream of the class file. 
+	 *  @return The class infos.
+	 */
+	public static final ClassInfo getClassInfo(InputStream inputstream, boolean includemethods)
+	{
 		ClassInfo ret = new ClassInfo();
 		
 		try
@@ -59,9 +70,12 @@ public class SClassReader
 			
 			skipFieldsOrMethods(is);
 			
-			skipFieldsOrMethods(is);
+			if (includemethods)
+				ret.setMethodInfos(readMethods(is, strings));
+			else
+				skipFieldsOrMethods(is);
 			
-			List<AnnotationInfos> annos = readVisibleAnnotations(is, strings);
+			List<AnnotationInfos> annos = readVisibleAnnotations(is, strings, true);
 			ret.setAnnotations(annos);
 		}
 		catch (Exception e)
@@ -170,14 +184,39 @@ public class SClassReader
 		int ac = is.readUnsignedShort();
 		for (int i = 0; i < ac; ++i)
 		{
-			//skip(is, 2);
-			int index = is.readUnsignedShort();
+			skip(is, 2);
+//			int index = is.readUnsignedShort();
 			int len = is.readInt();
 			skip(is, len);
 		}
 	}
 	
-	protected static final List<AnnotationInfos> readVisibleAnnotations(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
+	protected static final List<MethodInfo> readMethods(DataInputStream is, Map<Integer, byte[]> strings) throws IOException
+	{
+		List<MethodInfo> ret = new ArrayList<>();
+		int mcount = is.readUnsignedShort();
+		for (int i = 0; i < mcount; ++i)
+		{
+			MethodInfo mi = new MethodInfo();
+			mi.setAccessFlags(is.readUnsignedShort());
+			
+			int strind = is.readUnsignedShort();
+			byte[] rawstr = strings.get(strind);
+			mi.setMethodName(decodeModifiedUtf8(rawstr));
+			
+			strind = is.readUnsignedShort();
+			rawstr = strings.get(strind);
+			mi.setMethodDescriptor(decodeModifiedUtf8(rawstr));
+			
+//			skipAttributes(is);
+			mi.setAnnotations(readVisibleAnnotations(is, strings, false));
+			
+			ret.add(mi);
+		}
+		return ret;
+	}
+	
+	protected static final List<AnnotationInfos> readVisibleAnnotations(DataInputStream is, Map<Integer, byte[]> strings, boolean cancelread) throws IOException
 	{
 		List<AnnotationInfos> ret = null;
 		int ac = is.readUnsignedShort();
@@ -188,7 +227,8 @@ public class SClassReader
 			{
 				skip(is, 4);
 				ret = readAnnotations(is, strings);
-				break;
+				if (cancelread)
+					break;
 			}
 			else
 			{
@@ -356,55 +396,15 @@ public class SClassReader
     	return type.substring(1, type.length() - 1).replace('/', '.');
     }
     
-    /**
-     *  Class for infos about a class.
-     */
-    public static class ClassInfo
+    public static class AnnotatedEntity
     {
-    	/** The class name. */
-    	protected String classname;
-    	
     	/** The annotations. */
     	protected Collection<AnnotationInfos> annotations;
     	
     	/** Class access flags. */
     	protected int accessflags;
-
-    	/**
-    	 *  Create a new classinfo.
-    	 */
-		public ClassInfo()
-		{
-		}
     	
     	/**
-    	 *  Create a new classinfo.
-    	 */
-		public ClassInfo(String classname, Collection<AnnotationInfos> annotations)
-		{
-			this.classname = classname;
-			this.annotations = annotations;
-		}
-
-		/**
-		 *  Get the classname.
-		 *  @return the classname.
-		 */
-		public String getClassname()
-		{
-			return classname;
-		}
-
-		/**
-		 *  Set the classname.
-		 *  @param classname the classname to set
-		 */
-		public void setClassname(String classname)
-		{
-			this.classname = classname;
-		}
-
-		/**
 		 *  Get the annotations.
 		 *  @return the annotations
 		 */
@@ -417,7 +417,7 @@ public class SClassReader
 		 *  Set the annotations.
 		 *  @param annotations the annotations to set
 		 */
-		public void setAnnotations(Collection<AnnotationInfos> annotations)
+		protected void setAnnotations(Collection<AnnotationInfos> annotations)
 		{
 			this.annotations = annotations;
 		}
@@ -435,7 +435,7 @@ public class SClassReader
 		 *  Set the access flags.
 		 *  @param accessflags the access flags to set
 		 */
-		public void setAccessFlags(int accessflags)
+		protected void setAccessFlags(int accessflags)
 		{
 			this.accessflags = accessflags;
 		}
@@ -456,42 +456,6 @@ public class SClassReader
 		public boolean isFinal()
 		{
 			return (accessflags & 0x00000010) != 0;
-		}
-		
-		/**
-		 *  Tests if class is an interface.
-		 *  @return True, if an interface.
-		 */
-		public boolean isInterface()
-		{
-			return (accessflags & 0x00000200) != 0;
-		}
-		
-		/**
-		 *  Tests if class is an annotation.
-		 *  @return True, if an annotation.
-		 */
-		public boolean isAnnotation()
-		{
-			return (accessflags & 0x00002000) != 0;
-		}
-		
-		/**
-		 *  Tests if class is an enum.
-		 *  @return True, if an enum.
-		 */
-		public boolean isEnum()
-		{
-			return (accessflags & 0x00004000) != 0;
-		}
-		
-		/**
-		 *  Tests if class is abstract.
-		 *  @return True, if abstract.
-		 */
-		public boolean isAbstract()
-		{
-			return (accessflags & 0x00000400) != 0;
 		}
 		
 		/**
@@ -534,6 +498,166 @@ public class SClassReader
 				}
 			}
 			return ret;
+		}
+    }
+    
+    /**
+     *  Entity contained in a class.
+     *
+     */
+//    public static class ClassEntity extends AnnotatedEntity
+//    {
+//    }
+    
+    public static class MethodInfo extends AnnotatedEntity
+    {
+    	/** The method name. */
+    	protected String methodname;
+    	
+    	/** The method descriptor. */
+    	protected String methoddesc;
+    	
+    	/**
+    	 *  Create mew method info.
+    	 */
+    	public MethodInfo()
+		{
+		}
+    	
+    	/**
+		 *  Get the method name.
+		 *  @return the method name.
+		 */
+    	public String getMethodName()
+		{
+			return methodname;
+		}
+    	
+    	/**
+		 *  Get the method descriptor.
+		 *  @return the method descriptor.
+		 */
+    	public String getMethodDescriptor()
+		{
+			return methoddesc;
+		}
+    	
+    	/**
+		 *  Set the method name.
+		 *  @param methodname the method name to set
+		 */
+    	protected void setMethodName(String methodname)
+		{
+			this.methodname = methodname;
+		}
+    	
+    	/**
+		 *  Set the method descriptor.
+		 *  @param methodname the method descriptor to set
+		 */
+    	protected void setMethodDescriptor(String methoddesc)
+		{
+			this.methoddesc = methoddesc;
+		}
+    }
+    
+    /**
+     *  Class for infos about a class.
+     */
+    public static class ClassInfo extends AnnotatedEntity
+    {
+    	/** The class name. */
+    	protected String classname;
+    	
+    	/** Method infos, if available. */
+    	protected List<MethodInfo> methodinfos;
+    	
+    	/**
+    	 *  Create a new classinfo.
+    	 */
+		public ClassInfo()
+		{
+		}
+    	
+    	/**
+    	 *  Create a new classinfo.
+    	 */
+		public ClassInfo(String classname, Collection<AnnotationInfos> annotations)
+		{
+			this.classname = classname;
+			this.annotations = annotations;
+		}
+
+		/**
+		 *  Get the classname.
+		 *  @return the classname.
+		 */
+		public String getClassname()
+		{
+			return classname;
+		}
+		
+		/**
+		 *  Get the method infos.
+		 *  @return the method infos.
+		 */
+		public List<MethodInfo> getMethodInfos()
+		{
+			return methodinfos;
+		}
+		
+		/**
+		 *  Tests if class is an interface.
+		 *  @return True, if an interface.
+		 */
+		public boolean isInterface()
+		{
+			return (accessflags & 0x00000200) != 0;
+		}
+		
+		/**
+		 *  Tests if class is an annotation.
+		 *  @return True, if an annotation.
+		 */
+		public boolean isAnnotation()
+		{
+			return (accessflags & 0x00002000) != 0;
+		}
+		
+		/**
+		 *  Tests if class is an enum.
+		 *  @return True, if an enum.
+		 */
+		public boolean isEnum()
+		{
+			return (accessflags & 0x00004000) != 0;
+		}
+		
+		/**
+		 *  Tests if class is abstract.
+		 *  @return True, if abstract.
+		 */
+		public boolean isAbstract()
+		{
+			return (accessflags & 0x00000400) != 0;
+		}
+		
+		/**
+		 *  Set the class name.
+		 *  @param classname the class name to set
+		 */
+		protected void setClassname(String classname)
+		{
+			this.classname = classname;
+		}
+		
+		/**
+		 *  Set the method infos.
+		 *  @param methodinfos the method infos to set
+		 */
+		protected void setMethodInfos(List<MethodInfo> methodinfos)
+		{
+			this.methodinfos = methodinfos;
 		}
 
 		/**
@@ -651,4 +775,24 @@ public class SClassReader
 			return value;
 		}
     }
+    
+    public static void main(String[] args)
+	{
+    	String name = "jadex.micro.examples.fireflies.FireflyAgent".replace('.', '/') + ".class";
+    	ClassLoader syscl = ClassLoader.getSystemClassLoader();
+    	System.out.println(ClassLoader.getSystemClassLoader());
+//    	String name = "jadex.commons.SClassReader".replace('.', '/') + ".class";
+    	System.out.println(name);
+//    	InputStream is = SClassReader.class.getClassLoader().getResourceAsStream(name);
+    	InputStream is = SUtil.getResource0(name, ClassLoader.getSystemClassLoader());
+    	System.out.println(is);
+    	ClassInfo info = SClassReader.getClassInfo(is, true);
+    	
+    	for (MethodInfo mi : SUtil.notNull(info.getMethodInfos()))
+    	{
+    		System.out.println(mi.getMethodName());
+    		for (AnnotationInfos ai : SUtil.notNull(mi.getAnnotations()))
+    			System.out.println("\t" + ai.getType());
+    	}
+	}
 }
