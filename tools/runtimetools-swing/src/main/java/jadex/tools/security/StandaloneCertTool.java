@@ -79,7 +79,7 @@ public class StandaloneCertTool extends JFrame
 							catchain = catchain == null ? cert : catchain + cert;
 						X509PemStringsSecret secret = new X509PemStringsSecret(catchain, kp.getKey());
 //						System.out.println("SECWITHKEY: \"" + kp.getKey().replace("\n", "\\n").replace("\r", "\\r") + "\"");
-						System.out.println("SECWITHKEY: \"" + secret.toString() + "\"");
+						System.out.println("Full Secret: \"" + secret.toString() + "\"");
 					}
 				}
 			}

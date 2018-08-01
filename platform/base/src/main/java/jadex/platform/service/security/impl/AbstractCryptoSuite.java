@@ -92,7 +92,7 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 		else
 			secinf.setAuthenticatedPlatformName(authenticatedplatformname);
 		secinf.setAdminPlatform(platformauth);
-		secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
+		secinf.setNetworks(new HashSet<>(authnets));
 		
 		if (authenticatedplatformname != null && agent.getInternalTrustedPlatformNames().contains(authenticatedplatformname))
 			secinf.setTrustedPlatform(true);

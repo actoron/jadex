@@ -113,7 +113,7 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 //		secinf.setPlatformAuthenticated(true);
 		secinf.setTrustedPlatform(true);
 		secinf.setAdminPlatform(true);
-		secinf.setNetworks(agent.getInternalNetworks().keySet().toArray(new String[agent.getInternalNetworks().size()]));
+		secinf.setNetworks(agent.getInternalNetworks().keySet());
 		
 		if (!(incomingmessage instanceof NullMessage))
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), new NullMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId()));

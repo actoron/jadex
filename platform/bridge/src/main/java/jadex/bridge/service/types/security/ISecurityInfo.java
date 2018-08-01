@@ -41,7 +41,7 @@ public interface ISecurityInfo
 	 *
 	 *  @return The authenticated networks of the sender (sorted).
 	 */
-	public String[] getNetworks();
+	public Set<String> getNetworks();
 	
 	/**
 	 *  Gets the roles associated with the sender.

@@ -2,6 +2,7 @@ package jadex.platform.service.registryv2;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -17,6 +18,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -33,6 +35,7 @@ import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
 import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
 import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
 import jadex.commons.collection.MultiCollection;
@@ -65,6 +68,12 @@ import jadex.micro.annotation.RequiredService;
 public class SuperpeerClientAgent implements ISearchQueryManagerService
 {
 	//-------- constants --------
+	
+	/** Name of the global network. */
+	public static final String GLOBAL_NETWORK_NAME = "___GLOBAL___";
+	
+	/** Default root certificate for global network. */
+	public static final String DEFAULT_GLOBAL_ROOT_CERTIFICATE = "pem:-----BEGIN CERTIFICATE-----MIICszCCAhWgAwIBAgIVAP5jQirZLKNnSHf1FES8qkWMJyvKMAoGCCqGSM49BAMEMDYxHTAbBgNVBAMMFEphZGV4IEdsb2JhbCBSb290IFgxMRUwEwYDVQQKDAxBY3Rvcm9uIEdtYkgwHhcNMTgwODAxMDkxNjA5WhcNMjgwNzI5MDkxNjA5WjA2MR0wGwYDVQQDDBRKYWRleCBHbG9iYWwgUm9vdCBYMTEVMBMGA1UECgwMQWN0b3JvbiBHbWJIMIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQA6K9sA0U88s0/6nLTwZhXwzBesBr/MpNAqpZtCBe2sD+3sjppYtnug3RUbRFYNZsYPMMHBqOWyo0BR7N5DxeSJ8AB/T/zzTC9PqjDUcIazUDCf0XsSSx08a3UqBPZ5EzKRtOvf3cx/qCp/0/fND3iKWfrNhngLxYMS0d/BMlNRE3vQl6jgbwwgbkwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAoQwSQYDVR0OBEIEQLAcDiIifZpM0BihTvohWfxP5bHk3iHeA/O5vLaTp7o5Lw+2E2CcyIXfNcMRhQ5lAymDVYBwJjr0ZjgzvXOsJhIwSwYDVR0jBEQwQoBAsBwOIiJ9mkzQGKFO+iFZ/E/lseTeId4D87m8tpOnujkvD7YTYJzIhd81wxGFDmUDKYNVgHAmOvRmODO9c6wmEjAKBggqhkjOPQQDBAOBiwAwgYcCQgGYPCBbcI/ai9nAqzuU1oXIn4KFguj/95xbVm4HBb9wsNrB0K8LtdXsvB4BR2HeRCB0cWqyCKZimBbaJIoDBTcs2gJBTXfqb/KlKCwrO6KXLOtah5sgASt+QZ3uD6AXBNrBfBjC5nUBWkx/zJd+sllyYoekCGy/UAvwNIB4aFkTHnQGyS4=-----END CERTIFICATE-----";
 	
 	/** The fallback polling search rate as factor of the default remote timeout. */
 	public static final double	POLLING_RATE	= 0.33333333;	// 30*0.333.. secs  -> 10 secs.
@@ -116,12 +125,20 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					{
 						assert agent.getFeature(IExecutionFeature.class).isComponentThread();
 						
+						Set<String> networknames = new HashSet<>(networks.keySet());
+						
+						if (!networks.containsKey(GLOBAL_NETWORK_NAME))
+						{
+							secser.setNetwork(GLOBAL_NETWORK_NAME, DEFAULT_GLOBAL_ROOT_CERTIFICATE);
+							networknames.add(GLOBAL_NETWORK_NAME);
+						}
+						
 						for(String network: networks.keySet())
 						{
 							connections.put(network, new NetworkManager(network));
 							connections.get(network).startSuperpeerSearch();	// Start after put, because uses itself for superpeer search
 						}
-							
+						
 						ret.setResult(null);
 					}
 				});
@@ -517,6 +534,14 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							public void intermediateResultAvailable(Void result)
 							{
 								// First command -> connected (shouldn't be any other commands).
+								
+								// Check if the superpeer is genuine.
+								ISecurityInfo secinfo = (ISecurityInfo) ServiceCall.getCurrentInvocation().getProperty(ServiceCall.SECURITY_INFOS);
+								if (secinfo == null || secinfo.getNetworks() == null || !secinfo.getNetworks().contains(networkname))
+								{
+									regfut.terminate(new SecurityException("Superpeer failed to authenticate with the network '" + networkname + "'."));
+									return;
+								}
 								
 								// First connected super peer -> remember connection and stop search
 								if(running && superpeer==null)
