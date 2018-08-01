@@ -96,23 +96,6 @@ public class CreationBDI
 	@Plan
 	protected void startPeer(RPlan rplan)
 	{
-//		if(starttime==0)
-//		{
-//			IClockService cs = getClock().get();
-//			
-//			System.gc();
-//			try
-//			{
-//				Thread.sleep(500);
-//			}
-//			catch(InterruptedException e){}
-//			
-//			startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-//			starttime = cs.getTime();
-//		}
-//		
-//		step1();
-		
 		if(starttime==0)
 		{
 			getClock().addResultListener(new DefaultResultListener<IClockService>()
@@ -127,7 +110,7 @@ public class CreationBDI
 					catch(InterruptedException e){}
 					
 					startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-					starttime = ((IClockService)result).getTime();
+					starttime = System.currentTimeMillis();
 					
 					step1();
 				}
@@ -168,7 +151,7 @@ public class CreationBDI
 			{
 				public void resultAvailable(final IClockService clock)
 				{
-					final long end = clock.getTime();
+					final long end = System.currentTimeMillis();
 					
 					System.gc();
 					try
@@ -209,7 +192,7 @@ public class CreationBDI
 											{
 												public void resultAvailable(IClockService clock)
 												{
-													cbdi.deletePeers(max, clock.getTime(), dur, pera, omem, upera);
+													cbdi.deletePeers(max, System.currentTimeMillis(), dur, pera, omem, upera);
 												}
 												
 												public void exceptionOccurred(Exception exception)
@@ -272,7 +255,7 @@ public class CreationBDI
 		{
 			public void resultAvailable(IClockService cs)
 			{
-				long killend = cs.getTime();
+				long killend = System.currentTimeMillis();
 				System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 				double killdur = ((double)killend-killstarttime)/1000.0;
 				final double killpera = killdur/(max-1);

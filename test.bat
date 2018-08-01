@@ -1,5 +1,5 @@
 @REM perform a clean build and test
-@set jadex_timeout=90000
+@rem set jadex_timeout=90000
 
 CMD /C gradlew -Pdist=publishdists clean test -x javadoc -x processSchemas
 

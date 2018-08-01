@@ -895,7 +895,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public IFuture<Void>	abort()
 	{
-		System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get());
+//		System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get());
 		
 		if(!isFinishing())
 		{
