@@ -198,18 +198,18 @@ public class ComponentTest extends TestCase
 					{
 						if(parentRid==null && rid.getLocalIdentifier().getUri().equals(project[rootIndex].getCanonicalFile().toURI()))
 						{
-							System.out.println(fullname+": choose "+project[rootIndex]+" as "+rid);
+//							System.out.println(fullname+": choose "+project[rootIndex]+" as "+rid);
 							parentRid	= rid;
 							libsrv.addURL(null, project[rootIndex].toURI().toURL()).get(timeout, true);
 						}
 						else if(parentRid!=null)
 						{
-							System.out.println(fullname+": add "+project[rootIndex]+" to "+rid);
+//							System.out.println(fullname+": add "+project[rootIndex]+" to "+rid);
 							libsrv.addURL(parentRid, project[rootIndex].toURI().toURL()).get(timeout, true);
 						}
 						else
 						{
-							System.out.println(fullname+": no match "+project[rootIndex]+" for "+rid);
+//							System.out.println(fullname+": no match "+project[rootIndex]+" for "+rid);
 						}
 					}
 					catch(Exception e)
