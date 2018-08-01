@@ -253,7 +253,7 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
 	/**
 	 *  Find result in results
 	 */
-	protected TupleResult findResult(int idx)
+	protected synchronized TupleResult findResult(int idx)
 	{
 		TupleResult ret = null;
 		if(results!=null && results.size()>0)
