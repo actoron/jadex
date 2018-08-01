@@ -1901,8 +1901,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						(SUtil.equals(secinfos.getAuthenticatedPlatformName(), suiteinfos.getAuthenticatedPlatformName()) || (suiteinfos.getAuthenticatedPlatformName() == null && secinfos.getAuthenticatedPlatformName() != null)))
 						
 					{
-						Set<String> msgnets = new HashSet<String>(Arrays.asList(secinfos.getNetworks()));
-						if (msgnets.containsAll(Arrays.asList(suiteinfos.getNetworks())))
+						Set<String> msgnets = secinfos.getNetworks();
+						if (msgnets.containsAll(suiteinfos.getNetworks()))
 						{
 							deccontent = expsuite.getFirstEntity().decryptAndAuthLocal(req.getContent());
 						}
