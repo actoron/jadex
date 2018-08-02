@@ -508,12 +508,17 @@ public class ServiceQuery<T>
 
 	/**
 	 *  Sets the service identifier.
+	 *  Also sets the corresponding provider when sid!=null.
 	 *
 	 *  @param serviceidentifier The service identifier.
 	 */
+	// TODO: looking up sid shouldn't be search/query?
 	public ServiceQuery<T> setServiceIdentifier(IServiceIdentifier serviceidentifier)
 	{
 		this.serviceidentifier = serviceidentifier;
+		// When setting sid also set provider.
+		if(serviceidentifier!=null)
+			setProvider(serviceidentifier.getProviderId());
 		return this;
 	}
 
