@@ -28,7 +28,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Kill peer agent if present.
  *  Starts peer agent on terminate.
  */
-@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="superpeer"))
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="oldsuperpeer"))
 @ProvidedServices(@ProvidedService(type=ISuperpeerRegistrySynchronizationService.class, 
 	implementation=@Implementation(expression="new SuperpeerRegistrySynchronizationService(SuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS, $args.supersuperpeer? 0: 1)")))
 // TODO: publication scope.

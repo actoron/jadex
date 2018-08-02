@@ -24,6 +24,7 @@ import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registryv2.ISuperpeerCollaborationService;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
 import jadex.bridge.service.types.registryv2.ISuperpeerStatusService;
+import jadex.commons.Boolean3;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.collection.MultiCollection;
@@ -36,6 +37,7 @@ import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -43,8 +45,7 @@ import jadex.micro.annotation.RequiredService;
 /**
  *  Super peer collects services from client and answers search requests and queries.
  */
-// Dummy implementation for now.
-@Agent
+@Agent(autostart=@Autostart(name="superpeer", value=Boolean3.FALSE))
 @Service
 @ProvidedServices(replace=true,
 	value={@ProvidedService(type=ISuperpeerService.class, scope=RequiredService.SCOPE_GLOBAL),
@@ -67,6 +68,11 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	
 	/** Lookup for remote peer caches by network. */
 	protected MultiCollection<String, IServiceRegistry> peercaches = new MultiCollection<>();
+	
+	public SuperpeerRegistryAgent()
+	{
+		System.out.println("SUPER CREATED!");
+	}
 	
 	/**
 	 *  Initiates the client registration procedure
