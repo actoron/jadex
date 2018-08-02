@@ -110,7 +110,8 @@ public class X509PemStringsSecret extends AbstractX509PemSecret
 	public int hashCode()
 	{
 		int ret = cert != null ? cert.hashCode() : 0;
-		ret = 31 * ret + key != null ? key.hashCode() : 0;
+		if (key != null)
+			ret += 31 * key.hashCode();
 //		ret = 31 * ret + cacert != null ? cacert.hashCode() : 0;
 		return ret;
 	}
