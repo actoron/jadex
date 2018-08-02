@@ -1,4 +1,4 @@
-package jadex.kernelbase;
+package jadex.bridge.service.types.cms;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;

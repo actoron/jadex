@@ -263,6 +263,8 @@ public class SComponentFactory
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 		
+//		System.out.println("Scom isLoad: "+model);
+		
 		exta.scheduleStep(new IComponentStep<Boolean>()
 		{
 			@Classname("isLoadable")
@@ -482,7 +484,7 @@ public class SComponentFactory
 	public static IFuture<Boolean> isStartable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
-		
+				
 		exta.scheduleStep(new IComponentStep<Boolean>()
 		{
 			@Classname("isStartable")

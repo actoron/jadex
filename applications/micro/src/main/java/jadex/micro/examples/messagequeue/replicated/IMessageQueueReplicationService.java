@@ -16,11 +16,4 @@ public interface IMessageQueueReplicationService
 	 */
 //	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<Event> subscribeForReplication(String topic);
-
-	/**
-	 * Returns the services unique Id.
-	 * 
-	 * @return the service Id.
-	 */
-	public String getId();
 }

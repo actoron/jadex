@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -35,6 +36,9 @@ import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
+import jadex.bridge.service.types.cms.InitInfo;
+import jadex.bridge.service.types.cms.LockEntry;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -43,11 +47,13 @@ import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DelegationResultListener;
@@ -55,6 +61,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.transformation.traverser.TransformSet;
 import jadex.javaparser.SJavaParser;
 
@@ -86,9 +93,43 @@ public class Starter
     /** The used to store the current network names. */
     public static String DATA_NETWORKNAMESCACHE = "networknamescache";
 
+    
     /** The CMS component map. */
     public static String DATA_COMPONENTMAP = "componentmap";
 
+    /** The CMS initinfos. */
+    public static String DATA_INITINFOS = "initinfos";
+    
+    /** The CMS child counts. */
+    public static String DATA_CHILDCOUNTS = "childcounts";
+    
+    /** The CMS cleanup commands. */
+    public static String DATA_CLEANUPCOMMANDS = "cleanupcommands";
+    
+    /** The CMS cleanup commands. */
+    public static String DATA_CLEANUPFUTURES = "cleanupfutures";
+    
+    /** The CMS cleanup commands. */
+    /**	The local filename cache (tuple(parent filename, child filename) -> local typename)*/
+    public static String  DATA_LOCALTYPES = "localtypes";
+    
+    /** The CMS cid counts. */
+    public static String DATA_CIDCOUNTS = "cidcounts";
+    
+    /** The CMS cid counts. */
+    public static String DATA_LOCKENTRIES = "lockentries";
+    
+    /** The CMS listeners. */
+    public static String DATA_CMSLISTENERS = "listeners";
+    
+    
+    /** The bootstrap component factory. */
+    public static String DATA_PLATFORMACCESS = "$platformaccess";
+    
+    /** The bootstrap component factory. */
+    public static String DATA_BOOTSTRAPFACTORY = "$bootstrapfactory";
+    
+    
     /** Constant for local default timeout name. */
     public static String DATA_DEFAULT_LOCAL_TIMEOUT = "default_local_timeout";
 
@@ -423,7 +464,8 @@ public class Starter
 			else
 			{		
 //				config.checkConsistency(); // todo?
-				Class<?> pc = config.getExtendedPlatformConfiguration().getPlatformComponent().getType(cl);
+				ClassInfo ci = config.getExtendedPlatformConfiguration().getPlatformComponent();
+				Class<?> pc = ci.getType(cl);
 //				Object	pc = config.getValue(RootComponentConfiguration.PLATFORM_COMPONENT);
 //				rootConfig.setValue(RootComponentConfiguration.PLATFORM_COMPONENT, pc);
 				if(pc==null)
@@ -445,14 +487,23 @@ public class Starter
 					
 					/** Here */
 //					rootconf.setPlatformAccess(component);
-					putPlatformValue(cid, "$platformaccess", component);
-					putPlatformValue(cid, "$bootstrapfactory", cfac);
+					putPlatformValue(cid, DATA_PLATFORMACCESS, component);
+					putPlatformValue(cid, DATA_BOOTSTRAPFACTORY, cfac);
 //					putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, args);
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMCONFIG, config);
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMMODEL, model);
 					
-					putPlatformValue(cid, Starter.DATA_COMPONENTMAP, Collections.synchronizedMap(new HashMap<IComponentIdentifier, IPlatformComponentAccess>()));
-					
+					putPlatformValue(cid, DATA_COMPONENTMAP, Collections.synchronizedMap(new HashMap<IComponentIdentifier, IPlatformComponentAccess>()));
+					putPlatformValue(cid, DATA_INITINFOS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, InitInfo>()));
+					putPlatformValue(cid, DATA_CHILDCOUNTS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, Integer>()));
+					putPlatformValue(cid, DATA_CLEANUPCOMMANDS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, jadex.bridge.service.types.cms.CleanupCommand>()));
+					putPlatformValue(cid, DATA_CLEANUPFUTURES, Collections.synchronizedMap(new HashMap<IComponentIdentifier, IFuture<Map<String, Object>>>()));
+					putPlatformValue(cid, DATA_LOCALTYPES, Collections.synchronizedMap(new HashMap<Tuple, String>()));
+					putPlatformValue(cid, DATA_CIDCOUNTS, Collections.synchronizedMap(new HashMap<String, Integer>()));
+					putPlatformValue(cid, DATA_CHILDCOUNTS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, Integer>()));
+					putPlatformValue(cid, DATA_LOCKENTRIES, Collections.synchronizedMap(new HashMap<IComponentIdentifier, LockEntry>()));
+					putPlatformValue(cid, DATA_CMSLISTENERS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>>()));
+
 //					rootconf.setBootstrapFactory(cfac);
 //					config.setPlatformModel(model);
 					

@@ -77,7 +77,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 		tuple2FutureTest();
 	}
 
-	private void intermediateFutureTest() {
+	private void intermediateFutureTest() 
+	{
 		IIntermediateFuture<String> fut = ts.getIntermediateResults();
 
 		System.out.println("If test fails after this line, lazy delegation is broken");
@@ -100,26 +101,33 @@ public class LazyInjectTestAgent extends JunitAgentTest
 		final TestReport tr2 = new TestReport("#2", "Test if functional listener works.");
 		reports.add(tr2);
 
-		fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<String>() {
+		fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<String>() 
+		{
 			@Override
-			public void intermediateResultAvailable(String result) {
-
+			public void intermediateResultAvailable(String result) 
+			{
 				System.out.println("first: " + result);
-				if ("hello".equals(result)) {
+				if ("hello".equals(result)) 
+				{
 					tr2.setSucceeded(true);
-				} else {
+				} 
+				else 
+				{
 					tr2.setFailed("Received wrong results.");
 				}
 				checkFinished();
 			}
-		}, new IFunctionalIntermediateFinishedListener<Void>() {
+		}, new IFunctionalIntermediateFinishedListener<Void>() 
+		{
 			@Override
-			public void finished() {
+			public void finished() 
+			{
 				// should not happen as finish is never called
 				tr2.setFailed(new Exception("finish unexpected"));
 				checkFinished();
 			}
-		}, new IFunctionalExceptionListener() {
+		}, new IFunctionalExceptionListener() 
+		{
 			@Override
 			public void exceptionOccurred(Exception exception) {
 				System.out.println("ex: "+exception);
@@ -130,7 +138,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 
 	}
 
-	private void tuple2FutureTest() {
+	private void tuple2FutureTest() 
+	{
 		ITuple2Future<String, Integer> fut = ts.getFirstTupleResult();
 
 		System.out.println("If test fails after this line, lazy delegation is broken");
@@ -158,7 +167,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			public void firstResultAvailable(String result)
 			{
 				System.out.println("first: "+result);
-				if("hello".equals(result)) {
+				if("hello".equals(result)) 
+				{
 					tr2.setSucceeded(true);
 				}
 				else
@@ -198,7 +208,6 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			finished = finished && report.isFinished();
 		}
 
-
 		if(finished)
 		{
 			tc.setReports(reports.toArray(new TestReport[reports.size()]));
@@ -206,8 +215,6 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			agent.killComponent();
 		}
 	}
-
-
 	
 	/**
 	 *  Starter for testing.

@@ -10,7 +10,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -59,7 +62,8 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	protected Map<String, List<ReplicationSubscription>> repsubscriptions;
 
 	/** The service id */
-	protected String id;
+	@ServiceIdentifier
+	protected IServiceIdentifier id;
 
 	/** The search interval argument. */
 	@AgentArgument
@@ -74,7 +78,6 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 		this.localsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
 		this.repsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
 		this.repsubscriptions = new HashMap<String, List<ReplicationSubscription>>();
-		this.id = agent.getId().getName();
 	}
 
 	@AgentBody
@@ -104,7 +107,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 							}
 
 							// if it is not and it is not the own service...
-							if(!present && !result.getId().equals(id)) 
+							if(!present && !((IService)result).getId().equals(id)) 
 							{
 								// subscribe...
 								ISubscriptionIntermediateFuture<Event> subscription = result.subscribeForReplication(topic);
@@ -240,7 +243,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 				}
 
 				// if no subscription was found for the given service...
-				if(!present && !result.getId().equals(id)) 
+				if(!present && !((IService)result).getId().equals(id)) 
 				{
 					// subscribe...
 					ISubscriptionIntermediateFuture<Event> subscription = result.subscribeForReplication(topic);
@@ -325,15 +328,5 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	public IFuture<Void> publish(String topic, Event event) 
 	{
 		return publish(topic, event, false);
-	}
-
-	/**
-	 * Returns the services unique Id.
-	 * 
-	 * @return the service Id.
-	 */
-	public String getId() 
-	{
-		return this.id;
 	}
 }

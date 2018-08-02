@@ -82,6 +82,12 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/** The started factories (kernel classname -> kernel component). */
 	protected Map<String, IComponentIdentifier> kernels = new HashMap<>();
 	
+	/** The started flag (because init is invoked twice, service impl for 2 services. */
+	protected boolean inited;
+	
+	/** The dirty flag (when classpath changes). */
+	protected boolean dirty;
+	
 	public static final String MULTIFACTORY = "multifactory";
 
 	/** Used in SComponentFactory to reorder checks (multi last). Still necessary?!. */
@@ -102,6 +108,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	@ServiceStart
 	public IFuture<Void> startService()
 	{
+		if(inited)
+			return IFuture.DONE;
+		inited = true;
+		
 		// add data for implicitly started micro factory
 		componenttypes.add(".class");
 		kernels.put("jadex.micro.KernelMicroAgent", null);
@@ -118,7 +128,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						getKernelFiles(true);
+						dirty = true;
 						return IFuture.DONE;
 					}
 				});
@@ -131,7 +141,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						getKernelFiles(true);
+						dirty = true;
 						return IFuture.DONE;
 					}
 				});
@@ -237,7 +247,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
-		Map<String, Collection<Tuple2<String, Set<String>>>> kernelfiles = getKernelFiles(false);
+		Map<String, Collection<Tuple2<String, Set<String>>>> kernelfiles = getKernelFiles();
 		
 		Set<Tuple2<String, Set<String>>> found = new HashSet<>();
 		for(Map.Entry<String, Collection<Tuple2<String, Set<String>>>> entry: kernelfiles.entrySet())
@@ -365,6 +375,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		MultiCollection<String, Tuple2<String, Set<String>>> ret = new MultiCollection<>();
 		
+//		System.out.println("Scanning");
+		
 //		List<URL> urls = new ArrayList<URL>();
 //		ClassLoader basecl = MultiFactory.class.getClassLoader();
 //		for(URL url: SUtil.getClasspathURLs(basecl, true))
@@ -447,10 +459,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/**
 	 *  Get all kernel files, i.e. specs to start a kernel.
 	 */
-	protected Map<String, Collection<Tuple2<String, Set<String>>>> getKernelFiles(boolean force)
+	protected Map<String, Collection<Tuple2<String, Set<String>>>> getKernelFiles()
 	{
-		if(kernelfiles==null || force)
+		if(kernelfiles==null || dirty)
 			kernelfiles = scanForKernels();
+		dirty = false;
 		return kernelfiles;
 	}
 	
@@ -642,7 +655,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected Set<String> getSuffixes()
 	{
-		Map<String, Collection<Tuple2<String, Set<String>>>> types = getKernelFiles(false);
+		Map<String, Collection<Tuple2<String, Set<String>>>> types = getKernelFiles();
 //		System.out.println("types: "+types.keySet());
 		Set<String> ret = new HashSet<String>(types.keySet());
 		//ret.add(".class"); // Hack :-( add manually for micro (add type in kernel desc?!)

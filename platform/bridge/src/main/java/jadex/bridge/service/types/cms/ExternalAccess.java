@@ -1,4 +1,4 @@
-package jadex.kernelbase;
+package jadex.bridge.service.types.cms;
 
 import java.util.Collection;
 import java.util.Map;
