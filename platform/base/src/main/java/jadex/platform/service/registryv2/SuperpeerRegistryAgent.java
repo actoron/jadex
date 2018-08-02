@@ -35,6 +35,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -57,6 +58,9 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	
 	/** The superpeer service registry */
 	protected IServiceRegistry serviceregistry = new ServiceRegistry();
+	
+	@AgentArgument
+	protected boolean unrestricted = false;
 	
 	/** Queries received from client. */
 	protected MultiCollection<IComponentIdentifier, ServiceQueryInfo<?>> clientqueries = new MultiCollection<>();

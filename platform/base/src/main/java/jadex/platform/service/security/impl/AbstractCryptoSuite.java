@@ -94,6 +94,10 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 		secinf.setAdminPlatform(platformauth);
 		secinf.setNetworks(new HashSet<>(authnets));
 		
+		Set<String> sharednets = new HashSet<>(authnets);
+		sharednets.retainAll(agent.getInternalNetworks().keySet());
+		secinf.setSharedNetworks(sharednets);
+		
 		if (authenticatedplatformname != null && agent.getInternalTrustedPlatformNames().contains(authenticatedplatformname))
 			secinf.setTrustedPlatform(true);
 		
