@@ -13,7 +13,7 @@ public interface ISecurityInfo
 	 *
 	 *  @return True if authenticated.
 	 */
-	public boolean isAuthenticated();
+	public boolean hasDefaultAuthorization();
 	
 	/**
 	 *  Returns the authenticated platform name.
@@ -39,9 +39,16 @@ public interface ISecurityInfo
 	/**
 	 *  Gets the authenticated networks of the sender.
 	 *
-	 *  @return The authenticated networks of the sender (sorted).
+	 *  @return The authenticated networks of the sender.
 	 */
 	public Set<String> getNetworks();
+	
+	/**
+	 *  Gets the authenticated networks shared with the sender.
+	 *
+	 *  @return The authenticated networks shared with the sender.
+	 */
+	public Set<String> getSharedNetworks();
 	
 	/**
 	 *  Gets the roles associated with the sender.

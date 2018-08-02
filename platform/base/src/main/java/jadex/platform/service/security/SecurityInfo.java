@@ -21,6 +21,9 @@ public class SecurityInfo implements ISecurityInfo
 	/** Platform name if authenticated. */
 	protected String platformname;
 	
+	/** Networks shared with the sender. */
+	protected Set<String> sharednetworks;
+	
 	/** Networks containing the sender. */
 	protected Set<String> networks;
 	
@@ -35,13 +38,13 @@ public class SecurityInfo implements ISecurityInfo
 	}
 	
 	/**
-	 *  Checks if the sender platform is authenticated.
+	 *  Checks if the sender platform has default authorization.
 	 *
-	 *  @return True if authenticated.
+	 *  @return True if sender platform has default authorization.
 	 */
-	public boolean isAuthenticated()
+	public boolean hasDefaultAuthorization()
 	{
-		return trustedplatform || adminplatform || (networks != null && networks.size() > 0);
+		return trustedplatform || adminplatform || (sharednetworks != null && sharednetworks.size() > 0);
 	}
 	
 	/**
@@ -145,6 +148,26 @@ public class SecurityInfo implements ISecurityInfo
 	}
 	
 	/**
+	 *  Gets the authenticated networks of the sender.
+	 *
+	 *  @return The authenticated networks of the sender (sorted).
+	 */
+	public Set<String> getSharedNetworks()
+	{
+		return sharednetworks;
+	}
+
+	/**
+	 *  Sets the networks.
+	 *
+	 *  @param networks The networks.
+	 */
+	public void setSharedNetworks(Set<String> sharednetworks)
+	{
+		this.sharednetworks = Collections.unmodifiableSet(sharednetworks);
+	}
+	
+	/**
 	 *  Gets the roles.
 	 *
 	 *  @return The roles.
@@ -169,6 +192,6 @@ public class SecurityInfo implements ISecurityInfo
 	 */
 	public String toString()
 	{
-		return "Authenticated: " + isAuthenticated() + ", Trusted: " + trustedplatform + ", Admin: " + adminplatform + ", Networks: " + Arrays.toString(networks.toArray()); 
+		return "Authenticated: " + hasDefaultAuthorization() + ", Trusted: " + trustedplatform + ", Admin: " + adminplatform + ", Networks: " + Arrays.toString(networks.toArray()); 
 	}
 }

@@ -567,7 +567,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					// No roles or default role means any authenticated platform or network.
 					if(secroles==null || secroles.contains(Security.DEFAULT))
 					{
-						trusted	= secinfos.isAuthenticated();
+						trusted	= secinfos.hasDefaultAuthorization();
 					}
 					
 					// Always allow 'unrestricted' access

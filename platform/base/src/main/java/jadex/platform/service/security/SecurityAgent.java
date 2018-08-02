@@ -2,6 +2,7 @@ package jadex.platform.service.security;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +12,6 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,9 +107,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** Timeout used for internal expirations */
 	protected static final long TIMEOUT = 60000;
 	
-	/** Default trust anchor for global network. */
-	protected static final String DEFAULT_GLOBAL_NETWORK_TRUST_ANCHOR = "pem:LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN3akNDQWlPZ0F3SUJBZ0lWQU9hYlB5UTBITGtSYUdiZjRVNXZBVXMyMzVxck1Bb0dDQ3FHU000OUJBTUUKTUQweEpEQWlCZ05WQkFNTUcwcGhaR1Y0SUVkc2IySmhiQ0JUZFhCbGNuQmxaWElnVW05dmRERVZNQk1HQTFVRQpDZ3dNUVdOMGIzSnZiaUJIYldKSU1CNFhEVEU0TURjeU5qRTBNVEUwTTFvWERUSTRNRGN5TXpFME1URTBNMW93ClBURWtNQ0lHQTFVRUF3d2JTbUZrWlhnZ1IyeHZZbUZzSUZOMWNHVnljR1ZsY2lCU2IyOTBNUlV3RXdZRFZRUUsKREF4QlkzUnZjbTl1SUVkdFlrZ3dnWnN3RUFZSEtvWkl6ajBDQVFZRks0RUVBQ01EZ1lZQUJBQjUwMTlialVjQwp3Y3FOMW9SdnZGM0c3cGZVdC9LakZacjVXbzcyU1p5MktFb3NhYVl5dVFuV3JZWXFXeitvdDdqTUhxQUtOcVg1CkJRQkVFNTNzUlgxQ0RBRVcyUU9hNHdkbFZRTUNKSVExd0w5NG1MSHNlVXFzdTdvVDJteTBsZVZMVXpNdU5JSVEKMHNEZFZ0d3RJUlpHdExqY1JMQWFvUkdQanpPZFpkak1BR1VZeUtPQnZEQ0J1VEFQQmdOVkhSTUJBZjhFQlRBRApBUUgvTUE0R0ExVWREd0VCL3dRRUF3SUNoREJKQmdOVkhRNEVRZ1JBQ2MvVjlxZGV1bHd3TlBSdU5QSUxYam8rCmFnSmdWOFB1R0dQN0lwUHJGbEswV0dPcmJQWjljTjNLQzdza2FUWE5VU0lxaG5IS1B4a08vMFd3U3QrOW1EQkwKQmdOVkhTTUVSREJDZ0VBSno5WDJwMTY2WERBMDlHNDA4Z3RlT2o1cUFtQlh3KzRZWS9zaWsrc1dVclJZWTZ0cwo5bjF3M2NvTHV5UnBOYzFSSWlxR2Njby9HUTcvUmJCSzM3MllNQW9HQ0NxR1NNNDlCQU1FQTRHTUFEQ0JpQUpDCkFYWGV2dWh0NWlPWWJVQm1neENIcXVnZkFySWpFZ2Qxc0Vvd2IvSFBaNXRqblVleFdOVGdjUFZDSFRIZDc3TXQKQXRRMUV4dVBOT3VhNkVLOFNWUDdjSFoyQWtJQlJLVm81M2ZsaHpLSE1mZloxSGZsZ2k4NXU3TEcvS1VoeFVZdgpKTG5uQWJVd0w4OWJmZU95QjNZbTNXdXpmcjAzOE5tUSt5djRaLzBCdzVvcTM5d20vWXM9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K";
-	
 	/** Component access. */
 	@Agent
 	protected IInternalAccess agent;
@@ -136,14 +134,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	
 	/** Available virtual networks. */
 //	protected Map<String, AbstractAuthenticationSecret> networks = new HashMap<String, AbstractAuthenticationSecret>();
-	protected MultiCollection<String, AbstractAuthenticationSecret> networks = new MultiCollection<>();
+	protected MultiCollection<String, AbstractAuthenticationSecret> networks = new MultiCollection<>(new HashMap<>(), LinkedHashSet.class);
 	
 	/** The platform name certificate if available. */
 	protected AbstractX509PemSecret platformnamecertificate;
 	
 	/** The platform names that are trusted. */
 	protected Set<String> trustedplatformnames = new HashSet<>();
-	
 	
 	/** Trusted authorities for certifying platform names. */
 	protected Set<X509CertificateHolder> nameauthorities = new HashSet<>();
@@ -285,35 +282,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							}
 							
 							Enumeration<String> aliases = ks.aliases();
-//							System.out.println(SUtil.enumerationAsParallelStream(aliases).isParallel());
-//							long ts = System.currentTimeMillis();
-//							SUtil.enumerationAsParallelStream(aliases).forEach((alias) ->
-//							{
-//								try
-//								{
-//									Certificate cert = ks.getCertificate(alias);
-//									ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//									OutputStreamWriter osw = new OutputStreamWriter(baos);
-//									JcaPEMWriter jpw = new JcaPEMWriter(osw);
-//									jpw.writeObject(cert);
-//									SUtil.close(jpw);
-//									SUtil.close(baos);
-//									String pem = new String(baos.toByteArray(), SUtil.ASCII);
-//									try
-//									{
-//										synchronized(nameauthorities)
-//										{
-//											nameauthorities.add(SSecurity.readCertificateFromPEM(pem));
-//										}
-//									}
-//									catch (Exception e)
-//									{
-//									}
-//								}
-//								catch (Exception e)
-//								{
-//								}
-//							});
 							
 							ByteArrayOutputStream baos = new ByteArrayOutputStream();
 							OutputStreamWriter osw = new OutputStreamWriter(baos);
@@ -398,6 +366,41 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				else
 				{
 					networks = getProperty("networks", args, settings, networks);
+				}
+				
+				File networksfile = new File("networks.cfg");
+				if (networksfile.exists())
+				{
+					InputStream is = null;
+					try
+					{
+						is = new FileInputStream(networksfile);
+						is = new BufferedInputStream(is);
+						java.util.Properties nwfileprops = new java.util.Properties();
+						nwfileprops.load(is);
+						SUtil.close(is);
+						is = null;
+						
+						for (String propname : SUtil.notNull(nwfileprops.stringPropertyNames()))
+						{
+							String secretstr = nwfileprops.getProperty(propname);
+							try
+							{
+								AbstractAuthenticationSecret secret = AbstractAuthenticationSecret.fromString(secretstr, true);
+								networks.add(propname, secret);
+							}
+							catch (Exception e)
+							{
+							}
+						}
+					}
+					catch (Exception e)
+					{
+					}
+					finally
+					{
+						SUtil.close(is);
+					}
 				}
 				
 				remoteplatformsecrets = getProperty("remoteplatformsecrets", args, settings, remoteplatformsecrets);
