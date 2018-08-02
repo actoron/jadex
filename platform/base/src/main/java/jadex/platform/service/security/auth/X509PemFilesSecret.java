@@ -118,7 +118,7 @@ public class X509PemFilesSecret extends AbstractX509PemSecret
 	}
 	
 	/**
-	 *  Hashcode.
+	 *  Hashcode generation.
 	 */
 	public int hashCode()
 	{
