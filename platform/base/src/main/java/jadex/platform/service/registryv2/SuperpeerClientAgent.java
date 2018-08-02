@@ -536,7 +536,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								// First command -> connected (shouldn't be any other commands).
 								
 								// Check if the superpeer is genuine.
-								ISecurityInfo secinfo = (ISecurityInfo) ServiceCall.getCurrentInvocation().getProperty(ServiceCall.SECURITY_INFOS);
+								ISecurityInfo secinfo = (ISecurityInfo) ServiceCall.getLastInvocation().getProperty(ServiceCall.SECURITY_INFOS);
 								if (secinfo == null || secinfo.getNetworks() == null || !secinfo.getNetworks().contains(networkname))
 								{
 									regfut.terminate(new SecurityException("Superpeer failed to authenticate with the network '" + networkname + "'."));
