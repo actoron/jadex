@@ -9,6 +9,7 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Component kernel.
@@ -18,7 +19,7 @@ import jadex.micro.annotation.ProvidedServices;
 	@NameValue(name="kernel.types", value="new String[] {\"application.xml\"}")
 })
 @ProvidedServices({
-	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(expression="new jadex.application.ApplicationComponentFactory($component)"))
+	@ProvidedService(type=IComponentFactory.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.application.ApplicationComponentFactory($component)"))
 })
 @Agent(autostart=@Autostart(value=Boolean3.FALSE, name="kernel_application"))
 public class KernelApplicationAgent

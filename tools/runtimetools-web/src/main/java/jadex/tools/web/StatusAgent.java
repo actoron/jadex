@@ -24,6 +24,7 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.PlatformData;
+import jadex.commons.Boolean3;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -36,21 +37,28 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Publish;
 import jadex.micro.annotation.RequiredService;
 
+/**
+ *  An agent to provide a platform status view in the web.
+ */
 @ProvidedServices(
-	@ProvidedService(name="status", type=IStatusService.class, implementation=@Implementation(expression="$pojoagent"),
+	@ProvidedService(name="status", type=IStatusService.class,
+		scope=RequiredService.SCOPE_PLATFORM,
+		implementation=@Implementation(expression="$pojoagent"),
 		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="[http://localhost:8081/]status"
 //		properties={
 //			@NameValue(name="formats", value="new javax.ws.rs.core.MediaType[]{javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE}")
 //		}
 	))
 )
-@Agent
+// TODO: service dependencies instead of predecessors
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, predecessors="jadex.extension.rs.publish.JettyRSPublishAgent"))
 public class StatusAgent implements IStatusService
 {
 	@Agent
@@ -71,7 +79,7 @@ public class StatusAgent implements IStatusService
 		for(ITransportInfoService tis: agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
 		{
 			IIntermediateFuture<PlatformData>	fut	= tis.getConnections();
-			fut.addIntermediateResultListener(new IntermediateDelegationResultListener<PlatformData>(ret)
+			fut.addResultListener(new IntermediateDelegationResultListener<PlatformData>(ret)
 			{
 				@Override
 				public void exceptionOccurred(Exception exception)
@@ -224,7 +232,10 @@ public class StatusAgent implements IStatusService
 		return fubar.waitForResultsIgnoreFailures(null);
 	}
 
-	
+
+	/**
+	 *  Main for testing.
+	 */
 	public static void main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
