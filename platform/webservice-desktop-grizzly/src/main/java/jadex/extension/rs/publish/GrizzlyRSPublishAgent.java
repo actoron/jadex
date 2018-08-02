@@ -14,7 +14,7 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Agent that publishes the rs publication service.
  */
-@Agent(autostart=@Autostart(Boolean3.TRUE))
+@Agent(autostart=@Autostart(Boolean3.FALSE))
 @ProvidedServices(
 {
 	@ProvidedService(name="publish_rs", type=IWebPublishService.class, 
