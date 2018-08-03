@@ -2,6 +2,7 @@ package jadex.bridge.service.search;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -138,6 +139,11 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 		{
 			if(query.getOwner()!=null)
 				ret = new SetWrapper<String>(query.getOwner().getRoot().toString());
+		}
+		else if (KEY_TYPE_NETWORKS.equals(keytype))
+		{
+			if (query.getNetworkNames() != null)
+				ret = new HashSet<>(Arrays.asList(query.getNetworkNames()));
 		}
 //		else if(KEY_TYPE_ISREMOTE.equals(keytype))
 //		{
