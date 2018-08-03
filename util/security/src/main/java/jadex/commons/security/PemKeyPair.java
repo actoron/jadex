@@ -1,5 +1,9 @@
 package jadex.commons.security;
 
+import java.util.List;
+
+import org.bouncycastle.cert.X509CertificateHolder;
+
 import jadex.commons.SUtil;
 
 /**
@@ -33,6 +37,12 @@ public class PemKeyPair
 	 */
 	public void setCertificate(String certificate)
 	{
+		List<X509CertificateHolder> chain = SSecurity.readCertificateChainFromPEM(certificate);
+		if (chain.size() > 1)
+		{
+			System.out.println("CHAIN??? ");
+			certificate = SSecurity.writeCertificateAsPEM(SSecurity.readCertificateFromPEM(certificate));
+		}
 		this.certificate = certificate;
 	}
 	

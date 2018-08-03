@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -167,7 +168,7 @@ public class CertTree extends JTree implements TreeModel
 	}
 	
 	/** The loaded certificates used as model. */
-	Map<String, PemKeyPair> certmodel = new HashMap<>();;
+	Map<String, PemKeyPair> certmodel = new HashMap<>();
 	
 	/** Lookup helper for finding tree nodes. */
 	Map<String, CertTreeNode> nodelookup;
@@ -488,54 +489,89 @@ public class CertTree extends JTree implements TreeModel
 		nodelookup.clear();
 		clearToggledPaths();
 		
-		for (Map.Entry<String, PemKeyPair> entry : certmodel.entrySet())
-		{
-			List<X509CertificateHolder> certchain = SSecurity.readCertificateChainFromPEM(entry.getValue().getCertificate());
-			for (int i = 0; i < certchain.size(); ++i)
-			{
-				X509CertificateHolder cert = certchain.get(i);
-				String cn = SSecurity.getCommonName(cert.getSubject());
-				if (!certmodel.containsKey(cn))
-				{
-					PemKeyPair kp = new PemKeyPair();
-					kp.setCertificate(SSecurity.writeCertificateAsPEM(cert));
-					certmodel.put(cn, kp);
-				}
-			}
-		}
+//		for (Map.Entry<String, PemKeyPair> entry : certmodel.entrySet())
+//		{
+//			List<X509CertificateHolder> certchain = SSecurity.readCertificateChainFromPEM(entry.getValue().getCertificate());
+//			for (int i = 0; i < certchain.size(); ++i)
+//			{
+//				X509CertificateHolder cert = certchain.get(i);
+//				String cn = SSecurity.getCommonName(cert.getSubject());
+//				if (!certmodel.containsKey(cn))
+//				{
+//					PemKeyPair kp = new PemKeyPair();
+//					kp.setCertificate(SSecurity.writeCertificateAsPEM(cert));
+//					certmodel.put(cn, kp);
+//				}
+//			}
+//		}
 		
+		Map<String, PemKeyPair> model = null;
 		synchronized(certmodel)
 		{
-			for (Map.Entry<String, PemKeyPair> entry : certmodel.entrySet())
+			model = new HashMap<>(certmodel);
+		}
+		
+		boolean done = false;
+		while(!model.isEmpty() || done)
+		{
+			boolean hasremoved = false;
+			for (Iterator<Map.Entry<String, PemKeyPair>> it = model.entrySet().iterator(); it.hasNext(); )
 			{
-				List<X509CertificateHolder> certchain = SSecurity.readCertificateChainFromPEM(entry.getValue().getCertificate());
-				Collections.reverse(certchain);
+				Map.Entry<String, PemKeyPair> entry = it.next();
+				X509CertificateHolder cert = SSecurity.readCertificateFromPEM(entry.getValue().getCertificate());
+				String issuer = SSecurity.getCommonName(cert.getIssuer());
 				
-				for (int i = 0; i < certchain.size(); ++i)
+				if (SSecurity.getCommonName(cert.getSubject()).equals(issuer) ||
+					nodelookup.get(issuer) != null)
 				{
-					X509CertificateHolder cert = certchain.get(i);
+					it.remove();
+					hasremoved = true;
+					String sub = SSecurity.getCommonName(cert.getSubject());
+					CertTreeNode node = new CertTreeNode(sub);
+					nodelookup.put(SSecurity.getCommonName(cert.getSubject()), node);
 					
-					if (!nodelookup.containsKey(SSecurity.getCommonName(cert.getSubject())))
+					CertTreeNode issuernode = nodelookup.get(SSecurity.getCommonName(cert.getIssuer()).toString());
+					
+					if (cert.getIssuer().equals(cert.getSubject()) || issuernode == null)
 					{
-						String sub = SSecurity.getCommonName(cert.getSubject());
-						CertTreeNode node = new CertTreeNode(sub);
-						nodelookup.put(SSecurity.getCommonName(cert.getSubject()), node);
-						
-						CertTreeNode issuernode = nodelookup.get(SSecurity.getCommonName(cert.getIssuer()).toString());
-						
-						if (cert.getIssuer().equals(cert.getSubject()) || issuernode == null)
-						{
-							root.addChild(node);
-						}
-						else
-						{
-							issuernode.addChild(node);
-						}
+						root.addChild(node);
+					}
+					else
+					{
+						issuernode.addChild(node);
 					}
 				}
-				
 			}
+			done = !hasremoved;
+			
+//				List<X509CertificateHolder> certchain = SSecurity.readCertificateChainFromPEM(entry.getValue().getCertificate());
+//				Collections.reverse(certchain);
+			
+//				for (int i = 0; i < certchain.size(); ++i)
+//				{
+//					X509CertificateHolder cert = certchain.get(i);
+//					
+//					if (!nodelookup.containsKey(SSecurity.getCommonName(cert.getSubject())))
+//					{
+//						String sub = SSecurity.getCommonName(cert.getSubject());
+//						CertTreeNode node = new CertTreeNode(sub);
+//						nodelookup.put(SSecurity.getCommonName(cert.getSubject()), node);
+//						
+//						CertTreeNode issuernode = nodelookup.get(SSecurity.getCommonName(cert.getIssuer()).toString());
+//						
+//						if (cert.getIssuer().equals(cert.getSubject()) || issuernode == null)
+//						{
+//							root.addChild(node);
+//						}
+//						else
+//						{
+//							issuernode.addChild(node);
+//						}
+//					}
+//				}
+			
 		}
+		
 		int numchildren = root.getChildren().size();
 		int[] indices = new int[numchildren];
 		for (int i = 0; i < numchildren; ++i)
@@ -670,7 +706,7 @@ public class CertTree extends JTree implements TreeModel
 			CertTreeNode node = (CertTreeNode) onode;
 			String certstr = certmodel.get(node.getSubjectId()).getCertificate();
 			X509CertificateHolder cert = SSecurity.readCertificateFromPEM(certstr);
-			certs.add(certstr);
+			certs.add(SSecurity.writeCertificateAsPEM(cert));
 			node = nodelookup.get(SSecurity.getCommonName(cert.getIssuer()).toString());
 			while (node != null)
 			{
@@ -678,7 +714,7 @@ public class CertTree extends JTree implements TreeModel
 				cert = SSecurity.readCertificateFromPEM(certstr);
 				certs.add(certstr);
 				if (SSecurity.getCommonName(cert.getIssuer()).equals(SSecurity.getCommonName(cert.getSubject())))
-						node = null;
+					node = null;
 				else
 					node = nodelookup.get(SSecurity.getCommonName(cert.getIssuer()).toString());
 			}
