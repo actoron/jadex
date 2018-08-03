@@ -204,11 +204,13 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 			interfaces[i] = sid.getServiceSuperTypes()[i - 1].getGenericTypeName();
 		ret.add(new Tuple2<>(KEY_TYPE_INTERFACE, interfaces));
 		
-		ret.add(new Tuple2<>(KEY_TYPE_TAGS, sid.getTags().toArray(new String[sid.getTags().size()])));
+		if (sid.getTags() != null)
+			ret.add(new Tuple2<>(KEY_TYPE_TAGS, sid.getTags().toArray(new String[sid.getTags().size()])));
 		
 		ret.add(new Tuple2<>(KEY_TYPE_ID, new String[]{sid.toString()}));
 		
-		ret.add(new Tuple2<>(KEY_TYPE_NETWORKS, sid.getNetworkNames().toArray(new String[sid.getNetworkNames().size()])));
+		if (sid.getNetworkNames() != null)
+			ret.add(new Tuple2<>(KEY_TYPE_NETWORKS, sid.getNetworkNames().toArray(new String[sid.getNetworkNames().size()])));
 		
 		return ret;
 	}
