@@ -81,23 +81,23 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			Set<IServiceIdentifier> sers = getServices(query);
 			
-			Set<IServiceIdentifier> ownerservices = null;
-			rwlock.readLock().lock();
-			try
-			{
-				ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
-			}
-			finally
-			{
-				rwlock.readLock().unlock();
-			}
+//			Set<IServiceIdentifier> ownerservices = null;
+//			rwlock.readLock().lock();
+//			try
+//			{
+//				ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+//			}
+//			finally
+//			{
+//				rwlock.readLock().unlock();
+//			}
 			
 			if(sers!=null && !sers.isEmpty())
 			{
 				for(IServiceIdentifier ser : sers)
 				{
-					if(checkRestrictions(query, ser) &&
-					   (ownerservices == null || !ownerservices.contains(ser)))
+					if(checkRestrictions(query, ser))// &&
+//					   (ownerservices == null || !ownerservices.contains(ser)))
 					{
 						ret = ser;
 						break;
@@ -121,24 +121,24 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			ret = getServices(query);
 			
-			Set<IServiceIdentifier> ownerservices = null;
-			rwlock.readLock().lock();
-			try
-			{
-				ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
-			}
-			finally
-			{
-				rwlock.readLock().unlock();
-			}
+//			Set<IServiceIdentifier> ownerservices = null;
+//			rwlock.readLock().lock();
+//			try
+//			{
+//				ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+//			}
+//			finally
+//			{
+//				rwlock.readLock().unlock();
+//			}
 			
 			if(ret!=null && !ret.isEmpty())
 			{
 				for(Iterator<IServiceIdentifier> it = ret.iterator(); it.hasNext(); )
 				{
 					IServiceIdentifier ser = it.next();
-					if(!checkRestrictions(query, ser) ||
-					   !(ownerservices == null || !ownerservices.contains(ser)))
+					if(!checkRestrictions(query, ser)) // ||
+//					   !(ownerservices == null || !ownerservices.contains(ser)))
 					{
 						it.remove();
 					}
@@ -732,7 +732,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected boolean checkRestrictions(ServiceQuery<?> query, final IServiceIdentifier ser)
 	{
-		return checkSearchScope(query, ser)
+		return !(query.isExcludeOwner() && query.getOwner().equals(ser.getProviderId())) 
+			&& checkSearchScope(query, ser)
 			&& checkPublicationScope(query, ser)
 			&& checkLifecycleVisibility(query, ser);
 	}
