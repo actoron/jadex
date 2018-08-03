@@ -195,7 +195,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Set the resource identifier. 
 	 *  @param rid The resource identifier.
 	 */
-	public void setReourceIdentifier(IResourceIdentifier rid)
+	public void setResourceIdentifier(IResourceIdentifier rid)
 	{
 		this.rid = rid;
 	}
