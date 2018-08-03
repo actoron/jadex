@@ -203,7 +203,6 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							}
 						}
 						
-						@SuppressWarnings("unchecked")
 						@Override
 						public void resultAvailable(IServiceIdentifier result)
 						{
@@ -291,7 +290,6 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							}
 						}
 						
-						@SuppressWarnings("unchecked")
 						@Override
 						public void resultAvailable(Set<IServiceIdentifier> result)
 						{
@@ -511,7 +509,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			assert connection==null;
 			assert localquery==null;
 			
-//			System.out.println(agent+" searching for super peers for network "+networkname);
+			agent.getLogger().info(agent+" searching for super peers for network "+networkname);
 			
 			// Also finds and adds locally available super peers -> locaL registry only contains local services, (local/remote) super peer manages separate registry
 			ISubscriptionIntermediateFuture<ISuperpeerService>	queryfut	= agent.getFeature(IRequiredServicesFeature.class)
@@ -526,7 +524,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				{
 					if(running)
 					{
-						agent.getLogger().info("Rrequesting super peer connection for network "+networkname+" from super peer: "+sp);
+						agent.getLogger().info("Requesting super peer connection for network "+networkname+" from super peer: "+sp);
 						ISubscriptionIntermediateFuture<Void>	regfut	= sp.registerClient(networkname);
 						regfut.addResultListener(new IIntermediateResultListener<Void>()
 						{
