@@ -38,8 +38,6 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 
 	/** Key type for the id. */
 	public static final String KEY_TYPE_NETWORKS = "networks";
-
-	
 	
 	/** Key type for the owner. */
 	public static final String KEY_TYPE_OWNER_PLATORM = "owner";
@@ -47,16 +45,18 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 	/** Key type for the superpeer boolean. */
 //	public static final String KEY_TYPE_IsSREMOTE = "isremote";
 	
-	/** Key type for the id. */
-	public static final String KEY_TYPE_ID = "id";
+	/** Key type for the service id. */
+	public static final String KEY_TYPE_SID = "serviceid";
 	
+	/** Key type for the query id. */
+	public static final String KEY_TYPE_ID = "id";
 
 	
 	/** The key types. */
 	public static final String[] QUERY_KEY_TYPES;
 	
 	/** The indexable types. */
-	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_NETWORKS};//, KEY_TYPE_ISREMOTE};
+	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_SID, KEY_TYPE_NETWORKS};//, KEY_TYPE_ISREMOTE};
 	
 	static
 	{
@@ -152,13 +152,17 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 //		{
 //			ret = new SetWrapper<String>(sqi.getQuery().isRemote()? "true": "false");
 //		}
-		else if(KEY_TYPE_ID.equals(keytype))
+		else if(KEY_TYPE_SID.equals(keytype))
 		{
 			if (RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(query.getScope()))
 			{
 				String id = query.getSearchStart() != null ? query.getSearchStart().toString() : query.getOwner().toString();
 				ret = new SetWrapper<String>(id);
 			}
+		}
+		else if (KEY_TYPE_ID.equals(keytype))
+		{
+			ret = new SetWrapper<>(query.getId());
 		}
 		
 		return ret;
@@ -211,7 +215,7 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 		if (sid.getTags() != null)
 			ret.add(new Tuple2<>(KEY_TYPE_TAGS, sid.getTags().toArray(new String[sid.getTags().size()])));
 		
-		ret.add(new Tuple2<>(KEY_TYPE_ID, new String[]{sid.toString()}));
+		ret.add(new Tuple2<>(KEY_TYPE_SID, new String[]{sid.toString()}));
 		
 		if (sid.getNetworkNames() != null)
 			ret.add(new Tuple2<>(KEY_TYPE_NETWORKS, sid.getNetworkNames().toArray(new String[sid.getNetworkNames().size()])));
