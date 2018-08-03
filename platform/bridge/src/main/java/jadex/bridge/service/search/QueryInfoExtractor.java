@@ -7,8 +7,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
+import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 
 /**
  *  Extractor for query infos.
@@ -180,5 +183,33 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 	public String[] getKeyNames()
 	{
 		return QUERY_KEY_TYPES;
+	}
+	
+	/**
+	 *  Gets the specification for the indexer.
+	 *  
+	 *  @return The specification for the indexer.
+	 */
+	public List<Tuple2<String, String[]>> getIndexerSpec(IServiceIdentifier sid)
+	{
+		List<Tuple2<String, String[]>> ret = new ArrayList<>();
+		
+		ret.add(new Tuple2<>(KEY_TYPE_PLATFORM, new String[]{sid.getProviderId().getRoot().toString()}));
+		
+		ret.add(new Tuple2<>(KEY_TYPE_PROVIDER, new String[]{sid.getProviderId().toString()}));
+		
+		String[] interfaces = new String[sid.getServiceSuperTypes() == null ? 1 : sid.getServiceSuperTypes().length + 1];
+		interfaces[0] = sid.getServiceType().getGenericTypeName();
+		for (int i = 1; i < interfaces.length; ++i)
+			interfaces[i] = sid.getServiceSuperTypes()[i - 1].getGenericTypeName();
+		ret.add(new Tuple2<>(KEY_TYPE_INTERFACE, interfaces));
+		
+		ret.add(new Tuple2<>(KEY_TYPE_TAGS, sid.getTags().toArray(new String[sid.getTags().size()])));
+		
+		ret.add(new Tuple2<>(KEY_TYPE_ID, new String[]{sid.toString()}));
+		
+		ret.add(new Tuple2<>(KEY_TYPE_NETWORKS, sid.getNetworkNames().toArray(new String[sid.getNetworkNames().size()])));
+		
+		return ret;
 	}
 }

@@ -470,6 +470,16 @@ public class Indexer<T>
 	}
 	
 	/**
+	 *  Gets the key extractor used by the service.
+	 * 
+	 *  @return The key extractor.
+	 */
+	public IKeyExtractor<T> getKeyExtractor()
+	{
+		return keyextractor;
+	}
+	
+	/**
 	 *  Clears all contained values.
 	 */
 	public void clear()

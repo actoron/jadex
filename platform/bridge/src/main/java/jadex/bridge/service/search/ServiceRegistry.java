@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -17,6 +18,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -680,14 +682,18 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		Set<ServiceQueryInfo<?>> r1 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, ser.getServiceType().toString());
-		Set<ServiceQueryInfo<?>> r2 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, "null");
-		Set<ServiceQueryInfo<?>> sqis = r1;
-		if(sqis!=null && r2!=null)
-			sqis.addAll(r2);	// safe because indexer returns copy
-		else if(r2!=null)
-			sqis=r2;
+		List<Tuple2<String, String[]>> spec = ((QueryInfoExtractor) queries.getKeyExtractor()).getIndexerSpec(ser);
 		
+		Set<ServiceQueryInfo<?>> sqis = queries.getValuesInverted(spec);
+		
+//		Set<ServiceQueryInfo<?>> r1 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, ser.getServiceType().toString());
+//		Set<ServiceQueryInfo<?>> r2 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, "null");
+//		Set<ServiceQueryInfo<?>> sqis = r1;
+//		if(sqis!=null && r2!=null)
+//			sqis.addAll(r2);	// safe because indexer returns copy
+//		else if(r2!=null)
+//			sqis=r2;
+//		
 		if(sqis!=null)
 		{
 			for (ServiceQueryInfo<?> sqi : sqis)
