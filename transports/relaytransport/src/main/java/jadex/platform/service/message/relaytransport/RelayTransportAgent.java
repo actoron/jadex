@@ -222,7 +222,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		{
 			System.out.println("Relay transport in forwarding mode.");
 			
-			((RelayMessageComponentFeature) msgfeat).setRelayMessageHandler(new IUntrustedMessageHandler()
+			IUntrustedMessageHandler handler = new IUntrustedMessageHandler()
 			{
 				public boolean isRemove()
 				{
@@ -254,7 +254,9 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						sendMessage(header, (byte[]) msg);
 					}
 				}
-			});
+			};
+			((RelayMessageComponentFeature) msgfeat).setRelayMessageHandler(handler);
+			msgfeat.addMessageHandler(handler);
 		}
 		else
 		{
