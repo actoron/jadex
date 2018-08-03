@@ -86,10 +86,6 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 		{
 			catalog.add(addr.getPlatformId(), addr);
 		}
-		else
-		{
-			agent.getLogger().warning("Invalid platform URL: " + platformurl + ". Format: <transport>://<platformname>@<hostname>:<port>");
-		}
 		
 		return IFuture.DONE;
 	}
@@ -167,7 +163,13 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 			{
 				ret = new TransportAddress(new BasicComponentIdentifier(name), prot, addr);
 			}
+			// else ignore self
 		}
+		else
+		{
+			agent.getLogger().warning("Invalid platform URL: " + url + ". Format: <transport>://<platformname>@<hostname>:<port>");
+		}
+
 		return ret;
 	}
 }

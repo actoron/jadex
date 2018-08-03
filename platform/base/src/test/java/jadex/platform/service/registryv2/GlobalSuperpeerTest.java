@@ -42,10 +42,9 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		baseconf.setValue("superpeerclient.awaonly", false);
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenesscatalog", true);
-		baseconf.setValue("platformurls", "ws://ssp1@localhost:23751");
+		baseconf.setValue("platformurls", "tcp://ssp@localhost:23751");
 		baseconf.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
 		baseconf.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass);
-		baseconf.setLogging(true);
 			
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client_*");
@@ -63,28 +62,31 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		RELAYCONF.setValue("superpeer", true);
 		RELAYCONF.setValue("supersuperpeer", true);
 		RELAYCONF.setValue("rt.forwarding", true);
-		RELAYCONF.setValue("wsport", 23751);
-		RELAYCONF.setPlatformName("ssp1");
+		RELAYCONF.setValue("tcpport", 23751);
+		RELAYCONF.setPlatformName("ssp");
 		RELAYCONF.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME);
 		RELAYCONF.setNetworkSecrets(serversecret.toString());
+		RELAYCONF.setLogging(true);
+		RELAYCONF.setValue("status", true);
+		RELAYCONF.setValue("jettyrspublish", true);
 	}
 	
 	//-------- test cases --------
 
-	/**
-	 *  Test connection.
-	 */
+//	/**
+//	 *  Test connection.
+//	 */
 //	@Test
 //	public void testConnection()
 //	{
 //		IExternalAccess	relay	= createPlatform(RELAYCONF);
 //		IExternalAccess	sp	= createPlatform(SPCONF);
-////		IExternalAccess	client	= createPlatform(CLIENTCONF);
+//		IExternalAccess	client	= createPlatform(CLIENTCONF);
 //		
 //		// All connect to relay.
-//		waitForSuperpeerConnections(relay, sp);//, client);
+//		waitForSuperpeerConnections(relay, sp, client);
 //		
 //		// Client connect to local SP.
-////		waitForSuperpeerConnections(sp, client);
+//		waitForSuperpeerConnections(sp, client);
 //	}
 }
