@@ -154,7 +154,8 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 //		}
 		else if(KEY_TYPE_ID.equals(keytype))
 		{
-			ret = new SetWrapper<String>(sqi.getQuery().getId());
+			if (query.getId() != null)
+				ret = new SetWrapper<String>(sqi.getQuery().getId());
 		}
 		
 		return ret;
