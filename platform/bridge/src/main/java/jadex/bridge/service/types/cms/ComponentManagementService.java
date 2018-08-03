@@ -516,7 +516,7 @@ public class ComponentManagementService implements IComponentManagementService
      */
     public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToAll()
     {
-    	return SComponentManagementService.listenToComponent(null, agent);
+    	return SComponentManagementService.listenToAll(agent);
     }
 	
 }

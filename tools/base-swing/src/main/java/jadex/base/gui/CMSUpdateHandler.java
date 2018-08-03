@@ -73,10 +73,8 @@ public class CMSUpdateHandler
 		ISubscriptionIntermediateFuture<CMSStatusEvent>	ret;
 		
 		if(listeners==null)
-		{
 			listeners	= new LinkedHashMap<IComponentIdentifier, Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>,Integer>>();
-		}
-		Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>, Integer>	tup	= listeners.get(cid);
+		Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>, Integer> tup = listeners.get(cid);
 		
 		// If exists increase counter.
 		if(tup!=null)

@@ -50,6 +50,7 @@ public class LockEntry
 	/**
 	 *  Remove a locker id.
 	 *  @param locker The locker id.
+	 *  @return True, if it was last lock and the component needs to be killed.
 	 */
 	public boolean removeLocker(String locker)
 	{

@@ -103,8 +103,8 @@ public class Starter
     /** The CMS child counts. */
     public static String DATA_CHILDCOUNTS = "childcounts";
     
-    /** The CMS cleanup commands. */
-    public static String DATA_CLEANUPCOMMANDS = "cleanupcommands";
+//    /** The CMS cleanup commands. */
+//    public static String DATA_CLEANUPCOMMANDS = "cleanupcommands";
     
     /** The CMS cleanup commands. */
     public static String DATA_CLEANUPFUTURES = "cleanupfutures";
@@ -496,7 +496,7 @@ public class Starter
 					putPlatformValue(cid, DATA_COMPONENTMAP, Collections.synchronizedMap(new HashMap<IComponentIdentifier, IPlatformComponentAccess>()));
 					putPlatformValue(cid, DATA_INITINFOS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, InitInfo>()));
 					putPlatformValue(cid, DATA_CHILDCOUNTS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, Integer>()));
-					putPlatformValue(cid, DATA_CLEANUPCOMMANDS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, jadex.bridge.service.types.cms.CleanupCommand>()));
+//					putPlatformValue(cid, DATA_CLEANUPCOMMANDS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, jadex.bridge.service.types.cms.CleanupCommand>()));
 					putPlatformValue(cid, DATA_CLEANUPFUTURES, Collections.synchronizedMap(new HashMap<IComponentIdentifier, IFuture<Map<String, Object>>>()));
 					putPlatformValue(cid, DATA_LOCALTYPES, Collections.synchronizedMap(new HashMap<Tuple, String>()));
 					putPlatformValue(cid, DATA_CIDCOUNTS, Collections.synchronizedMap(new HashMap<String, Integer>()));
