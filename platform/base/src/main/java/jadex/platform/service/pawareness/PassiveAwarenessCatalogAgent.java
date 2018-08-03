@@ -21,6 +21,7 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Autostart;
 
 /**
  *  Passive awareness based on a pre-defined catalog of platforms + addresses.
@@ -28,7 +29,7 @@ import jadex.micro.annotation.AgentCreated;
  *
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE)
+@Agent(autoprovide = Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE, successors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
 public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 {
 	/** Platform URL pattern. */
@@ -60,10 +61,13 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		String[] spliturls = platformurls.split(",");
-		for (int i = 0; i < spliturls.length; ++i)
+		if(platformurls!=null)
 		{
-			addPlatform(spliturls[i].trim());
+			String[] spliturls = platformurls.split(",");
+			for (int i = 0; i < spliturls.length; ++i)
+			{
+				addPlatform(spliturls[i].trim());
+			}
 		}
 		return IFuture.DONE;
 	}
@@ -81,10 +85,6 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 		if (addr != null)
 		{
 			catalog.add(addr.getPlatformId(), addr);
-		}
-		else
-		{
-			agent.getLogger().warning("Invalid platform URL: " + platformurl + ". Format: <transport>://<platformname>@<hostname>:<port>");
 		}
 		
 		return IFuture.DONE;
@@ -163,7 +163,13 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 			{
 				ret = new TransportAddress(new BasicComponentIdentifier(name), prot, addr);
 			}
+			// else ignore self
 		}
+		else
+		{
+			agent.getLogger().warning("Invalid platform URL: " + url + ". Format: <transport>://<platformname>@<hostname>:<port>");
+		}
+
 		return ret;
 	}
 }

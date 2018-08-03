@@ -1,40 +1,30 @@
 package jadex.platform.service.registryv2;
 
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.registryv2.ISuperpeerStatusService;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
- *  Test search and query managing functionality.
+ *  Test basic search and query managing functionality
+ *  with and without one single superpeer.
  */
-public class SearchQueryManagerTest
+public class SuperpeerClientTest	extends AbstractInfrastructureTest
 {
 	//-------- constants --------
-	
-	/** The delay time as factor of the default remote timeout. */
-	public static final double	WAITFACTOR	= 0.05;	// 30 * 0.05 secs  -> 1500 millis.
 	
 	/** Client configuration for platform used for searching. */
 	public static final IPlatformConfiguration	CLIENTCONF;
@@ -44,9 +34,6 @@ public class SearchQueryManagerTest
 
 	/** Superpeer platform configuration. */
 	public static final IPlatformConfiguration	SPCONF;
-
-	/** Relay / global superpeer platform configuration. */
-	public static final IPlatformConfiguration	RELAYCONF;
 
 	static
 	{
@@ -65,102 +52,6 @@ public class SearchQueryManagerTest
 		SPCONF	= baseconf.clone();
 		SPCONF.addComponent(SuperpeerRegistryAgent.class);
 		SPCONF.setPlatformName("SP_*");
-
-		RELAYCONF	= baseconf.clone();
-		RELAYCONF.addComponent(SuperpeerRegistryAgent.class);
-		RELAYCONF.setValue("supersuperpeer", true);
-		RELAYCONF.setValue("jettyrspublish", true);
-		RELAYCONF.setValue("status", true);
-		RELAYCONF.setPlatformName("ssp1");
-	}
-	
-	//-------- life cycle and helpers --------
-	
-	/** Started platforms for later cleanup. */
-	protected Collection<IExternalAccess>	platforms;
-	
-	/**
-	 *  Test setup code.
-	 */
-	@Before
-	public void setup()
-	{
-		platforms	= new ArrayList<>();
-	}
-	
-	/**
-	 *  Test cleanup code.
-	 */
-	@After
-	public void tearDown()
-	{
-		for(IExternalAccess platform: platforms)
-		{
-			try
-			{
-				platform.killComponent().get();
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	/**
-	 *  Create a platform with a given config.
-	 */
-	protected IExternalAccess	createPlatform(IPlatformConfiguration config)
-	{
-		IExternalAccess	ret	= Starter.createPlatform(config).get();
-		platforms.add(ret);
-		return ret;
-	}
-	
-	/**
-	 *  Stop and remove the given platform.
-	 */
-	protected void	removePlatform(IExternalAccess platform)
-	{
-		platform.killComponent().get();
-		platforms.remove(platform);
-	}
-	
-	/**
-	 *  Wait a small amount of time (@see WAITFACTOR).
-	 */
-	protected void doWait(IExternalAccess platform)
-	{
-		platform.waitForDelay(Starter.getScaledRemoteDefaultTimeout(platform.getId(), WAITFACTOR), new IComponentStep<Void>()
-		{
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				return IFuture.DONE;
-			}
-		}, true).get();
-	}
-	
-	/**
-	 *  Wait until all clients have connected to superpeer.
-	 *  @param superpeer The superpeer.
-	 *  @param platforms The platforms that need to connect.
-	 */
-	protected void	waitForSuperpeerConnections(IExternalAccess... platforms)
-	{
-		ISuperpeerStatusService	status	= platforms[0].searchService(new ServiceQuery<>(ISuperpeerStatusService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		ISubscriptionIntermediateFuture<IComponentIdentifier>	connected	= status.getRegisteredClients();
-		Set<IComponentIdentifier>	platformids	= new LinkedHashSet<>();
-		for(IExternalAccess ea: platforms)
-		{
-			platformids.add(ea.getId());
-		}
-		while(!platformids.isEmpty())
-		{
-			IComponentIdentifier	cid	= connected.getNextIntermediateResult();
-			platformids.remove(cid.getRoot());
-			System.out.println("SP connected to: "+cid);
-		}
 	}
 	
 	//-------- test cases --------
@@ -276,51 +167,5 @@ public class SearchQueryManagerTest
 //		removePlatform(sp);
 //		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 //		Assert.assertEquals(""+result, 1, result.size());
-	}
-
-	//-------- main for testing --------
-	
-	/**
-	 *  Main for testing.
-	 */
-	public static void	main(String[] args)
-	{
-//		// Common base configuration
-//		IPlatformConfiguration	baseconfig	= PlatformConfigurationHandler.getMinimalComm();
-//		baseconfig.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
-////		baseconfig.setGui(true);
-////		baseconfig.setLogging(true);
-//		
-//		// Super peer base configuration
-//		IPlatformConfiguration	spbaseconfig	= baseconfig.clone();
-//		spbaseconfig.addComponent(SuperpeerRegistryAgent.class);
-//		
-//		IPlatformConfiguration	config;
-//		
-//		// Super peer AB
-//		config	= spbaseconfig.clone();
-//		config.setPlatformName("SPAB_*");
-//		config.setNetworkNames("network-a", "network-b");
-//		config.setNetworkSecrets("secret-a1234", "secret-b1234");
-//		Starter.createPlatform(config, args).get();
-//		
-//		// Super peer BC
-//		config	= spbaseconfig.clone();
-//		config.setPlatformName("SPBC_*");
-//		config.setNetworkNames("network-c", "network-b");
-//		config.setNetworkSecrets("secret-c1234", "secret-b1234");
-//		Starter.createPlatform(config, args).get();
-//
-//		// Client ABC
-//		config	= baseconfig.clone();
-//		config.addComponent(SuperpeerClientAgent.class);
-//		config.setPlatformName("ClientABC_*");
-//		config.setNetworkNames("network-a", "network-b", "network-c");
-//		config.setNetworkSecrets("secret-a1234", "secret-b1234", "secret-c1234");
-//		Starter.createPlatform(config, args).get();
-		
-		
-		// Test relay
-		Starter.createPlatform(RELAYCONF, args).get();
 	}
 }
