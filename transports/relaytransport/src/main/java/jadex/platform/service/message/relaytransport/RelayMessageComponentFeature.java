@@ -10,6 +10,7 @@ import java.util.Map;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
@@ -28,6 +29,9 @@ public class RelayMessageComponentFeature extends MicroMessageComponentFeature
 {
 	/** Transport cache for the relay, excludes itself. */
 	public Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> relaytransportcache = Collections.synchronizedMap(new LRU<IComponentIdentifier, Tuple2<ITransportService,Integer>>(100));
+	
+	/** Handler for relay messages. */
+	public IMessageHandler relaymessagehandler = null;
 	
 	/**
 	 *  Create the feature.
@@ -58,9 +62,23 @@ public class RelayMessageComponentFeature extends MicroMessageComponentFeature
 	{
 //		System.out.println("RMCF CALLED: " + Arrays.toString(((MsgHeader) header).getProperties().keySet().toArray()));
 		if (header.getProperty(RelayTransportAgent.FORWARD_DEST) != null)
-			messageArrived(null, header, bodydata);
+		{
+			if (relaymessagehandler != null)
+				relaymessagehandler.handleMessage(null, header, bodydata);
+		}
 		else
+		{
 			super.messageArrived(header, bodydata);
+		}
+	}
+	
+	/**
+	 *  Sets the handler for relay messages.
+	 *  @param handler The handler.
+	 */
+	public void setRelayMessageHandler(IMessageHandler handler)
+	{
+		relaymessagehandler = handler;
 	}
 	
 	/**
