@@ -521,6 +521,26 @@ public class SSecurity
 		return createCertificateBySpecification(null, null, subject, scheme, schemeconf, hashalg, strength, daysvalid, bcext, kuext);
 	}
 	
+	/** Creates a random CA certificate for testing. */
+	public static final PemKeyPair createTestCACert()
+	{
+		Tuple2<String, String> cacert = createRootCaCertificate("CN=TESTCA", -1, "ECDSA", "NIST P", "SHA256", 256, 1);
+		PemKeyPair ret = new PemKeyPair();
+		ret.setCertificate(cacert.getFirstEntity());
+		ret.setKey(cacert.getSecondEntity());
+		return ret;
+	}
+	
+	/** Creates a random certificate for testing. */
+	public static final PemKeyPair createTestCert(PemKeyPair ca)
+	{
+		Tuple2<String, String> cert = createCertificate(ca.getCertificate(), ca.getKey(), "CN=TEST", "ECDSA", "NIST P", "SHA256", 256, 1);
+		PemKeyPair ret = new PemKeyPair();
+		ret.setCertificate(cert.getFirstEntity());
+		ret.setKey(cert.getSecondEntity());
+		return ret;
+	}
+	
 	/**
 	 *  XORs two byte arrays.
 	 *  

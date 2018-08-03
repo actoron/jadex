@@ -40,7 +40,7 @@ public class PemKeyPair
 		List<X509CertificateHolder> chain = SSecurity.readCertificateChainFromPEM(certificate);
 		if (chain.size() > 1)
 		{
-			System.out.println("CHAIN??? ");
+//			System.out.println("CHAIN??? ");
 			certificate = SSecurity.writeCertificateAsPEM(SSecurity.readCertificateFromPEM(certificate));
 		}
 		this.certificate = certificate;
