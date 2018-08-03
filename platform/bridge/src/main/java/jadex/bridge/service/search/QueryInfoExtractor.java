@@ -154,8 +154,11 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 //		}
 		else if(KEY_TYPE_ID.equals(keytype))
 		{
-			if (query.getId() != null)
-				ret = new SetWrapper<String>(sqi.getQuery().getId());
+			if (RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(query.getScope()))
+			{
+				String id = query.getSearchStart() != null ? query.getSearchStart().toString() : query.getOwner().toString();
+				ret = new SetWrapper<String>(id);
+			}
 		}
 		
 		return ret;
