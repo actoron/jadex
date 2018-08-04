@@ -5,9 +5,13 @@ import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -24,7 +28,6 @@ import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
-import jadex.commons.Boolean3;
 import jadex.commons.IFilter;
 import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
@@ -37,11 +40,11 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.security.SSecurity;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -267,11 +270,19 @@ public class PlatformAgent
 		return null;
 	}
 	
+	// enable startup chaos monkey
+	boolean CHAOSMONKEY_STARTUP	= true;
+	
 	/**
 	 *  Start components in levels.
 	 */
 	protected IFuture<Void> startComponents(IComponentManagementService cms, Iterator<Set<String>> levels, Map<String, String> names)
 	{
+		if(CHAOSMONKEY_STARTUP)
+		{
+			return startComponentsDebug(cms, levels, null, names);
+		}
+		
 		final Future<Void> ret = new Future<>();
 		
 		if(levels.hasNext())
@@ -291,6 +302,7 @@ public class PlatformAgent
 					startComponents(cms, levels, names).addResultListener(new DelegationResultListener<>(ret));
 				}
 			});
+			
 			for(String c: level)
 			{
 				//ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(names.get(c), c.getName()+".class", (CreationInfo)null);
@@ -311,7 +323,43 @@ public class PlatformAgent
 		
 		return ret;
 	}
-	
+
+	/**
+	 *  Start components synhcronized using random order to find implicit dependencies. 
+	 */
+	protected IFuture<Void> startComponentsDebug(IComponentManagementService cms, Iterator<Set<String>> levels, Iterator<String> level, Map<String, String> names)
+	{
+		// Initial level or finished with last level -> start next level
+		if(level==null || !level.hasNext())
+		{
+			if(levels.hasNext())
+			{
+				//			System.out.println("---------- LEVEL --------------");
+				// Chaos monkey -> randomize list of components to find implicit dependencies
+				List<String>	list	= new ArrayList<>(levels.next());
+				Collections.shuffle(list, SSecurity.getSecureRandom());
+				return startComponentsDebug(cms, levels, list.iterator(), names);
+			}
+			else
+			{
+				return IFuture.DONE;
+			}
+		}
+		
+		// level!=null && level.hasNext() -> Start next component in level
+		else
+		{
+			Future<Void>	ret	= new Future<>();
+			
+			String	c	= level.next();
+			IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c+".class", null, null);
+			fut.addResultListener(
+				res -> {startComponentsDebug(cms, levels, level, names).addResultListener(new DelegationResultListener<>(ret));},
+				exception -> {ret.setException(new RuntimeException("Cannot autostart "+c+".class", exception));});
+			return ret;
+		}
+	}
+
 	/**
 	 *  Called when platform startup finished.
 	 */
