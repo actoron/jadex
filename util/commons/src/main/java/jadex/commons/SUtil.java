@@ -2998,7 +2998,8 @@ public class SUtil
 	{
 		String	ret;
 
-		URL sourceloc = clazz.getProtectionDomain()==null ? null 
+		URL sourceloc = clazz.getProtectionDomain()==null || clazz.getProtectionDomain().getCodeSource()==null
+			? null 
 			: clazz.getProtectionDomain().getCodeSource().getLocation();
 			
 		// in robolectric testcases, location is null
