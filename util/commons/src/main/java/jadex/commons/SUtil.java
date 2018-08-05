@@ -39,9 +39,9 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
+import java.security.Provider.Service;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.security.Provider.Service;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -5784,16 +5784,22 @@ public class SUtil
 		List<List<File>>	candidates	= new ArrayList<List<File>>();
 		
 		// eclipse old
-		candidates.add(new ArrayList<File>(Arrays.asList(
-			new File(projectDir, "bin"))));
-		// eclipse new
-		candidates.add(new ArrayList<File>(Arrays.asList(
-			new File(new File(projectDir, "bin"), "main"))));
-		if (includeTestClasses) {
-			candidates.get(candidates.size()-1).add(
-				new File(new File(projectDir, "bin"), "test"));
+		if(!new File(new File(projectDir, "bin"), "main").exists())
+		{
+			candidates.add(new ArrayList<File>(Arrays.asList(
+				new File(projectDir, "bin"))));
 		}
-		
+		else
+		{
+			// eclipse new
+			candidates.add(new ArrayList<File>(Arrays.asList(
+				new File(new File(projectDir, "bin"), "main"))));
+			if (includeTestClasses) {
+				candidates.get(candidates.size()-1).add(
+					new File(new File(projectDir, "bin"), "test"));
+			}
+		}
+			
 		// gradle
 		candidates.add(new ArrayList<File>(Arrays.asList(
 			new File(new File(new File(new File(projectDir, "build"), "classes"),"java"),  "main"),
