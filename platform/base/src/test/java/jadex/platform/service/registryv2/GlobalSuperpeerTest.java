@@ -66,27 +66,37 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		RELAYCONF.setPlatformName("ssp");
 		RELAYCONF.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME);
 		RELAYCONF.setNetworkSecrets(serversecret.toString());
-		RELAYCONF.setLogging(true);
-		RELAYCONF.setValue("status", true);
-		RELAYCONF.setValue("jettyrspublish", true);
+//		RELAYCONF.setLogging(true);
+//		RELAYCONF.setValue("status", true);
+//		RELAYCONF.setValue("jettyrspublish", true);
 	}
 	
 	//-------- test cases --------
 
 //	/**
-//	 *  Test connection.
+//	 *  Test relay self connection.
 //	 */
 //	@Test
-//	public void testConnection()
+//	public void testSelfConnection()
 //	{
 //		IExternalAccess	relay	= createPlatform(RELAYCONF);
-//		IExternalAccess	sp	= createPlatform(SPCONF);
-//		IExternalAccess	client	= createPlatform(CLIENTCONF);
-//		
-//		// All connect to relay.
-//		waitForSuperpeerConnections(relay, sp, client);
-//		
-//		// Client connect to local SP.
-//		waitForSuperpeerConnections(sp, client);
+//		waitForSuperpeerConnections(relay);
 //	}
+	
+	/**
+	 *  Test connection.
+	 */
+	@Test
+	public void testConnection()
+	{
+		IExternalAccess	relay	= createPlatform(RELAYCONF);
+		IExternalAccess	sp	= createPlatform(SPCONF);
+		IExternalAccess	client	= createPlatform(CLIENTCONF);
+		
+		// All connect to relay.
+		waitForSuperpeerConnections(relay, sp, client);
+		
+		// Client connect to local SP.
+//		waitForSuperpeerConnections(sp, client);
+	}
 }

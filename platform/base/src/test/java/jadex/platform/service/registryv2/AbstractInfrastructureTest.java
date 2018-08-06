@@ -102,12 +102,12 @@ public abstract class AbstractInfrastructureTest
 	 *  Wait until all clients have connected to superpeer.
 	 *  @param platforms The superpeer (first value) and other platforms that need to connect.
 	 */
-	protected void	waitForSuperpeerConnections(IExternalAccess... platforms)
+	protected void	waitForSuperpeerConnections(IExternalAccess sp, IExternalAccess... clients)
 	{
-		ISuperpeerStatusService	status	= platforms[0].searchService(new ServiceQuery<>(ISuperpeerStatusService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		ISuperpeerStatusService	status	= sp.searchService(new ServiceQuery<>(ISuperpeerStatusService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		ISubscriptionIntermediateFuture<IComponentIdentifier>	connected	= status.getRegisteredClients();
 		Set<IComponentIdentifier>	platformids	= new LinkedHashSet<>();
-		for(IExternalAccess ea: platforms)
+		for(IExternalAccess ea: clients)
 		{
 			platformids.add(ea.getId());
 		}
@@ -115,7 +115,7 @@ public abstract class AbstractInfrastructureTest
 		{
 			IComponentIdentifier	cid	= connected.getNextIntermediateResult();
 			platformids.remove(cid.getRoot());
-			System.out.println("SP connected to: "+cid);
+			System.out.println("Client "+cid+" connected to SP: "+sp.getId());
 		}
 	}
 }
