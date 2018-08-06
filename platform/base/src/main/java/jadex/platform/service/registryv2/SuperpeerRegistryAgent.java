@@ -71,7 +71,6 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	
 	public SuperpeerRegistryAgent()
 	{
-		System.out.println("SUPER CREATED!");
 	}
 	
 	/**
