@@ -31,13 +31,13 @@ public class X509PemStringsSecret extends AbstractX509PemSecret
 		if (toks.length != 1 && toks.length != 2)
 			throw new IllegalArgumentException("Could not decode pem file string: " +encodedstring);
 		
-		//cert = SUtil.unescapeLineBreaks(toks[0]);
-		cert = toks[0];
+		cert = SUtil.unescapeLineBreaks(toks[0]);
+//		cert = toks[0].replace("\\n", "\n");
 //		cacert = new String(Base64.decodeNoPadding(toks[0].getBytes(SUtil.UTF8)), SUtil.UTF8);
 		if (toks.length > 1)
 		{
-			//key = SUtil.unescapeLineBreaks(toks[1]);
-			key = toks[1];
+			key = SUtil.unescapeLineBreaks(toks[1]);
+//			key = toks[1];
 //			key = new String(Base64.decodeNoPadding(toks[2].getBytes(SUtil.UTF8)), SUtil.UTF8);
 		}
 	}
@@ -138,14 +138,14 @@ public class X509PemStringsSecret extends AbstractX509PemSecret
 	{
 //		String ret = PREFIX + ":" + new String(Base64.encodeNoPadding(cacert.getBytes(SUtil.UTF8)), SUtil.UTF8);
 //		String ret = PREFIX + ":" + new String(Base64.encodeNoPadding(cert.getBytes(SUtil.UTF8)), SUtil.UTF8);
-//		String ret = PREFIX + ":" + SUtil.escapeLineBreaks(cert);
-		String ret = PREFIX + ":" + cert.replace("\r", "").replace("\n", "");
+		String ret = PREFIX + ":" + SUtil.escapeLineBreaks(cert);
+//		String ret = PREFIX + ":" + cert.replace("\r", "").replace("\n", "\\n");
 		if (canSign())
 		{
 //			ret += ":" + new String(Base64.encodeNoPadding(cert.getBytes(SUtil.UTF8)), SUtil.UTF8);
 //			ret += ":" + new String(Base64.encodeNoPadding(key.getBytes(SUtil.UTF8)), SUtil.UTF8);
-//			ret += ":" + SUtil.escapeLineBreaks(key);
-			ret += key.replace("\r", "").replace("\n", "");
+			ret += ":" + SUtil.escapeLineBreaks(key);
+//			ret += ":" + key.replace("\r", "").replace("\n", "");
 		}
 		return ret;
 	}
