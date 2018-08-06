@@ -23,16 +23,16 @@ public class CreationInfo
 	protected String filename;
 	
 	/** The configuration. */
-	protected String	config;
+	protected String config;
 	
 	/** The arguments (map with name/value pairs). */
-	protected Map<String, Object>	args;
+	protected Map<String, Object> args;
 	
 	/** The parent component. */
-	protected IComponentIdentifier	parent;
+	protected IComponentIdentifier parent;
 	
 	/** The resource identifier. */
-	protected IResourceIdentifier	rid;
+	protected IResourceIdentifier rid;
 	
 	/** The suspend flag (default: false). */
 	protected Boolean suspend;

@@ -1416,4 +1416,72 @@ public class ExternalAccess implements IExternalAccess
 			}
 		});
 	}
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public IFuture<IExternalAccess> addComponent(Object component, CreationInfo info)
+	{
+		// todo: parameter for name
+		
+		// todo: resultlistener for results?!
+		
+		if(component==null)
+			return new Future<>(new RuntimeException("Component must not null."));
+		
+		if(info==null)
+			info = new CreationInfo();
+		if(info.getParent()==null)
+			info.setParent(getId());
+		
+		final CreationInfo finfo = info;
+		
+		return (IFuture<IExternalAccess>)scheduleStep(new IComponentStep<IExternalAccess>()
+		{
+			@Override
+			public IFuture<IExternalAccess> execute(IInternalAccess ia)
+			{
+				Future<IExternalAccess> ret = new Future<>();
+				
+				String modelname = null;
+				
+				if(component instanceof String)
+				{
+					modelname = (String)component;
+				}
+				else if(component instanceof Class<?>)
+				{
+					modelname = ((Class<?>)component).getName()+".class";
+				}
+				else if(component != null)
+				{
+					modelname = component.getClass().getName()+".class";
+					finfo.addArgument("__pojo", component); // hack?! use constant
+				}
+				
+				final String fmodelname = modelname;
+
+				IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(null, fmodelname, finfo, null, ia);
+				fut.addResultListener(new IResultListener<IComponentIdentifier>()
+				{
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+//						System.out.println("ex:"+exception);
+						ret.setException(exception);
+					}
+					
+					@Override
+					public void resultAvailable(IComponentIdentifier result)
+					{
+//						System.out.println("created: "+result);
+						SComponentManagementService.getExternalAccess(result, ia).addResultListener(new DelegationResultListener<>(ret));
+					}
+				});
+				
+				return ret;
+			}
+		});
+	}
 }

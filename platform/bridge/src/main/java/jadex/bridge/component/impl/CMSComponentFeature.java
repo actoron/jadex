@@ -1,4 +1,4 @@
-package jadex.micro.features.impl;
+package jadex.bridge.component.impl;
 
 import java.util.Collection;
 import java.util.Map;
@@ -9,7 +9,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.ICMSFeature;
-import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;

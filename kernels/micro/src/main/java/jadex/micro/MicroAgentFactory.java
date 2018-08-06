@@ -61,7 +61,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	protected static final LazyResource ICON = new LazyResource(MicroAgentFactory.class, "/jadex/micro/images/micro_agent.png");
 	
 	/** The specific component features for micro agents. */
-	public static final Collection<IComponentFeatureFactory>	MICRO_FEATURES	= Collections.unmodifiableCollection(
+	public static final Collection<IComponentFeatureFactory> MICRO_FEATURES = Collections.unmodifiableCollection(
 		Arrays.asList(
 			MicroPojoComponentFeature.FACTORY,
 			MicroInjectionComponentFeature.FACTORY,

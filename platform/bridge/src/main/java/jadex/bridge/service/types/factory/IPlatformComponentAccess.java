@@ -44,28 +44,28 @@ public interface IPlatformComponentAccess
 	 *  
 	 *  @return A future to indicate when the initialization is done.
 	 */
-	public IFuture<Void>	init();
+	public IFuture<Void> init();
 	
 	/**
 	 *  Perform the main execution of the component (if any).
 	 *  
 	 *  @return A future to indicate when the body is done.
 	 */
-	public IFuture<Void>	body();
+	public IFuture<Void> body();
 	
 	/**
 	 *  Perform the shutdown of the component (if any).
 	 *  
 	 *  @return A future to indicate when the shutdown is done.
 	 */
-	public IFuture<Void>	shutdown();
+	public IFuture<Void> shutdown();
 	
 	/**
 	 *  Get the user view of this platform component.
 	 *  
 	 *  @return An internal access exposing user operations of the component.
 	 */
-	public IInternalAccess	getInternalAccess();
+	public IInternalAccess getInternalAccess();
 	
 //	/**
 //	 *  Get the lifecycle state. 

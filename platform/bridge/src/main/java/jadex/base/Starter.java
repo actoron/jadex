@@ -122,6 +122,9 @@ public class Starter
     /** The CMS listeners. */
     public static String DATA_CMSLISTENERS = "listeners";
     
+    /** The CMS lock. */
+    public static String DATA_CMSLOCK = "cmslock";
+    
     
     /** The bootstrap component factory. */
     public static String DATA_PLATFORMACCESS = "$platformaccess";
@@ -503,6 +506,7 @@ public class Starter
 					putPlatformValue(cid, DATA_CHILDCOUNTS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, Integer>()));
 					putPlatformValue(cid, DATA_LOCKENTRIES, Collections.synchronizedMap(new HashMap<IComponentIdentifier, LockEntry>()));
 					putPlatformValue(cid, DATA_CMSLISTENERS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>>()));
+					putPlatformValue(cid, DATA_CMSLOCK, new Object());
 
 //					rootconf.setBootstrapFactory(cfac);
 //					config.setPlatformModel(model);
@@ -530,7 +534,7 @@ public class Starter
 					ILocalResourceIdentifier lid = rid.getLocalIdentifier();
 					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, lid.getUri()));
 					
-					String ctype	= cfac.getComponentType(configfile, null, model.getResourceIdentifier()).get();
+					String ctype = cfac.getComponentType(configfile, null, model.getResourceIdentifier()).get();
 					IComponentIdentifier caller = sc==null? null: sc.getCaller();
 					Cause cause = sc==null? null: sc.getCause();
 					assert cause!=null;
@@ -548,19 +552,8 @@ public class Starter
 //					rootConfig.setValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
 					putPlatformValue(cid, DATA_PARAMETERCOPY, config.getValue(DATA_PARAMETERCOPY, model));
 //					rootConfig.setValue(PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
-
 					putPlatformValue(cid, DATA_NETWORKNAMESCACHE, new TransformSet<String>());
-
-//					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
-//					if(config.getRegistrySync())
-//					{
-						putPlatformValue(cid, DATA_SERVICEREGISTRY, new ServiceRegistry());
-//					}
-//					else
-//					{
-						// ServiceRegistry cannot handle backport for polling in case of global queries
-//						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new GlobalQueryServ);
-//					}
+					putPlatformValue(cid, DATA_SERVICEREGISTRY, new ServiceRegistry());
 					
 					try
 					{
@@ -600,7 +593,7 @@ public class Starter
 						public void customResultAvailable(Void result)
 						{
 							@SuppressWarnings("rawtypes")
-							List	comps	= config.getComponents();
+							List comps = config.getComponents();
 							if(args!=null && args.containsKey("component"))
 							{
 								comps	= (List<?>)args.get("component");

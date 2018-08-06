@@ -18,12 +18,14 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.ICMSFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
+import jadex.bridge.component.impl.CMSComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.ComponentLifecycleFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
@@ -40,6 +42,7 @@ import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -65,6 +68,7 @@ public class SComponentFactory
 	static
 	{
 		Collection<IComponentFeatureFactory>	def_features	= new ArrayList<IComponentFeatureFactory>();
+		def_features.add(new ComponentFeatureFactory(ICMSFeature.class, CMSComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IExecutionFeature.class, ExecutionComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IMonitoringComponentFeature.class, MonitoringComponentFeature.class));
 		def_features.add(new ComponentFeatureFactory(IArgumentsResultsFeature.class, ArgumentsResultsComponentFeature.class));

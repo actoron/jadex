@@ -23,8 +23,7 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 	//-------- constants --------
 	
 	/** The factory. */
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IPojoComponentFeature.class, MicroPojoComponentFeature.class,
-		null, null);
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IPojoComponentFeature.class, MicroPojoComponentFeature.class, null, null);
 	
 	//-------- attributes --------
 	
@@ -47,7 +46,10 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 		{
 			// Create the pojo agent
 			MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
-			this.pojoagent = model.getPojoClass().getType(model.getClassloader()).newInstance();
+			if(cinfo.getArguments()!=null && cinfo.getArguments().get("__pojo")!=null)
+				this.pojoagent = cinfo.getArguments().get("__pojo");
+			else
+				this.pojoagent = model.getPojoClass().getType(model.getClassloader()).newInstance();
 		}
 		catch(Exception e)
 		{

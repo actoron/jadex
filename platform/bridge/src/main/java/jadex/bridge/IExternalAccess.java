@@ -6,6 +6,7 @@ import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
@@ -222,4 +223,10 @@ public interface IExternalAccess //extends INFPropertyProvider//extends IRemotab
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query);
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public IFuture<IExternalAccess> addComponent(Object component, CreationInfo info);
 }
