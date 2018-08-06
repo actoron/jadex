@@ -589,6 +589,25 @@ public class ServiceQuery<T>
 	{
 		return multiplicity;
 	}
+	
+	/**
+	 *  Set the multiplicity.
+	 *  @param multiplicity The minimum multiplicity to set
+	 */
+	public ServiceQuery<T> setMultiplicity(int multiplicity)
+	{
+		return setMultiplicity(multiplicity, -1);
+	}
+	
+	/**
+	 *  Set the multiplicity.
+	 *  @param multiplicitystart The minimum multiplicity to set
+	 *  @param multiplicityend The max multiplicity to set
+	 */
+	public ServiceQuery<T> setMultiplicity(int multiplicitystart, int multiplicityend)
+	{
+		return setMultiplicity(new Multiplicity(multiplicitystart, multiplicityend));
+	}
 
 	/**
 	 *  Set the multiplicity.
