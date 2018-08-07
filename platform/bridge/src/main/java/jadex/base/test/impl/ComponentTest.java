@@ -220,7 +220,7 @@ public class ComponentTest extends TestCase
 			}
 		}
 		 
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(null, filename, new CreationInfo(rid));
 		componentStarted(fut);
 		fut.addResultListener(new IntermediateDefaultResultListener<TupleResult>()
 		{

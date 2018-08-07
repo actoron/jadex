@@ -256,27 +256,19 @@ public class StarterPlugin extends AbstractJCCPlugin
 				final Map args = new HashMap();
 				args.put("component", cid);
 				
-				getJCC().getPlatformAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.addResultListener(new DefaultResultListener()		
+				CreationInfo ci = new CreationInfo(args);
+				ci.setName(cid.getLocalName());
+				ci.setFilename("jadex/platform/service/remote/ProxyAgent.class");
+				getJCC().getPlatformAccess().createComponent(null, ci, null).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-						IComponentManagementService cms = (IComponentManagementService)result;
-//								createComponent("jadex/platform/service/remote/ProxyAgent.class", cid.getLocalName(), null, args, false, null, null, null, null);
-						
-						cms.createComponent(cid.getLocalName(), "jadex/platform/service/remote/ProxyAgent.class", 
-							new CreationInfo(args), null).addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-								getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
-							}
-						});
+						getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 					}
 				});
 			}

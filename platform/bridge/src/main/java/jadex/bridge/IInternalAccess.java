@@ -53,7 +53,7 @@ public interface IInternalAccess
 	 *  @return	The component description.
 	 */
 	// Todo: hack??? should be internal to CMS!?
-	public IComponentDescription	getDescription();
+	public IComponentDescription getDescription();
 	
 	/**
 	 *  Kill the component.
@@ -125,4 +125,11 @@ public interface IInternalAccess
 	 *  @return The failure reason for use during cleanup, if any.
 	 */
 	public Exception getException();
+	
+	/**
+	 *  Get the external access for a component id.
+	 *  @param cid The component id.
+	 *  @return The external access.
+	 */
+	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid);
 }

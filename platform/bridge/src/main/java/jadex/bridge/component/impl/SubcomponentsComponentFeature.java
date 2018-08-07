@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -25,22 +27,30 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.Tuple2Future;
+import jadex.commons.future.TupleResult;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
 /**
  *  This feature provides subcomponents.
  */
-public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	implements ISubcomponentsFeature, IInternalSubcomponentsFeature
+public class SubcomponentsComponentFeature	extends	AbstractComponentFeature implements ISubcomponentsFeature, IInternalSubcomponentsFeature
 {
 	/**
 	 *  Create the feature.
@@ -216,26 +226,26 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 					// todo: rid
 //					System.out.println("curcall: "+getName(components[i], model, j+1)+" "+CallAccess.getCurrentInvocation().getCause());
 //					cms.createComponent(getName(components[i], model, j+1), type.getName(),
-					cms.createComponent(getName(components[i], model, j+1), getFilename(components[i], model),
-						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getId(),
-						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null),
-//							getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
-//						{
-//							@Override
-//							public void resultAvailable(Collection<Tuple2<String, Object>> result)
-//							{
-//								// OK -> ignore.
-//							}
-//							
-//							@Override
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								// Let super component fail when subcomponent fails.
-//								// TODO: alternative behavior? restart, ignore?
-//								getComponent().killComponent(exception);
-//							}
-//						})
-							null).addResultListener(crl);
+					CreationInfo ci = new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getId(),
+						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null);
+					ci.setName(getName(components[i], model, j+1));
+					ci.setFilename(getFilename(components[i], model));
+					getComponent().getFeature(ISubcomponentsFeature.class).createComponent(null, ci, null).addResultListener(new IResultListener<IExternalAccess>()
+					{
+						public void resultAvailable(IExternalAccess result) 
+						{
+							crl.resultAvailable(result.getId());
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							crl.exceptionOccurred(exception);
+						}
+					});
+//					cms.createComponent(getName(components[i], model, j+1), getFilename(components[i], model),
+//						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getId(),
+//						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null),
+//						null).addResultListener(crl);
 				}
 				else
 				{
@@ -354,7 +364,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	/**
 	 *  Called, when a subcomponent has been created.
 	 */
-	public IFuture<Void>	componentCreated(final IComponentDescription desc)
+	public IFuture<Void> componentCreated(final IComponentDescription desc)
 	{
 		// Throw component events for extensions (envsupport)
 		final IMonitoringComponentFeature	mon	= getComponent().getFeature0(IMonitoringComponentFeature.class);
@@ -439,5 +449,111 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	protected boolean isExternalThread()
 	{
 		return !getComponent().getFeature(IExecutionFeature.class).isComponentThread();
+	}
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
+	{
+		// todo: parameter for name
+		
+		if(component==null && (info==null || info.getFilename()==null))
+			return new Future<>(new RuntimeException("Component must not null."));
+		
+		final Future<IExternalAccess> ret = new Future<>();
+		
+		info = prepare(component, info);
+		
+		IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, resultlistener, getComponent());
+		fut.addResultListener(new IResultListener<IComponentIdentifier>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+//				System.out.println("ex:"+exception);
+				ret.setException(exception);
+			}
+			
+			@Override
+			public void resultAvailable(IComponentIdentifier result)
+			{
+//				System.out.println("created: "+result);
+				SComponentManagementService.getExternalAccess(result, getComponent()).addResultListener(new DelegationResultListener<>(ret));
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info)
+	{
+		// todo: resultlistener for results?!
+		
+		if(component==null && (info==null || info.getFilename()==null))
+			return new SubscriptionIntermediateFuture<>(new RuntimeException("Component must not null."));
+		
+		info = prepare(component, info);
+		
+		return SComponentManagementService.createComponent(info, info.getName(), info.getFilename(), getComponent());
+	}
+	
+	/**
+	 *  Create a new component on the platform.
+	 *  @param name The component name or null for automatic generation.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param info Additional start information such as parent component or arguments (optional).
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info)
+	{
+		// todo: resultlistener for results?!
+		
+		if(component==null && (info==null || info.getFilename()==null))
+			return new Tuple2Future<IComponentIdentifier, Map<String, Object>>(new RuntimeException("Component must not null."));
+				
+		info = prepare(component, info);
+		
+		return SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, getComponent());
+	}
+	
+	/**
+	 * 
+	 * @param component
+	 * @param info
+	 * @return
+	 */
+	public CreationInfo prepare(Object component, CreationInfo info)
+	{
+		if(info==null)
+			info = new CreationInfo();
+		if(info.getParent()==null)
+			info.setParent(getComponent().getId());
+		
+		String modelname = null;
+		
+		if(component instanceof String)
+		{
+			modelname = (String)component;
+			info.setFilename(modelname);
+		}
+		else if(component instanceof Class<?>)
+		{
+			modelname = ((Class<?>)component).getName()+".class";
+			info.setFilename(modelname);
+		}
+		else if(component != null)
+		{
+			modelname = component.getClass().getName()+".class";
+			info.addArgument("__pojo", component); // hack?! use constant
+			info.setFilename(modelname);
+		}
+		
+		return info;
 	}
 }

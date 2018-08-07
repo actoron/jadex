@@ -58,6 +58,90 @@ public class CreateComponentCommand extends ACliCommand
 			": create component from model jadex/micro/examples/helloworld/HelloWorldAgent.class with resource id similar to rid applications-micro";
 	}
 	
+//	/**
+//	 *  Invoke the command.
+//	 *  @param context The context.
+//	 *  @param args The arguments.
+//	 */
+//	public Object invokeCommand(final CliContext context, final Map<String, Object> args)
+//	{
+//		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+//		
+//		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
+//		
+//		comp.scheduleStep(new IComponentStep<IComponentIdentifier>()
+//		{
+//			public IFuture<IComponentIdentifier> execute(IInternalAccess ia)
+//			{
+//				final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+//				
+//				ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+//				{
+//					public void customResultAvailable(final IComponentManagementService cms)
+//					{
+//						final String name = (String)args.get("-name");
+//						final String model = (String)args.get("-model");
+//						final String config = (String)args.get("-config");
+//						final IComponentIdentifier parent = (IComponentIdentifier)args.get("-parent");
+//						final String ridtext = (String)args.get("-rid");
+//						final Integer count = (Integer)args.get("-cnt");
+//						
+//						IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
+//				
+//						comp.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
+//						{
+//							public void customResultAvailable(ILibraryService  libs)
+//							{
+//								libs.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, IComponentIdentifier>(ret)
+//								{
+//									public void customResultAvailable(List<IResourceIdentifier> rids) 
+//									{
+//										IResourceIdentifier found = null;
+//										if(ridtext!=null)
+//										{
+//											for(IResourceIdentifier rid: rids)
+//											{
+//												if(rid.toString().indexOf(ridtext)!=-1)
+//												{
+//													if(found==null)
+//													{
+//														found = rid;
+//													}
+//													else
+//													{
+//														ret.setException(new RuntimeException("More than one rid possible: "+found+" "+rid));
+//														return;
+//													}
+//												}
+//											}
+//										}
+//										
+//										CreationInfo info = new CreationInfo();
+//										if(parent!=null)
+//											info.setParent(parent);
+//										if(config!=null)
+//											info.setConfiguration(config);
+//										if(found!=null)
+//											info.setResourceIdentifier(found);
+//										
+//										for(int i=0; i<(count==null? 1: count.intValue()); i++)
+//											cms.createComponent(name, model, info, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+//									}
+//								});
+//							}
+//						});
+//					}
+//				});
+//				
+//				return ret;
+//			}
+//		}).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+//		
+//		return ret;
+//	}
+	
 	/**
 	 *  Invoke the command.
 	 *  @param context The context.
@@ -75,61 +159,66 @@ public class CreateComponentCommand extends ACliCommand
 			{
 				final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 				
-				ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
-				{
-					public void customResultAvailable(final IComponentManagementService cms)
-					{
-						final String name = (String)args.get("-name");
-						final String model = (String)args.get("-model");
-						final String config = (String)args.get("-config");
-						final IComponentIdentifier parent = (IComponentIdentifier)args.get("-parent");
-						final String ridtext = (String)args.get("-rid");
-						final Integer count = (Integer)args.get("-cnt");
-						
-						IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
+				final String name = (String)args.get("-name");
+				final String model = (String)args.get("-model");
+				final String config = (String)args.get("-config");
+				final IComponentIdentifier parent = (IComponentIdentifier)args.get("-parent");
+				final String ridtext = (String)args.get("-rid");
+				final Integer count = (Integer)args.get("-cnt");
 				
-						comp.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
+				IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
+		
+				comp.searchService( new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
+				{
+					public void customResultAvailable(ILibraryService  libs)
+					{
+						libs.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, IComponentIdentifier>(ret)
 						{
-							public void customResultAvailable(ILibraryService  libs)
+							public void customResultAvailable(List<IResourceIdentifier> rids) 
 							{
-								libs.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, IComponentIdentifier>(ret)
+								IResourceIdentifier found = null;
+								if(ridtext!=null)
 								{
-									public void customResultAvailable(List<IResourceIdentifier> rids) 
+									for(IResourceIdentifier rid: rids)
 									{
-										IResourceIdentifier found = null;
-										if(ridtext!=null)
+										if(rid.toString().indexOf(ridtext)!=-1)
 										{
-											for(IResourceIdentifier rid: rids)
+											if(found==null)
 											{
-												if(rid.toString().indexOf(ridtext)!=-1)
-												{
-													if(found==null)
-													{
-														found = rid;
-													}
-													else
-													{
-														ret.setException(new RuntimeException("More than one rid possible: "+found+" "+rid));
-														return;
-													}
-												}
+												found = rid;
+											}
+											else
+											{
+												ret.setException(new RuntimeException("More than one rid possible: "+found+" "+rid));
+												return;
 											}
 										}
-										
-										CreationInfo info = new CreationInfo();
-										if(parent!=null)
-											info.setParent(parent);
-										if(config!=null)
-											info.setConfiguration(config);
-										if(found!=null)
-											info.setResourceIdentifier(found);
-										
-										for(int i=0; i<(count==null? 1: count.intValue()); i++)
-											cms.createComponent(name, model, info, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 									}
-								});
+								}
+								
+								CreationInfo info = new CreationInfo();
+								if(parent!=null)
+									info.setParent(parent);
+								if(config!=null)
+									info.setConfiguration(config);
+								if(found!=null)
+									info.setResourceIdentifier(found);
+								if(name!=null)
+									info.setName(name);
+								if(model!=null)
+									info.setFilename(model);
+								
+								for(int i=0; i<(count==null? 1: count.intValue()); i++)
+								{
+									comp.createComponent(null, info, null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+									{
+										public void customResultAvailable(IExternalAccess result) throws Exception
+										{
+											ret.setResult(result.getId());
+										}
+									});
+								}
 							}
 						});
 					}

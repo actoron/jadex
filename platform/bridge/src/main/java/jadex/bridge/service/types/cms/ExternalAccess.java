@@ -22,6 +22,7 @@ import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
@@ -30,11 +31,16 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
+import jadex.commons.future.TupleResult;
 
 /**
  *  External access for applications.
@@ -362,51 +368,51 @@ public class ExternalAccess implements IExternalAccess
 		return ret;
 	}
 	
-	/**
-	 *  Create a subcomponent.
-	 *  @param component The instance info.
-	 */
-	public IFuture<IComponentIdentifier> createChild(final ComponentInstanceInfo component)
-	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		
-		if(!valid)
-		{
-			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
-		}
-		else if(isExternalThread())
-		{
-			try
-			{
-				ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						ia.getFeature(ISubcomponentsFeature.class).createChild(component)
-							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-						return IFuture.DONE;
-					}
-				});
-			}
-			catch(final Exception e)
-			{
-				Starter.scheduleRescueStep(cid, new Runnable()
-				{
-					public void run()
-					{
-						ret.setException(e);
-					}
-				});
-			}
-		}
-		else
-		{
-			ia.getFeature(ISubcomponentsFeature.class).createChild(component)
-				.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Create a subcomponent.
+//	 *  @param component The instance info.
+//	 */
+//	public IFuture<IComponentIdentifier> createChild(final ComponentInstanceInfo component)
+//	{
+//		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+//		
+//		if(!valid)
+//		{
+//			ret.setException(terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid));
+//		}
+//		else if(isExternalThread())
+//		{
+//			try
+//			{
+//				ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+//				{
+//					public IFuture<Void> execute(IInternalAccess ia)
+//					{
+//						ia.getFeature(ISubcomponentsFeature.class).createChild(component)
+//							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+//						return IFuture.DONE;
+//					}
+//				});
+//			}
+//			catch(final Exception e)
+//			{
+//				Starter.scheduleRescueStep(cid, new Runnable()
+//				{
+//					public void run()
+//					{
+//						ret.setException(e);
+//					}
+//				});
+//			}
+//		}
+//		else
+//		{
+//			ia.getFeature(ISubcomponentsFeature.class).createChild(component)
+//				.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+//		}
+//		
+//		return ret;
+//	}
 
 	
 	/**
@@ -1421,66 +1427,68 @@ public class ExternalAccess implements IExternalAccess
 	 *  Add a new component as subcomponent of this component.
 	 *  @param component The model or pojo of the component.
 	 */
-	public IFuture<IExternalAccess> addComponent(Object component, CreationInfo info)
+	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{
-		// todo: parameter for name
-		
-		// todo: resultlistener for results?!
-		
-		if(component==null)
-			return new Future<>(new RuntimeException("Component must not null."));
-		
-		if(info==null)
-			info = new CreationInfo();
-		if(info.getParent()==null)
-			info.setParent(getId());
-		
-		final CreationInfo finfo = info;
-		
 		return (IFuture<IExternalAccess>)scheduleStep(new IComponentStep<IExternalAccess>()
 		{
 			@Override
 			public IFuture<IExternalAccess> execute(IInternalAccess ia)
 			{
-				Future<IExternalAccess> ret = new Future<>();
-				
-				String modelname = null;
-				
-				if(component instanceof String)
-				{
-					modelname = (String)component;
-				}
-				else if(component instanceof Class<?>)
-				{
-					modelname = ((Class<?>)component).getName()+".class";
-				}
-				else if(component != null)
-				{
-					modelname = component.getClass().getName()+".class";
-					finfo.addArgument("__pojo", component); // hack?! use constant
-				}
-				
-				final String fmodelname = modelname;
-
-				IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(null, fmodelname, finfo, null, ia);
-				fut.addResultListener(new IResultListener<IComponentIdentifier>()
-				{
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-//						System.out.println("ex:"+exception);
-						ret.setException(exception);
-					}
-					
-					@Override
-					public void resultAvailable(IComponentIdentifier result)
-					{
-//						System.out.println("created: "+result);
-						SComponentManagementService.getExternalAccess(result, ia).addResultListener(new DelegationResultListener<>(ret));
-					}
-				});
-				
-				return ret;
+				return ia.getFeature(ISubcomponentsFeature.class).createComponent(component, info, resultlistener);
+			}
+		});
+	}
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info)
+	{
+		return (ISubscriptionIntermediateFuture<CMSStatusEvent>)scheduleStep(new IComponentStep<Collection<CMSStatusEvent>>()
+		{
+			// must declare ISubscriptionIntermediateFuture<CMSStatusEvent> as return value of method
+			// because it is internally used to determine the future type
+			@Override
+			public ISubscriptionIntermediateFuture<CMSStatusEvent> execute(IInternalAccess ia)
+			{
+				return ia.getFeature(ISubcomponentsFeature.class).createComponentWithResults(component, info);
+			}
+		});
+	}
+	
+	/**
+	 *  Create a new component on the platform.
+	 *  @param name The component name or null for automatic generation.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param info Additional start information such as parent component or arguments (optional).
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info)
+	{
+		return (ITuple2Future<IComponentIdentifier, Map<String, Object>>)scheduleStep(new IComponentStep<Collection<TupleResult>>()
+		{
+			@Override
+			public ITuple2Future<IComponentIdentifier, Map<String, Object>> execute(IInternalAccess ia)
+			{
+				return ia.getFeature(ISubcomponentsFeature.class).createComponent(component, info);
+			}
+		});
+	}
+	
+	/**
+	 *  Get the external access for a component id.
+	 *  @param cid The component id.
+	 *  @return The external access.
+	 */
+	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid)
+	{
+		return (IFuture<IExternalAccess>)scheduleStep(new IComponentStep<IExternalAccess>()
+		{
+			@Override
+			public IFuture<IExternalAccess> execute(IInternalAccess ia)
+			{
+				return SComponentManagementService.getExternalAccess(cid, ia);
 			}
 		});
 	}

@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
@@ -266,5 +267,15 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	public Exception getException()
 	{
 		return access.getException();
+	}
+	
+	/**
+	 *  Get the external access for a component id.
+	 *  @param cid The component id.
+	 *  @return The external access.
+	 */
+	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid)
+	{
+		return access.getExternalAccess(cid);
 	}
 }

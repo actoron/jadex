@@ -3,6 +3,7 @@ package jadex.platform.service.cron.jobs;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -54,20 +55,11 @@ public class CreateCommand implements IResultCommand<IIntermediateFuture<CMSStat
 		final SubscriptionIntermediateDelegationFuture<CMSStatusEvent> ret = (SubscriptionIntermediateDelegationFuture<CMSStatusEvent>)
 			SFuture.getNoTimeoutFuture(SubscriptionIntermediateDelegationFuture.class, ia);
 		
-		ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentManagementService>()
-		{
-			public void resultAvailable(IComponentManagementService cms)
-			{
-				ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, name, model);
-				TerminableIntermediateDelegationResultListener<CMSStatusEvent> lis = new TerminableIntermediateDelegationResultListener<CMSStatusEvent>(ret, fut);
-				fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(lis));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-		}));
+		info.setName(name);
+		info.setFilename(model);
+		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = ia.getFeature(ISubcomponentsFeature.class).createComponentWithResults(null, info);
+		TerminableIntermediateDelegationResultListener<CMSStatusEvent> lis = new TerminableIntermediateDelegationResultListener<CMSStatusEvent>(ret, fut);
+		fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(lis));
 				
 		return ret;
 	}

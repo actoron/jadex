@@ -15,6 +15,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.BasicService;
@@ -269,14 +270,14 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         else
         {
         	components.put(info.getFilename(), ret);
-            final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//          final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
             if(info.getParent()==null)
             	info.setParent(agent.getId());
-            cms.createComponent(info.getFilename(), info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+            agent.getFeature(ISubcomponentsFeature.class).createComponent(null, info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
             {
                 public void firstResultAvailable(IComponentIdentifier cid)
                 {
-                	cms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
+                	agent.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
                 	{
                 		public void customResultAvailable(IExternalAccess exta)
                 		{

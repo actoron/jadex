@@ -1100,13 +1100,13 @@ public class SComponentManagementService
 		
 		if(isRemoteComponent(cid, agent))
 		{
-			getRemoteCMS(agent, cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService rcms)
 				{
 					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 				}
-			});
+			}));
 		}
 		else
 		{
@@ -1662,6 +1662,98 @@ public class SComponentManagementService
 		return ret;
 	}
 	
+//	/**
+//	 * 
+//	 * @param oname
+//	 * @param modelname
+//	 * @param cinfo
+//	 * @param resultlistener
+//	 * @param agent
+//	 * @return
+//	 */
+//	protected static IFuture<IComponentIdentifier> handleRemoteCreation(String oname, String modelname, CreationInfo cinfo, final IResultListener<Collection<Tuple2<String, Object>>> resultlistener, IInternalAccess agent)
+//	{
+//		final Future<IComponentIdentifier> ret = new Future<>();
+//		
+//		getRemoteCMS(agent, cinfo.getParent()).addResultListener(createResultListener(agent, 
+//			new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+//		{
+//			public void customResultAvailable(IComponentManagementService rcms)
+//			{
+//				// todo: problem, the call will get a wrong caller due to IComponentIdentidier.LOCAL.get()
+//				// will deliver the platform (as this second call is performed by the cms itself)
+//				
+//				// Map remote subscription events to local result listener (avoids the need for listener as plain remote object)
+//				rcms.createComponent(cinfo, oname, modelname).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+//				{
+//					Collection<Tuple2<String, Object>>	results;
+//					
+//					@Override
+//					public void intermediateResultAvailable(CMSStatusEvent result)
+//					{
+//						if(result instanceof CMSCreatedEvent)
+//						{
+//							ret.setResult(result.getComponentIdentifier());
+//						}
+//						else if(result instanceof CMSIntermediateResultEvent && resultlistener!=null)
+//						{
+//							CMSIntermediateResultEvent	ire	= (CMSIntermediateResultEvent)result;
+//							Tuple2<String, Object>	res	= new Tuple2<String, Object>(ire.getName(), ire.getValue());
+//							
+//							if(resultlistener instanceof IIntermediateResultListener)
+//							{
+//								IIntermediateResultListener<Tuple2<String, Object>>	reslis	= (IIntermediateResultListener<Tuple2<String, Object>>)resultlistener;
+//								reslis.intermediateResultAvailable(res);
+//							}
+//							else
+//							{
+//								if(results==null)
+//									results	= new HashSet<Tuple2<String,Object>>();
+//								
+//								results.add(res);
+//							}
+//						}
+//					}
+//					
+//					@Override
+//					public void resultAvailable(Collection<CMSStatusEvent> result)
+//					{
+//						assert false: "Should not happen"; 
+//					}
+//					
+//					@Override
+//					public void finished()
+//					{
+//						if(resultlistener!=null)
+//						{
+//							if(resultlistener instanceof IIntermediateResultListener)
+//							{
+//								((IIntermediateResultListener<Tuple2<String, Object>>)resultlistener).finished();
+//							}
+//							else
+//							{
+//								if(results==null)
+//								{
+//									results	= Collections.emptySet();
+//								}
+//								resultlistener.resultAvailable(results);
+//							}								
+//						}
+//					}
+//					
+//					@Override
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						if(!ret.setExceptionIfUndone(exception) && resultlistener!=null)
+//							resultlistener.exceptionOccurred(exception);
+//					}
+//				});
+//			}
+//		}));
+//		
+//		return ret;
+//	}
+	
 	/**
 	 * 
 	 * @param oname
@@ -1675,16 +1767,14 @@ public class SComponentManagementService
 	{
 		final Future<IComponentIdentifier> ret = new Future<>();
 		
-		getRemoteCMS(agent, cinfo.getParent()).addResultListener(createResultListener(agent, 
-			new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		agent.getExternalAccess(cinfo.getParent().getRoot()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService rcms)
+			@Override
+			public void customResultAvailable(IExternalAccess platform) throws Exception
 			{
-				// todo: problem, the call will get a wrong caller due to IComponentIdentidier.LOCAL.get()
-				// will deliver the platform (as this second call is performed by the cms itself)
-				
-				// Map remote subscription events to local result listener (avoids the need for listener as plain remote object)
-				rcms.createComponent(cinfo, oname, modelname).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				cinfo.setName(oname);
+				cinfo.setFilename(modelname);
+				platform.createComponentWithResults(null, cinfo).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 				{
 					Collection<Tuple2<String, Object>>	results;
 					
@@ -1749,7 +1839,7 @@ public class SComponentManagementService
 					}
 				});
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -2026,7 +2116,7 @@ public class SComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + oname + " : Modelname must not be null."));
 
-//		System.out.println("create: "+name+" "+modelname+" "+agent.getComponentIdentifier());
+//		System.out.println("create: "+oname+" "+modelname+" "+agent.getId());
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();

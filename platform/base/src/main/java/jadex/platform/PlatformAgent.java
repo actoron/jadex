@@ -14,17 +14,17 @@ import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.DependencyResolver;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
-import jadex.commons.Boolean3;
 import jadex.commons.IFilter;
 import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfos;
@@ -41,7 +41,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -145,9 +144,7 @@ public class PlatformAgent
 		
 		Collection<Set<String>> levels = dr.resolveDependenciesWithLevel();
 		
-		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
-		
-		return startComponents(cms, levels.iterator(), names);
+		return startComponents(levels.iterator(), names);
 	}
 	
 	/**
@@ -270,25 +267,25 @@ public class PlatformAgent
 	/**
 	 *  Start components in levels.
 	 */
-	protected IFuture<Void> startComponents(IComponentManagementService cms, Iterator<Set<String>> levels, Map<String, String> names)
+	protected IFuture<Void> startComponents(Iterator<Set<String>> levels, Map<String, String> names)
 	{
 		final Future<Void> ret = new Future<>();
 		
 		if(levels.hasNext())
 		{
-//			System.out.println("---------- LEVEL --------------");
+			System.out.println("---------- LEVEL --------------");
 			Set<String> level = levels.next();
 			CounterResultListener<Void> lis = new CounterResultListener<>(level.size(), new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
-					startComponents(cms, levels, names).addResultListener(new DelegationResultListener<>(ret));
+					startComponents(levels, names).addResultListener(new DelegationResultListener<>(ret));
 				}
 
 				public void exceptionOccurred(Exception exception)
 				{
 					agent.getLogger().warning(SUtil.getExceptionStacktrace(exception));
-					startComponents(cms, levels, names).addResultListener(new DelegationResultListener<>(ret));
+					startComponents(levels, names).addResultListener(new DelegationResultListener<>(ret));
 				}
 			});
 			for(String c: level)
@@ -296,12 +293,15 @@ public class PlatformAgent
 				//ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(names.get(c), c.getName()+".class", (CreationInfo)null);
 				//fut.addTuple2ResultListener(res -> {lis.resultAvailable(null);}, res -> {});
 				
-				IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c+".class", null, null);
+				CreationInfo ci = new CreationInfo();
+				ci.setName(names.get(c));
+				ci.setFilename(c+".class");
+				IFuture<IExternalAccess> fut = agent.getFeature(ISubcomponentsFeature.class).createComponent(null, ci, null);
 				fut.addResultListener(
 					res -> {lis.resultAvailable(null);},
 					exception -> {lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c+".class", exception));});
 				
-//				System.out.println("Auto starting: "+names.get(c));
+				System.out.println("Auto starting: "+names.get(c));
 			}
 		}
 		else

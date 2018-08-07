@@ -24,6 +24,7 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -802,15 +803,27 @@ public class Starter
 				}
 			}
 			
-			cms.createComponent(name, comp, new CreationInfo(config, oargs), null)
-				.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+			CreationInfo ci = new CreationInfo(config, oargs);
+			ci.setName(name);
+			instance.getFeature(ISubcomponentsFeature.class).createComponent(null, ci, null)
+				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
-				public void customResultAvailable(IComponentIdentifier result)
+				public void customResultAvailable(IExternalAccess result)
 				{
 					startComponents(i+1, components, instance)
 						.addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
+			
+//			cms.createComponent(name, comp, new CreationInfo(config, oargs), null)
+//				.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+//			{
+//				public void customResultAvailable(IComponentIdentifier result)
+//				{
+//					startComponents(i+1, components, instance)
+//						.addResultListener(new DelegationResultListener<Void>(ret));
+//				}
+//			});
 		}
 		else
 		{
@@ -949,37 +962,42 @@ public class Starter
 	/**
 	 *  Create a proxy for the remote platform.
 	 */
-	public static IFuture<IComponentIdentifier>	createProxy(final IExternalAccess local, final IExternalAccess remote)
+	public static IFuture<IExternalAccess> createProxy(final IExternalAccess local, final IExternalAccess remote)
 	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
-		remote.searchService( new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+		remote.searchService( new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IExternalAccess>(ret)
 		{
 			public void customResultAvailable(ITransportAddressService remotetas) throws Exception
 			{
-				remotetas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, IComponentIdentifier>(ret)
+				remotetas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, IExternalAccess>(ret)
 				{
 					public void customResultAvailable(final List<TransportAddress> remoteaddrs) throws Exception
 					{
-						local.searchService( new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+						local.searchService( new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IExternalAccess>(ret)
 						{
 							public void customResultAvailable(ITransportAddressService localtas) throws Exception
 							{
-								localtas.addManualAddresses(remoteaddrs).addResultListener(new ExceptionDelegationResultListener<Void, IComponentIdentifier>(ret)
+								localtas.addManualAddresses(remoteaddrs).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 								{
 									public void customResultAvailable(Void result) throws Exception
 									{
-										local.searchService( new ServiceQuery<>(IComponentManagementService.class))
-											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
-										{
-											public void customResultAvailable(final IComponentManagementService localcms)
-											{
-												Map<String, Object>	args = new HashMap<String, Object>();
-												args.put("component", remote.getId().getRoot());
-												CreationInfo ci = new CreationInfo(args);
-												localcms.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-											}
-										});
+										Map<String, Object>	args = new HashMap<String, Object>();
+										args.put("component", remote.getId().getRoot());
+										CreationInfo ci = new CreationInfo(args);
+										local.createComponent("jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+										
+//										local.searchService( new ServiceQuery<>(IComponentManagementService.class))
+//											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+//										{
+//											public void customResultAvailable(final IComponentManagementService localcms)
+//											{
+//												Map<String, Object>	args = new HashMap<String, Object>();
+//												args.put("component", remote.getId().getRoot());
+//												CreationInfo ci = new CreationInfo(args);
+//												localcms.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+//											}
+//										});
 									}
 								});
 							}

@@ -1115,6 +1115,16 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 		return ((IInternalExecutionFeature)getFeature(IExecutionFeature.class)).getEndstateStart();
 	}
+	
+	/**
+	 *  Get the external access for a component id.
+	 *  @param cid The component id.
+	 *  @return The external access.
+	 */
+	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid)
+	{
+		return SComponentManagementService.getExternalAccess(cid, this);
+	}
 
 	/**
 	 *  Get a string representation.

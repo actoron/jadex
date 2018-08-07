@@ -18,6 +18,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -258,7 +259,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			}
 		}
 		
-		IComponentManagementService cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//		IComponentManagementService cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 
 		final Iterator<Tuple2<String, Set<String>>> it = found.iterator();
 		
@@ -279,8 +280,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						kernels.put(f.getFirstEntity(), null);
 						
 						CreationInfo ci = new CreationInfo(agent.getId());
+						ci.setFilename(f.getFirstEntity()+".class");
 						
-						cms.createComponent(null, f.getFirstEntity()+".class", ci, new IResultListener<Collection<Tuple2<String, Object>>>()
+						agent.getFeature(ISubcomponentsFeature.class).createComponent(null, ci, new IResultListener<Collection<Tuple2<String, Object>>>()
 						{
 							public void resultAvailable(Collection<Tuple2<String, Object>> result)
 							{
@@ -293,15 +295,28 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //								System.out.println("Killed kernel: " + f+", "+exception);
 								kernels.remove(f.getFirstEntity());
 							}
-						}).addResultListener(new IResultListener<IComponentIdentifier>()
+//						cms.createComponent(null, f.getFirstEntity()+".class", ci, new IResultListener<Collection<Tuple2<String, Object>>>()
+//						{
+//							public void resultAvailable(Collection<Tuple2<String, Object>> result)
+//							{
+//								System.out.println("Killed kernel: " + f);
+//								kernels.remove(f.getFirstEntity());
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+////								System.out.println("Killed kernel: " + f+", "+exception);
+//								kernels.remove(f.getFirstEntity());
+//							}
+						}).addResultListener(new IResultListener<IExternalAccess>()
 						{
-							public void resultAvailable(IComponentIdentifier cid)
+							public void resultAvailable(IExternalAccess exta)
 							{
 //								System.out.println("started factory: "+cid);
-								kernels.put(f.getFirstEntity(), cid);
+								kernels.put(f.getFirstEntity(), exta.getId());
 								
 								ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
-								q.setProvider(cid);
+								q.setProvider(exta.getId());
 								IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
 								
 								// If this is a new kernel, gather types and icons
@@ -342,7 +357,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				
 									public void exceptionOccurred(Exception exception)
 									{
-										System.out.println("Kernel cannot load: "+cid+" "+model);
+										System.out.println("Kernel cannot load: "+exta.getId()+" "+model);
 										run();
 									}
 								});

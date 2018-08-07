@@ -10,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -312,46 +313,41 @@ public class CronAgent implements ICronService
 		
 		if(useworkeragent)
 		{
-			IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+			IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
 				public void customResultAvailable(final IComponentManagementService cms)
 				{
 					CreationInfo ci = new CreationInfo(agent.getId());
-//					cms.createComponent(null, "invocation", ci, null)
-					cms.createComponent(null, "jadex/platform/service/cron/WorkerAgent.class", ci, null)
-						.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+					ci.setFilename("jadex/platform/service/cron/WorkerAgent.class");
+					agent.getFeature(ISubcomponentsFeature.class).createComponent(null, ci, null)
+//					cms.createComponent(null, "jadex/platform/service/cron/WorkerAgent.class", ci, null)
+						.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 					{
-						public void customResultAvailable(IComponentIdentifier cid) 
+						public void customResultAvailable(IExternalAccess exta) 
 						{
-							cms.getExternalAccess(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+							// Set to finished before executing command to decouple from cron main task
+							ret.setResult(null);
+							
+							exta.scheduleStep(new IComponentStep<Object>()
 							{
-								public void customResultAvailable(IExternalAccess exta) 
+								public IFuture<Object> execute(final IInternalAccess ia)
 								{
-									// Set to finished before executing command to decouple from cron main task
-									ret.setResult(null);
-									
-									exta.scheduleStep(new IComponentStep<Object>()
+									doExecuteCommand(jobtup, time).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 									{
-										public IFuture<Object> execute(final IInternalAccess ia)
+										public void resultAvailable(Void result)
 										{
-											doExecuteCommand(jobtup, time).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
-											{
-												public void resultAvailable(Void result)
-												{
-													ia.killComponent();
-												}
-												public void exceptionOccurred(Exception exception)
-												{
-													exception.printStackTrace();
-												}
-											}));
-											
-											return Future.getEmptyFuture();
+											ia.killComponent();
 										}
-									});
+										public void exceptionOccurred(Exception exception)
+										{
+											exception.printStackTrace();
+										}
+									}));
+									
+									return Future.getEmptyFuture();
 								}
-							}));
+							});
 						}
 					}));
 				}

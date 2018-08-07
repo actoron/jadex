@@ -19,6 +19,9 @@ public class CreationInfo
 {
 	//-------- attributes --------
 	
+	/** The instance name. */
+	protected String name;
+	
 	/** The file name. */
 	protected String filename;
 	
@@ -88,6 +91,7 @@ public class CreationInfo
 	{
 		if(info!=null)
 		{
+			this.name = info.getName();
 			this.filename = info.getFilename();
 			this.config	= info.getConfiguration();
 			this.args	= info.getArguments();
@@ -626,6 +630,24 @@ public class CreationInfo
 	public void setFilename(String filename)
 	{
 		this.filename = filename;
+	}
+
+	/**
+	 *  Get the instance name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 *  Set the name.
+	 *  @param name the name to set
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 	
 }

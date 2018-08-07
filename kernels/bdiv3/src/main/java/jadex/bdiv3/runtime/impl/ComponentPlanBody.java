@@ -4,6 +4,7 @@ import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -66,8 +67,11 @@ public class ComponentPlanBody implements IPlanBody
 		rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
 		// Todo: should also set processing state and RPLANS thread local?
 		
-		IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-		cms.createComponent(null, component, new CreationInfo(ia.getId()))
+//		IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+		CreationInfo ci = new CreationInfo(ia.getId());
+		ci.setFilename(component);
+		
+		ia.getFeature(ISubcomponentsFeature.class).createComponent(ret, ci)
 			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
 			@Override
