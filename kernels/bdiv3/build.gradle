@@ -12,7 +12,7 @@ dependencies
 	api project(':serialization:xml')
 	api project(':util:bytecode')
 	
-	apiNoAndroidRuntime 'org.ow2.asm:asm:6.2.1'
+	api 'org.ow2.asm:asm:6.2.1'
 //	api 'org.ow2.asm:asm-all:6.0_ALPHA'
 }
 
