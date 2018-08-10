@@ -25,6 +25,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
@@ -301,10 +302,8 @@ public class ServiceCallTestNFClearTest
 
 	private IExternalAccess createServiceAgent(IExternalAccess platform, Class< ? > clazz)
 	{
-		IComponentManagementService cms = platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
-
 		final Future<IComponentIdentifier> future = new Future<IComponentIdentifier>();
-		cms.createComponent(clazz.getName() + ".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+		platform.createComponent(null, new CreationInfo().setFilename(clazz.getName() + ".class")).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
 			@Override
 			public void firstResultAvailable(IComponentIdentifier result)
@@ -327,7 +326,7 @@ public class ServiceCallTestNFClearTest
 		// wait for creation
 		IComponentIdentifier identifier = future.get();
 
-		IExternalAccess ret = cms.getExternalAccess(identifier).get();
+		IExternalAccess ret = platform.getExternalAccess(identifier).get();
 	
 		return ret;
 	}

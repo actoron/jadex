@@ -9,6 +9,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
@@ -65,21 +66,21 @@ public class ServiceCallTestAgent extends TestAgent
 	/**
 	 *  Perform tests.
 	 */
-	protected IFuture<TestReport>	test(final IComponentManagementService cms, final boolean local)
+	protected IFuture<TestReport>	test(final IExternalAccess platform, final boolean local)
 	{
 		final Future<TestReport>	ret	= new Future<TestReport>();
 		
 //		System.out.println("Service call test on: "+agent.getComponentIdentifier());
 		
-		performTests(cms, RawServiceAgent.class.getName()+".class", local ? 20000 : 1, local ? 6 : 1, local ? 6 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+		performTests(platform, RawServiceAgent.class.getName()+".class", local ? 20000 : 1, local ? 6 : 1, local ? 6 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
-				performTests(cms, DirectServiceAgent.class.getName()+".class", local ? 10 : 1, local ? 6 : 1, local ? 4 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+				performTests(platform, DirectServiceAgent.class.getName()+".class", local ? 10 : 1, local ? 6 : 1, local ? 4 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						performTests(cms, DecoupledServiceAgent.class.getName()+".class", local ? 2 : 1, local ? 4 : 1, local ? 2 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+						performTests(platform, DecoupledServiceAgent.class.getName()+".class", local ? 2 : 1, local ? 4 : 1, local ? 2 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 						{
 							public void customResultAvailable(Void result)
 							{
@@ -98,20 +99,20 @@ public class ServiceCallTestAgent extends TestAgent
 	/**
 	 *  Perform all tests with the given agent.
 	 */
-	protected IFuture<Void>	performTests(final IComponentManagementService cms, final String agentname, final int rawfactor, final int directfactor, final int decoupledfactor)
+	protected IFuture<Void>	performTests(final IExternalAccess platform, final String agentname, final int rawfactor, final int directfactor, final int decoupledfactor)
 	{
 		final Future<Void> ret	= new Future<Void>();
-		CreationInfo ci = ((IService)cms).getId().getProviderId().getPlatformName().equals(agent.getId().getPlatformName())
+		CreationInfo ci = platform.getId().getPlatformName().equals(agent.getId().getPlatformName())
 			? new CreationInfo(agent.getId(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
 		
 		String an = agentname.toLowerCase();
 		final String tag = an.indexOf("raw")!=-1? "raw": an.indexOf("direct")!=-1? "direct": an.indexOf("decoupled")!=-1? "decoupled": null;	
 //		System.out.println("Tag is: "+tag+" "+agentname);	
 		
-		cms.createComponent(null, agentname, ci, null)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+		platform.createComponent(null, ci.setName(agentname), null)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(final IComponentIdentifier cid)
+			public void customResultAvailable(final IExternalAccess exta)
 			{
 				final Future<Void>	ret2 = new Future<Void>();
 				performSingleTest(tag, "raw", rawfactor).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret2)
@@ -132,13 +133,13 @@ public class ServiceCallTestAgent extends TestAgent
 				{
 					public void exceptionOccurred(Exception exception)
 					{
-						cms.destroyComponent(cid);
+						platform.killComponent(exta.getId());
 						ret.setException(exception);
 					}
 					
 					public void resultAvailable(Void result)
 					{
-						cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+						platform.killComponent(exta.getId()).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
 						{
 							public void customResultAvailable(Map<String, Object> result)
 							{

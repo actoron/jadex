@@ -5,6 +5,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 
 /**
@@ -25,7 +26,6 @@ public class StartAgentCreation
 			"-cli", "false",
 //			"-awareness", "false"
 		}).get();
-		IComponentManagementService cms = ea.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		cms.createComponent("jadex.bdi.benchmarks.AgentCreation.agent.xml", null).get();
+		ea.createComponent(null, new CreationInfo().setFilename("jadex.bdi.benchmarks.AgentCreation.agent.xml")).get();
 	}
 }

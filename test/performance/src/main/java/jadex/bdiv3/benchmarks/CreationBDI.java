@@ -15,6 +15,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IPojoComponentFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -152,15 +153,9 @@ public class CreationBDI
 			args.put("startmem", Long.valueOf(startmem));
 //			System.out.println("Args: "+num+" "+args);
 
-			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-				.addResultListener(new DefaultResultListener<IComponentManagementService>()
-			{
-				public void resultAvailable(IComponentManagementService result)
-				{
-					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getId()), "jadex.bdiv3.benchmarks.CreationBDI.class",
-						new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()), null);
-				}
-			});
+			agent.createComponent(null,
+				new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier())
+				.setFilename("jadex.bdiv3.benchmarks.CreationBDI.class").setName(createPeerName(num+1, agent.getId())), null);
 		}
 		else
 		{

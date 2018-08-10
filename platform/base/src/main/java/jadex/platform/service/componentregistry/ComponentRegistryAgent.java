@@ -273,7 +273,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 //          final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
             if(info.getParent()==null)
             	info.setParent(agent.getId());
-            agent.getFeature(ISubcomponentsFeature.class).createComponent(null, info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+            agent.createComponent(null, info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
             {
                 public void firstResultAvailable(IComponentIdentifier cid)
                 {

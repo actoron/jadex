@@ -5,6 +5,7 @@ import java.util.Map;
 import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -26,12 +27,10 @@ public class ArgumentsPlan extends Plan
 		TestReport tr = new TestReport("#1", "Test if a worker agent can be started and supplied with arguments.");
 		try
 		{
-			IComponentManagementService	cms	= getAgent().getFeature(IRequiredServicesFeature.class)
-				.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
 			Map<String, Object> args = SCollection.createHashMap();
 			args.put("creator", getComponentIdentifier());
-			cms.createComponent("/jadex/bdi/testcases/misc/ArgumentsWorker.agent.xml",
-				new CreationInfo(args, getComponentIdentifier())).getFirstResult();
+			getAgent().createComponent(null,
+				new CreationInfo(args, getComponentIdentifier()).setFilename("/jadex/bdi/testcases/misc/ArgumentsWorker.agent.xml")).getFirstResult();
 
 			waitForMessageEvent("inform_created", 1000);
 			tr.setSucceeded(true);

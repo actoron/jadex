@@ -9,8 +9,10 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.ServiceInvalidException;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -50,8 +52,8 @@ public class RemovedServiceAgent extends JunitAgentTest
 	protected IInternalAccess	agent;
 	
 	/** The cms service. */
-	@AgentServiceSearch
-	protected IComponentManagementService	cms;
+//	@AgentServiceSearch
+//	protected IComponentManagementService	cms;
 	
 	/** The test counter. */
 	protected int cnt;
@@ -116,10 +118,10 @@ public class RemovedServiceAgent extends JunitAgentTest
 		final IntermediateFuture<TestReport>	testfut	= new IntermediateFuture<TestReport>();
 		
 		// Create agent to call service on.
-		cms.createComponent(null, agentname, new CreationInfo(agent.getId()), null)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(testfut)
+		agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(agentname), null)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(testfut)
 		{
-			public void customResultAvailable(final IComponentIdentifier cid)
+			public void customResultAvailable(final IExternalAccess exta)
 			{
 				// Get service reference of created agent.
 				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, RequiredService.SCOPE_PLATFORM))
@@ -136,7 +138,7 @@ public class RemovedServiceAgent extends JunitAgentTest
 								tr1.setSucceeded(true);
 								
 								// Now kill the agent.
-								cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Collection<TestReport>>(testfut)
+								agent.killComponent(exta.getId()).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Collection<TestReport>>(testfut)
 								{
 									public void customResultAvailable(Map<String, Object> result)
 									{

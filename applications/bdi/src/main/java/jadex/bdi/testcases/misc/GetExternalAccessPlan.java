@@ -11,6 +11,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -39,12 +40,11 @@ public class GetExternalAccessPlan extends Plan
 		Future	wait	= new Future();
 
 		// Create component.
-		IComponentManagementService ces = getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', '.'));
 		Map	args	= new HashMap();
 		args.put("future", wait);
-		IFuture init = ces.createComponent(cid.getLocalName(), "jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml",
-			new CreationInfo(null, args, getComponentIdentifier(), false), null);
+		IFuture init = getAgent().createComponent(null,
+			new CreationInfo(null, args, getComponentIdentifier(), false).setName(cid.getLocalName()).setFilename("jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml"), null);
 		final boolean[]	gotexta	= new boolean[3];	// 0: got exception, 1: got access, 2: got belief value.	
 		
 		// Get and use external access.
@@ -92,7 +92,7 @@ public class GetExternalAccessPlan extends Plan
 		wait.setResult(null);
 		init.get();
 		done	= new Future();
-		ces.getExternalAccess(cid).addResultListener(lis);
+		getAgent().getExternalAccess(cid).addResultListener(lis);
 		done.get();
 		if(gotexta[0] && gotexta[1])
 			tr.setSucceeded(true);

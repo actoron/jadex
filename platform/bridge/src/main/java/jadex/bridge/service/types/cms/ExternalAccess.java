@@ -204,7 +204,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IFuture<Map<String, Object>> killComponent()
 	{
-		return killComponent(null);
+		return killComponent((Exception)null);
 	}
 	
 	/**
@@ -1434,7 +1434,7 @@ public class ExternalAccess implements IExternalAccess
 			@Override
 			public IFuture<IExternalAccess> execute(IInternalAccess ia)
 			{
-				return ia.getFeature(ISubcomponentsFeature.class).createComponent(component, info, resultlistener);
+				return ia.createComponent(component, info, resultlistener);
 			}
 		});
 	}
@@ -1452,7 +1452,7 @@ public class ExternalAccess implements IExternalAccess
 			@Override
 			public ISubscriptionIntermediateFuture<CMSStatusEvent> execute(IInternalAccess ia)
 			{
-				return ia.getFeature(ISubcomponentsFeature.class).createComponentWithResults(component, info);
+				return ia.createComponentWithResults(component, info);
 			}
 		});
 	}
@@ -1471,7 +1471,7 @@ public class ExternalAccess implements IExternalAccess
 			@Override
 			public ITuple2Future<IComponentIdentifier, Map<String, Object>> execute(IInternalAccess ia)
 			{
-				return ia.getFeature(ISubcomponentsFeature.class).createComponent(component, info);
+				return ia.createComponent(component, info);
 			}
 		});
 	}
@@ -1489,6 +1489,22 @@ public class ExternalAccess implements IExternalAccess
 			public IFuture<IExternalAccess> execute(IInternalAccess ia)
 			{
 				return SComponentManagementService.getExternalAccess(cid, ia);
+			}
+		});
+	}
+	
+	/**
+	 *  Kill the component.
+	 *  @param e The failure reason, if any.
+	 */
+	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid)
+	{
+		return (IFuture<Map<String, Object>>)scheduleStep(new IComponentStep<Map<String, Object>>()
+		{
+			@Override
+			public IFuture<Map<String, Object>> execute(IInternalAccess ia)
+			{
+				return ia.killComponent(cid);
 			}
 		});
 	}

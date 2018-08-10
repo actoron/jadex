@@ -12,6 +12,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -148,42 +149,28 @@ public class GenerateService implements IGenerateService
 			public IFuture createService()
 			{
 				final Future	ret	= new Future();
-				agent.getFeature(IRequiredServicesFeature.class).getService("cmsservice").addResultListener(new DelegationResultListener(ret)
+				Object delay = agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("delay");
+				if(delay==null)
+					delay = Long.valueOf(5000);
+				
+				agent.createComponent(null, 
+					new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
+					agent.getId().getParent()).setFilename("jadex/micro/examples/mandelbrot/CalculateAgent.class"), null)
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IExternalAccess>(ret)
 				{
-					public void customResultAvailable(Object result)
+					// Component created, now get the calculation service.
+					public void customResultAvailable(IExternalAccess result)
 					{
-						final IComponentManagementService cms = (IComponentManagementService)result;
-						Object delay = agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("delay");
-						if(delay==null)
-							delay = Long.valueOf(5000);
-						cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 
-							new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
-							agent.getId().getParent()), null)
-							.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+						result.searchService(new ServiceQuery<>(ICalculateService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY)).addResultListener(
+							agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<ICalculateService>(ret)
 						{
-							// Component created, now get the calculation service.
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(ICalculateService result)
 							{
-								cms.getExternalAccess((IComponentIdentifier)result).addResultListener(
-									agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IExternalAccess>(ret)
-								{
-									public void customResultAvailable(IExternalAccess result)
-									{
-										result.searchService(
-											new ServiceQuery<>(ICalculateService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY)).addResultListener(
-											agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-										{
-											public void customResultAvailable(Object result)
-											{
-												ret.setResult(result);
-											}
-										}));
-									}
-								}));
+								ret.setResult(result);
 							}
 						}));
 					}
-				});
+				}));
 				return ret;
 			}
 		}, -1);

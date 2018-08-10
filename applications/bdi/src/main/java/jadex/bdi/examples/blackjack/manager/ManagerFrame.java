@@ -43,6 +43,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -450,10 +451,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				final Future<Void>	ret	= new Future<Void>();
 				final IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				
-				IComponentManagementService	cms	= ia.getFeature(IRequiredServicesFeature.class)
-					.getLocalService(IComponentManagementService.class);
-				cms.createComponent("BlackjackDealer", "jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml",
-					new CreationInfo(ia.getId().getParent()))
+				ia.createComponent(null,
+					new CreationInfo(ia.getId().getParent()).setName("BlackjackDealer").setFilename("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml"))
 				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 				{
 					@Override
@@ -662,19 +661,17 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						bia.getLogger().info("starting playerAgent: "+player.getName());
 						
-						IComponentManagementService	cms	= ia.getFeature(IRequiredServicesFeature.class)
-							.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
 						Map<String, Object> args = new HashMap<String, Object>();
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
-						cms.createComponent(player.getName(), "jadex/bdi/examples/blackjack/player/Player.agent.xml",
-							new CreationInfo(args, ia.getId().getParent()))
-						.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+						ia.createComponent(null,
+							new CreationInfo(args, ia.getId().getParent()).setName(player.getName()).setFilename("jadex/bdi/examples/blackjack/player/Player.agent.xml"))
+						.addResultListener(new DefaultTuple2ResultListener<IExternalAccess, Map<String, Object>>()
 						{
 							@Override
-							public void firstResultAvailable(IComponentIdentifier playerid)
+							public void firstResultAvailable(IExternalAccess playerid)
 							{
-								player.setAgentID(playerid);
+								player.setAgentID(playerid.getId());
 								ret.setResult(null);
 							}
 							

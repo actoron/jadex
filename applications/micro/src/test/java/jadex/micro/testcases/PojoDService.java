@@ -3,10 +3,12 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -41,28 +43,20 @@ public class PojoDService implements IDService
 		
 		if("first".equals(agent.getConfiguration()))
 		{
-			IFuture<IComponentManagementService> cmsfut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
-			cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			agent.createComponent(null, 
+				new CreationInfo("second", null, agent.getId()).setFilename( "jadex.micro.testcases.ServiceParameterAgent.class"), null)
+				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
-				public void customResultAvailable(IComponentManagementService cms)
-				{	
-//					IComponentManagementService cms = (IComponentManagementService)result;
-					cms.createComponent(null, "jadex.micro.testcases.ServiceParameterAgent.class", 
-						new CreationInfo("second", null, agent.getId()), null)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
-					{
-						public void customResultAvailable(IComponentIdentifier cid)
-						{
+				public void customResultAvailable(IExternalAccess exta)
+				{
 //							IComponentIdentifier cid = (IComponentIdentifier)result;
-							IFuture<IDService> serfut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDService.class).setProvider(cid));
-							serfut.addResultListener(new ExceptionDelegationResultListener<IDService, Void>(ret)
-							{
-								public void customResultAvailable(IDService otherser)
-								{
-									otherser.testServiceArgument(PojoDService.this)
-										.addResultListener(new DelegationResultListener<Boolean>(res));
-								}
-							});
+					IFuture<IDService> serfut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDService.class).setProvider(exta.getId()));
+					serfut.addResultListener(new ExceptionDelegationResultListener<IDService, Void>(ret)
+					{
+						public void customResultAvailable(IDService otherser)
+						{
+							otherser.testServiceArgument(PojoDService.this)
+								.addResultListener(new DelegationResultListener<Boolean>(res));
 						}
 					});
 				}

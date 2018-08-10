@@ -8,11 +8,10 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
@@ -47,45 +46,40 @@ public class TestInjectedResultsAgent extends JunitAgentTest
 
 		final TestReport tr	= new TestReport("#1", "Test if injected results work.");
 		
-		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent
+			.createComponent(null, new CreationInfo(agent.getId()));
+		fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void firstResultAvailable(IComponentIdentifier result)
 			{
-				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(InjectedResultsAgent.class.getName()+".class", 
-					new CreationInfo(agent.getId()));
-				fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
-				{
-					public void firstResultAvailable(IComponentIdentifier result)
-					{
-					}
-					
-					public void secondResultAvailable(Map<String, Object> result)
-					{
-						Object myres = result.get("myres");
-						Object myint = result.get("myint");
-						
-						if("def_val".equals(myres) && Integer.valueOf(99).equals(myint))
-						{
-							tr.setSucceeded(true);
-						}
-						else
-						{
-							tr.setFailed("Wrong result values: myres="+myres+", myint="+myint);
-						}
-						
-						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-						ret.setResult(null);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						tr.setFailed("Exception occurred: "+exception);
-						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-						ret.setResult(null);
-					}
-				});
+			}
+			
+			public void secondResultAvailable(Map<String, Object> result)
+			{
+				Object myres = result.get("myres");
+				Object myint = result.get("myint");
 				
+				if("def_val".equals(myres) && Integer.valueOf(99).equals(myint))
+				{
+					tr.setSucceeded(true);
+				}
+				else
+				{
+					tr.setFailed("Wrong result values: myres="+myres+", myint="+myint);
+				}
+				
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				tr.setFailed("Exception occurred: "+exception);
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				ret.setResult(null);
+			}
+		});
+		
 //				, agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
 //				{
 //					public void resultAvailable(Collection<Tuple2<String, Object>> results)
@@ -113,8 +107,6 @@ public class TestInjectedResultsAgent extends JunitAgentTest
 //						ret.setResult(null);
 //					}
 //				}));
-			}
-		});
 		
 		return ret;
 	}

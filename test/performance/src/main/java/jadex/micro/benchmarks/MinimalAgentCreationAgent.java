@@ -13,6 +13,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -124,9 +125,8 @@ public class MinimalAgentCreationAgent
 			args.put("num", Integer.valueOf(num+1));
 //				System.out.println("Args: "+num+" "+args);
 
-			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-			cms.createComponent(createPeerName(num+1, agent.getId()), MinimalAgentCreationAgent.this.getClass().getName()+".class",
-				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()), null);
+			agent.createComponent(null,
+				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()).setName(createPeerName(num+1, agent.getId())).setFilename(MinimalAgentCreationAgent.this.getClass().getName()+".class"), null);
 		}
 		else
 		{
@@ -275,7 +275,6 @@ public class MinimalAgentCreationAgent
 			"-cli", "false",
 //			"-awareness", "false"
 		}).get();
-		IComponentManagementService cms = ea.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		cms.createComponent(MinimalAgentCreationAgent.class.getName()+".class", null).get();
+		ea.createComponent(null, new CreationInfo().setFilename(MinimalAgentCreationAgent.class.getName()+".class")).get();
 	}	
 }

@@ -40,6 +40,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -49,6 +50,7 @@ import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.TimeoutException;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -56,6 +58,10 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.Tuple2Future;
 
 /**
  *  Standalone platform component implementation.
@@ -698,7 +704,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Map<String, Object>> killComponent()
 	{
-		return killComponent(null);
+		return killComponent((Exception)null);
 	}
 	
 	/**
@@ -709,9 +715,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 		// Only remember first exception.
 		if(exception==null && e!=null)
-		{
 			this.exception	= e;
-		}
 		IComponentManagementService cms = this.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		IFuture<Map<String, Object>> ret = cms.destroyComponent(getId());
 		return ret;
@@ -730,6 +734,15 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 //				}
 //			});
 //		}
+	}
+	
+	/**
+	 *  Kill the component.
+	 *  @param e The failure reason, if any.
+	 */
+	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid)
+	{
+		return SComponentManagementService.destroyComponent(cid, this);
 	}
 	
 	/**
@@ -1124,6 +1137,112 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid)
 	{
 		return SComponentManagementService.getExternalAccess(cid, this);
+	}
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
+	{
+		// todo: parameter for name
+		
+		if(component==null && (info==null || info.getFilename()==null))
+			return new Future<>(new RuntimeException("Component must not null."));
+		
+		final Future<IExternalAccess> ret = new Future<>();
+		
+		info = prepare(component, info);
+		
+		IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, resultlistener, this);
+		fut.addResultListener(new IResultListener<IComponentIdentifier>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+//				System.out.println("ex:"+exception);
+				ret.setException(exception);
+			}
+			
+			@Override
+			public void resultAvailable(IComponentIdentifier result)
+			{
+//				System.out.println("created: "+result);
+				SComponentManagementService.getExternalAccess(result, PlatformComponent.this).addResultListener(new DelegationResultListener<>(ret));
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info)
+	{
+		// todo: resultlistener for results?!
+		
+		if(component==null && (info==null || info.getFilename()==null))
+			return new SubscriptionIntermediateFuture<>(new RuntimeException("Component must not null."));
+		
+		info = prepare(component, info);
+		
+		return SComponentManagementService.createComponent(info, info.getName(), info.getFilename(), this);
+	}
+	
+	/**
+	 *  Create a new component on the platform.
+	 *  @param name The component name or null for automatic generation.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param info Additional start information such as parent component or arguments (optional).
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info)
+	{
+		// todo: resultlistener for results?!
+		
+		if(component==null && (info==null || info.getFilename()==null))
+			return new Tuple2Future<IComponentIdentifier, Map<String, Object>>(new RuntimeException("Component must not null."));
+				
+		info = prepare(component, info);
+		
+		return SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, this);
+	}
+	
+	/**
+	 * 
+	 * @param component
+	 * @param info
+	 * @return
+	 */
+	public CreationInfo prepare(Object component, CreationInfo info)
+	{
+		if(info==null)
+			info = new CreationInfo();
+		if(info.getParent()==null)
+			info.setParent(getId());
+		
+		String modelname = null;
+		
+		if(component instanceof String)
+		{
+			modelname = (String)component;
+			info.setFilename(modelname);
+		}
+		else if(component instanceof Class<?>)
+		{
+			modelname = ((Class<?>)component).getName()+".class";
+			info.setFilename(modelname);
+		}
+		else if(component != null)
+		{
+			modelname = component.getClass().getName()+".class";
+			info.addArgument("__pojo", component); // hack?! use constant
+			info.setFilename(modelname);
+		}
+		
+		return info;
 	}
 
 	/**

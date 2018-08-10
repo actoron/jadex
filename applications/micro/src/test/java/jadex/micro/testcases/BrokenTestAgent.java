@@ -6,9 +6,11 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -124,41 +126,34 @@ public class BrokenTestAgent extends JunitAgentTest
 	protected IFuture<Void> testBrokenComponent(final String model)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		IResultListener<Collection<Tuple2<String, Object>>> lis = new IResultListener<Collection<Tuple2<String, Object>>>()
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public void resultAvailable(Collection<Tuple2<String, Object>> result)
 			{
-				IResultListener<Collection<Tuple2<String, Object>>> lis = new IResultListener<Collection<Tuple2<String, Object>>>()
-				{
-					public void resultAvailable(Collection<Tuple2<String, Object>> result)
-					{
 //						System.out.println("res: "+result);
-						ret.setException(new RuntimeException("Terminated gracefully."));
-					}
-					public void exceptionOccurred(Exception exception)
-					{
+				ret.setException(new RuntimeException("Terminated gracefully."));
+			}
+			public void exceptionOccurred(Exception exception)
+			{
 //						System.out.println("ex: "+exception);
-						
-						// Could already have exception if init has failed.
-						if(exception instanceof TimeoutException)
-						{
-							ret.setExceptionIfUndone(exception);
-						}
-						else
-						{
-							ret.setResultIfUndone(null);
-						}
-					}
-				};
 				
-				cms.createComponent(null, model, new CreationInfo(agent.getId()), lis)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				// Could already have exception if init has failed.
+				if(exception instanceof TimeoutException)
 				{
-					public void customResultAvailable(IComponentIdentifier result)
-					{
-					}
-				});
+					ret.setExceptionIfUndone(exception);
+				}
+				else
+				{
+					ret.setResultIfUndone(null);
+				}
+			}
+		};
+		
+		agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model), lis)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+		{
+			public void customResultAvailable(IExternalAccess result)
+			{
 			}
 		});
 		return ret;

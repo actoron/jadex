@@ -10,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -40,9 +41,7 @@ public class SubResultsTestAgent extends JunitAgentTest
 	@AgentBody
 	public void body()
 	{
-		IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
-		IComponentIdentifier cid = cms.createComponent("producer", new CreationInfo(agent.getId())).getFirstResult();
-		IExternalAccess ea = cms.getExternalAccess(cid).get();
+		IExternalAccess ea = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename("producer"), null).get();
 		
 		final TestReport tr = new TestReport("#1", "Test if intermediate results are retrieved.");
 		

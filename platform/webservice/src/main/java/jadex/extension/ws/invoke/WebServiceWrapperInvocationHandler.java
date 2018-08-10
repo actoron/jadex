@@ -8,6 +8,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -67,55 +68,41 @@ class WebServiceWrapperInvocationHandler implements InvocationHandler
 	{
 		final Future<Object> ret = new Future<Object>();
 			
-//		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getService("cms");
-		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
+		CreationInfo ci = new CreationInfo(agent.getId());
+		ci.setFilename("jadex/extension/ws/invoke/WebServiceInvocationAgent.class");
+		agent.createComponent(null, ci, null)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess exta) 
 			{
-				CreationInfo ci = new CreationInfo(agent.getId());
-//				cms.createComponent(null, "invocation", ci, null)
-				cms.createComponent(null, "jadex/extension/ws/invoke/WebServiceInvocationAgent.class", ci, null)
-					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
+				exta.scheduleStep(new IComponentStep<Object>()
 				{
-					public void customResultAvailable(IComponentIdentifier cid) 
+					public IFuture<Object> execute(IInternalAccess ia)
 					{
-						cms.getExternalAccess(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
+						Future<Object> re = new Future<Object>();
+						
+						try
 						{
-							public void customResultAvailable(IExternalAccess exta) 
-							{
-								exta.scheduleStep(new IComponentStep<Object>()
-								{
-									public IFuture<Object> execute(IInternalAccess ia)
-									{
-										Future<Object> re = new Future<Object>();
-										
-										try
-										{
-											Class<?> sclass = mapping.getService();
-											Object service = sclass.newInstance();
-											Method ptm = sclass.getMethod(mapping.getPortType(), new Class[0]);
-											Object porttype = ptm.invoke(service, new Object[0]);
-											Method m = porttype.getClass().getMethod(method.getName(), method.getParameterTypes());
-											Object res = m.invoke(porttype, args);
+							Class<?> sclass = mapping.getService();
+							Object service = sclass.newInstance();
+							Method ptm = sclass.getMethod(mapping.getPortType(), new Class[0]);
+							Object porttype = ptm.invoke(service, new Object[0]);
+							Method m = porttype.getClass().getMethod(method.getName(), method.getParameterTypes());
+							Object res = m.invoke(porttype, args);
 //											System.out.println("result is: "+res);
-											re.setResult(res);
-											ia.killComponent();
-										}
-										catch(Exception e)
-										{
-											e.printStackTrace();
-											re.setException(e);
-										}
-										return re;
-									}
-								}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Object>(ret)));
-							}
-						}));
+							re.setResult(res);
+							ia.killComponent();
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+							re.setException(e);
+						}
+						return re;
 					}
-				}));
+				}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Object>(ret)));
 			}
-		});
+		}));
 			
 		return ret;
 	}

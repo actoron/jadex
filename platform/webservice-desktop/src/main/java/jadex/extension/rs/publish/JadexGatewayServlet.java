@@ -66,7 +66,6 @@ public class JadexGatewayServlet extends HttpServlet
 	    this.platform = startPlatform();
 	    ServletCallAccess.purgeServiceCalls();
 	    
-		IComponentManagementService cms = platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 //		cms.createComponent(ExternalRSPublishAgent.class.getName()+".class", null).getFirstResult();
 		this.handler = platform.searchService( new ServiceQuery<>( IRequestHandlerService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 
@@ -135,8 +134,8 @@ public class JadexGatewayServlet extends HttpServlet
 		for(Map.Entry<String, Map<String, Object>> entry: comps.entrySet())
 		{
 			String model = (String)entry.getValue().remove("__model");
-			CreationInfo cinfo = new CreationInfo(entry.getValue());
-			cms.createComponent(model, cinfo).getFirstResult();
+			CreationInfo cinfo = new CreationInfo(entry.getValue()).setFilename(model);
+			platform.createComponent(null, cinfo).getFirstResult();
 		}
 		
 		System.out.println("Found init commands: "+initcmds);

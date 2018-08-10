@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -78,13 +79,12 @@ public class MegaParallelStarterAgent
 				
 				final int max = ((Integer)args.get("max")).intValue();
 				
-				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				String model = MegaParallelCreationAgent.class.getName().replaceAll("\\.", "/")+".class";
 				for(int i=1; i<=max; i++)
 				{
 					args.put("num", Integer.valueOf(i));
-//							System.out.println("Created agent: "+i);
-					cms.createComponent(subname+"_#"+i, model, new CreationInfo(new HashMap(args), agent.getId()), 
+//					System.out.println("Created agent: "+i);
+					agent.createComponent(null, new CreationInfo(new HashMap(args), agent.getId()).setName(subname+"_#"+i).setFilename(model), 
 						agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)

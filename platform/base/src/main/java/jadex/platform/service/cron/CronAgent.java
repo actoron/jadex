@@ -320,7 +320,7 @@ public class CronAgent implements ICronService
 				{
 					CreationInfo ci = new CreationInfo(agent.getId());
 					ci.setFilename("jadex/platform/service/cron/WorkerAgent.class");
-					agent.getFeature(ISubcomponentsFeature.class).createComponent(null, ci, null)
+					agent.createComponent(null, ci, null)
 //					cms.createComponent(null, "jadex/platform/service/cron/WorkerAgent.class", ci, null)
 						.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 					{

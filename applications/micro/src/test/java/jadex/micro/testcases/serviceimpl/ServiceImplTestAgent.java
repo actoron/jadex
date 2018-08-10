@@ -4,8 +4,10 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -52,9 +54,8 @@ public class ServiceImplTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport(""+no, "Test if creating service without explicit implementation works.");
 		try
 		{
-			IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
-			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getId()), null).get();
-			IInfoService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInfoService.class).setProvider(cid)).get();
+			IExternalAccess exta = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model), null).get();
+			IInfoService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInfoService.class).setProvider(exta.getId())).get();
 			String res = ser.getInfo().get();
 			tr.setSucceeded(true);
 		}

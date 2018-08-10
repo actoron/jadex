@@ -67,14 +67,13 @@ public class ComponentStartTestLazyPlatform extends	ComponentTestLazyPlatform
 				{
 //					if(cid.getName().indexOf("ParentProcess")!=-1)
 //						System.out.println("destroying "+cid);
-					IComponentManagementService	mycms	= cms;
-					if(mycms!=null)
+					if(platform!=null)
 					{
 //						if(cid.getName().indexOf("ParentProcess")!=-1)
 //							System.out.println("destroying1 "+cid);
 						try
 						{
-							mycms.destroyComponent(cid).get();
+							platform.killComponent(cid).get();
 						}
 						catch(ComponentTerminatedException e)
 						{
@@ -86,7 +85,8 @@ public class ComponentStartTestLazyPlatform extends	ComponentTestLazyPlatform
 				}
 
 				@Override
-				public void exceptionOccurred(Exception exception) {
+				public void exceptionOccurred(Exception exception) 
+				{
 					System.err.println("COULD NOT STOP COMPONENT!! Exception:");
 					super.exceptionOccurred(exception);
 				}
@@ -101,8 +101,7 @@ public class ComponentStartTestLazyPlatform extends	ComponentTestLazyPlatform
 //				}
 //			};
 			
-			IExternalAccess	ea	= cms.getExternalAccess(cms.getRootIdentifier().get()).get();
-			ea.scheduleStep(new IComponentStep<Void>()
+			platform.scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -111,7 +110,7 @@ public class ComponentStartTestLazyPlatform extends	ComponentTestLazyPlatform
 					return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, false);
 				}
 			}).addResultListener(lis);
-			ea.scheduleStep(new IComponentStep<Void>()
+			platform.scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

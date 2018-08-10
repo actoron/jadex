@@ -6,13 +6,17 @@ import java.util.List;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Agent;
@@ -49,8 +53,6 @@ public class TesterAgent implements ITestService
 	@AgentBody
 	public void body()
 	{
-		final IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
-
 		if(agent.getConfiguration().equals("created"))
 		{
 			ITestService tsa = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(agent.getId().getParent())).get();
@@ -86,14 +88,28 @@ public class TesterAgent implements ITestService
 						ci.setResourceIdentifier(agent.getModel().getResourceIdentifier());
 						final String name =  TesterAgent.class.getName()+".class";
 						
-						IComponentIdentifier ida = cms.createComponent(name, ci).getFirstResult();
-						IComponentIdentifier idb = cms.createComponent(name, ci).getFirstResult();
+						IExternalAccess eaa = agent.createComponent(name, ci, null).get();
+						IExternalAccess eab = agent.createComponent(name, ci, null).get();
 					
-						IComponentDescription desca = cms.getComponentDescription(ida).get();
-						IComponentDescription descb = cms.getComponentDescription(ida).get();
+						IComponentDescription desca = eaa.scheduleStep(new IComponentStep<IComponentDescription>()
+						{
+							@Override
+							public IFuture<IComponentDescription> execute(IInternalAccess ia)
+							{
+								return new Future<IComponentDescription>(ia.getDescription());
+							}
+						}).get();
+						IComponentDescription descb = eaa.scheduleStep(new IComponentStep<IComponentDescription>()
+						{
+							@Override
+							public IFuture<IComponentDescription> execute(IInternalAccess ia)
+							{
+								return new Future<IComponentDescription>(ia.getDescription());
+							}
+						}).get();
 					
-						System.out.println("chain a: "+ida+" "+desca.getCause().getOrigin());
-						System.out.println("chain b: "+idb+" "+descb.getCause().getOrigin());
+						System.out.println("chain a: "+eaa+" "+desca.getCause().getOrigin());
+						System.out.println("chain b: "+eab+" "+descb.getCause().getOrigin());
 					}
 					catch(ComponentTerminatedException e)
 					{

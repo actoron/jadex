@@ -5,6 +5,7 @@ import java.util.Map;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -47,59 +48,53 @@ public class ShutdownAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(BlockAgent.class.getName()+".class"))
+			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public void firstResultAvailable(final IComponentIdentifier cid)
 			{
-//				cms.createComponent("block", new CreationInfo(agent.getComponentIdentifier()))
-				cms.createComponent(BlockAgent.class.getName()+".class", new CreationInfo(agent.getId()))
-					.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+				// call several times a blocking method on the agent and then terminate it
+				
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IBlockService.class).setProvider(cid))
+					.addResultListener(new ExceptionDelegationResultListener<IBlockService, Void>(ret)
 				{
-					public void firstResultAvailable(final IComponentIdentifier cid)
+					public void customResultAvailable(IBlockService bs)
 					{
-						// call several times a blocking method on the agent and then terminate it
+						int numBlocks = 1000;
+						if (SReflect.isAndroid()) {
+							numBlocks = 100;
+						}
+						for(int i=0; i<numBlocks; i++) {
+							bs.block(-1);
+						}
 						
-						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IBlockService.class).setProvider(cid))
-							.addResultListener(new ExceptionDelegationResultListener<IBlockService, Void>(ret)
+						agent.getFeature(IExecutionFeature.class).waitForDelay(1000).addResultListener(new DelegationResultListener<Void>(ret)
 						{
-							public void customResultAvailable(IBlockService bs)
+							public void customResultAvailable(Void result)
 							{
-								int numBlocks = 1000;
-								if (SReflect.isAndroid()) {
-									numBlocks = 100;
-								}
-								for(int i=0; i<numBlocks; i++) {
-									bs.block(-1);
-								}
-								
-								agent.getFeature(IExecutionFeature.class).waitForDelay(1000).addResultListener(new DelegationResultListener<Void>(ret)
+								agent.killComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 								{
-									public void customResultAvailable(Void result)
+									public void customResultAvailable(Map<String, Object> result)
 									{
-										cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
-										{
-											public void customResultAvailable(Map<String, Object> result)
-											{
-												System.out.println("fini1: "+result);
-											}
-										});
+										System.out.println("fini1: "+result);
 									}
 								});
 							}
 						});
 					}
-					
-					public void secondResultAvailable(Map<String, Object> result)
-					{
-						System.out.println("fini2: "+result);
+				});
+			}
+			
+			public void secondResultAvailable(Map<String, Object> result)
+			{
+				System.out.println("fini2: "+result);
 //						String model = ShutdownAgent.class.getName()+".class";
 //						cms.createComponent(model, new CreationInfo(agent.getModel().getResourceIdentifier()))
 //							.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 //						{
 //							public void firstResultAvailable(IComponentIdentifier result)
 //							{
-								agent.killComponent();
+						agent.killComponent();
 //							}
 //							
 //							public void secondResultAvailable(Map<String, Object> result)
@@ -111,13 +106,11 @@ public class ShutdownAgent
 //								System.out.println("except: "+exception);
 //							}
 //						});
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
-					}
-				});
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
 			}
 		});
 	

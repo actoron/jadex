@@ -40,8 +40,7 @@ public class MessagingTest
 		
 		// Start receiver.
 		IExternalAccess	pf_receiver	= Starter.createPlatform(config).get();		
-		IComponentManagementService	cms	= pf_receiver.searchService( new ServiceQuery<>( IComponentManagementService.class)).get();
-		IComponentIdentifier	cid_receiver	= cms.createComponent(receiver.getName()+".class", null).getFirstResult();
+		IComponentIdentifier cid_receiver = pf_receiver.createComponent(receiver.getName()+".class", null).getFirstResult();
 				
 		// Start sender with receiver CID.
 		IExternalAccess	pf_sender;
@@ -54,8 +53,7 @@ public class MessagingTest
 			// Start second platform
 			pf_sender	= Starter.createPlatform(config).get();
 		}
-		cms	= pf_sender.searchService( new ServiceQuery<>( IComponentManagementService.class)).get();
-		cms.createComponent(sender.getName()+".class",
-			new CreationInfo(Collections.singletonMap("receiver", (Object)cid_receiver))).get();
+		pf_sender.createComponent(null,
+			new CreationInfo(Collections.singletonMap("receiver", (Object)cid_receiver)).setFilename(sender.getName()+".class")).get();
 	}
 }

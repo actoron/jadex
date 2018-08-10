@@ -12,6 +12,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IPojoComponentFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -105,9 +106,9 @@ public class AgentCreationAgent
 			args.put("num", Integer.valueOf(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-			cms.createComponent(createPeerName(num+1, agent.getId()), AgentCreationAgent.this.getClass().getName()+".class",
-				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()), null);
+			agent.createComponent(null,
+				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier())
+				.setName(createPeerName(num+1, agent.getId())).setFilename(AgentCreationAgent.this.getClass().getName()+".class"), null);
 		}
 		else
 		{
@@ -256,7 +257,6 @@ public class AgentCreationAgent
 			"-cli", "false",
 //			"-awareness", "false"
 		}).get();
-		IComponentManagementService cms = ea.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		cms.createComponent(AgentCreationAgent.class.getName()+".class", null).get();
+		ea.createComponent(null, new CreationInfo().setFilename(AgentCreationAgent.class.getName()+".class")).get();
 	}	
 }

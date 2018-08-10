@@ -11,6 +11,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -48,10 +49,9 @@ public class VisibilityTestAgent extends JunitAgentTest
 		TestAgent.createComponent(agent, FirstAgent.class.getName()+".class", null, null, plat.getId(), null).get();
 		TestAgent.createComponent(agent, SecondAgent.class.getName()+".class", null, null, plat.getId(), null).get();
 		
-		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
 		Map<String,Object> args = new HashMap<String, Object>();
 		args.put("selfkill", Boolean.TRUE);
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> ag = cms.createComponent(FirstAgent.class.getName()+".class", new CreationInfo(null, args, agent.getModel().getResourceIdentifier()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> ag = agent.createComponent(FirstAgent.class.getName()+".class", new CreationInfo(null, args, agent.getModel().getResourceIdentifier()));
 		ag.addTuple2ResultListener(null, new IFunctionalResultListener<Map<String,Object>>()
 		{
 			public void resultAvailable(Map<String, Object> result)

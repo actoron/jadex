@@ -7,6 +7,7 @@ import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -60,8 +61,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 		{
 			for(int i=0; i<args.length; i++)
 			{
-				IComponentManagementService ces = (IComponentManagementService)getAgent().getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
-				ITuple2Future<IComponentIdentifier, Map<String, Object>>	ret = ces.createComponent(null, type, new CreationInfo(config, args[i], getComponentIdentifier()));
+				ITuple2Future<IComponentIdentifier, Map<String, Object>> ret = getAgent().createComponent(null, new CreationInfo(config, args[i], getComponentIdentifier()).setFilename(type));
 				IComponentIdentifier aid = (IComponentIdentifier)ret.getFirstResult();
 				agents.add(aid);
 			}

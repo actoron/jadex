@@ -1246,23 +1246,17 @@ public class TestCenterPanel extends JSplitPanel
 					
 					plugin.getJCC().setStatusText("Performing test "+name);
 					final Future	ret	= new Future();
-					plugin.getJCC().getPlatformAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-						.addResultListener(new SwingDelegationResultListener(ret)
-					{
-						public void customResultAvailable(Object result)
-						{
-							IComponentManagementService	cms	= (IComponentManagementService)result;
-							Map	args	= new HashMap();
-							args.put("timeout", timeout);
-							// Todo: Use remote component for parent if any
-							CreationInfo ci = new CreationInfo(args, plugin.getJCC().getPlatformAccess().getId());
-							ci.setResourceIdentifier(name.getSecondEntity());
-							cms.createComponent(null, name.getFirstEntity(), ci, res)
-								.addResultListener(new SwingDelegationResultListener(ret));
-							
-							// Todo: timeout -> force destroy of component
-						}
-					});
+				
+					Map	args	= new HashMap();
+					args.put("timeout", timeout);
+					// Todo: Use remote component for parent if any
+					CreationInfo ci = new CreationInfo(args, plugin.getJCC().getPlatformAccess().getId());
+					ci.setResourceIdentifier(name.getSecondEntity());
+					ci.setFilename(name.getFirstEntity());
+					plugin.getJCC().getPlatformAccess().createComponent(null, ci, res)
+						.addResultListener(new SwingDelegationResultListener(ret));
+					
+					// Todo: timeout -> force destroy of component
 					ret.addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
 						public void customResultAvailable(Object result)

@@ -1,13 +1,21 @@
 package jadex.bridge;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITuple2Future;
 
 /**
  *  Common interface for all component types.
@@ -56,6 +64,27 @@ public interface IInternalAccess
 	public IComponentDescription getDescription();
 	
 	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener);
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info);
+	
+	/**
+	 *  Create a new component on the platform.
+	 *  @param name The component name or null for automatic generation.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param info Additional start information such as parent component or arguments (optional).
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info);
+	
+	/**
 	 *  Kill the component.
 	 */
 	public IFuture<Map<String, Object>> killComponent();
@@ -65,6 +94,12 @@ public interface IInternalAccess
 	 *  @param e The failure reason, if any.
 	 */
 	public IFuture<Map<String, Object>> killComponent(Exception e);
+	
+	/**
+	 *  Kill the component.
+	 *  @param e The failure reason, if any.
+	 */
+	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid);
 	
 	/**
 	 *  Get the external access.

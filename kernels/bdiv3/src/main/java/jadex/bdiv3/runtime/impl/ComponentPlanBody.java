@@ -71,7 +71,7 @@ public class ComponentPlanBody implements IPlanBody
 		CreationInfo ci = new CreationInfo(ia.getId());
 		ci.setFilename(component);
 		
-		ia.getFeature(ISubcomponentsFeature.class).createComponent(ret, ci)
+		ia.createComponent(ret, ci)
 			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
 			@Override

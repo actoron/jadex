@@ -805,7 +805,7 @@ public class Starter
 			
 			CreationInfo ci = new CreationInfo(config, oargs);
 			ci.setName(name);
-			instance.getFeature(ISubcomponentsFeature.class).createComponent(null, ci, null)
+			instance.createComponent(null, ci, null)
 				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)

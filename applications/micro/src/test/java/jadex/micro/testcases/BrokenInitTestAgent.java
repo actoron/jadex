@@ -6,9 +6,11 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -120,42 +122,34 @@ public class BrokenInitTestAgent extends JunitAgentTest
 	protected IFuture<Void> testBrokenComponent(final String model)
 	{
 		final Future<Void>	fut1	= new Future<Void>();
-		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut1)
+		agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model), new IResultListener<Collection<Tuple2<String,Object>>>()
 		{
-			@SuppressWarnings("deprecation")
-			public void customResultAvailable(final IComponentManagementService cms)
+			// Dummy listener to avoid fatal error being printed.
+			@Override
+			public void exceptionOccurred(Exception exception){}
+			@Override					
+			public void resultAvailable(Collection<Tuple2<String,Object>> result) {};
+		})
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
+		{
+			public void resultAvailable(IExternalAccess result)
 			{
-				cms.createComponent(null, model, new CreationInfo(agent.getId()), new IResultListener<Collection<Tuple2<String,Object>>>()
-				{
-					// Dummy listener to avoid fatal error being printed.
-					@Override
-					public void exceptionOccurred(Exception exception){}
-					@Override					
-					public void resultAvailable(Collection<Tuple2<String,Object>> result) {};
-				})
-					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
-				{
-					public void resultAvailable(IComponentIdentifier result)
-					{
-						fut1.setException(new RuntimeException("Creation unexpectedly succeded."));
-						cms.destroyComponent(result);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						if(exception.getMessage().equals("Exception in init."))
-						{
-							fut1.setResult(null);
-						}
-						else
-						{
-							fut1.setException(exception);
-						}
-					}
-				}));
+				fut1.setException(new RuntimeException("Creation unexpectedly succeded."));
+				agent.killComponent(result.getId());
 			}
-		});
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception.getMessage().equals("Exception in init."))
+				{
+					fut1.setResult(null);
+				}
+				else
+				{
+					fut1.setException(exception);
+				}
+			}
+		}));
 		return fut1;
 	}
 }

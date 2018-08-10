@@ -19,6 +19,7 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -139,11 +140,11 @@ public abstract class TestAgent
 						{
 							public void customResultAvailable(final IExternalAccess exta)
 							{
-								Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+								Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 								{
-									public void customResultAvailable(IComponentIdentifier result)
+									public void customResultAvailable(IExternalAccess result)
 									{
-										exta.searchService( new ServiceQuery<>( IComponentManagementService.class))
+										exta.searchService(new ServiceQuery<>(IComponentManagementService.class))
 											.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 										{
 											public void customResultAvailable(IComponentManagementService cms2)
@@ -254,33 +255,26 @@ public abstract class TestAgent
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		IResourceIdentifier	rid	= new ResourceIdentifier(
+		new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//		boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
+//		CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
+		CreationInfo ci	= new CreationInfo(root==null? agent.getId(): root, rid);
+		ci.setArguments(args);
+		ci.setConfiguration(config);
+		ci.setFilename(filename);
+		agent.createComponent(null, ci, reslis)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				IResourceIdentifier	rid	= new ResourceIdentifier(
-					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-//				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
-//				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
-				CreationInfo ci	= new CreationInfo(root==null? agent.getId(): root, rid);
-				ci.setArguments(args);
-				ci.setConfiguration(config);
-				cms.createComponent(null, filename, ci, reslis)
-					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
-				{
-					public void customResultAvailable(IComponentIdentifier result)
-					{
-						super.customResultAvailable(result);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-						super.exceptionOccurred(exception);
-					}
-				}
-				);
+				ret.setResult(result.getId());
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+				super.exceptionOccurred(exception);
 			}
 		});
 		
@@ -353,15 +347,15 @@ public abstract class TestAgent
 //					}
 //				});
 				
-				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier result)
+					public void customResultAvailable(IExternalAccess result)
 					{
 						// inverse proxy from remote to local.
 						Starter.createProxy(exta, agent.getExternalAccess())
-							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 						{
-							public void customResultAvailable(IComponentIdentifier result)
+							public void customResultAvailable(IExternalAccess result)
 							{
 								if(filename!=null)
 								{
@@ -394,15 +388,15 @@ public abstract class TestAgent
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 				Starter.createProxy(agent.getExternalAccess(), exta)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+					.addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier result)
+					public void customResultAvailable(IExternalAccess result)
 					{
 						// inverse proxy from remote to local.
 						Starter.createProxy(exta, agent.getExternalAccess())
-							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+							.addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 						{
-							public void customResultAvailable(IComponentIdentifier result)
+							public void customResultAvailable(IExternalAccess result)
 							{
 								ret.setResult(exta);
 							}
@@ -429,7 +423,7 @@ public abstract class TestAgent
 				public void customResultAvailable(final IExternalAccess exta)
 				{
 					System.out.println("creating platform: "+cnt);
-					CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(platforms.size()*2, new DelegationResultListener<Void>(ret)
+					CounterResultListener<IExternalAccess> lis = new CounterResultListener<IExternalAccess>(platforms.size()*2, new DelegationResultListener<Void>(ret)
 					{
 						public void customResultAvailable(Void result) 
 						{

@@ -48,15 +48,14 @@ public class BDICreationTest //extends TestCase
 //			"-printpass", "false"
 			}
 			).get(timeout);
-		IComponentManagementService cms = (IComponentManagementService)platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", Integer.valueOf(1000));
-		cms.createComponent(null, "jadex.bdi.benchmarks.AgentCreation.agent.xml", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<Tuple2<String, Object>>>(fut)
+		platform.createComponent(null, new CreationInfo(args).setFilename("jadex.bdi.benchmarks.AgentCreation.agent.xml"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void customResultAvailable(IExternalAccess result)
 			{
 				// Agent created. Kill listener waits for result.
 			}
@@ -106,7 +105,6 @@ public class BDICreationTest //extends TestCase
 		}
 		
 		platform	= null;
-		cms	= null;
 		fut	= null;
 		
 //		try

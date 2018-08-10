@@ -57,9 +57,8 @@ public class DirectConnectionDemo
 		// Create proxy for remote platform such that remote services are found
 		Map<String, Object>	args = new HashMap<String, Object>();
 		args.put("component", remote_cid);
-		CreationInfo ci = new CreationInfo(args);
-		IComponentManagementService	cms	= platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredService.SCOPE_PLATFORM)).get();
-		cms.createComponent("jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
+		CreationInfo ci = new CreationInfo(args).setFilename("jadex/platform/service/remote/ProxyAgent.class");
+		platform.createComponent(null, ci).getFirstResult();
 	}
 	
 	public static void	main(String[] args)

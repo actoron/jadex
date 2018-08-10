@@ -13,10 +13,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalIntermediateFinishedListener;
@@ -233,7 +232,7 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(LazyInjectTestAgent.class.getCanonicalName() + ".class", null).getSecondResult();
+					ia.createComponent(null, new CreationInfo().setFilename(LazyInjectTestAgent.class.getCanonicalName() + ".class")).getSecondResult();
 					System.out.println("Step done.");
 					return IFuture.DONE;
 				}

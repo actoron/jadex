@@ -10,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -42,10 +43,7 @@ public class ClientMain  {
 		fut.addResultListener(access -> {
 
 			access.scheduleStep(ia -> {
-				System.out.println("Got external platform access");
-				IComponentManagementService cms = getCMS(access).get();
-				System.out.println("Got cms");
-				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut2 = cms.createComponent("CDClient", ClientAgent.class.getName() + ".class", null);
+				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut2 = access.createComponent(null, new CreationInfo().setName("CDClient").setFilename(ClientAgent.class.getName() + ".class"));
 				fut2.addTuple2ResultListener(cid -> System.out.println("Client Agent created"), SResultListener.ignoreResults());
 				return Future.getEmptyFuture();
 			});

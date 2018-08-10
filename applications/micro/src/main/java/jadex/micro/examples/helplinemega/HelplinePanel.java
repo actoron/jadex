@@ -32,6 +32,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -288,8 +289,8 @@ public class HelplinePanel extends JPanel
 				}
 				catch(ServiceNotFoundException snfe)
 				{
-					CreationInfo	ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getId());
-					ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(ci, person, HelplineAgent.class.getName()+".class")
+					CreationInfo ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getId()).setFilename(HelplineAgent.class.getName()+".class").setName(person);
+					ia.createComponentWithResults(null, ci)
 						.addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
 					{
 						@Override

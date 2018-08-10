@@ -9,8 +9,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -39,7 +38,6 @@ public class UserAgent
 	{
 //    	ThreadSuspendable sus = new ThreadSuspendable();
 		IExternalAccess plat = Starter.createPlatform(new String[]{"-gui", "false"}).get();
-		IComponentManagementService cms = plat.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		final Future<Void> fut = new Future<Void>();
 		
@@ -47,7 +45,7 @@ public class UserAgent
 		final int[] cnt = new int[1];
 		for(int i=0; i<max; i++)
 		{
-			cms.createComponent(ProviderAgent.class.getName()+".class", null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+			plat.createComponent(null, new CreationInfo().setFilename(ProviderAgent.class.getName()+".class")).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 			{
 				public void firstResultAvailable(IComponentIdentifier result)
 				{
@@ -72,6 +70,6 @@ public class UserAgent
 		
 		fut.get();
 		
-		cms.createComponent(UserAgent.class.getName()+".class", null).get();
+		plat.createComponent(null, new CreationInfo().setFilename(UserAgent.class.getName()+".class")).get();
 	}
 }

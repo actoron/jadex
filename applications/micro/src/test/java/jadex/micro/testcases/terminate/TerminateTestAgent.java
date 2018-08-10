@@ -14,6 +14,7 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -198,60 +199,53 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 
 		// Start service agent
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<TestReport>>(ret)
-		{
-			public void customResultAvailable(final IComponentManagementService cms)
+		IResourceIdentifier	rid	= new ResourceIdentifier(
+			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+		
+		agent.createComponent(null, new CreationInfo(root, rid).setFilename("jadex/micro/testcases/terminate/TerminableProviderAgent.class"), null)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
+		{	
+			public void customResultAvailable(final IExternalAccess exta)
 			{
-				IResourceIdentifier	rid	= new ResourceIdentifier(
-					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-				
-				cms.createComponent(null, "jadex/micro/testcases/terminate/TerminableProviderAgent.class", new CreationInfo(root, rid), null)
-					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
-				{	
-					public void customResultAvailable(final IComponentIdentifier cid)
+				ret.addResultListener(new IResultListener<Collection<TestReport>>()
+				{
+					public void resultAvailable(Collection<TestReport> result)
 					{
-						ret.addResultListener(new IResultListener<Collection<TestReport>>()
-						{
-							public void resultAvailable(Collection<TestReport> result)
-							{
-								cms.destroyComponent(cid);
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								cms.destroyComponent(cid);
-							}
-						});
-						
+						agent.killComponent(exta.getId());
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						agent.killComponent(exta.getId());
+					}
+				});
+				
 //						System.out.println("cid is: "+cid);
-						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITerminableService.class).setProvider(cid))
-							.addResultListener(new ExceptionDelegationResultListener<ITerminableService, Collection<TestReport>>(ret)
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITerminableService.class).setProvider(exta.getId()))
+					.addResultListener(new ExceptionDelegationResultListener<ITerminableService, Collection<TestReport>>(ret)
+				{
+					public void customResultAvailable(final ITerminableService service)
+					{
+						testTerminate(testno, service, delay).addResultListener(
+							new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
 						{
-							public void customResultAvailable(final ITerminableService service)
+							public void customResultAvailable(TestReport result)
 							{
-								testTerminate(testno, service, delay).addResultListener(
+								ret.addIntermediateResult(result);
+								testTerminateAction(testno+1, service, delay).addResultListener(
 									new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
 								{
 									public void customResultAvailable(TestReport result)
 									{
 										ret.addIntermediateResult(result);
-										testTerminateAction(testno+1, service, delay).addResultListener(
-											new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
-										{
-											public void customResultAvailable(TestReport result)
-											{
-												ret.addIntermediateResult(result);
-												ret.setFinished();
-											}
-										});
+										ret.setFinished();
 									}
 								});
 							}
 						});
 					}
-				}));
-			}	
-		});
+				});
+			}
+		}));
 		
 		return ret;
 	}

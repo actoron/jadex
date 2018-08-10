@@ -1562,6 +1562,7 @@ public class SServiceProvider
 	 *  @return External access proxy.
 	 */
 	// TODO: remove?
+	// NO!!!
 	public static IExternalAccess getExternalAccessProxy(final IInternalAccess component, final IComponentIdentifier providerid)
 	{
 		Object ret = ProxyFactory.newProxyInstance(component.getClassLoader(), 

@@ -51,12 +51,11 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.commons.IResultCommand;
@@ -140,41 +139,31 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			{
 				buswitchpeer.setEnabled(false);
 				
-				getActiveComponent().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.addResultListener(new IResultListener<IComponentManagementService>()
+				getActiveComponent().searchService( new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 				{
-					public void resultAvailable(final IComponentManagementService cms)
+					public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
 					{
-						getActiveComponent().searchService( new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-							.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
-						{
-							public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
-							{
-								cms.destroyComponent(((IService)sps).getId().getProviderId());
-								cms.createComponent("registrypeer", PeerRegistrySynchronizationAgent.class.getName()+".class", null);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								getActiveComponent().searchService( new ServiceQuery<>( IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-									.addResultListener(new IResultListener<IPeerRegistrySynchronizationService>()
-								{
-									public void resultAvailable(IPeerRegistrySynchronizationService ps)
-									{
-										cms.destroyComponent(((IService)ps).getId().getProviderId());
-										cms.createComponent("registrysuperpeer", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null);
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-									}
-								});
-							}
-						});
+						getActiveComponent().killComponent(((IService)sps).getId().getProviderId());
+						
+						getActiveComponent().createComponent(null, new CreationInfo().setFilename(PeerRegistrySynchronizationAgent.class.getName()+".class").setName("registrypeer"));
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						getActiveComponent().searchService( new ServiceQuery<>( IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+							.addResultListener(new IResultListener<IPeerRegistrySynchronizationService>()
+						{
+							public void resultAvailable(IPeerRegistrySynchronizationService ps)
+							{
+								getActiveComponent().killComponent(((IService)ps).getId().getProviderId());
+								getActiveComponent().createComponent(null, new CreationInfo().setFilename(SuperpeerRegistrySynchronizationAgent.class.getName()+".class").setName("registrysuperpeer"));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+							}
+						});
 					}
 				});
 			}

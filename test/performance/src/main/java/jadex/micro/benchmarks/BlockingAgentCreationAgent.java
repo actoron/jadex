@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -85,15 +86,14 @@ public class BlockingAgentCreationAgent
 		
 		if(num<max)
 		{
-			IComponentManagementService	cms	=  getCMS(agent);
 			Map<String, Object>	args	= new HashMap<String, Object>();
 			args.put("max", Integer.valueOf(max));
 			args.put("num", Integer.valueOf(num));
 			args.put("starttime", Long.valueOf(starttime));
 			args.put("startmem", Long.valueOf(startmem));
-			cms.createComponent(createPeerName(num+1, agent.getId()),
-				BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
-				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()), null);
+			agent.createComponent(null,
+				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
+				.setName(createPeerName(num+1, agent.getId())).setFilename(BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"), null);
 		}
 		else
 		{

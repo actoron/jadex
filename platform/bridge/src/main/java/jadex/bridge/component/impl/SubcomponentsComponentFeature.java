@@ -230,7 +230,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null);
 					ci.setName(getName(components[i], model, j+1));
 					ci.setFilename(getFilename(components[i], model));
-					getComponent().getFeature(ISubcomponentsFeature.class).createComponent(null, ci, null).addResultListener(new IResultListener<IExternalAccess>()
+					getComponent().createComponent(null, ci, null).addResultListener(new IResultListener<IExternalAccess>()
 					{
 						public void resultAvailable(IExternalAccess result) 
 						{
@@ -449,111 +449,5 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	protected boolean isExternalThread()
 	{
 		return !getComponent().getFeature(IExecutionFeature.class).isComponentThread();
-	}
-	
-	/**
-	 *  Add a new component as subcomponent of this component.
-	 *  @param component The model or pojo of the component.
-	 */
-	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
-	{
-		// todo: parameter for name
-		
-		if(component==null && (info==null || info.getFilename()==null))
-			return new Future<>(new RuntimeException("Component must not null."));
-		
-		final Future<IExternalAccess> ret = new Future<>();
-		
-		info = prepare(component, info);
-		
-		IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, resultlistener, getComponent());
-		fut.addResultListener(new IResultListener<IComponentIdentifier>()
-		{
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
-//				System.out.println("ex:"+exception);
-				ret.setException(exception);
-			}
-			
-			@Override
-			public void resultAvailable(IComponentIdentifier result)
-			{
-//				System.out.println("created: "+result);
-				SComponentManagementService.getExternalAccess(result, getComponent()).addResultListener(new DelegationResultListener<>(ret));
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Add a new component as subcomponent of this component.
-	 *  @param component The model or pojo of the component.
-	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info)
-	{
-		// todo: resultlistener for results?!
-		
-		if(component==null && (info==null || info.getFilename()==null))
-			return new SubscriptionIntermediateFuture<>(new RuntimeException("Component must not null."));
-		
-		info = prepare(component, info);
-		
-		return SComponentManagementService.createComponent(info, info.getName(), info.getFilename(), getComponent());
-	}
-	
-	/**
-	 *  Create a new component on the platform.
-	 *  @param name The component name or null for automatic generation.
-	 *  @param model The model identifier (e.g. file name).
-	 *  @param info Additional start information such as parent component or arguments (optional).
-	 *  @return The id of the component and the results after the component has been killed.
-	 */
-	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info)
-	{
-		// todo: resultlistener for results?!
-		
-		if(component==null && (info==null || info.getFilename()==null))
-			return new Tuple2Future<IComponentIdentifier, Map<String, Object>>(new RuntimeException("Component must not null."));
-				
-		info = prepare(component, info);
-		
-		return SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, getComponent());
-	}
-	
-	/**
-	 * 
-	 * @param component
-	 * @param info
-	 * @return
-	 */
-	public CreationInfo prepare(Object component, CreationInfo info)
-	{
-		if(info==null)
-			info = new CreationInfo();
-		if(info.getParent()==null)
-			info.setParent(getComponent().getId());
-		
-		String modelname = null;
-		
-		if(component instanceof String)
-		{
-			modelname = (String)component;
-			info.setFilename(modelname);
-		}
-		else if(component instanceof Class<?>)
-		{
-			modelname = ((Class<?>)component).getName()+".class";
-			info.setFilename(modelname);
-		}
-		else if(component != null)
-		{
-			modelname = component.getClass().getName()+".class";
-			info.addArgument("__pojo", component); // hack?! use constant
-			info.setFilename(modelname);
-		}
-		
-		return info;
 	}
 }

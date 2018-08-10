@@ -7,9 +7,9 @@ import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -100,9 +100,8 @@ public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 		controller.start();
 		
 //		IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class)).get();
-		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		System.out.println(cms);
-		cms.createComponent("jadex.examples.presentationtimer.display.CountdownAgent.class", null).addTuple2ResultListener(
+		agent.createComponent(null, new CreationInfo().setFilename("jadex.examples.presentationtimer.display.CountdownAgent.class")).addTuple2ResultListener(
 			t -> System.out.println(t),
 			ex -> System.out.println(ex));
 		return Future.DONE;

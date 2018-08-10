@@ -296,7 +296,7 @@ public class PlatformAgent
 				CreationInfo ci = new CreationInfo();
 				ci.setName(names.get(c));
 				ci.setFilename(c+".class");
-				IFuture<IExternalAccess> fut = agent.getFeature(ISubcomponentsFeature.class).createComponent(null, ci, null);
+				IFuture<IExternalAccess> fut = agent.createComponent(null, ci, null);
 				fut.addResultListener(
 					res -> {lis.resultAvailable(null);},
 					exception -> {lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c+".class", exception));});

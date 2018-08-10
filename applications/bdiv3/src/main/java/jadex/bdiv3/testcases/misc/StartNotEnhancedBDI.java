@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -27,7 +28,7 @@ public class StartNotEnhancedBDI	extends ConstructorsSuper
 {
 	/** The agent. */
 	@Agent
-	protected IInternalAccess	agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Agent body.
@@ -36,7 +37,6 @@ public class StartNotEnhancedBDI	extends ConstructorsSuper
 	public void	body()
 	{
 		TestReport	tr	= new TestReport("#1", "Test if constructor calls work.");
-		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
 		try
 		{
 			Class<?> cl = NotEnhancedBDI.class;
@@ -49,7 +49,7 @@ public class StartNotEnhancedBDI	extends ConstructorsSuper
 			try
 			{
 				IResourceIdentifier rid = agent.getModel().getResourceIdentifier();
-				IComponentIdentifier cid = cms.createComponent(NotEnhancedBDI.class.getName()+".class", new CreationInfo(rid)).getFirstResult();
+				IComponentIdentifier cid = agent.createComponent(null, new CreationInfo(rid).setFilename(NotEnhancedBDI.class.getName()+".class")).getFirstResult();
 				System.out.println("cid: "+cid);
 				tr.setFailed("BDI agent was created although class was not enhanced.");
 			}

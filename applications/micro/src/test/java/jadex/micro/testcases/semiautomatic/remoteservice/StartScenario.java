@@ -62,41 +62,34 @@ public class StartScenario
 				{
 					public void resultAvailable(final IExternalAccess rplat)
 					{
-						lplat.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+						rplat.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 							.addResultListener(new DefaultResultListener<IComponentManagementService>()
 						{
-							public void resultAvailable(final IComponentManagementService lcms)
+							public void resultAvailable(final IComponentManagementService rcms)
 							{
-								rplat.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-									.addResultListener(new DefaultResultListener<IComponentManagementService>()
+								rplat.createComponent(null, new CreationInfo().setName("math").setFilename("MathAgent.class"), null)
+									.addResultListener(new DefaultResultListener<IExternalAccess>()
 								{
-									public void resultAvailable(final IComponentManagementService rcms)
+									public void resultAvailable(IExternalAccess result)
 									{
-										rcms.createComponent("math", "MathAgent.class", null, null)
-											.addResultListener(new DefaultResultListener<IComponentIdentifier>()
+//										System.out.println("started remote: "+result);
+										
+										IComponentIdentifier rrms = new ComponentIdentifier("rms@remote", 
+											new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
+										
+										lplat.createComponent(null,
+											new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{rrms})).setName("proxy").setFilename("jadex.platform.service.remote.ProxyAgent.class"), null)
+											.addResultListener(new DefaultResultListener<IExternalAccess>()
 										{
-											public void resultAvailable(IComponentIdentifier result)
+											public void resultAvailable(IExternalAccess result)
 											{
-	//											System.out.println("started remote: "+result);
-												
-												IComponentIdentifier rrms = new ComponentIdentifier("rms@remote", 
-													new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
-												
-												lcms.createComponent("proxy", "jadex.platform.service.remote.ProxyAgent.class", 
-													new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{rrms})), null)
-													.addResultListener(new DefaultResultListener<IComponentIdentifier>()
+												lplat.createComponent(null, new CreationInfo().setName("user").setFilename("UserAgent.class"), new DefaultResultListener<Collection<Tuple2<String, Object>>>()
 												{
-													public void resultAvailable(IComponentIdentifier result)
+													public void resultAvailable(Collection<Tuple2<String, Object>> res)
 													{
-														lcms.createComponent("user", "UserAgent.class", null, new DefaultResultListener<Collection<Tuple2<String, Object>>>()
-														{
-															public void resultAvailable(Collection<Tuple2<String, Object>> res)
-															{
-																//System.out.println("killed local user: "+result);
-															
-																ret.setResult(new IExternalAccess[]{lplat, rplat});
-															}
-														});
+														//System.out.println("killed local user: "+result);
+													
+														ret.setResult(new IExternalAccess[]{lplat, rplat});
 													}
 												});
 											}
@@ -104,9 +97,9 @@ public class StartScenario
 									}
 								});
 							}
-						});			
+						});
 					}
-				});
+				});			
 			}
 		});
 		

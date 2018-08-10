@@ -35,13 +35,10 @@ public class BPMNStartElementsTest //extends TestCase
 		IExternalAccess	platform	= fut.get(timeout);
 		timeout	= Starter.getLocalDefaultTimeout(platform.getId());
 		
-		IComponentManagementService	cms	= (IComponentManagementService)platform.searchService( new ServiceQuery<>(IComponentManagementService.class)).get(timeout);
-
-		
 		CreationInfo ci = new CreationInfo();
 		ci.setConfiguration("Case A");
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut2	= cms.createComponent("jadex.bpmn.testcases.StartElements.bpmn2", ci);
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut2 = platform.createComponent(null, ci.setFilename("jadex.bpmn.testcases.StartElements.bpmn2"));
 		
 //		new Future<>().get(-1);
 		
@@ -53,7 +50,7 @@ public class BPMNStartElementsTest //extends TestCase
 		
 		ci = new CreationInfo();
 		ci.setConfiguration("Case B");
-		results = cms.createComponent("jadex.bpmn.testcases.StartElements.bpmn2", ci).getSecondResult();
+		results = platform.createComponent(null, ci.setFilename("jadex.bpmn.testcases.StartElements.bpmn2")).getSecondResult();
 		if (!("B".equals(results.get("result"))))
 		{
 			throw new RuntimeException("BPMN start elements tests: Results do not match, expected B, got " + results.get("result") + ".");

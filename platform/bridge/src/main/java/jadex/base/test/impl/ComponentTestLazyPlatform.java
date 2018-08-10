@@ -40,8 +40,8 @@ public class ComponentTestLazyPlatform extends TestCase
 	protected String comp;
 	//-------- attributes --------
 
-	/** The component management system. */
-	protected IComponentManagementService	cms;
+	/** The platform. */
+	protected IExternalAccess platform;
 
 	/** The platform configuration */
 	protected IPlatformConfiguration	conf;
@@ -98,28 +98,37 @@ public class ComponentTestLazyPlatform extends TestCase
 		return 1;
 	}
 
-	public void setPlatform(IExternalAccess platform, IComponentManagementService cms) {
-		this.cms = cms;
-		if ((SComponentFactory.isLoadable(platform, comp, rid).get()).booleanValue()) {
+	public void setPlatform(IExternalAccess platform)
+	{
+		this.platform = platform;
+		if((SComponentFactory.isLoadable(platform, comp, rid).get()).booleanValue())
+		{
 			boolean startable = SComponentFactory.isStartable(platform, comp, rid).get().booleanValue();
 			IModelInfo model = null;
 			model = SComponentFactory.loadModel(platform, comp, rid).get();
-			if (model != null && model.getReport() == null && startable) {
-				this.filename	= model.getFilename();
-				this.rid	= model.getResourceIdentifier();
-				Object	to	= model.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, getClass().getClassLoader());
-				if(to!=null)
+			if(model != null && model.getReport() == null && startable)
+			{
+				this.filename = model.getFilename();
+				this.rid = model.getResourceIdentifier();
+				Object to = model.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, getClass().getClassLoader());
+				if(to != null)
 				{
-					this.timeout	= ((Number)to).longValue();
+					this.timeout = ((Number)to).longValue();
 					Logger.getLogger("ComponentTest").log(Level.INFO, "using timeout: " + timeout);
-				} else {
+				}
+				else
+				{
 					this.timeout = Starter.getLocalDefaultTimeout(platform.getId());
 				}
-			} else {
+			}
+			else
+			{
 				failed = true;
 				message = "not startable: " + comp;
 			}
-		} else {
+		}
+		else
+		{
 			failed = true;
 			message = "not loadable: " + comp;
 		}
@@ -131,13 +140,10 @@ public class ComponentTestLazyPlatform extends TestCase
 	 */
 	public void runBare()
 	{
-		if (failed) {
+		if(failed)
 			fail("could not start testcase: " + comp + ", " + message);
-		}
 		if(suite!=null && suite.isAborted())
-		{
 			return;
-		}
 		
 		// Start the component.
 		final IComponentIdentifier[]	cid	= new IComponentIdentifier[1];
@@ -159,10 +165,9 @@ public class ComponentTestLazyPlatform extends TestCase
 
 					triggered[0] = true;
 					boolean	b = finished.setExceptionIfUndone(new TimeoutException(ComponentTestLazyPlatform.this+" did not finish in "+timeout+" ms."));
-					IComponentManagementService	cms	= ComponentTestLazyPlatform.this.cms;
-					if(b && cid[0]!=null && cms!=null)
+					if(b && cid[0]!=null && platform!=null)
 					{
-						cms.destroyComponent(cid[0]);
+						platform.killComponent(cid[0]);
 					}
 				}
 			}, timeout);
@@ -171,7 +176,7 @@ public class ComponentTestLazyPlatform extends TestCase
 		// Actually not needed, because create component has no timoeut (hack???)
 		 ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = platform.createComponent(null, new CreationInfo(rid).setFilename(filename));
 		componentStarted(fut);
 		fut.addResultListener(new IntermediateDefaultResultListener<TupleResult>()
 		{
@@ -216,12 +221,9 @@ public class ComponentTestLazyPlatform extends TestCase
 		
 		// cleanup platform?
 		if(conf!=null)
-		{
-			cms.destroyComponent(cms.getRootIdentifier().get(timeout, true)).get(timeout, true);
-		}
+			platform.killComponent(platform.getId().getRoot()).get(timeout, true);
 		
 		// Remove references to Jadex resources to aid GC cleanup.
-		cms	= null;
 		suite	= null;
 		
 		checkTestResults(res);	// Do last -> throws exception on failure.

@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -34,30 +35,24 @@ public class KillAgent
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		agent.createComponent(null, new CreationInfo(agent.getId()).setFilename("jadex.micro.MicroAgent.class"), null)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void resultAvailable(IExternalAccess result) 
 			{
-				cms.createComponent(null, "jadex.micro.MicroAgent.class", new CreationInfo(agent.getId()), null)
-					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
-				{
-					public void resultAvailable(IComponentIdentifier result) 
-					{
-						System.out.println("Micro agent started: "+result);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-//						exception.printStackTrace();
-					}
-				}));
-				
-				ret.setResult(null);
-				agent.killComponent();
+				System.out.println("Micro agent started: "+result);
 			}
-		});
-		return ret;
+			
+			public void exceptionOccurred(Exception exception)
+			{
+//				exception.printStackTrace();
+			}
+		}));
+		
+		ret.setResult(null);
+		agent.killComponent();
+		
+		return IFuture.DONE;
 	}
 	
 	/**
@@ -67,14 +62,13 @@ public class KillAgent
 	{
 //		ThreadSuspendable sus = new ThreadSuspendable();
 		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get();
-		IComponentManagementService cms = pl.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		for(int i=0; i<1000; i++)
 		{
-			IComponentIdentifier cid = cms.createComponent(KillAgent.class.getName()+".class", null).getFirstResult();
+			IComponentIdentifier cid = pl.createComponent(null, new CreationInfo().setFilename(KillAgent.class.getName()+".class")).getFirstResult();
 			try
 			{
-				cms.destroyComponent(cid).get();
+				pl.killComponent(cid).get();
 			}
 			catch(Exception e)
 			{

@@ -41,7 +41,8 @@ public class ComponentTest extends TestCase
 	//-------- attributes --------
 	
 	/** The component management system. */
-	protected IComponentManagementService	cms;
+//	protected IComponentManagementService	cms;
+	protected IExternalAccess platform;
 	
 	/** The platform configuration */
 	protected IPlatformConfiguration	conf;
@@ -85,9 +86,9 @@ public class ComponentTest extends TestCase
 	 *  Run on existing test suite platform.
 	 *  @param cms	The CMS of the test suite platform.
 	 */
-	public ComponentTest(IComponentManagementService cms, IModelInfo comp, IAbortableTestSuite suite)
+	public ComponentTest(IExternalAccess platform, IModelInfo comp, IAbortableTestSuite suite)
 	{
-		this.cms	= cms;
+		this.platform = platform;
 		this.filename	= comp.getFilename();
 		this.rid	= comp.getResourceIdentifier();
 		this.fullname	= comp.getFullName();
@@ -99,7 +100,7 @@ public class ComponentTest extends TestCase
 		}
 		else
 		{
-			this.timeout	= Starter.getLocalDefaultTimeout(((IService)cms).getId().getProviderId());
+			this.timeout	= Starter.getLocalDefaultTimeout(platform.getId().getRoot());
 		}
 		this.suite	= suite;		
 	}
@@ -109,7 +110,7 @@ public class ComponentTest extends TestCase
 	 *  Run on separate platform.
 	 *  @param conf	The config for the new platform.
 	 */
-	public ComponentTest(IPlatformConfiguration conf, String[] args,  File[][] dirs, IComponentManagementService cms, IModelInfo comp, IAbortableTestSuite suite)
+	public ComponentTest(IPlatformConfiguration conf, String[] args,  File[][] dirs, IExternalAccess platform, IModelInfo comp, IAbortableTestSuite suite)
 	{
 		this.conf	= conf;
 		this.args	= args;
@@ -126,7 +127,7 @@ public class ComponentTest extends TestCase
 		}
 		else
 		{
-			this.timeout	= Starter.getLocalDefaultTimeout(((IService)cms).getId().getProviderId());
+			this.timeout	= Starter.getLocalDefaultTimeout(platform.getId().getRoot());
 		}
 		this.suite	= suite;		
 	}
@@ -147,9 +148,7 @@ public class ComponentTest extends TestCase
 	public void runBare()
 	{
 		if(suite!=null && suite.isAborted())
-		{
 			return;
-		}
 		
 		// Start the component.
 		final IComponentIdentifier[]	cid	= new IComponentIdentifier[1];
@@ -171,23 +170,21 @@ public class ComponentTest extends TestCase
 
 					triggered[0] = true;
 					boolean	b = finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
-					IComponentManagementService	cms	= ComponentTest.this.cms;
-					if(b && cid[0]!=null && cms!=null)
+					if(b && cid[0]!=null && platform!=null)
 					{
-						cms.destroyComponent(cid[0]);
+						platform.killComponent(cid[0]);
 					}
 				}
 			}, timeout);
 		}
 
 		// Actually not needed, because create component has no timoeut (hack???)
-		 ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
+		ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
 		
 		if(conf!=null)
 		{
-			IExternalAccess	exta	= Starter.createPlatform(conf, args).get(timeout, true);
-			cms	= exta.searchService( new ServiceQuery<>(IComponentManagementService.class)).get(timeout, true);
-			ILibraryService	libsrv	= exta.searchService( new ServiceQuery<>(ILibraryService.class)).get(timeout, true);
+			platform = Starter.createPlatform(conf, args).get(timeout, true);
+			ILibraryService	libsrv	= platform.searchService( new ServiceQuery<>(ILibraryService.class)).get(timeout, true);
 			
 			for (int projectIndex=0; projectIndex < dirs.length; projectIndex++) {
 				File[] project = dirs[projectIndex];
@@ -220,7 +217,7 @@ public class ComponentTest extends TestCase
 			}
 		}
 		 
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(null, filename, new CreationInfo(rid));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = platform.createComponent(null, new CreationInfo(rid).setFilename(filename));
 		componentStarted(fut);
 		fut.addResultListener(new IntermediateDefaultResultListener<TupleResult>()
 		{
@@ -265,13 +262,10 @@ public class ComponentTest extends TestCase
 		
 		// cleanup platform?
 		if(conf!=null)
-		{
-			cms.destroyComponent(cms.getRootIdentifier().get(timeout, true)).get(timeout, true);
-		}
+			platform.killComponent(platform.getId().getRoot()).get(timeout, true);
 		
 		// Remove references to Jadex resources to aid GC cleanup.
-		cms	= null;
-		suite	= null;
+		suite = null;
 		
 		checkTestResults(res);	// Do last -> throws exception on failure.
 	}

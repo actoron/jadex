@@ -7,6 +7,7 @@ import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
@@ -57,7 +58,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 	/**
 	 *  Perform tests.
 	 */
-	protected IFuture<TestReport> test(final IComponentManagementService cms, final boolean local)
+	protected IFuture<TestReport> test(final IExternalAccess platform, final boolean local)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
@@ -99,9 +100,9 @@ public class ServiceQueriesTestAgent extends TestAgent
 				
 				public void intermediateResultAvailable(IExampleService result)
 				{
-					System.out.println("received: "+result+" "+cms.getRootIdentifier().get()+" "+((IService)result).getId().getProviderId().getRoot());
+					System.out.println("received: "+result+" "+platform.getId().getRoot()+" "+((IService)result).getId().getProviderId().getRoot());
 					System.out.println("thread: " + IComponentIdentifier.LOCAL.get() +" on comp thread: " + agent.getFeature0(IExecutionFeature.class).isComponentThread());
-					if(cms.getRootIdentifier().get().equals(((IService)result).getId().getProviderId().getRoot()))
+					if(platform.getId().getRoot().equals(((IService)result).getId().getProviderId().getRoot()))
 					{
 						num++;
 					}
@@ -118,12 +119,12 @@ public class ServiceQueriesTestAgent extends TestAgent
 			});
 
 			// The creation info is important to be able to resolve the class/model
-			CreationInfo ci = ((IService)cms).getId().getProviderId().getPlatformName().equals(agent.getId().getPlatformName())
+			CreationInfo ci = platform.getId().getPlatformName().equals(agent.getId().getPlatformName())
 				? new CreationInfo(agent.getId(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
 
 			for(int i=0; i<cnt; i++)
 			{
-				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", ci);
+				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = platform.createComponent(null, ci.setFilename(ProviderAgent.class.getName()+".class"));
 				cids[i] = fut.getFirstResult(Starter.getRemoteDefaultTimeout(agent.getId()), true);
 			}
 			
@@ -149,7 +150,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 			{
 				for(int i=0; i<cids.length; i++)
 				{
-					cms.destroyComponent(cids[i]).get();
+					platform.killComponent(cids[i]).get();
 				}
 			}
 			catch(Exception e)

@@ -11,6 +11,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
@@ -102,17 +103,16 @@ public class EchoChatAgent
 	public static void main(String[] args)
 	{
 		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get();
-		IComponentManagementService cms = pl.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		for(int i=0; i<10000; i++)
 		{
 			System.out.print(".");
 			if(i%100==0)
 				System.out.println("\n "+i+": ");
-			IComponentIdentifier cid = cms.createComponent(EchoChatAgent.class.getName()+".class", null).getFirstResult();
+			IComponentIdentifier cid = pl.createComponent(null, new CreationInfo().setFilename(EchoChatAgent.class.getName()+".class")).getFirstResult();
 			try
 			{
-				cms.destroyComponent(cid).get();
+				pl.killComponent(cid).get();
 			}
 			catch(Exception e)
 			{

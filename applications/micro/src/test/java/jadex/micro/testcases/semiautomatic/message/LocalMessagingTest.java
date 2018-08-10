@@ -7,6 +7,7 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -29,12 +30,11 @@ public class LocalMessagingTest
 //		Starter.createPlatform(config).get();
 		
 		final IExternalAccess	access	= Starter.createPlatform(config).get();
-		IComponentManagementService	cms	= access.searchService( new ServiceQuery<>( IComponentManagementService.class)).get();
 		//cms.createComponent(SenderAgent.class.getName()+".class",
-		cms.createComponent(BenchmarkAgent.class.getName()+".class",
+		access.createComponent(null,
 			new CreationInfo(new HashMap<String, Object>(){{
 				put("receiver", (Object)new BasicComponentIdentifier("Receiver", access.getId()));
 				put("count", 100000);
-			}})).get();
+			}}).setFilename(BenchmarkAgent.class.getName()+".class")).get();
 	}
 }

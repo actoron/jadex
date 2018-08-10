@@ -46,6 +46,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
@@ -1236,45 +1237,38 @@ public class RestWebSocket extends Endpoint
 					{
 						session.getUserProperties().put(key, ret);
 
-						platform.searchService(new ServiceQuery<>(IComponentManagementService.class))
-							.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+						platform.createComponent(null, new CreationInfo().setFilename(filename)).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 						{
-							public void customResultAvailable(final IComponentManagementService cms)
+							public void firstResultAvailable(IComponentIdentifier cid)
 							{
-								cms.createComponent(filename, null).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+								platform.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+							}
+
+							public void secondResultAvailable(Map<String, Object> result)
+							{
+								try
 								{
-									public void firstResultAvailable(IComponentIdentifier cid)
-									{
-										cms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
-									}
+									session.getUserProperties().remove(key);
+								}
+								catch(IllegalStateException e)
+								{
+									// nop when session is already closed
+								}
+								catch(Exception e)
+								{
+//										System.out.println("Could not remove component from session: "+key);
+									System.out.println("Could not remove component from session: "+key);
+									e.printStackTrace();
+								}
+							}
 
-									public void secondResultAvailable(Map<String, Object> result)
-									{
-										try
-										{
-											session.getUserProperties().remove(key);
-										}
-										catch(IllegalStateException e)
-										{
-											// nop when session is already closed
-										}
-										catch(Exception e)
-										{
-	//										System.out.println("Could not remove component from session: "+key);
-											System.out.println("Could not remove component from session: "+key);
-											e.printStackTrace();
-										}
-									}
-
-									public void exceptionOccurred(Exception exception)
-									{
-										if(!ret.setExceptionIfUndone(exception))
-										{
-											System.out.println("Exception in session component");
-											exception.printStackTrace();
-										}
-									}
-								});
+							public void exceptionOccurred(Exception exception)
+							{
+								if(!ret.setExceptionIfUndone(exception))
+								{
+									System.out.println("Exception in session component");
+									exception.printStackTrace();
+								}
 							}
 						});
 					}

@@ -325,18 +325,17 @@ public class HelplineEvaluation
 			// Wait for CPU idle before starting measurement
 			while(getProcessCpuLoad()>0.1)
 				Thread.sleep(500);
-			FutureBarrier<IComponentIdentifier>	fubar	= new FutureBarrier<IComponentIdentifier>();
+			FutureBarrier<IExternalAccess>	fubar	= new FutureBarrier<IExternalAccess>();
 			long start	= System.nanoTime();
 			for(int i=0; i<platforms.length; i++)
 			{
-				IComponentManagementService	cms	= platforms[i].searchService( new ServiceQuery<>( IComponentManagementService.class)).get();
 				for(int j=0; j<cnt/measurecnt; j++)
 				{
 					int num	= multi
 						? m*cnt/measurecnt + j	// multi: same person numbers used on for all platforms.
 						: numpersons + m*platforms.length + i*cnt/measurecnt + j;	// single: different person numbers for each platform
-					fubar.addFuture(cms.createComponent(null, HelplineAgent.class.getName()+".class",
-						new CreationInfo(Collections.singletonMap("person", (Object)("person"+num))), null));
+					fubar.addFuture(platforms[i].createComponent(null,
+						new CreationInfo(Collections.singletonMap("person", (Object)("person"+num))).setFilename(HelplineAgent.class.getName()+".class"), null));
 				}
 			}
 			fubar.waitFor().get();

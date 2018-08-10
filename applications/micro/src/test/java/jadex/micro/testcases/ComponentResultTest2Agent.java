@@ -6,9 +6,11 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -98,36 +100,28 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 	protected IFuture<Void> testComponentResult(final String config, final String expected)
 	{
 		final Future<Void>	fut	= new Future<Void>();
-		agent.getFeature(IRequiredServicesFeature.class).getService("cms").addResultListener(new ExceptionDelegationResultListener<Object, Void>(fut)
+		agent.createComponent(null, new CreationInfo(config, null, agent.getId()).setFilename("jadex/micro/testcases/Result.component.xml"), null)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(fut)
 		{
-			@SuppressWarnings("deprecation")
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				final IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.createComponent(null, "jadex/micro/testcases/Result.component.xml", new CreationInfo(config, null, agent.getId()), null)
-					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
+				agent.killComponent(result.getId())
+					.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(fut)
 				{
-					public void customResultAvailable(IComponentIdentifier result)
+					public void customResultAvailable(Map<String, Object> results)
 					{
-						cms.destroyComponent(result)
-							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(fut)
+						if(results!=null && SUtil.equals(results.get("res"), expected))
 						{
-							public void customResultAvailable(Map<String, Object> results)
-							{
-								if(results!=null && SUtil.equals(results.get("res"), expected))
-								{
-									fut.setResult(null);
-								}
-								else
-								{
-									throw new RuntimeException("Results do not match, expected res="+expected+" but got: "+results);
-								}
-							}
-						});
-					}					
-				}));
-			}
-		});
+							fut.setResult(null);
+						}
+						else
+						{
+							throw new RuntimeException("Results do not match, expected res="+expected+" but got: "+results);
+						}
+					}
+				});
+			}					
+		}));
 		return fut;
 	}
 }

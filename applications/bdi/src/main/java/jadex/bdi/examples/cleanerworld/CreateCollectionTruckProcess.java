@@ -89,70 +89,35 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				final Map<String, Object> params = new HashMap<String, Object>();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
-				space.getExternalAccess().searchService( new ServiceQuery<>(IComponentManagementService.class))
-					.addResultListener(new DefaultResultListener<IComponentManagementService>()
+				IFuture<IExternalAccess> ret = space.getExternalAccess().createComponent(null,
+					new CreationInfo(null, params, space.getExternalAccess().getId(), null, null, null, null, null, null, null, space.getExternalAccess().getModel().getAllImports(), null, null).setName("Truck"), null);
+				
+				IResultListener<IExternalAccess> lis = new IResultListener<IExternalAccess>()
 				{
-					public void resultAvailable(final IComponentManagementService cms)
+					public void exceptionOccurred(Exception exception)
 					{
-						IFuture<IComponentIdentifier> ret = cms.createComponent(null, "Truck",
-							new CreationInfo(null, params, space.getExternalAccess().getId(), null, null, null, null, null, null, null, space.getExternalAccess().getModel().getAllImports(), null, null), null);
-						
-						IResultListener<IComponentIdentifier> lis = new IResultListener<IComponentIdentifier>()
-						{
-							public void exceptionOccurred(Exception exception)
-							{
-							}
-							public void resultAvailable(IComponentIdentifier truck)
-							{
-								cms.getExternalAccess(truck).addResultListener(new IResultListener<IExternalAccess>()
-								{
-									public void exceptionOccurred(Exception exception)
-									{
-									}
-									public void resultAvailable(IExternalAccess ex)
-									{
-										ex.scheduleStep(new IComponentStep<Void>()
-										{
-											@Classname("rem")
-											public IFuture<Void> execute(IInternalAccess ia)
-											{
-//												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//												bia.addComponentListener(new TerminationAdapter()
-//												{
-//													public void componentTerminated()
-//													{
-//														ongoing.removeAll(todo);
-//													}
-//												});
-												
-												ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
-													.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
-												{
-													public void intermediateResultAvailable(IMonitoringEvent result)
-													{
-														ongoing.removeAll(todo);
-													}
-												}));
-												return IFuture.DONE;
-											}
-										});
-//										ex.addAgentListener(new IAgentListener()
-//										{
-//											public void agentTerminated(AgentEvent ae)
-//											{
-//												ongoing.removeAll(todo);
-//											}
-//											public void agentTerminating(AgentEvent ae)
-//											{
-//											}
-//										});
-									}
-								});
-							}
-						};
-						ret.addResultListener(lis);
 					}
-				});
+					public void resultAvailable(IExternalAccess ea)
+					{
+						ea.scheduleStep(new IComponentStep<Void>()
+						{
+							@Classname("rem")
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+									.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
+								{
+									public void intermediateResultAvailable(IMonitoringEvent result)
+									{
+										ongoing.removeAll(todo);
+									}
+								}));
+								return IFuture.DONE;
+							}
+						});
+					}
+				};
+				ret.addResultListener(lis);
 			}
 		}
 	}

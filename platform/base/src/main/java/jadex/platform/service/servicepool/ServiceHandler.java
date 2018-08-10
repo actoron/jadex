@@ -18,6 +18,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -172,55 +173,36 @@ public class ServiceHandler implements InvocationHandler
 	{
 		final Future<IService> ret = new Future<IService>();
 		
-		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IService>(ret)
+		CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
+		ci.setParent(component.getId());
+		ci.setImports(component.getModel().getAllImports());
+		// Worker services are exposed with scope parent only to hinder others finding directly the worker services
+		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
+		ci.setFilename(componentname);
+		
+		component.createComponent(null, ci, null)
+			.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IService>(ret)
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess ea)
 			{
-				CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
-				ci.setParent(component.getId());
-				ci.setImports(component.getModel().getAllImports());
-				// Worker services are exposed with scope parent only to hinder others finding directly the worker services
-				ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
-				cms.createComponent(null, componentname, ci, null)
-					.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IService>(ret)
+				Future<IService> fut = (Future<IService>)ea.searchService(new ServiceQuery<>(servicetype, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
+				fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IService>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier result)
+					public void customResultAvailable(IService ser)
 					{
-	//					System.out.println("created: "+result);
-						cms.getExternalAccess(result)
-							.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IService>(ret)
-						{
-							public void customResultAvailable(IExternalAccess ea)
-							{
-								Future<IService> fut = (Future<IService>)ea.searchService( new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
-								fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IService>(ret)
-								{
-									public void customResultAvailable(IService ser)
-									{
-										allservices.add(ser);
-										addFreeService(ser);
-										ret.setResult(ser);
-									}
-								}));
-							}
-							
-	//						public void exceptionOccurred(Exception exception)
-	//						{
-	//							System.out.println("method: "+method+" "+args+" "+sc);
-	//							super.exceptionOccurred(exception);
-	//						}
-						}));
-					};
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-						super.exceptionOccurred(exception);
+						allservices.add(ser);
+						addFreeService(ser);
+						ret.setResult(ser);
 					}
 				}));
 			}
-		});
+					
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+				super.exceptionOccurred(exception);
+			}
+		}));
 		
 		return ret;
 	}

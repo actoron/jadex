@@ -16,6 +16,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.cpu.CoreNumberProperty;
 import jadex.bridge.sensor.memory.MaxMemoryProperty;
@@ -32,6 +33,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.IAutoConfigRegistryService;
 import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
@@ -583,9 +585,11 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		
 		if(spser==null)
 		{
-			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-			cms.createComponent("spreg", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null).
-				addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+//			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			CreationInfo ci = new CreationInfo().setName("spreg").setFilename(SuperpeerRegistrySynchronizationAgent.class.getName()+".class");
+			
+			agent.createComponent(null, ci)
+				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 			{
 				public void firstResultAvailable(IComponentIdentifier result)
 				{
@@ -630,9 +634,10 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		
 		if(pser==null)
 		{
-			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-			cms.createComponent("peerreg",PeerRegistrySynchronizationAgent.class.getName()+".class", null).
-				addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+			CreationInfo ci = new CreationInfo().setName("peerreg").setFilename(PeerRegistrySynchronizationAgent.class.getName()+".class");
+			
+			agent.createComponent(null, ci)	
+				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 			{
 				public void firstResultAvailable(IComponentIdentifier result)
 				{

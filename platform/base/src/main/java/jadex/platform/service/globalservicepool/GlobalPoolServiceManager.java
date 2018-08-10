@@ -14,10 +14,12 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -402,7 +404,6 @@ public class GlobalPoolServiceManager
 			public void intermediateResultAvailable(final IComponentManagementService cms) 
 			{
 //				System.out.println("create service on: "+cms+" "+component.getComponentIdentifier().getRoot()+" "+freeplatforms);
-			
 				if(strategy.isCreateWorkerOn(((IService)cms).getId().getProviderId().getRoot()) 
 					&& creating[0]++<n)
 				{
@@ -420,55 +421,35 @@ public class GlobalPoolServiceManager
 					Map<String, Object> args = new HashMap<String, Object>();
 					args.put("serviceinfos", new PoolServiceInfo[]{psi});
 					ci.setArguments(args);
+					ci.setFilename(ServicePoolAgent.class.getName()+".class");
 					
-					cms.createComponent(null, ServicePoolAgent.class.getName()+".class", ci, null)
+					IExternalAccess ea = SServiceProvider.getExternalAccessProxy(component, ((IService)cms).getId().getProviderId());
+					ea.createComponent(null, ci, null)
 //					cms.createComponent(null, componentname, ci, null)
-						.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentIdentifier>()
+						.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
 					{
-						public void resultAvailable(IComponentIdentifier result)
+						public void resultAvailable(IExternalAccess ea)
 						{
-//							System.out.println("created: "+result);
-							cms.getExternalAccess(result)
-								.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
+							Future<IService> fut = (Future<IService>)ea.searchService( new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
+							fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IService>()
 							{
-								public void resultAvailable(IExternalAccess ea)
+								public void resultAvailable(final IService ser)
 								{
-									Future<IService> fut = (Future<IService>)ea.searchService( new ServiceQuery<>( servicetype, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
-									fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IService>()
+									// update worker infos
+									updateServiceAdded(ser);
+									
+									updateWorkerTimer(ser.getId()).addResultListener(new IResultListener<Void>() 
 									{
-										public void resultAvailable(final IService ser)
+										public void resultAvailable(Void result) 
 										{
-											// update worker infos
-											updateServiceAdded(ser);
-//											services.put(ser.getId(), ser);
-//											IComponentIdentifier cid = ser.getId().getProviderId().getRoot();
-//											PlatformInfo pi = platforms.get(cid);
-//											pi.setWorker(ser);
-//											strategy.workersAdded(cid);
-											
-											updateWorkerTimer(ser.getId()).addResultListener(new IResultListener<Void>() 
+											// added in updateWorkerTimer
+											ret.addIntermediateResult(ser);
+											if(++created[0]==n || created[0]==creating[0] && fini)
 											{
-												public void resultAvailable(Void result) 
-												{
-													// added in updateWorkerTimer
-													ret.addIntermediateResult(ser);
-													if(++created[0]==n || created[0]==creating[0] && fini)
-													{
-														ret.setFinished();
-													}
-												}
-												
-												public void exceptionOccurred(Exception exception) 
-												{
-													exception.printStackTrace();
-													if(created[0]++==n)
-													{
-														ret.setFinished();
-													}
-												}
-											});
+												ret.setFinished();
+											}
 										}
-
+										
 										public void exceptionOccurred(Exception exception) 
 										{
 											exception.printStackTrace();
@@ -477,10 +458,10 @@ public class GlobalPoolServiceManager
 												ret.setFinished();
 											}
 										}
-									}));
+									});
 								}
-								
-								public void exceptionOccurred(Exception exception)
+
+								public void exceptionOccurred(Exception exception) 
 								{
 									exception.printStackTrace();
 									if(created[0]++==n)
@@ -489,7 +470,7 @@ public class GlobalPoolServiceManager
 									}
 								}
 							}));
-						};
+						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
@@ -500,7 +481,7 @@ public class GlobalPoolServiceManager
 							}
 						}
 					}));
-				}
+				};
 			}
 
 			public void finished() 
@@ -523,7 +504,7 @@ public class GlobalPoolServiceManager
 			
 			public void exceptionOccurred(Exception exception) 
 			{
-//				ret.setException(exception);
+		//		ret.setException(exception);
 				ret.setFinished();
 			}
 		});

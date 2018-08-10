@@ -282,7 +282,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						CreationInfo ci = new CreationInfo(agent.getId());
 						ci.setFilename(f.getFirstEntity()+".class");
 						
-						agent.getFeature(ISubcomponentsFeature.class).createComponent(null, ci, new IResultListener<Collection<Tuple2<String, Object>>>()
+						agent.createComponent(null, ci, new IResultListener<Collection<Tuple2<String, Object>>>()
 						{
 							public void resultAvailable(Collection<Tuple2<String, Object>> result)
 							{

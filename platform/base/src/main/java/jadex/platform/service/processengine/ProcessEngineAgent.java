@@ -19,6 +19,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -514,60 +515,49 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		
 		Tuple2<String, IResourceIdentifier> model = new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid());
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentManagementService>()
+		CreationInfo info = new CreationInfo(agent.getId(), det.getRid());
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
+		info.setArguments(args);
+		info.setFilename(det.getModel());
+		
+		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = agent.createComponentWithResults(null, info);
+		fut.addResultListener(new ConversionListener(new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid()), det.getFuture())); // Add converion listener for addmodel() future 
+		
+		fut.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 		{
-			public void resultAvailable(IComponentManagementService cms)
+			public void intermediateResultAvailable(CMSStatusEvent result)
 			{
-				CreationInfo info = new CreationInfo(agent.getId(), det.getRid());
-				Map<String, Object> args = new HashMap<String, Object>();
-				args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
-				info.setArguments(args);
-	
-				ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, null, det.getModel());
-				fut.addResultListener(new ConversionListener(new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid()), det.getFuture())); // Add converion listener for addmodel() future 
-				
-				fut.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				if(result instanceof CMSCreatedEvent)
 				{
-					public void intermediateResultAvailable(CMSStatusEvent result)
-					{
-						if(result instanceof CMSCreatedEvent)
-						{
 //							System.out.println("created: "+result);
-							cont();
-						}
-					}
-					
-					public void resultAvailable(Collection<CMSStatusEvent> result)
-					{
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-						cont();
-					}
-					
-					public void finished()
-					{
-					}
-					
-					protected void cont()
-					{
-						if(creating.remove(ret))
-						{
-							ret.setResult(null);
-//							System.out.println("creating fini");
-						}
-					}
-				});
+					cont();
+				}
+			}
+			
+			public void resultAvailable(Collection<CMSStatusEvent> result)
+			{
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				exception.printStackTrace();
+				cont();
 			}
-		}));
+			
+			public void finished()
+			{
+			}
+			
+			protected void cont()
+			{
+				if(creating.remove(ret))
+				{
+					ret.setResult(null);
+//							System.out.println("creating fini");
+				}
+			}
+		});
 		
 		return ret;
 	}

@@ -52,7 +52,6 @@ public class RemoteMessagingTest
 //		config2.setNetworkName("remotemessagetest");
 //		config2.setNetworkPass(key);
 		IExternalAccess	access2	= Starter.createPlatform(config2).get();
-		IComponentManagementService	cms	= access2.searchService( new ServiceQuery<>( IComponentManagementService.class)).get();
 
 		// Add addresses of first platform to second
 //		TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(access2.getComponentIdentifier());
@@ -65,7 +64,7 @@ public class RemoteMessagingTest
 		
 		// Start sender with receiver CID on remote platform.
 //		cms.createComponent(SenderAgent.class.getName()+".class",
-		cms.createComponent(BenchmarkAgent.class.getName()+".class",
+		access2.createComponent(BenchmarkAgent.class.getName()+".class",
 			new CreationInfo(Collections.singletonMap("receiver",
 				(Object)new BasicComponentIdentifier("Receiver", access1.getId())))).get();
 	}
