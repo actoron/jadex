@@ -135,7 +135,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	
 	/** Delay of keepalive messages. */
 	@AgentArgument
-	protected long keepaliveinterval = 3000;
+	protected long keepaliveinterval = 30000;
 	
 	/** Set to true for more verbose output. */
 	@AgentArgument
@@ -164,6 +164,12 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	
 	/** Routing information (target platform / next route hop + cost). */
 	protected LRU<IComponentIdentifier, Tuple2<IComponentIdentifier, Integer>> routes;
+	
+	/** Update future to shorten timeout when keepalive update happens. */
+	protected Future<Void> keepaliveupdatefuture = new Future<>();
+	
+	/** Update future to shorten timeout when query update happens. */
+	protected Future<Void> queryupdatefuture = new Future<>();
 	
 	/**
 	 *  Creates the agent.
@@ -202,6 +208,10 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			public void intermediateResultAvailable(IRoutingService result)
 			{
 				relays.add(((IService) result).getId().getProviderId().getRoot());
+				if (debug)
+					System.out.println("Got query update, releasing wait future.");
+				queryupdatefuture.setResult(null);
+				queryupdatefuture = new Future<>();
 			}
 
 			public void resultAvailable(Collection<IRoutingService> result)
@@ -302,6 +312,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 											System.out.println("Got answer " + id);
 										if (keepaliveconnections.size() < keepalivecount)
 											keepaliveconnections.add(id);
+										keepaliveupdatefuture.setResult(null);
+										keepaliveupdatefuture = new Future<>();
 									}
 									
 									public void exceptionOccurred(Exception exception)
@@ -329,7 +341,21 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 								});
 							}
 						}
-						agent.getFeature(IExecutionFeature.class).waitForDelay(keepaliveinterval >>> 1, this, true);
+						if (keepaliveconnections.size() < keepalivecount)
+						{
+							try
+							{
+								queryupdatefuture.get(keepaliveinterval, true);
+								agent.getFeature(IExecutionFeature.class).scheduleStep(this);
+							}
+							catch (Exception e)
+							{
+							}
+						}
+						else
+						{
+							agent.getFeature(IExecutionFeature.class).waitForDelay(keepaliveinterval >>> 1, this, true);
+						}
 						return IFuture.DONE;
 					}
 				};
@@ -597,9 +623,29 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				final Map<IComponentIdentifier, IRoutingService> routingservices = new HashMap<IComponentIdentifier, IRoutingService>();
 				Collection<IComponentIdentifier> rls = null;
 				if (forwarding)
+				{
 					rls = relays;
+				}
 				else
+				{
+					if (keepaliveconnections.size() == 0)
+					{
+						if (debug)
+							System.out.println(agent + ": Relays is 0, waiting for query update.");
+						try
+						{
+							keepaliveupdatefuture.get(MAX_ROUTING_SERVICE_DELAY, true);
+						}
+						catch (Exception e)
+						{
+							e.printStackTrace();
+						}
+						if (debug)
+							System.out.println(agent + ": Relays was 0, now:" + relays.size());
+					}
+					
 					rls = keepaliveconnections;
+				}
 				
 				for (IComponentIdentifier relayid : rls)
 				{
