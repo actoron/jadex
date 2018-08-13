@@ -565,8 +565,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									
 									// Local query uses registry directly (w/o feature) -> only service identifiers needed and also removed events
 									localquery = ServiceRegistry.getRegistry(agent.getId())
-										.addQuery(new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>)null, RequiredServiceInfo.SCOPE_PLATFORM)
-											.setNetworkNames(networkname).setReturnType(ServiceEvent.CLASSINFO)
+										.addQuery(new ServiceQuery<>((Class<IServiceIdentifier>)null, RequiredServiceInfo.SCOPE_PLATFORM)
+											.setNetworkNames(networkname).setEventMode()
 											.setOwner(agent.getId()));
 									localquery.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
 									{
@@ -944,7 +944,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								{
 									// Forward result to user query
 									Object res = result;
-									if (ServiceEvent.CLASSINFO.equals(query.getReturnType()))
+									if (query.isEventMode())
 										res = new ServiceEvent(result, ServiceEvent.SERVICE_ADDED);
 									
 									SubscriptionIntermediateFuture rawfut = retfut;

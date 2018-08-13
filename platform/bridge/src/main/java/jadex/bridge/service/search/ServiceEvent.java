@@ -9,9 +9,6 @@ import jadex.bridge.ClassInfo;
  */
 public class ServiceEvent<T>
 {
-	/** Class info of the ServiceEvent type. */
-	public static final ClassInfo CLASSINFO = new ClassInfo(ServiceEvent.class);
-	
 	/** Service was added event. */
 	public static final int SERVICE_ADDED = 0;
 	
