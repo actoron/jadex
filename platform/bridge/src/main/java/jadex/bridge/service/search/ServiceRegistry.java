@@ -513,7 +513,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			
 			for (IServiceIdentifier ser : SUtil.notNull(sers))
 			{
-				dispatchQueryEvent(ret, ser, ServiceEvent.SERVICE_ADDED);
+				if (checkRestrictions(query, ser))
+				{
+					dispatchQueryEvent(ret, ser, ServiceEvent.SERVICE_ADDED);
+				}
 			}
 		}
 		
