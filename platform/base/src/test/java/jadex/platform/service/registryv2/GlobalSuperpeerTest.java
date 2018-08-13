@@ -1,11 +1,16 @@
 package jadex.platform.service.registryv2;
 
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.registryv2.ISuperpeerService;
 import jadex.commons.security.PemKeyPair;
 import jadex.commons.security.SSecurity;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
@@ -48,6 +53,7 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 			
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client_*");
+//		CLIENTCONF.setLogging(true);
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(ProviderAgent.class);
@@ -84,19 +90,37 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 //	}
 	
 	/**
-	 *  Test connection.
+	 *  Test if local SP connects to SSP.
 	 */
 	@Test
-	public void testConnection()
+	public void testSPConnection()
 	{
 		IExternalAccess	relay	= createPlatform(RELAYCONF);
 		IExternalAccess	sp	= createPlatform(SPCONF);
-		IExternalAccess	client	= createPlatform(CLIENTCONF);
 		
 		// All connect to relay.
-		waitForSuperpeerConnections(relay, sp, client);
+		waitForSuperpeerConnections(relay, relay, sp);
 		
-		// Client connect to local SP.
-//		waitForSuperpeerConnections(sp, client);
+		// Should be able to find sp in ssp.
+		ISuperpeerService	sps	= relay.searchService(new ServiceQuery<>(ISuperpeerService.class)).get();
+		IServiceIdentifier	localsps	= sps.searchService(new ServiceQuery<>(ISuperpeerService.class, RequiredServiceInfo.SCOPE_GLOBAL).setNetworkNames(STest.testnetwork_name)).get();
+		Assert.assertNotNull("find local sp using ssp", localsps);
 	}
+	
+//	/**
+//	 *  Test if client can find local SP by using SSP.
+//	 */
+//	@Test
+//	public void testClientConnection()
+//	{
+//		IExternalAccess	relay	= createPlatform(RELAYCONF);
+//		IExternalAccess	sp	= createPlatform(SPCONF);
+//		IExternalAccess	client	= createPlatform(CLIENTCONF);
+//		
+//		// All connect to relay.
+//		waitForSuperpeerConnections(relay, relay, sp, client);
+//		
+//		// Client and local SP connect to local SP.
+//		waitForSuperpeerConnections(sp, sp, client);
+//	}
 }
