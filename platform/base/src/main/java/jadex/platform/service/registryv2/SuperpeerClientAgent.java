@@ -1,6 +1,7 @@
 package jadex.platform.service.registryv2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -178,10 +179,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
-		// TODO: search all if networks==null???
-		for(String networkname: query.getNetworkNames()!=null
-			? query.getNetworkNames()
-			: connections.keySet().toArray(new String[connections.size()]))
+		for(String networkname : getQueryNetworks(query, connections.keySet()))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -266,10 +264,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
-		// TODO: search all if networks==null???
-		for(String networkname: query.getNetworkNames()!=null
-			? query.getNetworkNames()
-			: connections.keySet().toArray(new String[connections.size()]))
+		for(String networkname : getQueryNetworks(query, connections.keySet()))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -440,6 +435,33 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Gets the networks relevant to the query.
+	 * 
+	 *  @param query The query.
+	 *  @return The relevant networks, may be empty for none.
+	 */
+	public static final String[] getQueryNetworks(ServiceQuery<?> query, Set<String> availablenetworks)
+	{
+		Set<String> retset = new HashSet<>();
+		if (query.getNetworkNames() != null)
+		{
+			retset.addAll(Arrays.asList(query.getNetworkNames()));
+			if (RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()) ||
+				RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope()))
+					retset.add(GLOBAL_NETWORK_NAME);
+		}
+		else
+		{
+			retset.addAll(availablenetworks);
+			if (!RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()) &&
+				!RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope()))
+				retset.remove(GLOBAL_NETWORK_NAME);
+		}
+		
+		return retset.toArray(new String[retset.size()]);
 	}
 	
 	//-------- helper classes --------
@@ -833,9 +855,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			
 			// Start handling
 			// TODO: search all if networks==null???
-			String[]	networknames	= query.getNetworkNames()!=null
-				? query.getNetworkNames()
-				: connections.keySet().toArray(new String[connections.size()]);
+			String[] networknames = getQueryNetworks(query, connections.keySet());
 			updateQuery(networknames);
 		}
 		
