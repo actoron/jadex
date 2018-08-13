@@ -39,24 +39,26 @@ app.filter('cid', function() {
 	return cidToString;
 });
 
-function	updateService($scope, service)
+function	updateService($scope, event)
 {
 	var	found	= false;
 	$scope.services	= $scope.services===undefined ? [] : $scope.services;
-	alert("Service: "+JSON.stringify(service));
-/*	for(var i=0; i<$scope.platforms.length; i++)
+	
+//	alert("Service: "+JSON.stringify(service));
+	for(var i=0; i<$scope.services.length; i++)
 	{
-		found	= $scope.platforms[i].platform.name==platform.platform.name
-			&& $scope.platforms[i].protocol==platform.protocol;
+		found	= $scope.services[i].serviceName==event.service.serviceName
+			&& $scope.services[i].providerId.name==event.service.providerId.name;
 		if(found)
 		{
-			if(platform.connected===undefined)
+			// 0: added, 1: removed, 2: changed
+			if(event.type==1)	// removed
 			{
-				$scope.platforms.splice(i,1);
+				$scope.services.splice(i,1);
 			}
-			else
+			else	// added / changed
 			{
-				$scope.platforms[i]	= platform;
+				$scope.services[i]	= event.service;
 			}
 			break;
 		}
@@ -64,7 +66,7 @@ function	updateService($scope, service)
 	
 	if(!found)
 	{
-		$scope.platforms.push(platform);
-	}*/
+		$scope.services.push(event.service);
+	}
 }
 //]]>

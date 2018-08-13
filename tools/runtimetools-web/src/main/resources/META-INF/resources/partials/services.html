@@ -3,7 +3,7 @@
 	<p>
 		This page shows currently registered provided services. No auto-update yet: refresh to update.
 	</p>
-	<table ng-controller="Services">
+	<table ng-controller="Services" ng-class="{'down': superpeerDown}">
 		<tbody>
 			<tr>
 				<th>Service Type</th>

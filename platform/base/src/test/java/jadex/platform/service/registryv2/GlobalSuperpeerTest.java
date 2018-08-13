@@ -97,6 +97,6 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		waitForSuperpeerConnections(relay, relay, sp, client);
 		
 		// Client connect to local SP.
-		waitForSuperpeerConnections(sp, sp);//, client);
+		waitForSuperpeerConnections(sp, sp, client);
 	}
 }

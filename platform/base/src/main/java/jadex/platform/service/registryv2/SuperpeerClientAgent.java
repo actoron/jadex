@@ -565,8 +565,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									waitingqueries.clear();
 									
 									// Local query uses registry directly (w/o feature) -> only service identifiers needed and also removed events
-									ServiceQuery<ServiceEvent<IServiceIdentifier>>	lquery	= new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>)null)
-										.setReturnType(ServiceEvent.CLASSINFO)
+									ServiceQuery<ServiceEvent<IServiceIdentifier>>	lquery	= new ServiceQuery<>((Class<IServiceIdentifier>)null)
+										.setEventMode()
 										.setOwner(spid);	// Only find services that are visible to SP
 									if(GLOBAL_NETWORK_NAME.equals(networkname))
 									{
@@ -580,8 +580,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 										lquery.setScope(RequiredServiceInfo.SCOPE_NETWORK);
 										lquery.setNetworkNames(networkname);
 									}
-									localquery = ServiceRegistry.getRegistry(agent.getId()).addQuery(lquery);
-									
+									localquery = ServiceRegistry.getRegistry(agent.getId()).addQuery(lquery);									
+
 									localquery.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
 									{
 										public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
@@ -958,7 +958,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								{
 									// Forward result to user query
 									Object res = result;
-									if (ServiceEvent.CLASSINFO.equals(query.getReturnType()))
+									if (query.isEventMode())
 										res = new ServiceEvent(result, ServiceEvent.SERVICE_ADDED);
 									
 									SubscriptionIntermediateFuture rawfut = retfut;

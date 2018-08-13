@@ -52,7 +52,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 //		ServiceQuery<ServiceEvent<IService>> query = new ServiceQuery<ServiceEvent<IService>>(ServiceEvent.CLASSINFO, (ClassInfo)null, Binding.SCOPE_PLATFORM, (IAsyncFilter)null, null, cid);
 		
 		// This is the query that is used to get change notifications from local registry
-		ServiceQuery<ServiceEvent<IService>> query = new ServiceQuery<ServiceEvent<IService>>((Class<ServiceEvent<IService>>)null).setProvider(cid).setReturnType(ServiceEvent.CLASSINFO);
+		ServiceQuery<ServiceEvent<IService>> query = new ServiceQuery<>((Class<IService>)null).setProvider(cid).setEventMode();
 		
 //		localregsub = ServiceRegistry.getRegistry(cid).addQuery(query);
 		localregsub = component.getFeature(IRequiredServicesFeature.class).addQuery(query);

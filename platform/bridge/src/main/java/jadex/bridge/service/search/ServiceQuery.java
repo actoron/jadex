@@ -15,6 +15,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
+import jadex.commons.transformation.annotations.Include;
 
 /**
  *  Service query definition. T is the return type for search methods.
@@ -174,8 +175,12 @@ public class ServiceQuery<T>
 	/** The multiple flag. Search for multiple services */
 	protected Multiplicity	multiplicity;
 	
-	/** The return type. Tell registry to return services or service events. */
-	protected ClassInfo returntype;
+	/** Flag if event mode is enabled on the query.
+	 *  Must "@Include" because no setter with parameter
+	 *  is available.
+	 */
+	@Include
+	protected boolean eventmode;
 	
 	/** The matching mode for multivalued terms. True is and and false is or. */
 	protected Map<String, Boolean> matchingmodes;
@@ -332,7 +337,6 @@ public class ServiceQuery<T>
 		this.servicetype = servicetype;
 		this.scope = scope;
 		this.owner = owner;
-		this.returntype = returntype;
 		
 		this.id = SUtil.createUniqueId();
 		this.networknames = NETWORKS_NOT_SET;
@@ -344,7 +348,6 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(ServiceQuery<T> original)
 	{
-		this.returntype = original.returntype;
 		this.servicetype = original.servicetype;
 		this.scope = original.scope;
 		this.servicetags = original.servicetags;
@@ -377,22 +380,24 @@ public class ServiceQuery<T>
 	}
 	
 	/**
-	 *  Get the return type.
-	 *  @return The return type
+	 *  Changes the query to event mode.
+	 *  
+	 *  @return The new query.
 	 */
-	public ClassInfo getReturnType()
+	@SuppressWarnings("unchecked")
+	public ServiceQuery<ServiceEvent<T>> setEventMode()
 	{
-		return returntype;
+		this.eventmode = true;
+		return (ServiceQuery<ServiceEvent<T>>) this;
 	}
-
+	
 	/**
-	 *  Set the return type.
-	 *  @param type The return type to set
+	 *  Checks if query is in event mode.
+	 *  @return True, if in event mode
 	 */
-	public ServiceQuery<T> setReturnType(ClassInfo returntype)
+	public boolean isEventMode()
 	{
-		this.returntype = returntype;
-		return this;
+		return eventmode;
 	}
 	
 	/**

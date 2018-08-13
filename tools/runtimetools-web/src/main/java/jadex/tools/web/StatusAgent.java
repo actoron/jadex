@@ -28,7 +28,6 @@ import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.Boolean3;
 import jadex.commons.future.FutureBarrier;
-import jadex.commons.future.IFunctionalIntermediateResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -226,16 +225,7 @@ public class StatusAgent implements IStatusService
 	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>	subscribeToServices()
 	{
 		ISuperpeerService	sps	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class));
-		ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>	fut	= sps.addQuery(new ServiceQuery<ServiceEvent<IServiceIdentifier>>((Class<ServiceEvent<IServiceIdentifier>>)null).setOwner(agent.getId()).setNetworkNames((String[])null).setReturnType(ServiceEvent.CLASSINFO));
-		fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
-		{
-			@Override
-			public void intermediateResultAvailable(ServiceEvent<IServiceIdentifier> event)
-			{
-				System.out.println("subscribeToServices: "+event);
-			}
-		});
-		return fut;
+		return sps.addQuery(new ServiceQuery<>((Class<IServiceIdentifier>)null).setEventMode().setOwner(agent.getId()).setNetworkNames((String[])null));
 	}
 	
 	/**
