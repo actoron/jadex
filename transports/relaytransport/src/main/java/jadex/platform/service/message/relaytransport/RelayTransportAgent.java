@@ -67,11 +67,12 @@ import jadex.platform.service.transport.AbstractTransportAgent;
  *  Agent implementing relay routing.
  */
 //@Agent(autoprovide=Boolean3.TRUE)
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="rt"))
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="rt",
+	predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
 @Arguments({
 	// todo: see SuperpeerRegistrySynchronizationAgent
 //	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),
-	@Argument(name="addresses", clazz=String.class, defaultvalue="\"ws://ssp1@ngrelay1.actoron.com:80\""),	// TODO: wss, TODO: set in PlatformAgent???
+//	@Argument(name="addresses", clazz=String.class, defaultvalue="\"ws://ssp1@ngrelay1.actoron.com:80\""),	// TODO: wss, TODO: set in PlatformAgent???
 })
 @ProvidedServices({
 		@ProvidedService(type=ITransportService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
@@ -195,7 +196,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		directconns = new PassiveLeaseTimeSet<IComponentIdentifier>(keepaliveinterval << 2);
 		
 		ServiceQuery<IRoutingService> query = new ServiceQuery<>(IRoutingService.class);
-		query.setScope(RequiredServiceInfo.SCOPE_GLOBAL).setExcludeOwner(true).setServiceTags("forwarding");
+		query.setScope(RequiredServiceInfo.SCOPE_GLOBAL).setExcludeOwner(true).setServiceTags("forwarding=true");
 		agent.getFeature(IRequiredServicesFeature.class).addQuery(query).addResultListener(new IIntermediateResultListener<IRoutingService>()
 		{
 			public void intermediateResultAvailable(IRoutingService result)
