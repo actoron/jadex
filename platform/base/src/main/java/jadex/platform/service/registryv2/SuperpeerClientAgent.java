@@ -129,13 +129,13 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						
 						Set<String> networknames = new HashSet<>(networks.keySet());
 						
-						if (!networks.containsKey(GLOBAL_NETWORK_NAME))
+						if (!networknames.contains(GLOBAL_NETWORK_NAME))
 						{
 							secser.setNetwork(GLOBAL_NETWORK_NAME, DEFAULT_GLOBAL_ROOT_CERTIFICATE);
 							networknames.add(GLOBAL_NETWORK_NAME);
 						}
 						
-						for(String network: networks.keySet())
+						for(String network: networknames)
 						{
 							connections.put(network, new NetworkManager(network));
 							connections.get(network).startSuperpeerSearch();	// Start after put, because uses itself for superpeer search
