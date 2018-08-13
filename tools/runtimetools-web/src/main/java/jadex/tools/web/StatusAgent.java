@@ -14,6 +14,7 @@ import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceEvent;
@@ -225,7 +226,11 @@ public class StatusAgent implements IStatusService
 	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>	subscribeToServices()
 	{
 		ISuperpeerService	sps	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class));
-		return sps.addQuery(new ServiceQuery<>((Class<IServiceIdentifier>)null).setEventMode().setOwner(agent.getId()).setNetworkNames((String[])null));
+		return sps.addQuery(new ServiceQuery<>((Class<IServiceIdentifier>)null)
+			.setEventMode()
+			.setOwner(agent.getId())
+			.setNetworkNames((String[])null)
+			.setScope(RequiredServiceInfo.SCOPE_GLOBAL));
 	}
 	
 	/**
