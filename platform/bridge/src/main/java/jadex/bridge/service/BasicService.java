@@ -340,7 +340,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 //							System.out.println("Starting serviceINIT: "+getId()+" "+getInternalAccess().getComponentFeature(IExecutionFeature.class).isComponentThread());
 							Collection<String> coll = result == null ? new ArrayList<String>() : new LinkedHashSet<String>((Collection<String>)result);
 							
-							IValueFetcher vf = (IValueFetcher) internalaccess.getFeature(IArgumentsResultsFeature.class);
+							IValueFetcher vf = (IValueFetcher) internalaccess.getFetcher();
 							Class<?>[] sertypes = new Class<?>[] { type, BasicService.this.impltype };
 							for (int si = 0; si < sertypes.length; ++si)
 							{
