@@ -29,7 +29,10 @@ import jadex.micro.annotation.Autostart;
  *
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE, successors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
+@Agent(autoprovide = Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE,
+	predecessors="jadex.platform.service.address.TransportAddressAgent",
+	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
+)
 public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 {
 	/** Platform URL pattern. */
