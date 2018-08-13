@@ -73,30 +73,30 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 	
 	//-------- test cases --------
 
-//	/**
-//	 *  Test relay self connection.
-//	 */
-//	@Test
-//	public void testSelfConnection()
-//	{
-//		IExternalAccess	relay	= createPlatform(RELAYCONF);
-//		waitForSuperpeerConnections(relay);
-//	}
+	/**
+	 *  Test relay self connection.
+	 */
+	@Test
+	public void testSelfConnection()
+	{
+		IExternalAccess	relay	= createPlatform(RELAYCONF);
+		waitForSuperpeerConnections(relay, relay);
+	}
 	
 	/**
 	 *  Test connection.
 	 */
 	@Test
-	public void testConnection()
+	public void testClientConnection()
 	{
 		IExternalAccess	relay	= createPlatform(RELAYCONF);
 		IExternalAccess	sp	= createPlatform(SPCONF);
 		IExternalAccess	client	= createPlatform(CLIENTCONF);
 		
 		// All connect to relay.
-		waitForSuperpeerConnections(relay, sp, client);
+		waitForSuperpeerConnections(relay, relay, sp, client);
 		
 		// Client connect to local SP.
-//		waitForSuperpeerConnections(sp, client);
+		waitForSuperpeerConnections(sp, sp);//, client);
 	}
 }

@@ -113,7 +113,8 @@ public abstract class AbstractInfrastructureTest
 		}
 		while(!platformids.isEmpty())
 		{
-			IComponentIdentifier	cid	= connected.getNextIntermediateResult();
+			// Hack??? Wait three times the wait factor!?
+			IComponentIdentifier	cid	= connected.getNextIntermediateResult(Starter.getScaledRemoteDefaultTimeout(sp.getId(), WAITFACTOR*3), true);
 			platformids.remove(cid.getRoot());
 			System.out.println("Client "+cid+" connected to SP: "+sp.getId());
 		}
