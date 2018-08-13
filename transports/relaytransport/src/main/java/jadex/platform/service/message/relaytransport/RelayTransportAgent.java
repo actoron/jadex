@@ -292,14 +292,14 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						{
 							for (final IComponentIdentifier id : relays)
 							{
-								if (debug)
-									System.out.println("Sending to " + id);
+								if(debug)
+									System.out.println(agent+": sending to " + id);
 								msgfeat.sendMessageAndWait(getRtComponent(id), new Ping()).addResultListener(new IResultListener<Object>()
 								{
 									public void resultAvailable(Object result)
 									{
-										if (debug)
-											System.out.println("Got answer " + id);
+										if(debug)
+											System.out.println(agent+": got answer " + id);
 										if (keepaliveconnections.size() < keepalivecount)
 											keepaliveconnections.add(id);
 									}
@@ -307,7 +307,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 									public void exceptionOccurred(Exception exception)
 									{
 										if (debug)
-											System.out.println("Got exception:  " + exception);
+											System.out.println(agent+": got exception:  " + exception);
 									}
 								});
 							}
