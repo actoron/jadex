@@ -42,12 +42,15 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		baseconf.setValue("superpeerclient.awaonly", false);
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenesscatalog", true);
+		baseconf.setValue("rt", true);
 		baseconf.setValue("platformurls", "tcp://ssp@localhost:23751");
 		baseconf.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
 		baseconf.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass);
 			
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client_*");
+//		CLIENTCONF.setLogging(true);
+		CLIENTCONF.setValue("rt.debug", true);
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(ProviderAgent.class);
@@ -57,6 +60,7 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		SPCONF	= baseconf.clone();
 		SPCONF.setValue("superpeer", true);
 		SPCONF.setPlatformName("SP_*");
+//		SPCONF.setLogging(true);
 		
 		RELAYCONF	= baseconf.clone();
 		RELAYCONF.setValue("superpeer", true);
