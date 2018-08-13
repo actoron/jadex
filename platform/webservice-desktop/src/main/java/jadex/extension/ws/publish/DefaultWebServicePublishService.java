@@ -75,7 +75,7 @@ public class DefaultWebServicePublishService implements IPublishService
 //		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getId().getServiceType()}, 
 //			new WebServiceToJadexWrapperInvocationHandler(service));
 		
-		IService service = (IService) component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(serviceid.getServiceType(), pi.getPublishScope(), null, null)).get();
+		IService service = (IService) component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(serviceid.getServiceType(), pi.getPublishScope(), null)).get();
 		
 		ClassLoader cl = null;
 		ILibraryService ls = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredService.SCOPE_PLATFORM));

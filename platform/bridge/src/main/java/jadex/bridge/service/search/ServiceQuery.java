@@ -220,7 +220,7 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype)
 	{
-		this(servicetype, null, null, null);
+		this(servicetype, null);
 	}
 	
 	/**
@@ -228,7 +228,7 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype, String scope)
 	{
-		this(servicetype, scope, null, null);
+		this(new ClassInfo(servicetype), scope, null);
 	}
 	
 //	
@@ -308,24 +308,15 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier owner, Class<?> returntype)
+	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier owner)
 	{
-		this(servicetype!=null? new ClassInfo(servicetype): null, scope,
-			owner, returntype!=null? new ClassInfo(returntype): null);
+		this(new ClassInfo(servicetype), scope, owner);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
 	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner)
-	{
-		this(servicetype, scope, owner, servicetype);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner, ClassInfo returntype)
 	{
 //		if(owner==null)
 //			throw new IllegalArgumentException("Owner must not null");
