@@ -69,10 +69,10 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	/** Lookup for remote peer caches by network. */
 	protected MultiCollection<String, IServiceRegistry> peercaches = new MultiCollection<>();
 	
-	public SuperpeerRegistryAgent()
-	{
-		System.out.println("SUPER CREATED!");
-	}
+//	public SuperpeerRegistryAgent()
+//	{
+//		System.out.println("SUPER CREATED!");
+//	}
 	
 	/**
 	 *  Initiates the client registration procedure
@@ -147,14 +147,12 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		IServiceIdentifier ret = serviceregistry.searchService(query);
 		if (ret == null)
 		{
-			Iterator<IServiceRegistry> it = getApplicablePeers(query).iterator();
-			
-			do
+			Iterator<IServiceRegistry> it = getApplicablePeers(query).iterator();			
+			while(ret==null && it.hasNext())
 			{
 				IServiceRegistry reg = it.next();
 				ret = reg.searchService(query);
 			}
-			while (ret == null && it.hasNext());
 		}
 		
 		return new Future<>(ret);
