@@ -5,9 +5,12 @@ import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -36,6 +39,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.security.SSecurity;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
@@ -265,20 +269,18 @@ public class PlatformAgent
 		return null;
 	}
 	
-	// enable startup chaos monkey
-//	boolean CHAOSMONKEY_STARTUP	= true;
+	// enable startup monkey for randomized sequential component startup (dependency testing).
+	boolean STARTUP_MONKEY	= true;
 	
 	/**
 	 *  Start components in levels.
 	 */
 	protected IFuture<Void> startComponents(IComponentManagementService cms, Iterator<Set<String>> levels, Map<String, String> names)
 	{
-		// Totally broken, does not wait for startups,
-		// also, why? levels are already Set?
-//		if(CHAOSMONKEY_STARTUP)
-//		{
-//			return startComponentsDebug(cms, levels, null, names);
-//		}
+		if(STARTUP_MONKEY)
+		{
+			return startComponentsDebug(cms, levels, null, names);
+		}
 		
 		final Future<Void> ret = new Future<>();
 		
@@ -324,38 +326,38 @@ public class PlatformAgent
 	/**
 	 *  Start components synhcronized using random order to find implicit dependencies. 
 	 */
-//	protected IFuture<Void> startComponentsDebug(IComponentManagementService cms, Iterator<Set<String>> levels, Iterator<String> level, Map<String, String> names)
-//	{
-//		// Initial level or finished with last level -> start next level
-//		if(level==null || !level.hasNext())
-//		{
-//			if(levels.hasNext())
-//			{
-//				//			System.out.println("---------- LEVEL --------------");
-//				// Chaos monkey -> randomize list of components to find implicit dependencies
-//				List<String>	list	= new ArrayList<>(levels.next());
-//				Collections.shuffle(list, SSecurity.getSecureRandom());
-//				return startComponentsDebug(cms, levels, list.iterator(), names);
-//			}
-//			else
-//			{
-//				return IFuture.DONE;
-//			}
-//		}
-//		
-//		// level!=null && level.hasNext() -> Start next component in level
-//		else
-//		{
-//			Future<Void>	ret	= new Future<>();
-//			
-//			String	c	= level.next();
-//			IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c+".class", null, null);
-//			fut.addResultListener(
-//				res -> {startComponentsDebug(cms, levels, level, names).addResultListener(new DelegationResultListener<>(ret));},
-//				exception -> {ret.setException(new RuntimeException("Cannot autostart "+c+".class", exception));});
-//			return ret;
-//		}
-//	}
+	protected IFuture<Void> startComponentsDebug(IComponentManagementService cms, Iterator<Set<String>> levels, Iterator<String> level, Map<String, String> names)
+	{
+		// Initial level or finished with last level -> start next level
+		if(level==null || !level.hasNext())
+		{
+			if(levels.hasNext())
+			{
+				//			System.out.println("---------- LEVEL --------------");
+				// Chaos monkey -> randomize list of components to find implicit dependencies
+				List<String>	list	= new ArrayList<>(levels.next());
+				Collections.shuffle(list, SSecurity.getSecureRandom());
+				return startComponentsDebug(cms, levels, list.iterator(), names);
+			}
+			else
+			{
+				return IFuture.DONE;
+			}
+		}
+		
+		// level!=null && level.hasNext() -> Start next component in level
+		else
+		{
+			Future<Void>	ret	= new Future<>();
+			
+			String	c	= level.next();
+			IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c+".class", null, null);
+			fut.addResultListener(
+				res -> {startComponentsDebug(cms, levels, level, names).addResultListener(new DelegationResultListener<>(ret));},
+				exception -> {ret.setException(new RuntimeException("Cannot autostart "+c+".class", exception));});
+			return ret;
+		}
+	}
 
 	/**
 	 *  Called when platform startup finished.
