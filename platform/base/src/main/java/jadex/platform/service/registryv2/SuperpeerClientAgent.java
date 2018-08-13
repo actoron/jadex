@@ -536,7 +536,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								agent.getLogger().info("Established super peer connection for network "+networkname+" with super peer: "+sp);
 								
 								// Check if the superpeer is genuine, i.e it is local or network is authenticated.
-								if(!((IService)sp).getId().getProviderId().getRoot().equals(agent.getId().getRoot()))
+								IComponentIdentifier	spid	= ((IService)sp).getId().getProviderId();
+								if(!spid.getRoot().equals(agent.getId().getRoot()))
 								{
 									ISecurityInfo secinfo = (ISecurityInfo) ServiceCall.getLastInvocation().getProperty(ServiceCall.SECURITY_INFOS);
 									if(secinfo==null || secinfo.getNetworks()==null || !secinfo.getNetworks().contains(networkname))
@@ -564,10 +565,23 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									waitingqueries.clear();
 									
 									// Local query uses registry directly (w/o feature) -> only service identifiers needed and also removed events
-									localquery = ServiceRegistry.getRegistry(agent.getId())
-										.addQuery(new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>)null, RequiredServiceInfo.SCOPE_PLATFORM)
-											.setNetworkNames(networkname).setReturnType(ServiceEvent.CLASSINFO)
-											.setOwner(agent.getId()));
+									ServiceQuery<ServiceEvent<IServiceIdentifier>>	lquery	= new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>)null)
+										.setReturnType(ServiceEvent.CLASSINFO)
+										.setOwner(spid);	// Only find services that are visible to SP
+									if(GLOBAL_NETWORK_NAME.equals(networkname))
+									{
+										// SSP connection -> global scope and no network name
+										lquery.setScope(RequiredServiceInfo.SCOPE_GLOBAL);
+										lquery.setNetworkNames((String[])null);
+									}
+									else
+									{
+										// Local SP connection -> network scope and network name
+										lquery.setScope(RequiredServiceInfo.SCOPE_NETWORK);
+										lquery.setNetworkNames(networkname);
+									}
+									localquery = ServiceRegistry.getRegistry(agent.getId()).addQuery(lquery);
+									
 									localquery.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
 									{
 										public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
@@ -592,7 +606,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 													{
 														try
 														{
-//															System.out.println("Sending service event to superpeer: "+event);
+															System.out.println(agent+ " sending service event to superpeer "+sp+": "+event);
 															regfut.sendBackwardCommand(event);
 														}
 														catch (Exception e)
