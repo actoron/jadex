@@ -50,7 +50,7 @@ import jadex.micro.annotation.RequiredService;
 @ProvidedServices(replace=true,
 	value={@ProvidedService(type=ISuperpeerService.class, scope=RequiredService.SCOPE_GLOBAL),
 		   @ProvidedService(type=ISuperpeerCollaborationService.class, scope=RequiredService.SCOPE_GLOBAL),
-		   @ProvidedService(type=ISuperpeerStatusService.class)})
+		   @ProvidedService(type=ISuperpeerStatusService.class, scope=RequiredService.SCOPE_PLATFORM)})
 public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerCollaborationService, ISuperpeerStatusService
 {
 	/** The agent. */
