@@ -175,11 +175,7 @@ public class ServiceQuery<T>
 	/** The multiple flag. Search for multiple services */
 	protected Multiplicity	multiplicity;
 	
-	/** Flag if event mode is enabled on the query.
-	 *  Must "@Include" because no setter with parameter
-	 *  is available.
-	 */
-	@Include
+	/** Flag if event mode is enabled on the query. */
 	protected boolean eventmode;
 	
 	/** The matching mode for multivalued terms. True is and and false is or. */
@@ -377,6 +373,18 @@ public class ServiceQuery<T>
 	{
 		this.servicetype = servicetype;
 		return this;
+	}
+	
+	/**
+	 *  Changes the query to event mode.
+	 *  
+	 *  @param eventmode the event mode state.
+	 *  @deprecated For bean purposes only, use setEventMode().
+	 */
+	@Deprecated
+	public void setEventMode(boolean eventmode)
+	{
+		this.eventmode = eventmode;
 	}
 	
 	/**
