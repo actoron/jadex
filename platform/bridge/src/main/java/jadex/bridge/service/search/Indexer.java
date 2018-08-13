@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
@@ -604,15 +605,15 @@ public class Indexer<T>
 		
 		}, true, ServiceKeyExtractor.SERVICE_KEY_TYPES); // todo: change to query types
 		
-		ServiceQuery<IService> q0 = new ServiceQuery<IService>((Class<?>)null, null, null, null);
+		ServiceQuery<IService> q0 = new ServiceQuery<>((Class<IService>)null, null, null);
 		idx.addValue(q0);
-		ServiceQuery<IService> q1 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null);
+		ServiceQuery<IService> q1 = new ServiceQuery<>(new ClassInfo(IComponentManagementService.class), null, null);
 		q1.setServiceTags(new String[]{"a", "b", "c"});
 		idx.addValue(q1);
-		ServiceQuery<IService> q2 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null);
+		ServiceQuery<IService> q2 = new ServiceQuery<>(new ClassInfo(IComponentManagementService.class), null, null);
 		q2.setServiceTags(new String[]{"a", "b"});
 		idx.addValue(q2);
-		ServiceQuery<IService> q3 = new ServiceQuery<IService>(IComponentManagementService.class, null, null, null);
+		ServiceQuery<IService> q3 = new ServiceQuery<>(new ClassInfo(IComponentManagementService.class), null, null);
 		q3.setServiceTags(new String[]{"a"});
 		idx.addValue(q3);
 		

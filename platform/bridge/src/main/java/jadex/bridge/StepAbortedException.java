@@ -31,6 +31,6 @@ public class StepAbortedException extends RuntimeException
 	@Override
 	public String toString()
 	{
-		return super.toString()+", "+step;
+		return super.toString()+", "+step + ", " + step.getClass();
 	}
 }

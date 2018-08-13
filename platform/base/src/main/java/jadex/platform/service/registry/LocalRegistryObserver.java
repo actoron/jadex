@@ -135,7 +135,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 	public RegistryEvent getCurrentStateEvent(IComponentIdentifier owner)
 	{
 		// Is the scope correct?! global should impose no scope restrictions. owner dictates which services
-		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, RequiredService.SCOPE_GLOBAL, owner==null? cid: owner, null);
+		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, RequiredService.SCOPE_GLOBAL, owner==null? cid: owner);
 //		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, owner==null? cid: owner, null);
 		Collection<IService> added = component.getFeature(IRequiredServicesFeature.class).searchLocalServices(query);
 		

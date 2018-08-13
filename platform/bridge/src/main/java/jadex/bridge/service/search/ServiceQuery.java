@@ -175,11 +175,7 @@ public class ServiceQuery<T>
 	/** The multiple flag. Search for multiple services */
 	protected Multiplicity	multiplicity;
 	
-	/** Flag if event mode is enabled on the query.
-	 *  Must "@Include" because no setter with parameter
-	 *  is available.
-	 */
-	@Include
+	/** Flag if event mode is enabled on the query. */
 	protected boolean eventmode;
 	
 	/** The matching mode for multivalued terms. True is and and false is or. */
@@ -224,7 +220,7 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype)
 	{
-		this(servicetype, null, null, null);
+		this(servicetype, null);
 	}
 	
 	/**
@@ -232,7 +228,7 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype, String scope)
 	{
-		this(servicetype, scope, null, null);
+		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, null);
 	}
 	
 //	
@@ -312,24 +308,15 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier owner, Class<?> returntype)
+	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier owner)
 	{
-		this(servicetype!=null? new ClassInfo(servicetype): null, scope,
-			owner, returntype!=null? new ClassInfo(returntype): null);
+		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, owner);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
 	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner)
-	{
-		this(servicetype, scope, owner, servicetype);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner, ClassInfo returntype)
 	{
 //		if(owner==null)
 //			throw new IllegalArgumentException("Owner must not null");
@@ -377,6 +364,18 @@ public class ServiceQuery<T>
 	{
 		this.servicetype = servicetype;
 		return this;
+	}
+	
+	/**
+	 *  Changes the query to event mode.
+	 *  
+	 *  @param eventmode the event mode state.
+	 *  @deprecated For bean purposes only, use setEventMode().
+	 */
+	@Deprecated
+	public void setEventMode(boolean eventmode)
+	{
+		this.eventmode = eventmode;
 	}
 	
 	/**
