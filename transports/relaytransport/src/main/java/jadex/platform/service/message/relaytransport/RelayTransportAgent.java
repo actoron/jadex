@@ -188,8 +188,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	{
 		this.cms = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		intmsgfeat = (IInternalMessageFeature) agent.getFeature(IMessageFeature.class);
-		if (debug)
-			System.out.println("Started relay transport");
+		if(debug)
+			System.out.println(agent+": started relay transport");
 		Map<String, Object> args = agent.getFeature(IArgumentsResultsFeature.class).getArguments();
 		
 		maxhops = SConfigParser.getIntValue(args.get(PROPERTY_MAX_HOPS), maxhops);
@@ -209,7 +209,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			{
 				relays.add(((IService) result).getId().getProviderId().getRoot());
 				if (debug)
-					System.out.println("Got query update, releasing wait future.");
+					System.out.println(agent + ": Got query update, releasing wait future.");
 				queryupdatefuture.setResult(null);
 				queryupdatefuture = new Future<>();
 			}
@@ -302,14 +302,14 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						{
 							for (final IComponentIdentifier id : relays)
 							{
-								if (debug)
-									System.out.println("Sending to " + id);
+								if(debug)
+									System.out.println(agent+": sending to " + id);
 								msgfeat.sendMessageAndWait(getRtComponent(id), new Ping()).addResultListener(new IResultListener<Object>()
 								{
 									public void resultAvailable(Object result)
 									{
-										if (debug)
-											System.out.println("Got answer " + id);
+										if(debug)
+											System.out.println(agent+": got answer " + id);
 										if (keepaliveconnections.size() < keepalivecount)
 											keepaliveconnections.add(id);
 										keepaliveupdatefuture.setResult(null);
@@ -319,7 +319,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 									public void exceptionOccurred(Exception exception)
 									{
 										if (debug)
-											System.out.println("Got exception:  " + exception);
+											System.out.println(agent+": got exception:  " + exception);
 									}
 								});
 							}
@@ -452,9 +452,9 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			
 			body = SUtil.mergeData(bheader, body);
 			
-			if (debug)
+			if(debug)
 			{
-				System.out.println("Preparing forward package for " + fwdest + " from " + fwsender + " orig header " + header);
+				System.out.println(agent+": preparing forward package for " + fwdest + " from " + fwsender + " orig header " + header);
 			}
 			
 			header = new MsgHeader();
@@ -465,10 +465,10 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		else
 		{
 			fwdest = (IComponentIdentifier) header.getProperty(FORWARD_DEST);
-			if (debug)
+			if(debug)
 			{
 				IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot();
-				System.out.println("Processing forward package for " + fwdest + " from " + fwsender);
+				System.out.println(agent+": processing forward package for " + fwdest + " from " + fwsender);
 			}
 		}
 		
@@ -577,7 +577,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	public IIntermediateFuture<Integer> discoverRoute(final IComponentIdentifier dest, final LinkedHashSet<IComponentIdentifier> hops)
 	{
 		if (debug)
-			System.out.println("Discover route on " + agent.getId() + " for " + dest);
+			System.out.println(agent+": discover route on " + agent.getId() + " for " + dest);
 		
 		final IComponentIdentifier destination = dest.getRoot();
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
