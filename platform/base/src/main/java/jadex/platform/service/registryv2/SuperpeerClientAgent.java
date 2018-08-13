@@ -138,7 +138,12 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						for(String network: networknames)
 						{
 							connections.put(network, new NetworkManager(network));
-							connections.get(network).startSuperpeerSearch();	// Start after put, because uses itself for superpeer search
+						}
+						
+						// Start after put, because uses itself and maybe global network for superpeer search
+						for(String network: networknames)
+						{
+							connections.get(network).startSuperpeerSearch();
 						}
 						
 						ret.setResult(null);
@@ -582,6 +587,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									// Activate waiting queries if any.
 									for(QueryManager<?> qmanager: waitingqueries)
 									{
+										agent.getLogger().info("Started waiting query for network: "+networkname+", "+qmanager.query);
 										qmanager.updateQuery(new String[]{networkname});
 									}
 									waitingqueries.clear();
@@ -804,6 +810,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		 */
 		protected <T>	void	addWaitingQuery(QueryManager<T> qmanager)
 		{
+			agent.getLogger().info("Waiting query for network: "+networkname+", "+qmanager.query);
+			
 			assert superpeer==null : "Should only be called when no connection.";
 			waitingqueries.add(qmanager);
 		}
