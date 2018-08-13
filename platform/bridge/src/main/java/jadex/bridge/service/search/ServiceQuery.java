@@ -228,7 +228,7 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype, String scope)
 	{
-		this(new ClassInfo(servicetype), scope, null);
+		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, null);
 	}
 	
 //	
@@ -310,7 +310,7 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier owner)
 	{
-		this(new ClassInfo(servicetype), scope, owner);
+		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, owner);
 	}
 	
 	/**
