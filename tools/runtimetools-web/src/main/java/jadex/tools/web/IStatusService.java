@@ -5,6 +5,7 @@ import java.util.Map;
 
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.future.IFuture;
@@ -34,13 +35,19 @@ public interface IStatusService
 	// TODO: subscription in registry to get notified about new queries? -> please no polling!
 	public IFuture<Collection<ServiceQuery<?>>>	getQueries(String... scope);
 	
+//	/**
+//	 *  Get provided services of a given (set of) scope(s) or no scope for all services.
+//	 *  @return A list of services.
+//	 */
+//	// No intermediate for easier REST?
+//	// TODO: subscription in registry to get notified about new services? -> please no polling!
+//	public IFuture<Collection<IServiceIdentifier>>	getServices(String... scope);
+
 	/**
-	 *  Get provided services of a given (set of) scope(s) or no scope for all services.
-	 *  @return A list of services.
+	 *  Get the managed services, if this platform is a super peer (i.e. has an ISuperpeerService).
+	 *  @return Service events for a self-updating list of services.
 	 */
-	// No intermediate for easier REST?
-	// TODO: subscription in registry to get notified about new services? -> please no polling!
-	public IFuture<Collection<IServiceIdentifier>>	getServices(String... scope);
+	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>	subscribeToServices();
 	
 	/**
 	 *  Get all memory stats. cf IMemstatService
