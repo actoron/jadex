@@ -182,10 +182,12 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
      *  the caller is blocked until either new results are available and true is returned
      *  or the future is finished, thus returning false.
      *  
+	 *  @param timeout The timeout in millis.
+	 *  @param realtime Flag, if wait should be realtime (in constrast to simulation time).
      *  @return	True, when there are more intermediate results for the caller.
      */
 	@Override
-    public boolean hasNextIntermediateResult()
+    public boolean hasNextIntermediateResult(long timeout, boolean realtime)
     {
     	boolean	ret;
     	boolean	suspend;
@@ -242,13 +244,12 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    	    		// todo: realtime as method parameter?!
-    				caller.suspend(this, UNSET, false);
+    				caller.suspend(this, timeout, realtime);
     	    	   	icallers.remove(caller);
     			}
     			// else already resumed.
     		}
-	    	ret	= hasNextIntermediateResult();
+	    	ret	= hasNextIntermediateResult(timeout, realtime);
     	}
     	
     	return ret;

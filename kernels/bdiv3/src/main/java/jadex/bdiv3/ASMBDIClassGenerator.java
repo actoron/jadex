@@ -180,7 +180,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			    		public AnnotationVisitor visitAnnotation(String name, String desc)
 			    		{
 //			    			System.out.println("visit: "+name+" "+desc);
-			    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? this: new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
+			    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? super.visitAnnotation(name, desc) : new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
 							{
 			    				public void visit(String name, Object value)
 			    				{
@@ -198,12 +198,12 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			    		
 			    		public AnnotationVisitor visitArray(String name)
 			    		{
-			    			return new AnnotationVisitor(api, super.visitArray(iclname))
+			    			return new AnnotationVisitor(api, super.visitArray(name))
 							{
 			    				public AnnotationVisitor visitAnnotation(String name, String desc)
 					    		{
 //					    			System.out.println("visit: "+name+" "+desc);
-					    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? this: new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
+					    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? super.visitAnnotation(name, desc) : new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
 									{
 					    				public void visit(String name, Object value)
 					    				{

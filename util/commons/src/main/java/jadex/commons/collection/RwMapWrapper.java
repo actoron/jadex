@@ -29,6 +29,17 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	}
 	
 	/**
+	 *  Creates the wrapper with a specific internal lock.
+	 * 
+	 *  @param map The wrapped map.
+	 */
+	public RwMapWrapper(Map<K, V> map, ReentrantReadWriteLock lock)
+	{
+		this.rwlock = lock;
+		this.map = map;
+	}
+	
+	/**
 	 *  Creates the wrapper.
 	 * 
 	 *  @param map The wrapped map.
@@ -178,5 +189,14 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	public WriteLock writeLock()
 	{
 		return rwlock.writeLock();
+	}
+	
+	/**
+	 *  Gets the internal lock.
+	 *  @return The lock.
+	 */
+	public ReentrantReadWriteLock getLock()
+	{
+		return rwlock;
 	}
 }

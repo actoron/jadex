@@ -52,7 +52,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 //		ServiceQuery<ServiceEvent<IService>> query = new ServiceQuery<ServiceEvent<IService>>(ServiceEvent.CLASSINFO, (ClassInfo)null, Binding.SCOPE_PLATFORM, (IAsyncFilter)null, null, cid);
 		
 		// This is the query that is used to get change notifications from local registry
-		ServiceQuery<ServiceEvent<IService>> query = new ServiceQuery<ServiceEvent<IService>>((Class<ServiceEvent<IService>>)null).setProvider(cid).setReturnType(ServiceEvent.CLASSINFO);
+		ServiceQuery<ServiceEvent<IService>> query = new ServiceQuery<>((Class<IService>)null).setProvider(cid).setEventMode();
 		
 //		localregsub = ServiceRegistry.getRegistry(cid).addQuery(query);
 		localregsub = component.getFeature(IRequiredServicesFeature.class).addQuery(query);
@@ -135,7 +135,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 	public RegistryEvent getCurrentStateEvent(IComponentIdentifier owner)
 	{
 		// Is the scope correct?! global should impose no scope restrictions. owner dictates which services
-		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, RequiredService.SCOPE_GLOBAL, owner==null? cid: owner, null);
+		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, RequiredService.SCOPE_GLOBAL, owner==null? cid: owner);
 //		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, owner==null? cid: owner, null);
 		Collection<IService> added = component.getFeature(IRequiredServicesFeature.class).searchLocalServices(query);
 		

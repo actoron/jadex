@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -270,15 +269,15 @@ public class PlatformAgent
 		return null;
 	}
 	
-	// enable startup chaos monkey
-	boolean CHAOSMONKEY_STARTUP	= true;
+	// enable startup monkey for randomized sequential component startup (dependency testing).
+	boolean STARTUP_MONKEY	= true;
 	
 	/**
 	 *  Start components in levels.
 	 */
 	protected IFuture<Void> startComponents(IComponentManagementService cms, Iterator<Set<String>> levels, Map<String, String> names)
 	{
-		if(CHAOSMONKEY_STARTUP)
+		if(STARTUP_MONKEY)
 		{
 			return startComponentsDebug(cms, levels, null, names);
 		}

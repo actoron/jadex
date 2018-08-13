@@ -1,4 +1,4 @@
-package jadex.bridge.service.types.registry;
+package jadex.bridge.service.types.registryv2;
 
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;

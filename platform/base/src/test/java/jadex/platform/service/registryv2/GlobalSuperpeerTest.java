@@ -41,12 +41,12 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		PemKeyPair cert = SSecurity.createTestCert(ca);
 		AbstractAuthenticationSecret clientsecret = AbstractAuthenticationSecret.fromKeyPair(ca, true);
 		AbstractAuthenticationSecret serversecret = AbstractAuthenticationSecret.fromKeyPair(cert, false, ca);
-
 		
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
 		baseconf.setValue("superpeerclient.awaonly", false);
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenesscatalog", true);
+		baseconf.setValue("rt", true);
 		baseconf.setValue("platformurls", "tcp://ssp@localhost:23751");
 		baseconf.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
 		baseconf.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass);
@@ -54,6 +54,7 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client_*");
 //		CLIENTCONF.setLogging(true);
+//		CLIENTCONF.setValue("rt.debug", true);
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(ProviderAgent.class);
@@ -63,6 +64,8 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		SPCONF	= baseconf.clone();
 		SPCONF.setValue("superpeer", true);
 		SPCONF.setPlatformName("SP_*");
+//		SPCONF.setValue("rt.debug", true);
+//		SPCONF.setLogging(true);
 		
 		RELAYCONF	= baseconf.clone();
 		RELAYCONF.setValue("superpeer", true);
@@ -79,15 +82,15 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 	
 	//-------- test cases --------
 
-//	/**
-//	 *  Test relay self connection.
-//	 */
-//	@Test
-//	public void testSelfConnection()
-//	{
-//		IExternalAccess	relay	= createPlatform(RELAYCONF);
-//		waitForSuperpeerConnections(relay);
-//	}
+	/**
+	 *  Test relay self connection.
+	 */
+	@Test
+	public void testSelfConnection()
+	{
+		IExternalAccess	relay	= createPlatform(RELAYCONF);
+		waitForSuperpeerConnections(relay, relay);
+	}
 	
 	/**
 	 *  Test if local SP connects to SSP.
@@ -107,20 +110,20 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		Assert.assertNotNull("find local sp using ssp", localsps);
 	}
 	
-//	/**
-//	 *  Test if client can find local SP by using SSP.
-//	 */
-//	@Test
-//	public void testClientConnection()
-//	{
-//		IExternalAccess	relay	= createPlatform(RELAYCONF);
-//		IExternalAccess	sp	= createPlatform(SPCONF);
-//		IExternalAccess	client	= createPlatform(CLIENTCONF);
-//		
-//		// All connect to relay.
-//		waitForSuperpeerConnections(relay, relay, sp, client);
-//		
-//		// Client and local SP connect to local SP.
-//		waitForSuperpeerConnections(sp, sp, client);
-//	}
+	/**
+	 *  Test if client can find local SP by using SSP.
+	 */
+	@Test
+	public void testClientConnection()
+	{
+		IExternalAccess	relay	= createPlatform(RELAYCONF);
+		IExternalAccess	sp	= createPlatform(SPCONF);
+		IExternalAccess	client	= createPlatform(CLIENTCONF);
+		
+		// All connect to relay.
+		waitForSuperpeerConnections(relay, relay, sp, client);
+		
+		// Client and local SP connect to local SP.
+		waitForSuperpeerConnections(sp, sp, client);
+	}
 }

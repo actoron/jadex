@@ -70,6 +70,7 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
+import jadex.platform.service.registryv2.SuperpeerClientAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.AbstractX509PemSecret;
 import jadex.platform.service.security.auth.KeySecret;
@@ -410,7 +411,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				{
 					for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
 					{
-						if (entry.getValue() != null)
+						if (entry.getValue() != null && !SuperpeerClientAgent.GLOBAL_NETWORK_NAME.equals(entry.getKey()))
 						{
 							for (AbstractAuthenticationSecret secret : entry.getValue())
 								System.out.println("Available network '" + entry.getKey() + "' with secret " + secret);

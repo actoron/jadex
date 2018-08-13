@@ -14,14 +14,17 @@ import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.memstat.IMemstatService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
+import jadex.bridge.service.types.registryv2.ISuperpeerService;
 import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.Boolean3;
@@ -193,27 +196,41 @@ public class StatusAgent implements IStatusService
 		return ret;
 	}
 	
+//	/**
+//	 *  Get provided services of a given (set of) scope(s) or no scope for all services.
+//	 *  @return A list of services.
+//	 */
+//	// No intermediate for easier REST?
+//	// TODO: subscription in registry to get notified about new services? -> please no polling!
+//	public IFuture<Collection<IServiceIdentifier>>	getServices(String... scope)
+//	{
+//		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
+//		IntermediateFuture<IServiceIdentifier>	ret	= new IntermediateFuture<IServiceIdentifier>();
+//		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getId());
+//		for(IServiceIdentifier ser: reg.getAllServices())
+//		{
+//			if(scopes==null || scopes.contains(ser.getScope()))
+//			{
+//				ret.addIntermediateResult(ser);
+//			}
+//		}
+//		ret.setFinished();
+//
+//		return ret;
+//	}
+	
 	/**
-	 *  Get provided services of a given (set of) scope(s) or no scope for all services.
-	 *  @return A list of services.
+	 *  Get the managed services, if this platform is a super peer (i.e. has an ISuperpeerService).
+	 *  @return Service events for a self-updating list of services.
 	 */
-	// No intermediate for easier REST?
-	// TODO: subscription in registry to get notified about new services? -> please no polling!
-	public IFuture<Collection<IServiceIdentifier>>	getServices(String... scope)
+	public ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>>	subscribeToServices()
 	{
-		Set<String>	scopes	= scope==null ? null: new HashSet<String>(Arrays.asList(scope));
-		IntermediateFuture<IServiceIdentifier>	ret	= new IntermediateFuture<IServiceIdentifier>();
-		IServiceRegistry	reg	= ServiceRegistry.getRegistry(agent.getId());
-		for(IServiceIdentifier ser: reg.getAllServices())
-		{
-			if(scopes==null || scopes.contains(ser.getScope()))
-			{
-				ret.addIntermediateResult(ser);
-			}
-		}
-		ret.setFinished();
-
-		return ret;
+		ISuperpeerService	sps	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class));
+		return sps.addQuery(new ServiceQuery<>((Class<IServiceIdentifier>)null)
+			.setEventMode()
+			.setOwner(agent.getId())
+			.setNetworkNames((String[])null)
+			.setScope(RequiredServiceInfo.SCOPE_GLOBAL));
 	}
 	
 	/**

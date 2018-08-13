@@ -1,6 +1,7 @@
 package jadex.platform.service.registryv2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,6 +22,7 @@ import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -73,7 +75,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	public static final String GLOBAL_NETWORK_NAME = "___GLOBAL___";
 	
 	/** Default root certificate for global network. */
-	public static final String DEFAULT_GLOBAL_ROOT_CERTIFICATE = "pem:-----BEGIN CERTIFICATE-----MIICszCCAhWgAwIBAgIVAP5jQirZLKNnSHf1FES8qkWMJyvKMAoGCCqGSM49BAMEMDYxHTAbBgNVBAMMFEphZGV4IEdsb2JhbCBSb290IFgxMRUwEwYDVQQKDAxBY3Rvcm9uIEdtYkgwHhcNMTgwODAxMDkxNjA5WhcNMjgwNzI5MDkxNjA5WjA2MR0wGwYDVQQDDBRKYWRleCBHbG9iYWwgUm9vdCBYMTEVMBMGA1UECgwMQWN0b3JvbiBHbWJIMIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQA6K9sA0U88s0/6nLTwZhXwzBesBr/MpNAqpZtCBe2sD+3sjppYtnug3RUbRFYNZsYPMMHBqOWyo0BR7N5DxeSJ8AB/T/zzTC9PqjDUcIazUDCf0XsSSx08a3UqBPZ5EzKRtOvf3cx/qCp/0/fND3iKWfrNhngLxYMS0d/BMlNRE3vQl6jgbwwgbkwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAoQwSQYDVR0OBEIEQLAcDiIifZpM0BihTvohWfxP5bHk3iHeA/O5vLaTp7o5Lw+2E2CcyIXfNcMRhQ5lAymDVYBwJjr0ZjgzvXOsJhIwSwYDVR0jBEQwQoBAsBwOIiJ9mkzQGKFO+iFZ/E/lseTeId4D87m8tpOnujkvD7YTYJzIhd81wxGFDmUDKYNVgHAmOvRmODO9c6wmEjAKBggqhkjOPQQDBAOBiwAwgYcCQgGYPCBbcI/ai9nAqzuU1oXIn4KFguj/95xbVm4HBb9wsNrB0K8LtdXsvB4BR2HeRCB0cWqyCKZimBbaJIoDBTcs2gJBTXfqb/KlKCwrO6KXLOtah5sgASt+QZ3uD6AXBNrBfBjC5nUBWkx/zJd+sllyYoekCGy/UAvwNIB4aFkTHnQGyS4=-----END CERTIFICATE-----";
+	public static final String DEFAULT_GLOBAL_ROOT_CERTIFICATE = "pem:-----BEGIN CERTIFICATE-----|MIICszCCAhWgAwIBAgIVAP5jQirZLKNnSHf1FES8qkWMJyvKMAoGCCqGSM49BAME|MDYxHTAbBgNVBAMMFEphZGV4IEdsb2JhbCBSb290IFgxMRUwEwYDVQQKDAxBY3Rv|cm9uIEdtYkgwHhcNMTgwODAxMDkxNjA5WhcNMjgwNzI5MDkxNjA5WjA2MR0wGwYD|VQQDDBRKYWRleCBHbG9iYWwgUm9vdCBYMTEVMBMGA1UECgwMQWN0b3JvbiBHbWJI|MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQA6K9sA0U88s0/6nLTwZhXwzBesBr/|MpNAqpZtCBe2sD+3sjppYtnug3RUbRFYNZsYPMMHBqOWyo0BR7N5DxeSJ8AB/T/z|zTC9PqjDUcIazUDCf0XsSSx08a3UqBPZ5EzKRtOvf3cx/qCp/0/fND3iKWfrNhng|LxYMS0d/BMlNRE3vQl6jgbwwgbkwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8E|BAMCAoQwSQYDVR0OBEIEQLAcDiIifZpM0BihTvohWfxP5bHk3iHeA/O5vLaTp7o5|Lw+2E2CcyIXfNcMRhQ5lAymDVYBwJjr0ZjgzvXOsJhIwSwYDVR0jBEQwQoBAsBwO|IiJ9mkzQGKFO+iFZ/E/lseTeId4D87m8tpOnujkvD7YTYJzIhd81wxGFDmUDKYNV|gHAmOvRmODO9c6wmEjAKBggqhkjOPQQDBAOBiwAwgYcCQgGYPCBbcI/ai9nAqzuU|1oXIn4KFguj/95xbVm4HBb9wsNrB0K8LtdXsvB4BR2HeRCB0cWqyCKZimBbaJIoD|BTcs2gJBTXfqb/KlKCwrO6KXLOtah5sgASt+QZ3uD6AXBNrBfBjC5nUBWkx/zJd+|sllyYoekCGy/UAvwNIB4aFkTHnQGyS4=|-----END CERTIFICATE-----|";
 	
 	/** The fallback polling search rate as factor of the default remote timeout. */
 	public static final double	POLLING_RATE	= 0.33333333;	// 30*0.333.. secs  -> 10 secs.
@@ -136,7 +138,12 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						for(String network: networknames)
 						{
 							connections.put(network, new NetworkManager(network));
-							connections.get(network).startSuperpeerSearch();	// Start after put, because uses itself for superpeer search
+						}
+						
+						// Start after put, because uses itself and maybe global network for superpeer search
+						for(String network: networknames)
+						{
+							connections.get(network).startSuperpeerSearch();
 						}
 						
 						ret.setResult(null);
@@ -177,7 +184,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
-		for(String networkname: getSearchableNetworks(query))
+//		for(String networkname: getSearchableNetworks(query))
+		for(String networkname : getQueryNetworks(query, connections.keySet()))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -262,7 +270,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
-		for(String networkname: getSearchableNetworks(query))
+//		for(String networkname: getSearchableNetworks(query))
+		for(String networkname : getQueryNetworks(query, connections.keySet()))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -444,6 +453,33 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		return ret;
 	}
 	
+	/**
+	 *  Gets the networks relevant to the query.
+	 * 
+	 *  @param query The query.
+	 *  @return The relevant networks, may be empty for none.
+	 */
+	public static final String[] getQueryNetworks(ServiceQuery<?> query, Set<String> availablenetworks)
+	{
+		Set<String> retset = new HashSet<>();
+		if (query.getNetworkNames() != null)
+		{
+			retset.addAll(Arrays.asList(query.getNetworkNames()));
+			if (RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()) ||
+				RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope()))
+					retset.add(GLOBAL_NETWORK_NAME);
+		}
+		else
+		{
+			retset.addAll(availablenetworks);
+			if (!RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()) &&
+				!RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope()))
+				retset.remove(GLOBAL_NETWORK_NAME);
+		}
+		
+		return retset.toArray(new String[retset.size()]);
+	}
+	
 	//-------- helper classes --------
 	
 	/**
@@ -535,13 +571,18 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							public void intermediateResultAvailable(Void result)
 							{
 								// First command -> connected (shouldn't be any other commands).
+								agent.getLogger().info("Established super peer connection for network "+networkname+" with super peer: "+sp);
 								
-								// Check if the superpeer is genuine.
-								ISecurityInfo secinfo = (ISecurityInfo) ServiceCall.getLastInvocation().getProperty(ServiceCall.SECURITY_INFOS);
-								if (secinfo == null || secinfo.getNetworks() == null || !secinfo.getNetworks().contains(networkname))
+								// Check if the superpeer is genuine, i.e it is local or network is authenticated.
+								IComponentIdentifier	spid	= ((IService)sp).getId().getProviderId();
+								if(!spid.getRoot().equals(agent.getId().getRoot()))
 								{
-									regfut.terminate(new SecurityException("Superpeer failed to authenticate with the network '" + networkname + "'."));
-									return;
+									ISecurityInfo secinfo = (ISecurityInfo) ServiceCall.getLastInvocation().getProperty(ServiceCall.SECURITY_INFOS);
+									if(secinfo==null || secinfo.getNetworks()==null || !secinfo.getNetworks().contains(networkname))
+									{
+										regfut.terminate(new SecurityException("Superpeer failed to authenticate with the network '" + networkname + "'."));
+										return;
+									}
 								}
 								
 								// First connected super peer -> remember connection and stop search
@@ -557,15 +598,29 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									// Activate waiting queries if any.
 									for(QueryManager<?> qmanager: waitingqueries)
 									{
+										agent.getLogger().info("Started waiting query for network: "+networkname+", "+qmanager.query);
 										qmanager.updateQuery(new String[]{networkname});
 									}
 									waitingqueries.clear();
 									
 									// Local query uses registry directly (w/o feature) -> only service identifiers needed and also removed events
-									localquery = ServiceRegistry.getRegistry(agent.getId())
-										.addQuery(new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>)null, RequiredServiceInfo.SCOPE_PLATFORM)
-											.setNetworkNames(networkname).setReturnType(ServiceEvent.CLASSINFO)
-											.setOwner(agent.getId()));
+									ServiceQuery<ServiceEvent<IServiceIdentifier>>	lquery	= new ServiceQuery<>((Class<IServiceIdentifier>)null)
+										.setEventMode()
+										.setOwner(spid);	// Only find services that are visible to SP
+									if(GLOBAL_NETWORK_NAME.equals(networkname))
+									{
+										// SSP connection -> global scope and no network name
+										lquery.setScope(RequiredServiceInfo.SCOPE_GLOBAL);
+										lquery.setNetworkNames((String[])null);
+									}
+									else
+									{
+										// Local SP connection -> network scope and network name
+										lquery.setScope(RequiredServiceInfo.SCOPE_NETWORK);
+										lquery.setNetworkNames(networkname);
+									}
+									localquery = ServiceRegistry.getRegistry(agent.getId()).addQuery(lquery);									
+
 									localquery.addResultListener(new IIntermediateResultListener<ServiceEvent<IServiceIdentifier>>()
 									{
 										public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
@@ -577,7 +632,6 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 										
 										public void exceptionOccurred(Exception exception)
 										{
-											System.out.println("Service event exception: "+exception);
 											// Should only happen on termination?
 											assert exception instanceof FutureTerminatedException : exception;
 										}
@@ -592,7 +646,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 													{
 														try
 														{
-															System.out.println("Sending service event to superpeer: "+event);
+//															System.out.println(agent+ " sending service event to superpeer "+sp+": "+event);
 															regfut.sendBackwardCommand(event);
 														}
 														catch (Exception e)
@@ -616,6 +670,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								// Stopped or additional connection -> terminate connection. 
 								else
 								{
+									agent.getLogger().info("Rejecting additional or stopped super peer connection for network "+networkname+" from super peer: "+sp);
 									regfut.terminate();
 								}
 							}	
@@ -767,6 +822,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		 */
 		protected <T>	void	addWaitingQuery(QueryManager<T> qmanager)
 		{
+			agent.getLogger().info("Waiting query for network: "+networkname+", "+qmanager.query);
+			
 			assert superpeer==null : "Should only be called when no connection.";
 			waitingqueries.add(qmanager);
 		}
@@ -817,7 +874,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			});
 			
 			// Start handling
-			updateQuery(getSearchableNetworks(query));
+//			updateQuery(getSearchableNetworks(query));
+			String[] networknames = getQueryNetworks(query, connections.keySet());
+			updateQuery(networknames);
 		}
 		
 		//-------- methods --------
@@ -939,7 +998,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								{
 									// Forward result to user query
 									Object res = result;
-									if (ServiceEvent.CLASSINFO.equals(query.getReturnType()))
+									if (query.isEventMode())
 										res = new ServiceEvent(result, ServiceEvent.SERVICE_ADDED);
 									
 									SubscriptionIntermediateFuture rawfut = retfut;

@@ -1,5 +1,6 @@
 package jadex.commons.future;
 
+import jadex.commons.TimeoutException;
 
 /**
  *  Interface for suspendable entities.
@@ -27,6 +28,7 @@ public interface ISuspendable
 	 *  @param future The future to wait for.
 	 *  @param timeout The timeout (-1 for no timeout, -2 for default timeout).
 	 *  @param realtime Flag if timeout is realtime (in contrast to simulation time).
+	 *  @throws TimeoutException when not resumed before timeout.
 	 */
 	public void suspend(Future<?> future, long timeout, boolean realtime);
 	

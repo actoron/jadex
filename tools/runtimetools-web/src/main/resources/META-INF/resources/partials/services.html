@@ -1,15 +1,15 @@
 <div class="actwtable section">
 	<h3 id="HConnectedPlatforms">Provided Services</h3>
 	<p>
-		This page shows currently registered provided services. No auto-update yet: refresh to update.
+		This page shows currently registered provided services.
 	</p>
-	<table ng-controller="Services">
+	<table ng-controller="Services" ng-class="{'down': superpeerDown}">
 		<tbody>
 			<tr>
 				<th>Service Type</th>
 				<th>Provided By</th>
 				<th>Publication Scope</th>
-<!-- 				<th>Networks</th> -->
+ 				<th>Networks</th>
 				<th>Security</th>
 			</tr>
 			<tr ng-repeat="x in services | orderBy: cidOrder"
@@ -17,7 +17,7 @@
 				<td>{{x.serviceType.value}}</td>
 				<td>{{x.providerId.name | cid}}</td>
 				<td>{{x.scope}}</td>
-<!-- 				<td>{{x.networkNames}}</td> -->
+ 				<td>{{x.networkNames}}</td>
 				<td>{{x.unrestricted && 'unrestricted' || 'restricted'}}</td>
 			</tr>
 		</tbody>

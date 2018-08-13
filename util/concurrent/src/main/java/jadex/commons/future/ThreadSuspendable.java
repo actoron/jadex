@@ -1,6 +1,7 @@
 package jadex.commons.future;
 
 import jadex.commons.SUtil;
+import jadex.commons.TimeoutException;
 import jadex.commons.concurrent.ThreadPool;
 
 /**
@@ -12,6 +13,9 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 	
 	/** The future. */
 	protected IFuture<?> future;
+	
+	/** The resumed flag to differentiante from timeout.*/
+	protected boolean	resumed;
 	
 	//-------- methods --------
 	
@@ -28,6 +32,7 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 		synchronized(this)
 		{
 			this.future	= future;
+			this.resumed	= false;
 			assert !ThreadPool.WAITING_THREADS.containsKey(Thread.currentThread());
 			ThreadPool.WAITING_THREADS.put(Thread.currentThread(), future);
 			try
@@ -54,6 +59,11 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 				afterSwitch();
 				this.future	= null;
 			}
+			
+			if(!resumed)
+			{
+				throw new TimeoutException(("Timeout: "+timeout+", realtime="+realtime));
+			}
 		}
 	}
 	
@@ -67,6 +77,7 @@ public class ThreadSuspendable extends ThreadLocalTransferHelper implements ISus
 			// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 			if(future==this.future)
 			{
+				resumed	= true;
 				// Save the thread local values before switch
 				beforeSwitch();
 				this.notify();

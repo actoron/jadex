@@ -50,7 +50,7 @@ import jadex.micro.annotation.RequiredService;
 @ProvidedServices(replace=true,
 	value={@ProvidedService(type=ISuperpeerService.class, scope=RequiredService.SCOPE_GLOBAL),
 		   @ProvidedService(type=ISuperpeerCollaborationService.class, scope=RequiredService.SCOPE_GLOBAL),
-		   @ProvidedService(type=ISuperpeerStatusService.class)})
+		   @ProvidedService(type=ISuperpeerStatusService.class, scope=RequiredService.SCOPE_PLATFORM)})
 public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerCollaborationService, ISuperpeerStatusService
 {
 	/** The agent. */
@@ -68,11 +68,6 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	
 	/** Lookup for remote peer caches by network. */
 	protected MultiCollection<String, IServiceRegistry> peercaches = new MultiCollection<>();
-	
-//	public SuperpeerRegistryAgent()
-//	{
-//		System.out.println("SUPER CREATED!");
-//	}
 	
 	/**
 	 *  Initiates the client registration procedure
@@ -316,8 +311,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	{
 		final ServiceRegistry regcache = new ServiceRegistry();
 		final Set<String> nwnames = ((IService) peer).getId().getNetworkNames();
-		ServiceQuery<ServiceEvent<IServiceIdentifier>> query = new ServiceQuery<>((Class<ServiceEvent<IServiceIdentifier>>) null);
-		query.setReturnType(ServiceEvent.CLASSINFO);
+		ServiceQuery<ServiceEvent<IServiceIdentifier>> query = new ServiceQuery<>((Class<IServiceIdentifier>) null).setEventMode();
 		ISubscriptionIntermediateFuture<ServiceEvent<IServiceIdentifier>> sub = peer.addIntransitiveQuery(query);
 		for (String nwname : nwnames)
 			peercaches.add(nwname, regcache);

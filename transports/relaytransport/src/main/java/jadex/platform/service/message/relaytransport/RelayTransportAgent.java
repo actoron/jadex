@@ -67,11 +67,12 @@ import jadex.platform.service.transport.AbstractTransportAgent;
  *  Agent implementing relay routing.
  */
 //@Agent(autoprovide=Boolean3.TRUE)
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="rt"))
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="rt",
+	predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
 @Arguments({
 	// todo: see SuperpeerRegistrySynchronizationAgent
 //	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),
-	@Argument(name="addresses", clazz=String.class, defaultvalue="\"ws://ssp1@ngrelay1.actoron.com:80\""),	// TODO: wss, TODO: set in PlatformAgent???
+//	@Argument(name="addresses", clazz=String.class, defaultvalue="\"ws://ssp1@ngrelay1.actoron.com:80\""),	// TODO: wss, TODO: set in PlatformAgent???
 })
 @ProvidedServices({
 		@ProvidedService(type=ITransportService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
@@ -164,6 +165,12 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	/** Routing information (target platform / next route hop + cost). */
 	protected LRU<IComponentIdentifier, Tuple2<IComponentIdentifier, Integer>> routes;
 	
+	/** Update future to shorten timeout when keepalive update happens. */
+	protected Future<Void> keepaliveupdatefuture = new Future<>();
+	
+	/** Update future to shorten timeout when query update happens. */
+	protected Future<Void> queryupdatefuture = new Future<>();
+	
 	/**
 	 *  Creates the agent.
 	 */
@@ -181,8 +188,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	{
 		this.cms = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		intmsgfeat = (IInternalMessageFeature) agent.getFeature(IMessageFeature.class);
-		if (debug)
-			System.out.println("Started relay transport");
+		if(debug)
+			System.out.println(agent+": started relay transport");
 		Map<String, Object> args = agent.getFeature(IArgumentsResultsFeature.class).getArguments();
 		
 		maxhops = SConfigParser.getIntValue(args.get(PROPERTY_MAX_HOPS), maxhops);
@@ -195,12 +202,16 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		directconns = new PassiveLeaseTimeSet<IComponentIdentifier>(keepaliveinterval << 2);
 		
 		ServiceQuery<IRoutingService> query = new ServiceQuery<>(IRoutingService.class);
-		query.setScope(RequiredServiceInfo.SCOPE_GLOBAL).setExcludeOwner(true).setServiceTags("forwarding");
+		query.setScope(RequiredServiceInfo.SCOPE_GLOBAL).setExcludeOwner(true).setServiceTags("forwarding=true");
 		agent.getFeature(IRequiredServicesFeature.class).addQuery(query).addResultListener(new IIntermediateResultListener<IRoutingService>()
 		{
 			public void intermediateResultAvailable(IRoutingService result)
 			{
-				relays.add(((IService) result).getId().getProviderId());
+				relays.add(((IService) result).getId().getProviderId().getRoot());
+				if (debug)
+					System.out.println(agent + ": Got query update, releasing wait future.");
+				queryupdatefuture.setResult(null);
+				queryupdatefuture = new Future<>();
 			}
 
 			public void resultAvailable(Collection<IRoutingService> result)
@@ -291,22 +302,24 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						{
 							for (final IComponentIdentifier id : relays)
 							{
-								if (debug)
-									System.out.println("Sending to " + id);
+								if(debug)
+									System.out.println(agent+": sending to " + id);
 								msgfeat.sendMessageAndWait(getRtComponent(id), new Ping()).addResultListener(new IResultListener<Object>()
 								{
 									public void resultAvailable(Object result)
 									{
-										if (debug)
-											System.out.println("Got answer " + id);
+										if(debug)
+											System.out.println(agent+": got answer " + id);
 										if (keepaliveconnections.size() < keepalivecount)
 											keepaliveconnections.add(id);
+										keepaliveupdatefuture.setResult(null);
+										keepaliveupdatefuture = new Future<>();
 									}
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										if (debug)
-											System.out.println("Got exception:  " + exception);
+										if(debug)
+											System.out.println(agent+": got exception:  " + exception);
 									}
 								});
 							}
@@ -328,7 +341,21 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 								});
 							}
 						}
-						agent.getFeature(IExecutionFeature.class).waitForDelay(keepaliveinterval >>> 1, this, true);
+						if (keepaliveconnections.size() < keepalivecount)
+						{
+							try
+							{
+								queryupdatefuture.get(keepaliveinterval, true);
+								agent.getFeature(IExecutionFeature.class).scheduleStep(this);
+							}
+							catch (Exception e)
+							{
+							}
+						}
+						else
+						{
+							agent.getFeature(IExecutionFeature.class).waitForDelay(keepaliveinterval >>> 1, this, true);
+						}
 						return IFuture.DONE;
 					}
 				};
@@ -425,9 +452,9 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			
 			body = SUtil.mergeData(bheader, body);
 			
-			if (debug)
+			if(debug)
 			{
-				System.out.println("Preparing forward package for " + fwdest + " from " + fwsender + " orig header " + header);
+				System.out.println(agent+": preparing forward package for " + fwdest + " from " + fwsender + " orig header " + header);
 			}
 			
 			header = new MsgHeader();
@@ -438,10 +465,10 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		else
 		{
 			fwdest = (IComponentIdentifier) header.getProperty(FORWARD_DEST);
-			if (debug)
+			if(debug)
 			{
 				IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot();
-				System.out.println("Processing forward package for " + fwdest + " from " + fwsender);
+				System.out.println(agent+": processing forward package for " + fwdest + " from " + fwsender);
 			}
 		}
 		
@@ -550,7 +577,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	public IIntermediateFuture<Integer> discoverRoute(final IComponentIdentifier dest, final LinkedHashSet<IComponentIdentifier> hops)
 	{
 		if (debug)
-			System.out.println("Discover route on " + agent.getId() + " for " + dest);
+			System.out.println(agent+": discover route on " + agent.getId() + " for " + dest);
 		
 		final IComponentIdentifier destination = dest.getRoot();
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
@@ -596,9 +623,29 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				final Map<IComponentIdentifier, IRoutingService> routingservices = new HashMap<IComponentIdentifier, IRoutingService>();
 				Collection<IComponentIdentifier> rls = null;
 				if (forwarding)
+				{
 					rls = relays;
+				}
 				else
+				{
+					if (keepaliveconnections.size() == 0)
+					{
+						if (debug)
+							System.out.println(agent + ": Relays is 0, waiting for query update.");
+						try
+						{
+							keepaliveupdatefuture.get(MAX_ROUTING_SERVICE_DELAY, true);
+						}
+						catch (Exception e)
+						{
+							e.printStackTrace();
+						}
+						if (debug)
+							System.out.println(agent + ": Relays was 0, now:" + relays.size());
+					}
+					
 					rls = keepaliveconnections;
+				}
 				
 				for (IComponentIdentifier relayid : rls)
 				{

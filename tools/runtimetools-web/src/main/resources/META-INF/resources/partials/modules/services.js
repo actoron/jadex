@@ -9,18 +9,15 @@ var cidToString	= function(cid) {
 var app = angular.module('acservices', []);
 app.controller('Services', [ '$scope', '$http',
 	function($scope, $http) {
-		$scope.cidOrder	= function(service) {
-			var ret	= cidToString(service.providerId.name);
-			// alert("order is: "+ret);
-			return ret;
-		};
-		$http.get('status/getServices', 
-			{params: {'scope': JSON.stringify(["global","network"])},	// Stringify otherwise angular adds multiple singlevalued parameter occurrences, grrr.
-			 data: '',	// Otherwise angular removes content type header required for json unpacking of arg (TODO: Jadex bug, should use something different than contetn type for get?)
-			 headers: {'Content-Type': 'application/json'}})
-		.then(function(response) {
-			$scope.services = response.data;
-		});
+		getIntermediate($http, 'status/subscribeToServices',
+			function(response)
+			{
+				updateService($scope, response.data);
+			},
+			function(response)
+			{
+				$scope.superpeerDown	= true;
+			});
 	}
 ]);
 app.controller('Queries', [ '$scope', '$http',
@@ -36,10 +33,40 @@ app.controller('Queries', [ '$scope', '$http',
 ]);
 
 /**
- *  Beatify cid representation for readability and sorting: platform (agent@platform).
+ *  Beautify cid representation for readability and sorting: platform (agent@platform).
  */
 app.filter('cid', function() {
 	return cidToString;
 });
 
+function	updateService($scope, event)
+{
+	var	found	= false;
+	$scope.services	= $scope.services===undefined ? [] : $scope.services;
+	
+//	alert("Service: "+JSON.stringify(service));
+	for(var i=0; i<$scope.services.length; i++)
+	{
+		found	= $scope.services[i].serviceName==event.service.serviceName
+			&& $scope.services[i].providerId.name==event.service.providerId.name;
+		if(found)
+		{
+			// 0: added, 1: removed, 2: changed
+			if(event.type==1)	// removed
+			{
+				$scope.services.splice(i,1);
+			}
+			else	// added / changed
+			{
+				$scope.services[i]	= event.service;
+			}
+			break;
+		}
+	}
+	
+	if(!found)
+	{
+		$scope.services.push(event.service);
+	}
+}
 //]]>

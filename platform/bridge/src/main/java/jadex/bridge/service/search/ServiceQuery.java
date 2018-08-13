@@ -15,6 +15,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
+import jadex.commons.transformation.annotations.Include;
 
 /**
  *  Service query definition. T is the return type for search methods.
@@ -174,8 +175,8 @@ public class ServiceQuery<T>
 	/** The multiple flag. Search for multiple services */
 	protected Multiplicity	multiplicity;
 	
-	/** The return type. Tell registry to return services or service events. */
-	protected ClassInfo returntype;
+	/** Flag if event mode is enabled on the query. */
+	protected boolean eventmode;
 	
 	/** The matching mode for multivalued terms. True is and and false is or. */
 	protected Map<String, Boolean> matchingmodes;
@@ -219,7 +220,7 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype)
 	{
-		this(servicetype, null, null, null);
+		this(servicetype, null);
 	}
 	
 	/**
@@ -227,7 +228,7 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype, String scope)
 	{
-		this(servicetype, scope, null, null);
+		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, null);
 	}
 	
 //	
@@ -307,10 +308,9 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier owner, Class<?> returntype)
+	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier owner)
 	{
-		this(servicetype!=null? new ClassInfo(servicetype): null, scope,
-			owner, returntype!=null? new ClassInfo(returntype): null);
+		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, owner);
 	}
 	
 	/**
@@ -318,21 +318,12 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner)
 	{
-		this(servicetype, scope, owner, servicetype);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner, ClassInfo returntype)
-	{
 //		if(owner==null)
 //			throw new IllegalArgumentException("Owner must not null");
 		
 		this.servicetype = servicetype;
 		this.scope = scope;
 		this.owner = owner;
-		this.returntype = returntype;
 		
 		this.id = SUtil.createUniqueId();
 		this.networknames = NETWORKS_NOT_SET;
@@ -344,7 +335,6 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(ServiceQuery<T> original)
 	{
-		this.returntype = original.returntype;
 		this.servicetype = original.servicetype;
 		this.scope = original.scope;
 		this.servicetags = original.servicetags;
@@ -377,22 +367,36 @@ public class ServiceQuery<T>
 	}
 	
 	/**
-	 *  Get the return type.
-	 *  @return The return type
+	 *  Changes the query to event mode.
+	 *  
+	 *  @param eventmode the event mode state.
+	 *  @deprecated For bean purposes only, use setEventMode().
 	 */
-	public ClassInfo getReturnType()
+	@Deprecated
+	public void setEventMode(boolean eventmode)
 	{
-		return returntype;
+		this.eventmode = eventmode;
 	}
-
+	
 	/**
-	 *  Set the return type.
-	 *  @param type The return type to set
+	 *  Changes the query to event mode.
+	 *  
+	 *  @return The new query.
 	 */
-	public ServiceQuery<T> setReturnType(ClassInfo returntype)
+	@SuppressWarnings("unchecked")
+	public ServiceQuery<ServiceEvent<T>> setEventMode()
 	{
-		this.returntype = returntype;
-		return this;
+		this.eventmode = true;
+		return (ServiceQuery<ServiceEvent<T>>) this;
+	}
+	
+	/**
+	 *  Checks if query is in event mode.
+	 *  @return True, if in event mode
+	 */
+	public boolean isEventMode()
+	{
+		return eventmode;
 	}
 	
 	/**
@@ -588,6 +592,25 @@ public class ServiceQuery<T>
 	public Multiplicity	getMultiplicity()
 	{
 		return multiplicity;
+	}
+	
+	/**
+	 *  Set the multiplicity.
+	 *  @param multiplicity The minimum multiplicity to set
+	 */
+	public ServiceQuery<T> setMultiplicity(int multiplicity)
+	{
+		return setMultiplicity(multiplicity, -1);
+	}
+	
+	/**
+	 *  Set the multiplicity.
+	 *  @param multiplicitystart The minimum multiplicity to set
+	 *  @param multiplicityend The max multiplicity to set
+	 */
+	public ServiceQuery<T> setMultiplicity(int multiplicitystart, int multiplicityend)
+	{
+		return setMultiplicity(new Multiplicity(multiplicitystart, multiplicityend));
 	}
 
 	/**
