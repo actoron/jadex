@@ -135,7 +135,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	
 	/** Delay of keepalive messages. */
 	@AgentArgument
-	protected long keepaliveinterval = 30000;
+	protected long keepaliveinterval = 3000;
 	
 	/** Set to true for more verbose output. */
 	@AgentArgument
@@ -201,7 +201,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		{
 			public void intermediateResultAvailable(IRoutingService result)
 			{
-				relays.add(((IService)result).getId().getProviderId());
+				relays.add(((IService)result).getId().getProviderId().getRoot());
 			}
 
 			public void resultAvailable(Collection<IRoutingService> result)
