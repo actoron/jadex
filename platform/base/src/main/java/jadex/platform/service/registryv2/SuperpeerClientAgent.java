@@ -127,13 +127,13 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						
 						Set<String> networknames = new HashSet<>(networks.keySet());
 						
-						if (!networks.containsKey(GLOBAL_NETWORK_NAME))
+						if (!networknames.contains(GLOBAL_NETWORK_NAME))
 						{
 							secser.setNetwork(GLOBAL_NETWORK_NAME, DEFAULT_GLOBAL_ROOT_CERTIFICATE);
 							networknames.add(GLOBAL_NETWORK_NAME);
 						}
 						
-						for(String network: networks.keySet())
+						for(String network: networknames)
 						{
 							connections.put(network, new NetworkManager(network));
 							connections.get(network).startSuperpeerSearch();	// Start after put, because uses itself for superpeer search
@@ -177,10 +177,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
-		// TODO: search all if networks==null???
-		for(String networkname: query.getNetworkNames()!=null
-			? query.getNetworkNames()
-			: connections.keySet().toArray(new String[connections.size()]))
+		for(String networkname: getSearchableNetworks(query))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -265,10 +262,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
-		// TODO: search all if networks==null???
-		for(String networkname: query.getNetworkNames()!=null
-			? query.getNetworkNames()
-			: connections.keySet().toArray(new String[connections.size()]))
+		for(String networkname: getSearchableNetworks(query))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -347,6 +341,18 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	//-------- helper methods --------
 	
 	/**
+	 * Search all networks if networks==null or global scope
+	 */
+	protected String[] getSearchableNetworks(ServiceQuery<?> query)
+	{
+		return query.getNetworkNames()!=null
+				&& !RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope())
+				&& !RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope())
+			? query.getNetworkNames()
+			: connections.keySet().toArray(new String[connections.size()]);
+	}
+	
+	/**
 	 *  Search for services on remote platforms using the polling fallback and awareness.
 	 */
 	protected <T> TerminableIntermediateFuture<IServiceIdentifier> searchRemoteServices(final ServiceQuery<T> query)
@@ -379,9 +385,6 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new BasicComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform), new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, RequiredService.SCOPE_NETWORK, null, true);
 						IRemoteRegistryService rrs = (IRemoteRegistryService) RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
 						final IFuture<Set<IServiceIdentifier>> remotesearch = rrs.searchServices(query);
-						// TODO: use remote registry service
-//						final IFuture<Collection<T>> remotesearch =  ((IInternalRemoteExecutionFeature)agent.getFeature(IRemoteExecutionFeature.class))
-//								.executeRemoteSearch(platform, query);
 						
 //						System.out.println(agent + " searching remote platform3: "+platform+", "+query);
 						remotesearch.addResultListener(new IResultListener<Set<IServiceIdentifier>>()
@@ -567,12 +570,14 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									{
 										public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
 										{
+											System.out.println("Service event query finished!?: "+result);
 											// Should not happen?
 											assert false;
 										}
 										
 										public void exceptionOccurred(Exception exception)
 										{
+											System.out.println("Service event exception: "+exception);
 											// Should only happen on termination?
 											assert exception instanceof FutureTerminatedException : exception;
 										}
@@ -587,7 +592,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 													{
 														try
 														{
-//															System.out.println("Sending service event to superpeer: "+event);
+															System.out.println("Sending service event to superpeer: "+event);
 															regfut.sendBackwardCommand(event);
 														}
 														catch (Exception e)
@@ -812,11 +817,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			});
 			
 			// Start handling
-			// TODO: search all if networks==null???
-			String[]	networknames	= query.getNetworkNames()!=null
-				? query.getNetworkNames()
-				: connections.keySet().toArray(new String[connections.size()]);
-			updateQuery(networknames);
+			updateQuery(getSearchableNetworks(query));
 		}
 		
 		//-------- methods --------
