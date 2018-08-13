@@ -430,6 +430,21 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public boolean hasNextIntermediateResult()
     {
+    	return hasNextIntermediateResult(UNSET, false);
+    }
+    
+    /**
+     *  Check if there are more results for iteration for the given caller.
+     *  If there are currently no unprocessed results and future is not yet finished,
+     *  the caller is blocked until either new results are available and true is returned
+     *  or the future is finished, thus returning false.
+     *  
+	 *  @param timeout The timeout in millis.
+	 *  @param realtime Flag, if wait should be realtime (in constrast to simulation time).
+     *  @return	True, when there are more intermediate results for the caller.
+     */
+    public boolean hasNextIntermediateResult(long timeout, boolean realtime)
+    {
     	boolean	ret;
     	boolean	suspend;
 		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
@@ -467,13 +482,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    	    	   	// todo: realtime as method parameter?!
-    				caller.suspend(this, UNSET, false);
+    				caller.suspend(this, timeout, realtime);
     	    	   	icallers.remove(caller);
     			}
     			// else already resumed.
     		}
-	    	ret	= hasNextIntermediateResult();
+	    	ret	= hasNextIntermediateResult(timeout, realtime);
     	}
     	
     	return ret;
@@ -599,7 +613,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    	    		// todo: realtime as method parameter?!
     				caller.suspend(this, timeout, realtime);
     	    	   	icallers.remove(caller);
     			}
