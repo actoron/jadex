@@ -21,6 +21,7 @@ import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -532,13 +533,17 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							public void intermediateResultAvailable(Void result)
 							{
 								// First command -> connected (shouldn't be any other commands).
+								agent.getLogger().info("Established super peer connection for network "+networkname+" with super peer: "+sp);
 								
-								// Check if the superpeer is genuine.
-								ISecurityInfo secinfo = (ISecurityInfo) ServiceCall.getLastInvocation().getProperty(ServiceCall.SECURITY_INFOS);
-								if (secinfo == null || secinfo.getNetworks() == null || !secinfo.getNetworks().contains(networkname))
+								// Check if the superpeer is genuine, i.e it is local or network is authenticated.
+								if(!((IService)sp).getId().getProviderId().getRoot().equals(agent.getId().getRoot()))
 								{
-									regfut.terminate(new SecurityException("Superpeer failed to authenticate with the network '" + networkname + "'."));
-									return;
+									ISecurityInfo secinfo = (ISecurityInfo) ServiceCall.getLastInvocation().getProperty(ServiceCall.SECURITY_INFOS);
+									if(secinfo==null || secinfo.getNetworks()==null || !secinfo.getNetworks().contains(networkname))
+									{
+										regfut.terminate(new SecurityException("Superpeer failed to authenticate with the network '" + networkname + "'."));
+										return;
+									}
 								}
 								
 								// First connected super peer -> remember connection and stop search
@@ -611,6 +616,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								// Stopped or additional connection -> terminate connection. 
 								else
 								{
+									agent.getLogger().info("Rejecting additional or stopped super peer connection for network "+networkname+" from super peer: "+sp);
 									regfut.terminate();
 								}
 							}	
