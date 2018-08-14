@@ -76,11 +76,11 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 })
 @ProvidedServices({
 		@ProvidedService(type=ITransportService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-		@ProvidedService(type=IRoutingService.class, name="routing", scope="%{$args.forwarding ? jadex.bridge.service.RequiredServiceInfo.SCOPE_GLOBAL : jadex.bridge.service.RequiredServiceInfo.SCOPE_PLATFORM}")
+		//@ProvidedService(type=IRoutingService.class, name="routing", scope="%{$args.forwarding ? jadex.bridge.service.RequiredServiceInfo.SCOPE_GLOBAL : jadex.bridge.service.RequiredServiceInfo.SCOPE_PLATFORM}")
 })
 @Features(additional=true, replace=true, value=@Feature(type=IMessageFeature.class, clazz=RelayMessageComponentFeature.class))
 @Service
-@Tags("\"forwarding=\"+$args.forwarding")
+//@Tags("\"forwarding=\"+$args.forwarding")
 public class RelayTransportAgent implements ITransportService, IRoutingService
 {
 	/** Maxmimum number of relays to use. */
@@ -202,7 +202,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		directconns = new PassiveLeaseTimeSet<IComponentIdentifier>(keepaliveinterval << 2);
 		
 		ServiceQuery<IRoutingService> query = new ServiceQuery<>(IRoutingService.class);
-		query.setScope(RequiredServiceInfo.SCOPE_GLOBAL).setExcludeOwner(true).setServiceTags("forwarding=true");
+		query.setScope(RequiredServiceInfo.SCOPE_GLOBAL).setExcludeOwner(true);//.setServiceTags("forwarding=true");
 		agent.getFeature(IRequiredServicesFeature.class).addQuery(query).addResultListener(new IIntermediateResultListener<IRoutingService>()
 		{
 			public void intermediateResultAvailable(IRoutingService result)
@@ -232,6 +232,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		if (forwarding)
 		{
 			System.out.println("Relay transport in forwarding mode.");
+			
+			agent.getFeature(IProvidedServicesFeature.class).addService("routing", IRoutingService.class, RelayTransportAgent.this, null, RequiredServiceInfo.SCOPE_GLOBAL);
 			
 			IUntrustedMessageHandler handler = new IUntrustedMessageHandler()
 			{
