@@ -101,8 +101,12 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 				clients.remove(client);
 				clientqueries.remove(client);
 				serviceregistry.removeQueriesOfPlatform(client.getRoot());
+				serviceregistry.removeServices(client.getRoot());
 				for (IServiceRegistry reg : getApplicablePeers(null))
+				{
 					reg.removeQueriesOfPlatform(client.getRoot());
+					reg.removeServices(client.getRoot());
+				}
 			}
 		});
 		
