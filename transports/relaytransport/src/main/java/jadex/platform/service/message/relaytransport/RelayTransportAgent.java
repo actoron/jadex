@@ -118,7 +118,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	
 	/** Maximum time spent on finding routing services. */
 	@AgentArgument
-	protected int routingdelay;
+	protected int routingdelay = 3000;
 	
 	/** Set to true for more verbose output. */
 	@AgentArgument
@@ -479,7 +479,11 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				while (rls.size() == 0 && !waited);
 				
 				if (hasDirectConnection(destination))
+				{
 					ret.addIntermediateResult(0);
+					ret.setFinished();
+					return IFuture.DONE;
+				}
 				
 				if (rls.size() == 0)
 				{
