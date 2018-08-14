@@ -17,8 +17,10 @@ dependencies
 	
 	api 'commons-daemon:commons-daemon:1.0.10'
 	
-	// Add transports, otherwise test fails due to consistency check.
-	//testImplementation project(':transports:jadex-platform-extension-relaytransport')
+	// Add transpors for testing
+	testImplementation project(':transports:tcp')
+	testImplementation project(':transports:relaytransport')
+	
 	//testImplementation project(':transports:jadex-platform-extension-websockettransport')
 	// required for test suite (why?)
 	//testImplementation project(':kernels:jadex-kernel-component')

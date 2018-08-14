@@ -58,7 +58,7 @@ public class TcpMessageBuffer
 	 *  Always reads the length as 4 byte int and then reads the required amount of data into an array. 
 	 * 
 	 *  @return Two byte arrays, when the next message is complete, null as long as data is still pending.
-	 *  @throws Exception on read error.
+	 *  @throws IOException on read error.
 	 */
 	public Tuple2<byte[], byte[]>	read(SocketChannel sc) throws IOException
 	{

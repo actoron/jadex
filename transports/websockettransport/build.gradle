@@ -2,7 +2,9 @@ description 'Message transport protocols supporting websockets.'
 
 dependencies
 {
-	api project(':platform:base')
+	api project(':platform:bridge')
+	api project(':kernels:micro')
+	api project(':transports:base')
 	//api 'org.eclipse.jetty.websocket:websocket-client:9.4.4.v20170414'
 	
 	// NanoHTTPd server

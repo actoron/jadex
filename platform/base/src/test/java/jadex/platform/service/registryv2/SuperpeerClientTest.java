@@ -66,7 +66,7 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		System.out.println("1) add query");
 		IExternalAccess	client	= createPlatform(CLIENTCONF);
 		ISubscriptionIntermediateFuture<ITestService>	results	= client.addQuery(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL));
-		doWait(client);
+		waitALittle(client);
 		Assert.assertEquals("1) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		
 		// 2) start remote platform, wait for service -> test if awa fallback works with one platform, also checks local duplicate removal over time
@@ -85,7 +85,7 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		System.out.println("4) start SP, wait for connection from remote platforms and local platform");
 		IExternalAccess	sp	= createPlatform(SPCONF);
 		waitForSuperpeerConnections(sp, client, pro1, pro2);
-		doWait(client);
+		waitALittle(client);
 		Assert.assertEquals("4) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		
 		// 5) add second query -> wait for two services (test if works when already SP)
@@ -99,7 +99,7 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		Set<IComponentIdentifier>	providers2	= new LinkedHashSet<>();
 		providers2.add(pro1.getId());
 		providers2.add(pro2.getId());
-		doWait(client);
+		waitALittle(client);
 		Assert.assertEquals("5) ", Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
 		Assert.assertEquals(providers1, providers2);
 		
@@ -131,7 +131,7 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		// 1) search for service -> not found (test if works with no superpeers and no other platforms)
 		System.out.println("1) search for service");
 		IExternalAccess	client	= createPlatform(CLIENTCONF);
-		doWait(client);
+		waitALittle(client);
 		Collection<ITestService>	result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 		Assert.assertTrue(""+result, result.isEmpty());
 		
@@ -151,7 +151,7 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		System.out.println("4) start SP, wait for connection from remote platforms and local platform, search for service");
 		IExternalAccess	sp	= createPlatform(SPCONF);
 		waitForSuperpeerConnections(sp, client, pro1, pro2);
-		doWait(client);
+		waitALittle(client);
 		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 		Assert.assertEquals(""+result, 2, result.size());
 		

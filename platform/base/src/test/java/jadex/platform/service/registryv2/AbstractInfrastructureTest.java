@@ -86,7 +86,7 @@ public abstract class AbstractInfrastructureTest
 	/**
 	 *  Wait a small amount of time (@see WAITFACTOR).
 	 */
-	protected void doWait(IExternalAccess platform)
+	protected void waitALittle(IExternalAccess platform)
 	{
 		platform.waitForDelay(Starter.getScaledRemoteDefaultTimeout(platform.getId(), WAITFACTOR), new IComponentStep<Void>()
 		{

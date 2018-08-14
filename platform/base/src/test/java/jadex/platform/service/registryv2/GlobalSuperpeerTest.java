@@ -104,6 +104,8 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		// All connect to relay.
 		waitForSuperpeerConnections(relay, relay, sp);
 		
+		waitALittle(sp);	// Wait to allow SP services published to SSP
+		
 		// Should be able to find sp in ssp.
 		ISuperpeerService	sps	= relay.searchService(new ServiceQuery<>(ISuperpeerService.class)).get();
 		IServiceIdentifier	localsps	= sps.searchService(new ServiceQuery<>(ISuperpeerService.class, RequiredServiceInfo.SCOPE_GLOBAL).setNetworkNames(STest.testnetwork_name)).get();
