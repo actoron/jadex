@@ -136,6 +136,10 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			// Instantiate service objects
 			for(ProvidedServiceInfo info: sermap.values())
 			{
+				String scope = info.getScope();
+				scope = (String) SJavaParser.evaluateExpressionPotentially(scope, component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
+				info.setScope(scope);
+				
 				final ProvidedServiceImplementation	impl = info.getImplementation();
 				// Virtual service (e.g. promoted)
 				if(impl!=null && impl.getBinding()!=null)
