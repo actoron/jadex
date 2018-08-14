@@ -362,76 +362,78 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			.searchLocalServices(new ServiceQuery<>(IPassiveAwarenessService.class));
 		if(!pawas.isEmpty())
 		{
-			IPassiveAwarenessService	pawa	= pawas.iterator().next();
 			// Count awa search + platform searches (+ async filtering, if any).
-			final AtomicInteger	cnt	= new AtomicInteger(1);
+			final AtomicInteger	cnt	= new AtomicInteger(pawas.size());
 			
-			// Search for other platforms
-			pawa.searchPlatforms().addResultListener(new IntermediateDefaultResultListener<IComponentIdentifier>()
+			for(IPassiveAwarenessService pawa: pawas)
 			{
-				@Override
-				public void intermediateResultAvailable(final IComponentIdentifier platform)
+				// Search for other platforms
+				pawa.searchPlatforms().addResultListener(new IntermediateDefaultResultListener<IComponentIdentifier>()
 				{
-//					System.out.println(agent + " searching remote platform: "+platform+", "+query);
-					
-					// Only (continue to) search remote when future not yet finished or cancelled.
-					if(!ret.isDone())
+					@Override
+					public void intermediateResultAvailable(final IComponentIdentifier platform)
 					{
-						cnt.incrementAndGet();
+	//					System.out.println(agent + " searching remote platform: "+platform+", "+query);
 						
-						IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new BasicComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform), new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, RequiredService.SCOPE_NETWORK, null, true);
-						IRemoteRegistryService rrs = (IRemoteRegistryService) RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
-						final IFuture<Set<IServiceIdentifier>> remotesearch = rrs.searchServices(query);
-						
-//						System.out.println(agent + " searching remote platform3: "+platform+", "+query);
-						remotesearch.addResultListener(new IResultListener<Set<IServiceIdentifier>>()
+						// Only (continue to) search remote when future not yet finished or cancelled.
+						if(!ret.isDone())
 						{
-							public void resultAvailable(final Set<IServiceIdentifier> result)
+							cnt.incrementAndGet();
+							
+							IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new BasicComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform), new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, RequiredService.SCOPE_NETWORK, null, true);
+							IRemoteRegistryService rrs = (IRemoteRegistryService) RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
+							final IFuture<Set<IServiceIdentifier>> remotesearch = rrs.searchServices(query);
+							
+	//						System.out.println(agent + " searching remote platform3: "+platform+", "+query);
+							remotesearch.addResultListener(new IResultListener<Set<IServiceIdentifier>>()
 							{
-//								System.out.println(agent + " searched remote platform: "+platform+", "+result);
-								if(result != null)
+								public void resultAvailable(final Set<IServiceIdentifier> result)
 								{
-									for(Iterator<IServiceIdentifier> it = result.iterator(); it.hasNext(); )
+	//								System.out.println(agent + " searched remote platform: "+platform+", "+result);
+									if(result != null)
 									{
-//										T ser = RemoteMethodInvocationHandler.createRemoteServiceProxy(localcomp, remotesvc)
-//										ret.addIntermediateResultIfUndone(ser);
-										ret.addIntermediateResultIfUndone(it.next());
+										for(Iterator<IServiceIdentifier> it = result.iterator(); it.hasNext(); )
+										{
+	//										T ser = RemoteMethodInvocationHandler.createRemoteServiceProxy(localcomp, remotesvc)
+	//										ret.addIntermediateResultIfUndone(ser);
+											ret.addIntermediateResultIfUndone(it.next());
+										}
 									}
+									doFinished();
 								}
-								doFinished();
-							}
-
-							public void exceptionOccurred(Exception exception)
-							{
-//								System.out.println(agent + " searched remote platform: "+platform+", "+exception);
-								doFinished();
-							}
-						});
+	
+								public void exceptionOccurred(Exception exception)
+								{
+	//								System.out.println(agent + " searched remote platform: "+platform+", "+exception);
+									doFinished();
+								}
+							});
+						}
 					}
-				}
-				
-				@Override
-				public void finished()
-				{
-					doFinished();
-				}
-				
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-					// ignore exception
-					doFinished();
-				}
-				
-				private void doFinished()
-				{
-					if(cnt.decrementAndGet()==0)
+					
+					@Override
+					public void finished()
 					{
-						// Undone, because gets terminated on first result for search one
-						ret.setFinishedIfUndone();
+						doFinished();
 					}
-				}
-			});
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						// ignore exception
+						doFinished();
+					}
+					
+					private void doFinished()
+					{
+						if(cnt.decrementAndGet()==0)
+						{
+							// Undone, because gets terminated on first result for search one
+							ret.setFinishedIfUndone();
+						}
+					}
+				});
+			}
 		}
 		else
 		{

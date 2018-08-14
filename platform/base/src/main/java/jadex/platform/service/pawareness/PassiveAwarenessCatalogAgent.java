@@ -29,7 +29,7 @@ import jadex.micro.annotation.Autostart;
  *
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE,
+@Agent(autoprovide = Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE,
 	predecessors="jadex.platform.service.address.TransportAddressAgent",
 	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
 )
