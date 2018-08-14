@@ -13,7 +13,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
 
@@ -88,14 +87,5 @@ public class Main
 			});
 		});
 
-	}
-
-	private IFuture<IComponentManagementService> getCMS(IExternalAccess access)
-	{
-		return access.scheduleStep(ia -> ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class)));
-
-		// return access.scheduleStep(ia -> SServiceProvider.getService(ia,
-		// IComponentManagementService.class,
-		// RequiredServiceInfo.SCOPE_PLATFORM));
 	}
 }

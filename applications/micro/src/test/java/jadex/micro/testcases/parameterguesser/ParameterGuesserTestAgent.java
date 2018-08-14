@@ -9,16 +9,12 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -26,7 +22,6 @@ import jadex.micro.annotation.Results;
  *  Test if the parameter guesser works correctly when using injection annotations.
  */
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ParameterGuesserTestAgent extends JunitAgentTest
 {

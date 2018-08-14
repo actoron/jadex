@@ -8,13 +8,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
@@ -167,7 +165,6 @@ public class MegaParallelStarterAgent
 	{
 		final String name = subname+"_#"+cnt;
 //		System.out.println("Destroying peer: "+name);
-		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId());
 		IResultListener lis = new IResultListener()
 		{
@@ -185,7 +182,7 @@ public class MegaParallelStarterAgent
 				exception.printStackTrace();
 			}
 		};
-		IFuture ret = cms.destroyComponent(aid);
+		IFuture ret = agent.killComponent(aid);
 		ret.addResultListener(lis);
 	}
 	

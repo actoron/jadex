@@ -4,11 +4,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
@@ -64,6 +63,13 @@ public interface IInternalAccess
 	public IComponentDescription getDescription();
 	
 	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid);
+	
+	/**
 	 *  Add a new component as subcomponent of this component.
 	 *  @param component The model or pojo of the component.
 	 */
@@ -100,6 +106,34 @@ public interface IInternalAccess
 	 *  @param e The failure reason, if any.
 	 */
 	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid);
+	
+	/**
+	 *  Suspend the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> suspendComponent(IComponentIdentifier componentid);
+	
+	/**
+	 *  Resume the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> resumeComponent(IComponentIdentifier componentid);
+	
+	/**
+	 *  Execute a step of a suspended component.
+	 *  @param componentid The component identifier.
+	 *  @param listener Called when the step is finished (result will be the component description).
+	 */
+	public IFuture<Void> stepComponent(IComponentIdentifier componentid, String stepinfo);
+	
+	/**
+	 *  Set breakpoints for a component.
+	 *  Replaces existing breakpoints.
+	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
+	 *  @param componentid The component identifier.
+	 *  @param breakpoints The new breakpoints (if any).
+	 */
+	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints);
 	
 	/**
 	 *  Get the external access.
@@ -151,9 +185,11 @@ public interface IInternalAccess
 		
 	/**
 	 *  Get the children (if any) component identifiers.
+	 *  @param type The local component type.
+	 *  @param parent The parent.
 	 *  @return The children component identifiers.
 	 */
-	public IFuture<IComponentIdentifier[]> getChildren(String type);
+	public IFuture<IComponentIdentifier[]> getChildren(String type, IComponentIdentifier parent);
 	
 	/**
 	 *  Get the exception, if any.
@@ -167,4 +203,17 @@ public interface IInternalAccess
 	 *  @return The external access.
 	 */
 	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid);
+	
+	/**
+	 *  Add a component listener for a specific component.
+	 *  The listener is registered for component changes.
+	 *  @param cid	The component to be listened.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid);
+	
+	/**
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con);//, boolean remote);
 }

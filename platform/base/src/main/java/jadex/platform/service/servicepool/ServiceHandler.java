@@ -18,7 +18,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -32,7 +31,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IPoolStrategy;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
@@ -487,23 +485,15 @@ public class ServiceHandler implements InvocationHandler
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IComponentManagementService> fut = component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( 
-			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		component.killComponent(workercid).addResultListener(
+			inta.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(Map<String, Object> result) 
 			{
-				cms.destroyComponent(workercid).addResultListener(
-					inta.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
-				{
-					public void customResultAvailable(Map<String, Object> result) 
-					{
-//						System.out.println("removed worker: "+workercid);
-//						System.out.println("strategy state: "+strategy);
-						allservices.remove(service);
-						ret.setResult(null);
-					}
-				}));
+//				System.out.println("removed worker: "+workercid);
+//				System.out.println("strategy state: "+strategy);
+				allservices.remove(service);
+				ret.setResult(null);
 			}
 		}));
 		

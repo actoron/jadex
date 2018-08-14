@@ -8,17 +8,14 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.ServiceInvalidException;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -27,10 +24,8 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.servicecall.DecoupledServiceAgent;
@@ -43,7 +38,6 @@ import jadex.micro.testcases.servicecall.RawServiceAgent;
  */
 @Description("A test case for testing access to services of already terminated components.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredService.SCOPE_PLATFORM))
 @Agent
 public class RemovedServiceAgent extends JunitAgentTest
 {

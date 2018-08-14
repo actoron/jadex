@@ -1,18 +1,5 @@
 package jadex.bridge.component;
 
-import java.util.Collection;
-import java.util.Map;
-
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
-import jadex.commons.Tuple2;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITuple2Future;
-
 /**
  *  Allows a component to have subcomponents.
  */

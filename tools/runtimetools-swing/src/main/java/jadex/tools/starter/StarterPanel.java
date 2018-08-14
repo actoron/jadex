@@ -60,10 +60,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.FixedJComboBox;
@@ -1704,13 +1701,13 @@ public class StarterPanel extends JLayeredPane
 			public void resultAvailable(IExternalAccess result)
 			{
 				ret.setResult(result.getId());
-				jcc.setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+				jcc.setStatusText("Created component: " + result.getId().getLocalName());
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
-//						exception.printStackTrace();
+//				exception.printStackTrace();
 				jcc.displayError("Problem Starting Component", "Component could not be started.", exception);
 			}
 		});

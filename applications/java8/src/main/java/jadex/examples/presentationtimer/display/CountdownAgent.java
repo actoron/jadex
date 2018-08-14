@@ -7,10 +7,8 @@ import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -23,11 +21,8 @@ import jadex.examples.presentationtimer.common.State;
 import jadex.examples.presentationtimer.display.ui.ConfigureFrame;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 
 @Agent
 @ProvidedServices({
@@ -35,9 +30,6 @@ import jadex.micro.annotation.RequiredServices;
 	@ProvidedService(type = ICountdownGUIService.class)
 }
 )
-@RequiredServices({
-	@RequiredService(type= IComponentManagementService.class, name = "cms")
-})
 public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 
 	private Set<ICountdownListener> listeners;
@@ -45,9 +37,6 @@ public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 	private Set<SubscriptionIntermediateFuture<State>> stateFutures;
 	private Set<SubscriptionIntermediateFuture<String>> timeFutures;
 
-	@AgentServiceSearch
-	private IComponentManagementService cms;
-	
 	@Agent
 	private IInternalAccess agent;
 	private String lastTime = "00:00";
@@ -100,7 +89,6 @@ public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 		controller.start();
 		
 //		IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class)).get();
-		System.out.println(cms);
 		agent.createComponent(null, new CreationInfo().setFilename("jadex.examples.presentationtimer.display.CountdownAgent.class")).addTuple2ResultListener(
 			t -> System.out.println(t),
 			ex -> System.out.println(ex));

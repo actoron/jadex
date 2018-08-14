@@ -218,7 +218,7 @@ public class AsyncSwingTreeModel extends AsyncTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 
-//		System.out.println("added node: "+node);
+//		System.out.println("addnode: "+node);
 		super.addNode(node);
 	}
 	

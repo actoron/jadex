@@ -5,13 +5,10 @@ import java.util.Map;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.ISubcomponentsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -22,8 +19,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 
 /**
  * 
@@ -31,7 +26,6 @@ import jadex.micro.annotation.RequiredServices;
 @Agent
 @Service
 @ComponentTypes(@ComponentType(name="block", clazz=BlockAgent.class))
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 public class ShutdownAgent
 {
 	//-------- attributes --------

@@ -7,11 +7,7 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.component.ISubcomponentsFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 
 /**
  *  Test local message sending.

@@ -5,10 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -28,10 +25,11 @@ public class RawBlockingTestAgent extends JunitAgentTest
 	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
-		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
-			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
+//			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		
-		cms.getComponentDescriptions().get();
+//		cms.getComponentDescriptions().get();
+		SComponentManagementService.getComponentDescriptions(agent).get();
 		
 		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 			new TestReport[]{new TestReport("#1", "Test blocking wait.", true, null)}));

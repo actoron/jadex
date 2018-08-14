@@ -8,13 +8,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
@@ -117,10 +115,10 @@ public class BlockingAgentCreationAgent
 			System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 		
 			// Use initial component to kill others
-			IComponentManagementService cms	= getCMS(agent);
+//			IComponentManagementService cms	= getCMS(agent);
 			String	initial	= createPeerName(1, agent.getId());
 			IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-			IExternalAccess exta	= cms.getExternalAccess(cid).get();
+			IExternalAccess exta	= agent.getExternalAccess(cid).get();
 			exta.scheduleStep(new IComponentStep<Void>()
 			{
 				@Classname("deletePeers")
@@ -128,12 +126,12 @@ public class BlockingAgentCreationAgent
 				{
 					IClockService	clock	= getClock(ia);
 					long	killstarttime	= clock.getTime();
-					IComponentManagementService	cms	= getCMS(ia);
+//					IComponentManagementService	cms	= getCMS(ia);
 					for(int i=max; i>1; i--)
 					{
 						String name = createPeerName(i, ia.getId());
 						IComponentIdentifier cid = new BasicComponentIdentifier(name, ia.getId().getRoot());
-						cms.destroyComponent(cid).get();
+						agent.killComponent(cid).get();
 						System.out.println("Successfully destroyed peer: "+name);
 					}
 					
@@ -186,12 +184,6 @@ public class BlockingAgentCreationAgent
 		}
 		return name;
 	}
-	
-	protected static IComponentManagementService	getCMS(IInternalAccess ia)
-	{
-		return ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-	}
-	
 	
 	protected static IClockService getClock(IInternalAccess ia)
 	{

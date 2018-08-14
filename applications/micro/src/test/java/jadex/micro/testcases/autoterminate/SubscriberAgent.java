@@ -4,12 +4,10 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
@@ -24,7 +22,6 @@ import jadex.micro.annotation.RequiredServices;
 	@Configuration(name="platform")})
 @RequiredServices({
 	@RequiredService(name="sub", type=IAutoTerminateService.class, scope=RequiredService.SCOPE_GLOBAL),
-	@RequiredService(name="cms", type=IComponentManagementService.class)
 })
 public class SubscriberAgent
 {
@@ -38,10 +35,6 @@ public class SubscriberAgent
 //	@AgentService
 //	protected IAutoTerminateService	sub;
 
-	/** The cms. */
-	@AgentServiceSearch
-	protected IComponentManagementService	cms;
-	
 	//-------- methods --------
 	
 	/**
@@ -71,7 +64,7 @@ public class SubscriberAgent
 						if("platform".equals(agent.getConfiguration()))
 						{
 //							agent.getLogger().severe("destroy platform: "+agent.getComponentIdentifier().getRoot());
-							cms.destroyComponent(agent.getId().getRoot());
+							agent.killComponent(agent.getId().getRoot());
 						}
 						else
 						{

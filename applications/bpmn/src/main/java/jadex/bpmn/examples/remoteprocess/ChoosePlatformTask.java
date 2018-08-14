@@ -26,7 +26,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -53,10 +53,10 @@ public class ChoosePlatformTask implements ITask
 		
 		final IExternalAccess exta	= process.getExternalAccess();
 		
-		process.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL))
-			.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentManagementService>, Void>(ret)
+		process.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+			.addResultListener(new ExceptionDelegationResultListener<Collection<ILibraryService>, Void>(ret)
 		{
-			public void customResultAvailable(final Collection<IComponentManagementService> result)
+			public void customResultAvailable(final Collection<ILibraryService> result)
 			{
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -79,7 +79,7 @@ public class ChoosePlatformTask implements ITask
 						IComponentIdentifier[]	cids	= new IComponentIdentifier[result.size()];
 						JRadioButton[]	buts	= new JRadioButton[result.size()];
 						ButtonGroup	bg	= new ButtonGroup();
-						Iterator<IComponentManagementService> it=result.iterator();
+						Iterator<ILibraryService> it=result.iterator();
 						for(int i=0; i<cids.length; i++)
 						{
 							IService	next	= (IService)it.next();

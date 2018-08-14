@@ -10,19 +10,18 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
-import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
@@ -31,14 +30,11 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
-import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import jadex.commons.future.TupleResult;
 
@@ -328,7 +324,7 @@ public class ExternalAccess implements IExternalAccess
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture<IComponentIdentifier[]> getChildren(final String type)
+	public IFuture<IComponentIdentifier[]> getChildren(final String type, IComponentIdentifier parent)
 	{
 		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
 		
@@ -344,7 +340,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
+						ia.getChildren(type, parent).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
 						return IFuture.DONE;
 					}
 				});
@@ -362,7 +358,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ia.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
+			ia.getChildren(type, parent).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
 		}
 		
 		return ret;
@@ -1508,4 +1504,141 @@ public class ExternalAccess implements IExternalAccess
 			}
 		});
 	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription> getDescription()
+	{
+		return (IFuture<IComponentDescription>)scheduleStep(new IComponentStep<IComponentDescription>()
+		{
+			@Override
+			public IFuture<IComponentDescription> execute(IInternalAccess ia)
+			{
+				return new Future<>(ia.getDescription());
+			}
+		});
+	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid)
+	{
+		return (IFuture<IComponentDescription>)scheduleStep(new IComponentStep<IComponentDescription>()
+		{
+			@Override
+			public IFuture<IComponentDescription> execute(IInternalAccess ia)
+			{
+				return ia.getDescription(cid);
+			}
+		});
+	}
+	
+	/**
+	 *  Suspend the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> suspendComponent(IComponentIdentifier componentid)
+	{
+		return (IFuture<Void>)scheduleStep(new IComponentStep<Void>()
+		{
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				return ia.suspendComponent(componentid);
+			}
+		});
+	}
+	
+	/**
+	 *  Resume the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> resumeComponent(IComponentIdentifier componentid)
+	{
+		return (IFuture<Void>)scheduleStep(new IComponentStep<Void>()
+		{
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				return ia.resumeComponent(componentid);
+			}
+		});
+	}
+	
+	/**
+	 *  Execute a step of a suspended component.
+	 *  @param componentid The component identifier.
+	 *  @param listener Called when the step is finished (result will be the component description).
+	 */
+	public IFuture<Void> stepComponent(IComponentIdentifier componentid, String stepinfo)
+	{
+		return (IFuture<Void>)scheduleStep(new IComponentStep<Void>()
+		{
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				return ia.stepComponent(componentid, stepinfo);
+			}
+		});
+	}
+	
+	/**
+	 *  Set breakpoints for a component.
+	 *  Replaces existing breakpoints.
+	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
+	 *  @param componentid The component identifier.
+	 *  @param breakpoints The new breakpoints (if any).
+	 */
+	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints)
+	{
+		return (IFuture<Void>)scheduleStep(new IComponentStep<Void>()
+		{
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				return ia.setComponentBreakpoints(componentid, breakpoints);
+			}
+		});
+	}
+	
+	/**
+	 *  Add a component listener for a specific component.
+	 *  The listener is registered for component changes.
+	 *  @param cid	The component to be listened.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid)
+	{
+		return (ISubscriptionIntermediateFuture<CMSStatusEvent>)scheduleStep(new IComponentStep<Collection<CMSStatusEvent>>()
+		{
+			@Override
+			public  ISubscriptionIntermediateFuture<CMSStatusEvent> execute(IInternalAccess ia)
+			{
+				return ia.listenToComponent(cid);
+			}
+		});
+	}
+	
+	/**
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con)//, boolean remote)
+	{
+		return (IFuture<IComponentDescription[]>)scheduleStep(new IComponentStep<IComponentDescription[]>()
+		{
+			@Override
+			public IFuture<IComponentDescription[]> execute(IInternalAccess ia)
+			{
+				return ia.searchComponents(adesc, con);
+			}
+		});
+	}
+
+
 }

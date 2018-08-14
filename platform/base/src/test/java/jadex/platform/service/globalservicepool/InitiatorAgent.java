@@ -17,7 +17,6 @@ import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
@@ -43,7 +42,6 @@ import jadex.platform.service.servicepool.PoolServiceInfo;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="cms", type=IComponentManagementService.class),
 	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL),
 	@RequiredService(name="aser", type=ITestService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL,
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))

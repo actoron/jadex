@@ -3,11 +3,10 @@ package jadex.micro.testcases.blocking;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.SComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Result;
@@ -34,10 +33,11 @@ public class RemoteBlockingTestAgent	extends TestAgent
 		// timeout none due to remote call and simulation mode
 		IExternalAccess	exta	= createPlatform(null).get(Timeout.NONE);
 		
-		IComponentManagementService	cms	= exta.searchService(
-			new ServiceQuery<>(IComponentManagementService.class)).get(Timeout.NONE);
+		ILibraryService	ls = exta.searchService(
+			new ServiceQuery<>(ILibraryService.class)).get(Timeout.NONE);
 		
-		cms.getComponentDescriptions().get(Timeout.NONE);
+//		cms.getComponentDescriptions().get(Timeout.NONE);
+		SComponentManagementService.getComponentDescriptions(agent).get(Timeout.NONE);
 		
 		tc.addReport(new TestReport("#1", "Test blocking wait.", true, null));
 		

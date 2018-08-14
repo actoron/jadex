@@ -334,6 +334,8 @@ public class AsyncTreeModel
 	 */
 	public void addNode(ITreeNode node)
 	{
+//		if(added.containsKey(node.getId()))
+//			throw new RuntimeException("Already contained: "+node+" node is: "+this);
 		added.put(node.getId(), node);
 
 		INodeListener[] lis = nodelisteners.toArray(new INodeListener[nodelisteners.size()]);

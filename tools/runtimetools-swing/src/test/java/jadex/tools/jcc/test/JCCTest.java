@@ -13,9 +13,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SNonAndroid;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -46,9 +43,7 @@ public class JCCTest //extends TestCase
 		IExternalAccess	platform	= fut.get(timeout);
 		timeout	= Starter.getLocalDefaultTimeout(platform.getId());
 		
-		IComponentManagementService	cms	= (IComponentManagementService)platform.searchService( new ServiceQuery<>(IComponentManagementService.class)).get(timeout);
-
-		IExternalAccess	jcc	= (IExternalAccess)cms.getExternalAccess(
+		IExternalAccess	jcc	= (IExternalAccess)platform.getExternalAccess(
 			new BasicComponentIdentifier("jcc", platform.getId())).get(timeout);
 		
 		jcc.scheduleStep(new IComponentStep<Void>()
@@ -77,7 +72,6 @@ public class JCCTest //extends TestCase
 		fut	= null;
 		platform	= null;
 		jcc	= null;
-		cms	= null;
 		
 		SNonAndroid.clearAWT();
 		

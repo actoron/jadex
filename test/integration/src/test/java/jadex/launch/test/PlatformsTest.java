@@ -16,12 +16,8 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IIntermediateResultListener;
@@ -126,8 +122,8 @@ public class PlatformsTest //extends TestCase
 			}
 			
 			final Future<Void>	fut	= new Future<Void>();
-			IComponentManagementService cms = platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
-			cms.listenToComponent(platform.getId()).addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
+			
+			platform.listenToComponent(platform.getId()).addIntermediateResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 			{
 				@Override
 				public void exceptionOccurred(Exception exception)
@@ -153,6 +149,34 @@ public class PlatformsTest //extends TestCase
 				{
 				}
 			});
+			
+//			IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
+//			cms.listenToComponent(platform.getId()).addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
+//			{
+//				@Override
+//				public void exceptionOccurred(Exception exception)
+//				{
+//				}
+//				
+//				@Override
+//				public void resultAvailable(Collection<CMSStatusEvent> result)
+//				{
+//				}
+//				
+//				@Override
+//				public void intermediateResultAvailable(CMSStatusEvent result)
+//				{
+//					if(result instanceof CMSTerminatedEvent)
+//					{
+//						fut.setResult(null);
+//					}
+//				}
+//				
+//				@Override
+//				public void finished()
+//				{
+//				}
+//			});
 			
 //			// Test CTRL-C shutdown behavior.
 //			Timer	timer	= new Timer();

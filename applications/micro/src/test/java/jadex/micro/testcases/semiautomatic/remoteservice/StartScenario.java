@@ -8,11 +8,7 @@ import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
@@ -62,11 +58,11 @@ public class StartScenario
 				{
 					public void resultAvailable(final IExternalAccess rplat)
 					{
-						rplat.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-							.addResultListener(new DefaultResultListener<IComponentManagementService>()
-						{
-							public void resultAvailable(final IComponentManagementService rcms)
-							{
+//						rplat.searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//							.addResultListener(new DefaultResultListener<IComponentManagementService>()
+//						{
+//							public void resultAvailable(final IComponentManagementService rcms)
+//							{
 								rplat.createComponent(null, new CreationInfo().setName("math").setFilename("MathAgent.class"), null)
 									.addResultListener(new DefaultResultListener<IExternalAccess>()
 								{
@@ -96,8 +92,8 @@ public class StartScenario
 										});
 									}
 								});
-							}
-						});
+							//}
+						//});
 					}
 				});			
 			}

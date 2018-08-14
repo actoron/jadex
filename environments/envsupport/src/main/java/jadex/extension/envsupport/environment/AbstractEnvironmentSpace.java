@@ -21,15 +21,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
@@ -643,44 +639,37 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						ia.getClassLoader(), killonexit!=null ? killonexit.booleanValue() : true);
 					observercenters.add(oc);
 					
-					getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-						.addResultListener(new DefaultResultListener()
+					getExternalAccess().listenToComponent(getExternalAccess().getId())
+						.addIntermediateResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 					{
-						public void resultAvailable(final Object result)
+						@Override
+						public void exceptionOccurred(Exception exception)
 						{
-							((IComponentManagementService)result).listenToComponent(getExternalAccess().getId())
-								.addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
+						}
+						
+						@Override
+						public void resultAvailable(Collection<CMSStatusEvent> result)
+						{
+						}
+						
+						@Override
+						public void intermediateResultAvailable(CMSStatusEvent result)
+						{
+							if(result instanceof CMSTerminatedEvent)
 							{
-								@Override
-								public void exceptionOccurred(Exception exception)
+								SwingUtilities.invokeLater(new Runnable()
 								{
-								}
-								
-								@Override
-								public void resultAvailable(Collection<CMSStatusEvent> result)
-								{
-								}
-								
-								@Override
-								public void intermediateResultAvailable(CMSStatusEvent result)
-								{
-									if(result instanceof CMSTerminatedEvent)
+									public void run()
 									{
-										SwingUtilities.invokeLater(new Runnable()
-										{
-											public void run()
-											{
-												oc.dispose();
-											}
-										});
+										oc.dispose();
 									}
-								}
-								
-								@Override
-								public void finished()
-								{
-								}
-							});
+								});
+							}
+						}
+						
+						@Override
+						public void finished()
+						{
 						}
 					});
 					
@@ -1859,14 +1848,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
 				if(mapping.isKillComponent())
 				{
-					getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_COMPONENT))
-						.addResultListener(new DefaultResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							((IComponentManagementService)result).destroyComponent(desc.getName());
-						}
-					});
+					getExternalAccess().killComponent(desc.getName());
 				}
 			}
 		}
@@ -2599,21 +2581,13 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	protected IFuture getComponentType(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
-		getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new DelegationResultListener(ret)
+		getExternalAccess().getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						IExternalAccess exta = (IExternalAccess)result;
-						String componenttype = exta.getLocalType();
-						ret.setResult(componenttype);
-					}
-				});
+				IExternalAccess exta = (IExternalAccess)result;
+				String componenttype = exta.getLocalType();
+				ret.setResult(componenttype);
 			}
 		});
 		return ret;

@@ -291,7 +291,7 @@ public class RemoteReferenceModule
 	/**
 	 *  Create a proxy info for a service. 
 	 */
-	protected static ProxyInfo createProxyInfo(Object target, Class<?>[] remoteinterfaces, ClassLoader cl, IComponentIdentifier platform)
+	public static ProxyInfo createProxyInfo(Object target, Class<?>[] remoteinterfaces, ClassLoader cl, IComponentIdentifier platform)
 	{
 		// todo: dgc, i.e. remember that target is a remote object (for which a proxyinfo is sent away).
 			
@@ -299,7 +299,7 @@ public class RemoteReferenceModule
 		Map<String, Object> properties = null;
 		
 		// Hack! as long as registry is not there
-		String[]	imports	= null;
+		String[] imports = null;
 //		ClassLoader	cl	= null;
 		if(target instanceof IExternalAccess)
 		{
@@ -403,7 +403,7 @@ public class RemoteReferenceModule
 //				deftimeout	= new Long(ta.value());
 //			}
 			
-			boolean	allex	= allinterfaces[i].isAnnotationPresent(Excluded.class);
+			boolean	allex = allinterfaces[i].isAnnotationPresent(Excluded.class);
 			
 //			if(allinterfaces[i].isAnnotationPresent(TargetResolver.class))
 //			{
@@ -547,9 +547,7 @@ public class RemoteReferenceModule
 		// the computer which only uses the proxy.
 		Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
 		if(ret.getMethodReplacement(getclass)==null)
-		{
 			ret.addExcludedMethod(new MethodInfo(getclass));
-		}
 		
 		return ret;
 	}
@@ -671,16 +669,16 @@ public class RemoteReferenceModule
 	 *  Get a remote reference.
 	 *  @param target The (local) remote object.
 	 */
-	protected RemoteReference getRemoteReference(Object target)
+	protected static RemoteReference getRemoteReference(Object target)
 	{
-		return getRemoteReference(target, target, true);
+		return getRemoteReference(target, target);//, true);
 	}
 	
 	/**
 	 *  Get a remote reference.
 	 *  @param target The (local) remote object.
 	 */
-	protected RemoteReference getRemoteReference(Object target, Object orig, boolean add)
+	public static RemoteReference getRemoteReference(Object target, Object orig)//, boolean add)
 	{
 		RemoteReference ret;// = (RemoteReference)remoterefs.get(target);
 		
@@ -697,7 +695,7 @@ public class RemoteReferenceModule
 					// Has to look into service as could be nested remote handler inside.
 					if(ser instanceof IService)
 					{
-						ret = getRemoteReference(ser, orig, false);
+						ret = getRemoteReference(ser, orig);//, false);
 					}
 					else 
 					{
@@ -731,7 +729,7 @@ public class RemoteReferenceModule
 				ServiceInfo si = (ServiceInfo)target;
 				if(ProxyFactory.isProxyClass(si.getDomainService().getClass()))
 				{
-					ret = getRemoteReference(si.getDomainService(), orig, false);
+					ret = getRemoteReference(si.getDomainService(), orig);//, false);
 				}
 				else
 				{
@@ -1661,7 +1659,7 @@ public class RemoteReferenceModule
 	/**
 	 *  Get the proxy interfaces (empty list if none).
 	 */
-	public Class<?>[] getRemoteInterfaces(Object object, ClassLoader cl)
+	public static Class<?>[] getRemoteInterfaces(Object object, ClassLoader cl)
 	{
 		List<Class<?>> ret = new ArrayList<Class<?>>();
 		

@@ -28,11 +28,9 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Tags;
-import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
@@ -108,7 +106,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected IInternalAccess agent;
 	
 	/** The cms (cached for speed). */
-	protected IComponentManagementService	cms;
+//	protected IComponentManagementService	cms;
 	
 	/** The security service. */
 	protected ISecurityService secservice;
@@ -179,7 +177,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		this.cms = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+//		this.cms = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		intmsgfeat = (IInternalMessageFeature) agent.getFeature(IMessageFeature.class);
 		if (debug)
 			System.out.println("Started relay transport");
@@ -450,7 +448,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			final ISerializationServices serser = (ISerializationServices) Starter.getPlatformValue(agent.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 			
 //			System.out.println("Final receiver, delivering to component: " + body);
-			AbstractTransportAgent.deliverRemoteMessage(agent, secservice, cms, serser, source, unpacked.get(0), unpacked.get(1));
+			AbstractTransportAgent.deliverRemoteMessage(agent, secservice, serser, source, unpacked.get(0), unpacked.get(1));
 			
 			return IFuture.DONE;
 		}

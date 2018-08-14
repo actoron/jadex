@@ -7,9 +7,9 @@ import java.util.logging.Logger;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
@@ -195,6 +195,16 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	}
 	
 	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription>	getDescription(IComponentIdentifier cid)
+	{
+		return access.getDescription(cid);
+	}
+	
+	/**
 	 *  Kill the component.
 	 */
 	public IFuture<Map<String, Object>> killComponent()
@@ -261,9 +271,9 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	 *  Get the children (if any) component identifiers.
 	 *  @return The children component identifiers.
 	 */
-	public IFuture<IComponentIdentifier[]> getChildren(String type)
+	public IFuture<IComponentIdentifier[]> getChildren(String type, IComponentIdentifier parent)
 	{
-		return access.getChildren(type);
+		return access.getChildren(type, parent);
 	}
 	
 	/**
@@ -322,5 +332,64 @@ public class InternalAccessAdapter implements IInternalAccess//, INonUserAccess
 	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info)
 	{
 		return access.createComponent(component, info);
+	}
+	
+	/**
+	 *  Suspend the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> suspendComponent(IComponentIdentifier componentid)
+	{
+		return access.suspendComponent(componentid);
+	}
+	
+	/**
+	 *  Resume the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> resumeComponent(IComponentIdentifier componentid)
+	{
+		return access.resumeComponent(componentid);
+	}
+	
+	/**
+	 *  Execute a step of a suspended component.
+	 *  @param componentid The component identifier.
+	 *  @param listener Called when the step is finished (result will be the component description).
+	 */
+	public IFuture<Void> stepComponent(IComponentIdentifier componentid, String stepinfo)
+	{
+		return access.stepComponent(componentid, stepinfo);
+	}
+	
+	/**
+	 *  Set breakpoints for a component.
+	 *  Replaces existing breakpoints.
+	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
+	 *  @param componentid The component identifier.
+	 *  @param breakpoints The new breakpoints (if any).
+	 */
+	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints)
+	{
+		return access.setComponentBreakpoints(componentid, breakpoints);
+	}
+	
+	/**
+	 *  Add a component listener for a specific component.
+	 *  The listener is registered for component changes.
+	 *  @param cid	The component to be listened.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid)
+	{
+		return access.listenToComponent(cid);
+	}
+	
+	/**
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con)
+	{
+		return access.searchComponents(adesc, con);
 	}
 }

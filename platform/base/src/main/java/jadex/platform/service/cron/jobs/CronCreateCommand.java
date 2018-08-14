@@ -1,8 +1,8 @@
 package jadex.platform.service.cron.jobs;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ISubscriptionIntermediateFuture;

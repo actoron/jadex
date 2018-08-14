@@ -24,10 +24,8 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.ServiceQuery;
@@ -35,11 +33,12 @@ import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
+import jadex.bridge.service.types.cms.IBootstrapFactory;
 import jadex.bridge.service.types.cms.InitInfo;
 import jadex.bridge.service.types.cms.LockEntry;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -54,7 +53,6 @@ import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
-import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.DelegationResultListener;
@@ -589,50 +587,61 @@ public class Starter
 
 					initRescueThread(cid, config);	// Required for bootstrapping init.
 
-					component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+					IBootstrapFactory fac = (IBootstrapFactory)SComponentManagementService.getComponentFactory(cid);
+					
+					fac.startService(component.getInternalAccess(), rid).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 					{
 						public void customResultAvailable(Void result)
 						{
-							@SuppressWarnings("rawtypes")
-							List comps = config.getComponents();
-							if(args!=null && args.containsKey("component"))
-							{
-								comps	= (List<?>)args.get("component");
-								if(config.getComponents()!=null)
-								{
-									comps.addAll((List<?>)config.getComponents());
-								}
-							}
-							
-							startComponents(0, comps, component.getInternalAccess())
-								.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
+							SComponentManagementService.removeInitInfo(cid);
+							SComponentManagementService.getComponents(cid).put(cid, component);
+						
+							component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(Boolean.TRUE.equals(config.getValue(IPlatformConfiguration.WELCOME, model)))
+									@SuppressWarnings("rawtypes")
+									List comps = config.getComponents();
+									if(args!=null && args.containsKey("component"))
 									{
-										long startup = System.currentTimeMillis() - starttime;
-										// platform.logger.info("Platform startup time: " + startup + " ms.");
-										System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
-//										System.out.println(desc.getName()+" platform startup time: " + "799 ms.");
+										comps	= (List<?>)args.get("component");
+										if(config.getComponents()!=null)
+										{
+											comps.addAll((List<?>)config.getComponents());
+										}
 									}
-									fret.setResult(component.getInternalAccess().getExternalAccess());
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									// On exception in init: kill platform.
-									component.getInternalAccess().getExternalAccess().killComponent();
-									super.exceptionOccurred(exception);
+									
+									startComponents(0, comps, component.getInternalAccess())
+										.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
+									{
+										public void customResultAvailable(Void result)
+										{
+											if(Boolean.TRUE.equals(config.getValue(IPlatformConfiguration.WELCOME, model)))
+											{
+												long startup = System.currentTimeMillis() - starttime;
+												// platform.logger.info("Platform startup time: " + startup + " ms.");
+												System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+		//										System.out.println(desc.getName()+" platform startup time: " + "799 ms.");
+											}
+											fret.setResult(component.getInternalAccess().getExternalAccess());
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											// On exception in init: kill platform.
+											component.getInternalAccess().getExternalAccess().killComponent();
+											super.exceptionOccurred(exception);
+										}
+									});
 								}
 							});
+							
+							if(cid.equals(IComponentIdentifier.LOCAL.get()))
+							{
+								IComponentIdentifier.LOCAL.set(null);
+							}
 						}
 					});
-					
-					if(cid.equals(IComponentIdentifier.LOCAL.get()))
-					{
-						IComponentIdentifier.LOCAL.set(null);
-					}
 				}
 			}
 	//		System.out.println("Model: "+model);
@@ -739,7 +748,7 @@ public class Starter
 		
 		if(components!=null && i<components.size())
 		{
-			IComponentManagementService cms = instance.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
+//			IComponentManagementService cms = instance.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
 			String name	= null;
 			String config	= null;
 			String args = null;

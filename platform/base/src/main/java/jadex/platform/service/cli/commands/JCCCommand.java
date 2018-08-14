@@ -6,12 +6,8 @@ import java.util.Map;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -79,16 +75,17 @@ public class JCCCommand extends CreateComponentCommand
 				{
 					final Future<Void> ret = new Future<Void>();
 			
-					final IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//					final IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 					IComponentDescription adesc = new CMSComponentDescription(null, null, false, false, false, false, false, null, "jadex.tools.jcc.JCC", null, null, -1, null, null, false);
-					cms.searchComponents(adesc, null, false).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>()
+//					cms.searchComponents(adesc, null, false).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>()
+					ia.searchComponents(adesc, null).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>()
 					{
 						public void customResultAvailable(IComponentDescription[] descs)
 						{
 							CounterResultListener<Map<String, Object>> lis = new CounterResultListener<Map<String, Object>>(descs.length, new DelegationResultListener<Void>(ret));
 							for(IComponentDescription desc: descs)
 							{
-								cms.destroyComponent(desc.getName()).addResultListener(lis);
+								ia.killComponent(desc.getName()).addResultListener(lis);
 							}
 						}
 					});

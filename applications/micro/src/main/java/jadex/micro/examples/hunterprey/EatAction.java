@@ -2,13 +2,8 @@ package jadex.micro.examples.hunterprey;
 
 import java.util.Map;
 
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -72,18 +67,7 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 		if(target.getProperty(ISpaceObject.PROPERTY_OWNER)!=null)
 		{
 //			System.err.println("Destroying: "+target.getProperty(ISpaceObject.PROPERTY_OWNER));
-			space.getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new IResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					IComponentManagementService cms = (IComponentManagementService)result;
-					cms.destroyComponent(((IComponentDescription)target.getProperty(ISpaceObject.PROPERTY_OWNER)).getName());
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			});
+			space.getExternalAccess().killComponent(((IComponentDescription)target.getProperty(ISpaceObject.PROPERTY_OWNER)).getName());
 		}
 		
 		avatar.setProperty(PROPERTY_POINTS, points);

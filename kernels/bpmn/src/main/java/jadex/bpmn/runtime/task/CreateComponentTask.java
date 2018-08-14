@@ -19,17 +19,12 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -276,8 +271,7 @@ public class CreateComponentTask implements ITask
 		{
 			public void resultAvailable(final IComponentIdentifier cid)
 			{
-				IComponentManagementService cms	= instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				IFuture<Map<String, Object>> fut = cms.destroyComponent(cid);
+				IFuture<Map<String, Object>> fut = instance.killComponent(cid);
 				fut.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 				{
 					public void customResultAvailable(Map<String, Object> result)

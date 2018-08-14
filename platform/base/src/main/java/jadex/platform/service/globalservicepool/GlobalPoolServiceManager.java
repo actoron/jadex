@@ -14,7 +14,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -25,7 +24,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -70,7 +69,7 @@ public class GlobalPoolServiceManager
 	protected Map<IComponentIdentifier, PlatformInfo> platforms;
 	
 	/** The current set of free platforms. */
-	protected Map<IComponentIdentifier, IComponentManagementService> freeplatforms;
+	protected Map<IComponentIdentifier, ILibraryService> freeplatforms;
 
 	/** The component. */
 	protected IInternalAccess component;
@@ -109,7 +108,7 @@ public class GlobalPoolServiceManager
 		this.onholds = new HashMap<IServiceIdentifier, IService>();
 		this.timers = new HashMap<IServiceIdentifier, ITimer>();
 		this.platforms = new HashMap<IComponentIdentifier, PlatformInfo>();
-		this.freeplatforms = new HashMap<IComponentIdentifier, IComponentManagementService>();
+		this.freeplatforms = new HashMap<IComponentIdentifier, ILibraryService>();
 		this.info = info;
 		this.usages = new HashMap<IServiceIdentifier, UsageInfo>();
 		this.strategy = strategy;
@@ -292,9 +291,9 @@ public class GlobalPoolServiceManager
 	 *  Get all available platforms for workers.
 	 *  (Excludes the own platforms because global pool already provides workers)
 	 */
-	protected ITerminableIntermediateFuture<IComponentManagementService> getPlatforms()
+	protected ITerminableIntermediateFuture<ILibraryService> getPlatforms()
 	{
-		TerminableIntermediateFuture<IComponentManagementService> ret = new TerminableIntermediateFuture<IComponentManagementService>();
+		TerminableIntermediateFuture<ILibraryService> ret = new TerminableIntermediateFuture<ILibraryService>();
 		if(platforms!=null && platforms.size()>0)
 		{
 			for(PlatformInfo pi: platforms.values())
@@ -307,10 +306,10 @@ public class GlobalPoolServiceManager
 //		{
 			
 			//SServiceProvider.getServices(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-			component.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(RequiredService.SCOPE_GLOBAL)))
-				.addResultListener(new IntermediateDelegationResultListener<IComponentManagementService>(ret)
+			component.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(ILibraryService.class).setScope(RequiredService.SCOPE_GLOBAL)))
+				.addResultListener(new IntermediateDelegationResultListener<ILibraryService>(ret)
 			{
-				public void customIntermediateResultAvailable(IComponentManagementService cms) 
+				public void customIntermediateResultAvailable(ILibraryService cms) 
 				{
 					IComponentIdentifier cid = ((IService)cms).getId().getProviderId().getRoot();
 					if(!platforms.containsKey(cid))
@@ -329,15 +328,15 @@ public class GlobalPoolServiceManager
 	 *  Get all free platforms. A free platform is a platform on which no worker
 	 *  of this pool has been started.
 	 */
-	protected ITerminableIntermediateFuture<IComponentManagementService> getFreePlatforms()
+	protected ITerminableIntermediateFuture<ILibraryService> getFreePlatforms()
 	{
-		final TerminableIntermediateFuture<IComponentManagementService> ret = new TerminableIntermediateFuture<IComponentManagementService>();
+		final TerminableIntermediateFuture<ILibraryService> ret = new TerminableIntermediateFuture<ILibraryService>();
 
 		// todo: when to search again
 		
 		if(freeplatforms!=null && freeplatforms.size()>0)
 		{
-			for(IComponentManagementService cms: freeplatforms.values())
+			for(ILibraryService cms: freeplatforms.values())
 			{
 				System.out.println("found free platform1: "+cms);
 				ret.addIntermediateResult(cms);
@@ -346,9 +345,9 @@ public class GlobalPoolServiceManager
 		}
 		else
 		{
-			getPlatforms().addResultListener(new IIntermediateResultListener<IComponentManagementService>() 
+			getPlatforms().addResultListener(new IIntermediateResultListener<ILibraryService>() 
 			{
-				public void intermediateResultAvailable(IComponentManagementService cms) 
+				public void intermediateResultAvailable(ILibraryService cms) 
 				{
 					IComponentIdentifier cid = ((IService)cms).getId().getProviderId().getRoot();
 					if(!((IService)cms).getId().getProviderId().getRoot().equals(component.getId().getRoot())
@@ -370,9 +369,9 @@ public class GlobalPoolServiceManager
 					ret.setFinished();
 				}
 				
-				public void resultAvailable(Collection<IComponentManagementService> result) 
+				public void resultAvailable(Collection<ILibraryService> result) 
 				{
-					for(IComponentManagementService cms: result)
+					for(ILibraryService cms: result)
 					{
 						intermediateResultAvailable(cms);
 					}
@@ -398,10 +397,10 @@ public class GlobalPoolServiceManager
 		final int[] creating = new int[1];
 		final int[] created = new int[1];
 				
-		getFreePlatforms().addResultListener(new IIntermediateResultListener<IComponentManagementService>() 
+		getFreePlatforms().addResultListener(new IIntermediateResultListener<ILibraryService>() 
 		{
 			boolean fini = false;
-			public void intermediateResultAvailable(final IComponentManagementService cms) 
+			public void intermediateResultAvailable(final ILibraryService cms) 
 			{
 //				System.out.println("create service on: "+cms+" "+component.getComponentIdentifier().getRoot()+" "+freeplatforms);
 				if(strategy.isCreateWorkerOn(((IService)cms).getId().getProviderId().getRoot()) 
@@ -493,9 +492,9 @@ public class GlobalPoolServiceManager
 				fini = true;
 			}
 			
-			public void resultAvailable(Collection<IComponentManagementService> result) 
+			public void resultAvailable(Collection<ILibraryService> result) 
 			{
-				for(IComponentManagementService cms: result)
+				for(ILibraryService cms: result)
 				{
 					intermediateResultAvailable(cms);
 				}
@@ -598,9 +597,7 @@ public class GlobalPoolServiceManager
 
 //		System.out.println("removing worker: "+workercid+" "+servicepool);
 		
-		IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		
-		cms.destroyComponent(workercid).addResultListener(
+		component.killComponent(workercid).addResultListener(
 			inta.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{
 			public void customResultAvailable(Map<String, Object> result) 
@@ -669,7 +666,7 @@ public class GlobalPoolServiceManager
 	public static class PlatformInfo
 	{
 		/** The cms. */
-		protected IComponentManagementService cms;
+		protected ILibraryService cms;
 		
 		/** The worker(s) that have been created on the platform. */
 		protected IService worker;
@@ -677,7 +674,7 @@ public class GlobalPoolServiceManager
 		/**
 		 * Create a new PlatformInfo.
 		 */
-		public PlatformInfo(IComponentManagementService cms, IService worker) 
+		public PlatformInfo(ILibraryService cms, IService worker) 
 		{
 			this.cms = cms;
 			this.worker = worker;
@@ -687,7 +684,7 @@ public class GlobalPoolServiceManager
 		 *  Get the cms.
 		 *  @return the cms
 		 */
-		public IComponentManagementService getCms() 
+		public ILibraryService getCms() 
 		{
 			return cms;
 		}
@@ -696,7 +693,7 @@ public class GlobalPoolServiceManager
 		 *  Set the cms.
 		 *  @param cms The cms to set
 		 */
-		public void setCms(IComponentManagementService cms) 
+		public void setCms(ILibraryService cms) 
 		{
 			this.cms = cms;
 		}

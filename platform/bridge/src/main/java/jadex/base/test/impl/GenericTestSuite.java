@@ -7,7 +7,6 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.test.IAbortableTestSuite;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 

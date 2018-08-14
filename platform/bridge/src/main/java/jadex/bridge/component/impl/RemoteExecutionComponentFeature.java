@@ -553,9 +553,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			
 			// Admin platforms (i.e. in possession  of our platform key) can do anything.
 			if(secinfos.isAdminPlatform())
-			{
 				trusted	= true;
-			}
 			
 			// Internal command -> safe to check as stated by command.
 			else if(SAFE_COMMANDS.contains(msg.getClass()))

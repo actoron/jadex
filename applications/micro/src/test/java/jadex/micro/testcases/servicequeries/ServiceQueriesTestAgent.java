@@ -16,7 +16,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
@@ -26,7 +25,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
-import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
@@ -39,7 +37,6 @@ import jadex.micro.testcases.TestAgent;
 @Agent(keepalive=Boolean3.FALSE)
 @RequiredServices(
 {
-	@RequiredService(name="cms", type=IComponentManagementService.class),
 	//@RequiredService(name="exaser", type=IExampleService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))

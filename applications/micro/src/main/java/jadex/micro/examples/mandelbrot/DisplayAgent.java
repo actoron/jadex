@@ -15,7 +15,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.Future;
@@ -44,7 +43,6 @@ import jadex.micro.annotation.RequiredServices;
 @RequiredServices({
 	@RequiredService(name="generateservice", type=IGenerateService.class),
 	@RequiredService(name="progressservice", type=IProgressService.class),
-	@RequiredService(name="cmsservice", type=IComponentManagementService.class),
 	@RequiredService(name="mandelservice", type=IMandelbrotService.class)
 })
 @Agent

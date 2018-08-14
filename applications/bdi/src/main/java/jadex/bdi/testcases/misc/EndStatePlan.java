@@ -7,15 +7,10 @@ import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.collection.SCollection;
 
 /**
@@ -45,9 +40,8 @@ public class EndStatePlan extends Plan
 		
 		// Check if worker agent has been correctly removed.
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
-		IComponentManagementService cms = getAgent().getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
-		IComponentDescription[]	results	= SComponentManagementService.searchComponents(
-			new CMSComponentDescription(worker, null, false, false, false, false, false, null, null, null, null, -1, null, null, false), null, false, getAgent(), ((IService)cms).getId()).get();
+		IComponentDescription[]	results	= getAgent().searchComponents(
+			new CMSComponentDescription(worker, null, false, false, false, false, false, null, null, null, null, -1, null, null, false), null).get();
 		TestReport	report	= new TestReport("termination", "Test if the worker agent has been terminated");
 		if(results.length==0)
 		{

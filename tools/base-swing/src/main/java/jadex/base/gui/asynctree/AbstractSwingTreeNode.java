@@ -155,6 +155,8 @@ public abstract class AbstractSwingTreeNode	extends AbstractTreeNode implements 
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 
 		super.setChildren(newchildren);
+		
+		System.out.println("setChildren: "+this+" "+newchildren);
 	}
 	
 	@Override

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
@@ -26,24 +25,15 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
-import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITuple2Future;
-import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.future.Tuple2Future;
-import jadex.commons.future.TupleResult;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -141,7 +131,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 		
 		final Future<Void> res = new Future<Void>();
 		final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
-		IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//		IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		// NOTE: in current implementation application waits for subcomponents
 		// to be finished and cms implements a hack to get the external
 		// access of an uninited parent.
@@ -153,7 +143,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 		// (NOTE2: subcomponents must be created one by one as they
 		// might depend on each other (e.g. bdi factory must be there for jcc)).
 		
-		createComponent(components, cms, component.getModel(), 0, res, cids);
+		createComponent(components, component.getModel(), 0, res, cids);
 		
 		final Future<List<IComponentIdentifier>> ret = new Future<List<IComponentIdentifier>>();
 		res.addResultListener(new ExceptionDelegationResultListener<Void, List<IComponentIdentifier>>(ret)
@@ -188,7 +178,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	/**
 	 *  Create subcomponents.
 	 */
-	protected void	createComponent(final ComponentInstanceInfo[] components, final IComponentManagementService cms, final IModelInfo model, final int i, final Future<Void> fut, final List<IComponentIdentifier> cids)
+	protected void	createComponent(final ComponentInstanceInfo[] components, final IModelInfo model, final int i, final Future<Void> fut, final List<IComponentIdentifier> cids)
 	{
 		if(i<components.length)
 		{			
@@ -205,7 +195,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 //					if(num>0)
 //						System.out.println("created comp: "+components[i].getName());
 					cids.addAll(result);
-					createComponent(components, cms, model, i+1, fut, cids);
+					createComponent(components, model, i+1, fut, cids);
 				}
 			}));
 			for(int j=0; j<num; j++)

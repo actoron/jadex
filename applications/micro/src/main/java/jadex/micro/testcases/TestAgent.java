@@ -15,14 +15,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.ISubcomponentsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -43,7 +39,6 @@ import jadex.micro.annotation.Results;
 {
 //	@RequiredService(name="msgservice", type=IMessageService.class,
 //		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="cms", type=IComponentManagementService.class),
 	@RequiredService(name="clock", type=IClockService.class)
 })
 //@ComponentTypes(
@@ -268,14 +263,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
-		{
-			public void customResultAvailable(final IComponentManagementService cms)
-			{
-				cms.destroyComponent(cid).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
-			}
-		});
+		agent.killComponent(cid).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 		
 		return ret;
 	}

@@ -12,9 +12,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -51,10 +48,9 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 	{
 		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();
 		
-		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
 		for(IComponentIdentifier proxy: proxies)
 		{
-			IFuture<Map<String, Object>>	kill	= cms.destroyComponent(proxy);
+			IFuture<Map<String, Object>> kill = agent.killComponent(proxy);
 			fubar.addFuture(kill);
 		}
 		proxies	= null;

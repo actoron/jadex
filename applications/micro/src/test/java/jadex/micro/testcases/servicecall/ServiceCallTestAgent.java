@@ -8,15 +8,12 @@ import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.util.STest;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -36,7 +33,6 @@ import jadex.micro.testcases.TestAgent;
 	@RequiredService(name="raw", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_RAW, scope=RequiredService.SCOPE_GLOBAL),
 	@RequiredService(name="direct", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_DIRECT, scope=RequiredService.SCOPE_GLOBAL),
 	@RequiredService(name="decoupled", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_DECOUPLED, scope=RequiredService.SCOPE_GLOBAL),
-	@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredService.SCOPE_PLATFORM)
 })
 @Agent
 //@Arguments(replace=false, value=@Argument(name="max", clazz=int.class, defaultvalue="10"))

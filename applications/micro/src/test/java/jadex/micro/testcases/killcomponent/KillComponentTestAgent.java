@@ -7,10 +7,6 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -119,8 +115,7 @@ public class KillComponentTestAgent extends TestAgent
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
 				agent.getLogger().severe("Testagent create provider done: "+agent.getDescription());
-				IComponentManagementService cms = getCms().get();
-				IExternalAccess exta = cms.getExternalAccess(cid).get();
+				IExternalAccess exta = agent.getExternalAccess(cid).get();
 				final TestReport tr = new TestReport("#"+testno, "Test if kill returns result");
 				System.out.println("Killing my subcomponent...");
 				exta.killComponent().addResultListener(new IResultListener<Map<String, Object>>() {
@@ -163,10 +158,10 @@ public class KillComponentTestAgent extends TestAgent
 		return ret;
 	}
 	
-	private Future<IComponentManagementService> getCms() {
-		Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-				.addResultListener(new DelegationResultListener<IComponentManagementService>(ret));
-		return ret;
-	}
+//	private Future<IComponentManagementService> getCms() {
+//		Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
+//		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				.addResultListener(new DelegationResultListener<IComponentManagementService>(ret));
+//		return ret;
+//	}
 }

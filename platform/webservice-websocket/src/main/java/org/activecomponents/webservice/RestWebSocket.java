@@ -47,7 +47,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -264,8 +263,8 @@ public class RestWebSocket extends Endpoint
 
 					if(cid!=null)
 					{
-						IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
-						cms.destroyComponent(cid);
+//						IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
+						platform.killComponent(cid);
 						System.out.println("Killing session component: "+((IService)val).getId().getProviderId());
 					}
 				}

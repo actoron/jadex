@@ -4,11 +4,7 @@ import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.ISubcomponentsFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -106,8 +102,7 @@ public class ComponentPlanBody implements IPlanBody
 		if(cid!=null)
 		{
 			// todo: fix synchronous subcomponents!? may be called from inner or outer component.
-			IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-			cms.destroyComponent(cid);
+			ia.killComponent(cid);
 		}
 	}
 }

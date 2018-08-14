@@ -42,7 +42,6 @@ import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -220,43 +219,55 @@ public class SComponentFactory
 			{
 				final Future<IModelInfo> ret = new Future<IModelInfo>();
 				
-//				ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-//					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-//				{
-//					public void customResultAvailable(Object result)
-//					{
-//						final ILibraryService ls = (ILibraryService)result;
-						
-//						(IServiceProvider)ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid)))
-//						ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
-						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
-						fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
+				fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+				{
+					public void customResultAvailable(IComponentFactory fac)
+					{
+						fac.loadModel(model, null, rid)
+							.addResultListener(new DelegationResultListener<IModelInfo>(ret));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof ServiceNotFoundException)
 						{
-							public void customResultAvailable(IComponentFactory fac)
-							{
-								fac.loadModel(model, null, rid)
-									.addResultListener(new DelegationResultListener<IModelInfo>(ret));
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								if(exception instanceof ServiceNotFoundException)
-								{
-									ret.setResult(null);
-								}
-								else
-								{
-									super.exceptionOccurred(exception);
-								}
-							}
-						}));
-//					}
-//				}));
+							ret.setResult(null);
+						}
+						else
+						{
+							super.exceptionOccurred(exception);
+						}
+					}
+				}));
 				
 				return ret;
 			}
 		});
 	}
+	
+//	Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//	FactoryFilter facfilter = new FactoryFilter(filename, null, rid);
+//	
+//	SFilter.applyFilter(facs, facfilter).addResultListener(new IResultListener<Collection<IComponentFactory>>()
+//	{
+//		public void resultAvailable(Collection<IComponentFactory> result)
+//		{
+//			if (result != null && result.size() > 0)
+//			{
+//				result.iterator().next().loadModel(filename, null, rid)
+//					.addResultListener(new DelegationResultListener<IModelInfo>(ret));
+//			}
+//			else
+//			{
+//				ret.setResult(null);
+//			}
+//		}
+//		public void exceptionOccurred(Exception exception)
+//		{
+//			ret.setException(exception);
+//		}
+//	});
 
 	/**
 	 * Test if a model can be loaded by the factory.

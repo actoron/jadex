@@ -20,8 +20,7 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -176,7 +175,7 @@ public class ComponentStartTest extends ComponentTest
 	public static void main(String[] args) throws IOException
 	{
 		IExternalAccess platform = Starter.createPlatform(STest.getDefaultTestConfig()).get();
-		IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
+//		IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
 
 		String filename = null;
 		String ridname = null;
@@ -197,7 +196,8 @@ public class ComponentStartTest extends ComponentTest
 		}
 
 		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(platform.getId(), new File(ridname).getCanonicalFile().toURI()), null);
-		IModelInfo model = cms.loadComponentModel(filename, rid).get();
+//		IModelInfo model = cms.loadComponentModel(filename, rid).get();
+		IModelInfo model = SComponentFactory.loadModel(platform, filename, rid).get();
 
 		ComponentStartTest test = new ComponentStartTest(platform, model, null);
 

@@ -1,5 +1,7 @@
 package jadex.bridge.service.types.cms;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,10 +19,12 @@ import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.FactoryFilter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -31,38 +35,43 @@ import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.IInternalArgumentsResultsFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.component.impl.IInternalSubcomponentsFeature;
+import jadex.bridge.component.impl.remotecommands.IMethodReplacement;
+import jadex.bridge.component.impl.remotecommands.ProxyInfo;
+import jadex.bridge.component.impl.remotecommands.ProxyReference;
+import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSIntermediateResultEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSCreatedEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSIntermediateResultEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.MethodInfo;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SFilter;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
-import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -262,7 +271,7 @@ public class SComponentManagementService
      */
     public static ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(final IComponentIdentifier cid, IInternalAccess agent)
     {
-    	final SubscriptionIntermediateFuture<CMSStatusEvent> ret = new SubscriptionIntermediateFuture<IComponentManagementService.CMSStatusEvent>();
+    	final SubscriptionIntermediateFuture<CMSStatusEvent> ret = new SubscriptionIntermediateFuture<CMSStatusEvent>();
     	SFuture.avoidCallTimeouts(ret, agent);
     	
 //    	if(getListeners()==null)
@@ -597,7 +606,7 @@ public class SComponentManagementService
 	 */
 	public static boolean isRemoteComponent(IComponentIdentifier cid, IInternalAccess agent)
 	{
-		return !cid.getPlatformName().equals(agent.getId().getName());
+		return !cid.getPlatformName().equals(agent.getId().getRoot().getName());
 	}
 	
 	/**
@@ -632,15 +641,24 @@ public class SComponentManagementService
 		return agent==null? listener: agent.getFeature(IExecutionFeature.class).createResultListener(listener);
 	}
 	
+//	/**
+//	 *  Get the remote component management system for a specific component id.
+//	 */
+//	protected static IFuture<IComponentManagementService> getRemoteCMS(IInternalAccess agent, final IComponentIdentifier cid)
+//	{
+//		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+//		sq.setPlatform(cid.getRoot());
+//		return agent.getFeature(IRequiredServicesFeature.class).searchService(sq);
+//	}
+	
 	/**
-	 *  Get the remote component management system for a specific component id.
+	 *  Get the external access for a remote cid..
 	 */
-	protected static IFuture<IComponentManagementService> getRemoteCMS(IInternalAccess agent, final IComponentIdentifier cid)
+	protected static IExternalAccess getRemotePlatform(IInternalAccess agent, final IComponentIdentifier cid)
 	{
-		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
-		sq.setPlatform(cid.getRoot());
-		return agent.getFeature(IRequiredServicesFeature.class).searchService(sq);
+		return SServiceProvider.getExternalAccessProxy(agent, cid);
 	}
+	
 	
 	// reads initinfos
 	// reads components
@@ -750,7 +768,8 @@ public class SComponentManagementService
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions.
 	 */
-	public static IFuture<IComponentDescription[]> searchComponents(final IComponentDescription adesc, final ISearchConstraints con, boolean remote, IInternalAccess agent, IServiceIdentifier sid)
+	// todo: support remote? 
+	public static IFuture<IComponentDescription[]> searchComponents(final IComponentDescription adesc, final ISearchConstraints con, IInternalAccess agent)//, IServiceIdentifier sid)
 	{
 		final Future<IComponentDescription[]> fut = new Future<IComponentDescription[]>();
 		
@@ -793,65 +812,67 @@ public class SComponentManagementService
 		
 //		System.out.println("Started search: "+ret);
 //		open.add(fut);
+		
+		boolean remote = false;
 		if(remote)
 		{
-			IFuture<Collection<IComponentManagementService>> futi = agent.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(RequiredServiceInfo.SCOPE_GLOBAL)));
-			futi.addResultListener(createResultListener(agent, new IResultListener<Collection<IComponentManagementService>>()
-			{
-				public void resultAvailable(Collection<IComponentManagementService> result)
-				{
-//					System.out.println("cms: "+coll);
-					// Ignore search failures of remote dfs
-					IResultListener<IComponentDescription[]> lis = createResultListener(agent, new CollectionResultListener<IComponentDescription[]>(result.size(), true, 
-						new IResultListener<Collection<IComponentDescription[]>>()
-					{
-						public void resultAvailable(Collection<IComponentDescription[]> result)
-						{
-							// Add all services of all remote dfs
-							for(Iterator<IComponentDescription[]> it=result.iterator(); it.hasNext(); )
-							{
-								IComponentDescription[] res = it.next();
-								if(res!=null)
-								{
-									for(int i=0; i<res.length; i++)
-									{
-										ret.add(res[i]);
-									}
-								}
-							}
-//							open.remove(fut);
-//							System.out.println("Federated search: "+ret);//+" "+open);
-							fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-//							open.remove(fut);
-							fut.setException(exception);
-//							fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
-						}
-					}));
-					for(Iterator<IComponentManagementService> it=result.iterator(); it.hasNext(); )
-					{
-						IComponentManagementService remotecms = it.next();
-//						if(remotecms!=ComponentManagementService.this)
-						if(!((IService)remotecms).getId().equals(sid))
-						{
-							remotecms.searchComponents(adesc, con, false).addResultListener(lis);
-						}
-						else
-						{
-							lis.resultAvailable(null);
-						}
-					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-//					open.remove(fut);
-					fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
-				}
-			}));
+//			IFuture<Collection<IComponentManagementService>> futi = agent.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(RequiredServiceInfo.SCOPE_GLOBAL)));
+//			futi.addResultListener(createResultListener(agent, new IResultListener<Collection<IComponentManagementService>>()
+//			{
+//				public void resultAvailable(Collection<IComponentManagementService> result)
+//				{
+////					System.out.println("cms: "+coll);
+//					// Ignore search failures of remote dfs
+//					IResultListener<IComponentDescription[]> lis = createResultListener(agent, new CollectionResultListener<IComponentDescription[]>(result.size(), true, 
+//						new IResultListener<Collection<IComponentDescription[]>>()
+//					{
+//						public void resultAvailable(Collection<IComponentDescription[]> result)
+//						{
+//							// Add all services of all remote dfs
+//							for(Iterator<IComponentDescription[]> it=result.iterator(); it.hasNext(); )
+//							{
+//								IComponentDescription[] res = it.next();
+//								if(res!=null)
+//								{
+//									for(int i=0; i<res.length; i++)
+//									{
+//										ret.add(res[i]);
+//									}
+//								}
+//							}
+////							open.remove(fut);
+////							System.out.println("Federated search: "+ret);//+" "+open);
+//							fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+////							open.remove(fut);
+//							fut.setException(exception);
+////							fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+//						}
+//					}));
+////					for(Iterator<IComponentManagementService> it=result.iterator(); it.hasNext(); )
+////					{
+////						IComponentManagementService remotecms = it.next();
+//////						if(remotecms!=ComponentManagementService.this)
+////						if(!((IService)remotecms).getId().equals(sid))
+////						{
+////							remotecms.searchComponents(adesc, con, false).addResultListener(lis);
+////						}
+////						else
+////						{
+////							lis.resultAvailable(null);
+////						}
+////					}
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+////					open.remove(fut);
+//					fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
+//				}
+//			}));
 		}
 		else
 		{
@@ -907,13 +928,14 @@ public class SComponentManagementService
 		
 		if(isRemoteComponent(cid, agent))
 		{
-			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, IComponentDescription>(ret)
-			{
-				public void customResultAvailable(IComponentManagementService rcms)
-				{
-					rcms.getComponentDescription(cid).addResultListener(createResultListener(agent, new DelegationResultListener<IComponentDescription>(ret)));
-				}
-			}));
+//			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, IComponentDescription>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+//					rcms.getComponentDescription(cid).addResultListener(createResultListener(agent, new DelegationResultListener<IComponentDescription>(ret)));
+//				}
+//			}));
+			return getRemotePlatform(agent, cid).getDescription(cid);
 		}
 		else
 		{
@@ -951,18 +973,27 @@ public class SComponentManagementService
 		
 		if(isRemoteComponent(cid, agent))
 		{
-			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent,
-				new ExceptionDelegationResultListener<IComponentManagementService, IComponentDescription[]>(ret)
+//			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent,
+//				new ExceptionDelegationResultListener<IComponentManagementService, IComponentDescription[]>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+//					rcms.getChildrenDescriptions(cid).addResultListener(createResultListener(agent, new DelegationResultListener<IComponentDescription[]>(ret)));
+//				}
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					super.exceptionOccurred(exception);
+//				}
+//			}));
+			
+			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<IComponentDescription[]>()
 			{
-				public void customResultAvailable(IComponentManagementService rcms)
+				@Override
+				public IFuture<IComponentDescription[]> execute(IInternalAccess ia)
 				{
-					rcms.getChildrenDescriptions(cid).addResultListener(createResultListener(agent, new DelegationResultListener<IComponentDescription[]>(ret)));
+					return SComponentManagementService.getChildrenDescriptions(cid, agent);
 				}
-				public void exceptionOccurred(Exception exception)
-				{
-					super.exceptionOccurred(exception);
-				}
-			}));
+			});
 		}
 		else
 		{
@@ -993,21 +1024,31 @@ public class SComponentManagementService
 		
 		if(isRemoteComponent(cid, agent))
 		{
-			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier[]>(ret)
+//			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier[]>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+//					rcms.getChildren(cid).addResultListener(createResultListener(agent, new DelegationResultListener<IComponentIdentifier[]>(ret)));
+//				}
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					super.exceptionOccurred(exception);
+//				}
+//			}));
+			
+			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<IComponentIdentifier[]>()
 			{
-				public void customResultAvailable(IComponentManagementService rcms)
+				@Override
+				public IFuture<IComponentIdentifier[]> execute(IInternalAccess ia)
 				{
-					rcms.getChildren(cid).addResultListener(createResultListener(agent, new DelegationResultListener<IComponentIdentifier[]>(ret)));
+					return SComponentManagementService.getChildren(cid, agent);
 				}
-				public void exceptionOccurred(Exception exception)
-				{
-					super.exceptionOccurred(exception);
-				}
-			}));
+			});
 		}
 		else
 		{
 			IComponentIdentifier[] tmp = internalGetChildren(cid);
+//			System.out.println("children: "+cid+" "+Arrays.toString(tmp));
 			ret.setResult(tmp);
 		}
 		
@@ -1086,6 +1127,7 @@ public class SComponentManagementService
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
+	// todo: return IExternalAccess directly and defer calls when in init
 	public static IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid, boolean internal, IInternalAccess agent)
 	{
 //		System.out.println("getExta: "+cid);
@@ -1100,19 +1142,78 @@ public class SComponentManagementService
 		
 		if(isRemoteComponent(cid, agent))
 		{
-			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+			System.out.println("remote cid: "+cid);
+			
+			try
 			{
-				public void customResultAvailable(IComponentManagementService rcms)
+				Class<?>[] interfaces = new Class[]{IExternalAccess.class};
+				ProxyInfo pi = new ProxyInfo(interfaces);
+				pi.addMethodReplacement(new MethodInfo("equals", new Class[]{Object.class}), new IMethodReplacement()
 				{
-					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
-				}
-			}));
+					public Object invoke(Object obj, Object[] args)
+					{
+						return Boolean.valueOf(args[0]!=null && ProxyFactory.isProxyClass(args[0].getClass())
+							&& ProxyFactory.getInvocationHandler(obj).equals(ProxyFactory.getInvocationHandler(args[0])));
+					}
+				});
+				pi.addMethodReplacement(new MethodInfo("hashCode", new Class[0]), new IMethodReplacement()
+				{
+					public Object invoke(Object obj, Object[] args)
+					{
+						return Integer.valueOf(ProxyFactory.getInvocationHandler(obj).hashCode());
+					}
+				});
+				pi.addMethodReplacement(new MethodInfo("toString", new Class[0]), new IMethodReplacement()
+				{
+					public Object invoke(Object obj, Object[] args)
+					{
+						return "Fake proxy for external access("+cid+")";
+					}
+				});
+				pi.addMethodReplacement(new MethodInfo("getId", new Class[0]), new IMethodReplacement()
+				{
+					public Object invoke(Object obj, Object[] args)
+					{
+						return cid;
+					}
+				});
+				Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
+				pi.addExcludedMethod(new MethodInfo(getclass));
+				
+				RemoteReference rr = new RemoteReference(cid, cid);
+				ProxyReference pr = new ProxyReference(pi, rr);
+				InvocationHandler handler = new RemoteMethodInvocationHandler(agent, pr);
+				IExternalAccess ea = (IExternalAccess)ProxyFactory.newProxyInstance(agent.getClassLoader(), 
+					interfaces, handler);
+				ret.setResult(ea);
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+			
+//			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+//					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+//				}
+//			}));
+		
+//			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<IExternalAccess>()
+//			{
+//				@Override
+//				public IFuture<IExternalAccess> execute(IInternalAccess ia)
+//				{
+//					return SComponentManagementService.getExternalAccess(cid, agent);
+//				}
+//			});
 		}
 		else
 		{
 //			System.out.println("getExternalAccess: local");
 			IPlatformComponentAccess component = null;
-//				System.out.println("getExternalAccess: adapters");
+//			System.out.println("getExternalAccess: adapters");
 			boolean delayed = false;
 			component = SComponentManagementService.getComponents(agent.getId()).get(cid);
 			
@@ -1131,7 +1232,7 @@ public class SComponentManagementService
 					}
 					else
 					{
-//							System.out.println("getExternalAccess: delayed");
+//						System.out.println("getExternalAccess: delayed");
 						delayed = true;
 						IFuture<Void> fut = ii.getInitFuture();
 						fut.addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
@@ -1196,14 +1297,22 @@ public class SComponentManagementService
 		
 		if(isRemoteComponent(cid, agent))
 		{
-			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+//					rcms.setComponentBreakpoints(cid, breakpoints).addResultListener(
+//						createResultListener(agent, new DelegationResultListener<Void>(ret)));
+//				}
+//			}));
+			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<Void>()
 			{
-				public void customResultAvailable(IComponentManagementService rcms)
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					rcms.setComponentBreakpoints(cid, breakpoints).addResultListener(
-						createResultListener(agent, new DelegationResultListener<Void>(ret)));
+					return SComponentManagementService.setComponentBreakpoints(cid, breakpoints, agent);
 				}
-			}));
+			});
 		}
 		else
 		{
@@ -1228,13 +1337,22 @@ public class SComponentManagementService
 		
 		if(isRemoteComponent(cid, agent))
 		{
-			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+//					rcms.stepComponent(cid, stepinfo).addResultListener(createResultListener(agent, new DelegationResultListener<Void>(ret)));
+//				}
+//			}));
+			
+			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<Void>()
 			{
-				public void customResultAvailable(IComponentManagementService rcms)
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					rcms.stepComponent(cid, stepinfo).addResultListener(createResultListener(agent, new DelegationResultListener<Void>(ret)));
+					return SComponentManagementService.stepComponent(cid, stepinfo, agent);
 				}
-			}));
+			});
 		}
 		else
 		{
@@ -1295,13 +1413,22 @@ public class SComponentManagementService
 		if(isRemoteComponent(cid, agent))
 		{
 			assert !initresume;
-			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+//					rcms.resumeComponent(cid).addResultListener(createResultListener(agent, new DelegationResultListener<Void>(ret)));
+//				}
+//			}));
+			
+			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<Void>()
 			{
-				public void customResultAvailable(IComponentManagementService rcms)
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					rcms.resumeComponent(cid).addResultListener(createResultListener(agent, new DelegationResultListener<Void>(ret)));
+					return SComponentManagementService.resumeComponent(cid, initresume, agent);
 				}
-			}));
+			});
 		}
 		else
 		{
@@ -1415,17 +1542,28 @@ public class SComponentManagementService
 		
 		if(isRemoteComponent(cid, agent))
 		{
-			final Future<Void> fut = new Future<Void>();
-			ret	= fut;
-			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent,
-				new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut)
+//			final Future<Void> fut = new Future<Void>();
+//			ret	= fut;
+			
+//			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent,
+//				new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+//					rcms.suspendComponent(cid).addResultListener(createResultListener(agent, new DelegationResultListener<Void>(fut)));
+//				}
+//			}));
+			
+			return getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<Void>()
 			{
-				public void customResultAvailable(IComponentManagementService rcms)
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					rcms.suspendComponent(cid).addResultListener(createResultListener(agent, new DelegationResultListener<Void>(fut)));
+					return SComponentManagementService.suspendComponent(cid, agent);
 				}
-			}));
-			return ret;
+			});
+			
+//			return ret;
 		}
 		else
 		{
@@ -1519,12 +1657,22 @@ public class SComponentManagementService
 		
 		if(isRemoteComponent(cid, agent))
 		{
-			getRemoteCMS(agent, cid.getParent()).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
+//			getRemoteCMS(agent, cid.getParent()).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+////					final IComponentManagementService rcms = (IComponentManagementService)result;
+//					rcms.destroyComponent(cid).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+//				}
+//			});
+			
+			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<Void>()
 			{
-				public void customResultAvailable(IComponentManagementService rcms)
+				@Override
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-//					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.destroyComponent(cid).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+					SComponentManagementService.destroyComponent(cid, ret, agent);
+					return IFuture.DONE;
 				}
 			});
 		}
@@ -2521,7 +2669,7 @@ public class SComponentManagementService
 		}
 		else
 		{
-			ILibraryService	ls	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class));
+//			ILibraryService	ls	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class));
 			Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			FactoryFilter facfilter = new FactoryFilter(filename, null, rid);
 			

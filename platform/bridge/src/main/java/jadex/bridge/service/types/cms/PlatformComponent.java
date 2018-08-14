@@ -22,6 +22,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -36,12 +37,11 @@ import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
@@ -671,6 +671,16 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 		return info.getComponentDescription();
 	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid)
+	{
+		return SComponentManagementService.getComponentDescription(cid, this);
+	}
 
 	/**
 	 *  Get a feature of the component.
@@ -716,8 +726,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		// Only remember first exception.
 		if(exception==null && e!=null)
 			this.exception	= e;
-		IComponentManagementService cms = this.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		IFuture<Map<String, Object>> ret = cms.destroyComponent(getId());
+//		IComponentManagementService cms = this.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IFuture<Map<String, Object>> ret = this.killComponent(getId());
 		return ret;
 //		if(getComponentIdentifier().getParent()==null)
 //		{
@@ -1039,39 +1049,60 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture<IComponentIdentifier[]> getChildren(final String type)
+	public IFuture<IComponentIdentifier[]> getChildren(final String type, IComponentIdentifier parent)
 	{
+		if(parent!=null && !getId().equals(parent))
+		{
+			return SServiceProvider.getExternalAccessProxy(this, parent).scheduleStep(new IComponentStep<IComponentIdentifier[]>()
+			{
+				public IFuture<IComponentIdentifier[]> execute(IInternalAccess ia)
+				{
+					return ia.getChildren(type, null);
+				}
+			});
+		}
+		
 		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
 		final String filename = getComponentFilename(type);
 		
-		if(filename==null)
+		if(filename==null && type!=null)
 		{
 			ret.setException(new IllegalArgumentException("Unknown type: "+type));
 		}
+		else if(type==null)
+		{
+			SComponentManagementService.getChildren(getId(), this).addResultListener(new DelegationResultListener<>(ret));
+		}
 		else
 		{
-			IComponentManagementService cms = getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//			IComponentManagementService cms = getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			// Can use the parent resource identifier as child must depend on parent
-			cms.loadComponentModel(filename, getModel().getResourceIdentifier()).addResultListener(getFeature(IExecutionFeature.class).createResultListener(
+			
+			SComponentFactory.loadModel(getExternalAccess(), filename, getModel().getResourceIdentifier())
+//			cms.loadComponentModel(filename, getModel().getResourceIdentifier())
+				.addResultListener(getFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IModelInfo, IComponentIdentifier[]>(ret)
 			{
 				public void customResultAvailable(IModelInfo model)
 				{
 					final String modelname = model.getFullName();
 				
-					final Future<Collection<IExternalAccess>>	childaccesses	= new Future<Collection<IExternalAccess>>();
-					cms.getChildren(getId()).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret)
+					final Future<Collection<IExternalAccess>> childaccesses	= new Future<Collection<IExternalAccess>>();
+					
+					SComponentManagementService.getChildren(getId(), PlatformComponent.this)
+						.addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier[] children)
 						{
-							IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
+							IResultListener<IExternalAccess> crl = new CollectionResultListener<IExternalAccess>(children.length, true,
 								new DelegationResultListener<Collection<IExternalAccess>>(childaccesses));
 							for(int i=0; !ret.isDone() && i<children.length; i++)
 							{
-								cms.getExternalAccess(children[i]).addResultListener(crl);
+								getExternalAccess(children[i]).addResultListener(crl);
 							}
 						}
 					});
+					
 					childaccesses.addResultListener(getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, IComponentIdentifier[]>(ret)
 					{
 						public void customResultAvailable(Collection<IExternalAccess> col)
@@ -1211,10 +1242,10 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	}
 	
 	/**
-	 * 
-	 * @param component
-	 * @param info
-	 * @return
+	 *  Helper method for preparing the creation info.
+	 *  @param component The pojo or filename
+	 *  @param info The creation info. 
+	 *  @return The creation info.
 	 */
 	public CreationInfo prepare(Object component, CreationInfo info)
 	{
@@ -1243,6 +1274,65 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 		
 		return info;
+	}
+	
+	/**
+	 *  Suspend the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> suspendComponent(IComponentIdentifier componentid)
+	{
+		return SComponentManagementService.suspendComponent(componentid, this);
+	}
+	
+	/**
+	 *  Resume the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> resumeComponent(IComponentIdentifier componentid)
+	{
+		return SComponentManagementService.resumeComponent(componentid, false, this);
+	}
+	
+	/**
+	 *  Execute a step of a suspended component.
+	 *  @param componentid The component identifier.
+	 *  @param listener Called when the step is finished (result will be the component description).
+	 */
+	public IFuture<Void> stepComponent(IComponentIdentifier cid, String stepinfo)
+	{
+		return SComponentManagementService.stepComponent(cid, stepinfo, this);
+	}
+	
+	/**
+	 *  Set breakpoints for a component.
+	 *  Replaces existing breakpoints.
+	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
+	 *  @param componentid The component identifier.
+	 *  @param breakpoints The new breakpoints (if any).
+	 */
+	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier cid, String[] breakpoints)
+	{
+		return SComponentManagementService.setComponentBreakpoints(cid, breakpoints, this); 
+	}
+	
+	/**
+	 *  Add a component listener for a specific component.
+	 *  The listener is registered for component changes.
+	 *  @param cid	The component to be listened.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid)
+	{
+		return SComponentManagementService.listenToComponent(cid, this);
+	}
+	
+	/**
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con)//, boolean remote)
+	{
+		return SComponentManagementService.searchComponents(adesc, con, this);//, sid);
 	}
 
 	/**

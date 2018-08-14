@@ -8,11 +8,9 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
@@ -29,7 +27,6 @@ import jadex.micro.annotation.Results;
 @Agent(keepalive=Boolean3.FALSE)
 @RequiredServices(
 {
-	@RequiredService(name="cms", type=IComponentManagementService.class),
 	@RequiredService(name="exaser", type=IExampleService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))

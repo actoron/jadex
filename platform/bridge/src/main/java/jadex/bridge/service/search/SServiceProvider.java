@@ -12,8 +12,6 @@ import jadex.bridge.nonfunctional.search.IRankingSearchTerminationDecider;
 import jadex.bridge.nonfunctional.search.IServiceRanker;
 import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener;
 import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener2;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -1576,14 +1574,15 @@ public class SServiceProvider
 				
 				if(access==null)
 				{
-					IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//					System.out.println("comp is: "+component+" prov: "+providerid);
+//					IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 
 					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 					{
 						ret = SFuture.getFuture(method.getReturnType());
 						final Future<IExternalAccess> sret = (Future<IExternalAccess>)ret;
 						
-						cms.getExternalAccess(providerid).addResultListener(new IResultListener<IExternalAccess>()
+						component.getExternalAccess(providerid).addResultListener(new IResultListener<IExternalAccess>()
 						{
 							public void resultAvailable(IExternalAccess result) 
 							{
@@ -1609,7 +1608,7 @@ public class SServiceProvider
 					}
 					else
 					{
-						access = cms.getExternalAccess(providerid).get();
+						access = component.getExternalAccess(providerid).get();
 						ret = method.invoke(access, args);
 					}
 				}
