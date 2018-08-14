@@ -59,7 +59,7 @@ public class SellerAgent implements IBuyBookService, INegotiationAgent
 	@Belief
 	protected List<NegotiationReport> reports = new ArrayList<NegotiationReport>();
 
-	protected Gui gui;
+	protected Future<Gui> gui;
 	
 	/**
 	 *  The agent body.
@@ -76,13 +76,14 @@ public class SellerAgent implements IBuyBookService, INegotiationAgent
 			}
 		}
 		
-		SwingUtilities.invokeLater(new Runnable()
+		SwingUtilities.invokeLater(()->
 		{
-			public void run()
+			gui	= new Future<>();
+			if(agent!=null)
 			{
 				try
 				{
-					gui = new Gui(agent.getExternalAccess());
+					gui.setResult(new Gui(agent.getExternalAccess()));
 				}
 				catch(ComponentTerminatedException cte)
 				{
@@ -97,9 +98,13 @@ public class SellerAgent implements IBuyBookService, INegotiationAgent
 	@AgentKilled
 	public void shutdown()
 	{
+		agent	= null;
 		if(gui!=null)
 		{
-			gui.dispose();
+			gui.addResultListener(thegui ->
+			{
+				SwingUtilities.invokeLater(()->thegui.dispose());
+			});
 		}
 	}
 	

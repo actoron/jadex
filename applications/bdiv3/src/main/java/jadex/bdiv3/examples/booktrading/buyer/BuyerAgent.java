@@ -30,7 +30,6 @@ import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.Tuple2;
@@ -64,7 +63,7 @@ public class BuyerAgent implements INegotiationAgent
 	@Belief
 	protected List<NegotiationReport> reports = new ArrayList<NegotiationReport>();
 	
-	protected Gui gui;
+	protected Future<Gui> gui;
 	
 	/**
 	 *  The agent body.
@@ -81,13 +80,14 @@ public class BuyerAgent implements INegotiationAgent
 			}
 		}
 		
-		SwingUtilities.invokeLater(new Runnable()
+		SwingUtilities.invokeLater(()->
 		{
-			public void run()
+			gui	= new Future<>();
+			if(agent!=null)
 			{
 				try
 				{
-					gui = new Gui(agent.getExternalAccess());
+					gui.setResult(new Gui(agent.getExternalAccess()));
 				}
 				catch(ComponentTerminatedException cte)
 				{
@@ -102,9 +102,13 @@ public class BuyerAgent implements INegotiationAgent
 	@AgentKilled
 	public void shutdown()
 	{
+		agent	= null;
 		if(gui!=null)
 		{
-			gui.dispose();
+			gui.addResultListener(thegui ->
+			{
+				SwingUtilities.invokeLater(()->thegui.dispose());
+			});
 		}
 	}
 	
