@@ -1853,7 +1853,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
 						{
-//							System.out.println(agent.getComponentIdentifier()+" finished handshake: " + secmsg.getSender());
+//							System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().isTrustedPlatform());
 							currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
 							initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 							state.getResultFuture().setResult(state.getCryptoSuite());
@@ -1861,7 +1861,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					}
 					catch (Exception e)
 					{
-//						e.printStackTrace();
+						e.printStackTrace();
 						state.getResultFuture().setException(e);
 						initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 					}
