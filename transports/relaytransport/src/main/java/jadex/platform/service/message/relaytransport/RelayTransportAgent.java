@@ -479,7 +479,11 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				while (rls.size() == 0 && !waited);
 				
 				if (hasDirectConnection(destination))
+				{
 					ret.addIntermediateResult(0);
+					ret.setFinished();
+					return IFuture.DONE;
+				}
 				
 				if (rls.size() == 0)
 				{
