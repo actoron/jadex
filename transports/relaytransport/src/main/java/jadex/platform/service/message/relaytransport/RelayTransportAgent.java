@@ -118,7 +118,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	
 	/** Maximum time spent on finding routing services. */
 	@AgentArgument
-	protected int routingdelay;
+	protected int routingdelay = 3000;
 	
 	/** Set to true for more verbose output. */
 	@AgentArgument
