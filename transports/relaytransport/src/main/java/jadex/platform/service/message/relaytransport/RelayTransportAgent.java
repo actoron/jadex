@@ -29,6 +29,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceQuery;
@@ -53,7 +54,6 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Feature;
@@ -76,7 +76,7 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 })
 @ProvidedServices({
 		@ProvidedService(type=ITransportService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-		@ProvidedService(type=IRoutingService.class, name="routing", scope=RequiredServiceInfo.SCOPE_GLOBAL)
+		@ProvidedService(type=IRoutingService.class, name="routing", scope="%{$args.forwarding ? jadex.bridge.service.RequiredServiceInfo.SCOPE_GLOBAL : jadex.bridge.service.RequiredServiceInfo.SCOPE_PLATFORM}")
 })
 @Features(additional=true, replace=true, value=@Feature(type=IMessageFeature.class, clazz=RelayMessageComponentFeature.class))
 @Service
@@ -186,6 +186,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		System.out.println("SCOPE " + ((IService) agent.getFeature(IProvidedServicesFeature.class).getProvidedService(IRoutingService.class)).getId().getScope());
 		this.cms = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		intmsgfeat = (IInternalMessageFeature) agent.getFeature(IMessageFeature.class);
 		if(debug)
