@@ -1167,7 +1167,7 @@ public class ComponentManagementService implements IComponentManagementService
 						{
 							singles.add(fac);
 							// Remove fallback factory when first real factory is found.
-							componentfactory = null;
+//							componentfactory = null;
 						}
 					}
 					facts	= singles;
