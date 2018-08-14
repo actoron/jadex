@@ -185,7 +185,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		boolean	foundsuperpeer	= false;
 		
 //		for(String networkname: getSearchableNetworks(query))
-		for(String networkname : getQueryNetworks(query, connections.keySet()))
+		for(String networkname : getQueryNetworks(query))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -271,7 +271,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		boolean	foundsuperpeer	= false;
 		
 //		for(String networkname: getSearchableNetworks(query))
-		for(String networkname : getQueryNetworks(query, connections.keySet()))
+		for(String networkname : getQueryNetworks(query))
 		{
 			NetworkManager	manager	= connections.get(networkname);
 			if(manager!=null)
@@ -348,18 +348,6 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	}
 	
 	//-------- helper methods --------
-	
-	/**
-	 * Search all networks if networks==null or global scope
-	 */
-	protected String[] getSearchableNetworks(ServiceQuery<?> query)
-	{
-		return query.getNetworkNames()!=null
-				&& !RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope())
-				&& !RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope())
-			? query.getNetworkNames()
-			: connections.keySet().toArray(new String[connections.size()]);
-	}
 	
 	/**
 	 *  Search for services on remote platforms using the polling fallback and awareness.
@@ -459,25 +447,43 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	 *  @param query The query.
 	 *  @return The relevant networks, may be empty for none.
 	 */
-	public static final String[] getQueryNetworks(ServiceQuery<?> query, Set<String> availablenetworks)
+	protected String[] getQueryNetworks(ServiceQuery<?> query)
 	{
-		Set<String> retset = new HashSet<>();
-		if (query.getNetworkNames() != null)
+		String[]	ret	=	query.getNetworkNames();
+		
+		// If networks set, but query has global scope -> add global network
+		if(ret!=null)
 		{
-			retset.addAll(Arrays.asList(query.getNetworkNames()));
 			if (RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()) ||
 				RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope()))
-					retset.add(GLOBAL_NETWORK_NAME);
-		}
-		else
-		{
-			retset.addAll(availablenetworks);
-			if (!RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()) &&
-				!RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope()))
-				retset.remove(GLOBAL_NETWORK_NAME);
+			{
+				Set<String> retset = new LinkedHashSet<>(Arrays.asList(ret));
+				retset.add(GLOBAL_NETWORK_NAME);
+				ret	= retset.toArray(new String[retset.size()]);
+			}
 		}
 		
-		return retset.toArray(new String[retset.size()]);
+		// If networks not set -> use all connections but exclude global unless global scope
+		else
+		{
+			Set<String> retset;
+			if(connections.containsKey(GLOBAL_NETWORK_NAME)
+				&& !RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope())
+				&& !RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope()))
+			{
+				// use all connections but exclude global
+				retset = new LinkedHashSet<>(connections.keySet());
+				retset.remove(GLOBAL_NETWORK_NAME);
+			}
+			else
+			{
+				// use all connections
+				retset	= connections.keySet();
+			}
+			ret	= retset.toArray(new String[retset.size()]);
+		}
+		
+		return ret;
 	}
 	
 	//-------- helper classes --------
@@ -875,7 +881,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			
 			// Start handling
 //			updateQuery(getSearchableNetworks(query));
-			String[] networknames = getQueryNetworks(query, connections.keySet());
+			String[] networknames = getQueryNetworks(query);
 			updateQuery(networknames);
 		}
 		

@@ -113,7 +113,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			
 			final String iclname = clname.replace(".", "/");
 			
-			ClassVisitor cv = new ClassVisitor(Opcodes.ASM4, cn)
+			ClassVisitor cv = new ClassVisitor(Opcodes.ASM5, cn)
 			{
 				boolean isagentorcapa = false;
 				boolean isgoal = false;

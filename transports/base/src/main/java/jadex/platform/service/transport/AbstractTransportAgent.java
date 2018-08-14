@@ -611,8 +611,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 //			handler.getAccess().getLogger().info("Error on connection: "+((SocketChannel)sc).socket().getRemoteSocketAddress()+", "+e);
 			agent.getLogger().info("Closed connection " + cand.getConnection() + " to: "+cand.getTarget()+(e!=null? ", "+e:""));
 			VirtualConnection vircon = getVirtualConnection(cand.getTarget());
-			assert vircon!=null;
-			vircon.removeConnection(cand);
+			assert vircon!=null || cand.getTarget()==null;
+			if(vircon!=null)	// Can null, when connection closed before target id received -> never added to vircon
+			{
+				vircon.removeConnection(cand);
+			}
 		}
 		else
 		{
@@ -1036,19 +1039,20 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			
 			synchronized(this)
 			{
-				assert this.cons==null || !this.cons.contains(cand);
+				if(cons==null)
+				{
+					cons = new ArrayList<ConnectionCandidate>();
+				}
+				
+				assert !cons.contains(cand);
 				
 				if(failed)
 				{
 					close	= true;
+					cons.add(cand);	// Add because is later removed on close (assert)
 				}
 				else
 				{
-					if(cons==null)
-					{
-						cons = new ArrayList<ConnectionCandidate>();
-					}
-		
 					// Is the new the preferred connection?
 					if(cons.isEmpty() || cons.get(0).compareTo(cand)<0)
 					{
