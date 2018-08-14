@@ -179,7 +179,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		if(debug)
 			System.out.println(agent+": started relay transport");
 		
-		secservice = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
+		secservice = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class));
 		
 		routecache = new RwMapWrapper<>(new LRU<IComponentIdentifier, Tuple2<IComponentIdentifier, Integer>>(cachesize, null, true));
 		
@@ -279,13 +279,16 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				});
 			}
 		}
-		ret.addResultListener(new IFunctionalResultListener<Integer>()
+		if (debug)
 		{
-			public void resultAvailable(Integer result)
+			ret.addResultListener(new IFunctionalResultListener<Integer>()
 			{
-				System.out.println(agent + " isready: " + result);
-			}
-		});
+				public void resultAvailable(Integer result)
+				{
+					System.out.println(agent + " isready: " + result + " " + rec);
+				}
+			});
+		}
 		
 		return ret;
 	}
@@ -372,6 +375,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		Tuple2<IComponentIdentifier, Integer> route = getRouteFromCache(fwdest);
 		if (route != null)
 		{
+			if (debug)
+				System.out.println(agent + " forwarding via known route: " + route.getFirstEntity() + " to " + fwdest);
 			header.addProperty(IMsgHeader.RECEIVER, getRtComponent(route.getFirstEntity()));
 //			System.out.println("sending to route target: " + route.getFirstEntity() + " " + header.getProperty(FORWARD_DEST));
 			return intmsgfeat.sendToTransports(header, body);
@@ -492,11 +497,11 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						final IComponentStep<Void> routingstep = this;
 						--count[0];
 						
-						IComponentIdentifier relplat = getRtComponent(trelays[count[0]]);
+						IComponentIdentifier relplat = trelays[count[0]];
 						if (!hops.contains(relplat))
 						{
 							hops.add(relplat);
-							getRoutingService(relplat).discoverRoute(destination, hops).addResultListener(new IIntermediateResultListener<Integer>()
+							getRoutingService(getRtComponent(relplat)).discoverRoute(destination, hops).addResultListener(new IIntermediateResultListener<Integer>()
 							{
 								public void intermediateResultAvailable(Integer result)
 								{
@@ -836,6 +841,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				}
 				else
 				{
+					if (debug)
+						System.out.println(agent + " forwarding: " + header);
 					sendMessage(header, (byte[]) msg);
 				}
 			}
