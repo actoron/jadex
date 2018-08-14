@@ -1140,41 +1140,41 @@ public class ComponentManagementService implements IComponentManagementService
 	protected IFuture<IComponentFactory> getComponentFactory(final String model, final CreationInfo cinfo, final IResourceIdentifier rid, final boolean searched, final boolean cachemiss)
 	{
 		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
-		Collection<IComponentFactory> factories = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+		Collection<IComponentFactory>	factories;
 
 		// Search, if no cache available or not found in cache
 //		if((factories==null || cachemiss) && !searched)
 //		{
 ////			System.out.println("searching factories");
 //			
-//			Collection<IComponentFactory> facts = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
-//			if(!facts.isEmpty())
-//			{						
-//				// Reorder factories to assure that delegating multi loaders are last (if present).
-//				if(facts.size()>1)
-//				{
-//					List<IComponentFactory>	singles	= new ArrayList<IComponentFactory>();
-//					List<IComponentFactory>	multies	= new ArrayList<IComponentFactory>();
-//					for(IComponentFactory fac: facts)
-//					{
-////						if(fac.toString().toLowerCase().indexOf("multi")!=-1)
-//						if(isMultiFactory(fac))
-////						if(((IService)fac).getId().getProviderId().getLocalName().indexOf("multi")!=-1)
-//						{
-//							multies.add(fac);
-//						}
-//						else
-//						{
-//							singles.add(fac);
-//							// Remove fallback factory when first real factory is found.
-//							componentfactory = null;
-//						}
-//					}
-//					facts	= singles;
-//					facts.addAll(multies);
-//				}
-//			}
-//			factories = facts.isEmpty() ? null : facts;
+			Collection<IComponentFactory> facts = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
+			if(!facts.isEmpty())
+			{						
+				// Reorder factories to assure that delegating multi loaders are last (if present).
+				if(facts.size()>1)
+				{
+					List<IComponentFactory>	singles	= new ArrayList<IComponentFactory>();
+					List<IComponentFactory>	multies	= new ArrayList<IComponentFactory>();
+					for(IComponentFactory fac: facts)
+					{
+//						if(fac.toString().toLowerCase().indexOf("multi")!=-1)
+						if(isMultiFactory(fac))
+//						if(((IService)fac).getId().getProviderId().getLocalName().indexOf("multi")!=-1)
+						{
+							multies.add(fac);
+						}
+						else
+						{
+							singles.add(fac);
+							// Remove fallback factory when first real factory is found.
+							componentfactory = null;
+						}
+					}
+					facts	= singles;
+					facts.addAll(multies);
+				}
+			}
+			factories = facts.isEmpty() ? null : facts;
 //			
 //			// Invoke again, now with up-to-date cache.
 //			getComponentFactory(model, cinfo, rid, true, false).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
