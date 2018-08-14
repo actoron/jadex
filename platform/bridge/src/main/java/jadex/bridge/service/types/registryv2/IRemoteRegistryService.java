@@ -3,6 +3,7 @@ package jadex.bridge.service.types.registryv2;
 import java.util.Set;
 
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
@@ -15,6 +16,8 @@ import jadex.commons.future.IFuture;
  *  For remote queries use the extended ISuperpeerService, if available.
  */
 @Service(system=true)
+//TODO: change supersuperpeer to globalsuperpeer?
+@Security(roles="%{true.equals($platformargs.supersuperpeer)? jadex.bridge.service.annotation.Security.UNRESTRICTED: jadex.bridge.service.annotation.Security.DEFAULT}")
 public interface IRemoteRegistryService
 {
 	/** Name of the remote registry component and service. */

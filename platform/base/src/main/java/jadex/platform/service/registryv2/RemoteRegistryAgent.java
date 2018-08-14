@@ -24,7 +24,6 @@ import jadex.micro.annotation.ProvidedServices;
  *  Plain service access to a remote registry.
  *  See SuperpeerRegistryAgent for extended implementation supporting also persistent queries.
  */
-@Security(roles=Security.UNRESTRICTED)
 @Agent(autostart=@Autostart(value=Boolean3.TRUE, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME))
 @ProvidedServices(@ProvidedService(type=IRemoteRegistryService.class, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME, scope=RequiredServiceInfo.SCOPE_NETWORK))
 public class RemoteRegistryAgent implements IRemoteRegistryService
