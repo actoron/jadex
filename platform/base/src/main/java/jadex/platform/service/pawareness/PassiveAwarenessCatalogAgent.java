@@ -35,6 +35,8 @@ import jadex.micro.annotation.Autostart;
 )
 public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 {
+	protected static final String DEFAULT_URLS = "ws://ssp1@ngrelay1.actoron.com:80";
+	
 	/** Platform URL pattern. */
 	protected static final Pattern URL_PATTERN = Pattern.compile("[a-zA-Z]+://[a-zA-Z0-9]+@.+:[0-9]+");
 	
@@ -64,13 +66,13 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		if(platformurls!=null)
+		if(platformurls==null)
+			platformurls = DEFAULT_URLS;
+		
+		String[] spliturls = platformurls.split(",");
+		for (int i = 0; i < spliturls.length; ++i)
 		{
-			String[] spliturls = platformurls.split(",");
-			for (int i = 0; i < spliturls.length; ++i)
-			{
-				addPlatform(spliturls[i].trim());
-			}
+			addPlatform(spliturls[i].trim());
 		}
 		return IFuture.DONE;
 	}
