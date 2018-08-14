@@ -131,6 +131,7 @@ public class AuthenticateTestAgent extends TestAgent
 		{
 			conf.setNetworkNames((String[]) null);
 			conf.setNetworkSecrets((String[])null);
+			conf.setSupersuperpeer(true);	// Hack!!! -> unrestricted registry service
 		}
 		
 		// Add agents.
