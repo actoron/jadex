@@ -186,7 +186,6 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		System.out.println("SCOPE " + ((IService) agent.getFeature(IProvidedServicesFeature.class).getProvidedService(IRoutingService.class)).getId().getScope());
 		this.cms = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		intmsgfeat = (IInternalMessageFeature) agent.getFeature(IMessageFeature.class);
 		if(debug)
