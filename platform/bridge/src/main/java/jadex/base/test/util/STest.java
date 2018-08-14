@@ -55,6 +55,7 @@ public class STest {
 		config.setValue("superpeerclient.awaonly", true);
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
 		config.setValue("passiveawarenessintravm", true);
+		config.setValue("passiveawarenesscatalog", false);
 		config.setAwareness(false);	// disable old awareness
 		
         config.getExtendedPlatformConfiguration().setSecurity(true);
