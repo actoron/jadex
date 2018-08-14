@@ -39,7 +39,7 @@ public class BDICreationTest //extends TestCase
 			new String[]{
 //				"-platformname", "benchmarks_*", 
 ////			"-kernels", "\"micro\"",
-			"-logging", "true",
+//			"-logging", "true",
 //			"-libpath", SUtil.getOutputDirsExpression(projectroot, true),
 //			"-awareness", "false",	// otherwise influences performance measure
 //			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
