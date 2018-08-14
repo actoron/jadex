@@ -86,7 +86,7 @@ public abstract class AbstractInfrastructureTest
 	/**
 	 *  Wait a small amount of time (@see WAITFACTOR).
 	 */
-	protected void doWait(IExternalAccess platform)
+	protected void waitALittle(IExternalAccess platform)
 	{
 		platform.waitForDelay(Starter.getScaledRemoteDefaultTimeout(platform.getId(), WAITFACTOR), new IComponentStep<Void>()
 		{
@@ -114,7 +114,7 @@ public abstract class AbstractInfrastructureTest
 		while(!platformids.isEmpty())
 		{
 			// Hack??? Wait three times the wait factor!?
-			IComponentIdentifier	cid	= connected.getNextIntermediateResult(Starter.getScaledRemoteDefaultTimeout(sp.getId(), WAITFACTOR*3), true);
+			IComponentIdentifier	cid	= connected.getNextIntermediateResult(Starter.getScaledRemoteDefaultTimeout(sp.getId(), WAITFACTOR*30), true);
 			platformids.remove(cid.getRoot());
 			System.out.println("Client "+cid+" connected to SP: "+sp.getId());
 		}

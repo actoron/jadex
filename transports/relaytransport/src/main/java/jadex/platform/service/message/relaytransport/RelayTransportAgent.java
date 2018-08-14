@@ -319,7 +319,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										if (debug)
+										if(debug)
 											System.out.println(agent+": got exception:  " + exception);
 									}
 								});

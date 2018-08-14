@@ -184,6 +184,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
+//		for(String networkname: getSearchableNetworks(query))
 		for(String networkname : getQueryNetworks(query, connections.keySet()))
 		{
 			NetworkManager	manager	= connections.get(networkname);
@@ -269,6 +270,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
+//		for(String networkname: getSearchableNetworks(query))
 		for(String networkname : getQueryNetworks(query, connections.keySet()))
 		{
 			NetworkManager	manager	= connections.get(networkname);
@@ -348,6 +350,18 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	//-------- helper methods --------
 	
 	/**
+	 * Search all networks if networks==null or global scope
+	 */
+	protected String[] getSearchableNetworks(ServiceQuery<?> query)
+	{
+		return query.getNetworkNames()!=null
+				&& !RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope())
+				&& !RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope())
+			? query.getNetworkNames()
+			: connections.keySet().toArray(new String[connections.size()]);
+	}
+	
+	/**
 	 *  Search for services on remote platforms using the polling fallback and awareness.
 	 */
 	protected <T> TerminableIntermediateFuture<IServiceIdentifier> searchRemoteServices(final ServiceQuery<T> query)
@@ -380,9 +394,6 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new BasicComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform), new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, RequiredService.SCOPE_NETWORK, null, true);
 						IRemoteRegistryService rrs = (IRemoteRegistryService) RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
 						final IFuture<Set<IServiceIdentifier>> remotesearch = rrs.searchServices(query);
-						// TODO: use remote registry service
-//						final IFuture<Collection<T>> remotesearch =  ((IInternalRemoteExecutionFeature)agent.getFeature(IRemoteExecutionFeature.class))
-//								.executeRemoteSearch(platform, query);
 						
 //						System.out.println(agent + " searching remote platform3: "+platform+", "+query);
 						remotesearch.addResultListener(new IResultListener<Set<IServiceIdentifier>>()
@@ -614,6 +625,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									{
 										public void resultAvailable(Collection<ServiceEvent<IServiceIdentifier>> result)
 										{
+											System.out.println("Service event query finished!?: "+result);
 											// Should not happen?
 											assert false;
 										}
@@ -862,7 +874,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			});
 			
 			// Start handling
-			// TODO: search all if networks==null???
+//			updateQuery(getSearchableNetworks(query));
 			String[] networknames = getQueryNetworks(query, connections.keySet());
 			updateQuery(networknames);
 		}

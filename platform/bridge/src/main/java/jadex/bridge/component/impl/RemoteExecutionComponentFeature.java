@@ -34,19 +34,16 @@ import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
 import jadex.bridge.component.impl.remotecommands.RemotePullCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.component.impl.remotecommands.RemoteResultCommand;
-import jadex.bridge.component.impl.remotecommands.RemoteSearchCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteTerminationCommand;
 import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
@@ -65,6 +62,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	public static final String RX_ID = "__rx_id__";
 	
 	/** Commands safe to use with untrusted clients. */
+	@SuppressWarnings("serial")
 	protected static final Set<Class<?>> SAFE_COMMANDS	= Collections.unmodifiableSet(new HashSet<Class<?>>()
 	{{
 		// Unconditional commands
@@ -228,23 +226,6 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		return ret;
 	}
 	
-	/**
-	 *  Execute a command on a remote agent.
-	 *  @param target	The component to send the command to.
-	 *  @param command	The command to be executed.
-	 *  @return	The result(s) of the command, if any.
-	 */
-	// TODO: remove method and use remote registry service instead!!!
-//	public <T> IFuture<Collection<T>>	executeRemoteSearch(IComponentIdentifier target, ServiceQuery<T> query)
-//	{
-//		Long timeout	= null;	// TODO: custom search timeout?
-//		@SuppressWarnings({"rawtypes"})
-//		Class	clazz	= query.getMultiplicity().getTo()!=-1
-//			? IIntermediateFuture.class
-//			: IFuture.class;
-//		return execute(target, new RemoteSearchCommand<T>(query), clazz, timeout);
-//	}
-
 	/**
 	 *  Invoke a method on a remote object.
 	 *  @param ref	The target reference.
@@ -432,11 +413,6 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 									// OK -> ignore
 								}
 							});
-						}
-						
-						public void resultAvailable(Collection result)
-						{
-							resultAvailable(result);
 						}
 						
 						public void exceptionOccurred(Exception exception)

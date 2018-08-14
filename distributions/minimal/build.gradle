@@ -5,6 +5,8 @@ dependencies
 	api project(':kernels:micro')
 	api project(':kernels:microservice')
 	api project(':platform:base')
+	api project(':transports:base')
+	api project(':transports:tcp')
 	api project(':transports:relaytransport')
 	api project(':transports:websockettransport')
 }
