@@ -365,6 +365,8 @@ public class Indexer<T>
 				}
 			}
 		}
+		
+		values.remove(value);
 	}
 	
 	/**
