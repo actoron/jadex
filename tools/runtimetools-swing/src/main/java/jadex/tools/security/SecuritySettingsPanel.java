@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +56,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.jtable.StringArrayTableModel;
 import jadex.commons.security.PemKeyPair;
 import jadex.commons.security.SSecurity;
+import jadex.platform.service.registryv2.SuperpeerClientAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.AbstractX509PemSecret;
 import jadex.platform.service.security.auth.X509PemStringsSecret;
@@ -266,7 +268,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 
 			public void actionPerformed(ActionEvent e)
 			{
-				SecretWizard wizard = new SecretWizard(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+				byte[] oldstore = settingsservice.loadFile(DEFAULT_CERT_STORE).get();
+				SecretWizard wizard = new SecretWizard(oldstore);
 				
 				wizard.addTerminationListener(new AbstractAction()
 				{
@@ -277,7 +280,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						if (JWizard.FINISH_ID == e.getID())
 						{
 							SecretWizard wizard = ((SecretWizard) e.getSource());
-							writeCertStore(wizard.getCertstore());
+							if (wizard.getCertstore() != null && !Arrays.equals(oldstore, wizard.getCertstore()))
+								writeCertStore(wizard.getCertstore());
 							final String secret = wizard.getResult().toString();
 							jccaccess.scheduleStep(new IComponentStep<Void>()
 							{
@@ -514,7 +518,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 				}
 				
 				final String role = rolename.getText();
-				if (role.length() == 0)
+				if (role.length() == 0 || role.contains(","))
 				{
 					rolename.showInvalid();
 					return;
@@ -860,7 +864,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							return secservice.addTrustedPlatformName(res);
+							return secservice.addTrustedPlatform(res);
 						}
 					}).get();
 					refreshTrustedPlatforms();
@@ -886,7 +890,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							for (int i = 0; i < names.length; ++i)
-								secservice.removeTrustedPlatformName(names[i]).get();
+								secservice.removeTrustedPlatform(names[i]).get();
 							
 							return IFuture.DONE;
 						};
@@ -960,7 +964,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	 */
 	protected void setNetwork()
 	{
-		SecretWizard wizard = new SecretWizard(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+		byte[] oldstore = settingsservice.loadFile(DEFAULT_CERT_STORE).get();
+		SecretWizard wizard = new SecretWizard(oldstore);
 		//wizard.setEntity(nwn);
 		wizard.setEntityType("the network name");
 		
@@ -973,7 +978,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 				if (e.getID() == JWizard.FINISH_ID)
 				{
 					SecretWizard wizard = (SecretWizard) e.getSource();
-					writeCertStore(wizard.getCertstore());
+					if (wizard.getCertstore() != null && !Arrays.equals(oldstore, wizard.getCertstore()))
+						writeCertStore(wizard.getCertstore());
 					final String nw = wizard.getEntity();
 					final String secret = wizard.getResult().toString();
 					
@@ -1051,21 +1057,22 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						String[][] table = null;
 						if (nws != null && nws.size() > 0)
 						{
-							table = new String[nws.size()][2];
+							List<String[]> dtable = new ArrayList<>();
 							
-							int i = 0;
 							for (Map.Entry<String, Collection<String>> entry : nws.entrySet())
 							{
-								if (entry.getValue() != null)
+								if (entry.getValue() != null && entry.getValue().size() > 0 && !SuperpeerClientAgent.GLOBAL_NETWORK_NAME.equals(entry.getKey()))
 								{
 									for (String secret : entry.getValue())
 									{
-										table[i][0] = entry.getKey();
-										table[i][1] = secret;
-										++i;
+										String[] tentry = new String[2];
+										tentry[0] = entry.getKey();
+										tentry[1] = secret;
+										dtable.add(tentry);
 									}
 								}
 							}
+							table = dtable.toArray(new String[dtable.size()][]);
 						}
 						else
 						{
@@ -1211,30 +1218,27 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				final Set<String> tpn = secservice.getTrustedPlatformNames().get();
+				final Set<String> tps = secservice.getTrustedPlatforms().get();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
 					{
 						String[][] table = null;
-						if (tpn != null && tpn.size() > 0)
+						if (tps != null && tps.size() > 0)
 						{
-							table = new String[tpn.size()][1];
+							List<String[]> dtable = new ArrayList<>();
 							
-							int i = 0;
-							for (String tname : tpn)
+							for (String tname : tps)
 							{
 								if (tname != null)
 								{
-									table[i][0] = tname;
+									String[] tentry = new String[] { tname };
+									dtable.add(tentry);
 								}
-								else
-								{
-									table[i][0] = "Unavailable";
-								}
-								++i;
 							}
+							
+							table = dtable.toArray(new String[dtable.size()][]);
 						}
 						else
 						{

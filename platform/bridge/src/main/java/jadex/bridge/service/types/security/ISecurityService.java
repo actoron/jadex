@@ -7,7 +7,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
-import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -127,7 +126,7 @@ public interface ISecurityService
 	 *  @param name The platform name, name must be authenticated with certificate.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> addTrustedPlatformName(String name);
+	public IFuture<Void> addTrustedPlatform(String name);
 	
 	/** 
 	 *  Adds a name of an authenticated platform to allow access.
@@ -135,13 +134,13 @@ public interface ISecurityService
 	 *  @param name The platform name.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> removeTrustedPlatformName(String name);
+	public IFuture<Void> removeTrustedPlatform(String name);
 	
 	/**
-	 *  Gets the trusted platform names. 
-	 *  @return The trusted platform names.
+	 *  Gets the trusted platforms that are specified by names. 
+	 *  @return The trusted platforms and their roles.
 	 */
-	public IFuture<Set<String>> getTrustedPlatformNames();
+	public IFuture<Set<String>> getTrustedPlatforms();
 	
 	/** 
 	 *  Gets all authorities for authenticating platform names.

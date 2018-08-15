@@ -131,7 +131,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected Map<IComponentIdentifier, AbstractAuthenticationSecret> remoteplatformsecrets = new HashMap<IComponentIdentifier, AbstractAuthenticationSecret>();;
 	
 	/** Flag whether to allow platforms to be associated with roles (clashes, spoofing problem?). */
-	protected boolean allowplatformroles = false;
+//	protected boolean allowplatformroles = false;
 	
 	/** Available virtual networks. */
 //	protected Map<String, AbstractAuthenticationSecret> networks = new HashMap<String, AbstractAuthenticationSecret>();
@@ -140,8 +140,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** The platform name certificate if available. */
 	protected AbstractX509PemSecret platformnamecertificate;
 	
-	/** The platform names that are trusted. */
-	protected Set<String> trustedplatformnames = new HashSet<>();
+	/** The platform names that are trusted and identified by name. */
+	protected Set<String> trustedplatforms = new HashSet<>();
 	
 	/** Trusted authorities for certifying platform names. */
 	protected Set<X509CertificateHolder> nameauthorities = new HashSet<>();
@@ -326,20 +326,19 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				if (args.get("trustedplatforms") != null)
 				{
-					trustedplatformnames = new HashSet<>();
 					String authstr = (String) args.get("trustedplatforms");
 					String[] split = authstr.split(",");
 					for (int i = 0; i < split.length; ++i)
 					{
 						if (split[i].length() > 0)
 						{
-							trustedplatformnames.add(split[i]);
+							trustedplatforms.add(split[i]);
 						}
 					}
 				}
 				else
 				{
-					trustedplatformnames = getProperty("trustedplatforms", args, settings, trustedplatformnames);
+					trustedplatforms = getProperty("trustedplatforms", args, settings, trustedplatforms);
 				}
 				
 				if (args.get("platformsecret") != null)
@@ -1047,15 +1046,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  Adds a name of an authenticated platform to allow access.
 	 *  
 	 *  @param name The platform name, name must be authenticated with certificate.
+	 *  @param roles The roles the platform should have, can be null or empty.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> addTrustedPlatformName(final String name)
+	public IFuture<Void> addTrustedPlatform(String name)
 	{
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				trustedplatformnames.add(name);
+				trustedplatforms.add(name);
 				
 				saveSettings();
 				
@@ -1070,13 +1070,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param name The platform name.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> removeTrustedPlatformName(String name)
+	public IFuture<Void> removeTrustedPlatform(String name)
 	{
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				trustedplatformnames.remove(name);
+				trustedplatforms.remove(name);
 				
 				saveSettings();
 				
@@ -1086,16 +1086,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	/**
-	 *  Gets the trusted platform names. 
-	 *  @return The trusted platform names.
+	 *  Gets the trusted platforms that are specified by names. 
+	 *  @return The trusted platforms and their roles.
 	 */
-	public IFuture<Set<String>> getTrustedPlatformNames()
+	public IFuture<Set<String>> getTrustedPlatforms()
 	{
 		return agent.getExternalAccess().scheduleStep(new IComponentStep<Set<String>>()
 		{
 			public IFuture<Set<String>> execute(IInternalAccess ia)
 			{
-				return new Future<Set<String>>(new HashSet<>(trustedplatformnames));
+				return new Future<>(new HashSet<>(trustedplatforms));
 			}
 		});
 	}
@@ -1304,9 +1304,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Gets the trusted platform names.
 	 */
-	public Set<String> getInternalTrustedPlatformNames()
+	public Set<String> getInternalTrustedPlatforms()
 	{
-		return trustedplatformnames;
+		return trustedplatforms;
 	}
 	
 	/**
@@ -1345,15 +1345,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public boolean getInternalRefuseUnauth()
 	{
 		return refuseunauth;
-	}
-	
-	/**
-	 *  Checks whether to allow platform roles.
-	 *  @return True, if used.
-	 */
-	public boolean getInternalAllowPlatformRoles()
-	{
-		return allowplatformroles;
 	}
 	
 	/**
@@ -1608,8 +1599,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			settings.put("platformnamecertificate", platformnamecertificate);
 		if (customnameauthorities != null && customnameauthorities.size() > 0)
 			settings.put("nameauthorities", customnameauthorities);
-		if (trustedplatformnames != null && trustedplatformnames.size() > 0)
-			settings.put("trustedplatforms", trustedplatformnames);
+		if (trustedplatforms != null && trustedplatforms.size() > 0)
+			settings.put("trustedplatforms", trustedplatforms);
 		
 		getSettingsService().saveState(PROPERTIES_ID, settings);
 		

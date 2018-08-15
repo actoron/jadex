@@ -70,33 +70,8 @@ public class SecretWizard extends JWizard
 	public SecretWizard(byte[] certstore)
 	{
 		this.certstore = certstore;
-		String[] stypes = new String[] { "Key", "Password", "X509 Certificates", "Enter Encoded Secret" };
-		start = new ChoiceNode("Select Secret Type", stypes)
-		{
-			public void onShow()
-			{
-				result = null;
-				secret = null;
-			}
-		};
 		
-		WizardNode finish = createSummaryNode();
-		
-		WizardNode node = createKeyNode();
-		node.addChild(finish);
-		start.addChild(node);
-		
-		node = createPasswordNode();
-		node.addChild(finish);
-		start.addChild(node);
-		
-		node = createPasswordX509Node();
-		node.addChild(finish);
-		start.addChild(node);
-		
-		start.addChild(finish);
-		
-		next();
+		setupNodes();
 	}
 	
 	/**
@@ -134,14 +109,52 @@ public class SecretWizard extends JWizard
 	public void setEntityType(String entitytype)
 	{
 		this.entitytype = entitytype;
+		setupNodes();
+	}
+	
+	/**
+	 *  Sets up the wizard nodes.
+	 */
+	protected void setupNodes()
+	{
+		String[] stypes = new String[] { "Key", "Password", "X509 Certificates", "Enter Encoded Secret" };
+		WizardNode choice = new ChoiceNode("Select Secret Type", stypes)
+		{
+			private static final long serialVersionUID = -3528309491194312888L;
+
+			public void onShow()
+			{
+				result = null;
+				secret = null;
+			}
+		};
+		
 		if (entitytype != null && entitytype.length() != 0)
 		{
-			WizardNode choice = start;
 			start = createEntityNode();
 			start.addChild(choice);
-			reset();
-			next();
 		}
+		else
+		{
+			start = choice;
+		}
+		
+		WizardNode finish = createSummaryNode();
+		
+		WizardNode node = createKeyNode();
+		node.addChild(finish);
+		choice.addChild(node);
+		
+		node = createPasswordNode();
+		node.addChild(finish);
+		choice.addChild(node);
+		
+		node = createPasswordX509Node();
+		node.addChild(finish);
+		choice.addChild(node);
+		
+		reset();
+		next();
 	}
 	
 	/**
@@ -161,6 +174,8 @@ public class SecretWizard extends JWizard
 		
 		final WizardNode node = new WizardNode()
 		{
+			private static final long serialVersionUID = -5335652399409989914L;
+
 			protected void onNext()
 			{
 				entity = entityfield.getText();
@@ -206,6 +221,8 @@ public class SecretWizard extends JWizard
 		
 		final JButton randbutton = new JButton(new AbstractAction("Generate Random")
 		{
+			private static final long serialVersionUID = -2726089994487188785L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				String key = SUtil.toUTF8(Base64.encodeNoPadding(KeySecret.createRandom().getKey()));
@@ -214,6 +231,8 @@ public class SecretWizard extends JWizard
 		});
 		JButton pwbutton = new JButton(new AbstractAction("Generate from Password")
 		{
+			private static final long serialVersionUID = 6676194211498329187L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				final JButton pwbutton = (JButton) e.getSource();
@@ -305,6 +324,7 @@ public class SecretWizard extends JWizard
 		
 		final WizardNode node = new WizardNode()
 		{
+			private static final long serialVersionUID = 682879019116951614L;
 			/** Flag if first shown. */
 			protected boolean firstshow = true;
 			
@@ -368,6 +388,8 @@ public class SecretWizard extends JWizard
 		
 		WizardNode node = new WizardNode()
 		{
+			private static final long serialVersionUID = 4418751805896913431L;
+
 			protected void onNext()
 			{
 				String pw = pwfield.getText();
@@ -461,6 +483,8 @@ public class SecretWizard extends JWizard
 		
 		WizardNode node = new WizardNode()
 		{
+			private static final long serialVersionUID = -3182272530590954326L;
+
 			public void onShow()
 			{
 //				validationaction.actionPerformed(null);
@@ -530,6 +554,8 @@ public class SecretWizard extends JWizard
 		
 		WizardNode node = new WizardNode()
 		{
+			private static final long serialVersionUID = -6216501182663569265L;
+
 			public void onShow()
 			{
 				if (secret != null)
