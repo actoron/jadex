@@ -52,3 +52,4 @@ jadex-platform-standalone-launch/highscore.dmp
 /distributions/standard/jcc.settings.json
 /applications/bdi/highscore.dmp
 /tools/runtimetools-swing/jcc.settings.json
+/platform/webservice-websocket/node_modules
