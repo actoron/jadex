@@ -41,6 +41,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -620,7 +621,10 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 		enhanceQuery(query, true);
 		
-		ITerminableIntermediateFuture<T> ret = null;
+		TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<>();
+		
+		int[] finishcount = new int[1];
+		finishcount[0] = 1;
 		
 		// Find remote matches
 		if(isRemote(query))
@@ -628,22 +632,36 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			ISearchQueryManagerService sqms = searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 			if(sqms!=null)
 			{
-				@SuppressWarnings("rawtypes")
-				ITerminableIntermediateFuture remotes = sqms.searchServices(query);
-				@SuppressWarnings("unchecked")
-				ITerminableIntermediateFuture<T> castedremotes = (ITerminableIntermediateFuture<T>) remotes;
-				Future<Collection<T>> fut = FutureFunctionality.getDelegationFuture(castedremotes, new FutureFunctionality(getComponent().getLogger())
+				++finishcount[0];
+				ITerminableIntermediateFuture<IServiceIdentifier> remotes = sqms.searchServices(query);
+				
+				remotes.addResultListener(new IIntermediateResultListener<IServiceIdentifier>()
 				{
-					@Override
-					public Object handleIntermediateResult(Object result) throws Exception
+
+					public void resultAvailable(Collection<IServiceIdentifier> result)
 					{
-						return createServiceProxy(result, info);
+						finished();
+					}
+
+					public void exceptionOccurred(Exception exception)
+					{
+						finished();
+					}
+					
+					public void intermediateResultAvailable(IServiceIdentifier result)
+					{
+						@SuppressWarnings("unchecked")
+						T t = (T)createServiceProxy(result, info);
+						ret.addIntermediateResult(t);
+					}
+
+					public void finished()
+					{
+						--finishcount[0];
+						if (finishcount[0] == 0)
+							ret.setFinished();
 					}
 				});
-				
-				@SuppressWarnings("unchecked")
-				ITerminableIntermediateFuture<T> tmp = (ITerminableIntermediateFuture<T>)fut;
-				ret = tmp;
 			}
 		}
 		
@@ -651,34 +669,75 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		IServiceRegistry registry = ServiceRegistry.getRegistry(getComponent());
 		Collection<IServiceIdentifier> localresults =  registry.searchServices(query);
 		
-		// No remote matches -> create simple result future.
-		if(ret==null)
-		{
-			TerminableIntermediateFuture<T> fut = new TerminableIntermediateFuture<>();
-			for(IServiceIdentifier result: localresults)
-			{
-				@SuppressWarnings("unchecked")
-				T t = (T)createServiceProxy(result, info);
-				fut.addIntermediateResult(t);
-			}
-			fut.setFinished();
-			ret = fut;
-		}
-		
-		// Merge remote and local matches using delegation future functionality  (on same thread, thus local before remote results, if any)
-		else
+		for(IServiceIdentifier result: localresults)
 		{
 			@SuppressWarnings("unchecked")
-			IntermediateFuture<T> fut = (IntermediateFuture<T>)ret;
-			
-			for(IServiceIdentifier result: localresults)
-			{
-				@SuppressWarnings("unchecked")
-				T t = (T)result; // Hack!!! Isn't really <T> but ignored at runtime anyways and converted by future functionality
-				fut.addIntermediateResultIfUndone(t);
-			}
+			T t = (T)createServiceProxy(result, info);
+			ret.addIntermediateResult(t);
 		}
-				
+		--finishcount[0];
+		if (finishcount[0] == 0)
+			ret.setFinished();
+		
+//		ITerminableIntermediateFuture<T> ret = null;
+//		
+//		// Find remote matches
+//		if(isRemote(query))
+//		{
+//			ISearchQueryManagerService sqms = searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+//			if(sqms!=null)
+//			{
+//				@SuppressWarnings("rawtypes")
+//				ITerminableIntermediateFuture remotes = sqms.searchServices(query);
+//				@SuppressWarnings("unchecked")
+//				ITerminableIntermediateFuture<T> castedremotes = (ITerminableIntermediateFuture<T>) remotes;
+//				Future<Collection<T>> fut = FutureFunctionality.getDelegationFuture(castedremotes, new FutureFunctionality(getComponent().getLogger())
+//				{
+//					@Override
+//					public Object handleIntermediateResult(Object result) throws Exception
+//					{
+//						return createServiceProxy(result, info);
+//					}
+//				});
+//				
+//				@SuppressWarnings("unchecked")
+//				ITerminableIntermediateFuture<T> tmp = (ITerminableIntermediateFuture<T>)fut;
+//				ret = tmp;
+//			}
+//		}
+//		
+//		// Find local matches.
+//		IServiceRegistry registry = ServiceRegistry.getRegistry(getComponent());
+//		Collection<IServiceIdentifier> localresults =  registry.searchServices(query);
+//		
+//		// No remote matches -> create simple result future.
+//		if(ret==null)
+//		{
+//			TerminableIntermediateFuture<T> fut = new TerminableIntermediateFuture<>();
+//			for(IServiceIdentifier result: localresults)
+//			{
+//				@SuppressWarnings("unchecked")
+//				T t = (T)createServiceProxy(result, info);
+//				fut.addIntermediateResult(t);
+//			}
+//			fut.setFinished();
+//			ret = fut;
+//		}
+//		
+//		// Merge remote and local matches using delegation future functionality  (on same thread, thus local before remote results, if any)
+//		else
+//		{
+//			@SuppressWarnings("unchecked")
+//			IntermediateFuture<T> fut = (IntermediateFuture<T>)ret;
+//			
+//			for(IServiceIdentifier result: localresults)
+//			{
+//				@SuppressWarnings("unchecked")
+//				T t = (T)result; // Hack!!! Isn't really <T> but ignored at runtime anyways and converted by future functionality
+//				fut.addIntermediateResultIfUndone(t);
+//			}
+//		}
+//				
 		return ret;
 	}
 	
