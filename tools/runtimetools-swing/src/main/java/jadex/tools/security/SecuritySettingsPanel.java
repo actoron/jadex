@@ -518,7 +518,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 				}
 				
 				final String role = rolename.getText();
-				if (role.length() == 0)
+				if (role.length() == 0 || role.contains(","))
 				{
 					rolename.showInvalid();
 					return;
@@ -864,7 +864,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							return secservice.addTrustedPlatformName(res);
+							return secservice.addTrustedPlatform(res);
 						}
 					}).get();
 					refreshTrustedPlatforms();
@@ -890,7 +890,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							for (int i = 0; i < names.length; ++i)
-								secservice.removeTrustedPlatformName(names[i]).get();
+								secservice.removeTrustedPlatform(names[i]).get();
 							
 							return IFuture.DONE;
 						};
@@ -1218,30 +1218,27 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				final Set<String> tpn = secservice.getTrustedPlatformNames().get();
+				final Set<String> tps = secservice.getTrustedPlatforms().get();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
 					{
 						String[][] table = null;
-						if (tpn != null && tpn.size() > 0)
+						if (tps != null && tps.size() > 0)
 						{
-							table = new String[tpn.size()][1];
+							List<String[]> dtable = new ArrayList<>();
 							
-							int i = 0;
-							for (String tname : tpn)
+							for (String tname : tps)
 							{
 								if (tname != null)
 								{
-									table[i][0] = tname;
+									String[] tentry = new String[] { tname };
+									dtable.add(tentry);
 								}
-								else
-								{
-									table[i][0] = "Unavailable";
-								}
-								++i;
 							}
+							
+							table = dtable.toArray(new String[dtable.size()][]);
 						}
 						else
 						{

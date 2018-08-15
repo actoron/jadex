@@ -9,8 +9,8 @@ import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.platform.service.security.ICryptoSuite;
-import jadex.platform.service.security.SecurityInfo;
 import jadex.platform.service.security.SecurityAgent;
+import jadex.platform.service.security.SecurityInfo;
 
 /**
  *  Abstract crypto suite class for handling message IDs / replays.
@@ -98,18 +98,18 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 		sharednets.retainAll(agent.getInternalNetworks().keySet());
 		secinf.setSharedNetworks(sharednets);
 		
-		if (authenticatedplatformname != null && agent.getInternalTrustedPlatformNames().contains(authenticatedplatformname))
+		if (authenticatedplatformname != null && agent.getInternalTrustedPlatforms().contains(authenticatedplatformname))
 			secinf.setTrustedPlatform(true);
 		
 		Map<String, Set<String>> rolemap = agent.getInternalRoles();
 		Set<String> roles = new HashSet<String>();
 		
-		if (agent.getInternalAllowPlatformRoles())
-		{
-			Set<String> r = rolemap.get(secinf.getAuthenticatedPlatformName());
-			if (r != null)
-				roles.addAll(r);
-		}
+		Set<String> platformroles = rolemap.get(secinf.getAuthenticatedPlatformName());
+		if (platformroles != null)
+			roles.addAll(platformroles);
+		else
+			roles.add(secinf.getAuthenticatedPlatformName());
+		
 		
 		if (secinf.getNetworks() != null)
 		{
