@@ -8,7 +8,6 @@ import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 
 /**
@@ -28,6 +27,7 @@ public class RemoteReferenceTest //extends TestCase
 		
 		// Start platform1 with local service.
 		IPlatformConfiguration	config1	= STest.getDefaultTestConfig();
+//		config1.setLogging(true);
 		config1.addComponent(LocalServiceProviderAgent.class);
 		final IExternalAccess	platform1	= Starter.createPlatform(config1).get(timeout);
 		timeout	= Starter.getLocalDefaultTimeout(platform1.getId());
