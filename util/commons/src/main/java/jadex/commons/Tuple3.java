@@ -3,6 +3,7 @@ package jadex.commons;
 /**
  *  Generic version of tuple for two elements.
  */
+@SuppressWarnings("serial")
 public class Tuple3<T, E, F> extends Tuple
 {
 	/**

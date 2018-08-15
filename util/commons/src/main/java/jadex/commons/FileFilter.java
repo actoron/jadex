@@ -72,13 +72,15 @@ public class FileFilter implements IFilter<Object>
 	
 	/**
 	 *  Add a filename filter
-	 *  @param filter The filter.
+	 *  @param filter The filter to add.
+	 *  @return This filter (builder pattern).
 	 */
-	public void addFilenameFilter(IFilter<String> filter)
+	public FileFilter	addFilenameFilter(IFilter<String> filter)
 	{
 		if(filters==null)
 			filters = new ArrayList<>();
 		filters.add(filter);
+		return this;
 	}
 	
 	/**

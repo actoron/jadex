@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -1770,60 +1771,71 @@ public class SReflect
 		return ret.toArray(new String[ret.size()]);
 	}
 	
+	protected static Map<Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>, Set<ClassInfo>> CICACHE	= Collections.synchronizedMap(new LinkedHashMap<>());
+	
 	/**
 	 *  Scan for component classes in the classpath.
 	 */
 	public static Set<ClassInfo> scanForClassInfos(URL[] urls, IFilter<Object> filefilter, IFilter<ClassInfo> classfilter)
 	{
-		Set<ClassInfo> ret = new HashSet<ClassInfo>();
-			
-		if(filefilter==null)
-			filefilter = new jadex.commons.FileFilter("$", false, ".class");
-		Map<String, Set<String>> files = SReflect.scanForFiles2(urls, filefilter);
+		Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>	key
+			= new Tuple3<>(new HashSet<>(Arrays.asList(urls)), filefilter, classfilter);
 		
-		//int cnt = 0;
-		for(Map.Entry<String, Set<String>> entry: files.entrySet())
+		Set<ClassInfo> ret = CICACHE.get(key);
+		if(ret==null)
 		{
-			String jarname = entry.getKey();
-			if(jarname!=null)
+			ret	= new LinkedHashSet<>();
+			
+			if(filefilter==null)
+				filefilter = new jadex.commons.FileFilter("$", false, ".class");
+			Map<String, Set<String>> files = SReflect.scanForFiles2(urls, filefilter);
+			
+			//int cnt = 0;
+			for(Map.Entry<String, Set<String>> entry: files.entrySet())
 			{
-				try(JarFile jar	= new JarFile(jarname))
+				String jarname = entry.getKey();
+				if(jarname!=null)
 				{
-					for(String jename: entry.getValue())
+					try(JarFile jar	= new JarFile(jarname))
 					{
-						JarEntry je = jar.getJarEntry(jename);
-						InputStream is = jar.getInputStream(je);
-						ClassInfo ci = SClassReader.getClassInfo(is);
-						if(classfilter.filter(ci))
+						for(String jename: entry.getValue())
 						{
-							ret.add(ci);
+							JarEntry je = jar.getJarEntry(jename);
+							InputStream is = jar.getInputStream(je);
+							ClassInfo ci = SClassReader.getClassInfo(jarname+jename, is);
+							if(classfilter.filter(ci))
+							{
+								ret.add(ci);
+							}
 						}
-					}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			else
-			{
-				for(String filename: entry.getValue())
-				{
-					try(FileInputStream is = new FileInputStream(filename))
-					{
-						ClassInfo ci = SClassReader.getClassInfo(is);
-						if(classfilter.filter(ci))
-						{
-							ret.add(ci);
-						}
-//						System.out.println(cnt++);
 					}
 					catch(Exception e)
 					{
 						e.printStackTrace();
 					}
 				}
+				else
+				{
+					for(String filename: entry.getValue())
+					{
+						try(FileInputStream is = new FileInputStream(filename))
+						{
+							ClassInfo ci = SClassReader.getClassInfo(filename, is);
+							if(classfilter.filter(ci))
+							{
+								ret.add(ci);
+							}
+	//						System.out.println(cnt++);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+				}
 			}
+			CICACHE.put(key, ret);
+			System.out.println("scanned class infos cache size: "+CICACHE.size());
 		}
 		
 		return ret;

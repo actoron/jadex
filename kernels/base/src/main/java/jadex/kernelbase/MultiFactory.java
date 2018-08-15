@@ -59,6 +59,25 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/** Kernel model property for extensions */
 	protected static final String KERNEL_EXTENSIONS = "kernel.types";
 	
+	/** Filter for scanning for kernel agent class files. */
+	protected static FileFilter ffilter = new FileFilter("$", false, ".class")
+		.addFilenameFilter(new IFilter<String>()
+	{
+		public boolean filter(String fn)
+		{
+			return fn.startsWith("Kernel");
+		}
+	});
+	
+	/** Filter for scanning for kernel agent class infos. */
+	protected static IFilter<ClassInfo>	cfilter	= new IFilter<ClassInfo>()
+	{
+		public boolean filter(ClassInfo ci) 
+		{
+			return ci.hasAnnotation("jadex.micro.annotation.Agent");
+		}
+	};
+	
 	/** The internal access. */
 	@ServiceComponent
 	protected IInternalAccess agent;
@@ -387,7 +406,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ILibraryService.class);
 		List<URL> urls2 = ls.getAllURLs().get();
 
-//		System.out.println("urls: "+urls2.size());
+//		System.out.println("urls2: "+urls2.size());
 //		for(URL u: urls2)
 //			System.out.println(u);
 		for(Iterator<URL> it=urls2.iterator(); it.hasNext(); )
@@ -403,23 +422,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		//System.out.println("scan: "+urls2.size());
 		
-		FileFilter ff = new FileFilter("$", false, ".class");
-		ff.addFilenameFilter(new IFilter<String>()
-		{
-			public boolean filter(String fn)
-			{
-				return fn.startsWith("Kernel");
-			}
-		});
-		
 //		System.out.println("urls: "+urls);
-		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls2.toArray(new URL[urls2.size()]), ff, new IFilter<ClassInfo>()
-		{
-			public boolean filter(ClassInfo ci) 
-			{
-				return ci.hasAnnotation("jadex.micro.annotation.Agent");
-			}
-		});
+		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls2.toArray(new URL[urls2.size()]), ffilter, cfilter);
 
 		for(ClassInfo ci: cis)
 		{

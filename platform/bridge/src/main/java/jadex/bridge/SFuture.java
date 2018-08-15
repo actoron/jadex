@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
@@ -318,12 +319,13 @@ public class SFuture
 	/**
 	 *  Blocking wait for first result.
 	 *  Future is terminated after first result is received.
+	 *  Uses realtime timeout (hack?)
 	 *  @param fut	The future.
 	 *  @return The first result.
 	 */
 	public static <T> T getFirstResultAndTerminate(ITerminableIntermediateFuture<T> fut)
 	{
-		T	ret	= fut.getNextIntermediateResult();
+		T	ret	= fut.getNextIntermediateResult(Timeout.UNSET, true);
 		fut.terminate();
 		return ret;
 	}
