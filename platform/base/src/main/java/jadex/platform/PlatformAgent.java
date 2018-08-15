@@ -271,7 +271,7 @@ public class PlatformAgent
 		
 		if(levels.hasNext())
 		{
-//			System.out.println("---------- LEVEL --------------");
+			System.out.println("---------- LEVEL --------------");
 			Set<String> level = levels.next();
 			CounterResultListener<Void> lis = new CounterResultListener<>(level.size(), new IResultListener<Void>()
 			{
@@ -299,7 +299,7 @@ public class PlatformAgent
 					res -> {lis.resultAvailable(null);},
 					exception -> {lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c+".class", exception));});
 				
-//				System.out.println("Auto starting: "+names.get(c));
+				System.out.println("Auto starting: "+names.get(c));
 			}
 		}
 		else

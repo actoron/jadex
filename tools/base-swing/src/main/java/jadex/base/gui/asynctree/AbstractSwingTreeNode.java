@@ -156,7 +156,7 @@ public abstract class AbstractSwingTreeNode	extends AbstractTreeNode implements 
 
 		super.setChildren(newchildren);
 		
-		System.out.println("setChildren: "+this+" "+newchildren);
+//		System.out.println("setChildren: "+this+" "+newchildren);
 	}
 	
 	@Override

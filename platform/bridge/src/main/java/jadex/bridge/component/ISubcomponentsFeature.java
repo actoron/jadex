@@ -44,4 +44,20 @@ public interface ISubcomponentsFeature
 	 *  @return The file name of this component type.
 	 */
 	public String getComponentFilename(final String ctype);
+	
+	/**
+	 *  Get the childcount.
+	 *  @return the childcount.
+	 */
+	public int getChildcount();
+	
+	/**
+	 *  Inc the child count.
+	 */
+	public int incChildcount();
+	
+	/**
+	 *  Dec the child count.
+	 */
+	public int decChildcount();
 }

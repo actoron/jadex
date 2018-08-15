@@ -102,6 +102,9 @@ public class SComponentManagementService
 	 *  @param cid The component id.
 	 *  @return External Access.
 	 */
+	// r: components
+	// w: -
+	// -> ok
 	public static final IExternalAccess getLocalExternalAccess(IComponentIdentifier cid)
 	{
 		assert cid != null;
@@ -109,7 +112,7 @@ public class SComponentManagementService
 		IComponentIdentifier platform = cid.getRoot();
 		
 		IPlatformComponentAccess comp = getComponents(platform).get(cid);
-		if (comp == null)
+		if(comp == null)
 			throw new RuntimeException("Component not found: " + cid);
 		return comp.getInternalAccess().getExternalAccess();
 	}
@@ -120,6 +123,9 @@ public class SComponentManagementService
 	 *  @param cid The component id.
 	 *  @return ClassLoader.
 	 */
+	// r: components
+	// w: -
+	// -> ok
 	public static final ClassLoader getLocalClassLoader(IComponentIdentifier cid)
 	{
 		assert cid != null;
@@ -127,7 +133,7 @@ public class SComponentManagementService
 		IComponentIdentifier platform = cid.getRoot();
 		
 		IPlatformComponentAccess comp = getComponents(platform).get(cid);
-		if (comp == null)
+		if(comp == null)
 			throw new RuntimeException("Component not found: " + cid);
 		return comp.getInternalAccess().getClassLoader();
 	}
@@ -147,42 +153,72 @@ public class SComponentManagementService
 //		return ret;
 //	}
 	
+	/**
+	 *  Get the components map.
+	 *  @param cid The platform id.
+	 *  @return The component map.
+	 */
 	public static Map<IComponentIdentifier, IPlatformComponentAccess> getComponents(IComponentIdentifier cid)
 	{
 		return (Map<IComponentIdentifier, IPlatformComponentAccess>)Starter.getPlatformValue(cid, Starter.DATA_COMPONENTMAP);
 	}
 	
+	/**
+	 *  Get the init infos..
+	 *  @param cid The platform id.
+	 *  @return The init infos.
+	 */
 	public static Map<IComponentIdentifier, InitInfo> getInitInfos(IComponentIdentifier cid)
 	{
 		return (Map<IComponentIdentifier, InitInfo>)Starter.getPlatformValue(cid, Starter.DATA_INITINFOS);
 	}
 	
-	public static Map<IComponentIdentifier, Integer> getChildCounts(IComponentIdentifier cid)
-	{
-		return (Map<IComponentIdentifier, Integer>)Starter.getPlatformValue(cid, Starter.DATA_CHILDCOUNTS);
-	}
-	
-//	public static Map<IComponentIdentifier, CleanupCommand> getCleanupCommands(IComponentIdentifier cid)
+//	/**
+//	 *  Get the child counts.
+//	 *  @param cid The platform id.
+//	 *  @return The child counts.
+//	 */
+//	public static Map<IComponentIdentifier, Integer> getChildCounts(IComponentIdentifier cid)
 //	{
-//		return (Map<IComponentIdentifier, CleanupCommand>)Starter.getPlatformValue(cid, Starter.DATA_CLEANUPCOMMANDS);
+//		return (Map<IComponentIdentifier, Integer>)Starter.getPlatformValue(cid, Starter.DATA_CHILDCOUNTS);
 //	}
 	
+	/**
+	 *  Get the cleanup futures.
+	 *  @param cid The platform id.
+	 *  @return The cleanup futures.
+	 */
 	public static Map<IComponentIdentifier, IFuture<Map<String, Object>>> getCleanupFutures(IComponentIdentifier cid)
 	{
 		return (Map<IComponentIdentifier, IFuture<Map<String, Object>>>)Starter.getPlatformValue(cid, Starter.DATA_CLEANUPFUTURES);
 	}
 	
+	/**
+	 *  Get the local types (modelname, filename)->local types (kept once per model).
+	 *  @param cid The platform id.
+	 *  @return The local types map.
+	 */
 	public static  Map<Tuple, String> getLocalTypes(IComponentIdentifier cid)
 	{
 		/**	The local filename cache (tuple(parent filename, child filename) -> local typename)*/
 		return (Map<Tuple, String>)Starter.getPlatformValue(cid, Starter.DATA_LOCALTYPES);
 	}
 	
+	/**
+	 *  Get the cid counts, i.e. number for the next agent of specific type.
+	 *  @param cid The platform id.
+	 *  @return The cid counts.
+	 */
 	public static  Map<String, Integer> getCidCounts(IComponentIdentifier cid)
 	{
 		return (Map<String, Integer>)Starter.getPlatformValue(cid, Starter.DATA_CIDCOUNTS);
 	}
 	
+	/**
+	 *  Get the lock entries counts, i.e. number for the next agent of specific type.
+	 *  @param cid The platform id.
+	 *  @return The cid counts.
+	 */
 	public static Map<IComponentIdentifier, LockEntry> getLockEntries(IComponentIdentifier cid)
 	{
 		/** The locked components (component are locked till init is finished,
@@ -190,16 +226,31 @@ public class SComponentManagementService
 		return (Map<IComponentIdentifier, LockEntry>)Starter.getPlatformValue(cid, Starter.DATA_LOCKENTRIES);
 	}
 	
+	/**
+	 *  Get the listeners
+	 *  @param cid The platform id.
+	 *  @return The listeners.
+	 */
 	public static Map<IComponentIdentifier, Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>> getListeners(IComponentIdentifier cid)
 	{
 		return (Map<IComponentIdentifier, Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>>)Starter.getPlatformValue(cid, Starter.DATA_CMSLISTENERS);
 	}
 	
+	/**
+	 *  Get the bootstrap factory
+	 *  @param cid The platform id.
+	 *  @return The bootstrap factory.
+	 */
 	public static IComponentFactory getComponentFactory(IComponentIdentifier cid)
 	{
 		return (IComponentFactory)Starter.getPlatformValue(cid, Starter.DATA_BOOTSTRAPFACTORY);
 	}
 	
+	/**
+	 *  Remove the bootstrap factory
+	 *  @param cid The platform id.
+	 *  @return The bootstrap factory.
+	 */
 	public static void removeComponentFactory(IComponentIdentifier cid)
 	{
 		Starter.putPlatformValue(cid, Starter.DATA_BOOTSTRAPFACTORY, null);
@@ -208,27 +259,22 @@ public class SComponentManagementService
 	/**
 	 *  Get the description for a component (if any).
 	 */
+	// r: components
+	// w: -
 	public static IComponentDescription	getDescription(IComponentIdentifier cid)
 	{
 		if(cid==null)
 			return null;
-		
-		IPlatformComponentAccess	component	= getComponents(cid).get(cid);
-		// Hack? Allows components to get description in init phase
-		if(component==null)
-		{
-			InitInfo ii = getInitInfos(cid).get(cid);
-			if(ii!=null)
-				component = ii.getComponent();
-		}
+		IPlatformComponentAccess component = getComponent(cid);
 		return component!=null ? component.getInternalAccess().getDescription() : null;
 	}
 	
-	 // writes cleanup futures
 	/**
 	 *  Exit the destroy method by setting description state and resetting maps.
 	 *  @return True, when somebody was notified.
 	 */
+	// r: -
+	// w: cleanup futures
 	public static void exitDestroy(IComponentIdentifier cid, IComponentDescription desc, Exception ex, Map<String, Object> results)
 	{
 //		Thread.dumpStack();
@@ -253,7 +299,8 @@ public class SComponentManagementService
 		}
 	}
 	
-	 // reads and writes listeners
+	// r: listeners
+	// w: listeners
 	/**
      *  Add a component listener for all components.
      *  The listener is registered for component changes.
@@ -263,7 +310,8 @@ public class SComponentManagementService
     	return listenToComponent(null, agent);
     }
 	
-    // reads and writes listeners
+	// r: listeners
+	// w: listeners
 	/**
      *  Add a component listener for a specific component.
      *  The listener is registered for component changes.
@@ -300,7 +348,8 @@ public class SComponentManagementService
     	return ret;    	
     }
     
-    // reads listeners
+    // r: listeners
+ 	// w: -
     /**
 	 *  Notify the cms listeners of an addition.
 	 */
@@ -316,7 +365,8 @@ public class SComponentManagementService
 		}
 	}
     
-	 // reads listeners
+	// r: listeners
+ 	// w: -
     /**
 	 *  Notify the cms listeners of a change.
 	 */
@@ -346,7 +396,8 @@ public class SComponentManagementService
 //		}
 	}
 	
-	// reads listeners
+	// r: listeners
+ 	// w: -
 	/**
 	 *  Notify the cms listeners of a removal.
 	 */
@@ -373,8 +424,8 @@ public class SComponentManagementService
 		getListeners(desc.getName()).remove(desc.getName());	// remove(!) subscriptions for termination event
 	}
 	
-	// reads components
-	// reads/writes local component types
+	// r: components, local component types
+	// w: local component types
 	/**
 	 *  Find the file name and local component type name
 	 *  for a component to be started.
@@ -417,7 +468,7 @@ public class SComponentManagementService
 						// Try to find local type for file
 						if(cinfo.getLocalType()==null && subcomps.length>0)
 						{
-							Tuple	key	= new Tuple(parent.getModel().getFullName(), filename);
+							Tuple key = new Tuple(parent.getModel().getFullName(), filename);
 							if(SComponentManagementService.getLocalTypes(agent.getId()).containsKey(key))
 							{
 								cinfo.setLocalType((String)SComponentManagementService.getLocalTypes(agent.getId()).get(key));
@@ -484,7 +535,8 @@ public class SComponentManagementService
 		return ret;
 	}
 	
-	// reads/writes component factory
+	// r: factory
+	// w: factory (deletes as sideeffect)
 	/**
 	 *  Get a fitting component factory for a specific model.
 	 *  Searches the cached factories for the one that fits
@@ -556,7 +608,8 @@ public class SComponentManagementService
 		return ((IService)fac).getId().getProviderId().getLocalName().indexOf("multi")!=-1;
 	}
 	
-	// reads initinfos
+	// r: init infos
+	// w: - 
 	/**
 	 *  Get the info of the parent component.
 	 */
@@ -566,6 +619,8 @@ public class SComponentManagementService
 		return getInitInfo(paid);
 	}
 	
+	// r: components, init infos
+	// w: -
 	/**
 	 *  Get the parent component.
 	 */	
@@ -575,13 +630,11 @@ public class SComponentManagementService
 		IPlatformComponentAccess component	= SComponentManagementService.getComponents(agent.getId()).get(paid);
 		if(component==null)
 		{
-			InitInfo	pinfo = getParentInfo(cinfo, agent);
+			InitInfo pinfo = getParentInfo(cinfo, agent);
 			
 			// Hack!!! happens when parent is killed while trying to create subcomponent (todo: integrate locking for destroy and create of component structure)
 			if(pinfo==null)
-			{
 				throw new ComponentTerminatedException(paid);
-			}
 			
 			component = pinfo.getComponent();
 		}
@@ -660,8 +713,8 @@ public class SComponentManagementService
 	}
 	
 	
-	// reads initinfos
-	// reads components
+	// r: initinfos, components
+	// w: 
 	/**
 	 *  Test if a component should be suspended after init is done.
 	 *  @param cinfo	The creation info.
@@ -676,9 +729,8 @@ public class SComponentManagementService
 		// Parent also still in init.
 		if(painfo!=null && painfo.getComponent().getInternalAccess().getModel()!=null)
 		{
-			pasuspend	= isInitSuspend(painfo.getInfo(), painfo.getComponent().getInternalAccess().getModel(), agent);
+			pasuspend = isInitSuspend(painfo.getInfo(), painfo.getComponent().getInternalAccess().getModel(), agent);
 		}
-		
 		// Parent already running.
 		else
 		{
@@ -693,7 +745,7 @@ public class SComponentManagementService
 		return suspend;
 	}
 	
-	// reads components
+	// r: components
 	/**
 	 *  Get the children of a component.
 	 */
@@ -708,7 +760,8 @@ public class SComponentManagementService
 		return tmp;
 	}
 	
-	// writes components
+	// w: desc
+	// r: listeners, components
 	/**
 	 *  Set the state of a component (i.e. update the component description).
 	 *  Currently only switching between suspended/waiting is allowed.
@@ -763,7 +816,8 @@ public class SComponentManagementService
 		return ret;
 	}
 	
-	// reads components
+	// r: components
+	// w: -
 	/**
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions.
@@ -884,6 +938,8 @@ public class SComponentManagementService
 		return fut;
 	}
 	
+	// r: components
+	// w: -
 	/**
 	 *  Get the component identifiers.
 	 *  @return The component identifiers.
@@ -895,7 +951,8 @@ public class SComponentManagementService
 		return new Future<IComponentIdentifier[]>((IComponentIdentifier[])SComponentManagementService.getComponents(agent.getId()).keySet().toArray(new IComponentIdentifier[SComponentManagementService.getComponents(agent.getId()).size()]));
 	}
 	
-	// reads components
+	// r: components
+	// w: 
 	/**
 	 *  Get the component descriptions.
 	 *  @return The component descriptions.
@@ -915,8 +972,8 @@ public class SComponentManagementService
 		return fut;
 	}
 	
-	// reads components
-	// reads initinfos
+	// r: components, initinfos
+	// w: -
 	/**
 	 *  Get the component description of a single component.
 	 *  @param cid The component identifier.
@@ -961,7 +1018,8 @@ public class SComponentManagementService
 		return ret;
 	}
 	
-	// reads components
+	// r: components
+	// w: -
 	/**
 	 *  Get the children components of a component.
 	 *  @param cid The component identifier.
@@ -1393,9 +1451,10 @@ public class SComponentManagementService
 		// cannot check parent shutdown state because could be still uninited
 		if(!ad.isDaemon())
 		{
-			Integer	childcount	= (Integer)SComponentManagementService.getChildCounts(agent.getId()).get(padesc.getName());
-			int cc = childcount!=null ? childcount.intValue()+1 : 1;
-			SComponentManagementService.getChildCounts(agent.getId()).put(padesc.getName(), Integer.valueOf(cc));
+//			Integer	childcount	= (Integer)SComponentManagementService.getChildCounts(agent.getId()).get(padesc.getName());
+//			int cc = childcount!=null ? childcount.intValue()+1 : 1;
+//			SComponentManagementService.getChildCounts(agent.getId()).put(padesc.getName(), Integer.valueOf(cc));
+			pad.getFeature(ISubcomponentsFeature.class).incChildcount();
 		}
 		
 		// Register component at parent.
@@ -2741,7 +2800,7 @@ public class SComponentManagementService
 //		if(cid.getName().indexOf("Peer")==-1)
 //			System.out.println("removed adapter: "+adapter.getComponentIdentifier().getLocalName()+" "+cid+" "+adapters);
 		
-		desc	= (CMSComponentDescription)comp.getInternalAccess().getDescription();
+		desc = (CMSComponentDescription)comp.getInternalAccess().getDescription();
 		
 		IArgumentsResultsFeature	af	= comp.getInternalAccess().getFeature0(IArgumentsResultsFeature.class); 
 		results = af!=null ? af.getResults() : null;
@@ -2766,21 +2825,28 @@ public class SComponentManagementService
 				if(!desc.isDaemon())
 //				if(padesc.isAutoShutdown() && !desc.isDaemon())
 				{
-					Integer	childcount	= (Integer)SComponentManagementService.getChildCounts(cid).get(padesc.getName());
-//					assert childcount!=null && childcount.intValue()>0;
-					if(childcount!=null)
-					{
-						int cc = childcount.intValue()-1;
-						if(cc>0)
-							SComponentManagementService.getChildCounts(cid).put(padesc.getName(), Integer.valueOf(cc));
-						else
-							SComponentManagementService.getChildCounts(cid).remove(padesc.getName());
-//						System.out.println("childcount-: "+padesc.getName()+" "+cc);
-					}
+					pad	= getComponent(padesc.getName());
+					
+					int cc = -1;
+					if(pad!=null)
+						cc = pad.getInternalAccess().getFeature(ISubcomponentsFeature.class).decChildcount();
+					killparent = killparent || (padesc.isAutoShutdown() && cc<=0);
+					
+//					Integer	childcount	= (Integer)SComponentManagementService.getChildCounts(cid).get(padesc.getName());
+////					assert childcount!=null && childcount.intValue()>0;
+//					if(childcount!=null)
+//					{
+//						int cc = childcount.intValue()-1;
+//						if(cc>0)
+//							SComponentManagementService.getChildCounts(cid).put(padesc.getName(), Integer.valueOf(cc));
+//						else
+//							SComponentManagementService.getChildCounts(cid).remove(padesc.getName());
+////						System.out.println("childcount-: "+padesc.getName()+" "+cc);
+//					}
 					// todo: could fail when parent is still in init phase. 
 					// Should test for init phase and remember that it has to be killed.
-					killparent = killparent || (padesc.isAutoShutdown() 
-						&& (childcount==null || childcount.intValue()<=1));
+//					killparent = killparent || (padesc.isAutoShutdown() 
+//						&& (childcount==null || childcount.intValue()<=1));
 				}
 			}
 			pad	= SComponentManagementService.getComponents(cid).get(desc.getName().getParent());
@@ -2860,5 +2926,21 @@ public class SComponentManagementService
 //		{
 //			t.printStackTrace();
 //		}
+	}
+	
+	/**
+	 *  Helper to get a component from components or init infos.
+	 *  @param cid The component id.
+	 *  @return The component.
+	 */
+	protected static IPlatformComponentAccess getComponent(IComponentIdentifier cid)
+	{
+		IPlatformComponentAccess ret = SComponentManagementService.getComponents(cid).get(cid);
+		if(ret==null)
+		{
+			InitInfo ii = getInitInfo(cid);
+			ret	= ii.getComponent();
+		}
+		return ret;
 	}
 }

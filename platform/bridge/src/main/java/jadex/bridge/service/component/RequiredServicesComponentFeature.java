@@ -585,9 +585,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		IServiceIdentifier	sid	= ServiceRegistry.getRegistry(getComponent()).searchService(query);
 		
 		if(sid==null && query.getMultiplicity().getFrom()>0)
-		{
 			throw new ServiceNotFoundException(query.toString());
-		}
 		
 		// Fetches service and wraps result in proxy, if required. 
 		@SuppressWarnings("unchecked")

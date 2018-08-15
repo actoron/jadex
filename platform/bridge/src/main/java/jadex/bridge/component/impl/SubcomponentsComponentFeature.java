@@ -42,6 +42,9 @@ import jadex.javaparser.SimpleValueFetcher;
  */
 public class SubcomponentsComponentFeature	extends	AbstractComponentFeature implements ISubcomponentsFeature, IInternalSubcomponentsFeature
 {
+	/** The number of children. */
+	protected int childcount;
+	
 	/**
 	 *  Create the feature.
 	 */
@@ -434,10 +437,45 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	}
 	
 	/**
-	 * 
+	 *  Test if the current thread is an external thread.
 	 */
 	protected boolean isExternalThread()
 	{
 		return !getComponent().getFeature(IExecutionFeature.class).isComponentThread();
 	}
+
+	/**
+	 *  Get the childcount.
+	 *  @return the childcount.
+	 */
+	public int getChildcount()
+	{
+		return childcount;
+	}
+
+//	/**
+//	 *  Set the child count.
+//	 *  @param childcount the childcount to set.
+//	 */
+//	public void setChildcount(int childcount)
+//	{
+//		this.childcount = childcount;
+//	}
+	
+	/**
+	 *  Inc the child count.
+	 */
+	public int incChildcount()
+	{
+		return ++this.childcount;
+	}
+	
+	/**
+	 *  Dec the child count.
+	 */
+	public int decChildcount()
+	{
+		return childcount>0? --childcount: childcount;
+	}
+	
 }
