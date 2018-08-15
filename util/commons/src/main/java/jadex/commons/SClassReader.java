@@ -5,8 +5,6 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,6 +18,50 @@ import java.util.Map;
  */
 public class SClassReader
 {
+	//-------- cached access --------
+	
+//	protected static final Map<String, Object>	CI	CACHE	= Collections.synchronizedMap(new LinkedHashMap<>()); 
+	
+	/**
+	 *  Get infos about a class.
+	 * 
+	 *  @param inputstream The input stream of the class file. 
+	 *  @return The class infos.
+	 */
+	public static final ClassInfo getClassInfo(String cachekey, InputStream inputstream)
+	{
+		Object	ret;
+//		if(CICACHE.containsKey(cachekey))
+//		{
+//			ret	=	CICACHE.get(cachekey);
+//		}
+//		else
+		{
+			try
+			{
+				ret	= getClassInfo(inputstream, false, false);
+			}
+			catch(Throwable t)
+			{
+				ret	= t;
+			}
+//			CICACHE.put(cachekey, ret);
+//			if(CICACHE.size()%1000==0)
+//				System.out.println("classinfo cachesize: "+CICACHE.size());
+		}
+		
+		if(ret instanceof ClassInfo)
+		{
+			return (ClassInfo)ret;
+		}
+		else
+		{
+			throw SUtil.throwUnchecked((Throwable)ret);
+		}
+	}
+	
+	//-------- direct access --------
+	
 	/**
 	 *  Get infos about a class.
 	 * 

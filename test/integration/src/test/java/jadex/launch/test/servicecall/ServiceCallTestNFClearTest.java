@@ -67,6 +67,7 @@ public class ServiceCallTestNFClearTest
 //		String pid = SUtil.createPlainRandomId(name.getMethodName(), 3) + "-*";
 
 		IPlatformConfiguration	config	= STest.getDefaultTestConfig();
+//		config.getExtendedPlatformConfiguration().setDebugFutures(true);
 //		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
 ////		config.setLogging(true);
 ////		config.setDefaultTimeout(-1);

@@ -892,7 +892,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					{
 						if(!unblocked[0])
 						{
-							unblock(monitor, new TimeoutException(Future.DEBUG ? "" : "Use PlatformConfiguration.setDebugFutures(true) for timeout cause.", ex));
+							unblock(monitor, new TimeoutException(Future.DEBUG ? "" : "Use PlatformConfiguration.getExtendedPlatformConfiguration().setDebugFutures(true) for timeout cause.", ex));
 						}
 					}
 					

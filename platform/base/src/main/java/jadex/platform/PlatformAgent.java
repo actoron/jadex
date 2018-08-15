@@ -82,6 +82,29 @@ import jadex.platform.service.security.SecurityAgent;
 @Agent
 public class PlatformAgent
 {
+	//-------- static part --------
+	
+	/** Filter for finding agents to be auto-started. */
+	protected static IFilter<SClassReader.ClassInfo>	filter	= new IFilter<SClassReader.ClassInfo>()
+	{
+		public boolean filter(ClassInfo ci)
+		{
+			boolean ret = false;
+			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
+			if(ai!=null)
+			{
+				AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
+				if(aai!=null)
+				{
+					EnumInfo ei = (EnumInfo)aai.getValue("value");
+					String val = ei.getValue();
+					ret = val==null? false: "true".equals(val.toLowerCase()) || "false".equals(val.toLowerCase()); // include all which define the value (false can be overridden from args)
+				}
+			}
+			return ret;
+		}
+	};
+	
 	@Agent
 	protected IInternalAccess agent;
 	
@@ -109,28 +132,9 @@ public class PlatformAgent
 		ClassLoader classloader = PlatformAgent.class.getClassLoader();
 		if(classloader instanceof URLClassLoader)
 			urls = ((URLClassLoader)classloader).getURLs();
+//		System.out.println("urls: "+urls.length);
 		
-		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, new IFilter<SClassReader.ClassInfo>()
-		{
-			public boolean filter(ClassInfo ci)
-			{
-				boolean ret = false;
-				AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
-				if(ai!=null)
-				{
-					AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
-					if(aai!=null)
-					{
-						EnumInfo ei = (EnumInfo)aai.getValue("value");
-						String val = ei.getValue();
-//						if(val.toBoolean()!=null)
-//							ret = val.toBoolean().booleanValue();
-						ret = val==null? false: "true".equals(val.toLowerCase()) || "false".equals(val.toLowerCase()); // include all which define the value (false can be overrided from args)
-					}
-				}
-				return ret;
-			}
-		});
+		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
 		
 		for(ClassInfo ci: cis)
 		{
