@@ -314,6 +314,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				
 				// else not connected -> ignore
 			}
+			
 			// else ignore unknown network
 			
 			// TODO: allow selective/hybrid polling fallback for unknown/unconnected networks?			
@@ -362,8 +363,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		if(!pawas.isEmpty())
 		{
 			// Count awa search + platform searches (+ async filtering, if any).
-//			final AtomicInteger	cnt	= new AtomicInteger(pawas.size());
-			final AtomicInteger	cnt	= new AtomicInteger(1);
+			final AtomicInteger	cnt	= new AtomicInteger(pawas.size());
 			
 			for(IPassiveAwarenessService pawa: pawas)
 			{
@@ -434,8 +434,6 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					}
 				});
 			}
-			if(cnt.decrementAndGet()==0)
-				ret.setFinishedIfUndone();
 		}
 		else
 		{
