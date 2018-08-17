@@ -22,7 +22,7 @@ public @interface Timeout
 	/** Constant for no timeout. */
 	public static final long NONE = Future.NONE;
 	
-	/** Constant for unset. */
+	/** Constant for unset (i.e. use current default timeout). */
 	public static final long UNSET = Future.UNSET;
 
 	/** Constant for timeout name in non-functional properties. */
