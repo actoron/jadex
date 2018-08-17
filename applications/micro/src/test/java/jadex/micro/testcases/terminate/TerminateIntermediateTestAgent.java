@@ -4,9 +4,11 @@ package jadex.micro.testcases.terminate;
 import java.util.Collection;
 
 import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
@@ -16,6 +18,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Properties;
 
 /**
  *  The intermediate invoker agent tests if intermediate futures can be terminated
@@ -24,6 +27,7 @@ import jadex.micro.annotation.Description;
 @Agent
 @Description("The intermediate invoker agent tests if intermediate futures can be terminated " +
 	"in local and remote cases.")
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledRemoteDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class TerminateIntermediateTestAgent extends TerminateTestAgent
 {
 	/**
