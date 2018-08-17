@@ -16,6 +16,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.registryv2.ISuperpeerStatusService;
 import jadex.commons.future.IFuture;
@@ -29,7 +30,7 @@ public abstract class AbstractInfrastructureTest
 	//-------- constants --------
 	
 	/** The delay time as factor of the default remote timeout. */
-	public static final double	WAITFACTOR	= 0.05;	// 30 * 0.05 secs  -> 1500 millis.
+	public static final double	WAITFACTOR	= 0.1;	// 30 * 0.1 secs  -> 3 secs.
 	
 	//-------- life cycle and helpers --------
 	
@@ -113,8 +114,7 @@ public abstract class AbstractInfrastructureTest
 		}
 		while(!platformids.isEmpty())
 		{
-			// Hack??? Wait three times the wait factor!?
-			IComponentIdentifier	cid	= connected.getNextIntermediateResult(Starter.getScaledRemoteDefaultTimeout(sp.getId(), WAITFACTOR*30), true);
+			IComponentIdentifier	cid	= connected.getNextIntermediateResult(Timeout.UNSET, true);
 			platformids.remove(cid.getRoot());
 			System.out.println("Client "+cid+" connected to SP: "+sp.getId());
 		}
