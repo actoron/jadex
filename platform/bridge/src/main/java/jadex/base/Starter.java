@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 import jadex.bridge.BasicComponentIdentifier;
@@ -45,6 +46,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
@@ -55,6 +57,7 @@ import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.CallSequentializer;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -102,9 +105,6 @@ public class Starter
     /** The CMS child counts. */
     public static String DATA_CHILDCOUNTS = "childcounts";
     
-//    /** The CMS cleanup commands. */
-//    public static String DATA_CLEANUPCOMMANDS = "cleanupcommands";
-    
     /** The CMS cleanup commands. */
     public static String DATA_CLEANUPFUTURES = "cleanupfutures";
     
@@ -122,7 +122,7 @@ public class Starter
     public static String DATA_CMSLISTENERS = "listeners";
     
     /** The CMS lock. */
-    public static String DATA_CMSLOCK = "cmslock";
+    public static String DATA_CMSSEQ = "cmsseq";
     
     
     /** The bootstrap component factory. */
@@ -495,18 +495,40 @@ public class Starter
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMCONFIG, config);
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMMODEL, model);
 					
-					putPlatformValue(cid, DATA_COMPONENTMAP, Collections.synchronizedMap(new HashMap<IComponentIdentifier, IPlatformComponentAccess>()));
-					putPlatformValue(cid, DATA_INITINFOS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, InitInfo>()));
-					putPlatformValue(cid, DATA_CHILDCOUNTS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, Integer>()));
-//					putPlatformValue(cid, DATA_CLEANUPCOMMANDS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, jadex.bridge.service.types.cms.CleanupCommand>()));
-					putPlatformValue(cid, DATA_CLEANUPFUTURES, Collections.synchronizedMap(new HashMap<IComponentIdentifier, IFuture<Map<String, Object>>>()));
-					putPlatformValue(cid, DATA_LOCALTYPES, Collections.synchronizedMap(new HashMap<Tuple, String>()));
-					putPlatformValue(cid, DATA_CIDCOUNTS, Collections.synchronizedMap(new HashMap<String, Integer>()));
-					putPlatformValue(cid, DATA_CHILDCOUNTS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, Integer>()));
-					putPlatformValue(cid, DATA_LOCKENTRIES, Collections.synchronizedMap(new HashMap<IComponentIdentifier, LockEntry>()));
-					putPlatformValue(cid, DATA_CMSLISTENERS, Collections.synchronizedMap(new HashMap<IComponentIdentifier, Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>>()));
-					putPlatformValue(cid, DATA_CMSLOCK, new Object());
-
+					// All cms state uses the same lock
+					ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
+					
+					putPlatformValue(cid, DATA_COMPONENTMAP, new RwMapWrapper<>(new HashMap<IComponentIdentifier, IPlatformComponentAccess>(), lock));
+					putPlatformValue(cid, DATA_INITINFOS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, InitInfo>(), lock));
+					putPlatformValue(cid, DATA_CHILDCOUNTS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Integer>(), lock));
+					putPlatformValue(cid, DATA_CLEANUPFUTURES, new RwMapWrapper<>(new HashMap<IComponentIdentifier, IFuture<Map<String, Object>>>(), lock));
+					putPlatformValue(cid, DATA_LOCALTYPES, new RwMapWrapper<>(new HashMap<Tuple, String>(), lock));
+					putPlatformValue(cid, DATA_CIDCOUNTS, new RwMapWrapper<>(new HashMap<String, Integer>(), lock));
+					putPlatformValue(cid, DATA_CHILDCOUNTS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Integer>(), lock));
+					putPlatformValue(cid, DATA_LOCKENTRIES, new RwMapWrapper<>(new HashMap<IComponentIdentifier, LockEntry>(), lock));
+					putPlatformValue(cid, DATA_CMSLISTENERS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>>(), lock));
+					
+					// does not work as create with subscomponents is recursive
+//					/** The sequentializer to execute getNewFactory() one by one and not interleaved. */
+//					CallSequentializer<Object> cmscaller = new CallSequentializer<Object>();
+//					cmscaller.addCommand("create", new IResultCommand<IFuture<Object>, Object[]>()
+//					{
+//						public IFuture<Object> execute(Object[] args)
+//						{
+////							SComponentManagementService.createComponent(oname, modelname, info, resultlistener, agent)
+//							return (IFuture)SComponentManagementService.createComponentInternal((String)args[0], (String)args[1], (CreationInfo)args[2], (IResultListener<Collection<Tuple2<String, Object>>>)args[3], (IInternalAccess)args[4]);
+//						}
+//					});
+//					cmscaller.addCommand("kill", new IResultCommand<IFuture<Object>, Object[]>()
+//					{
+//						public IFuture<Object> execute(Object[] args)
+//						{
+////							SComponentManagementService.createComponent(oname, modelname, info, resultlistener, agent)
+//							return (IFuture)SComponentManagementService.destroyComponentInternal((IComponentIdentifier)args[0], (IInternalAccess)args[1]);
+//						}
+//					});
+//					putPlatformValue(cid, DATA_CMSSEQ, cmscaller);
+					
 //					rootconf.setBootstrapFactory(cfac);
 //					config.setPlatformModel(model);
 					

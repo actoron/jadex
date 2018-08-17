@@ -1186,6 +1186,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		info = prepare(component, info);
 		
 		IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, resultlistener, this);
+		
 		fut.addResultListener(new IResultListener<IComponentIdentifier>()
 		{
 			@Override

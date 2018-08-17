@@ -223,6 +223,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null);
 					ci.setName(getName(components[i], model, j+1));
 					ci.setFilename(getFilename(components[i], model));
+					
 					getComponent().createComponent(null, ci, null).addResultListener(new IResultListener<IExternalAccess>()
 					{
 						public void resultAvailable(IExternalAccess result) 

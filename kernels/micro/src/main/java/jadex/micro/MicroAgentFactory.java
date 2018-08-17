@@ -140,7 +140,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new MicroModelLoader();
-		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
+		features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}
 	
 	/**

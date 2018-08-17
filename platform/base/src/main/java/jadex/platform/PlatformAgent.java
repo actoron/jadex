@@ -286,6 +286,7 @@ public class PlatformAgent
 					startComponents(levels, names).addResultListener(new DelegationResultListener<>(ret));
 				}
 			});
+			
 			for(String c: level)
 			{
 				//ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(names.get(c), c.getName()+".class", (CreationInfo)null);
@@ -296,7 +297,7 @@ public class PlatformAgent
 				ci.setFilename(c+".class");
 				IFuture<IExternalAccess> fut = agent.createComponent(null, ci, null);
 				fut.addResultListener(
-					res -> {lis.resultAvailable(null);},
+					res -> {System.out.println("created: "+res); lis.resultAvailable(null);},
 					exception -> {lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c+".class", exception));});
 				
 				System.out.println("Auto starting: "+names.get(c));
