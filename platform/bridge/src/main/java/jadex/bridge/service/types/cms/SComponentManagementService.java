@@ -540,6 +540,9 @@ public class SComponentManagementService
 	{
 		Future<IComponentFactory> ret = new Future<>();
 		
+//		if(model.indexOf("KernelMicro")!=-1)
+//			System.out.println("getCompFac: "+model);
+		
 		FactoryFilter ff = new FactoryFilter(model, cinfo==null? null: cinfo.getImports(), rid);
 		SComponentFactory.getFactory(ff, agent).addResultListener(new DelegationResultListener<IComponentFactory>(ret)
 		{
@@ -553,7 +556,7 @@ public class SComponentManagementService
 					removeComponentFactory(agent.getId());
 //					System.out.println("deleting fallback factory: "+model);
 //				}
-				System.out.println("found factory for: "+model);
+//				System.out.println("found factory for: "+model);
 				super.customResultAvailable(result);
 			}
 			
@@ -568,7 +571,7 @@ public class SComponentManagementService
 						{
 							if(result.booleanValue())
 							{
-								System.out.println("found fallback factory for: "+model);
+//								System.out.println("found fallback factory for: "+model);
 								ret.setResult(getComponentFactory(agent.getId()));
 							}
 							else
@@ -2385,8 +2388,8 @@ public class SComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + oname + " : Modelname must not be null."));
 
-		if(modelname.indexOf("Micro")!=-1)
-			System.out.println("create: "+oname+" "+modelname+" "+agent.getId());
+//		if(modelname.indexOf("Micro")!=-1)
+//			System.out.println("create: "+oname+" "+modelname+" "+agent.getId());
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();

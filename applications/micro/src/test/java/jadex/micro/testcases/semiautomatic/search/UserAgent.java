@@ -50,7 +50,7 @@ public class UserAgent
 				public void firstResultAvailable(IComponentIdentifier result)
 				{
 					cnt[0]++;
-					System.out.println("created: "+result+" "+cnt[0]);
+//					System.out.println("created: "+result+" "+cnt[0]);
 					if(cnt[0]==max)
 					{
 						fut.setResult(null);

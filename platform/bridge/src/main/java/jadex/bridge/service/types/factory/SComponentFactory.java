@@ -673,10 +673,6 @@ public class SComponentFactory
 			public IFuture<String> execute(final IInternalAccess ia)
 			{
 				final Future<String> ret = new Future<String>();
-				ILibraryService ls = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
-//						IFuture<IComponentFactory> fut = SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, 
-//							RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid));
-//						ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
 				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
 				fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
 				{
