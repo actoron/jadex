@@ -195,7 +195,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
       // false
 
       /** Logging level for platform. **/
-      public static final String	LOGGING_LEVEL		= "logging_level";							// class:
+      public static final String	LOGGING_LEVEL		= "logginglevel";							// class:
       // java.util.logging.Level
       // default:
       // java.util.logging.Level.SEVERE

@@ -77,7 +77,7 @@ import jadex.platform.service.security.SecurityAgent;
 @Properties(
 {
 	@NameValue(name="componentviewer.viewerclass", value="jadex.commons.SReflect.classForName0(\"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel\", jadex.platform.service.library.LibraryService.class.getClassLoader())"),
-	@NameValue(name="logging.level", value="$args.logging ? java.util.logging.Level.INFO : $args.logging_level")
+	@NameValue(name="logging.level", value="$args.logging ? java.util.logging.Level.INFO : $args.logginglevel")
 })
 @Agent
 public class PlatformAgent
