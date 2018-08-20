@@ -11,21 +11,13 @@ import jadex.commons.future.IFuture;
  */
 @Service(system=true)
 public interface ITransportService
-{	
-	/**
-	 *  Checks if the transport is ready.
-	 * 
-	 *  @param header Message header.
-	 *  @return Transport priority, when ready
-	 */
-	public IFuture<Integer> isReady(IMsgHeader header);
-	
+{
 	/**
 	 *  Send a message.
 	 *  
 	 *  @param header Message header.
 	 *  @param body Message body.
-	 *  @return Done, when sent, failure otherwise.
+	 *  @return Transport priority, when sent. Failure does not need to be returned as message feature uses its own timeouts.
 	 */
-	public IFuture<Void> sendMessage(@Reference IMsgHeader header, @Reference byte[] body);
+	public IFuture<Integer> sendMessage(@Reference IMsgHeader header, @Reference byte[] body);
 }
