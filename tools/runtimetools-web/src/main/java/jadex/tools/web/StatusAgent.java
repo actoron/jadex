@@ -127,7 +127,7 @@ public class StatusAgent implements IStatusService
 			@Override
 			public void terminated(Exception reason)
 			{
-				System.out.println("terminated: "+reason);
+//				System.out.println("terminated: "+reason);
 				for(ISubscriptionIntermediateFuture<PlatformData> fut: futs)
 				{
 					fut.terminate();
@@ -144,14 +144,14 @@ public class StatusAgent implements IStatusService
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("status ex: "+exception);
+//					System.out.println("status ex: "+exception);
 					// ignore
 				}
 								
 				@Override
 				public void finished()
 				{
-					System.out.println("status fini: "+tis);
+//					System.out.println("status fini: "+tis);
 					//ignore
 				}
 				
