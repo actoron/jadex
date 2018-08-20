@@ -3,7 +3,7 @@ package jadex.bridge.service.types.transport;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableFuture;
 
 /**
  *  Interface for a transport service.
@@ -18,6 +18,7 @@ public interface ITransportService
 	 *  @param header Message header.
 	 *  @param body Message body.
 	 *  @return Transport priority, when sent. Failure does not need to be returned as message feature uses its own timeouts.
+	 *  	Future is terminated by message feature, when another transport has sent the message.
 	 */
-	public IFuture<Integer> sendMessage(@Reference IMsgHeader header, @Reference byte[] body);
+	public ITerminableFuture<Integer> sendMessage(@Reference IMsgHeader header, @Reference byte[] body);
 }
