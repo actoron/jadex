@@ -16,9 +16,10 @@ public interface ITransportService
 	 *  Send a message.
 	 *  
 	 *  @param header Message header.
+	 *  @param bheader Message header already encoded and encrypted for sending.
 	 *  @param body Message body.
 	 *  @return Transport priority, when sent. Failure does not need to be returned as message feature uses its own timeouts.
 	 *  	Future is terminated by message feature, when another transport has sent the message.
 	 */
-	public ITerminableFuture<Integer> sendMessage(@Reference IMsgHeader header, @Reference byte[] body);
+	public ITerminableFuture<Integer> sendMessage(@Reference IMsgHeader header, @Reference byte[] bheader, @Reference byte[] body);
 }

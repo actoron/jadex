@@ -52,7 +52,7 @@ public interface ITransport<Con>
 	 *  @param sc	The connection.
 	 *  @param header	The message header.
 	 *  @param body	The message body.
-	 *  @return	A future indicating success.
+	 *  @return	A future indicating success and the current transport priority.
 	 */
-	public IFuture<Void> sendMessage(Con con, byte[] header, byte[] body);
+	public IFuture<Integer> sendMessage(Con con, byte[] header, byte[] body);
 }
