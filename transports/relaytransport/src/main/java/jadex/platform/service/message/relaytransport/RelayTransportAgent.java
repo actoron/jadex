@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
@@ -40,14 +41,18 @@ import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.PassiveLeaseTimeSet;
 import jadex.commons.collection.RwMapWrapper;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.ExceptionResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
@@ -300,39 +305,34 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	 *  @param body Message body.
 	 *  @return Done, when sent, failure otherwise.
 	 */
-	public IFuture<Void> sendMessage(IMsgHeader header, byte[] body)
+	public ITerminableFuture<Integer> sendMessage(IMsgHeader header, byte[] encheader, byte[] body)
 	{
-		IComponentIdentifier fwdest = null;
+		IComponentIdentifier fwdest = header.getReceiver().getRoot();
+			
+		IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot();
 		
-		if (header.getProperty(FORWARD_DEST) == null)
+		body = SUtil.mergeData(encheader, body);
+		
+		if(debug)
 		{
-			fwdest = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot();
-			
-			IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot();
-			ISerializationServices serserv = (ISerializationServices) Starter.getPlatformValue(agent.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
-			byte[] bheader = serserv.encode(header, agent, header);
-			bheader = secservice.encryptAndSign(header, bheader).get();
-			
-			body = SUtil.mergeData(bheader, body);
-			
-			if(debug)
-			{
-				System.out.println(agent+": preparing forward package for " + fwdest + " from " + fwsender + " orig header " + header);
-			}
-			
-			header = new MsgHeader();
-			
-			header.addProperty(FORWARD_SENDER, fwsender);
-			header.addProperty(FORWARD_DEST, fwdest);
+			System.out.println(agent+": preparing forward package for " + fwdest + " from " + fwsender + " orig header " + header);
 		}
-		else
+		
+		header = new MsgHeader();
+		
+		header.addProperty(FORWARD_SENDER, fwsender);
+		header.addProperty(FORWARD_DEST, fwdest);
+		
+		return forwardMessage(header, body);
+	}
+	
+	protected ITerminableFuture<Integer> forwardMessage(final IMsgHeader header, final byte[] body)
+	{
+		IComponentIdentifier fwdest = (IComponentIdentifier) header.getProperty(FORWARD_DEST);
+		if(debug)
 		{
-			fwdest = (IComponentIdentifier) header.getProperty(FORWARD_DEST);
-			if(debug)
-			{
-				IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot();
-				System.out.println(agent+": processing forward package for " + fwdest + " from " + fwsender);
-			}
+			IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot();
+			System.out.println(agent+": processing forward package for " + fwdest + " from " + fwsender);
 		}
 		
 		if (agent.getId().getRoot().equals(fwdest))
@@ -344,29 +344,42 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 //			System.out.println("Final receiver, delivering to component: " + body);
 			AbstractTransportAgent.deliverRemoteMessage(agent, secservice, cms, serser, source, unpacked.get(0), unpacked.get(1));
 			
-			return IFuture.DONE;
+			return getTerminableFuture();
 		}
 		
 		if (hasDirectConnection(fwdest))
 		{
 			header.addProperty(IMsgHeader.RECEIVER, getRtComponent(fwdest));
-			IFuture<Void> ret = intmsgfeat.sendToTransports(header, body);
-			final IComponentIdentifier ffwdest = fwdest;
-			ret.addResultListener(new IResultListener<Void>()
+			
+			TerminableFuture<Integer> ret = new TerminableFuture<>();
+			
+			encryptHeader(header).addResultListener(new ExceptionDelegationResultListener<byte[], Integer>(ret)
 			{
-				public void resultAvailable(Void result)
+				public void customResultAvailable(byte[] encheader) throws Exception
 				{
+					IFuture<Void> msgfut = intmsgfeat.sendToTransports(header, encheader, body);
+					msgfut.addResultListener(new ExceptionResultListener<Void>()
+					{
+						public void exceptionOccurred(Exception exception)
+						{
+							synchronized(directconns)
+							{
+								directconns.checkStale();
+								directconns.remove(fwdest);
+							}
+						}
+					});
+					msgfut.addResultListener(new ExceptionDelegationResultListener<Void, Integer>(ret)
+					{
+						public void customResultAvailable(Void result) throws Exception
+						{
+							ret.setResultIfUndone(PRIORITY);
+						}
+					});
 				}
 				
-				public void exceptionOccurred(Exception exception)
-				{
-					synchronized(directconns)
-					{
-						directconns.checkStale();
-						directconns.remove(ffwdest);
-					}
-				}
 			});
+			
 			return ret;
 		}
 		
@@ -379,12 +392,33 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				System.out.println(agent + " forwarding via known route: " + route.getFirstEntity() + " to " + fwdest);
 			header.addProperty(IMsgHeader.RECEIVER, getRtComponent(route.getFirstEntity()));
 //			System.out.println("sending to route target: " + route.getFirstEntity() + " " + header.getProperty(FORWARD_DEST));
-			return intmsgfeat.sendToTransports(header, body);
+			final TerminableFuture<Integer> ret = new TerminableFuture<>();
+			encryptHeader(header).addResultListener(new ExceptionDelegationResultListener<byte[], Integer>(ret)
+			{
+				public void customResultAvailable(byte[] encheader) throws Exception
+				{
+					intmsgfeat.sendToTransports(header, encheader, body).addResultListener(new ExceptionDelegationResultListener<Void, Integer>(ret)
+					{
+						public void customResultAvailable(Void result) throws Exception
+						{
+							ret.setResult(PRIORITY);
+						}
+					});
+				}
+			});
+			return ret;
 		}
 		
-		final Future<Void> ret = new Future<Void>();
-		final IMsgHeader fheader = header;
-		final byte[] fbody = body;
+		final TerminableFuture<Integer> ret = new TerminableFuture<>();
+		final AtomicBoolean notcanceled = new AtomicBoolean(true);
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				notcanceled.set(false);
+			}
+		});
+		
 		final IComponentIdentifier ffwdest = fwdest;
 		discoverRoute(fwdest, new LinkedHashSet<IComponentIdentifier>()).addResultListener(new IIntermediateResultListener<Integer>()
 		{
@@ -401,18 +435,37 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			public void intermediateResultAvailable(Integer result)
 			{
 				Tuple2<IComponentIdentifier, Integer> route = getRouteFromCache(ffwdest);
-				if (route != null && notsent)
+				if (route != null && notsent && notcanceled.get())
 				{
-					fheader.addProperty(IMsgHeader.RECEIVER, getRtComponent(route.getFirstEntity()));
-					intmsgfeat.sendToTransports(fheader, fbody).addResultListener(new DelegationResultListener<Void>(ret));
+					header.addProperty(IMsgHeader.RECEIVER, getRtComponent(route.getFirstEntity()));
 					notsent = false;
+					encryptHeader(header).addResultListener(new IResultListener<byte[]>()
+					{
+						public void resultAvailable(byte[] encheader)
+						{
+							intmsgfeat.sendToTransports(header, encheader, body).addResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+									ret.setResultIfUndone(PRIORITY);
+								};
+								public void exceptionOccurred(Exception exception)
+								{
+									ret.setExceptionIfUndone(exception);
+								};
+							});
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+					});
 				}
 			}
 			
 			public void finished()
 			{
 				if (notsent)
-					ret.setException(new IllegalStateException("No route to receiver found."));
+					ret.setExceptionIfUndone(new IllegalStateException("No route to receiver found."));
 			}
 		});
 		return ret;
@@ -847,7 +900,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				{
 					if (debug)
 						System.out.println(agent + " forwarding: " + header);
-					sendMessage(header, (byte[]) msg);
+					forwardMessage(header, (byte[]) msg);
 				}
 			}
 		};
@@ -878,7 +931,14 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			{
 				IComponentIdentifier fwdest = (IComponentIdentifier) header.getProperty(FORWARD_DEST);
 				if (fwdest != null && agent.getId().getRoot().equals(fwdest))
-					sendMessage(header, (byte[]) msg);
+				{
+					final List<byte[]> unpacked = SUtil.splitData((byte[]) msg);
+					final IComponentIdentifier source = (IComponentIdentifier) header.getProperty(FORWARD_SENDER);
+					final ISerializationServices serser = (ISerializationServices) Starter.getPlatformValue(agent.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+					
+//					System.out.println("Final receiver, delivering to component: " + body);
+					AbstractTransportAgent.deliverRemoteMessage(agent, secservice, cms, serser, source, unpacked.get(0), unpacked.get(1));
+				}
 			}
 		});
 		
@@ -1018,6 +1078,30 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected IComponentIdentifier getRtComponent(IComponentIdentifier platformid)
 	{
 		return new BasicComponentIdentifier("rt", platformid);
+	}
+	
+	/**
+	 *  Encrypts the header.
+	 * @param header Header.
+	 * @return Encrypted header.
+	 */
+	protected IFuture<byte[]> encryptHeader(IMsgHeader header)
+	{
+		ISerializationServices serial = (ISerializationServices)Starter.getPlatformValue(agent.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+		byte[] bheader = serial.encode(header, agent, header);
+		
+		return secservice.encryptAndSign(header, bheader);
+	}
+	
+	/**
+	 *  Gets terminable future with priority.
+	 *  @return Terminable future with priority.
+	 */
+	ITerminableFuture<Integer> getTerminableFuture()
+	{
+		TerminableFuture<Integer> ret = new TerminableFuture<>();
+		ret.setResult(PRIORITY);
+		return ret;
 	}
 	
 	/** Ping message. */
