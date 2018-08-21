@@ -22,10 +22,11 @@ public interface IInternalMessageFeature
 	 *  Forwards the prepared message to the transport layer.
 	 *  
 	 *  @param header The message header.
+	 *  @param encryptedheader The encrypted header.
 	 *  @param encryptedbody The encrypted message body.
 	 *  @return Null, when done, exception if failed.
 	 */
-	public IFuture<Void> sendToTransports(IMsgHeader header, byte[] encryptedbody);
+	public IFuture<Void> sendToTransports(final IMsgHeader header, final byte[] encryptedheader, final byte[] encryptedbody);
 	
 	/**
 	 *  Inform the component that a message has arrived.
