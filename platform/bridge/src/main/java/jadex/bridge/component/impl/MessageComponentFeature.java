@@ -466,9 +466,10 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			{
 				public void resultAvailable(Integer result)
 				{
-					if (getTransportCache(platformid).get(rplat).getSecondEntity() < result)
+					Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> cache = getTransportCache(platformid);
+					if (cache.get(rplat) == null || cache.get(rplat).getSecondEntity() < result)
 					{
-						getTransportCache(platformid).put(rplat, new Tuple2<ITransportService, Integer>(transport, result));
+						cache.put(rplat, new Tuple2<ITransportService, Integer>(transport, result));
 					}
 					
 					ret.setResultIfUndone(null);
