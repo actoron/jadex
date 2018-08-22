@@ -168,7 +168,7 @@ public class ComponentSuspendable extends ThreadLocalTransferHelper implements I
 	 */
 	public long getDefaultTimeout()
 	{
-		return Starter.getLocalDefaultTimeout(agent.getId());
+		return Starter.getDefaultTimeout(agent.getId());
 //		return ((INonUserAccess)agent).getPlatformData().
 	}
 

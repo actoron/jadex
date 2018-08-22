@@ -33,7 +33,7 @@ public class ConcurrentSettingsTest
 	{
 		int	number	= 3;	// Number of platforms to create in parallel
 //		long	timeout	= Starter.getScaledLocalDefaultTimeout(null, number);
-		long	timeout	= Starter.getLocalDefaultTimeout(null);
+		long	timeout	= Starter.getDefaultTimeout(null);
 		
 		IPlatformConfiguration	conf	= PlatformConfigurationHandler.getMinimal();
 		conf.getExtendedPlatformConfiguration().setSecurity(true);	// enabled to write/read password

@@ -259,7 +259,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		IPlatformConfiguration conf = STest.getDefaultTestConfig();
 //		IPlatformConfiguration conf = Starter.processArgs(args);
 //		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
-		this.timeout	= conf.getExtendedPlatformConfiguration().getLocalDefaultTimeout();	// Initial timeout for starting platform.
+		this.timeout	= conf.getExtendedPlatformConfiguration().getDefaultTimeout();	// Initial timeout for starting platform.
 		startTimer();
 
 		if (tests != null) 
@@ -283,7 +283,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 
 		// Only works with x-rids hack or maven dependency service, because rms cannot use default classloader for decoding application messages.
 //		final IResourceIdentifier	rid	= null;
-		long ctimeout = Starter.getLocalDefaultTimeout(platform.getId());	// Start with normal timeout for platform startup/shutdown.
+		long ctimeout = Starter.getDefaultTimeout(platform.getId());	// Start with normal timeout for platform startup/shutdown.
 
 		IResourceIdentifier[] rids = new IResourceIdentifier[roots.length];
 		for (int projectIndex=0; projectIndex < roots.length; projectIndex++) {
@@ -323,7 +323,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 			{
 				// Scan for test cases.
 				List<String> scanForTestCases = getAllFiles(project[rootIndex]);
-				this.timeout = Starter.getScaledLocalDefaultTimeout(platform.getId(), 1 + 0.05 * scanForTestCases.size()); // Timeout
+				this.timeout = Starter.getScaledDefaultTimeout(platform.getId(), 1 + 0.05 * scanForTestCases.size()); // Timeout
 																																			// for
 																																			// loading
 																																			// models.

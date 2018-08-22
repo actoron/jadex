@@ -113,7 +113,7 @@ public class ComponentTestLazyPlatform extends TestCase
 					this.timeout	= ((Number)to).longValue();
 					Logger.getLogger("ComponentTest").log(Level.INFO, "using timeout: " + timeout);
 				} else {
-					this.timeout = Starter.getLocalDefaultTimeout(platform.getId());
+					this.timeout = Starter.getDefaultTimeout(platform.getId());
 				}
 			} else {
 				failed = true;

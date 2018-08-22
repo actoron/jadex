@@ -99,7 +99,7 @@ public class ComponentTest extends TestCase
 		}
 		else
 		{
-			this.timeout	= Starter.getLocalDefaultTimeout(((IService)cms).getId().getProviderId());
+			this.timeout	= Starter.getDefaultTimeout(((IService)cms).getId().getProviderId());
 		}
 		this.suite	= suite;		
 	}
@@ -126,7 +126,7 @@ public class ComponentTest extends TestCase
 		}
 		else
 		{
-			this.timeout	= Starter.getLocalDefaultTimeout(((IService)cms).getId().getProviderId());
+			this.timeout	= Starter.getDefaultTimeout(((IService)cms).getId().getProviderId());
 		}
 		this.suite	= suite;		
 	}

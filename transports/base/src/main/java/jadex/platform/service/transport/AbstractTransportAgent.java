@@ -103,6 +103,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 * Used e.g. for sendMessage().
 	 */
 	protected Map<IComponentIdentifier, VirtualConnection>	virtuals;
+	
+	/** 
 
 	/**
 	 * The connections currently in handshake or in use (impl connection ->

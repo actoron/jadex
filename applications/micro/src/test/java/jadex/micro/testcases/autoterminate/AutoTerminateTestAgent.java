@@ -113,7 +113,7 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 		
 //		agent.getLogger().severe("test: "+report.getDescription()+", "+Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()));
 		
-		waitForRealtimeDelay(Starter.getScaledRemoteDefaultTimeout(agent.getId(), 1.25),
+		waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.25),
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)

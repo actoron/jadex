@@ -23,7 +23,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
@@ -62,7 +61,7 @@ public class ServiceCallTestNFClearTest
 	@Before
 	public void setUp()
 	{
-		timeout = Starter.getLocalDefaultTimeout(null);
+		timeout = Starter.getDefaultTimeout(null);
 
 //		String pid = SUtil.createPlainRandomId(name.getMethodName(), 3) + "-*";
 

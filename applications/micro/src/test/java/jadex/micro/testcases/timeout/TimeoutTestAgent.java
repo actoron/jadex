@@ -220,7 +220,7 @@ public class TimeoutTestAgent extends TestAgent
 						else if(exception instanceof TimeoutException)
 						{
 							long diff = System.currentTimeMillis() - (start+to);
-							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledLocalDefaultTimeout(agent.getId(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
+							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledDefaultTimeout(agent.getId(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
 							{
 								tr.setSucceeded(true);
 							}

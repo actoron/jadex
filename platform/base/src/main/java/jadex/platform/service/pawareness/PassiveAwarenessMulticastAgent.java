@@ -161,7 +161,7 @@ public class PassiveAwarenessMulticastAgent	implements IPassiveAwarenessService
 				{
 					// TODO: timeout from service call
 					agent.getFeature(IExecutionFeature.class)
-						.waitForDelay(Starter.getRemoteDefaultTimeout(agent.getId()), true)
+						.waitForDelay(Starter.getDefaultTimeout(agent.getId()), true)
 						.addResultListener(new IResultListener<Void>()
 					{
 						@Override
