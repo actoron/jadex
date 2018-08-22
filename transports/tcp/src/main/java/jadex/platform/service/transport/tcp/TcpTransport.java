@@ -35,6 +35,11 @@ import jadex.platform.service.transport.ITransportHandler;
  */
 public class TcpTransport	implements ITransport<SocketChannel>
 {
+	//-------- constants --------
+	
+	/** Priority of transport. */
+	public static final int	PRIORITY	= 1000;
+	
 	// -------- attributes --------
 
 	/** The transport handler, e.g. for delivering received messages. */
@@ -56,7 +61,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	protected List<Runnable>	tasks;
 	
 	/** The write tasks of data waiting to be written to a connection. */
-	protected Map<SocketChannel, List<Tuple2<ByteBuffer, Future<Void>>>>	writetasks;
+	protected Map<SocketChannel, List<Tuple2<ByteBuffer, Future<Integer>>>>	writetasks;
 	
 	/** Daemon thread pool. */
 	protected IDaemonThreadPoolService tps;
@@ -256,9 +261,9 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	 *  @param body	The message body.
 	 *  @return	A future indicating success.
 	 */
-	public IFuture<Void> sendMessage(final SocketChannel sc, final byte[] header, final byte[] body)
+	public IFuture<Integer> sendMessage(final SocketChannel sc, final byte[] header, final byte[] body)
 	{
-		final Future<Void>	ret	= new Future<Void>();
+		final Future<Integer>	ret	= new Future<>();
 		
 		try
 		{
@@ -283,13 +288,13 @@ public class TcpTransport	implements ITransport<SocketChannel>
 							// Add buffer as new write task.
 							if(writetasks==null)
 							{
-								writetasks	= new LinkedHashMap<SocketChannel, List<Tuple2<ByteBuffer,Future<Void>>>>();
+								writetasks	= new LinkedHashMap<SocketChannel, List<Tuple2<ByteBuffer,Future<Integer>>>>();
 							}
-							Tuple2<ByteBuffer, Future<Void>>	task	= new Tuple2<ByteBuffer, Future<Void>>(buf, ret);
-							List<Tuple2<ByteBuffer, Future<Void>>>	queue	= (List<Tuple2<ByteBuffer, Future<Void>>>)writetasks.get(sc);
+							Tuple2<ByteBuffer, Future<Integer>>	task	= new Tuple2<ByteBuffer, Future<Integer>>(buf, ret);
+							List<Tuple2<ByteBuffer, Future<Integer>>>	queue	= (List<Tuple2<ByteBuffer, Future<Integer>>>)writetasks.get(sc);
 							if(queue==null)
 							{
-								queue	= new LinkedList<Tuple2<ByteBuffer, Future<Void>>>();
+								queue	= new LinkedList<Tuple2<ByteBuffer, Future<Integer>>>();
 								writetasks.put(sc, queue);
 		//						System.out.println("writetasks0: "+writetasks.size());
 							}
@@ -359,13 +364,13 @@ public class TcpTransport	implements ITransport<SocketChannel>
 		if(sc instanceof SocketChannel)
 		{
 			// Connection closed: abort all open write tasks.
-			List<Tuple2<ByteBuffer, Future<Void>>>	queue	= (List<Tuple2<ByteBuffer, Future<Void>>>)(this.writetasks!=null ? this.writetasks.get(sc) : null);
+			List<Tuple2<ByteBuffer, Future<Integer>>>	queue	= (List<Tuple2<ByteBuffer, Future<Integer>>>)(this.writetasks!=null ? this.writetasks.get(sc) : null);
 			if(queue!=null)
 			{
-				for(Iterator<Tuple2<ByteBuffer, Future<Void>>> it=queue.iterator(); it.hasNext(); )
+				for(Iterator<Tuple2<ByteBuffer, Future<Integer>>> it=queue.iterator(); it.hasNext(); )
 				{
-					Tuple2<ByteBuffer, Future<Void>>	task	= (Tuple2<ByteBuffer, Future<Void>>)it.next();
-					Future<Void>	fut	= task.getSecondEntity();
+					Tuple2<ByteBuffer, Future<Integer>>	task	= (Tuple2<ByteBuffer, Future<Integer>>)it.next();
+					Future<Integer>	fut	= task.getSecondEntity();
 					fut.setException(e!=null ? e : new RuntimeException("Channel closed."));
 					it.remove();
 				}
@@ -605,7 +610,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 	{
 		SocketChannel sc = (SocketChannel)key.channel();
 		
-		List<Tuple2<ByteBuffer, Future<Void>>>	queue	= (List<Tuple2<ByteBuffer, Future<Void>>>) (writetasks!=null ? (this.writetasks.get(sc)) : null);
+		List<Tuple2<ByteBuffer, Future<Integer>>>	queue	= (List<Tuple2<ByteBuffer, Future<Integer>>>) (writetasks!=null ? (this.writetasks.get(sc)) : null);
 
 		try
 		{
@@ -626,7 +631,7 @@ public class TcpTransport	implements ITransport<SocketChannel>
 				}
 				else
 				{
-					Tuple2<ByteBuffer, Future<Void>>	task	= queue.get(0);
+					Tuple2<ByteBuffer, Future<Integer>>	task	= queue.get(0);
 					ByteBuffer buf = task.getFirstEntity();	
 					sc.write(buf);
 					if(buf.remaining()>0)
@@ -638,8 +643,8 @@ public class TcpTransport	implements ITransport<SocketChannel>
 					{
 						// Buffer written: remove task and inform future, when no more buffers for this task.
 						queue.remove(task);
-						Future<Void>	fut	= task.getSecondEntity();
-						fut.setResult(null);
+						Future<Integer>	fut	= task.getSecondEntity();
+						fut.setResult(PRIORITY);
 					}
 				}
 			}
