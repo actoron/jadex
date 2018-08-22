@@ -39,7 +39,7 @@ public class SFuture
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 //		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
-		boolean	realtime = sc.isRemoteCall(ia.getId());
+		boolean	realtime = sc != null ? sc.isRemoteCall(ia.getId()) : false;
 		avoidCallTimeouts(ret, ia, realtime);
 	}
 	
@@ -75,7 +75,7 @@ public class SFuture
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		long to = sc!=null? sc.getTimeout(): Starter.getDefaultTimeout(ea.getId()); // Hack!!! find out in which cases service call can null
 //		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
-		boolean	realtime = sc.isRemoteCall(ea.getId());
+		boolean	realtime = sc != null ? sc.isRemoteCall(ea.getId()) : false;
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
 	//	to = 5000;
