@@ -117,6 +117,10 @@ public class ProviderAgent implements ITestService
 		long to = sc.getTimeout();
 
 //		System.out.println("Timeout is: " + to);
+		
+		boolean realtime = sc.isRemoteCall(agent.getId());
+		
+		System.out.println(agent + " isRemote / Realtime: " + realtime);
 	
 		final long wait = to>0? to*2: 0;
 		final long startwait = System.currentTimeMillis();
@@ -129,6 +133,6 @@ public class ProviderAgent implements ITestService
 				ret.setResultIfUndone(null);
 				return IFuture.DONE;
 			}
-		});
+		}, realtime);
 	}
 }

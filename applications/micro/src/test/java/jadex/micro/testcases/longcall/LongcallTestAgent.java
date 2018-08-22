@@ -223,7 +223,7 @@ public class LongcallTestAgent extends TestAgent
 //					ServiceCall.setInvocationProperties(to, true);
 					ServiceCall call = ServiceCall.getOrCreateNextInvocation();
 					call.setTimeout(to);
-					call.setRealtime(Boolean.TRUE);
+//					call.setRealtime(Boolean.FALSE);
 				}				
 				
 				System.out.println("calling method: "+ServiceCall.getOrCreateNextInvocation());

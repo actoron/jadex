@@ -196,7 +196,7 @@ public class TimeoutTestAgent extends TestAgent
 //					ServiceCall.setInvocationProperties(to, true);
 					ServiceCall call = ServiceCall.getOrCreateNextInvocation();
 					call.setTimeout(to);
-					call.setRealtime(Boolean.TRUE);
+//					call.setRealtime(Boolean.TRUE);
 					call.setProperty("extra", "somval");
 				}				
 				
