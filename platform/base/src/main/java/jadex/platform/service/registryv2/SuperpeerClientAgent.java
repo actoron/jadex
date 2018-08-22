@@ -710,7 +710,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								if(running && superpeer==sp)
 								{
 									// On error -> restart search after e.g. 300 millis (realtime) (very small delay to prevent busy loop on persistent immediate error)
-									agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getId(), 0.01), new IComponentStep<Void>()
+									agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 0.01), new IComponentStep<Void>()
 									{
 										@Override
 										public IFuture<Void> execute(IInternalAccess ia)
@@ -729,7 +729,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								// Connection immediately failed but no other connection -> retry this super peer after some timeout
 								if(superpeer==null && !(reason instanceof ComponentTerminatedException))
 								{
-									agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getRemoteDefaultTimeout(agent.getId()), new IComponentStep<Void>()
+									agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getDefaultTimeout(agent.getId()), new IComponentStep<Void>()
 									{
 										@Override
 										public IFuture<Void> execute(IInternalAccess ia)
@@ -771,7 +771,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					if(running && superpeerquery==queryfut)
 					{
 						// On error -> restart search after e.g. 3 secs (realtime) (small delay to prevent busy loop on persistent immediate error)
-						agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getId(), 0.1), new IComponentStep<Void>()
+						agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 0.1), new IComponentStep<Void>()
 						{
 							@Override
 							public IFuture<Void> execute(IInternalAccess ia)
@@ -994,7 +994,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						{
 							// Schedule next search
 							agent.getFeature(IExecutionFeature.class)
-								.waitForDelay(Starter.getScaledRemoteDefaultTimeout(agent.getId(), pollingrate), step, true);
+								.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), pollingrate), step, true);
 							
 							// Start current search
 							searchRemoteServices(query)

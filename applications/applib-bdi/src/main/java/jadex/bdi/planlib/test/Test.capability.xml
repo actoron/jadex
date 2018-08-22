@@ -24,7 +24,7 @@
 
 		<!-- Default timeout platform timeout, e.g. 30 seconds. -->
 		<belief name="timeout" class="long" exported="true">
-			<fact>Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
+			<fact>Starter.getDefaultTimeout($scope.getComponentIdentifier())</fact>
 		</belief>
 
 		<!-- The testcase reports. -->

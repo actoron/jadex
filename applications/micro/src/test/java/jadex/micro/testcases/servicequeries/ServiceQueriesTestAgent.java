@@ -43,7 +43,7 @@ import jadex.micro.testcases.TestAgent;
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
 // Todo: long timeouts really necessary?
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 2)")}) // cannot use $component.getId() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 2)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class ServiceQueriesTestAgent extends TestAgent
 {
 	//-------- attributes --------
@@ -124,7 +124,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 			for(int i=0; i<cnt; i++)
 			{
 				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", ci);
-				cids[i] = fut.getFirstResult(Starter.getRemoteDefaultTimeout(agent.getId()), true);
+				cids[i] = fut.getFirstResult(Starter.getDefaultTimeout(agent.getId()), true);
 			}
 			
 			// Wait some time and then terminate query

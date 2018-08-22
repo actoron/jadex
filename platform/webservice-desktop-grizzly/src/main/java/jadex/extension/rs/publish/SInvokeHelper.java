@@ -431,7 +431,7 @@ public class SInvokeHelper
 //			
 			ret = targetmethod.invoke(service, targetparams);
 			if(ret instanceof IFuture)
-				ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null)); // todo: how to get platform context?
+				ret = ((IFuture<?>)ret).get(Starter.getDefaultTimeout(null)); // todo: how to get platform context?
 			System.out.println("call finished: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service+" "+Arrays.toString(targetparams));
 			
 			if(method.isAnnotationPresent(ResultMapper.class))

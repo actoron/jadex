@@ -33,14 +33,4 @@ public @interface Timeout
 	 *  are aborted when no result is received.
 	 */
 	public long value() default UNSET;
-	
-	/**
-	 *  The local timeout period for specifying different values for local and remote.
-	 */
-	public long local() default UNSET;
-	
-	/**
-	 *  The remote timeout period for specifying different values for local and remote.
-	 */
-	public long remote() default UNSET;
 }

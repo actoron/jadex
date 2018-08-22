@@ -32,7 +32,6 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
@@ -1049,7 +1048,7 @@ public class ChatService implements IChatService, IChatGuiService
 				
 				// Call chat service of receiver (alternative interface)
 				final TransferInfo fi = new TransferInfo(false, null, file.getName(), filepath, cid, file.length(), System.currentTimeMillis() + // Hack!!! assume real time timeout.
-					(cid.getRoot().equals(agent.getId().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getId()) : Starter.getRemoteDefaultTimeout(agent.getId())));	// Todo: actual timeout of method!?
+					(cid.getRoot().equals(agent.getId().getRoot()) ? Starter.getDefaultTimeout(agent.getId()) : Starter.getDefaultTimeout(agent.getId())));	// Todo: actual timeout of method!?
 				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, file.getName(), size, fi.getId());
 				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));
@@ -1116,7 +1115,7 @@ public class ChatService implements IChatService, IChatGuiService
 				String filepath = fname.indexOf(".")!=-1? fname.substring(fname.lastIndexOf(".")): null;
 				String name = fname.indexOf(".")!=-1? fname.substring(0, fname.lastIndexOf(".")-1): fname;
 				final TransferInfo fi = new TransferInfo(false, null, name, filepath, cid, size, System.currentTimeMillis() + // Hack!!! assume real time timeout.
-					(cid.getRoot().equals(agent.getId().getRoot()) ? Starter.getLocalDefaultTimeout(agent.getId()) : Starter.getRemoteDefaultTimeout(agent.getId())));	// Todo: actual timeout of method!?
+					(cid.getRoot().equals(agent.getId().getRoot()) ? Starter.getDefaultTimeout(agent.getId()) : Starter.getDefaultTimeout(agent.getId())));	// Todo: actual timeout of method!?
 				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, name, size, fi.getId());
 				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));

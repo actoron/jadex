@@ -38,7 +38,7 @@ import jadex.micro.testcases.TestAgent;
 @Service
 @Agent
 @ProvidedServices(@ProvidedService(type=IAutoTerminateService.class))
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledRemoteDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateService
 {
 	//-------- attributes --------
@@ -111,9 +111,9 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			: "Test remote offline automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller());
 		reports.add(report);
 		
-//		agent.getLogger().severe("test: "+report.getDescription()+", "+Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()));
+//		agent.getLogger().severe("test: "+report.getDescription()+", "+Starter.getDefaultTimeout(agent.getComponentIdentifier()));
 		
-		waitForRealtimeDelay(Starter.getScaledRemoteDefaultTimeout(agent.getId(), 1.25),
+		waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.25),
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)

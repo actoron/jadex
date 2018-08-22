@@ -11,7 +11,7 @@ public class SwapService	//implements ISwapService, IIdleHook
 //	//-------- constants --------
 //	
 //	/** The default minimum time span of inactivity after which a component is swapped to disk. */
-//	public static final long DEFAULT_SWAP_DELAY	= BasicService.getScaledLocalDefaultTimeout(1);
+//	public static final long DEFAULT_SWAP_DELAY	= BasicService.getScaledDefaultTimeout(1);
 //	
 //	/** The offset between minimum and maximum swap delay (e.g. delay=30 offset=0.5 -> maximum=30+30*0.5=45). */
 //	public static final double DEFAULT_SWAP_OFFSET	= 0.5;

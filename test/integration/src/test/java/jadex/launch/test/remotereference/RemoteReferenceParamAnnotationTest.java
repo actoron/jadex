@@ -9,7 +9,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -30,7 +29,7 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 
 	private IExternalAccess	platform1;
 
-	long timeout = Starter.getLocalDefaultTimeout(null);
+	long timeout = Starter.getDefaultTimeout(null);
 
 	@Before
 	public void initPlatforms()
@@ -41,7 +40,7 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 		platform1 = Starter.createPlatform(
 			new String[]{"-platformname", "testcases_*", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 				"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(timeout);
-		timeout	= Starter.getLocalDefaultTimeout(platform1.getId());
+		timeout	= Starter.getDefaultTimeout(platform1.getId());
 		
 		// Find local service (as local provided service proxy).
 		ILocalService service1 = platform1.searchService( new ServiceQuery<>( ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);

@@ -39,7 +39,7 @@ import jadex.micro.testcases.TestAgent;
 })
 @Agent
 //@Arguments(replace=false, value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getId() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 3)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class ServiceCallTestAgent extends TestAgent
 {
 	//-------- constants --------

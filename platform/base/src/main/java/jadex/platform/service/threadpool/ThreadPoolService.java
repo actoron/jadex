@@ -58,7 +58,7 @@ public class ThreadPoolService extends BasicService implements IThreadPoolServic
 		final Future<Void> ret = new Future<Void>();
 		
 		final Timer	t	= new Timer(true);
-		long delay = Starter.getScaledLocalDefaultTimeout(getProviderId(), 1.0 / 3); // hack!!! hard coded to 1/3 of default timeout
+		long delay = Starter.getScaledDefaultTimeout(getProviderId(), 1.0 / 3); // hack!!! hard coded to 1/3 of default timeout
 		t.schedule(new TimerTask()
 		{
 			public void run()

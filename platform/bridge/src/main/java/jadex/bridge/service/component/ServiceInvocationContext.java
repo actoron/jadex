@@ -247,8 +247,8 @@ public class ServiceInvocationContext
 			}
 			else 
 			{
-				nextcall.setProperty(ServiceCall.DEFTIMEOUT, isRemoteCall()? Starter.getLocalDefaultTimeout(sid.getProviderId())
-					: Starter.getLocalDefaultTimeout(sid.getProviderId()));
+				nextcall.setProperty(ServiceCall.DEFTIMEOUT, isRemoteCall()? Starter.getDefaultTimeout(sid.getProviderId())
+					: Starter.getDefaultTimeout(sid.getProviderId()));
 			}
 		}
 		if(!nextcall.getProperties().containsKey(ServiceCall.REALTIME))

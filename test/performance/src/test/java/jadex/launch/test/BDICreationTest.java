@@ -32,7 +32,7 @@ public class BDICreationTest //extends TestCase
 	@Test
 	public void	testBDICreation()
 	{
-		long timeout	= -1;//BasicService.getLocalDefaultTimeout();
+		long timeout	= -1;//BasicService.getDefaultTimeout();
 //		String projectroot = new String("jadex-integration-performance-test");
 //		System.out.println(resdir);
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(STest.getDefaultTestConfig(),

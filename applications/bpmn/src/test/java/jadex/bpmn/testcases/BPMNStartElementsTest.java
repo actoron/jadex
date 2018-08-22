@@ -30,10 +30,10 @@ public class BPMNStartElementsTest //extends TestCase
 //		config.setValue("kernel_bpmn", true);
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(config);
 		
-		long timeout = Starter.getLocalDefaultTimeout(null);
+		long timeout = Starter.getDefaultTimeout(null);
 		
 		IExternalAccess	platform	= fut.get(timeout);
-		timeout	= Starter.getLocalDefaultTimeout(platform.getId());
+		timeout	= Starter.getDefaultTimeout(platform.getId());
 		
 		IComponentManagementService	cms	= (IComponentManagementService)platform.searchService( new ServiceQuery<>(IComponentManagementService.class)).get(timeout);
 

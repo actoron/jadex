@@ -590,7 +590,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		final Set<Object>	fwq	= wq;
 		final String	ftype	= type;
 		
-		long to = Starter.getLocalDefaultTimeout(agent.getId());
+		long to = Starter.getDefaultTimeout(agent.getId());
 		if(to>0)
 		{
 			agent.getFeature(IExecutionFeature.class).waitForDelay(to, new IComponentStep<Void>()

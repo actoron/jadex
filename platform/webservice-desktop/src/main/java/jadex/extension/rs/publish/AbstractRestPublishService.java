@@ -191,7 +191,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		converters.add(MediaType.TEXT_PLAIN, tostrc);
 		converters.add("*/*", tostrc);
     	
-    	final Long to = (Long)Starter.getPlatformValue(component.getId(), Starter.DATA_DEFAULT_REMOTE_TIMEOUT);
+    	final Long to = (Long)Starter.getPlatformValue(component.getId(), Starter.DATA_DEFAULT_TIMEOUT);
 		component.getLogger().info("Using default client timeout: "+to);
     	
     	requestspercall = new MultiCollection<String, AsyncContext>()
@@ -486,7 +486,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //				        				System.out.println("checking "+result);
 				        				// if timeout -> cancel future.
 				        				// TODO: which timeout? (client vs server).
-				        				if(System.currentTimeMillis() - rinfo.getTimestamp()>Starter.getRemoteDefaultTimeout(component.getId()))
+				        				if(System.currentTimeMillis() - rinfo.getTimestamp()>Starter.getDefaultTimeout(component.getId()))
 				        				{
 //				        					System.out.println("terminating "+result);
 				        					rinfo.setTerminated();
@@ -545,7 +545,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //                    			ctx.complete();
                     		}
 						}));
-//                        ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
+//                        ret = ((IFuture<?>)ret).get(Starter.getDefaultTimeout(null));
                     }
                     else
                     {

@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.management.ServiceNotFoundException;
-
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -42,7 +40,6 @@ import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
-import jadex.commons.MultiException;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
@@ -233,7 +230,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					fut.setException(exception);
 			}
 		});
-		timeout = timeout == null ? Starter.getLocalDefaultTimeout(platformid) : timeout;
+		timeout = timeout == null ? Starter.getDefaultTimeout(platformid) : timeout;
 		execfeat.waitForDelay(timeout, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -313,7 +310,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			sendToAllTransports(rplat, header, encheader, encryptedbody).addResultListener(new DelegationResultListener<>(ret, true));
 		}
 		
-		component.getFeature(IExecutionFeature.class).waitForDelay(Starter.getRemoteDefaultTimeout(platformid), new IComponentStep<Void>()
+		component.getFeature(IExecutionFeature.class).waitForDelay(Starter.getDefaultTimeout(platformid), new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1304,7 +1301,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	public static long getMinLeaseTime(IComponentIdentifier platform)
 	{
-		return Starter.getScaledRemoteDefaultTimeout(platform, 1.0/6);
+		return Starter.getScaledDefaultTimeout(platform, 1.0/6);
 	}
 
 	/**

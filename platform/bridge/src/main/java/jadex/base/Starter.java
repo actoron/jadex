@@ -89,13 +89,9 @@ public class Starter
     /** The CMS component map. */
     public static String DATA_COMPONENTMAP = "componentmap";
 
-    /** Constant for local default timeout name. */
-    public static String DATA_DEFAULT_LOCAL_TIMEOUT = "default_local_timeout";
+    /** Constant for default timeout name. */
+    public static String DATA_DEFAULT_TIMEOUT = "default_timeout";
 
-    /** Constant for remote default timeout name. */
-    public static String DATA_DEFAULT_REMOTE_TIMEOUT = "default_remote_timeout";
-    
-    
     // todo: cannot be used because registry needs to know when superpeer changes (remap queries)
 //    /** Constant for the superpeer. */
 //    public static String DATA_SUPERPEER = "superpeer";
@@ -521,8 +517,7 @@ public class Starter
 
 					putPlatformValue(cid, DATA_TRANSPORTCACHE, Collections.synchronizedMap(new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>(2000)));
 					
-					putPlatformValue(cid, DATA_DEFAULT_LOCAL_TIMEOUT, config.getExtendedPlatformConfiguration().getLocalDefaultTimeout());
-					putPlatformValue(cid, DATA_DEFAULT_REMOTE_TIMEOUT, config.getExtendedPlatformConfiguration().getRemoteDefaultTimeout());
+					putPlatformValue(cid, DATA_DEFAULT_TIMEOUT, config.getDefaultTimeout());
 
 					Map<String, Object> argsmap = config==null? new HashMap<String, Object>(): config.getValues();
 					if(args!=null)
@@ -1019,19 +1014,14 @@ public class Starter
 		IRwMap<String, Object> mem = platformmem.get(platform.getRoot());
 		if(mem == null)
 		{
+			platformmem.writeLock().lock();
 			mem = platformmem.get(platform.getRoot());
 			if (mem == null)
 			{
-				platformmem.writeLock().lock();
-				mem = platformmem.get(platform.getRoot());
-				if (mem == null)
-				{
-					mem = new RwMapWrapper<String, Object>(new HashMap<String, Object>());
-					platformmem.put(platform, mem);
-				}
-				platformmem.writeLock().unlock();
+				mem = new RwMapWrapper<String, Object>(new HashMap<String, Object>());
+				platformmem.put(platform, mem);
 			}
-			
+			platformmem.writeLock().unlock();
 		}
 		mem.put(key, value);
 	}
@@ -1063,57 +1053,30 @@ public class Starter
 	}
 
 	/**
-	 * Get the remote default timeout.
+	 * Get the default timeout.
 	 */
-	public static long getRemoteDefaultTimeout(IComponentIdentifier platform)
+	public static long getDefaultTimeout(IComponentIdentifier platform)
 	{
-		return platform!=null && hasPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)
-			? ((Long)getPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT)).longValue()
+		return platform!=null && hasPlatformValue(platform, DATA_DEFAULT_TIMEOUT)
+			? ((Long)getPlatformValue(platform, DATA_DEFAULT_TIMEOUT)).longValue()
 			: SUtil.DEFTIMEOUT;
 	}
 
 	/**
-	 * Get the scaled remote default timeout.
+	 * Get the scaled default timeout.
 	 */
-	public static long getScaledRemoteDefaultTimeout(IComponentIdentifier platform, double scale)
+	public static long getScaledDefaultTimeout(IComponentIdentifier platform, double scale)
 	{
-		long ret = getRemoteDefaultTimeout(platform);
+		long ret = getDefaultTimeout(platform);
 		return ret == -1 ? -1 : (long)(ret * scale);
 	}
 
 	/**
-	 * Get the local default timeout.
+	 * Set the default timeout.
 	 */
-	public static long getLocalDefaultTimeout(IComponentIdentifier platform)
+	public static void setDefaultTimeout(IComponentIdentifier platform, long timeout)
 	{
-		return platform!=null && hasPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)
-			? ((Long)getPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT)).longValue()
-			: SUtil.DEFTIMEOUT;
-	}
-
-	/**
-	 * Get the scaled local default timeout.
-	 */
-	public static long getScaledLocalDefaultTimeout(IComponentIdentifier platform, double scale)
-	{
-		long ret = getLocalDefaultTimeout(platform);
-		return ret == -1 ? -1 : (long)(ret * scale);
-	}
-
-	/**
-	 * Set the remote default timeout.
-	 */
-	public static void setRemoteDefaultTimeout(IComponentIdentifier platform, long timeout)
-	{
-		putPlatformValue(platform, DATA_DEFAULT_REMOTE_TIMEOUT, timeout);
-	}
-
-	/**
-	 * Set the local default timeout.
-	 */
-	public static void setLocalDefaultTimeout(IComponentIdentifier platform, long timeout)
-	{
-		putPlatformValue(platform, DATA_DEFAULT_LOCAL_TIMEOUT, timeout);
+		putPlatformValue(platform, DATA_DEFAULT_TIMEOUT, timeout);
 	}
 
 	/**

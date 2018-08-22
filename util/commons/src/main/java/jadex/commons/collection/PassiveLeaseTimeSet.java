@@ -26,6 +26,7 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 	
 	/** The entries. */
 	// DEFAULT_INITIAL_CAPACITY=11, no constructor without ic in java <1.8
+	@SuppressWarnings("serial")
 	protected PriorityQueue<E> entries = new PriorityQueue<E>(11, new Comparator<E>()
 	{
 		// could also use simple t1-t2 if Long.MAX_VALUE would be used for no leasetime. */

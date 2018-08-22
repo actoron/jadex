@@ -492,7 +492,7 @@ public class RemoteReferenceModule
 //					System.out.println("hjgff");
 				long to = BasicService.getMethodTimeout(remoteinterfaces, methods[j], true);
 				// Do not save default value (overhead)
-				if(to!=Timeout.UNSET && to!=Starter.getRemoteDefaultTimeout(platform))
+				if(to!=Timeout.UNSET && to!=Starter.getDefaultTimeout(platform))
 					ret.addMethodTimeout(new MethodInfo(methods[j]), to);
 			}
 		}

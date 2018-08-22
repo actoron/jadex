@@ -13,7 +13,6 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
@@ -601,9 +600,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 				SReflect.getMethod(allinterfaces[i], method.getName(), method.getParameterTypes())!=null)
 			{
 				Timeout	ta	= (Timeout)allinterfaces[i].getAnnotation(Timeout.class);
-				deftimeout = remote? ta.remote(): ta.local();
-				if(Timeout.UNSET==deftimeout)
-					deftimeout = ta.value();
+				deftimeout = ta.value();
 			}
 		}
 		
@@ -611,9 +608,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		if(method.isAnnotationPresent(Timeout.class))
 		{
 			Timeout	ta	= method.getAnnotation(Timeout.class);
-			ret = remote? ta.remote(): ta.local();
-			if(Timeout.UNSET==ret)
-				ret = ta.value();
+			ret = ta.value();
 		}
 		
 		if(Timeout.UNSET!=deftimeout && Timeout.UNSET==ret)
@@ -621,7 +616,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			ret = deftimeout;
 		}
 				
-//		return ret==Timeout.UNSET? remote? BasicService.getRemoteDefaultTimeout(): BasicService.getLocalDefaultTimeout(): ret;
+//		return ret==Timeout.UNSET? remote? BasicService.getRemoteDefaultTimeout(): BasicService.getDefaultTimeout(): ret;
 		return ret;
 	}
 	

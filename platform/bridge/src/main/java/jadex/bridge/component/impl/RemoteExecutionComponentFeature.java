@@ -126,7 +126,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	{
 		final String rxid = SUtil.createUniqueId("");
 //		System.out.println(getComponent().getComponentIdentifier() + " sending remote command: "+command+", rxid="+rxid);
-		final long ftimeout	= timeout!=null ? timeout.longValue() : Starter.getRemoteDefaultTimeout(getComponent().getId());
+		final long ftimeout	= timeout!=null ? timeout.longValue() : Starter.getDefaultTimeout(getComponent().getId());
 		
 		// TODO: Merge with DecouplingInterceptor code.
 		@SuppressWarnings("unchecked")

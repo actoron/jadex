@@ -41,7 +41,7 @@ import jadex.micro.annotation.Results;
 // Scope global causes search timeouts -> increase test timeout to exceed search timeout
 // Hangs with jadex_deftimeout -1 when incompatible platforms are online, because global search does not return and creation binding never happens :(
 @Properties(
-	@NameValue(name="test.timeout", value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 1.5)"))
+	@NameValue(name="test.timeout", value="jadex.base.Starter.getScaledDefaultTimeout(null, 1.5)"))
 public class TupleFutureTestAgent extends JunitAgentTest
 {
 	@Agent

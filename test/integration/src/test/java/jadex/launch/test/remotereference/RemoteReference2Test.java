@@ -10,7 +10,6 @@ import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 
 /**
@@ -25,11 +24,11 @@ public class RemoteReference2Test //extends TestCase
 	@Test
 	public void	testRemoteReference()
 	{
-		long timeout	= Starter.getLocalDefaultTimeout(null);
+		long timeout	= Starter.getDefaultTimeout(null);
 		
 		// Start platform1 used for remote access.
 		final IExternalAccess	platform1	= Starter.createPlatform(STest.getDefaultTestConfig()).get(timeout);
-		timeout	= Starter.getLocalDefaultTimeout(platform1.getId());
+		timeout	= Starter.getDefaultTimeout(platform1.getId());
 		
 		// Start platform2 with services.
 		IPlatformConfiguration	config2	= STest.getDefaultTestConfig();

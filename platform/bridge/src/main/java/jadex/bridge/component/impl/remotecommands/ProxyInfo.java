@@ -120,7 +120,7 @@ public class ProxyInfo
 	 */
 	public long	getMethodTimeout(IComponentIdentifier platform, Method method)
 	{
-		long	ret	= Starter.getRemoteDefaultTimeout(platform);
+		long	ret	= Starter.getDefaultTimeout(platform);
 		MethodInfo	key	= new MethodInfo(method);
 		if(timeouts!=null && timeouts.containsKey(key))
 		{

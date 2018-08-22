@@ -191,8 +191,8 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	public AbstractConnectionHandler(IInternalAccess component, Map<String, Object> nonfunc)
 	{
 		// Use timeouts relative to deftimeout
-		this(component, nonfunc, 3, Starter.getScaledRemoteDefaultTimeout(component.getId(), 1.0/3), 
-			Starter.getScaledRemoteDefaultTimeout(component.getId(), 1.0/2));
+		this(component, nonfunc, 3, Starter.getScaledDefaultTimeout(component.getId(), 1.0/3), 
+			Starter.getScaledDefaultTimeout(component.getId(), 1.0/2));
 	}
 	
 	/**

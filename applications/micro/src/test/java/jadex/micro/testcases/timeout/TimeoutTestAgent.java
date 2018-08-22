@@ -37,7 +37,7 @@ import jadex.micro.testcases.TestAgent;
 {
 	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
 })
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 3)")}) // cannot use $component.getId() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 3)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class TimeoutTestAgent extends TestAgent
 {
 	/**
@@ -220,7 +220,7 @@ public class TimeoutTestAgent extends TestAgent
 						else if(exception instanceof TimeoutException)
 						{
 							long diff = System.currentTimeMillis() - (start+to);
-							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledLocalDefaultTimeout(agent.getId(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
+							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledDefaultTimeout(agent.getId(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
 							{
 								tr.setSucceeded(true);
 							}

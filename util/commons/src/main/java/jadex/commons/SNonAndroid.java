@@ -370,7 +370,7 @@ public class SNonAndroid
 			}
 		});
 		
-//		disposed.get(new ThreadSuspendable(), BasicService.getLocalDefaultTimeout());
+//		disposed.get(new ThreadSuspendable(), BasicService.getDefaultTimeout());
 //		disposed.get(new ThreadSuspendable(), 30000);
 //		disposed.get(30000);
 		try

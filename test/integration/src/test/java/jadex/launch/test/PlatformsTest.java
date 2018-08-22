@@ -17,7 +17,6 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
@@ -93,7 +92,7 @@ public class PlatformsTest //extends TestCase
 	@Test
 	public void	testPlatforms()
 	{
-		long timeout = Starter.getLocalDefaultTimeout(null);
+		long timeout = Starter.getDefaultTimeout(null);
 		long[] starttimes = new long[PLATFORMS.length/2+1];
 		long[] shutdowntimes = new long[PLATFORMS.length/2+1];
 		IModelInfo	defmodel	= null;	// Model of default platform to compare others to.
@@ -112,7 +111,7 @@ public class PlatformsTest //extends TestCase
 			
 			long start = System.currentTimeMillis();
 			IExternalAccess	platform = (IExternalAccess)Starter.createPlatform(args).get(timeout);
-			timeout = Starter.getLocalDefaultTimeout(platform.getId());
+			timeout = Starter.getDefaultTimeout(platform.getId());
 			starttimes[i] = System.currentTimeMillis()-start;
 //			System.out.println("Started platform: "+i);
 			
