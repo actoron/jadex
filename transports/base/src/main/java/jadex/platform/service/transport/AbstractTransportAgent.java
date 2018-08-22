@@ -16,7 +16,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
@@ -53,6 +52,7 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminationCommand;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
@@ -221,17 +221,16 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		if(port >= 0)
 		{
 			final Future<Void>	ret	= new Future<Void>();
-			impl.openPort(port)
-				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-			{
-				@Override
-				public void customResultAvailable(Integer port)
-				{
+			Integer iport	= impl.openPort(port).get(new ThreadSuspendable());	// Hack!!! Hard block of component thread to trick simulation.	
+//				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+//			{
+//				@Override
+//				public void customResultAvailable(Integer iport)
+//				{
 					try
 					{
 						// Announce connection addresses.
 						InetAddress[] addresses = SUtil.getNetworkAddresses();
-//						String[] saddresses = new String[addresses.length];
 						IComponentIdentifier platformid = agent.getId().getRoot();
 						List<TransportAddress> saddresses = new ArrayList<TransportAddress>();
 						for(int i = 0; i < addresses.length; i++)
@@ -239,21 +238,17 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 							String addrstr = null;
 							if(addresses[i] instanceof Inet6Address)
 							{
-//								saddresses[i] = "[" + addresses[i].getHostAddress() + "]:" + port;
-								addrstr = "[" + addresses[i].getHostAddress() + "]:" + port;
+								addrstr = "[" + addresses[i].getHostAddress() + "]:" + iport;
 							}
 							else // if (address instanceof Inet4Address)
 							{
-//								saddresses[i] = addresses[i].getHostAddress() + ":" + port;
-								addrstr = addresses[i].getHostAddress() + ":" + port;
+								addrstr = addresses[i].getHostAddress() + ":" + iport;
 							}
 							saddresses.add(new TransportAddress(platformid, impl.getProtocolName(), addrstr));
 						}
 						
-						agent.getLogger().info("Platform "+agent.getId().getPlatformName()+" listening to port " + port + " for " + impl.getProtocolName() + " transport.");
+						agent.getLogger().info("Platform "+agent.getId().getPlatformName()+" listening to port " + iport + " for " + impl.getProtocolName() + " transport.");
 
-//						TransportAddressBook tab = TransportAddressBook.getAddressBook(agent);
-//						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
 						ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
 						
 //						System.out.println("Transport addresses: "+agent+", "+saddresses);
@@ -263,8 +258,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					{
 						ret.setException(e);
 					}
-				}
-			}));
+//				}
+//			}));
 			
 			return ret;
 		}
