@@ -50,13 +50,15 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Autostart;
 
 /**
  *  Agent that observes the environment and decides to
  *  a) make this platform to a SP registry (upgrade)
  *  b) make this platform from a SP registry to a normal client (downgrade) 
  */
-@Agent(autoprovide=Boolean3.TRUE)
+@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE, name="spautoconf", 
+predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
 @Service
 public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 {
@@ -122,13 +124,22 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		{
 			public void resultAvailable(java.util.Collection<ISuperpeerService> sps) 
 			{
+				// Remove superpeers that ONLY provide the global superpeer network.
+				for (Iterator<ISuperpeerService> it = SUtil.notNull(sps).iterator(); it.hasNext(); )
+				{
+					ISuperpeerService sp = it.next();
+					Set<String> networks = ((IService) sp).getId().getNetworkNames();
+					if (networks == null || (networks.size() == 1 && networks.contains(SuperpeerClientAgent.GLOBAL_NETWORK_NAME)))
+						it.remove();
+				}
+				
 				int foundcnt = sps.size();
 				
 				System.out.println("found: "+foundcnt+" "+tracker);
 				
 				Counting c = tracker.addResultCount(foundcnt);
 				
-				// When too less are found search a peer is searched and promoted to superpeer
+				// When too few are found search a peer is searched and promoted to superpeer
 				if(c==Counting.TOO_FEW)
 				{
 					findPeers().addResultListener(new IResultListener<Set<Tuple2<IAutoConfigRegistryService, Double>>>()
@@ -257,7 +268,6 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 					
 					// todo: activate from outside
 					//ret.setResult(null);
-					
 					searchAfterDelay(tracker);
 				}
 			}
@@ -266,7 +276,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 			{
 				// todo: activate from outside
 				//ret.setResult(null);
-				
+				exception.printStackTrace();
 				searchAfterDelay(tracker);
 			}
 		});
