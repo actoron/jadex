@@ -32,7 +32,7 @@ public class ConcurrentSettingsTest
 	public void	testMultiplePlatforms() throws Exception
 	{
 		int	number	= 3;	// Number of platforms to create in parallel
-//		long	timeout	= Starter.getScaledLocalDefaultTimeout(null, number);
+//		long	timeout	= Starter.getScaledDefaultTimeout(null, number);
 		long	timeout	= Starter.getDefaultTimeout(null);
 		
 		IPlatformConfiguration	conf	= PlatformConfigurationHandler.getMinimal();

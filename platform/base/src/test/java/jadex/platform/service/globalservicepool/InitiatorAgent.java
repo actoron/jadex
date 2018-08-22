@@ -50,7 +50,7 @@ import jadex.platform.service.servicepool.PoolServiceInfo;
 })
 // Test requires starting/stopping multiple platforms and many test calls  -> increase test timeout
 @Properties(
-	@NameValue(name="test.timeout", value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 2)"))
+	@NameValue(name="test.timeout", value="jadex.base.Starter.getScaledDefaultTimeout(null, 2)"))
 public class InitiatorAgent extends TestAgent
 {
 	/**
