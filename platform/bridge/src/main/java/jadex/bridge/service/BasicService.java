@@ -621,7 +621,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			ret = deftimeout;
 		}
 				
-//		return ret==Timeout.UNSET? remote? BasicService.getRemoteDefaultTimeout(): BasicService.getLocalDefaultTimeout(): ret;
+//		return ret==Timeout.UNSET? remote? BasicService.getRemoteDefaultTimeout(): BasicService.getDefaultTimeout(): ret;
 		return ret;
 	}
 	

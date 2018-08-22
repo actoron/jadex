@@ -38,7 +38,7 @@ public class PlatformConfigurationTest
 //		rootConfig.setWelcome(false);
 //		config.setAutoShutdown(false);
 //		rootConfig.setPrintPass(false);
-//		long timeout = Starter.getLocalDefaultTimeout(null);
+//		long timeout = Starter.getDefaultTimeout(null);
 		
 		
 		// only load model

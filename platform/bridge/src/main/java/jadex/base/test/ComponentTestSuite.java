@@ -258,7 +258,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		
 		IPlatformConfiguration conf = STest.getDefaultTestConfig();
 //		IPlatformConfiguration conf = Starter.processArgs(args);
-//		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
+//		this.timeout	= Starter.getDefaultTimeout(null);	// Initial timeout for starting platform.
 		this.timeout	= conf.getExtendedPlatformConfiguration().getDefaultTimeout();	// Initial timeout for starting platform.
 		startTimer();
 
@@ -274,7 +274,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 
 //		System.out.println("start platform");
 		platform	= Starter.createPlatform(conf, args).get();
-//		this.timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
+//		this.timeout	= Starter.getDefaultTimeout(platform.getComponentIdentifier());
 //		System.out.println("end platform");
 		ServiceQuery<IComponentManagementService> cmsquery = new ServiceQuery<>(IComponentManagementService.class);
 		IComponentManagementService cms = platform.searchService( cmsquery).get();

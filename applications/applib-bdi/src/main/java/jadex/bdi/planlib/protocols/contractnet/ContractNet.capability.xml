@@ -28,7 +28,7 @@
 	<beliefs>
 		<!-- Timeout for messages. -->
 		<belief name="timeout" class="Long" exported="true">
-			<fact>Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
+			<fact>Starter.getDefaultTimeout($scope.getComponentIdentifier())</fact>
 		</belief>
 
 		<!-- Filters are only relevant for the participants protocol side. -->

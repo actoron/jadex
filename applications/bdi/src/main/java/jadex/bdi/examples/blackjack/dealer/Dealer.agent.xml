@@ -38,7 +38,7 @@
 		
 		<!-- The number of seconds to wait for answers from players. -->
 		<belief name="playerwaitmillis" class="long">
-			<fact>jadex.base.Starter.getLocalDefaultTimeout($scope.getComponentIdentifier())</fact>
+			<fact>jadex.base.Starter.getDefaultTimeout($scope.getComponentIdentifier())</fact>
 		</belief>
 
 		<!-- The time to wait between rounds.

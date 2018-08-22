@@ -545,7 +545,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //                    			ctx.complete();
                     		}
 						}));
-//                        ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
+//                        ret = ((IFuture<?>)ret).get(Starter.getDefaultTimeout(null));
                     }
                     else
                     {

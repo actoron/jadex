@@ -111,7 +111,7 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			: "Test remote offline automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller());
 		reports.add(report);
 		
-//		agent.getLogger().severe("test: "+report.getDescription()+", "+Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()));
+//		agent.getLogger().severe("test: "+report.getDescription()+", "+Starter.getDefaultTimeout(agent.getComponentIdentifier()));
 		
 		waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.25),
 			new IComponentStep<Void>()
