@@ -470,12 +470,12 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 	 *  @param body The message body.
 	 *  @return	A future indicating success.
 	 */
-	public IFuture<Void> sendMessage(byte[] header, byte[] body)
+	public IFuture<Integer> sendMessage(byte[] header, byte[] body)
 	{
 		if (!WebSocketState.OPEN.equals(websocket.getState()) || websocket.getSocket().isClosed())
-			return new Future<Void>(new IOException("Connection is not available."));
+			return new Future<Integer>(new IOException("Connection is not available."));
 //		System.out.println("SendClient: " + hashCode() + " " + (header == null ? "null" : String.valueOf(header.length)) + " " + (body == null ? "null" : String.valueOf(body.length)));
-		final Future<Void> ret = new Future<Void>();
+		final Future<Integer> ret = new Future<>();
 		
 		try
 		{
@@ -484,7 +484,7 @@ public class WebSocketConnectionClient extends AWebsocketConnection
 				sendAsFrames(header);
 				sendAsFrames(body);
 			}
-			ret.setResult(null);
+			ret.setResult(WebSocketTransport.PRIORITY);
 		}
 		catch (Exception e)
 		{

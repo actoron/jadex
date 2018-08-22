@@ -17,6 +17,8 @@ import jadex.platform.service.transport.ITransportHandler;
  */
 public class WebSocketTransport implements ITransport<IWebSocketConnection>
 {
+	protected static final int PRIORITY = 500;
+	
 	/** Connection handler. */
 	protected WebSocketTransportAgent handler;
 	
@@ -144,7 +146,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	 *  @param body	The message body.
 	 *  @return	A future indicating success.
 	 */
-	public IFuture<Void> sendMessage(IWebSocketConnection con, byte[] header, byte[] body)
+	public IFuture<Integer> sendMessage(IWebSocketConnection con, byte[] header, byte[] body)
 	{
 //		System.out.println("send: " + Arrays.hashCode(header) + " " + Arrays.hashCode(body));
 		return con.sendMessage(header, body);
