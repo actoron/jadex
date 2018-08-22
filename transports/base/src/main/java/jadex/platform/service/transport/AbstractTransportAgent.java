@@ -506,8 +506,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 //			handler.getAccess().getLogger().info("Error on connection: "+((SocketChannel)sc).socket().getRemoteSocketAddress()+", "+e);
 			agent.getLogger().info("Closed connection " + cand.getConnection() + " to: "+cand.getTarget()+(e!=null? ", "+e:""));
 			VirtualConnection vircon = getVirtualConnection(cand.getTarget());
-			assert vircon!=null || cand.getTarget()==null;
-			if(vircon!=null)	// Can null, when connection closed before target id received -> never added to vircon
+			if(vircon!=null)	// Can null, when connection removed after lease timeout
 			{
 				vircon.removeConnection(cand);
 			}
