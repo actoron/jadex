@@ -190,6 +190,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	 */
 	public IFuture<List<TransportAddress>> resolveAddresses(final IComponentIdentifier platformid, final String transporttype)
 	{
+		assert (platformid != null && platformid.equals(platformid.getRoot()));
 //		System.out.println("RESOLVE CALLED: " + platformid + " " + transporttype);
 		Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
 		try
