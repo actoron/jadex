@@ -44,7 +44,6 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 	 */
 	public WebSocketTransportAgent()
 	{
-		priority = 500;
 	}
 	
 	/**
