@@ -78,10 +78,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 {
 	// -------- arguments --------
 
-	/** The default priority, when choosing a transport to communicate with specific platform. */
-	@AgentArgument
-	protected int	priority	= 1000;
-
 	/** The port, the transport should listen to (&lt;0: don't listen, 0: choose random port, >0: use given port). */
 	@AgentArgument
 	protected int	port	= 0;
