@@ -517,7 +517,7 @@ public class Starter
 
 					putPlatformValue(cid, DATA_TRANSPORTCACHE, Collections.synchronizedMap(new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>(2000)));
 					
-					putPlatformValue(cid, DATA_DEFAULT_TIMEOUT, config.getExtendedPlatformConfiguration().getDefaultTimeout());
+					putPlatformValue(cid, DATA_DEFAULT_TIMEOUT, config.getDefaultTimeout());
 
 					Map<String, Object> argsmap = config==null? new HashMap<String, Object>(): config.getValues();
 					if(args!=null)

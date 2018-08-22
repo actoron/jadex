@@ -28,7 +28,7 @@ import jadex.micro.testcases.TestAgent;
 @Ignore	// TODO: implement (de)referencing of services as arguments
 @Agent(autoprovide=Boolean3.TRUE)
 // Larger timeout to capture service search/call timeout
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledRemoteDefaultTimeout(null, 1.5)")}) // cannot use $component.getId() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 1.5)")}) // cannot use $component.getId() because is extracted from test suite :-(
 @Service
 public class ServiceCallbackTestAgent extends TestAgent	implements ICalledService
 {

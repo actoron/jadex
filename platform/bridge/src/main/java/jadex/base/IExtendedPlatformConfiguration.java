@@ -119,12 +119,6 @@ public interface IExtendedPlatformConfiguration
     public boolean getOpenGl();
     
     /**
-     *  Get the default timeout.
-     *  @return The default timeout.
-     */
-    public long getDefaultTimeout();
-
-    /**
      *  Sets if the platform should keep admin/root privileges
      *  or attempt to drop to a user.
      *  

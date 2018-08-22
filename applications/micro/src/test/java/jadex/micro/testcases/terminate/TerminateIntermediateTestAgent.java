@@ -27,7 +27,7 @@ import jadex.micro.annotation.Properties;
 @Agent
 @Description("The intermediate invoker agent tests if intermediate futures can be terminated " +
 	"in local and remote cases.")
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledRemoteDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class TerminateIntermediateTestAgent extends TerminateTestAgent
 {
 	/**

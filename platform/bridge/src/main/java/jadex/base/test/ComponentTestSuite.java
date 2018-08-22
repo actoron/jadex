@@ -259,7 +259,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 		IPlatformConfiguration conf = STest.getDefaultTestConfig();
 //		IPlatformConfiguration conf = Starter.processArgs(args);
 //		this.timeout	= Starter.getDefaultTimeout(null);	// Initial timeout for starting platform.
-		this.timeout	= conf.getExtendedPlatformConfiguration().getDefaultTimeout();	// Initial timeout for starting platform.
+		this.timeout	= conf.getDefaultTimeout();	// Initial timeout for starting platform.
 		startTimer();
 
 		if (tests != null) 
