@@ -41,14 +41,22 @@ public class RelayMessageComponentFeature extends MicroMessageComponentFeature
 		super(component, cinfo);
 	}
 	
-	public IFuture<Void> sendToTransports(IMsgHeader header, byte[] encryptedbody)
+	/**
+	 *  Forwards the prepared message to the transport layer.
+	 *  
+	 *  @param header The message header.
+	 *  @param encryptedheader The encrypted header.
+	 *  @param encryptedbody The encrypted message body.
+	 *  @return Null, when done, exception if failed.
+	 */
+	public IFuture<Void> sendToTransports(final IMsgHeader header, final byte[] encryptedheader, final byte[] encryptedbody)
 	{
 //		if (header.getProperty(RelayTransportAgent.FORWARD_DEST) == null)
 //		if (header.getProperty(IMsgHeader.RECEIVER).equals(((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot()))
 //		{
 //			(new RuntimeException("msg to pf component: " + Arrays.toString(((MsgHeader) header).getProperties().keySet().toArray()))).printStackTrace();
 //		}
-		return super.sendToTransports(header, encryptedbody);
+		return super.sendToTransports(header, encryptedheader, encryptedbody);
 	}
 	
 	/**
