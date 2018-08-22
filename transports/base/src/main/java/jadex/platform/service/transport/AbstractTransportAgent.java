@@ -294,19 +294,22 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public ITerminableFuture<Integer> sendMessage(IMsgHeader header, byte[] bheader, byte[] body)
 	{
+		
 		final TerminableFuture<Integer> ret = new TerminableFuture<>();
 		final IComponentIdentifier	target	= (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 		assert target!=null; // Message feature should disallow sending without receiver.
+		
+		System.out.println(agent+".sendMessage to "+target);
 
 		// Check if connection handler exists, else create...
 		VirtualConnection	handler;
 		boolean	create	= false;
 		synchronized(this)
 		{
-			handler = getVirtualConnection(target);
+			handler = getVirtualConnection(target.getRoot());
 			if(handler==null)
 			{
-				handler	= createVirtualConnection(target);
+				handler	= createVirtualConnection(target.getRoot());
 				create	= true;
 			}
 		}
@@ -315,6 +318,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		if(create)
 		{
 			handler.createConnections();
+			handler.notifySubscribers();
 		}
 
 		// add message to handler -> will be sent when ready or otherwise remembered for sending later, if not terminated in mean time.
@@ -476,6 +480,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		// Start handshake by sending id.
 		if(created)
 		{
+			System.out.println(agent +(clientcon ? " connected to " : " accepted connection ") + con + ". Starting handshake...");
 			agent.getLogger().info((clientcon ? "Connected to " : "Accepted connection ") + con + ". Starting handshake...");
 			impl.sendMessage(con, new byte[0], agent.getId().getPlatformName().getBytes(SUtil.UTF8));
 		}
@@ -512,10 +517,14 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	}
 	
 	/**
-	 * Get the connection handler, if any.
+	 *  Get the connection handler, if any.
+	 *  @param target	The target platform id.
 	 */
 	protected VirtualConnection getVirtualConnection(IComponentIdentifier target)
 	{
+		// Should only be called for platforms.
+		assert target.equals(target.getRoot());
+		
 		synchronized(this)
 		{
 			return virtuals!=null ? virtuals.get(target) : null;
@@ -523,85 +532,46 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	}
 
 	/**
-	 * Create a virtual connection.
+	 *  Create a virtual connection.
+	 *  @param target	The target platform id.
 	 */
-	protected VirtualConnection createVirtualConnection(IComponentIdentifier target)
+	protected synchronized VirtualConnection createVirtualConnection(IComponentIdentifier target)
 	{
+		// Should only be called for platforms.
+		assert target.equals(target.getRoot());
+		
 		VirtualConnection vircon = new VirtualConnection(target);
-		SubscriptionIntermediateFuture<PlatformData>[]	notify;
-		synchronized(this)
+		if(virtuals==null)
 		{
-			if(virtuals==null)
-			{
-				virtuals = new HashMap<IComponentIdentifier, VirtualConnection>();
-			}
-			VirtualConnection prev = virtuals.put(target, vircon);
-			assert prev == null;
+			virtuals = new HashMap<IComponentIdentifier, VirtualConnection>();
+		}
+		VirtualConnection prev = virtuals.put(target, vircon);
+		assert prev == null;
 			
-			@SuppressWarnings("unchecked")
-			SubscriptionIntermediateFuture<PlatformData>[]	tmp
-				= infosubscribers!=null ? infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]) : null;
-			notify	= tmp;
-		}
-		
-		if(notify!=null)
-		{
-			// Newly created connection -> ready=false.
-			PlatformData	info	= vircon.getPlatformdata();
-			for(SubscriptionIntermediateFuture<PlatformData> fut: notify)
-			{
-				fut.addIntermediateResult(info);
-			}
-		}
-		
 		return vircon;
 	}
-	
-//	/**
-//	 *  Get or create a virtual connection.
-//	 */
-//	protected VirtualConnection getOrCreateVirtualConnection(IComponentIdentifier target)
-//	{
-//		synchronized(this)
-//		{
-//			VirtualConnection	ret	= getVirtualConnection(target);
-//			if(ret==null)
-//			{
-//				ret	= createVirtualConnection(target);
-//			}
-//			return ret;
-//		}
-//	}
 	
 	/**
 	 *  Remove a virtual connection if it is still the current connection for the target.
 	 */
 	protected void	removeVirtualConnection(IComponentIdentifier target, VirtualConnection con)
 	{
-		SubscriptionIntermediateFuture<PlatformData>[]	notify;
-		VirtualConnection	vircon;
+		// Should only be called for platforms.
+		assert target.equals(target.getRoot());
+
+		boolean	notify	= false;
 		synchronized(this)
 		{
-			vircon	= getVirtualConnection(target);
-			if(vircon==con)
+			if(getVirtualConnection(target)==con)
 			{
 				virtuals.remove(target);
+				notify	= true;
 			}
-			
-			@SuppressWarnings("unchecked")
-			SubscriptionIntermediateFuture<PlatformData>[]	tmp
-				= infosubscribers!=null ? infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]) : null;
-			notify	= tmp;
 		}
-
-		if(notify!=null)
+		
+		if(notify)
 		{
-			// Removed connection -> ready=null.
-			PlatformData	info	= vircon.getPlatformdata();
-			for(SubscriptionIntermediateFuture<PlatformData> fut: notify)
-			{
-				fut.addIntermediateResult(info);
-			}
+			con.notifySubscribers();
 		}
 	}
 
@@ -620,6 +590,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		{
 			public void customResultAvailable(List<TransportAddress> addrs) throws Exception
 			{
+				System.out.println(agent + " found " + addrs + " for pf " + target);
 				if (addrs != null && addrs.size() > 0)
 				{
 					for (TransportAddress addr : addrs)
@@ -632,7 +603,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			}
 		});
 		
-//		System.out.println("Found " + Arrays.toString(ret) + " for pf " + target);
 		return ret;
 	}
 	
@@ -889,10 +859,13 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		//-------- constructors --------
 		
 		/**
-		 *  Create a virtual connection to a given target.
+		 *  Create a virtual connection to a given target platform.
 		 */
 		public VirtualConnection(IComponentIdentifier target)
 		{
+			// Should only be called for platforms.
+			assert target.equals(target.getRoot());
+			
 			this.target	= target;
 		}
 		
@@ -966,27 +939,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			
 			if(notify)
 			{
-				SubscriptionIntermediateFuture<PlatformData>[]	subs	= null;
-				synchronized(AbstractTransportAgent.this)
-				{
-					// (new) connection established -> notify listeners, if any
-					if(infosubscribers!=null)
-					{
-						@SuppressWarnings("unchecked")
-						SubscriptionIntermediateFuture<PlatformData>[]	tmp
-							= infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]);
-						subs	= tmp;
-					}
-				}
-
-				if(subs!=null)
-				{
-					PlatformData info = getPlatformdata();
-					for(SubscriptionIntermediateFuture<PlatformData> subfut: subs)
-					{
-						subfut.addIntermediateResult(info);
-					}
-				}
+				notifySubscribers();
 			}
 		}
 
@@ -1101,10 +1054,12 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		protected void	createConnections()
 		{
+			System.out.println(agent+" searching addresses for " + getTarget());
 			getAddresses(getTarget()).addResultListener(addresses ->
 			{
 				for(final String address : addresses)
 				{
+					System.out.println(agent+" attempting connection to " + getTarget() + " using address: " + address);
 					agent.getLogger().info("Attempting connection to " + getTarget() + " using address: " + address);
 					impl.createConnection(address, getTarget())
 						.addResultListener(con ->
@@ -1113,6 +1068,30 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					});
 				}
 			});
+		}
+		
+		/**
+		 *  Notify subscribers (if any) when the connection has changed.
+		 */
+		protected void	notifySubscribers()
+		{
+			SubscriptionIntermediateFuture<PlatformData>[]	notify;
+			synchronized(AbstractTransportAgent.this)
+			{
+				@SuppressWarnings("unchecked")
+				SubscriptionIntermediateFuture<PlatformData>[]	tmp
+					= infosubscribers!=null ? infosubscribers.toArray(new SubscriptionIntermediateFuture[infosubscribers.size()]) : null;
+				notify	= tmp;
+			}
+			if(notify!=null)
+			{
+				// Newly created connection -> ready=false.
+				PlatformData	info	= getPlatformdata();
+				for(SubscriptionIntermediateFuture<PlatformData> fut: notify)
+				{
+					fut.addIntermediateResult(info);
+				}
+			}
 		}
 
 		/**
