@@ -182,8 +182,8 @@ public class BTTransport implements ITransport<BTChannel>, AndroidContextChangeL
 	}
 
 	@Override
-	public IFuture<Void> sendMessage(final BTChannel btChannel, final byte[] header, final byte[] body) {
-		IFuture<Void>	ret	= null;
+	public IFuture<Integer> sendMessage(final BTChannel btChannel, final byte[] header, final byte[] body) {
+		IFuture<Integer>	ret	= null;
 
 		IComponentIdentifier receiver = btChannel.getReceiver();
 
@@ -205,9 +205,9 @@ public class BTTransport implements ITransport<BTChannel>, AndroidContextChangeL
 
 		try {
 			binder.sendMessage(bluetoothMessage);
-			ret	= IFuture.DONE;
+			ret	= new Future<>(250);
 		} catch (RemoteException e) {
-			ret	= new Future<Void>(new RuntimeException("Send failed: "+bluetoothMessage));
+			ret	= new Future<>(new RuntimeException("Send failed: "+bluetoothMessage));
 			e.printStackTrace();
 		}
 
@@ -215,7 +215,7 @@ public class BTTransport implements ITransport<BTChannel>, AndroidContextChangeL
 
 		if(ret==null)
 		{
-			ret	= new Future<Void>(new RuntimeException("No working connection."));
+			ret	= new Future<>(new RuntimeException("No working connection."));
 		}
 
 		return ret;
