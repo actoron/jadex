@@ -344,38 +344,51 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 //			System.out.println("Final receiver, delivering to component: " + body);
 			AbstractTransportAgent.deliverRemoteMessage(agent, secservice, cms, serser, source, unpacked.get(0), unpacked.get(1));
 			
-			return getTerminableFuture();
+			TerminableFuture<Integer> ret = new TerminableFuture<>();
+			ret.setResult(PRIORITY);
+			return ret;
 		}
+		
+		final TerminableFuture<Integer> ret = new TerminableFuture<>();
+		final AtomicBoolean notcanceled = new AtomicBoolean(true);
+		ret.setTerminationCommand(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				notcanceled.set(false);
+			}
+		});
 		
 		if (hasDirectConnection(fwdest))
 		{
 			header.addProperty(IMsgHeader.RECEIVER, getRtComponent(fwdest));
 			
-			TerminableFuture<Integer> ret = new TerminableFuture<>();
-			
 			encryptHeader(header).addResultListener(new ExceptionDelegationResultListener<byte[], Integer>(ret)
 			{
 				public void customResultAvailable(byte[] encheader) throws Exception
 				{
-					IFuture<Void> msgfut = intmsgfeat.sendToTransports(header, encheader, body);
-					msgfut.addResultListener(new ExceptionResultListener<Void>()
+					if (notcanceled.get())
 					{
-						public void exceptionOccurred(Exception exception)
+						IFuture<Void> msgfut = intmsgfeat.sendToTransports(header, encheader, body);
+						msgfut.addResultListener(new ExceptionResultListener<Void>()
 						{
-							synchronized(directconns)
+							public void exceptionOccurred(Exception exception)
 							{
-								directconns.checkStale();
-								directconns.remove(fwdest);
+								synchronized(directconns)
+								{
+									directconns.checkStale();
+									directconns.remove(fwdest);
+								}
 							}
-						}
-					});
-					msgfut.addResultListener(new ExceptionDelegationResultListener<Void, Integer>(ret)
-					{
-						public void customResultAvailable(Void result) throws Exception
+						});
+						msgfut.addResultListener(new ExceptionDelegationResultListener<Void, Integer>(ret)
 						{
-							ret.setResultIfUndone(PRIORITY);
-						}
-					});
+							public void customResultAvailable(Void result) throws Exception
+							{
+								ret.setResultIfUndone(PRIORITY);
+							}
+						});
+					}
 				}
 				
 			});
@@ -392,32 +405,24 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				System.out.println(agent + " forwarding via known route: " + route.getFirstEntity() + " to " + fwdest);
 			header.addProperty(IMsgHeader.RECEIVER, getRtComponent(route.getFirstEntity()));
 //			System.out.println("sending to route target: " + route.getFirstEntity() + " " + header.getProperty(FORWARD_DEST));
-			final TerminableFuture<Integer> ret = new TerminableFuture<>();
 			encryptHeader(header).addResultListener(new ExceptionDelegationResultListener<byte[], Integer>(ret)
 			{
 				public void customResultAvailable(byte[] encheader) throws Exception
 				{
-					intmsgfeat.sendToTransports(header, encheader, body).addResultListener(new ExceptionDelegationResultListener<Void, Integer>(ret)
+					if (notcanceled.get())
 					{
-						public void customResultAvailable(Void result) throws Exception
+						intmsgfeat.sendToTransports(header, encheader, body).addResultListener(new ExceptionDelegationResultListener<Void, Integer>(ret)
 						{
-							ret.setResult(PRIORITY);
-						}
-					});
+							public void customResultAvailable(Void result) throws Exception
+							{
+								ret.setResultIfUndone(PRIORITY);
+							}
+						});
+					}
 				}
 			});
 			return ret;
 		}
-		
-		final TerminableFuture<Integer> ret = new TerminableFuture<>();
-		final AtomicBoolean notcanceled = new AtomicBoolean(true);
-		ret.setTerminationCommand(new TerminationCommand()
-		{
-			public void terminated(Exception reason)
-			{
-				notcanceled.set(false);
-			}
-		});
 		
 		final IComponentIdentifier ffwdest = fwdest;
 		discoverRoute(fwdest, new LinkedHashSet<IComponentIdentifier>()).addResultListener(new IIntermediateResultListener<Integer>()
@@ -437,28 +442,34 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				Tuple2<IComponentIdentifier, Integer> route = getRouteFromCache(ffwdest);
 				if (route != null && notsent && notcanceled.get())
 				{
-					header.addProperty(IMsgHeader.RECEIVER, getRtComponent(route.getFirstEntity()));
-					notsent = false;
-					encryptHeader(header).addResultListener(new IResultListener<byte[]>()
+					if (notcanceled.get())
 					{
-						public void resultAvailable(byte[] encheader)
+						header.addProperty(IMsgHeader.RECEIVER, getRtComponent(route.getFirstEntity()));
+						notsent = false;
+						encryptHeader(header).addResultListener(new IResultListener<byte[]>()
 						{
-							intmsgfeat.sendToTransports(header, encheader, body).addResultListener(new IResultListener<Void>()
+							public void resultAvailable(byte[] encheader)
 							{
-								public void resultAvailable(Void result)
+								if (notcanceled.get())
 								{
-									ret.setResultIfUndone(PRIORITY);
-								};
-								public void exceptionOccurred(Exception exception)
-								{
-									ret.setExceptionIfUndone(exception);
-								};
-							});
-						}
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					});
+									intmsgfeat.sendToTransports(header, encheader, body).addResultListener(new IResultListener<Void>()
+									{
+										public void resultAvailable(Void result)
+										{
+											ret.setResultIfUndone(PRIORITY);
+										};
+										public void exceptionOccurred(Exception exception)
+										{
+											ret.setExceptionIfUndone(exception);
+										};
+									});
+								}
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+							}
+						});
+					}
 				}
 			}
 			
@@ -1091,17 +1102,6 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		byte[] bheader = serial.encode(header, agent, header);
 		
 		return secservice.encryptAndSign(header, bheader);
-	}
-	
-	/**
-	 *  Gets terminable future with priority.
-	 *  @return Terminable future with priority.
-	 */
-	ITerminableFuture<Integer> getTerminableFuture()
-	{
-		TerminableFuture<Integer> ret = new TerminableFuture<>();
-		ret.setResult(PRIORITY);
-		return ret;
 	}
 	
 	/** Ping message. */
