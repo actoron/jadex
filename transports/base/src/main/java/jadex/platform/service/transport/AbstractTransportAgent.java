@@ -299,9 +299,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	public ITerminableFuture<Integer> sendMessage(IMsgHeader header, byte[] bheader, byte[] body)
 	{
 		final TerminableFuture<Integer> ret = new TerminableFuture<>();
-		final IComponentIdentifier	target	= getTarget(header);
+		final IComponentIdentifier	target	= (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
+		assert target!=null; // Message feature should disallow sending without receiver.
 
-		// Try to get existing connection
+		// Check if connection handler exists, else create...
 		VirtualConnection	handler;
 		boolean	create	= false;
 		synchronized(this)
@@ -314,51 +315,15 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			}
 		}
 		
-		// If no existing connection -> create handler and start creation of actual connections in background. 
+		// If no existing connection -> start creation of actual connections in background. 
 		if(create)
 		{
-			final VirtualConnection	fhandler	= handler;
-			getAddresses(header).addResultListener(addresses ->
-			{
-				if(!ret.isDone())
-				{
-					for(final String address : addresses)
-					{
-						agent.getLogger().info("Attempting connection to " + fhandler.getTarget() + " using address: " + address);
-						impl.createConnection(address, fhandler.getTarget())
-							.addResultListener(con ->
-						{
-							createConnectionCandidate(con, true);
-						});
-					}
-				}
-			});
+			handler.createConnections();
 		}
 
 		// add message to handler -> will be sent when ready or otherwise remembered for sending later, if not terminated in mean time.
-		handler.sendMessage();
+		handler.sendMessage(bheader, body, ret);
 		
-//		// Try with existing connection. When failed -> check if new
-//		// connection available,
-//		// e.g. if current connection terminated due to multiple
-//		// open connections.
-//		impl.sendMessage(con, ebheader, body).addResultListener(new DelegationResultListener<Integer>(ret)
-//		{
-//			@Override
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				Con con2	= handler.getConnection();
-//				if(con2!=null && con2!=con)
-//				{
-//					trySend(con2, handler, ebheader);
-//				}
-//				else
-//				{
-//					super.exceptionOccurred(exception);
-//				}
-//			}
-//		});
-
 		return ret;
 	}
 	
@@ -469,32 +434,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected Logger getLogger()
 	{
 		return agent.getLogger();
-	}
-
-	/**
-	 * Create a connection to a given platform. Tries all available addresses in
-	 * parallel. Fails when no connection can be established.
-	 */
-	protected void	createConnections(final VirtualConnection handler, final Collection<String> addresses)
-	{
-		for(final String address : addresses)
-		{
-			agent.getLogger().info("Attempting connection to " + handler.getTarget() + " using address: " + address);
-			IFuture<Con> fcon = impl.createConnection(address, handler.getTarget());
-			fcon.addResultListener(new IResultListener<Con>()
-			{
-				@Override
-				public void resultAvailable(Con con)
-				{
-					createConnectionCandidate(con, true);
-				}
-
-				@Override
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			});
-		}
 	}
 
 	// -------- connection management methods --------
@@ -670,27 +609,14 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		}
 	}
 
-
-
-	/**
-	 * Get the target platform for a message.
-	 */
-	protected IComponentIdentifier getTarget(IMsgHeader header)
-	{
-		IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
-		assert rec != null; // Message feature should disallow sending without receiver.
-		return rec.getRoot();
-	}
-	
 	/**
 	 * Get the target addresses for a message.
 	 * 
 	 * @param The message header.
 	 * @return The addresses, if any.
 	 */
-	protected IIntermediateFuture<String> getAddresses(IMsgHeader header)
+	protected IIntermediateFuture<String> getAddresses(IComponentIdentifier target)
 	{
-		IComponentIdentifier target = getTarget(header).getRoot();
 		ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
 		
 		final IntermediateFuture<String> ret = new IntermediateFuture<String>();
@@ -880,9 +806,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		/**
 		 * Set the target platform.
 		 */
+		@SuppressWarnings("unused")
 		public void setTarget(IComponentIdentifier target)
 		{
 			// Hack to allow ConnectionCandidate to be used as transfer bean w/o outer object.
+			// Claimed as unused by eclipse, grrr.
 			if(AbstractTransportAgent.this==null)
 			{
 				this.target = target;
@@ -906,8 +834,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		}
 
 		/**
-		 * Mark the connection as unpreferred. May lead to disconnection (if
-		 * client connection).
+		 *  Mark the connection as unpreferred.
+		 *  May lead to disconnection (if client connection).
 		 */
 		public void unprefer()
 		{
@@ -956,14 +884,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		/** The target platform of this connection. */
 		protected IComponentIdentifier	target;
 		
-		/** The future, if any, when isReady() was called but not yet confirmed. */
-		protected Future<Integer>			fut;
+		/** The future, if any, when sendMessage() was called but there is no connection yet. */
+		protected Future<ConnectionCandidate>	fut;
 
-		/** The available connection candidates. */
-		protected List<ConnectionCandidate>	cons;
-		
-		/** Flag, when the connection failed and should be removed. */
-		protected boolean failed;
+		/** The connection (if any). */
+		protected ConnectionCandidate	con;
 		
 		//-------- constructors --------
 		
@@ -986,17 +911,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		}
 
 		/**
-		 * Get an impl connection for message sending, if any.
-		 */
-		public Con getConnection()
-		{
-			synchronized(this)
-			{
-				return cons != null && !cons.isEmpty() ? cons.get(0).getConnection() : null;
-			}
-		}
-
-		/**
 		 * Add a connection. Conflicts are resolved by dropping the client
 		 * connection of the smaller platform name. The server cand replaces,
 		 * but doesn't drop.
@@ -1008,56 +922,33 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			assert target.equals(cand.getTarget());
 			
 			ConnectionCandidate	unprefer	= null;
-			Future<Integer>	fut	= null;
+			Future<ConnectionCandidate>	fut	= null;
 			boolean log	= false;
-			boolean	close	= false;
 			boolean notify	= false;
 			
 			synchronized(this)
 			{
-				if(cons==null)
+				// Is the new the preferred connection?
+				if(con==null || con.compareTo(cand)<0)
 				{
-					cons = new ArrayList<ConnectionCandidate>();
+					unprefer	= con;
+					con	= cand;
+					log	= true;	// tell logger to info handshake.
+					
+					// Inform listener, if any.
+					if(this.fut!=null)
+					{
+						fut	= this.fut;
+						this.fut = null;
+					}
+					notify	= true;
 				}
 				
-				assert !cons.contains(cand);
-				
-				if(failed)
-				{
-					// Added after e.g. timeout -> close no longer needed connection candidate
-					close	= true;
-					cons.add(cand);	// Add because is later removed on close (assert)
-				}
+		
+				// Else unprefer, to cause abort, if on client side.
 				else
 				{
-					// Is the new the preferred connection?
-					if(cons.isEmpty() || cons.get(0).compareTo(cand)<0)
-					{
-						cons.add(0, cand);
-						log	= true;	// tell logger to info handshake.
-						
-						// Inform listener, if any.
-						if(this.fut!=null)
-						{
-							fut	= this.fut;
-							this.fut = null;
-						}
-		
-						// Unprefer previous connection, if any
-						if(cons.size() > 1)
-						{
-							unprefer	= cons.get(1);
-						}
-						
-						notify	= true;
-					}
-		
-					// Keep connection but unprefer, to cause abort, if on client side.
-					else
-					{
-						cons.add(cand);
-						unprefer	= cand;
-					}
+					unprefer	= cand;
 				}
 			}
 			
@@ -1069,17 +960,12 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 
 			if(fut!=null)
 			{
-				fut.setResult(priority);
+				fut.setResult(con);
 			}
 			
 			if(unprefer!=null)
 			{
 				unprefer.unprefer();
-			}
-			
-			if(close)
-			{
-				impl.closeConnection(cand.getConnection());
 			}
 			
 			if(notify)
@@ -1120,7 +1006,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 				// Not contained? removed connection -> ready=null.
 				contained	= virtuals.containsKey(target);
 			}
-			return new PlatformData(target, impl.getProtocolName(), contained ? isReady().isDone() : null);
+			return new PlatformData(target, impl.getProtocolName(), contained ? con!=null : null);
 		}
 
 		/**
@@ -1134,67 +1020,105 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			boolean	dofail	= false;
 			synchronized(this)
 			{
-				assert this.cons!=null && this.cons.contains(cand);
-				cons.remove(cand);
-				dofail	= cons.isEmpty();
+				if(con==cand)
+				{
+					dofail	= true;
+					con	= null;
+				}
 			}
 			
 			if(dofail)
 			{
-				fail(new RuntimeException("No more "+impl.getProtocolName()+" connections to "+target));
+				removeVirtualConnection(target, this);
 			}
 		}
 
 		/**
-		 * Future to indicate that the connection is ready to send messages.
+		 *  Send a message.
+		 *  
+		 *  @param header Message header.
+		 *  @param bheader Message header already encoded and encrypted for sending.
+		 *  @param body Message body.
+		 *  @return Transport priority, when sent. Failure does not need to be returned as message feature uses its own timeouts.
+		 *  	Future is terminated by message feature, when another transport has sent the message.
 		 */
-		protected IFuture<Integer> isReady()
+		protected void	sendMessage(byte[] header, byte[] body, TerminableFuture<Integer> ret)
 		{
+			ConnectionCandidate	con	= null;
+			IFuture<ConnectionCandidate>	fut	= null;
 			synchronized(this)
 			{
-				if(cons==null || cons.isEmpty())
+				if(this.con!=null)
 				{
-					if(fut==null)
-					{
-						fut = new Future<Integer>();
-					}
-					return fut;
+					con	= this.con;
 				}
 				else
 				{
-					return new Future<Integer>(priority);
-				}
-			}
-		}
-
-		/**
-		 * Indicate that an attempt to open a client connection has failed.
-		 */
-		protected void fail(Exception e)
-		{
-			Future<Integer>	fut	= null;
-
-			synchronized(this)
-			{
-				// Only fail, when no backward connection in mean time.
-				if(failed || (cons==null || cons.isEmpty()) && this.fut!=null)
-				{
+					if(this.fut==null)
+					{
+						this.fut = new Future<ConnectionCandidate>();
+					}
 					fut	= this.fut;
-					this.fut = null;
-					this.failed	= true;
 				}
 			}
 			
-			if(failed)
-				removeVirtualConnection(target, this);
-
-			
-			if(fut!=null)
+			assert con!=null || fut!=null;
+			if(con!=null)
 			{
-				fut.setExceptionIfUndone(e);
+				ConnectionCandidate	fcon	= con;
+				impl.sendMessage(con.getConnection(), header, body)
+					.addResultListener(new DelegationResultListener<Integer>(ret)
+				{
+					// On failure of old connection -> retry finding a new connection.
+					@Override
+					public void	exceptionOccurred(Exception e)
+					{
+						boolean	create	= false;
+						synchronized(this)
+						{
+							// No new connection in mean time.
+							if(VirtualConnection.this.con==fcon)
+							{
+								VirtualConnection.this.con	= null;
+								create	= true;
+							}
+						}
+						
+						if(create)
+						{
+							createConnections();
+						}
+						
+						sendMessage(header, body, ret);
+					}
+				});
+			}
+			else
+			{
+				fut.addResultListener(fcon -> impl.sendMessage(fcon.getConnection(), header, body)
+					.addResultListener(new DelegationResultListener<>(ret)));
 			}
 		}
 		
+		/**
+		 *  Create actual connections based on known/discovered addresses of target platform.
+		 */
+		protected void	createConnections()
+		{
+			getAddresses(getTarget()).addResultListener(addresses ->
+			{
+				for(final String address : addresses)
+				{
+					agent.getLogger().info("Attempting connection to " + getTarget() + " using address: " + address);
+					impl.createConnection(address, getTarget())
+						.addResultListener(con ->
+					{
+						createConnectionCandidate(con, true);
+					});
+				}
+			});
+		}
+
 		/**
 		 *  Readable info about this virtual connection.
 		 */
