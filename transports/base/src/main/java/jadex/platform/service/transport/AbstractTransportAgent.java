@@ -299,7 +299,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		final IComponentIdentifier	target	= (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 		assert target!=null; // Message feature should disallow sending without receiver.
 		
-		System.out.println(agent+".sendMessage to "+target);
+//		System.out.println(agent+".sendMessage to "+target);
 
 		// Check if connection handler exists, else create...
 		VirtualConnection	handler;
