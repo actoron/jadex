@@ -652,14 +652,14 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					{
 						@SuppressWarnings("unchecked")
 						T t = (T)createServiceProxy(result, info);
-						ret.addIntermediateResult(t);
+						ret.addIntermediateResultIfUndone(t);
 					}
 
 					public void finished()
 					{
 						--finishcount[0];
 						if (finishcount[0] == 0)
-							ret.setFinished();
+							ret.setFinishedIfUndone();
 					}
 				});
 			}
