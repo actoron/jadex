@@ -332,7 +332,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 * 
 	 * @return the service Id.
 	 */
-	public String getId() 
+	public String getIdString() 
 	{
 		return this.id;
 	}
