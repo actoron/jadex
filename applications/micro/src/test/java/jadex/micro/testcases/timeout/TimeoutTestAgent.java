@@ -17,6 +17,7 @@ import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -189,8 +190,12 @@ public class TimeoutTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final ITestService ts)
 			{
+				// Use clock (i.e. sim time) for local and real time for remote
+				final long start = agent.getId().getRoot().equals(cid.getRoot())
+					? agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime()
+					: System.currentTimeMillis();
+					
 				// create a service call meta object and set the timeout
-				final long start = System.currentTimeMillis();
 				if(to!=-1)
 				{
 //					ServiceCall.setInvocationProperties(to, true);
@@ -219,7 +224,11 @@ public class TimeoutTestAgent extends TestAgent
 						}
 						else if(exception instanceof TimeoutException)
 						{
-							long diff = System.currentTimeMillis() - (start+to);
+							// Use clock (i.e. sim time) for local and real time for remote
+							long end = agent.getId().getRoot().equals(cid.getRoot())
+								? agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime()
+								: System.currentTimeMillis();
+							long diff = end - (start+to);
 							if(to==Timeout.NONE || diff>=0 && diff<Starter.getScaledDefaultTimeout(agent.getId(), 1.0/15)) // 2 secs max overdue delay? ignore diff when deftimeout==-1
 							{
 								tr.setSucceeded(true);
