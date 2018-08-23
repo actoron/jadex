@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -39,8 +41,10 @@ import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bridge.service.types.transport.PlatformData;
+import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.LeaseTimeMap;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -104,8 +108,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	protected Map<IComponentIdentifier, VirtualConnection>	virtuals;
 	
-	/** 
-
 	/**
 	 * The connections currently in handshake or in use (impl connection ->
 	 * connection candidate object). Used also for messageReceived().
@@ -544,7 +546,14 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		VirtualConnection vircon = new VirtualConnection(target);
 		if(virtuals==null)
 		{
-			virtuals = new HashMap<IComponentIdentifier, VirtualConnection>();
+			virtuals = new LeaseTimeMap<>(Starter.getDefaultTimeout(agent.getId()), new  ICommand<Tuple2<Entry<IComponentIdentifier, VirtualConnection>, Long>>()
+			{
+				@Override
+				public void execute(Tuple2<Entry<IComponentIdentifier, AbstractTransportAgent<Con>.VirtualConnection>, Long> arg)
+				{
+					System.out.println(agent+" outdated connection to: "+arg.getFirstEntity().getKey()+" val: "+arg.getSecondEntity());
+				}
+			}, true, true, true);
 		}
 		VirtualConnection prev = virtuals.put(target, vircon);
 		assert prev == null;

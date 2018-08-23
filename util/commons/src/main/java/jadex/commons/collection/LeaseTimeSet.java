@@ -28,6 +28,7 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 	
 	/** The entries. */
 	// DEFAULT_INITIAL_CAPACITY=11, no constructor without ic in java <1.8
+	@SuppressWarnings("serial")
 	protected PriorityQueue<E> entries = new PriorityQueue<E>(11, new Comparator<E>()
 	{
 		// could also use simple t1-t2 if Long.MAX_VALUE would be used for no leasetime. */
@@ -132,7 +133,7 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 	 */
 	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime)
 	{
-		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet(leasetime));
+		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet<>(leasetime));
 	}
 	
 	/**
@@ -140,7 +141,7 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 	 */
 	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, ICommand<Tuple2<E, Long>> removecmd)
 	{
-		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet(leasetime, removecmd));
+		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet<>(leasetime, removecmd));
 	}
 	
 	/**
@@ -148,15 +149,17 @@ public class LeaseTimeSet<E> implements ILeaseTimeSet<E>
 	 */
 	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, ICommand<Tuple2<E, Long>> removecmd, Object mutex)
 	{
-		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet(leasetime, removecmd), mutex);
+		return new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet<>(leasetime, removecmd), mutex);
 	}
 	
 	/**
 	 *  Create a lease time collection.
 	 */
-	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, ICommand<Tuple2<E, Long>> removecmd, IDelayRunner timer, boolean sync, Object mutex)
+	public static <E> ILeaseTimeSet<E> createLeaseTimeCollection(long leasetime, ICommand<Tuple2<E, Long>> removecmd, boolean passive, IDelayRunner timer, boolean sync, Object mutex)
 	{
-		return sync? new SynchronizedLeaseTimeCollection<E>(new LeaseTimeSet(leasetime, removecmd, timer), mutex): new LeaseTimeSet(leasetime, removecmd, timer);
+		return sync
+			? new SynchronizedLeaseTimeCollection<E>(createLeaseTimeCollection(leasetime, removecmd, passive, timer, false, mutex), mutex)
+			: passive ? new PassiveLeaseTimeSet<>(leasetime, removecmd) : new LeaseTimeSet<>(leasetime, removecmd, timer);
 	}
 	
 	//-------- methods --------
