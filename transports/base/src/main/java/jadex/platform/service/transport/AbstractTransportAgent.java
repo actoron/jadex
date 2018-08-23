@@ -47,6 +47,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -221,7 +222,13 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		if(port >= 0)
 		{
 			final Future<Void>	ret	= new Future<Void>();
-			Integer iport	= impl.openPort(port).get(new ThreadSuspendable());	// Hack!!! Hard block of component thread to trick simulation.	
+			
+			// Hack!!! Hard block of component while waiting for external thread avoid simulation clock being advanced.
+			ISuspendable	sus	= ISuspendable.SUSPENDABLE.get();
+			ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+			Integer iport	= impl.openPort(port).get();
+			ISuspendable.SUSPENDABLE.set(sus);
+			
 //				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 //			{
 //				@Override
