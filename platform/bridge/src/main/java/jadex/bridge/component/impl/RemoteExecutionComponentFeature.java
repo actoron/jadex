@@ -9,7 +9,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
+import jadex.base.IPlatformConfiguration;
+import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -37,11 +41,15 @@ import jadex.bridge.component.impl.remotecommands.RemoteResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteTerminationCommand;
 import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.security.ISecurityInfo;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
+import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
@@ -194,6 +202,66 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				}
 			};			
 			ret.addResultListener(trl);
+		}
+		
+		
+		IPlatformConfiguration conf = (IPlatformConfiguration) Starter.getPlatformValue(component.getId().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
+		if (conf.getExtendedPlatformConfiguration().getSimulation())
+		{
+			ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).getLocalService(ISimulationService.class);
+			Future<Void> blocker = new Future<>();
+			simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					ret.addResultListener(new IResultListener<T>()
+					{
+						public void resultAvailable(T result)
+						{
+							blocker.setResult(null);
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+							resultAvailable(null);
+						}
+					});
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			});
+			
+//			Semaphore sem = new Semaphore(0);
+//			IExecutionService execserv = component.getFeature(IRequiredServicesFeature.class).getLocalService(IExecutionService.class);
+//			execserv.execute(new IExecutable()
+//			{
+//				public boolean execute()
+//				{
+//					boolean acquired = false;
+//					try
+//					{
+//						acquired = sem.tryAcquire(10, TimeUnit.MILLISECONDS);
+//					}
+//					catch (InterruptedException e)
+//					{
+//						e.printStackTrace();
+//					}
+//					return !acquired;
+//				}
+//			});
+//			ret.addResultListener(new IResultListener<T>()
+//			{
+//				public void resultAvailable(T result)
+//				{
+//					System.out.println("SEM RELEASE");
+//					sem.release();
+//				}
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					System.out.println("SEM RELEASE");
+//					sem.release();
+//				}
+//			});
 		}
 
 		if(outcommands==null)

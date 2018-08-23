@@ -85,6 +85,16 @@ public interface ISimulationService
 //	@Excluded
 	public IExecutionService getExecutorService();
 	
+	/**
+	 *  Adds a blocker to the clock that prevents the clock from
+	 *  advancing until the future is triggered either by result
+	 *  or exception.
+	 *  
+	 *  @param blocker The blocking future.
+	 *  @return Null, when added.
+	 */
+	public IFuture<Void> addAdvanceBlocker(IFuture<Void> blocker);
+	
 	// todo: hack remove method?!
 	/**
 	 *  Add a change listener.

@@ -1,5 +1,6 @@
 package jadex.platform.service.simulation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jadex.bridge.IComponentStep;
@@ -29,6 +30,7 @@ import jadex.commons.Property;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
@@ -66,6 +68,9 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	
 	/** The future (if any) indicating when a step is finished. */
 	protected Future	stepfuture;
+	
+	/** Blockers that prevent the clock from advancing. */
+	protected List<IFuture<Void>> advanceblockers = new ArrayList<>();
 	
 	/** The idle future listener. */
 	protected IdleListener	idlelistener;
@@ -408,6 +413,20 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	{
 		return exeservice;
 	}
+	
+	/**
+	 *  Adds a blocker to the clock that prevents the clock from
+	 *  advancing until the future is triggered either by result
+	 *  or exception.
+	 *  
+	 *  @param blocker The blocking future.
+	 *  @return Null, when added.
+	 */
+	public IFuture<Void> addAdvanceBlocker(IFuture<Void> blocker)
+	{
+		advanceblockers.add(blocker);
+		return IFuture.DONE;
+	}
 
 	/**
 	 *  Stop execution.
@@ -429,10 +448,24 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	 */
 	protected void scheduleAdvanceClock()
 	{
-		if(idlelistener!=null)
-			idlelistener.outdated	= true;
-		idlelistener	= new IdleListener();
-		getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
+//		System.out.println("Wait2");
+		waitForBlockers().addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+//				System.out.println("Release2");
+				if(idlelistener!=null)
+					idlelistener.outdated	= true;
+				idlelistener	= new IdleListener();
+				
+				getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				resultAvailable(null);
+			}
+		});
 	}
 	
 	/**
@@ -455,9 +488,22 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 				if(getClockService().advanceEvent())
 				{
 //					System.out.println("Advanced clock");
-					if(idlelistener==null)
-						idlelistener	= new IdleListener();
-					getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
+//					System.out.println("Wait1");
+					waitForBlockers().addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+//							System.out.println("Release1");
+							if(idlelistener==null)
+								idlelistener	= new IdleListener();
+							getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							resultAvailable(null);
+						}
+					});
 				}
 				else
 				{
@@ -505,6 +551,38 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //		{
 //			System.out.println("Not advancing clock");
 //		}
+	}
+	
+	/**
+	 *  Waits for blockers
+	 * @return
+	 */
+	protected IFuture<Void> waitForBlockers()
+	{
+		IFuture<Void> ret = null;
+		if (advanceblockers.size() > 0)
+		{
+			Future<Void> futret = new Future<>();
+			ret = futret;
+			FutureBarrier<Void> bar = new FutureBarrier<>();
+			for (IFuture<Void> blocker : advanceblockers)
+				bar.addFuture(blocker);
+			bar.waitForIgnoreFailures(null).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					waitForBlockers().addResultListener(new DelegationResultListener<>(futret));
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			}));
+		}
+		else
+		{
+			ret = IFuture.DONE;
+		}
+		return ret;
 	}
 	
 	//-------- helper classes --------
