@@ -22,8 +22,10 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -32,6 +34,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.IFilter;
 import jadex.commons.IPropertyObject;
 import jadex.commons.IValueFetcher;
@@ -40,6 +43,7 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IIntermediateResultListener;
@@ -702,8 +706,18 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 							List props = (List)sourcepers.get("properties");
 							MEnvSpaceType.setProperties(persp, props, fetcher);
 							
-							oc.addPerspective((String)MEnvSpaceType.getProperty(sourcepers, "name"), persp)
-								.addResultListener(crl2);
+							IFuture<Void>	fut	= oc.addPerspective((String)MEnvSpaceType.getProperty(sourcepers, "name"), persp);
+							
+							ISimulationService	simserv	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+							if(simserv!=null)
+							{
+								FutureBarrier<Void>	fubar	= new FutureBarrier<>();
+								fubar.addFuture(fut);
+								fubar.addFuture(simserv.addAdvanceBlocker(fut));
+								fut	= fubar.waitFor();
+							}
+
+							fut.addResultListener(crl2);
 						}
 						catch(Exception e)
 						{
@@ -2986,7 +3000,18 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	public IFuture<Void> terminate()
 	{
 //		System.err.println("terminate space: "+exta.getComponentIdentifier());
-		final Future<Void>	ret	= new Future<Void>();
+		final Future<Void>	fut	= new Future<Void>();
+		IFuture<Void>	ret	= fut;
+		
+		ISimulationService	simserv	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+		if(simserv!=null)
+		{
+			FutureBarrier<Void>	fubar	= new FutureBarrier<>();
+			fubar.addFuture(ret);
+			fubar.addFuture(simserv.addAdvanceBlocker(ret));
+			ret	= fubar.waitFor();
+		}
+		
 		final IObserverCenter[]	ocs	= (IObserverCenter[])observercenters.toArray(new IObserverCenter[observercenters.size()]);
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -2998,15 +3023,16 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					{
 						ocs[i].dispose();
 					}
-					ret.setResult(null);
+					fut.setResult(null);
 				}
 				catch(Exception e)
 				{
-					ret.setException(e);
+					fut.setException(e);
 				}
 			}
 		});
 //		System.err.println("terminate space finished: "+ret.isDone());
+		
 		return ret;
 	}
 	

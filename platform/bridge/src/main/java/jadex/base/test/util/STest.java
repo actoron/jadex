@@ -66,6 +66,7 @@ public class STest {
         config.setValue("settings.readonly", true);
         
 //        config.setLogging(true);
+        config.getExtendedPlatformConfiguration().setDebugFutures(true);
                 
         return config;
     }
