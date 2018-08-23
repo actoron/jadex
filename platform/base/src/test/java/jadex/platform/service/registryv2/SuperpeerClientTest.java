@@ -40,6 +40,9 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
 		baseconf.setValue("superpeerclient.awaonly", false);
 		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// -> 750 millis.
+		// Remote only -> no simulation please
+		baseconf.getExtendedPlatformConfiguration().setSimul(false);
+		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
 		
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client_*");
