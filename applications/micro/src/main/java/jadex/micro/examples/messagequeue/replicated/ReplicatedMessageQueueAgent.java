@@ -240,7 +240,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 				}
 
 				// if no subscription was found for the given service...
-				if(!present && !result.getId().equals(id)) 
+				if(!present && !result.getIdString().equals(id)) 
 				{
 					// subscribe...
 					ISubscriptionIntermediateFuture<Event> subscription = result.subscribeForReplication(topic);
