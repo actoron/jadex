@@ -78,8 +78,8 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		RELAYCONF.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME);
 		RELAYCONF.setNetworkSecrets(serversecret.toString());
 //		RELAYCONF.setLogging(true);
-//		RELAYCONF.setValue("status", true);
-//		RELAYCONF.setValue("jettyrspublish", true);
+		RELAYCONF.setValue("status", true);
+		RELAYCONF.setValue("jettyrspublish", true);
 	}
 	
 	//-------- test cases --------

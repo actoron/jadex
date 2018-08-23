@@ -12,9 +12,10 @@ import jadex.commons.Tuple2;
  *  Lease time map with supervised write/update access.
  *  For every entry a (potentially different) leasetime is used. 
  *  
- *  Note: The map internally uses a timer to prune expired entries.
- *  It should thus be used as synchronized map besides it is used
+ *  Note: When not set to passive, the map internally uses a timer to prune expired entries.
+ *  It should thus be used as synchronized map (default for non-passive) besides it is used
  *  with a specific timer that runs on same thread as normal access.
+ *  The passive variant should only be called from same thread or externally synchronized or explicitly setting sync to true. 
  */
 public class LeaseTimeMap<K, V> implements Map<K, V>
 {
@@ -35,22 +36,22 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	 */
 	public LeaseTimeMap(long leasetime)
 	{
-		this(leasetime, null, true, true);
+		this(leasetime, null, true, true, false);
 	}
 	
 
 	/**
 	 *  Create a new lease time map.
 	 */
-	public LeaseTimeMap(long leasetime, final ICommand<Tuple2<Entry<K, V>, Long>> removecmd, boolean touchonread, boolean touchonwrite)
+	public LeaseTimeMap(long leasetime, final ICommand<Tuple2<Entry<K, V>, Long>> removecmd, boolean touchonread, boolean touchonwrite, boolean passive)
 	{
-		this(leasetime, removecmd, touchonread, touchonwrite, null, true);
+		this(leasetime, removecmd, touchonread, touchonwrite, passive, null, !passive); // Default sync=true when active due to separate timer.
 	}
 	
 	/**
 	 *  Create a new lease time map.
 	 */
-	public LeaseTimeMap(long leasetime, final ICommand<Tuple2<Entry<K,V>, Long>> removecmd, boolean touchonread, boolean touchonwrite, IDelayRunner timer, boolean sync)
+	public LeaseTimeMap(long leasetime, final ICommand<Tuple2<Entry<K,V>, Long>> removecmd, boolean touchonread, boolean touchonwrite, boolean passive, IDelayRunner timer, boolean sync)
 	{
 		this.touchonread = touchonread;
 		this.touchonwrite = touchonwrite;
@@ -67,7 +68,7 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 			}
 		};
 		
-		this.times = LeaseTimeSet.createLeaseTimeCollection(leasetime, rcmd, timer, sync, this);
+		this.times = LeaseTimeSet.createLeaseTimeCollection(leasetime, rcmd, passive, timer, sync, this);
 	}
 	
 //	/**

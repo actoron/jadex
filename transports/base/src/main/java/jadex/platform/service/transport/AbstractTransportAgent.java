@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -38,8 +40,10 @@ import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bridge.service.types.transport.PlatformData;
+import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.LeaseTimeMap;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -105,8 +109,6 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	protected Map<IComponentIdentifier, VirtualConnection>	virtuals;
 	
-	/** 
-
 	/**
 	 * The connections currently in handshake or in use (impl connection ->
 	 * connection candidate object). Used also for messageReceived().
@@ -484,7 +486,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		// Start handshake by sending id.
 		if(created)
 		{
-			System.out.println(agent +(clientcon ? " connected to " : " accepted connection ") + con + ". Starting handshake...");
+//			System.out.println(agent +(clientcon ? " connected to " : " accepted connection ") + con + ". Starting handshake...");
 			agent.getLogger().info((clientcon ? "Connected to " : "Accepted connection ") + con + ". Starting handshake...");
 			impl.sendMessage(con, new byte[0], agent.getId().getPlatformName().getBytes(SUtil.UTF8));
 		}
@@ -546,7 +548,16 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		VirtualConnection vircon = new VirtualConnection(target);
 		if(virtuals==null)
 		{
-			virtuals = new HashMap<IComponentIdentifier, VirtualConnection>();
+			// Use twice the default timeout to avoid potential oscillations due to always hitting default timeout
+			virtuals = new LeaseTimeMap<>(Starter.getScaledDefaultTimeout(agent.getId(), 2), new  ICommand<Tuple2<Entry<IComponentIdentifier, VirtualConnection>, Long>>()
+			{
+				@Override
+				public void execute(Tuple2<Entry<IComponentIdentifier, AbstractTransportAgent<Con>.VirtualConnection>, Long> arg)
+				{
+//					System.out.println(agent+" outdated connection to: "+arg.getFirstEntity().getKey()+" val: "+arg.getSecondEntity());
+					arg.getFirstEntity().getValue().cleanup();
+				}
+			}, true, true, true);
 		}
 		VirtualConnection prev = virtuals.put(target, vircon);
 		assert prev == null;
@@ -593,7 +604,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		{
 			public void customResultAvailable(List<TransportAddress> addrs) throws Exception
 			{
-				System.out.println(agent + " found " + addrs + " for pf " + target);
+//				System.out.println(agent + " found " + addrs + " for pf " + target);
 				if (addrs != null && addrs.size() > 0)
 				{
 					for (TransportAddress addr : addrs)
@@ -1057,12 +1068,12 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		protected void	createConnections()
 		{
-			System.out.println(agent+" searching addresses for " + getTarget());
+//			System.out.println(agent+" searching addresses for " + getTarget());
 			getAddresses(getTarget()).addResultListener(addresses ->
 			{
 				for(final String address : addresses)
 				{
-					System.out.println(agent+" attempting connection to " + getTarget() + " using address: " + address);
+//					System.out.println(agent+" attempting connection to " + getTarget() + " using address: " + address);
 					agent.getLogger().info("Attempting connection to " + getTarget() + " using address: " + address);
 					impl.createConnection(address, getTarget())
 						.addResultListener(con ->
@@ -1094,6 +1105,18 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 				{
 					fut.addIntermediateResult(info);
 				}
+			}
+		}
+		
+		/**
+		 *  Cleanup the connection after removal.
+		 */
+		protected void	cleanup()
+		{
+			if(con!=null)
+			{
+				assert con.getConnection()!=null;
+				impl.closeConnection(con.getConnection());
 			}
 		}
 

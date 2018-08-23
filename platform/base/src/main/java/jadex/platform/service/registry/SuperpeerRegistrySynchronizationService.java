@@ -161,7 +161,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 							// Remove services and queries of client and indirect clients
 							removeAllClientRegistrations(tup.getFirstEntity().getValue());
 						}
-					}, false, true, new AgentDelayRunner(component), false);
+					}, false, true, false, new AgentDelayRunner(component), false);
 				}
 				
 				clients.put(client.getPlatformId(), client);
