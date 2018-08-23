@@ -567,6 +567,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			FutureBarrier<Void> bar = new FutureBarrier<>();
 			for (IFuture<Void> blocker : advanceblockers)
 				bar.addFuture(blocker);
+			advanceblockers.clear();
 			bar.waitForIgnoreFailures(null).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
