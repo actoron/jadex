@@ -2,10 +2,6 @@
 
 // Click to sort: https://scotch.io/tutorials/sort-and-filter-a-table-using-angular 
 
-var cidToString	= function(cid) {
-	var	cidparts	= cid.split(/[@\.]+/);	// Split at '@' and '.', cf. https://stackoverflow.com/questions/650022/how-do-i-split-a-string-with-multiple-separators-in-javascript
-	return cidparts.length>1 ? cidparts[cidparts.length-1] +" ("+cid+")" : cid;
-};
 var app = angular.module('acservices', []);
 app.controller('Services', [ '$scope', '$http',
 	function($scope, $http) {
@@ -36,7 +32,34 @@ app.controller('Queries', [ '$scope', '$http',
  *  Beautify cid representation for readability and sorting: platform (agent@platform).
  */
 app.filter('cid', function() {
-	return cidToString;
+	return function(cid) {
+		var	cidparts	= cid.split(/[@\.]+/);	// Split at '@' and '.', cf. https://stackoverflow.com/questions/650022/how-do-i-split-a-string-with-multiple-separators-in-javascript
+		return cidparts.length>1 ? cidparts[cidparts.length-1] +" ("+cid+")" : cid;
+	}
+});
+
+/**
+ *  Beautify network names representation for readability: exclude global and skip emtpy
+ */
+app.filter('networks', function() {
+	return function(networks) {
+		var nets	= null;
+		networks.forEach(function(network)
+		{
+			if("___GLOBAL___".localeCompare(network)!=0)
+			{
+				if(nets==null)
+				{
+					nets = network;
+				}
+				else
+				{
+					nets += ", "+network
+				}
+			}
+		});
+		return nets==null ? "" : nets;
+	}
 });
 
 function	updateService($scope, event)
