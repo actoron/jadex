@@ -48,9 +48,9 @@ import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 
 /**
@@ -205,9 +205,9 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		IPlatformConfiguration conf = (IPlatformConfiguration) Starter.getPlatformValue(component.getId().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
 		if (conf.getExtendedPlatformConfiguration().getSimulation())
 		{
-			// Call A_local -> B_local -Subscription-> C_remote is still dangerous since
+			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
 			// there is no way of known how long to hold the clock.
-			if (!(ret instanceof ISubscriptionIntermediateFuture))
+			if (!(ret instanceof IIntermediateFuture))
 			{
 				ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
 				if (simserv != null)
