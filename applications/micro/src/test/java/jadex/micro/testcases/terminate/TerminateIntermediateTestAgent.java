@@ -3,8 +3,10 @@ package jadex.micro.testcases.terminate;
 
 import java.util.Collection;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.util.STest;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
@@ -30,6 +32,14 @@ import jadex.micro.annotation.Properties;
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class TerminateIntermediateTestAgent extends TerminateTestAgent
 {
+	public IPlatformConfiguration getConfig()
+	{
+		IPlatformConfiguration conf = STest.getDefaultTestConfig();
+		conf.getExtendedPlatformConfiguration().setSimul(false);
+		conf.getExtendedPlatformConfiguration().setSimulation(false);
+		return conf;
+	}
+	
 	/**
 	 *  Test terminating a future.
 	 */
