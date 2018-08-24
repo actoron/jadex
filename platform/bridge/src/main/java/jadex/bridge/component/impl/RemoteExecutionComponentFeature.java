@@ -41,6 +41,7 @@ import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SUtil;
@@ -208,28 +209,31 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			// there is no way of known how long to hold the clock.
 			if (!(ret instanceof ISubscriptionIntermediateFuture))
 			{
-				ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).getLocalService(ISimulationService.class);
-				Future<Void> blocker = new Future<>();
-				simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
+				ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
+				if (simserv != null)
 				{
-					public void resultAvailable(Void result)
+					Future<Void> blocker = new Future<>();
+					simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
 					{
-						ret.addResultListener(new IResultListener<T>()
+						public void resultAvailable(Void result)
 						{
-							public void resultAvailable(T result)
+							ret.addResultListener(new IResultListener<T>()
 							{
-								blocker.setResult(null);
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								resultAvailable(null);
-							}
-						});
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-					}
-				});
+								public void resultAvailable(T result)
+								{
+									blocker.setResult(null);
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									resultAvailable(null);
+								}
+							});
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+					});
+				}
 			}
 			
 //			Semaphore sem = new Semaphore(0);
