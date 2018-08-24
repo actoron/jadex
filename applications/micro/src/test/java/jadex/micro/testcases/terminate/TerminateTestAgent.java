@@ -58,6 +58,14 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 
 	//-------- methods --------
 	
+	public IPlatformConfiguration getConfig()
+	{
+		IPlatformConfiguration conf = STest.getDefaultTestConfig();
+		conf.getExtendedPlatformConfiguration().setSimul(false);
+		conf.getExtendedPlatformConfiguration().setSimulation(false);
+		return conf;
+	}
+	
 	/**
 	 *  The agent body.
 	 */
