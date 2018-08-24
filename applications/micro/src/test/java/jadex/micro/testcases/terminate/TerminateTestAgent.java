@@ -2,6 +2,7 @@ package jadex.micro.testcases.terminate;
 
 import java.util.Collection;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -144,43 +145,55 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 		// Start platform
 		try
 		{
-			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
+//			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
-				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-printpass", "false",
-				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
-			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
-				new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
+//			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
+//				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
+//	//			"-logging_level", "java.util.logging.Level.INFO",
+//				"-gui", "false", "-simulation", "false", "-printpass", "false",
+//				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
+//			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+//				new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
+//			{
+//				public void customResultAvailable(final IExternalAccess platform)
+//				{
+//					createProxies(platform)
+//						.addResultListener(new ExceptionDelegationResultListener<Void, Collection<TestReport>>(ret)
+//					{
+//						public void customResultAvailable(Void result)
+//						{
+//							performTest(platform.getId(), testno, delay)
+//								.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
+//							{
+//								public void customResultAvailable(final Collection<TestReport> result)
+//								{
+//									platform.killComponent();
+//			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+//			//						{
+//			//							public void customResultAvailable(Map<String, Object> v)
+//			//							{
+//			//								ret.setResult(result);
+//			//							}
+//			//						});
+//									ret.setResult(result);
+//								}
+//							});
+//						}
+//					});
+//				}
+//			}));
+			IPlatformConfiguration conf = STest.getDefaultTestConfig();
+			conf.getExtendedPlatformConfiguration().setSimul(false);
+			conf.getExtendedPlatformConfiguration().setSimulation(false);
+			IExternalAccess platform = STest.createPlatform(conf);
+			performTest(platform.getId(), testno, delay).addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
 			{
-				public void customResultAvailable(final IExternalAccess platform)
+				public void customResultAvailable(final Collection<TestReport> result)
 				{
-					createProxies(platform)
-						.addResultListener(new ExceptionDelegationResultListener<Void, Collection<TestReport>>(ret)
-					{
-						public void customResultAvailable(Void result)
-						{
-							performTest(platform.getId(), testno, delay)
-								.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
-							{
-								public void customResultAvailable(final Collection<TestReport> result)
-								{
-									platform.killComponent();
-			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-			//						{
-			//							public void customResultAvailable(Map<String, Object> v)
-			//							{
-			//								ret.setResult(result);
-			//							}
-			//						});
-									ret.setResult(result);
-								}
-							});
-						}
-					});
+					platform.killComponent();
+					ret.setResult(result);
 				}
-			}));
+			});
 		}
 		catch(Exception e)
 		{
