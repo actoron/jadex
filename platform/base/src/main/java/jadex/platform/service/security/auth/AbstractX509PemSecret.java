@@ -13,7 +13,7 @@ public abstract class AbstractX509PemSecret extends AbstractAuthenticationSecret
 	 *  
 	 *  @return Stream of the CA certificate.
 	 */
-	public abstract InputStream openTrustAnchorCert();
+//	public abstract InputStream openTrustAnchorCert();
 	
 	/**
 	 *  Opens the local certificate.

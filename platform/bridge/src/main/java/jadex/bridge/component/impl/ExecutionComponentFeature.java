@@ -619,6 +619,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				// Todo w/o proxy???
 //				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 				getComponent().getExternalAccess(getComponent().getId().getParent())
+				// raw because called from scheduleStep also on external thread.
 					.addResultListener(new DefaultResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)

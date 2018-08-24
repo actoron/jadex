@@ -17,6 +17,9 @@ import jadex.commons.future.IFuture;
 @Service(system=true)
 public interface IRemoteRegistryService
 {
+	/** Name of the remote registry component and service. */
+	public static final String REMOTE_REGISTRY_NAME = "remoteregistry";
+	
 	/**
 	 *  Search remote registry for a single service.
 	 *  

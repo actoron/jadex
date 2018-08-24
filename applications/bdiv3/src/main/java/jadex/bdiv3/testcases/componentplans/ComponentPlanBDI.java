@@ -3,6 +3,7 @@ package jadex.bdiv3.testcases.componentplans;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgentFactory;
+import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
@@ -24,7 +25,7 @@ import jadex.micro.annotation.AgentResult;
 @Plans(@Plan(trigger=@Trigger(goals=ComponentPlanBDI.AchieveSuccess.class),
 	body=@Body(ComponentPlanAgent.class)))
 //@Results(@Result(name="testresults", clazz=Testcase.class))
-public class ComponentPlanBDI
+public abstract class ComponentPlanBDI implements IBDIAgent
 {
 	//-------- attributes --------
 	

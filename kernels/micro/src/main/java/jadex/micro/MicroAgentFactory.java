@@ -25,7 +25,7 @@ import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SClassReader;
-import jadex.commons.SClassReader.AnnotationInfos;
+import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -309,10 +309,10 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 							else
 							{
 								ClassInfo ci = SClassReader.getClassInfo(ri.getInputStream());
-								Collection<AnnotationInfos> ans = ci.getAnnotations();
+								Collection<AnnotationInfo> ans = ci.getAnnotations();
 								if(ans!=null)
 								{
-									for(AnnotationInfos ai: ans)
+									for(AnnotationInfo ai: ans)
 									{
 										if(Agent.class.getName().equals(ai.getType()))
 										{

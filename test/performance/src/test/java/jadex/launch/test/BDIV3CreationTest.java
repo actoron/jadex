@@ -27,13 +27,12 @@ public class BDIV3CreationTest //extends TestCase
 	@Test
 	public void	testBDICreation()
 	{
-		long timeout	= -1;//BasicService.getLocalDefaultTimeout();
 //		ISuspendable	sus	= 	new ThreadSuspendable();
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(STest.getDefaultTestConfig(),
 			new String[]{
 //				"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
-			"-logging", "true",
+//			"-logging", "true",
 //			"-libpath", SUtil.getOutputDirsExpression("jadex-integration-performance-test", true),
 //			"-awareness", "false",	// otherwise influences performance measure
 //			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
@@ -41,7 +40,7 @@ public class BDIV3CreationTest //extends TestCase
 ////			"-conf", "jadex.standalone.Platform.component.xml",
 //			"-printpass", "false"
 			}
-			).get(timeout);
+			).get();
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
@@ -55,8 +54,8 @@ public class BDIV3CreationTest //extends TestCase
 			}
 		});
 		
-		// 2 times timeout should do on all build servers. if test fails, check if platform has become slower ;-)
-		Collection<Tuple2<String, Object>>	results	= fut.get(timeout*2);
+		// timeout should do on all build servers. if test fails, check if platform has become slower ;-)
+		Collection<Tuple2<String, Object>>	results	= fut.get();
 		
 //		// Write values to property files for hudson plot plugin.
 //		Collection<Tuple2<String, Object>>	results	= fut.get(sus, timeout);
@@ -87,7 +86,7 @@ public class BDIV3CreationTest //extends TestCase
 		
 		try
 		{
-			platform.killComponent().get(timeout);
+			platform.killComponent().get();
 		}
 		catch(Exception e)
 		{

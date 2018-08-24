@@ -4180,6 +4180,34 @@ public class SUtil
 	}
 	
 	/**
+	 *  Escapes all line breaks similar to Java string literals.
+	 *  
+	 *  @param unescapedstring Unescaped input string.
+	 *  @return Escaped string.
+	 */
+	public static String escapeLineBreaks(String unescapedstring)
+	{
+		if (unescapedstring == null)
+			return null;
+		
+		return unescapedstring.replace("\\", "\\\\").replace("\n", "\\n").replace("\r", "\\r");
+	}
+	
+	/**
+	 *  Unescapes all line breaks from strings similar to Java string literals.
+	 *  
+	 *  @param escapedstring Escaped input string.
+	 *  @return Unescaped string.
+	 */
+	public static String unescapeLineBreaks(String escapedstring)
+	{
+		if (escapedstring == null)
+			return null;
+		
+		return escapedstring.replace("\\r", "\r").replace("\\n", "\n").replace("\\\\", "\\");
+	}
+	
+	/**
 	 *  Taken from ant.
 	 *  Split a command line.
 	 * 

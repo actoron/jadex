@@ -30,6 +30,7 @@ import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -894,7 +895,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public IFuture<Void>	abort()
 	{
-//		System.out.println("aborting: "+this);
+//		System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get());
 		
 		if(!isFinishing())
 		{

@@ -231,7 +231,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		// Start service agent
 		// Hack!!! TODO: use some internal/external access for fetching service???
 		@SuppressWarnings("unchecked")
-		IClockService	clock	= (IClockService)ServiceRegistry.getRegistry(root)
+		IClockService clock	= (IClockService)ServiceRegistry.getRegistry(root)
 			.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class).setNetworkNames(null)));
 		IResourceIdentifier	rid	= new ResourceIdentifier(
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
@@ -248,6 +248,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 				{
 					public void customResultAvailable(IPullResultService service)
+
 					{
 						// Invoke service agent
 						System.out.println("Invoking");
@@ -333,7 +334,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		// Start service agent
 		// Hack!!! TODO: use some internal/external access for fetching service???
 		@SuppressWarnings("unchecked")
-		IClockService	clock	= (IClockService)ServiceRegistry.getRegistry(root)
+		IClockService clock	= (IClockService)ServiceRegistry.getRegistry(root)
 			.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class).setNetworkNames(null)));
 		IResourceIdentifier	rid	= new ResourceIdentifier(
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
@@ -350,6 +351,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 				{
 					public void customResultAvailable(IPullResultService service)
+
 					{
 						// Invoke service agent
 						System.out.println("Invoking B");

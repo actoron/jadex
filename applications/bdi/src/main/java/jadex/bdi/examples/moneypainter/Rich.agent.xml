@@ -64,7 +64,7 @@
 
 	<services>
 		<requiredservice name="paintservices" class="IPaintMoneyService" multiple="true">
-			<binding dynamic="true" scope="platform"/>
+			<binding scope="platform"/>
 		</requiredservice>
 	</services>
 

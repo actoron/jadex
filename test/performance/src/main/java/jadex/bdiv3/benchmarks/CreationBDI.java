@@ -95,23 +95,6 @@ public class CreationBDI
 	@Plan
 	protected void startPeer(RPlan rplan)
 	{
-//		if(starttime==0)
-//		{
-//			IClockService cs = getClock().get();
-//			
-//			System.gc();
-//			try
-//			{
-//				Thread.sleep(500);
-//			}
-//			catch(InterruptedException e){}
-//			
-//			startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-//			starttime = cs.getTime();
-//		}
-//		
-//		step1();
-		
 		if(starttime==0)
 		{
 			getClock().addResultListener(new DefaultResultListener<IClockService>()
@@ -126,7 +109,7 @@ public class CreationBDI
 					catch(InterruptedException e){}
 					
 					startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-					starttime = ((IClockService)result).getTime();
+					starttime = System.currentTimeMillis();
 					
 					step1();
 				}
@@ -161,7 +144,7 @@ public class CreationBDI
 			{
 				public void resultAvailable(final IClockService clock)
 				{
-					final long end = clock.getTime();
+					final long end = System.currentTimeMillis();
 					
 					System.gc();
 					try
@@ -192,7 +175,7 @@ public class CreationBDI
 								@Classname("deletePeers")
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
-//											final CreationBDI	cbdi	= (CreationBDI)((PojoBDIAgent)ia).getPojoAgent();
+//									final CreationBDI	cbdi	= (CreationBDI)((PojoBDIAgent)ia).getPojoAgent();
 									final CreationBDI cbdi = (CreationBDI)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 									cbdi.getClock().addResultListener(new IResultListener<IClockService>()
 									{
@@ -253,7 +236,7 @@ public class CreationBDI
 		{
 			public void resultAvailable(IClockService cs)
 			{
-				long killend = cs.getTime();
+				long killend = System.currentTimeMillis();
 				System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 				double killdur = ((double)killend-killstarttime)/1000.0;
 				final double killpera = killdur/(max-1);

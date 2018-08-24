@@ -26,7 +26,7 @@ import jadex.commons.ResourceInfo;
 import jadex.commons.SClassReader;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.SClassReader.AnnotationInfos;
+import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -282,10 +282,10 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 							else
 							{
 								ClassInfo ci = SClassReader.getClassInfo(ri.getInputStream());
-								Collection<AnnotationInfos> ans = ci.getAnnotations();
+								Collection<AnnotationInfo> ans = ci.getAnnotations();
 								if(ans!=null)
 								{
-									for(AnnotationInfos ai: ans)
+									for(AnnotationInfo ai: ans)
 									{
 										if(Microservice.class.getName().equals(ai.getType()))
 										{

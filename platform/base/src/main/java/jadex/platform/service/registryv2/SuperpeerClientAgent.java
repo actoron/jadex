@@ -2,6 +2,7 @@ package jadex.platform.service.registryv2;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -10,26 +11,31 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.base.Starter;
+import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.component.IRemoteExecutionFeature;
-import jadex.bridge.component.impl.IInternalRemoteExecutionFeature;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
 import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
 import jadex.commons.collection.MultiCollection;
@@ -59,9 +65,15 @@ import jadex.micro.annotation.RequiredService;
  */
 @Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(Boolean3.TRUE))
 @Service
-public class SuperpeerClientAgent	implements ISearchQueryManagerService
+public class SuperpeerClientAgent implements ISearchQueryManagerService
 {
 	//-------- constants --------
+	
+	/** Name of the global network. */
+	public static final String GLOBAL_NETWORK_NAME = "___GLOBAL___";
+	
+	/** Default root certificate for global network. */
+	public static final String DEFAULT_GLOBAL_ROOT_CERTIFICATE = "pem:-----BEGIN CERTIFICATE-----MIICszCCAhWgAwIBAgIVAP5jQirZLKNnSHf1FES8qkWMJyvKMAoGCCqGSM49BAMEMDYxHTAbBgNVBAMMFEphZGV4IEdsb2JhbCBSb290IFgxMRUwEwYDVQQKDAxBY3Rvcm9uIEdtYkgwHhcNMTgwODAxMDkxNjA5WhcNMjgwNzI5MDkxNjA5WjA2MR0wGwYDVQQDDBRKYWRleCBHbG9iYWwgUm9vdCBYMTEVMBMGA1UECgwMQWN0b3JvbiBHbWJIMIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQA6K9sA0U88s0/6nLTwZhXwzBesBr/MpNAqpZtCBe2sD+3sjppYtnug3RUbRFYNZsYPMMHBqOWyo0BR7N5DxeSJ8AB/T/zzTC9PqjDUcIazUDCf0XsSSx08a3UqBPZ5EzKRtOvf3cx/qCp/0/fND3iKWfrNhngLxYMS0d/BMlNRE3vQl6jgbwwgbkwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAoQwSQYDVR0OBEIEQLAcDiIifZpM0BihTvohWfxP5bHk3iHeA/O5vLaTp7o5Lw+2E2CcyIXfNcMRhQ5lAymDVYBwJjr0ZjgzvXOsJhIwSwYDVR0jBEQwQoBAsBwOIiJ9mkzQGKFO+iFZ/E/lseTeId4D87m8tpOnujkvD7YTYJzIhd81wxGFDmUDKYNVgHAmOvRmODO9c6wmEjAKBggqhkjOPQQDBAOBiwAwgYcCQgGYPCBbcI/ai9nAqzuU1oXIn4KFguj/95xbVm4HBb9wsNrB0K8LtdXsvB4BR2HeRCB0cWqyCKZimBbaJIoDBTcs2gJBTXfqb/KlKCwrO6KXLOtah5sgASt+QZ3uD6AXBNrBfBjC5nUBWkx/zJd+sllyYoekCGy/UAvwNIB4aFkTHnQGyS4=-----END CERTIFICATE-----";
 	
 	/** The fallback polling search rate as factor of the default remote timeout. */
 	public static final double	POLLING_RATE	= 0.33333333;	// 30*0.333.. secs  -> 10 secs.
@@ -113,12 +125,20 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 					{
 						assert agent.getFeature(IExecutionFeature.class).isComponentThread();
 						
+						Set<String> networknames = new HashSet<>(networks.keySet());
+						
+						if (!networks.containsKey(GLOBAL_NETWORK_NAME))
+						{
+							secser.setNetwork(GLOBAL_NETWORK_NAME, DEFAULT_GLOBAL_ROOT_CERTIFICATE);
+							networknames.add(GLOBAL_NETWORK_NAME);
+						}
+						
 						for(String network: networks.keySet())
 						{
 							connections.put(network, new NetworkManager(network));
 							connections.get(network).startSuperpeerSearch();	// Start after put, because uses itself for superpeer search
 						}
-							
+						
 						ret.setResult(null);
 					}
 				});
@@ -151,9 +171,9 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	 *  @param query	The search query.
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> ITerminableFuture<T> searchService(ServiceQuery<T> query)
+	public <T> ITerminableFuture<IServiceIdentifier> searchService(ServiceQuery<T> query)
 	{
-		TerminableFuture<T>	ret	= new TerminableFuture<>();
+		TerminableFuture<IServiceIdentifier>	ret	= new TerminableFuture<>();
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
@@ -188,7 +208,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 						public void resultAvailable(IServiceIdentifier result)
 						{
 							// Forward result if first
-							ret.setResultIfUndone((T)result);
+							ret.setResultIfUndone(result);
 						}
 					});
 				}
@@ -204,10 +224,10 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 		// awa fallback when no superpeers
 		if(!foundsuperpeer)
 		{
-			searchRemoteServices(query).addResultListener(new IntermediateDefaultResultListener<T>()
+			searchRemoteServices(query).addResultListener(new IntermediateDefaultResultListener<IServiceIdentifier>()
 			{
 				@Override
-				public void intermediateResultAvailable(T result)
+				public void intermediateResultAvailable(IServiceIdentifier result)
 				{
 					// Forward result if first
 					ret.setResultIfUndone(result);					
@@ -240,9 +260,9 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	 *  @param query	The search query.
 	 *  @return Each service as an intermediate result or a collection of services as final result.
 	 */
-	public <T>  ITerminableIntermediateFuture<T> searchServices(ServiceQuery<T> query)
+	public <T>  ITerminableIntermediateFuture<IServiceIdentifier> searchServices(ServiceQuery<T> query)
 	{
-		TerminableIntermediateFuture<T>	ret	= new TerminableIntermediateFuture<>();
+		TerminableIntermediateFuture<IServiceIdentifier> ret = new TerminableIntermediateFuture<>();
 		AtomicInteger	track	= new AtomicInteger(1);
 		boolean	foundsuperpeer	= false;
 		
@@ -279,7 +299,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 							{
 								for(IServiceIdentifier sid: result)
 								{
-									ret.addIntermediateResultIfUndone((T)sid);
+									ret.addIntermediateResultIfUndone(sid);
 								}
 							}
 							
@@ -331,10 +351,10 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 	/**
 	 *  Search for services on remote platforms using the polling fallback and awareness.
 	 */
-	protected <T> TerminableIntermediateFuture<T> searchRemoteServices(final ServiceQuery<T> query)
+	protected <T> TerminableIntermediateFuture<IServiceIdentifier> searchRemoteServices(final ServiceQuery<T> query)
 	{
 		// TODO: termination? currently not used
-		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+		final TerminableIntermediateFuture<IServiceIdentifier> ret = new TerminableIntermediateFuture<IServiceIdentifier>();
 		
 		// Check for awareness service
 		Collection<IPassiveAwarenessService>	pawas	= agent.getFeature(IRequiredServicesFeature.class)
@@ -357,22 +377,27 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 					if(!ret.isDone())
 					{
 						cnt.incrementAndGet();
+						
+						IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new BasicComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform), new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, RequiredService.SCOPE_NETWORK, null, true);
+						IRemoteRegistryService rrs = (IRemoteRegistryService) RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
+						final IFuture<Set<IServiceIdentifier>> remotesearch = rrs.searchServices(query);
 						// TODO: use remote registry service
-						final IFuture<Collection<T>> remotesearch =  ((IInternalRemoteExecutionFeature)agent.getFeature(IRemoteExecutionFeature.class))
-								.executeRemoteSearch(platform, query);
+//						final IFuture<Collection<T>> remotesearch =  ((IInternalRemoteExecutionFeature)agent.getFeature(IRemoteExecutionFeature.class))
+//								.executeRemoteSearch(platform, query);
 						
 //						System.out.println(agent + " searching remote platform3: "+platform+", "+query);
-						remotesearch.addResultListener(new IResultListener<Collection<T>>()
+						remotesearch.addResultListener(new IResultListener<Set<IServiceIdentifier>>()
 						{
-							public void resultAvailable(Collection<T> result)
+							public void resultAvailable(final Set<IServiceIdentifier> result)
 							{
 //								System.out.println(agent + " searched remote platform: "+platform+", "+result);
 								if(result != null)
 								{
-									for(Iterator<T> it = result.iterator(); it.hasNext(); )
+									for(Iterator<IServiceIdentifier> it = result.iterator(); it.hasNext(); )
 									{
-										T ser = it.next();
-										ret.addIntermediateResultIfUndone(ser);
+//										T ser = RemoteMethodInvocationHandler.createRemoteServiceProxy(localcomp, remotesvc)
+//										ret.addIntermediateResultIfUndone(ser);
+										ret.addIntermediateResultIfUndone(it.next());
 									}
 								}
 								doFinished();
@@ -509,6 +534,14 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 							public void intermediateResultAvailable(Void result)
 							{
 								// First command -> connected (shouldn't be any other commands).
+								
+								// Check if the superpeer is genuine.
+								ISecurityInfo secinfo = (ISecurityInfo) ServiceCall.getCurrentInvocation().getProperty(ServiceCall.SECURITY_INFOS);
+								if (secinfo == null || secinfo.getNetworks() == null || !secinfo.getNetworks().contains(networkname))
+								{
+									regfut.terminate(new SecurityException("Superpeer failed to authenticate with the network '" + networkname + "'."));
+									return;
+								}
 								
 								// First connected super peer -> remember connection and stop search
 								if(running && superpeer==null)
@@ -899,13 +932,19 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 							
 							// Start current search
 							searchRemoteServices(query)
-								.addResultListener(new IIntermediateResultListener<T>()
+								.addResultListener(new IIntermediateResultListener<IServiceIdentifier>()
 							{
+								@SuppressWarnings({ "unchecked", "rawtypes" })
 								@Override
-								public void intermediateResultAvailable(T result)
+								public void intermediateResultAvailable(IServiceIdentifier result)
 								{
 									// Forward result to user query
-									retfut.addIntermediateResultIfUndone(result);
+									Object res = result;
+									if (ServiceEvent.CLASSINFO.equals(query.getReturnType()))
+										res = new ServiceEvent(result, ServiceEvent.SERVICE_ADDED);
+									
+									SubscriptionIntermediateFuture rawfut = retfut;
+									rawfut.addIntermediateResultIfUndone(res);
 								}
 								
 								@Override
@@ -921,7 +960,7 @@ public class SuperpeerClientAgent	implements ISearchQueryManagerService
 								}
 								
 								@Override
-								public void resultAvailable(Collection<T> result)
+								public void resultAvailable(Collection<IServiceIdentifier> result)
 								{
 									// Ignore
 								}

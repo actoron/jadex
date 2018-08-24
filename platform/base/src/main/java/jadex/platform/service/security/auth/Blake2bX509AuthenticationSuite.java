@@ -7,10 +7,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.crypto.agreement.jpake.JPAKERound1Payload;
 import org.bouncycastle.crypto.agreement.jpake.JPAKERound2Payload;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
@@ -707,7 +709,10 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				byte[] sig = new byte[authtoken.getAuthData().length - 4 - salt.length];
 				System.arraycopy(authtoken.getAuthData(), 4 + salt.length, sig, 0, sig.length);
 				
-				ret = SSecurity.verifyWithPEM(msghash, sig, ((X509AuthToken) authtoken).getCertificate(), aps.openTrustAnchorCert());
+				String apscert = new String(SUtil.readStream(aps.openCertificate()), SUtil.UTF8);
+				LinkedHashSet<X509CertificateHolder> apscertchain = new LinkedHashSet<>(SSecurity.readCertificateChainFromPEM(apscert));
+				
+				ret = SSecurity.verifyWithPEM(msghash, sig, ((X509AuthToken) authtoken).getCertificate(), apscertchain);
 			}
 			else
 			{

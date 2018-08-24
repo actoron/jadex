@@ -1,6 +1,7 @@
 package jadex.platform.service.security;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 
 import jadex.bridge.service.types.security.ISecurityInfo;
@@ -21,7 +22,7 @@ public class SecurityInfo implements ISecurityInfo
 	protected String platformname;
 	
 	/** Networks containing the sender. */
-	protected String[] networks;
+	protected Set<String> networks;
 	
 	/** Roles of the sender. */
 	protected Set<String> roles;
@@ -40,7 +41,7 @@ public class SecurityInfo implements ISecurityInfo
 	 */
 	public boolean isAuthenticated()
 	{
-		return trustedplatform || adminplatform || (networks != null && networks.length > 0);
+		return trustedplatform || adminplatform || (networks != null && networks.size() > 0);
 	}
 	
 	/**
@@ -128,7 +129,7 @@ public class SecurityInfo implements ISecurityInfo
 	 *
 	 *  @return The authenticated networks of the sender (sorted).
 	 */
-	public String[] getNetworks()
+	public Set<String> getNetworks()
 	{
 		return networks;
 	}
@@ -138,9 +139,9 @@ public class SecurityInfo implements ISecurityInfo
 	 *
 	 *  @param networks The networks.
 	 */
-	public void setNetworks(String[] networks)
+	public void setNetworks(Set<String> networks)
 	{
-		this.networks = networks;
+		this.networks = Collections.unmodifiableSet(networks);
 	}
 	
 	/**
@@ -160,7 +161,7 @@ public class SecurityInfo implements ISecurityInfo
 	 */
 	public void setRoles(Set<String> roles)
 	{
-		this.roles = roles;
+		this.roles = Collections.unmodifiableSet(roles);
 	}
 
 	/**
@@ -168,6 +169,6 @@ public class SecurityInfo implements ISecurityInfo
 	 */
 	public String toString()
 	{
-		return "Authenticated: " + isAuthenticated() + ", Trusted: " + trustedplatform + ", Admin: " + adminplatform + ", Networks: " + Arrays.toString(networks); 
+		return "Authenticated: " + isAuthenticated() + ", Trusted: " + trustedplatform + ", Admin: " + adminplatform + ", Networks: " + Arrays.toString(networks.toArray()); 
 	}
 }

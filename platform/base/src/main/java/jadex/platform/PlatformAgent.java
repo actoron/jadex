@@ -25,7 +25,7 @@ import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IFilter;
 import jadex.commons.SClassReader;
-import jadex.commons.SClassReader.AnnotationInfos;
+import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SClassReader.EnumInfo;
 import jadex.commons.SReflect;
@@ -110,10 +110,10 @@ public class PlatformAgent
 			public boolean filter(ClassInfo ci)
 			{
 				boolean ret = false;
-				AnnotationInfos ai = ci.getAnnotation(Agent.class.getName());
+				AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
 				if(ai!=null)
 				{
-					AnnotationInfos aai = (AnnotationInfos)ai.getValue("autostart");
+					AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
 					if(aai!=null)
 					{
 						EnumInfo ei = (EnumInfo)aai.getValue("value");
@@ -158,13 +158,13 @@ public class PlatformAgent
 //			Autostart autostart = aan.autostart();
 //			if(autostart.value().toBoolean()!=null)
 //			{		
-				AnnotationInfos ai = ci.getAnnotation(Agent.class.getName());
-				AnnotationInfos autostart = (AnnotationInfos)ai.getValue("autostart");
+				AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
+				AnnotationInfo autostart = (AnnotationInfo)ai.getValue("autostart");
 				
 				String name = autostart.getValue("name")==null || ((String)autostart.getValue("name")).length()==0? null: (String)autostart.getValue("name");
 //				String name = autostart.name().length()==0? null: autostart.name();
 				
-				AnnotationInfos aai = (AnnotationInfos)ai.getValue("autostart");
+				AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
 				
 				EnumInfo ei = (EnumInfo)aai.getValue("value");
 				String val = ei.getValue();
@@ -179,7 +179,7 @@ public class PlatformAgent
 				{
 					// check classname as parameter
 //					name = SReflect.getInnerClassName(cl);
-					name = SReflect.getUnqualifiedTypeName(ci.getClassname());
+					name = SReflect.getUnqualifiedTypeName(ci.getClassName());
 					
 					if(getAgentStart(name.toLowerCase())!=null)
 					{	
@@ -203,7 +203,7 @@ public class PlatformAgent
 				
 				if(ok)
 				{
-					String cname = ci.getClassname();
+					String cname = ci.getClassName();
 					dr.addNode(cname);
 					Object[] pres = (Object[])autostart.getValue("predecessors");
 					if(pres!=null)

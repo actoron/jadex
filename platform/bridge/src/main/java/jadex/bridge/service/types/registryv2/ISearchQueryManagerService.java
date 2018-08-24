@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.registryv2;
 
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -18,14 +19,14 @@ public interface ISearchQueryManagerService
 	 *  @param query	The search query.
 	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
 	 */
-	public <T> ITerminableFuture<T> searchService(ServiceQuery<T> query);
+	public <T> ITerminableFuture<IServiceIdentifier> searchService(ServiceQuery<T> query);
 	
 	/**
 	 *  Search for all matching services.
 	 *  @param query	The search query.
 	 *  @return Each service as an intermediate result or a collection of services as final result.
 	 */
-	public <T>  ITerminableIntermediateFuture<T> searchServices(ServiceQuery<T> query);
+	public <T> ITerminableIntermediateFuture<IServiceIdentifier> searchServices(ServiceQuery<T> query);
 	
 	/**
 	 *  Add a service query.

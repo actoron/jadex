@@ -10,13 +10,13 @@ import jadex.commons.SUtil;
  *  Secret based on PEM-encoded X.509 certificate files and key.
  *
  */
-public class X509PemSecret extends AbstractX509PemSecret
+public class X509PemFilesSecret extends AbstractX509PemSecret
 {
 	/** Prefix used to encode secret type as strings. */
 	public static final String PREFIX = "pemfiles";
 	
 	/** The trust anchor file/ca cert. */
-	protected String cacert;
+//	protected String cacert;
 	
 	/** The local certificate. */
 	protected String cert;
@@ -24,18 +24,22 @@ public class X509PemSecret extends AbstractX509PemSecret
 	/** The local certificate key. */
 	protected String key;
 	
-	public X509PemSecret(String encodedstring)
+	public X509PemFilesSecret(String encodedstring)
 	{
 		String basestring = encodedstring.substring(PREFIX.length() + 1);
 		String[] toks = basestring.split(":");
-		if (toks.length != 1 && toks.length != 3)
+//		if (toks.length != 1 && toks.length != 3)
+//			throw new IllegalArgumentException("Could not decode pem file string: " +encodedstring);
+		if (toks.length != 1 && toks.length != 2)
 			throw new IllegalArgumentException("Could not decode pem file string: " +encodedstring);
 		
-		cacert = toks[0];
+//		cacert = toks[0];
+		cert = toks[0];
 		if (toks.length > 1)
 		{
-			cert = toks[1];
-			key = toks[2];
+//			cert = toks[1];
+//			key = toks[2];
+			key = toks[1];
 		}
 	}
 	
@@ -46,9 +50,9 @@ public class X509PemSecret extends AbstractX509PemSecret
 	 *  @param cert Path to the local certificate.
 	 *  @param key Path to the local certificate key.
 	 */
-	public X509PemSecret(String cacert, String cert, String key)
+	public X509PemFilesSecret(String cert, String key)
 	{
-		this.cacert = cacert;
+//		this.cacert = cacert;
 		this.cert = cert;
 		this.key = key;
 	}
@@ -67,17 +71,17 @@ public class X509PemSecret extends AbstractX509PemSecret
 	 *  
 	 *  @return Stream of the CA certificate.
 	 */
-	public InputStream openTrustAnchorCert()
-	{
-		try
-		{
-			return new FileInputStream(cacert);
-		}
-		catch (FileNotFoundException e)
-		{
-			throw SUtil.convertToRuntimeException(e);
-		}
-	}
+//	public InputStream openTrustAnchorCert()
+//	{
+//		try
+//		{
+//			return new FileInputStream(cacert);
+//		}
+//		catch (FileNotFoundException e)
+//		{
+//			throw SUtil.convertToRuntimeException(e);
+//		}
+//	}
 	
 	/**
 	 *  Opens the local certificate.
@@ -120,7 +124,7 @@ public class X509PemSecret extends AbstractX509PemSecret
 	{
 		int ret = cert != null ? cert.hashCode() : 0;
 		ret = 31 * ret + key != null ? key.hashCode() : 0;
-		ret = 31 * ret + cacert != null ? cacert.hashCode() : 0;
+//		ret = 31 * ret + cacert != null ? cacert.hashCode() : 0;
 		return ret;
 	}
 	
@@ -132,8 +136,8 @@ public class X509PemSecret extends AbstractX509PemSecret
 		if (obj instanceof X509PemStringsSecret)
 		{
 			X509PemStringsSecret other = (X509PemStringsSecret) obj;
-			return SUtil.equals(cacert, other.cacert) &&
-				   SUtil.equals(cert, other.cert) &&
+//			return SUtil.equals(cacert, other.cacert) &&
+			return SUtil.equals(cert, other.cert) &&
 				   SUtil.equals(key, other.key);
 		}
 		return false;
@@ -144,10 +148,11 @@ public class X509PemSecret extends AbstractX509PemSecret
 	 */
 	public String toString()
 	{
-		String ret = PREFIX + ":" + cacert;
+//		String ret = PREFIX + ":" + cacert;
+		String ret = PREFIX + ":" + cert;
 		if (canSign())
 		{
-			ret += ":" + cert;
+//			ret += ":" + cert;
 			ret += ":" + key;
 		}
 		return ret;

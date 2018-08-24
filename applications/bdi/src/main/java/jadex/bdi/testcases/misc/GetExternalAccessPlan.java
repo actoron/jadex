@@ -67,6 +67,7 @@ public class GetExternalAccessPlan extends Plan
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("Got exceptions: "+exception);
 				// Expected on first call.
 			}
 		};

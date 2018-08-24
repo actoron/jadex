@@ -41,7 +41,7 @@ import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.SClassReader;
-import jadex.commons.SClassReader.AnnotationInfos;
+import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -363,7 +363,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{
 				for(String type: types)
 				{
-					ret.add(type, new Tuple2<String, Set<String>>(ci.getClassname(), SUtil.arrayToSet(types)));
+					ret.add(type, new Tuple2<String, Set<String>>(ci.getClassName(), SUtil.arrayToSet(types)));
 				}
 			}
 		}
@@ -503,7 +503,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					{
 						for(String type: types)
 						{
-							known_kernels_cache.add(type, new Tuple2<String, Set<String>>(ci.getClassname(), SUtil.arrayToSet(types)));
+							known_kernels_cache.add(type, new Tuple2<String, Set<String>>(ci.getClassName(), SUtil.arrayToSet(types)));
 						}
 					}
 				}
@@ -522,7 +522,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected String[] getKernelTypes(ClassInfo ci)
 	{
-		AnnotationInfos ai = ci.getAnnotation("jadex.micro.annotation.Properties");
+		AnnotationInfo ai = ci.getAnnotation("jadex.micro.annotation.Properties");
 		if(ai!=null)
 		{
 			Object[] vals = (Object[])ai.getValue("value");
@@ -530,7 +530,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{
 				for(Object val: vals)
 				{
-					AnnotationInfos a = (AnnotationInfos)val;
+					AnnotationInfo a = (AnnotationInfo)val;
 					String name = (String)a.getValue("name");
 					if("kernel.types".equals(name))
 					{
