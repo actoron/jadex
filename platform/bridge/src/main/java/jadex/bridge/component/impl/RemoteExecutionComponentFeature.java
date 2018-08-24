@@ -9,11 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -44,16 +41,15 @@ import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
-import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 
 /**
@@ -208,28 +204,33 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		IPlatformConfiguration conf = (IPlatformConfiguration) Starter.getPlatformValue(component.getId().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
 		if (conf.getExtendedPlatformConfiguration().getSimulation())
 		{
-			ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).getLocalService(ISimulationService.class);
-			Future<Void> blocker = new Future<>();
-			simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
+			// Call A_local -> B_local -Subscription-> C_remote is still dangerous since
+			// there is no way of known how long to hold the clock.
+			if (!(ret instanceof ISubscriptionIntermediateFuture))
 			{
-				public void resultAvailable(Void result)
+				ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).getLocalService(ISimulationService.class);
+				Future<Void> blocker = new Future<>();
+				simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
 				{
-					ret.addResultListener(new IResultListener<T>()
+					public void resultAvailable(Void result)
 					{
-						public void resultAvailable(T result)
+						ret.addResultListener(new IResultListener<T>()
 						{
-							blocker.setResult(null);
-						}
-						public void exceptionOccurred(Exception exception)
-						{
-							resultAvailable(null);
-						}
-					});
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			});
+							public void resultAvailable(T result)
+							{
+								blocker.setResult(null);
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+								resultAvailable(null);
+							}
+						});
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				});
+			}
 			
 //			Semaphore sem = new Semaphore(0);
 //			IExecutionService execserv = component.getFeature(IRequiredServicesFeature.class).getLocalService(IExecutionService.class);
