@@ -52,6 +52,10 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		baseconf.setValue("platformurls", "tcp://ssp@localhost:"+relayport);
 		baseconf.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
 		baseconf.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass);
+		// Remote only -> no simulation please
+		baseconf.getExtendedPlatformConfiguration().setSimul(false);
+		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
+
 			
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client_*");
