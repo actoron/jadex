@@ -93,7 +93,7 @@ public class PlatformAgent
 	@AgentCreated
 	public IFuture<Void> init()
 	{
-		System.out.println("Start scanning...");
+//		System.out.println("Start scanning...");
 		long start = System.currentTimeMillis();
 		
 		// Class name -> instance name

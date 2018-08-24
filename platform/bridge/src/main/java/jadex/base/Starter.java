@@ -836,6 +836,8 @@ public class Starter
 			
 			CreationInfo ci = new CreationInfo(config, oargs);
 			ci.setName(name);
+			ci.setFilename(comp);
+			
 			instance.createComponent(null, ci, null)
 				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{

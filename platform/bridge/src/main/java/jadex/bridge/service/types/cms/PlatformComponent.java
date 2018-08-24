@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import jadex.base.Starter;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -1187,7 +1188,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		
 		IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, resultlistener, this);
 		
-		fut.addResultListener(new IResultListener<IComponentIdentifier>()
+		fut.addResultListener(new ComponentResultListener<>(new IResultListener<IComponentIdentifier>()
 		{
 			@Override
 			public void exceptionOccurred(Exception exception)
@@ -1202,7 +1203,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 //				System.out.println("created: "+result);
 				SComponentManagementService.getExternalAccess(result, PlatformComponent.this).addResultListener(new DelegationResultListener<>(ret));
 			}
-		});
+		}, getExternalAccess()));
 		
 		return ret;
 	}
@@ -1252,8 +1253,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 		if(info==null)
 			info = new CreationInfo();
-		if(info.getParent()==null)
-			info.setParent(getId());
+//		if(info.getParent()==null)
+//			info.setParent(getId());
 		
 		String modelname = null;
 		

@@ -56,7 +56,6 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 		TestReport tr1 = new TestReport("#1", "Test if local service proxy can be created");
 		try 
 		{
-			ILibraryService cms = getServiceProxy(agent, agent.getId().getRoot(), ILibraryService.class);
 //			IComponentDescription[] descs = cms.getComponentDescriptions().get();
 			IComponentDescription[] descs = SComponentManagementService.getComponentDescriptions(agent).get();
 			

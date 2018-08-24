@@ -105,8 +105,8 @@ public class ServiceCallTestAgent extends TestAgent
 		final String tag = an.indexOf("raw")!=-1? "raw": an.indexOf("direct")!=-1? "direct": an.indexOf("decoupled")!=-1? "decoupled": null;	
 //		System.out.println("Tag is: "+tag+" "+agentname);	
 		
-		platform.createComponent(null, ci.setName(agentname), null)
-			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+		platform.createComponent(null, ci.setFilename(agentname), null)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
@@ -145,7 +145,7 @@ public class ServiceCallTestAgent extends TestAgent
 					}
 				});
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -153,6 +153,7 @@ public class ServiceCallTestAgent extends TestAgent
 	/**
 	 *  Perform a number of calls on one required service.
 	 */
+	int cnt = 0;
 	protected IFuture<Void>	performSingleTest(final String tag, final String servicename, final int factor)
 	{
 		final Future<Void> ret	= new Future<Void>();
@@ -166,7 +167,10 @@ public class ServiceCallTestAgent extends TestAgent
 //					new TagFilter<IServiceCallService>(agent.getExternalAccess(), tag));
 //			}
 //		}, 7, 1500);
+//		if(cnt==9)
+//			System.out.println("before "+cnt);
 		IFuture<IServiceCallService> fut = agent.getFeature(IRequiredServicesFeature.class).getService(servicename);
+//		System.out.println("after"+cnt++);
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Void>(ret)
 		{

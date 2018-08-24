@@ -42,7 +42,7 @@ public class TestInjectedResultsAgent extends JunitAgentTest
 		final TestReport tr	= new TestReport("#1", "Test if injected results work.");
 		
 		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent
-			.createComponent(null, new CreationInfo(agent.getId()));
+			.createComponent(null, new CreationInfo(agent.getId()).setFilename(InjectedResultsAgent.class.getName()+".class"));
 		fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
 			public void firstResultAvailable(IComponentIdentifier result)

@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.jcajce.provider.digest.Blake2b;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 
 import jadex.base.Starter;
@@ -616,6 +617,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Tuple2<ISecurityInfo,byte[]>> decryptAndAuth(final IComponentIdentifier sender, final byte[] content)
 	{
+//		System.out.println("received: "+sender+" at "+agent.getId());
+		
 		checkCleanup();
 		
 		if (content == null || content.length == 0)
@@ -707,8 +710,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						else
 						{
 							cleartext = requestReencryption(splat, content);
-							if (cleartext == null)
-								ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString()));
+							if(cleartext == null)
+								ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString() + "  " + content));
 							else
 								cs = currentcryptosuites.get(splat);
 						}
@@ -1672,6 +1675,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	protected byte[] requestReencryption(String platformname, byte[] content)
 	{
+		System.out.println("reencryption: "+platformname+" "+Arrays.hashCode(content));
+		
 		ReencryptionRequest req = new ReencryptionRequest();
 		req.setContent(content);
 		

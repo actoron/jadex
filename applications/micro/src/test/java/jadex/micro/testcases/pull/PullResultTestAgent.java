@@ -243,7 +243,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-				System.out.println("cid is: "+exta);
+//				System.out.println("cid is: "+exta);
 				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPullResultService.class).setProvider(exta.getId()))
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 				{
@@ -345,7 +345,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-				System.out.println("cid is: "+exta);
+//				System.out.println("cid is: "+exta);
 				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPullResultService.class).setProvider(exta.getId()))
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 				{

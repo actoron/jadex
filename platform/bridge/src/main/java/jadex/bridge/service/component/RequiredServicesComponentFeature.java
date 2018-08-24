@@ -769,9 +769,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 		ret.setMultiplicity(info.isMultiple() ? Multiplicity.ZERO_MANY : Multiplicity.ONE);
 		
 		if(info.getTags()!=null)
-		{
 			ret.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), getComponent().getExternalAccess());
-		}
 		
 		return ret;
 	}
@@ -794,9 +792,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	{
 		RequiredServiceInfo	info	= requiredserviceinfos==null ? null : requiredserviceinfos.get(name);
 		if(info==null)
-		{
 			throw new IllegalArgumentException("No such required service: "+name);
-		}
 		return info;
 	}
 	
@@ -808,9 +804,7 @@ public class RequiredServicesComponentFeature	extends AbstractComponentFeature i
 	{
 		RequiredServiceInfo	info	= requiredserviceinfos==null ? null : requiredserviceinfos.get(SReflect.getClassName(type));
 		if(info==ISS_MEHR_WURST)
-		{
 			throw new IllegalArgumentException("Multiple required service declarations found for type: "+type);
-		}
 		return info;
 	}
 	

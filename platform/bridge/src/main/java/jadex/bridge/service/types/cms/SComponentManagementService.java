@@ -27,6 +27,7 @@ import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.StepAbortedException;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -86,6 +87,7 @@ import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.Tuple2Future;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -287,6 +289,7 @@ public class SComponentManagementService
 //		Thread.dumpStack();
 		Future<Map<String, Object>>	ret;
 		//getCleanupCommands(cid).remove(cid);
+//		System.out.println("exit destoy remove cleanup future: "+cid);
 		ret	= (Future<Map<String, Object>>)getCleanupFutures(cid).remove(cid);
 
 		if(desc instanceof CMSComponentDescription)
@@ -295,7 +298,8 @@ public class SComponentManagementService
 		}
 		if(ret!=null)
 		{
-			if(ex!=null)
+			// StepAbortedException is normal for steps during kill
+			if(ex!=null && !(ex instanceof StepAbortedException))
 			{
 				ret.setExceptionIfUndone(ex);
 			}
@@ -1141,7 +1145,7 @@ public class SComponentManagementService
 	 */
 	public static IComponentIdentifier getParentIdentifier(CreationInfo ci, IInternalAccess agent)
 	{
-		IComponentIdentifier ret = ci!=null && ci.getParent()!=null ? ci.getParent() : agent.getId(); 
+		IComponentIdentifier ret = ci!=null && ci.getParent()!=null ? ci.getParent() : agent.getId().getRoot(); 
 //		System.out.println("parent id: "+ret);
 		return ret;
 	}
@@ -1207,8 +1211,6 @@ public class SComponentManagementService
 	// todo: return IExternalAccess directly and defer calls when in init
 	public static IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid, boolean internal, IInternalAccess agent)
 	{
-//		System.out.println("getExta: "+cid);
-		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		if(cid==null)
@@ -1219,6 +1221,7 @@ public class SComponentManagementService
 		
 		if(isRemoteComponent(cid, agent))
 		{
+//			System.out.println("getExta remote: "+cid);
 			try
 			{
 				Class<?>[] interfaces = new Class[]{IExternalAccess.class};
@@ -1286,6 +1289,9 @@ public class SComponentManagementService
 		}
 		else
 		{
+			if(cid.toString().indexOf("VisibilityTestAgent")!=-1)
+				System.out.println("getExta local: "+cid);
+			
 			setReadLock(agent.getId());
 			
 //			System.out.println("getExternalAccess: local");
@@ -1312,6 +1318,7 @@ public class SComponentManagementService
 //						System.out.println("getExternalAccess: delayed");
 						delayed = true;
 						IFuture<Void> fut = ii.getInitFuture();
+						
 						fut.addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 						{
 							public void customResultAvailable(Void result)
@@ -1575,6 +1582,8 @@ public class SComponentManagementService
 								else if(getInitInfo(cid)!=null)
 								{
 									removeInitInfo(cid);
+									
+									System.out.println("init resume remove cleanup future: "+cid);
 									SComponentManagementService.getCleanupFutures(agent.getId()).remove(cid);
 									
 									releaseWriteLock(agent.getId());
@@ -1747,7 +1756,8 @@ public class SComponentManagementService
 	 */
 	protected static void destroyComponent(final IComponentIdentifier cid,	final Future<Map<String, Object>> ret, IInternalAccess agent)
 	{
-//		System.out.println("kill: "+cid);
+//		if(cid.toString().indexOf("Vis")!=-1)
+//			System.out.println("kill: "+cid);
 		
 		if(isRemoteComponent(cid, agent))
 		{
@@ -1760,19 +1770,19 @@ public class SComponentManagementService
 //				}
 //			});
 			
-			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<Void>()
+			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<Map<String, Object>>()
 			{
+				@Classname("destroyComponent")
 				@Override
-				public IFuture<Void> execute(IInternalAccess ia)
+				public IFuture<Map<String, Object>> execute(IInternalAccess ia)
 				{
-					SComponentManagementService.destroyComponent(cid, ret, agent);
-					return IFuture.DONE;
+					return SComponentManagementService.destroyComponent(cid, ia);
 				}
-			});
+			}).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 		}
 		else
 		{
-			InitInfo infos	= getInitInfo(cid);
+			InitInfo infos = getInitInfo(cid);
 			IPlatformComponentAccess comp = infos!=null ? infos.getComponent() : SComponentManagementService.getComponents(agent.getId()).get(cid);
 			
 			// Terminate component that is shut down during init.
@@ -1781,13 +1791,13 @@ public class SComponentManagementService
 			if(infos!=null && !infos.getInitFuture().isDone())
 			{
 				// Propagate failed component init.
-//				if(comp!=null && comp.getException()!=null)
-//				{
-//					infos.getInitFuture().setException(adapter.getException());
-//				}
+				if(comp!=null && comp.getInternalAccess().getException()!=null)
+				{
+					infos.getInitFuture().setException(comp.getInternalAccess().getException());
+				}
 				
 				// Component terminated from outside: wait for init to complete, will be removed as cleanup future is registered (cfs).
-//				else
+				else
 				{
 //					if(cid.toString().indexOf("Mandelbrot")!=-1)
 //						System.out.println("Queued component termination during init: "+cid.getName());
@@ -1883,6 +1893,9 @@ public class SComponentManagementService
 		
 //		ServiceCall sc = ServiceCall.getCurrentInvocation();
 //		System.out.println("kill compo: "+cid);//+" "+(sc!=null? sc.getCaller(): "null"));
+		
+//		if(cid.toString().indexOf("StreamPro")!=-1)
+//			System.out.println("kill: "+cid);
 		
 		setWriteLock(agent.getId());
 		
@@ -2031,7 +2044,7 @@ public class SComponentManagementService
 				cinfo.setFilename(modelname);
 				platform.createComponentWithResults(null, cinfo).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 				{
-					Collection<Tuple2<String, Object>>	results;
+					Collection<Tuple2<String, Object>> results;
 					
 					@Override
 					public void intermediateResultAvailable(CMSStatusEvent result)
@@ -2332,7 +2345,21 @@ public class SComponentManagementService
 					}
 					else
 					{
-						resultlistener.exceptionOccurred(new NullPointerException("No cleanup future!?"));
+						// Although order of kill is
+						// a) component.sutdown(), argumentsfeature notifies listener via setFinished(), listener copies values but needs future
+						// b) cleanup in cms (remove cleanup future)
+						// order is nondeterministic
+						
+						// todo: use values from future
+						Collection<Tuple2<String, Object>>	results	= new ArrayList<Tuple2<String,Object>>();
+						Map<String, Object> result = af.getResults();
+						for(Map.Entry<String, Object> entry: result.entrySet())
+						{
+							results.add(new Tuple2<String, Object>(entry.getKey(), entry.getValue()));
+						}
+						resultlistener.resultAvailable(results);
+//						System.out.println("No cleanup future for: "+cid);
+//						resultlistener.exceptionOccurred(new NullPointerException("No cleanup future!? "+cid));
 					}
 				}
 				
@@ -2350,10 +2377,9 @@ public class SComponentManagementService
 					Thread.dumpStack();
 				}
 			}; 
+
 			if(af!=null)
-			{
 				af.subscribeToResults().addResultListener(rl);
-			}
 		}
 	}
 	
@@ -2388,8 +2414,8 @@ public class SComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + oname + " : Modelname must not be null."));
 
-//		if(modelname.indexOf("Micro")!=-1)
-//			System.out.println("create: "+oname+" "+modelname+" "+agent.getId());
+		if(modelname.indexOf("Vis")!=-1)
+			System.out.println("create: "+oname+" "+modelname+" on "+agent.getId());
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
@@ -2927,7 +2953,7 @@ public class SComponentManagementService
 
 		SComponentManagementService.notifyListenersRemoved(desc, results);
 		
-		if(ex!=null)
+		if(ex!=null && !(ex instanceof StepAbortedException))
 		{
 			// Unhandled component exception
 			if(af!=null && ((IInternalArgumentsResultsFeature)af).exceptionNotified())
@@ -2985,7 +3011,8 @@ public class SComponentManagementService
 		if(ret==null)
 		{
 			InitInfo ii = getInitInfo(cid);
-			ret	= ii.getComponent();
+			if(ii!=null)
+				ret	= ii.getComponent();
 		}
 		
 		releaseReadLock(cid);
@@ -2999,7 +3026,7 @@ public class SComponentManagementService
 	 */
 	protected static void setReadLock(IComponentIdentifier cid)
 	{
-//		((RwMapWrapper)SComponentManagementService.getComponents(cid)).readLock().lock();
+		((RwMapWrapper)SComponentManagementService.getComponents(cid)).readLock().lock();
 //		System.out.println("setReadLock");
 	}
 	
@@ -3009,7 +3036,7 @@ public class SComponentManagementService
 	 */
 	protected static void releaseReadLock(IComponentIdentifier cid)
 	{
-//		((RwMapWrapper)SComponentManagementService.getComponents(cid)).readLock().unlock();
+		((RwMapWrapper)SComponentManagementService.getComponents(cid)).readLock().unlock();
 //		System.out.println("releaseReadLock");
 	}
 	
@@ -3019,7 +3046,7 @@ public class SComponentManagementService
 	 */
 	protected static void setWriteLock(IComponentIdentifier cid)
 	{
-//		((RwMapWrapper)SComponentManagementService.getComponents(cid)).writeLock().lock();
+		((RwMapWrapper)SComponentManagementService.getComponents(cid)).writeLock().lock();
 //		System.out.println("setWriteLock");
 	}
 	
@@ -3029,8 +3056,26 @@ public class SComponentManagementService
 	 */
 	protected static void releaseWriteLock(IComponentIdentifier cid)
 	{
-//		((RwMapWrapper)SComponentManagementService.getComponents(cid)).writeLock().unlock();
+		((RwMapWrapper)SComponentManagementService.getComponents(cid)).writeLock().unlock();
 //		System.out.println("releaseWriteLock");
 	}
 	
+	/**
+	 *  Schedule a step without getting external access.
+	 *  @param cid The component id.
+	 *  @param step The step.
+	 *  @return result of the step or runtime exception when component not found.
+	 */
+	public static <T> IFuture<T> scheduleStep(IComponentIdentifier cid, IComponentStep<T> step)
+	{
+		IPlatformComponentAccess comp = getComponent(cid);
+		if(comp!=null)
+		{
+			return comp.getInternalAccess().scheduleStep(step);
+		}
+		else
+		{
+			return new Future<T>(new RuntimeException("Component not found to scheldule: "+cid));
+		}
+	}
 }

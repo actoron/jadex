@@ -103,6 +103,7 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 				{
 					public void customResultAvailable(Map<String, Object> results)
 					{
+						System.out.println("setting results: "+results);
 						if(results!=null && SUtil.equals(results.get("res"), expected))
 						{
 							fut.setResult(null);

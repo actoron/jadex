@@ -200,8 +200,8 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-//				IResourceIdentifier	rid	= new ResourceIdentifier(
-//					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//		IResourceIdentifier	rid	= new ResourceIdentifier(
+//			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		boolean	local = root.equals(agent.getId().getRoot());
 		CreationInfo ci	= new CreationInfo(local? agent.getId(): root, agent.getModel().getResourceIdentifier());
 		ci.setArguments(args);

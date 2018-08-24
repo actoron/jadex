@@ -304,7 +304,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		MultiCollection<String, Tuple2<String, Set<String>>> ret = new MultiCollection<>();
 		
-		System.out.println("MultiFactory scanning...");
+//		System.out.println("MultiFactory scanning...");
 		
 //		List<URL> urls = new ArrayList<URL>();
 //		ClassLoader basecl = MultiFactory.class.getClassLoader();
@@ -399,7 +399,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				{
 					public void resultAvailable(Collection<Tuple2<String, Object>> result)
 					{
-						System.out.println("Killed kernel: " + f);
+//						System.out.println("Killed kernel: " + f);
 						kernels.remove(f.getFirstEntity());
 					}
 					
@@ -412,7 +412,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				{
 					public void resultAvailable(IExternalAccess exta)
 					{
-						System.out.println("Started factory: "+exta);
+//						System.out.println("Started factory: "+exta);
 						kernels.put(f.getFirstEntity(), exta.getId());
 						
 						ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
