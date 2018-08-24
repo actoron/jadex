@@ -2,8 +2,10 @@ package jadex.micro.testcases.stream;
 
 import java.util.Map;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
@@ -31,6 +33,14 @@ import jadex.micro.testcases.TestAgent;
 @RequiredServices(@RequiredService(name="ss", type=IStreamService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL))
 public class StreamUserAgent extends TestAgent
 {
+	public IPlatformConfiguration getConfig()
+	{
+		IPlatformConfiguration ret = STest.getDefaultTestConfig();
+		ret.getExtendedPlatformConfiguration().setSimul(false);
+		ret.getExtendedPlatformConfiguration().setSimulation(false);
+		return ret;
+	}
+	
 	/**
 	 *  The test count.
 	 */
@@ -89,38 +99,19 @@ public class StreamUserAgent extends TestAgent
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
-		setupRemotePlatform(/*sec ? new String[]{"-ssltcptransport", "true"} : null*/false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
-			new ExceptionDelegationResultListener<IExternalAccess, Integer>(ret)
-		{
-			public void customResultAvailable(final IExternalAccess platform)
-			{
-//				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Integer>(ret)
-//				{
-//					public void customResultAvailable(ITransportComponentIdentifier result) 
-//					{
-//						if(!sec)
-//						{
-							performTests(testno, platform.getId(), tc)
-								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
-							{
-								public void customResultAvailable(final Integer result)
-								{
-									platform.killComponent();
-			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-			//						{
-			//							public void customResultAvailable(Map<String, Object> v)
-			//							{
-			//								ret.setResult(result);
-			//							}
-			//						});
-									ret.setResult(result);
-								}
-							}));
-//						}
-//						else
-//						{
-//							performSecureTests(testno, platform.getComponentIdentifier(), tc)
-//								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
+//		setupRemotePlatform(/*sec ? new String[]{"-ssltcptransport", "true"} : null*/false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+//			new ExceptionDelegationResultListener<IExternalAccess, Integer>(ret)
+//		{
+//			public void customResultAvailable(final IExternalAccess platform)
+//			{
+////				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Integer>(ret)
+////				{
+////					public void customResultAvailable(ITransportComponentIdentifier result) 
+////					{
+////						if(!sec)
+////						{
+//							performTests(testno, platform.getId(), tc)
+//								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
 //							{
 //								public void customResultAvailable(final Integer result)
 //								{
@@ -135,9 +126,46 @@ public class StreamUserAgent extends TestAgent
 //									ret.setResult(result);
 //								}
 //							}));
-//						}
-//					}
-//				});
+////						}
+////						else
+////						{
+////							performSecureTests(testno, platform.getComponentIdentifier(), tc)
+////								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
+////							{
+////								public void customResultAvailable(final Integer result)
+////								{
+////									platform.killComponent();
+////			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+////			//						{
+////			//							public void customResultAvailable(Map<String, Object> v)
+////			//							{
+////			//								ret.setResult(result);
+////			//							}
+////			//						});
+////									ret.setResult(result);
+////								}
+////							}));
+////						}
+////					}
+////				});
+//			}
+//		}));
+		
+		IExternalAccess platform = STest.createPlatform(getConfig());
+		performTests(testno, platform.getId(), tc)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
+		{
+			public void customResultAvailable(final Integer result)
+			{
+				platform.killComponent();
+		//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+		//						{
+		//							public void customResultAvailable(Map<String, Object> v)
+		//							{
+		//								ret.setResult(result);
+		//							}
+		//						});
+				ret.setResult(result);
 			}
 		}));
 		
