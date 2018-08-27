@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -44,7 +45,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -1243,9 +1243,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(valid && stateok) 
 				{
 					step.getTransfer().afterSwitch();
-//					if(getComponent().getComponentIdentifier().getName().indexOf("Execute")!=-1)
-//						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getComponentDescription().getState());
+					
+					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
+						System.out.println("executing: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
+					
 					stepfut	= step.getStep().execute(component);
+					
+					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
+						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
 				}
 				else
 				{
