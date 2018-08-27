@@ -160,6 +160,8 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 //				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 //			})
 			
+			disableLocalSimulationMode().get();
+			
 			IPlatformConfiguration	config	= STest.getDefaultTestConfig();
 			config.getExtendedPlatformConfiguration().setSimulation(false);	// No simulaton, because we need to measure in real time
 			Starter.createPlatform(config)

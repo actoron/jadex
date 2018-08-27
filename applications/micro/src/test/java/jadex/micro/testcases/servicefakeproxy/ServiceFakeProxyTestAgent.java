@@ -79,6 +79,9 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 //				"-gui", "false", "-simulation", "false", "-printpass", "false", "-wstransport", "false",
 //				"-superpeerclient", "false",
 //			}).get();
+			
+			disableLocalSimulationMode().get();
+			
 			IExternalAccess plat = STest.createPlatform();
 			
 			createProxies(plat).get();

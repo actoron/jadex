@@ -2,6 +2,7 @@ package jadex.micro.testcases.autoterminate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
@@ -20,9 +21,11 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -179,6 +182,42 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			System.out.println("Auto terminate result: "+tc);
 			ret.setResult(null);
 		}
+	}
+	
+	/**
+	 *  Setup a local test.
+	 */
+	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename,  IResultListener<Map<String,Object>> reslis)
+	{
+		return createComponent(filename, agent.getId().getRoot(), reslis);
+	}
+	
+	/**
+	 *  Setup a remote test.
+	 */
+	protected IFuture<IComponentIdentifier>	setupRemoteTest(final String filename, final String config,
+		final  IResultListener<Map<String,Object>> reslis, final boolean remove)
+	{
+		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
+		
+		setupRemotePlatform(remove)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+		{
+			public void customResultAvailable(final IExternalAccess exta)
+			{
+//				ComponentIdentifier.getTransportIdentifier(exta)
+//					.addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
+//                {
+//                    public void customResultAvailable(ITransportComponentIdentifier cid)
+//                    {
+						createComponent(filename, null, config, exta.getId(), reslis)
+							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+//                    }
+//                });
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**

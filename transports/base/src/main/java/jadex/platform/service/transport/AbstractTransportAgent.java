@@ -598,6 +598,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected IIntermediateFuture<String> getAddresses(IComponentIdentifier target)
 	{
 		ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
+		if (tas == null)
+		{
+			agent.getLogger().warning(agent + " did not find transport address service.");
+			return new IntermediateFuture<>(new ArrayList<>());
+		}
 		
 		final IntermediateFuture<String> ret = new IntermediateFuture<String>();
 		tas.resolveAddresses(target, impl.getProtocolName()).addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Collection<String>>(ret)

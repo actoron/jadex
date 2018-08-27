@@ -3,7 +3,6 @@ package jadex.micro.testcases.terminate;
 import java.util.Collection;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.util.STest;
@@ -21,7 +20,6 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -57,14 +55,6 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 	protected IInternalAccess agent;
 
 	//-------- methods --------
-	
-	public IPlatformConfiguration getConfig()
-	{
-		IPlatformConfiguration conf = STest.getDefaultTestConfig();
-		conf.getExtendedPlatformConfiguration().setSimul(false);
-		conf.getExtendedPlatformConfiguration().setSimulation(false);
-		return conf;
-	}
 	
 	/**
 	 *  The agent body.
@@ -190,6 +180,9 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 //					});
 //				}
 //			}));
+			
+			disableLocalSimulationMode().get();
+			
 			IPlatformConfiguration conf = STest.getDefaultTestConfig();
 			conf.getExtendedPlatformConfiguration().setSimul(false);
 			conf.getExtendedPlatformConfiguration().setSimulation(false);
@@ -229,7 +222,7 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 			{
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-				
+				System.out.println("CREATE COMPONENT1");
 				cms.createComponent(null, "jadex/micro/testcases/terminate/TerminableProviderAgent.class", new CreationInfo(root, rid), null)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
 				{	

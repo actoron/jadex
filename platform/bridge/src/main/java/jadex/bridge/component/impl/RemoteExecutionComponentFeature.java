@@ -42,6 +42,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SUtil;
@@ -202,8 +203,8 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		}
 		
 		
-		IPlatformConfiguration conf = (IPlatformConfiguration) Starter.getPlatformValue(component.getId().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
-		if (conf.getExtendedPlatformConfiguration().getSimulation())
+		Boolean issim = (Boolean) Starter.getPlatformValue(component.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
+		if (Boolean.TRUE.equals(issim))
 		{
 			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
 			// there is no way of known how long to hold the clock.

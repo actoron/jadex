@@ -207,6 +207,8 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 		// Start platform
 		try
 		{
+			disableLocalSimulationMode().get();
+			
 			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
