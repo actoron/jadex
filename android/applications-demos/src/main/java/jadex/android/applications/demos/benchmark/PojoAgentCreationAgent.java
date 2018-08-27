@@ -107,20 +107,21 @@ public class PojoAgentCreationAgent
 		
 		if(num<max)
 		{
-			getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-			{
-				public void resultAvailable(IComponentManagementService cms)
-				{
+//			getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+//			{
+//				public void resultAvailable(IComponentManagementService cms)
+//				{
 					Map<String, Object>	args	= new HashMap<String, Object>();
 					args.put("max", Integer.valueOf(max));
 					args.put("num", Integer.valueOf(num));
 					args.put("starttime", Long.valueOf(starttime));
 					args.put("startmem", Long.valueOf(startmem));
-					cms.createComponent(createPeerName(num+1, agent.getId()),
+					agent.createComponent(
 						PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
-						new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()), null);
-				}
-			});
+						new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
+							.setName(createPeerName(num+1, agent.getId())), null);
+//				}
+//			});
 		}
 		else
 		{
@@ -149,13 +150,13 @@ public class PojoAgentCreationAgent
 					System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 				
 					// Use initial component to kill others
-					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-					{
-						public void resultAvailable(IComponentManagementService cms)
-						{
+//					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+//					{
+//						public void resultAvailable(IComponentManagementService cms)
+//						{
 							String	initial	= createPeerName(1, agent.getId());
 							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+							agent.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess exta)
 								{
@@ -180,8 +181,8 @@ public class PojoAgentCreationAgent
 									});
 								}
 							});
-						}
-					});
+//						}
+//					});
 				}
 			});
 		}
