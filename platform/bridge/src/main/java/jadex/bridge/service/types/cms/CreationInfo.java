@@ -19,20 +19,23 @@ public class CreationInfo
 {
 	//-------- attributes --------
 	
+	/** The instance name. */
+	protected String name;
+	
 	/** The file name. */
 	protected String filename;
 	
 	/** The configuration. */
-	protected String	config;
+	protected String config;
 	
 	/** The arguments (map with name/value pairs). */
-	protected Map<String, Object>	args;
+	protected Map<String, Object> args;
 	
 	/** The parent component. */
-	protected IComponentIdentifier	parent;
+	protected IComponentIdentifier parent;
 	
 	/** The resource identifier. */
-	protected IResourceIdentifier	rid;
+	protected IResourceIdentifier rid;
 	
 	/** The suspend flag (default: false). */
 	protected Boolean suspend;
@@ -88,6 +91,7 @@ public class CreationInfo
 	{
 		if(info!=null)
 		{
+			this.name = info.getName();
 			this.filename = info.getFilename();
 			this.config	= info.getConfiguration();
 			this.args	= info.getArguments();
@@ -309,9 +313,10 @@ public class CreationInfo
 	 *  Set the configuration.
 	 *  @param config the config to set.
 	 */
-	public void setConfiguration(String config)
+	public CreationInfo setConfiguration(String config)
 	{
 		this.config = config;
+		return this;
 	}
 
 	/**
@@ -327,9 +332,10 @@ public class CreationInfo
 	 *  Set the arguments.
 	 *  @param args the args to set
 	 */
-	public void setArguments(Map<String, Object> args)
+	public CreationInfo setArguments(Map<String, Object> args)
 	{
 		this.args = args;
+		return this;
 	}
 
 	/**
@@ -361,9 +367,10 @@ public class CreationInfo
 	 *  Set the parent.
 	 *  @param parent the parent to set
 	 */
-	public void setParent(IComponentIdentifier parent)
+	public CreationInfo setParent(IComponentIdentifier parent)
 	{
 		this.parent = parent;
+		return this;
 	}
 
 	/**
@@ -379,9 +386,10 @@ public class CreationInfo
 	 *  Set the resource identifier for loading the component model.
 	 *  @param rid the resource identifier to set
 	 */
-	public void setResourceIdentifier(IResourceIdentifier rid)
+	public CreationInfo setResourceIdentifier(IResourceIdentifier rid)
 	{
 		this.rid = rid;
+		return this;
 	}
 
 	/**
@@ -397,9 +405,10 @@ public class CreationInfo
 	 *  Set the suspend flag.
 	 *  @param suspend the suspend to set flag
 	 */
-	public void setSuspend(Boolean suspend)
+	public CreationInfo setSuspend(Boolean suspend)
 	{
 		this.suspend = suspend;
+		return this;
 	}
 
 	/**
@@ -415,9 +424,10 @@ public class CreationInfo
 	 *  Set the master.
 	 *  @param master The master to set.
 	 */
-	public void setMaster(Boolean master)
+	public CreationInfo setMaster(Boolean master)
 	{
 		this.master = master;
+		return this;
 	}
 
 	/**
@@ -433,9 +443,10 @@ public class CreationInfo
 	 *  Set the daemon.
 	 *  @param daemon The daemon to set.
 	 */
-	public void setDaemon(Boolean daemon)
+	public CreationInfo setDaemon(Boolean daemon)
 	{
 		this.daemon = daemon;
+		return this;
 	}
 
 	/**
@@ -451,9 +462,10 @@ public class CreationInfo
 	 *  Set the autoshutdown.
 	 *  @param autoshutdown The autoshutdown to set.
 	 */
-	public void setAutoShutdown(Boolean autoshutdown)
+	public CreationInfo setAutoShutdown(Boolean autoshutdown)
 	{
 		this.autoshutdown = autoshutdown;
+		return this;
 	}
 	
 //	public Boolean getPlatformloader()
@@ -479,9 +491,10 @@ public class CreationInfo
 	 *  Set the imports
 	 *  @param imports The imports to set.
 	 */
-	public void setImports(String[] imports)
+	public CreationInfo setImports(String[] imports)
 	{
 		this.imports = imports;
+		return this;
 	}
 
 	/**
@@ -497,9 +510,10 @@ public class CreationInfo
 	 *  Set the bindings.
 	 *  @param bindings The bindings to set.
 	 */
-	public void setRequiredServiceBindings(RequiredServiceBinding[] bindings)
+	public CreationInfo setRequiredServiceBindings(RequiredServiceBinding[] bindings)
 	{
 		this.bindings = bindings;
+		return this;
 	}
 
 	/**
@@ -515,9 +529,10 @@ public class CreationInfo
 	 *  Set the ProvidedServiceInfos.
 	 *  @param pinfos The ProvidedServiceInfo to set.
 	 */
-	public void setProvidedServiceInfos(ProvidedServiceInfo[] pinfos)
+	public CreationInfo setProvidedServiceInfos(ProvidedServiceInfo[] pinfos)
 	{
 		this.pinfos = pinfos;
+		return this;
 	}
 
 	/**
@@ -533,9 +548,10 @@ public class CreationInfo
 	 *  Set the localtype.
 	 *  @param localtype The localtype to set.
 	 */
-	public void setLocalType(String localtype)
+	public CreationInfo setLocalType(String localtype)
 	{
 		this.localtype = localtype;
+		return this;
 	}
 
 //	/**
@@ -569,9 +585,10 @@ public class CreationInfo
 	 *  Set the monitoring.
 	 *  @param monitoring The monitoring to set.
 	 */
-	public void setMonitoring(PublishEventLevel monitoring)
+	public CreationInfo setMonitoring(PublishEventLevel monitoring)
 	{
 		this.monitoring = monitoring;
+		return this;
 	}
 	
 	/**
@@ -587,9 +604,10 @@ public class CreationInfo
 	 *  Set the synchronous.
 	 *  @param synchronous The synchronous to set.
 	 */
-	public void setSynchronous(Boolean synchronous)
+	public CreationInfo setSynchronous(Boolean synchronous)
 	{
 		this.synchronous = synchronous;
+		return this;
 	}
 	
 	/**
@@ -605,9 +623,10 @@ public class CreationInfo
 	 *  Set the persistable.
 	 *  @param persistable The persistable to set.
 	 */
-	public void setPersistable(Boolean persistable)
+	public CreationInfo setPersistable(Boolean persistable)
 	{
 		this.persistable = persistable;
+		return this;
 	}
 
 	/**
@@ -623,9 +642,29 @@ public class CreationInfo
 	 *  Set the filename.
 	 *  @param filename The filename to set
 	 */
-	public void setFilename(String filename)
+	public CreationInfo setFilename(String filename)
 	{
 		this.filename = filename;
+		return this;
+	}
+
+	/**
+	 *  Get the instance name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 *  Set the name.
+	 *  @param name the name to set
+	 */
+	public CreationInfo setName(String name)
+	{
+		this.name = name;
+		return this;
 	}
 	
 }

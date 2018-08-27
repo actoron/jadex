@@ -34,7 +34,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.filetransfer.BunchFileData;
 import jadex.bridge.service.types.filetransfer.FileData;
@@ -141,37 +140,38 @@ public class SRemoteGui
 		});		
 	}
 	
-	/**
-	 *  Remove a service.
-	 *  @param cms	The cms
-	 *  @param container	The service provider.
-	 *  @param sid	The service to remove.
-	 */
-	public static IFuture<Void> removeService(IComponentManagementService cms,
-			IExternalAccess container, final IServiceIdentifier sid)
-	{
-//		final Future<Void>	ret	= new Future<Void>();
-//		cms.getExternalAccess(sid.getProviderId())
-//			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-//		{
-//			public void customResultAvailable(IExternalAccess exta)
-//			{
-//				exta.scheduleStep(new IComponentStep<Void>()
-//				{
-//					@Classname("removeService")
-//					public IFuture<Void> execute(IInternalAccess ia)
-//					{
-//						ia.getServiceContainer().removeService(sid);
-//						return IFuture.DONE;
-//					}
-//				})
-//				.addResultListener(new DelegationResultListener<Void>(ret));
-//			}
-//		});
-//		return ret;
-		
-		throw new UnsupportedOperationException();
-	}
+//	/**
+//	 *  Remove a service.
+//	 *  @param cms	The cms
+//	 *  @param container	The service provider.
+//	 *  @param sid	The service to remove.
+//	 */
+//	@Deprecated
+//	public static IFuture<Void> removeService(IComponentManagementService cms,
+//		IExternalAccess container, final IServiceIdentifier sid)
+//	{
+////		final Future<Void>	ret	= new Future<Void>();
+////		cms.getExternalAccess(sid.getProviderId())
+////			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+////		{
+////			public void customResultAvailable(IExternalAccess exta)
+////			{
+////				exta.scheduleStep(new IComponentStep<Void>()
+////				{
+////					@Classname("removeService")
+////					public IFuture<Void> execute(IInternalAccess ia)
+////					{
+////						ia.getServiceContainer().removeService(sid);
+////						return IFuture.DONE;
+////					}
+////				})
+////				.addResultListener(new DelegationResultListener<Void>(ret));
+////			}
+////		});
+////		return ret;
+//		
+//		throw new UnsupportedOperationException();
+//	}
 	
 //	/**
 //	 *  Install the remote listener.

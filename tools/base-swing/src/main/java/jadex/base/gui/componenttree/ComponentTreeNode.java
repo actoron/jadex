@@ -26,11 +26,10 @@ import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSCreatedEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -66,7 +65,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 	protected IComponentDescription	desc;
 		
 	/** The component management service. */
-	protected final IComponentManagementService	cms;
+//	protected final IComponentManagementService	cms;
 		
 	/** The platform access. */
 	protected IExternalAccess	access;
@@ -92,7 +91,8 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 	 *  Create a new service container node.
 	 */
 	public ComponentTreeNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, IComponentDescription desc,
-		IComponentManagementService cms, ComponentIconCache iconcache, IExternalAccess access)
+		//IComponentManagementService cms, 
+		ComponentIconCache iconcache, IExternalAccess access)
 	{
 		super(parent, model, tree);
 		
@@ -101,7 +101,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 //		System.out.println("node: "+getClass()+" "+desc.getName()+" "+desc.getType());
 		
 		this.desc	= desc;
-		this.cms	= cms;
+//		this.cms	= cms;
 		this.iconcache	= iconcache;
 		this.access	= access;
 		
@@ -172,7 +172,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		busy	= true;
 		getModel().fireNodeChanged(ComponentTreeNode.this);
 		
-		cms.getComponentDescription(desc.getName())
+		access.getDescription(desc.getName())
 			.addResultListener(new SwingResultListener<IComponentDescription>(new IResultListener<IComponentDescription>()
 		{
 			public void resultAvailable(IComponentDescription result)
@@ -203,7 +203,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		getModel().fireNodeChanged(ComponentTreeNode.this);
 //		if(getComponentIdentifier().getName().indexOf("Garbage")!=-1)
 //			System.out.println("searchChildren: "+getId());
-		searchChildren(cms, getComponentIdentifier())
+		searchChildren(access, getComponentIdentifier())
 			.addResultListener(new IResultListener<List<ITreeNode>>()
 		{
 			public void resultAvailable(List<ITreeNode> result)
@@ -241,17 +241,17 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 				if(((IActiveComponentTreeNode)getModel().getRoot()).getComponentIdentifier().getName().equals(desc.getName().getPlatformName()))
 				{
 //					System.out.println("proxy for: "+desc.getName()+" from: "+getDescription().getName());
-					node = new ProxyComponentTreeNode(this, getModel(), getTree(), desc, cms, iconcache, access);
+					node = new ProxyComponentTreeNode(this, getModel(), getTree(), desc, iconcache, access);
 				}
 				else
 				{
 //					System.out.println("creating pseudo: "+desc.getName()+" from: "+getDescription().getName());
-					node = new PseudoProxyComponentTreeNode(this, getModel(), getTree(), desc, cms, iconcache, access);
+					node = new PseudoProxyComponentTreeNode(this, getModel(), getTree(), desc, iconcache, access);
 				}
 			}
 			else
 			{
-				node = new ComponentTreeNode(this, getModel(), getTree(), desc, cms, iconcache, access);
+				node = new ComponentTreeNode(this, getModel(), getTree(), desc, iconcache, access);
 			}
 		}
 		return node;
@@ -324,7 +324,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 	/**
 	 *  Asynchronously search for children.
 	 */
-	protected IFuture<List<ITreeNode>> searchChildren(final IComponentManagementService cms, final IComponentIdentifier cid)
+	protected IFuture<List<ITreeNode>> searchChildren(final IExternalAccess access, final IComponentIdentifier cid)
 	{
 		final Future<List<ITreeNode>>	ret	= new Future<List<ITreeNode>>();
 		final List<ITreeNode>	children	= new ArrayList<ITreeNode>();
@@ -332,25 +332,23 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 
 //		if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //			System.out.println("searchChildren 1: "+this);
-		cms.getChildrenDescriptions(cid).addResultListener(new SwingResultListener<IComponentDescription[]>(new IResultListener<IComponentDescription[]>()
+		
+		access.getChildren(null, cid).addResultListener(new SwingResultListener<>(new IResultListener<IComponentIdentifier[]>()
 		{
-			public void resultAvailable(final IComponentDescription[] achildren)
+			public void resultAvailable(IComponentIdentifier[] result)
 			{
-//				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
-//					System.out.println("searchChildren 2: "+ComponentTreeNode.this+" "+achildren.length);
-//				final IComponentDescription[] achildren = (IComponentDescription[])result;
-				
-				Arrays.sort(achildren, new java.util.Comparator<IComponentDescription>()
+				Arrays.sort(result, new java.util.Comparator<IComponentIdentifier>()
 				{
-					public int compare(IComponentDescription o1, IComponentDescription o2)
+					public int compare(IComponentIdentifier o1, IComponentIdentifier o2)
 					{
-						return o1.getName().getName().toLowerCase().compareTo(o2.getName().getName().toLowerCase());
+						return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
 					}
 				});
 				
-				for(int i=0; i<achildren.length; i++)
+				for(int i=0; i<result.length; i++)
 				{
-					ISwingTreeNode	node	= createComponentNode(achildren[i]);
+					// todo: avoid get()
+					ISwingTreeNode node = createComponentNode(access.getDescription(result[i]).get());
 					children.add(node);
 				}
 				ready[0]	= true;
@@ -360,55 +358,86 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 				}
 			}
 			
+			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-//				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
-//					System.out.println("searchChildren ex: "+ComponentTreeNode.this);
-				ready[0]	= true;
-				if(ready[0] &&  ready[1])
-				{
-					ret.setExceptionIfUndone(exception);
-				}
 			}
 		}));
+		
+//		cms.getChildrenDescriptions(cid).addResultListener(new SwingResultListener<IComponentDescription[]>(new IResultListener<IComponentDescription[]>()
+//		{
+//			public void resultAvailable(final IComponentDescription[] achildren)
+//			{
+////				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
+////					System.out.println("searchChildren 2: "+ComponentTreeNode.this+" "+achildren.length);
+////				final IComponentDescription[] achildren = (IComponentDescription[])result;
+//				
+//				Arrays.sort(achildren, new java.util.Comparator<IComponentDescription>()
+//				{
+//					public int compare(IComponentDescription o1, IComponentDescription o2)
+//					{
+//						return o1.getName().getName().toLowerCase().compareTo(o2.getName().getName().toLowerCase());
+//					}
+//				});
+//				
+//				for(int i=0; i<achildren.length; i++)
+//				{
+//					ISwingTreeNode node = createComponentNode(achildren[i]);
+//					children.add(node);
+//				}
+//				ready[0]	= true;
+//				if(ready[0] &&  ready[1])
+//				{
+//					ret.setResult(children);
+//				}
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+////				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
+////					System.out.println("searchChildren ex: "+ComponentTreeNode.this);
+//				ready[0]	= true;
+//				if(ready[0] &&  ready[1])
+//				{
+//					ret.setExceptionIfUndone(exception);
+//				}
+//			}
+//		}));
 		
 		// Search services and only add container node when services are found.
 //		System.out.println("name: "+desc.getName());
 		
-		cms.getRootIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
+		IComponentIdentifier root = access.getId().getRoot();//.addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
+		access.getExternalAccess(root)
+			.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 		{
-			public void resultAvailable(IComponentIdentifier root) 
+			public void resultAvailable(final IExternalAccess rootea)
 			{
-				cms.getExternalAccess(root)
+				access.getExternalAccess(cid)
 					.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 				{
-					public void resultAvailable(final IExternalAccess rootea)
+					public void resultAvailable(final IExternalAccess ea)
 					{
-						cms.getExternalAccess(cid)
-							.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
-						{
-							public void resultAvailable(final IExternalAccess ea)
-							{
-	//							System.out.println("search childs: "+ea);
-								
-								SNFPropertyProvider.getNFPropertyNames(ea)
+//							System.out.println("search childs: "+ea);
+						
+						SNFPropertyProvider.getNFPropertyNames(ea)
 //								((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyNames()
-									.addResultListener(new SwingResultListener<String[]>(new IResultListener<String[]>()
+							.addResultListener(new SwingResultListener<String[]>(new IResultListener<String[]>()
+						{
+							public void resultAvailable(String[] names)
+							{
+								if(names!=null && names.length>0)
 								{
-									public void resultAvailable(String[] names)
-									{
-										if(names!=null && names.length>0)
-										{
-											NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
-											if(cn==null)
-												cn = new NFPropertyContainerNode(null, null, ComponentTreeNode.this, getModel(), getTree(), ea, null, null, null);
-											children.add(0, cn);
-											cont(ea);
+									NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
+									if(cn==null)
+										cn = new NFPropertyContainerNode(null, null, ComponentTreeNode.this, getModel(), getTree(), ea, null, null, null);
+									children.add(0, cn);
+									cont(ea);
 //											final NFPropertyContainerNode node = cn;
 //											
 //											final List<ISwingTreeNode>	results	= new ArrayList<ISwingTreeNode>();
 //											Iterator<String> it = SReflect.getIterator(names);
-											
+									
 //											createNFPropertyNodes(it, results, ea, rootea, cn).addResultListener(new IResultListener<Void>()
 //											{
 //												public void resultAvailable(Void result)
@@ -432,124 +461,113 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 //													cont(ea, null, null);
 //												}
 //											});
-										}
-										else
-										{
-											cont(ea);
-										}
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										cont(ea);
-									}
-								}));
+								}
+								else
+								{
+									cont(ea);
+								}
 							}
 							
-							public void cont(final IExternalAccess ea)
+							public void exceptionOccurred(Exception exception)
 							{
-								SRemoteGui.getServiceInfos(ea)
-									.addResultListener(new SwingResultListener<Object[]>(new IResultListener<Object[]>()
+								cont(ea);
+							}
+						}));
+					}
+					
+					public void cont(final IExternalAccess ea)
+					{
+						SRemoteGui.getServiceInfos(ea)
+							.addResultListener(new SwingResultListener<Object[]>(new IResultListener<Object[]>()
+						{
+							public void resultAvailable(final Object[] res)
+							{
+								final ProvidedServiceInfo[] pros = (ProvidedServiceInfo[])res[0];
+								final RequiredServiceInfo[] reqs = (RequiredServiceInfo[])res[1];
+								final IServiceIdentifier[] sis = (IServiceIdentifier[])res[2];
+//									if(sis.length>0 && sis[0].getProviderId().getName().indexOf("Mandel")!=-1)
+//										System.out.println("gotacha: "+sis[0].getProviderId().getName());
+								if((pros!=null && pros.length>0 || (reqs!=null && reqs.length>0)))
 								{
-									public void resultAvailable(final Object[] res)
+									ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
+									if(scn==null)
+										scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), ea);
+//										System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
+									children.add(0, scn);
+									
+									final List<ISwingTreeNode>	subchildren	= new ArrayList<ISwingTreeNode>();
+									if(pros!=null)
 									{
-										final ProvidedServiceInfo[] pros = (ProvidedServiceInfo[])res[0];
-										final RequiredServiceInfo[] reqs = (RequiredServiceInfo[])res[1];
-										final IServiceIdentifier[] sis = (IServiceIdentifier[])res[2];
-	//									if(sis.length>0 && sis[0].getProviderId().getName().indexOf("Mandel")!=-1)
-	//										System.out.println("gotacha: "+sis[0].getProviderId().getName());
-										if((pros!=null && pros.length>0 || (reqs!=null && reqs.length>0)))
+										for(int i=0; i<pros.length; i++)
 										{
-											ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
-											if(scn==null)
-												scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), ea);
-	//										System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
-											children.add(0, scn);
-											
-											final List<ISwingTreeNode>	subchildren	= new ArrayList<ISwingTreeNode>();
-											if(pros!=null)
+											try
 											{
-												for(int i=0; i<pros.length; i++)
-												{
-													try
-													{
-														String id	= ProvidedServiceInfoNode.getId(scn, pros[i]);
-														ProvidedServiceInfoNode	sn	= (ProvidedServiceInfoNode)getModel().getNode(id);
-														if(sn==null)
-															sn	= new ProvidedServiceInfoNode(scn, getModel(), getTree(), pros[i], sis[i], ea, access);
-														subchildren.add(sn);
-													}
-													catch(Exception e)
-													{
-														e.printStackTrace();
-													}
-												}
-												
-												Collections.sort(subchildren, new java.util.Comparator<ISwingTreeNode>()
-												{
-													public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
-													{
-														ProvidedServiceInfo si1 = ((ProvidedServiceInfoNode)t1).getServiceInfo();
-														ProvidedServiceInfo si2 = ((ProvidedServiceInfoNode)t2).getServiceInfo();
-														return SReflect.getUnqualifiedTypeName(si1.getType().getTypeName())
-															.compareTo(SReflect.getUnqualifiedTypeName(si2.getType().getTypeName()));
-													}
-												});
+												String id	= ProvidedServiceInfoNode.getId(scn, pros[i]);
+												ProvidedServiceInfoNode	sn	= (ProvidedServiceInfoNode)getModel().getNode(id);
+												if(sn==null)
+													sn	= new ProvidedServiceInfoNode(scn, getModel(), getTree(), pros[i], sis[i], ea, access);
+												subchildren.add(sn);
 											}
-											
-											if(reqs!=null)
+											catch(Exception e)
 											{
-												Arrays.sort(reqs, new java.util.Comparator<RequiredServiceInfo>()
-												{
-													public int compare(RequiredServiceInfo o1, RequiredServiceInfo o2)
-													{
-														return SReflect.getUnqualifiedTypeName(o1.getType().getTypeName())
-															.compareTo(SReflect.getUnqualifiedTypeName(o2.getType().getTypeName()));
-													}
-												});
-												
-												for(int i=0; i<reqs.length; i++)
-												{
-													String nid = ea.getId()+"."+reqs[i].getName();
-													RequiredServiceNode	sn = (RequiredServiceNode)getModel().getNode(nid);
-													if(sn==null)
-														sn	= new RequiredServiceNode(scn, getModel(), getTree(), reqs[i], nid, ea);
-													subchildren.add(sn);
-												}
+												e.printStackTrace();
 											}
-											
-											final ServiceContainerNode	node	= scn;
-											ret.addResultListener(new SwingResultListener<List<ITreeNode>>(new IResultListener<List<ITreeNode>>()
-											{
-												public void resultAvailable(List<ITreeNode> result)
-												{
-													node.setChildren(subchildren);
-//													if(pcnode!=null)
-//														pcnode.setChildren(pcchilds);
-												}
-												public void exceptionOccurred(Exception exception)
-												{
-													// Children not found -> don't add services.
-												}
-											}));
 										}
 										
-										ready[1]	= true;
-										if(ready[0] &&  ready[1])
+										Collections.sort(subchildren, new java.util.Comparator<ISwingTreeNode>()
 										{
-											ret.setResult(children);
+											public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
+											{
+												ProvidedServiceInfo si1 = ((ProvidedServiceInfoNode)t1).getServiceInfo();
+												ProvidedServiceInfo si2 = ((ProvidedServiceInfoNode)t2).getServiceInfo();
+												return SReflect.getUnqualifiedTypeName(si1.getType().getTypeName())
+													.compareTo(SReflect.getUnqualifiedTypeName(si2.getType().getTypeName()));
+											}
+										});
+									}
+									
+									if(reqs!=null)
+									{
+										Arrays.sort(reqs, new java.util.Comparator<RequiredServiceInfo>()
+										{
+											public int compare(RequiredServiceInfo o1, RequiredServiceInfo o2)
+											{
+												return SReflect.getUnqualifiedTypeName(o1.getType().getTypeName())
+													.compareTo(SReflect.getUnqualifiedTypeName(o2.getType().getTypeName()));
+											}
+										});
+										
+										for(int i=0; i<reqs.length; i++)
+										{
+											String nid = ea.getId()+"."+reqs[i].getName();
+											RequiredServiceNode	sn = (RequiredServiceNode)getModel().getNode(nid);
+											if(sn==null)
+												sn	= new RequiredServiceNode(scn, getModel(), getTree(), reqs[i], nid, ea);
+											subchildren.add(sn);
 										}
 									}
 									
-									public void exceptionOccurred(Exception exception)
+									final ServiceContainerNode	node	= scn;
+									ret.addResultListener(new SwingResultListener<List<ITreeNode>>(new IResultListener<List<ITreeNode>>()
 									{
-										ready[1]	= true;
-										if(ready[0] &&  ready[1])
+										public void resultAvailable(List<ITreeNode> result)
 										{
-											ret.setExceptionIfUndone(exception);
+											node.setChildren(subchildren);
+//													if(pcnode!=null)
+//														pcnode.setChildren(pcchilds);
 										}
-									}
-								}));
+										public void exceptionOccurred(Exception exception)
+										{
+											// Children not found -> don't add services.
+										}
+									}));
+								}
+								
+								ready[1]	= true;
+								if(ready[0] &&  ready[1])
+								{
+									ret.setResult(children);
+								}
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -562,6 +580,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 							}
 						}));
 					}
+					
 					public void exceptionOccurred(Exception exception)
 					{
 						ready[1]	= true;

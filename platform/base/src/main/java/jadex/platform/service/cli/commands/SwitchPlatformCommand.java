@@ -9,7 +9,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -92,22 +91,15 @@ public class SwitchPlatformCommand extends ACliCommand
 					if(plat.equals(cid) && !ret.isDone())
 					{
 						found = true;
-						comp.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-							.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IInternalCliService>(ret)
+						comp.getExternalAccess(plat).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IInternalCliService>(ret)
 						{
-							public void customResultAvailable(IComponentManagementService cms)
+							public void customResultAvailable(IExternalAccess exta)
 							{
-								cms.getExternalAccess(plat).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IInternalCliService>(ret)
-								{
-									public void customResultAvailable(IExternalAccess exta)
-									{
-										Tuple2<String, Integer> osid = context.getShell().getSessionId();
-										Tuple2<String, Integer> nsid = new Tuple2<String, Integer>(osid.getFirstEntity(), Integer.valueOf(osid.getSecondEntity().intValue()+1)); 
-										context.getShell().addSubshell(new RemoteCliShell(cliser, nsid));
+								Tuple2<String, Integer> osid = context.getShell().getSessionId();
+								Tuple2<String, Integer> nsid = new Tuple2<String, Integer>(osid.getFirstEntity(), Integer.valueOf(osid.getSecondEntity().intValue()+1)); 
+								context.getShell().addSubshell(new RemoteCliShell(cliser, nsid));
 //										ret.setResult(cliser);
-										ret.setResult(null);
-									}
-								});
+								ret.setResult(null);
 							}
 						});
 					}

@@ -24,9 +24,6 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple3;
 import jadex.commons.future.IFuture;
 
@@ -254,8 +251,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 			finishing = true;
 //				((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
 			
-			IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-			cms.destroyComponent(getComponent().getId()); // todo: listener?
+			getComponent().killComponent(getComponent().getId()); // todo: listener?
 		}
 		
 //			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));

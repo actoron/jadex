@@ -12,10 +12,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -254,7 +253,6 @@ public class IntermediateTestAgent
 	{
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
@@ -265,7 +263,7 @@ public class IntermediateTestAgent
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model));
 		
 		try
 		{
@@ -277,7 +275,7 @@ public class IntermediateTestAgent
 			tr.setFailed("Timeout exception.");
 			try
 			{
-				cms.destroyComponent(fut.getFirstResult());
+				agent.killComponent(fut.getFirstResult());
 			}
 			catch(Exception ex)
 			{
@@ -298,12 +296,12 @@ public class IntermediateTestAgent
 		
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		IProcessEngineService	pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
+		IProcessEngineService pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
+		CreationInfo ci = new CreationInfo(agent.getId()).setFilename(model);
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, ci);
 		fut.getFirstResult();
 		
 //		// For debugging to receive error messages, when thread hangs before fut.get().
@@ -335,7 +333,7 @@ public class IntermediateTestAgent
 			tr.setFailed("Timeout exception.");
 			try
 			{
-				cms.destroyComponent(fut.getFirstResult());
+				agent.killComponent(fut.getFirstResult());
 			}
 			catch(Exception ex)
 			{
@@ -356,12 +354,11 @@ public class IntermediateTestAgent
 
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model));
 		fut.getFirstResult();
 
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
@@ -380,7 +377,7 @@ public class IntermediateTestAgent
 			tr.setSucceeded(true);
 			try
 			{
-				cms.destroyComponent(fut.getFirstResult());
+				agent.killComponent(fut.getFirstResult());
 			}
 			catch(Exception ex)
 			{
@@ -401,12 +398,11 @@ public class IntermediateTestAgent
 		
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model));
 		fut.getFirstResult();
 
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
@@ -425,7 +421,7 @@ public class IntermediateTestAgent
 			tr.setSucceeded(true);
 			try
 			{
-				cms.destroyComponent(fut.getFirstResult());
+				agent.killComponent(fut.getFirstResult());
 			}
 			catch(Exception ex)
 			{
@@ -447,14 +443,13 @@ public class IntermediateTestAgent
 
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getFeature(IRequiredServicesFeature.class).getService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model));
 		
 		try
 		{
@@ -466,7 +461,7 @@ public class IntermediateTestAgent
 			tr.setSucceeded(true);
 			try
 			{
-				cms.destroyComponent(fut.getFirstResult());
+				agent.killComponent(fut.getFirstResult());
 			}
 			catch(Exception ex)
 			{

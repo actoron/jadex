@@ -20,7 +20,6 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
@@ -30,96 +29,106 @@ import jadex.commons.future.TupleResult;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
+
 /**
- *  Test a component.
- *  This version does not need a Platform on instantiation, but rather later, before tests are started.
+ * Test a component. This version does not need a Platform on instantiation, but
+ * rather later, before tests are started.
  */
 public class ComponentTestLazyPlatform extends TestCase
 {
 	/** The component to test. **/
-	protected String comp;
-	//-------- attributes --------
+	protected String					comp;
+	// -------- attributes --------
 
-	/** The component management system. */
-	protected IComponentManagementService	cms;
+	/** The platform. */
+	protected IExternalAccess			platform;
 
 	/** The platform configuration */
 	protected IPlatformConfiguration	conf;
 
 	/** The dirs for rids (e.g. classes and resources dirs). */
-//	protected File[][]	dirs;
+	// protected File[][] dirs;
 
 	/** The component model. */
-	protected String	filename;
+	protected String					filename;
 
 	/** The component resource identifier. */
-	protected IResourceIdentifier	rid;
+	protected IResourceIdentifier		rid;
 
 	/** The timeout. */
-	protected long	timeout;
+	protected long						timeout;
 
 	/** The test suite. */
-	protected IAbortableTestSuite suite;
+	protected IAbortableTestSuite		suite;
 
-	/** Indicates if this test has already failed.  */
-	private boolean failed;
+	/** Indicates if this test has already failed. */
+	private boolean						failed;
 
 	/** Message that describes an early test failure. **/
-	private String message;
+	private String						message;
 
-	//-------- constructors --------
+	// -------- constructors --------
 
 	/**
-	 *  Create a new ComponentTest.
+	 * Create a new ComponentTest.
 	 */
 	protected ComponentTestLazyPlatform()
 	{
-//		Logger.getLogger("ComponentTest").log(Level.SEVERE, "Empty ComponentTest Constructor called");
+		// Logger.getLogger("ComponentTest").log(Level.SEVERE, "Empty
+		// ComponentTest Constructor called");
 	}
 
 	/**
-	 *  Create a component test.
-	 *  Run on existing test suite platform.
+	 * Create a component test. Run on existing test suite platform.
 	 */
 	public ComponentTestLazyPlatform(String comp, IAbortableTestSuite suite)
 	{
 		super(comp);
 		this.comp = comp;
-		this.suite	= suite;
+		this.suite = suite;
 	}
 
-	//-------- methods --------
-	
+	// -------- methods --------
+
 	/**
-	 *  The number of test cases.
+	 * The number of test cases.
 	 */
 	public int countTestCases()
 	{
 		return 1;
 	}
 
-	public void setPlatform(IExternalAccess platform, IComponentManagementService cms) {
-		this.cms = cms;
-		if ((SComponentFactory.isLoadable(platform, comp, rid).get()).booleanValue()) {
+	public void setPlatform(IExternalAccess platform)
+	{
+		this.platform = platform;
+		if((SComponentFactory.isLoadable(platform, comp, rid).get()).booleanValue())
+		{
 			boolean startable = SComponentFactory.isStartable(platform, comp, rid).get().booleanValue();
 			IModelInfo model = null;
 			model = SComponentFactory.loadModel(platform, comp, rid).get();
-			if (model != null && model.getReport() == null && startable) {
-				this.filename	= model.getFilename();
-				this.rid	= model.getResourceIdentifier();
-				Object	to	= model.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, getClass().getClassLoader());
-				if(to!=null)
+			if(model != null && model.getReport() == null && startable)
+			{
+				this.filename = model.getFilename();
+				this.rid = model.getResourceIdentifier();
+				Object to = model.getProperty(Testcase.PROPERTY_TEST_TIMEOUT, getClass().getClassLoader());
+				if(to != null)
 				{
-					this.timeout	= ((Number)to).longValue();
+					this.timeout = ((Number)to).longValue();
 					Logger.getLogger("ComponentTest").log(Level.INFO, "using timeout: " + timeout);
-				} else {
+				}
+				else
+				{
 					this.timeout = Starter.getDefaultTimeout(platform.getId());
 				}
-			} else {
+			}
+			else
+			{
 				failed = true;
 				message = "not startable: " + comp;
 			}
-		} else {
+		}
+		else
+		{
 			failed = true;
 			message = "not loadable: " + comp;
 		}
@@ -127,122 +136,121 @@ public class ComponentTestLazyPlatform extends TestCase
 	}
 
 	/**
-	 *  Test the component.
+	 * Test the component.
 	 */
 	public void runBare()
 	{
-		if (failed) {
+		if(failed)
 			fail("could not start testcase: " + comp + ", " + message);
-		}
-		if(suite!=null && suite.isAborted())
-		{
+		if(suite != null && suite.isAborted())
 			return;
-		}
-		
+
 		// Start the component.
-		final IComponentIdentifier[]	cid	= new IComponentIdentifier[1];
-		final Future<Map<String, Object>>	finished	= new Future<Map<String,Object>>();
-		Timer	t	= null;
-		final boolean[]	triggered	= new boolean[1];	
-		
-		if(timeout!=Timeout.NONE)
+		final IComponentIdentifier[] cid = new IComponentIdentifier[1];
+		final Future<Map<String, Object>> finished = new Future<Map<String, Object>>();
+		Timer t = null;
+		final boolean[] triggered = new boolean[1];
+
+		if(timeout != Timeout.NONE)
 		{
-			t	= new Timer(true);
-			
-//			System.out.println("Using test timeout: "+timeout+" "+System.currentTimeMillis()+" "+filename);
-			
+			t = new Timer(true);
+
+			// System.out.println("Using test timeout: "+timeout+"
+			// "+System.currentTimeMillis()+" "+filename);
+
 			t.schedule(new TimerTask()
 			{
 				public void run()
 				{
-//					System.out.println("TIMEOUT: "+System.currentTimeMillis()+" "+filename);
+					// System.out.println("TIMEOUT:
+					// "+System.currentTimeMillis()+" "+filename);
 
 					triggered[0] = true;
-					boolean	b = finished.setExceptionIfUndone(new TimeoutException(ComponentTestLazyPlatform.this+" did not finish in "+timeout+" ms."));
-					IComponentManagementService	cms	= ComponentTestLazyPlatform.this.cms;
-					if(b && cid[0]!=null && cms!=null)
+					boolean b = finished.setExceptionIfUndone(new TimeoutException(ComponentTestLazyPlatform.this + " did not finish in " + timeout + " ms."));
+					if(b && cid[0] != null && platform != null)
 					{
-						cms.destroyComponent(cid[0]);
+						platform.killComponent(cid[0]);
 					}
 				}
 			}, timeout);
 		}
 
-		// Actually not needed, because create component has no timoeut (hack???)
-		 ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
-		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(null, filename, new CreationInfo(rid));
+		// Actually not needed, because create component has no timoeut
+		// (hack???)
+		ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
+
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = platform.createComponent(null, new CreationInfo(rid).setFilename(filename));
 		componentStarted(fut);
 		fut.addResultListener(new IntermediateDefaultResultListener<TupleResult>()
 		{
 			@SuppressWarnings("unchecked")
 			public void intermediateResultAvailable(TupleResult result)
 			{
-				if(result.getNum()==0)
+				if(result.getNum() == 0)
 				{
-					cid[0]	= (IComponentIdentifier)result.getResult();
+					cid[0] = (IComponentIdentifier)result.getResult();
 				}
 				else
 				{
-//					if(filename.toString().indexOf("Feature")!=-1)
-//						Thread.dumpStack();
+					// if(filename.toString().indexOf("Feature")!=-1)
+					// Thread.dumpStack();
 					finished.setResultIfUndone((Map<String, Object>)result.getResult());
 				}
 			}
-			
+
 			public void exceptionOccurred(Exception exception)
 			{
 				finished.setExceptionIfUndone(exception);
 			}
 		});
-		Map<String, Object>	res	= null;
+		Map<String, Object> res = null;
 		try
 		{
-			res	= finished.get();	// Timeout set by timer above -> no get timeout needed.
+			res = finished.get(); // Timeout set by timer above -> no get
+									// timeout needed.
 		}
 		catch(TimeoutException te)
 		{
 			te.printStackTrace();
-			// Hack!! Allow timeout exception for start tests when not from test execution, e.g. termination timeout in EndStateAbort.
+			// Hack!! Allow timeout exception for start tests when not from test
+			// execution, e.g. termination timeout in EndStateAbort.
 			if(triggered[0])
 			{
 				throw te;
 			}
 		}
-		if(t!=null)
+		if(t != null)
 		{
 			t.cancel();
 		}
-		
+
 		// cleanup platform?
-		if(conf!=null)
-		{
-			cms.destroyComponent(cms.getRootIdentifier().get(timeout, true)).get(timeout, true);
-		}
-		
+		if(conf != null)
+			platform.killComponent(platform.getId().getRoot()).get(timeout, true);
+
 		// Remove references to Jadex resources to aid GC cleanup.
-		cms	= null;
-		suite	= null;
-		
-		checkTestResults(res);	// Do last -> throws exception on failure.
+		suite = null;
+
+		checkTestResults(res); // Do last -> throws exception on failure.
 	}
 
 	/**
-	 *  Called when a component has been started.
+	 * Called when a component has been started.
 	 */
 	protected void componentStarted(ITuple2Future<IComponentIdentifier, Map<String, Object>> fut)
 	{
 	}
 
 	/**
-	 *  Optional checking after component has finished.
-	 *  @param res	The results.
+	 * Optional checking after component has finished.
+	 * 
+	 * @param res The results.
 	 */
 	protected void checkTestResults(Map<String, Object> res)
 	{
 		// Evaluate the results.
-		Testcase	tc	= null;
-		for(Iterator<Map.Entry<String, Object>> it=res.entrySet().iterator(); it.hasNext(); )
+		Testcase tc = null;
+		for(Iterator<Map.Entry<String, Object>> it = res.entrySet().iterator(); it.hasNext();)
 		{
 			Map.Entry<String, Object> tup = it.next();
 			if(tup.getKey().equals("testresults"))
@@ -251,46 +259,46 @@ public class ComponentTestLazyPlatform extends TestCase
 				break;
 			}
 		}
-		
-		if(tc!=null && tc.getReports()!=null)
+
+		if(tc != null && tc.getReports() != null)
 		{
-			TestReport[]	reports	= tc.getReports();
-			if(tc.getTestCount()!=reports.length)
+			TestReport[] reports = tc.getReports();
+			if(tc.getTestCount() != reports.length)
 			{
-				throw new AssertionFailedError("Number of testcases do not match. Expected "+tc.getTestCount()+" but was "+reports.length+".");			
+				throw new AssertionFailedError("Number of testcases do not match. Expected " + tc.getTestCount() + " but was " + reports.length + ".");
 			}
-			for(int i=0; i<reports.length; i++)
+			for(int i = 0; i < reports.length; i++)
 			{
 				if(!reports[i].isSucceeded())
 				{
-					throw new AssertionFailedError(reports[i].getDescription()+" Failed with reason: "+reports[i].getReason());
+					throw new AssertionFailedError(reports[i].getDescription() + " Failed with reason: " + reports[i].getReason());
 				}
 			}
 		}
 		else
 		{
-			throw new AssertionFailedError("No test results provided by component: "+res);
+			throw new AssertionFailedError("No test results provided by component: " + res);
 		}
 	}
 
 	public String getName()
 	{
-		return comp.endsWith(".class") ? comp.substring(0, comp.length()-6) : comp;
+		return comp.endsWith(".class") ? comp.substring(0, comp.length() - 6) : comp;
 	}
-	
-	
+
+
 	/**
-	 *  Get a string representation of this test.
+	 * Get a string representation of this test.
 	 */
 	public String toString()
 	{
-		return  getName();
+		return getName();
 	}
 
 	/**
-	 *  Get the timeout.
+	 * Get the timeout.
 	 */
-	public long	getTimeout()
+	public long getTimeout()
 	{
 		return timeout;
 	}

@@ -17,11 +17,9 @@ import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -124,9 +122,8 @@ public class MinimalAgentCreationAgent
 			args.put("num", Integer.valueOf(num+1));
 //				System.out.println("Args: "+num+" "+args);
 
-			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-			cms.createComponent(createPeerName(num+1, agent.getId()), MinimalAgentCreationAgent.this.getClass().getName()+".class",
-				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()), null);
+			agent.createComponent(null,
+				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()).setName(createPeerName(num+1, agent.getId())).setFilename(MinimalAgentCreationAgent.this.getClass().getName()+".class"), null);
 		}
 		else
 		{
@@ -160,10 +157,10 @@ public class MinimalAgentCreationAgent
 			// If nested, use initial component to kill others
 //				else
 			{
-				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				String	initial	= createPeerName(1, agent.getId());
 				IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-				cms.getExternalAccess(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
+				agent.getExternalAccess(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)
 					{
@@ -210,9 +207,8 @@ public class MinimalAgentCreationAgent
 	{
 		final String name = createPeerName(cnt, agent.getId());
 //			System.out.println("Destroying peer: "+name);
-		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
-		cms.destroyComponent(aid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Map<String, Object>>()
+		agent.killComponent(aid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Map<String, Object>>()
 		{
 			public void resultAvailable(Map<String, Object> results)
 			{
@@ -275,7 +271,6 @@ public class MinimalAgentCreationAgent
 			"-cli", "false",
 //			"-awareness", "false"
 		}).get();
-		IComponentManagementService cms = ea.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		cms.createComponent(MinimalAgentCreationAgent.class.getName()+".class", null).get();
+		ea.createComponent(null, new CreationInfo().setFilename(MinimalAgentCreationAgent.class.getName()+".class")).get();
 	}	
 }

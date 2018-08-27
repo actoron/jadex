@@ -22,5 +22,5 @@ public interface IMessageQueueReplicationService
 	 * 
 	 * @return the service Id.
 	 */
-	public String getId();
+	public String getIdString();
 }

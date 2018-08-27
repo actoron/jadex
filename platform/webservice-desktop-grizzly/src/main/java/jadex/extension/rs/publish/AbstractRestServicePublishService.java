@@ -50,7 +50,6 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
@@ -205,8 +204,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		if (serviceid.getProviderId().getPlatformName().equals(component.getId().getPlatformName()))
 		{
 			// Local publish, get the component's classloader.
-			IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredService.SCOPE_PLATFORM));
-			IComponentDescription desc = cms.getComponentDescription(serviceid.getProviderId()).get();
+			IComponentDescription desc = component.getDescription(serviceid.getProviderId()).get();
 			cl = ls.getClassLoader(desc.getResourceIdentifier()).get();
 		}
 		else

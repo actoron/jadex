@@ -13,12 +13,8 @@ import org.junit.Test;
 
 import jadex.base.Starter;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
@@ -57,18 +53,17 @@ public class MicroCreationTest //extends TestCase
 //			"-deftimeout", "-1",
 			"-printpass", "false"}).get(timeout);
 		timeout	= Starter.getDefaultTimeout(platform.getId());
-		IComponentManagementService cms = (IComponentManagementService)platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", Integer.valueOf(10000));
 //		cms.createComponent(null, "jadex/micro/benchmarks/ParallelAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 //		cms.createComponent(null, "jadex/micro/benchmarks/PojoAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-		cms.createComponent(null, "jadex/micro/benchmarks/BlockingAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+		platform.createComponent(null, new CreationInfo(args).setFilename("jadex/micro/benchmarks/BlockingAgentCreationAgent.class"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 //		cms.createComponent(null, "jadex/micro/benchmarks/AgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<Tuple2<String, Object>>>(fut)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void customResultAvailable(IExternalAccess result)
 			{
 				// Agent created. Kill listener waits for result.
 			}
@@ -118,7 +113,6 @@ public class MicroCreationTest //extends TestCase
 		
 //		sus	= null;
 		platform	= null;
-		cms	= null;
 		fut	= null;
 		
 //		try

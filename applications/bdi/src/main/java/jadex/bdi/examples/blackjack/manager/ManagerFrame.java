@@ -43,11 +43,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.DefaultTuple2ResultListener;
@@ -58,7 +54,6 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 /**
@@ -140,21 +135,9 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@Classname("dealerpan")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IFuture<IComponentManagementService>	cms	= ia.getFeature(IRequiredServicesFeature.class).getService("cms");
-//				if(cms.isDone() && cms.get(null)==null)
-//					Thread.dumpStack();
-				cms.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
-				{
-					public void resultAvailable(final IComponentManagementService ces)
-					{
-//						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
-						dealeraid = new BasicComponentIdentifier(LOCAL_DEALER, access.getId().getParent());
-						dealertf.setText(dealeraid.getName());
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-					}
-				}));
+//				dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
+				dealeraid = new BasicComponentIdentifier(LOCAL_DEALER, access.getId().getParent());
+				dealertf.setText(dealeraid.getName());
 				return IFuture.DONE;
 			}
 		});
@@ -169,16 +152,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("dealertf")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getFeature(IRequiredServicesFeature.class).getService("cms")
-							.addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
-						{
-							public void customResultAvailable(Object result)
-							{
-								final IComponentManagementService ces = (IComponentManagementService)result;
-//								dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
-								dealeraid = new BasicComponentIdentifier(dealertf.getText());
-							}
-						});
+//						dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
+						dealeraid = new BasicComponentIdentifier(dealertf.getText());
 						return IFuture.DONE;
 					}
 				});
@@ -375,14 +350,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("close")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getFeature(IRequiredServicesFeature.class).getService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
-						{
-							public void customResultAvailable(Object result)
-							{
-								final IComponentManagementService	cms	= (IComponentManagementService)result;
-								cms.destroyComponent(agent.getId().getParent());
-							}
-						});
+						ia.killComponent(agent.getId().getParent());
 
 						return IFuture.DONE;
 					}
@@ -450,10 +418,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				final Future<Void>	ret	= new Future<Void>();
 				final IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				
-				IComponentManagementService	cms	= ia.getFeature(IRequiredServicesFeature.class)
-					.getLocalService(IComponentManagementService.class);
-				cms.createComponent("BlackjackDealer", "jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml",
-					new CreationInfo(ia.getId().getParent()))
+				ia.createComponent(null,
+					new CreationInfo(ia.getId().getParent()).setName("BlackjackDealer").setFilename("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml"))
 				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 				{
 					@Override
@@ -502,9 +468,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				IComponentIdentifier dealer = (IComponentIdentifier)bia.getBeliefbase().getBelief("localDealerAID").getFact();
 				if(dealer!=null)
 				{
-					IComponentManagementService	cms	= ia.getFeature(IRequiredServicesFeature.class)
-						.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-					cms.destroyComponent(dealer);
+					ia.killComponent(dealer);
 					bia.getBeliefbase().getBelief("localDealerAID").setFact(null);
 				}
 				return IFuture.DONE;
@@ -662,19 +626,17 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						bia.getLogger().info("starting playerAgent: "+player.getName());
 						
-						IComponentManagementService	cms	= ia.getFeature(IRequiredServicesFeature.class)
-							.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
 						Map<String, Object> args = new HashMap<String, Object>();
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
-						cms.createComponent(player.getName(), "jadex/bdi/examples/blackjack/player/Player.agent.xml",
-							new CreationInfo(args, ia.getId().getParent()))
-						.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+						ia.createComponent(null,
+							new CreationInfo(args, ia.getId().getParent()).setName(player.getName()).setFilename("jadex/bdi/examples/blackjack/player/Player.agent.xml"))
+						.addResultListener(new DefaultTuple2ResultListener<IExternalAccess, Map<String, Object>>()
 						{
 							@Override
-							public void firstResultAvailable(IComponentIdentifier playerid)
+							public void firstResultAvailable(IExternalAccess playerid)
 							{
-								player.setAgentID(playerid);
+								player.setAgentID(playerid.getId());
 								ret.setResult(null);
 							}
 							
@@ -709,9 +671,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				@Classname("stop")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IComponentManagementService	cms	= ia.getFeature(IRequiredServicesFeature.class)
-						.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
-					cms.destroyComponent(player.getAgentID());
+					ia.killComponent(player.getAgentID());
 					return IFuture.DONE;
 				}
 			});

@@ -21,17 +21,12 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.simulation.ISimulationService;
@@ -647,44 +642,37 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						ia.getClassLoader(), killonexit!=null ? killonexit.booleanValue() : true);
 					observercenters.add(oc);
 					
-					getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-						.addResultListener(new DefaultResultListener()
+					getExternalAccess().listenToComponent(getExternalAccess().getId())
+						.addIntermediateResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 					{
-						public void resultAvailable(final Object result)
+						@Override
+						public void exceptionOccurred(Exception exception)
 						{
-							((IComponentManagementService)result).listenToComponent(getExternalAccess().getId())
-								.addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
+						}
+						
+						@Override
+						public void resultAvailable(Collection<CMSStatusEvent> result)
+						{
+						}
+						
+						@Override
+						public void intermediateResultAvailable(CMSStatusEvent result)
+						{
+							if(result instanceof CMSTerminatedEvent)
 							{
-								@Override
-								public void exceptionOccurred(Exception exception)
+								SwingUtilities.invokeLater(new Runnable()
 								{
-								}
-								
-								@Override
-								public void resultAvailable(Collection<CMSStatusEvent> result)
-								{
-								}
-								
-								@Override
-								public void intermediateResultAvailable(CMSStatusEvent result)
-								{
-									if(result instanceof CMSTerminatedEvent)
+									public void run()
 									{
-										SwingUtilities.invokeLater(new Runnable()
-										{
-											public void run()
-											{
-												oc.dispose();
-											}
-										});
+										oc.dispose();
 									}
-								}
-								
-								@Override
-								public void finished()
-								{
-								}
-							});
+								});
+							}
+						}
+						
+						@Override
+						public void finished()
+						{
 						}
 					});
 					
@@ -1719,48 +1707,41 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						{
 							final String filename = (String)result;
 							
-							exta.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new DefaultResultListener()
+							// cannot be dummy cid because agent calls getAvatar(cid) in init and needs its avatar
+							// the cid must be the final cid of the component hence it creates unique ids
+///									IComponentIdentifier cid = cms.generateComponentIdentifier(SUtil.createUniqueId(compotype, 3), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
+							// SUtil.createUniqueId(compotype, 3) might lead to conflicts due to race conditions. Use object id as it is really unique.
+//									IComponentIdentifier cid = cms.generateComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
+							// todo: can fail?
+							IComponentIdentifier cid = new BasicComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getId());
+//									IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");
+							// Hack!!! Should have actual description and not just name and local type!?
+							CMSComponentDescription desc = new CMSComponentDescription();
+							desc.setName(cid);
+							desc.setLocalType(compotype);
+							setOwner(ret.getId(), desc);
+//							System.out.println("env create: "+cid);
+							IFuture	future	= exta.createComponent(null,
+								new CreationInfo(null, null, getExternalAccess().getId(), false, getExternalAccess().getModel().getAllImports()).setFilename(filename).setName(cid.getLocalName()), null);
+							future.addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
-									IComponentManagementService cms = (IComponentManagementService)result;
-									// cannot be dummy cid because agent calls getAvatar(cid) in init and needs its avatar
-									// the cid must be the final cid of the component hence it creates unique ids
-///									IComponentIdentifier cid = cms.generateComponentIdentifier(SUtil.createUniqueId(compotype, 3), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
-									// SUtil.createUniqueId(compotype, 3) might lead to conflicts due to race conditions. Use object id as it is really unique.
-//									IComponentIdentifier cid = cms.generateComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
-									// todo: can fail?
-									IComponentIdentifier cid = new BasicComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getId());
-//									IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");
-									// Hack!!! Should have actual description and not just name and local type!?
-									CMSComponentDescription desc = new CMSComponentDescription();
-									desc.setName(cid);
-									desc.setLocalType(compotype);
-									setOwner(ret.getId(), desc);
-//									System.out.println("env create: "+cid);
-									IFuture	future	= cms.createComponent(cid.getLocalName(), filename,
-										new CreationInfo(null, null, getExternalAccess().getId(), false, getExternalAccess().getModel().getAllImports()), null);
-									future.addResultListener(new IResultListener()
+//									System.out.println("env created: "+result);
+//									setOwner(ret.getId(), (IComponentIdentifier)result);
+								}
+								
+								public void exceptionOccurred(final Exception exception)
+								{
+									exta.scheduleStep(new IComponentStep<Void>()
 									{
-										public void resultAvailable(Object result)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
-//											System.out.println("env created: "+result);
-//											setOwner(ret.getId(), (IComponentIdentifier)result);
-										}
-										
-										public void exceptionOccurred(final Exception exception)
-										{
-											exta.scheduleStep(new IComponentStep<Void>()
-											{
-												public IFuture<Void> execute(IInternalAccess ia)
-												{
-													// Todo: Propagate exception to kill application!
-													StringWriter	sw	= new StringWriter();
-													exception.printStackTrace(new PrintWriter(sw));
-													ia.getLogger().severe("Could not create component: "+compotype+"\n"+exception);
-													return IFuture.DONE;
-												}
-											});
+											// Todo: Propagate exception to kill application!
+											StringWriter	sw	= new StringWriter();
+											exception.printStackTrace(new PrintWriter(sw));
+											ia.getLogger().severe("Could not create component: "+compotype+"\n"+exception);
+											return IFuture.DONE;
 										}
 									});
 								}
@@ -1880,14 +1861,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
 				if(mapping.isKillComponent())
 				{
-					getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_COMPONENT))
-						.addResultListener(new DefaultResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							((IComponentManagementService)result).destroyComponent(desc.getName());
-						}
-					});
+					getExternalAccess().killComponent(desc.getName());
 				}
 			}
 		}
@@ -2620,21 +2594,13 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	protected IFuture getComponentType(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
-		getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new DelegationResultListener(ret)
+		getExternalAccess().getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						IExternalAccess exta = (IExternalAccess)result;
-						String componenttype = exta.getLocalType();
-						ret.setResult(componenttype);
-					}
-				});
+				IExternalAccess exta = (IExternalAccess)result;
+				String componenttype = exta.getLocalType();
+				ret.setResult(componenttype);
 			}
 		});
 		return ret;

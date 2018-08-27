@@ -24,10 +24,8 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
@@ -244,9 +242,8 @@ public class JettyRestPublishService extends AbstractRestPublishService
     public IFuture<Void> publishResources(final String pid, final String rootpath)
     {
 		final Future<Void>	ret	= new Future<Void>();
-		IComponentManagementService	cms	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getId();
-		cms.getComponentDescription(cid)
+		component.getDescription(cid)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
 		{
 			public void customResultAvailable(IComponentDescription desc)

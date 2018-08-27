@@ -4,10 +4,6 @@ import java.util.Map;
 
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -22,9 +18,6 @@ public class SimulationEndPlan extends Plan
 
 	public void body()
 	{
-		IComponentManagementService	cms	= getAgent().getFeature(IRequiredServicesFeature.class)
-			.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
-		
 		Environment en = (Environment)getBeliefbase().getBelief("environment").getFact();
 		Creature[] creatures = en.getCreatures();
 		Future<Void>	destroyed	= new Future<Void>();
@@ -33,10 +26,10 @@ public class SimulationEndPlan extends Plan
 		{
 			// System.out.println(creatures[i].getAID());
 			en.removeCreature(creatures[i]);
-			cms.destroyComponent(creatures[i].getAID()).addResultListener(lis);
+			getAgent().killComponent(creatures[i].getAID()).addResultListener(lis);
 		}
 		
 		destroyed.get();
-		cms.destroyComponent(getScope().getComponentIdentifier().getParent());
+		getAgent().killComponent(getScope().getComponentIdentifier().getParent());
 	}
 }

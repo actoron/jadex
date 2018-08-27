@@ -16,7 +16,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -609,18 +609,20 @@ public class Indexer<T>
 		
 		ServiceQuery<IService> q0 = new ServiceQuery<>((Class<IService>)null, null, null);
 		idx.addValue(q0);
-		ServiceQuery<IService> q1 = new ServiceQuery<>(new ClassInfo(IComponentManagementService.class), null, null);
+
+		ServiceQuery<IService> q1 = new ServiceQuery<>(new ClassInfo(ILibraryService.class), null, null);
 		q1.setServiceTags(new String[]{"a", "b", "c"});
 		idx.addValue(q1);
-		ServiceQuery<IService> q2 = new ServiceQuery<>(new ClassInfo(IComponentManagementService.class), null, null);
+		ServiceQuery<IService> q2 = new ServiceQuery<>(new ClassInfo(ILibraryService.class), null, null);
 		q2.setServiceTags(new String[]{"a", "b"});
 		idx.addValue(q2);
-		ServiceQuery<IService> q3 = new ServiceQuery<>(new ClassInfo(IComponentManagementService.class), null, null);
+		ServiceQuery<IService> q3 = new ServiceQuery<>(new ClassInfo(ILibraryService.class), null, null);
+
 		q3.setServiceTags(new String[]{"a"});
 		idx.addValue(q3);
 		
 		List<Tuple2<String, String[]>> spec = new ArrayList<Tuple2<String,String[]>>();
-		Tuple2<String, String[]> s1 = new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[]{IComponentManagementService.class.getName()});
+		Tuple2<String, String[]> s1 = new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[]{ILibraryService.class.getName()});
 		spec.add(s1);
 		Tuple2<String, String[]> s2 = new Tuple2<String, String[]>(ServiceKeyExtractor.KEY_TYPE_TAGS, new String[]{"a", "b"});
 		spec.add(s2);

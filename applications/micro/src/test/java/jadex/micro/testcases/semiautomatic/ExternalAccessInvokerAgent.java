@@ -9,10 +9,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -46,24 +42,17 @@ public class ExternalAccessInvokerAgent
 				final IComponentIdentifier cid = agentselector.selectAgent(null);
 				if(cid!=null)
 				{
-					agent.getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-						.addResultListener(new DefaultResultListener<IComponentManagementService>()
+					agent.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 					{
-						public void resultAvailable(IComponentManagementService cms)
+						public void resultAvailable(IExternalAccess ea)
 						{
-							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+							ea.scheduleStep(new IComponentStep<Void>()
 							{
-								public void resultAvailable(IExternalAccess ea)
+								@Classname("exe")
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									ea.scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("exe")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											System.out.println("Executing step on component: "+ia);
-											return IFuture.DONE;
-										}
-									});
+									System.out.println("Executing step on component: "+ia);
+									return IFuture.DONE;
 								}
 							});
 						}

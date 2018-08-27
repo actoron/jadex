@@ -48,6 +48,7 @@ public class Receiver2Agent
 				{
 					public void resultAvailable(Integer result)
 					{
+//						System.out.println("read: "+cnt[0]);
 						if(cnt[0]++<max)
 						{
 							agent.getFeature(IExecutionFeature.class).waitForDelay(50, self);
@@ -60,7 +61,7 @@ public class Receiver2Agent
 					}
 					public void exceptionOccurred(Exception exception)
 					{
-//						System.out.println("Write failed: "+exception);
+						System.out.println("Write failed: "+exception);
 					}
 				});
 				return IFuture.DONE;

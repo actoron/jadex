@@ -42,7 +42,7 @@ public class FireflyAgent
 	@AgentCreated
 	public void agentCreated()
 	{
-		System.out.println("firefly created: "+agent.getId());
+//		System.out.println("firefly created: "+agent.getId());
 	}
 	
 	/**
@@ -51,7 +51,7 @@ public class FireflyAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		System.out.println("firefly body: "+agent.getId());
+//		System.out.println("firefly body: "+agent.getId());
 		
 		final Future<Void>	ret	= new Future<Void>();
 		

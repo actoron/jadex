@@ -141,7 +141,7 @@ public class TimeoutTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				System.out.println("Comp created.");
+				System.out.println("Comp created: "+cid);
 				callService(cid, testno, 5000).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 			

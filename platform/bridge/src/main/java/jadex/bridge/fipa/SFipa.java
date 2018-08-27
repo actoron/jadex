@@ -5,7 +5,6 @@ import java.util.Set;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
@@ -240,7 +239,7 @@ public class SFipa
 	 *  @param source The source df component description.
 	 *  @param df The df service.
 	 */
-	public static IDFComponentDescription cloneDFComponentDescription(IDFComponentDescription source, IComponentManagementService cms, IDF df)
+	public static IDFComponentDescription cloneDFComponentDescription(IDFComponentDescription source, IDF df)
 	{
 		IDFServiceDescription[] sds = source.getServices();
 		IDFServiceDescription[] tds = null;

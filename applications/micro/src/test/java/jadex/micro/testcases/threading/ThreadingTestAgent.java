@@ -35,9 +35,9 @@ import jadex.micro.testcases.TestAgent;
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class ThreadingTestAgent extends TestAgent
 {
+	private int maxlocal = 10000;
+	private int maxremote = 1000;
 	
-	private int maxLocal = 10000;
-	private int maxRemote = 1000;
 	/**
 	 *  Perform the tests.
 	 */
@@ -45,19 +45,21 @@ public class ThreadingTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if (SReflect.isAndroid()) {
+		if(SReflect.isAndroid()) 
+		{
 			// reduce number of threads for android
-			maxLocal /=100;
-			maxRemote /=100;
+			maxlocal /=100;
+			maxremote /=100;
 		}
+		
 		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
-		testLocal(1, maxLocal).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		testLocal(1, maxlocal).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
 				agent.getLogger().severe("Testagent test rmeote: "+agent.getDescription());
 				tc.addReport(result);
-				testRemote(2, maxRemote).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2, maxremote).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
@@ -107,7 +109,7 @@ public class ThreadingTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				System.out.println("Test remote1: "+agent.getModel().getFullName());
+				System.out.println("Test remote1: "+platform+" "+agent.getModel().getFullName());
 				
 				performTest(platform.getId(), testno, max, false)
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));

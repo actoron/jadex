@@ -305,10 +305,10 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	{
 		if(resfuts!=null)
 		{
-			Exception	ex	= getComponent().getException();
+			Exception ex = getComponent().getException();
 			if(ex!=null)
 			{
-				notified	= true;
+				notified = true;
 				for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resfuts)
 				{
 					fut.setExceptionIfUndone(ex);
@@ -316,6 +316,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 			}
 			else
 			{
+//				System.out.println("setFinished "+getComponent().getId());
 				for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resfuts)
 				{
 					fut.setFinishedIfUndone();

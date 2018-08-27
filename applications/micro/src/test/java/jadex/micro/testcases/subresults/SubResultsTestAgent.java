@@ -5,28 +5,21 @@ import java.util.Collection;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 @ComponentTypes(@ComponentType(name="producer", clazz=ResultProducerAgent.class))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class SubResultsTestAgent extends JunitAgentTest
@@ -40,9 +33,7 @@ public class SubResultsTestAgent extends JunitAgentTest
 	@AgentBody
 	public void body()
 	{
-		IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
-		IComponentIdentifier cid = cms.createComponent("producer", new CreationInfo(agent.getId())).getFirstResult();
-		IExternalAccess ea = cms.getExternalAccess(cid).get();
+		IExternalAccess ea = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename("producer"), null).get();
 		
 		final TestReport tr = new TestReport("#1", "Test if intermediate results are retrieved.");
 		

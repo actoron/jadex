@@ -4,8 +4,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -108,24 +106,56 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 	{
 		final Future<T> ret = new Future<T>();
 		
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+		if(required)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			if(methodinfo!=null)
 			{
-				if(required)
+				if(unit!=null)
+				{
+					IFuture<T> res = SNFPropertyProvider.getRequiredMethodNFPropertyValue(component, sid, methodinfo, propertyname, unit);
+					res.addResultListener(new DelegationResultListener<T>(ret));
+//								return provider.getMethodNFPropertyValue(methodinfo, propertyname, unit);
+				}
+				else
+				{
+					IFuture<T> res = SNFPropertyProvider.getRequiredMethodNFPropertyValue(component, sid, methodinfo, propertyname);
+					res.addResultListener(new DelegationResultListener<T>(ret));
+//								return provider.getMethodNFPropertyValue(methodinfo, propertyname);
+				}
+			}
+			else
+			{
+				if(unit!=null)
+				{
+					IFuture<T> res = SNFPropertyProvider.getRequiredNFPropertyValue(component, sid, propertyname, unit);
+					res.addResultListener(new DelegationResultListener<T>(ret));
+//								return provider.getNFPropertyValue(propertyname, unit);
+				}
+				else
+				{
+					IFuture<T> res = SNFPropertyProvider.getRequiredNFPropertyValue(component, sid, propertyname);
+					res.addResultListener(new DelegationResultListener<T>(ret));
+//								return provider.getNFPropertyValue(propertyname);
+				}
+			}
+		}
+		else
+		{
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
 				{
 					if(methodinfo!=null)
 					{
 						if(unit!=null)
 						{
-							IFuture<T> res = SNFPropertyProvider.getRequiredMethodNFPropertyValue(component, sid, methodinfo, propertyname, unit);
+							IFuture<T> res = SNFPropertyProvider.getMethodNFPropertyValue(result, sid, methodinfo, propertyname, unit);
 							res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getMethodNFPropertyValue(methodinfo, propertyname, unit);
 						}
 						else
 						{
-							IFuture<T> res = SNFPropertyProvider.getRequiredMethodNFPropertyValue(component, sid, methodinfo, propertyname);
+							IFuture<T> res = SNFPropertyProvider.getMethodNFPropertyValue(result, sid, methodinfo, propertyname);
 							res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getMethodNFPropertyValue(methodinfo, propertyname);
 						}
@@ -134,60 +164,21 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 					{
 						if(unit!=null)
 						{
-							IFuture<T> res = SNFPropertyProvider.getRequiredNFPropertyValue(component, sid, propertyname, unit);
+							IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(result, sid, propertyname, unit);
 							res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getNFPropertyValue(propertyname, unit);
 						}
 						else
 						{
-							IFuture<T> res = SNFPropertyProvider.getRequiredNFPropertyValue(component, sid, propertyname);
+							IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(result, sid, propertyname);
 							res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getNFPropertyValue(propertyname);
 						}
 					}
 				}
-				else
-				{
-					cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
-					{
-						public void customResultAvailable(IExternalAccess result)
-						{
-							if(methodinfo!=null)
-							{
-								if(unit!=null)
-								{
-									IFuture<T> res = SNFPropertyProvider.getMethodNFPropertyValue(result, sid, methodinfo, propertyname, unit);
-									res.addResultListener(new DelegationResultListener<T>(ret));
-	//								return provider.getMethodNFPropertyValue(methodinfo, propertyname, unit);
-								}
-								else
-								{
-									IFuture<T> res = SNFPropertyProvider.getMethodNFPropertyValue(result, sid, methodinfo, propertyname);
-									res.addResultListener(new DelegationResultListener<T>(ret));
-	//								return provider.getMethodNFPropertyValue(methodinfo, propertyname);
-								}
-							}
-							else
-							{
-								if(unit!=null)
-								{
-									IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(result, sid, propertyname, unit);
-									res.addResultListener(new DelegationResultListener<T>(ret));
-	//								return provider.getNFPropertyValue(propertyname, unit);
-								}
-								else
-								{
-									IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(result, sid, propertyname);
-									res.addResultListener(new DelegationResultListener<T>(ret));
-	//								return provider.getNFPropertyValue(propertyname);
-								}
-							}
-						}
-					});
-				}
-			}
-		});
-		
+			});
+		}
+
 		return ret;
 	}
 }

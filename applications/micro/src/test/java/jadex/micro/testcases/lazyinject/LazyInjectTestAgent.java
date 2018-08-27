@@ -13,10 +13,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalIntermediateFinishedListener;
@@ -77,7 +76,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 		tuple2FutureTest();
 	}
 
-	private void intermediateFutureTest() {
+	private void intermediateFutureTest() 
+	{
 		IIntermediateFuture<String> fut = ts.getIntermediateResults();
 
 		System.out.println("If test fails after this line, lazy delegation is broken");
@@ -100,26 +100,33 @@ public class LazyInjectTestAgent extends JunitAgentTest
 		final TestReport tr2 = new TestReport("#2", "Test if functional listener works.");
 		reports.add(tr2);
 
-		fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<String>() {
+		fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<String>() 
+		{
 			@Override
-			public void intermediateResultAvailable(String result) {
-
+			public void intermediateResultAvailable(String result) 
+			{
 				System.out.println("first: " + result);
-				if ("hello".equals(result)) {
+				if ("hello".equals(result)) 
+				{
 					tr2.setSucceeded(true);
-				} else {
+				} 
+				else 
+				{
 					tr2.setFailed("Received wrong results.");
 				}
 				checkFinished();
 			}
-		}, new IFunctionalIntermediateFinishedListener<Void>() {
+		}, new IFunctionalIntermediateFinishedListener<Void>() 
+		{
 			@Override
-			public void finished() {
+			public void finished() 
+			{
 				// should not happen as finish is never called
 				tr2.setFailed(new Exception("finish unexpected"));
 				checkFinished();
 			}
-		}, new IFunctionalExceptionListener() {
+		}, new IFunctionalExceptionListener() 
+		{
 			@Override
 			public void exceptionOccurred(Exception exception) {
 				System.out.println("ex: "+exception);
@@ -130,7 +137,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 
 	}
 
-	private void tuple2FutureTest() {
+	private void tuple2FutureTest() 
+	{
 		ITuple2Future<String, Integer> fut = ts.getFirstTupleResult();
 
 		System.out.println("If test fails after this line, lazy delegation is broken");
@@ -158,7 +166,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			public void firstResultAvailable(String result)
 			{
 				System.out.println("first: "+result);
-				if("hello".equals(result)) {
+				if("hello".equals(result)) 
+				{
 					tr2.setSucceeded(true);
 				}
 				else
@@ -198,7 +207,6 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			finished = finished && report.isFinished();
 		}
 
-
 		if(finished)
 		{
 			tc.setReports(reports.toArray(new TestReport[reports.size()]));
@@ -206,8 +214,6 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			agent.killComponent();
 		}
 	}
-
-
 	
 	/**
 	 *  Starter for testing.
@@ -226,7 +232,7 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(LazyInjectTestAgent.class.getCanonicalName() + ".class", null).getSecondResult();
+					ia.createComponent(null, new CreationInfo().setFilename(LazyInjectTestAgent.class.getCanonicalName() + ".class")).getSecondResult();
 					System.out.println("Step done.");
 					return IFuture.DONE;
 				}

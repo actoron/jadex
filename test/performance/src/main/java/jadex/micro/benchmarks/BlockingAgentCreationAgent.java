@@ -13,7 +13,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
@@ -85,15 +84,14 @@ public class BlockingAgentCreationAgent
 		
 		if(num<max)
 		{
-			IComponentManagementService	cms	=  getCMS(agent);
 			Map<String, Object>	args	= new HashMap<String, Object>();
 			args.put("max", Integer.valueOf(max));
 			args.put("num", Integer.valueOf(num));
 			args.put("starttime", Long.valueOf(starttime));
 			args.put("startmem", Long.valueOf(startmem));
-			cms.createComponent(createPeerName(num+1, agent.getId()),
-				BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
-				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()), null);
+			agent.createComponent(null,
+				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
+				.setName(createPeerName(num+1, agent.getId())).setFilename(BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"), null);
 		}
 		else
 		{
@@ -117,10 +115,10 @@ public class BlockingAgentCreationAgent
 			System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 		
 			// Use initial component to kill others
-			IComponentManagementService cms	= getCMS(agent);
+//			IComponentManagementService cms	= getCMS(agent);
 			String	initial	= createPeerName(1, agent.getId());
 			IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-			IExternalAccess exta	= cms.getExternalAccess(cid).get();
+			IExternalAccess exta	= agent.getExternalAccess(cid).get();
 			exta.scheduleStep(new IComponentStep<Void>()
 			{
 				@Classname("deletePeers")
@@ -128,12 +126,12 @@ public class BlockingAgentCreationAgent
 				{
 					IClockService	clock	= getClock(ia);
 					long	killstarttime	= clock.getTime();
-					IComponentManagementService	cms	= getCMS(ia);
+//					IComponentManagementService	cms	= getCMS(ia);
 					for(int i=max; i>1; i--)
 					{
 						String name = createPeerName(i, ia.getId());
 						IComponentIdentifier cid = new BasicComponentIdentifier(name, ia.getId().getRoot());
-						cms.destroyComponent(cid).get();
+						agent.killComponent(cid).get();
 						System.out.println("Successfully destroyed peer: "+name);
 					}
 					
@@ -186,12 +184,6 @@ public class BlockingAgentCreationAgent
 		}
 		return name;
 	}
-	
-	protected static IComponentManagementService	getCMS(IInternalAccess ia)
-	{
-		return ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-	}
-	
 	
 	protected static IClockService getClock(IInternalAccess ia)
 	{

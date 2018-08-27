@@ -6,7 +6,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.commons.Boolean3;
@@ -42,8 +41,7 @@ public class PeerRegistrySynchronizationAgent
 			
 			if(spser!=null)
 			{
-				IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-				cms.destroyComponent(((IService)spser).getId().getProviderId());
+				component.killComponent(((IService)spser).getId().getProviderId());
 			}
 		}
 		catch(ServiceNotFoundException e)

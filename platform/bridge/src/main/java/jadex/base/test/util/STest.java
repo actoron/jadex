@@ -67,7 +67,9 @@ public class STest {
         
 //        config.setLogging(true);
         config.getExtendedPlatformConfiguration().setDebugFutures(true);
-                
+		config.setWelcome(true);
+		
+		
         return config;
     }
 

@@ -126,6 +126,7 @@ public class MicroClassReader
 			clname = model.substring(0, model.indexOf(".class"));
 		clname = clname.replace('\\', '.');
 		clname = clname.replace('/', '.');
+		//clname = clname.replace("..", ".");
 		
 		Class<?> cma = getMicroAgentClass(clname, imports, classloader);
 		
@@ -1846,10 +1847,10 @@ public class MicroClassReader
 	 * Get the mirco agent class.
 	 */
 	// todo: make use of cache
-	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
+	protected Class<?> getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
 	{
 		String	oclname	= clname;
-		Class ret = SReflect.findClass0(clname, imports, classloader);
+		Class<?> ret = SReflect.findClass0(clname, imports, classloader);
 //		System.out.println(clname+" "+ret+" "+classloader);
 		int idx;
 		while(ret == null && (idx = clname.indexOf('.')) != -1)
@@ -1866,6 +1867,9 @@ public class MicroClassReader
 			}
 			// System.out.println(clname+" "+cma+" "+ret);
 		}
+		
+//		System.out.println(clname+" "+ret+" "+classloader.hashCode());
+		
 		if(ret == null)
 		{
 			throw new RuntimeException("Micro agent class not found: " + oclname + ", " + SUtil.arrayToString(imports) + ", " + classloader);

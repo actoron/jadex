@@ -1,16 +1,16 @@
-package jadex.bdi.benchmarks;
+package jadex.bdiv3.benchmarks;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 
 /**
- *  Starter class for agent creation benchmark.
+ * 
  */
-public class StartAgentCreation 
+public class StartCreationBDI 
 {
 	/**
-	 *  Main method starts creation benchmark.
+	 * 
 	 */
 	public static void main(String[] args) throws Exception
 	{
@@ -22,6 +22,6 @@ public class StartAgentCreation
 			"-cli", "false",
 //			"-awareness", "false"
 		}).get();
-		ea.createComponent(null, new CreationInfo().setFilename("jadex.bdi.benchmarks.AgentCreation.agent.xml")).get();
+		ea.createComponent(null, new CreationInfo().setFilename("CreationBDI.class")).get();
 	}
 }
