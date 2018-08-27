@@ -6,6 +6,7 @@ import java.util.Map;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;

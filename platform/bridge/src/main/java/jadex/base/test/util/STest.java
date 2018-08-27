@@ -4,8 +4,6 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
 
@@ -72,12 +70,7 @@ public class STest {
 		
         return config;
     }
-
-    public static IComponentManagementService getCMS(IExternalAccess platform) 
-    {
-        return platform.searchService( new ServiceQuery<>(IComponentManagementService.class)).get();
-    }
-
+    
     public static void terminatePlatform(IExternalAccess platform) 
     {
         platform.killComponent().get();

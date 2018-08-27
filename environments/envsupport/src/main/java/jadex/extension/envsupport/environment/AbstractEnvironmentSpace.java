@@ -25,6 +25,8 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
