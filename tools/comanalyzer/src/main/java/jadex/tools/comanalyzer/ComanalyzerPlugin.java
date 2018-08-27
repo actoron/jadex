@@ -57,12 +57,10 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.ServiceCallEvent;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IFilter;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -1799,88 +1797,81 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */	
 	protected void addMessageListener(final List<Component> added)
 	{
-		jcc.getJCCAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>()
+		for(int i=0; i<added.size(); i++)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			Component	comp	= (Component)added.get(i);
+			final IComponentIdentifier	cid	= comp.getDescription().getName();
+			jcc.getJCCAccess().getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>()
 			{
-				for(int i=0; i<added.size(); i++)
+				public void customResultAvailable(IExternalAccess ea)
 				{
-					Component	comp	= (Component)added.get(i);
-					final IComponentIdentifier	cid	= comp.getDescription().getName();
-					cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>()
+					// Generic listener
+					IIntermediateResultListener<Object>	lis	= new SwingIntermediateDefaultResultListener<Object>()
 					{
-						public void customResultAvailable(IExternalAccess ea)
+						@Override
+						public void customIntermediateResultAvailable(Object result)
 						{
-							// Generic listener
-							IIntermediateResultListener<Object>	lis	= new SwingIntermediateDefaultResultListener<Object>()
-							{
-								@Override
-								public void customIntermediateResultAvailable(Object result)
-								{
-									addEvent(result);
-								}
-								
-								@Override
-								public void customFinished()
-								{
-									subscriptions.remove(cid);
-								}
-								
-								@Override
-								public void customExceptionOccurred(Exception exception)
-								{
-									subscriptions.remove(cid);
-									super.customExceptionOccurred(exception);
-								}
-							};
-							
-							// Messages
-							ISubscriptionIntermediateFuture<Object>	sub	= (ISubscriptionIntermediateFuture<Object>)
-								ea.scheduleStep(new IComponentStep<Collection<Object>>()
-							{
-								@SuppressWarnings({"rawtypes", "unchecked"})
-								@Override
-								public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
-								{
-									return (ISubscriptionIntermediateFuture)((IInternalMessageFeature)ia.getFeature(IMessageFeature.class))
-										.getMessageEvents();
-								}
-							});
-							subscriptions.put(cid, sub);
-							sub.addResultListener(lis);
-							
-							// Service calls
-							sub	= (ISubscriptionIntermediateFuture<Object>)
-								ea.scheduleStep(new IComponentStep<Collection<Object>>()
-							{
-								@SuppressWarnings({"rawtypes", "unchecked"})
-								@Override
-								public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
-								{
-									final IRequiredServicesFeature	feat	= ia.getFeature0(IRequiredServicesFeature.class);
-									if(feat instanceof IInternalServiceMonitoringFeature)
-									{
-										return (ISubscriptionIntermediateFuture)((IInternalServiceMonitoringFeature)feat).getServiceEvents();
-									}
-									else
-									{
-										@SuppressWarnings("unchecked")
-										SubscriptionIntermediateFuture<Object>	ret	= (SubscriptionIntermediateFuture<Object>)SFuture.getFuture(SubscriptionIntermediateFuture.class);
-										ret.setFinished();
-										return ret;
-									}
-								}
-							});
-							subscriptions.put(cid, sub);
-							sub.addResultListener(lis);
-							
-							// Todo: provided
-						}	
+							addEvent(result);
+						}
+						
+						@Override
+						public void customFinished()
+						{
+							subscriptions.remove(cid);
+						}
+						
+						@Override
+						public void customExceptionOccurred(Exception exception)
+						{
+							subscriptions.remove(cid);
+							super.customExceptionOccurred(exception);
+						}
+					};
+					
+					// Messages
+					ISubscriptionIntermediateFuture<Object>	sub	= (ISubscriptionIntermediateFuture<Object>)
+						ea.scheduleStep(new IComponentStep<Collection<Object>>()
+					{
+						@SuppressWarnings({"rawtypes", "unchecked"})
+						@Override
+						public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
+						{
+							return (ISubscriptionIntermediateFuture)((IInternalMessageFeature)ia.getFeature(IMessageFeature.class))
+								.getMessageEvents();
+						}
 					});
-				}
-			}
-		});
+					subscriptions.put(cid, sub);
+					sub.addResultListener(lis);
+					
+					// Service calls
+					sub	= (ISubscriptionIntermediateFuture<Object>)
+						ea.scheduleStep(new IComponentStep<Collection<Object>>()
+					{
+						@SuppressWarnings({"rawtypes", "unchecked"})
+						@Override
+						public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
+						{
+							final IRequiredServicesFeature	feat	= ia.getFeature0(IRequiredServicesFeature.class);
+							if(feat instanceof IInternalServiceMonitoringFeature)
+							{
+								return (ISubscriptionIntermediateFuture)((IInternalServiceMonitoringFeature)feat).getServiceEvents();
+							}
+							else
+							{
+								@SuppressWarnings("unchecked")
+								SubscriptionIntermediateFuture<Object>	ret	= (SubscriptionIntermediateFuture<Object>)SFuture.getFuture(SubscriptionIntermediateFuture.class);
+								ret.setFinished();
+								return ret;
+							}
+						}
+					});
+					subscriptions.put(cid, sub);
+					sub.addResultListener(lis);
+					
+					// Todo: provided
+				}	
+			});
+		}
 	}
 
 	/**

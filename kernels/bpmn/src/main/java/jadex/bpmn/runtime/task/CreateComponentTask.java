@@ -16,18 +16,15 @@ import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -98,7 +95,7 @@ public class CreateComponentTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IComponentManagementService cms	= instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//		IComponentManagementService cms	= instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		String name = (String)context.getParameterValue("name");
 		String model = (String)context.getParameterValue("model");
 		String config = (String)context.getParameterValue("configuration");
@@ -228,12 +225,21 @@ public class CreateComponentTask implements ITask
 		// todo: rid
 		// todo: monitoring
 		PublishEventLevel elm = monitoring!=null && monitoring.booleanValue() ? PublishEventLevel.COARSE: PublishEventLevel.OFF;
-		cms.createComponent(name, model,
-			new CreationInfo(config, args, sub? instance.getId() : null, 
-				suspend, master, daemon, autoshutdown, synchronous, persistable, elm ,
-				instance.getModel().getAllImports(), bindings,
-				instance.getModel().getResourceIdentifier()), lis)
-			.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(creationfuture)));
+		CreationInfo ci = new CreationInfo(config, args, sub? instance.getId() : null, 
+			suspend, master, daemon, autoshutdown, synchronous, persistable, elm ,
+			instance.getModel().getAllImports(), bindings,
+			instance.getModel().getResourceIdentifier());
+		ci.setFilename(model);
+		ci.setName(name);
+		instance.createComponent(null, ci, lis)
+			.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(creationfuture)
+		{
+			@Override
+			public void customResultAvailable(IExternalAccess result) throws Exception
+			{
+				creationfuture.setResult(result.getId());
+			}
+		}));
 		
 		creationfuture.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{
@@ -265,8 +271,7 @@ public class CreateComponentTask implements ITask
 		{
 			public void resultAvailable(final IComponentIdentifier cid)
 			{
-				IComponentManagementService cms	= instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				IFuture<Map<String, Object>> fut = cms.destroyComponent(cid);
+				IFuture<Map<String, Object>> fut = instance.killComponent(cid);
 				fut.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 				{
 					public void customResultAvailable(Map<String, Object> result)

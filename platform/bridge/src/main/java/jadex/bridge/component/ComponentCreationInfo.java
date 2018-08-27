@@ -15,7 +15,7 @@ public class ComponentCreationInfo
 	//-------- attributes --------
 	
 	/** The model. */
-	protected IModelInfo	model;
+	protected IModelInfo model;
 	
 	/** The start configuration name. */
 	protected String config;
@@ -31,7 +31,7 @@ public class ComponentCreationInfo
 	protected ProvidedServiceInfo[]	infos;
 	
 	/** The required service bindings. */
-	protected RequiredServiceBinding[]	bindings;
+	protected RequiredServiceBinding[] bindings;
 	
 	//-------- constructors --------
 	
@@ -61,7 +61,7 @@ public class ComponentCreationInfo
 	/**
 	 *  Get the model.
 	 */
-	public IModelInfo	getModel()
+	public IModelInfo getModel()
 	{
 		return this.model;
 	}
@@ -69,7 +69,7 @@ public class ComponentCreationInfo
 	/**
 	 *  Get the configuration.
 	 */
-	public String	getConfiguration()
+	public String getConfiguration()
 	{
 		return this.config;
 	}
@@ -85,7 +85,7 @@ public class ComponentCreationInfo
 	/**
 	 *  Get the component description.
 	 */
-	public IComponentDescription	getComponentDescription()
+	public IComponentDescription getComponentDescription()
 	{
 		return this.desc;
 	}
@@ -95,7 +95,7 @@ public class ComponentCreationInfo
 	 *  
 	 *  @return The provided service infos..
 	 */
-	public ProvidedServiceInfo[]	getProvidedServiceInfos()
+	public ProvidedServiceInfo[] getProvidedServiceInfos()
 	{
 		return infos;
 	}
@@ -108,4 +108,56 @@ public class ComponentCreationInfo
 	{
 		return bindings;
 	}
+	
+//	/**
+//	 *  Create a component creation info.
+//	 */
+//	public static ComponentCreationInfo createComponentCreationInfo(boolean systemcomponent, IComponentIdentifier cid, CreationInfo cinfo, IModelInfo lmodel, long time, Cause cause, IComponentIdentifier creator)
+//	{
+//		Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
+//		Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
+//		Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
+//		Boolean sync = cinfo.getSynchronous()!=null? cinfo.getSynchronous(): lmodel.getSynchronous(cinfo.getConfiguration());
+//		Boolean persistable = cinfo.getPersistable()!=null? cinfo.getPersistable(): lmodel.getPersistable(cinfo.getConfiguration());
+//		PublishEventLevel moni = cinfo.getMonitoring()!=null? cinfo.getMonitoring(): lmodel.getMonitoring(cinfo.getConfiguration());
+//		// Inherit monitoring from parent if null
+//		if(moni==null && cinfo.getParent()!=null)
+//		{
+//			CMSComponentDescription desc = (CMSComponentDescription)SComponentManagementService.getDescription(cinfo.getParent());
+//			moni = desc.getMonitoring();
+//		}
+//		
+//		// todo: how to do platform init so that clock is always available?
+//		final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master!=null ? master.booleanValue() : false,
+//			daemon!=null ? daemon.booleanValue() : false, autosd!=null ? autosd.booleanValue() : false, sync!=null ? sync.booleanValue() : false,
+//			persistable!=null ? persistable.booleanValue() : false, moni,
+//			lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), time, creator, cause, systemcomponent);
+//		
+//		// Use first configuration if no config specified.
+//		String config = cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
+//			: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
+//		ComponentCreationInfo cci = new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, cinfo.getProvidedServiceInfos(), cinfo.getRequiredServiceBindings());
+//		
+//		return cci;
+//	}
+//	
+//	/**
+//	 *  Create a component creation info.
+//	 */
+//	public static ComponentCreationInfo createComponentCreationInfo(CMSComponentDescription desc, CreationInfo cinfo, IModelInfo lmodel)
+//	{
+//		Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
+//		Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
+//		Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
+//		Boolean sync = cinfo.getSynchronous()!=null? cinfo.getSynchronous(): lmodel.getSynchronous(cinfo.getConfiguration());
+//		Boolean persistable = cinfo.getPersistable()!=null? cinfo.getPersistable(): lmodel.getPersistable(cinfo.getConfiguration());
+//		PublishEventLevel moni = cinfo.getMonitoring()!=null? cinfo.getMonitoring(): lmodel.getMonitoring(cinfo.getConfiguration());
+//		
+//		// Use first configuration if no config specified.
+//		String config = cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
+//			: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
+//		ComponentCreationInfo cci = new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), desc, cinfo.getProvidedServiceInfos(), cinfo.getRequiredServiceBindings());
+//		
+//		return cci;
+//	}
 }

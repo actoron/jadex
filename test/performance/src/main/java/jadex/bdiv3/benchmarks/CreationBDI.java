@@ -21,7 +21,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -135,15 +134,9 @@ public class CreationBDI
 			args.put("startmem", Long.valueOf(startmem));
 //			System.out.println("Args: "+num+" "+args);
 
-			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-				.addResultListener(new DefaultResultListener<IComponentManagementService>()
-			{
-				public void resultAvailable(IComponentManagementService result)
-				{
-					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getId()), "jadex.bdiv3.benchmarks.CreationBDI.class",
-						new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()), null);
-				}
-			});
+			agent.createComponent(null,
+				new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier())
+				.setFilename("jadex.bdiv3.benchmarks.CreationBDI.class").setName(createPeerName(num+1, agent.getId())), null);
 		}
 		else
 		{
@@ -171,38 +164,32 @@ public class CreationBDI
 					System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 				
 					// Use initial component to kill others
-					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+					String	initial	= createPeerName(0, agent.getId());
+					IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
+					agent.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 					{
-						public void resultAvailable(IComponentManagementService cms)
+						public void resultAvailable(IExternalAccess exta)
 						{
-							String	initial	= createPeerName(0, agent.getId());
-							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+							exta.scheduleStep(new IComponentStep<Void>()
 							{
-								public void resultAvailable(IExternalAccess exta)
+								@Classname("deletePeers")
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									exta.scheduleStep(new IComponentStep<Void>()
+//									final CreationBDI	cbdi	= (CreationBDI)((PojoBDIAgent)ia).getPojoAgent();
+									final CreationBDI cbdi = (CreationBDI)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+									cbdi.getClock().addResultListener(new IResultListener<IClockService>()
 									{
-										@Classname("deletePeers")
-										public IFuture<Void> execute(IInternalAccess ia)
+										public void resultAvailable(IClockService clock)
 										{
-//											final CreationBDI	cbdi	= (CreationBDI)((PojoBDIAgent)ia).getPojoAgent();
-											final CreationBDI cbdi = (CreationBDI)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
-											cbdi.getClock().addResultListener(new IResultListener<IClockService>()
-											{
-												public void resultAvailable(IClockService clock)
-												{
-													cbdi.deletePeers(max, System.currentTimeMillis(), dur, pera, omem, upera);
-												}
-												
-												public void exceptionOccurred(Exception exception)
-												{
-													exception.printStackTrace();
-												}
-											});
-											return IFuture.DONE;
+											cbdi.deletePeers(max, clock.getTime(), dur, pera, omem, upera);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											exception.printStackTrace();
 										}
 									});
+									return IFuture.DONE;
 								}
 							});
 						}
@@ -220,27 +207,21 @@ public class CreationBDI
 		final long omem, final double upera)
 	{
 		final String name = createPeerName(cnt, agent.getId());
-		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
+		agent.killComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
 		{
-			public void resultAvailable(IComponentManagementService cms)
+			public void resultAvailable(Map<String, Object> result)
 			{
-				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
-				cms.destroyComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
+				System.out.println("Successfully destroyed peer: "+name);
+				
+				if(cnt>1)
 				{
-					public void resultAvailable(Map<String, Object> result)
-					{
-						System.out.println("Successfully destroyed peer: "+name);
-						
-						if(cnt>1)
-						{
-							deletePeers(cnt-1, killstarttime, dur, pera, omem, upera);
-						}
-						else
-						{
-							killLastPeer(killstarttime, dur, pera, omem, upera);
-						}
-					}
-				});
+					deletePeers(cnt-1, killstarttime, dur, pera, omem, upera);
+				}
+				else
+				{
+					killLastPeer(killstarttime, dur, pera, omem, upera);
+				}
 			}
 		});
 	}
@@ -290,11 +271,11 @@ public class CreationBDI
 		return agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 	}
 
-	/**
-	 *  Get the cms.
-	 */
-	protected IFuture<IComponentManagementService>	getCMS()
-	{
-		return agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-	}
+//	/**
+//	 *  Get the cms.
+//	 */
+//	protected IFuture<IComponentManagementService>	getCMS()
+//	{
+//		return agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//	}
 }

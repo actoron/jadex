@@ -17,6 +17,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.IBootstrapFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -33,7 +34,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.kernelbase.IBootstrapFactory;
 import jadex.micro.annotation.Agent;
 import jadex.micro.features.impl.MicroInjectionComponentFeature;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
@@ -61,7 +61,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	protected static final LazyResource ICON = new LazyResource(MicroAgentFactory.class, "/jadex/micro/images/micro_agent.png");
 	
 	/** The specific component features for micro agents. */
-	public static final Collection<IComponentFeatureFactory>	MICRO_FEATURES	= Collections.unmodifiableCollection(
+	public static final Collection<IComponentFeatureFactory> MICRO_FEATURES = Collections.unmodifiableCollection(
 		Arrays.asList(
 			MicroPojoComponentFeature.FACTORY,
 			MicroInjectionComponentFeature.FACTORY,
@@ -140,7 +140,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new MicroModelLoader();
-		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
+		features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}
 	
 	/**

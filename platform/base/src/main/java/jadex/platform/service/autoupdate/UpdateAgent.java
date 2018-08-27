@@ -24,7 +24,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.bridge.service.types.email.Email;
@@ -43,7 +42,6 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Component;
@@ -64,7 +62,6 @@ import jadex.xml.writer.XMLWriterFactory;
 @Agent
 @RequiredServices(
 {	
-	@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
 	@RequiredService(name="chatser", type=IChatGuiService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
 	@RequiredService(name="emailser", type=IEmailService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
 	@RequiredService(name="depser", type=IDependencyService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
@@ -107,8 +104,8 @@ public class UpdateAgent implements IUpdateService
 	protected IInternalAccess agent;
 	
 	/** The cms. */
-	@AgentServiceSearch
-	protected IComponentManagementService cms;
+//	@AgentServiceSearch
+//	protected IComponentManagementService cms;
 	
 //	/** The new cid (need to be acknowledge by create and via call ack). */
 //	protected IComponentIdentifier newcomp;
@@ -177,7 +174,7 @@ public class UpdateAgent implements IUpdateService
 												public void resultAvailable(Void result) 
 												{
 													// Kill platform.
-													cms.destroyComponent(agent.getId().getRoot());	
+													agent.killComponent(agent.getId().getRoot());	
 												}
 												
 												public void exceptionOccurred(Exception exception) 
@@ -297,26 +294,19 @@ public class UpdateAgent implements IUpdateService
 	{
 		// Todo: version service!?
 		final Future<String>	ret	= new Future<String>();
-		IFuture<IComponentManagementService>	cms	= agent.getFeature(IRequiredServicesFeature.class).getService("cms");
-		cms.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String>(ret)
+		agent.getExternalAccess(newcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess exta)
 			{
-				cms.getExternalAccess(newcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
+				exta.scheduleStep(new IComponentStep<String>()
 				{
-					public void customResultAvailable(IExternalAccess exta)
+					@Classname("getVersionInfo")
+					
+					public IFuture<String> execute(IInternalAccess ia)
 					{
-						exta.scheduleStep(new IComponentStep<String>()
-						{
-							@Classname("getVersionInfo")
-							
-							public IFuture<String> execute(IInternalAccess ia)
-							{
-								return new Future<String>(getLocalVersionInfo());
-							}
-						}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<String>(ret)));
+						return new Future<String>(getLocalVersionInfo());
 					}
-				});
+				}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<String>(ret)));
 			}
 		});
 		
@@ -539,62 +529,55 @@ public class UpdateAgent implements IUpdateService
 		
 //		String cmd = System.getProperty("sun.java.command");
 		
-		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, StartOptions>(ret)
+		agent.getExternalAccess(agent.getId().getRoot())
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, StartOptions>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess plat)
 			{
-				cms.getExternalAccess(agent.getId().getRoot())
-					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, StartOptions>(ret)
+				plat.getArguments().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, StartOptions>(ret)
 				{
-					public void customResultAvailable(IExternalAccess plat)
+					public void customResultAvailable(Map<String, Object> args)
 					{
-						plat.getArguments().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, StartOptions>(ret)
+						// Set program args according to the original ones
+						// Will change the argument with the update agent to have the creator cid
+						
+						String[] oldargs = (String[])args.get(IPlatformConfiguration.PROGRAM_ARGUMENTS);
+						List<String> newargs = new ArrayList<String>();
+						
+						if(oldargs!=null)
 						{
-							public void customResultAvailable(Map<String, Object> args)
+							for(int i=0; i<oldargs.length; i++)
 							{
-								// Set program args according to the original ones
-								// Will change the argument with the update agent to have the creator cid
-								
-								String[] oldargs = (String[])args.get(IPlatformConfiguration.PROGRAM_ARGUMENTS);
-								List<String> newargs = new ArrayList<String>();
-								
-								if(oldargs!=null)
-								{
-									for(int i=0; i<oldargs.length; i++)
-									{
 //										if("-component".equals(oldargs[i]) && oldargs[i+1].indexOf("jadex.platform.service.autoupdate.FileUpdateAgent")!=-1)
-										if("-component".equals(oldargs[i]) && (oldargs[i+1].indexOf("UpdateAgent")!=-1
-											// Hack!!! Shouldn't know about daemon responder!?
-											|| oldargs[i+1].indexOf("DaemonResponderAgent")!=-1))
-										{
-											i++;
-										}
-										else
-										{
-											newargs.add("\""+SUtil.escapeString(oldargs[i])+"\"");
-										}
-									}
+								if("-component".equals(oldargs[i]) && (oldargs[i+1].indexOf("UpdateAgent")!=-1
+									// Hack!!! Shouldn't know about daemon responder!?
+									|| oldargs[i+1].indexOf("DaemonResponderAgent")!=-1))
+								{
+									i++;
 								}
-								
-								// Add -component jadex.platform.service.autoupdate.FileUpdateAgent.class with fresh argument
-								Map<String, Object> uaargs = getUpdateArguments();
-								String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), uaargs, null, JavaWriter.getObjectHandler());
-//								System.out.println("pre: "+argsstr);
-								argsstr	= SUtil.escapeString(argsstr);	// First: escape string
-								argsstr = argsstr.replace("\"", "\\\\\""); // then escape quotes again for argument parser
-//								System.out.println("post: "+argsstr);
-								String deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\",null)";
-								newargs.add("-component");
-								newargs.add("\""+agent.getModel().getFullName().replace(".", "/")+"Agent.class(:"+deser+")\"");
-
-								so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(newargs), " "));
-								
-								ret.setResult(so);
+								else
+								{
+									newargs.add("\""+SUtil.escapeString(oldargs[i])+"\"");
+								}
 							}
-						}));
+						}
+						
+						// Add -component jadex.platform.service.autoupdate.FileUpdateAgent.class with fresh argument
+						Map<String, Object> uaargs = getUpdateArguments();
+						String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), uaargs, null, JavaWriter.getObjectHandler());
+//								System.out.println("pre: "+argsstr);
+						argsstr	= SUtil.escapeString(argsstr);	// First: escape string
+						argsstr = argsstr.replace("\"", "\\\\\""); // then escape quotes again for argument parser
+//								System.out.println("post: "+argsstr);
+						String deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\",null)";
+						newargs.add("-component");
+						newargs.add("\""+agent.getModel().getFullName().replace(".", "/")+"Agent.class(:"+deser+")\"");
+
+						so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(newargs), " "));
+						
+						ret.setResult(so);
 					}
-				});
+				}));
 			}
 		});
 		

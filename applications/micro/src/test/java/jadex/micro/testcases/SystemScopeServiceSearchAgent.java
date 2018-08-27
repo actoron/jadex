@@ -7,7 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -24,14 +24,14 @@ import jadex.micro.annotation.Results;
  */
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
+@RequiredServices(@RequiredService(name="cms", type=ILibraryService.class))
 public class SystemScopeServiceSearchAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;
 	
 	@AgentServiceSearch
-	protected IComponentManagementService cms;
+	protected ILibraryService cms;
 	
 	@AgentBody
 	public void body()
@@ -39,7 +39,7 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 		TestReport tr1 = new TestReport("#1", "Test if system service can be found without scope with SServiceProvider");
 		try
 		{
-			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
+			ILibraryService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 			System.out.println("Found: "+cms);
 			tr1.setSucceeded(true);
 		}
@@ -52,7 +52,7 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 		TestReport tr2 = new TestReport("#2", "Test if system service can be found without scope with required service def");
 		try
 		{
-			IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
+			IFuture<ILibraryService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 			System.out.println("Found: "+fut.get());
 			tr2.setSucceeded(true);
 		}

@@ -31,7 +31,8 @@ public class ProviderAgent implements ITestService
 	/**
 	 *  Example implementation of the method.
 	 */
-	public IIntermediateFuture<String> getIntermediateResults() {
+	public IIntermediateFuture<String> getIntermediateResults() 
+	{
 		IntermediateFuture<String> ret = new IntermediateFuture<String>();
 		ret.addIntermediateResult("hello");
 		System.out.println("called method getIntermediateResults()");

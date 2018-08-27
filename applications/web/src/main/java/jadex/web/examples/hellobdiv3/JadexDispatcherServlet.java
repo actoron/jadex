@@ -12,9 +12,8 @@ import javax.servlet.http.HttpSession;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.ThreadSuspendable;
 
 /**
@@ -49,8 +48,7 @@ public class JadexDispatcherServlet extends HttpServlet
 		};
 //		ThreadSuspendable	sus	= new ThreadSuspendable();
 		this.platform	= Starter.createPlatform(args).get(30000);
-		IComponentManagementService cms = platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(30000);
-		cms.createComponent("jadex.web.examples.hellobdiv3.SayHelloBDI.class", null).getFirstResult();
+		platform.createComponent(null, new CreationInfo().setFilename("jadex.web.examples.hellobdiv3.SayHelloBDI.class")).getFirstResult();
 	}
 	
 	/**

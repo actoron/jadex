@@ -23,12 +23,10 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
@@ -44,7 +42,6 @@ import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.ExceptionResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -101,7 +98,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	protected IInternalAccess agent;
 	
 	/** The cms (cached for speed). */
-	protected IComponentManagementService	cms;
+//	protected IComponentManagementService	cms;
 	
 	/** The security service. */
 	protected ISecurityService secservice;
@@ -179,7 +176,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		this.cms = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+//		this.cms = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		intmsgfeat = (IInternalMessageFeature) agent.getFeature(IMessageFeature.class);
 		if(debug)
 			System.out.println(agent+": started relay transport");
@@ -268,7 +265,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			final ISerializationServices serser = (ISerializationServices) Starter.getPlatformValue(agent.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 			
 //			System.out.println("Final receiver, delivering to component: " + body);
-			AbstractTransportAgent.deliverRemoteMessage(agent, secservice, cms, serser, source, unpacked.get(0), unpacked.get(1));
+			AbstractTransportAgent.deliverRemoteMessage(agent, secservice, serser, source, unpacked.get(0), unpacked.get(1));
 			
 			TerminableFuture<Integer> ret = new TerminableFuture<>();
 			ret.setResult(PRIORITY);
@@ -874,7 +871,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					final ISerializationServices serser = (ISerializationServices) Starter.getPlatformValue(agent.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 					
 //					System.out.println("Final receiver, delivering to component: " + body);
-					AbstractTransportAgent.deliverRemoteMessage(agent, secservice, cms, serser, source, unpacked.get(0), unpacked.get(1));
+					AbstractTransportAgent.deliverRemoteMessage(agent, secservice, serser, source, unpacked.get(0), unpacked.get(1));
 				}
 			}
 		});

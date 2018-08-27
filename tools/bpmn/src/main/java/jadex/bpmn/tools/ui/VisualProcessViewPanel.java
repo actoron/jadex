@@ -65,12 +65,8 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IBreakpointPanel;
@@ -1070,26 +1066,19 @@ public class VisualProcessViewPanel extends JPanel
 	 */
 	protected void doStep()
 	{
-		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(this)
+		IFuture<Void> ret = access.stepComponent(access.getId(), getStepInfo());
+		ret.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public void resultAvailable(Void result)
 			{
-				IFuture<Void> ret = cms.stepComponent(access.getId(), getStepInfo());
-				ret.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
-				{
-					public void resultAvailable(Void result)
-					{
-						updateViews();
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-					}
-				}));
+				updateViews();
 			}
-		});
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		}));
 	}
 	
 	/**
@@ -1118,15 +1107,8 @@ public class VisualProcessViewPanel extends JPanel
 						abps.add(bp);
 					}
 					
-					access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-					{
-						public void customResultAvailable(final IComponentManagementService cms)
-						{
-							cms.setComponentBreakpoints(access.getId(), (String[])abps.toArray(new String[abps.size()]))
-								.addResultListener(new DelegationResultListener<Void>(ret));
-						}
-					});
+					access.setComponentBreakpoints(access.getId(), (String[])abps.toArray(new String[abps.size()]))
+						.addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -1141,20 +1123,13 @@ public class VisualProcessViewPanel extends JPanel
 	{
 		final Future<List<String>> ret = new Future<List<String>>();
 		
-		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, List<String>>(ret)
+		access.getDescription(access.getId())
+			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, List<String>>(ret)
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public void customResultAvailable(IComponentDescription desc) 
 			{
-				cms.getComponentDescription(access.getId())
-					.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, List<String>>(ret)
-				{
-					public void customResultAvailable(IComponentDescription desc) 
-					{
-						List<String> bps = new ArrayList<String>(Arrays.asList(desc.getBreakpoints()));
-						ret.setResult(bps);
-					}
-				});
+				List<String> bps = new ArrayList<String>(Arrays.asList(desc.getBreakpoints()));
+				ret.setResult(bps);
 			}
 		});
 				

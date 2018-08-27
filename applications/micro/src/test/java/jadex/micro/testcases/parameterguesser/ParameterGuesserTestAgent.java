@@ -12,12 +12,9 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -25,7 +22,6 @@ import jadex.micro.annotation.Results;
  *  Test if the parameter guesser works correctly when using injection annotations.
  */
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ParameterGuesserTestAgent extends JunitAgentTest
 {
@@ -54,9 +50,7 @@ public class ParameterGuesserTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport(""+no, " Test if the parameter guesser works correctly when using injection annotations.");
 		try
 		{
-			IComponentManagementService cms = (IComponentManagementService)agent.getFeature(IRequiredServicesFeature.class).getService("cms").get();
-//			IComponentIdentifier cid = cms.createComponent(null, model, new CreationInfo(agent.getComponentIdentifier()), null).get();
-			IComponentIdentifier cid = cms.createComponent(model, new CreationInfo(agent.getId())).getFirstResult();
+			IComponentIdentifier cid = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model)).getFirstResult();
 
 			IInjectionTestService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInjectionTestService.class).setProvider(cid)).get();
 

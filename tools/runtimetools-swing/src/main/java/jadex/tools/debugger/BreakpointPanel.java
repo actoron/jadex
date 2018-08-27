@@ -29,12 +29,8 @@ import javax.swing.table.TableModel;
 
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
@@ -42,7 +38,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.TableSorter;
 
 /**
@@ -291,15 +286,8 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 					{
 						bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
 					}
-					access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-						.addResultListener(new SwingDefaultResultListener(BreakpointPanel.this)
-					{
-						public void customResultAvailable(Object result)
-						{
-							((IComponentManagementService)result).setComponentBreakpoints(
-								description.getName(), (String[])bps.toArray(new String[bps.size()]));
-						}
-					});
+					access.setComponentBreakpoints(
+						description.getName(), (String[])bps.toArray(new String[bps.size()]));
 				}
 			});
 			return	ret;

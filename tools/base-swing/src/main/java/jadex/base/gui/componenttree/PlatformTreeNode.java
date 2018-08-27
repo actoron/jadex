@@ -13,7 +13,6 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.gui.SGUI;
 
 /**
@@ -46,9 +45,10 @@ public class PlatformTreeNode extends ComponentTreeNode
 	 *  Create a new service container node.
 	 */
 	public PlatformTreeNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, IComponentDescription desc,
-		IComponentManagementService cms, ComponentIconCache iconcache, IExternalAccess access)
+//		IComponentManagementService cms, 
+		ComponentIconCache iconcache, IExternalAccess access)
 	{
-		super(parent, model, tree, desc, cms, iconcache, access);
+		super(parent, model, tree, desc, iconcache, access);
 		
 //		System.out.println(getId());
 //		proxy = new ViewTreeNode("Platforms", this, model, tree, null);

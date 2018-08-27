@@ -23,7 +23,6 @@ import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
@@ -47,7 +46,7 @@ public class DirectoryFacilitatorService	implements IDF
 	protected IInternalAccess provider;
 	
 	/** The cached component management service. */
-	protected IComponentManagementService cms;
+//	protected IComponentManagementService cms;
 	
 	/** The cached clock service. */
 	protected IClockService clockservice;
@@ -76,7 +75,7 @@ public class DirectoryFacilitatorService	implements IDF
 		Future<IDFComponentDescription> ret = new Future<IDFComponentDescription>();
 		
 		//System.out.println("Registered: "+adesc.getName()+" "+adesc.getLeaseTime());
-		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, cms, this);
+		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, this);
 
 		// Add description, when valid.
 		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clockservice.getTime())
@@ -130,7 +129,7 @@ public class DirectoryFacilitatorService	implements IDF
 		Future<IDFComponentDescription> ret = new Future<IDFComponentDescription>();
 		
 		// Use clone to avoid caller manipulating object after insertion.
-		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, cms, this);
+		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, this);
 
 		// Change description, when valid.
 		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clockservice.getTime())
@@ -428,7 +427,7 @@ public class DirectoryFacilitatorService	implements IDF
 		final Future<Void> ret = new Future<Void>();
 		
 		final boolean[]	services	= new boolean[2];
-		cms	= ((IInternalRequiredServicesFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+//		cms	= ((IInternalRequiredServicesFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		boolean	setresult;
 		synchronized(services)
 		{

@@ -25,15 +25,14 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.SComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.RemoteTestBaseAgent;
@@ -42,7 +41,6 @@ import jadex.micro.testcases.RemoteTestBaseAgent;
  *  Test if service implementations can be omitted when the agent implements them.
  */
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 {
@@ -58,8 +56,9 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 		TestReport tr1 = new TestReport("#1", "Test if local service proxy can be created");
 		try 
 		{
-			IComponentManagementService cms = getServiceProxy(agent, agent.getId().getRoot(), IComponentManagementService.class);
-			IComponentDescription[] descs = cms.getComponentDescriptions().get();
+//			IComponentDescription[] descs = cms.getComponentDescriptions().get();
+			IComponentDescription[] descs = SComponentManagementService.getComponentDescriptions(agent).get();
+			
 			System.out.println(Arrays.toString(descs));
 			tr1.setSucceeded(true);
 		}
@@ -85,8 +84,9 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 			// awareness is disabled in testsuite
 //			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000).get();
 			
-			IComponentManagementService cms = getServiceProxy(agent, plat.getId(), IComponentManagementService.class);
-			IComponentDescription[] descs = cms.getComponentDescriptions().get();
+			ILibraryService ls = getServiceProxy(agent, plat.getId(), ILibraryService.class);
+//			IComponentDescription[] descs = cms.getComponentDescriptions().get();
+			IComponentDescription[] descs = SComponentManagementService.getComponentDescriptions(agent).get();
 			System.out.println(Arrays.toString(descs));
 			tr2.setSucceeded(true);
 		}

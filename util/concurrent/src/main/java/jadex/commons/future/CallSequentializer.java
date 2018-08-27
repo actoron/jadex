@@ -1,10 +1,12 @@
 package jadex.commons.future;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jadex.commons.IResultCommand;
-import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 
 /**
  *  The call sequentializer realizes a 'critical region' for async calls,
@@ -22,10 +24,18 @@ public class CallSequentializer<T>
 	protected IFuture<T> currentcall;
 	
 	/** The list of waiting calls with future and args. */
-	protected List<Tuple2<Object[], Future<T>>> calls = new ArrayList<>();
+	protected List<Tuple3<String, Object[], Future<T>>> calls = new ArrayList<>();
 	
 	/** The command to execute a call. */
-	protected IResultCommand<IFuture<T>, Object[]> call;
+	protected Map<String, IResultCommand<IFuture<T>, Object[]>> commands;
+	
+	/**
+	 *  Create a new sequentializer.
+	 */
+	public CallSequentializer()
+	{
+		this.commands = new HashMap<>();
+	}
 	
 	/**
 	 *  Create a new sequentializer.
@@ -33,7 +43,17 @@ public class CallSequentializer<T>
 	 */
 	public CallSequentializer(IResultCommand<IFuture<T>, Object[]> call)
 	{
-		this.call = call;
+		this();
+		commands.put(null, call);
+	}
+	
+	/**
+	 *  Add a command by (method) name.
+	 *  @param method The method name (or just a name).
+	 */
+	public void addCommand(String method, IResultCommand<IFuture<T>, Object[]> call)
+	{
+		commands.put(method, call);
 	}
 	
 	/**
@@ -50,6 +70,16 @@ public class CallSequentializer<T>
 	 */
 	public IFuture<T> call(Object[] args)
 	{
+		return call(null, args);
+	}
+	
+	public IFuture<T> call(String method, Object[] args)
+	{
+		IResultCommand<IFuture<T>, Object[]> call = commands.get(method); 
+		
+		if(call==null)
+			return new Future<>(new RuntimeException("Method name not found: "+method));
+		
 		//cnt++;
 		if(currentcall==null)
 		{
@@ -60,7 +90,7 @@ public class CallSequentializer<T>
 		else
 		{
 			Future<T> ret = new Future<>();
-			calls.add(new Tuple2<Object[], Future<T>>(args, ret));
+			calls.add(new Tuple3<String, Object[], Future<T>>(method, args, ret));
 			return ret;
 		}
 	}
@@ -74,9 +104,10 @@ public class CallSequentializer<T>
 		//System.out.println("call count: "+cnt);
 		if(calls.size()>0)
 		{
-			Tuple2<Object[], Future<T>> next = calls.remove(0);
-			IFuture<T> fut = call.execute(next.getFirstEntity());
-			fut.addResultListener(new DelegationResultListener<T>(next.getSecondEntity()));
+			Tuple3<String, Object[], Future<T>> next = calls.remove(0);
+			IResultCommand<IFuture<T>, Object[]> call = commands.get(next.getFirstEntity()); 
+			IFuture<T> fut = call.execute(next.getSecondEntity());
+			fut.addResultListener(new DelegationResultListener<T>(next.getThirdEntity()));
 			fut.addResultListener(res -> {proceed();}, ex -> {proceed();});
 		}
 		else

@@ -9,12 +9,8 @@ import org.junit.Test;
 import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -45,15 +41,14 @@ public class BDIV3CreationTest //extends TestCase
 //			"-printpass", "false"
 			}
 			).get();
-		IComponentManagementService cms = (IComponentManagementService)platform.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", Integer.valueOf(10000));
-		cms.createComponent(null, "jadex.bdiv3.benchmarks.CreationBDI.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<Tuple2<String, Object>>>(fut)
+		platform.createComponent(null, new CreationInfo(args).setFilename("jadex.bdiv3.benchmarks.CreationBDI.class"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void customResultAvailable(IExternalAccess result)
 			{
 				// Agent created. Kill listener waits for result.
 			}
@@ -104,7 +99,6 @@ public class BDIV3CreationTest //extends TestCase
 		
 //		sus	= null;
 		platform	= null;
-		cms	= null;
 		fut	= null;
 		
 //		try

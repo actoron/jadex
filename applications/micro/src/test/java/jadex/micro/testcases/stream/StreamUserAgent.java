@@ -36,7 +36,7 @@ public class StreamUserAgent extends TestAgent
 	 */
 	protected int getTestCount()
 	{
-		return 4;
+		return 8;
 	}
 	
 	/**
@@ -50,10 +50,10 @@ public class StreamUserAgent extends TestAgent
 //		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 //		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 
-//		testLocal(1, tc).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-//		{
-//			public void customResultAvailable(Integer testcnt)
-//			{
+		testLocal(1, tc).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+		{
+			public void customResultAvailable(Integer testcnt)
+			{
 //				testRemote(testcnt.intValue(), tc, false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 				testRemote(1, tc, false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 				{
@@ -68,8 +68,8 @@ public class StreamUserAgent extends TestAgent
 //						}));
 					}
 				}));
-//			}
-//		}));
+			}
+		}));
 		
 		return ret;
 	}

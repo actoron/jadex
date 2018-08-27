@@ -601,9 +601,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		IServiceIdentifier sid = ServiceRegistry.getRegistry(getComponent()).searchService(query);
 		
 		if(sid==null && query.getMultiplicity().getFrom()>0)
-		{
 			throw new ServiceNotFoundException(query.toString());
-		}
 		
 		// Fetches service and wraps result in proxy, if required. 
 		@SuppressWarnings("unchecked")
@@ -848,9 +846,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		ret.setMultiplicity(info.isMultiple() ? Multiplicity.ZERO_MANY : Multiplicity.ONE);
 		
 		if(info.getTags()!=null)
-		{
 			ret.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), getComponent().getExternalAccess());
-		}
 		
 		return ret;
 	}
@@ -873,9 +869,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 		RequiredServiceInfo info = requiredserviceinfos==null ? null : requiredserviceinfos.get(name);
 		if(info==null)
-		{
 			throw new IllegalArgumentException("No such required service: "+name);
-		}
 		return info;
 	}
 	
@@ -887,9 +881,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 		RequiredServiceInfo info = requiredserviceinfos==null ? null : requiredserviceinfos.get(SReflect.getClassName(type));
 		if(info==DUPLICATE_SERVICE_TYPE_MARKER)
-		{
 			throw new IllegalArgumentException("Multiple required service declarations found for type: "+type);
-		}
 		return info;
 	}
 	

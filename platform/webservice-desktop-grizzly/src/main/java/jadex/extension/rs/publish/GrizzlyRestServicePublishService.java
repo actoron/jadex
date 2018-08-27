@@ -36,7 +36,6 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -381,9 +380,8 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	public IFuture<Void> publishResources(final String uri, final String path)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IComponentManagementService	cms	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getId();
-		cms.getComponentDescription(cid)
+		component.getDescription(cid)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
 		{
 			public void customResultAvailable(IComponentDescription desc)

@@ -13,7 +13,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
@@ -131,17 +131,17 @@ public class JCCAgent	implements IComponentStep<Void>
 			{
 				agent.getLogger().info("Searching for platforms matching '"+platforms+"'.");
 				
-				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL))
-					.addResultListener(new TimeoutIntermediateResultListener<IComponentManagementService>(RETRY_DELAY, agent.getExternalAccess(),
-						new IntermediateExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+					.addResultListener(new TimeoutIntermediateResultListener<ILibraryService>(RETRY_DELAY, agent.getExternalAccess(),
+						new IntermediateExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{
-					public void intermediateResultAvailable(IComponentManagementService cms)
+					public void intermediateResultAvailable(ILibraryService cms)
 					{
-						IComponentIdentifier	cid	= ((IService)cms).getId().getProviderId().getRoot();
+						IComponentIdentifier cid = ((IService)cms).getId().getProviderId().getRoot();
 						if(cid.getName().startsWith(platforms))
 						{
-							connected	= true;
-							cms.getExternalAccess(cid)
+							connected = true;
+							agent.getExternalAccess(cid)
 								.addResultListener(new IResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess platform)

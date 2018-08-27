@@ -8,8 +8,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -193,28 +191,22 @@ public class SNFPropertyProvider
 	{
 		final Future<String[]> ret = new Future<String[]>();
 
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String[]>(ret)
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+				result.scheduleStep(new ImmediateComponentStep<String[]>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getNFPropertyNames9")
+					public IFuture<String[]> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<String[]>()
-						{
-							@Classname("getNFPropertyNames9")
-							public IFuture<String[]> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyNames();
-							}
-						}).addResultListener(new DelegationResultListener<String[]>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyNames();
 					}
-				});
+				}).addResultListener(new DelegationResultListener<String[]>(ret));
 			}
 		});
+		
 		return ret;
 	}
 	
@@ -225,28 +217,23 @@ public class SNFPropertyProvider
 	public static IFuture<String[]> getNFAllPropertyNames(IExternalAccess component, final IServiceIdentifier sid)
 	{
 		final Future<String[]> ret = new Future<String[]>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String[]>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+				result.scheduleStep(new ImmediateComponentStep<String[]>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getNFAllPropertyNames10")
+					public IFuture<String[]> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<String[]>()
-						{
-							@Classname("getNFAllPropertyNames10")
-							public IFuture<String[]> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getNFAllPropertyNames();
-							}
-						}).addResultListener(new DelegationResultListener<String[]>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getNFAllPropertyNames();
 					}
-				});
+				}).addResultListener(new DelegationResultListener<String[]>(ret));
 			}
 		});
+		
 		return ret;
 	}
 	
@@ -258,40 +245,35 @@ public class SNFPropertyProvider
 	public static IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos(IExternalAccess component, final IServiceIdentifier sid)
 	{
 		final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, INFPropertyMetaInfo>>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, INFPropertyMetaInfo>>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, INFPropertyMetaInfo>>(ret)
+				result.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getNFPropertyMetaInfos11")
+					public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						if (nfp != null)
 						{
-							@Classname("getNFPropertyMetaInfos11")
-							public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
+							INFMixedPropertyProvider prov = nfp.getProvidedServicePropertyProvider(sid);
+							if (prov != null)
 							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								if (nfp != null)
+								IFuture<Map<String, INFPropertyMetaInfo>> metainf = prov.getNFPropertyMetaInfos();
+								if (metainf != null)
 								{
-									INFMixedPropertyProvider prov = nfp.getProvidedServicePropertyProvider(sid);
-									if (prov != null)
-									{
-										IFuture<Map<String, INFPropertyMetaInfo>> metainf = prov.getNFPropertyMetaInfos();
-										if (metainf != null)
-										{
-											return metainf;
-										}
-									}
+									return metainf;
 								}
-								return new Future<Map<String,INFPropertyMetaInfo>>(new HashMap<String,INFPropertyMetaInfo>());
 							}
-						}).addResultListener(new DelegationResultListener<Map<String, INFPropertyMetaInfo>>(ret));
+						}
+						return new Future<Map<String,INFPropertyMetaInfo>>(new HashMap<String,INFPropertyMetaInfo>());
 					}
-				});
+				}).addResultListener(new DelegationResultListener<Map<String, INFPropertyMetaInfo>>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -303,28 +285,23 @@ public class SNFPropertyProvider
 	public static IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(IExternalAccess component, final IServiceIdentifier sid, final String name)
 	{
 		final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, INFPropertyMetaInfo>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
+				result.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getNFPropertyMetaInfo12")
+					public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
-						{
-							@Classname("getNFPropertyMetaInfo12")
-							public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyMetaInfo(name);
-							}
-						}).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyMetaInfo(name);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 			}
 		});
+		
 		return ret;
 	}
 	
@@ -337,28 +314,23 @@ public class SNFPropertyProvider
 	public static <T> IFuture<T> getNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final String name)
 	{
 		final Future<T> ret = new Future<T>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+				result.scheduleStep(new ImmediateComponentStep<T>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getNFPropertyValue13")
+					public IFuture<T> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<T>()
-						{
-							@Classname("getNFPropertyValue13")
-							public IFuture<T> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyValue(name);
-							}
-						}).addResultListener(new DelegationResultListener<T>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyValue(name);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<T>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -373,28 +345,23 @@ public class SNFPropertyProvider
 	public static <T, U> IFuture<T> getNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final String name, final U unit)
 	{
 		final Future<T> ret = new Future<T>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+				result.scheduleStep(new ImmediateComponentStep<T>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getNFPropertyValue14")
+					public IFuture<T> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<T>()
-						{
-							@Classname("getNFPropertyValue14")
-							public IFuture<T> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyValue(name, unit);
-							}
-						}).addResultListener(new DelegationResultListener<T>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyValue(name, unit);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<T>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -405,28 +372,23 @@ public class SNFPropertyProvider
 	public static IFuture<Void> addNFProperty(IExternalAccess component, final IServiceIdentifier sid, final INFProperty<?, ?> nfprop)
 	{
 		final Future<Void> ret = new Future<Void>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				result.scheduleStep(new ImmediateComponentStep<Void>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("addNFProperty15")
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<Void>()
-						{
-							@Classname("addNFProperty15")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).addNFProperty(nfprop);
-							}
-						}).addResultListener(new DelegationResultListener<Void>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).addNFProperty(nfprop);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -437,28 +399,23 @@ public class SNFPropertyProvider
 	public static IFuture<Void> removeNFProperty(IExternalAccess component, final IServiceIdentifier sid, final String name)
 	{
 		final Future<Void> ret = new Future<Void>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				result.scheduleStep(new ImmediateComponentStep<Void>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("removeNFProperty16")
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<Void>()
-						{
-							@Classname("removeNFProperty16")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).removeNFProperty(name);
-							}
-						}).addResultListener(new DelegationResultListener<Void>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).removeNFProperty(name);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -468,28 +425,23 @@ public class SNFPropertyProvider
 	public static IFuture<Void> shutdownNFPropertyProvider(IExternalAccess component, final IServiceIdentifier sid)
 	{
 		final Future<Void> ret = new Future<Void>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				result.scheduleStep(new ImmediateComponentStep<Void>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("shutdownNFPropertyProvider17")
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<Void>()
-						{
-							@Classname("shutdownNFPropertyProvider17")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).shutdownNFPropertyProvider();
-							}
-						}).addResultListener(new DelegationResultListener<Void>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).shutdownNFPropertyProvider();
 					}
-				});
+				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -502,28 +454,23 @@ public class SNFPropertyProvider
 	public static IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> getMethodNFPropertyMetaInfos(IExternalAccess component, final IServiceIdentifier sid)
 	{
 		final Future<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> ret = new Future<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>(ret)
+				result.scheduleStep(new ImmediateComponentStep<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getMethodNFPropertyMetaInfos18")
+					public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>()
-						{
-							@Classname("getMethodNFPropertyMetaInfos18")
-							public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfos();
-							}
-						}).addResultListener(new DelegationResultListener<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfos();
 					}
-				});
+				}).addResultListener(new DelegationResultListener<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -535,28 +482,23 @@ public class SNFPropertyProvider
 	public static IFuture<String[]> getMethodNFPropertyNames(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method)
 	{
 		final Future<String[]> ret = new Future<String[]>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String[]>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+				result.scheduleStep(new ImmediateComponentStep<String[]>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getMethodNFPropertyNames19")
+					public IFuture<String[]> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<String[]>()
-						{
-							@Classname("getMethodNFPropertyNames19")
-							public IFuture<String[]> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyNames(method);
-							}
-						}).addResultListener(new DelegationResultListener<String[]>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyNames(method);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<String[]>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -568,28 +510,23 @@ public class SNFPropertyProvider
 	public static IFuture<String[]> getMethodNFAllPropertyNames(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method)
 	{
 		final Future<String[]> ret = new Future<String[]>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String[]>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+				result.scheduleStep(new ImmediateComponentStep<String[]>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getMethodNFAllPropertyNames20")
+					public IFuture<String[]> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<String[]>()
-						{
-							@Classname("getMethodNFAllPropertyNames20")
-							public IFuture<String[]> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFAllPropertyNames(method);
-							}
-						}).addResultListener(new DelegationResultListener<String[]>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getMethodNFAllPropertyNames(method);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<String[]>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -600,28 +537,23 @@ public class SNFPropertyProvider
 	public static IFuture<Map<String, INFPropertyMetaInfo>> getMethodNFPropertyMetaInfos(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method)
 	{
 		final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, INFPropertyMetaInfo>>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, INFPropertyMetaInfo>>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, INFPropertyMetaInfo>>(ret)
+				result.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getMethodNFPropertyMetaInfos21")
+					public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
-						{
-							@Classname("getMethodNFPropertyMetaInfos21")
-							public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfos(method);
-							}
-						}).addResultListener(new DelegationResultListener<Map<String, INFPropertyMetaInfo>>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfos(method);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<Map<String, INFPropertyMetaInfo>>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -634,28 +566,23 @@ public class SNFPropertyProvider
 	public static IFuture<INFPropertyMetaInfo> getMethodNFPropertyMetaInfo(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name)
 	{
 		final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, INFPropertyMetaInfo>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
+				result.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getMethodNFPropertyMetaInfo22")
+					public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
-						{
-							@Classname("getMethodNFPropertyMetaInfo22")
-							public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfo(method, name);
-							}
-						}).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfo(method, name);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -669,26 +596,20 @@ public class SNFPropertyProvider
 	public static <T> IFuture<T> getMethodNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name)
 	{
 		final Future<T> ret = new Future<T>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+				result.scheduleStep(new ImmediateComponentStep<T>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getMethodNFPropertyValue23")
+					public IFuture<T> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<T>()
-						{
-							@Classname("getMethodNFPropertyValue23")
-							public IFuture<T> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyValue(method, name);
-							}
-						}).addResultListener(new DelegationResultListener<T>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyValue(method, name);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<T>(ret));
 			}
 		});
 		
@@ -720,28 +641,23 @@ public class SNFPropertyProvider
 	public static <T, U> IFuture<T> getMethodNFPropertyValue(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name, final U unit)
 	{
 		final Future<T> ret = new Future<T>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+				result.scheduleStep(new ImmediateComponentStep<T>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("getMethodNFPropertyValue24")
+					public IFuture<T> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<T>()
-						{
-							@Classname("getMethodNFPropertyValue24")
-							public IFuture<T> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyValue(method, name, unit);
-							}
-						}).addResultListener(new DelegationResultListener<T>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyValue(method, name, unit);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<T>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -753,28 +669,23 @@ public class SNFPropertyProvider
 	public static IFuture<Void> addMethodNFProperty(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final INFProperty<?, ?> nfprop)
 	{
 		final Future<Void> ret = new Future<Void>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				result.scheduleStep(new ImmediateComponentStep<Void>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("addMethodNFProperty25")
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<Void>()
-						{
-							@Classname("addMethodNFProperty25")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).addMethodNFProperty(method, nfprop);
-							}
-						}).addResultListener(new DelegationResultListener<Void>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).addMethodNFProperty(method, nfprop);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
+
 		return ret;
 	}
 	
@@ -786,28 +697,23 @@ public class SNFPropertyProvider
 	public static IFuture<Void> removeMethodNFProperty(IExternalAccess component, final IServiceIdentifier sid, final MethodInfo method, final String name)
 	{
 		final Future<Void> ret = new Future<Void>();
-		component.searchService( new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		
+		component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				cms.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				result.scheduleStep(new ImmediateComponentStep<Void>()
 				{
-					public void customResultAvailable(IExternalAccess result)
+					@Classname("removeMethodNFProperty26")
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						result.scheduleStep(new ImmediateComponentStep<Void>()
-						{
-							@Classname("removeMethodNFProperty26")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
-								return nfp.getProvidedServicePropertyProvider(sid).removeMethodNFProperty(method, name);
-							}
-						}).addResultListener(new DelegationResultListener<Void>(ret));
+						INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+						return nfp.getProvidedServicePropertyProvider(sid).removeMethodNFProperty(method, name);
 					}
-				});
+				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
+
 		return ret;
 	}
 

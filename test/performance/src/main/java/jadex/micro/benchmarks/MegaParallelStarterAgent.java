@@ -13,7 +13,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
@@ -78,13 +77,12 @@ public class MegaParallelStarterAgent
 				
 				final int max = ((Integer)args.get("max")).intValue();
 				
-				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				String model = MegaParallelCreationAgent.class.getName().replaceAll("\\.", "/")+".class";
 				for(int i=1; i<=max; i++)
 				{
 					args.put("num", Integer.valueOf(i));
-//							System.out.println("Created agent: "+i);
-					cms.createComponent(subname+"_#"+i, model, new CreationInfo(new HashMap(args), agent.getId()), 
+//					System.out.println("Created agent: "+i);
+					agent.createComponent(null, new CreationInfo(new HashMap(args), agent.getId()).setName(subname+"_#"+i).setFilename(model), 
 						agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
@@ -167,7 +165,6 @@ public class MegaParallelStarterAgent
 	{
 		final String name = subname+"_#"+cnt;
 //		System.out.println("Destroying peer: "+name);
-		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId());
 		IResultListener lis = new IResultListener()
 		{
@@ -185,7 +182,7 @@ public class MegaParallelStarterAgent
 				exception.printStackTrace();
 			}
 		};
-		IFuture ret = cms.destroyComponent(aid);
+		IFuture ret = agent.killComponent(aid);
 		ret.addResultListener(lis);
 	}
 	

@@ -17,7 +17,7 @@ import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.persistence.IPersistenceService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -74,10 +74,13 @@ public class BPMNRecoveryTestAgent
 	{
 		Future<TestReport> ret = new Future<TestReport>();
 		
-		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 		IPersistenceService	ps	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getId()));
-		IExternalAccess	exta	= cms.getExternalAccess(fut.getFirstResult()).get();
+		CreationInfo ci = new CreationInfo(agent.getId());
+		ci.setFilename(model);
+		
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, ci);
+		IExternalAccess	exta = agent.getExternalAccess(fut.getFirstResult()).get();
 		ISubscriptionIntermediateFuture<Tuple2<String, Object>>	res	= exta.subscribeToResults();
 		if(!exta.getResults().get().containsKey("running"))
 		{
@@ -96,7 +99,7 @@ public class BPMNRecoveryTestAgent
 		ps.restore(info).get();
 		
 		Future<Collection<Tuple2<String,Object>>>	cres	= new Future<Collection<Tuple2<String,Object>>>();
-		IExternalAccess	exta2	= cms.getExternalAccess(fut.getFirstResult()).get();
+		IExternalAccess	exta2	= agent.getExternalAccess(fut.getFirstResult()).get();
 		exta2.subscribeToResults().addResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres));
 //		cms.addComponentResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres), fut.getFirstResult()).get();
 		

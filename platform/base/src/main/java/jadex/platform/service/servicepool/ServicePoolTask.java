@@ -30,14 +30,13 @@ import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskProperty;
 import jadex.bpmn.model.task.annotation.TaskPropertyGui;
 import jadex.bridge.ClassInfo;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -83,14 +82,14 @@ public class ServicePoolTask implements ITask
 	{
 		final Future<Void>	ret	= new Future<Void>();
 
-		IComponentManagementService cms	= process.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
-		CreationInfo ci = new CreationInfo(process.getId());
-		cms.createComponent(null, ServicePoolAgent.class.getName()+".class", ci, null)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+		CreationInfo ci = new CreationInfo(process.getId()).setFilename(ServicePoolAgent.class.getName()+".class");
+		
+		process.createComponent(null, ci, null)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(IComponentIdentifier cid) 
+			public void customResultAvailable(IExternalAccess ea) 
 			{
-				process.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServicePoolService.class).setProvider(cid))
+				process.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServicePoolService.class).setProvider(ea.getId()))
 					.addResultListener(process.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 				{
 					public void customResultAvailable(IServicePoolService sps)

@@ -33,11 +33,8 @@ import javax.swing.Timer;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -394,82 +391,61 @@ public class DisplayPanel extends JComponent
 									{
 										// do not depend on hosting component!
 //										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getService("cmsservice");
-										IFuture<IComponentManagementService>	fut	= ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-										fut.addResultListener(new SwingResultListener<IComponentManagementService>(new IResultListener<IComponentManagementService>()
+										if(progressdata!=null)
 										{
-											public void resultAvailable(IComponentManagementService cms)
+											Object[]	pds	= progressdata.keySet().toArray();
+											for(int i=0; i<pds.length; i++)
 											{
-												if(progressdata!=null)
+												final ProgressData	progress	= (ProgressData)pds[i];
+												if(!progress.isFinished())
 												{
-													Object[]	pds	= progressdata.keySet().toArray();
-													for(int i=0; i<pds.length; i++)
+													ia.getExternalAccess(progress.getProviderId())
+														.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 													{
-														final ProgressData	progress	= (ProgressData)pds[i];
-														if(!progress.isFinished())
+														public void resultAvailable(IExternalAccess	ea)
 														{
-															cms.getExternalAccess(progress.getProviderId())
-																.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
+															// It is not really possible to define the progress services as required service.
+															// Needs component specific progress service.
+															ea.searchService( new ServiceQuery<>( IProgressService.class))
+																.addResultListener(new SwingResultListener<IProgressService>(new IResultListener<IProgressService>()
 															{
-																public void resultAvailable(IExternalAccess	ea)
+																public void resultAvailable(IProgressService	ps)
 																{
-																	// It is not really possible to define the progress services as required service.
-																	// Needs component specific progress service.
-																	ea.searchService( new ServiceQuery<>( IProgressService.class))
-																		.addResultListener(new SwingResultListener<IProgressService>(new IResultListener<IProgressService>()
+																	if(ps!=null)
 																	{
-																		public void resultAvailable(IProgressService	ps)
+																		ps.getProgress(progress.getTaskId())
+																			.addResultListener(new SwingResultListener<Integer>(new IResultListener<Integer>()
 																		{
-																			if(ps!=null)
+																			public void resultAvailable(Integer current)
 																			{
-																				ps.getProgress(progress.getTaskId())
-																					.addResultListener(new SwingResultListener<Integer>(new IResultListener<Integer>()
+																				if(progressdata!=null && progressdata.containsKey(progress))
 																				{
-																					public void resultAvailable(Integer current)
+																					Integer	percent	= (Integer)progressdata.get(progress);
+																					if(current.intValue()>percent.intValue())
 																					{
-																						if(progressdata!=null && progressdata.containsKey(progress))
-																						{
-																							Integer	percent	= (Integer)progressdata.get(progress);
-																							if(current.intValue()>percent.intValue())
-																							{
-																								progressdata.put(progress, current);
-																								repaint();
-																							}
-																						}
+																						progressdata.put(progress, current);
+																						repaint();
 																					}
-					
-																					public void exceptionOccurred(Exception exception)
-																					{
-																						// Component removed.
-																						if(progressdata!=null)
-																						{
-																							progressdata.remove(progress);
-																						}
-																						else if(progressupdate!=null)
-																						{
-																							progressupdate.stop();
-																							progressupdate	= null;
-																						}
-																					}
-																				}));
+																				}
 																			}
-																		}
-					
-																		public void exceptionOccurred(Exception exception)
-																		{
-																			// Component removed.
-																			if(progressdata!=null)
+			
+																			public void exceptionOccurred(Exception exception)
 																			{
-																				progressdata.remove(progress);
+																				// Component removed.
+																				if(progressdata!=null)
+																				{
+																					progressdata.remove(progress);
+																				}
+																				else if(progressupdate!=null)
+																				{
+																					progressupdate.stop();
+																					progressupdate	= null;
+																				}
 																			}
-																			else if(progressupdate!=null)
-																			{
-																				progressupdate.stop();
-																				progressupdate	= null;
-																			}
-																		}
-																	}));
+																		}));
+																	}
 																}
-					
+			
 																public void exceptionOccurred(Exception exception)
 																{
 																	// Component removed.
@@ -485,16 +461,24 @@ public class DisplayPanel extends JComponent
 																}
 															}));
 														}
-													}
+			
+														public void exceptionOccurred(Exception exception)
+														{
+															// Component removed.
+															if(progressdata!=null)
+															{
+																progressdata.remove(progress);
+															}
+															else if(progressupdate!=null)
+															{
+																progressupdate.stop();
+																progressupdate	= null;
+															}
+														}
+													}));
 												}
 											}
-		
-											public void exceptionOccurred(Exception exception)
-											{
-												// ignore
-												exception.printStackTrace();
-											}
-										}));
+										}
 										return IFuture.DONE;
 									}
 								});

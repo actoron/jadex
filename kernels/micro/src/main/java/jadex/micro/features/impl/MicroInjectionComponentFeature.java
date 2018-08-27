@@ -14,8 +14,6 @@ import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -143,8 +141,8 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			final FieldInfo[]	pis	= model.getParentInjections();
 			if(pis.length>0)
 			{
-				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				cms.getExternalAccess(getComponent().getId().getParent())
+//				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				getComponent().getExternalAccess(getComponent().getId().getParent())
 					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 				{
 					public void customResultAvailable(IExternalAccess exta)

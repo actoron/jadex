@@ -1,7 +1,7 @@
 package jadex.platform.service.cron.jobs;
 
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.platform.service.cron.TimePatternFilter;
 

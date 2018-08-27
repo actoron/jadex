@@ -15,7 +15,6 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultTuple2ResultListener;
@@ -40,7 +39,6 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="cms", type=IComponentManagementService.class),
 	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL),
 	@RequiredService(name="aser", type=ITestService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL,
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))
@@ -112,30 +110,23 @@ public class NFLatencyTestAgent extends TestAgent
 //				{
 //					public void customResultAvailable(final ITransportComponentIdentifier result) 
 //					{
-						IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
-						fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
+						CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getId()})).setFilename("jadex.platform.service.remote.ProxyAgent.class");
+						agent.createComponent(null, ci).addResultListener(
+							new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
+//							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 						{
-							public void customResultAvailable(final IComponentManagementService cms)
+							public void firstResultAvailable(IComponentIdentifier result)
 							{
-								CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getId()}));
-								cms.createComponent("jadex.platform.service.remote.ProxyAgent.class", ci).addResultListener(
-									new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
-		//							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
-								{
-									public void firstResultAvailable(IComponentIdentifier result)
-									{
-										performTest(result, testno, false)
-											.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
-									}
-									public void secondResultAvailable(Map<String,Object> result) 
-									{
-										System.out.println("sec");
-									}
-									public void exceptionOccurred(Exception exception)
-									{
-										ret.setExceptionIfUndone(exception);
-									}
-								});
+								performTest(result, testno, false)
+									.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+							}
+							public void secondResultAvailable(Map<String,Object> result) 
+							{
+								System.out.println("sec");
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+								ret.setExceptionIfUndone(exception);
 							}
 						});
 //					}

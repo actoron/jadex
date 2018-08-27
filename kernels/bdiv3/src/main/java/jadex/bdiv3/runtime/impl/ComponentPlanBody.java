@@ -4,11 +4,7 @@ import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.component.IInternalRequiredServicesFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 
@@ -50,6 +46,16 @@ public class ComponentPlanBody extends AbstractPlanBody
 	@Override
 	public Class< ? >[] getPassedParameterTypes()
 	{
+//		final Future<Void>	ret	= new Future<Void>();
+//
+//		rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
+//		// Todo: should also set processing state and RPLANS thread local?
+//		
+////		IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//		CreationInfo ci = new CreationInfo(ia.getId());
+//		ci.setFilename(component);
+//		
+//		ia.createComponent(ret, ci)
 		return null;
 	}
 	
@@ -69,8 +75,7 @@ public class ComponentPlanBody extends AbstractPlanBody
 	public Object invokeBody(Object[] params) throws BodyAborted
 	{
 		Future<Void>	ret	= new Future<>();
-		IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-		cms.createComponent(null, component, new CreationInfo(ia.getId()))
+		ia.createComponent(null, new CreationInfo(ia.getId()).setFilename(component))
 			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
 			@Override
@@ -128,8 +133,7 @@ public class ComponentPlanBody extends AbstractPlanBody
 		if(cid!=null)
 		{
 			// todo: fix synchronous subcomponents!? may be called from inner or outer component.
-			IComponentManagementService cms = ((IInternalRequiredServicesFeature)ia.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
-			cms.destroyComponent(cid);
+			ia.killComponent(cid);
 		}
 		
 		super.abort();

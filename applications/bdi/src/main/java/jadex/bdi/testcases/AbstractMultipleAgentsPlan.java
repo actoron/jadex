@@ -7,11 +7,7 @@ import jadex.base.test.TestReport;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
@@ -60,8 +56,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 		{
 			for(int i=0; i<args.length; i++)
 			{
-				IComponentManagementService ces = (IComponentManagementService)getAgent().getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
-				ITuple2Future<IComponentIdentifier, Map<String, Object>>	ret = ces.createComponent(null, type, new CreationInfo(config, args[i], getComponentIdentifier()));
+				ITuple2Future<IComponentIdentifier, Map<String, Object>> ret = getAgent().createComponent(null, new CreationInfo(config, args[i], getComponentIdentifier()).setFilename(type));
 				IComponentIdentifier aid = (IComponentIdentifier)ret.getFirstResult();
 				agents.add(aid);
 			}
@@ -87,8 +82,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //			System.out.println("Killing " + ((IComponentIdentifier)agents.get(i)).getName());
 			try
 			{
-				IComponentManagementService ces = (IComponentManagementService)getAgent().getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
-				IFuture<Map<String, Object>> ret = ces.destroyComponent((IComponentIdentifier)agents.get(i));
+				IFuture<Map<String, Object>> ret = getAgent().killComponent((IComponentIdentifier)agents.get(i));
 				ret.get();
 			}
 			catch(GoalFailureException e)

@@ -27,7 +27,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
@@ -269,14 +268,14 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         else
         {
         	components.put(info.getFilename(), ret);
-            final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//          final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
             if(info.getParent()==null)
             	info.setParent(agent.getId());
-            cms.createComponent(info.getFilename(), info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+            agent.createComponent(null, info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
             {
                 public void firstResultAvailable(IComponentIdentifier cid)
                 {
-                	cms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
+                	agent.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
                 	{
                 		public void customResultAvailable(IExternalAccess exta)
                 		{

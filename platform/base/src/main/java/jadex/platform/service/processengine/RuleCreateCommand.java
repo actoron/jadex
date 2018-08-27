@@ -3,8 +3,8 @@ package jadex.platform.service.processengine;
 import java.util.Collection;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;

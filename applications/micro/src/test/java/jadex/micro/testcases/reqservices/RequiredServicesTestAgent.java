@@ -6,7 +6,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
@@ -30,8 +30,8 @@ public class RequiredServicesTestAgent extends JunitAgentTest
 	protected IClockService clockser;
 	
 	// todo: allow for omitting name=""
-	@AgentServiceSearch(lazy=false, requiredservice=@RequiredService(name="", type=IComponentManagementService.class))
-	protected IComponentManagementService cms;
+	@AgentServiceSearch(lazy=false, requiredservice=@RequiredService(name="", type=ILibraryService.class))
+	protected ILibraryService ls;
 
 	/**
 	 * The agent body.
@@ -41,13 +41,13 @@ public class RequiredServicesTestAgent extends JunitAgentTest
 	{
 		final TestReport tr1 = new TestReport("#1", "Test if inline required service definition works");
 		
-		if(cms instanceof IComponentManagementService)
+		if(ls instanceof ILibraryService)
 		{
 			tr1.setSucceeded(true);
 		}
 		else
 		{
-			tr1.setFailed("Component management service was not injected: "+cms);
+			tr1.setFailed("Component management service was not injected: "+ls);
 		}
 		
 		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr1}));

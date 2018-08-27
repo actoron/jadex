@@ -60,6 +60,8 @@ public class InitiatorAgent extends TestAgent
 						{
 							agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 							tc.addReport(result);
+							for(TestReport tr: tc.getReports())
+								System.out.println(tr.isSucceeded());
 							ret.setResult(null);
 						}
 					}));

@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.Cause;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -25,7 +27,6 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.ServiceQuery;
@@ -33,16 +34,22 @@ import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IBootstrapFactory;
+import jadex.bridge.service.types.cms.InitInfo;
+import jadex.bridge.service.types.cms.LockEntry;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
@@ -50,11 +57,13 @@ import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.CallSequentializer;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.transformation.traverser.TransformSet;
 import jadex.javaparser.SJavaParser;
 
@@ -86,12 +95,46 @@ public class Starter
     /** The used to store the current network names. */
     public static String DATA_NETWORKNAMESCACHE = "networknamescache";
 
+    
     /** The CMS component map. */
     public static String DATA_COMPONENTMAP = "componentmap";
 
     /** Constant for default timeout name. */
     public static String DATA_DEFAULT_TIMEOUT = "default_timeout";
 
+    /** The CMS initinfos. */
+    public static String DATA_INITINFOS = "initinfos";
+    
+    /** The CMS child counts. */
+    public static String DATA_CHILDCOUNTS = "childcounts";
+    
+    /** The CMS cleanup commands. */
+    public static String DATA_CLEANUPFUTURES = "cleanupfutures";
+    
+    /** The CMS cleanup commands. */
+    /**	The local filename cache (tuple(parent filename, child filename) -> local typename)*/
+    public static String  DATA_LOCALTYPES = "localtypes";
+    
+    /** The CMS cid counts. */
+    public static String DATA_CIDCOUNTS = "cidcounts";
+    
+    /** The CMS cid counts. */
+    public static String DATA_LOCKENTRIES = "lockentries";
+    
+    /** The CMS listeners. */
+    public static String DATA_CMSLISTENERS = "listeners";
+    
+    /** The CMS lock. */
+    public static String DATA_CMSSEQ = "cmsseq";
+    
+    
+    /** The bootstrap component factory. */
+    public static String DATA_PLATFORMACCESS = "$platformaccess";
+    
+    /** The bootstrap component factory. */
+    public static String DATA_BOOTSTRAPFACTORY = "$bootstrapfactory";
+    
+    
     // todo: cannot be used because registry needs to know when superpeer changes (remap queries)
 //    /** Constant for the superpeer. */
 //    public static String DATA_SUPERPEER = "superpeer";
@@ -419,7 +462,8 @@ public class Starter
 			else
 			{		
 //				config.checkConsistency(); // todo?
-				Class<?> pc = config.getExtendedPlatformConfiguration().getPlatformComponent().getType(cl);
+				ClassInfo ci = config.getExtendedPlatformConfiguration().getPlatformComponent();
+				Class<?> pc = ci.getType(cl);
 //				Object	pc = config.getValue(RootComponentConfiguration.PLATFORM_COMPONENT);
 //				rootConfig.setValue(RootComponentConfiguration.PLATFORM_COMPONENT, pc);
 				if(pc==null)
@@ -441,11 +485,46 @@ public class Starter
 					
 					/** Here */
 //					rootconf.setPlatformAccess(component);
-					putPlatformValue(cid, "$platformaccess", component);
-					putPlatformValue(cid, "$bootstrapfactory", cfac);
+					putPlatformValue(cid, DATA_PLATFORMACCESS, component);
+					putPlatformValue(cid, DATA_BOOTSTRAPFACTORY, cfac);
 //					putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, args);
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMCONFIG, config);
 					putPlatformValue(cid, IPlatformConfiguration.PLATFORMMODEL, model);
+					
+					// All cms state uses the same lock
+					ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
+					
+					putPlatformValue(cid, DATA_COMPONENTMAP, new RwMapWrapper<>(new HashMap<IComponentIdentifier, IPlatformComponentAccess>(), lock));
+					putPlatformValue(cid, DATA_INITINFOS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, InitInfo>(), lock));
+					putPlatformValue(cid, DATA_CHILDCOUNTS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Integer>(), lock));
+					putPlatformValue(cid, DATA_CLEANUPFUTURES, new RwMapWrapper<>(new HashMap<IComponentIdentifier, IFuture<Map<String, Object>>>(), lock));
+					putPlatformValue(cid, DATA_LOCALTYPES, new RwMapWrapper<>(new HashMap<Tuple, String>(), lock));
+					putPlatformValue(cid, DATA_CIDCOUNTS, new RwMapWrapper<>(new HashMap<String, Integer>(), lock));
+					putPlatformValue(cid, DATA_CHILDCOUNTS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Integer>(), lock));
+					putPlatformValue(cid, DATA_LOCKENTRIES, new RwMapWrapper<>(new HashMap<IComponentIdentifier, LockEntry>(), lock));
+					putPlatformValue(cid, DATA_CMSLISTENERS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>>(), lock));
+					
+					// does not work as create with subscomponents is recursive
+//					/** The sequentializer to execute getNewFactory() one by one and not interleaved. */
+//					CallSequentializer<Object> cmscaller = new CallSequentializer<Object>();
+//					cmscaller.addCommand("create", new IResultCommand<IFuture<Object>, Object[]>()
+//					{
+//						public IFuture<Object> execute(Object[] args)
+//						{
+////							SComponentManagementService.createComponent(oname, modelname, info, resultlistener, agent)
+//							return (IFuture)SComponentManagementService.createComponentInternal((String)args[0], (String)args[1], (CreationInfo)args[2], (IResultListener<Collection<Tuple2<String, Object>>>)args[3], (IInternalAccess)args[4]);
+//						}
+//					});
+//					cmscaller.addCommand("kill", new IResultCommand<IFuture<Object>, Object[]>()
+//					{
+//						public IFuture<Object> execute(Object[] args)
+//						{
+////							SComponentManagementService.createComponent(oname, modelname, info, resultlistener, agent)
+//							return (IFuture)SComponentManagementService.destroyComponentInternal((IComponentIdentifier)args[0], (IInternalAccess)args[1]);
+//						}
+//					});
+//					putPlatformValue(cid, DATA_CMSSEQ, cmscaller);
+					
 //					rootconf.setBootstrapFactory(cfac);
 //					config.setPlatformModel(model);
 					
@@ -472,7 +551,7 @@ public class Starter
 					ILocalResourceIdentifier lid = rid.getLocalIdentifier();
 					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, lid.getUri()));
 					
-					String ctype	= cfac.getComponentType(configfile, null, model.getResourceIdentifier()).get();
+					String ctype = cfac.getComponentType(configfile, null, model.getResourceIdentifier()).get();
 					IComponentIdentifier caller = sc==null? null: sc.getCaller();
 					Cause cause = sc==null? null: sc.getCause();
 					assert cause!=null;
@@ -490,19 +569,8 @@ public class Starter
 //					rootConfig.setValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
 					putPlatformValue(cid, DATA_PARAMETERCOPY, config.getValue(DATA_PARAMETERCOPY, model));
 //					rootConfig.setValue(PlatformConfiguration.DATA_PARAMETERCOPY, config.getValue(PlatformConfiguration.DATA_PARAMETERCOPY));
-
 					putPlatformValue(cid, DATA_NETWORKNAMESCACHE, new TransformSet<String>());
-
-//					else if(config.getBooleanValue(PlatformConfiguration.REGISTRY_SYNC))
-//					if(config.getRegistrySync())
-//					{
-						putPlatformValue(cid, DATA_SERVICEREGISTRY, new ServiceRegistry());
-//					}
-//					else
-//					{
-						// ServiceRegistry cannot handle backport for polling in case of global queries
-//						PlatformConfiguration.putPlatformValue(cid, PlatformConfiguration.DATA_SERVICEREGISTRY, new GlobalQueryServ);
-//					}
+					putPlatformValue(cid, DATA_SERVICEREGISTRY, new ServiceRegistry());
 					
 					try
 					{
@@ -536,50 +604,61 @@ public class Starter
 
 					initRescueThread(cid, config);	// Required for bootstrapping init.
 
-					component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+					IBootstrapFactory fac = (IBootstrapFactory)SComponentManagementService.getComponentFactory(cid);
+					
+					fac.startService(component.getInternalAccess(), rid).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 					{
 						public void customResultAvailable(Void result)
 						{
-							@SuppressWarnings("rawtypes")
-							List	comps	= config.getComponents();
-							if(args!=null && args.containsKey("component"))
-							{
-								comps	= (List<?>)args.get("component");
-								if(config.getComponents()!=null)
-								{
-									comps.addAll((List<?>)config.getComponents());
-								}
-							}
-							
-							startComponents(0, comps, component.getInternalAccess())
-								.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
+							SComponentManagementService.removeInitInfo(cid);
+							SComponentManagementService.getComponents(cid).put(cid, component);
+						
+							component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(Boolean.TRUE.equals(config.getValue(IPlatformConfiguration.WELCOME, model)))
+									@SuppressWarnings("rawtypes")
+									List comps = config.getComponents();
+									if(args!=null && args.containsKey("component"))
 									{
-										long startup = System.currentTimeMillis() - starttime;
-										// platform.logger.info("Platform startup time: " + startup + " ms.");
-										System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
-//										System.out.println(desc.getName()+" platform startup time: " + "799 ms.");
+										comps	= (List<?>)args.get("component");
+										if(config.getComponents()!=null)
+										{
+											comps.addAll((List<?>)config.getComponents());
+										}
 									}
-									fret.setResult(component.getInternalAccess().getExternalAccess());
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									// On exception in init: kill platform.
-									component.getInternalAccess().getExternalAccess().killComponent();
-									super.exceptionOccurred(exception);
+									
+									startComponents(0, comps, component.getInternalAccess())
+										.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
+									{
+										public void customResultAvailable(Void result)
+										{
+											if(Boolean.TRUE.equals(config.getValue(IPlatformConfiguration.WELCOME, model)))
+											{
+												long startup = System.currentTimeMillis() - starttime;
+												// platform.logger.info("Platform startup time: " + startup + " ms.");
+												System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+		//										System.out.println(desc.getName()+" platform startup time: " + "799 ms.");
+											}
+											fret.setResult(component.getInternalAccess().getExternalAccess());
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											// On exception in init: kill platform.
+											component.getInternalAccess().getExternalAccess().killComponent();
+											super.exceptionOccurred(exception);
+										}
+									});
 								}
 							});
+							
+							if(cid.equals(IComponentIdentifier.LOCAL.get()))
+							{
+								IComponentIdentifier.LOCAL.set(null);
+							}
 						}
 					});
-					
-					if(cid.equals(IComponentIdentifier.LOCAL.get()))
-					{
-						IComponentIdentifier.LOCAL.set(null);
-					}
 				}
 			}
 	//		System.out.println("Model: "+model);
@@ -686,7 +765,7 @@ public class Starter
 		
 		if(components!=null && i<components.size())
 		{
-			IComponentManagementService cms = instance.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
+//			IComponentManagementService cms = instance.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
 			String name	= null;
 			String config	= null;
 			String args = null;
@@ -750,15 +829,29 @@ public class Starter
 				}
 			}
 			
-			cms.createComponent(name, comp, new CreationInfo(config, oargs), null)
-				.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+			CreationInfo ci = new CreationInfo(config, oargs);
+			ci.setName(name);
+			ci.setFilename(comp);
+			
+			instance.createComponent(null, ci, null)
+				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
-				public void customResultAvailable(IComponentIdentifier result)
+				public void customResultAvailable(IExternalAccess result)
 				{
 					startComponents(i+1, components, instance)
 						.addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
+			
+//			cms.createComponent(name, comp, new CreationInfo(config, oargs), null)
+//				.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+//			{
+//				public void customResultAvailable(IComponentIdentifier result)
+//				{
+//					startComponents(i+1, components, instance)
+//						.addResultListener(new DelegationResultListener<Void>(ret));
+//				}
+//			});
 		}
 		else
 		{
@@ -897,37 +990,42 @@ public class Starter
 	/**
 	 *  Create a proxy for the remote platform.
 	 */
-	public static IFuture<IComponentIdentifier>	createProxy(final IExternalAccess local, final IExternalAccess remote)
+	public static IFuture<IExternalAccess> createProxy(final IExternalAccess local, final IExternalAccess remote)
 	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
-		remote.searchService( new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+		remote.searchService( new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IExternalAccess>(ret)
 		{
 			public void customResultAvailable(ITransportAddressService remotetas) throws Exception
 			{
-				remotetas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, IComponentIdentifier>(ret)
+				remotetas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, IExternalAccess>(ret)
 				{
 					public void customResultAvailable(final List<TransportAddress> remoteaddrs) throws Exception
 					{
-						local.searchService( new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+						local.searchService( new ServiceQuery<>(ITransportAddressService.class)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IExternalAccess>(ret)
 						{
 							public void customResultAvailable(ITransportAddressService localtas) throws Exception
 							{
-								localtas.addManualAddresses(remoteaddrs).addResultListener(new ExceptionDelegationResultListener<Void, IComponentIdentifier>(ret)
+								localtas.addManualAddresses(remoteaddrs).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 								{
 									public void customResultAvailable(Void result) throws Exception
 									{
-										local.searchService( new ServiceQuery<>(IComponentManagementService.class))
-											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
-										{
-											public void customResultAvailable(final IComponentManagementService localcms)
-											{
-												Map<String, Object>	args = new HashMap<String, Object>();
-												args.put("component", remote.getId().getRoot());
-												CreationInfo ci = new CreationInfo(args);
-												localcms.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-											}
-										});
+										Map<String, Object>	args = new HashMap<String, Object>();
+										args.put("component", remote.getId().getRoot());
+										CreationInfo ci = new CreationInfo(args);
+										local.createComponent("jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+										
+//										local.searchService( new ServiceQuery<>(IComponentManagementService.class))
+//											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+//										{
+//											public void customResultAvailable(final IComponentManagementService localcms)
+//											{
+//												Map<String, Object>	args = new HashMap<String, Object>();
+//												args.put("component", remote.getId().getRoot());
+//												CreationInfo ci = new CreationInfo(args);
+//												localcms.createComponent(null, "jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+//											}
+//										});
 									}
 								});
 							}

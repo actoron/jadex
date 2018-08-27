@@ -136,6 +136,7 @@ public class Initiator2Agent extends TestAgent
 								{
 									public void customResultAvailable(Map<String,Object> result) 
 									{
+										System.out.println("Test result: "+tr);
 										ret.setResult(tr);
 									}
 								});
