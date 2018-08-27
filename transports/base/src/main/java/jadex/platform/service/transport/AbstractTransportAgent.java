@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -124,6 +125,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	/** Listeners from transport info service. */
 	protected Collection<SubscriptionIntermediateFuture<PlatformData>>	infosubscribers;
 	
+	/** Flag to indicate that the component is killed. After the agent is killed it needs to ignore input from the external transport impl. */
+	protected boolean 	killed;
+	
 
 	// -------- abstract methods to be provided by concrete transport --------
 
@@ -151,6 +155,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public void messageReceived(final Con con, final byte[] header, final byte[] body)
 	{
+		if(killed)
+			return;
+		
 		ConnectionCandidate cand = getConnectionCandidate(con);
 		
 		// Race condition between con result future in handleConnect and received CID from server.
@@ -183,6 +190,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public void connectionEstablished(final Con con)
 	{
+		if(killed)
+			return;
+
 		createConnectionCandidate(con, false);
 	}
 
@@ -194,6 +204,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public void connectionClosed(Con con, Exception e)
 	{
+		if(killed)
+			return;
+
 //		System.out.println("Close connection called: " + System.identityHashCode(con) + " " + con + " " + e);
 		ConnectionCandidate cand = getConnectionCandidate(con);
 		
@@ -284,6 +297,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	@AgentKilled
 	protected void shutdown()
 	{
+		this.killed	= true;
 		impl.shutdown();
 	}
 
@@ -1007,6 +1021,12 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		protected void	sendMessage(byte[] header, byte[] body, TerminableFuture<Integer> ret)
 		{
+			if(killed)
+			{
+				ret.setExceptionIfUndone(new ComponentTerminatedException(agent.getId()));
+				return;
+			}
+			
 			ConnectionCandidate	con	= null;
 			IFuture<ConnectionCandidate>	fut	= null;
 			synchronized(this)
@@ -1058,8 +1078,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			}
 			else
 			{
-				fut.addResultListener(fcon -> impl.sendMessage(fcon.getConnection(), header, body)
-					.addResultListener(new DelegationResultListener<>(ret)));
+				fut.addResultListener(fcon -> sendMessage(header, body, ret));
 			}
 		}
 		
