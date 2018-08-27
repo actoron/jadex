@@ -5,7 +5,6 @@ import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.future.IFuture;
@@ -85,10 +84,10 @@ public class JadexPlatformBinder extends JadexMultiPlatformBinder implements IJa
 		service.setPlatformId(platformId);
 	}
 
-	public IFuture<IComponentManagementService> getCMS()
-	{
-		return service.getCMS();
-	}
+//	public IFuture<IComponentManagementService> getCMS()
+//	{
+//		return service.getCMS();
+//	}
 
 	public IExternalAccess getExternalPlatformAccess()
 	{

@@ -12,7 +12,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -109,22 +108,22 @@ public class RestServiceWrapperInvocationHandlerAndroid implements InvocationHan
 		final Future<Object> ret = new Future<Object>();
 			
 //		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getService("cms");
-		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-		fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
-		{
-			public void customResultAvailable(final IComponentManagementService cms)
-			{
+//		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
+//		{
+//			public void customResultAvailable(final IComponentManagementService cms)
+//			{
 				CreationInfo ci = new CreationInfo(agent.getId());
 //				cms.createComponent(null, "invocation", ci, null)
-				cms.createComponent(null, "jadex/extension/rs/invoke/RestServiceInvocationAgent.class", ci, null)
-					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
+				agent.createComponent("jadex/extension/rs/invoke/RestServiceInvocationAgent.class", ci, null)
+					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier cid) 
+					public void customResultAvailable(IExternalAccess exta) 
 					{
-						cms.getExternalAccess(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
-						{
-							public void customResultAvailable(IExternalAccess exta) 
-							{
+//						cms.getExternalAccess(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
+//						{
+//							public void customResultAvailable(IExternalAccess exta) 
+//							{
 								exta.scheduleStep(new IComponentStep<Object>()
 								{
 									public IFuture<Object> execute(IInternalAccess ia)
@@ -331,12 +330,12 @@ public class RestServiceWrapperInvocationHandlerAndroid implements InvocationHan
 
 									
 								}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Object>(ret)));
-							}
-						}));
+//							}
+//						}));
 					}
-				}));
-			}
-		}));
+				});
+//			}
+//		}));
 			
 		return ret;
 	}

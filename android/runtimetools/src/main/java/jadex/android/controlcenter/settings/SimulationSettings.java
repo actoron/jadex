@@ -16,7 +16,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -326,20 +325,9 @@ public class SimulationSettings extends AServiceSettings {
 	 * Get the host component of a service.
 	 */
 	public IFuture<IExternalAccess> getComponentForService() {
-		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 
-		JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId).searchService(new ServiceQuery<>(
-			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
-				new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret) {
-					public void customResultAvailable(IComponentManagementService cms) {
-						// IComponentManagementService cms =
-						// (IComponentManagementService)result;
-						cms.getExternalAccess((IComponentIdentifier) ((IService)simService).getId().getProviderId()).addResultListener(
-								new DelegationResultListener<IExternalAccess>(ret));
-					}
-				});
-
-		return ret;
+		return JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId)
+			.getExternalAccess((IComponentIdentifier) ((IService)simService).getId().getProviderId());
 	}
 
 	/**

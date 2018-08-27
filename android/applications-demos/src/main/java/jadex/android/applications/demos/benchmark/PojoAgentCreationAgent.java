@@ -12,7 +12,6 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -214,12 +213,12 @@ public class PojoAgentCreationAgent
 		final long omem, final double upera)
 	{
 		final String name = createPeerName(cnt, agent.getId());
-		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-		{
-			public void resultAvailable(IComponentManagementService cms)
-			{
+//		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+//		{
+//			public void resultAvailable(IComponentManagementService cms)
+//			{
 				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
-				cms.destroyComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
+				agent.killComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
 				{
 					public void resultAvailable(Map<String, Object> result)
 					{
@@ -235,8 +234,8 @@ public class PojoAgentCreationAgent
 						}
 					}
 				});
-			}
-		});
+//			}
+//		});
 	}
 	
 	/**
@@ -276,10 +275,10 @@ public class PojoAgentCreationAgent
 		});
 	}
 	
-	protected IFuture<IComponentManagementService>	getCMS()
-	{
-		return agent.getFeature(IRequiredServicesFeature.class).getService(IComponentManagementService.class);
-	}
+//	protected IFuture<IComponentManagementService>	getCMS()
+//	{
+//		return agent.getFeature(IRequiredServicesFeature.class).getService(IComponentManagementService.class);
+//	}
 	
 	
 	protected IFuture<IClockService> getClock()

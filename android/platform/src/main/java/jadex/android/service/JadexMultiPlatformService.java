@@ -20,7 +20,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.platform.IJadexMultiPlatformBinder;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
@@ -126,10 +125,10 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		return jadexPlatformManager.isPlatformRunning(platformId);
 	}
 
-	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformId)
-	{
-		return getService(platformId, IComponentManagementService.class);
-	}
+//	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformId)
+//	{
+//		return getService(platformId, IComponentManagementService.class);
+//	}
 
 	public <S> S getsService(IComponentIdentifier platformId, Class<S> serviceClazz)
 	{
@@ -260,14 +259,16 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 			Logger.d("Setting RID before starting Component: " + rid);
 			creationInfo.setResourceIdentifier(rid);
 		}
+		creationInfo.setName(name);
 		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		getCMS(platformId)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
-		{
-			public void customResultAvailable(final IComponentManagementService cms)
-			{
-				ITuple2Future<IComponentIdentifier,Map<String,Object>> fut = cms.createComponent(name, modelPath, creationInfo);
+//		getCMS(platformId)
+//			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+//		{
+//			public void customResultAvailable(final IComponentManagementService cms)
+//			{
+				ITuple2Future<IComponentIdentifier,Map<String,Object>> fut = jadexPlatformManager.getExternalPlatformAccess(platformId)
+					.createComponent(modelPath, creationInfo);
 				
 				fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>() {
 
@@ -346,8 +347,8 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 						ret.setException(exception);
 					}
 				});
-			}
-		});
+//			}
+//		});
 
 		return ret;
 	}
