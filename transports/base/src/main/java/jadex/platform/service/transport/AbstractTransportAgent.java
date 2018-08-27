@@ -302,7 +302,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	{
 		
 		final TerminableFuture<Integer> ret = new TerminableFuture<>();
-		final IComponentIdentifier	target	= (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
+		final IComponentIdentifier	target	= header.getReceiver();
 		assert target!=null; // Message feature should disallow sending without receiver.
 		
 //		System.out.println(agent+".sendMessage to "+target);
