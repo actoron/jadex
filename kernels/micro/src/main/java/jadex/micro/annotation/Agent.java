@@ -29,30 +29,30 @@ public @interface Agent
 	 */
 	public Boolean3 suspend() default Boolean3.NULL;
 	
-	/**
-	 *  Specify if the component is a master and leads to killing of parent when stopped.
-	 */
-	public Boolean3 master() default Boolean3.NULL;
+//	/**
+//	 *  Specify if the component is a master and leads to killing of parent when stopped.
+//	 */
+//	public Boolean3 master() default Boolean3.NULL;
 	
-	/**
-	 *  Specify if the component is a daemon that doesn't prevent autoshutdown of its parent.
-	 */
-	public Boolean3 daemon() default Boolean3.NULL;
+//	/**
+//	 *  Specify if the component is a daemon that doesn't prevent autoshutdown of its parent.
+//	 */
+//	public Boolean3 daemon() default Boolean3.NULL;
 	
-	/**
-	 *  Specify if the component be killed automatically when no more subcomponents exist.
-	 */
-	public Boolean3 autoshutdown() default Boolean3.NULL;
+//	/**
+//	 *  Specify if the component be killed automatically when no more subcomponents exist.
+//	 */
+//	public Boolean3 autoshutdown() default Boolean3.NULL;
 	
 	/**
 	 *  Specify if the subcomponent should run synchronously on its parent's thread.
 	 */
 	public Boolean3 synchronous() default Boolean3.NULL;
 	
-	/**
-	 *  Specify if the component is persistable.
-	 */
-	public Boolean3 persistable() default Boolean3.NULL;
+//	/**
+//	 *  Specify if the component is persistable.
+//	 */
+//	public Boolean3 persistable() default Boolean3.NULL;
 	
 	/**
 	 *  Specify if monitoring should be enabled on the component.

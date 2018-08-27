@@ -537,10 +537,10 @@ public class Starter
 						{
 							scn = CallAccess.getOrCreateNextInvocation();
 						}
-						if(scn.getCause()==null)
-						{
-							scn.setCause(new Cause((String)null, "createPlatform"));
-						}
+//						if(scn.getCause()==null)
+//						{
+//							scn.setCause(new Cause((String)null, "createPlatform"));
+//						}
 
 						CallAccess.setCurrentInvocation(scn);
 						sc	= scn;
@@ -553,17 +553,22 @@ public class Starter
 					
 					String ctype = cfac.getComponentType(configfile, null, model.getResourceIdentifier()).get();
 					IComponentIdentifier caller = sc==null? null: sc.getCaller();
-					Cause cause = sc==null? null: sc.getCause();
-					assert cause!=null;
+//					Cause cause = sc==null? null: sc.getCause();
+//					assert cause!=null;
 					
-					Boolean autosd = config.getExtendedPlatformConfiguration().getAutoShutdown();
+//					Boolean autosd = config.getExtendedPlatformConfiguration().getAutoShutdown();
 //					Boolean autosd = (Boolean)config.getValue(RootComponentConfiguration.AUTOSHUTDOWN);
 //					rootConfig.setValue(RootComponentConfiguration.AUTOSHUTDOWN, autosd);
 					PublishEventLevel monitoring = config.getExtendedPlatformConfiguration().getMonitoring();
 	
-					final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, false, false, 
-						autosd!=null ? autosd.booleanValue() : false, false, false, monitoring, model.getFullName(),
-						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause, false);
+//					final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, false, false, 
+//						autosd!=null ? autosd.booleanValue() : false, false, false, monitoring, model.getFullName(),
+//						null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, false);
+
+					
+					final CMSComponentDescription desc = new CMSComponentDescription(cid).setType(ctype).setModelName(model.getFullName())
+						.setResourceIdentifier(model.getResourceIdentifier()).setCreationTime(System.currentTimeMillis()).setCreator(caller)
+						.setMonitoring(monitoring);
 
 					putPlatformValue(cid, DATA_REALTIMETIMEOUT, config.getValue(DATA_REALTIMETIMEOUT, model));
 //					rootConfig.setValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));

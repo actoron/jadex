@@ -13,7 +13,6 @@ import java.util.Map;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.Cause;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
@@ -1097,6 +1096,44 @@ public class SComponentManagementService
 	// r: components
 	// w: -
 	/**
+	 *  Get the children count.
+	 *  @param cid The component identifier.
+	 *  @return The child count
+	 */
+	public static IFuture<Integer> getChildCount(final IComponentIdentifier cid, IInternalAccess agent)
+	{
+		final Future<Integer> ret = new Future<Integer>();
+		
+		if(isRemoteComponent(cid, agent))
+		{
+			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<Integer>()
+			{
+				@Override
+				public IFuture<Integer> execute(IInternalAccess ia)
+				{
+					return SComponentManagementService.getChildCount(cid, agent);
+				}
+			});
+		}
+		else
+		{
+			setReadLock(agent.getId());
+			
+			CMSComponentDescription desc = (CMSComponentDescription)SComponentManagementService.getDescription(cid);
+			IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+				IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
+			
+			ret.setResult(tmp.length);
+			
+			releaseReadLock(agent.getId());
+		}
+		
+		return ret;
+	}
+	
+	// r: components
+	// w: -
+	/**
 	 *  Get the children components of a component.
 	 *  @param cid The component identifier.
 	 *  @return The children component identifiers.
@@ -1476,13 +1513,13 @@ public class SComponentManagementService
 //		if(padesc.isAutoShutdown() && !ad.isDaemon())
 //		if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
 		// cannot check parent shutdown state because could be still uninited
-		if(!ad.isDaemon())
-		{
-//			Integer	childcount	= (Integer)SComponentManagementService.getChildCounts(agent.getId()).get(padesc.getName());
-//			int cc = childcount!=null ? childcount.intValue()+1 : 1;
-//			SComponentManagementService.getChildCounts(agent.getId()).put(padesc.getName(), Integer.valueOf(cc));
-			pad.getFeature(ISubcomponentsFeature.class).incChildcount();
-		}
+//		if(!ad.isDaemon())
+//		{
+////			Integer	childcount	= (Integer)SComponentManagementService.getChildCounts(agent.getId()).get(padesc.getName());
+////			int cc = childcount!=null ? childcount.intValue()+1 : 1;
+////			SComponentManagementService.getChildCounts(agent.getId()).put(padesc.getName(), Integer.valueOf(cc));
+//			pad.getFeature(ISubcomponentsFeature.class).incChildcount();
+//		}
 		
 		// Register component at parent.
 		return ((IInternalSubcomponentsFeature)pad.getFeature(ISubcomponentsFeature.class)).componentCreated(ad);//, lmodel);
@@ -2419,7 +2456,7 @@ public class SComponentManagementService
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
-		final Cause curcause = sc==null? agent.getDescription().getCause(): sc.getCause();
+//		final Cause curcause = sc==null? agent.getDescription().getCause(): sc.getCause();
 		
 		final Future<IComponentIdentifier> inited = new Future<IComponentIdentifier>();
 		final Future<Void> resfut = new Future<Void>();
@@ -2479,11 +2516,11 @@ public class SComponentManagementService
 					// Defer component services being found from registry
 					ServiceRegistry.getRegistry(agent).addExcludedComponent(cid);
 					
-					Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
-					Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
-					Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
+//					Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
+//					Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
+//					Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
 					Boolean sync = cinfo.getSynchronous()!=null? cinfo.getSynchronous(): lmodel.getSynchronous(cinfo.getConfiguration());
-					Boolean persistable = cinfo.getPersistable()!=null? cinfo.getPersistable(): lmodel.getPersistable(cinfo.getConfiguration());
+//					Boolean persistable = cinfo.getPersistable()!=null? cinfo.getPersistable(): lmodel.getPersistable(cinfo.getConfiguration());
 					PublishEventLevel moni = cinfo.getMonitoring()!=null? cinfo.getMonitoring(): lmodel.getMonitoring(cinfo.getConfiguration());
 					// Inherit monitoring from parent if null
 					if(moni==null && cinfo.getParent()!=null)
@@ -2492,14 +2529,17 @@ public class SComponentManagementService
 						moni = desc.getMonitoring();
 					}
 					
-					Cause cause = curcause;
+//					Cause cause = curcause;
 					// todo: how to do platform init so that clock is always available?
 					IClockService cs = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(
 						new ServiceQuery<>(IClockService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-					final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master!=null ? master.booleanValue() : false,
-						daemon!=null ? daemon.booleanValue() : false, autosd!=null ? autosd.booleanValue() : false, sync!=null ? sync.booleanValue() : false,
-						persistable!=null ? persistable.booleanValue() : false, moni,
-						lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), cs!=null? cs.getTime(): System.currentTimeMillis(), creator, cause, systemcomponent);
+//					final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master!=null ? master.booleanValue() : false,
+//						daemon!=null ? daemon.booleanValue() : false, autosd!=null ? autosd.booleanValue() : false, sync!=null ? sync.booleanValue() : false,
+//						persistable!=null ? persistable.booleanValue() : false, moni,
+//						lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), cs!=null? cs.getTime(): System.currentTimeMillis(), creator, systemcomponent);
+					final CMSComponentDescription ad = new CMSComponentDescription(cid).setType(lmodel.getType()).setModelName(lmodel.getFullName()).setLocalType(cinfo.getLocalType())
+						.setResourceIdentifier(lmodel.getResourceIdentifier()).setCreator(creator).setSystemComponent(systemcomponent).setCreationTime(cs!=null? cs.getTime(): System.currentTimeMillis())
+						.setSynchronous(sync!=null ? sync.booleanValue() : false);
 					
 					// Use first configuration if no config specified.
 					String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
@@ -2906,20 +2946,20 @@ public class SComponentManagementService
 		{
 			// Stop execution of component. When root component services are already shutdowned.
 			
-			killparent = desc.isMaster();
+//			killparent = desc.isMaster();
 			CMSComponentDescription padesc = (CMSComponentDescription)SComponentManagementService.getDescription(desc.getName().getParent());
 			if(padesc!=null)
 			{
 				padesc.removeChild(desc.getName());
-				if(!desc.isDaemon())
-				{
-					pad	= getComponent(padesc.getName());
-					
-					int cc = -1;
-					if(pad!=null)
-						cc = pad.getInternalAccess().getFeature(ISubcomponentsFeature.class).decChildcount();
-					killparent = killparent || (padesc.isAutoShutdown() && cc<=0);
-				}
+//				if(!desc.isDaemon())
+//				{
+//					pad	= getComponent(padesc.getName());
+//					
+//					int cc = -1;
+//					if(pad!=null)
+//						cc = pad.getInternalAccess().getFeature(ISubcomponentsFeature.class).decChildcount();
+//					killparent = killparent || (padesc.isAutoShutdown() && cc<=0);
+//				}
 			}
 			pad	= SComponentManagementService.getComponents(cid).get(desc.getName().getParent());
 			

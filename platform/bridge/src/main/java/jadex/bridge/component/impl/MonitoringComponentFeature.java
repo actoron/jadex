@@ -61,20 +61,20 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	 */
 	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt)
 	{
-		if(event.getCause()==null)
-		{
-			ServiceCall call = CallAccess.getCurrentInvocation();
-			if(call!=null)
-			{
-//				System.out.println("injecting call cause: "+call.getCause());
-				event.setCause(call.getCause());
-			}
-			else if(getComponent().getDescription().getCause()!=null)
-			{
-//				System.out.println("injecting root cause: "+call.getCause());
-				event.setCause(getComponent().getDescription().getCause().createNext());//event.getSourceIdentifier().toString()));
-			}
-		}
+//		if(event.getCause()==null)
+//		{
+//			ServiceCall call = CallAccess.getCurrentInvocation();
+//			if(call!=null)
+//			{
+////				System.out.println("injecting call cause: "+call.getCause());
+//				event.setCause(call.getCause());
+//			}
+//			else if(getComponent().getDescription().getCause()!=null)
+//			{
+////				System.out.println("injecting root cause: "+call.getCause());
+//				event.setCause(getComponent().getDescription().getCause().createNext());//event.getSourceIdentifier().toString()));
+//			}
+//		}
 		
 		// Publish to local subscribers
 		publishLocalEvent(event);

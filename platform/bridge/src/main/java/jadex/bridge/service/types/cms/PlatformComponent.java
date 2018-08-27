@@ -223,7 +223,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 //							if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
 //								System.out.println("shutdown component features end1: "+getComponentIdentifier()+", "+ex);
 							MonitoringEvent event = new MonitoringEvent(getDescription().getName(), getDescription().getCreationTime(),
-								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getDescription().getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
+//								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getDescription().getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
+								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, System.currentTimeMillis(), PublishEventLevel.COARSE);
 							event.setProperty("details", getDescription());
 							getFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL).addResultListener(new IResultListener<Void>()
 							{

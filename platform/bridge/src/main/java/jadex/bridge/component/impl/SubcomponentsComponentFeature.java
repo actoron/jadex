@@ -23,8 +23,10 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
@@ -42,8 +44,8 @@ import jadex.javaparser.SimpleValueFetcher;
  */
 public class SubcomponentsComponentFeature	extends	AbstractComponentFeature implements ISubcomponentsFeature, IInternalSubcomponentsFeature
 {
-	/** The number of children. */
-	protected int childcount;
+//	/** The number of children. */
+//	protected int childcount;
 	
 	/**
 	 *  Create the feature.
@@ -209,18 +211,18 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 //					if(type.getFilename().indexOf("Registry")!=-1)
 //						System.out.println("reg");
 					final Boolean suspend	= components[i].getSuspend()!=null ? components[i].getSuspend() : type.getSuspend();
-					Boolean	master = components[i].getMaster()!=null ? components[i].getMaster() : type.getMaster();
-					Boolean	daemon = components[i].getDaemon()!=null ? components[i].getDaemon() : type.getDaemon();
-					Boolean	autoshutdown = components[i].getAutoShutdown()!=null ? components[i].getAutoShutdown() : type.getAutoShutdown();
+//					Boolean	master = components[i].getMaster()!=null ? components[i].getMaster() : type.getMaster();
+//					Boolean	daemon = components[i].getDaemon()!=null ? components[i].getDaemon() : type.getDaemon();
+//					Boolean	autoshutdown = components[i].getAutoShutdown()!=null ? components[i].getAutoShutdown() : type.getAutoShutdown();
 					Boolean	synchronous = components[i].getSynchronous()!=null ? components[i].getSynchronous() : type.getSynchronous();
-					Boolean	persistable = components[i].getPersistable()!=null ? components[i].getPersistable() : type.getPersistable();
+//					Boolean	persistable = components[i].getPersistable()!=null ? components[i].getPersistable() : type.getPersistable();
 					PublishEventLevel monitoring = components[i].getMonitoring()!=null ? components[i].getMonitoring() : type.getMonitoring();
 					RequiredServiceBinding[] bindings = components[i].getBindings();
 					// todo: rid
 //					System.out.println("curcall: "+getName(components[i], model, j+1)+" "+CallAccess.getCurrentInvocation().getCause());
 //					cms.createComponent(getName(components[i], model, j+1), type.getName(),
 					CreationInfo ci = new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getId(),
-						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null);
+						suspend,  synchronous, monitoring, model.getAllImports(), bindings, null);
 					ci.setName(getName(components[i], model, j+1));
 					ci.setFilename(getFilename(components[i], model));
 					
@@ -371,8 +373,9 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 					Future<Void>	ret	= new Future<Void>();
 					if(mon.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 					{
+						// desc.getCause()
 						MonitoringEvent me = new MonitoringEvent(desc.getName(), desc.getCreationTime(), 
-							MonitoringEvent.TYPE_COMPONENT_CREATED, desc.getCause(), desc.getCreationTime(), PublishEventLevel.COARSE);
+							MonitoringEvent.TYPE_COMPONENT_CREATED, desc.getCreationTime(), PublishEventLevel.COARSE);
 						me.setProperty("details", desc);
 						// for extensions only
 						mon.publishEvent(me, PublishTarget.TOALL) .addResultListener(new DelegationResultListener<Void>(ret));
@@ -407,9 +410,10 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 					Future<Void>	ret	= new Future<Void>();
 					if(mon.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 					{
+//						desc.getCause()
 						long time = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime();
 						MonitoringEvent me = new MonitoringEvent(desc.getName(), desc.getCreationTime(), 
-							MonitoringEvent.TYPE_COMPONENT_DISPOSED, desc.getCause(), time, PublishEventLevel.COARSE);
+							MonitoringEvent.TYPE_COMPONENT_DISPOSED, time, PublishEventLevel.COARSE);
 						me.setProperty("details", desc);
 						// for extensions only
 						mon.publishEvent(me, PublishTarget.TOALL) .addResultListener(new DelegationResultListener<Void>(ret));
@@ -451,7 +455,8 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	 */
 	public int getChildcount()
 	{
-		return childcount;
+		return ((CMSComponentDescription)getComponent().getDescription()).getChildren().length;
+//		return childcount;
 	}
 
 //	/**
@@ -463,20 +468,20 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 //		this.childcount = childcount;
 //	}
 	
-	/**
-	 *  Inc the child count.
-	 */
-	public int incChildcount()
-	{
-		return ++this.childcount;
-	}
-	
-	/**
-	 *  Dec the child count.
-	 */
-	public int decChildcount()
-	{
-		return childcount>0? --childcount: childcount;
-	}
+//	/**
+//	 *  Inc the child count.
+//	 */
+//	public int incChildcount()
+//	{
+//		return ++this.childcount;
+//	}
+//	
+//	/**
+//	 *  Dec the child count.
+//	 */
+//	public int decChildcount()
+//	{
+//		return childcount>0? --childcount: childcount;
+//	}
 	
 }

@@ -51,7 +51,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		// This stuff must be in the configuration because it configures the starter (not the platform component itself)
 //		defvalues.put(IPlatformConfiguration.PLATFORM_NAME, "jadex");
 		defvalues.put(IPlatformConfiguration.CONFIGURATION_NAME, "auto");
-		defvalues.put(IPlatformConfiguration.AUTOSHUTDOWN, Boolean.FALSE);
+//		defvalues.put(IPlatformConfiguration.AUTOSHUTDOWN, Boolean.FALSE);
 		defvalues.put(IPlatformConfiguration.WELCOME, Boolean.TRUE);
 		defvalues.put(IPlatformConfiguration.COMPONENT_FACTORY, IPlatformConfiguration.FALLBACK_COMPONENT_FACTORY);
 		defvalues.put(IPlatformConfiguration.CONFIGURATION_FILE, IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION);

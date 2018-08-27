@@ -40,14 +40,14 @@ public class CreationInfo
 	/** The suspend flag (default: false). */
 	protected Boolean suspend;
 
-	/** The master flag (default: false). */
-	protected Boolean master;
+//	/** The master flag (default: false). */
+//	protected Boolean master;
 	
-	/** The daemon flag (default: false). */
-	protected Boolean daemon;
+//	/** The daemon flag (default: false). */
+//	protected Boolean daemon;
 	
-	/** The auto shutdown flag (default: false). */
-	protected Boolean autoshutdown;
+//	/** The auto shutdown flag (default: false). */
+//	protected Boolean autoshutdown;
 
 //	/** The monitoring flag (default: false). */
 //	protected Boolean monitoring;
@@ -56,8 +56,8 @@ public class CreationInfo
 	/** The synchronous flag (default: false). */
 	protected Boolean synchronous;
 	
-	/** The persistable flag (default: false). */
-	protected Boolean persistable;
+//	/** The persistable flag (default: false). */
+//	protected Boolean persistable;
 	
 //	/** The platform classloader flag (default: false). */
 //	protected Boolean platformloader;
@@ -97,9 +97,9 @@ public class CreationInfo
 			this.args	= info.getArguments();
 			this.parent	= info.getParent();
 			this.suspend	= info.getSuspend(); 
-			this.master = info.getMaster();
-			this.daemon = info.getDaemon();
-			this.autoshutdown = info.getAutoShutdown();
+//			this.master = info.getMaster();
+//			this.daemon = info.getDaemon();
+//			this.autoshutdown = info.getAutoShutdown();
 			this.monitoring = info.getMonitoring();
 			this.synchronous = info.getSynchronous();
 			this.imports	= info.getImports();
@@ -134,7 +134,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(IResourceIdentifier rid)
 	{
-		this(null, null, null, null, null, null, null, null, null, null, null, null, rid);
+		this(null, null, null, null, null, null, null, null, rid);
 	}
 	
 	/**
@@ -143,7 +143,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(IComponentIdentifier parent, IResourceIdentifier rid)
 	{
-		this(null, null, parent, null, null, null, null, null, null, null, null, null, rid);
+		this(null, null, parent, null, null, null, null, null, rid);
 	}
 	
 	/**
@@ -161,7 +161,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IResourceIdentifier rid)
 	{
-		this(config, args, null, null, null, null, null, null, null, null, null, null, rid);
+		this(config, args, null, null, null, null, null, null, rid);
 	}
 	
 
@@ -208,33 +208,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, String[] imports)
 	{
-		this(config, args, parent, suspend, null, null, null, null, null, null, imports, null, null);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 *  @param suspend	The suspend flag.
-	 *  @param master	The master flag.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, Boolean master)
-	{
-		this(config, args, parent, suspend, master, null);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 *  @param suspend	The suspend flag.
-	 *  @param master	The master flag.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, Boolean master, Boolean daemon)
-	{
-		this(config, args, parent, suspend, master, daemon, null, null, null, null);
+		this(config, args, parent, suspend, null, null, imports, null, null);
 	}
 	
 	/**
@@ -246,9 +220,11 @@ public class CreationInfo
 	 *  @param master	The master flag.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, 
-		Boolean master, Boolean daemon, Boolean autoshutdown, Boolean synchronous, Boolean persistable, PublishEventLevel monitoring)
+		//Boolean master, Boolean daemon, Boolean autoshutdown, 
+		Boolean synchronous, //Boolean persistable, 
+		PublishEventLevel monitoring)
 	{
-		this(config, args, parent, suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, null, null, null);
+		this(config, args, parent, suspend, synchronous, monitoring, null, null, null);
 	}
 	
 	/**
@@ -261,17 +237,18 @@ public class CreationInfo
 	 *  @param imports	The imports.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, 
-		Boolean suspend, Boolean master, Boolean daemon, Boolean autoshutdown, 
-		Boolean synchronous, Boolean persistable, PublishEventLevel monitoring,
+		Boolean suspend, //Boolean master, Boolean daemon, Boolean autoshutdown, 
+		Boolean synchronous, //Boolean persistable, 
+		PublishEventLevel monitoring,
 		String[] imports, RequiredServiceBinding[] bindings, IResourceIdentifier rid)
 	{
 		this.config	= config;
 		this.args	= args;
 		this.parent	= parent;
 		this.suspend	= suspend;
-		this.master = master;
-		this.daemon = daemon;
-		this.autoshutdown = autoshutdown;
+//		this.master = master;
+//		this.daemon = daemon;
+//		this.autoshutdown = autoshutdown;
 		this.monitoring = monitoring;
 		this.imports	= imports;
 		this.bindings = bindings;
@@ -411,62 +388,62 @@ public class CreationInfo
 		return this;
 	}
 
-	/**
-	 *  Get the master.
-	 *  @return The master.
-	 */
-	public Boolean getMaster()
-	{
-		return master;
-	}
+//	/**
+//	 *  Get the master.
+//	 *  @return The master.
+//	 */
+//	public Boolean getMaster()
+//	{
+//		return master;
+//	}
+//
+//	/**
+//	 *  Set the master.
+//	 *  @param master The master to set.
+//	 */
+//	public CreationInfo setMaster(Boolean master)
+//	{
+//		this.master = master;
+//		return this;
+//	}
 
-	/**
-	 *  Set the master.
-	 *  @param master The master to set.
-	 */
-	public CreationInfo setMaster(Boolean master)
-	{
-		this.master = master;
-		return this;
-	}
+//	/**
+//	 *  Get the daemon.
+//	 *  @return The daemon.
+//	 */
+//	public Boolean getDaemon()
+//	{
+//		return daemon;
+//	}
+//
+//	/**
+//	 *  Set the daemon.
+//	 *  @param daemon The daemon to set.
+//	 */
+//	public CreationInfo setDaemon(Boolean daemon)
+//	{
+//		this.daemon = daemon;
+//		return this;
+//	}
 
-	/**
-	 *  Get the daemon.
-	 *  @return The daemon.
-	 */
-	public Boolean getDaemon()
-	{
-		return daemon;
-	}
-
-	/**
-	 *  Set the daemon.
-	 *  @param daemon The daemon to set.
-	 */
-	public CreationInfo setDaemon(Boolean daemon)
-	{
-		this.daemon = daemon;
-		return this;
-	}
-
-	/**
-	 *  Get the autoshutdown.
-	 *  @return The autoshutdown.
-	 */
-	public Boolean getAutoShutdown()
-	{
-		return autoshutdown;
-	}
-
-	/**
-	 *  Set the autoshutdown.
-	 *  @param autoshutdown The autoshutdown to set.
-	 */
-	public CreationInfo setAutoShutdown(Boolean autoshutdown)
-	{
-		this.autoshutdown = autoshutdown;
-		return this;
-	}
+//	/**
+//	 *  Get the autoshutdown.
+//	 *  @return The autoshutdown.
+//	 */
+//	public Boolean getAutoShutdown()
+//	{
+//		return autoshutdown;
+//	}
+//
+//	/**
+//	 *  Set the autoshutdown.
+//	 *  @param autoshutdown The autoshutdown to set.
+//	 */
+//	public CreationInfo setAutoShutdown(Boolean autoshutdown)
+//	{
+//		this.autoshutdown = autoshutdown;
+//		return this;
+//	}
 	
 //	public Boolean getPlatformloader()
 //	{
@@ -610,24 +587,24 @@ public class CreationInfo
 		return this;
 	}
 	
-	/**
-	 *  Get the persistable.
-	 *  @return The persistable.
-	 */
-	public Boolean getPersistable()
-	{
-		return persistable;
-	}
-
-	/**
-	 *  Set the persistable.
-	 *  @param persistable The persistable to set.
-	 */
-	public CreationInfo setPersistable(Boolean persistable)
-	{
-		this.persistable = persistable;
-		return this;
-	}
+//	/**
+//	 *  Get the persistable.
+//	 *  @return The persistable.
+//	 */
+//	public Boolean getPersistable()
+//	{
+//		return persistable;
+//	}
+//
+//	/**
+//	 *  Set the persistable.
+//	 *  @param persistable The persistable to set.
+//	 */
+//	public CreationInfo setPersistable(Boolean persistable)
+//	{
+//		this.persistable = persistable;
+//		return this;
+//	}
 
 	/**
 	 *  Get the filename.

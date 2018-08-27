@@ -1202,7 +1202,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		if(sender == null)
 		{
 			// add to agent tree table
-			sender = new Component(new CMSComponentDescription(sid, "unknown-component-type", false, false, false, false, false, null, null, null, null, -1, null, null, false));
+//			sender = new Component(new CMSComponentDescription(sid, "unknown-component-type", false, false, false, false, false, null, null, null, null, -1, null, false));
+			sender = new Component(new CMSComponentDescription(sid).setType("unknown-component-type"));
 			sender.setState(Component.STATE_DEAD);
 			sender.addMessage(message);
 			sender.applyFilter(agentfilter, true);
@@ -1219,7 +1220,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		Component receiver = componentlist.getAgent(rid);
 		if(receiver == null)
 		{
-			receiver = new Component(new CMSComponentDescription(rid, "unknown-component-type", false, false, false, false, false, null, null, null, null, -1, null, null, false));
+//			receiver = new Component(new CMSComponentDescription(rid, "unknown-component-type", false, false, false, false, false, null, null, null, null, -1, null, false));
+			sender = new Component(new CMSComponentDescription(rid).setType("unknown-component-type"));
 			receiver.setState(Component.STATE_DEAD);
 			receiver.addMessage(message);
 			receiver.applyFilter(agentfilter, true);

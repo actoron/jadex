@@ -1360,7 +1360,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 								{
 									getComponent().getFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getId(), 
 										getComponent().getDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
-										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 									// null was step.getCause()
 								}
 							}
@@ -1696,7 +1696,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		if(step.getPriority()<IExecutionFeature.STEP_PRIORITY_IMMEDIATE && getComponent().getFeature0(IMonitoringComponentFeature.class)!=null 
 			&& getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{
-			MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(), type+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
+			MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(), type+"."+TYPE_STEP, System.currentTimeMillis(), PublishEventLevel.FINE);
 			// null was step.getCause()
 			event.setProperty("sourcename", SReflect.getUnqualifiedClassName(step.getStep().getClass()));
 			event.setProperty("details", getStepDetails(step));
@@ -1811,7 +1811,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					if(step.getPriority()<IExecutionFeature.STEP_PRIORITY_IMMEDIATE)
 					{
-						MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(),  IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
+						MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(),  IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, System.currentTimeMillis(), PublishEventLevel.FINE);
 						// null was step.getCause()
 						event.setProperty("sourcename", SReflect.getUnqualifiedClassName(step.getStep().getClass()));
 						event.setProperty("details", getStepDetails(step));

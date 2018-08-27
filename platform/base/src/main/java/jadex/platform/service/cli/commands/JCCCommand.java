@@ -76,7 +76,9 @@ public class JCCCommand extends CreateComponentCommand
 					final Future<Void> ret = new Future<Void>();
 			
 //					final IComponentManagementService cms = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-					IComponentDescription adesc = new CMSComponentDescription(null, null, false, false, false, false, false, null, "jadex.tools.jcc.JCC", null, null, -1, null, null, false);
+//					IComponentDescription adesc = new CMSComponentDescription(null, null, false, false, false, false, false, null, "jadex.tools.jcc.JCC", null, null, -1, null, false);
+					IComponentDescription adesc = new CMSComponentDescription().setModelName("jadex.tools.jcc.JCC");//null, null, false, false, false, false, false, null, "jadex.tools.jcc.JCC", null, null, -1, null, false);
+					
 //					cms.searchComponents(adesc, null, false).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>()
 					ia.searchComponents(adesc, null).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>()
 					{

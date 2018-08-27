@@ -274,41 +274,41 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		cbox.setText("Suspend");
 		column.add(cbox);
 		
-		cbox = new JCheckBox();
-		cbox.setSelected(convBool(getModelInfo().getMaster()));
-		cbox.setAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getModelInfo().setMaster(((JCheckBox) e.getSource()).isSelected());
-			}
-		});
-		cbox.setText("Master");
-		column.add(cbox);
-		
-		cbox = new JCheckBox();
-		cbox.setSelected(convBool(getModelInfo().getDaemon()));
-		cbox.setAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getModelInfo().setDaemon(((JCheckBox) e.getSource()).isSelected());
-			}
-		});
-		cbox.setText("Daemon");
-		column.add(cbox);
-		
-		cbox = new JCheckBox();
-		cbox.setSelected(convBool(getModelInfo().getAutoShutdown()));
-		cbox.setAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getModelInfo().setAutoShutdown(((JCheckBox) e.getSource()).isSelected());
-			}
-		});
-		cbox.setText("Autoshutdown");
-		column.add(cbox);
+//		cbox = new JCheckBox();
+//		cbox.setSelected(convBool(getModelInfo().getMaster()));
+//		cbox.setAction(new AbstractAction()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				getModelInfo().setMaster(((JCheckBox) e.getSource()).isSelected());
+//			}
+//		});
+//		cbox.setText("Master");
+//		column.add(cbox);
+//		
+//		cbox = new JCheckBox();
+//		cbox.setSelected(convBool(getModelInfo().getDaemon()));
+//		cbox.setAction(new AbstractAction()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				getModelInfo().setDaemon(((JCheckBox) e.getSource()).isSelected());
+//			}
+//		});
+//		cbox.setText("Daemon");
+//		column.add(cbox);
+//		
+//		cbox = new JCheckBox();
+//		cbox.setSelected(convBool(getModelInfo().getAutoShutdown()));
+//		cbox.setAction(new AbstractAction()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				getModelInfo().setAutoShutdown(((JCheckBox) e.getSource()).isSelected());
+//			}
+//		});
+//		cbox.setText("Autoshutdown");
+//		column.add(cbox);
 		
 		cbox = new JCheckBox();
 		cbox.setSelected(convBool(getModel().isKeepAlive()));
@@ -495,9 +495,9 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				int row = conftable.getRowCount();
 				ConfigurationInfo conf = new ConfigurationInfo(createFreeName("name", new ConfigurationContains(confcache)));
 				conf.setSuspend(getModelInfo().getSuspend());
-				conf.setMaster(getModelInfo().getMaster());
-				conf.setDaemon(getModelInfo().getDaemon());
-				conf.setAutoShutdown(getModelInfo().getAutoShutdown());
+//				conf.setMaster(getModelInfo().getMaster());
+//				conf.setDaemon(getModelInfo().getDaemon());
+//				conf.setAutoShutdown(getModelInfo().getAutoShutdown());
 				confcache.add(conf);
 				getModelInfo().setConfigurations((ConfigurationInfo[]) confcache.toArray(new ConfigurationInfo[confcache.size()]));
 				modelcontainer.setDirty(true);
@@ -1520,15 +1520,15 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				case 1:
 					ret = convBool(confcache.get(rowIndex).getSuspend());
 					break;
-				case 2:
-					ret = convBool(confcache.get(rowIndex).getMaster());
-					break;
-				case 3:
-					ret = convBool(confcache.get(rowIndex).getDaemon());
-					break;
-				case 4:
-					ret = convBool(confcache.get(rowIndex).getAutoShutdown());
-					break;
+//				case 2:
+//					ret = convBool(confcache.get(rowIndex).getMaster());
+//					break;
+//				case 3:
+//					ret = convBool(confcache.get(rowIndex).getDaemon());
+//					break;
+//				case 4:
+//					ret = convBool(confcache.get(rowIndex).getAutoShutdown());
+//					break;
 			}
 			return ret;
 		}
@@ -1588,15 +1588,15 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				case 1:
 					confcache.get(rowIndex).setSuspend((Boolean) value);
 					break;
-				case 2:
-					confcache.get(rowIndex).setMaster(((Boolean) value));
-					break;
-				case 3:
-					confcache.get(rowIndex).setDaemon(((Boolean) value));
-					break;
-				case 4:
-					confcache.get(rowIndex).setAutoShutdown(((Boolean) value));
-					break;
+//				case 2:
+//					confcache.get(rowIndex).setMaster(((Boolean) value));
+//					break;
+//				case 3:
+//					confcache.get(rowIndex).setDaemon(((Boolean) value));
+//					break;
+//				case 4:
+//					confcache.get(rowIndex).setAutoShutdown(((Boolean) value));
+//					break;
 //				case 1:
 //				
 //					getModel().addPoolLane(confcache.get(rowIndex).getName(), (String) value);

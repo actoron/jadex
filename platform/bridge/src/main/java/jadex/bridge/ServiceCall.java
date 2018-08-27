@@ -24,8 +24,8 @@ public class ServiceCall
 	/** The realtime constant. */
 	public static final String REALTIME = "realtime";
 	
-	/** The cause constant. */
-	public static final String CAUSE = "cause";
+//	/** The cause constant. */
+//	public static final String CAUSE = "cause";
 	
 	/** The monitoring constant. */
 	public static final String MONITORING = "monitoring";
@@ -265,28 +265,28 @@ public class ServiceCall
 		return getRealtime().booleanValue();
 	}
 	
-	/**
-	 *  Get the cause.
-	 *  @return The cause.
-	 */
-	public Cause getCause()
-	{
-//		if(properties.get(CAUSE)!=null && !(properties.get(CAUSE) instanceof Cause))
-//		{
-//			System.out.println("sdmyb");
-//		}
-		return (Cause)properties.get(CAUSE);
-	}
-	
-	/**
-	 *  Set the cause.
-	 *  @param cause The cause.
-	 */
-	public void setCause(Cause cause)
-	{
-		lastmod	= IComponentIdentifier.LOCAL.get();
-		properties.put(CAUSE, cause);
-	}
+//	/**
+//	 *  Get the cause.
+//	 *  @return The cause.
+//	 */
+//	public Cause getCause()
+//	{
+////		if(properties.get(CAUSE)!=null && !(properties.get(CAUSE) instanceof Cause))
+////		{
+////			System.out.println("sdmyb");
+////		}
+//		return (Cause)properties.get(CAUSE);
+//	}
+//	
+//	/**
+//	 *  Set the cause.
+//	 *  @param cause The cause.
+//	 */
+//	public void setCause(Cause cause)
+//	{
+//		lastmod	= IComponentIdentifier.LOCAL.get();
+//		properties.put(CAUSE, cause);
+//	}
 	
 	/**
 	 *  Get a property.

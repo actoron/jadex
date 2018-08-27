@@ -20,8 +20,8 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
     /** The configuration to use. **/
     public static final String CONFIGURATION_NAME = "configname"; // class: String default: "auto"
     
-    /** Automatically shut down the platform when no user agents are running anymore. **/
-    public static final String AUTOSHUTDOWN = "autoshutdown"; // class: boolean default: false
+//    /** Automatically shut down the platform when no user agents are running anymore. **/
+//    public static final String AUTOSHUTDOWN = "autoshutdown"; // class: boolean default: false
     
     /** Tell the starter to use the default platform component implementation (usually no need to change). **/
     public static final String PLATFORM_COMPONENT = "platformcomponent"; // class: Class default: jadex.platform.service.cms.PlatformComponent.class

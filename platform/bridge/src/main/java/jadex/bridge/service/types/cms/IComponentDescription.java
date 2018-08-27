@@ -96,11 +96,11 @@ public interface IComponentDescription
 	 */
 	public IComponentIdentifier getCreator();
 	
-	/**
-	 *  Get the cause for creating the component.
-	 *  @return The cause.
-	 */
-	public Cause getCause();
+//	/**
+//	 *  Get the cause for creating the component.
+//	 *  @return The cause.
+//	 */
+//	public Cause getCause();
 	
 	/**
 	 *  Get the enabled breakpoints (if any).
@@ -108,26 +108,26 @@ public interface IComponentDescription
 	 */
 	public String[]	getBreakpoints();
 	
-	/**
-	 *  Is the component a master.
-	 *  When a master component is killed the parent component will be killed two.
-	 *  @return True, if master component.
-	 */
-	public boolean isMaster();
+//	/**
+//	 *  Is the component a master.
+//	 *  When a master component is killed the parent component will be killed two.
+//	 *  @return True, if master component.
+//	 */
+//	public boolean isMaster();
 
-	/**
-	 *  Is the component a daemon.
-	 *  When platform is in autoshutdown mode and the last non-daemon component is killed
-	 *  the platform will also be shutdowned.
-	 *  @return True, if daemon component.
-	 */
-	public boolean isDaemon();
+//	/**
+//	 *  Is the component a daemon.
+//	 *  When platform is in autoshutdown mode and the last non-daemon component is killed
+//	 *  the platform will also be shutdowned.
+//	 *  @return True, if daemon component.
+//	 */
+//	public boolean isDaemon();
 	
-	/**
-	 *  Get the auto shutdown flag.
-	 *  @return	The flag.
-	 */
-	public boolean isAutoShutdown();
+//	/**
+//	 *  Get the auto shutdown flag.
+//	 *  @return	The flag.
+//	 */
+//	public boolean isAutoShutdown();
 
 	/**
 	 *  Get the synchronous flag.
@@ -135,11 +135,11 @@ public interface IComponentDescription
 	 */
 	public boolean isSynchronous();
 	
-	/**
-	 *  Get the persistable flag.
-	 *  @return	The persistable flag.
-	 */
-	public boolean isPersistable();
+//	/**
+//	 *  Get the persistable flag.
+//	 *  @return	The persistable flag.
+//	 */
+//	public boolean isPersistable();
 	
 	/**
 	 *  Get the monitoring flag.

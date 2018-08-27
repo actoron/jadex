@@ -50,14 +50,14 @@ public interface ISubcomponentsFeature
 	 *  @return the childcount.
 	 */
 	public int getChildcount();
-	
-	/**
-	 *  Inc the child count.
-	 */
-	public int incChildcount();
-	
-	/**
-	 *  Dec the child count.
-	 */
-	public int decChildcount();
+//	
+//	/**
+//	 *  Inc the child count.
+//	 */
+//	public int incChildcount();
+//	
+//	/**
+//	 *  Dec the child count.
+//	 */
+//	public int decChildcount();
 }

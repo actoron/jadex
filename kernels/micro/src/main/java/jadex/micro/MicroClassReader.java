@@ -292,11 +292,11 @@ public class MicroClassReader
 			{
 				Agent	val	= getAnnotation(cma, Agent.class, cl);
 				Boolean	susp	= val.suspend().toBoolean();
-				Boolean	mast	= val.master().toBoolean();
-				Boolean	daem	= val.daemon().toBoolean();
-				Boolean	auto	= val.autoshutdown().toBoolean();
+//				Boolean	mast	= val.master().toBoolean();
+//				Boolean	daem	= val.daemon().toBoolean();
+//				Boolean	auto	= val.autoshutdown().toBoolean();
 				Boolean	sync	= val.synchronous().toBoolean();
-				Boolean	persist	= val.persistable().toBoolean();
+//				Boolean	persist	= val.persistable().toBoolean();
 				Boolean	keep	= val.keepalive().toBoolean();
 				
 				// Use most specific autoprovide setting.
@@ -306,26 +306,26 @@ public class MicroClassReader
 				{
 					modelinfo.setSuspend(susp);
 				}
-				if(mast!=null && modelinfo.getMaster()==null)
-				{
-					modelinfo.setMaster(mast);
-				}
-				if(daem!=null && modelinfo.getDaemon()==null)
-				{
-					modelinfo.setDaemon(daem);
-				}
-				if(auto!=null && modelinfo.getAutoShutdown()==null)
-				{
-					modelinfo.setAutoShutdown(auto);
-				}
+//				if(mast!=null && modelinfo.getMaster()==null)
+//				{
+//					modelinfo.setMaster(mast);
+//				}
+//				if(daem!=null && modelinfo.getDaemon()==null)
+//				{
+//					modelinfo.setDaemon(daem);
+//				}
+//				if(auto!=null && modelinfo.getAutoShutdown()==null)
+//				{
+//					modelinfo.setAutoShutdown(auto);
+//				}
 				if(sync!=null && modelinfo.getSynchronous()==null)
 				{
 					modelinfo.setSynchronous(sync);
 				}
-				if(persist!=null && modelinfo.getPersistable()==null)
-				{
-					modelinfo.setPersistable(persist);
-				}
+//				if(persist!=null && modelinfo.getPersistable()==null)
+//				{
+//					modelinfo.setPersistable(persist);
+//				}
 				if(keep!=null && modelinfo.getKeepalive()==null)
 				{
 					modelinfo.setKeepalive(keep);
@@ -684,16 +684,16 @@ public class MicroClassReader
 							confs.put(config.name(), configinfo);
 						}
 						
-						if(configinfo.getMaster()==null)
-							configinfo.setMaster(config.master().toBoolean());
-						if(configinfo.getDaemon()==null)
-							configinfo.setDaemon(config.daemon().toBoolean());
-						if(configinfo.getAutoShutdown()==null)
-							configinfo.setAutoShutdown(config.autoshutdown().toBoolean());
+//						if(configinfo.getMaster()==null)
+//							configinfo.setMaster(config.master().toBoolean());
+//						if(configinfo.getDaemon()==null)
+//							configinfo.setDaemon(config.daemon().toBoolean());
+//						if(configinfo.getAutoShutdown()==null)
+//							configinfo.setAutoShutdown(config.autoshutdown().toBoolean());
 						if(configinfo.getSynchronous()==null)
 							configinfo.setSynchronous(config.synchronous().toBoolean());
-						if(configinfo.getPersistable()==null)
-							configinfo.setPersistable(config.persistable().toBoolean());
+//						if(configinfo.getPersistable()==null)
+//							configinfo.setPersistable(config.persistable().toBoolean());
 						if(configinfo.getSuspend()==null)
 							configinfo.setSuspend(config.suspend().toBoolean());
 						if(configinfo.getScope()==null && !RequiredServiceInfo.SCOPE_GLOBAL.equals(config.scope()))
@@ -1756,11 +1756,11 @@ public class MicroClassReader
 		ComponentInstanceInfo ret = new ComponentInstanceInfo();
 		
 		ret.setSuspend(comp.suspend().toBoolean());
-		ret.setMaster(comp.master().toBoolean());
-		ret.setDaemon(comp.daemon().toBoolean());
-		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
+//		ret.setMaster(comp.master().toBoolean());
+//		ret.setDaemon(comp.daemon().toBoolean());
+//		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
 		ret.setSynchronous(comp.synchronous().toBoolean());
-		ret.setPersistable(comp.persistable().toBoolean());
+//		ret.setPersistable(comp.persistable().toBoolean());
 		
 		if(comp.name().length()>0)
 			ret.setName(comp.name());
@@ -1800,11 +1800,11 @@ public class MicroClassReader
 		ComponentInstanceInfo ret = new ComponentInstanceInfo();
 		
 		ret.setSuspend(comp.suspend().toBoolean());
-		ret.setMaster(comp.master().toBoolean());
-		ret.setDaemon(comp.daemon().toBoolean());
-		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
+//		ret.setMaster(comp.master().toBoolean());
+//		ret.setDaemon(comp.daemon().toBoolean());
+//		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
 		ret.setSynchronous(comp.synchronous().toBoolean());
-		ret.setPersistable(comp.persistable().toBoolean());
+//		ret.setPersistable(comp.persistable().toBoolean());
 		ret.setMonitoring(comp.monitoring());
 		
 		if(comp.name().length()>0)
