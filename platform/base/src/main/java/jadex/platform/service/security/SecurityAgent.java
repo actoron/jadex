@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.jcajce.provider.digest.Blake2b;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 
 import jadex.base.Starter;
@@ -690,14 +689,14 @@ public class SecurityAgent implements ISecurityService, IInternalService
 								public void resultAvailable(ICryptoSuite result)
 								{
 									byte[] cleartext = result.decryptAndAuth(fcontent);
-									if (cleartext != null)
+									if(cleartext != null)
 									{
 										ret.setResult(new Tuple2<ISecurityInfo, byte[]>(result.getSecurityInfos(), cleartext));
 									}
 									else
 									{
 										cleartext = requestReencryption(splat, content);
-										if (cleartext != null)
+										if(cleartext != null)
 											ret.setResult(new Tuple2<ISecurityInfo, byte[]>(result.getSecurityInfos(), cleartext));
 										else
 											ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString()));
@@ -1509,7 +1508,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-//				exception.printStackTrace();
+				exception.printStackTrace();
+				System.out.println("removing suite for: "+receiver.getRoot().toString());
+				
 				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
 				if(state != null)
 				{
@@ -1679,6 +1680,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected byte[] requestReencryption(String platformname, byte[] content)
 	{
 		System.out.println("reencryption: "+platformname+" "+Arrays.hashCode(content));
+//		Thread.dumpStack();
 		
 		ReencryptionRequest req = new ReencryptionRequest();
 		req.setContent(content);
