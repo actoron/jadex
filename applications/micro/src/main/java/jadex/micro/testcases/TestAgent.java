@@ -288,6 +288,8 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 				if(manualremove)
 					platforms.remove(exta);
 				
+				ret.setResult(exta);
+				
 //				createProxies(exta).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 //				{
 //					@Override
