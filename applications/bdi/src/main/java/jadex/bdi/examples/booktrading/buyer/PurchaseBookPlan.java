@@ -30,7 +30,7 @@ public class PurchaseBookPlan extends Plan
 	 */
 	public void body()
 	{
-//		System.out.println("PurchaseBookPlan");
+		System.out.println("PurchaseBookPlan "+new Date());
 		
 		// Get order properties and calculate acceptable price.
 		Order order = (Order)getParameter("order").getValue();
