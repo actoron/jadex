@@ -552,7 +552,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 				@Override
 				public void execute(Tuple2<Entry<IComponentIdentifier, AbstractTransportAgent<Con>.VirtualConnection>, Long> arg)
 				{
-//					System.out.println(agent+" outdated connection to: "+arg.getFirstEntity().getKey()+" val: "+arg.getSecondEntity());
+					System.out.println(agent+" outdated connection to: "+arg.getFirstEntity().getKey()+" val: "+arg.getSecondEntity());
 					arg.getFirstEntity().getValue().cleanup();
 				}
 			}, true, true, true);

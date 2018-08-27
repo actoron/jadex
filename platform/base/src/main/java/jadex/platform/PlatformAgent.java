@@ -107,6 +107,9 @@ public class PlatformAgent
 	@Agent
 	protected IInternalAccess agent;
 	
+	// enable startup monkey for randomized sequential component startup (dependency testing).
+	boolean STARTUP_MONKEY	= true;
+	
 	// where should the defaults be defined (here or in the config)
 //	@Arguments
 //	public static jadex.bridge.modelinfo.Argument[] getArguments()
@@ -269,19 +272,14 @@ public class PlatformAgent
 			return (Boolean)argsmap.get(name);
 		return null;
 	}
-	
-	// enable startup monkey for randomized sequential component startup (dependency testing).
-	boolean STARTUP_MONKEY	= true;
-	
+		
 	/**
 	 *  Start components in levels.
 	 */
 	protected IFuture<Void> startComponents(Iterator<Set<String>> levels, Map<String, String> names)
 	{
 		if(STARTUP_MONKEY)
-		{
-			return startComponentsDebug(cms, levels, null, names);
-		}
+			return startComponentsDebug(levels, null, names);
 		
 		final Future<Void> ret = new Future<>();
 		
@@ -330,7 +328,7 @@ public class PlatformAgent
 	/**
 	 *  Start components synhcronized using random order to find implicit dependencies. 
 	 */
-	protected IFuture<Void> startComponentsDebug(IComponentManagementService cms, Iterator<Set<String>> levels, Iterator<String> level, Map<String, String> names)
+	protected IFuture<Void> startComponentsDebug(Iterator<Set<String>> levels, Iterator<String> level, Map<String, String> names)
 	{
 		// Initial level or finished with last level -> start next level
 		if(level==null || !level.hasNext())
@@ -341,7 +339,7 @@ public class PlatformAgent
 				// Chaos monkey -> randomize list of components to find implicit dependencies
 				List<String>	list	= new ArrayList<>(levels.next());
 				Collections.shuffle(list, SSecurity.getSecureRandom());
-				return startComponentsDebug(cms, levels, list.iterator(), names);
+				return startComponentsDebug(levels, list.iterator(), names);
 			}
 			else
 			{
@@ -355,9 +353,9 @@ public class PlatformAgent
 			Future<Void>	ret	= new Future<>();
 			
 			String	c	= level.next();
-			IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c+".class", null, null);
+			IFuture<IExternalAccess> fut = agent.createComponent(null, new CreationInfo().setName(names.get(c)).setFilename(c+".class"), null);
 			fut.addResultListener(
-				res -> {startComponentsDebug(cms, levels, level, names).addResultListener(new DelegationResultListener<>(ret));},
+				res -> {startComponentsDebug(levels, level, names).addResultListener(new DelegationResultListener<>(ret));},
 				exception -> {ret.setException(new RuntimeException("Cannot autostart "+c+".class", exception));});
 			return ret;
 		}

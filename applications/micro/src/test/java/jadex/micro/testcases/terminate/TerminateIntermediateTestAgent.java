@@ -75,7 +75,7 @@ public class TerminateIntermediateTestAgent extends TerminateTestAgent
 			}
 		});
 		
-		final Future<TestReport>	ret	= new Future<TestReport>();
+		final Future<TestReport> ret = new Future<TestReport>();
 		final TestReport tr = new TestReport("#"+testno, "Tests if intermediate future is terminated");
 		tmp.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 		{
