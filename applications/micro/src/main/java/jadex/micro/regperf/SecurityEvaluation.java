@@ -8,9 +8,7 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.FutureBarrier;
 
 /**
@@ -196,15 +194,14 @@ public class SecurityEvaluation
 	 */
 	protected static long createAgents(IExternalAccess[] platforms, int cnt)
 	{
-		FutureBarrier<IComponentIdentifier>	fubar	= new FutureBarrier<IComponentIdentifier>();
+		FutureBarrier<IExternalAccess> fubar = new FutureBarrier<IExternalAccess>();
 		long start	= System.nanoTime();
 		for(int i=0; i<platforms.length; i++)
 		{
-			IComponentManagementService	cms	= platforms[i].searchService( new ServiceQuery<>( IComponentManagementService.class)).get();
 			for(int j=0; j<cnt; j++)
 			{
-				fubar.addFuture(cms.createComponent(null, ServiceProviderAgent.class.getName()+".class", null, null));
-				fubar.addFuture(cms.createComponent(null, ServiceQueryAgent.class.getName()+".class", null, null));
+				fubar.addFuture(platforms[i].createComponent(null, new CreationInfo().setFilename(ServiceProviderAgent.class.getName()+".class"), null));
+				fubar.addFuture(platforms[i].createComponent(null, new CreationInfo().setFilename(ServiceQueryAgent.class.getName()+".class"), null));
 			}
 		}
 		fubar.waitFor().get();

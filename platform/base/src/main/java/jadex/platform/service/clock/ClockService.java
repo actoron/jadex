@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
+import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
@@ -425,6 +426,11 @@ public class ClockService extends BasicService implements IClockService, IProper
 			clock = new SimulationEventClock(this.clock);
 		else
 			throw new RuntimeException("Unknown clock type: "+type);
+		
+		if (clock instanceof ISimulationClock)
+			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.TRUE);
+		else
+			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
 		
 		this.clock.dispose();
 		

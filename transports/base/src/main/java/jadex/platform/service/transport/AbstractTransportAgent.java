@@ -33,7 +33,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.memstat.IMemstatService;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -119,8 +119,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	/** The security service (cached for speed). */
 	protected ISecurityService	secser;
 	
-	/** The cms (cached for speed). */
-	protected IComponentManagementService	cms;
+//	/** The cms (cached for speed). */
+//	protected IComponentManagementService	cms;
 	
 	/** Listeners from transport info service. */
 	protected Collection<SubscriptionIntermediateFuture<PlatformData>>	infosubscribers;
@@ -179,7 +179,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		else
 		{
 			if (IComponentDescription.STATE_ACTIVE.equals(agent.getDescription().getState()))
-				deliverRemoteMessage(agent, secser, cms, codec, source, header, body);
+				deliverRemoteMessage(agent, secser, codec, source, header, body);
 		}
 	}
 
@@ -228,7 +228,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	{
 		this.codec = MessageComponentFeature.getSerializationServices(agent.getId().getRoot());
 		this.secser	= ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ISecurityService.class);
-		this.cms	= ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+//		this.cms	= ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		this.impl = createTransportImpl();
 		impl.init(this);
 
@@ -568,7 +568,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 				@Override
 				public void execute(Tuple2<Entry<IComponentIdentifier, AbstractTransportAgent<Con>.VirtualConnection>, Long> arg)
 				{
-//					System.out.println(agent+" outdated connection to: "+arg.getFirstEntity().getKey()+" val: "+arg.getSecondEntity());
+					System.out.println(agent+" outdated connection to: "+arg.getFirstEntity().getKey()+" val: "+arg.getSecondEntity());
 					arg.getFirstEntity().getValue().cleanup();
 				}
 			}, true, true, true);
@@ -612,6 +612,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected IIntermediateFuture<String> getAddresses(IComponentIdentifier target)
 	{
 		ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
+		if (tas == null)
+		{
+			agent.getLogger().warning(agent + " did not find transport address service.");
+			return new IntermediateFuture<>(new ArrayList<>());
+		}
 		
 		final IntermediateFuture<String> ret = new IntermediateFuture<String>();
 		tas.resolveAddresses(target, impl.getProtocolName()).addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Collection<String>>(ret)
@@ -645,7 +650,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 *  @param header The header of the message.
 	 *  @param body The body of the message.
 	 */
-	public static final void deliverRemoteMessage(final IInternalAccess agent, ISecurityService secser, final IComponentManagementService cms, final ISerializationServices serser, final IComponentIdentifier source, byte[] header, final byte[] body)
+	public static final void deliverRemoteMessage(final IInternalAccess agent, ISecurityService secser, final ISerializationServices serser, final IComponentIdentifier source, byte[] header, final byte[] body)
 	{
 		final Logger logger = agent.getLogger();
 		// First decrypt.
@@ -660,41 +665,30 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					final IMsgHeader header = (IMsgHeader)serser.decode(null, agent, tup.getSecondEntity());
 					final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 					
-					cms.getExternalAccess(rec).addResultListener(new IResultListener<IExternalAccess>()
+					// Cannot use agent/cms.getExternalAccess(cid) because when remote call
+					// is in init the call will be delayed after init has finished (deadlock)
+					SComponentManagementService.scheduleStep(rec, new IComponentStep<Void>()
 					{
 						@Override
-						public void resultAvailable(IExternalAccess exta)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							exta.scheduleStep(new IComponentStep<Void>()
+							IMessageFeature mf = ia.getFeature0(IMessageFeature.class);
+							if(mf instanceof IInternalMessageFeature)
 							{
-								@Override
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									IMessageFeature mf = ia.getFeature0(IMessageFeature.class);
-									if(mf instanceof IInternalMessageFeature)
-									{
-										((IInternalMessageFeature)mf).messageArrived(header, body);
-									}
-									return IFuture.DONE;
-								}
-							}).addResultListener(new IResultListener<Void>()
-							{
-								@Override
-								public void resultAvailable(Void result)
-								{
-									// NOP
-								}
-
-								@Override
-								public void exceptionOccurred(Exception exception)
-								{
-									logger.warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
-								}
-							});
+								((IInternalMessageFeature)mf).messageArrived(header, body);
+							}
+							return IFuture.DONE;
+						}
+					}).addResultListener(new IResultListener<Void>()
+					{
+						@Override
+						public void resultAvailable(Void result)
+						{
+							// NOP
 						}
 
 						@Override
-						public void exceptionOccurred(final Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							logger.warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
 							
@@ -723,7 +717,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 												public void resultAvailable(Void result)
 												{
 													// OK -> ignore
-//																System.out.println("Sent error message: "+header.getProperty(IMsgHeader.SENDER) + ", "+exception);
+//													System.out.println("Sent error message: "+header.getProperty(IMsgHeader.SENDER) + ", "+exception);
 												}
 											});
 										return IFuture.DONE;
@@ -738,6 +732,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("Could not deliver message from platform " + source + ": " + exception);
 				logger.warning("Could not deliver message from platform " + source + ": " + exception);
 			}
 		});

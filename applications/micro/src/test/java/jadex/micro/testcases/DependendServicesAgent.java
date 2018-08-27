@@ -14,10 +14,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SUtil;
@@ -168,25 +164,16 @@ public class DependendServicesAgent extends JunitAgentTest
 	{
 		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
+		agent.getChildren(null, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService result)
+			public void customResultAvailable(IComponentIdentifier[] children)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				
-				cms.getChildren(agent.getId()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
+				IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
+					new DelegationResultListener<Collection<IExternalAccess>>(ret));
+				for(int i=0; !ret.isDone() && i<children.length; i++)
 				{
-					public void customResultAvailable(IComponentIdentifier[] children)
-					{
-						IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
-							new DelegationResultListener<Collection<IExternalAccess>>(ret));
-						for(int i=0; !ret.isDone() && i<children.length; i++)
-						{
-							cms.getExternalAccess(children[i]).addResultListener(crl);
-						}
-					}
-				});
+					agent.getExternalAccess(children[i]).addResultListener(crl);
+				}
 			}
 		});
 		

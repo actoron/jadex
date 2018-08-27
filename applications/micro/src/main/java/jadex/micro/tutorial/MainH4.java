@@ -1,11 +1,9 @@
 package jadex.micro.tutorial;
 
 import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IFuture;
 
 /**
@@ -40,16 +38,12 @@ public class MainH4
 		IExternalAccess	platform	= platfut.get();
 		System.out.println("Started platform: "+platform.getId());
 		
-		// Get the CMS service from the platform
-		IComponentManagementService	cms	= platform.searchService(
-			new ServiceQuery<>(IComponentManagementService.class)).get();
-		
 		// Start the chat component
-		IComponentIdentifier	cid	= cms.createComponent(null, ChatD2Agent.class.getName()+".class", null, null).get();
-		System.out.println("Started chat component: "+cid);
+		IExternalAccess exta = platform.createComponent(null, new CreationInfo().setFilename(ChatD2Agent.class.getName()+".class"), null).get();
+		System.out.println("Started chat component: "+exta);
 		
 		// Fetch the chat service
-		IChatService	chat	= platform.searchService( new ServiceQuery<>(IChatService.class).setProvider(cid)).get();
+		IChatService chat = platform.searchService( new ServiceQuery<>(IChatService.class).setProvider(exta.getId())).get();
 		chat.message("Main", "Chat started.");
 
 	}

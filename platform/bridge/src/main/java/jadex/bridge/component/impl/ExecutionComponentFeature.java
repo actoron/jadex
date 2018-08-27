@@ -49,7 +49,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -618,9 +617,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Add to parent and wake up parent.
 			if(parenta==null)
 			{
+				// Todo w/o proxy???
+//				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				getComponent().getExternalAccess(getComponent().getId().getParent())
 				// raw because called from scheduleStep also on external thread.
-				IComponentManagementService cms = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
-				cms.getExternalAccess(getComponent().getId().getParent())
 					.addResultListener(new DefaultResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)
@@ -1209,8 +1209,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		if(breakpoint_triggered)
 		{
-			IComponentManagementService	cms	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
-			cms.suspendComponent(getComponent().getDescription().getName());
+//			IComponentManagementService	cms	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+			getComponent().suspendComponent(getComponent().getDescription().getName());
 		}
 		
 		boolean	hasstep;

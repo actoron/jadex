@@ -14,14 +14,12 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -29,7 +27,6 @@ import jadex.micro.annotation.Results;
  *  Test abort of externally waiting plan with invokeInterruptable
  */
 @Agent(type=BDIAgentFactory.TYPE)
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="extWait")))
 public class ListenerWaitBDI
@@ -48,13 +45,13 @@ public class ListenerWaitBDI
 		
 //		agent.createResultListener(listener)
 		
-		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
+		IFuture<ILibraryService> fut = agent.getFeature(IRequiredServicesFeature.class).getService(ILibraryService.class);
 //		agent.createResultListener(listener)
-		fut.addResultListener(new IResultListener<IComponentManagementService>()
+		fut.addResultListener(new IResultListener<ILibraryService>()
 		{
-			public void resultAvailable(IComponentManagementService cms)
+			public void resultAvailable(ILibraryService cms)
 			{
-				System.out.println("after cms: "+cms);
+				System.out.println("after lib: "+cms);
 				ret.setResult(null);
 				tr.setSucceeded(true);
 				agent.killComponent();

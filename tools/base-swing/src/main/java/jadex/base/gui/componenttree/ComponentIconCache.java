@@ -13,10 +13,6 @@ import javax.swing.UIDefaults;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -135,53 +131,46 @@ public class ComponentIconCache
 	 */
 	protected void	doSearch(final Future<Icon> ret, final String type, final List<IComponentIdentifier> todo, final int i)
 	{
-		jccaccess.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Icon>(ret)
+		jccaccess.getExternalAccess(todo.get(i)).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Icon>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess exta)
 			{
-				cms.getExternalAccess(todo.get(i)).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Icon>(ret)
-				{
-					public void customResultAvailable(IExternalAccess exta)
-					{
 //						System.out.println("Searching for icon: "+type+" at "+exta);
-						SComponentFactory.getFileTypeIcon(exta, type)
-							.addResultListener(new SwingExceptionDelegationResultListener<byte[], Icon>(ret)
+				SComponentFactory.getFileTypeIcon(exta, type)
+					.addResultListener(new SwingExceptionDelegationResultListener<byte[], Icon>(ret)
+				{
+					public void customResultAvailable(byte[] result)
+					{
+						if(result!=null)
 						{
-							public void customResultAvailable(byte[] result)
-							{
-								if(result!=null)
-								{
-									Icon	icon	= new ImageIcon(result);
-									icons.put(type, icon);
-									ret.setResult(icon);
-									
+							Icon	icon	= new ImageIcon(result);
+							icons.put(type, icon);
+							ret.setResult(icon);
+							
 //									JFrame f = new JFrame();
 //									f.add(new JLabel(icon), BorderLayout.CENTER);
 //									f.pack();
 //									f.show();
-								}
-								else
-								{
-									customExceptionOccurred(new RuntimeException("Icon "+type+" not found."));
-								}
-							}
-							
-							public void customExceptionOccurred(Exception exception)
-							{
-								if(i+1<todo.size())
-								{
-									doSearch(ret, type, todo, i+1);
-								}
-								else
-								{
-									super.customExceptionOccurred(exception);
-								}
-							}
-						});
+						}
+						else
+						{
+							customExceptionOccurred(new RuntimeException("Icon "+type+" not found."));
+						}
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						if(i+1<todo.size())
+						{
+							doSearch(ret, type, todo, i+1);
+						}
+						else
+						{
+							super.customExceptionOccurred(exception);
+						}
 					}
 				});
-			}			
+			}
 		});
 	}
 }

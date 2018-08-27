@@ -1,9 +1,11 @@
 package jadex.kernelbase;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,10 +16,13 @@ import java.util.Set;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -28,7 +33,6 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -36,6 +40,7 @@ import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
@@ -101,6 +106,24 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/** The started factories (kernel classname -> kernel component). */
 	protected Map<String, IComponentIdentifier> kernels = new HashMap<>();
 	
+	/** The started flag (because init is invoked twice, service impl for 2 services. */
+	protected boolean inited;
+	
+	/** The dirty flag (when classpath changes). */
+	protected boolean dirty;
+
+	/** The known factories. */
+	protected Set<String> known_kernels = SUtil.createHashSet(new String[]{
+		"jadex/micro/KernelMicroAgent.class", 
+		"jadex/bdiv3/KernelBDIV3Agent.class", 
+		"jadex/bdiv3x/KernelBDIXAgent.class", 
+		"jadex/bpmn/KernelBpmnAgent.class", 
+		"jadex/application/KernelApplicationAgent.class", 
+		"jadex/component/KernelComponentAgent.class",
+		"jadex/microservice/KernelMicroserviceAgent.class"
+	});
+	protected MultiCollection<String, Tuple2<String, Set<String>>> known_kernels_cache;
+	
 	public static final String MULTIFACTORY = "multifactory";
 
 	/** Used in SComponentFactory to reorder checks (multi last). Still necessary?!. */
@@ -115,17 +138,15 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		}
 	});
 	
-	boolean started;	// HACK: same object is used for two provided services.
-	
 	/**
 	 *  Starts the service.
 	 */
 	@ServiceStart
 	public IFuture<Void> startService()
 	{
-		if(started)
+		if(inited)
 			return IFuture.DONE;
-		started	= true;
+		inited = true;
 		
 		// add data for implicitly started micro factory
 		componenttypes.add(".class");
@@ -143,7 +164,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						getKernelFiles(true);
+						dirty = true;
 						return IFuture.DONE;
 					}
 				});
@@ -156,14 +177,13 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						getKernelFiles(true);
+						dirty = true;
 						return IFuture.DONE;
 					}
 				});
 				return IFuture.DONE;
 			}
 		};
-
 		libservice.addLibraryServiceListener(liblistener);
 		
 		return IFuture.DONE;
@@ -232,8 +252,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture<IComponentFactory> getFactoryForModel(String model, String[] imports, IResourceIdentifier rid, Iterator<IComponentFactory> it)
 	{
-//		System.out.println("getFactory: "+model);
-		
 		Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
 		getRunningFactory(model, imports, rid, null).addResultListener(new IResultListener<IComponentFactory>()
@@ -245,8 +263,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 
 			public void exceptionOccurred(Exception exception)
 			{
-				getnewfac.call(new Object[]{model, imports, rid}).addResultListener(new DelegationResultListener<>(ret));
-//				getNewFactory(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+//				getnewfac.call(new Object[]{model, imports, rid}).addResultListener(new DelegationResultListener<>(ret));
+				getNewFactory(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
 			}
 		});
 		
@@ -263,8 +281,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
-		Map<String, Collection<Tuple2<String, Set<String>>>> kernelfiles = getKernelFiles(false);
-		
+		Map<String, Collection<Tuple2<String, Set<String>>>> kernelfiles = getKnownKernels();
 		Set<Tuple2<String, Set<String>>> found = new HashSet<>();
 		for(Map.Entry<String, Collection<Tuple2<String, Set<String>>>> entry: kernelfiles.entrySet())
 		{
@@ -273,113 +290,28 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				found.addAll(entry.getValue());
 			}
 		}
-		
-		IComponentManagementService cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-
 		final Iterator<Tuple2<String, Set<String>>> it = found.iterator();
 		
-		Runnable start = new Runnable()
+		check(it, model, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret)
 		{
-			public void run() 
+			public void exceptionOccurred(Exception exception)
 			{
-				if(it.hasNext())
+//				System.out.println("getKernelFiles: "+model);
+				Map<String, Collection<Tuple2<String, Set<String>>>> kernelfiles = getKernelFiles();
+				Set<Tuple2<String, Set<String>>> found = new HashSet<>();
+				for(Map.Entry<String, Collection<Tuple2<String, Set<String>>>> entry: kernelfiles.entrySet())
 				{
-					Tuple2<String, Set<String>> f = it.next();
-					
-					if(kernels.containsKey(f.getFirstEntity()))
+					if(model.endsWith(entry.getKey()))
 					{
-						run();
+						found.addAll(entry.getValue());
 					}
-					else
-					{	
-						kernels.put(f.getFirstEntity(), null);
-						
-						CreationInfo ci = new CreationInfo(agent.getId());
-						
-						cms.createComponent(null, f.getFirstEntity()+".class", ci, new IResultListener<Collection<Tuple2<String, Object>>>()
-						{
-							public void resultAvailable(Collection<Tuple2<String, Object>> result)
-							{
-								System.out.println("Killed kernel: " + f);
-								kernels.remove(f.getFirstEntity());
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-//								System.out.println("Killed kernel: " + f+", "+exception);
-								kernels.remove(f.getFirstEntity());
-							}
-						}).addResultListener(new IResultListener<IComponentIdentifier>()
-						{
-							public void resultAvailable(IComponentIdentifier cid)
-							{
-//								System.out.println("started factory: "+cid);
-								kernels.put(f.getFirstEntity(), cid);
-								
-								ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
-								q.setProvider(cid);
-								IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
-								
-								// If this is a new kernel, gather types and icons
-								final String[] types = fac.getComponentTypes();
-								componenttypes.addAll(Arrays.asList(types));
-									
-								if(SReflect.HAS_GUI)
-								{
-									fireTypesAdded(types);
-									
-									for(int i = 0; i < types.length; ++i)
-									{
-										final int fi = i;
-										fac.getComponentTypeIcon(types[i]).addResultListener(new IResultListener<byte[]>()
-										{
-											public void resultAvailable(byte[] result)
-											{
-//												System.out.println("adding icon: "+types[fi]);
-												iconcache.put(types[fi], result);
-											}
-											
-											public void exceptionOccurred(Exception exception)
-											{
-											}
-										});
-									}
-								}
-								
-								fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
-								{
-									public void resultAvailable(Boolean loadable) 
-									{
-										if(loadable.booleanValue())
-											ret.setResult(fac);
-										else 
-											run();
-									}
+				}
+				final Iterator<Tuple2<String, Set<String>>> it = found.iterator();
 				
-									public void exceptionOccurred(Exception exception)
-									{
-										System.out.println("Kernel cannot load: "+cid+" "+model);
-										run();
-									}
-								});
-							}
-							
-							public void exceptionOccurred(Exception exception) 
-							{
-								System.out.println("error starting factory: "+exception);
-							}
-						}) ;
-					}
-				}
-				else
-				{
-					ret.setException(new RuntimeException("No factory found"));
-				}
+				check(it, model, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 			}
-		};
+		});
 		
-		start.run();
-				
 		return ret;
 	}
 	
@@ -390,6 +322,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	protected Map<String, Collection<Tuple2<String, Set<String>>>> scanForKernels()
 	{
 		MultiCollection<String, Tuple2<String, Set<String>>> ret = new MultiCollection<>();
+		
+//		System.out.println("MultiFactory scanning...");
 		
 //		List<URL> urls = new ArrayList<URL>();
 //		ClassLoader basecl = MultiFactory.class.getClassLoader();
@@ -427,27 +361,13 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 
 		for(ClassInfo ci: cis)
 		{
-			AnnotationInfo ai = ci.getAnnotation("jadex.micro.annotation.Properties");
-			if(ai!=null)
+			String[] types = getKernelTypes(ci);
+			
+			if(types!=null)
 			{
-				Object[] vals = (Object[])ai.getValue("value");
-				if(vals!=null)
+				for(String type: types)
 				{
-					for(Object val: vals)
-					{
-						AnnotationInfo a = (AnnotationInfo)val;
-						String name = (String)a.getValue("name");
-						if("kernel.types".equals(name))
-						{
-							String value = (String)a.getValue("value");
-							String[] types = (String[])SJavaParser.evaluateExpression(value, null);
-//							System.out.println("foound: "+ci.getClassname()+" "+Arrays.toString(types));
-							for(String type: types)
-							{
-								ret.add(type, new Tuple2<String, Set<String>>(ci.getClassName(), SUtil.arrayToSet(types)));
-							}
-						}
-					}
+					ret.add(type, new Tuple2<String, Set<String>>(ci.getClassName(), SUtil.arrayToSet(types)));
 				}
 			}
 		}
@@ -456,12 +376,187 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	}
 	
 	/**
+	 *  Check a factory
+	 *  @param it factory iterator.
+	 */
+	protected IFuture<IComponentFactory> check(Iterator<Tuple2<String, Set<String>>> it, String model, String[] imports, IResourceIdentifier rid)
+	{
+		Future<IComponentFactory> ret = new Future<>();
+		
+		if(it.hasNext())
+		{
+			Tuple2<String, Set<String>> f = it.next();
+			
+			if(kernels.containsKey(f.getFirstEntity()))
+			{
+				check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+			}
+			else
+			{	
+				kernels.put(f.getFirstEntity(), null);
+				
+				CreationInfo ci = new CreationInfo(agent.getId());
+				ci.setFilename(f.getFirstEntity()+".class");
+				
+//				System.out.println("create compo start: "+f.getFirstEntity());
+				agent.createComponent(null, ci, new IResultListener<Collection<Tuple2<String, Object>>>()
+				{
+					public void resultAvailable(Collection<Tuple2<String, Object>> result)
+					{
+//						System.out.println("Killed kernel: " + f);
+						kernels.remove(f.getFirstEntity());
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+//						System.out.println("Killed kernel: " + f+", "+exception);
+						kernels.remove(f.getFirstEntity());
+					}
+				}).addResultListener(new IResultListener<IExternalAccess>()
+				{
+					public void resultAvailable(IExternalAccess exta)
+					{
+//						System.out.println("Started factory: "+exta);
+						kernels.put(f.getFirstEntity(), exta.getId());
+						
+						ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
+						q.setProvider(exta.getId());
+						final IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
+						
+						// If this is a new kernel, gather types and icons
+						final String[] types = fac.getComponentTypes();
+						componenttypes.addAll(Arrays.asList(types));
+							
+						if(SReflect.HAS_GUI)
+						{
+							fireTypesAdded(types);
+							
+							for(int i = 0; i < types.length; ++i)
+							{
+								final int fi = i;
+								fac.getComponentTypeIcon(types[i]).addResultListener(new IResultListener<byte[]>()
+								{
+									public void resultAvailable(byte[] result)
+									{
+//										System.out.println("adding icon: "+types[fi]);
+										iconcache.put(types[fi], result);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+									}
+								});
+							}
+						}
+						
+						fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
+						{
+							public void resultAvailable(Boolean loadable) 
+							{
+								if(loadable.booleanValue())
+									ret.setResult(fac);
+								else 
+									check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+							}
+		
+							public void exceptionOccurred(Exception exception)
+							{
+//								System.out.println("Kernel cannot load: "+exta.getId()+" "+model);
+								check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception) 
+					{
+						System.out.println("error starting factory: "+exception);
+						check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+					}
+				});
+			}
+		}
+		else
+		{
+			ret.setException(new RuntimeException("No factory found"));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get known kernels.
+	 */
+	protected Map<String, Collection<Tuple2<String, Set<String>>>> getKnownKernels()
+	{
+		if(known_kernels_cache==null)
+		{
+			known_kernels_cache = new MultiCollection<>();
+		
+			for(String kk: known_kernels)
+			{
+				// todo: use library loader (needs rid besides classname)
+				try
+				{
+					ClassLoader cl = agent.getClassLoader();
+					InputStream is = SUtil.getResource(kk, cl);
+					ClassInfo ci = SClassReader.getClassInfo(is);
+				
+					String[] types = getKernelTypes(ci);
+				
+					if(types!=null)
+					{
+						for(String type: types)
+						{
+							known_kernels_cache.add(type, new Tuple2<String, Set<String>>(ci.getClassName(), SUtil.arrayToSet(types)));
+						}
+					}
+				}
+				catch(Exception e)
+				{
+					System.out.println("Error reading: "+kk);
+				}
+			}
+		}
+		
+		return known_kernels_cache;
+	}
+	
+	/**
+	 *  Add infos about a kernel to the map.
+	 */
+	protected String[] getKernelTypes(ClassInfo ci)
+	{
+		AnnotationInfo ai = ci.getAnnotation("jadex.micro.annotation.Properties");
+		if(ai!=null)
+		{
+			Object[] vals = (Object[])ai.getValue("value");
+			if(vals!=null)
+			{
+				for(Object val: vals)
+				{
+					AnnotationInfo a = (AnnotationInfo)val;
+					String name = (String)a.getValue("name");
+					if("kernel.types".equals(name))
+					{
+						String value = (String)a.getValue("value");
+						String[] types = (String[])SJavaParser.evaluateExpression(value, null);
+//						System.out.println("foound: "+ci.getClassname()+" "+Arrays.toString(types));
+						return types;
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 *  Get all kernel files, i.e. specs to start a kernel.
 	 */
-	protected Map<String, Collection<Tuple2<String, Set<String>>>> getKernelFiles(boolean force)
+	protected Map<String, Collection<Tuple2<String, Set<String>>>> getKernelFiles()
 	{
-		if(kernelfiles==null || force)
+		if(kernelfiles==null || dirty)
 			kernelfiles = scanForKernels();
+		dirty = false;
 		return kernelfiles;
 	}
 	
@@ -525,19 +620,21 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void resultAvailable(IComponentFactory fac)
 			{
-				fac.isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret));
-//				{
+//				System.out.println("facformodel: "+model);
+				fac.isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
+				{
 //					public void customResultAvailable(Boolean result)
 //					{
 //						super.customResultAvailable(result);
-//						if(model.indexOf("Block")!=-1)
-//							System.out.println("model: "+result);
+////						if(model.indexOf("Block")!=-1)
+//							System.out.println("model: "+model+" "+result);
 //					}
-//				});
+				});
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
+//				System.out.println("ex: "+exception);
 				ret.setResult(false);
 			}
 		});
@@ -653,7 +750,13 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected Set<String> getSuffixes()
 	{
-		Map<String, Collection<Tuple2<String, Set<String>>>> types = getKernelFiles(false);
+		// todo: add additional suffixes
+		// this hack is important. otherwise the multi factory cannot start its own micro factory subcomponent
+		if(agent.getFeature(ISubcomponentsFeature.class).getChildcount()==0)
+			return Collections.EMPTY_SET;
+		
+//		Map<String, Collection<Tuple2<String, Set<String>>>> types = getKernelFiles();
+		Map<String, Collection<Tuple2<String, Set<String>>>> types = getKnownKernels();
 //		System.out.println("types: "+types.keySet());
 		Set<String> ret = new HashSet<String>(types.keySet());
 		//ret.add(".class"); // Hack :-( add manually for micro (add type in kernel desc?!)

@@ -29,7 +29,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -114,8 +113,8 @@ public class RestInvocationHelper
 			restargs.put("inurlparams", inurlparams);
 			CreationInfo info = new CreationInfo();
 			info.addArgument("restargs", restargs);
-			IComponentManagementService cms = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-			cms.createComponent(null, "jadex.extension.rs.invoke.RestInvocationAgent.class", info, new IResultListener<Collection<Tuple2<String,Object>>>()
+			info.setFilename("jadex.extension.rs.invoke.RestInvocationAgent.class");
+			component.createComponent(null, info, new IResultListener<Collection<Tuple2<String,Object>>>()
 			{
 				public void resultAvailable(Collection<Tuple2<String, Object>> result)
 				{
@@ -146,17 +145,10 @@ public class RestInvocationHelper
 	
 	/**
 	 *  Perform the REST call.
-	 * 
 	 */
-	public static final void performRequest(IExternalAccess exta,
-											final String uri,
-								 			final String path,
-								 			final Map<String, Object> headers,
-								 			final Map<String, Object> params,
-								 			final String postplainjson,
-								 			final Class<?> resttype,
-								 			final boolean inurlparams,
-								 			final Future<String> ret)
+	public static final void performRequest(IExternalAccess exta, final String uri,
+		final String path, final Map<String, Object> headers, final Map<String, Object> params,
+		final String postplainjson, final Class<?> resttype, final boolean inurlparams, final Future<String> ret)
 	{
 		int status = 500;
 		String reqcontent = null;

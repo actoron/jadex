@@ -51,6 +51,7 @@ import jadex.base.gui.ParserValidator;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IErrorReport;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -59,10 +60,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.FixedJComboBox;
@@ -1647,37 +1645,70 @@ public class StarterPanel extends JLayeredPane
 		}
 	};
 	
+//	/**
+//	 *  Create a new component on the platform.
+//	 *  Any errors will be displayed in a dialog to the user.
+//	 */
+//	public static IFuture createComponent(final IControlCenter jcc, final IResourceIdentifier rid, final String type, final String name, 
+//		final String configname, final Map arguments, final Boolean suspend, 
+//		final Boolean master, final Boolean daemon, final Boolean autosd, final Boolean sync, final Boolean pers,
+//		final PublishEventLevel moni, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
+//	{
+//		final Future ret = new Future(); 
+//		jcc.getPlatformAccess().searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(panel)
+//		{
+//			public void customResultAvailable(IComponentManagementService cms)
+//			{
+//				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd, sync, pers, moni, null, null, rid), killlistener)
+//					.addResultListener(new IResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						ret.setResult(result);
+//						jcc.setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						ret.setException(exception);
+////						exception.printStackTrace();
+//						jcc.displayError("Problem Starting Component", "Component could not be started.", exception);
+//					}
+//				});
+//			}
+//		});
+//		return ret;
+//	}
+	
 	/**
 	 *  Create a new component on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
-	public static IFuture createComponent(final IControlCenter jcc, final IResourceIdentifier rid, final String type, final String name, 
+	public static IFuture<IComponentIdentifier> createComponent(final IControlCenter jcc, final IResourceIdentifier rid, final String type, final String name, 
 		final String configname, final Map arguments, final Boolean suspend, 
 		final Boolean master, final Boolean daemon, final Boolean autosd, final Boolean sync, final Boolean pers,
 		final PublishEventLevel moni, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
-		final Future ret = new Future(); 
-		jcc.getPlatformAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(panel)
+		final Future<IComponentIdentifier> ret = new Future<>(); 
+		
+		CreationInfo ci = new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd, sync, pers, moni, null, null, rid);
+		ci.setName(name);
+		ci.setFilename(type);
+		
+		jcc.getPlatformAccess().createComponent(null, ci, killlistener).addResultListener(new IResultListener<IExternalAccess>()
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void resultAvailable(IExternalAccess result)
 			{
-				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd, sync, pers, moni, null, null, rid), killlistener)
-					.addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						ret.setResult(result);
-						jcc.setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
-//						exception.printStackTrace();
-						jcc.displayError("Problem Starting Component", "Component could not be started.", exception);
-					}
-				});
+				ret.setResult(result.getId());
+				jcc.setStatusText("Created component: " + result.getId().getLocalName());
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+//				exception.printStackTrace();
+				jcc.displayError("Problem Starting Component", "Component could not be started.", exception);
 			}
 		});
 		return ret;

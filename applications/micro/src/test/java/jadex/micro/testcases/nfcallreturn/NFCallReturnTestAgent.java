@@ -136,7 +136,10 @@ public class NFCallReturnTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
+				System.out.println("comp thread: "+agent.getFeature(IExecutionFeature.class).isComponentThread());
+				
 				agent.getLogger().severe("Testagent create provider done: "+agent.getDescription());
+				
 				callReqService(cid, testno, 5000).addResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 				{
 					public void customResultAvailable(final TestReport result1)

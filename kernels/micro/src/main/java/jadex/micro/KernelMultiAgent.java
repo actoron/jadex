@@ -6,6 +6,8 @@ import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.commons.Boolean3;
 import jadex.kernelbase.MultiFactory;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;

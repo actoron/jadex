@@ -49,11 +49,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
@@ -1246,23 +1242,17 @@ public class TestCenterPanel extends JSplitPanel
 					
 					plugin.getJCC().setStatusText("Performing test "+name);
 					final Future	ret	= new Future();
-					plugin.getJCC().getPlatformAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-						.addResultListener(new SwingDelegationResultListener(ret)
-					{
-						public void customResultAvailable(Object result)
-						{
-							IComponentManagementService	cms	= (IComponentManagementService)result;
-							Map	args	= new HashMap();
-							args.put("timeout", timeout);
-							// Todo: Use remote component for parent if any
-							CreationInfo ci = new CreationInfo(args, plugin.getJCC().getPlatformAccess().getId());
-							ci.setResourceIdentifier(name.getSecondEntity());
-							cms.createComponent(null, name.getFirstEntity(), ci, res)
-								.addResultListener(new SwingDelegationResultListener(ret));
-							
-							// Todo: timeout -> force destroy of component
-						}
-					});
+				
+					Map	args	= new HashMap();
+					args.put("timeout", timeout);
+					// Todo: Use remote component for parent if any
+					CreationInfo ci = new CreationInfo(args, plugin.getJCC().getPlatformAccess().getId());
+					ci.setResourceIdentifier(name.getSecondEntity());
+					ci.setFilename(name.getFirstEntity());
+					plugin.getJCC().getPlatformAccess().createComponent(null, ci, res)
+						.addResultListener(new SwingDelegationResultListener(ret));
+					
+					// Todo: timeout -> force destroy of component
 					ret.addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
 						public void customResultAvailable(Object result)
@@ -1295,14 +1285,15 @@ public class TestCenterPanel extends JSplitPanel
 		{
 			final Future<Void>	ret	= new Future<Void>();
 			
-			plugin.getJCC().getJCCAccess().searchService(
-				new ServiceQuery<>(IComponentManagementService.class))
-				.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-			{
-				public void customResultAvailable(IComponentManagementService cms)
-				{
+//			plugin.getJCC().getJCCAccess().searchService(
+//				new ServiceQuery<>(IComponentManagementService.class))
+//				.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService cms)
+//				{
 //					System.out.println("destroying: "+testcase);
-					cms.destroyComponent(testcase)
+					plugin.getJCC().getJCCAccess().killComponent(testcase)
+//					cms.destroyComponent(testcase)
 						.addResultListener(new SwingExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 					{
 						public void customResultAvailable(Map<String, Object> result)
@@ -1311,8 +1302,8 @@ public class TestCenterPanel extends JSplitPanel
 							ret.setResult(null);
 						}
 					});
-				}
-			});
+//				}
+//			});
 			
 			return ret;
 		}

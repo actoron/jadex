@@ -9,9 +9,6 @@ import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -39,7 +36,6 @@ public class DestroyComponentTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IComponentManagementService cms	= instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		final IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
 		final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): false;
 		
@@ -47,14 +43,14 @@ public class DestroyComponentTask implements ITask
 		if(cid==null)
 		{
 			String name = (String)context.getParameterValue("name");
-//					cid = ces.createComponentIdentifier(name, true, null);
+//			cid = ces.createComponentIdentifier(name, true, null);
 			if(name.indexOf("@")==-1)
 				cid = new BasicComponentIdentifier(name);
 			else
 				cid = new BasicComponentIdentifier(name, instance.getId().getParent());
 		}
 		
-		IFuture<Map<String, Object>> tmp = cms.destroyComponent(cid);
+		IFuture<Map<String, Object>> tmp = instance.killComponent(cid);
 		if(wait || resultlistener!=null)
 		{
 			tmp.addResultListener(new IResultListener<Map<String, Object>>()

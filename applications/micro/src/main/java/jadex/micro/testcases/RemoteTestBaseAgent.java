@@ -13,10 +13,11 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.clock.IClock;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
@@ -51,10 +52,9 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 	{
 		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();
 		
-		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class));
 		for(IComponentIdentifier proxy: proxies)
 		{
-			IFuture<Map<String, Object>>	kill	= cms.destroyComponent(proxy);
+			IFuture<Map<String, Object>> kill = agent.killComponent(proxy);
 			fubar.addFuture(kill);
 		}
 		proxies	= null;
@@ -78,17 +78,17 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 	protected IFuture<Void>	createProxies(final IExternalAccess remote)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		Starter.createProxy(agent.getExternalAccess(), remote).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+		Starter.createProxy(agent.getExternalAccess(), remote).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				proxies.add(result);
+				proxies.add(result.getId());
 				
 				// inverse proxy from remote to local.
 				Starter.createProxy(remote, agent.getExternalAccess())
-					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier result)
+					public void customResultAvailable(IExternalAccess result)
 					{
 						// Hack!!! Don't remove remote proxies. Expected that platform is killed anyways.
 //						proxies.add(result);
@@ -100,4 +100,28 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 		});
 		return ret;
 	}
+	
+	 /**
+     *  Enables an agent to disable simulation mode on its platform.
+     *  @return Null, when done.
+     */
+    protected IFuture<Void> disableLocalSimulationMode()
+    {
+    	final Future<Void> ret = new Future<>();
+    	ISimulationService simserv = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ISimulationService.class); 
+		simserv.pause().addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
+		{
+			public void customResultAvailable(Void result) throws Exception
+			{
+				simserv.setClockType(IClock.TYPE_SYSTEM).addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
+				{
+					public void customResultAvailable(Void result) throws Exception
+					{
+						simserv.start().addResultListener(new DelegationResultListener<>(ret));
+					}
+				});
+			}
+		});
+		return ret;
+    }
 }

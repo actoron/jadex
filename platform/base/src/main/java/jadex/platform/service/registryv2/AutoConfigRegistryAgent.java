@@ -33,9 +33,11 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registryv2.IAutoConfigRegistryService;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
+import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -594,11 +596,11 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		
 		if(spser==null)
 		{
-			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-//			cms.createComponent("spreg", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null).
-//				addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
-			cms.createComponent((String) null, SuperpeerRegistryAgent.class.getName()+".class", null).
-				addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+//			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			CreationInfo ci = new CreationInfo().setName("spreg").setFilename(SuperpeerRegistryAgent.class.getName()+".class");
+			
+			agent.createComponent(null, ci)
+				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 			{
 				public void firstResultAvailable(IComponentIdentifier result)
 				{
@@ -634,8 +636,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		ISuperpeerService sps = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class).setMultiplicity(0));
 		if (sps != null)
 		{
-			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-			cms.destroyComponent(((IService) sps).getId().getProviderId()).addResultListener(new IResultListener<Map<String,Object>>()
+			agent.killComponent(((IService)sps).getId().getProviderId()).addResultListener(new IResultListener<Map<String,Object>>()
 			{
 				public void resultAvailable(Map<String, Object> result)
 				{

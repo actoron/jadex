@@ -36,9 +36,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
@@ -418,52 +416,45 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 						final IComponentIdentifier cid = node.getComponentIdentifier();
 						
-						IFuture<IComponentManagementService> fut = getJCC().getJCCAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-						fut.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(comptree)
+						getJCC().getJCCAccess().getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>(comptree)
 						{
-							public void customResultAvailable(IComponentManagementService cms)
+							public void customResultAvailable(final IExternalAccess exta)
 							{
-								cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>(comptree)
-								{
-									public void customResultAvailable(final IExternalAccess exta)
-									{
-										getJCC().getJCCAccess().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+								getJCC().getJCCAccess().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //										AbstractJCCPlugin.getClassLoader(cid, getJCC())
-											.addResultListener(new SwingDefaultResultListener<ILibraryService>(comptree)
+									.addResultListener(new SwingDefaultResultListener<ILibraryService>(comptree)
+								{
+									public void customResultAvailable(ILibraryService ls)
+									{
+										ls.getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>(comptree)
 										{
-											public void customResultAvailable(ILibraryService ls)
+											public void customResultAvailable(ClassLoader cl)
 											{
-												ls.getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>(comptree)
+												Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+												
+												if(clid instanceof String[]) 
 												{
-													public void customResultAvailable(ClassLoader cl)
+													// use first gui class found
+													for(String classname : (String[])clid) 
 													{
-														Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-														
-														if(clid instanceof String[]) 
+														Class<?> clazz = SReflect.classForName0(classname, cl);
+														if(clazz != null)
 														{
-															// use first gui class found
-															for(String classname : (String[])clid) 
-															{
-																Class<?> clazz = SReflect.classForName0(classname, cl);
-																if(clazz != null)
-																{
-																	clid = clazz;
-																	break;
-																}
-															}
-														}
-														
-														if(clid instanceof String)
-														{
-															Class<?> clazz	= SReflect.classForName0((String)clid, cl);
-															createPanel(clazz, exta, node);
-														}
-														else if(clid instanceof Class)
-														{
-															createPanel((Class<?>)clid, exta, node);
+															clid = clazz;
+															break;
 														}
 													}
-												});
+												}
+												
+												if(clid instanceof String)
+												{
+													Class<?> clazz	= SReflect.classForName0((String)clid, cl);
+													createPanel(clazz, exta, node);
+												}
+												else if(clid instanceof Class)
+												{
+													createPanel((Class<?>)clid, exta, node);
+												}
 											}
 										});
 									}
@@ -611,26 +602,19 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					final Future<Boolean>	fut	= new Future<Boolean>();
 					viewables.put(cid, fut);
 					// Unknown -> start search to find out asynchronously
-					getJCC().getJCCAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-						.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Boolean>(fut)
+					getJCC().getJCCAccess().getExternalAccess(cid).addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, Boolean>(fut)
 					{
-						public void customResultAvailable(final IComponentManagementService cms)
+						public void customResultAvailable(final IExternalAccess exta)
 						{
-							cms.getExternalAccess(cid).addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, Boolean>(fut)
+							getJCC().getClassLoader(exta.getModel().getResourceIdentifier())
+								.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Boolean>(fut)
 							{
-								public void customResultAvailable(final IExternalAccess exta)
+								public void customResultAvailable(ClassLoader cl)
 								{
-									getJCC().getClassLoader(exta.getModel().getResourceIdentifier())
-										.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Boolean>(fut)
-									{
-										public void customResultAvailable(ClassLoader cl)
-										{
-											final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-											fut.setResult(clid==null? Boolean.FALSE: Boolean.TRUE);
+									final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+									fut.setResult(clid==null? Boolean.FALSE: Boolean.TRUE);
 //											System.out.println("isVis first res: "+viewables.get(cid));
-											node.refresh(false);
-										}
-									});
+									node.refresh(false);
 								}
 							});
 						}

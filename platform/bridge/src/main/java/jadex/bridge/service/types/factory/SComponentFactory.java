@@ -216,43 +216,55 @@ public class SComponentFactory
 			{
 				final Future<IModelInfo> ret = new Future<IModelInfo>();
 				
-//				ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-//					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-//				{
-//					public void customResultAvailable(Object result)
-//					{
-//						final ILibraryService ls = (ILibraryService)result;
-						
-//						(IServiceProvider)ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid)))
-//						ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
-						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
-						fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
+				fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+				{
+					public void customResultAvailable(IComponentFactory fac)
+					{
+						fac.loadModel(model, null, rid)
+							.addResultListener(new DelegationResultListener<IModelInfo>(ret));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof ServiceNotFoundException)
 						{
-							public void customResultAvailable(IComponentFactory fac)
-							{
-								fac.loadModel(model, null, rid)
-									.addResultListener(new DelegationResultListener<IModelInfo>(ret));
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								if(exception instanceof ServiceNotFoundException)
-								{
-									ret.setResult(null);
-								}
-								else
-								{
-									super.exceptionOccurred(exception);
-								}
-							}
-						}));
-//					}
-//				}));
+							ret.setResult(null);
+						}
+						else
+						{
+							super.exceptionOccurred(exception);
+						}
+					}
+				}));
 				
 				return ret;
 			}
 		});
 	}
+	
+//	Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//	FactoryFilter facfilter = new FactoryFilter(filename, null, rid);
+//	
+//	SFilter.applyFilter(facs, facfilter).addResultListener(new IResultListener<Collection<IComponentFactory>>()
+//	{
+//		public void resultAvailable(Collection<IComponentFactory> result)
+//		{
+//			if (result != null && result.size() > 0)
+//			{
+//				result.iterator().next().loadModel(filename, null, rid)
+//					.addResultListener(new DelegationResultListener<IModelInfo>(ret));
+//			}
+//			else
+//			{
+//				ret.setResult(null);
+//			}
+//		}
+//		public void exceptionOccurred(Exception exception)
+//		{
+//			ret.setException(exception);
+//		}
+//	});
 
 	/**
 	 * Test if a model can be loaded by the factory.
@@ -262,6 +274,8 @@ public class SComponentFactory
 	public static IFuture<Boolean> isLoadable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
+		
+//		System.out.println("Scom isLoad: "+model);
 		
 		exta.scheduleStep(new IComponentStep<Boolean>()
 		{
@@ -482,7 +496,7 @@ public class SComponentFactory
 	public static IFuture<Boolean> isStartable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
-		
+				
 		exta.scheduleStep(new IComponentStep<Boolean>()
 		{
 			@Classname("isStartable")
@@ -659,10 +673,6 @@ public class SComponentFactory
 			public IFuture<String> execute(final IInternalAccess ia)
 			{
 				final Future<String> ret = new Future<String>();
-				ILibraryService ls = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
-//						IFuture<IComponentFactory> fut = SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IComponentFactory.class, 
-//							RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(model, null, rid));
-//						ia.getServiceContainer().searchService( new ServiceQuery<>( new ComponentFactorySelector(model, null, rid)))
 				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
 				fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
 				{
@@ -694,7 +704,7 @@ public class SComponentFactory
 	/**
 	 * 
 	 */
-	protected static IFuture<IComponentFactory> getFactory(final FactoryFilter filter, IInternalAccess ia)
+	public static IFuture<IComponentFactory> getFactory(final FactoryFilter filter, IInternalAccess ia)
 	{
 		Collection<IComponentFactory> facs = ia.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IComponentFactory.class));
 		if(facs!=null && facs.size()>0)

@@ -10,10 +10,7 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
@@ -158,28 +155,20 @@ public class SWebSocket
 			@Override
 			public void customResultAvailable(IExternalAccess platform) throws Exception
 			{				
-				platform.searchService(new ServiceQuery<>(IComponentManagementService.class))
-					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+				platform.createComponent(null, new CreationInfo().setFilename(model)).addTuple2ResultListener(new IFunctionalResultListener<IComponentIdentifier>()
 				{
 					@Override
-					public void customResultAvailable(IComponentManagementService cms) throws Exception
+					public void resultAvailable(IComponentIdentifier cid)
 					{
-						cms.createComponent(model, null).addTuple2ResultListener(new IFunctionalResultListener<IComponentIdentifier>()
-						{
-							@Override
-							public void resultAvailable(IComponentIdentifier cid)
-							{
-								ret.setResult(cid);
-								System.out.println("Created component: "+cid);
-							}
-						}, null, new IFunctionalExceptionListener()
-						{
-							@Override
-							public void exceptionOccurred(Exception exception)
-							{
-								ret.setExceptionIfUndone(exception);
-							}
-						});
+						ret.setResult(cid);
+						System.out.println("Created component: "+cid);
+					}
+				}, null, new IFunctionalExceptionListener()
+				{
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setExceptionIfUndone(exception);
 					}
 				});
 			}

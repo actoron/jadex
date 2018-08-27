@@ -2,7 +2,6 @@ package jadex.micro.testcases.terminate;
 
 import java.util.Collection;
 
-import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -19,7 +18,6 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -57,14 +55,6 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 	protected IInternalAccess agent;
 
 	//-------- methods --------
-	
-	public IPlatformConfiguration getConfig()
-	{
-		IPlatformConfiguration conf = STest.getDefaultTestConfig();
-		conf.getExtendedPlatformConfiguration().setSimul(false);
-		conf.getExtendedPlatformConfiguration().setSimulation(false);
-		return conf;
-	}
 	
 	/**
 	 *  The agent body.
@@ -153,55 +143,45 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 		// Start platform
 		try
 		{
-//			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
+			disableLocalSimulationMode().get();
+			
+			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-//			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
-//				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-//	//			"-logging_level", "java.util.logging.Level.INFO",
-//				"-gui", "false", "-simulation", "false", "-printpass", "false",
-//				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
-//			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
-//				new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
-//			{
-//				public void customResultAvailable(final IExternalAccess platform)
-//				{
-//					createProxies(platform)
-//						.addResultListener(new ExceptionDelegationResultListener<Void, Collection<TestReport>>(ret)
-//					{
-//						public void customResultAvailable(Void result)
-//						{
-//							performTest(platform.getId(), testno, delay)
-//								.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
-//							{
-//								public void customResultAvailable(final Collection<TestReport> result)
-//								{
-//									platform.killComponent();
-//			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-//			//						{
-//			//							public void customResultAvailable(Map<String, Object> v)
-//			//							{
-//			//								ret.setResult(result);
-//			//							}
-//			//						});
-//									ret.setResult(result);
-//								}
-//							});
-//						}
-//					});
-//				}
-//			}));
-			IPlatformConfiguration conf = STest.getDefaultTestConfig();
-			conf.getExtendedPlatformConfiguration().setSimul(false);
-			conf.getExtendedPlatformConfiguration().setSimulation(false);
-			IExternalAccess platform = STest.createPlatform(conf);
-			performTest(platform.getId(), testno, delay).addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
+			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
+				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
+	//			"-logging_level", "java.util.logging.Level.INFO",
+				"-gui", "false", "-simulation", "false", "-printpass", "false",
+				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
+			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+				new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 			{
-				public void customResultAvailable(final Collection<TestReport> result)
+				public void customResultAvailable(final IExternalAccess platform)
 				{
-					platform.killComponent();
-					ret.setResult(result);
+					createProxies(platform)
+						.addResultListener(new ExceptionDelegationResultListener<Void, Collection<TestReport>>(ret)
+					{
+						public void customResultAvailable(Void result)
+						{
+							performTest(platform.getId(), testno, delay)
+								.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
+							{
+								public void customResultAvailable(final Collection<TestReport> result)
+								{
+									platform.killComponent();
+			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+			//						{
+			//							public void customResultAvailable(Map<String, Object> v)
+			//							{
+			//								ret.setResult(result);
+			//							}
+			//						});
+									ret.setResult(result);
+								}
+							});
+						}
+					});
 				}
-			});
+			}));
 		}
 		catch(Exception e)
 		{
@@ -222,60 +202,53 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 
 		// Start service agent
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<TestReport>>(ret)
-		{
-			public void customResultAvailable(final IComponentManagementService cms)
+		IResourceIdentifier	rid	= new ResourceIdentifier(
+			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+		
+		agent.createComponent(null, new CreationInfo(root, rid).setFilename("jadex/micro/testcases/terminate/TerminableProviderAgent.class"), null)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
+		{	
+			public void customResultAvailable(final IExternalAccess exta)
 			{
-				IResourceIdentifier	rid	= new ResourceIdentifier(
-					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-				
-				cms.createComponent(null, "jadex/micro/testcases/terminate/TerminableProviderAgent.class", new CreationInfo(root, rid), null)
-					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
-				{	
-					public void customResultAvailable(final IComponentIdentifier cid)
+				ret.addResultListener(new IResultListener<Collection<TestReport>>()
+				{
+					public void resultAvailable(Collection<TestReport> result)
 					{
-						ret.addResultListener(new IResultListener<Collection<TestReport>>()
-						{
-							public void resultAvailable(Collection<TestReport> result)
-							{
-								cms.destroyComponent(cid);
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								cms.destroyComponent(cid);
-							}
-						});
-						
+						agent.killComponent(exta.getId());
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						agent.killComponent(exta.getId());
+					}
+				});
+				
 //						System.out.println("cid is: "+cid);
-						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITerminableService.class).setProvider(cid))
-							.addResultListener(new ExceptionDelegationResultListener<ITerminableService, Collection<TestReport>>(ret)
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITerminableService.class).setProvider(exta.getId()))
+					.addResultListener(new ExceptionDelegationResultListener<ITerminableService, Collection<TestReport>>(ret)
+				{
+					public void customResultAvailable(final ITerminableService service)
+					{
+						testTerminate(testno, service, delay).addResultListener(
+							new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
 						{
-							public void customResultAvailable(final ITerminableService service)
+							public void customResultAvailable(TestReport result)
 							{
-								testTerminate(testno, service, delay).addResultListener(
+								ret.addIntermediateResult(result);
+								testTerminateAction(testno+1, service, delay).addResultListener(
 									new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
 								{
 									public void customResultAvailable(TestReport result)
 									{
 										ret.addIntermediateResult(result);
-										testTerminateAction(testno+1, service, delay).addResultListener(
-											new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
-										{
-											public void customResultAvailable(TestReport result)
-											{
-												ret.addIntermediateResult(result);
-												ret.setFinished();
-											}
-										});
+										ret.setFinished();
 									}
 								});
 							}
 						});
 					}
-				}));
-			}	
-		});
+				});
+			}
+		}));
 		
 		return ret;
 	}

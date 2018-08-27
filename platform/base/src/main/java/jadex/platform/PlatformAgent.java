@@ -17,12 +17,11 @@ import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
@@ -66,7 +65,7 @@ import jadex.platform.service.security.SecurityAgent;
 	// hack!!! no daemon here (possibly fixed?)
 	@ProvidedService(type=IDaemonThreadPoolService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new jadex.platform.service.execution.SyncExecutionService($component): new jadex.platform.service.execution.AsyncExecutionService($component)", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.platform.service.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
+//	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.bridge.service.types.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
 })
 
 @RequiredServices(
@@ -107,6 +106,9 @@ public class PlatformAgent
 	
 	@Agent
 	protected IInternalAccess agent;
+	
+	// enable startup monkey for randomized sequential component startup (dependency testing).
+	boolean STARTUP_MONKEY	= true;
 	
 	// where should the defaults be defined (here or in the config)
 //	@Arguments
@@ -151,9 +153,7 @@ public class PlatformAgent
 		
 		Collection<Set<String>> levels = dr.resolveDependenciesWithLevel();
 		
-		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).getLocalService(IComponentManagementService.class);
-		
-		return startComponents(cms, levels.iterator(), names);
+		return startComponents(levels.iterator(), names);
 	}
 	
 	/**
@@ -272,19 +272,14 @@ public class PlatformAgent
 			return (Boolean)argsmap.get(name);
 		return null;
 	}
-	
-	// enable startup monkey for randomized sequential component startup (dependency testing).
-	boolean STARTUP_MONKEY	= true;
-	
+		
 	/**
 	 *  Start components in levels.
 	 */
-	protected IFuture<Void> startComponents(IComponentManagementService cms, Iterator<Set<String>> levels, Map<String, String> names)
+	protected IFuture<Void> startComponents(Iterator<Set<String>> levels, Map<String, String> names)
 	{
 		if(STARTUP_MONKEY)
-		{
-			return startComponentsDebug(cms, levels, null, names);
-		}
+			return startComponentsDebug(levels, null, names);
 		
 		final Future<Void> ret = new Future<>();
 		
@@ -296,13 +291,13 @@ public class PlatformAgent
 			{
 				public void resultAvailable(Void result)
 				{
-					startComponents(cms, levels, names).addResultListener(new DelegationResultListener<>(ret));
+					startComponents(levels, names).addResultListener(new DelegationResultListener<>(ret));
 				}
 
 				public void exceptionOccurred(Exception exception)
 				{
 					agent.getLogger().warning(SUtil.getExceptionStacktrace(exception));
-					startComponents(cms, levels, names).addResultListener(new DelegationResultListener<>(ret));
+					startComponents(levels, names).addResultListener(new DelegationResultListener<>(ret));
 				}
 			});
 			
@@ -311,7 +306,10 @@ public class PlatformAgent
 				//ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(names.get(c), c.getName()+".class", (CreationInfo)null);
 				//fut.addTuple2ResultListener(res -> {lis.resultAvailable(null);}, res -> {});
 				
-				IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c+".class", null, null);
+				CreationInfo ci = new CreationInfo();
+				ci.setName(names.get(c));
+				ci.setFilename(c+".class");
+				IFuture<IExternalAccess> fut = agent.createComponent(null, ci, null);
 				fut.addResultListener(
 					res -> {lis.resultAvailable(null);},
 					exception -> {lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c+".class", exception));});
@@ -330,7 +328,7 @@ public class PlatformAgent
 	/**
 	 *  Start components synhcronized using random order to find implicit dependencies. 
 	 */
-	protected IFuture<Void> startComponentsDebug(IComponentManagementService cms, Iterator<Set<String>> levels, Iterator<String> level, Map<String, String> names)
+	protected IFuture<Void> startComponentsDebug(Iterator<Set<String>> levels, Iterator<String> level, Map<String, String> names)
 	{
 		// Initial level or finished with last level -> start next level
 		if(level==null || !level.hasNext())
@@ -341,7 +339,7 @@ public class PlatformAgent
 				// Chaos monkey -> randomize list of components to find implicit dependencies
 				List<String>	list	= new ArrayList<>(levels.next());
 				Collections.shuffle(list, SSecurity.getSecureRandom());
-				return startComponentsDebug(cms, levels, list.iterator(), names);
+				return startComponentsDebug(levels, list.iterator(), names);
 			}
 			else
 			{
@@ -355,9 +353,9 @@ public class PlatformAgent
 			Future<Void>	ret	= new Future<>();
 			
 			String	c	= level.next();
-			IFuture<IComponentIdentifier> fut = cms.createComponent(names.get(c), c+".class", null, null);
+			IFuture<IExternalAccess> fut = agent.createComponent(null, new CreationInfo().setName(names.get(c)).setFilename(c+".class"), null);
 			fut.addResultListener(
-				res -> {startComponentsDebug(cms, levels, level, names).addResultListener(new DelegationResultListener<>(ret));},
+				res -> {startComponentsDebug(levels, level, names).addResultListener(new DelegationResultListener<>(ret));},
 				exception -> {ret.setException(new RuntimeException("Cannot autostart "+c+".class", exception));});
 			return ret;
 		}

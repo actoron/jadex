@@ -2,15 +2,13 @@ package jadex.platform.service.cli.commands;
 
 import java.util.Map;
 
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.CliContext;
@@ -55,18 +53,26 @@ public class ListComponentsCommand extends ACliCommand
 	 */
 	public Object invokeCommand(CliContext context, Map<String, Object> args)
 	{
-		final Future<IComponentDescription[]> ret = new Future<IComponentDescription[]>();
+//		final Future<IComponentDescription[]> ret = new Future<IComponentDescription[]>();
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
-		comp.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentDescription[]>(ret)
+//		comp.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentDescription[]>(ret)
+//		{
+//			public void customResultAvailable(IComponentManagementService cms)
+//			{
+//				cms.getComponentDescriptions().addResultListener(new DelegationResultListener<IComponentDescription[]>(ret));
+//			}
+//		});
+		
+		return comp.scheduleStep(new IComponentStep<IComponentDescription[]>()
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			@Override
+			public IFuture<IComponentDescription[]> execute(IInternalAccess ia)
 			{
-				cms.getComponentDescriptions().addResultListener(new DelegationResultListener<IComponentDescription[]>(ret));
+				return SComponentManagementService.getComponentDescriptions(ia);
 			}
 		});
-		return ret;
 	}
 	
 	/**

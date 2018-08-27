@@ -12,6 +12,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
@@ -39,10 +40,16 @@ public class FirstAgent
 	@AgentArgument
 	private boolean selfkill;
 
+	@AgentCreated
+	public void init()
+	{
+		System.out.println("Inited :" + ia.getId());
+	}
+	
 	@AgentBody
 	public void body()
 	{
-//		System.out.println("MY PLATFORM :" + ia.getComponentIdentifier().getPlatformName());
+		System.out.println("MY PLATFORM :" + ia.getId().getPlatformName());
 		
 		@SuppressWarnings({"unchecked", "rawtypes"})
 		Collection<IMessageService> services = (Collection)ia.getFeature(IRequiredServicesFeature.class).getServices("MessageService").get();

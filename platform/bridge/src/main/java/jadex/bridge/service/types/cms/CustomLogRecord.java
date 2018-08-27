@@ -1,4 +1,4 @@
-package jadex.platform.service.cms;
+package jadex.bridge.service.types.cms;
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;

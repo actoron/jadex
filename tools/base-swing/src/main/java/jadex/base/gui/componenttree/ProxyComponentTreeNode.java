@@ -13,10 +13,8 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IProxyAgentService.State;
 import jadex.commons.future.DefaultResultListener;
@@ -81,9 +79,10 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 	 *  Create a new service container node.
 	 */
 	public ProxyComponentTreeNode(final ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, IComponentDescription desc,
-		IComponentManagementService cms, ComponentIconCache iconcache, IExternalAccess access)
+		//IComponentManagementService cms, 
+		ComponentIconCache iconcache, IExternalAccess access)
 	{
-		super(parent, model, tree, desc, cms, iconcache, access);
+		super(parent, model, tree, desc, iconcache, access);
 		this.state = State.UNCONNECTED;
 		
 		// Add CMS listener for remote proxy node.
@@ -168,7 +167,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 				if(result!=null)
 				{
 //					System.out.println("search: "+ProxyComponentTreeNode.this.hashCode());
-					searchChildren(cms, result).addResultListener(new IResultListener<List<ITreeNode>>()
+					searchChildren(access, result).addResultListener(new IResultListener<List<ITreeNode>>()
 					{
 						public void resultAvailable(List<ITreeNode> result)
 						{

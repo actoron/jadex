@@ -11,11 +11,7 @@ import jadex.bdiv3.model.MBelief;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
@@ -96,169 +92,157 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		if(invoke)
 		{
 			// HACK!!! todo
-			space.getExternalAccess().searchService(new ServiceQuery<>(IComponentManagementService.class))
-				.addResultListener(new IResultListener<IComponentManagementService>()
+			IFuture<IExternalAccess> fut = space.getExternalAccess().getExternalAccess(agent.getName());
+			fut.addResultListener(new IResultListener<IExternalAccess>()
 			{
-				public void resultAvailable(IComponentManagementService cms)
-				{
-					IFuture<IExternalAccess> fut = cms.getExternalAccess(agent.getName());
-					fut.addResultListener(new IResultListener<IExternalAccess>()
-					{
-						public void exceptionOccurred(Exception exception)
-						{
-							// Happens when component already removed
-//							exception.printStackTrace();
-						}
-						public void resultAvailable(final IExternalAccess exta)
-						{
-							for(int i=0; i<metainfos.length; i++)
-							{
-								final IParsedExpression	cond	= metainfos[i].length==2 ? null
-									: (IParsedExpression)getProperty(metainfos[i][2]);
-								final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-								if(cond!=null)
-								{
-//									fetcher	= new SimpleValueFetcher();
-									fetcher.setValue("$space", space);
-									fetcher.setValue("$percept", percept);
-									fetcher.setValue("$avatar", avatar);
-									fetcher.setValue("$type", type);
-									fetcher.setValue("$aid", agent);
-									fetcher.setValue("$scope", exta);
-								}
-								final String name = metainfos[i][1];
-
-								if(ADD.equals(metainfos[i][0]))
-								{
-									exta.scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("add")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-											MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
-											Collection<?>	facts	= (Collection<?>)mbel.getValue(ia);
-											if(cond!=null)
-												fetcher.setValue("$facts", facts);
-											
-											if(!facts.contains(percept) && (cond==null || evaluate(cond, fetcher)))
-											{
-												((Collection<Object>)facts).add(percept);
-//												System.out.println(agent.getName()+": added "+percept+" to: "+name);
-											}
-											return IFuture.DONE;
-										}
-									});
-								}
-								else if(REMOVE.equals(metainfos[i][0]))
-								{
-									exta.scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("remove")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-											MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
-											Collection<?>	facts	= (Collection<?>)mbel.getValue(ia);
-											if(cond!=null)
-												fetcher.setValue("$facts", facts);
-											
-											if(facts.contains(percept) && (cond==null || evaluate(cond, fetcher)))
-											{
-												((Collection<Object>)facts).remove(percept);
-//												System.out.println(agent.getName()+": removed "+percept+" from: "+name);
-											}
-											return IFuture.DONE;
-										}
-									});
-								}
-								else if(SET.equals(metainfos[i][0]))
-								{
-									exta.scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("set")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-											MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
-											Object	fact	= mbel.getValue(ia);
-											if(cond!=null)
-												fetcher.setValue("$fact", fact);
-											
-											if(cond==null || evaluate(cond, fetcher))
-											{
-												mbel.setValue(ia, percept);
-//												System.out.println(agent.getName()+": set "+percept+" on: "+name);
-											}
-											return IFuture.DONE;
-										}
-									});
-								}
-								else if(UNSET.equals(metainfos[i][0]))
-								{
-									exta.scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("unset")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-											MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
-											Object	fact	= mbel.getValue(ia);
-											if(cond!=null)
-												fetcher.setValue("$fact", fact);
-											
-											if(cond==null || evaluate(cond, fetcher))
-											{
-												mbel.setValue(ia, null);
-//												System.out.println(agent.getName()+": unset "+percept+" on: "+name);
-											}
-											return IFuture.DONE;
-										}
-									});
-								}
-								else if(REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar))
-								{
-									exta.scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("removeoutdated")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-											MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
-											Collection<?>	facts	= (Collection<?>)mbel.getValue(ia);
-											if(cond!=null)
-												fetcher.setValue("$facts", facts);
-											
-											if(cond==null || evaluate(cond, fetcher))
-											{
-												IVector1 vision	= getRange(avatar);
-												Space2D	space2d	= (Space2D)space;
-												IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
-												Set<ISpaceObject>	seen = space2d.getNearObjects(mypos, vision);
-												for(Iterator<?> it=facts.iterator(); it.hasNext(); )
-												{
-													Object	known	= it.next();
-													IVector2	knownpos	= (IVector2)((ISpaceObject)known).getProperty(Space2D.PROPERTY_POSITION);
-													// Hack!!! Shouldn't react to knownpos==null
-													if(!seen.contains(known) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
-													{
-//														System.out.println(agent.getName()+": Removing disappeared object: "+percept+", "+known);
-														it.remove();
-													}
-												}
-											}
-											return IFuture.DONE;
-										}
-									});
-								}
-							}
-						}
-					});
-				}
-				
 				public void exceptionOccurred(Exception exception)
 				{
-					exception.printStackTrace();
+					// Happens when component already removed
+//							exception.printStackTrace();
+				}
+				public void resultAvailable(final IExternalAccess exta)
+				{
+					for(int i=0; i<metainfos.length; i++)
+					{
+						final IParsedExpression	cond	= metainfos[i].length==2 ? null
+							: (IParsedExpression)getProperty(metainfos[i][2]);
+						final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+						if(cond!=null)
+						{
+//									fetcher	= new SimpleValueFetcher();
+							fetcher.setValue("$space", space);
+							fetcher.setValue("$percept", percept);
+							fetcher.setValue("$avatar", avatar);
+							fetcher.setValue("$type", type);
+							fetcher.setValue("$aid", agent);
+							fetcher.setValue("$scope", exta);
+						}
+						final String name = metainfos[i][1];
+
+						if(ADD.equals(metainfos[i][0]))
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("add")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+									MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
+									Collection<?>	facts	= (Collection<?>)mbel.getValue(ia);
+									if(cond!=null)
+										fetcher.setValue("$facts", facts);
+									
+									if(!facts.contains(percept) && (cond==null || evaluate(cond, fetcher)))
+									{
+										((Collection<Object>)facts).add(percept);
+//												System.out.println(agent.getName()+": added "+percept+" to: "+name);
+									}
+									return IFuture.DONE;
+								}
+							});
+						}
+						else if(REMOVE.equals(metainfos[i][0]))
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("remove")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+									MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
+									Collection<?>	facts	= (Collection<?>)mbel.getValue(ia);
+									if(cond!=null)
+										fetcher.setValue("$facts", facts);
+									
+									if(facts.contains(percept) && (cond==null || evaluate(cond, fetcher)))
+									{
+										((Collection<Object>)facts).remove(percept);
+//												System.out.println(agent.getName()+": removed "+percept+" from: "+name);
+									}
+									return IFuture.DONE;
+								}
+							});
+						}
+						else if(SET.equals(metainfos[i][0]))
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("set")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+									MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
+									Object	fact	= mbel.getValue(ia);
+									if(cond!=null)
+										fetcher.setValue("$fact", fact);
+									
+									if(cond==null || evaluate(cond, fetcher))
+									{
+										mbel.setValue(ia, percept);
+//												System.out.println(agent.getName()+": set "+percept+" on: "+name);
+									}
+									return IFuture.DONE;
+								}
+							});
+						}
+						else if(UNSET.equals(metainfos[i][0]))
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("unset")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+									MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
+									Object	fact	= mbel.getValue(ia);
+									if(cond!=null)
+										fetcher.setValue("$fact", fact);
+									
+									if(cond==null || evaluate(cond, fetcher))
+									{
+										mbel.setValue(ia, null);
+//												System.out.println(agent.getName()+": unset "+percept+" on: "+name);
+									}
+									return IFuture.DONE;
+								}
+							});
+						}
+						else if(REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar))
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("removeoutdated")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+//											BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+									MBelief	mbel	= ((BDIModel)ia.getModel().getRawModel()).getCapability().getBelief(name);
+									Collection<?>	facts	= (Collection<?>)mbel.getValue(ia);
+									if(cond!=null)
+										fetcher.setValue("$facts", facts);
+									
+									if(cond==null || evaluate(cond, fetcher))
+									{
+										IVector1 vision	= getRange(avatar);
+										Space2D	space2d	= (Space2D)space;
+										IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
+										Set<ISpaceObject>	seen = space2d.getNearObjects(mypos, vision);
+										for(Iterator<?> it=facts.iterator(); it.hasNext(); )
+										{
+											Object	known	= it.next();
+											IVector2	knownpos	= (IVector2)((ISpaceObject)known).getProperty(Space2D.PROPERTY_POSITION);
+											// Hack!!! Shouldn't react to knownpos==null
+											if(!seen.contains(known) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
+											{
+//														System.out.println(agent.getName()+": Removing disappeared object: "+percept+", "+known);
+												it.remove();
+											}
+										}
+									}
+									return IFuture.DONE;
+								}
+							});
+						}
+					}
 				}
 			});
 		}

@@ -5,13 +5,8 @@ import javax.swing.JComponent;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -120,15 +115,8 @@ public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPan
 	public IFuture<IExternalAccess>	getServiceAccess()
 	{
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
-		getJCC().getJCCAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
-		{
-			public void customResultAvailable(IComponentManagementService cms)
-			{
-				cms.getExternalAccess(((IService)getService()).getId().getProviderId())
-					.addResultListener(new DelegationResultListener<IExternalAccess>(ret));
-			}
-		});
+		getJCC().getJCCAccess().getExternalAccess(((IService)getService()).getId().getProviderId())
+			.addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 		return ret;
 	}
 	

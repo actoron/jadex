@@ -104,7 +104,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 							}
 
 							// if it is not and it is not the own service...
-							if(!present && !result.getId().equals(id)) 
+							if(!present && !result.getIdString().equals(id)) 
 							{
 								// subscribe...
 								ISubscriptionIntermediateFuture<Event> subscription = result.subscribeForReplication(topic);
@@ -240,7 +240,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 				}
 
 				// if no subscription was found for the given service...
-				if(!present && !result.getId().equals(id)) 
+				if(!present && !result.getIdString().equals(id)) 
 				{
 					// subscribe...
 					ISubscriptionIntermediateFuture<Event> subscription = result.subscribeForReplication(topic);
@@ -332,7 +332,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 * 
 	 * @return the service Id.
 	 */
-	public String getId() 
+	public String getIdString() 
 	{
 		return this.id;
 	}

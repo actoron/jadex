@@ -14,11 +14,9 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -207,6 +205,8 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 		// Start platform
 		try
 		{
+			disableLocalSimulationMode().get();
+			
 			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
@@ -276,28 +276,23 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 		});
 		
 		// Start service agent
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
-		{
-			public void customResultAvailable(final IComponentManagementService cms)
+		IResourceIdentifier	rid	= new ResourceIdentifier(
+			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//		System.out.println("Using rid: "+rid);
+		final boolean	local	= root.equals(agent.getId().getRoot());
+		jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(local ? agent.getId() : root, rid);
+		agent.createComponent(null, ci.setFilename(AAgent.class.getName()+".class"), null)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+		{	
+			public void customResultAvailable(final IExternalAccess exta)
 			{
-				IResourceIdentifier	rid	= new ResourceIdentifier(
-					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-//						System.out.println("Using rid: "+rid);
-				final boolean	local	= root.equals(agent.getId().getRoot());
-				jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(local ? agent.getId() : root, rid);
-				cms.createComponent(null, AAgent.class.getName()+".class", ci, null)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
-				{	
-					public void customResultAvailable(final IComponentIdentifier cid)
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IAService.class).setProvider(exta.getId()))
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IAService, TestReport>(ret)
+				{
+					public void customResultAvailable(IAService service)
 					{
-						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IAService.class).setProvider(cid))
-							.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IAService, TestReport>(ret)
-						{
-							public void customResultAvailable(IAService service)
-							{
-								System.out.println("found service: "+((IService)service).getId());
-								
+						System.out.println("found service: "+((IService)service).getId());
+						
 //								IFuture<IFuture<String>> futa = service.methodA();
 //								futa.addResultListener(new DefaultResultListener<IFuture<String>>()
 //								{
@@ -317,35 +312,33 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 //										});
 //									}
 //								});
+						
+						IFuture<IIntermediateFuture<String>> futb = service.methodB();
+						futb.addResultListener(new ExceptionDelegationResultListener<IIntermediateFuture<String>, TestReport>(ret)
+						{
+							public void customResultAvailable(IIntermediateFuture<String> fut2)
+							{
+								System.out.println("received first: "+fut2);
 								
-								IFuture<IIntermediateFuture<String>> futb = service.methodB();
-								futb.addResultListener(new ExceptionDelegationResultListener<IIntermediateFuture<String>, TestReport>(ret)
+								fut2.addResultListener(new IntermediateDefaultResultListener<String>()
 								{
-									public void customResultAvailable(IIntermediateFuture<String> fut2)
+									public void intermediateResultAvailable(String result) 
 									{
-										System.out.println("received first: "+fut2);
-										
-										fut2.addResultListener(new IntermediateDefaultResultListener<String>()
-										{
-											public void intermediateResultAvailable(String result) 
-											{
-												System.out.println("received: "+result);
-											}
-											
-											public void finished() 
-											{
-												System.out.println("fini");
-												TestReport tr = new TestReport("#"+testno, "Tests if rec results work");
-												tr.setSucceeded(true);
-												ret.setResult(tr);
-											}	
-										});
+										System.out.println("received: "+result);
 									}
+									
+									public void finished() 
+									{
+										System.out.println("fini");
+										TestReport tr = new TestReport("#"+testno, "Tests if rec results work");
+										tr.setSucceeded(true);
+										ret.setResult(tr);
+									}	
 								});
 							}
-						}));
+						});
 					}
-				});
+				}));
 			}
 		});
 		

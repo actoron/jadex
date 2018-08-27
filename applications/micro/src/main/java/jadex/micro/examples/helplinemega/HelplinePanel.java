@@ -35,10 +35,9 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSCreatedEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.Future;
@@ -288,8 +287,8 @@ public class HelplinePanel extends JPanel
 				}
 				catch(ServiceNotFoundException snfe)
 				{
-					CreationInfo	ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getId());
-					ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class)).createComponent(ci, person, HelplineAgent.class.getName()+".class")
+					CreationInfo ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getId()).setFilename(HelplineAgent.class.getName()+".class").setName(person);
+					ia.createComponentWithResults(null, ci)
 						.addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
 					{
 						@Override

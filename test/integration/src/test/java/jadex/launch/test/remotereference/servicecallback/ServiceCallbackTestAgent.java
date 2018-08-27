@@ -7,12 +7,12 @@ import org.junit.Ignore;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -48,19 +48,19 @@ public class ServiceCallbackTestAgent extends TestAgent	implements ICalledServic
 	 *  Execute test locally and remote.
 	 */
 	@Override
-	protected IFuture<TestReport> test(IComponentManagementService cms, boolean local)
+	protected IFuture<TestReport> test(IExternalAccess platform, boolean local)
 	{
 		Future<TestReport>	ret	= new Future<>(new TestReport(local?"#1":"#2", local?"Test local callback":"Test remote callback"));
 
 		try
 		{
-			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= cms.createComponent(ServiceCallbackProviderAgent.class.getName()+".class",
+			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= platform.createComponent(ServiceCallbackProviderAgent.class.getName()+".class",
 				local ? new CreationInfo(agent.getId()) : null);	// Start as subcomponent in local case
 			IComponentIdentifier	provider	= fut.getFirstResult();
 			ICallerService	service	= local ? agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class)).get()
 				: agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class, RequiredService.SCOPE_GLOBAL)).get(); // Search globally in remote case.
 			service.doCall(this).get();
-			cms.destroyComponent(provider).get();
+			platform.killComponent(provider).get();
 			ret.get().setSucceeded(true);
 		}
 		catch(Exception e)

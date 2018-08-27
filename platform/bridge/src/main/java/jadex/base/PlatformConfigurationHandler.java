@@ -55,11 +55,11 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		defvalues.put(IPlatformConfiguration.WELCOME, Boolean.TRUE);
 		defvalues.put(IPlatformConfiguration.COMPONENT_FACTORY, IPlatformConfiguration.FALLBACK_COMPONENT_FACTORY);
 		defvalues.put(IPlatformConfiguration.CONFIGURATION_FILE, IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION);
-		defvalues.put("platformcomponent", new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
 		defvalues.put("defaulttimeout", SUtil.DEFTIMEOUT);
-		defvalues.put("defaulttimeout", SUtil.DEFTIMEOUT);
-
-		//		defvalues.put("components", new ArrayList<String>());
+//		defvalues.put("platformcomponent", new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
+		defvalues.put("platformcomponent", new ClassInfo("jadex.bridge.service.types.cms.PlatformComponent"));
+		
+//		defvalues.put("components", new ArrayList<String>());
 //		defvalues.put(GUI, Boolean.TRUE);
 //		defvalues.put(CLI, Boolean.TRUE);
 //		defvalues.put(CLICONSOLE, Boolean.FALSE);

@@ -2,13 +2,10 @@ package jadex.extension.rs.invoke;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.extension.rs.RSFactory;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 
 /**
  *  Convenience agent that wraps a normal rest web service as Jadex service.
@@ -16,7 +13,6 @@ import jadex.micro.annotation.RequiredServices;
  *  in the same way as normal Jadex component services.
  */
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 @ComponentTypes(@ComponentType(name="invocation", filename="jadex/extension/rs/invoke/RestServiceInvocationAgent.class"))
 public class RestServiceAgent
 {

@@ -26,11 +26,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -914,15 +912,7 @@ public class ObserverCenter implements IObserverCenter
 			dispose();
 			if(killonexit)
 			{
-				space.getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.addResultListener(new SwingDefaultResultListener(mainwindow)
-				{
-					public void customResultAvailable(Object result)
-					{
-						IComponentManagementService	cms = (IComponentManagementService)result;
-						cms.destroyComponent(space.getExternalAccess().getId());
-					}
-				});
+				space.getExternalAccess().killComponent(space.getExternalAccess().getId());
 			}
 		}
 		

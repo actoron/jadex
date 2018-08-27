@@ -42,6 +42,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SUtil;
@@ -202,8 +203,8 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		}
 		
 		
-		IPlatformConfiguration conf = (IPlatformConfiguration) Starter.getPlatformValue(component.getId().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
-		if (conf.getExtendedPlatformConfiguration().getSimulation())
+		Boolean issim = (Boolean) Starter.getPlatformValue(component.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
+		if (Boolean.TRUE.equals(issim))
 		{
 			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
 			// there is no way of known how long to hold the clock.
@@ -384,7 +385,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		public void handleMessage(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			final String rxid = (String) header.getProperty(RX_ID);
-//			System.out.println(getComponent().getComponentIdentifier() + " received remote command: "+msg+", rxid="+rxid);
+//			System.out.println(getComponent().getId() + " received remote command: "+msg+", rxid="+rxid);
 			
 			if(msg instanceof IRemoteCommand)
 			{
@@ -445,7 +446,8 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						{
 							RemoteIntermediateResultCommand<?> rc = new RemoteIntermediateResultCommand(result, fsc!=null ? fsc.getProperties() : null);
 							rc.setResultCount(counter++);
-							IFuture<Void>	fut	= sendRxMessage(remote, rxid, rc);
+//							System.out.println("send RemoteIntermediateResultCommand to: "+remote);
+							IFuture<Void> fut = sendRxMessage(remote, rxid, rc);
 							if(term!=null)
 							{
 								fut.addResultListener(term);
@@ -537,6 +539,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 							{
 								// TODO: why null?
 								sc	= CallAccess.createServiceCall((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER), nonfunc);
+								CallAccess.setLastInvocation(sc);
 							}
 							else
 							{
@@ -602,9 +605,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			
 			// Admin platforms (i.e. in possession  of our platform key) can do anything.
 			if(secinfos.isAdminPlatform())
-			{
 				trusted	= true;
-			}
 			
 			// Internal command -> safe to check as stated by command.
 			else if(SAFE_COMMANDS.contains(msg.getClass()))
@@ -654,6 +655,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			if(!trusted)
 			{
 				getComponent().getLogger().info("Untrusted command not executed: "+msg);
+//				System.out.println("Untrusted command not executed: "+msg);
 			}
 //			else
 //			{

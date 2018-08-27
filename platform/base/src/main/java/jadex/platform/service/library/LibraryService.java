@@ -48,7 +48,6 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -981,79 +980,72 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		final Future<Void>	ret	= new Future<Void>();
 		final IComponentIdentifier	remote	= rid.getLocalIdentifier().getComponentIdentifier();
-		component.getExternalAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		component.getExternalAccess(remote).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess exta)
 			{
-				cms.getExternalAccess(remote).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				exta.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{
-					public void customResultAvailable(IExternalAccess exta)
+					public void customResultAvailable(ILibraryService ls)
 					{
-						exta.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
+						ls.getResourceAsStream(rid)
+							.addResultListener(new ExceptionDelegationResultListener<IInputConnection, Void>(ret)
 						{
-							public void customResultAvailable(ILibraryService ls)
+							public void customResultAvailable(IInputConnection icon)
 							{
-								ls.getResourceAsStream(rid)
-									.addResultListener(new ExceptionDelegationResultListener<IInputConnection, Void>(ret)
+								try
 								{
-									public void customResultAvailable(IInputConnection icon)
+									File	f	= getHashRidFile(rid);
+									f.getParentFile().mkdirs();
+									final OutputStream	os	= new BufferedOutputStream(new FileOutputStream(f));
+									icon.writeToOutputStream(os, component.getExternalAccess())
+										.addResultListener(new IIntermediateResultListener<Long>()
 									{
-										try
+										public void exceptionOccurred(Exception exception)
 										{
-											File	f	= getHashRidFile(rid);
-											f.getParentFile().mkdirs();
-											final OutputStream	os	= new BufferedOutputStream(new FileOutputStream(f));
-											icon.writeToOutputStream(os, component.getExternalAccess())
-												.addResultListener(new IIntermediateResultListener<Long>()
+											exception.printStackTrace();
+											try
 											{
-												public void exceptionOccurred(Exception exception)
-												{
-													exception.printStackTrace();
-													try
-													{
-														os.close();
-													}
-													catch(Exception e)
-													{
-														// ignore
-													}
-													ret.setException(null);
-												}
-												
-												public void finished()
-												{
-//													System.out.println("finished");
-													try
-													{
-														os.close();
-													}
-													catch(Exception e)
-													{
-														// ignore
-													}
-													ret.setResult(null);
-												}
-												
-												public void intermediateResultAvailable(Long result)
-												{
-													// ignore
-//													System.out.println("update: "+result);
-												}
-												
-												public void resultAvailable(Collection<Long> result)
-												{
-													// should not be called.
-												}
-											});
+												os.close();
+											}
+											catch(Exception e)
+											{
+												// ignore
+											}
+											ret.setException(null);
 										}
-										catch(FileNotFoundException e)
+										
+										public void finished()
 										{
-											throw new RuntimeException(e);
+//													System.out.println("finished");
+											try
+											{
+												os.close();
+											}
+											catch(Exception e)
+											{
+												// ignore
+											}
+											ret.setResult(null);
 										}
-									}
-								});
+										
+										public void intermediateResultAvailable(Long result)
+										{
+											// ignore
+//													System.out.println("update: "+result);
+										}
+										
+										public void resultAvailable(Collection<Long> result)
+										{
+											// should not be called.
+										}
+									});
+								}
+								catch(FileNotFoundException e)
+								{
+									throw new RuntimeException(e);
+								}
 							}
 						});
 					}

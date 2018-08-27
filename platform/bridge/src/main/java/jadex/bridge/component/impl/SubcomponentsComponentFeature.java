@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -24,7 +25,6 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
@@ -40,8 +40,11 @@ import jadex.javaparser.SimpleValueFetcher;
 /**
  *  This feature provides subcomponents.
  */
-public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	implements ISubcomponentsFeature, IInternalSubcomponentsFeature
+public class SubcomponentsComponentFeature	extends	AbstractComponentFeature implements ISubcomponentsFeature, IInternalSubcomponentsFeature
 {
+	/** The number of children. */
+	protected int childcount;
+	
 	/**
 	 *  Create the feature.
 	 */
@@ -131,7 +134,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		
 		final Future<Void> res = new Future<Void>();
 		final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
-		IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//		IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 		// NOTE: in current implementation application waits for subcomponents
 		// to be finished and cms implements a hack to get the external
 		// access of an uninited parent.
@@ -143,7 +146,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 		// (NOTE2: subcomponents must be created one by one as they
 		// might depend on each other (e.g. bdi factory must be there for jcc)).
 		
-		createComponent(components, cms, component.getModel(), 0, res, cids);
+		createComponent(components, component.getModel(), 0, res, cids);
 		
 		final Future<List<IComponentIdentifier>> ret = new Future<List<IComponentIdentifier>>();
 		res.addResultListener(new ExceptionDelegationResultListener<Void, List<IComponentIdentifier>>(ret)
@@ -178,7 +181,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	/**
 	 *  Create subcomponents.
 	 */
-	protected void	createComponent(final ComponentInstanceInfo[] components, final IComponentManagementService cms, final IModelInfo model, final int i, final Future<Void> fut, final List<IComponentIdentifier> cids)
+	protected void	createComponent(final ComponentInstanceInfo[] components, final IModelInfo model, final int i, final Future<Void> fut, final List<IComponentIdentifier> cids)
 	{
 		if(i<components.length)
 		{			
@@ -195,7 +198,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 //					if(num>0)
 //						System.out.println("created comp: "+components[i].getName());
 					cids.addAll(result);
-					createComponent(components, cms, model, i+1, fut, cids);
+					createComponent(components, model, i+1, fut, cids);
 				}
 			}));
 			for(int j=0; j<num; j++)
@@ -216,26 +219,27 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 					// todo: rid
 //					System.out.println("curcall: "+getName(components[i], model, j+1)+" "+CallAccess.getCurrentInvocation().getCause());
 //					cms.createComponent(getName(components[i], model, j+1), type.getName(),
-					cms.createComponent(getName(components[i], model, j+1), getFilename(components[i], model),
-						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getId(),
-						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null),
-//							getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
-//						{
-//							@Override
-//							public void resultAvailable(Collection<Tuple2<String, Object>> result)
-//							{
-//								// OK -> ignore.
-//							}
-//							
-//							@Override
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								// Let super component fail when subcomponent fails.
-//								// TODO: alternative behavior? restart, ignore?
-//								getComponent().killComponent(exception);
-//							}
-//						})
-							null).addResultListener(crl);
+					CreationInfo ci = new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getId(),
+						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null);
+					ci.setName(getName(components[i], model, j+1));
+					ci.setFilename(getFilename(components[i], model));
+					
+					getComponent().createComponent(null, ci, null).addResultListener(new IResultListener<IExternalAccess>()
+					{
+						public void resultAvailable(IExternalAccess result) 
+						{
+							crl.resultAvailable(result.getId());
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							crl.exceptionOccurred(exception);
+						}
+					});
+//					cms.createComponent(getName(components[i], model, j+1), getFilename(components[i], model),
+//						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getId(),
+//						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null),
+//						null).addResultListener(crl);
 				}
 				else
 				{
@@ -354,7 +358,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	/**
 	 *  Called, when a subcomponent has been created.
 	 */
-	public IFuture<Void>	componentCreated(final IComponentDescription desc)
+	public IFuture<Void> componentCreated(final IComponentDescription desc)
 	{
 		// Throw component events for extensions (envsupport)
 		final IMonitoringComponentFeature	mon	= getComponent().getFeature0(IMonitoringComponentFeature.class);
@@ -434,10 +438,45 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature	impl
 	}
 	
 	/**
-	 * 
+	 *  Test if the current thread is an external thread.
 	 */
 	protected boolean isExternalThread()
 	{
 		return !getComponent().getFeature(IExecutionFeature.class).isComponentThread();
 	}
+
+	/**
+	 *  Get the childcount.
+	 *  @return the childcount.
+	 */
+	public int getChildcount()
+	{
+		return childcount;
+	}
+
+//	/**
+//	 *  Set the child count.
+//	 *  @param childcount the childcount to set.
+//	 */
+//	public void setChildcount(int childcount)
+//	{
+//		this.childcount = childcount;
+//	}
+	
+	/**
+	 *  Inc the child count.
+	 */
+	public int incChildcount()
+	{
+		return ++this.childcount;
+	}
+	
+	/**
+	 *  Dec the child count.
+	 */
+	public int decChildcount()
+	{
+		return childcount>0? --childcount: childcount;
+	}
+	
 }

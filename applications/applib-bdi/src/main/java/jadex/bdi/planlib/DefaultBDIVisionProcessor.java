@@ -8,11 +8,7 @@ import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
@@ -93,166 +89,154 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		if(invoke)
 		{
 			// HACK!!! todo
-			space.getExternalAccess().searchService(new ServiceQuery<>(IComponentManagementService.class))
-				.addResultListener(new IResultListener<IComponentManagementService>()
+			IFuture<IExternalAccess> fut = space.getExternalAccess().getExternalAccess(agent.getName());
+			fut.addResultListener(new IResultListener<IExternalAccess>()
 			{
-				public void resultAvailable(IComponentManagementService result)
-				{
-					IFuture<IExternalAccess> fut = result.getExternalAccess(agent.getName());
-					fut.addResultListener(new IResultListener<IExternalAccess>()
-					{
-						public void exceptionOccurred(Exception exception)
-						{
-							// Happens when component already removed
-//							exception.printStackTrace();
-						}
-						public void resultAvailable(IExternalAccess result)
-						{
-							final IExternalAccess exta = (IExternalAccess)result;
-							
-							for(int i=0; i<metainfos.length; i++)
-							{
-								final IParsedExpression	cond	= metainfos[i].length==2 ? null
-									: (IParsedExpression)getProperty(metainfos[i][2]);
-								final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-								if(cond!=null)
-								{
-//									fetcher	= new SimpleValueFetcher();
-									fetcher.setValue("$space", space);
-									fetcher.setValue("$percept", percept);
-									fetcher.setValue("$avatar", avatar);
-									fetcher.setValue("$type", type);
-									fetcher.setValue("$aid", agent);
-									fetcher.setValue("$scope", exta);
-								}
-								final String name = metainfos[i][1];
-
-								if(ADD.equals(metainfos[i][0]))
-								{
-									exta.scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("add")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
-											Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
-											if(cond!=null)
-												fetcher.setValue("$facts", facts);
-											
-											if(!SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
-											{
-												bdif.getBeliefbase().getBeliefSet(name).addFact(percept);
-//												System.out.println("added: "+percept+" to: "+belset);
-											}
-											return IFuture.DONE;
-										}
-									});
-								}
-								else if(REMOVE.equals(metainfos[i][0]))
-								{
-									exta.scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("remove")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
-											Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
-											if(cond!=null)
-												fetcher.setValue("$facts", facts);
-											
-											if(SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
-											{
-												bdif.getBeliefbase().getBeliefSet(name).removeFact(percept);
-//												System.out.println("removed: "+percept+" from: "+belset);
-											}
-											return IFuture.DONE;
-										}
-									});
-								}
-								else if(SET.equals(metainfos[i][0]))
-								{
-									exta.scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("set")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
-											Object	fact	= bdif.getBeliefbase().getBelief(name).getFact();
-											if(cond!=null)
-												fetcher.setValue("$fact", fact);
-											
-											if(cond==null || evaluate(cond, fetcher))
-											{
-												bdif.getBeliefbase().getBelief(name).setFact(percept);
-//												System.out.println("set: "+percept+" on: "+belset);
-											}
-											return IFuture.DONE;
-										}
-									});
-								}
-								else if(UNSET.equals(metainfos[i][0]))
-								{
-									exta.scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("unset")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
-											Object	fact	= bdif.getBeliefbase().getBelief(name).getFact();
-											if(cond!=null)
-												fetcher.setValue("$fact", fact);
-											
-											if(cond==null || evaluate(cond, fetcher))
-											{
-												bdif.getBeliefbase().getBelief(name).setFact(null);
-//												System.out.println("unset: "+percept+" on: "+belset);
-											}
-											return IFuture.DONE;
-										}
-									});
-								}
-								else if(REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar))
-								{
-									exta.scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("removeoutdated")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
-											Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
-											if(cond!=null)
-												fetcher.setValue("$facts", facts);
-											
-											if(cond==null || evaluate(cond, fetcher))
-											{
-												IVector1 vision	= getRange(avatar);
-												Space2D	space2d	= (Space2D)space;
-												IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
-												ISpaceObject[]	known	= (ISpaceObject[])facts;
-												Set	seen = space2d.getNearObjects(mypos, vision);
-												for(int j=0; j<known.length; j++)
-												{
-													IVector2	knownpos	= (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION);
-													// Hack!!! Shouldn't react to knownpos==null
-													if(!seen.contains(known[j]) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
-													{
-//														System.out.println("Removing disappeared object: "+percept+", "+known[j]);
-														bdif.getBeliefbase().getBeliefSet(name).removeFact(known[j]);
-													}
-												}
-											}
-											return IFuture.DONE;
-										}
-									});
-								}
-							}
-						}
-					});
-				}
-				
 				public void exceptionOccurred(Exception exception)
 				{
-					exception.printStackTrace();
+					// Happens when component already removed
+//							exception.printStackTrace();
+				}
+				public void resultAvailable(IExternalAccess result)
+				{
+					final IExternalAccess exta = (IExternalAccess)result;
+					
+					for(int i=0; i<metainfos.length; i++)
+					{
+						final IParsedExpression	cond	= metainfos[i].length==2 ? null
+							: (IParsedExpression)getProperty(metainfos[i][2]);
+						final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+						if(cond!=null)
+						{
+//									fetcher	= new SimpleValueFetcher();
+							fetcher.setValue("$space", space);
+							fetcher.setValue("$percept", percept);
+							fetcher.setValue("$avatar", avatar);
+							fetcher.setValue("$type", type);
+							fetcher.setValue("$aid", agent);
+							fetcher.setValue("$scope", exta);
+						}
+						final String name = metainfos[i][1];
+
+						if(ADD.equals(metainfos[i][0]))
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("add")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
+									Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
+									if(cond!=null)
+										fetcher.setValue("$facts", facts);
+									
+									if(!SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
+									{
+										bdif.getBeliefbase().getBeliefSet(name).addFact(percept);
+//												System.out.println("added: "+percept+" to: "+belset);
+									}
+									return IFuture.DONE;
+								}
+							});
+						}
+						else if(REMOVE.equals(metainfos[i][0]))
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("remove")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
+									Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
+									if(cond!=null)
+										fetcher.setValue("$facts", facts);
+									
+									if(SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
+									{
+										bdif.getBeliefbase().getBeliefSet(name).removeFact(percept);
+//												System.out.println("removed: "+percept+" from: "+belset);
+									}
+									return IFuture.DONE;
+								}
+							});
+						}
+						else if(SET.equals(metainfos[i][0]))
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("set")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
+									Object	fact	= bdif.getBeliefbase().getBelief(name).getFact();
+									if(cond!=null)
+										fetcher.setValue("$fact", fact);
+									
+									if(cond==null || evaluate(cond, fetcher))
+									{
+										bdif.getBeliefbase().getBelief(name).setFact(percept);
+//												System.out.println("set: "+percept+" on: "+belset);
+									}
+									return IFuture.DONE;
+								}
+							});
+						}
+						else if(UNSET.equals(metainfos[i][0]))
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("unset")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
+									Object	fact	= bdif.getBeliefbase().getBelief(name).getFact();
+									if(cond!=null)
+										fetcher.setValue("$fact", fact);
+									
+									if(cond==null || evaluate(cond, fetcher))
+									{
+										bdif.getBeliefbase().getBelief(name).setFact(null);
+//												System.out.println("unset: "+percept+" on: "+belset);
+									}
+									return IFuture.DONE;
+								}
+							});
+						}
+						else if(REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar))
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("removeoutdated")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
+									Object[]	facts	= bdif.getBeliefbase().getBeliefSet(name).getFacts();
+									if(cond!=null)
+										fetcher.setValue("$facts", facts);
+									
+									if(cond==null || evaluate(cond, fetcher))
+									{
+										IVector1 vision	= getRange(avatar);
+										Space2D	space2d	= (Space2D)space;
+										IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
+										ISpaceObject[]	known	= (ISpaceObject[])facts;
+										Set	seen = space2d.getNearObjects(mypos, vision);
+										for(int j=0; j<known.length; j++)
+										{
+											IVector2	knownpos	= (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION);
+											// Hack!!! Shouldn't react to knownpos==null
+											if(!seen.contains(known[j]) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
+											{
+//														System.out.println("Removing disappeared object: "+percept+", "+known[j]);
+												bdif.getBeliefbase().getBeliefSet(name).removeFact(known[j]);
+											}
+										}
+									}
+									return IFuture.DONE;
+								}
+							});
+						}
+					}
 				}
 			});
 		}

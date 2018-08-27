@@ -35,7 +35,6 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreePath;
 
-import jadex.base.SRemoteGui;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ObjectInspectorPanel;
 import jadex.base.gui.PropertyUpdateHandler;
@@ -58,10 +57,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.ICommand;
@@ -164,7 +162,7 @@ public class ComponentTreePanel extends JSplitPane
 	protected final JTree	tree;
 	
 	/** The component management service. */
-	protected IComponentManagementService	cms;
+//	protected IComponentManagementService	cms;
 
 	/** The actions. */
 	protected Map actions;
@@ -244,38 +242,36 @@ public class ComponentTreePanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if(cms!=null)
+				final TreePath[] paths	= tree.getSelectionPaths();
+				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					final TreePath[] paths	= tree.getSelectionPaths();
-					for(int i=0; paths!=null && i<paths.length; i++)
+					// note: cannot use getComponentIdenfier() due to proxy components return their remote cid
+	//						final IActiveComponentTreeNode sel = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
+					final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
+	//						final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
+					access.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 					{
-						// note: cannot use getComponentIdenfier() due to proxy components return their remote cid
-//						final IActiveComponentTreeNode sel = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-//						final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
-						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+						public void customResultAvailable(Object result)
 						{
-							public void customResultAvailable(Object result)
+							access.killComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+	//								cms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 							{
-								cms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+								public void customResultAvailable(Object result)
 								{
-									public void customResultAvailable(Object result)
-									{
-										// Done by CMS listener?
-//										if(sel.getParent()!=null)
-//										{
-//											((AbstractSwingTreeNode)sel.getParent()).removeChild(sel);
-//										}
-									}
-									
-									public void customExceptionOccurred(Exception exception)
-									{
-										super.customExceptionOccurred(new RuntimeException("Could not kill component: "+cid, exception));
-									}
-								});
-							}
-						});
-					}
+									// Done by CMS listener?
+	//								if(sel.getParent()!=null)
+	//								{
+	//									((AbstractSwingTreeNode)sel.getParent()).removeChild(sel);
+	//								}
+								}
+								
+								public void customExceptionOccurred(Exception exception)
+								{
+									super.customExceptionOccurred(new RuntimeException("Could not kill component: "+cid, exception));
+								}
+							});
+						}
+					});
 				}
 			}
 		};
@@ -285,32 +281,29 @@ public class ComponentTreePanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if(cms!=null)
+				TreePath[]	paths	= tree.getSelectionPaths();
+				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					TreePath[]	paths	= tree.getSelectionPaths();
-					for(int i=0; paths!=null && i<paths.length; i++)
+					final ProxyComponentTreeNode sel = (ProxyComponentTreeNode)paths[i].getLastPathComponent();
+					
+					sel.getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 					{
-						final ProxyComponentTreeNode sel = (ProxyComponentTreeNode)paths[i].getLastPathComponent();
-						
-						sel.getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+						public void customResultAvailable(Object result)
 						{
-							public void customResultAvailable(Object result)
+							final IComponentIdentifier cid = (IComponentIdentifier)result;
+							
+							killComponent(access, cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 							{
-								final IComponentIdentifier cid = (IComponentIdentifier)result;
-								
-								killComponent(access, cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+								public void	customResultAvailable(Object o)
 								{
-									public void	customResultAvailable(Object o)
+									if(sel.getParent()!=null)
 									{
-										if(sel.getParent()!=null)
-										{
-											((AbstractSwingTreeNode)sel.getParent()).removeChild(sel);
-										}										
-									}
-								});
-							}
-						});
-					}
+										((AbstractSwingTreeNode)sel.getParent()).removeChild(sel);
+									}										
+								}
+							});
+						}
+					});
 				}
 			}
 		};
@@ -320,22 +313,19 @@ public class ComponentTreePanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if(cms!=null)
+				TreePath[]	paths	= tree.getSelectionPaths();
+				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					TreePath[]	paths	= tree.getSelectionPaths();
-					for(int i=0; paths!=null && i<paths.length; i++)
+					final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
+					final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
+					access.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 					{
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-						final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
-						cms.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+						public void customResultAvailable(Object result)
 						{
-							public void customResultAvailable(Object result)
-							{
-								// Required for remote nodes.
-								sel.refresh(false);
-							}
-						});
-					}
+							// Required for remote nodes.
+							sel.refresh(false);
+						}
+					});
 				}
 			}
 		};
@@ -346,22 +336,19 @@ public class ComponentTreePanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if(cms!=null)
+				TreePath[]	paths	= tree.getSelectionPaths();
+				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					TreePath[]	paths	= tree.getSelectionPaths();
-					for(int i=0; paths!=null && i<paths.length; i++)
+					final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
+					final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
+					access.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 					{
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-						final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
-						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+						public void customResultAvailable(Object result)
 						{
-							public void customResultAvailable(Object result)
-							{
-								// Required for remote nodes.
-								sel.refresh(false);
-							}
-						});
-					}
+							// Required for remote nodes.
+							sel.refresh(false);
+						}
+					});
 				}
 			}
 		};
@@ -371,23 +358,20 @@ public class ComponentTreePanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if(cms!=null)
+				TreePath[]	paths	= tree.getSelectionPaths();
+				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					TreePath[]	paths	= tree.getSelectionPaths();
-					for(int i=0; paths!=null && i<paths.length; i++)
-					{
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
+					final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 
-						final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
-						cms.stepComponent(cid, null).addResultListener(new SwingDefaultResultListener<Void>(ComponentTreePanel.this)
+					final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
+					access.stepComponent(cid, null).addResultListener(new SwingDefaultResultListener<Void>(ComponentTreePanel.this)
+					{
+						public void customResultAvailable(Void result)
 						{
-							public void customResultAvailable(Void result)
-							{
-								// Required for remote nodes.
-								sel.refresh(false);
-							}
-						});
-					}
+							// Required for remote nodes.
+							sel.refresh(false);
+						}
+					});
 				}
 			}
 		};
@@ -432,27 +416,28 @@ public class ComponentTreePanel extends JSplitPane
 		};
 		actions.put(showprops.getValue(Action.NAME), showprops);
 
-		final Action removeservice = new AbstractAction(REMOVESERVICE_ACTION, icons.getIcon("show_properties"))
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				TreePath path = tree.getSelectionPath();
-				if(path!=null)
-				{
-					final ServiceContainerNode scn = (ServiceContainerNode)path.getPathComponent(path.getPathCount()-2);
-					final ProvidedServiceInfoNode sn = (ProvidedServiceInfoNode)path.getLastPathComponent();
-					SRemoteGui.removeService(cms, scn.getContainer(), sn.getServiceIdentifier())
-						.addResultListener(new SwingDefaultResultListener<Void>(proppanel)
-					{
-						public void customResultAvailable(Void result)
-						{
-							scn.removeChild(sn);
-						}
-					});
-				}
-			}
-		};
-		actions.put(removeservice.getValue(Action.NAME), removeservice);
+//		final Action removeservice = new AbstractAction(REMOVESERVICE_ACTION, icons.getIcon("show_properties"))
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				TreePath path = tree.getSelectionPath();
+//				if(path!=null)
+//				{
+//					final ServiceContainerNode scn = (ServiceContainerNode)path.getPathComponent(path.getPathCount()-2);
+//					final ProvidedServiceInfoNode sn = (ProvidedServiceInfoNode)path.getLastPathComponent();
+//					
+//					SRemoteGui.removeService(cms, scn.getContainer(), sn.getServiceIdentifier())
+//						.addResultListener(new SwingDefaultResultListener<Void>(proppanel)
+//					{
+//						public void customResultAvailable(Void result)
+//						{
+//							scn.removeChild(sn);
+//						}
+//					});
+//				}
+//			}
+//		};
+//		actions.put(removeservice.getValue(Action.NAME), removeservice);
 
 		final Action showobject = new AbstractAction(SHOWDETAILS_ACTION, icons.getIcon("show_details"))
 		{
@@ -480,7 +465,7 @@ public class ComponentTreePanel extends JSplitPane
 					{
 						//IComponentDescription desc = ((IActiveComponentTreeNode)node).getDescription();
 						IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getDescription().getName();
-						cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>((Component)null)
+						access.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>((Component)null)
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
@@ -925,38 +910,36 @@ public class ComponentTreePanel extends JSplitPane
 			}
 		});
 
-		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new DefaultResultListener<IComponentManagementService>()
-		{
-			public void resultAvailable(IComponentManagementService result)
-			{
-				cms	= result;
 				
-				// Hack!!! How to find root node?
-				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener()
+		access.scheduleStep(new IComponentStep<IComponentDescription[]>()
+		{
+			@Override
+			public IFuture<IComponentDescription[]> execute(IInternalAccess ia)
+			{
+				return SComponentManagementService.getComponentDescriptions(ia);
+			}
+		}).addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object result)
+			{
+				IComponentDescription[]	descriptions = (IComponentDescription[])result;
+				if(descriptions.length!=0)
 				{
-					public void customResultAvailable(Object result)
+					IComponentDescription	root	= null;
+					for(int i=0; root==null && i<descriptions.length; i++)
 					{
-						IComponentDescription[]	descriptions	= (IComponentDescription[])result;
-						if(descriptions.length!=0)
+						if(descriptions[i].getName().getParent()==null)
 						{
-							IComponentDescription	root	= null;
-							for(int i=0; root==null && i<descriptions.length; i++)
-							{
-								if(descriptions[i].getName().getParent()==null)
-								{
-									root	= descriptions[i];
-								}
-							}
-							if(root==null)
-								throw new RuntimeException("No root node found: "+SUtil.arrayToString(descriptions));
-							model.setRoot(new PlatformTreeNode(null, model, tree, root, cms, cic, access));
-							// Expand root node.
-							TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
-							teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));
+							root	= descriptions[i];
 						}
 					}
-				});
+					if(root==null)
+						throw new RuntimeException("No root node found: "+SUtil.arrayToString(descriptions));
+					model.setRoot(new PlatformTreeNode(null, model, tree, root, cic, access));
+					// Expand root node.
+					TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
+					teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));
+				}
 			}
 		});
 		
@@ -1149,53 +1132,46 @@ public class ComponentTreePanel extends JSplitPane
 				final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 				final IComponentIdentifier cid = node.getComponentIdentifier();
 				
-				jcc.getJCCAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, JComponent>(ret)
+				jcc.getJCCAccess().getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, JComponent>(ret)
 				{
-					public void customResultAvailable(final IComponentManagementService cms)
+					public void customResultAvailable(final IExternalAccess exta)
 					{
-						cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, JComponent>(ret)
+						AbstractJCCPlugin.getClassLoader(cid, jcc)
+							.addResultListener(new SwingDefaultResultListener<ClassLoader>()
 						{
-							public void customResultAvailable(final IExternalAccess exta)
+							public void customResultAvailable(ClassLoader cl)
 							{
-								AbstractJCCPlugin.getClassLoader(cid, jcc)
-									.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+								Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+								
+								if(clid instanceof String)
 								{
-									public void customResultAvailable(ClassLoader cl)
+									clid = SReflect.classForName0((String)clid, cl);
+								}
+								
+								try
+								{
+									final IComponentViewerPanel panel = (IComponentViewerPanel)((Class)clid).newInstance();
+									panel.init(jcc, exta).addResultListener(new ExceptionDelegationResultListener<Void, JComponent>(ret)
 									{
-										Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-										
-										if(clid instanceof String)
+										public void customResultAvailable(Void result)
 										{
-											clid = SReflect.classForName0((String)clid, cl);
+//													Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+//													if(sub!=null)
+//														panel.setProperties(sub);
+											JComponent comp = panel.getComponent();
+											ret.setResult(comp);
+											// todo: help
+											//SHelp.setupHelp(comp, getHelpID());
+//													panels.put(exta.getComponentIdentifier(), panel);
+//													detail.add(comp, exta.getComponentIdentifier());
+//													comptree.getModel().fireNodeChanged(node);
 										}
-										
-										try
-										{
-											final IComponentViewerPanel panel = (IComponentViewerPanel)((Class)clid).newInstance();
-											panel.init(jcc, exta).addResultListener(new ExceptionDelegationResultListener<Void, JComponent>(ret)
-											{
-												public void customResultAvailable(Void result)
-												{
-	//													Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
-	//													if(sub!=null)
-	//														panel.setProperties(sub);
-													JComponent comp = panel.getComponent();
-													ret.setResult(comp);
-													// todo: help
-													//SHelp.setupHelp(comp, getHelpID());
-	//													panels.put(exta.getComponentIdentifier(), panel);
-	//													detail.add(comp, exta.getComponentIdentifier());
-	//													comptree.getModel().fireNodeChanged(node);
-												}
-											});
-										}
-										catch(Exception e)
-										{
-											ret.setException(e);
-										}
-									}
-								});
+									});
+								}
+								catch(Exception e)
+								{
+									ret.setException(e);
+								}
 							}
 						});
 					}
@@ -1270,36 +1246,28 @@ public class ComponentTreePanel extends JSplitPane
 				else
 				{
 					// Unknown -> start search to find out asynchronously
-					IFuture<IComponentManagementService> fut = jcc.getJCCAccess().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-					fut.addResultListener(new DefaultResultListener<IComponentManagementService>()
-					{
-						public void resultAvailable(IComponentManagementService result)
-						{
-							final IComponentManagementService cms = (IComponentManagementService)result;
 							
-							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+					jcc.getJCCAccess().getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+					{
+						public void resultAvailable(final IExternalAccess exta)
+						{
+							jcc.getClassLoader(exta.getModel().getResourceIdentifier())
+								.addResultListener(new SwingDefaultResultListener<ClassLoader>()
 							{
-								public void resultAvailable(final IExternalAccess exta)
+								public void customResultAvailable(ClassLoader cl)
 								{
-									jcc.getClassLoader(exta.getModel().getResourceIdentifier())
-										.addResultListener(new SwingDefaultResultListener<ClassLoader>()
-									{
-										public void customResultAvailable(ClassLoader cl)
-										{
-											final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-											viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
-//											System.out.println("isVis first res: "+viewables.get(cid));
-											node.refresh(false);
-										}										
-									});
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									// Happens e.g. when remote classes not locally available.
-//									exception.printStackTrace();
-								}
+									final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+									viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
+//									System.out.println("isVis first res: "+viewables.get(cid));
+									node.refresh(false);
+								}										
 							});
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// Happens e.g. when remote classes not locally available.
+//									exception.printStackTrace();
 						}
 					});
 				}
@@ -1315,19 +1283,13 @@ public class ComponentTreePanel extends JSplitPane
 	protected static IFuture<Void>	killComponent(IExternalAccess access, final IComponentIdentifier cid)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		access.killComponent(cid)
+//				cms.destroyComponent(cid)
+			.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(Map<String, Object> result)
 			{
-				cms.destroyComponent(cid)
-					.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
-				{
-					public void customResultAvailable(Map<String, Object> result)
-					{
-						ret.setResult(null);
-					}
-				});
+				ret.setResult(null);
 			}
 		});
 		return ret;

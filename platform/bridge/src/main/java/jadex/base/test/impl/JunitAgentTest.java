@@ -52,8 +52,6 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
      */
     public void setConfig(IPlatformConfiguration config) 
     {
-        if (cms == null) 
-            throw new IllegalStateException("Platform already started.");
         this.config = config;
     }
 
@@ -70,8 +68,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
     public void runBare() 
     {
         IExternalAccess platform = STest.createPlatform(getConfig());
-        cms = STest.getCMS(platform);
-        setPlatform(platform, cms);
+        setPlatform(platform);
         super.runBare();
         platform.killComponent();
     }

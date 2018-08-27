@@ -8,7 +8,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.ServiceInvalidException;
@@ -16,7 +16,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -25,10 +24,8 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.servicecall.DecoupledServiceAgent;
@@ -41,7 +38,6 @@ import jadex.micro.testcases.servicecall.RawServiceAgent;
  */
 @Description("A test case for testing access to services of already terminated components.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, scope=RequiredService.SCOPE_PLATFORM))
 @Agent
 public class RemovedServiceAgent extends JunitAgentTest
 {
@@ -50,8 +46,8 @@ public class RemovedServiceAgent extends JunitAgentTest
 	protected IInternalAccess	agent;
 	
 	/** The cms service. */
-	@AgentServiceSearch
-	protected IComponentManagementService	cms;
+//	@AgentServiceSearch
+//	protected IComponentManagementService	cms;
 	
 	/** The test counter. */
 	protected int cnt;
@@ -116,10 +112,10 @@ public class RemovedServiceAgent extends JunitAgentTest
 		final IntermediateFuture<TestReport>	testfut	= new IntermediateFuture<TestReport>();
 		
 		// Create agent to call service on.
-		cms.createComponent(null, agentname, new CreationInfo(agent.getId()), null)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(testfut)
+		agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(agentname), null)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(testfut)
 		{
-			public void customResultAvailable(final IComponentIdentifier cid)
+			public void customResultAvailable(final IExternalAccess exta)
 			{
 				// Get service reference of created agent.
 				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, RequiredService.SCOPE_PLATFORM))
@@ -136,7 +132,7 @@ public class RemovedServiceAgent extends JunitAgentTest
 								tr1.setSucceeded(true);
 								
 								// Now kill the agent.
-								cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Collection<TestReport>>(testfut)
+								agent.killComponent(exta.getId()).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Collection<TestReport>>(testfut)
 								{
 									public void customResultAvailable(Map<String, Object> result)
 									{
