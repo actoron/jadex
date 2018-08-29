@@ -314,7 +314,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ret.setExceptionIfUndone(new TimeoutException("Timeout occured by " + component.getId().toString() + " while sending message to " + rplat));
+				// Check first to avoid creating an exception.
+				if (!ret.isDone())
+					ret.setExceptionIfUndone(new TimeoutException("Timeout occured by " + component.getId().toString() + " while sending message to " + rplat));
 				return IFuture.DONE;
 			}
 		}, true);
