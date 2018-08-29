@@ -16,11 +16,14 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.service.component.ComponentFutureFunctionality;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -30,12 +33,15 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
+import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.TupleResult;
 
 /**
@@ -305,7 +311,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 		}
 		
-		return killfut;
+		return getDecoupledFuture(killfut);
 	}
 	
 	
@@ -361,7 +367,7 @@ public class ExternalAccess implements IExternalAccess
 			ia.getChildren(type, parent).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
 		}
 		
-		return ret;
+		return getDecoupledFuture(ret);
 	}
 	
 //	/**
@@ -469,7 +475,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 		}
 		
-		return ret;
+		return getDecoupledFuture(ret);
 	}
 	
 	/**
@@ -500,7 +506,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
-		return ia.getFeature(IExecutionFeature.class).scheduleStep(step);
+		return getDecoupledFuture(ia.getFeature(IExecutionFeature.class).scheduleStep(step));
 	}
 	
 	/**
@@ -511,7 +517,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T> IFuture<T> scheduleStep(int priority, IComponentStep<T> step)
 	{
-		return ia.getFeature(IExecutionFeature.class).scheduleStep(priority, step);
+		return getDecoupledFuture(ia.getFeature(IExecutionFeature.class).scheduleStep(priority, step));
 	}
 	
 	/**
@@ -519,7 +525,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step, boolean realtime)
 	{
-		return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, step, realtime);
+		return getDecoupledFuture(ia.getFeature(IExecutionFeature.class).waitForDelay(delay, step, realtime));
 
 	}
 
@@ -528,7 +534,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step)
 	{
-		return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, step);
+		return getDecoupledFuture(ia.getFeature(IExecutionFeature.class).waitForDelay(delay, step));
 	}
 	
 	// todo: move to external feature!?
@@ -584,7 +590,7 @@ public class ExternalAccess implements IExternalAccess
 			fut.addResultListener(lis);
 		}
 		
-		return ret;
+		return getDecoupledSubscriptionFuture(ret);
 	}
 	
 	// todo: move to external feature!?
@@ -633,7 +639,7 @@ public class ExternalAccess implements IExternalAccess
 			fut.addResultListener(lis);
 		}
 		
-		return ret;
+		return getDecoupledSubscriptionFuture(ret);
 	}
 
 	/**
@@ -677,7 +683,7 @@ public class ExternalAccess implements IExternalAccess
 			ret.setResult(ia.getFeature(IArgumentsResultsFeature.class).getArguments());
 		}
 		
-		return ret;
+		return getDecoupledFuture(ret);
 	}
 	
 	/**
@@ -723,7 +729,7 @@ public class ExternalAccess implements IExternalAccess
 			ret.setResult(ia.getFeature(IArgumentsResultsFeature.class).getResults());
 		}
 		
-		return ret;
+		return getDecoupledFuture(ret);
 	}
 	
 	/**
@@ -1462,7 +1468,8 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info)
 	{
-		return (ITuple2Future<IComponentIdentifier, Map<String, Object>>)scheduleStep(new IComponentStep<Collection<TupleResult>>()
+		@SuppressWarnings("unchecked")
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> ret = (ITuple2Future<IComponentIdentifier, Map<String, Object>>)scheduleStep(new IComponentStep<Collection<TupleResult>>()
 		{
 			@Override
 			public ITuple2Future<IComponentIdentifier, Map<String, Object>> execute(IInternalAccess ia)
@@ -1470,6 +1477,7 @@ public class ExternalAccess implements IExternalAccess
 				return ia.createComponent(component, info);
 			}
 		});
+		return ret;
 	}
 	
 	/**
@@ -1640,5 +1648,30 @@ public class ExternalAccess implements IExternalAccess
 		});
 	}
 
-
+	/**
+	 *  Returns a future that schedules back to calling component if necessary..
+	 *  @param infut Input future.
+	 *  @return 
+	 */
+	protected <T> IFuture<T> getDecoupledFuture(IFuture<T> infut)
+	{
+		IFuture<T> ret = infut;
+		IInternalAccess caller = IInternalExecutionFeature.LOCAL.get();
+		if (caller != null)
+		{
+			IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller));
+			ret = newret;
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Returns a future that schedules back to calling component if necessary..
+	 *  @param infut Input future.
+	 *  @return 
+	 */
+	protected <T> ISubscriptionIntermediateFuture<T> getDecoupledSubscriptionFuture(final ISubscriptionIntermediateFuture<T> infut)
+	{
+		return (ISubscriptionIntermediateFuture<T>) getDecoupledFuture(infut);
+	}
 }
