@@ -27,6 +27,7 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -1656,7 +1657,38 @@ public class ExternalAccess implements IExternalAccess
 		IInternalAccess caller = IInternalExecutionFeature.LOCAL.get();
 		if (caller != null && !ia.equals(caller))
 		{
-			IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller));
+			IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller)
+			{
+				public void scheduleBackward(ICommand<Void> command)
+				{
+					if(!ia.getFeature(IExecutionFeature.class).isComponentThread())
+					{
+						ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess intaccess)
+							{
+								command.execute(null);
+								return IFuture.DONE;
+							}
+						}).addResultListener(new IResultListener<Void>()
+						{
+							public void exceptionOccurred(Exception exception)
+							{
+								System.err.println("Unexpected Exception: "+command);
+								exception.printStackTrace();
+							}
+							
+							public void resultAvailable(Void result)
+							{
+							}
+						});
+					}
+					else
+					{
+						command.execute(null);
+					}
+				}
+			});
 			ret = newret;
 		}
 		return ret;
