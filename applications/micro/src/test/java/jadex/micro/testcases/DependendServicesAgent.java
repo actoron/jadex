@@ -110,9 +110,9 @@ public class DependendServicesAgent extends JunitAgentTest
                             {
                                 public void resultAvailable(Map<String, Object> res)
                                 {
-                                  System.out.println("del: "+child.getId()+" "+res);
-//                                    Map res = (Map)result;
-                                    List<TestReport> tests = (List<TestReport>)res.get("testcases");
+                                	System.out.println("del: "+child.getId()+" "+res);
+                                    @SuppressWarnings("unchecked")
+									List<TestReport> tests = (List<TestReport>)res.get("testcases");
                                     lis.resultAvailable(tests);
                                 }
                                 public void exceptionOccurred(Exception exception)

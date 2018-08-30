@@ -698,18 +698,14 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else if(isExternalThread())
 		{
-			try
+			ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
-				ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						ret.setResult(ia.getFeature(IArgumentsResultsFeature.class).getResults());
-						return IFuture.DONE;
-					}
-				});
-			}
-			catch(final Exception e)
+					ret.setResult(ia.getFeature(IArgumentsResultsFeature.class).getResults());
+					return IFuture.DONE;
+				}
+			}).addResultListener(null,	exception ->
 			{
 				Starter.scheduleRescueStep(cid, new Runnable()
 				{
@@ -717,10 +713,9 @@ public class ExternalAccess implements IExternalAccess
 					{
 						// Should be possible to get the results even if component is already terminated?!
 						ret.setResult(ia.getFeature(IArgumentsResultsFeature.class).getResults());
-//						ret.setException(e);
 					}
 				});
-			}
+			});
 		}
 		else
 		{

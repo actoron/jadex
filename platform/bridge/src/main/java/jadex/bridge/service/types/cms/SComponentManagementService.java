@@ -2894,7 +2894,7 @@ public class SComponentManagementService
 		if(comp==null)
 			throw new ComponentNotFoundException("Component Identifier not registered: "+cid);
 		
-//		comp.getLogger().info("Terminated component: "+cid.getName());
+		comp.getInternalAccess().getLogger().info("Terminated component: "+cid.getName());
 		
 		desc = (CMSComponentDescription)comp.getInternalAccess().getDescription();
 		
