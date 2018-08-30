@@ -1654,7 +1654,7 @@ public class ExternalAccess implements IExternalAccess
 		{
 			// Not checking if remote platform since the check for simulation mode in addSimulationBlocker() is cheaper
 			// and the more common case it being false.
-			((IInternalExecutionFeature) ia.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
+			((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
 			
 			IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller)
 			{
