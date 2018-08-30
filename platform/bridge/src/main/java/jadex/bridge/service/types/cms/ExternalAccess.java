@@ -1652,6 +1652,10 @@ public class ExternalAccess implements IExternalAccess
 		IInternalAccess caller = IInternalExecutionFeature.LOCAL.get();
 		if (caller != null && !ia.equals(caller))
 		{
+			// Not checking if remote platform since the check for simulation mode in addSimulationBlocker() is cheaper
+			// and the more common case it being false.
+			((IInternalExecutionFeature) ia.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
+			
 			IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller)
 			{
 				public void scheduleBackward(ICommand<Void> command)
@@ -1687,7 +1691,7 @@ public class ExternalAccess implements IExternalAccess
 			ret = newret;
 		}
 		
-		((IInternalExecutionFeature) ia.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
+		
 		
 		return ret;
 	}
