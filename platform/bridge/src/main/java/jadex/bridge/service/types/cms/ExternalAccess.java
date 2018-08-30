@@ -25,6 +25,7 @@ import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.ICommand;
@@ -1652,9 +1653,10 @@ public class ExternalAccess implements IExternalAccess
 		IInternalAccess caller = IInternalExecutionFeature.LOCAL.get();
 		if (caller != null && !ia.equals(caller))
 		{
-			// Not checking if remote platform since the check for simulation mode in addSimulationBlocker() is cheaper
-			// and the more common case it being false.
-			((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
+			IComponentIdentifier callerplat = caller.getId().getRoot();
+			Boolean issim = (Boolean) Starter.getPlatformValue(callerplat, IClockService.SIMULATION_CLOCK_FLAG);
+			if (Boolean.TRUE.equals(issim) && !callerplat.equals(ia.getId().getRoot()))
+				((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
 			
 			IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller)
 			{
