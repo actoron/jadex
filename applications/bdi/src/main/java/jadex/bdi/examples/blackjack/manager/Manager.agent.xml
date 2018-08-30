@@ -92,13 +92,7 @@
 			<match>$content instanceof String &amp;&amp; ((String)$content).startsWith("playerPlaying")</match>
 		</messageevent>
 	</events>
-	
-	<services>
-		<requiredservice name="cms" class="IComponentManagementService">
-			<binding scope="platform"/>
-		</requiredservice>
-	</services>
-	
+		
 	<!-- 
 	     logging-properties, needed to debug the application.
 	     Start the Jadex-Logging-Agent to see whats going on behind
