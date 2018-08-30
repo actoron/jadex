@@ -204,7 +204,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	protected void doCleanup(Error e)
 	{
-//		System.out.println("shutdown end: "+getComponent().getComponentIdentifier());
+//		System.err.println("shutdown end: "+getComponent().getDescription()+", "+steps.size());
 		
 		// Should not wake up all blocked threads at the same time?!
 		// Could theoretically catch the threaddeath and do sth what is not guarded against concurrent access
@@ -266,7 +266,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		synchronized(this)
 		{
 			// Todo: synchronize with last step!
-			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
+//			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
+			if(endagenda.isDone())
 			{
 				ret.setException(new ComponentTerminatedException(getComponent().getId()));
 			}
@@ -783,7 +784,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public boolean isComponentThread()
 	{
 		return Thread.currentThread()==getComponentThread() || 
-			IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState())
+//			IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState())
+			endagenda.isDone()
 				&& Starter.isRescueThread(getComponent().getId());
 	}
 	
@@ -909,7 +911,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				wakeup();
 				exe.blockThread(monitor);
 				// Todo: wait for blocked threads to be resumed before terminating component
-				if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
+//				if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
+				if(endagenda.isDone())
 				{
 					throw new ThreadDeath();
 				}
@@ -929,7 +932,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				unblocked[0]	= true;
 				
 				// Todo: should also work for thread death (i.e. blocked threads terminated before component is gone).
-				assert threaddeath || !IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState());
+				assert threaddeath || !endagenda.isDone();
 				
 				synchronized(this)
 				{
@@ -1299,6 +1302,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					// Todo: plan for other uses of step aborted= -> step terminated exception in addition to step aborted error?
 					ex	= new ComponentTerminatedException(component.getId());
+					System.err.println(component.getId()+": step after termination: "+step);
 				}
 				else if(ex instanceof ThreadDeath)
 				{
