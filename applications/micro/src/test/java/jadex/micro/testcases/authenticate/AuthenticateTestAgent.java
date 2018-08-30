@@ -121,6 +121,8 @@ public class AuthenticateTestAgent extends TestAgent
 	 */
 	protected	IFuture<IExternalAccess> setupTestPlatform(boolean def, final boolean cus)
 	{
+		disableLocalSimulationMode().get();
+		
 		IPlatformConfiguration	conf	= STest.getDefaultTestConfig();
 		// use different platform name / key etc.
 		conf.setPlatformName("other_*");
