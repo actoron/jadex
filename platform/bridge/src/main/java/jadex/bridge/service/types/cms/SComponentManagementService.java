@@ -2791,8 +2791,10 @@ public class SComponentManagementService
 	 */
 	public static ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(String name, final String model, CreationInfo info, IInternalAccess agent)
 	{
-//		final Tuple2Future<IComponentIdentifier, Map<String, Object>> ret = new Tuple2Future<IComponentIdentifier, Map<String,Object>>();
-		final Tuple2Future<IComponentIdentifier, Map<String, Object>> ret = (Tuple2Future<IComponentIdentifier, Map<String,Object>>)SFuture.getNoTimeoutFuture(Tuple2Future.class, agent);
+		// No timeout is issued since this is not a service call. NoTimeoutFuture causes 100% CPU in
+		// simulation mode if the platform is idle.
+		final Tuple2Future<IComponentIdentifier, Map<String, Object>> ret = new Tuple2Future<IComponentIdentifier, Map<String,Object>>();
+//		final Tuple2Future<IComponentIdentifier, Map<String, Object>> ret = (Tuple2Future<IComponentIdentifier, Map<String,Object>>)SFuture.getNoTimeoutFuture(Tuple2Future.class, agent);
 		createComponent(name, model, info, new IResultListener<Collection<Tuple2<String,Object>>>()
 		{
 			public void resultAvailable(Collection<jadex.commons.Tuple2<String,Object>> result) 
