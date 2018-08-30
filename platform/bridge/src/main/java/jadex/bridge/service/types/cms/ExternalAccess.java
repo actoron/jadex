@@ -33,15 +33,12 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
-import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.TupleResult;
 
 /**
@@ -1657,7 +1654,7 @@ public class ExternalAccess implements IExternalAccess
 	{
 		IFuture<T> ret = infut;
 		IInternalAccess caller = IInternalExecutionFeature.LOCAL.get();
-		if (caller != null)
+		if (caller != null && !ia.equals(caller))
 		{
 			IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller));
 			ret = newret;
