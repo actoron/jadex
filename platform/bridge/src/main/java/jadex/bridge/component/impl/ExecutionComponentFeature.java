@@ -269,14 +269,26 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		synchronized(this)
 		{
 			// Todo: synchronize with last step!
+//			int prio2 = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
 //			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
-			if(endagenda.isDone())
+			if(endagenda.isDone())// || (STEP_PRIORITY_IMMEDIATE > prio2 && endstepcnt != -1))
 			{
 				ret.setException(new ComponentTerminatedException(getComponent().getId()));
 			}
 			else
 			{
 				int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
+				// Reject non-priority steps if we are already terminating.
+				// Otherwise this leads to a bad interaction with the monitoring:
+				// The step creation/dispose gets reported to the monitoring agent
+				// the return path then decouples onto the external access, which
+				// creates, schedule and aborts a step, creating two more create/dispose
+				// events to be reported etc...
+				if((STEP_PRIORITY_IMMEDIATE > prio && endstepcnt != -1))
+				{
+					ret.setException(new ComponentTerminatedException(getComponent().getId()));
+					return ret;
+				}
 				addStep(new StepInfo(step, ret, new ThreadLocalTransferHelper(true), prio, stepcnt++));
 				
 //				System.out.println("steps: "+steps);
@@ -1241,8 +1253,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				
 				// Prio steps are always ok?!
 				int endstart = ((IInternalExecutionFeature)getComponent().getFeature(IExecutionFeature.class)).getEndstateStart();
-				boolean stateok  = priostep || endstart==-1 || step.getStepCount()>=endstart;
-				
+				boolean stateok  = priostep || endstart==-1 || step.getStepCount()<=endstart;
+//				if (Math.random() < 0.01)
+//				{
+//					if (priostep)
+//						System.out.println(step.getStep());
+//					System.out.println("stateok " + component + " " + priostep + " " + (endstart==-1) + " " + (step.getStepCount()<= endstart) + " " + + step.getStepCount() + " " + endstart);
+//				}
 				// for test execution to ensure that not dropped steps cause problems
 //				stateok = true;
 				
