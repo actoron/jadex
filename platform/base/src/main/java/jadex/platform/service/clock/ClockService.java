@@ -327,6 +327,13 @@ public class ClockService extends BasicService implements IClockService, IProper
 //			{
 //				threadpool = result;
 				clock = createClock(cinfo, threadpool);
+				
+				// Hack!!! Unify with setClock()!?
+				if (clock instanceof ISimulationClock)
+					Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.TRUE);
+				else
+					Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
+
 				clock.start();
 				ClockService.super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 				{
