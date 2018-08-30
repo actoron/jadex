@@ -202,73 +202,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			ret.addResultListener(trl);
 		}
 		
-		
-		Boolean issim = (Boolean) Starter.getPlatformValue(component.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
-		if (Boolean.TRUE.equals(issim))
-		{
-			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
-			// there is no way of known how long to hold the clock.
-			if (!(ret instanceof IIntermediateFuture))
-			{
-				ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
-				if (simserv != null)
-				{
-					Future<Void> blocker = new Future<>();
-					simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-							ret.addResultListener(new IResultListener<T>()
-							{
-								public void resultAvailable(T result)
-								{
-									blocker.setResult(null);
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									resultAvailable(null);
-								}
-							});
-						}
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					});
-				}
-			}
-			
-//			Semaphore sem = new Semaphore(0);
-//			IExecutionService execserv = component.getFeature(IRequiredServicesFeature.class).getLocalService(IExecutionService.class);
-//			execserv.execute(new IExecutable()
-//			{
-//				public boolean execute()
-//				{
-//					boolean acquired = false;
-//					try
-//					{
-//						acquired = sem.tryAcquire(10, TimeUnit.MILLISECONDS);
-//					}
-//					catch (InterruptedException e)
-//					{
-//						e.printStackTrace();
-//					}
-//					return !acquired;
-//				}
-//			});
-//			ret.addResultListener(new IResultListener<T>()
-//			{
-//				public void resultAvailable(T result)
-//				{
-//					System.out.println("SEM RELEASE");
-//					sem.release();
-//				}
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					System.out.println("SEM RELEASE");
-//					sem.release();
-//				}
-//			});
-		}
+		((IInternalExecutionFeature) component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
 
 		if(outcommands==null)
 		{

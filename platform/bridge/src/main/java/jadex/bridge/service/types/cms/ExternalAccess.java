@@ -1686,6 +1686,9 @@ public class ExternalAccess implements IExternalAccess
 			});
 			ret = newret;
 		}
+		
+		((IInternalExecutionFeature) ia.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
+		
 		return ret;
 	}
 	
@@ -1698,4 +1701,6 @@ public class ExternalAccess implements IExternalAccess
 	{
 		return (ISubscriptionIntermediateFuture<T>) getDecoupledFuture(infut);
 	}
+	
+	
 }

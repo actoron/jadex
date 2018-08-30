@@ -45,6 +45,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -54,6 +55,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
@@ -69,6 +71,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -1897,6 +1900,61 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public int getEndstateStart()
 	{
 		return endstepcnt;
+	}
+	
+	/**
+	 *  Adds a simulation blocker for remote actions that have
+	 *  a definite end (i.e. regular futures), so remote calls
+	 *  work in simulation mode.
+	 *  
+	 *  Does not work for intermediates. Noop if simulation is
+	 *  disabled
+	 *  
+	 *  @param remotefuture The future of the remote action.
+	 */
+	public <T> void addSimulationBlocker(IFuture<T> remotefuture)
+	{
+		Boolean issim = (Boolean) Starter.getPlatformValue(component.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
+		if (Boolean.TRUE.equals(issim))
+		{
+			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
+			// there is no way of known how long to hold the clock.
+			if (!(remotefuture instanceof IIntermediateFuture))
+			{
+				component.scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
+						if (simserv != null)
+						{
+							Future<Void> blocker = new Future<>();
+							simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+									remotefuture.addResultListener(new IResultListener<T>()
+									{
+										public void resultAvailable(T result)
+										{
+											blocker.setResult(null);
+										}
+										public void exceptionOccurred(Exception exception)
+										{
+											resultAvailable(null);
+										}
+									});
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+								}
+							});
+						}
+						return IFuture.DONE;
+					}
+				});
+			}
+		}
 	}
 	
 	/**
