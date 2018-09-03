@@ -82,7 +82,7 @@ public class BPMNRecoveryTestAgent
 		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, ci);
 		IExternalAccess	exta = agent.getExternalAccess(fut.getFirstResult()).get();
 		ISubscriptionIntermediateFuture<Tuple2<String, Object>>	res	= exta.subscribeToResults();
-		if(!exta.getResults().get().containsKey("running"))
+		if(!exta.getResultsAsync().get().containsKey("running"))
 		{
 			System.out.println("Not yet running.");
 			res.getNextIntermediateResult();

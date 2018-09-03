@@ -21,6 +21,7 @@ import javax.swing.SwingUtilities;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -101,69 +102,81 @@ public class DebuggerMainPanel extends JSplitPane
 			{
 				// The left panel (breakpoints)
 				final BreakpointPanel[] leftpanel = new BreakpointPanel[1];
-				String[] bps = exta.getModel().getBreakpoints();
-				if(bps!=null && bps.length>0)
-				{
-					leftpanel[0] = new BreakpointPanel(bps, desc, jcc.getPlatformAccess(), jcc.getCMSHandler());
-					DebuggerMainPanel.this.setLeftComponent(leftpanel[0]);
-					DebuggerMainPanel.this.setDividerLocation(0);	// 150? Hack???
-				}
-				else
-				{
-					JPanel nobreakpoints = new JPanel();
-					nobreakpoints.add(new JLabel("no breakpoints"));
-					DebuggerMainPanel.this.setLeftComponent(nobreakpoints);
-					DebuggerMainPanel.this.setDividerLocation(0);
-				}
-				
-				// Sub panels of right panel.
-				SComponentFactory.getProperty(exta, DebuggerMainPanel.this.desc.getType(), KEY_DEBUGGER_PANELS)
-					.addResultListener(new SwingDefaultResultListener<Object>(DebuggerMainPanel.this)
-				{
-					public void customResultAvailable(Object result)
+				exta.getModelAsync().addResultListener(new SwingResultListener<IModelInfo>(new IResultListener<IModelInfo>()
+				{			
+					public void resultAvailable(final IModelInfo model)
 					{
-						final String	panels	= (String)result;
-						if(panels!=null)
+						String[] bps = model.getBreakpoints();
+						if(bps!=null && bps.length>0)
 						{
-							AbstractJCCPlugin.getClassLoader(desc.getName(), jcc).addResultListener(new SwingDefaultResultListener<ClassLoader>(DebuggerMainPanel.this)
-							{
-								public void customResultAvailable(ClassLoader cl)
-								{
-//											final ClassLoader	cl	= (ClassLoader)result;
-									StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
-									while(stok.hasMoreTokens())
-									{
-										String classname	= stok.nextToken();
-										try
-										{
-//													System.out.println("loading panel: "+classname+" "+cl);
-											Class<?> clazz	= SReflect.classForName(classname, cl);
-											IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
-											panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
-											debuggerpanels.add(panel);
-											tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
-										}
-										catch(Exception e)
-										{
-											DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
-										}
-									}
-								}
-							});
+							leftpanel[0] = new BreakpointPanel(bps, desc, jcc.getPlatformAccess(), jcc.getCMSHandler());
+							DebuggerMainPanel.this.setLeftComponent(leftpanel[0]);
+							DebuggerMainPanel.this.setDividerLocation(0);	// 150? Hack???
 						}
 						else
 						{
-							ObjectInspectorDebuggerPanel panel = new ObjectInspectorDebuggerPanel();
-							panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
-							debuggerpanels.add(panel);
-							tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
+							JPanel nobreakpoints = new JPanel();
+							nobreakpoints.add(new JLabel("no breakpoints"));
+							DebuggerMainPanel.this.setLeftComponent(nobreakpoints);
+							DebuggerMainPanel.this.setDividerLocation(0);
 						}
+						
+						// Sub panels of right panel.
+						SComponentFactory.getProperty(exta, DebuggerMainPanel.this.desc.getType(), KEY_DEBUGGER_PANELS)
+							.addResultListener(new SwingDefaultResultListener<Object>(DebuggerMainPanel.this)
+						{
+							public void customResultAvailable(Object result)
+							{
+								final String	panels	= (String)result;
+								if(panels!=null)
+								{
+									AbstractJCCPlugin.getClassLoader(desc.getName(), jcc).addResultListener(new SwingDefaultResultListener<ClassLoader>(DebuggerMainPanel.this)
+									{
+										public void customResultAvailable(ClassLoader cl)
+										{
+		//											final ClassLoader	cl	= (ClassLoader)result;
+											StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
+											while(stok.hasMoreTokens())
+											{
+												String classname	= stok.nextToken();
+												try
+												{
+		//													System.out.println("loading panel: "+classname+" "+cl);
+													Class<?> clazz	= SReflect.classForName(classname, cl);
+													IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
+													panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
+													debuggerpanels.add(panel);
+													tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
+												}
+												catch(Exception e)
+												{
+													DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
+												}
+											}
+										}
+									});
+								}
+								else
+								{
+									ObjectInspectorDebuggerPanel panel = new ObjectInspectorDebuggerPanel();
+									panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
+									debuggerpanels.add(panel);
+									tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
+								}
+							}
+						});
 					}
-				});
+				
+					public void exceptionOccurred(Exception exception)
+					{
+						DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panels.", null, exception);
+					}
+				}));
 			}
+			
 			public void exceptionOccurred(Exception exception)
 			{
-				DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panels.", null, exception);
+					DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panels.", null, exception);
 			}
 		}));
 		

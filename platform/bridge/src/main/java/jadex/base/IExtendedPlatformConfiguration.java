@@ -25,14 +25,14 @@ public interface IExtendedPlatformConfiguration
      *  @return The platform component class.
      */
 //    public Class<?> getPlatformComponent();
-    public ClassInfo getPlatformComponent();
+//    public ClassInfo getPlatformComponent();
 
     /**
      *  Set the platform component.
      *  @param value The platform component.
      */
 //    public void setPlatformComponent(Class<?> value);
-    public void setPlatformComponent(ClassInfo value);
+//    public void setPlatformComponent(ClassInfo value);
     
     /**
      *  Get the component factory.

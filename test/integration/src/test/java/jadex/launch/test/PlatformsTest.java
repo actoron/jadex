@@ -114,11 +114,11 @@ public class PlatformsTest //extends TestCase
 			
 			if(defmodel==null)
 			{
-				defmodel	= platform.getModel();
+				defmodel = platform.getModelAsync().get();
 			}
 			else if(!EXCLUDEPLATFORMS.contains(PLATFORMS[(i-1)*2+1]))
 			{
-				compareModels(defmodel, platform.getModel());
+				compareModels(defmodel, platform.getModelAsync().get());
 			}
 			
 			final Future<Void>	fut	= new Future<Void>();

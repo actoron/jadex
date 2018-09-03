@@ -115,6 +115,16 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	}
 	
 	/**
+	 *  Get the model name of a component type.
+	 *  @param ctype The component type.
+	 *  @return The model name of this component type.
+	 */
+	public IFuture<String> getFileName(String ctype)
+	{
+		return new Future<String>(getComponentFilename(ctype));
+	}
+	
+	/**
 	 *  Get the local type name of this component as defined in the parent.
 	 *  @return The type of this component type.
 	 */
@@ -484,4 +494,23 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 //		return childcount>0? --childcount: childcount;
 //	}
 	
+	/**
+	 *  Get the children (if any) component identifiers.
+	 *  @param type The local child type.
+	 *  @param parent The parent (null for this).
+	 *  @return The children component identifiers.
+	 */
+	public IFuture<IComponentIdentifier[]> getChildren(String type, IComponentIdentifier parent)
+	{
+		return getComponent().getChildren(type, parent);
+	}
+	
+	/**
+	 *  Get the local type name of this component as defined in the parent.
+	 *  @return The type of this component type.
+	 */
+	public IFuture<String> getLocalTypeAsync()
+	{
+		return new Future<String>(getLocalType());
+	}
 }

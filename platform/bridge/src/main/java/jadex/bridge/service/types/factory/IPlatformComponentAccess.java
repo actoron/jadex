@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.PlatformComponent;
 import jadex.commons.future.IFuture;
 
 /**
@@ -66,6 +67,12 @@ public interface IPlatformComponentAccess
 	 *  @return An internal access exposing user operations of the component.
 	 */
 	public IInternalAccess getInternalAccess();
+	
+	/**
+	 *  Get the platform component.
+	 *  @return The platform component.
+	 */
+	public PlatformComponent getPlatformComponent();
 	
 //	/**
 //	 *  Get the lifecycle state. 

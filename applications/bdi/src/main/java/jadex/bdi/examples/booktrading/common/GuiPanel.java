@@ -890,7 +890,7 @@ public class GuiPanel extends JPanel
 	 */
 	public static boolean isBuyer(IExternalAccess agent)
 	{
-		return agent.getModel().getName().indexOf("Buyer")!=-1;
+		return agent.getModelAsync().get().getName().indexOf("Buyer")!=-1;
 	}
 }
 

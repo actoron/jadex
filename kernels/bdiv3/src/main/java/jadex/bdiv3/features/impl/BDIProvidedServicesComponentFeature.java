@@ -58,7 +58,7 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 				
 				Set<Object> vals = new HashSet<Object>();
 				vals.add(ocapa);
-				vals.add(new CapabilityPojoWrapper(getComponent(), ocapa, capa));
+				vals.add(new CapabilityPojoWrapper(getInternalAccess(), ocapa, capa));
 				hackguesser = new SimpleParameterGuesser(super.getParameterGuesser(), vals);
 			}
 			else
@@ -74,7 +74,7 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 		{
 			Class<?> iface = info.getType().getType(getComponent().getClassLoader());
 			ret = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{iface}, 
-				new BDIServiceInvocationHandler(getComponent(), iface));
+				new BDIServiceInvocationHandler(getInternalAccess(), iface));
 		}
 		else
 		{

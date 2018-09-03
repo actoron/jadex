@@ -136,7 +136,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 			
 		if(mevent!=null)
 		{
-			RMessageEvent<Object> revent = new RMessageEvent<Object>(mevent, body, getComponent(), original);
+			RMessageEvent<Object> revent = new RMessageEvent<Object>(mevent, body, getInternalAccess(), original);
 			FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(revent);
 			getComponent().getFeature(IExecutionFeature.class).scheduleStep(fac);
 		}
@@ -201,7 +201,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 			{
 				Object pvalue = msg.get(param.getName());
 				Object mvalue = SJavaParser.parseExpression(param.getDefaultValue(), getComponent().getModel().getAllImports(), 
-					getComponent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getComponent(), param.getDefaultValue().getLanguage()));
+					getComponent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getInternalAccess(), param.getDefaultValue().getLanguage()));
 				if(!SUtil.equals(pvalue, mvalue))
 				{
 					match	= false;
@@ -316,7 +316,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 //			        System.out.println("added: $"+prop+"/"+snake_case+" -> "+msg.get(prop));
 				}
 				IParsedExpression exp = SJavaParser.parseExpression(matchexp, getComponent().getModel().getAllImports(), getComponent().getClassLoader());
-				match = ((Boolean)exp.getValue(CapabilityWrapper.getFetcher(getComponent(), matchexp.getLanguage(), exparams))).booleanValue();
+				match = ((Boolean)exp.getValue(CapabilityWrapper.getFetcher(getInternalAccess(), matchexp.getLanguage(), exparams))).booleanValue();
 			}
 			catch(Exception e)
 			{

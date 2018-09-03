@@ -16,7 +16,7 @@ import jadex.javaparser.SJavaParser;
  *  This feature provides arguments.
  */
 // Todo: remove!!! only used for logging level.
-public class PropertiesComponentFeature	extends	AbstractComponentFeature	implements IPropertiesFeature
+public class PropertiesComponentFeature	extends	AbstractComponentFeature implements IPropertiesFeature
 {
 	//-------- constants ---------
 	

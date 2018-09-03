@@ -20,6 +20,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
@@ -1694,43 +1695,54 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						{
 							final String filename = (String)result;
 							
-							// cannot be dummy cid because agent calls getAvatar(cid) in init and needs its avatar
-							// the cid must be the final cid of the component hence it creates unique ids
-///									IComponentIdentifier cid = cms.generateComponentIdentifier(SUtil.createUniqueId(compotype, 3), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
-							// SUtil.createUniqueId(compotype, 3) might lead to conflicts due to race conditions. Use object id as it is really unique.
-//									IComponentIdentifier cid = cms.generateComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
-							// todo: can fail?
-							IComponentIdentifier cid = new BasicComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getId());
-//									IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");
-							// Hack!!! Should have actual description and not just name and local type!?
-							CMSComponentDescription desc = new CMSComponentDescription();
-							desc.setName(cid);
-							desc.setLocalType(compotype);
-							setOwner(ret.getId(), desc);
-//							System.out.println("env create: "+cid);
-							IFuture	future	= exta.createComponent(null,
-								new CreationInfo(null, null, getExternalAccess().getId(), false, getExternalAccess().getModel().getAllImports()).setFilename(filename).setName(cid.getLocalName()), null);
-							future.addResultListener(new IResultListener()
+							getExternalAccess().getModelAsync().addResultListener(new IResultListener<IModelInfo>()
 							{
-								public void resultAvailable(Object result)
+								public void resultAvailable(IModelInfo model) 
 								{
-//									System.out.println("env created: "+result);
-//									setOwner(ret.getId(), (IComponentIdentifier)result);
-								}
-								
-								public void exceptionOccurred(final Exception exception)
-								{
-									exta.scheduleStep(new IComponentStep<Void>()
+									// cannot be dummy cid because agent calls getAvatar(cid) in init and needs its avatar
+									// the cid must be the final cid of the component hence it creates unique ids
+		///									IComponentIdentifier cid = cms.generateComponentIdentifier(SUtil.createUniqueId(compotype, 3), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
+									// SUtil.createUniqueId(compotype, 3) might lead to conflicts due to race conditions. Use object id as it is really unique.
+//											IComponentIdentifier cid = cms.generateComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
+									// todo: can fail?
+									IComponentIdentifier cid = new BasicComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getId());
+//											IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");
+									// Hack!!! Should have actual description and not just name and local type!?
+									CMSComponentDescription desc = new CMSComponentDescription();
+									desc.setName(cid);
+									desc.setLocalType(compotype);
+									setOwner(ret.getId(), desc);
+//									System.out.println("env create: "+cid);
+									IFuture	future	= exta.createComponent(null,
+										new CreationInfo(null, null, getExternalAccess().getId(), false, model.getAllImports()).setFilename(filename).setName(cid.getLocalName()), null);
+									future.addResultListener(new IResultListener()
 									{
-										public IFuture<Void> execute(IInternalAccess ia)
+										public void resultAvailable(Object result)
 										{
-											// Todo: Propagate exception to kill application!
-											StringWriter	sw	= new StringWriter();
-											exception.printStackTrace(new PrintWriter(sw));
-											ia.getLogger().severe("Could not create component: "+compotype+"\n"+exception);
-											return IFuture.DONE;
+//											System.out.println("env created: "+result);
+//											setOwner(ret.getId(), (IComponentIdentifier)result);
+										}
+										
+										public void exceptionOccurred(final Exception exception)
+										{
+											exta.scheduleStep(new IComponentStep<Void>()
+											{
+												public IFuture<Void> execute(IInternalAccess ia)
+												{
+													// Todo: Propagate exception to kill application!
+													StringWriter	sw	= new StringWriter();
+													exception.printStackTrace(new PrintWriter(sw));
+													ia.getLogger().severe("Could not create component: "+compotype+"\n"+exception);
+													return IFuture.DONE;
+												}
+											});
 										}
 									});
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
 								}
 							});
 						}
@@ -2254,7 +2266,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			String	componenttype	= owner.getLocalType();
 			if(componenttype==null && fullname!=null)
 			{
-				SubcomponentTypeInfo[] atypes = exta.getModel().getSubcomponentTypes();
+				SubcomponentTypeInfo[] atypes = exta.getModelAsync().get().getSubcomponentTypes();
 				for(int i=0; i<atypes.length; i++)
 				{
 					String tmp = atypes[i].getFilename().replace('/', '.');
@@ -2585,9 +2597,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		{
 			public void customResultAvailable(Object result)
 			{
-				IExternalAccess exta = (IExternalAccess)result;
-				String componenttype = exta.getLocalType();
-				ret.setResult(componenttype);
+				exta.getLocalTypeAsync().addResultListener(new DelegationResultListener<>(ret));
 			}
 		});
 		return ret;

@@ -48,7 +48,7 @@ public class BDIMonitoringComponentFeature extends MonitoringComponentFeature
 		{
 			for(MBelief mbel: mbels)
 			{
-				BeliefInfo info = BeliefInfo.createBeliefInfo(getComponent(), mbel, getComponent().getClassLoader());
+				BeliefInfo info = BeliefInfo.createBeliefInfo(getInternalAccess(), mbel, getComponent().getClassLoader());
 				MonitoringEvent ev = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(mbel.toString());
 				ev.setProperty("details", info);

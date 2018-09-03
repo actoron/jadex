@@ -106,7 +106,7 @@ public class DependendServicesAgent extends JunitAgentTest
 					{
 						public void intermediateResultAvailable(IMonitoringEvent result)
 						{
-							child.getResults().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, Object>>()
+							child.getResultsAsync().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, Object>>()
                             {
                                 public void resultAvailable(Map<String, Object> res)
                                 {

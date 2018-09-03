@@ -109,7 +109,7 @@ public class BpmnProvidedServicesFeature extends ProvidedServicesComponentFeatur
 //			System.out.println("Found mapping: "+methods);
 			// Todo: interceptors
 			ret = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{info.getType().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports())}, 
-				new ProcessServiceInvocationHandler(getComponent(), methods));
+				new ProcessServiceInvocationHandler(getInternalAccess(), methods));
 		}
 		
 		// External service implementation

@@ -566,7 +566,7 @@ public class VisualProcessViewPanel extends JPanel
 						graph.deactivate();
 						graph.setEventsEnabled(false);
 						graph.getModel().beginUpdate();
-						MBpmnModel mmodel = SBpmnModelReader.readModel(new ByteArrayInputStream(content.getBytes("UTF-8")), access.getModel().getFilename(), vreader);
+						MBpmnModel mmodel = SBpmnModelReader.readModel(new ByteArrayInputStream(content.getBytes("UTF-8")), access.getModelAsync().get().getFilename(), vreader);
 						graph.getModel().endUpdate();
 						graph.setEventsEnabled(true);
 						graph.activate();
@@ -606,7 +606,7 @@ public class VisualProcessViewPanel extends JPanel
 					IComponentDescription	desc	= result.getComponentDescription();
 					try
 					{
-						final String[] bps = access.getModel().getBreakpoints();
+						final String[] bps = access.getModelAsync().get().getBreakpoints();
 						final List<String> abps = SUtil.arrayToList(desc.getBreakpoints());
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -1088,7 +1088,7 @@ public class VisualProcessViewPanel extends JPanel
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		List<String> bps = Arrays.asList(access.getModel().getBreakpoints());
+		List<String> bps = Arrays.asList(access.getModelAsync().get().getBreakpoints());
 		
 		if(bps.contains(bp))
 		{

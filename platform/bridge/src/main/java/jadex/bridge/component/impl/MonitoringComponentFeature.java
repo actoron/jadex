@@ -162,7 +162,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	public ServiceGetter<IMonitoringService> getMonitoringServiceGetter()
 	{
 		if(getter == null)
-			getter = new ServiceGetter<IMonitoringService>(getComponent(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		return getter;
 	}
 
@@ -247,7 +247,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel emitlevel)
 	{
 		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = (SubscriptionIntermediateFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class,
-			getComponent());
+			getInternalAccess());
 
 		ITerminationCommand tcom = new ITerminationCommand()
 		{

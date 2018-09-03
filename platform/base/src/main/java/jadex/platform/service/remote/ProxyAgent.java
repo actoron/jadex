@@ -85,7 +85,7 @@ public class ProxyAgent	implements IProxyAgentService
 				{
 					public void resultAvailable(IExternalAccess pl)
 					{
-						pl.getArguments().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, Object>>()
+						pl.getArgumentsAsync().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, Object>>()
 						{
 							public void resultAvailable(Map<String, Object> args)
 							{

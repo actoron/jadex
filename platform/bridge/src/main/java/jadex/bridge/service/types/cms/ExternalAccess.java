@@ -19,11 +19,14 @@ import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -62,7 +65,7 @@ public class ExternalAccess implements IExternalAccess
 	
 	/** The model info (cached when persisted). */
 	// Todo: should not be kept in memory?
-	protected IModelInfo	model;
+	protected IModelInfo model;
 	
 	/** The local type (cached when persisted). */
 	// Todo: should not be kept in memory?
@@ -90,20 +93,24 @@ public class ExternalAccess implements IExternalAccess
 	 *  Get the model.
 	 *  @return The model.
 	 */
-	public IModelInfo getModel()
+	public IFuture<IModelInfo> getModelAsync()
 	{
+		Future<IModelInfo> ret = new Future<>();
+		
 		if(terminated)
 		{
-			throw new ComponentTerminatedException(cid);
+			ret.setException(new ComponentTerminatedException(cid));
 		}
 		else if(!valid)
 		{
-			return model;
+			ret.setResult(model);
 		}
 		else
 		{
-			return ia.getModel();
+			ret.setResult(ia.getModel());
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -640,7 +647,7 @@ public class ExternalAccess implements IExternalAccess
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */
-	public IFuture<Map<String, Object>> getArguments()
+	public IFuture<Map<String, Object>> getArgumentsAsync()
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
@@ -684,7 +691,7 @@ public class ExternalAccess implements IExternalAccess
 	 *  Get the component results.
 	 *  @return The results.
 	 */
-	public IFuture<Map<String, Object>> getResults()
+	public IFuture<Map<String, Object>> getResultsAsync()
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
@@ -1259,9 +1266,7 @@ public class ExternalAccess implements IExternalAccess
 	public boolean isExternalThread()
 	{
 		if(!valid)
-		{
 			throw terminated ? new ComponentTerminatedException(cid) : new ComponentPersistedException(cid);
-		}
 
 		return !ia.getFeature(IExecutionFeature.class).isComponentThread();
 	}
@@ -1510,7 +1515,7 @@ public class ExternalAccess implements IExternalAccess
 	 *  @return	The component description.
 	 */
 	// Todo: hack??? should be internal to CMS!?
-	public IFuture<IComponentDescription> getDescription()
+	public IFuture<IComponentDescription> getDescriptionAsync()
 	{
 		return (IFuture<IComponentDescription>)scheduleStep(new IComponentStep<IComponentDescription>()
 		{
@@ -1640,5 +1645,136 @@ public class ExternalAccess implements IExternalAccess
 		});
 	}
 
+	@Override
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(Class<T> type)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(String name)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IFuture<Void> addService(String name, Class< ? > type, Object service)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IFuture<Void> addService(String name, Class< ? > type, Object service, PublishInfo pi, String scope)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IFuture<Void> addService(String name, Class< ? > type, Object service, String proxytype)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IFuture<String> getLocalTypeAsync()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public <T> IFuture<T> getService(Class<T> type)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public <T> IFuture<T> getService(String name)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+	@Override
+	public <T> ITerminableIntermediateFuture<T> getServices(Class<T> type)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public <T> ITerminableIntermediateFuture<T> getServices(String name)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IFuture<Void> removeService(IServiceIdentifier sid)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step, boolean ignorefailures)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IFuture<Void> setTags(IServiceIdentifier sid, String... tags)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IFuture<Void> waitForDelay(long delay)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IFuture<Void> waitForDelay(long delay, boolean realtime)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IFuture<Void> waitForTick()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IFuture<Void> waitForTick(IComponentStep<Void> run)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

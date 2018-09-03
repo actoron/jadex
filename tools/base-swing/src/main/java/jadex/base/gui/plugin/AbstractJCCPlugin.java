@@ -17,6 +17,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ProxyComponentTreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -264,8 +265,14 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 				{
 					public void customResultAvailable(final ILibraryService libservice)
 					{
-						libservice.getClassLoader(exta.getModel().getResourceIdentifier())
-							.addResultListener(new DelegationResultListener<ClassLoader>(ret));
+						exta.getModelAsync().addResultListener(new ExceptionDelegationResultListener<IModelInfo, ClassLoader>(ret)
+						{
+							public void customResultAvailable(final IModelInfo model)
+							{
+								libservice.getClassLoader(model.getResourceIdentifier())
+									.addResultListener(new DelegationResultListener<ClassLoader>(ret));
+							}
+						});
 					}
 				});
 			}
