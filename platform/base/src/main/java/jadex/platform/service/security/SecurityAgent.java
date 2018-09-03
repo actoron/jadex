@@ -1393,6 +1393,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	protected void doCleanup()
 	{
+		assert agent.getFeature(IExecutionFeature.class).isComponentThread();
 		long time = System.currentTimeMillis();
 		
 		for (Iterator<Map.Entry<String, HandshakeState>> it = initializingcryptosuites.entrySet().iterator(); it.hasNext(); )
@@ -1405,7 +1406,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			}
 		}
 		
-		String[] keys = expiringcryptosuites.keySet().toArray(new String[expiringcryptosuites.size()]);
+		String[] keys = expiringcryptosuites.keySet().toArray(new String[expiringcryptosuites.keySet().size()]);
 		for (String pf : keys)
 		{
 			Collection<Tuple2<ICryptoSuite, Long>> coll = new ArrayList<Tuple2<ICryptoSuite, Long>>(expiringcryptosuites.get(pf));
