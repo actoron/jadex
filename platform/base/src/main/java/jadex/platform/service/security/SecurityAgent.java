@@ -1677,7 +1677,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	protected byte[] requestReencryption(String platformname, byte[] content)
 	{
-		System.out.println("reencryption: "+platformname+" "+Arrays.hashCode(content));
+		System.out.println("reencryption: "+platformname+" "+Arrays.hashCode(content) + " " + currentcryptosuites.get(platformname));
 //		Thread.dumpStack();
 		
 		ReencryptionRequest req = new ReencryptionRequest();
@@ -1737,7 +1737,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				final Future<ICryptoSuite> fut = new Future<ICryptoSuite>();
 				
-				HandshakeState state = initializingcryptosuites.remove(rplat.toString());
+				HandshakeState state = initializingcryptosuites.get(rplat.toString());
 				
 				// Check if handshake is already happening. 
 				if (state != null)
