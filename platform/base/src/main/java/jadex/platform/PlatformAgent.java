@@ -49,6 +49,9 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.platform.service.execution.AsyncExecutionService;
+import jadex.platform.service.execution.BisimExecutionService;
+import jadex.platform.service.execution.SyncExecutionService;
 import jadex.platform.service.security.SecurityAgent;
 
 /**
@@ -64,7 +67,7 @@ import jadex.platform.service.security.SecurityAgent;
 	@ProvidedService(type=IThreadPoolService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(false), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	// hack!!! no daemon here (possibly fixed?)
 	@ProvidedService(type=IDaemonThreadPoolService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IExecutionService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new jadex.platform.service.execution.SyncExecutionService($component): new jadex.platform.service.execution.AsyncExecutionService($component)", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IExecutionService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="PlatformAgent.createExecutionServiceImpl($args.asyncexecution, $args.simulation, $args.bisimulation, $component)", proxytype=Implementation.PROXYTYPE_RAW)),
 //	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.bridge.service.types.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
 })
 
@@ -81,6 +84,22 @@ import jadex.platform.service.security.SecurityAgent;
 @Agent
 public class PlatformAgent
 {
+	//-------- service creation helpers --------
+	
+	/** Create execution service. */
+	public static synchronized IExecutionService	createExecutionServiceImpl(Object asyncexecution, Object simulation, Object bisimulation, IInternalAccess component)
+	{
+		if(Boolean.TRUE.equals(bisimulation))
+		{
+			return BisimExecutionService.getInstance(component);
+		}
+		else
+		{
+			boolean	sync	= Boolean.FALSE.equals(asyncexecution) || Boolean.TRUE.equals(simulation);
+			return sync ? new SyncExecutionService(component) : new AsyncExecutionService(component);
+		}
+	}
+	
 	//-------- static part --------
 	
 	/** Filter for finding agents to be auto-started. */
