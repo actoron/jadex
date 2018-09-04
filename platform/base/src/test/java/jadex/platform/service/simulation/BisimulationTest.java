@@ -2,6 +2,9 @@ package jadex.platform.service.simulation;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
@@ -10,7 +13,10 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 
 /**
@@ -31,8 +37,11 @@ public class BisimulationTest
 		// Run test on first platform such that clock cannot advance
 		p1.scheduleStep(ia ->
 		{
-			// Start local agent
-			IFuture<?>	c1	= ia.createComponentWithResults(CounterAgent.class, null);
+			FutureBarrier<Collection<CMSStatusEvent>>	fubar	= new FutureBarrier<>();
+			
+			// Start two local agents
+			fubar.addFuture(ia.createComponentWithResults(CounterAgent.class, null));
+			fubar.addFuture(ia.createComponentWithResults(CounterAgent.class, null));
 			
 			// Start second platform
 			IPlatformConfiguration config2	= config.clone();
@@ -43,16 +52,18 @@ public class BisimulationTest
 			ISimulationService	simserv	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class));
 			simserv.addAdvanceBlocker(fp2).get();
 			
-			// Start agent on second platform
-			IFuture<?>	c2	= fp2.get().createComponentWithResults(CounterAgent.class, null);
+			// Start two agents on second platform
+			fubar.addFuture(fp2.get().createComponentWithResults(CounterAgent.class,
+				new CreationInfo(Collections.singletonMap("offset", 2))));
+			fubar.addFuture(fp2.get().createComponentWithResults(CounterAgent.class,
+				new CreationInfo(Collections.singletonMap("offset", 2))));
 			
-			// Wait for both agents.
-			c1.get();
-			c2.get();
+			// Wait for all agents.
+			fubar.waitFor().get();
 			
 			return IFuture.DONE;
 		}).get();
 		
-		assertEquals("[1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10]", CounterAgent.LIST.toString());
+		assertEquals("[1, 1, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8, 8, 8, 8, 9, 9, 10, 10, 10, 10]", CounterAgent.LIST.toString());
 	}
 }

@@ -5,9 +5,12 @@ import java.util.List;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentServiceSearch;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Agent that counts and stores values in static list.
@@ -18,9 +21,13 @@ public class CounterAgent
 	/** The list with counted values. */
 	protected static List<String>	LIST	= new ArrayList<>();
 	
-	/** The initial wait offset. */
+	/** The count offset. */
 	@AgentArgument
-	protected long	offset	= 0;
+	protected int	offset	= 1;
+	
+	/** The clock service. */
+	@AgentServiceSearch(requiredservice=@RequiredService(name="clock", type=IClockService.class))
+	protected IClockService	clock;
 	
 	/**
 	 *  Count to ten.
@@ -28,12 +35,14 @@ public class CounterAgent
 	@AgentBody
 	public void count(IInternalAccess agent)
 	{
-		agent.getFeature(IExecutionFeature.class).waitForDelay(offset).get();
-		for(int i=1; i<=10; i++)
+		long	start	= clock.getTime();
+		
+		for(int i=offset; i<=10; i+=offset)
 		{
-			agent.getFeature(IExecutionFeature.class).waitForDelay(1000).get();
-			LIST.add(Integer.toString(i));
-			System.out.println(agent+" counts "+i);
+			agent.getFeature(IExecutionFeature.class).waitForDelay(offset).get();
+			long	time	= clock.getTime() - start;
+			LIST.add(Long.toString(time));
+			System.out.println(agent+" counts at "+time);
 		}
 		agent.killComponent();
 	}
