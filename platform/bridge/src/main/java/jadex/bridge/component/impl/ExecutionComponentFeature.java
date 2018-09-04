@@ -33,6 +33,7 @@ import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -680,6 +681,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					exe.execute(ExecutionComponentFeature.this);
 				}
+			}
+			else if(Boolean.TRUE.equals(cinfo.getArguments().get("bisimulation"))
+				&& LOCAL.get()!=null && LOCAL.get()!=getComponent())
+			{
+				// Do not use rescue thread for bisimulation to avoid clock running out.
+				exe = LOCAL.get().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IExecutionService.class));
+				exe.execute(ExecutionComponentFeature.this);
 			}
 			else
 			{
