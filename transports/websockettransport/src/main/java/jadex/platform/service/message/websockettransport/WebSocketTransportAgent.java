@@ -12,7 +12,7 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Autostart;
-import jadex.platform.service.transport.AbstractTransportAgent;
+import jadex.platform.service.transport.AbstractTransportAgent2;
 import jadex.platform.service.transport.ITransport;
 
 /**
@@ -20,7 +20,7 @@ import jadex.platform.service.transport.ITransport;
  *
  */
 @Agent(autostart=@Autostart(value=Boolean3.TRUE, name="ws", predecessors="jadex.platform.service.address.TransportAddressAgent"))
-public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketConnection>
+public class WebSocketTransportAgent extends AbstractTransportAgent2<IWebSocketConnection>
 {
 	/** Maximum size of websocket frame payloads. */
 	@AgentArgument
@@ -44,36 +44,6 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 	 */
 	public WebSocketTransportAgent()
 	{
-	}
-	
-	/**
-	 *  Initializes the agent.
-	 */
-	@AgentCreated
-	public IFuture<Void> start()
-	{
-		websocketfactory = new WebSocketFactory(); //.setConnectionTimeout(5000);
-		websocketfactory.setConnectionTimeout((int) connecttimeout);
-		threadpoolsrv = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IDaemonThreadPoolService.class);
-//		threadpoolsrv = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class));
-		return super.init();
-	}
-	
-	@AgentKilled
-	public void stop()
-	{
-		super.shutdown();
-		
-		synchronized(this)
-		{
-			if (candidates != null)
-			{
-				for (IWebSocketConnection con : candidates.keySet())
-				{
-					con.forceClose();
-				}
-			}
-		}
 	}
 	
  	/**
@@ -134,8 +104,31 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
  		return threadpoolsrv;
  	}
  	
+ 	/**
+ 	 *  Sets the thread pool service.
+ 	 * 
+ 	 *  @param tps The thread pool service.
+ 	 */
+ 	public void setThreadPoolService(IDaemonThreadPoolService tps)
+ 	{
+ 		threadpoolsrv = tps;
+ 	}
+ 	
+ 	/**
+ 	 *  Gets the WebSocket factory.
+ 	 *  @return The WebSocket factory.
+ 	 */
  	public WebSocketFactory getWebSocketFactory()
 	{
 		return websocketfactory;
+	}
+ 	
+ 	/**
+ 	 *  Sets the WebSocket factory.
+ 	 *  @param websocketfactory The WebSocket factory.
+ 	 */
+ 	public void setWebsocketFactory(WebSocketFactory websocketfactory)
+	{
+		this.websocketfactory = websocketfactory;
 	}
 }
