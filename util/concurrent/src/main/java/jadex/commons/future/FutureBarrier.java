@@ -41,7 +41,40 @@ public class FutureBarrier<E>
 			CounterResultListener<E> lis = new CounterResultListener<E>(futures.size(), new DelegationResultListener<Void>(ret));
 			for(IFuture<E> fut: futures)
 			{
-				fut.addResultListener(lis);
+				if(fut instanceof ISubscriptionIntermediateFuture)
+				{
+					@SuppressWarnings("unchecked")
+					IResultListener<E>	tmplis	= (IResultListener<E>)new IIntermediateResultListener<Object>()
+					{
+						@Override
+						public void finished()
+						{
+							lis.resultAvailable(null);
+						}
+						
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							lis.exceptionOccurred(exception);
+						}
+						
+						@Override
+						public void intermediateResultAvailable(Object result)
+						{
+						}
+						
+						@Override
+						public void resultAvailable(Collection<Object> result)
+						{
+							lis.resultAvailable(null);
+						}
+					};
+					fut.addResultListener(tmplis);
+				}
+				else
+				{
+					fut.addResultListener(lis);
+				}
 			}
 		}
 		else

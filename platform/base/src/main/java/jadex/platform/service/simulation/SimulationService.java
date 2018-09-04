@@ -70,7 +70,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	protected Future	stepfuture;
 	
 	/** Blockers that prevent the clock from advancing. */
-	protected List<IFuture<Void>> advanceblockers = new ArrayList<>();
+	protected List<IFuture<?>> advanceblockers = new ArrayList<>();
 	
 	/** The idle future listener. */
 	protected IdleListener	idlelistener;
@@ -422,7 +422,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	 *  @param blocker The blocking future.
 	 *  @return Null, when added.
 	 */
-	public IFuture<Void> addAdvanceBlocker(IFuture<Void> blocker)
+	public IFuture<Void> addAdvanceBlocker(IFuture<?> blocker)
 	{
 		advanceblockers.add(blocker);
 		return IFuture.DONE;
@@ -564,9 +564,13 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		{
 			Future<Void> futret = new Future<>();
 			ret = futret;
-			FutureBarrier<Void> bar = new FutureBarrier<>();
-			for (IFuture<Void> blocker : advanceblockers)
-				bar.addFuture(blocker);
+			FutureBarrier<Object> bar = new FutureBarrier<>();
+			for (IFuture<?> blocker : advanceblockers)
+			{
+				@SuppressWarnings("unchecked")
+				IFuture<Object>	oblocker	= (IFuture<Object>)blocker;
+				bar.addFuture(oblocker);
+			}
 			advanceblockers.clear();
 			bar.waitForIgnoreFailures(null).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 			{

@@ -93,7 +93,7 @@ public interface ISimulationService
 	 *  @param blocker The blocking future.
 	 *  @return Null, when added.
 	 */
-	public IFuture<Void> addAdvanceBlocker(IFuture<Void> blocker);
+	public IFuture<Void> addAdvanceBlocker(IFuture<?> blocker);
 	
 	// todo: hack remove method?!
 	/**
