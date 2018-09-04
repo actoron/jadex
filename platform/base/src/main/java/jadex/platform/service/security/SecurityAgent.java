@@ -700,11 +700,24 @@ public class SecurityAgent implements ISecurityService, IInternalService
 									}
 									else
 									{
-										cleartext = requestReencryption(splat, content);
-										if(cleartext != null)
-											ret.setResult(new Tuple2<ISecurityInfo, byte[]>(result.getSecurityInfos(), cleartext));
-										else
+										Object reply = requestReencryption(splat, content);
+										if(reply == null)
+										{
 											ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString()));
+										}
+										else if (reply instanceof Exception)
+										{
+											ret.setException((Exception) reply);
+										}
+										else if (reply instanceof byte[])
+										{
+											cleartext = (byte[]) reply;
+											ret.setResult(new Tuple2<ISecurityInfo, byte[]>(result.getSecurityInfos(), cleartext));
+										}
+										else
+										{
+											ret.setException(new SecurityException("Unrecognized decryption request reply: " + reply));
+										}
 									}
 								}
 								
@@ -716,11 +729,24 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 						else
 						{
-							cleartext = requestReencryption(splat, content);
-							if(cleartext == null)
+							Object reply = requestReencryption(splat, content);
+							if(reply == null)
+							{
 								ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString() + "  " + content));
-							else
+							}
+							else if (reply instanceof Exception)
+							{
+								ret.setException((Exception) reply);
+							}
+							else if (reply instanceof byte[])
+							{
+								cleartext = (byte[]) reply;
 								cs = currentcryptosuites.get(splat);
+							}
+							else
+							{
+								ret.setException(new SecurityException("Unrecognized decryption request reply: " + reply));
+							}
 						}
 					}
 					
@@ -1673,9 +1699,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  
 	 *  @param source Source of the content.
 	 *  @param content The encrypted content.
-	 *  @return Clear decrypted content.
+	 *  @return Reply of decryption request, may be exception.
 	 */
-	protected byte[] requestReencryption(String platformname, byte[] content)
+	protected Object requestReencryption(String platformname, byte[] content)
 	{
 		System.out.println("reencryption: "+platformname+" "+Arrays.hashCode(content) + " " + currentcryptosuites.get(platformname));
 //		Thread.dumpStack();
@@ -1683,15 +1709,15 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		ReencryptionRequest req = new ReencryptionRequest();
 		req.setContent(content);
 		
-		byte[] ret = null;
+		Object ret = null;
 		try
 		{
 			BasicComponentIdentifier source = new BasicComponentIdentifier("security@" + platformname);
-			ret = (byte[]) agent.getFeature(IMessageFeature.class).sendMessageAndWait(source, req).get();
+			ret = agent.getFeature(IMessageFeature.class).sendMessageAndWait(source, req).get();
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			ret = e;
 		}
 		
 		return ret;
@@ -1893,30 +1919,48 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			ReencryptionRequest req = (ReencryptionRequest) msg;
 			String senderpf = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot().toString();
 			
-			byte[] deccontent = null;
+			Object ret = null;
 			
 			Collection<Tuple2<ICryptoSuite, Long>> expsuites = expiringcryptosuites.get(senderpf);
-			if (expsuites != null)
+			if (expsuites != null && expsuites.size() > 0)
 			{
+//				String checkresults = "";
 				for (Tuple2<ICryptoSuite, Long> expsuite : expsuites)
 				{
 					ISecurityInfo suiteinfos = expsuite.getFirstEntity().getSecurityInfos();
 					
-					if ((secinfos.isAdminPlatform() || (suiteinfos.isAdminPlatform() == secinfos.isAdminPlatform())) &&
-						(secinfos.isTrustedPlatform() || (suiteinfos.isTrustedPlatform() == secinfos.isTrustedPlatform())) && 
-						(SUtil.equals(secinfos.getAuthenticatedPlatformName(), suiteinfos.getAuthenticatedPlatformName()) || (suiteinfos.getAuthenticatedPlatformName() == null && secinfos.getAuthenticatedPlatformName() != null)))
-						
+//					checkresults += ""+secinfos.isAdminPlatform()+" "+suiteinfos.isAdminPlatform()+" "+secinfos.isAdminPlatform()
+//					+" msgtrust:"+secinfos.isTrustedPlatform()+" suitetrust:"+suiteinfos.isTrustedPlatform()+" "+secinfos.isTrustedPlatform()
+//					+" "+secinfos.getAuthenticatedPlatformName()+" "+suiteinfos.getAuthenticatedPlatformName()
+//					+" "+suiteinfos.getAuthenticatedPlatformName()+" "+secinfos.getAuthenticatedPlatformName()
+//					+" "+Arrays.toString(secinfos.getNetworks().toArray())
+//					+" "+Arrays.toString(suiteinfos.getNetworks().toArray())+"\n";
+					
+					if ((secinfos.isAdminPlatform() || !suiteinfos.isAdminPlatform()) &&
+						(secinfos.isTrustedPlatform() || !suiteinfos.isTrustedPlatform()) && 
+						SUtil.equals(secinfos.getAuthenticatedPlatformName(), suiteinfos.getAuthenticatedPlatformName()) || (suiteinfos.getAuthenticatedPlatformName() == null && secinfos.getAuthenticatedPlatformName() != null))
 					{
 						Set<String> msgnets = secinfos.getNetworks();
 						if (msgnets.containsAll(suiteinfos.getNetworks()))
 						{
-							deccontent = expsuite.getFirstEntity().decryptAndAuthLocal(req.getContent());
+							ret = expsuite.getFirstEntity().decryptAndAuthLocal(req.getContent());
+							if (ret != null)
+								break;
 						}
 					}
 				}
+				if (ret == null)
+				{
+					ret = new SecurityException("Found expired suites but none match required security criteria.");
+//					ret = new SecurityException("Found " + expsuites.size() + " expired suites but none match required security criteria:\n" + checkresults);
+				}
+			}
+			else
+			{
+				ret = new IllegalStateException("No expired suites found to decrypt message.");
 			}
 			
-			agent.getFeature(IMessageFeature.class).sendReply(header, deccontent);
+			agent.getFeature(IMessageFeature.class).sendReply(header, ret);
 		}
 	}
 	
