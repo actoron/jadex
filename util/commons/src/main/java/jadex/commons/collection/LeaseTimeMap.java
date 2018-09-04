@@ -419,6 +419,17 @@ public class LeaseTimeMap<K, V> implements Map<K, V>
 	}
 	
 	/**
+	 *  Check for stale entries and remove them.
+	 *  This operation is only permissible in passive mode.
+	 */
+	public void checkStale()
+	{
+		if (!(times instanceof PassiveLeaseTimeSet))
+			throw new UnsupportedOperationException("Passive checkStale() checks only allowed on passive lease time maps.");
+		((PassiveLeaseTimeSet<K>)times).checkStale();
+	}
+	
+	/**
 	 *  Main for testing.
 	 */
 	public static void main(String[] args)
