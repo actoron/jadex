@@ -2765,9 +2765,6 @@ public class SComponentManagementService
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 			{
-				if(method.getName().indexOf("createCompo")!=-1)
-					System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
-			
 				Object ret = null;
 				try
 				{

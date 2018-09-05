@@ -22,8 +22,6 @@ public class ProxyFactory
     	if(loader==null)
     		throw new IllegalArgumentException("Classloader must not null");
     	
-    	try
-    	{
     	if(useasm && !SReflect.isAndroid())
     	{
     		try
@@ -39,12 +37,6 @@ public class ProxyFactory
     	else
     	{
     		return java.lang.reflect.Proxy.newProxyInstance(loader, interfaces, h);
-    	}
-    	}
-    	catch(Exception e)
-    	{
-    		e.printStackTrace();
-    		throw e;
     	}
     }
    
