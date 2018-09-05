@@ -672,8 +672,8 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 						{
 //						for (Map.Entry<IComponentIdentifier, Collection<Tuple2<ICommand<Con>, Long>>> entry : commandswaitingforcons.entrySet())
 //						{
-							Collection<Tuple2<ICommand<Con>, Long>> coll = commandswaitingforcons.get(key);
-							for (Tuple2<ICommand<Con>, Long> cmd : SUtil.notNull(coll))
+							List<Tuple2<ICommand<Con>, Long>> coll = new ArrayList<>(commandswaitingforcons.get(key));
+							for (Tuple2<ICommand<Con>, Long> cmd : coll)
 							{
 								if (cur < cmd.getSecondEntity())
 									commandswaitingforcons.removeObject(key, cmd);
