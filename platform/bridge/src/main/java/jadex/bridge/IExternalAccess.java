@@ -21,16 +21,23 @@ public interface IExternalAccess extends IExternalExecutionFeature, IExternalArg
 	//-------- cache --------
 	
 	/**
+	 *  Get the model of the component.
+	 *  @return	The model.
+	 */
+	public IFuture<IModelInfo> getModelAsync();
+	
+	/**
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
 	public IComponentIdentifier getId();
 	
 	/**
-	 *  Get the model of the component.
-	 *  @return	The model.
+	 *  Get a feature of the component.
+	 *  @param feature	The type of the feature.
+	 *  @return The feature instance.
 	 */
-	public IFuture<IModelInfo> getModelAsync();
+	public <T> T getExternalFeature(Class<? extends T> type);
 	
 //	/**
 //	 *  Test if current thread is an external thread.

@@ -36,16 +36,16 @@ public interface IInternalAccess extends IExternalAccess, IExecutionFeature, IAr
 	public IModelInfo getModel();
 
 	/**
-	 *  Get the configuration.
-	 *  @return	The configuration.
-	 */
-	public String getConfiguration();
-	
-	/**
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
 	public IComponentIdentifier	getId();
+	
+	/**
+	 *  Get the configuration.
+	 *  @return	The configuration.
+	 */
+	public String getConfiguration();
 	
 	/**
 	 *  Get a feature of the component.

@@ -8,9 +8,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
- * 
+ *  External perspective of the monitoring feature.
  */
-public interface IExternalMonitoringComponentFeature
+public interface IExternalMonitoringComponentFeature extends IExternalComponentFeature
 {
 	/**
 	 *  Subscribe to component events.

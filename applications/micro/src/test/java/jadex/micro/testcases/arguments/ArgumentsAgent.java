@@ -34,7 +34,8 @@ public class ArgumentsAgent extends JunitAgentTest
 	@AgentResult
 	protected String someresult;
 
-	public ArgumentsAgent() {
+	public ArgumentsAgent() 
+	{
 		super(ArgumentsAgent.class);
 	}
 

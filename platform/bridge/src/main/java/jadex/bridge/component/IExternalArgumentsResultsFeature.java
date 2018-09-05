@@ -9,7 +9,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 /**
  * 
  */
-public interface IExternalArgumentsResultsFeature
+public interface IExternalArgumentsResultsFeature extends IExternalComponentFeature
 {
 	/**
 	 *  Get the component results.

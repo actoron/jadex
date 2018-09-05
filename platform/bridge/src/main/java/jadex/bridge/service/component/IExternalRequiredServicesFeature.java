@@ -1,14 +1,15 @@
 package jadex.bridge.service.component;
 
+import jadex.bridge.component.IExternalComponentFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
- * 
+ *  External perspective of the required services feature.
  */
-public interface IExternalRequiredServicesFeature
+public interface IExternalRequiredServicesFeature extends IExternalComponentFeature
 {
 	/**
 	 *  Resolve a declared required service of a given name.

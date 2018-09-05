@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -19,8 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 import jadex.base.Starter;
 import jadex.bridge.ComponentResultListener;
@@ -39,6 +36,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IExternalComponentFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPropertiesFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
@@ -46,7 +44,6 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -66,9 +63,12 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
 
@@ -710,7 +710,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	{
 		return features!=null? type.cast(features.get(type)): null;
 	}
-
+	
 	/**
 	 *  Kill the component.
 	 */
@@ -821,6 +821,22 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					return cid == null? 0 : cid.hashCode();
 //					return getId() == null? 0 : getId().hashCode();
 				}
+				else if("getExternalFeature".equals(method.getName()))
+				{
+					Class<?> iface = (Class<?>)args[0];
+					
+					if(!SReflect.isSupertype(IExternalComponentFeature.class, iface))
+						throw new IllegalArgumentException("Must be external feature interface (extend IExternalComponentFeature)");
+					
+					return ProxyFactory.newProxyInstance(getClassLoader(), new Class[]{iface, IExternalAccess.class}, new InvocationHandler()
+					{
+						@Override
+						public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+						{
+							return method.invoke(getInternalAccess(), args);
+						}
+					});
+				}
 				else
 				{
 					if(!getFeature(IExecutionFeature.class).isComponentThread())
@@ -833,7 +849,11 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							@Override
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								doInvoke(ia, method, args).addResultListener(new DelegationResultListener<>(ret));
+								boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType());
+								if(!intermediate)
+									doInvoke(ia, method, args).addResultListener(new DelegationResultListener<>(ret));
+								else
+									doInvoke(ia, method, args).addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
 								return IFuture.DONE;
 							}
 						});
@@ -1372,7 +1392,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	{
 		// todo: resultlistener for results?!
 		
-		System.out.println("tuplecreate: "+info.getFilename());
+//		System.out.println("tuplecreate: "+info.getFilename());
 		
 		if(component==null && (info==null || info.getFilename()==null))
 			return new Tuple2Future<IComponentIdentifier, Map<String, Object>>(new RuntimeException("Component must not null."));
