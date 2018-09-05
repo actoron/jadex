@@ -444,7 +444,7 @@ public class SComponentManagementService
 						public void customResultAvailable(ClassLoader cl)
 						{
 							final IInternalAccess pad = getParentComponent(cinfo, agent);
-							final IExternalAccess parent = pad.getExternalAccess();
+//							final IExternalAccess parent = pad.getExternalAccess();
 							
 							String filename = modelname;
 							
@@ -514,7 +514,7 @@ public class SComponentManagementService
 						String	localtype = modelname!=null ? modelname : cinfo.getLocalType();
 						filename = null;
 						IInternalAccess pad = getParentComponent(cinfo, agent);
-						IExternalAccess parent = pad.getExternalAccess();
+//						IExternalAccess parent = pad.getExternalAccess();
 						final SubcomponentTypeInfo[] subcomps = model.getSubcomponentTypes();
 						
 						for(int i=0; filename==null && i<subcomps.length; i++)
@@ -531,7 +531,8 @@ public class SComponentManagementService
 						}
 					}
 					
-					ret.setResult(new Tuple2<String, ClassLoader>(filename, null));
+//					ret.setResult(new Tuple2<String, ClassLoader>(filename, null));
+					ret.setResult(new Tuple2<String, ClassLoader>(filename, SComponentManagementService.class.getClassLoader()));
 				}
 			}
 			
@@ -2182,9 +2183,6 @@ public class SComponentManagementService
 		{
 			public void customResultAvailable(final IResourceIdentifier rid)
 			{
-				if(modelname.indexOf("ServiceImpl")!=-1)
-					System.out.println("loading: "+modelname+" "+rid);
-
 				resolveFilename(modelname, cinfo, rid, agent).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<Tuple2<String, ClassLoader>, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(ret)
 				{
 					public void customResultAvailable(final Tuple2<String, ClassLoader> tup)

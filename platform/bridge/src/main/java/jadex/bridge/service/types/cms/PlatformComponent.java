@@ -627,6 +627,15 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	{
 		return info!=null? info.getModel(): null;
 	}
+	
+	/**
+	 *  Get the model of the component.
+	 *  @return	The model.
+	 */
+	public IFuture<IModelInfo> getModelAsync()
+	{
+		return new Future<>(getModel());
+	}
 
 	/**
 	 *  Get the start configuration or the default configuration if any.
@@ -786,7 +795,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 			{
-//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 				
 				if("getId".equals(method.getName()))
 				{
@@ -1357,6 +1366,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info)
 	{
 		// todo: resultlistener for results?!
+		
+		System.out.println("tuplecreate: "+info.getFilename());
 		
 		if(component==null && (info==null || info.getFilename()==null))
 			return new Tuple2Future<IComponentIdentifier, Map<String, Object>>(new RuntimeException("Component must not null."));
