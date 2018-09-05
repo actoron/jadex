@@ -2,15 +2,10 @@ package jadex.platform.service.message.websockettransport;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
 
-import jadex.bridge.service.component.IInternalRequiredServicesFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.Boolean3;
-import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Autostart;
 import jadex.platform.service.transport.AbstractTransportAgent2;
 import jadex.platform.service.transport.ITransport;
@@ -37,6 +32,7 @@ public class WebSocketTransportAgent extends AbstractTransportAgent2<IWebSocketC
 	/** Daemon thread pool service. */
 	protected IDaemonThreadPoolService threadpoolsrv;
 	
+	/** WebSocket factory. */
 	protected WebSocketFactory websocketfactory;
 	
 	/**
