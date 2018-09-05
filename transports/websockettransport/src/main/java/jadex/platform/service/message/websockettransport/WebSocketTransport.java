@@ -3,9 +3,14 @@ package jadex.platform.service.message.websockettransport;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
 
+import com.neovisionaries.ws.client.WebSocketFactory;
+
 import fi.iki.elonen.NanoHTTPD;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IPojoComponentFeature;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.transport.ITransport;
@@ -33,6 +38,9 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	public void	init(ITransportHandler<IWebSocketConnection> handler)
 	{
 		this.handler = (WebSocketTransportAgent) handler;
+		this.handler.setWebsocketFactory(new WebSocketFactory());
+		this.handler.getWebSocketFactory().setConnectionTimeout((int) this.handler.getConnectTimeout());
+		this.handler.setThreadPoolService(((IInternalRequiredServicesFeature)this.handler.getAccess().getFeature(IRequiredServicesFeature.class)).getRawService(IDaemonThreadPoolService.class));
 	}
 	
 	/**
@@ -73,7 +81,6 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 			{
 			}
 		}
-		
 	}
 
 	/**
