@@ -5,7 +5,6 @@ import java.nio.channels.SocketChannel;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Autostart;
-import jadex.platform.service.transport.AbstractTransportAgent;
 import jadex.platform.service.transport.AbstractTransportAgent2;
 import jadex.platform.service.transport.ITransport;
 

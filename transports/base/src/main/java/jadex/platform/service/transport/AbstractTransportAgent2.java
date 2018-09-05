@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicLong;
 
 import jadex.base.Starter;
@@ -310,114 +312,64 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 							body != null)
 						{
 							remotepf = handshakingconnections.get(con);
-							if (remotepf != null && body.length > 0)
+							if (remotepf == null && body.length > 0)
 							{
-								//client side, received platform name
+								// server receiving name
+								remotepf = new BasicComponentIdentifier((new String(body, SUtil.UTF8)).intern());
+								boolean notconnected = false;
+								if (canDecide(remotepf))
+								{
+									establishedconnections.writeLock().lock();
+									notconnected = !establishedconnections.containsKey(remotepf);
+									if (notconnected)
+										establishedconnections.put(remotepf, null);
+									establishedconnections.writeLock().unlock();
+								}
+								else
+								{
+									notconnected = true;
+								}
+								
+								if (notconnected)
+								{
+									final IComponentIdentifier fremotepf = remotepf;
+									impl.sendMessage(con, new byte[0], platformid.toString().getBytes(SUtil.UTF8))
+										.addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
+										{
+											public void resultAvailable(Integer result)
+											{
+												establishConnection(fremotepf, con);
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												if (canDecide(fremotepf))
+												{
+													establishedconnections.remove(fremotepf);
+													impl.closeConnection(con);
+												}
+											}
+										}));
+								}
+								else
+								{
+									handshakingconnections.remove(con);
+									impl.closeConnection(con);
+								}
+							}
+							else if (remotepf != null && body.length > 0)
+							{
+								// client receiving name
 								IComponentIdentifier rcvdpf = new BasicComponentIdentifier(new String(body, SUtil.UTF8));
 								if (rcvdpf.equals(remotepf))
 								{
-									if (canDecide(remotepf))
-									{
-										if (establishedconnections.containsKey(remotepf))
-										{
-											// Already connected
-											handshakingconnections.remove(con);
-											impl.closeConnection(con);
-										}
-										else
-										{
-											final IComponentIdentifier fremotepf = remotepf;
-											
-											// lock in the connection.
-											establishedconnections.put(remotepf, null);
-											
-											impl.sendMessage(con, new byte[0], platformid.toString().getBytes(SUtil.UTF8)).addResultListener(
-												execfeat.createResultListener(new IResultListener<Integer>()
-												{
-													public void resultAvailable(Integer result)
-													{
-														establishConnection(fremotepf, con);
-													}
-													public void exceptionOccurred(Exception exception)
-													{
-														establishedconnections.remove(fremotepf);
-														handshakingconnections.remove(con);
-														impl.closeConnection(con);
-													}
-												}));
-											
-										}
-									}
-									else
-									{
-										impl.sendMessage(con, new byte[0], platformid.toString().getBytes(SUtil.UTF8)).addResultListener(
-											execfeat.createResultListener(new IResultListener<Integer>()
-											{
-												public void resultAvailable(Integer result)
-												{
-												}
-												public void exceptionOccurred(Exception exception)
-												{
-													handshakingconnections.remove(con);
-													impl.closeConnection(con);
-												}
-											}));
-									}
+									establishConnection(remotepf, con);
 								}
 								else
 								{
 									agent.getLogger().warning("Tried to connect to " + remotepf + ", but answered " + rcvdpf + ".");
 									impl.closeConnection(con);
 								}
-							}
-							else if (remotepf == null && body.length > 0)
-							{
-								// server side, receive platform name
-								remotepf = new BasicComponentIdentifier(new String(body, SUtil.UTF8));
-								if (canDecide(remotepf))
-								{
-									if (establishedconnections.containsKey(remotepf))
-									{
-										// Already connected
-										handshakingconnections.remove(con);
-										impl.closeConnection(con);
-									}
-									else
-									{
-										final IComponentIdentifier fremotepf = remotepf;
-										
-										// lock in the connection.
-										establishedconnections.put(remotepf, null);
-										
-										impl.sendMessage(con, new byte[0], new byte[0]).addResultListener(
-											execfeat.createResultListener(new IResultListener<Integer>()
-											{
-												public void resultAvailable(Integer result)
-												{
-													establishConnection(fremotepf, con);
-												}
-												public void exceptionOccurred(Exception exception)
-												{
-													establishedconnections.remove(fremotepf);
-													impl.closeConnection(con);
-												}
-											}));
-									}
-									
-									PlatformData data = new PlatformData(remotepf, impl.getProtocolName(), false);
-									for (SubscriptionIntermediateFuture<PlatformData> sub : infosubscribers)
-										sub.addIntermediateResult(data);
-								}
-								else
-								{
-									// server side, confirmation from client-decider received
-									establishConnection(remotepf, con);
-								}
-							}
-							else if (body.length == 0 && remotepf != null && !canDecide(remotepf))
-							{
-								// client side, confirmation from decider received
-								establishConnection(remotepf, con);
 							}
 							else
 							{
@@ -451,18 +403,6 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				handshakingconnections.put(con, null);
-				impl.sendMessage(con, new byte[0], platformid.toString().getBytes(SUtil.UTF8))
-					.addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
-					{
-						public void resultAvailable(Integer result)
-						{
-						}
-						public void exceptionOccurred(Exception exception)
-						{
-							handshakingconnections.remove(con);
-							impl.closeConnection(con);
-						}
-					}));
 				return IFuture.DONE;
 			}
 		});
@@ -622,17 +562,59 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 					for (TransportAddress address : result)
 					{
 						impl.createConnection(address.getAddress(), remotepf).addResultListener(
-							execfeat.createResultListener(new IResultListener<Con>()
+							new IResultListener<Con>()
 						{
-							public void resultAvailable(Con result)
+							public void resultAvailable(final Con con)
 							{
-								handshakingconnections.put(result, remotepf);
+								if (canDecide(remotepf))
+								{
+									establishedconnections.writeLock().lock();
+									boolean notconnected = !establishedconnections.containsKey(remotepf);
+									if (notconnected)
+										establishedconnections.put(remotepf, null);
+									establishedconnections.writeLock().unlock();
+									
+									if (notconnected)
+									{
+										impl.sendMessage(con, new byte[0], platformid.toString().getBytes(SUtil.UTF8))
+											.addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
+											{
+												public void resultAvailable(Integer result)
+												{
+													handshakingconnections.put(con, remotepf);
+												}
+												
+												public void exceptionOccurred(Exception exception)
+												{
+													establishedconnections.remove(remotepf);
+													impl.closeConnection(con);
+												}
+											}));
+									}
+								}
+								else
+								{
+									impl.sendMessage(con, new byte[0], platformid.toString().getBytes(SUtil.UTF8))
+										.addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
+									{
+										public void resultAvailable(Integer result)
+										{
+											handshakingconnections.put(con, remotepf);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											impl.closeConnection(con);
+	//										exception.printStackTrace();
+										}
+									}));
+								}
 							}
 							public void exceptionOccurred(Exception exception)
 							{
-								exception.printStackTrace();
+//								exception.printStackTrace();
 							}
-						}));
+						});
 					}
 					
 					PlatformData data = new PlatformData(remotepf, impl.getProtocolName(), false);
@@ -652,7 +634,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	protected void establishConnection(IComponentIdentifier remotepf, Con con)
 	{
 		assert execfeat.isComponentThread();
-//		System.out.println("HANDSHAKE DONE FOR " + platformid + " -> " + remotepf + " " + con);
+//		System.out.println("HANDSHAKE DONE FOR " + platformid + " -> " + remotepf + " " + con + " " + canDecide(remotepf));
 		
 		Collection<Tuple2<ICommand<Con>, Long>> waitingcmds = commandswaitingforcons.remove(remotepf);
 		for (Tuple2<ICommand<Con>, Long> cmdtup : SUtil.notNull(waitingcmds))
