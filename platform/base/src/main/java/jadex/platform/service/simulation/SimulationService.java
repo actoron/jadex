@@ -484,10 +484,10 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			}
 			else
 			{
-//				System.out.println("Advancing clock");
+//				System.out.println(access+" advancing clock");
 				if(getClockService().advanceEvent())
 				{
-//					System.out.println("Advanced clock");
+//					System.out.println(access+" advanced clock");
 //					System.out.println("Wait1");
 					waitForBlockers().addResultListener(new IResultListener<Void>()
 					{

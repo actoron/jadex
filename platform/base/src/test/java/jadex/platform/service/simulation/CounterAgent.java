@@ -6,6 +6,7 @@ import java.util.List;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
@@ -23,7 +24,11 @@ public class CounterAgent
 	
 	/** The count offset. */
 	@AgentArgument
-	protected int	offset	= 1;
+	protected int	offset	= 0;
+	
+	/** The count increment. */
+	@AgentArgument
+	protected int	increment	= 3;
 	
 	/** The clock service. */
 	@AgentServiceSearch(requiredservice=@RequiredService(name="clock", type=IClockService.class))
@@ -37,12 +42,38 @@ public class CounterAgent
 	{
 		long	start	= clock.getTime();
 		
-		for(int i=offset; i<=10; i+=offset)
+		for(int i=0; i<3; i++)
 		{
-			agent.getFeature(IExecutionFeature.class).waitForDelay(offset).get();
+			// Wait for next time point.
+			long	wait	= i==0 ? offset : increment;
+			System.out.println(agent+" wait for "+wait);
+			agent.getFeature(IExecutionFeature.class).waitForDelay(wait).get();
+			
+			// Do/wait some steps to check if clock stays at time point
+			for(int step=0; step<3; step++)
+			{
+				agent.scheduleStep(ia ->
+				{
+					long	time	= clock.getTime() - start;
+					System.out.println(agent+" step at "+time);
+					return IFuture.DONE;
+				}).get();
+			}
+			
 			long	time	= clock.getTime() - start;
 			LIST.add(Long.toString(time));
 			System.out.println(agent+" counts at "+time);
+			
+			// Do/wait some steps to check if clock stays at time point
+			for(int step=0; step<3; step++)
+			{
+				agent.scheduleStep(ia ->
+				{
+					long	time1	= clock.getTime() - start;
+					System.out.println(agent+" step at "+time1);
+					return IFuture.DONE;
+				}).get();
+			}
 		}
 		agent.killComponent();
 	}
