@@ -699,24 +699,40 @@ public class SecurityAgent implements ISecurityService, IInternalService
 									}
 									else
 									{
-										Object reply = requestReencryption(splat, content);
-										if(reply == null)
+										requestReencryption(splat, content).addResultListener(new IResultListener<byte[]>()
 										{
-											ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString()));
-										}
-										else if (reply instanceof Exception)
-										{
-											ret.setException((Exception) reply);
-										}
-										else if (reply instanceof byte[])
-										{
-											cleartext = (byte[]) reply;
-											ret.setResult(new Tuple2<ISecurityInfo, byte[]>(result.getSecurityInfos(), cleartext));
-										}
-										else
-										{
-											ret.setException(new SecurityException("Unrecognized decryption request reply: " + reply));
-										}
+											public void resultAvailable(byte[] result)
+											{
+												ICryptoSuite cs = currentcryptosuites.get(splat);
+												if (cs != null)
+													ret.setResult(new Tuple2<ISecurityInfo, byte[]>(cs.getSecurityInfos(), result));
+												else
+													ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString() + "  " + content));
+											};
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												ret.setException(exception);
+											}
+										});
+//										Object reply = requestReencryption(splat, content);
+//										if(reply == null)
+//										{
+//											ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString()));
+//										}
+//										else if (reply instanceof Exception)
+//										{
+//											ret.setException((Exception) reply);
+//										}
+//										else if (reply instanceof byte[])
+//										{
+//											cleartext = (byte[]) reply;
+//											
+//										}
+//										else
+//										{
+//											ret.setException(new SecurityException("Unrecognized decryption request reply: " + reply));
+//										}
 									}
 								}
 								
@@ -728,24 +744,40 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 						else
 						{
-							Object reply = requestReencryption(splat, content);
-							if(reply == null)
+							requestReencryption(splat, content).addResultListener(new IResultListener<byte[]>()
 							{
-								ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString() + "  " + content));
-							}
-							else if (reply instanceof Exception)
-							{
-								ret.setException((Exception) reply);
-							}
-							else if (reply instanceof byte[])
-							{
-								cleartext = (byte[]) reply;
-								cs = currentcryptosuites.get(splat);
-							}
-							else
-							{
-								ret.setException(new SecurityException("Unrecognized decryption request reply: " + reply));
-							}
+								public void resultAvailable(byte[] result)
+								{
+									ICryptoSuite cs = currentcryptosuites.get(splat);
+									if (cs != null)
+										ret.setResult(new Tuple2<ISecurityInfo, byte[]>(cs.getSecurityInfos(), result));
+									else
+										ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString() + "  " + content));
+								};
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									ret.setException(exception);
+								}
+							});
+//							Object reply = requestReencryption(splat, content);
+//							if(reply == null)
+//							{
+//								ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString() + "  " + content));
+//							}
+//							else if (reply instanceof Exception)
+//							{
+//								ret.setException((Exception) reply);
+//							}
+//							else if (reply instanceof byte[])
+//							{
+//								cleartext = (byte[]) reply;
+//								cs = currentcryptosuites.get(splat);
+//							}
+//							else
+//							{
+//								ret.setException(new SecurityException("Unrecognized decryption request reply: " + reply));
+//							}
 						}
 					}
 					
@@ -1700,24 +1732,41 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param content The encrypted content.
 	 *  @return Reply of decryption request, may be exception.
 	 */
-	protected Object requestReencryption(String platformname, byte[] content)
+	protected IFuture<byte[]> requestReencryption(String platformname, byte[] content)
 	{
+		synchronized(currentcryptosuites)
+		{
+			ICryptoSuite cur = currentcryptosuites.remove(platformname);
+			if (cur != null)
+				expiringcryptosuites.add(platformname, new Tuple2<>(cur, System.currentTimeMillis() + TIMEOUT));
+		}
+		
 		System.out.println("reencryption: "+platformname+" "+Arrays.hashCode(content) + " " + currentcryptosuites.get(platformname));
 //		Thread.dumpStack();
 		
 		ReencryptionRequest req = new ReencryptionRequest();
 		req.setContent(content);
 		
-		Object ret = null;
-		try
+		Future<byte[]> ret = new Future<>();
+		BasicComponentIdentifier source = new BasicComponentIdentifier("security@" + platformname);
+		agent.getFeature(IMessageFeature.class).sendMessageAndWait(source, req)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Object>()
 		{
-			BasicComponentIdentifier source = new BasicComponentIdentifier("security@" + platformname);
-			ret = agent.getFeature(IMessageFeature.class).sendMessageAndWait(source, req).get();
-		}
-		catch (Exception e)
-		{
-			ret = e;
-		}
+			public void resultAvailable(Object result)
+			{
+				if (result instanceof byte[])
+					ret.setResult((byte[]) result);
+				else if (result instanceof Exception)
+					exceptionOccurred((Exception) result);
+				else
+					ret.setException(new IllegalArgumentException("Received unknown reply: " + result));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		}));
 		
 		return ret;
 	}
