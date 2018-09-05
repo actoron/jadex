@@ -236,14 +236,14 @@ public class BeanCodec extends AbstractCodec
 	 */
 	public static void writeBeanProperties(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, Traverser traverser, MODE mode, IEncodingContext ec, IBeanIntrospector intro)
 	{
-		Map props = intro.getBeanProperties(clazz, true, false);
+		Map<String, BeanProperty> props = intro.getBeanProperties(clazz, true, false);
 		
-		List<String> names = new ArrayList<String>();
-		List<Object> values = new ArrayList<Object>();
-		List<Class> clazzes = new ArrayList<Class>();
-		for(Iterator it=props.keySet().iterator(); it.hasNext(); )
+		List<String> names = new ArrayList<>();
+		List<Object> values = new ArrayList<>();
+		List<Class<?>> clazzes = new ArrayList<>();
+		for(Map.Entry<String, BeanProperty> entry : props.entrySet())
 		{
-			BeanProperty prop = (BeanProperty)props.get(it.next());
+			BeanProperty prop = entry.getValue();
 			if(prop!=null && prop.isReadable())
 			{
 				Object val = prop.getPropertyValue(object);
@@ -255,6 +255,20 @@ public class BeanCodec extends AbstractCodec
 				}
 			}
 		}
+//		for(Iterator it=props.keySet().iterator(); it.hasNext(); )
+//		{
+//			BeanProperty prop = (BeanProperty)props.get(it.next());
+//			if(prop!=null && prop.isReadable())
+//			{
+//				Object val = prop.getPropertyValue(object);
+//				if(val != null)
+//				{
+//					names.add(prop.getName());
+//					clazzes.add(prop.getType());
+//					values.add(val);
+//				}
+//			}
+//		}
 		ec.writeVarInt(names.size());
 		
 		for(int i = 0; i < names.size(); ++i)

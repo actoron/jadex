@@ -295,7 +295,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			{
 				public void resultAvailable(Integer result)
 				{
-					ret.setResult(null);
+					ret.setResultIfUndone(null);
 				}
 				
 				public void exceptionOccurred(Exception exception)

@@ -2,6 +2,7 @@ package jadex.platform.service.transport.tcp;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 
 import jadex.commons.SUtil;
@@ -49,6 +50,7 @@ public class TcpMessageBuffer
 		this.maxsize = maxsize;
 		this.wb = ByteBuffer.allocateDirect(BUFFER_SIZE);
 		this.rb = wb.asReadOnlyBuffer();
+		rb.order(ByteOrder.BIG_ENDIAN);
 	}
 
 	// -------- methods --------
@@ -115,12 +117,14 @@ public class TcpMessageBuffer
 		// Need at least 4 size bytes, else NOP until more bytes available.
 		if(data==null && wb.position()-rb.position()>=4)
 		{
-			byte[]	bytes	= new byte[4];
-			bytes[0]	= rb.get();
-			bytes[1]	= rb.get();
-			bytes[2]	= rb.get();
-			bytes[3]	= rb.get();
-			int	len = SUtil.bytesToInt(bytes);
+//			byte[]	bytes	= new byte[4];
+//			bytes[0]	= rb.get();
+//			bytes[1]	= rb.get();
+//			bytes[2]	= rb.get();
+//			bytes[3]	= rb.get();
+//			int	len = SUtil.bytesToInt(bytes);
+			
+			int len = rb.getInt();
 			
 			// Size sanity check.
 			int remsize = maxsize;
