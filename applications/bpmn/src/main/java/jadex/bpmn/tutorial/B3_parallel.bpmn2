@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>B3_parallel</jadex:modelname>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="vq1VKFEd5CnfmLko">
     <semantic:task name="Task 2aI" id="iCPm4vVrOZZZWQKZ">

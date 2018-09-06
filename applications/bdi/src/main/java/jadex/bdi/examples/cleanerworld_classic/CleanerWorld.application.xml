@@ -20,25 +20,25 @@
 	<configurations>
 		<configuration name="Two cleaners local">
 			<components>
-				<component type="EnvironmentLocal" master="true"/>
+				<component type="EnvironmentLocal"/>
 				<component type="CleanerLocal" number="2"/>
 			</components>
 		</configuration>
 		<configuration name="One cleaner local">
 			<components>
-				<component type="EnvironmentLocal" master="true"/>
+				<component type="EnvironmentLocal"/>
 				<component type="CleanerLocal"/>
 			</components>
 		</configuration>
 		<configuration name="Two cleaners remote">
 			<components>
-				<component type="EnvironmentRemote" master="true"/>
+				<component type="EnvironmentRemote"/>
 				<component type="CleanerRemote" number="2"/>
 			</components>
 		</configuration>
 		<configuration name="One cleaner remote">
 			<components>
-				<component type="EnvironmentRemote" master="true"/>
+				<component type="EnvironmentRemote"/>
 				<component type="CleanerRemote"/>
 			</components>
 		</configuration>

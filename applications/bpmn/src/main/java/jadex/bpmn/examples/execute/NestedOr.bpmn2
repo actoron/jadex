@@ -9,7 +9,7 @@
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
     <jadex:modelname>NestedOr</jadex:modelname>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="_Hw2QsUzlEeGMpKapd6sUmg">
     <semantic:task name="D" id="_fUKKAUzlEeGMpKapd6sUmg">

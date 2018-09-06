@@ -23,13 +23,13 @@
 		<configuration name="micro provider">
 			<components>
 				<component name="provider" type="ChartMicroProvider"/>
-				<component name="user" type="ChartUser" master="true"/>
+				<component name="user" type="ChartUser"/>
 			</components>
 		</configuration>
 		<configuration name="component provider">
 			<components>
 				<component name="provider" type="ChartComponentProvider"/>
-				<component name="user" type="ChartUser" master="true"/>
+				<component name="user" type="ChartUser"/>
 			</components>
 		</configuration>
 	</configurations>

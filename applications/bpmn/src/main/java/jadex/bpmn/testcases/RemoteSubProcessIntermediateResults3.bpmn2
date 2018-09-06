@@ -11,7 +11,7 @@
     <jadex:modelname>RemoteSubProcessIntermediateResults</jadex:modelname>
     <jadex:description>&lt;H1&gt;Intermediate Result Events&lt;/H1&gt; Tests if a subprocess can be started that produces intermediate results. These intermediate results will be received by the parent process and can be handled by an activity signal handler.</jadex:description>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:imports>
       <jadex:import>jadex.base.test.*</jadex:import>
       <jadex:import>jadex.bridge.*</jadex:import>

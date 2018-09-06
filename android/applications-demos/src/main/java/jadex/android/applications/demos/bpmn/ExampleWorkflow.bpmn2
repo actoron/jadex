@@ -9,7 +9,7 @@
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
     <jadex:modelname>ExampleWorkflow</jadex:modelname>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:arguments>
       <jadex:argument name="androidContext" type="android.content.Context">
         <jadex:description>The android application context</jadex:description>

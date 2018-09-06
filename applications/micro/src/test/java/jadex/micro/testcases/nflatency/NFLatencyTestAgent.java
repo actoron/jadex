@@ -3,13 +3,16 @@ package jadex.micro.testcases.nflatency;
 import java.util.Collection;
 import java.util.Map;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -28,6 +31,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.TupleResult;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -43,6 +47,7 @@ import jadex.micro.testcases.TestAgent;
 	@RequiredService(name="aser", type=ITestService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL,
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))
 })
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class NFLatencyTestAgent extends TestAgent
 {
 	/**
@@ -100,7 +105,13 @@ public class NFLatencyTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(null).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+		disableLocalSimulationMode().get();
+		
+//		createPlatform(null)
+		IPlatformConfiguration config = STest.getDefaultTestConfig();
+		config.getExtendedPlatformConfiguration().setSimul(false);
+		config.getExtendedPlatformConfiguration().setSimulation(false);
+		createPlatform(config, null).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)

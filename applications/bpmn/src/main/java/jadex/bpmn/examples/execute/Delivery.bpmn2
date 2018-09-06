@@ -11,7 +11,7 @@
     <jadex:modelname>Delivery</jadex:modelname>
     <jadex:description>&lt;h1&gt;Simple Delivery Process&lt;/h1&gt; This process sends payment reminders to the JCC. Try sending the process an &apos;inform(payment)&apos;.</jadex:description>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:contextvariables>
       <jadex:contextvariable name="dunnings" type="int">
         <jadex:value>0</jadex:value>

@@ -17,7 +17,7 @@
 	<configurations>
 		<configuration name="Only Manager">
 			<components>
-				<component type="Manager" master="true"/>
+				<component type="Manager"/>
 			</components>
 		</configuration>
 	</configurations>

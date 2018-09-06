@@ -55,21 +55,6 @@ public @interface BDIConfiguration
 	public RequiredService[] requiredservices() default {};
 	
 	/**
-	 *  The master flag.
-	 */
-	public boolean master() default false;
-	
-	/**
-	 *  The master flag.
-	 */
-	public boolean daemon() default false;
-	
-	/**
-	 *  The autoshutdown flag.
-	 */
-	public boolean autoshutdown() default false;
-	
-	/**
 	 *  The synchronous flag.
 	 */
 	public boolean synchronous() default false;

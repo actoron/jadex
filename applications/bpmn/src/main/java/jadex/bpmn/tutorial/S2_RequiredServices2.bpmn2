@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>S2_RequiredServices</jadex:modelname>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:requiredservices>
       <jadex:requiredservice name="bser" interface="jadex.bpmn.tutorial.IBService" scope="platform" dynamic="false" create="false"/>
     </jadex:requiredservices>

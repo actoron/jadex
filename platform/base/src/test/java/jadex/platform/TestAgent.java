@@ -176,7 +176,7 @@ public abstract class TestAgent
 		String[] defargs = new String[]{
 //			"-libpath", url,
 			"-platformname", agent.getId().getPlatformPrefix()+"_*",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
+			"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
 //			"-logging", "true",
 //			"-relaytransport", "false",
 //				"-gui", "false", "-usepass", "false", "-simulation", "false"
