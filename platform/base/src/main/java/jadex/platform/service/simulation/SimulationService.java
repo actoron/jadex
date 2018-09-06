@@ -448,24 +448,28 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	 */
 	protected void scheduleAdvanceClock()
 	{
+		if(idlelistener!=null)
+			idlelistener.outdated	= true;
+		idlelistener	= new IdleListener();
+		getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
 //		System.out.println("Wait2");
-		waitForBlockers().addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-//				System.out.println("Release2");
-				if(idlelistener!=null)
-					idlelistener.outdated	= true;
-				idlelistener	= new IdleListener();
-				
-				getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				resultAvailable(null);
-			}
-		});
+//		waitForBlockers().addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+////				System.out.println("Release2");
+//				if(idlelistener!=null)
+//					idlelistener.outdated	= true;
+//				idlelistener	= new IdleListener();
+//				
+//				getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				resultAvailable(null);
+//			}
+//		});
 	}
 	
 	/**
@@ -484,66 +488,68 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			}
 			else
 			{
-//				System.out.println(access+" advancing clock");
-				if(getClockService().advanceEvent())
+				waitForBlockers().addResultListener(new IResultListener<Void>()
 				{
-//					System.out.println(access+" advanced clock");
-//					System.out.println("Wait1");
-					waitForBlockers().addResultListener(new IResultListener<Void>()
+					public void resultAvailable(Void result)
 					{
-						public void resultAvailable(Void result)
+		//				System.out.println(access+" advancing clock");
+						if(getClockService().advanceEvent())
 						{
-//							System.out.println("Release1");
+		//					System.out.println(access+" advanced clock");
+		//					System.out.println("Wait1");
+							
+		//							System.out.println("Release1");
 							if(idlelistener==null)
 								idlelistener	= new IdleListener();
 							getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
+								
 						}
-						
-						public void exceptionOccurred(Exception exception)
+						else
 						{
-							resultAvailable(null);
-						}
-					});
-				}
-				else
-				{
-//					System.out.println("Clock not advanced");
-
-					// Simulation stopped due to no more entries
-					// -> listen on clock until new entries available.
-					if(MODE_NORMAL.equals(mode))
-					{
-						getClockService().addChangeListener(new IChangeListener()
-						{
-							public void changeOccurred(ChangeEvent event)
+		//					System.out.println("Clock not advanced");
+		
+							// Simulation stopped due to no more entries
+							// -> listen on clock until new entries available.
+							if(MODE_NORMAL.equals(mode))
 							{
-								if(IClock.EVENT_TYPE_TIMER_ADDED.equals(event.getType()))
+								getClockService().addChangeListener(new IChangeListener()
 								{
-									getClockService().removeChangeListener(this);
-									access.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+									public void changeOccurred(ChangeEvent event)
 									{
-										public IFuture<Void> execute(IInternalAccess ia)
+										if(IClock.EVENT_TYPE_TIMER_ADDED.equals(event.getType()))
 										{
-											// Resume execution if still executing.
-											if(MODE_NORMAL.equals(mode) && executing)
+											getClockService().removeChangeListener(this);
+											access.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 											{
-//												System.out.println("Schedule advancing clock");
-												scheduleAdvanceClock();
-											}
-											return IFuture.DONE;
+												public IFuture<Void> execute(IInternalAccess ia)
+												{
+													// Resume execution if still executing.
+													if(MODE_NORMAL.equals(mode) && executing)
+													{
+		//												System.out.println("Schedule advancing clock");
+														scheduleAdvanceClock();
+													}
+													return IFuture.DONE;
+												}
+											});
 										}
-									});
-								}
+									}
+								});
 							}
-						});
+							
+							// Step finished.
+							else
+							{
+								setIdle();
+							}
+						}
 					}
 					
-					// Step finished.
-					else
+					public void exceptionOccurred(Exception exception)
 					{
-						setIdle();
+						resultAvailable(null);
 					}
-				}
+				});
 			}
 		}
 		// else do nothing for continuous clock as it executes itself.

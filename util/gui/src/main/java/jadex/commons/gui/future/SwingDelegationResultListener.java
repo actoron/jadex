@@ -266,7 +266,7 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	protected static void	block(Future<?> adblock)
 	{
 		IInternalAccess	ia	= ExecutionComponentFeature.LOCAL.get();
-		if(Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG)))
+		if(ia != null && Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG)))
 		{
 			ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
 				.addAdvanceBlocker(adblock).get();

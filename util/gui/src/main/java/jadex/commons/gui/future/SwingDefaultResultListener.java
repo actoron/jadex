@@ -81,7 +81,7 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	{
 		Future<Void>	adblock	= null;
 		IInternalAccess	ia	= ExecutionComponentFeature.LOCAL.get();
-		if(Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG)))
+		if(ia != null && Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG)))
 		{
 			adblock	= new Future<>();
 			ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
