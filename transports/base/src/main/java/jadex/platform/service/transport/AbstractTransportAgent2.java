@@ -153,7 +153,6 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		
 		secser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(
 			new ServiceQuery<>(ISecurityService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW));
-		System.out.println("secserv is: " + secser);
 		serser =  (ISerializationServices)Starter.getPlatformValue(platformid, Starter.DATA_SERIALIZATIONSERVICES);
 		
 		infosubscribers = new ArrayList<SubscriptionIntermediateFuture<PlatformData>>();
@@ -637,7 +636,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	protected void establishConnection(IComponentIdentifier remotepf, Con con)
 	{
 		assert execfeat.isComponentThread();
-//		System.out.println("HANDSHAKE DONE FOR " + platformid + " -> " + remotepf + " " + con + " " + canDecide(remotepf));
+		System.out.println("HANDSHAKE DONE FOR " + platformid + " -> " + remotepf + " " + con + " " + canDecide(remotepf));
 		
 		Collection<Tuple2<ICommand<Con>, Long>> waitingcmds = commandswaitingforcons.remove(remotepf);
 		for (Tuple2<ICommand<Con>, Long> cmdtup : SUtil.notNull(waitingcmds))
