@@ -713,36 +713,7 @@ public class RemoteReferenceModule
 		// Create a remote reference if not yet available.
 //		if(ret==null)
 		{
-			if(ProxyFactory.isProxyClass(target.getClass()))
-			{
-				Object handler = ProxyFactory.getInvocationHandler(target);
-				if(handler instanceof BasicServiceInvocationHandler)
-				{
-					BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
-					Object ser = bsh.getService();
-					// Has to look into service as could be nested remote handler inside.
-					if(ser instanceof IService)
-					{
-						ret = getRemoteReference(ser, orig);//, false);
-					}
-					else 
-					{
-						ret = new RemoteReference(bsh.getServiceIdentifier().getProviderId(), bsh.getServiceIdentifier());
-					}
-				}
-				else if(handler instanceof RemoteMethodInvocationHandler)
-				{
-					RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)ProxyFactory.getInvocationHandler(target);
-					ret	= rmih.getProxyReference().getRemoteReference();
-				}
-				else
-				{
-					// TODO: can not happen?
-					throw new UnsupportedOperationException("Proxy type not supproetd: "+target);
-//					ret = generateRemoteReference();
-				}
-			}
-			else if(target instanceof IExternalAccess)
+			if(target instanceof IExternalAccess)
 			{
 				ret = new RemoteReference(((IExternalAccess)target).getId(), ((IExternalAccess)target).getId());
 //				System.out.println("component ref: "+ret);
@@ -764,6 +735,26 @@ public class RemoteReferenceModule
 					ret = new RemoteReference(((ServiceInfo)target).getManagementService().getId().getProviderId(), ((ServiceInfo)target).getManagementService().getId());
 	//				System.out.println("service ref: "+ret);
 				}
+			}
+			else if(ProxyFactory.isProxyClass(target.getClass()) && ProxyFactory.getInvocationHandler(target) instanceof BasicServiceInvocationHandler)
+			{
+				Object handler = ProxyFactory.getInvocationHandler(target);
+				BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
+				Object ser = bsh.getService();
+				// Has to look into service as could be nested remote handler inside.
+				if(ser instanceof IService)
+				{
+					ret = getRemoteReference(ser, orig);//, false);
+				}
+				else 
+				{
+					ret = new RemoteReference(bsh.getServiceIdentifier().getProviderId(), bsh.getServiceIdentifier());
+				}
+			}
+			else if(ProxyFactory.isProxyClass(target.getClass()) && ProxyFactory.getInvocationHandler(target) instanceof RemoteMethodInvocationHandler)
+			{
+				RemoteMethodInvocationHandler rmih = (RemoteMethodInvocationHandler)ProxyFactory.getInvocationHandler(target);
+				ret	= rmih.getProxyReference().getRemoteReference();
 			}
 			else
 			{
