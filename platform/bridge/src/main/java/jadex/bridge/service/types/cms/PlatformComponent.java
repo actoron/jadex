@@ -246,27 +246,30 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getDescription().getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
 								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, System.currentTimeMillis(), PublishEventLevel.COARSE);
 							event.setProperty("details", getDescription());
-							getFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL).addResultListener(new IResultListener<Void>()
-							{
-								public void resultAvailable(Void result)
-								{
-//									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-//										System.out.println("shutdown component features end2: "+getComponentIdentifier()+", "+ex);
-									if(ex!=null)
-										ret.setExceptionIfUndone(ex);
-									else
-										ret.setResultIfUndone(null);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-//									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-//										System.out.println("shutdown component features end3: "+getComponentIdentifier()+", "+ex);
-									ret.setExceptionIfUndone(exception);
-								}
-							});
+							getFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL);
+//								.addResultListener(new IResultListener<Void>()
+//							{
+//								public void resultAvailable(Void result)
+//								{
+////									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+////										System.out.println("shutdown component features end2: "+getComponentIdentifier()+", "+ex);
+//									if(ex!=null)
+//										ret.setExceptionIfUndone(ex);
+//									else
+//										ret.setResultIfUndone(null);
+//								}
+//								
+//								public void exceptionOccurred(Exception exception)
+//								{
+////									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+////										System.out.println("shutdown component features end3: "+getComponentIdentifier()+", "+ex);
+//									ret.setExceptionIfUndone(exception);
+//								}
+//							});
 						}
-						else
+						
+						// Do not wait for monitoring event but directly terminate to avoid having all return steps being scheduled immediately (see DecouplingReturnInterceptor) 
+//						else
 						{
 //							if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
 //								System.out.println("shutdown component features end4: "+getComponentIdentifier()+", "+ex);

@@ -818,6 +818,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ia.getExternalAccess(), info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
 				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
+//			else
+//				System.out.println("hurz: "+service);
 			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, service.getId()));
 			handler.addFirstServiceInterceptor(new NFRequiredServicePropertyProviderInterceptor(ia, service.getId()));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;

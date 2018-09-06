@@ -3,6 +3,7 @@ package jadex.bridge.service.component.interceptors;
 import java.util.logging.Logger;
 
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
@@ -53,7 +54,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 		{
 			public void customResultAvailable(Void result)
 			{
-//				if(sic.getMethod().getName().indexOf("Void")!=-1)
+//				if(sic.getMethod().getName().indexOf("getAllKnownNetworks")!=-1)
 //					System.out.println("decouplingret: "+sic.getArguments());
 				
 				final Object	res	= sic.getResult();
@@ -81,7 +82,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							{
 								try
 								{
-									caller.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+									caller.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+//									caller.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()	// immediate was required for return of monitoring event component disposed. disabled waiting for last monitoring event instead. 
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
