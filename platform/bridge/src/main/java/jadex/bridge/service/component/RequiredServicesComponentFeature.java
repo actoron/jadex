@@ -509,7 +509,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 		try
 		{
-			return resolveLocalService(new ServiceQuery<>(type).setMultiplicity(Multiplicity.ZERO_ONE), null);
+			ServiceQuery<T> query = new ServiceQuery<>(type).setMultiplicity(Multiplicity.ZERO_ONE);
+			query.setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW);
+			return resolveLocalService(query, createServiceInfo(query));
 		}
 		catch(ServiceNotFoundException snfe)
 		{
@@ -522,7 +524,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public <T> Collection<T> getRawServices(Class<T> type)
 	{
-		return resolveLocalServices(new ServiceQuery<>(type), null);
+		ServiceQuery<T> query = new ServiceQuery<>(type);
+		query.setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW);
+		return resolveLocalServices(query, createServiceInfo(query));
 	}
 
 	
@@ -861,6 +865,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 		// TODO: multiplicity required here for info? should not be needed for proxy creation
 		RequiredServiceBinding binding = new RequiredServiceBinding(SUtil.createUniqueId(), query.getScope());
+		binding.setProxytype(query.getRequiredProxyType());
 		return new RequiredServiceInfo(null, query.getServiceType(), false, binding, null, query.getServiceTags()==null ? null : Arrays.asList(query.getServiceTags()));
 	}
 	
@@ -1000,6 +1005,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			// Fix multiple flag according to single/multi method 
 			query.setMultiplicity(multi ? Multiplicity.ZERO_MANY : Multiplicity.ONE);
 		}
+		
+		if (query.getRequiredProxyType() == null)
+			query.setRequiredProxyType(ServiceQuery.PROXYTYPE_DECOUPLED);
 		
 		// Network names not set by user?
 		if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
