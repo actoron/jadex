@@ -17,7 +17,7 @@ import jadex.platform.service.transport.ITransportHandler;
  *  Message transport for bisimulation (no external threads)
  *  based on intra VM passing of message data.
  */
-public class IntravmTransport	implements ITransport<IntravmTransport>
+public class IntravmTransport implements ITransport<IntravmTransport.HandlerHolder>
 {
 	//-------- constants --------
 	
@@ -30,7 +30,7 @@ public class IntravmTransport	implements ITransport<IntravmTransport>
 	// -------- attributes --------
 
 	/** The transport handler, e.g. for delivering received messages. */
-	protected ITransportHandler<IntravmTransport>	handler;
+	protected ITransportHandler<HandlerHolder>	handler;
 //	
 //	/** Flag indicating the thread should be running (set to false for shutdown). */
 //	protected boolean	running;
@@ -58,9 +58,9 @@ public class IntravmTransport	implements ITransport<IntravmTransport>
 	 *  To be called once, before any other method.
 	 *  @param handler 	The transport handler with callback methods. 
 	 */
-	public void	init(ITransportHandler<IntravmTransport> handler)
+	public void	init(ITransportHandler<HandlerHolder> handler)
 	{
-		this.handler	= handler;
+		this.handler = handler;
 	}
 		
 	/**
@@ -114,20 +114,24 @@ public class IntravmTransport	implements ITransport<IntravmTransport>
 	 *  @param target	The target identifier to maybe perform authentication of the connection.
 	 *  @return A future containing the connection when succeeded.
 	 */
-	public IFuture<IntravmTransport>	createConnection(final String address, final IComponentIdentifier target)
+	public IFuture<HandlerHolder> createConnection(final String address, final IComponentIdentifier target)
 	{
-		Future<IntravmTransport>	ret	= new Future<IntravmTransport>();
+		Future<HandlerHolder> ret = new Future<>();
 		
 		try
 		{
 			// Some scheme required for URI parsing
 			URI uri = new URI(getProtocolName()+"://" + address);
 			int	port	= uri.getPort();
-			IntravmTransport	con	= ports.get(port);
-			if(con!=null)
+			IntravmTransport tp = ports.get(port);
+			if(tp!=null)
 			{
-				con.handler.connectionEstablished(this);
-				ret.setResult(con);
+				HandlerHolder rcon = new HandlerHolder(this.handler);
+				HandlerHolder lcon = new HandlerHolder(tp.handler);
+				rcon.other = lcon;
+				lcon.other = rcon;
+				tp.handler.connectionEstablished(rcon);
+				ret.setResult(lcon);
 			}
 			else
 			{
@@ -146,7 +150,7 @@ public class IntravmTransport	implements ITransport<IntravmTransport>
 	 *  Perform close operations on a connection.
 	 *  Potentially cleans up key attachments as well.
 	 */
-	public void closeConnection(IntravmTransport con)
+	public void closeConnection(HandlerHolder con)
 	{
 		// NOP.
 	}
@@ -158,9 +162,28 @@ public class IntravmTransport	implements ITransport<IntravmTransport>
 	 *  @param body	The message body.
 	 *  @return	A future indicating success.
 	 */
-	public IFuture<Integer> sendMessage(IntravmTransport con, byte[] header, byte[] body)
+	public IFuture<Integer> sendMessage(HandlerHolder con, byte[] header, byte[] body)
 	{
-		con.handler.messageReceived(this, header, body);		
+		con.handler.messageReceived(con.other, header, body);		
 		return new Future<>(PRIORITY);
+	}
+	
+	/** Holder to distinguish connections. */
+	protected static class HandlerHolder
+	{
+		/** The handler. */
+		public ITransportHandler<HandlerHolder> handler;
+		
+		/** Connection counterpart */
+		public HandlerHolder other;
+		
+		/**
+		 *  Create the holder.
+		 *  @param transport The transport.
+		 */
+		public HandlerHolder(ITransportHandler<HandlerHolder> handler)
+		{
+			this.handler = handler;
+		}
 	}
 }
