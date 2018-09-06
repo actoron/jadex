@@ -24,7 +24,7 @@
 	name="HunterPrey" package="jadex.bdi.examples.hunterprey_classic">
 	
 	<componenttypes>
-		<componenttype name="Environment" filename="jadex/bdi/examples/hunterprey_classic/environment/Environment.agent.xml" master="true"/>
+		<componenttype name="Environment" filename="jadex/bdi/examples/hunterprey_classic/environment/Environment.agent.xml"/>
 		
 		<componenttype name="SleepingPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/sleepingprey/SleepingPrey.agent.xml"/>
 		<componenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/dumbprey/DumbPrey.agent.xml"/>

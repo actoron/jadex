@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>SimpleWorkflow</jadex:modelname>
     <jadex:description>Simple Workflow Test</jadex:description>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:requiredservices>
       <jadex:requiredservice name="androidcontext" interface="jadex.bridge.service.types.context.IContextService" scope="platform" dynamic="false" create="false"/>
     </jadex:requiredservices>

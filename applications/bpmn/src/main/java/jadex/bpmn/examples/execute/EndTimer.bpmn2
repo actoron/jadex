@@ -11,7 +11,7 @@
     <jadex:modelname>EndTimer</jadex:modelname>
     <jadex:description>Test if process can end with intermediate timer event.</jadex:description>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="_SJeYUY6VEd-q-6UwAd77qg">
     <semantic:task name="Task" id="_SJe_YY6VEd-q-6UwAd77qg">

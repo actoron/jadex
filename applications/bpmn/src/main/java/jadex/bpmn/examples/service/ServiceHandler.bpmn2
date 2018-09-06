@@ -11,7 +11,7 @@
     <jadex:modelname>ServiceHandler</jadex:modelname>
     <jadex:description>&lt;h1&gt;Service Handling Process&lt;/h1&gt;This process provides a service and starts threads for handling service invocations.</jadex:description>
     <jadex:package>jadex.bpmn.examples.service</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:providedservices>
       <jadex:providedservice name="calc" interface="jadex.bpmn.examples.service.ICalculatorService" proxytype="decoupled"/>
     </jadex:providedservices>

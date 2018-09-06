@@ -11,7 +11,7 @@
     <jadex:modelname>TimerEventStart</jadex:modelname>
     <jadex:description>Process that is triggered by a timer.</jadex:description>
     <jadex:package>jadex.platform.service.processengine</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="_LXmc0STtEeKCHsqNbb_z5Q">
     <semantic:task name="Print" id="_LXwN0STtEeKCHsqNbb_z5Q">

@@ -9,8 +9,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
 	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
-	name="BookTrading" package="jadex.bdi.examples.booktrading"
-	autoshutdown="true">
+	name="BookTrading" package="jadex.bdi.examples.booktrading">
 	
 	<imports>
   		<import>jadex.bdi.examples.booktrading.common.*</import>

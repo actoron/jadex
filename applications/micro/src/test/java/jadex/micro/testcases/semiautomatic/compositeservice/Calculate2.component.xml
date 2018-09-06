@@ -16,7 +16,7 @@
 	</arguments>
 	
 	<componenttypes>
-		<componenttype name="Calculator" filename="jadex/micro/testcases/semiautomatic/compositeservice/CompositeCalculatorAgent.class" master="true"/>
+		<componenttype name="Calculator" filename="jadex/micro/testcases/semiautomatic/compositeservice/CompositeCalculatorAgent.class"/>
 		<componenttype name="CorruptAdder" filename="jadex/micro/testcases/semiautomatic/compositeservice/CorruptAdderAgent.class"/>
 		<componenttype name="Adder" filename="jadex/micro/testcases/semiautomatic/compositeservice/Adder.component.xml"/>
 		<componenttype name="Subtractor" filename="jadex/micro/testcases/semiautomatic/compositeservice/Subtractor.component.xml"/>

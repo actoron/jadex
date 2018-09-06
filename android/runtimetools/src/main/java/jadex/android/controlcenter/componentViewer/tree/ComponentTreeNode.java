@@ -601,10 +601,6 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 		props.add(new PropertyItem("Resource Identifier", gid==null? "N/A": gid));
 		props.add(new PropertyItem("(global / local)", lid==null? "n/a": lid.toString()));
 		
-		props.add(new PropertyItem("Master", desc.isMaster()));
-		props.add(new PropertyItem("Daemon", desc.isDaemon()));
-		props.add(new PropertyItem("Auto shutdown", (desc.isAutoShutdown())));
-		
 		return props.toArray(new PropertyItem[props.size()]);
 	}
 }

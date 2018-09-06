@@ -11,7 +11,7 @@
     <jadex:modelname>EvaluateProposalsRandom</jadex:modelname>
     <jadex:description>&lt;h1&gt;Standard Proposal Evaluation Process&lt;/h1&gt; This process randomly selects some of the available proposals.</jadex:description>
     <jadex:package>jadex.bpmn.examples.contractnet</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:imports>
       <jadex:import>java.util.Collection</jadex:import>
     </jadex:imports>

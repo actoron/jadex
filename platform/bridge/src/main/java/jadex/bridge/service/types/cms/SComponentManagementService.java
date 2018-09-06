@@ -3196,7 +3196,7 @@ public class SComponentManagementService
 		}
 		else
 		{
-			return new Future<T>(new RuntimeException("Component not found to scheldule: "+cid));
+			return new Future<T>(new RuntimeException("Component not found to schedule: "+cid));
 		}
 	}
 }

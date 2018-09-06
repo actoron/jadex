@@ -53,20 +53,20 @@ public @interface Configuration
 	 */
 	public String scope() default RequiredServiceInfo.SCOPE_GLOBAL;
 	
-	/**
-	 *  The master flag.
-	 */
-	public Boolean3 master() default Boolean3.NULL;
-	
-	/**
-	 *  The master flag.
-	 */
-	public Boolean3 daemon() default Boolean3.NULL;
-	
-	/**
-	 *  The autoshutdown flag.
-	 */
-	public Boolean3 autoshutdown() default Boolean3.NULL;
+//	/**
+//	 *  The master flag.
+//	 */
+//	public Boolean3 master() default Boolean3.NULL;
+//	
+//	/**
+//	 *  The master flag.
+//	 */
+//	public Boolean3 daemon() default Boolean3.NULL;
+//	
+//	/**
+//	 *  The autoshutdown flag.
+//	 */
+//	public Boolean3 autoshutdown() default Boolean3.NULL;
 	
 	/**
 	 *  The synchronous flag.

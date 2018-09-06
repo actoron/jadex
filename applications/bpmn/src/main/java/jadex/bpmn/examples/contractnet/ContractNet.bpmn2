@@ -11,7 +11,7 @@
     <jadex:modelname>ContractNet</jadex:modelname>
     <jadex:description>&lt;h1&gt;Contract Net&lt;/h1&gt;This process implements initiator and participant of a contract net interaction.</jadex:description>
     <jadex:package>jadex.bpmn.examples.contractnet</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:imports>
       <jadex:import>java.util.*</jadex:import>
       <jadex:import>jadex.commons.SUtil</jadex:import>
