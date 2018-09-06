@@ -11,6 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -22,6 +23,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -31,6 +33,7 @@ import jadex.micro.testcases.TestAgent;
  */
 @Agent
 @RequiredServices(@RequiredService(name="ss", type=IStreamService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL))
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class StreamUserAgent extends TestAgent
 {
 	public IPlatformConfiguration getConfig()
@@ -195,21 +198,25 @@ public class StreamUserAgent extends TestAgent
 						{
 							public void customResultAvailable(TestReport result)
 							{
+								System.out.println(result);
 								tc.addReport(result);
 								testGetOutputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 								{
 									public void customResultAvailable(TestReport result)
 									{
+										System.out.println(result);
 										tc.addReport(result);
 										testPassInputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 										{
 											public void customResultAvailable(TestReport result)
 											{
+												System.out.println(result);
 												tc.addReport(result);
 												testPassOutputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 												{
 													public void customResultAvailable(TestReport result)
 													{
+														System.out.println(result);
 														tc.addReport(result);
 														destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Integer>(ret)
 														{
