@@ -5,8 +5,16 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
+import jadex.base.Starter;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.impl.ExecutionComponentFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
@@ -27,6 +35,9 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	
 	/** Custom result listener */
 	protected IFunctionalExceptionListener	customExceptionListener;
+	
+	/** Future for clock advancement blocking. */
+	protected Future<Void>	adblock;
 	
 	//-------- constructors --------
 	
@@ -66,12 +77,32 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 		this.customExceptionListener = customExceptionListener;
 	}
 
+	protected static Future<Void>	block()
+	{
+		Future<Void>	adblock	= null;
+		IInternalAccess	ia	= ExecutionComponentFeature.LOCAL.get();
+		if(Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG)))
+		{
+			adblock	= new Future<>();
+			ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
+				.addAdvanceBlocker(adblock).get();
+		}
+		return adblock;
+	}
+	
+	protected static void	unblock(Future<Void> adblock)
+	{
+		if(adblock!=null)
+			adblock.setResult(null);
+	}
+
 	/**
 	 *  Create a new listener.
 	 */
 	public SwingDefaultResultListener()
 	{
 //		Thread.dumpStack();
+		adblock	= block();
 	}
 	
 	/**
@@ -81,6 +112,7 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	public SwingDefaultResultListener(Component parent)
 	{
 		this.parent	= parent;
+		adblock	= block();
 //		Thread.dumpStack();
 	}
 	
@@ -91,6 +123,7 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	public SwingDefaultResultListener(Logger logger)
 	{
 		super(logger);
+		adblock	= block();
 //		Thread.dumpStack();
 	}
 	
@@ -107,7 +140,14 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
-			customResultAvailable(result);
+			try
+			{
+				customResultAvailable(result);
+			}
+			finally
+			{
+				unblock(adblock);
+			}
 		}
 		else
 		{
@@ -115,7 +155,14 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 			{
 				public void run()
 				{
-					customResultAvailable(result);
+					try
+					{
+						customResultAvailable(result);
+					}
+					finally
+					{
+						unblock(adblock);
+					}
 				}
 			});
 		}
@@ -133,7 +180,14 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
-			customExceptionOccurred(exception);			
+			try
+			{
+				customExceptionOccurred(exception);			
+			}
+			finally
+			{
+				unblock(adblock);
+			}
 		}
 		else
 		{
@@ -142,7 +196,14 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 			{
 				public void run()
 				{
-					customExceptionOccurred(exception);
+					try
+					{
+						customExceptionOccurred(exception);			
+					}
+					finally
+					{
+						unblock(adblock);
+					}
 				}
 			});
 		}
