@@ -824,18 +824,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				else if("getExternalFeature".equals(method.getName()))
 				{
 					Class<?> iface = (Class<?>)args[0];
-					
-					if(!SReflect.isSupertype(IExternalComponentFeature.class, iface))
-						throw new IllegalArgumentException("Must be external feature interface (extend IExternalComponentFeature)");
-					
-					return ProxyFactory.newProxyInstance(getClassLoader(), new Class[]{iface, IExternalAccess.class}, new InvocationHandler()
-					{
-						@Override
-						public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-						{
-							return method.invoke(getInternalAccess(), args);
-						}
-					});
+					return getExternalFeature(iface, getClassLoader(), getInternalAccess());
 				}
 				else
 				{
@@ -912,6 +901,27 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				}
 				
 				return ret;
+			}
+		});
+	}
+	
+	/**
+	 *  Get external feature wrapper.
+	 *  @param iface
+	 *  @param args
+	 *  @return The proxy.
+	 */
+	public static <T> T getExternalFeature(Class<T> iface, ClassLoader cl, Object original)
+	{
+		if(!SReflect.isSupertype(IExternalComponentFeature.class, iface))
+			throw new IllegalArgumentException("Must be external feature interface (extend IExternalComponentFeature)");
+		
+		return (T)ProxyFactory.newProxyInstance(cl, new Class[]{iface, IExternalAccess.class}, new InvocationHandler()
+		{
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+			{
+				return method.invoke(original, args);
 			}
 		});
 	}

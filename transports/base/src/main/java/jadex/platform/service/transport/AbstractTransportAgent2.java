@@ -27,6 +27,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.memstat.IMemstatService;
@@ -150,7 +151,8 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		establishedconnections = wrappedmap;
 		restablishedconnections = new RwMapWrapper<>(econsbimap.flip(), wrappedmap.getLock());
 		
-		secser = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ISecurityService.class);
+		secser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(
+			new ServiceQuery<>(ISecurityService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW));
 		serser =  (ISerializationServices)Starter.getPlatformValue(platformid, Starter.DATA_SERIALIZATIONSERVICES);
 		
 		infosubscribers = new ArrayList<SubscriptionIntermediateFuture<PlatformData>>();

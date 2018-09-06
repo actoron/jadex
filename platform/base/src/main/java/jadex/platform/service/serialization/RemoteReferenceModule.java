@@ -50,6 +50,7 @@ import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.cms.PlatformComponent;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IChangeListener;
@@ -557,6 +558,24 @@ public class RemoteReferenceModule
 		Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
 		if(ret.getMethodReplacement(getclass)==null)
 			ret.addExcludedMethod(new MethodInfo(getclass));
+		
+		Method getfeat = SReflect.getMethod(Object.class, "getExternalFeature", new Class[]{Class.class});
+		if(ret.getMethodReplacement(getfeat)==null)
+		{
+			MethodInfo[] mis = getMethodInfo(getfeat, targetclass, false);
+			for(int i=0; i<mis.length; i++)
+			{
+				ret.addMethodReplacement(mis[i], new IMethodReplacement()
+				{
+					@Override
+					public Object invoke(Object obj, Object[] args)
+					{
+						Class<?> iface = (Class<?>)args[0];
+						return PlatformComponent.getExternalFeature(iface, cl, target);
+					}
+				});
+			}
+		}
 		
 		return ret;
 	}

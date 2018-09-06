@@ -286,15 +286,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		synchronized(this)
 		{
 			// Todo: synchronize with last step!
-//			int prio2 = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
+			int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
 //			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
-			if(endagenda.isDone())// || (STEP_PRIORITY_IMMEDIATE > prio2 && endstepcnt != -1))
+			if(endagenda.isDone() && STEP_PRIORITY_IMMEDIATE < prio)
 			{
 				ret.setException(new ComponentTerminatedException(getComponent().getId()));
 			}
 			else
 			{
-				int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
+//				int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
 				// Reject non-priority steps if we are already terminating.
 				// Otherwise this leads to a bad interaction with the monitoring:
 				// The step creation/dispose gets reported to the monitoring agent
