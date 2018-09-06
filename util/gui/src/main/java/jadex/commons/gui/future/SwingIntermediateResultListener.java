@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import jadex.commons.SReflect;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
@@ -30,6 +31,9 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	
 	/** The undone flag. */
 	protected boolean undone;
+	
+	/** Future for clock advancement blocking. */
+	protected Future<Void>	adblock;
 	
 	//-------- constructors --------
 
@@ -94,6 +98,8 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	public SwingIntermediateResultListener(final IIntermediateResultListener<E> listener)
 	{
 		this.listener = listener;
+		
+		adblock	= SwingDefaultResultListener.block();
 	}
 	
 	//-------- methods --------
@@ -112,7 +118,14 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 //					if(SwingUtilities.isEventDispatchThread())
 		{
-			customResultAvailable(result);
+			try
+			{
+				customResultAvailable(result);
+			}
+			finally
+			{
+				SwingDefaultResultListener.unblock(adblock);
+			}
 		}
 		else
 		{
@@ -120,7 +133,14 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 			{
 				public void run()
 				{
-					customResultAvailable(result);
+					try
+					{
+						customResultAvailable(result);
+					}
+					finally
+					{
+						SwingDefaultResultListener.unblock(adblock);
+					}
 				}
 			});
 		}
@@ -138,7 +158,14 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 	//		if(SwingUtilities.isEventDispatchThread())
 		{
-			customExceptionOccurred(exception);			
+			try
+			{
+				customExceptionOccurred(exception);			
+			}
+			finally
+			{
+				SwingDefaultResultListener.unblock(adblock);
+			}
 		}
 		else
 		{
@@ -147,7 +174,14 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 			{
 				public void run()
 				{
-					customExceptionOccurred(exception);
+					try
+					{
+						customExceptionOccurred(exception);			
+					}
+					finally
+					{
+						SwingDefaultResultListener.unblock(adblock);
+					}
 				}
 			});
 		}

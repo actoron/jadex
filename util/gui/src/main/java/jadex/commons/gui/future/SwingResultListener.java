@@ -6,6 +6,7 @@ import javax.swing.SwingUtilities;
 
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
@@ -25,6 +26,9 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 	
 	/** Flag if undone methods should be used. */
 	protected boolean undone;
+	
+	/** Future for clock advancement blocking. */
+	protected Future<Void>	adblock;
 	
 	//-------- constructors --------
 
@@ -70,6 +74,8 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 	public SwingResultListener(final IResultListener<E> listener)
 	{
 		this.listener = listener;
+		
+		adblock	= SwingDefaultResultListener.block();
 	}
 	
 	//-------- methods --------
@@ -85,7 +91,14 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
-			customResultAvailable(result);
+			try
+			{
+				customResultAvailable(result);
+			}
+			finally
+			{
+				SwingDefaultResultListener.unblock(adblock);
+			}
 		}
 		else
 		{
@@ -93,7 +106,14 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 			{
 				public void run()
 				{
-					customResultAvailable(result);
+					try
+					{
+						customResultAvailable(result);
+					}
+					finally
+					{
+						SwingDefaultResultListener.unblock(adblock);
+					}
 				}
 			});
 		}
@@ -111,7 +131,14 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
-			customExceptionOccurred(exception);			
+			try
+			{
+				customExceptionOccurred(exception);			
+			}
+			finally
+			{
+				SwingDefaultResultListener.unblock(adblock);
+			}
 		}
 		else
 		{
@@ -120,7 +147,14 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 			{
 				public void run()
 				{
-					customExceptionOccurred(exception);
+					try
+					{
+						customExceptionOccurred(exception);			
+					}
+					finally
+					{
+						SwingDefaultResultListener.unblock(adblock);
+					}
 				}
 			});
 		}

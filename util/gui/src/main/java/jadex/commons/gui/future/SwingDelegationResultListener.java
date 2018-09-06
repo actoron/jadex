@@ -3,6 +3,13 @@ package jadex.commons.gui.future;
 
 import javax.swing.SwingUtilities;
 
+import jadex.base.Starter;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.impl.ExecutionComponentFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFunctionalExceptionListener;
@@ -62,6 +69,7 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	public SwingDelegationResultListener(Future<E> future)
 	{
 		this.future = future;
+		block(future);
 	}
 	
 	//-------- IResultListener --------
@@ -252,5 +260,16 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	public boolean isUndone()
 	{
 		return undone;
+	}
+
+
+	protected static void	block(Future<?> adblock)
+	{
+		IInternalAccess	ia	= ExecutionComponentFeature.LOCAL.get();
+		if(Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG)))
+		{
+			ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
+				.addAdvanceBlocker(adblock).get();
+		}
 	}
 }

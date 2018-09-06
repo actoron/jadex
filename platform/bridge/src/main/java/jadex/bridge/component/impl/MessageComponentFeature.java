@@ -310,7 +310,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			sendToAllTransports(rplat, header, encheader, encryptedbody).addResultListener(new DelegationResultListener<>(ret, true));
 		}
 		
-		component.getFeature(IExecutionFeature.class).waitForDelay(Starter.getDefaultTimeout(platformid), new IComponentStep<Void>()
+		long timeout = Starter.getDefaultTimeout(platformid);
+		timeout = timeout != -1 ? timeout : 30000;
+		component.getFeature(IExecutionFeature.class).waitForDelay(timeout, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
