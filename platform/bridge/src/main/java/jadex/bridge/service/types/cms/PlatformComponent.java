@@ -807,8 +807,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 			{
-				if(method.getName().indexOf("killComponent")!=-1)
-					System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+//				if(method.getName().indexOf("killComponent")!=-1)
+//					System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 				
 				if("getId".equals(method.getName()))
 				{

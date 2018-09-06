@@ -313,7 +313,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		public void handleMessage(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			final String rxid = (String) header.getProperty(RX_ID);
-			System.out.println(getComponent().getId() + " received remote command: "+msg+", rxid="+rxid);
+//			System.out.println(getComponent().getId() + " received remote command: "+msg+", rxid="+rxid);
 			
 			if(msg instanceof IRemoteCommand)
 			{

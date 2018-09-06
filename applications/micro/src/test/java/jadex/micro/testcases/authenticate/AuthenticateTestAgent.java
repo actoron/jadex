@@ -160,7 +160,7 @@ public class AuthenticateTestAgent extends TestAgent
 								@Override
 								public void customResultAvailable(ISecurityService result) throws Exception
 								{
-									System.out.println("is compo:"+agent.isComponentThread());
+//									System.out.println("is compo:"+agent.isComponentThread());
 									
 									result.addRole(STest.testnetwork_name, "custom")
 										.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
