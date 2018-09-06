@@ -271,7 +271,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
-		return scheduleStep(IExecutionFeature.STEP_PRIORITY_NOMRAL, step);
+		return scheduleStep(IExecutionFeature.STEP_PRIORITY_NORMAL, step);
 	}
 	
 	/**

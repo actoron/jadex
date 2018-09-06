@@ -11,7 +11,7 @@ import jadex.commons.future.IResultListener;
 public interface IExecutionFeature extends IExternalExecutionFeature
 {
 	/** Constant for first normal step level. */
-	public static final int STEP_PRIORITY_NOMRAL = 0;
+	public static final int STEP_PRIORITY_NORMAL = 0;
 
 	/** Constant for first immediate step level. */
 	public static final int STEP_PRIORITY_IMMEDIATE = 100;

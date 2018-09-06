@@ -842,12 +842,18 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				}
 				else
 				{
+					int prio = IExecutionFeature.STEP_PRIORITY_NORMAL;
+					
+					// Allow getting results from dead components.
+					if ("getResultsAsync".equals(method.getName()))
+						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+					
 					if(!getFeature(IExecutionFeature.class).isComponentThread())
 					{
 //						System.out.println("scheduleStep: "+method.getName());
 						final Future<Object> ret = (Future<Object>)SFuture.getFuture(method.getReturnType());
 						
-						getInternalAccess().scheduleStep(new IComponentStep<Void>()
+						getInternalAccess().scheduleStep(prio, new IComponentStep<Void>()
 						{
 							@Override
 							public IFuture<Void> execute(IInternalAccess ia)
