@@ -25,6 +25,7 @@ import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.wrappers.MapWrapper;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -35,7 +36,7 @@ import jadex.javaparser.SJavaParser;
 /**
  *  This feature provides arguments.
  */
-public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsResultsFeature, IValueFetcher, IInternalArgumentsResultsFeature, IMapAccess
+public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	implements IArgumentsResultsFeature, IValueFetcher, IInternalArgumentsResultsFeature, IMapAccess
 {
 	//-------- attributes --------
 	
@@ -403,6 +404,24 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	public Map<String, Object> getResults()
 	{
 		return results;
+	}
+	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public IFuture<Map<String, Object>> getArgumentsAsync()
+	{
+		return new Future<Map<String, Object>>(getArguments());
+	}
+	
+	/**
+	 *  Get the current results.
+	 *  @return The current result values (if any).
+	 */
+	public IFuture<Map<String, Object>> getResultsAsync()
+	{
+		return new Future<Map<String, Object>>(getResults());
 	}
 	
 	/**

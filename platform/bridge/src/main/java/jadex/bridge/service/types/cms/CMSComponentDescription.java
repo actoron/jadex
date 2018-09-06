@@ -19,7 +19,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	//-------- attributes ----------
 
 	/** Attribute for slot state. */
-	protected String state;
+	protected String state = IComponentDescription.STATE_ACTIVE;
 
 	/** Attribute for slot component identifier. */
 	protected IComponentIdentifier name;
@@ -39,23 +39,23 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/** The breakpoints. */
 	protected String[] breakpoints;
 	
-	/** The master flag. */
-	protected boolean master;
+//	/** The master flag. */
+//	protected boolean master;
 	
-	/** The daemon flag. */
-	protected boolean daemon;
+//	/** The daemon flag. */
+//	protected boolean daemon;
 	
-	/** The auto shutdown flag. */
-	protected boolean autoshutdown;
+//	/** The auto shutdown flag. */
+//	protected boolean autoshutdown;
 
 	/** The synchronous flag. */
 	protected boolean synchronous;
 	
-	/** The persistable flag. */
-	protected boolean persistable;
+//	/** The persistable flag. */
+//	protected boolean persistable;
 	
 	/** The monitoring flag. */
-	protected PublishEventLevel monitoring;
+	protected PublishEventLevel monitoring = PublishEventLevel.OFF;
 	
 	/** The model name. */
 	protected String modelname;
@@ -69,8 +69,8 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/** The creator. */
 	protected IComponentIdentifier creator;
 	
-	/** The cause. */
-	protected Cause cause;
+//	/** The cause. */
+//	protected Cause cause;
 	
 	/** The step info for debugging. To determine the next step. */
 	protected String stepinfo;
@@ -91,32 +91,40 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/**
 	 *  Create a new CMSComponentDescription.
 	 */
-	public CMSComponentDescription(IComponentIdentifier cid, String type, boolean master, 
-		boolean daemon, boolean autoshutdown, boolean synchronous, boolean persistable,
-		PublishEventLevel monitoring, String modelname, String localtype, IResourceIdentifier rid,
-		long creationtime, IComponentIdentifier creator, Cause cause, boolean systemcomponent)
+	public CMSComponentDescription(IComponentIdentifier cid)  
 	{
-//		if(cid.getName().indexOf("Dyn")!=-1)
-//			System.out.println("created desc: "+cid+" "+hashCode());
 		setName(cid);
-		setType(type);
-//		setParent(parent);
-		setState(IComponentDescription.STATE_ACTIVE);
-//		setProcessingState(IComponentDescription.PROCESSINGSTATE_IDLE);
-		setMaster(master);
-		setDaemon(daemon);
-		setAutoShutdown(autoshutdown);
-		setSynchronous(synchronous);
-		setPersistable(persistable);
-		setMonitoring(monitoring!=null? monitoring: PublishEventLevel.OFF);
-		setModelName(modelname);
-		setLocalType(localtype);
-		setResourceIdentifier(rid);
-		setCreationTime(creationtime);
-		setCreator(creator);
-		setCause(cause);
-		setSystemComponent(systemcomponent);
 	}
+	
+//	/**
+//	 *  Create a new CMSComponentDescription.
+//	 */
+//	public CMSComponentDescription(IComponentIdentifier cid, String type, boolean master, 
+//		boolean daemon, boolean autoshutdown, boolean synchronous, boolean persistable,
+//		PublishEventLevel monitoring, String modelname, String localtype, IResourceIdentifier rid,
+//		long creationtime, IComponentIdentifier creator, boolean systemcomponent) // Cause cause, 
+//	{
+////		if(cid.getName().indexOf("Dyn")!=-1)
+////			System.out.println("created desc: "+cid+" "+hashCode());
+//		setName(cid);
+//		setType(type);
+////		setParent(parent);
+//		setState(IComponentDescription.STATE_ACTIVE);
+////		setProcessingState(IComponentDescription.PROCESSINGSTATE_IDLE);
+////		setMaster(master);
+////		setDaemon(daemon);
+////		setAutoShutdown(autoshutdown);
+//		setSynchronous(synchronous);
+////		setPersistable(persistable);
+//		setMonitoring(monitoring!=null? monitoring: PublishEventLevel.OFF);
+//		setModelName(modelname);
+//		setLocalType(localtype);
+//		setResourceIdentifier(rid);
+//		setCreationTime(creationtime);
+//		setCreator(creator);
+////		setCause(cause);
+//		setSystemComponent(systemcomponent);
+//	}
 
 	//-------- accessor methods --------
 
@@ -133,9 +141,10 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the state of this CESComponentDescription.
 	 *  @param state the value to be set
 	 */
-	public void setState(String state)
+	public CMSComponentDescription setState(String state)
 	{
 		this.state = state;
+		return this;
 	}
 
 	/**
@@ -151,9 +160,10 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the componentidentifier of this CESComponentDescription.
 	 * @param name the value to be set
 	 */
-	public void setName(IComponentIdentifier name)
+	public CMSComponentDescription setName(IComponentIdentifier name)
 	{
 		this.name = name;
+		return this;
 	}
 
 	/**
@@ -169,16 +179,17 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the resource identifier.
 	 *  @param rid The resource identifier.
 	 */
-	public void setResourceIdentifier(IResourceIdentifier rid)
+	public CMSComponentDescription setResourceIdentifier(IResourceIdentifier rid)
 	{
 		this.rid = rid;
+		return this;
 	}
 	
 	/**
 	 *  Add a child component.
 	 *  @param child The child component.
 	 */
-	public void addChild(IComponentIdentifier child)
+	public CMSComponentDescription addChild(IComponentIdentifier child)
 	{
 		// CMS / external access / component may access description concurrently?!
 		synchronized(this)
@@ -188,19 +199,21 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 				children = new LinkedHashSet();
 			children.add(child);
 		}
+		return this;
 	}
 	
 	/**
 	 *  Remove a child component.
 	 *  @param child The child component.
 	 */
-	public void removeChild(IComponentIdentifier child)
+	public CMSComponentDescription removeChild(IComponentIdentifier child)
 	{
 		synchronized(this)
 		{
 			if(children!=null)
 				children.remove(child);
 		}
+		return this;
 	}
 	
 	/**
@@ -228,9 +241,10 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the ownership of this CESComponentDescription.
 	 * @param ownership the value to be set
 	 */
-	public void setOwnership(String ownership)
+	public CMSComponentDescription setOwnership(String ownership)
 	{
 		this.ownership = ownership;
+		return this;
 	}
 
 	/**
@@ -246,9 +260,10 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the component type.
 	 *  @param type	The component type name (e.g. 'BDI Agent').
 	 */
-	public void setType(String type)
+	public CMSComponentDescription setType(String type)
 	{
 		this.type	= type;
+		return this;
 	}
 
 	/**
@@ -264,64 +279,68 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the enabled breakpoints (if any).
 	 *  @param breakpoints The enabled breakpoints.
 	 */
-	public void	setBreakpoints(String[] breakpoints)
+	public CMSComponentDescription	setBreakpoints(String[] breakpoints)
 	{
 		this.breakpoints	= breakpoints;
+		return this;
 	}
 	
-	/**
-	 *  Get the master.
-	 *  @return the master.
-	 */
-	public boolean isMaster()
-	{
-		return master;
-	}
+//	/**
+//	 *  Get the master.
+//	 *  @return the master.
+//	 */
+//	public boolean isMaster()
+//	{
+//		return master;
+//	}
+//
+//	/**
+//	 *  Set the master.
+//	 *  @param master The master to set.
+//	 */
+//	public CMSComponentDescription setMaster(boolean master)
+//	{
+//		this.master = master;
+//		return this;
+//	}
 
-	/**
-	 *  Set the master.
-	 *  @param master The master to set.
-	 */
-	public void setMaster(boolean master)
-	{
-		this.master = master;
-	}
+//	/**
+//	 *  Get the daemon.
+//	 *  @return the daemon.
+//	 */
+//	public boolean isDaemon()
+//	{
+//		return daemon;
+//	}
+//
+//	/**
+//	 *  Set the daemon.
+//	 *  @param daemon The daemon to set.
+//	 */
+//	public CMSComponentDescription setDaemon(boolean daemon)
+//	{
+//		this.daemon = daemon;
+//		return this;
+//	}
 
-	/**
-	 *  Get the daemon.
-	 *  @return the daemon.
-	 */
-	public boolean isDaemon()
-	{
-		return daemon;
-	}
-
-	/**
-	 *  Set the daemon.
-	 *  @param daemon The daemon to set.
-	 */
-	public void setDaemon(boolean daemon)
-	{
-		this.daemon = daemon;
-	}
-
-	/**
-	 *  Get the autoshutdown.
-	 *  @return the autoshutdown.
-	 */
-	public boolean isAutoShutdown()
-	{
-		return autoshutdown;
-	}
-
-	/**
-	 *  Set the autoshutdown.
-	 *  @param autoshutdown The autoshutdown to set.
-	 */
-	public void setAutoShutdown(boolean autoshutdown)
-	{
-		this.autoshutdown = autoshutdown;
-	}
+//	/**
+//	 *  Get the autoshutdown.
+//	 *  @return the autoshutdown.
+//	 */
+//	public boolean isAutoShutdown()
+//	{
+//		return autoshutdown;
+//	}
+//
+//	/**
+//	 *  Set the autoshutdown.
+//	 *  @param autoshutdown The autoshutdown to set.
+//	 */
+//	public CMSComponentDescription setAutoShutdown(boolean autoshutdown)
+//	{
+//		this.autoshutdown = autoshutdown;
+//		return this;
+//	}
 
 	/**
 	 *  Get the model name.
@@ -336,9 +355,10 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the model name.
 	 *  @param modelname The model name.
 	 */
-	public void setModelName(String modelname)
+	public CMSComponentDescription setModelName(String modelname)
 	{
 		this.modelname = modelname;
+		return this;
 	}
 	
 	/**
@@ -354,9 +374,10 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the localtype.
 	 *  @param localtype The localtype to set.
 	 */
-	public void setLocalType(String localtype)
+	public CMSComponentDescription setLocalType(String localtype)
 	{
 		this.localtype = localtype;
+		return this;
 	}
 	
 	/**
@@ -372,9 +393,10 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the creationtime.
 	 *  @param creationtime The creationtime to set.
 	 */
-	public void setCreationTime(long creationtime)
+	public CMSComponentDescription setCreationTime(long creationtime)
 	{
 		this.creationtime = creationtime;
+		return this;
 	}
 	
 	/**
@@ -390,28 +412,29 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the creator.
 	 *  @param creator The creator to set.
 	 */
-	public void setCreator(IComponentIdentifier creator)
+	public CMSComponentDescription setCreator(IComponentIdentifier creator)
 	{
 		this.creator = creator;
+		return this;
 	}
 	
-	/**
-	 *  Get the cause.
-	 *  @return The cause.
-	 */
-	public Cause getCause()
-	{
-		return cause;
-	}
-
-	/**
-	 *  Set the cause.
-	 *  @param cause The cause to set.
-	 */
-	public void setCause(Cause cause)
-	{
-		this.cause = cause;
-	}
+//	/**
+//	 *  Get the cause.
+//	 *  @return The cause.
+//	 */
+//	public Cause getCause()
+//	{
+//		return cause;
+//	}
+//
+//	/**
+//	 *  Set the cause.
+//	 *  @param cause The cause to set.
+//	 */
+//	public void setCause(Cause cause)
+//	{
+//		this.cause = cause;
+//	}
 
 	/**
 	 *  Get the synchronous flag.
@@ -426,28 +449,30 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the synchronous flag.
 	 *  @param synchronous	The synchronous flag.
 	 */
-	public void	setSynchronous(boolean synchronous)
+	public CMSComponentDescription	setSynchronous(boolean synchronous)
 	{
 		this.synchronous = synchronous;
+		return this;
 	}
 	
-	/**
-	 *  Get the persistable flag.
-	 *  @return	The persistable flag.
-	 */
-	public boolean isPersistable()
-	{
-		return persistable;
-	}
-
-	/**
-	 *  Set the persistable flag.
-	 *  @param persistable	The persistable flag.
-	 */
-	public void	setPersistable(boolean persistable)
-	{
-		this.persistable	= persistable;
-	}
+//	/**
+//	 *  Get the persistable flag.
+//	 *  @return	The persistable flag.
+//	 */
+//	public boolean isPersistable()
+//	{
+//		return persistable;
+//	}
+//
+//	/**
+//	 *  Set the persistable flag.
+//	 *  @param persistable	The persistable flag.
+//	 */
+//	public CMSComponentDescription	setPersistable(boolean persistable)
+//	{
+//		this.persistable	= persistable;
+//		return this;
+//	}
 
 	/**
 	 *  Get the monitoring.
@@ -462,9 +487,10 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the monitoring.
 	 *  @param monitoring The monitoring to set.
 	 */
-	public void setMonitoring(PublishEventLevel monitoring)
+	public CMSComponentDescription setMonitoring(PublishEventLevel monitoring)
 	{
 		this.monitoring = monitoring;
+		return this;
 	}
 	
 //	/**
@@ -498,9 +524,10 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the system component flag.
 	 *  @param systemcomponent The flag.
 	 */
-	public void setSystemComponent(boolean systemcomponent)
+	public CMSComponentDescription setSystemComponent(boolean systemcomponent)
 	{
 		this.systemcomponent = systemcomponent;
+		return this;
 	}
 
 	/**
@@ -545,7 +572,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 //				ret.children.addAll(children);
 //			}
 			
-			ret.cause = cause!=null ? new Cause(cause) : cause;
+//			ret.cause = cause!=null ? new Cause(cause) : cause;
 			return ret;
 		}
 		catch(CloneNotSupportedException e)

@@ -534,7 +534,7 @@ public class UpdateAgent implements IUpdateService
 		{
 			public void customResultAvailable(IExternalAccess plat)
 			{
-				plat.getArguments().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, StartOptions>(ret)
+				plat.getArgumentsAsync().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, StartOptions>(ret)
 				{
 					public void customResultAvailable(Map<String, Object> args)
 					{

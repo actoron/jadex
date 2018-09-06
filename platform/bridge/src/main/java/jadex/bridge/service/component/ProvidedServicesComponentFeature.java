@@ -55,7 +55,7 @@ import jadex.javaparser.SJavaParser;
 /**
  *  Feature for provided services.
  */
-public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	implements IProvidedServicesFeature
+public class ProvidedServicesComponentFeature extends AbstractComponentFeature implements IProvidedServicesFeature
 {
 	//-------- attributes --------
 	
@@ -562,7 +562,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}
 			else
 			{
-				getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), (Iterator<IPublishService>)null)
+				getPublishService(getInternalAccess(), pi.getPublishType(), pi.getPublishScope(), (Iterator<IPublishService>)null)
 					.addResultListener(getComponent().getFeature(IExecutionFeature.class)
 					.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
 				{
@@ -605,7 +605,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				{
 					final IServiceIdentifier sid = service.getId();
 //					getPublishService(instance, pi.getPublishType(), null).addResultListener(instance.createResultListener(new IResultListener<IPublishService>()
-					getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), null).addResultListener(new IResultListener<IPublishService>()
+					getPublishService(getInternalAccess(), pi.getPublishType(), pi.getPublishScope(), null).addResultListener(new IResultListener<IPublishService>()
 					{
 						public void resultAvailable(IPublishService ps)
 						{
@@ -970,54 +970,60 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 *  @param tags The tags.
 	 *  @return New service identifier.
 	 */
-	public void setTags(IServiceIdentifier sid, String... tags)
+	public IFuture<Void> setTags(IServiceIdentifier sid, String... tags)
 	{
-		if (sid instanceof ServiceIdentifier)
+		Future<Void> ret = new Future<>();
+		
+		if(sid instanceof ServiceIdentifier)
 		{
 			ServiceIdentifier ssid = (ServiceIdentifier) sid;
 			ssid.setTags(new HashSet<String>(Arrays.asList(tags)));
 			
 			Collection<IInternalService> coll = services.get(ssid.getServiceType().getType(component.getClassLoader()));
-			if (coll != null)
+			if(coll != null)
 			{
-				synchronized(coll)
-				{
-					for (Iterator<IInternalService> it = coll.iterator(); it.hasNext(); )
+//				synchronized(coll)
+//				{
+					for(Iterator<IInternalService> it = coll.iterator(); it.hasNext(); )
 					{
 						IInternalService ser = it.next();
-						if (ser.getId().equals(ssid))
+						if(ser.getId().equals(ssid))
 						{
 							ser.setServiceIdentifier(ssid);
 							break;
 						}
 					}
-				}
+//				}
 			}
 			
-			synchronized(servicelisteners)
-			{
+//			synchronized(servicelisteners)
+//			{
 				if (servicelisteners.containsKey(sid))
 				{
 					MethodListenerHandler hndlr = servicelisteners.get(sid);
 					servicelisteners.put(ssid, hndlr);
 				}
-			}
+//			}
 			
-			synchronized(serviceinfos)
-			{
+//			synchronized(serviceinfos)
+//			{
 				if (serviceinfos.containsKey(sid))
 				{
 					ProvidedServiceInfo info = serviceinfos.get(sid);
 					serviceinfos.put(ssid, info);
 				}
-			}
+//			}
 			
 			ServiceRegistry.getRegistry(component.getId().getRoot()).updateService(ssid);
+			
+			ret.setResult(null);
 		}
 		else
 		{
-			throw new IllegalArgumentException("Unsupported service identifier type: " + sid);
+			ret.setException(new IllegalArgumentException("Unsupported service identifier type: " + sid));
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -1216,7 +1222,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		
 		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-			getComponent(), service, name, type, proxytype, ics, moni, 
+			getInternalAccess(), service, name, type, proxytype, ics, moni, 
 			info, scope!=null ? scope : info!=null? info.getScope(): null);
 		
 		addService(proxy, info);

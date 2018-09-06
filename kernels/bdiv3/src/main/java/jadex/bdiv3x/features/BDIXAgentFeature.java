@@ -155,17 +155,17 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 	@Override
 	public IFuture<Void> init()
 	{
-		RBeliefbase bb = new RBeliefbase(getComponent());
+		RBeliefbase bb = new RBeliefbase(getInternalAccess());
 		getCapability().setBeliefbase(bb);
 		bb.init();
 		
-		RExpressionbase eb = new RExpressionbase(getComponent());
+		RExpressionbase eb = new RExpressionbase(getInternalAccess());
 		getCapability().setExpressionbase(eb);
 		
 //		RGoalbase gb = new RGoalbase(getComponent());
 //		getCapability().setGoalbase(gb);
 		
-		RPlanbase pb = new RPlanbase(getComponent());
+		RPlanbase pb = new RPlanbase(getInternalAccess());
 		getCapability().setPlanbase(pb);
 
 //		REventbase evb = new REventbase(getComponent());
@@ -219,7 +219,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		List<MBelief> beliefs = ((IBDIModel)component.getModel().getRawModel()).getCapability().getBeliefs();
 		for(MBelief belief: beliefs)
 		{
-			belief.cleanup(getComponent());
+			belief.cleanup(getInternalAccess());
 		}
 	}
 	
@@ -806,7 +806,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		{
 			try
 			{
-				Object val = mbel.getValue(getComponent());
+				Object val = mbel.getValue(getInternalAccess());
 				if(val==null)
 				{
 					String impl = mbel.getImplClassName();
@@ -835,17 +835,17 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 				if(val instanceof List)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getComponent(), new ListWrapper((List<?>)val, getComponent(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getInternalAccess(), new ListWrapper((List<?>)val, getInternalAccess(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 				else if(val instanceof Set)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getComponent(), new SetWrapper((Set<?>)val, getComponent(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getInternalAccess(), new SetWrapper((Set<?>)val, getInternalAccess(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 				else if(val instanceof Map)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getComponent(), new MapWrapper((Map<?,?>)val, getComponent(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getInternalAccess(), new MapWrapper((Map<?,?>)val, getInternalAccess(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 			}
 			catch(RuntimeException e)
@@ -869,7 +869,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		String fname = bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
 		
 		List<EventType> events = new ArrayList<EventType>();
-		addBeliefEvents(getComponent(), events, fname);
+		addBeliefEvents(getInternalAccess(), events, fname);
 
 		final boolean multi = ((MCapability)getCapability().getModelElement())
 			.getBelief(fname).isMulti(((ModelInfo)bdimodel).getClassLoader());
@@ -1561,7 +1561,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 		{
 			for(MBelief mbel: mbels)
 			{
-				BeliefInfo info = BeliefInfo.createBeliefInfo(getComponent(), mbel, getComponent().getClassLoader());
+				BeliefInfo info = BeliefInfo.createBeliefInfo(getInternalAccess(), mbel, getComponent().getClassLoader());
 				MonitoringEvent ev = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(mbel.toString());
 				ev.setProperty("details", info);
@@ -1653,7 +1653,7 @@ public class BDIXAgentFeature extends AbstractComponentFeature implements IBDIXA
 				}
 				else if("$scope".equals(name))
 				{
-					return new CapabilityWrapper(getComponent(), null);
+					return new CapabilityWrapper(getInternalAccess(), null);
 				}
 				else
 				{

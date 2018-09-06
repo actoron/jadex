@@ -61,7 +61,8 @@ public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPan
 	public void refreshCombo()
 	{
 		// Search starting from remote CMS.
-		IComponentDescription adesc = new CMSComponentDescription(null, null, false, false, false, false, false, null, getModelName(), null, null, -1, null, null, false);
+//		IComponentDescription adesc = new CMSComponentDescription(null, null, false, false, false, false, false, null, getModelName(), null, null, -1, null, false);
+		IComponentDescription adesc = new CMSComponentDescription().setModelName(getModelName());//, null, null, -1, null, false);
 //				platformaccess.searchComponents(adesc, null, isRemote()).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>(AbstractComponentSelectorPanel.this)
 		platformaccess.searchComponents(adesc, null).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>(AbstractComponentSelectorPanel.this)
 		{

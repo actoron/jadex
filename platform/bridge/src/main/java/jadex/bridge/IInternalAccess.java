@@ -4,7 +4,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -21,7 +27,7 @@ import jadex.commons.future.ITuple2Future;
  *  Provides the user view of the component, i.e.,
  *  methods the component can call on itself.
  */
-public interface IInternalAccess
+public interface IInternalAccess extends IExternalAccess, IExecutionFeature, IArgumentsResultsFeature, IProvidedServicesFeature, IRequiredServicesFeature, ISubcomponentsFeature, IMonitoringComponentFeature //extends INFPropertyProvider//extends IRemotable
 {
 	/**
 	 *  Get the model of the component.
@@ -30,16 +36,16 @@ public interface IInternalAccess
 	public IModelInfo getModel();
 
 	/**
-	 *  Get the configuration.
-	 *  @return	The configuration.
-	 */
-	public String getConfiguration();
-	
-	/**
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
 	public IComponentIdentifier	getId();
+	
+	/**
+	 *  Get the configuration.
+	 *  @return	The configuration.
+	 */
+	public String getConfiguration();
 	
 	/**
 	 *  Get a feature of the component.
@@ -55,85 +61,85 @@ public interface IInternalAccess
 	 */
 	public <T> T getFeature0(Class<? extends T> type);
 	
-	/**
-	 *  Get the component description.
-	 *  @return	The component description.
-	 */
-	// Todo: hack??? should be internal to CMS!?
-	public IComponentDescription getDescription();
+//	/**
+//	 *  Get the component description.
+//	 *  @return	The component description.
+//	 */
+//	// Todo: hack??? should be internal to CMS!?
+//	public IComponentDescription getDescription();
+//	
+//	/**
+//	 *  Get the component description.
+//	 *  @return	The component description.
+//	 */
+//	// Todo: hack??? should be internal to CMS!?
+//	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid);
 	
-	/**
-	 *  Get the component description.
-	 *  @return	The component description.
-	 */
-	// Todo: hack??? should be internal to CMS!?
-	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid);
+//	/**
+//	 *  Add a new component as subcomponent of this component.
+//	 *  @param component The model or pojo of the component.
+//	 */
+//	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener);
+//	
+//	/**
+//	 *  Add a new component as subcomponent of this component.
+//	 *  @param component The model or pojo of the component.
+//	 */
+//	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info);
+//	
+//	/**
+//	 *  Create a new component on the platform.
+//	 *  @param name The component name or null for automatic generation.
+//	 *  @param model The model identifier (e.g. file name).
+//	 *  @param info Additional start information such as parent component or arguments (optional).
+//	 *  @return The id of the component and the results after the component has been killed.
+//	 */
+//	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info);
 	
-	/**
-	 *  Add a new component as subcomponent of this component.
-	 *  @param component The model or pojo of the component.
-	 */
-	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener);
-	
-	/**
-	 *  Add a new component as subcomponent of this component.
-	 *  @param component The model or pojo of the component.
-	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info);
-	
-	/**
-	 *  Create a new component on the platform.
-	 *  @param name The component name or null for automatic generation.
-	 *  @param model The model identifier (e.g. file name).
-	 *  @param info Additional start information such as parent component or arguments (optional).
-	 *  @return The id of the component and the results after the component has been killed.
-	 */
-	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info);
-	
-	/**
-	 *  Kill the component.
-	 */
-	public IFuture<Map<String, Object>> killComponent();
-	
-	/**
-	 *  Kill the component.
-	 *  @param e The failure reason, if any.
-	 */
-	public IFuture<Map<String, Object>> killComponent(Exception e);
-	
-	/**
-	 *  Kill the component.
-	 *  @param e The failure reason, if any.
-	 */
-	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid);
-	
-	/**
-	 *  Suspend the execution of an component.
-	 *  @param componentid The component identifier.
-	 */
-	public IFuture<Void> suspendComponent(IComponentIdentifier componentid);
-	
-	/**
-	 *  Resume the execution of an component.
-	 *  @param componentid The component identifier.
-	 */
-	public IFuture<Void> resumeComponent(IComponentIdentifier componentid);
-	
-	/**
-	 *  Execute a step of a suspended component.
-	 *  @param componentid The component identifier.
-	 *  @param listener Called when the step is finished (result will be the component description).
-	 */
-	public IFuture<Void> stepComponent(IComponentIdentifier componentid, String stepinfo);
-	
-	/**
-	 *  Set breakpoints for a component.
-	 *  Replaces existing breakpoints.
-	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
-	 *  @param componentid The component identifier.
-	 *  @param breakpoints The new breakpoints (if any).
-	 */
-	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints);
+//	/**
+//	 *  Kill the component.
+//	 */
+//	public IFuture<Map<String, Object>> killComponent();
+//	
+//	/**
+//	 *  Kill the component.
+//	 *  @param e The failure reason, if any.
+//	 */
+//	public IFuture<Map<String, Object>> killComponent(Exception e);
+//	
+//	/**
+//	 *  Kill the component.
+//	 *  @param e The failure reason, if any.
+//	 */
+//	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid);
+//	
+//	/**
+//	 *  Suspend the execution of an component.
+//	 *  @param componentid The component identifier.
+//	 */
+//	public IFuture<Void> suspendComponent(IComponentIdentifier componentid);
+//	
+//	/**
+//	 *  Resume the execution of an component.
+//	 *  @param componentid The component identifier.
+//	 */
+//	public IFuture<Void> resumeComponent(IComponentIdentifier componentid);
+//	
+//	/**
+//	 *  Execute a step of a suspended component.
+//	 *  @param componentid The component identifier.
+//	 *  @param listener Called when the step is finished (result will be the component description).
+//	 */
+//	public IFuture<Void> stepComponent(IComponentIdentifier componentid, String stepinfo);
+//	
+//	/**
+//	 *  Set breakpoints for a component.
+//	 *  Replaces existing breakpoints.
+//	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
+//	 *  @param componentid The component identifier.
+//	 *  @param breakpoints The new breakpoints (if any).
+//	 */
+//	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints);
 	
 	/**
 	 *  Get the external access.
@@ -173,23 +179,23 @@ public interface IInternalAccess
 	 */
 	public ClassLoader	getClassLoader();
 	
-	/**
-	 *  Execute a component step.
-	 */
-	public <T> IFuture<T> scheduleStep(IComponentStep<T> step);
-	
-	/**
-	 *  Wait for some time and execute a component step afterwards.
-	 */
-	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step);
+//	/**
+//	 *  Execute a component step.
+//	 */
+//	public <T> IFuture<T> scheduleStep(IComponentStep<T> step);
+//	
+//	/**
+//	 *  Wait for some time and execute a component step afterwards.
+//	 */
+//	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step);
 		
-	/**
-	 *  Get the children (if any) component identifiers.
-	 *  @param type The local component type.
-	 *  @param parent The parent.
-	 *  @return The children component identifiers.
-	 */
-	public IFuture<IComponentIdentifier[]> getChildren(String type, IComponentIdentifier parent);
+//	/**
+//	 *  Get the children (if any) component identifiers.
+//	 *  @param type The local component type.
+//	 *  @param parent The parent.
+//	 *  @return The children component identifiers.
+//	 */
+//	public IFuture<IComponentIdentifier[]> getChildren(String type, IComponentIdentifier parent);
 	
 	/**
 	 *  Get the exception, if any.
@@ -197,23 +203,23 @@ public interface IInternalAccess
 	 */
 	public Exception getException();
 	
-	/**
-	 *  Get the external access for a component id.
-	 *  @param cid The component id.
-	 *  @return The external access.
-	 */
-	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid);
-	
-	/**
-	 *  Add a component listener for a specific component.
-	 *  The listener is registered for component changes.
-	 *  @param cid	The component to be listened.
-	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid);
-	
-	/**
-	 *  Search for components matching the given description.
-	 *  @return An array of matching component descriptions.
-	 */
-	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con);//, boolean remote);
+//	/**
+//	 *  Get the external access for a component id.
+//	 *  @param cid The component id.
+//	 *  @return The external access.
+//	 */
+//	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid);
+//	
+//	/**
+//	 *  Add a component listener for a specific component.
+//	 *  The listener is registered for component changes.
+//	 *  @param cid	The component to be listened.
+//	 */
+//	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid);
+//	
+//	/**
+//	 *  Search for components matching the given description.
+//	 *  @return An array of matching component descriptions.
+//	 */
+//	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con);//, boolean remote);
 }

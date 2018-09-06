@@ -5974,6 +5974,26 @@ public class SUtil
 	}
 	
 	/**
+	 *  Replace the last occurrence of a substring.
+	 *  @param string The string
+	 *  @param toreplace The substring to replace.
+	 *  @param replacement The new substring
+	 *  @return The new string.
+	 */
+	public static String replaceLast(String string, String toreplace, String replacement) 
+	{
+	    int pos = string.lastIndexOf(toreplace);
+	    if(pos > -1) 
+	    {
+	    	return string.substring(0, pos) + replacement + string.substring(pos + toreplace.length(), string.length());
+	    } 
+	    else 
+	    {
+	        return string;
+	    }
+	}
+	
+	/**
      * Lookup table used for unique strings.
      */
     protected static final char[] ID_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',

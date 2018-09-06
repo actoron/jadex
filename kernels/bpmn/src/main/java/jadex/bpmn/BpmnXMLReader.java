@@ -1838,18 +1838,18 @@ public class BpmnXMLReader
 								{
 									// ignore? The selected configuration for next editor opening
 								}
-								else if("master".equals(key))
-								{
-									mi.setMaster(Boolean.valueOf(value));
-								}
-								else if("daemon".equals(key))
-								{
-									mi.setDaemon(Boolean.valueOf(value));
-								}
-								else if("autoshutdown".equals(key))
-								{
-									mi.setAutoShutdown(Boolean.valueOf(value));
-								}
+//								else if("master".equals(key))
+//								{
+//									mi.setMaster(Boolean.valueOf(value));
+//								}
+//								else if("daemon".equals(key))
+//								{
+//									mi.setDaemon(Boolean.valueOf(value));
+//								}
+//								else if("autoshutdown".equals(key))
+//								{
+//									mi.setAutoShutdown(Boolean.valueOf(value));
+//								}
 								else if("suspend".equals(key))
 								{
 									mi.setSuspend(Boolean.valueOf(value));

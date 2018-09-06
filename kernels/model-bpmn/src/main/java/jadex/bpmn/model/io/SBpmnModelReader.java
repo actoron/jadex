@@ -914,26 +914,26 @@ public class SBpmnModelReader
 				{
 					((ModelInfo) model.getModelInfo()).setSuspend(Boolean.parseBoolean(attrs.get("suspend")));
 				}
-				if (attrs.containsKey("master"))
-				{
-					((ModelInfo) model.getModelInfo()).setMaster(Boolean.parseBoolean(attrs.get("master")));
-				}
-				if (attrs.containsKey("daemon"))
-				{
-					((ModelInfo) model.getModelInfo()).setDaemon(Boolean.parseBoolean(attrs.get("daemon")));
-				}
-				if (attrs.containsKey("autoshutdown"))
-				{
-					((ModelInfo) model.getModelInfo()).setAutoShutdown(Boolean.parseBoolean(attrs.get("autoshutdown")));
-				}
+//				if (attrs.containsKey("master"))
+//				{
+//					((ModelInfo) model.getModelInfo()).setMaster(Boolean.parseBoolean(attrs.get("master")));
+//				}
+//				if (attrs.containsKey("daemon"))
+//				{
+//					((ModelInfo) model.getModelInfo()).setDaemon(Boolean.parseBoolean(attrs.get("daemon")));
+//				}
+//				if (attrs.containsKey("autoshutdown"))
+//				{
+//					((ModelInfo) model.getModelInfo()).setAutoShutdown(Boolean.parseBoolean(attrs.get("autoshutdown")));
+//				}
 				if (attrs.containsKey("synchronous"))
 				{
 					((ModelInfo) model.getModelInfo()).setSynchronous(Boolean.parseBoolean(attrs.get("synchronous")));
 				}
-				if (attrs.containsKey("persistable"))
-				{
-					((ModelInfo) model.getModelInfo()).setPersistable(Boolean.parseBoolean(attrs.get("persistable")));
-				}
+//				if (attrs.containsKey("persistable"))
+//				{
+//					((ModelInfo) model.getModelInfo()).setPersistable(Boolean.parseBoolean(attrs.get("persistable")));
+//				}
 				if (attrs.containsKey("keepalive"))
 				{
 					model.setKeepAlive(Boolean.parseBoolean(attrs.get("keepalive")));
@@ -1099,18 +1099,18 @@ public class SBpmnModelReader
 				{
 					conf.setSuspend(Boolean.parseBoolean(attrs.get("suspend")));
 				}
-				if (attrs.containsKey("master"))
-				{
-					conf.setMaster(Boolean.parseBoolean(attrs.get("master")));
-				}
-				if (attrs.containsKey("daemon"))
-				{
-					conf.setDaemon(Boolean.parseBoolean(attrs.get("daemon")));
-				}
-				if (attrs.containsKey("autoshutdown"))
-				{
-					conf.setAutoShutdown(Boolean.parseBoolean(attrs.get("autoshutdown")));
-				}
+//				if (attrs.containsKey("master"))
+//				{
+//					conf.setMaster(Boolean.parseBoolean(attrs.get("master")));
+//				}
+//				if (attrs.containsKey("daemon"))
+//				{
+//					conf.setDaemon(Boolean.parseBoolean(attrs.get("daemon")));
+//				}
+//				if (attrs.containsKey("autoshutdown"))
+//				{
+//					conf.setAutoShutdown(Boolean.parseBoolean(attrs.get("autoshutdown")));
+//				}
 				
 				if (buffer.containsKey("description"))
 				{

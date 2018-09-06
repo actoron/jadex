@@ -1,12 +1,16 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.InternalAccessAdapter;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RequiredServicesFeatureAdapter;
 
@@ -101,26 +105,58 @@ public class CapabilityPojoWrapper implements ICapability
 	 */
 	public IInternalAccess	getAgent()
 	{
-		return new InternalAccessAdapter(agent)
+//		return new InternalAccessAdapter(agent)
+//		{
+//			public <T> T getFeature(Class<? extends T> type)
+//			{
+//				if(type.equals(IRequiredServicesFeature.class))
+//				{
+//					return (T)new RequiredServicesFeatureAdapter((IRequiredServicesFeature)super.getFeature(type))
+//					{
+//						public String rename(String name)
+//						{
+//							return capa!=null? capa+MElement.CAPABILITY_SEPARATOR+name: name;
+//						}
+//					};
+//				}
+//				else
+//				{
+//					return super.getFeature(type);
+//				}
+//			}
+//		};
+		
+		return (IInternalAccess)ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class[]{IInternalAccess.class}, new InvocationHandler()
 		{
-			public <T> T getFeature(Class<? extends T> type)
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 			{
-				if(type.equals(IRequiredServicesFeature.class))
+				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+				
+				if("getFeature".equals(method.getName()))
 				{
-					return (T)new RequiredServicesFeatureAdapter((IRequiredServicesFeature)super.getFeature(type))
+					Class<?> type = (Class<?>)args[0];
+					if(type.equals(IRequiredServicesFeature.class))
 					{
-						public String rename(String name)
+						return new RequiredServicesFeatureAdapter((IRequiredServicesFeature)agent.getFeature(type))
 						{
-							return capa!=null? capa+MElement.CAPABILITY_SEPARATOR+name: name;
-						}
-					};
+							public String rename(String name)
+							{
+								return capa!=null? capa+MElement.CAPABILITY_SEPARATOR+name: name;
+							}
+						};
+					}
+					else
+					{
+						return agent.getFeature(type);
+					}
 				}
 				else
 				{
-					return super.getFeature(type);
+					return method.invoke(agent, args);
 				}
 			}
-		};
+		});
 //		return agent;
 	}
 	

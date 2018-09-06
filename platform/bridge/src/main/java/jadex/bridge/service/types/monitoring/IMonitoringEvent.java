@@ -119,17 +119,17 @@ public interface IMonitoringEvent
 	 */
 	public long getTime();
 	
-	/**
-	 *  Get the cause.
-	 *  @return The cause.
-	 */
-	public Cause getCause();
-	
-	/**
-	 *  Set the cause.
-	 *  @param cause The cause to set.
-	 */
-	public void setCause(Cause cause);
+//	/**
+//	 *  Get the cause.
+//	 *  @return The cause.
+//	 */
+//	public Cause getCause();
+//	
+//	/**
+//	 *  Set the cause.
+//	 *  @param cause The cause to set.
+//	 */
+//	public void setCause(Cause cause);
 
 	/**
 	 *  Get a property.

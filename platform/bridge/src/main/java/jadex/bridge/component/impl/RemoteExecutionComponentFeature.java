@@ -546,7 +546,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			{
 				if(msg instanceof ISecuredRemoteCommand)
 				{
-					Set<String>	secroles	= ServiceIdentifier.getRoles(((ISecuredRemoteCommand)msg).getSecurityLevel(getComponent()), getComponent());
+					Set<String>	secroles	= ServiceIdentifier.getRoles(((ISecuredRemoteCommand)msg).getSecurityLevel(getInternalAccess()), getInternalAccess());
 					
 					// No roles or default role means any authenticated platform or network.
 					if(secroles==null || secroles.contains(Security.DEFAULT))

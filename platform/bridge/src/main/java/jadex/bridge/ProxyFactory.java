@@ -10,7 +10,7 @@ import jadex.commons.SReflect;
  */
 public class ProxyFactory
 {
-	public static boolean useasm = true;
+	public static boolean useasm = false;
 	
 	/**
      * Returns an instance of a proxy class for the specified interfaces
@@ -19,6 +19,9 @@ public class ProxyFactory
      */
     public static Object newProxyInstance(ClassLoader loader, Class<?>[] interfaces, InvocationHandler h)
     {
+    	if(loader==null)
+    		throw new IllegalArgumentException("Classloader must not null");
+    	
     	if(useasm && !SReflect.isAndroid())
     	{
     		try

@@ -102,8 +102,8 @@ public class TesterAgent implements ITestService
 							}
 						}).get();
 					
-						System.out.println("chain a: "+eaa+" "+desca.getCause().getOrigin());
-						System.out.println("chain b: "+eab+" "+descb.getCause().getOrigin());
+//						System.out.println("chain a: "+eaa+" "+desca.getCause().getOrigin());
+//						System.out.println("chain b: "+eab+" "+descb.getCause().getOrigin());
 					}
 					catch(ComponentTerminatedException e)
 					{

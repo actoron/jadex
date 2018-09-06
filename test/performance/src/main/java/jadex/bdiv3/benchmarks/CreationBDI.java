@@ -135,7 +135,7 @@ public class CreationBDI
 //			System.out.println("Args: "+num+" "+args);
 
 			agent.createComponent(null,
-				new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getDescription().getResourceIdentifier())
+				new CreationInfo().setArguments(args).setResourceIdentifier(agent.getDescription().getResourceIdentifier())
 				.setFilename("jadex.bdiv3.benchmarks.CreationBDI.class").setName(createPeerName(num+1, agent.getId())), null);
 		}
 		else

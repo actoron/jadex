@@ -12,7 +12,6 @@ import jadex.bridge.IExternalAccess;
  */
 public abstract class JunitAgentTest extends ComponentTestLazyPlatform 
 {
-
     private IPlatformConfiguration config;
 
     /**
@@ -20,7 +19,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
      */
     public JunitAgentTest() 
     {
-//        Logger.getLogger("ComponentTest").log(Level.INFO, "Trying to guess TestAgent name...");
+//      Logger.getLogger("ComponentTest").log(Level.INFO, "Trying to guess TestAgent name...");
         String className = this.getClass().getName();
         this.comp = extendWithClassIfNeeded(className);
         this.config = STest.getDefaultTestConfig();

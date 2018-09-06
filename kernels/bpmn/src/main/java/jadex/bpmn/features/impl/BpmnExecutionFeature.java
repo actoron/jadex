@@ -130,15 +130,15 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
             {
             	if(triggersubproc != null)
             	{
-            		ProcessThread thread = new ProcessThread(triggersubproc, bcf.getTopLevelThread(), getComponent(), true);
+            		ProcessThread thread = new ProcessThread(triggersubproc, bcf.getTopLevelThread(), getInternalAccess(), true);
             		bcf.getTopLevelThread().addThread(thread);
-					ProcessThread subthread = new ProcessThread(triggeractivity, thread, getComponent());
+					ProcessThread subthread = new ProcessThread(triggeractivity, thread, getInternalAccess());
 					thread.addThread(subthread);
 					subthread.setOrCreateParameterValue("$event", trigger.getThirdEntity());
             	}
             	else
             	{
-                    ProcessThread thread = new ProcessThread(mact, bcf.getTopLevelThread(), getComponent());
+                    ProcessThread thread = new ProcessThread(mact, bcf.getTopLevelThread(), getInternalAccess());
                     thread.setOrCreateParameterValue("$event", trigger.getThirdEntity());
                     bcf.getTopLevelThread().addThread(thread);
             	}
@@ -149,7 +149,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
             	&& !MBpmnModel.EVENT_START_SIGNAL.equals(mact.getActivityType())
             	&& !MBpmnModel.EVENT_START_TIMER.equals(mact.getActivityType()))
             {
-                ProcessThread thread = new ProcessThread(mact, bcf.getTopLevelThread(), getComponent());
+                ProcessThread thread = new ProcessThread(mact, bcf.getTopLevelThread(), getInternalAccess());
                 bcf.getTopLevelThread().addThread(thread);
             }
         } 

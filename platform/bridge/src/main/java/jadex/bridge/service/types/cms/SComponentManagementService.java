@@ -3,6 +3,7 @@ package jadex.bridge.service.types.cms;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +14,6 @@ import java.util.Map;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.Cause;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
@@ -429,22 +429,94 @@ public class SComponentManagementService
 		
 		ILibraryService libservice = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 		// Hack!!! May be null on platform init
-		if(libservice!=null)
+		
+		final IInternalAccess pad = getParentComponent(cinfo, agent);
+		final IExternalAccess parent = pad.getExternalAccess();
+		
+		parent.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, ClassLoader>>(ret)
 		{
-			libservice.getClassLoader(rid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<ClassLoader, Tuple2<String, ClassLoader>>(ret)
+			public void customResultAvailable(IModelInfo model)
 			{
-				public void customResultAvailable(ClassLoader cl)
+				if(libservice!=null)
 				{
-					String filename = modelname;
+					libservice.getClassLoader(rid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<ClassLoader, Tuple2<String, ClassLoader>>(ret)
+					{
+						public void customResultAvailable(ClassLoader cl)
+						{
+							final IInternalAccess pad = getParentComponent(cinfo, agent);
+//							final IExternalAccess parent = pad.getExternalAccess();
+							
+							String filename = modelname;
+							
+							if(cinfo.getParent()!=null)
+							{
+								// Try to find file for local type.
+								String localtype = modelname!=null ? modelname : cinfo.getLocalType();
+								filename = null;
+								final SubcomponentTypeInfo[] subcomps = model.getSubcomponentTypes();
+								for(int i=0; filename==null && i<subcomps.length; i++)
+								{
+									if(subcomps[i].getName().equals(localtype))
+									{
+										filename = subcomps[i].getFilename();
+										cinfo.setLocalType(localtype);
+									}
+								}
+								if(filename==null)
+									filename	= modelname;
+								
+								// Try to find local type for file
+								if(cinfo.getLocalType()==null && subcomps.length>0)
+								{
+									Tuple key = new Tuple(model.getFullName(), filename);
+									// as no one removes local types this is threadsafe in two steps
+									if(SComponentManagementService.getLocalTypes(agent.getId()).containsKey(key))
+									{
+										cinfo.setLocalType((String)SComponentManagementService.getLocalTypes(agent.getId()).get(key));
+									}
+									else
+									{
+										ResourceInfo info = SUtil.getResourceInfo0(filename, cl);
+										if(info!=null)
+										{
+											for(int i=0; cinfo.getLocalType()==null && i<subcomps.length; i++)
+											{
+												ResourceInfo info1 = SUtil.getResourceInfo0(subcomps[i].getFilename(), cl);
+												if(info1!=null)
+												{
+													if(info.getFilename().equals(info1.getFilename()))
+													{
+														cinfo.setLocalType(subcomps[i].getName());
+													}
+													info1.cleanup();
+												}
+											}
+											info.cleanup();
+										}
+										SComponentManagementService.getLocalTypes(agent.getId()).put(key, cinfo.getLocalType());
+						//				System.out.println("Local type: "+cinfo.getLocalType()+", "+pad.getComponentIdentifier());
+									}
+								}
+							}
+							
+							ret.setResult(new Tuple2<String, ClassLoader>(filename, cl));
+						}
+					}));
+				}
+				else
+				{
+					// Hack for platform init
+					String	filename	= modelname;
 					
 					if(cinfo.getParent()!=null)
 					{
 						// Try to find file for local type.
-						String localtype = modelname!=null ? modelname : cinfo.getLocalType();
+						String	localtype = modelname!=null ? modelname : cinfo.getLocalType();
 						filename = null;
 						IInternalAccess pad = getParentComponent(cinfo, agent);
-						IExternalAccess parent = pad.getExternalAccess();
-						final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
+//						IExternalAccess parent = pad.getExternalAccess();
+						final SubcomponentTypeInfo[] subcomps = model.getSubcomponentTypes();
+						
 						for(int i=0; filename==null && i<subcomps.length; i++)
 						{
 							if(subcomps[i].getName().equals(localtype))
@@ -454,75 +526,17 @@ public class SComponentManagementService
 							}
 						}
 						if(filename==null)
-							filename	= modelname;
-						
-						// Try to find local type for file
-						if(cinfo.getLocalType()==null && subcomps.length>0)
 						{
-							Tuple key = new Tuple(parent.getModel().getFullName(), filename);
-							// as no one removes local types this is threadsafe in two steps
-							if(SComponentManagementService.getLocalTypes(agent.getId()).containsKey(key))
-							{
-								cinfo.setLocalType((String)SComponentManagementService.getLocalTypes(agent.getId()).get(key));
-							}
-							else
-							{
-								ResourceInfo info = SUtil.getResourceInfo0(filename, cl);
-								if(info!=null)
-								{
-									for(int i=0; cinfo.getLocalType()==null && i<subcomps.length; i++)
-									{
-										ResourceInfo info1 = SUtil.getResourceInfo0(subcomps[i].getFilename(), cl);
-										if(info1!=null)
-										{
-											if(info.getFilename().equals(info1.getFilename()))
-											{
-												cinfo.setLocalType(subcomps[i].getName());
-											}
-											info1.cleanup();
-										}
-									}
-									info.cleanup();
-								}
-								SComponentManagementService.getLocalTypes(agent.getId()).put(key, cinfo.getLocalType());
-				//				System.out.println("Local type: "+cinfo.getLocalType()+", "+pad.getComponentIdentifier());
-							}
+							filename = modelname;
 						}
 					}
 					
-					ret.setResult(new Tuple2<String, ClassLoader>(filename, cl));
-				}
-			}));
-		}
-		else
-		{
-			// Hack for platform init
-			String	filename	= modelname;
-			
-			if(cinfo.getParent()!=null)
-			{
-				// Try to find file for local type.
-				String	localtype = modelname!=null ? modelname : cinfo.getLocalType();
-				filename = null;
-				IInternalAccess pad = getParentComponent(cinfo, agent);
-				IExternalAccess parent = pad.getExternalAccess();
-				final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
-				for(int i=0; filename==null && i<subcomps.length; i++)
-				{
-					if(subcomps[i].getName().equals(localtype))
-					{
-						filename = subcomps[i].getFilename();
-						cinfo.setLocalType(localtype);
-					}
-				}
-				if(filename==null)
-				{
-					filename = modelname;
+//					ret.setResult(new Tuple2<String, ClassLoader>(filename, null));
+					ret.setResult(new Tuple2<String, ClassLoader>(filename, SComponentManagementService.class.getClassLoader()));
 				}
 			}
 			
-			ret.setResult(new Tuple2<String, ClassLoader>(filename, null));
-		}
+		}));
 		
 		return ret;
 	}
@@ -1097,6 +1111,44 @@ public class SComponentManagementService
 	// r: components
 	// w: -
 	/**
+	 *  Get the children count.
+	 *  @param cid The component identifier.
+	 *  @return The child count
+	 */
+	public static IFuture<Integer> getChildCount(final IComponentIdentifier cid, IInternalAccess agent)
+	{
+		final Future<Integer> ret = new Future<Integer>();
+		
+		if(isRemoteComponent(cid, agent))
+		{
+			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<Integer>()
+			{
+				@Override
+				public IFuture<Integer> execute(IInternalAccess ia)
+				{
+					return SComponentManagementService.getChildCount(cid, agent);
+				}
+			});
+		}
+		else
+		{
+			setReadLock(agent.getId());
+			
+			CMSComponentDescription desc = (CMSComponentDescription)SComponentManagementService.getDescription(cid);
+			IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+				IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
+			
+			ret.setResult(tmp.length);
+			
+			releaseReadLock(agent.getId());
+		}
+		
+		return ret;
+	}
+	
+	// r: components
+	// w: -
+	/**
 	 *  Get the children components of a component.
 	 *  @param cid The component identifier.
 	 *  @return The children component identifiers.
@@ -1181,7 +1233,13 @@ public class SComponentManagementService
 				{
 //					System.err.println("Model class loader: "+ea.getModel().getName()+", "+ea.getModel().getClassLoader());
 //						classloadercache.put(ci.getParent(), ea.getModel().getClassLoader());
-					ret.setResult(ea.getModel().getResourceIdentifier());
+					ea.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, IResourceIdentifier>(ret)
+					{
+						public void customResultAvailable(IModelInfo model)
+						{
+							ret.setResult(model.getResourceIdentifier());
+						}
+					}));
 				}
 				public void exceptionOccurred(Exception exception)
 				{
@@ -1289,9 +1347,6 @@ public class SComponentManagementService
 		}
 		else
 		{
-			if(cid.toString().indexOf("VisibilityTestAgent")!=-1)
-				System.out.println("getExta local: "+cid);
-			
 			setReadLock(agent.getId());
 			
 //			System.out.println("getExternalAccess: local");
@@ -1476,13 +1531,13 @@ public class SComponentManagementService
 //		if(padesc.isAutoShutdown() && !ad.isDaemon())
 //		if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
 		// cannot check parent shutdown state because could be still uninited
-		if(!ad.isDaemon())
-		{
-//			Integer	childcount	= (Integer)SComponentManagementService.getChildCounts(agent.getId()).get(padesc.getName());
-//			int cc = childcount!=null ? childcount.intValue()+1 : 1;
-//			SComponentManagementService.getChildCounts(agent.getId()).put(padesc.getName(), Integer.valueOf(cc));
-			pad.getFeature(ISubcomponentsFeature.class).incChildcount();
-		}
+//		if(!ad.isDaemon())
+//		{
+////			Integer	childcount	= (Integer)SComponentManagementService.getChildCounts(agent.getId()).get(padesc.getName());
+////			int cc = childcount!=null ? childcount.intValue()+1 : 1;
+////			SComponentManagementService.getChildCounts(agent.getId()).put(padesc.getName(), Integer.valueOf(cc));
+//			pad.getFeature(ISubcomponentsFeature.class).incChildcount();
+//		}
 		
 		// Register component at parent.
 		return ((IInternalSubcomponentsFeature)pad.getFeature(ISubcomponentsFeature.class)).componentCreated(ad);//, lmodel);
@@ -2128,8 +2183,6 @@ public class SComponentManagementService
 		{
 			public void customResultAvailable(final IResourceIdentifier rid)
 			{
-//				System.out.println("loading: "+modelname+" "+rid);
-
 				resolveFilename(modelname, cinfo, rid, agent).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<Tuple2<String, ClassLoader>, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(ret)
 				{
 					public void customResultAvailable(final Tuple2<String, ClassLoader> tup)
@@ -2419,7 +2472,7 @@ public class SComponentManagementService
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
-		final Cause curcause = sc==null? agent.getDescription().getCause(): sc.getCause();
+//		final Cause curcause = sc==null? agent.getDescription().getCause(): sc.getCause();
 		
 		final Future<IComponentIdentifier> inited = new Future<IComponentIdentifier>();
 		final Future<Void> resfut = new Future<Void>();
@@ -2479,11 +2532,11 @@ public class SComponentManagementService
 					// Defer component services being found from registry
 					ServiceRegistry.getRegistry(agent).addExcludedComponent(cid);
 					
-					Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
-					Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
-					Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
+//					Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
+//					Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
+//					Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
 					Boolean sync = cinfo.getSynchronous()!=null? cinfo.getSynchronous(): lmodel.getSynchronous(cinfo.getConfiguration());
-					Boolean persistable = cinfo.getPersistable()!=null? cinfo.getPersistable(): lmodel.getPersistable(cinfo.getConfiguration());
+//					Boolean persistable = cinfo.getPersistable()!=null? cinfo.getPersistable(): lmodel.getPersistable(cinfo.getConfiguration());
 					PublishEventLevel moni = cinfo.getMonitoring()!=null? cinfo.getMonitoring(): lmodel.getMonitoring(cinfo.getConfiguration());
 					// Inherit monitoring from parent if null
 					if(moni==null && cinfo.getParent()!=null)
@@ -2492,19 +2545,24 @@ public class SComponentManagementService
 						moni = desc.getMonitoring();
 					}
 					
-					Cause cause = curcause;
+//					Cause cause = curcause;
 					// todo: how to do platform init so that clock is always available?
 					IClockService cs = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(
 						new ServiceQuery<>(IClockService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-					final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master!=null ? master.booleanValue() : false,
-						daemon!=null ? daemon.booleanValue() : false, autosd!=null ? autosd.booleanValue() : false, sync!=null ? sync.booleanValue() : false,
-						persistable!=null ? persistable.booleanValue() : false, moni,
-						lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), cs!=null? cs.getTime(): System.currentTimeMillis(), creator, cause, systemcomponent);
+//					final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master!=null ? master.booleanValue() : false,
+//						daemon!=null ? daemon.booleanValue() : false, autosd!=null ? autosd.booleanValue() : false, sync!=null ? sync.booleanValue() : false,
+//						persistable!=null ? persistable.booleanValue() : false, moni,
+//						lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), cs!=null? cs.getTime(): System.currentTimeMillis(), creator, systemcomponent);
+					final CMSComponentDescription ad = new CMSComponentDescription(cid).setType(lmodel.getType()).setModelName(lmodel.getFullName()).setLocalType(cinfo.getLocalType())
+						.setResourceIdentifier(lmodel.getResourceIdentifier()).setCreator(creator).setSystemComponent(systemcomponent).setCreationTime(cs!=null? cs.getTime(): System.currentTimeMillis())
+						.setSynchronous(sync!=null ? sync.booleanValue() : false);
 					
 					// Use first configuration if no config specified.
 					String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 						: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
-					final IPlatformComponentAccess component = new PlatformComponent();
+					
+					final IPlatformComponentAccess component = createPlatformComponent(cl);
+					
 					ComponentCreationInfo cci = new ComponentCreationInfo(lmodel, config, cinfo.getArguments(), ad, cinfo.getProvidedServiceInfos(), cinfo.getRequiredServiceBindings());
 
 					releaseWriteLock(agent.getId());
@@ -2692,6 +2750,67 @@ public class SComponentManagementService
 			}));
 		}
 		return inited;
+	}
+	
+	/**
+	 *  Create a platform component.
+	 *  It creates a proxy around the platform component to autoimplement the feature methods of internal access.
+	 */
+	public static IPlatformComponentAccess createPlatformComponent(ClassLoader classloader)
+	{
+		final PlatformComponent comp = new PlatformComponent();
+		
+		IPlatformComponentAccess ret = (IPlatformComponentAccess)ProxyFactory.newProxyInstance(classloader, new Class[]{IInternalAccess.class, IPlatformComponentAccess.class}, new InvocationHandler()
+		{
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+			{
+				Object ret = null;
+				try
+				{
+					Class<?> iface = method.getDeclaringClass();
+					String name = SReflect.getClassName(iface);
+					String intname = SUtil.replaceLast(name, "External", "");
+//					System.out.println(name+" "+intname);
+					
+					ClassLoader cl = comp.getClassLoader()!=null? comp.getClassLoader(): classloader;
+					Class<?> clazz = SReflect.findClass0(intname, null, cl);
+					Object feat = clazz!=null? comp.getFeature0(clazz): null;
+					
+					if(feat==null)
+					{
+						String mname = method.getName();
+//						int idx = mname.lastIndexOf("Async");
+//						if(idx>0)
+//							mname = mname.substring(0, idx);
+						Method m = PlatformComponent.class.getMethod(mname, method.getParameterTypes());
+						ret = m.invoke(comp, args);
+					}
+					else
+					{
+						ret = method.invoke(feat, args);
+					}
+				}
+				catch(Exception e)
+				{
+					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+					{
+						ret = SFuture.getFuture(method.getReturnType());
+						((Future)ret).setException(e);
+					}
+					else
+					{
+						throw e;
+					}
+				}
+				return ret;
+			}
+		});
+		
+		// Hack to combine proxy with component
+		comp.setInternalAccess((IInternalAccess)ret);
+		
+		return ret;
 	}
 	
 	/**
@@ -2908,20 +3027,20 @@ public class SComponentManagementService
 		{
 			// Stop execution of component. When root component services are already shutdowned.
 			
-			killparent = desc.isMaster();
+//			killparent = desc.isMaster();
 			CMSComponentDescription padesc = (CMSComponentDescription)SComponentManagementService.getDescription(desc.getName().getParent());
 			if(padesc!=null)
 			{
 				padesc.removeChild(desc.getName());
-				if(!desc.isDaemon())
-				{
-					pad	= getComponent(padesc.getName());
-					
-					int cc = -1;
-					if(pad!=null)
-						cc = pad.getInternalAccess().getFeature(ISubcomponentsFeature.class).decChildcount();
-					killparent = killparent || (padesc.isAutoShutdown() && cc<=0);
-				}
+//				if(!desc.isDaemon())
+//				{
+//					pad	= getComponent(padesc.getName());
+//					
+//					int cc = -1;
+//					if(pad!=null)
+//						cc = pad.getInternalAccess().getFeature(ISubcomponentsFeature.class).decChildcount();
+//					killparent = killparent || (padesc.isAutoShutdown() && cc<=0);
+//				}
 			}
 			pad	= SComponentManagementService.getComponents(cid).get(desc.getName().getParent());
 			

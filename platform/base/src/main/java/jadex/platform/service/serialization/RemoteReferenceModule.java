@@ -240,7 +240,10 @@ public class RemoteReferenceModule
 		// -> not necessary due to only single threaded access via agent thread
 		
 
-		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
+//		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
+		// todo: repair cache for external access
+		Object tcid = target instanceof IExternalAccess? null: target.getClass();
+		
 //		ProxyInfo pi;
 		ProxyReference ret;
 		
@@ -257,11 +260,12 @@ public class RemoteReferenceModule
 				throw new RuntimeException("Proxyable object has no remote interfaces: "+target);
 			
 			// test and create not synchronized due to service invocation (getPropertyMap) in createProxyInfo() potentially leading to deadlock
-			ProxyInfo pi = (ProxyInfo)proxyinfos.get(tcid);
+			ProxyInfo pi = tcid==null? null: (ProxyInfo)proxyinfos.get(tcid);
 			if(pi==null)
 			{
 				pi = createProxyInfo(target, remoteinterfaces, cl, platform);
-				proxyinfos.put(tcid, pi);
+				if(tcid!=null)
+					proxyinfos.put(tcid, pi);
 //				System.out.println("add: "+tcid+" "+pi);
 			}
 			
@@ -301,92 +305,97 @@ public class RemoteReferenceModule
 		// Hack! as long as registry is not there
 		String[] imports = null;
 //		ClassLoader	cl	= null;
-		if(target instanceof IExternalAccess)
-		{
-			imports	= ((IExternalAccess)target).getModel().getAllImports();
-//			cl	= libservice.getClassLoader(((IExternalAccess)target).getModel().getResourceIdentifier());
-			properties = ((IExternalAccess)target).getModel().getProperties();		
-		}
-		else if(target instanceof IService)
-		{
-			properties = ((IService)target).getPropertyMap();
-		}
+		
+		// todo: remove support for properties?! or fix 
+		
+//		if(target instanceof IExternalAccess)
+//		{
+//			imports	= ((IExternalAccess)target).getModel().getAllImports();
+////			cl	= libservice.getClassLoader(((IExternalAccess)target).getModel().getResourceIdentifier());
+//			properties = ((IExternalAccess)target).getModel().getProperties();		
+//		}
+//		else if(target instanceof IService)
+//		{
+//			properties = ((IService)target).getPropertyMap();
+//		}
 		
 		Class<?> targetclass = target.getClass();
 		
 		// Check for excluded and synchronous methods.
-		if(properties!=null)
-		{
-			Object ex = SJavaParser.getProperty(properties, Excluded.class.getName(), imports, null, cl);
-			if(ex!=null)
-			{
-				for(Iterator<Object> it = SReflect.getIterator(ex); it.hasNext(); )
-				{
-					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
-					for(int j=0; j<mis.length; j++)
-					{
-						ret.addExcludedMethod(mis[j]);
-					}
-				}
-			}
-			Object syn = SJavaParser.getProperty(properties, Synchronous.class.getName(), imports, null, cl);
-			if(syn!=null)
-			{
-				for(Iterator<Object> it = SReflect.getIterator(syn); it.hasNext(); )
-				{
-					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
-					for(int j=0; j<mis.length; j++)
-					{
-						ret.addSynchronousMethod(mis[j]);
-					}
-				}
-			}
-			Object un = SJavaParser.getProperty(properties, Uncached.class.getName(), imports, null, cl);
-			if(un!=null)
-			{
-				for(Iterator<Object> it = SReflect.getIterator(un); it.hasNext(); )
-				{
-					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
-					for(int j=0; j<mis.length; j++)
-					{
-						ret.addUncachedMethod(mis[j]);
-					}
-				}
-			}
-			Object mr = SJavaParser.getProperty(properties, Replacement.class.getName(), imports, null, cl);
-			if(mr!=null)
-			{
-				for(Iterator<Object> it = SReflect.getIterator(mr); it.hasNext(); )
-				{
-					Object[] tmp = (Object[])it.next();
-					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
-					for(int j=0; j<mis.length; j++)
-					{
-						ret.addMethodReplacement(mis[j], (IMethodReplacement)tmp[1]);
-					}
-				}
-			}
-			Object to = SJavaParser.getProperty(properties, Timeout.class.getName(), imports, null, cl);
-			if(to!=null)
-			{
-				for(Iterator<Object> it = SReflect.getIterator(to); it.hasNext(); )
-				{
-					Object[] tmp = (Object[])it.next();
-					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
-					for(int j=0; j<mis.length; j++)
-					{
-						ret.addMethodTimeout(mis[j], ((Number)tmp[1]).longValue());
-					}
-				}
-			}
-			Object td = SJavaParser.getProperty(properties, ITargetResolver.TARGETRESOLVER, imports, null, cl);
-			if(td!=null)
-			{
-				@SuppressWarnings("unchecked")
-				Class<ITargetResolver> tmp = (Class<ITargetResolver>)td;
-				ret.setTargetResolverClazz(tmp);
-			}
-		}
+//		if(properties!=null)
+//		{
+//			System.out.println();
+//			
+//			Object ex = SJavaParser.getProperty(properties, Excluded.class.getName(), imports, null, cl);
+//			if(ex!=null)
+//			{
+//				for(Iterator<Object> it = SReflect.getIterator(ex); it.hasNext(); )
+//				{
+//					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+//					for(int j=0; j<mis.length; j++)
+//					{
+//						ret.addExcludedMethod(mis[j]);
+//					}
+//				}
+//			}
+//			Object syn = SJavaParser.getProperty(properties, Synchronous.class.getName(), imports, null, cl);
+//			if(syn!=null)
+//			{
+//				for(Iterator<Object> it = SReflect.getIterator(syn); it.hasNext(); )
+//				{
+//					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+//					for(int j=0; j<mis.length; j++)
+//					{
+//						ret.addSynchronousMethod(mis[j]);
+//					}
+//				}
+//			}
+//			Object un = SJavaParser.getProperty(properties, Uncached.class.getName(), imports, null, cl);
+//			if(un!=null)
+//			{
+//				for(Iterator<Object> it = SReflect.getIterator(un); it.hasNext(); )
+//				{
+//					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+//					for(int j=0; j<mis.length; j++)
+//					{
+//						ret.addUncachedMethod(mis[j]);
+//					}
+//				}
+//			}
+//			Object mr = SJavaParser.getProperty(properties, Replacement.class.getName(), imports, null, cl);
+//			if(mr!=null)
+//			{
+//				for(Iterator<Object> it = SReflect.getIterator(mr); it.hasNext(); )
+//				{
+//					Object[] tmp = (Object[])it.next();
+//					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
+//					for(int j=0; j<mis.length; j++)
+//					{
+//						ret.addMethodReplacement(mis[j], (IMethodReplacement)tmp[1]);
+//					}
+//				}
+//			}
+//			Object to = SJavaParser.getProperty(properties, Timeout.class.getName(), imports, null, cl);
+//			if(to!=null)
+//			{
+//				for(Iterator<Object> it = SReflect.getIterator(to); it.hasNext(); )
+//				{
+//					Object[] tmp = (Object[])it.next();
+//					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
+//					for(int j=0; j<mis.length; j++)
+//					{
+//						ret.addMethodTimeout(mis[j], ((Number)tmp[1]).longValue());
+//					}
+//				}
+//			}
+//			Object td = SJavaParser.getProperty(properties, ITargetResolver.TARGETRESOLVER, imports, null, cl);
+//			if(td!=null)
+//			{
+//				@SuppressWarnings("unchecked")
+//				Class<ITargetResolver> tmp = (Class<ITargetResolver>)td;
+//				ret.setTargetResolverClazz(tmp);
+//			}
+//		}
 		
 		// Add properties from annotations.
 		// Todo: merge with external properties (which precedence?)

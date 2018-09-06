@@ -3,6 +3,8 @@ package jadex.bridge.service.types.cms;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -25,6 +27,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.ProxyFactory;
+import jadex.bridge.SFuture;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.FeatureNotAvailableException;
@@ -32,6 +36,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IExternalComponentFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPropertiesFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
@@ -39,7 +44,6 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -50,6 +54,7 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
@@ -58,16 +63,19 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
 
 /**
  *  Standalone platform component implementation.
  */
-public class PlatformComponent implements IPlatformComponentAccess, IInternalAccess
+public class PlatformComponent implements IPlatformComponentAccess //, IInternalAccess
 {	
 	//-------- constants --------
 	
@@ -75,6 +83,9 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public static final String	PROPERTY_TERMINATION_TIMEOUT	= "termination_timeout";
 	
 	//-------- attributes --------
+	
+	/** The internal access. */
+	protected IInternalAccess ia;
 	
 	/** The creation info. */
 	protected ComponentCreationInfo	info;
@@ -127,6 +138,15 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				features.put(ltype, instance);
 			lfeatures.add(instance);
 		}
+	}
+	
+	/**
+	 *  Set the internal access (proxy).
+	 *  @param ia The internal access.
+	 */
+	protected void setInternalAccess(IInternalAccess ia)
+	{
+		this.ia = ia;
 	}
 	
 	/**
@@ -223,7 +243,8 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 //							if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
 //								System.out.println("shutdown component features end1: "+getComponentIdentifier()+", "+ex);
 							MonitoringEvent event = new MonitoringEvent(getDescription().getName(), getDescription().getCreationTime(),
-								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getDescription().getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
+//								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getDescription().getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
+								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, System.currentTimeMillis(), PublishEventLevel.COARSE);
 							event.setProperty("details", getDescription());
 							getFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL).addResultListener(new IResultListener<Void>()
 							{
@@ -534,7 +555,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IInternalAccess	getInternalAccess()
 	{
-		return this;
+		return ia;
 	}
 	
 	/**
@@ -559,16 +580,6 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	//-------- IInternalAccess interface --------
 	
 	/**
-	 *  @deprecated From version 3.0 - replaced with internal access.
-	 *  Get the service provider.
-	 *  @return The service provider.
-	 */
-	public IInternalAccess getServiceContainer()
-	{
-		return this;
-	}
-	
-	/**
 	 *  @deprecated From 3.0. Use getComponentFeature(IArgumentsResultsFeature.class).getArguments()
 	 *  Get an argument value per name.
 	 *  @param name The argument name.
@@ -579,53 +590,34 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		return getFeature(IArgumentsResultsFeature.class).getArguments().get(name);
 	}
 	
-	/**
-	 *  @deprecated From 3.0. Use internal access.
-	 *  @return The interpreter.
-	 */
-	public IInternalAccess getInterpreter()
-	{
-		return this;
-	}
-	
-	/**
-	 *  @deprecated From version 3.0 - replaced with internal access.
-	 *  Get the service provider.
-	 *  @return The service provider.
-	 */
-	public IInternalAccess getServiceProvider()
-	{
-		return this;
-	}
-	
-	/**
-	 *  @deprecated From version 3.0 - Use getComponentFeature(IRequiredServicesFeatures.class).getService()
-	 *  Get a required service of a given name.
-	 *  @param name The service name.
-	 *  @return The service.
-	 */
-	public <T> IFuture<T> getService(String name)
-	{
-		return getFeature(IRequiredServicesFeature.class).getService(name);
-	}
-	
-	/**
-	 *  @deprecated From version 3.0 - replaced with getComponentFeature(IExecutionFeature.class).scheduleStep()
-	 *  Execute a component step.
-	 */
-	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
-	{
-		return getFeature(IExecutionFeature.class).scheduleStep(step);
-	}
-	
-	/**
-	 * 	@deprecated From version 3.0 - replaced with getComponentFeature(IExecutionFeature.class).waitForDelay()
-	 *  Wait for some time and execute a component step afterwards.
-	 */
-	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step)
-	{
-		return getFeature(IExecutionFeature.class).waitForDelay(delay, step);
-	}
+//	/**
+//	 *  @deprecated From version 3.0 - Use getComponentFeature(IRequiredServicesFeatures.class).getService()
+//	 *  Get a required service of a given name.
+//	 *  @param name The service name.
+//	 *  @return The service.
+//	 */
+//	public <T> IFuture<T> getService(String name)
+//	{
+//		return getFeature(IRequiredServicesFeature.class).getService(name);
+//	}
+//	
+//	/**
+//	 *  @deprecated From version 3.0 - replaced with getComponentFeature(IExecutionFeature.class).scheduleStep()
+//	 *  Execute a component step.
+//	 */
+//	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
+//	{
+//		return getFeature(IExecutionFeature.class).scheduleStep(step);
+//	}
+//	
+//	/**
+//	 * 	@deprecated From version 3.0 - replaced with getComponentFeature(IExecutionFeature.class).waitForDelay()
+//	 *  Wait for some time and execute a component step afterwards.
+//	 */
+//	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step)
+//	{
+//		return getFeature(IExecutionFeature.class).waitForDelay(delay, step);
+//	}
 	
 	/**
 	 *  Get the model of the component.
@@ -633,7 +625,16 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IModelInfo getModel()
 	{
-		return info.getModel();
+		return info!=null? info.getModel(): null;
+	}
+	
+	/**
+	 *  Get the model of the component.
+	 *  @return	The model.
+	 */
+	public IFuture<IModelInfo> getModelAsync()
+	{
+		return new Future<>(getModel());
 	}
 
 	/**
@@ -680,7 +681,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	// Todo: hack??? should be internal to CMS!?
 	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid)
 	{
-		return SComponentManagementService.getComponentDescription(cid, this);
+		return SComponentManagementService.getComponentDescription(cid, getInternalAccess());
 	}
 
 	/**
@@ -707,9 +708,9 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public <T> T getFeature0(Class<? extends T> type)
 	{
-		return type.cast(features.get(type));
+		return features!=null? type.cast(features.get(type)): null;
 	}
-
+	
 	/**
 	 *  Kill the component.
 	 */
@@ -753,7 +754,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid)
 	{
-		return SComponentManagementService.destroyComponent(cid, this);
+		return SComponentManagementService.destroyComponent(cid, getInternalAccess());
 	}
 	
 	/**
@@ -763,7 +764,156 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	public IExternalAccess getExternalAccess()
 	{
 		// Todo: shadow access and invalidation
-		return new ExternalAccess(this);
+//		return new ExternalAccess(this);
+		
+//		final ExternalAccess ea = new ExternalAccess(this);
+//		
+//		return (IExternalAccess)ProxyFactory.newProxyInstance(getClassLoader(), new Class[]{IExternalAccess.class}, new InvocationHandler()
+//		{
+//			@Override
+//			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+//			{
+//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+//				
+//				return method.invoke(ea, args);
+//			}
+//		});
+		
+		return (IExternalAccess)ProxyFactory.newProxyInstance(getClassLoader(), new Class[]{IExternalAccess.class}, new InvocationHandler()
+		{
+			/** The component identifier. */
+			protected IComponentIdentifier	cid;
+			
+			/** The toString value. */
+			protected String tostring;
+			
+			{
+				this.cid	= getId();
+				this.tostring = cid.getLocalName();
+			}
+			
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+			{
+//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+				
+				if("getId".equals(method.getName()))
+				{
+					return cid;
+//					return getId();
+				}
+				else if("toString".equals(method.getName()))
+				{
+					return tostring;
+//					return getId().getLocalName();
+				}
+				else if("equals".equals(method.getName()))
+				{
+					boolean ret = false;
+					
+					if(args[0] instanceof IExternalAccess)
+						ret = ((IExternalAccess)args[0]).getId().equals(getId());
+					
+					return ret;
+				}
+				else if("hashCode".equals(method.getName()))
+				{
+					return cid == null? 0 : cid.hashCode();
+//					return getId() == null? 0 : getId().hashCode();
+				}
+				else if("getExternalFeature".equals(method.getName()))
+				{
+					Class<?> iface = (Class<?>)args[0];
+					
+					if(!SReflect.isSupertype(IExternalComponentFeature.class, iface))
+						throw new IllegalArgumentException("Must be external feature interface (extend IExternalComponentFeature)");
+					
+					return ProxyFactory.newProxyInstance(getClassLoader(), new Class[]{iface, IExternalAccess.class}, new InvocationHandler()
+					{
+						@Override
+						public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+						{
+							return method.invoke(getInternalAccess(), args);
+						}
+					});
+				}
+				else
+				{
+					if(!getFeature(IExecutionFeature.class).isComponentThread())
+					{
+//						System.out.println("scheduleStep: "+method.getName());
+						final Future<Object> ret = (Future<Object>)SFuture.getFuture(method.getReturnType());
+						
+						getInternalAccess().scheduleStep(new IComponentStep<Void>()
+						{
+							@Override
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType());
+								if(!intermediate)
+									doInvoke(ia, method, args).addResultListener(new DelegationResultListener<>(ret));
+								else
+									doInvoke(ia, method, args).addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
+								return IFuture.DONE;
+							}
+						});
+						
+						return ret;
+					}
+					else
+					{
+						return doInvoke(getInternalAccess(), method, args);
+//						System.out.println("res2: "+res.getClass());
+					}
+				}
+			}
+			
+			public IFuture<Object> doInvoke(IInternalAccess ia, Method method, Object[] args)
+			{
+				Future<Object> ret = new Future<>();
+				
+				try
+				{
+					Class<?> iface = method.getDeclaringClass();
+					String name = SReflect.getClassName(iface);
+					String intname = SUtil.replaceLast(name, "External", "");
+//					System.out.println(name+" "+intname);
+					
+					Class<?> clazz = SReflect.findClass0(intname, null, ia.getClassLoader());
+					Object feat = clazz!=null? ia.getFeature0(clazz): null;
+					
+					Object res;
+					if(feat==null)
+					{
+						String mname = method.getName();
+//						int idx = mname.lastIndexOf("Async");
+//						if(idx>0)
+//							mname = mname.substring(0, idx);
+						Method m = IInternalAccess.class.getMethod(mname, method.getParameterTypes());
+						res = m.invoke(ia, args);
+					}
+					else
+					{
+						res = method.invoke(feat, args);
+					}
+					
+					if(res instanceof IFuture)
+					{
+						return (IFuture<Object>)res;
+					}
+					else
+					{
+						ret.setResult(res);
+					}
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+				
+				return ret;
+			}
+		});
 	}
 	
 	/**
@@ -1043,7 +1193,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public ClassLoader	getClassLoader()
 	{
-		return ((ModelInfo)getModel()).getClassLoader();
+		return getModel()!=null? ((ModelInfo)getModel()).getClassLoader(): null;
 	}
 	
 	/**
@@ -1054,7 +1204,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 		if(parent!=null && !getId().equals(parent))
 		{
-			return SServiceProvider.getExternalAccessProxy(this, parent).scheduleStep(new IComponentStep<IComponentIdentifier[]>()
+			return SServiceProvider.getExternalAccessProxy(getInternalAccess(), parent).scheduleStep(new IComponentStep<IComponentIdentifier[]>()
 			{
 				public IFuture<IComponentIdentifier[]> execute(IInternalAccess ia)
 				{
@@ -1072,7 +1222,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		}
 		else if(type==null)
 		{
-			SComponentManagementService.getChildren(getId(), this).addResultListener(new DelegationResultListener<>(ret));
+			SComponentManagementService.getChildren(getId(), getInternalAccess()).addResultListener(new DelegationResultListener<>(ret));
 		}
 		else
 		{
@@ -1090,7 +1240,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 				
 					final Future<Collection<IExternalAccess>> childaccesses	= new Future<Collection<IExternalAccess>>();
 					
-					SComponentManagementService.getChildren(getId(), PlatformComponent.this)
+					SComponentManagementService.getChildren(getId(), getInternalAccess())
 						.addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier[] children)
@@ -1112,10 +1262,17 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 							for(Iterator<IExternalAccess> it=col.iterator(); it.hasNext(); )
 							{
 								IExternalAccess subcomp = it.next();
-								if(modelname.equals(subcomp.getModel().getFullName()))
+								
+								subcomp.getModelAsync().addResultListener(getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IModelInfo, IComponentIdentifier[]>(ret)
 								{
-									res.add(subcomp.getId());
-								}
+									public void customResultAvailable(IModelInfo model)
+									{
+										if(modelname.equals(model.getFullName()))
+										{
+											res.add(subcomp.getId());
+										}
+									}
+								}));
 							}
 							ret.setResult((IComponentIdentifier[])res.toArray(new IComponentIdentifier[0]));
 						}
@@ -1168,7 +1325,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid)
 	{
-		return SComponentManagementService.getExternalAccess(cid, this);
+		return SComponentManagementService.getExternalAccess(cid, getInternalAccess());
 	}
 	
 	/**
@@ -1186,7 +1343,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		
 		info = prepare(component, info);
 		
-		IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, resultlistener, this);
+		IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, resultlistener, getInternalAccess());
 		
 		fut.addResultListener(new ComponentResultListener<>(new IResultListener<IComponentIdentifier>()
 		{
@@ -1201,7 +1358,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 			public void resultAvailable(IComponentIdentifier result)
 			{
 //				System.out.println("created: "+result);
-				SComponentManagementService.getExternalAccess(result, PlatformComponent.this).addResultListener(new DelegationResultListener<>(ret));
+				SComponentManagementService.getExternalAccess(result, getInternalAccess()).addResultListener(new DelegationResultListener<>(ret));
 			}
 		}, getExternalAccess()));
 		
@@ -1221,7 +1378,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 		
 		info = prepare(component, info);
 		
-		return SComponentManagementService.createComponent(info, info.getName(), info.getFilename(), this);
+		return SComponentManagementService.createComponent(info, info.getName(), info.getFilename(), getInternalAccess());
 	}
 	
 	/**
@@ -1235,12 +1392,14 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	{
 		// todo: resultlistener for results?!
 		
+//		System.out.println("tuplecreate: "+info.getFilename());
+		
 		if(component==null && (info==null || info.getFilename()==null))
 			return new Tuple2Future<IComponentIdentifier, Map<String, Object>>(new RuntimeException("Component must not null."));
 				
 		info = prepare(component, info);
 		
-		return SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, this);
+		return SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, getInternalAccess());
 	}
 	
 	/**
@@ -1284,7 +1443,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void> suspendComponent(IComponentIdentifier componentid)
 	{
-		return SComponentManagementService.suspendComponent(componentid, this);
+		return SComponentManagementService.suspendComponent(componentid, getInternalAccess());
 	}
 	
 	/**
@@ -1293,7 +1452,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void> resumeComponent(IComponentIdentifier componentid)
 	{
-		return SComponentManagementService.resumeComponent(componentid, false, this);
+		return SComponentManagementService.resumeComponent(componentid, false, getInternalAccess());
 	}
 	
 	/**
@@ -1303,7 +1462,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void> stepComponent(IComponentIdentifier cid, String stepinfo)
 	{
-		return SComponentManagementService.stepComponent(cid, stepinfo, this);
+		return SComponentManagementService.stepComponent(cid, stepinfo, getInternalAccess());
 	}
 	
 	/**
@@ -1315,7 +1474,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier cid, String[] breakpoints)
 	{
-		return SComponentManagementService.setComponentBreakpoints(cid, breakpoints, this); 
+		return SComponentManagementService.setComponentBreakpoints(cid, breakpoints, getInternalAccess()); 
 	}
 	
 	/**
@@ -1325,7 +1484,7 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid)
 	{
-		return SComponentManagementService.listenToComponent(cid, this);
+		return SComponentManagementService.listenToComponent(cid, getInternalAccess());
 	}
 	
 	/**
@@ -1334,7 +1493,15 @@ public class PlatformComponent implements IPlatformComponentAccess, IInternalAcc
 	 */
 	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con)//, boolean remote)
 	{
-		return SComponentManagementService.searchComponents(adesc, con, this);//, sid);
+		return SComponentManagementService.searchComponents(adesc, con, getInternalAccess());//, sid);
+	}
+	
+	/**
+	 *  Get the platform component.
+	 */
+	public PlatformComponent getPlatformComponent()
+	{
+		return this;
 	}
 
 	/**

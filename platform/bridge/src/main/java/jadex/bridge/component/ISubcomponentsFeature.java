@@ -1,9 +1,12 @@
 package jadex.bridge.component;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.commons.future.IFuture;
+
 /**
  *  Allows a component to have subcomponents.
  */
-public interface ISubcomponentsFeature
+public interface ISubcomponentsFeature extends IExternalSubcomponentsFeature
 {
 //	/**
 //	 *  Create a subcomponent.
@@ -50,14 +53,15 @@ public interface ISubcomponentsFeature
 	 *  @return the childcount.
 	 */
 	public int getChildcount();
-	
-	/**
-	 *  Inc the child count.
-	 */
-	public int incChildcount();
-	
-	/**
-	 *  Dec the child count.
-	 */
-	public int decChildcount();
+//	
+//	/**
+//	 *  Inc the child count.
+//	 */
+//	public int incChildcount();
+//	
+//	/**
+//	 *  Dec the child count.
+//	 */
+//	public int decChildcount();
+
 }

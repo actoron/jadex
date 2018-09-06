@@ -245,7 +245,7 @@ public class StarterPluginPanel extends JPanel
 											public void customResultAvailable(Object result)
 											{
 												if(((Boolean)result).booleanValue())
-													StarterPanel.createComponent(jcc, rid, filename, null, null, null, null, false, null, null, null, null, null, null, null, StarterPluginPanel.this);
+													StarterPanel.createComponent(jcc, rid, filename, null, null, null, null, false, null, null, null, StarterPluginPanel.this);
 												mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 											}
 										});

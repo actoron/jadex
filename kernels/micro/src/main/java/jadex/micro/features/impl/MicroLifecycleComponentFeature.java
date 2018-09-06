@@ -66,7 +66,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public IFuture<Void> init()
 	{
-		return invokeMethod(getComponent(), AgentCreated.class, null);
+		return invokeMethod(getInternalAccess(), AgentCreated.class, null);
 	}
 	
 	/**
@@ -79,7 +79,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		// Invoke initial service calls.
 		invokeServices();
 		
-		return invokeMethod(getComponent(), AgentBody.class, null);
+		return invokeMethod(getInternalAccess(), AgentBody.class, null);
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 //			System.out.println("lifecycle feature shutdown start: "+getComponent().getComponentIdentifier());
 			
 		final Future<Void> ret = new Future<Void>();
-		invokeMethod(getComponent(), AgentKilled.class, null).addResultListener(new IResultListener<Void>()
+		invokeMethod(getInternalAccess(), AgentKilled.class, null).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
