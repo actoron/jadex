@@ -444,7 +444,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					
 					public String toString()
 					{
-						return "waitForDelay[Step]("+getComponent().getId()+")";
+						return "waitForDelay["+step+"]("+getComponent().getId()+")";
 					}
 				};
 				if(realtime)
