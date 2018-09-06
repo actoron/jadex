@@ -860,7 +860,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	protected <T> RequiredServiceInfo createServiceInfo(ServiceQuery<T> query)
 	{
 		// TODO: multiplicity required here for info? should not be needed for proxy creation
-		return new RequiredServiceInfo(null, query.getServiceType(), false, null, null, query.getServiceTags()==null ? null : Arrays.asList(query.getServiceTags()));
+		RequiredServiceBinding binding = new RequiredServiceBinding(SUtil.createUniqueId(), query.getScope());
+		return new RequiredServiceInfo(null, query.getServiceType(), false, binding, null, query.getServiceTags()==null ? null : Arrays.asList(query.getServiceTags()));
 	}
 	
 	/**
