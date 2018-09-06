@@ -13,7 +13,7 @@
 	name="GarbageCollector" package="jadex.bdi.examples.garbagecollector_classic">
 	
 	<componenttypes>
-		<componenttype name="Environment" filename="jadex/bdi/examples/garbagecollector_classic/Environment.agent.xml" master="true"/>
+		<componenttype name="Environment" filename="jadex/bdi/examples/garbagecollector_classic/Environment.agent.xml"/>
 		<componenttype name="Collector" filename="jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml"/>
 		<componenttype name="Burner" filename="jadex/bdi/examples/garbagecollector_classic/GarbageBurner.agent.xml"/>
 	</componenttypes>

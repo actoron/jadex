@@ -29,7 +29,7 @@
 	<configurations>
 		<configuration name="1 Sentry / 2 Producers / 3 Carriers">
 			<components>
-				<component type="Environment" master="true"/>
+				<component type="Environment"/>
 				<component type="Sentry"/>
 				<component type="Producer" number="2" />
 				<component type="Carrier" number="3" />
@@ -37,7 +37,7 @@
 		</configuration>
 		<configuration name="Sentry only">
 			<components>
-				<component type="Environment" master="true"/>
+				<component type="Environment"/>
 				<component type="Sentry" number="1" />
 			</components>
 		</configuration>

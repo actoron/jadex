@@ -12,7 +12,7 @@
 	name="Calculate" package="jadex.micro.testcases.semiautomatic.compositeservice">
 	
 	<componenttypes>
-		<componenttype name="Calculator" filename="jadex/micro/testcases/semiautomatic/compositeservice/CalculatorAgent.class" master="true"/>
+		<componenttype name="Calculator" filename="jadex/micro/testcases/semiautomatic/compositeservice/CalculatorAgent.class"/>
 		<componenttype name="User" filename="jadex/micro/testcases/semiautomatic/compositeservice/UserAgent.class"/>
 	</componenttypes>
 	

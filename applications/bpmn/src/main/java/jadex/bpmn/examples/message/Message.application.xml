@@ -30,7 +30,6 @@
 	<configurations>
 		<configuration name="One sender and one receiver">
 			<components>
-				<!-- <component type="Receiver" name="Receiver" master="true">-->
 				<component type="Receiver" name="Receiver">
 					<arguments>
 						<argument name="message_number">$args.message_number</argument>

@@ -18,19 +18,19 @@
 	<configurations>
 		<configuration name="Two cleaners local">
 			<components>
-				<component type="EnvironmentLocal" master="true"/>
+				<component type="EnvironmentLocal"/>
 				<component type="CleanerLocal" number="2"/>
 			</components>
 		</configuration>
 		<configuration name="One cleaner local">
 			<components>
-				<component type="EnvironmentLocal" master="true"/>
+				<component type="EnvironmentLocal"/>
 				<component type="CleanerLocal"/>
 			</components>
 		</configuration>
 		<configuration name="Ten cleaners local">
 			<components>
-				<component type="EnvironmentLocal" master="true"/>
+				<component type="EnvironmentLocal"/>
 				<component type="CleanerLocal" number="10"/>
 			</components>
 		</configuration>

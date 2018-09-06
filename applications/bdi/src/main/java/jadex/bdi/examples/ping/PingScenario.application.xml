@@ -11,8 +11,8 @@
 	name="PingScenario" package="jadex.bdi.examples.ping">
 	
 	<componenttypes>
-		<componenttype name="Ping" filename="jadex/bdi/examples/ping/Ping.agent.xml" master="true"/>
-		<componenttype name="Pinging" filename="jadex/bdi/examples/ping/Pinging.agent.xml" master="true"/>
+		<componenttype name="Ping" filename="jadex/bdi/examples/ping/Ping.agent.xml"/>
+		<componenttype name="Pinging" filename="jadex/bdi/examples/ping/Pinging.agent.xml"/>
 	</componenttypes>
 	
 	<configurations>
