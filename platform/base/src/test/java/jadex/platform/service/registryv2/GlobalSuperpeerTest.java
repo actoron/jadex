@@ -35,7 +35,8 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 	/** Global superpeer and relay platform configuration. */
 	public static final IPlatformConfiguration	RELAYCONF;
 	
-	public static final int relayport	= SSecurity.getSecureRandom().nextInt(Short.MAX_VALUE*2-1024)+1025; 
+	/** Fixed port for SSP platform. */
+	public static final int sspport	= SSecurity.getSecureRandom().nextInt(Short.MAX_VALUE*2-1024)+1025; 
 
 	static
 	{
@@ -49,7 +50,7 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenesscatalog", true);
 		baseconf.setValue("rt", true);
-		baseconf.setValue("platformurls", "tcp://ssp@localhost:"+relayport);
+		baseconf.setValue("platformurls", "intravm://ssp@localhost:"+sspport);
 		baseconf.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
 		baseconf.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass);
 		// Remote only -> no simulation please
@@ -77,7 +78,7 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		RELAYCONF.setValue("superpeer", true);
 		RELAYCONF.setValue("supersuperpeer", true);
 		RELAYCONF.setValue("rt.forwarding", true);
-		RELAYCONF.setValue("tcpport", relayport);
+		RELAYCONF.setValue("intravm.port", sspport);
 		RELAYCONF.setPlatformName("ssp");
 		RELAYCONF.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME);
 		RELAYCONF.setNetworkSecrets(serversecret.toString());

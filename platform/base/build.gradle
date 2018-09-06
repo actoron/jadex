@@ -18,6 +18,7 @@ dependencies
 	api 'commons-daemon:commons-daemon:1.0.10'
 	
 	// Add transpors for testing
+	testImplementation project(':transports:intravm')
 	testImplementation project(':transports:tcp')
 	testImplementation project(':transports:relaytransport')
 	

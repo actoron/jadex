@@ -1,7 +1,5 @@
 package jadex.platform.service.execution;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.future.IFuture;
@@ -12,21 +10,26 @@ import jadex.commons.future.IFuture;
 public class BisimExecutionService extends SyncExecutionService
 {
 	/** The shared execution service. */
-	protected static volatile IExecutionService	instance;
-	
+	protected static volatile BisimExecutionService	instance;
+
+	/** The inited flag of the service. */
+	protected static IFuture<Void>	inited;
+
 	/**
 	 *  Get the instance.
 	 */
 	public static IExecutionService	getInstance(IInternalAccess provider)
 	{
-		if(instance==null)
+		synchronized(BisimExecutionService.class)
 		{
-			instance	= new BisimExecutionService(provider);
+			if(instance==null)
+			{
+				instance	= new BisimExecutionService(provider);
+				inited	= instance.doInit();
+			}
 		}
 		return instance;
 	}
-	
-	AtomicInteger	users	= new AtomicInteger(0);
 	
 	/**
 	 *  Create a new synchronous executor service. 
@@ -39,30 +42,21 @@ public class BisimExecutionService extends SyncExecutionService
 	@Override
 	public IFuture<Void> startService()
 	{
-		if(users.incrementAndGet()==1)
-		{
-			return super.startService();
-		}
-		else
-		{
-			return IFuture.DONE;
-		}
+		return inited;
+	}
+	
+	/**
+	 *  Do the actual init (called once).
+	 */
+	private IFuture<Void>	doInit()
+	{
+		return super.startService();
 	}
 	
 	@Override
 	public IFuture<Void> shutdownService()
 	{
-		if(users.decrementAndGet()==1)
-		{
-			// Todo: synchronize!?
-			if(instance==this)
-				instance	= null;
-			
-			return super.shutdownService();
-		}
-		else
-		{
-			return IFuture.DONE;
-		}
+		// Hack!!! never shut down as might be reused later
+		return IFuture.DONE;
 	}
 }
