@@ -293,7 +293,7 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 							{
 								public void resultAvailable(final IExternalAccess acc)
 								{
-									Object clid = acc.getModel().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS,
+									Object clid = acc.getModelAsync().get().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS,
 											getClassLoader());
 
 									final Class<?> clazz = getGuiClass(clid);

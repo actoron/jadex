@@ -16,6 +16,7 @@ import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
@@ -328,6 +329,6 @@ public class BTTransportTest {
 	}
 
 	private IInternalAccess createInternalAccess() {
-		return new PlatformComponent();
+		return (IInternalAccess)SComponentManagementService.createPlatformComponent(getClass().getClassLoader());
 	}
 }
