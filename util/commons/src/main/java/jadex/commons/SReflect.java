@@ -816,13 +816,13 @@ public class SReflect
 	 *  @param types	The parameter types.
 	 *  @return	The method (or null if not found).
 	 */
-	public static Method	getMethod(Class clazz, String name, Class[] types)
+	public static Method	getMethod(Class<?> clazz, String name, Class<?>[] types)
 	{
 		Method	meth	= null;
 		Method[]	ms	= getMethods(clazz, name);
 		for(int i=0; i<ms.length; i++)
 		{
-			Class[]	ptypes	= ms[i].getParameterTypes();
+			Class<?>[]	ptypes	= ms[i].getParameterTypes();
 			boolean	match	= ptypes.length==types.length;
 			for(int j=0; match && j<ptypes.length; j++)
 			{
