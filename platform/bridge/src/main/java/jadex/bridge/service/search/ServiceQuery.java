@@ -232,7 +232,7 @@ public class ServiceQuery<T>
 	protected Map<String, Boolean> matchingmodes;
 	
 	/** Required service proxy type. */
-	protected String requiredproxytype;
+	protected String requiredproxytype = PROXYTYPE_DECOUPLED;
 	
 	//-------- identification of a query --------
 	

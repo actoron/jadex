@@ -1006,9 +1006,6 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			query.setMultiplicity(multi ? Multiplicity.ZERO_MANY : Multiplicity.ONE);
 		}
 		
-		if (query.getRequiredProxyType() == null)
-			query.setRequiredProxyType(ServiceQuery.PROXYTYPE_DECOUPLED);
-		
 		// Network names not set by user?
 		if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))
 		{
