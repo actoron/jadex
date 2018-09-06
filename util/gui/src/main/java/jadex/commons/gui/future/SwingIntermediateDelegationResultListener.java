@@ -31,6 +31,7 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
 	{
 		this.future = future;
 //		this.ex	= new DebugException();
+		SwingDelegationResultListener.block(future);
 	}
 	
 	//-------- methods --------
