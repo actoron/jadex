@@ -126,6 +126,7 @@ public class IntravmTransport	implements ITransport<IntravmTransport>
 			IntravmTransport	con	= ports.get(port);
 			if(con!=null)
 			{
+				con.handler.connectionEstablished(this);
 				ret.setResult(con);
 			}
 			else
