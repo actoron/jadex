@@ -25,7 +25,7 @@ import jadex.commons.transformation.annotations.Classname;
 public class GetExternalAccessPlan extends Plan
 {
 	boolean	gotexta	= false;
-	Future	done;
+	Future<Void>	done;
 	
 	/**
 	 *  The plan body.
@@ -33,22 +33,21 @@ public class GetExternalAccessPlan extends Plan
 	public void body()
 	{
 		// Sub component will not be initialized before wait future is done.
-		Future	wait	= new Future();
+		Future<Void>	wait	= new Future<>();
 
 		// Create component.
-		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', '.'));
-		Map	args	= new HashMap();
+		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', ':'));
+		Map<String, Object>	args	= new HashMap<>();
 		args.put("future", wait);
-		IFuture init = getAgent().createComponent(null,
+		IFuture<IExternalAccess> init = getAgent().createComponent(null,
 			new CreationInfo(null, args, getComponentIdentifier(), false).setName(cid.getLocalName()).setFilename("jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml"), null);
 		final boolean[]	gotexta	= new boolean[3];	// 0: got exception, 1: got access, 2: got belief value.	
 		
 		// Get and use external access.
-		IResultListener	lis	= new DefaultResultListener()
+		IResultListener<IExternalAccess>	lis	= new DefaultResultListener<IExternalAccess>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IExternalAccess exta)
 			{
-				IExternalAccess exta = (IExternalAccess)result;
 				gotexta[0]	= true;
 //				System.out.println("Got external access: "+exta);
 				
@@ -62,7 +61,7 @@ public class GetExternalAccessPlan extends Plan
 						gotexta[1]	= "testfact".equals(fact);
 						return IFuture.DONE;
 					}
-				}).addResultListener(new DelegationResultListener(done));
+				}).addResultListener(new DelegationResultListener<>(done));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -88,7 +87,7 @@ public class GetExternalAccessPlan extends Plan
 		TestReport	tr	= new TestReport("#2", "External access after init.");
 		wait.setResult(null);
 		init.get();
-		done	= new Future();
+		done	= new Future<>();
 		getAgent().getExternalAccess(cid).addResultListener(lis);
 		done.get();
 		if(gotexta[0] && gotexta[1])
