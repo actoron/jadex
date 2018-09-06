@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -43,14 +44,22 @@ import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.ComponentFutureFunctionality;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RequiredServicesComponentFeature;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.ICommand;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -795,7 +804,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 			{
-//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+				if(method.getName().indexOf("killComponent")!=-1)
+					System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 				
 				if("getId".equals(method.getName()))
 				{
@@ -847,11 +857,11 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							}
 						});
 						
-						return ret;
+						return getDecoupledFuture(ret);
 					}
 					else
 					{
-						return doInvoke(getInternalAccess(), method, args);
+						return getDecoupledFuture(doInvoke(getInternalAccess(), method, args));
 //						System.out.println("res2: "+res.getClass());
 					}
 				}
@@ -859,7 +869,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			
 			public IFuture<Object> doInvoke(IInternalAccess ia, Method method, Object[] args)
 			{
-				Future<Object> ret = new Future<>();
+				IFuture<Object> ret = null;
 				
 				try
 				{
@@ -883,25 +893,112 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					}
 					else
 					{
+						// todo: create generic (double) hook (also in RMI proxy) mechanism
+						
+						if(feat instanceof IRequiredServicesFeature)
+						{
+							if("searchService".equals(method.getName()))
+							{
+								method = RequiredServicesComponentFeature.class.getMethod("resolveService",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
+								args = Arrays.copyOf(args, 2);
+							}
+							else if("searchServices".equals(method.getName()))
+							{
+								method = RequiredServicesComponentFeature.class.getMethod("resolveServices",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
+								args = Arrays.copyOf(args, 2);
+							}
+							else if("addQuery".equals(method.getName()))
+							{
+								method = RequiredServicesComponentFeature.class.getMethod("resolveQuery",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
+								args = Arrays.copyOf(args, 2);
+							}
+						}
+						
 						res = method.invoke(feat, args);
 					}
 					
 					if(res instanceof IFuture)
 					{
-						return (IFuture<Object>)res;
+						ret = (IFuture<Object>)res;
 					}
 					else
 					{
-						ret.setResult(res);
+						((Future)ret).setResult(res);
 					}
 				}
 				catch(Exception e)
 				{
-					ret.setException(e);
+					ret = new Future<Object>();
+					((Future)ret).setException(e);
+				}
+				
+//				return getDecoupledFuture(ret);
+				return ret;
+			}
+			
+			/**
+			 *  Returns a future that schedules back to calling component if necessary..
+			 *  @param infut Input future.
+			 *  @return 
+			 */
+			protected <T> IFuture<T> getDecoupledFuture(IFuture<T> infut)
+			{
+				IFuture<T> ret = infut;
+				IInternalAccess caller = IInternalExecutionFeature.LOCAL.get();
+				if(caller != null && !getInternalAccess().equals(caller))
+				{
+					IComponentIdentifier callerplat = caller.getId().getRoot();
+					Boolean issim = (Boolean) Starter.getPlatformValue(callerplat, IClockService.SIMULATION_CLOCK_FLAG);
+					if (Boolean.TRUE.equals(issim) && !callerplat.equals(getInternalAccess().getId().getRoot()))
+						((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
+					
+					IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller)
+					{
+						public void scheduleBackward(ICommand<Void> command)
+						{
+							if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
+							{
+								getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+								{
+									public IFuture<Void> execute(IInternalAccess intaccess)
+									{
+										command.execute(null);
+										return IFuture.DONE;
+									}
+								}).addResultListener(new IResultListener<Void>()
+								{
+									public void exceptionOccurred(Exception exception)
+									{
+										System.err.println("Unexpected Exception: "+command);
+										exception.printStackTrace();
+									}
+									
+									public void resultAvailable(Void result)
+									{
+									}
+								});
+							}
+							else
+							{
+								command.execute(null);
+							}
+						}
+					});
+					ret = newret;
 				}
 				
 				return ret;
 			}
+			
+//			/**
+//			 *  Returns a future that schedules back to calling component if necessary..
+//			 *  @param infut Input future.
+//			 *  @return 
+//			 */
+//			protected <T> ISubscriptionIntermediateFuture<T> getDecoupledSubscriptionFuture(final ISubscriptionIntermediateFuture<T> infut)
+//			{
+//				return (ISubscriptionIntermediateFuture<T>) getDecoupledFuture(infut);
+//			}
 		});
 	}
 	

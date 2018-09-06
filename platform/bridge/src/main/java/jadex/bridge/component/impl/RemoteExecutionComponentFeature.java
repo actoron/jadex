@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -38,18 +37,13 @@ import jadex.bridge.component.impl.remotecommands.RemoteResultCommand;
 import jadex.bridge.component.impl.remotecommands.RemoteTerminationCommand;
 import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.security.ISecurityInfo;
-import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
@@ -319,7 +313,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		public void handleMessage(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			final String rxid = (String) header.getProperty(RX_ID);
-//			System.out.println(getComponent().getId() + " received remote command: "+msg+", rxid="+rxid);
+			System.out.println(getComponent().getId() + " received remote command: "+msg+", rxid="+rxid);
 			
 			if(msg instanceof IRemoteCommand)
 			{

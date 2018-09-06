@@ -665,6 +665,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					final IMsgHeader header = (IMsgHeader)serser.decode(null, agent, tup.getSecondEntity());
 					final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 					
+//					System.out.println("rec msg: "+header);
+					
 					// Cannot use agent/cms.getExternalAccess(cid) because when remote call
 					// is in init the call will be delayed after init has finished (deadlock)
 					SComponentManagementService.scheduleStep(rec, new IComponentStep<Void>()
@@ -690,7 +692,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
-							logger.warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+							System.out.println("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+//							logger.warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
 							
 							// For undeliverable conversation messages -> send error reply (only for non-error messages). 
 							if((header.getProperty(IMsgHeader.CONVERSATION_ID)!=null || header.getProperty(RemoteExecutionComponentFeature.RX_ID)!=null)

@@ -53,6 +53,9 @@ public class MethodInfo
 	 */
 	public MethodInfo(Method m)
 	{
+		if(m==null)
+			throw new IllegalArgumentException("Method must not null");
+		
 		this.name = m.getName();
 		
 		Type[] pts = m.getGenericParameterTypes();
