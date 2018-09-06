@@ -22,14 +22,11 @@ public class FlagPlan extends Plan
 	  */
 	public void body()
 	{
-		TestReport tr = new TestReport("#1", "Start agent as suspended.");
+		TestReport tr = new TestReport("#1", "Start agent externally as suspended.");
 		CreationInfo ci =  new CreationInfo("donothing", null, getComponentIdentifier());
 		ci.setSuspend(Boolean.TRUE);
 		IExternalAccess ea = getAgent().createComponent(null, ci.setFilename("jadex/bdi/testcases/misc/Flag.agent.xml") , null).get();
 		IComponentDescription desc = getComponentDescription(ea);
-		
-//		IComponentDescription desc = (IComponentDescription)cms.getComponentDescription(cid).get();
-		
 		if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 		{
 			tr.setSucceeded(true);
@@ -39,60 +36,12 @@ public class FlagPlan extends Plan
 			tr.setReason("Component not suspended: "+desc);
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
+
 		
-//		tr = new TestReport("#2", "Start agent as master.");
-//		ci =  new CreationInfo("donothing", null, getComponentIdentifier());
-//		ci.setMaster(Boolean.TRUE);
-//		ea = getAgent().createComponent(null, ci.setFilename( "jadex/bdi/testcases/misc/Flag.agent.xml") , null).get();
-//		desc = getComponentDescription(ea);
-//		
-//		if(desc.isMaster())
-//		{
-//			tr.setSucceeded(true);
-//		}
-//		else
-//		{
-//			tr.setReason("Component not master: "+desc);
-//		}
-//		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-		
-//		tr = new TestReport("#3", "Start agent as daemon.");
-//		ci =  new CreationInfo("donothing", null, getComponentIdentifier());
-//		ci.setDaemon(Boolean.TRUE);
-//		ea = getAgent().createComponent(null, ci.setFilename("jadex/bdi/testcases/misc/Flag.agent.xml") , null).get();
-//		desc = getComponentDescription(ea);
-//		
-//		if(desc.isDaemon())
-//		{
-//			tr.setSucceeded(true);
-//		}
-//		else
-//		{
-//			tr.setReason("Component not daemon: "+desc);
-//		}
-//		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-		
-//		tr = new TestReport("#4", "Start agent as autoshutdown.");
-//		ci =  new CreationInfo("donothing", null, getComponentIdentifier());
-//		ci.setAutoShutdown(Boolean.TRUE);
-//		ea = getAgent().createComponent(null, ci.setFilename("jadex/bdi/testcases/misc/Flag.agent.xml") , null).get();
-//		desc = getComponentDescription(ea);
-//		
-//		if(desc.isAutoShutdown())
-//		{
-//			tr.setSucceeded(true);
-//		}
-//		else
-//		{
-//			tr.setReason("Component not autoshutdown: "+desc);
-//		}
-//		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-		
-		tr = new TestReport("#5", "Start agent as suspended.");
+		tr = new TestReport("#1", "Start agent that has suspended flag.");
 		ci =  new CreationInfo("suspend", null, getComponentIdentifier());
 		ea = getAgent().createComponent(null, ci.setFilename("jadex/bdi/testcases/misc/Flag.agent.xml") , null).get();
 		desc = getComponentDescription(ea);
-		
 		if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 		{
 			tr.setSucceeded(true);
@@ -103,50 +52,6 @@ public class FlagPlan extends Plan
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 		
-//		tr = new TestReport("#6", "Start agent as master.");
-//		ci =  new CreationInfo("master", null, getComponentIdentifier());
-//		ea = getAgent().createComponent(null, ci.setFilename("jadex/bdi/testcases/misc/Flag.agent.xml") , null).get();
-//		desc = getComponentDescription(ea);
-//		
-//		if(desc.isMaster())
-//		{
-//			tr.setSucceeded(true);
-//		}
-//		else
-//		{
-//			tr.setReason("Component not master: "+desc);
-//		}
-//		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-		
-//		tr = new TestReport("#7", "Start agent as daemon.");
-//		ci =  new CreationInfo("daemon", null, getComponentIdentifier());
-//		ea = getAgent().createComponent(null, ci.setFilename("jadex/bdi/testcases/misc/Flag.agent.xml") , null).get();
-//		desc = getComponentDescription(ea);
-//		
-//		if(desc.isDaemon())
-//		{
-//			tr.setSucceeded(true);
-//		}
-//		else
-//		{
-//			tr.setReason("Component not daemon: "+desc);
-//		}
-//		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-		
-//		tr = new TestReport("#8", "Start agent as autoshutdown.");
-//		ci =  new CreationInfo("autoshutdown", null, getComponentIdentifier());
-//		ea = getAgent().createComponent(null, ci.setFilename("jadex/bdi/testcases/misc/Flag.agent.xml") , null).get();
-//		desc = getComponentDescription(ea);
-//		
-//		if(desc.isAutoShutdown())
-//		{
-//			tr.setSucceeded(true);
-//		}
-//		else
-//		{
-//			tr.setReason("Component not autoshutdown: "+desc);
-//		}
-//		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 	}
 	
 	/**
