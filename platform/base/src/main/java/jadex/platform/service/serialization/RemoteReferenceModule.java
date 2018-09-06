@@ -63,6 +63,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.ImmutableProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -559,21 +560,13 @@ public class RemoteReferenceModule
 		if(ret.getMethodReplacement(getclass)==null)
 			ret.addExcludedMethod(new MethodInfo(getclass));
 		
-		Method getfeat = SReflect.getMethod(Object.class, "getExternalFeature", new Class[]{Class.class});
+		Method getfeat = SReflect.getMethod(IExternalAccess.class, "getExternalFeature", new Class[]{Class.class});
 		if(ret.getMethodReplacement(getfeat)==null)
 		{
 			MethodInfo[] mis = getMethodInfo(getfeat, targetclass, false);
 			for(int i=0; i<mis.length; i++)
 			{
-				ret.addMethodReplacement(mis[i], new IMethodReplacement()
-				{
-					@Override
-					public Object invoke(Object obj, Object[] args)
-					{
-						Class<?> iface = (Class<?>)args[0];
-						return PlatformComponent.getExternalFeature(iface, cl, target);
-					}
-				});
+				ret.addMethodReplacement(mis[i], new GetExternalFeatureMethodReplacement());
 			}
 		}
 		
