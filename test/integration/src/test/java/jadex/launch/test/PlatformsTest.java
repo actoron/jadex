@@ -46,7 +46,6 @@ public class PlatformsTest //extends TestCase
 		"-gui", "false",
 		"-saveonexit", "false",
 		"-welcome", "false",
-		"-autoshutdown", "false",
 		"-printpass", "false",
 		"-superpeerclient", "false", // TODO: fails on shutdown due to auto restart
 //		"-deftimeout", ""+TIMEOUT

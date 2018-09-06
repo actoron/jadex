@@ -9,7 +9,7 @@
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
     <jadex:modelname>test</jadex:modelname>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="ikaHuqJC7mJkadPs">
     <semantic:subProcess id="FdPJqNLord1NCWgZ">

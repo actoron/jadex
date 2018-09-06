@@ -6,7 +6,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
 	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
-	name="Mandelbrot" package="jadex.micro.examples.mandelbrot" autoshutdown="true">
+	name="Mandelbrot" package="jadex.micro.examples.mandelbrot">
 	
 	<imports>
 		<import>jadex.bridge.serviceclock.IClockService</import>

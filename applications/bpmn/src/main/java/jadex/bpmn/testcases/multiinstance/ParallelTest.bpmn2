@@ -9,7 +9,7 @@
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
     <jadex:modelname>ParallellTest</jadex:modelname>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:imports>
       <jadex:import>jadex.base.test.*</jadex:import>
     </jadex:imports>

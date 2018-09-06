@@ -15,8 +15,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
 	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
-	name="Shopping" package="jadex.bdiv3.examples.shop"
-	autoshutdown="true">
+	name="Shopping" package="jadex.bdiv3.examples.shop">
 	
 	<componenttypes>
 		<componenttype name="Shop" filename="jadex/bdiv3/examples/shop/ShopAgent.class"/>

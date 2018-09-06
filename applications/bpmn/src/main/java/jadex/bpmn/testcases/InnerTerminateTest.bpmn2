@@ -11,7 +11,7 @@
     <jadex:modelname>InnerTerminateTest</jadex:modelname>
     <jadex:description>Test if inner terminate event works.</jadex:description>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
     <jadex:imports>
       <jadex:import>jadex.base.test.*</jadex:import>
       <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>

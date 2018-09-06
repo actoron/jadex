@@ -11,7 +11,7 @@
 	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
 	                    http://www.activecomponents.org/jadex-envspace 
 	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
-	name="Message" package="jadex.bpmn.examples.message" autoshutdown="true">
+	name="Message" package="jadex.bpmn.examples.message">
 	
 	<imports>
 		<import>jadex.commons.*</import>

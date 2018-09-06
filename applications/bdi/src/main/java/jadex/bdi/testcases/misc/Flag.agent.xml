@@ -50,9 +50,6 @@
 		</configuration>
 		<configuration name="donothing"/>
 		<configuration name="suspend" suspend="true"/>
-		<configuration name="master" master="true"/>
-		<configuration name="daemon" daemon="true"/>
-		<configuration name="autoshutdown" autoshutdown="true"/>
 	</configurations>
 </agent>
 

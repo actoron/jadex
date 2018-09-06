@@ -11,7 +11,7 @@
     <jadex:modelname>ExecuteRequestRandom</jadex:modelname>
     <jadex:description>&lt;h1&gt;Execute a Request&lt;/h1&gt; This process randomly produces a result or fails.</jadex:description>
     <jadex:package>jadex.bpmn.examples.contractnet</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:arguments>
       <jadex:argument name="proposal" type="Object">
         <jadex:description>The proposal.</jadex:description>

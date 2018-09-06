@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>ConditionEventStart</jadex:modelname>
     <jadex:package>jadex.platform.service.processengine</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
     <jadex:results>
       <jadex:result name="result" type="String">
         <jadex:description>&quot;The result&quot;</jadex:description>

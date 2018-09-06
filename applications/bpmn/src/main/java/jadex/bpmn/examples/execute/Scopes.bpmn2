@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>Scopes</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
     <jadex:imports>
       <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
     </jadex:imports>
