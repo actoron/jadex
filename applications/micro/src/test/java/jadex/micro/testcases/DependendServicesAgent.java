@@ -87,7 +87,7 @@ public class DependendServicesAgent extends JunitAgentTest
 							Collection<TestReport> tmp = (Collection<TestReport>)it.next();
 							tests.addAll(tmp);
 						}
-						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tests.size(), (TestReport[])tests.toArray(new TestReport[tests.size()])));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, (TestReport[])tests.toArray(new TestReport[tests.size()])));
 						
 						agent.killComponent();
                     }
