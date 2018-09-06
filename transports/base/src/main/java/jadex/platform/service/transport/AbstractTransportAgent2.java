@@ -636,7 +636,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	protected void establishConnection(IComponentIdentifier remotepf, Con con)
 	{
 		assert execfeat.isComponentThread();
-		System.out.println("HANDSHAKE DONE FOR " + platformid + " -> " + remotepf + " " + con + " " + canDecide(remotepf));
+//		System.out.println("HANDSHAKE DONE FOR " + platformid + " -> " + remotepf + " " + con + " " + canDecide(remotepf));
 		
 		Collection<Tuple2<ICommand<Con>, Long>> waitingcmds = commandswaitingforcons.remove(remotepf);
 		for (Tuple2<ICommand<Con>, Long> cmdtup : SUtil.notNull(waitingcmds))

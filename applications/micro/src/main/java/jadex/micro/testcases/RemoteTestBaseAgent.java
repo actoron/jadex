@@ -77,28 +77,29 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 	 */
 	protected IFuture<Void>	createProxies(final IExternalAccess remote)
 	{
-		final Future<Void>	ret	= new Future<Void>();
-		Starter.createProxy(agent.getExternalAccess(), remote).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-		{
-			public void customResultAvailable(IExternalAccess result)
-			{
-				proxies.add(result.getId());
-				
-				// inverse proxy from remote to local.
-				Starter.createProxy(remote, agent.getExternalAccess())
-					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-				{
-					public void customResultAvailable(IExternalAccess result)
-					{
-						// Hack!!! Don't remove remote proxies. Expected that platform is killed anyways.
-//						proxies.add(result);
-//						agent.getLogger().severe("Testagent setup remote platform done: "+agent.getComponentDescription());
-						ret.setResult(null);
-					}
-				}));
-			}
-		});
-		return ret;
+		return IFuture.DONE;
+//		final Future<Void>	ret	= new Future<Void>();
+//		Starter.createProxy(agent.getExternalAccess(), remote).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//		{
+//			public void customResultAvailable(IExternalAccess result)
+//			{
+//				proxies.add(result.getId());
+//				
+//				// inverse proxy from remote to local.
+//				Starter.createProxy(remote, agent.getExternalAccess())
+//					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//				{
+//					public void customResultAvailable(IExternalAccess result)
+//					{
+//						// Hack!!! Don't remove remote proxies. Expected that platform is killed anyways.
+////						proxies.add(result);
+////						agent.getLogger().severe("Testagent setup remote platform done: "+agent.getComponentDescription());
+//						ret.setResult(null);
+//					}
+//				}));
+//			}
+//		});
+//		return ret;
 	}
 	
 	 /**
