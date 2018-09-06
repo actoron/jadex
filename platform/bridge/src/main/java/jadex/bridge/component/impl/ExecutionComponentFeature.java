@@ -2102,7 +2102,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public <T> void addSimulationBlocker(IFuture<T> remotefuture)
 	{
 		Boolean issim = (Boolean) Starter.getPlatformValue(component.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
-		if (Boolean.TRUE.equals(issim))
+		if(Boolean.TRUE.equals(issim))
 		{
 			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
 			// there is no way of known how long to hold the clock.

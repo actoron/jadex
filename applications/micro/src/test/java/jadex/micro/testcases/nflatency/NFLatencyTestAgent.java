@@ -196,6 +196,7 @@ public class NFLatencyTestAgent extends TestAgent
 //			null, null, null, SReflect.getInnerClassName(this.getClass()));
 //		awa.addAwarenessInfo(info).get();
 		
+		
 		IIntermediateFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
 		fut.addResultListener(new IIntermediateResultListener<ITestService>()
 		{

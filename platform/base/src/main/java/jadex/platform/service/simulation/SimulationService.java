@@ -6,6 +6,7 @@ import java.util.List;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -425,6 +426,8 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	public IFuture<Void> addAdvanceBlocker(IFuture<?> blocker)
 	{
 		advanceblockers.add(blocker);
+		System.out.println(advanceblockers.size());
+		System.out.println("addBlocker: "+ServiceCall.getCurrentInvocation()+" "+access);
 		return IFuture.DONE;
 	}
 
@@ -566,22 +569,24 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	protected IFuture<Void> waitForBlockers()
 	{
 		IFuture<Void> ret = null;
-		if (advanceblockers.size() > 0)
+		if(advanceblockers.size() > 0)
 		{
 			Future<Void> futret = new Future<>();
 			ret = futret;
 			FutureBarrier<Object> bar = new FutureBarrier<>();
-			for (IFuture<?> blocker : advanceblockers)
+			for(IFuture<?> blocker : advanceblockers)
 			{
 				@SuppressWarnings("unchecked")
-				IFuture<Object>	oblocker	= (IFuture<Object>)blocker;
+				IFuture<Object>	oblocker = (IFuture<Object>)blocker;
 				bar.addFuture(oblocker);
 			}
 			advanceblockers.clear();
+			System.out.println("waitForBlockers start");
 			bar.waitForIgnoreFailures(null).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
+					System.out.println("waitForBlockers end");
 					waitForBlockers().addResultListener(new DelegationResultListener<>(futret));
 				}
 				public void exceptionOccurred(Exception exception)
