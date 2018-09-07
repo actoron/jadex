@@ -57,8 +57,8 @@ public class STest {
 		config.setAwareness(false);	// disable old awareness
 		
         config.getExtendedPlatformConfiguration().setSecurity(true);
-//        config.getExtendedPlatformConfiguration().setTcpTransport(true);
-        config.setValue("intravm", true);
+        config.getExtendedPlatformConfiguration().setTcpTransport(true);
+//        config.setValue("intravm", true);
         config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
         config.getExtendedPlatformConfiguration().setSimulation(true);
         
