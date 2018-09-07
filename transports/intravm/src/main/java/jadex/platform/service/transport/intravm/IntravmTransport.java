@@ -29,7 +29,7 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	protected static final Map<Integer, IntravmTransport> ports = Collections.synchronizedMap(new LinkedHashMap<>());
 	
 	/** Active flag. */
-	protected volatile boolean active = true;
+	protected boolean active = true;
 	
 	// -------- attributes --------
 
@@ -72,12 +72,15 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public void	shutdown()
 	{
-		active = false;
-		Object key;
-		synchronized(ports)
+		synchronized(this)
 		{
-			while((key=SUtil.findKeyForValue(ports, this))!=null)
-				ports.remove(key);
+			active = false;
+			Object key;
+			synchronized(ports)
+			{
+				while((key=SUtil.findKeyForValue(ports, this))!=null)
+					ports.remove(key);
+			}
 		}
 	}
 	
@@ -178,14 +181,17 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public IFuture<Integer> sendMessage(HandlerHolder con, byte[] header, byte[] body)
 	{
-		if(con.isActive())
+		synchronized(con.target)
 		{
-			con.target.handler.messageReceived(con.other, header, body);
-			return new Future<>(PRIORITY);
-		}
-		else
-		{
-			return new Future<>(new ComponentTerminatedException(con.target.handler.getAccess().getId()));
+			if(con.isActive())
+			{
+				con.target.handler.messageReceived(con.other, header, body);
+				return new Future<>(PRIORITY);
+			}
+			else
+			{
+				return new Future<>(new ComponentTerminatedException(con.target.handler.getAccess().getId()));
+			}
 		}
 	}
 	
