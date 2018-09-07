@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -68,7 +69,9 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public void	shutdown()
 	{
-		ports.remove(SUtil.findKeyForValue(ports, this));
+		Object key;
+		while((key=SUtil.findKeyForValue(ports, this))!=null)
+			ports.remove(key);
 	}
 	
 	/**
@@ -126,8 +129,8 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 			IntravmTransport tp = ports.get(port);
 			if(tp!=null)
 			{
-				HandlerHolder rcon = new HandlerHolder(this.handler);
-				HandlerHolder lcon = new HandlerHolder(tp.handler);
+				HandlerHolder rcon = new HandlerHolder(this);
+				HandlerHolder lcon = new HandlerHolder(tp);
 				rcon.other = lcon;
 				lcon.other = rcon;
 				tp.handler.connectionEstablished(rcon);
@@ -164,15 +167,22 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public IFuture<Integer> sendMessage(HandlerHolder con, byte[] header, byte[] body)
 	{
-		con.handler.messageReceived(con.other, header, body);		
-		return new Future<>(PRIORITY);
+		if(con.isActive())
+		{
+			con.target.handler.messageReceived(con.other, header, body);
+			return new Future<>(PRIORITY);
+		}
+		else
+		{
+			return new Future<>(new ComponentTerminatedException(con.target.handler.getAccess().getId()));
+		}
 	}
 	
 	/** Holder to distinguish connections. */
 	protected static class HandlerHolder
 	{
-		/** The handler. */
-		public ITransportHandler<HandlerHolder> handler;
+		/** The target (remote) transport. */
+		public IntravmTransport target;
 		
 		/** Connection counterpart */
 		public HandlerHolder other;
@@ -181,9 +191,14 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 		 *  Create the holder.
 		 *  @param transport The transport.
 		 */
-		public HandlerHolder(ITransportHandler<HandlerHolder> handler)
+		public HandlerHolder(IntravmTransport transport)
 		{
-			this.handler = handler;
+			this.target = transport;
+		}
+		
+		protected boolean	isActive()
+		{
+			return ports.containsValue(target);
 		}
 	}
 }

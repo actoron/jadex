@@ -25,10 +25,11 @@ public class SingleTest extends	ComponentTestSuite
 	{
 		super(findOutputDirs(
 //				"applications"+File.separator+"securetransport",
-//				"applications"+File.separator+"bdi",
+				"applications"+File.separator+"bdi"
 //				"applications"+File.separator+"bdiv3",
-				"applications"+File.separator+"micro",
-				"applications"+File.separator+"bpmn"), tests, new String[0]);
+//				"applications"+File.separator+"micro",
+//				"applications"+File.separator+"bpmn"
+				), tests, new String[0]);
 	}
 
 	private static File[][] findOutputDirs(String... projects) 
@@ -53,7 +54,7 @@ public class SingleTest extends	ComponentTestSuite
 		SingleTest test = null;
 //		test = new SingleTest("jadex.bdi.examples.puzzle.Benchmark");
 //		test = new SingleTest("jadex.bdiv3.testcases.semiautomatic");
-//		test = new SingleTest("jadex.bdi.testcases.semiautomatic.Wakeup",
+		test = new SingleTest("jadex.bdi.testcases.misc.Flag");
 //				"jadex.micro.testcases.servicequeries.User",
 //				"jadex.micro.testcases.threading.Initiator",
 //				"jadex.micro.servicecall.ServiceCall");
