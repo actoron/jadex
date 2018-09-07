@@ -216,8 +216,11 @@ public class NFLatencyTestAgent extends TestAgent
 			{
 				if(cid.equals(((IService)result).getId().getProviderId()))
 				{
-					called = true;
-					callService(result);
+					if(!called)
+					{
+						called = true;
+						callService(result);
+					}
 				}
 			}
 			public void finished()
@@ -238,7 +241,7 @@ public class NFLatencyTestAgent extends TestAgent
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				ret.setExceptionIfUndone(exception);
 			}
 			
 			protected void callService(final ITestService ts)
