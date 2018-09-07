@@ -183,14 +183,21 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	{
 		synchronized(con.target)
 		{
-			if(con.isActive())
+			try
 			{
-				con.target.handler.messageReceived(con.other, header, body);
-				return new Future<>(PRIORITY);
+				if(con.isActive())
+				{
+					con.target.handler.messageReceived(con.other, header, body);
+					return new Future<>(PRIORITY);
+				}
+				else
+				{
+					return new Future<>(new ComponentTerminatedException(con.target.handler.getAccess().getId()));
+				}
 			}
-			else
+			catch (Exception e)
 			{
-				return new Future<>(new ComponentTerminatedException(con.target.handler.getAccess().getId()));
+				return new Future<>(e);
 			}
 		}
 	}
