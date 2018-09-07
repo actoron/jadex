@@ -108,12 +108,12 @@ public class NFPropertyProperties extends PropertiesPanel
 								if(mi!=null)
 								{
 //									((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getMethodNFPropertyValue(mi, propmi.getName(), u).addResultListener(lis);
-									SNFPropertyProvider.getMethodNFPropertyValue(ea, ser.getId(), mi, propmi.getName()).addResultListener(lis);
+									ea.getMethodNFPropertyValue(ser.getId(), mi, propmi.getName()).addResultListener(lis);
 								}
 								else
 								{
 //									((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyValue(propmi.getName(), u).addResultListener(lis);
-									SNFPropertyProvider.getNFPropertyValue(ea, ser.getId(), propmi.getName()).addResultListener(lis);
+									ea.getNFPropertyValue(ser.getId(), propmi.getName()).addResultListener(lis);
 								}
 							}
 							
@@ -126,7 +126,7 @@ public class NFPropertyProperties extends PropertiesPanel
 					{
 //						IFuture<Object> fut = ((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyValue(propmi.getName(), u);
 //						fut.addResultListener(lis);
-						SNFPropertyProvider.getNFPropertyValue(ea, propmi.getName(), u).addResultListener(lis);
+						ea.getNFPropertyValue(propmi.getName(), u).addResultListener(lis);
 					}
 				}
 			}

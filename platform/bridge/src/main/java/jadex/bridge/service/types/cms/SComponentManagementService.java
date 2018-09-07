@@ -1605,6 +1605,7 @@ public class SComponentManagementService
 									{
 										boolean	suspend = isInitSuspend(ii.getInfo(), adapter.getInternalAccess().getModel(), agent);
 										
+//										System.out.println("cid: "+cid+" "+suspend);
 										if(suspend)
 										{
 											desc.setState(IComponentDescription.STATE_SUSPENDED);
@@ -2467,8 +2468,8 @@ public class SComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + oname + " : Modelname must not be null."));
 
-		if(modelname.indexOf("Vis")!=-1)
-			System.out.println("create: "+oname+" "+modelname+" on "+agent.getId());
+//		if(modelname.indexOf("Flag")!=-1)
+//			System.out.println("create: "+oname+" "+modelname+" on "+agent.getId());
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();

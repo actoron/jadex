@@ -7,7 +7,7 @@ import jadex.bridge.service.IServiceIdentifier;
 /**
  *  Feature for non-functional properties.
  */
-public interface INFPropertyComponentFeature
+public interface INFPropertyComponentFeature extends IExternalNFPropertyComponentFeature
 {
 	/**
 	 *  Get the component property provider.
@@ -38,4 +38,5 @@ public interface INFPropertyComponentFeature
 //	 *  Get the required service property provider for a service.
 //	 */
 //	public INFMixedPropertyProvider getRequiredServicePropertyProvider(String name);
+	
 }

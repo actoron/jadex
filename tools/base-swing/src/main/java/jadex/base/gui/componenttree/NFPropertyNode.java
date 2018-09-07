@@ -255,13 +255,13 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 							{
 //								((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeMethodNFProperty(mi, propmi.getName())
 //									.addResultListener(new DelegationResultListener<Void>(ret));
-								SNFPropertyProvider.removeMethodNFProperty(ea, ser.getId(), mi, propmi.getName())
+								ea.removeMethodNFProperty(ser.getId(), mi, propmi.getName())
 									.addResultListener(new DelegationResultListener<Void>(ret));
 							}
 							else
 							{
 //								((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
-								SNFPropertyProvider.removeNFProperty(ea, ser.getId(), propmi.getName())
+								ea.removeNFProperty(ser.getId(), propmi.getName())
 									.addResultListener(new DelegationResultListener<Void>(ret));
 							}
 						}
@@ -275,7 +275,7 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 			else
 			{
 //				((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
-				SNFPropertyProvider.removeNFProperty(ea, propmi.getName())
+				ea.removeNFProperty(propmi.getName())
 					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		}

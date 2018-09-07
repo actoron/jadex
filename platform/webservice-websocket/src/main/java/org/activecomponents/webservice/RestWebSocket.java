@@ -812,7 +812,7 @@ public class RestWebSocket extends Endpoint
 									Map<String, Object> params = new HashMap<String, Object>();
 									params.put(TagProperty.NAME, tags);
 									TagProperty tag = new TagProperty(ia, null, null, params);
-									SNFPropertyProvider.addNFProperty(ia.getExternalAccess(), sid, tag).addResultListener(new ExceptionDelegationResultListener<Void, String>(ret)
+									ia.addNFProperty(sid, tag).addResultListener(new ExceptionDelegationResultListener<Void, String>(ret)
 									{
 										public void customResultAvailable(Void result) throws Exception
 										{

@@ -112,13 +112,13 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 			{
 				if(unit!=null)
 				{
-					IFuture<T> res = SNFPropertyProvider.getRequiredMethodNFPropertyValue(component, sid, methodinfo, propertyname, unit);
+					IFuture<T> res = component.getRequiredMethodNFPropertyValue(sid, methodinfo, propertyname, unit);
 					res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getMethodNFPropertyValue(methodinfo, propertyname, unit);
 				}
 				else
 				{
-					IFuture<T> res = SNFPropertyProvider.getRequiredMethodNFPropertyValue(component, sid, methodinfo, propertyname);
+					IFuture<T> res = component.getRequiredMethodNFPropertyValue(sid, methodinfo, propertyname);
 					res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getMethodNFPropertyValue(methodinfo, propertyname);
 				}
@@ -127,13 +127,13 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 			{
 				if(unit!=null)
 				{
-					IFuture<T> res = SNFPropertyProvider.getRequiredNFPropertyValue(component, sid, propertyname, unit);
+					IFuture<T> res = component.getRequiredNFPropertyValue(sid, propertyname, unit);
 					res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getNFPropertyValue(propertyname, unit);
 				}
 				else
 				{
-					IFuture<T> res = SNFPropertyProvider.getRequiredNFPropertyValue(component, sid, propertyname);
+					IFuture<T> res = component.getRequiredNFPropertyValue(sid, propertyname);
 					res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getNFPropertyValue(propertyname);
 				}
@@ -149,13 +149,13 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 					{
 						if(unit!=null)
 						{
-							IFuture<T> res = SNFPropertyProvider.getMethodNFPropertyValue(result, sid, methodinfo, propertyname, unit);
+							IFuture<T> res = result.getMethodNFPropertyValue(sid, methodinfo, propertyname, unit);
 							res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getMethodNFPropertyValue(methodinfo, propertyname, unit);
 						}
 						else
 						{
-							IFuture<T> res = SNFPropertyProvider.getMethodNFPropertyValue(result, sid, methodinfo, propertyname);
+							IFuture<T> res = result.getMethodNFPropertyValue(sid, methodinfo, propertyname);
 							res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getMethodNFPropertyValue(methodinfo, propertyname);
 						}
@@ -164,13 +164,13 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 					{
 						if(unit!=null)
 						{
-							IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(result, sid, propertyname, unit);
+							IFuture<T> res = result.getNFPropertyValue(sid, propertyname, unit);
 							res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getNFPropertyValue(propertyname, unit);
 						}
 						else
 						{
-							IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(result, sid, propertyname);
+							IFuture<T> res = result.getNFPropertyValue(sid, propertyname);
 							res.addResultListener(new DelegationResultListener<T>(ret));
 //								return provider.getNFPropertyValue(propertyname);
 						}

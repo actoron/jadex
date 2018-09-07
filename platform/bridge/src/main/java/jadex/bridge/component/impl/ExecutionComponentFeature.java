@@ -795,6 +795,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		Future<Void> ret = new Future<Void>();
 		synchronized(this)
 		{
+//			System.out.println("is sus: "+getComponent().getDescription().getState()+" "+getComponent());
 			if(!IComponentDescription.STATE_SUSPENDED.equals(getComponent().getDescription().getState()))
 			{
 				ret.setException(new IllegalStateException("Component not suspended: "+getComponent().getId()));
