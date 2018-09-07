@@ -447,7 +447,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 				}
 			});
 		}
-		System.out.println("CON REMOVED: " + con + " " + e);
+//		System.out.println("CON REMOVED: " + con + " " + e);
 	}
 	
 	/**
