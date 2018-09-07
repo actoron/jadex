@@ -1911,7 +1911,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							state.setCryptoSuite(suite);
 							if (!suite.handleHandshake(SecurityAgent.this, fm))
 							{
-								System.out.println(agent.getId()+" finished handshake: " + fm.getSender());
+//								System.out.println(agent.getId()+" finished handshake: " + fm.getSender());
 								currentcryptosuites.put(fm.getSender().getRoot().toString(), state.getCryptoSuite());
 								initializingcryptosuites.remove(fm.getSender().getRoot().toString());
 								state.getResultFuture().setResult(state.getCryptoSuite());
@@ -1931,7 +1931,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
 						{
-							System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().isTrustedPlatform());
+//							System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().isTrustedPlatform());
 							currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
 							initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 							state.getResultFuture().setResult(state.getCryptoSuite());
