@@ -188,6 +188,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	{
 		if (timeout < 0)
 			timeout = Starter.getDefaultTimeout(agent.getId().getRoot()) << 1;
+		if (timeout <= 0)
+			timeout = 60000;
 		final Future<Void> ret = new Future<Void>();
 		
 		loadSettings().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
