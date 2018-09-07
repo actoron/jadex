@@ -23,15 +23,15 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	//-------- constants --------
 	
 	/** Priority of transport. */
-	public static final int	PRIORITY	= 10000;
+	public static final int	PRIORITY = 10000;
 	
 	/** The "ports". */
-	protected static final Map<Integer, IntravmTransport>	ports	= Collections.synchronizedMap(new LinkedHashMap<>());
+	protected static final Map<Integer, IntravmTransport> ports = Collections.synchronizedMap(new LinkedHashMap<>());
 	
 	// -------- attributes --------
 
 	/** The transport handler, e.g. for delivering received messages. */
-	protected ITransportHandler<HandlerHolder>	handler;
+	protected ITransportHandler<HandlerHolder> handler;
 //	
 //	/** Flag indicating the thread should be running (set to false for shutdown). */
 //	protected boolean	running;
@@ -70,8 +70,11 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	public void	shutdown()
 	{
 		Object key;
-		while((key=SUtil.findKeyForValue(ports, this))!=null)
-			ports.remove(key);
+		synchronized(ports)
+		{
+			while((key=SUtil.findKeyForValue(ports, this))!=null)
+				ports.remove(key);
+		}
 	}
 	
 	/**
@@ -88,24 +91,28 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	public IFuture<Integer>	openPort(int port)
 	{
 		final Future<Integer>	ret	= new Future<>();
-		if(port<0)
+		synchronized(ports)
 		{
-			ret.setException(new IllegalArgumentException("Port must be greater or equal to zero: "+port));
-		}
-		else if(port==0)
-		{
-			// Find free port
-			while(ports.containsKey(++port));
-		}
+			if(port<0)
+			{
+				ret.setException(new IllegalArgumentException("Port must be greater or equal to zero: "+port));
+			}
+			else if(port==0)
+			{
+				// Find free port
+				while(ports.containsKey(++port));
+			}
 		
-		if(ports.containsKey(port))
-		{
-			ret.setException(new IllegalArgumentException("Port already in use: "+port));
-		}
-		else
-		{
-			ports.put(port, this);
-			ret.setResult(port);
+		
+			if(ports.containsKey(port))
+			{
+				ret.setException(new IllegalArgumentException("Port already in use: "+port));
+			}
+			else
+			{
+				ports.put(port, this);
+				ret.setResult(port);
+			}
 		}
 		
 		return new Future<Integer>(port);
