@@ -28,6 +28,9 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	/** The "ports". */
 	protected static final Map<Integer, IntravmTransport> ports = Collections.synchronizedMap(new LinkedHashMap<>());
 	
+	/** Active flag. */
+	protected volatile boolean active = true;
+	
 	// -------- attributes --------
 
 	/** The transport handler, e.g. for delivering received messages. */
@@ -69,6 +72,7 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public void	shutdown()
 	{
+		active = false;
 		Object key;
 		synchronized(ports)
 		{
@@ -90,7 +94,7 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public IFuture<Integer>	openPort(int port)
 	{
-		final Future<Integer>	ret	= new Future<>();
+		final Future<Integer> ret = new Future<>();
 		synchronized(ports)
 		{
 			if(port<0)
@@ -203,9 +207,13 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 			this.target = transport;
 		}
 		
-		protected boolean	isActive()
+		/**
+		 *  Check if active.
+		 *  @return True, if active.
+		 */
+		protected boolean isActive()
 		{
-			return ports.containsValue(target);
+			return target.active;
 		}
 	}
 }
