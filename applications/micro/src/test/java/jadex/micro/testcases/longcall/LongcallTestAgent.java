@@ -291,6 +291,7 @@ public class LongcallTestAgent extends TestAgent
 					public void exceptionOccurred(Exception exception)
 					{
 						System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						exception.printStackTrace();
 						tr.setFailed("Exception: "+exception);
 						ret.addIntermediateResult(tr);
 						proceed();
