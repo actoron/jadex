@@ -3148,7 +3148,10 @@ public class SComponentManagementService
 	 */
 	protected static void setReadLock(IComponentIdentifier cid)
 	{
-		((RwMapWrapper)SComponentManagementService.getComponents(cid)).readLock().lock();
+		RwMapWrapper wrapper = ((RwMapWrapper)SComponentManagementService.getComponents(cid));
+		if (wrapper == null)
+			throw new ComponentTerminatedException(cid);
+		wrapper.readLock().lock();
 //		System.out.println("setReadLock");
 	}
 	

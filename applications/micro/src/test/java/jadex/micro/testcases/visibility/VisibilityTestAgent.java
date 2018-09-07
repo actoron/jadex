@@ -11,6 +11,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IFunctionalResultListener;
@@ -18,6 +19,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.TestAgent;
@@ -27,6 +29,7 @@ import jadex.micro.testcases.TestAgent;
  */
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class VisibilityTestAgent extends JunitAgentTest
 {
 	@Agent

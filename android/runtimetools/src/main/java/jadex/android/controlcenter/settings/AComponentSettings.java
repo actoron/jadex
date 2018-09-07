@@ -14,7 +14,7 @@ public abstract class AComponentSettings implements ISettings {
 
 	public AComponentSettings(IExternalAccess component) {
 		this.extAcc = component;
-		this.title = extAcc.getModel().getName();
+		this.title = extAcc.getModelAsync().get().getName();
 	}
 
 	/**

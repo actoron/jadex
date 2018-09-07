@@ -3,9 +3,9 @@ package jadex.commons.collection;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 /**
  *  Thread-safe wrapper for maps that uses a read/write lock.
@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 public class RwMapWrapper<K, V> implements IRwMap<K, V>
 {
 	/** The lock. */
-	protected ReentrantReadWriteLock rwlock;
+	protected ReadWriteLock rwlock;
 	
 	/** The wrapped map. */
 	protected Map<K, V> map;
@@ -33,7 +33,7 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 * 
 	 *  @param map The wrapped map.
 	 */
-	public RwMapWrapper(Map<K, V> map, ReentrantReadWriteLock lock)
+	public RwMapWrapper(Map<K, V> map, ReadWriteLock lock)
 	{
 		this.rwlock = lock;
 		this.map = map;
@@ -178,7 +178,7 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	/**
 	 *  Gets the read lock for manual locking.
 	 */
-	public ReadLock readLock()
+	public Lock readLock()
 	{
 		return rwlock.readLock();
 	}
@@ -186,7 +186,7 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	/**
 	 *  Gets the write lock for manual locking.
 	 */
-	public WriteLock writeLock()
+	public Lock writeLock()
 	{
 		return rwlock.writeLock();
 	}
@@ -195,7 +195,7 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 *  Gets the internal lock.
 	 *  @return The lock.
 	 */
-	public ReentrantReadWriteLock getLock()
+	public ReadWriteLock getLock()
 	{
 		return rwlock;
 	}

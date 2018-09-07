@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -22,15 +23,18 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	//-------- constants --------
 	
 	/** Priority of transport. */
-	public static final int	PRIORITY	= 10000;
+	public static final int	PRIORITY = 10000;
 	
 	/** The "ports". */
-	protected static final Map<Integer, IntravmTransport>	ports	= Collections.synchronizedMap(new LinkedHashMap<>());
+	protected static final Map<Integer, IntravmTransport> ports = Collections.synchronizedMap(new LinkedHashMap<>());
+	
+	/** Active flag. */
+	protected volatile boolean active = true;
 	
 	// -------- attributes --------
 
 	/** The transport handler, e.g. for delivering received messages. */
-	protected ITransportHandler<HandlerHolder>	handler;
+	protected ITransportHandler<HandlerHolder> handler;
 //	
 //	/** Flag indicating the thread should be running (set to false for shutdown). */
 //	protected boolean	running;
@@ -68,7 +72,13 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public void	shutdown()
 	{
-		ports.remove(SUtil.findKeyForValue(ports, this));
+		active = false;
+		Object key;
+		synchronized(ports)
+		{
+			while((key=SUtil.findKeyForValue(ports, this))!=null)
+				ports.remove(key);
+		}
 	}
 	
 	/**
@@ -84,25 +94,29 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public IFuture<Integer>	openPort(int port)
 	{
-		final Future<Integer>	ret	= new Future<>();
-		if(port<0)
+		final Future<Integer> ret = new Future<>();
+		synchronized(ports)
 		{
-			ret.setException(new IllegalArgumentException("Port must be greater or equal to zero: "+port));
-		}
-		else if(port==0)
-		{
-			// Find free port
-			while(ports.containsKey(++port));
-		}
+			if(port<0)
+			{
+				ret.setException(new IllegalArgumentException("Port must be greater or equal to zero: "+port));
+			}
+			else if(port==0)
+			{
+				// Find free port
+				while(ports.containsKey(++port));
+			}
 		
-		if(ports.containsKey(port))
-		{
-			ret.setException(new IllegalArgumentException("Port already in use: "+port));
-		}
-		else
-		{
-			ports.put(port, this);
-			ret.setResult(port);
+		
+			if(ports.containsKey(port))
+			{
+				ret.setException(new IllegalArgumentException("Port already in use: "+port));
+			}
+			else
+			{
+				ports.put(port, this);
+				ret.setResult(port);
+			}
 		}
 		
 		return new Future<Integer>(port);
@@ -126,8 +140,8 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 			IntravmTransport tp = ports.get(port);
 			if(tp!=null)
 			{
-				HandlerHolder rcon = new HandlerHolder(this.handler);
-				HandlerHolder lcon = new HandlerHolder(tp.handler);
+				HandlerHolder rcon = new HandlerHolder(this);
+				HandlerHolder lcon = new HandlerHolder(tp);
 				rcon.other = lcon;
 				lcon.other = rcon;
 				tp.handler.connectionEstablished(rcon);
@@ -164,15 +178,29 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public IFuture<Integer> sendMessage(HandlerHolder con, byte[] header, byte[] body)
 	{
-		con.handler.messageReceived(con.other, header, body);		
-		return new Future<>(PRIORITY);
+		try
+		{
+			if(con.isActive())
+			{
+				con.target.handler.messageReceived(con.other, header, body);
+				return new Future<>(PRIORITY);
+			}
+			else
+			{
+				return new Future<>(new ComponentTerminatedException(con.target.handler.getAccess().getId()));
+			}
+		}
+		catch (Exception e)
+		{
+			return new Future<>(e);
+		}
 	}
 	
 	/** Holder to distinguish connections. */
 	protected static class HandlerHolder
 	{
-		/** The handler. */
-		public ITransportHandler<HandlerHolder> handler;
+		/** The target (remote) transport. */
+		public IntravmTransport target;
 		
 		/** Connection counterpart */
 		public HandlerHolder other;
@@ -181,9 +209,18 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 		 *  Create the holder.
 		 *  @param transport The transport.
 		 */
-		public HandlerHolder(ITransportHandler<HandlerHolder> handler)
+		public HandlerHolder(IntravmTransport transport)
 		{
-			this.handler = handler;
+			this.target = transport;
+		}
+		
+		/**
+		 *  Check if active.
+		 *  @return True, if active.
+		 */
+		protected boolean isActive()
+		{
+			return target.active;
 		}
 	}
 }

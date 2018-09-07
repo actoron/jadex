@@ -9,6 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -59,13 +60,6 @@ public class FlagPlan extends Plan
 	 */
 	protected IComponentDescription getComponentDescription(IExternalAccess ea)
 	{
-		return ea.scheduleStep(new IComponentStep<IComponentDescription>()
-		{
-			@Override
-			public IFuture<IComponentDescription> execute(IInternalAccess ia)
-			{
-				return new Future<IComponentDescription>(ia.getDescription());
-			}
-		}).get();
+		return SComponentManagementService.getDescription(ea.getId());
 	}
 }
