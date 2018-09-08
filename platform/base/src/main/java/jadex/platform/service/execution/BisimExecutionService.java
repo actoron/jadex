@@ -2,7 +2,10 @@ package jadex.platform.service.execution;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.execution.IExecutionService;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.concurrent.JavaThreadPool;
 import jadex.commons.future.IFuture;
+import jadex.platform.service.threadpool.ThreadPoolService;
 
 /**
  *  Helper class to allow bisimulation in same VM.
@@ -58,5 +61,12 @@ public class BisimExecutionService extends SyncExecutionService
 	{
 		// Hack!!! never shut down as might be reused later
 		return IFuture.DONE;
+	}
+	
+	@Override
+	protected IThreadPoolService getThreadPool()
+	{
+		// Extra thread pool that never shuts down
+		return new ThreadPoolService(new JavaThreadPool(false), getProviderId());
 	}
 }

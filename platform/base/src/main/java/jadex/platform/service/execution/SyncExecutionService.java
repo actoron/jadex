@@ -183,8 +183,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		{
 			public void customResultAvailable(Void v)
 			{
-				IThreadPoolService	result	= ((IInternalRequiredServicesFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
-				executor = new Executor(result, new IExecutable()
+				executor = new Executor(getThreadPool(), new IExecutable()
 				{
 					public boolean execute()
 					{
@@ -336,5 +335,13 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 			ret = idlefuture;
 		}
 		return ret;
+	}
+
+	/**
+	 *  Thread pool template method to support replacment.
+	 */
+	protected IThreadPoolService getThreadPool()
+	{
+		return ((IInternalRequiredServicesFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
 	}
 }
