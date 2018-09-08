@@ -24,9 +24,11 @@ import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.concurrent.JavaThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.platform.service.threadpool.ThreadPoolService;
 
 /**
  *  A clock service abstracts away from clock implementations.
@@ -441,20 +443,22 @@ public class ClockService extends BasicService implements IClockService, IProper
 				if(bisimclock==null)
 				{
 					// HACK!!! first setting wins
-					bisimclock	= createClock(cinfo, tp);
+					bisimclock	= createClock(cinfo, new ThreadPoolService(new JavaThreadPool(false), getProviderId()));
 				}
-				clock	= bisimclock;
 			}
+			clock	= bisimclock;
+			// Sim flag false to disable auto-adblockers (not required for bisim).
+			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
 		}
 		else
 		{
 			clock	= createClock(cinfo, tp);
+			
+			if (clock instanceof ISimulationClock)
+				Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.TRUE);
+			else
+				Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
 		}
-		
-		if (clock instanceof ISimulationClock)
-			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.TRUE);
-		else
-			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
 		
 		if(old!=null)
 		{

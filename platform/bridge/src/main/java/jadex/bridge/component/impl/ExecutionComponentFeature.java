@@ -707,6 +707,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 			else
 			{
+				System.out.println("rescue");
 				available	= false;
 				// Happens during platform bootstrapping -> execute on platform rescue thread.
 				if(!bootstrap)
@@ -2101,47 +2102,47 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public <T> void addSimulationBlocker(IFuture<T> remotefuture)
 	{
-		Boolean issim = (Boolean) Starter.getPlatformValue(component.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
-		if (Boolean.TRUE.equals(issim))
-		{
-			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
-			// there is no way of known how long to hold the clock.
-			if (!(remotefuture instanceof IIntermediateFuture))
-			{
-				component.scheduleStep(new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
-						if (simserv != null)
-						{
-							Future<Void> blocker = new Future<>();
-							simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
-							{
-								public void resultAvailable(Void result)
-								{
-									remotefuture.addResultListener(new IResultListener<T>()
-									{
-										public void resultAvailable(T result)
-										{
-											blocker.setResult(null);
-										}
-										public void exceptionOccurred(Exception exception)
-										{
-											resultAvailable(null);
-										}
-									});
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-								}
-							});
-						}
-						return IFuture.DONE;
-					}
-				});
-			}
-		}
+//		Boolean issim = (Boolean) Starter.getPlatformValue(component.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
+//		if (Boolean.TRUE.equals(issim))
+//		{
+//			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
+//			// there is no way of known how long to hold the clock.
+//			if (!(remotefuture instanceof IIntermediateFuture))
+//			{
+//				component.scheduleStep(new IComponentStep<Void>()
+//				{
+//					public IFuture<Void> execute(IInternalAccess ia)
+//					{
+//						ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
+//						if (simserv != null)
+//						{
+//							Future<Void> blocker = new Future<>();
+//							simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
+//							{
+//								public void resultAvailable(Void result)
+//								{
+//									remotefuture.addResultListener(new IResultListener<T>()
+//									{
+//										public void resultAvailable(T result)
+//										{
+//											blocker.setResult(null);
+//										}
+//										public void exceptionOccurred(Exception exception)
+//										{
+//											resultAvailable(null);
+//										}
+//									});
+//								}
+//								public void exceptionOccurred(Exception exception)
+//								{
+//								}
+//							});
+//						}
+//						return IFuture.DONE;
+//					}
+//				});
+//			}
+//		}
 	}
 	
 	/**

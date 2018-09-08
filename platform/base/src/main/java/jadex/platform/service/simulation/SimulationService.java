@@ -424,7 +424,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	 */
 	public IFuture<Void> addAdvanceBlocker(IFuture<?> blocker)
 	{
-		advanceblockers.add(blocker);
+//		advanceblockers.add(blocker);
 		return IFuture.DONE;
 	}
 
