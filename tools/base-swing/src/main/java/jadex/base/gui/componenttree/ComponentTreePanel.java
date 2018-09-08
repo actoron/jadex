@@ -54,6 +54,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -1141,37 +1142,43 @@ public class ComponentTreePanel extends JSplitPane
 						{
 							public void customResultAvailable(ClassLoader cl)
 							{
-								Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-								
-								if(clid instanceof String)
+								exta.getModelAsync().addResultListener(new SwingDefaultResultListener<IModelInfo>()
 								{
-									clid = SReflect.classForName0((String)clid, cl);
-								}
-								
-								try
-								{
-									final IComponentViewerPanel panel = (IComponentViewerPanel)((Class)clid).newInstance();
-									panel.init(jcc, exta).addResultListener(new ExceptionDelegationResultListener<Void, JComponent>(ret)
+									public void customResultAvailable(IModelInfo model)
 									{
-										public void customResultAvailable(Void result)
+										Object clid = model.getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+										
+										if(clid instanceof String)
 										{
-//													Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
-//													if(sub!=null)
-//														panel.setProperties(sub);
-											JComponent comp = panel.getComponent();
-											ret.setResult(comp);
-											// todo: help
-											//SHelp.setupHelp(comp, getHelpID());
-//													panels.put(exta.getComponentIdentifier(), panel);
-//													detail.add(comp, exta.getComponentIdentifier());
-//													comptree.getModel().fireNodeChanged(node);
+											clid = SReflect.classForName0((String)clid, cl);
 										}
-									});
-								}
-								catch(Exception e)
-								{
-									ret.setException(e);
-								}
+										
+										try
+										{
+											final IComponentViewerPanel panel = (IComponentViewerPanel)((Class)clid).newInstance();
+											panel.init(jcc, exta).addResultListener(new ExceptionDelegationResultListener<Void, JComponent>(ret)
+											{
+												public void customResultAvailable(Void result)
+												{
+		//											Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+		//											if(sub!=null)
+		//												panel.setProperties(sub);
+													JComponent comp = panel.getComponent();
+													ret.setResult(comp);
+													// todo: help
+													//SHelp.setupHelp(comp, getHelpID());
+		//											panels.put(exta.getComponentIdentifier(), panel);
+		//											detail.add(comp, exta.getComponentIdentifier());
+		//											comptree.getModel().fireNodeChanged(node);
+												}
+											});
+										}
+										catch(Exception e)
+										{
+											ret.setException(e);
+										}
+									}
+								});
 							}
 						});
 					}
@@ -1251,17 +1258,25 @@ public class ComponentTreePanel extends JSplitPane
 					{
 						public void resultAvailable(final IExternalAccess exta)
 						{
-							jcc.getClassLoader(exta.getModel().getResourceIdentifier())
-								.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+							exta.getModelAsync().addResultListener(new DefaultResultListener<IModelInfo>()
 							{
-								public void customResultAvailable(ClassLoader cl)
+								public void resultAvailable(final IModelInfo model)
 								{
-									final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-									viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
-//									System.out.println("isVis first res: "+viewables.get(cid));
-									node.refresh(false);
-								}										
+									jcc.getClassLoader(model.getResourceIdentifier())
+										.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+									{
+										public void customResultAvailable(ClassLoader cl)
+										{
+											final Object clid = exta.getModelAsync().get().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+											viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
+	//										System.out.println("isVis first res: "+viewables.get(cid));
+											node.refresh(false);
+										}										
+									});
+								}
 							});
+							
+							
 						}
 						
 						public void exceptionOccurred(Exception exception)

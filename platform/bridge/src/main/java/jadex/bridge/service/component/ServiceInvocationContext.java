@@ -152,8 +152,8 @@ public class ServiceInvocationContext
 //	/** The flag if local timeouts should be realtime. */
 //	protected boolean realtime;
 	
-	/** The creation (root) cause. */
-	protected Cause cause;
+//	/** The creation (root) cause. */
+//	protected Cause cause;
 	
 	protected IServiceIdentifier sid;
 
@@ -166,7 +166,7 @@ public class ServiceInvocationContext
 	 */
 	public ServiceInvocationContext(Object proxy, Method method, 
 		IServiceInvocationInterceptor[] interceptors, IComponentIdentifier platform, 
-		IServiceIdentifier sid, Cause crcause)
+		IServiceIdentifier sid)//, Cause crcause)
 	{
 //		this.ex = new RuntimeException();
 		this.sid = sid;
@@ -177,7 +177,7 @@ public class ServiceInvocationContext
 		this.method = new ArrayList<Method>();
 		this.arguments = new ArrayList<List<Object>>();
 		this.result = new ArrayList<Object>();
-		this.cause = crcause;
+//		this.cause = crcause;
 		
 		this.used = new ArrayList<Integer>();
 		this.interceptors = interceptors;
@@ -216,11 +216,11 @@ public class ServiceInvocationContext
 					throw new RuntimeException("Dreck: "+this
 						+"\nlocal: "+IComponentIdentifier.LOCAL.get()
 						+"\ncurrentcall: "+currentcall
-						+"\ncause: "+currentcall.getCause()
+//						+"\ncause: "+currentcall.getCause()
 						+"\nmethod: "+method
 						+"\n: lastmod"+currentcall.lastmod, e);
 				}
-				props.remove(ServiceCall.CAUSE); // remove cause as it has to be adapted
+//				props.remove(ServiceCall.CAUSE); // remove cause as it has to be adapted
 			}
 			else
 			{
@@ -256,32 +256,32 @@ public class ServiceInvocationContext
 			nextcall.setProperty(ServiceCall.REALTIME, Starter.isRealtimeTimeout(sid.getProviderId())? Boolean.TRUE : Boolean.FALSE);
 		}
 		
-		// Init the cause of the next call based on the last one
-		if(this.nextcall.getCause()==null)
-		{
-//			String target = SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3);
-			String target = sid.toString();
-			if(currentcall!=null && currentcall.getCause()!=null)
-			{
-				this.nextcall.setCause(new Cause(currentcall.getCause(), target));
-//				if(method.getName().indexOf("test")!=-1 && lastcall!=null)
-//					System.out.println("Creating new cause based on: "+lastcall.getCause());
-//				this.call.setCause(new Tuple2<String, String>(cause.getSecondEntity(), SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3)));
-			}
-			else
-			{
-				// Create cause with novel chain id as origin is component itself
-				Cause newc = new Cause(cause);
-//				newc.setChainId(newc.createUniqueId());
-//				newc.setOrigin(cause.getTargetId());
-				// This is on receiver side, i.e. must set the caller as origin
-				newc.setOrigin(caller!=null? caller.getName(): sid.getProviderId().getName());
-				this.nextcall.setCause(new Cause(newc, target));
-				
-//				if(method.getName().indexOf("createCompo")!=-1)
-//					System.out.println("herer: "+cause);
-			}
-		}
+//		// Init the cause of the next call based on the last one
+//		if(this.nextcall.getCause()==null)
+//		{
+////			String target = SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3);
+//			String target = sid.toString();
+//			if(currentcall!=null && currentcall.getCause()!=null)
+//			{
+//				this.nextcall.setCause(new Cause(currentcall.getCause(), target));
+////				if(method.getName().indexOf("test")!=-1 && lastcall!=null)
+////					System.out.println("Creating new cause based on: "+lastcall.getCause());
+////				this.call.setCause(new Tuple2<String, String>(cause.getSecondEntity(), SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3)));
+//			}
+//			else
+//			{
+//				// Create cause with novel chain id as origin is component itself
+//				Cause newc = new Cause(cause);
+////				newc.setChainId(newc.createUniqueId());
+////				newc.setOrigin(cause.getTargetId());
+//				// This is on receiver side, i.e. must set the caller as origin
+//				newc.setOrigin(caller!=null? caller.getName(): sid.getProviderId().getName());
+//				this.nextcall.setCause(new Cause(newc, target));
+//				
+////				if(method.getName().indexOf("createCompo")!=-1)
+////					System.out.println("herer: "+cause);
+//			}
+//		}
 	}
 	
 	/**
@@ -307,7 +307,7 @@ public class ServiceInvocationContext
 		
 		this.caller = context.caller;
 //		this.calleradapter = context.calleradapter;
-		this.cause = context.cause;
+//		this.cause = context.cause;
 	}
 	
 //	/**

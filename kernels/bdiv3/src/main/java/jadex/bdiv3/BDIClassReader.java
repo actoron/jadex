@@ -420,11 +420,11 @@ public class BDIClassReader extends MicroClassReader
 						ConfigurationInfo configinfo = new ConfigurationInfo(configs[i].name());
 						confs.put(configs[i].name(), configinfo);
 						
-						configinfo.setMaster(configs[i].master());
-						configinfo.setDaemon(configs[i].daemon());
-						configinfo.setAutoShutdown(configs[i].autoshutdown());
+//						configinfo.setMaster(configs[i].master());
+//						configinfo.setDaemon(configs[i].daemon());
+//						configinfo.setAutoShutdown(configs[i].autoshutdown());
 						configinfo.setSynchronous(configs[i].synchronous());
-						configinfo.setPersistable(configs[i].persistable());
+//						configinfo.setPersistable(configs[i].persistable());
 						configinfo.setSuspend(configs[i].suspend());
 						
 						NameValue[] argvals = configs[i].arguments();

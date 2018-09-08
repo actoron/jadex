@@ -147,7 +147,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		// cannot do this in constructor because it needs access to this feature in expressions
 		
 		Object pojo = getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
-		injectAgent(getComponent(), pojo, bdimodel, null);
+		injectAgent(getInternalAccess(), pojo, bdimodel, null);
 		invokeInitCalls(pojo);
 		initCapabilities(pojo, bdimodel.getSubcapabilities() , 0);
 //		startBehavior();
@@ -193,7 +193,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		List<MBelief> beliefs = ((IBDIModel)component.getModel().getRawModel()).getCapability().getBeliefs();
 		for(MBelief belief: beliefs)
 		{
-			belief.cleanup(getComponent());
+			belief.cleanup(getInternalAccess());
 		}
 	}
 	
@@ -276,14 +276,14 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			Object oldval = setFieldValue(obj, fieldname, val);
 			
 			// unobserve old value for property changes
-			unobserveObject(getComponent(), oldval, ev2, rs);
+			unobserveObject(getInternalAccess(), oldval, ev2, rs);
 //			rs.unobserveObject(oldval);
 
 			MBelief	mbel = ((MCapability)getComponent().getFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement()).getBelief(belname);
 		
 			if(!SUtil.equals(val, oldval))
 			{
-				publishToolBeliefEvent(getComponent(), mbel);
+				publishToolBeliefEvent(getInternalAccess(), mbel);
 //				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
 				rs.addEvent(new jadex.rules.eca.Event(ev1, new ChangeInfo<Object>(val, oldval, null)));
 				
@@ -297,7 +297,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			
 			// observe new value for property changes
 //				observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+belname, mbel);
-			observeValue(rs, val, getComponent(), ev2, mbel);
+			observeValue(rs, val, getInternalAccess(), ev2, mbel);
 			
 			// initiate a step to reevaluate the conditions
 			((IInternalExecutionFeature)getComponent().getFeature(IExecutionFeature.class)).wakeup();
@@ -1621,7 +1621,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					throw SUtil.throwUnchecked(e);
 				}
 				
-				injectAgent(getComponent(), capa, caps[i].getSecondEntity(), globalname);
+				injectAgent(getInternalAccess(), capa, caps[i].getSecondEntity(), globalname);
 				
 				// Todo: capability features?
 //				MicroInjectionComponentFeature.injectServices(capa, caps[i].getSecondEntity(), getComponent())
@@ -1729,7 +1729,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			try
 			{
-				Object val = mbel.getValue(getComponent());
+				Object val = mbel.getValue(getInternalAccess());
 				if(val==null)
 				{
 					String impl = mbel.getImplClassName();
@@ -1758,17 +1758,17 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 				if(val instanceof List)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getComponent(), new ListWrapper((List<?>)val, getComponent(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getInternalAccess(), new ListWrapper((List<?>)val, getInternalAccess(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 				else if(val instanceof Set)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getComponent(), new SetWrapper((Set<?>)val, getComponent(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getInternalAccess(), new SetWrapper((Set<?>)val, getInternalAccess(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 				else if(val instanceof Map)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(getComponent(), new MapWrapper((Map<?,?>)val, getComponent(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
+					mbel.setValue(getInternalAccess(), new MapWrapper((Map<?,?>)val, getInternalAccess(), ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 			}
 			catch(RuntimeException e)
@@ -1829,7 +1829,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		final MGoal mgoal = ((MCapability)capa.getModelElement()).getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(getComponent(), mgoal, goal, null, null, null, null);
+		final RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, null, null, null, null);
 		rgoal.addListener(new ExceptionDelegationResultListener<Void, E>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -1840,7 +1840,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		});
 
 //		System.out.println("adopt goal");
-		RGoal.adoptGoal(rgoal, getComponent());
+		RGoal.adoptGoal(rgoal, getInternalAccess());
 		
 		return ret;
 	}
@@ -1887,9 +1887,9 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		ICandidateInfo ci = plan instanceof String? new CandidateInfoMPlan(new MPlanInfo(mplan, null), null, component):
 			new CandidateInfoPojoPlan(plan, null, component);
 		
-		final RPlan rplan = RPlan.createRPlan(mplan, ci, new ChangeEvent(null, null, args, null), getComponent(), null, null);
+		final RPlan rplan = RPlan.createRPlan(mplan, ci, new ChangeEvent(null, null, args, null), getInternalAccess(), null, null);
 		rplan.addListener(new DelegationResultListener(ret));
-		RPlan.executePlan(rplan, getComponent());
+		RPlan.executePlan(rplan, getInternalAccess());
 		return ret;
 	}
 	
@@ -1903,7 +1903,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		String fname = bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
 		
 		List<EventType> events = new ArrayList<EventType>();
-		addBeliefEvents(getComponent(), events, fname);
+		addBeliefEvents(getInternalAccess(), events, fname);
 
 		final boolean multi = ((MCapability)getCapability().getModelElement())
 			.getBelief(fname).isMulti(bdimodel.getClassloader());
@@ -2834,7 +2834,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 		{
 			for(MBelief mbel: mbels)
 			{
-				BeliefInfo info = BeliefInfo.createBeliefInfo(getComponent(), mbel, getComponent().getClassLoader());
+				BeliefInfo info = BeliefInfo.createBeliefInfo(getInternalAccess(), mbel, getComponent().getClassLoader());
 				MonitoringEvent ev = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(mbel.toString());
 				ev.setProperty("details", info);

@@ -334,7 +334,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
 		
-		this.topthread = new ProcessThread(null, null, getComponent());
+		this.topthread = new ProcessThread(null, null, getInternalAccess());
 		this.messages = new ArrayList<Object>();
 		this.streams = new ArrayList<IConnection>();
 		
@@ -631,7 +631,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 								thread.getTask().cancel(component).get();
 							}
 							
-							step(activity, getComponent(), thread, event);
+							step(activity, getInternalAccess(), thread, event);
 							thread.setNonWaiting();
 							if(getComponent().getFeature0(IMonitoringComponentFeature.class)!=null 
 								&& getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
@@ -657,7 +657,7 @@ public class BpmnComponentFeature extends AbstractComponentFeature implements IB
 			if(isCurrentActivity(activity, thread))
 			{
 //				System.out.println("Notify1: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
-				step(activity, getComponent(), thread, event);
+				step(activity, getInternalAccess(), thread, event);
 				thread.setNonWaiting();
 //				if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null
 //					&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))

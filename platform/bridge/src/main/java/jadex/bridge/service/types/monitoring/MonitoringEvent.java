@@ -3,7 +3,6 @@ package jadex.bridge.service.types.monitoring;
 import java.util.HashMap;
 import java.util.Map;
 
-import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 
@@ -30,8 +29,8 @@ public class MonitoringEvent implements IMonitoringEvent
 	/** The timepoint. */
 	protected long time;
 	
-	/** The cause. */
-	protected Cause cause;
+//	/** The cause. */
+//	protected Cause cause;
 	
 	/** The event importance. */
 	protected PublishEventLevel level;
@@ -54,35 +53,38 @@ public class MonitoringEvent implements IMonitoringEvent
 	 */
 	public MonitoringEvent(IComponentIdentifier source, long crtime, String type, long time, PublishEventLevel importance)
 	{
-		this(source, crtime, null, type, null, time, importance, null);
+		this(source, crtime, null, type, time, importance, null);
 	}
+	
+//	/**
+//	 *  Create a new monitoring event.
+//	 */
+//	public MonitoringEvent(IComponentIdentifier source, long crtime, String type, long time, PublishEventLevel importance)
+////	public MonitoringEvent(IComponentIdentifier source, long crtime, String type, Cause cause, long time, PublishEventLevel importance)
+//	{
+//		this(source, crtime, null, type, time, importance, null);
+//	}
 	
 	/**
 	 *  Create a new monitoring event.
 	 */
-	public MonitoringEvent(IComponentIdentifier source, long crtime, String type, Cause cause, long time, PublishEventLevel importance)
+	public MonitoringEvent(IComponentIdentifier source, long crtime, String sourcedesc, String type, long time, PublishEventLevel importance)
+//	public MonitoringEvent(IComponentIdentifier source, long crtime, String sourcedesc, String type, Cause cause, long time, PublishEventLevel importance)
 	{
-		this(source, crtime, null, type, cause, time, importance, null);
+		this(source, crtime, sourcedesc, type, time, importance, null);
 	}
 	
 	/**
 	 *  Create a new monitoring event.
 	 */
-	public MonitoringEvent(IComponentIdentifier source, long crtime, String sourcedesc, String type, Cause cause, long time, PublishEventLevel importance)
-	{
-		this(source, crtime, sourcedesc, type, cause, time, importance, null);
-	}
-	
-	/**
-	 *  Create a new monitoring event.
-	 */
-	public MonitoringEvent(IComponentIdentifier source, long crtime, String sourcdesc, String type, Cause cause, long time, PublishEventLevel level, Map<String, Object> props)
+	public MonitoringEvent(IComponentIdentifier source, long crtime, String sourcdesc, String type, long time, PublishEventLevel level, Map<String, Object> props)
+//	public MonitoringEvent(IComponentIdentifier source, long crtime, String sourcdesc, String type, Cause cause, long time, PublishEventLevel level, Map<String, Object> props)
 	{
 		this.source = source;
 		this.sourcedesc = sourcdesc;
 		this.creationtime = crtime;
 		this.type = type;
-		this.cause = cause;
+//		this.cause = cause;
 		this.time = time;
 		this.level = level!=null? level: PublishEventLevel.FINE;
 		this.properties = props;
@@ -180,23 +182,23 @@ public class MonitoringEvent implements IMonitoringEvent
 		this.time = time;
 	}
 
-	/**
-	 *  Get the cause.
-	 *  @return The cause.
-	 */
-	public Cause getCause()
-	{
-		return cause;
-	}
-
-	/**
-	 *  Set the cause.
-	 *  @param cause The cause to set.
-	 */
-	public void setCause(Cause cause)
-	{
-		this.cause = cause;
-	}
+//	/**
+//	 *  Get the cause.
+//	 *  @return The cause.
+//	 */
+//	public Cause getCause()
+//	{
+//		return cause;
+//	}
+//
+//	/**
+//	 *  Set the cause.
+//	 *  @param cause The cause to set.
+//	 */
+//	public void setCause(Cause cause)
+//	{
+//		this.cause = cause;
+//	}
 	
 	/**
 	 *  Get a property.
@@ -261,7 +263,8 @@ public class MonitoringEvent implements IMonitoringEvent
 	public String toString()
 	{
 		return "MonitoringEvent(source=" + source + ", type=" + type
-			+ ", time=" + time + ", cause=" + cause + ", properties="
+			+ ", time=" + time // + ", cause=" + cause 
+			+ ", properties="
 			+ properties + ")";
 	}
 }

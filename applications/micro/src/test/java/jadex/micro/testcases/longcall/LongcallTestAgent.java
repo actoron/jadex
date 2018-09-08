@@ -226,7 +226,7 @@ public class LongcallTestAgent extends TestAgent
 //					call.setRealtime(Boolean.FALSE);
 				}				
 				
-				System.out.println("calling method: "+ServiceCall.getOrCreateNextInvocation());
+//				System.out.println("calling method: "+ServiceCall.getOrCreateNextInvocation());
 				
 				callMethod(ts, 1, ret).addResultListener(new IResultListener<Void>()
 				{

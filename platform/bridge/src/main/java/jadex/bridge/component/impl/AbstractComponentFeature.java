@@ -5,6 +5,8 @@ import java.util.Collections;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.service.types.cms.PlatformComponent;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SimpleParameterGuesser;
@@ -44,12 +46,28 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 		this.cinfo	= cinfo;
 	}
 	
+//	/**
+//	 *  Get the component access.
+//	 */
+//	public IInternalAccess getComponent()
+//	{
+//		return component;
+//	}
+	
 	/**
 	 *  Get the component access.
 	 */
-	public IInternalAccess getComponent()
+	public IInternalAccess getInternalAccess()
 	{
 		return component;
+	}
+	
+	/**
+	 *  Get the component access.
+	 */
+	public PlatformComponent getComponent()
+	{
+		return ((IPlatformComponentAccess)component).getPlatformComponent();
 	}
 	
 	//-------- IComponentFeature interface / instance level --------

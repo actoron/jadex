@@ -342,33 +342,37 @@ public class ComponentRegistryAgent implements IComponentRegistryService
     {
     	final Future<Void> ret = new Future<Void>();
     	
-    	IModelInfo model = comp.getModel();
-		
-		ComponentInfo ci = componenttypes.get(model.getFilename());
-		
-		final CounterResultListener<Void> lis = new CounterResultListener<Void>(ci.getSids()!=null? ci.getSids().size()+1: 1, new DelegationResultListener<Void>(ret));
-		
-		if(ci.getSids()!=null)
+    	comp.getModelAsync().addResultListener(new ExceptionDelegationResultListener<IModelInfo, Void>(ret)
 		{
-			for(IServiceIdentifier sid: ci.getSids())
-			{
-				 agent.getFeature(IProvidedServicesFeature.class).removeService(sid).addResultListener(lis);
-			}
-		}
-		
-		((IExternalAccess)comp).killComponent().addResultListener(new IResultListener<Map<String,Object>>()
-		{
-			public void exceptionOccurred(Exception exception)
-			{
-				lis.exceptionOccurred(exception);
-			}
-			
-			public void resultAvailable(Map<String, Object> result)
-			{
-				lis.resultAvailable(null);
-			}
+    		public void customResultAvailable(IModelInfo model) throws Exception
+    		{
+    			ComponentInfo ci = componenttypes.get(model.getFilename());
+    			
+    			final CounterResultListener<Void> lis = new CounterResultListener<Void>(ci.getSids()!=null? ci.getSids().size()+1: 1, new DelegationResultListener<Void>(ret));
+    			
+    			if(ci.getSids()!=null)
+    			{
+    				for(IServiceIdentifier sid: ci.getSids())
+    				{
+    					 agent.getFeature(IProvidedServicesFeature.class).removeService(sid).addResultListener(lis);
+    				}
+    			}
+    			
+    			((IExternalAccess)comp).killComponent().addResultListener(new IResultListener<Map<String,Object>>()
+    			{
+    				public void exceptionOccurred(Exception exception)
+    				{
+    					lis.exceptionOccurred(exception);
+    				}
+    				
+    				public void resultAvailable(Map<String, Object> result)
+    				{
+    					lis.resultAvailable(null);
+    				}
+    			});
+    		}
 		});
-		
+    	
 		return ret;
     }
     

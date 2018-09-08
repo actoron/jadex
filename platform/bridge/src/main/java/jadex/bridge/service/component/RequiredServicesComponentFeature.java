@@ -14,8 +14,10 @@ import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
@@ -457,7 +459,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		}
 		@SuppressWarnings("unchecked")
 		final SubscriptionIntermediateFuture<ServiceCallEvent> ret = (SubscriptionIntermediateFuture<ServiceCallEvent>)
-			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getComponent());
+			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess());
 		ret.setTerminationCommand(new TerminationCommand()
 		{
 			@Override
@@ -538,7 +540,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		Future<T> ret = null;
 		
 		// Try to find locally
-		IServiceIdentifier sid = ServiceRegistry.getRegistry(getComponent()).searchService(query);
+		IServiceIdentifier sid = ServiceRegistry.getRegistry(getInternalAccess()).searchService(query);
 		if(sid!=null)
 		{
 			ret = new TerminableFuture<>();
@@ -564,7 +566,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					{
 						return createServiceProxy(result, info);
 					}
-				}); 			
+				});
+				((IInternalExecutionFeature) component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
 			}
 		}
 		
@@ -598,7 +601,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 		enhanceQuery(query, false);
 		
-		IServiceIdentifier sid = ServiceRegistry.getRegistry(getComponent()).searchService(query);
+		IServiceIdentifier sid = ServiceRegistry.getRegistry(getInternalAccess()).searchService(query);
 		
 		if(sid==null && query.getMultiplicity().getFrom()>0)
 			throw new ServiceNotFoundException(query.toString());
@@ -664,7 +667,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		}
 		
 		// Find local matches.
-		IServiceRegistry registry = ServiceRegistry.getRegistry(getComponent());
+		IServiceRegistry registry = ServiceRegistry.getRegistry(getInternalAccess());
 		Collection<IServiceIdentifier> localresults =  registry.searchServices(query);
 		
 		for(IServiceIdentifier result: localresults)
@@ -750,7 +753,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 		enhanceQuery(query, true);
 		
-		IServiceRegistry registry = ServiceRegistry.getRegistry(getComponent());
+		IServiceRegistry registry = ServiceRegistry.getRegistry(getInternalAccess());
 		Collection<IServiceIdentifier> results =  registry.searchServices(query);
 		
 		// Wraps result in proxy, if required. 
@@ -781,12 +784,12 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		ISubscriptionIntermediateFuture<T> remotes = isRemote(query) && sqms!=null ? sqms.addQuery(query) : null;
 		
 		// Query local registry
-		IServiceRegistry registry = ServiceRegistry.getRegistry(getComponent());
+		IServiceRegistry registry = ServiceRegistry.getRegistry(getInternalAccess());
 		ISubscriptionIntermediateFuture<?> localresults =  (ISubscriptionIntermediateFuture<?>)registry.addQuery(query);
 		@SuppressWarnings({"unchecked", "rawtypes"})
 		ISubscriptionIntermediateFuture<T> ret = (ISubscriptionIntermediateFuture)FutureFunctionality
 			// Component functionality as local registry pushes results on arbitrary thread.
-			.getDelegationFuture(localresults, new ComponentFutureFunctionality(getComponent())
+			.getDelegationFuture(localresults, new ComponentFutureFunctionality(getInternalAccess())
 		{
 			@Override
 			public Object handleIntermediateResult(Object result) throws Exception
@@ -908,13 +911,13 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			// Local component -> fetch local service object.
 			if(sid.getProviderId().getRoot().equals(getComponent().getId().getRoot()))
 			{
-				service = ServiceRegistry.getRegistry(getComponent()).getLocalService(sid); 			
+				service = ServiceRegistry.getRegistry(getInternalAccess()).getLocalService(sid); 			
 			}
 			
 			// Remote component -> create remote proxy
 			else
 			{
-				service = RemoteMethodInvocationHandler.createRemoteServiceProxy(getComponent(), sid);
+				service = RemoteMethodInvocationHandler.createRemoteServiceProxy(getInternalAccess(), sid);
 			}
 		}
 		
@@ -924,7 +927,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		// Add required service proxy if specified.
 		if(service instanceof IService && info!=null)
 		{
-			service = BasicServiceInvocationHandler.createRequiredServiceProxy(getComponent(), 
+			service = BasicServiceInvocationHandler.createRequiredServiceProxy(getInternalAccess(), 
 				(IService)service, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getId()));
 			
 			
@@ -941,7 +944,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					{
 						MethodInfo mi = nfprop.getMethodInfo();
 						Class<?> clazz = nfprop.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
-						INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getComponent(), (IService)service, nfprop.getMethodInfo(), nfprop.getParameters());
+						INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), (IService)service, nfprop.getMethodInfo(), nfprop.getParameters());
 						if(mi==null)
 						{
 							nfpp.addNFProperty(nfp);
@@ -1002,7 +1005,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		{
 			// Local or unrestricted?
 			if(!isRemote(query) || Boolean.TRUE.equals(query.isUnrestricted())
-				|| query.getServiceType()!=null && ServiceIdentifier.isUnrestricted(getComponent(), query.getServiceType().getType(getComponent().getClassLoader()))) 
+				|| query.getServiceType()!=null && ServiceIdentifier.isUnrestricted(getInternalAccess(), query.getServiceType().getType(getComponent().getClassLoader()))) 
 			{
 				// Unrestricted -> Don't check networks.
 				query.setNetworkNames((String[])null);

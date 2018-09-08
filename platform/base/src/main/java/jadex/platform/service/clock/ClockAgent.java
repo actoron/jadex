@@ -15,7 +15,7 @@ import jadex.micro.annotation.RequiredService;
 /**
  *  Agent that provides the clock service.
  */
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, predecessors="jadex.platform.service.monitoring.MonitoringAgent"))
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, predecessors="jadex.platform.service.settings.SettingsAgent"))
 @Arguments({
 	@Argument(name="simulation", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="bisimulation", clazz=boolean.class, defaultvalue="false")})

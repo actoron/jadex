@@ -75,25 +75,25 @@ public class BulkMonitoringEvent implements IMonitoringEvent
 		throw new UnsupportedOperationException();
 	}
 	
-	/**
-	 *  Get the cause.
-	 *  @return The cause.
-	 */
-	@Exclude
-	public Cause getCause()
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 *  Set the cause.
-	 *  @param cause The cause to set.
-	 */
-	@Exclude
-	public void setCause(Cause cause)
-	{
-		throw new UnsupportedOperationException();
-	}
+//	/**
+//	 *  Get the cause.
+//	 *  @return The cause.
+//	 */
+//	@Exclude
+//	public Cause getCause()
+//	{
+//		throw new UnsupportedOperationException();
+//	}
+//	
+//	/**
+//	 *  Set the cause.
+//	 *  @param cause The cause to set.
+//	 */
+//	@Exclude
+//	public void setCause(Cause cause)
+//	{
+//		throw new UnsupportedOperationException();
+//	}
 
 	/**
 	 *  Get a property.

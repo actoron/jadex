@@ -94,8 +94,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/** The list of interceptors. */
 	protected List<IServiceInvocationInterceptor> interceptors;
 	
-	/** The root cause that was given at creation time. */
-	protected Cause cause;
+//	/** The root cause that was given at creation time. */
+//	protected Cause cause;
 	
 //	/** The call id. */
 //	protected AtomicLong callid;
@@ -116,13 +116,13 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public BasicServiceInvocationHandler(IInternalAccess comp, IServiceIdentifier sid, Logger logger, Cause cause, boolean required)
+	public BasicServiceInvocationHandler(IInternalAccess comp, IServiceIdentifier sid, Logger logger, boolean required)
 	{
-		assert cause!=null;
+//		assert cause!=null;
 		this.comp = comp;
 		this.sid = sid;
 		this.logger	= logger;
-		this.cause = cause;
+//		this.cause = cause;
 		this.switchcall = true;
 		this.required	= required;
 //		this.callid = new AtomicLong();
@@ -131,15 +131,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public BasicServiceInvocationHandler(IInternalAccess comp, IService service, Logger logger, Cause cause, boolean required)
+	public BasicServiceInvocationHandler(IInternalAccess comp, IService service, Logger logger, boolean required)
 	{
-		assert cause!=null;
+//		assert cause!=null;
 		this.comp = comp;
 		this.service = service;
 //		this.sid = service.getId();
 		this.logger	= logger;
 //		this.realtime	= realtime;
-		this.cause = cause;
+//		this.cause = cause;
 		this.switchcall = false; 
 		this.required	= required;
 //		this.callid = new AtomicLong();
@@ -148,15 +148,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public BasicServiceInvocationHandler(IInternalAccess comp, ServiceInfo service, Logger logger, Cause cause)
+	public BasicServiceInvocationHandler(IInternalAccess comp, ServiceInfo service, Logger logger)//, Cause cause)
 	{
-		assert cause!=null;
+//		assert cause!=null;
 		this.comp = comp;
 		this.service = service;
 //		this.sid = service.getManagementService().getId();
 		this.logger	= logger;
 //		this.realtime	= realtime;
-		this.cause = cause;
+//		this.cause = cause;
 		this.switchcall = false; // called for provided proxy which must not switch (is the object that is asked in the req proxy)
 //		this.callid = new AtomicLong();
 	}
@@ -244,7 +244,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		else
 		{
 			final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, method, getInterceptors(), 
-				getServiceIdentifier().getProviderId().getRoot(), getServiceIdentifier(), cause);
+				getServiceIdentifier().getProviderId().getRoot(), getServiceIdentifier());//, cause);
 //			sicon = sic;
 			
 //			if(method.getName().indexOf("getExternalAccess")!=-1 && sic.getLastServiceCall()==null)
@@ -609,7 +609,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				((BasicService)service).setPropertyMap(serprops);
 			}
 			
-			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), ia.getDescription().getCause(), false);
+			handler = new BasicServiceInvocationHandler(ia, ser, ia.getLogger(), false);
 			
 //			if(type==null)
 //			{
@@ -702,7 +702,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			}
 			
 			ServiceInfo si = new ServiceInfo(service, mgmntservice);
-			handler = new BasicServiceInvocationHandler(ia, si, ia.getLogger(), ia.getDescription().getCause());
+			handler = new BasicServiceInvocationHandler(ia, si, ia.getLogger());//, ia.getDescription().getCause());
 			
 //			addPojoServiceIdentifier(service, mgmntservice.getServiceIdentifier());
 		}
@@ -782,7 +782,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	public static IInternalService createDelegationProvidedServiceProxy(IInternalAccess ia, IServiceIdentifier sid, 
 		RequiredServiceInfo info, RequiredServiceBinding binding, ClassLoader classloader, boolean realtime)
 	{
-		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, sid, ia.getLogger(), ia.getDescription().getCause(), false);
+		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, sid, ia.getLogger(), false);//, ia.getDescription().getCause(), false);
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 //		handler.addFirstServiceInterceptor(new DelegationInterceptor(ia, info, binding, null, sid, realtime));	// TODO
 		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, null,*/));
@@ -810,7 +810,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		if(binding==null || !PROXYTYPE_RAW.equals(binding.getProxytype()))
 		{
 	//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
-			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, service, ia.getLogger(), ia.getDescription().getCause(), true);
+			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, service, ia.getLogger(), true); // ia.getDescription().getCause()
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, true));
 			// Dropped for v4???

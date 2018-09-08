@@ -74,7 +74,7 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			{
 				Field f = fields[i].getField(getComponent().getClassLoader());
 				f.setAccessible(true);
-				f.set(agent, getComponent());
+				f.set(agent, getInternalAccess());
 			}
 	
 			// Inject argument values

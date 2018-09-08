@@ -567,6 +567,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					
 					if (cs != null && cs.isExpiring())
 					{
+						System.out.println("Expiring: "+rplat);
 						expiringcryptosuites.add(rplat, new Tuple2<ICryptoSuite, Long>(cs, System.currentTimeMillis() + TIMEOUT));
 						currentcryptosuites.remove(rplat);
 						cs = null;
@@ -1513,6 +1514,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 									String rplat = suite.getKey();
 									initializeHandshake(rplat);
 								}
+								System.out.println("Resetting suites");
 								currentcryptosuites.clear();
 							}
 							
@@ -1852,6 +1854,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				ICryptoSuite oldcs = currentcryptosuites.remove(rplat.toString());
 				if (oldcs != null)
 				{
+					System.out.println("Removing suite: "+rplat);
 					expiringcryptosuites.add(rplat.toString(), new Tuple2<ICryptoSuite, Long>(oldcs, System.currentTimeMillis() + TIMEOUT));
 				}
 				
@@ -1908,7 +1911,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							state.setCryptoSuite(suite);
 							if (!suite.handleHandshake(SecurityAgent.this, fm))
 							{
-//								System.out.println(agent.getComponentIdentifier()+" finished handshake: " + fm.getSender());
+								System.out.println(agent.getId()+" finished handshake: " + fm.getSender());
 								currentcryptosuites.put(fm.getSender().getRoot().toString(), state.getCryptoSuite());
 								initializingcryptosuites.remove(fm.getSender().getRoot().toString());
 								state.getResultFuture().setResult(state.getCryptoSuite());
@@ -1928,7 +1931,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
 						{
-//							System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().isTrustedPlatform());
+							System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().isTrustedPlatform());
 							currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
 							initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 							state.getResultFuture().setResult(state.getCryptoSuite());

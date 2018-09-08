@@ -45,7 +45,7 @@ public class MicroMessageComponentFeature extends MessageComponentFeature
 		///WTF?
 //		if(body instanceof StreamPacket)
 //		{
-			MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentMessageArrived.class, new Object[]{secinf, header, body, body != null ? body.getClass() : null})
+			MicroLifecycleComponentFeature.invokeMethod(getInternalAccess(), AgentMessageArrived.class, new Object[]{secinf, header, body, body != null ? body.getClass() : null})
 				.addResultListener(new IResultListener<Void>()
 			{
 				@Override
@@ -69,7 +69,7 @@ public class MicroMessageComponentFeature extends MessageComponentFeature
 	 */
 	public void streamArrived(IConnection con)
 	{
-		MicroLifecycleComponentFeature.invokeMethod(getComponent(), AgentStreamArrived.class, new Object[]{con})
+		MicroLifecycleComponentFeature.invokeMethod(getInternalAccess(), AgentStreamArrived.class, new Object[]{con})
 			.addResultListener(new IResultListener<Void>()
 		{
 			@Override

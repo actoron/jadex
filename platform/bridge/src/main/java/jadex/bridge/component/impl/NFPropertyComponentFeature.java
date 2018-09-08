@@ -98,7 +98,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 				try
 				{
 					Class<?> clazz = nfprop.getClazz().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
-					INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getComponent(), null, null, nfprop.getParameters());
+					INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), null, null, nfprop.getParameters());
 					cnt++;
 					getComponentPropertyProvider().addNFProperty(nfp).addResultListener(lis);
 				}
@@ -163,7 +163,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	public INFPropertyProvider getComponentPropertyProvider()
 	{
 		if(compprovider==null)
-			this.compprovider = new NFPropertyProvider(getComponent().getId().getParent(), getComponent()); 
+			this.compprovider = new NFPropertyProvider(getComponent().getId().getParent(), getInternalAccess()); 
 		
 		return compprovider;
 	}
@@ -192,7 +192,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		ret = reqserprops.get(sid);
 		if(ret==null)
 		{
-			ret = new NFMethodPropertyProvider(null, getComponent()); 
+			ret = new NFMethodPropertyProvider(null, getInternalAccess()); 
 			reqserprops.put(sid, ret);
 //			System.out.println("created req ser provider: "+sid+" "+hashCode());
 		}
@@ -222,7 +222,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		{
 			// TODO: parent???
 //			ret = new NFMethodPropertyProvider(getComponent().getComponentIdentifier(), getComponent()); 
-			ret = new NFMethodPropertyProvider(null, getComponent()); 
+			ret = new NFMethodPropertyProvider(null, getInternalAccess()); 
 			proserprops.put(sid, ret);
 		}
 		return ret;
@@ -312,7 +312,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		for(NFProperty nfprop : nfprops.value())
 		{
 			Class<?> clazz = nfprop.value();
-			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getComponent(), ser, null, SNameValue.createUnparsedExpressionsList(nfprop.parameters()));
+			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getInternalAccess(), ser, null, SNameValue.createUnparsedExpressionsList(nfprop.parameters()));
 			prov.addNFProperty(prop).addResultListener(lis);
 		}
 		
@@ -331,7 +331,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		for(NFProperty nfprop : nfprops.value())
 		{
 			Class<?> clazz = ((NFProperty)nfprop).value();
-			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getComponent(), ser, mi, SNameValue.createUnparsedExpressionsList(nfprop.parameters()));
+			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, getInternalAccess(), ser, mi, SNameValue.createUnparsedExpressionsList(nfprop.parameters()));
 			prov.addMethodNFProperty(mi, prop).addResultListener(lis);
 		}
 		

@@ -64,7 +64,7 @@ public class PlatformConfigurationTest
 			String name = argument.getName();
 			// those don't have to be in the root component configuration
 			if (!(name.equals(IPlatformConfiguration.PLATFORM_NAME)
-				|| name.equals(IPlatformConfiguration.AUTOSHUTDOWN)
+//				|| name.equals(IPlatformConfiguration.AUTOSHUTDOWN)
 				|| name.equals(IPlatformConfiguration.CONFIGURATION_NAME)
 				|| name.equals(IPlatformConfiguration.PLATFORM_COMPONENT))) {
 				Field field = staticFieldContents.get(name);

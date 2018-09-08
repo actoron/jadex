@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IPriorityComponentStep;
+import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ITypedComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
@@ -33,7 +35,6 @@ import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -50,6 +51,8 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -63,6 +66,7 @@ import jadex.commons.IResultCommand;
 import jadex.commons.MutableObject;
 import jadex.commons.SReflect;
 import jadex.commons.TimeoutException;
+import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -77,6 +81,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
+import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.ThreadLocalTransferHelper;
@@ -249,6 +254,17 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	
 	// for debugging: remember stack trace of stack addition
 	protected Map<IComponentStep<?>, Exception>	stepadditions;
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IComponentDescription getDescription()
+	{
+		return getComponent().getDescription();
+	}
+	
 	
 	/**
 	 *  Execute a component step.
@@ -1398,7 +1414,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 								{
 									getComponent().getFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getId(), 
 										getComponent().getDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
-										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 									// null was step.getCause()
 								}
 							}
@@ -1629,10 +1645,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		setComponentThread(Thread.currentThread());
 //		this.componentthread	= Thread.currentThread();
 		IComponentIdentifier.LOCAL.set(getComponent().getId());
-		IInternalExecutionFeature.LOCAL.set(getComponent());
+		IInternalExecutionFeature.LOCAL.set(getInternalAccess());
 		ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(component.getClassLoader());
-		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(getComponent()));
+		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(getInternalAccess()));
 		return cl;
 	}
 	
@@ -1734,7 +1750,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		if(step.getPriority()<IExecutionFeature.STEP_PRIORITY_IMMEDIATE && getComponent().getFeature0(IMonitoringComponentFeature.class)!=null 
 			&& getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{
-			MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(), type+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
+			MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(), type+"."+TYPE_STEP, System.currentTimeMillis(), PublishEventLevel.FINE);
 			// null was step.getCause()
 			event.setProperty("sourcename", SReflect.getUnqualifiedClassName(step.getStep().getClass()));
 			event.setProperty("details", getStepDetails(step));
@@ -1849,7 +1865,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					if(step.getPriority()<IExecutionFeature.STEP_PRIORITY_IMMEDIATE)
 					{
-						MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(),  IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
+						MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(),  IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, System.currentTimeMillis(), PublishEventLevel.FINE);
 						// null was step.getCause()
 						event.setProperty("sourcename", SReflect.getUnqualifiedClassName(step.getStep().getClass()));
 						event.setProperty("details", getStepDetails(step));
@@ -1917,6 +1933,152 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Add a component listener for a specific component.
+	 *  The listener is registered for component changes.
+	 *  @param cid	The component to be listened.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid)
+	{
+		return getComponent().listenToComponent(cid);
+	}
+	
+	/**
+	 * Search for components matching the given description.
+	 * @return An array of matching component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con)
+	{
+		return getComponent().searchComponents(adesc, con);
+	}
+	
+	/**
+	 *  Execute a step of a suspended component.
+	 *  @param componentid The component identifier.
+	 *  @param listener Called when the step is finished (result will be the component description).
+	 */
+	public IFuture<Void> stepComponent(IComponentIdentifier componentid, String stepinfo)
+	{
+		return getComponent().stepComponent(componentid, stepinfo);
+	}
+	
+	/**
+	 *  Set breakpoints for a component.
+	 *  Replaces existing breakpoints.
+	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
+	 *  @param componentid The component identifier.
+	 *  @param breakpoints The new breakpoints (if any).
+	 */
+	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints)
+	{
+		return getComponent().setComponentBreakpoints(componentid, breakpoints);
+	}
+	
+	/**
+	 *  Suspend the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> suspendComponent(IComponentIdentifier componentid)
+	{
+		return getComponent().suspendComponent(componentid);
+	}
+	
+	/**
+	 *  Resume the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> resumeComponent(IComponentIdentifier componentid)
+	{
+		return getComponent().resumeComponent(componentid);
+	}
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
+	{
+		return getComponent().createComponent(component, info, resultlistener);
+	}
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info)
+	{
+		return getComponent().createComponentWithResults(component, info);
+	}
+	
+	/**
+	 *  Create a new component on the platform.
+	 *  @param name The component name or null for automatic generation.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param info Additional start information such as parent component or arguments (optional).
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info)
+	{
+		return getComponent().createComponent(component, info);
+	}
+	
+	/**
+	 *  Kill the component.
+	 */
+	public IFuture<Map<String, Object>> killComponent()
+	{
+		return getComponent().killComponent();
+	}
+	
+	/**
+	 *  Kill the component.
+	 *  @param e The failure reason, if any.
+	 */
+	public IFuture<Map<String, Object>> killComponent(Exception e)
+	{
+		return getComponent().killComponent(e);
+	}
+	
+	/**
+	 *  Kill the component.
+	 *  @param e The failure reason, if any.
+	 */
+	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid)
+	{
+		return getComponent().killComponent(cid);
+	}
+	
+	/**
+	 *  Get the external access for a component id.
+	 *  @param cid The component id.
+	 *  @return The external access.
+	 */
+	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid)
+	{
+		return getComponent().getExternalAccess(cid);
+	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription> getDescriptionAsync()
+	{
+		return new Future<>(getComponent().getDescription());
+	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid)
+	{
+		return getComponent().getDescription(cid);
+	}
+
 	
 	/**
 	 *  Get the step number when endstate began.

@@ -892,7 +892,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
-		OutputConnectionHandler och = new OutputConnectionHandler(getComponent(), nonfunc);
+		OutputConnectionHandler och = new OutputConnectionHandler(getInternalAccess(), nonfunc);
 		addOutputConnection(conid, och);
 //		icons.put(conid, och);
 		OutputConnection con = new OutputConnection(sender, receiver, conid, true, och);
@@ -915,7 +915,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
-		InputConnectionHandler ich = new InputConnectionHandler(getComponent(), nonfunc);
+		InputConnectionHandler ich = new InputConnectionHandler(getInternalAccess(), nonfunc);
 		addInputConnection(conid, ich);
 //		icons.put(conid, ich);
 		InputConnection con = new InputConnection(sender, receiver, conid, true, ich);
@@ -947,7 +947,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			ich = getInputConnection(Integer.valueOf(conid));
 			if(ich==null)
 			{
-				ich = new InputConnectionHandler(getComponent(), nonfunc);
+				ich = new InputConnectionHandler(getInternalAccess(), nonfunc);
 				con = new InputConnection(initiator, participant, conid, false, ich);
 				addInputConnection(Integer.valueOf(conid), ich);
 //				pcons.put(Integer.valueOf(conid), ich);
@@ -1038,7 +1038,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			
 			if(och==null)
 			{
-				och = new OutputConnectionHandler(getComponent(), nonfunc);
+				och = new OutputConnectionHandler(getInternalAccess(), nonfunc);
 				con = new OutputConnection(initiator, participant, conid, false, och);
 				addOutputConnection(Integer.valueOf(conid), och);
 //				pcons.put(Integer.valueOf(conid), och);
@@ -1873,7 +1873,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		}
 		@SuppressWarnings("unchecked")
 		final SubscriptionIntermediateFuture<MessageEvent>	ret	= (SubscriptionIntermediateFuture<MessageEvent>)
-			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getComponent(), true);
+			SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess(), true);
 		ret.setTerminationCommand(new TerminationCommand()
 		{
 			@Override

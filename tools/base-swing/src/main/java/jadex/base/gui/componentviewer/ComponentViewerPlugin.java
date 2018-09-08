@@ -33,6 +33,7 @@ import jadex.base.gui.componenttree.ProvidedServiceInfoNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -430,31 +431,37 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 										{
 											public void customResultAvailable(ClassLoader cl)
 											{
-												Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-												
-												if(clid instanceof String[]) 
+												exta.getModelAsync().addResultListener(new SwingDefaultResultListener<IModelInfo>(comptree)
 												{
-													// use first gui class found
-													for(String classname : (String[])clid) 
+													public void customResultAvailable(IModelInfo model)
 													{
-														Class<?> clazz = SReflect.classForName0(classname, cl);
-														if(clazz != null)
+														Object clid = model.getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+														
+														if(clid instanceof String[]) 
 														{
-															clid = clazz;
-															break;
+															// use first gui class found
+															for(String classname : (String[])clid) 
+															{
+																Class<?> clazz = SReflect.classForName0(classname, cl);
+																if(clazz != null)
+																{
+																	clid = clazz;
+																	break;
+																}
+															}
+														}
+														
+														if(clid instanceof String)
+														{
+															Class<?> clazz	= SReflect.classForName0((String)clid, cl);
+															createPanel(clazz, exta, node);
+														}
+														else if(clid instanceof Class)
+														{
+															createPanel((Class<?>)clid, exta, node);
 														}
 													}
-												}
-												
-												if(clid instanceof String)
-												{
-													Class<?> clazz	= SReflect.classForName0((String)clid, cl);
-													createPanel(clazz, exta, node);
-												}
-												else if(clid instanceof Class)
-												{
-													createPanel((Class<?>)clid, exta, node);
-												}
+												});
 											}
 										});
 									}
@@ -606,15 +613,27 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					{
 						public void customResultAvailable(final IExternalAccess exta)
 						{
-							getJCC().getClassLoader(exta.getModel().getResourceIdentifier())
-								.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Boolean>(fut)
+							exta.getModelAsync().addResultListener(new SwingExceptionDelegationResultListener<IModelInfo, Boolean>(fut)
 							{
-								public void customResultAvailable(ClassLoader cl)
+								public void customResultAvailable(final IModelInfo model)
 								{
-									final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-									fut.setResult(clid==null? Boolean.FALSE: Boolean.TRUE);
-//											System.out.println("isVis first res: "+viewables.get(cid));
-									node.refresh(false);
+									getJCC().getClassLoader(model.getResourceIdentifier())
+										.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Boolean>(fut)
+									{
+										public void customResultAvailable(ClassLoader cl)
+										{
+											exta.getModelAsync().addResultListener(new SwingExceptionDelegationResultListener<IModelInfo, Boolean>(fut)
+											{
+												public void customResultAvailable(IModelInfo model)
+												{
+													final Object clid = model.getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+													fut.setResult(clid==null? Boolean.FALSE: Boolean.TRUE);
+				//									System.out.println("isVis first res: "+viewables.get(cid));
+													node.refresh(false);
+												}
+											});
+										}
+									});
 								}
 							});
 						}

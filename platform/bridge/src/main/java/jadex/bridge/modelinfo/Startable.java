@@ -18,14 +18,14 @@ public class Startable
 	/** The keepalive flag. */
 	private Boolean keepalive;
 	
-	/** The master flag. */
-	private Boolean master;
+//	/** The master flag. */
+//	private Boolean master;
 	
-	/** The daemon flag. */
-	private Boolean daemon;
+//	/** The daemon flag. */
+//	private Boolean daemon;
 	
-	/** The autoshutdown flag. */
-	private Boolean autoshutdown;
+//	/** The autoshutdown flag. */
+//	private Boolean autoshutdown;
 
 	/** The monitoring flag. */
 	private PublishEventLevel monitoring;
@@ -33,8 +33,8 @@ public class Startable
 	/** The synchronous flag. */
 	private Boolean synchronous;
 	
-	/** The persistable flag. */
-	private Boolean persistable;
+//	/** The persistable flag. */
+//	private Boolean persistable;
 	
 	/** The scope. */
 	private String scope;
@@ -59,59 +59,59 @@ public class Startable
 		this.description = description;
 	}
 	
-	/**
-	 *  Get the master.
-	 *  @return the master.
-	 */
-	public Boolean getMaster()
-	{
-		return master;
-	}
+//	/**
+//	 *  Get the master.
+//	 *  @return the master.
+//	 */
+//	public Boolean getMaster()
+//	{
+//		return master;
+//	}
+//
+//	/**
+//	 *  Set the master.
+//	 *  @param master The master to set.
+//	 */
+//	public void setMaster(Boolean master)
+//	{
+//		this.master = master;
+//	}
+//
+//	/**
+//	 *  Get the daemon.
+//	 *  @return the daemon.
+//	 */
+//	public Boolean getDaemon()
+//	{
+//		return daemon;
+//	}
+//
+//	/**
+//	 *  Set the daemon.
+//	 *  @param daemon The daemon to set.
+//	 */
+//	public void setDaemon(Boolean daemon)
+//	{
+//		this.daemon = daemon;
+//	}
 
-	/**
-	 *  Set the master.
-	 *  @param master The master to set.
-	 */
-	public void setMaster(Boolean master)
-	{
-		this.master = master;
-	}
-
-	/**
-	 *  Get the daemon.
-	 *  @return the daemon.
-	 */
-	public Boolean getDaemon()
-	{
-		return daemon;
-	}
-
-	/**
-	 *  Set the daemon.
-	 *  @param daemon The daemon to set.
-	 */
-	public void setDaemon(Boolean daemon)
-	{
-		this.daemon = daemon;
-	}
-
-	/**
-	 *  Get the autoshutdown.
-	 *  @return the autoshutdown.
-	 */
-	public Boolean getAutoShutdown()
-	{
-		return autoshutdown;
-	}
-
-	/**
-	 *  Set the autoshutdown.
-	 *  @param autoshutdown The autoshutdown to set.
-	 */
-	public void setAutoShutdown(Boolean autoshutdown)
-	{
-		this.autoshutdown = autoshutdown;
-	}
+//	/**
+//	 *  Get the autoshutdown.
+//	 *  @return the autoshutdown.
+//	 */
+//	public Boolean getAutoShutdown()
+//	{
+//		return autoshutdown;
+//	}
+//
+//	/**
+//	 *  Set the autoshutdown.
+//	 *  @param autoshutdown The autoshutdown to set.
+//	 */
+//	public void setAutoShutdown(Boolean autoshutdown)
+//	{
+//		this.autoshutdown = autoshutdown;
+//	}
 
 	/**
 	 *  Get the suspend.
@@ -167,23 +167,23 @@ public class Startable
 		this.synchronous = synchronous;
 	}
 	
-	/**
-	 *  Get the persistable.
-	 *  @return The persistable.
-	 */
-	public Boolean getPersistable()
-	{
-		return persistable;
-	}
-
-	/**
-	 *  Set the persistable flag.
-	 *  @param persistable The persistable flag to set.
-	 */
-	public void setPersistable(Boolean persistable)
-	{
-		this.persistable = persistable;
-	}
+//	/**
+//	 *  Get the persistable.
+//	 *  @return The persistable.
+//	 */
+//	public Boolean getPersistable()
+//	{
+//		return persistable;
+//	}
+//
+//	/**
+//	 *  Set the persistable flag.
+//	 *  @param persistable The persistable flag to set.
+//	 */
+//	public void setPersistable(Boolean persistable)
+//	{
+//		this.persistable = persistable;
+//	}
 	
 	/**
 	 *  Get the monitoring.

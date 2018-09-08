@@ -8,31 +8,31 @@ import jadex.bridge.service.types.monitoring.IMonitoringService;
  */
 public interface IExtendedPlatformConfiguration
 {
-	/**
-     *  Get the auto shutdown flag.
-     *  @return The auto shutdown flag.
-     */
-    public boolean getAutoShutdown();
-
-    /**
-     *  Set the auto shutdown flag.
-     *  @param value The value.
-     */
-    public void setAutoShutdown(boolean value);
+//	/**
+//     *  Get the auto shutdown flag.
+//     *  @return The auto shutdown flag.
+//     */
+//    public boolean getAutoShutdown();
+//
+//    /**
+//     *  Set the auto shutdown flag.
+//     *  @param value The value.
+//     */
+//    public void setAutoShutdown(boolean value);
     
     /**
      *  Get the platform component.
      *  @return The platform component class.
      */
 //    public Class<?> getPlatformComponent();
-    public ClassInfo getPlatformComponent();
+//    public ClassInfo getPlatformComponent();
 
     /**
      *  Set the platform component.
      *  @param value The platform component.
      */
 //    public void setPlatformComponent(Class<?> value);
-    public void setPlatformComponent(ClassInfo value);
+//    public void setPlatformComponent(ClassInfo value);
     
     /**
      *  Get the component factory.
@@ -146,11 +146,6 @@ public interface IExtendedPlatformConfiguration
      */
     public IMonitoringService.PublishEventLevel getMonitoring();
     
-    
-    
-
-
-
 
 
     /**
