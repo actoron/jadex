@@ -33,6 +33,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.IFilter;
 import jadex.commons.IPropertyObject;
 import jadex.commons.IValueFetcher;
@@ -699,14 +700,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 							
 							IFuture<Void>	fut	= oc.addPerspective((String)MEnvSpaceType.getProperty(sourcepers, "name"), persp);
 							
-							ISimulationService	simserv	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-							if(simserv!=null)
-							{
-								FutureBarrier<Void>	fubar	= new FutureBarrier<>();
-								fubar.addFuture(fut);
-								fubar.addFuture(simserv.addAdvanceBlocker(fut));
-								fut	= fubar.waitFor();
-							}
+							SSimulation.addBlocker(fut);
 
 							fut.addResultListener(crl2);
 						}
@@ -2978,17 +2972,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	public IFuture<Void> terminate()
 	{
 //		System.err.println("terminate space: "+exta.getComponentIdentifier());
-		final Future<Void>	fut	= new Future<Void>();
-		IFuture<Void>	ret	= fut;
-		
-		ISimulationService	simserv	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-		if(simserv!=null)
-		{
-			FutureBarrier<Void>	fubar	= new FutureBarrier<>();
-			fubar.addFuture(ret);
-			fubar.addFuture(simserv.addAdvanceBlocker(ret));
-			ret	= fubar.waitFor();
-		}
+		final Future<Void>	ret	= new Future<Void>();
+
+		SSimulation.addBlocker(ret);
 		
 		final IObserverCenter[]	ocs	= (IObserverCenter[])observercenters.toArray(new IObserverCenter[observercenters.size()]);
 		SwingUtilities.invokeLater(new Runnable()
@@ -3001,11 +2987,11 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					{
 						ocs[i].dispose();
 					}
-					fut.setResult(null);
+					ret.setResult(null);
 				}
 				catch(Exception e)
 				{
-					fut.setException(e);
+					ret.setException(e);
 				}
 			}
 		});
