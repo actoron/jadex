@@ -383,7 +383,7 @@ public abstract class AbstractClock implements IClock
 			boolean	removed	= timers.remove(timer);
 //			if(!removed)
 //				System.out.println("Could not remove timer: "+timer+" "+timers);
-//			System.err.println("Removed timer: "+timers);
+			System.out.println(this+" Removed timer: "+removed+", "+timer.getTimedObject());
 		}
 		
 		notifyListeners(new ChangeEvent(this, EVENT_TYPE_TIMER_REMOVED));
@@ -465,7 +465,7 @@ public abstract class AbstractClock implements IClock
 	 */
 	protected void notifyListeners(ChangeEvent ce)
 	{
-//		System.out.println(""+this.getClass()+" "+ce);
+//		System.out.println(this+" "+ce);
 		IChangeListener[]	cls	= (IChangeListener[])listeners.toArray(new IChangeListener[0]);
 		for(int i=0; i<cls.length; i++)
 			cls[i].changeOccurred(ce);

@@ -1309,13 +1309,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					step.getTransfer().afterSwitch();
 					
-					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
-						System.out.println("executing: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
+//					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
+//						System.out.println("executing: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
 					
 					stepfut	= step.getStep().execute(component);
 					
-					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
-						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
+//					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
+//						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
 				}
 				else
 				{

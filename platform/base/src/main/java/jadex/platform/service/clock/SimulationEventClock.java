@@ -49,7 +49,7 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 		Timer dorem = null;
 		synchronized(this)
 		{
-			//System.out.println(this+" advance "+state+" numtimers="+timers.size());
+//			System.out.println(this+" advance "+state+" numtimers="+timers.size());
 			if(STATE_RUNNING.equals(state) && timers.size()>0)
 			{
 				advanced	= true;
