@@ -1,5 +1,7 @@
 package jadex.platform.service.clock;
 
+import java.util.logging.Logger;
+
 import jadex.bridge.service.types.clock.IClock;
 import jadex.commons.ChangeEvent;
 
@@ -41,14 +43,13 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 	 */
 	public boolean advanceEvent()
 	{
-//		System.out.println("advance");
-		
 		boolean	advanced	= false;
 		Timer t = null;
 		
 		Timer dorem = null;
 		synchronized(this)
 		{
+			//System.out.println(this+" advance "+state+" numtimers="+timers.size());
 			if(STATE_RUNNING.equals(state) && timers.size()>0)
 			{
 				advanced	= true;
@@ -71,7 +72,16 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 		
 		// Must not be done while holding lock to avoid deadlocks.
 		if(t!=null)
-			t.getTimedObject().timeEventOccurred(currenttime);
+		{
+			try
+			{
+				t.getTimedObject().timeEventOccurred(currenttime);
+			}
+			catch(Exception e)
+			{
+				Logger.getLogger(name).warning("Exception in time event: "+e);
+			}
+		}
 			
 		notifyListeners(new ChangeEvent(this, EVENT_TYPE_NEXT_TIMEPOINT));
 		return advanced;
