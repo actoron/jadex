@@ -6,12 +6,20 @@ import java.util.Set;
 
 import org.junit.Ignore;
 
+import jadex.base.Starter;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.clock.IClock;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -100,22 +108,29 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
      */
     protected IFuture<Void> disableLocalSimulationMode()
     {
-    	return IFuture.DONE;
-//    	final Future<Void> ret = new Future<>();
-//    	ISimulationService simserv = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ISimulationService.class); 
-//		simserv.pause().addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
-//		{
-//			public void customResultAvailable(Void result) throws Exception
-//			{
-//				simserv.setClockType(IClock.TYPE_SYSTEM).addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
-//				{
-//					public void customResultAvailable(Void result) throws Exception
-//					{
-//						simserv.start().addResultListener(new DelegationResultListener<>(ret));
-//					}
-//				});
-//			}
-//		});
-//		return ret;
+		Boolean issim = (Boolean) Starter.getPlatformValue(agent.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
+		if(Boolean.TRUE.equals(issim))
+		{
+	    	final Future<Void> ret = new Future<>();
+	    	ISimulationService simserv = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ISimulationService.class); 
+			simserv.pause().addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
+			{
+				public void customResultAvailable(Void result) throws Exception
+				{
+					simserv.setClockType(IClock.TYPE_SYSTEM).addResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
+					{
+						public void customResultAvailable(Void result) throws Exception
+						{
+							simserv.start().addResultListener(new DelegationResultListener<>(ret));
+						}
+					});
+				}
+			});
+			return ret;
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
     }
 }

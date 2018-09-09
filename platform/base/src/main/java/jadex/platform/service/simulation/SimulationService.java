@@ -424,7 +424,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	 */
 	public IFuture<Void> addAdvanceBlocker(IFuture<?> blocker)
 	{
-//		advanceblockers.add(blocker);
+		advanceblockers.add(blocker);
 		return IFuture.DONE;
 	}
 
@@ -488,17 +488,16 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			}
 			else
 			{
+//				System.out.println(this+" waiting for blockers");
 				waitForBlockers().addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
-		//				System.out.println(access+" advancing clock");
+//						System.out.println(access+" advancing clock");
 						if(getClockService().advanceEvent())
 						{
-		//					System.out.println(access+" advanced clock");
-		//					System.out.println("Wait1");
-							
-		//							System.out.println("Release1");
+//							System.out.println(access+" advanced clock");
+
 							if(idlelistener==null)
 								idlelistener	= new IdleListener();
 							getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
@@ -506,7 +505,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 						}
 						else
 						{
-		//					System.out.println("Clock not advanced");
+//							System.out.println(access+" Clock not advanced");
 		
 							// Simulation stopped due to no more entries
 							// -> listen on clock until new entries available.
@@ -516,6 +515,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 								{
 									public void changeOccurred(ChangeEvent event)
 									{
+//										System.out.println(access+" Clock changed after not advanced");
 										if(IClock.EVENT_TYPE_TIMER_ADDED.equals(event.getType()))
 										{
 											getClockService().removeChangeListener(this);
@@ -526,7 +526,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 													// Resume execution if still executing.
 													if(MODE_NORMAL.equals(mode) && executing)
 													{
-		//												System.out.println("Schedule advancing clock");
+//														System.out.println(access+" Schedule advancing clock");
 														scheduleAdvanceClock();
 													}
 													return IFuture.DONE;
@@ -628,7 +628,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		 */
 		public void resultAvailable(Object result)
 		{
-//			System.err.println("Executor idle");
+//			System.out.println(SimulationService.this+" Executor idle");
 			if(executing && !outdated)
 			{
 				if(MODE_NORMAL.equals(mode) || MODE_TIME_STEP.equals(mode) || !continued)

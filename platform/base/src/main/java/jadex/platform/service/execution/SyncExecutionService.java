@@ -41,7 +41,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	protected Executor executor;
 	
 	/** The idle future. */
-	protected Future<Void> idlefuture;
+	protected volatile Future<Void> idlefuture;
 	
 	/** The state of the service. */
 	protected State state;
@@ -207,7 +207,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 							try
 							{
 //										if(DEBUG)
-//											System.out.println("Executing task: "+task+", "+this);
+								//System.out.println(SyncExecutionService.this+" Executing task: "+task+", "+this);
 								again = task.execute();
 							}
 							catch(Throwable e)
@@ -240,7 +240,9 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 							}
 							
 							task = null;
-//									System.out.println("task finished: "+state+", "+queue.isEmpty()+", "+executor.isSwitching());
+//							System.out.println(SyncExecutionService.this+" task finished: "+state+", "+queue.isEmpty()+", "+executor.isSwitching()
+//								+"\n idle: "+(state==State.RUNNING && queue.isEmpty() && !executor.isSwitching())+" idlefuture: "+idlefuture
+//								+"\n again: "+(state==State.RUNNING && !queue.isEmpty() && !executor.isSwitching()));
 							if(state==State.RUNNING && queue.isEmpty() && !executor.isSwitching())
 							{
 								idf = idlefuture;
@@ -256,7 +258,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 						// When no more executables, inform idle commands.
 						if(idf!=null)
 						{
-//							System.out.println("Idle");
+//							System.out.println(SyncExecutionService.this+" Idle");
 							idf.setResult(null);
 //							Iterator it	= idlecommands.iterator();
 //							while(it.hasNext())
@@ -330,9 +332,11 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		}
 		else
 		{
+//			System.out.println(this+" getNextIdleFuture");
 			if(idlefuture==null)
 				idlefuture = new Future<Void>();
 			ret = idlefuture;
+//			System.out.println(this+" getNextIdleFuture: "+ret);
 		}
 		return ret;
 	}

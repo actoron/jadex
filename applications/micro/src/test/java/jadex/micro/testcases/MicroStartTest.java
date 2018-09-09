@@ -2,6 +2,8 @@ package jadex.micro.testcases;
 
 import java.io.File;
 
+import org.junit.Ignore;
+
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -10,6 +12,7 @@ import junit.framework.Test;
 /**
  *  Test suite for micro agent tests.
  */
+//@Ignore
 public class MicroStartTest extends ComponentTestSuite
 {
 	private static final String NOEXCLUDE = "__noexclude__";

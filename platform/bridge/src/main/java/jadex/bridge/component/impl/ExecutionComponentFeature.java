@@ -288,7 +288,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Todo: synchronize with last step!
 			int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
 //			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
-			if(endagenda.isDone() && STEP_PRIORITY_IMMEDIATE < prio)
+			if(endagenda.isDone() && prio<STEP_PRIORITY_IMMEDIATE)
 			{
 				ret.setException(new ComponentTerminatedException(getComponent().getId()));
 			}
@@ -323,7 +323,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 
 		if(!ret.isDone())
 		{
-			wakeup();
+			try
+			{
+				// may fail when killed in mean time.
+				wakeup();
+			}
+			catch(Exception e)
+			{
+			}
 		}
 		
 		return ret;
@@ -684,9 +691,26 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			IExecutionService exe = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+			IExecutionService exe	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+			
+			// Do not use rescue thread in platform init for bisimulation to avoid clock running out.
+			if(exe==null && Boolean.TRUE.equals(cinfo.getArguments().get("bisimulation")))
+			{
+				try
+				{
+					Field	f	= Class.forName("jadex.platform.service.execution.BisimExecutionService")
+						.getDeclaredField("instance");
+					f.setAccessible(true);
+					exe	= (IExecutionService)f.get(null);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+
 			// Hack!!! service is foudn before it is started, grrr.
-			if(exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
+			if(exe!=null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
 				if(bootstrap)
 				{
@@ -697,13 +721,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					exe.execute(ExecutionComponentFeature.this);
 				}
-			}
-			else if(Boolean.TRUE.equals(cinfo.getArguments().get("bisimulation"))
-				&& LOCAL.get()!=null && LOCAL.get()!=getComponent())
-			{
-				// Do not use rescue thread for bisimulation to avoid clock running out.
-				exe = LOCAL.get().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IExecutionService.class));
-				exe.execute(ExecutionComponentFeature.this);
 			}
 			else
 			{
@@ -1448,46 +1465,47 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										{
 											// Todo: fail fast vs robust components.
 											
-											IExecutionService	exe	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
-											// Hack!!! service is foudn before it is started, grrr.
-											if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
-											{
-												if(bootstrap)
-												{
-													// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
-													available	= true;
-												}
-												else
-												{
-													exe.execute(ExecutionComponentFeature.this);
-												}
-											}
-											else
-											{
-												// Happens during platform bootstrapping -> execute on platform rescue thread.
-												if(!bootstrap)
-												{
-													bootstrap	= true;
-													Starter.scheduleRescueStep(getComponent().getId().getRoot(), new Runnable()
-													{
-														public void run()
-														{
-															boolean	again	= true;
-															while(!available && again)
-															{
-																again	= execute();
-															}
-															bootstrap	= false;
-															
-															if(again)
-															{					
-																// Bootstrapping finished -> do real kickoff
-																wakeup();
-															}
-														}
-													});
-												}
-											}
+											// TODO: why is this code here???
+//											IExecutionService	exe	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+//											// Hack!!! service is foudn before it is started, grrr.
+//											if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
+//											{
+//												if(bootstrap)
+//												{
+//													// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+//													available	= true;
+//												}
+//												else
+//												{
+//													exe.execute(ExecutionComponentFeature.this);
+//												}
+//											}
+//											else
+//											{
+//												// Happens during platform bootstrapping -> execute on platform rescue thread.
+//												if(!bootstrap)
+//												{
+//													bootstrap	= true;
+//													Starter.scheduleRescueStep(getComponent().getId().getRoot(), new Runnable()
+//													{
+//														public void run()
+//														{
+//															boolean	again	= true;
+//															while(!available && again)
+//															{
+//																again	= execute();
+//															}
+//															bootstrap	= false;
+//															
+//															if(again)
+//															{					
+//																// Bootstrapping finished -> do real kickoff
+//																wakeup();
+//															}
+//														}
+//													});
+//												}
+//											}
 											StringWriter	sw	= new StringWriter();
 											exception.printStackTrace(new PrintWriter(sw));
 											getComponent().getLogger().severe("No listener for component step exception: "+step.getStep()+"\n"+sw);
@@ -2102,47 +2120,47 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public <T> void addSimulationBlocker(IFuture<T> remotefuture)
 	{
-//		Boolean issim = (Boolean) Starter.getPlatformValue(component.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
-//		if (Boolean.TRUE.equals(issim))
-//		{
-//			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
-//			// there is no way of known how long to hold the clock.
-//			if (!(remotefuture instanceof IIntermediateFuture))
-//			{
-//				component.scheduleStep(new IComponentStep<Void>()
-//				{
-//					public IFuture<Void> execute(IInternalAccess ia)
-//					{
-//						ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
-//						if (simserv != null)
-//						{
-//							Future<Void> blocker = new Future<>();
-//							simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
-//							{
-//								public void resultAvailable(Void result)
-//								{
-//									remotefuture.addResultListener(new IResultListener<T>()
-//									{
-//										public void resultAvailable(T result)
-//										{
-//											blocker.setResult(null);
-//										}
-//										public void exceptionOccurred(Exception exception)
-//										{
-//											resultAvailable(null);
-//										}
-//									});
-//								}
-//								public void exceptionOccurred(Exception exception)
-//								{
-//								}
-//							});
-//						}
-//						return IFuture.DONE;
-//					}
-//				});
-//			}
-//		}
+		Boolean issim = (Boolean) Starter.getPlatformValue(component.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
+		if (Boolean.TRUE.equals(issim))
+		{
+			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
+			// there is no way of known how long to hold the clock.
+			if (!(remotefuture instanceof IIntermediateFuture))
+			{
+				component.scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
+						if (simserv != null)
+						{
+							Future<Void> blocker = new Future<>();
+							simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+									remotefuture.addResultListener(new IResultListener<T>()
+									{
+										public void resultAvailable(T result)
+										{
+											blocker.setResult(null);
+										}
+										public void exceptionOccurred(Exception exception)
+										{
+											resultAvailable(null);
+										}
+									});
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+								}
+							});
+						}
+						return IFuture.DONE;
+					}
+				});
+			}
+		}
 	}
 	
 	/**
