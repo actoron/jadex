@@ -724,7 +724,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 			else
 			{
-				System.out.println("rescue");
+//				System.out.println("rescue");
 				available	= false;
 				// Happens during platform bootstrapping -> execute on platform rescue thread.
 				if(!bootstrap)

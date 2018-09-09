@@ -457,7 +457,7 @@ public class TransportAddressAgent implements ITransportAddressService
 			{
 				try
 				{
-					System.out.println(agent+" ask pawa: "+awa);
+//					System.out.println(agent+" ask pawa: "+awa);
 					Collection<TransportAddress> result = awa.getPlatformAddresses(platformid).get();
 					if (result != null)
 						ret.addAll(result);
