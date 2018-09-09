@@ -11,6 +11,7 @@ import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
@@ -81,7 +82,8 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	{
 		Future<Void>	adblock	= null;
 		IInternalAccess	ia	= ExecutionComponentFeature.LOCAL.get();
-		if(ia != null && Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG)))
+		if(ia!=null && (Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG))
+			|| ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IExecutionService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW)).toString().startsWith("Bisim")))
 		{
 			adblock	= new Future<>();
 			ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
