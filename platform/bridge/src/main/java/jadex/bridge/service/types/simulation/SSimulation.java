@@ -1,9 +1,6 @@
 package jadex.bridge.service.types.simulation;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
@@ -12,7 +9,6 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.execution.IExecutionService;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -51,7 +47,7 @@ public class SSimulation
 		}
 	}
 
-	protected static final Map<Future<Void>, String>	openfuts	= Collections.synchronizedMap(new LinkedHashMap<>());
+//	protected static final Map<Future<Void>, String>	openfuts	= Collections.synchronizedMap(new LinkedHashMap<>());
 	
 	/**
 	 *  Create future as simulation blocker, if currently in simulation mode.
@@ -85,13 +81,15 @@ public class SSimulation
 			}
 		}
 		
-		if(adblock!=null)
-		{
-			openfuts.put(adblock, SUtil.getExceptionStacktrace(new RuntimeException("Stacktrace")));
-			Future<Void>	fadblock	= adblock;
-			adblock.addResultListener(result -> {openfuts.remove(fadblock);});
-			System.out.println("adblocks: "+openfuts);
-		}
+		// For debugging when simulation hangs due to leftover adblocker.
+//		if(adblock!=null)
+//		{
+//			openfuts.put(adblock, SUtil.getExceptionStacktrace(new RuntimeException("Stacktrace")));
+//			Future<Void>	fadblock	= adblock;
+//			adblock.addResultListener(result -> {openfuts.remove(fadblock);});
+//			System.out.println("adblocks: "+openfuts);
+//		}
+		
 		return adblock;
 	}
 

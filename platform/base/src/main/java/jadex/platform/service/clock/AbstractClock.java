@@ -383,7 +383,7 @@ public abstract class AbstractClock implements IClock
 			boolean	removed	= timers.remove(timer);
 //			if(!removed)
 //				System.out.println("Could not remove timer: "+timer+" "+timers);
-			System.out.println(this+" Removed timer: "+removed+", "+timer.getTimedObject());
+//			System.out.println(this+" Removed timer: "+removed+", "+timer.getTimedObject());
 		}
 		
 		notifyListeners(new ChangeEvent(this, EVENT_TYPE_TIMER_REMOVED));
