@@ -52,13 +52,13 @@ import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.ICommand;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
@@ -964,8 +964,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				if(caller != null && !getInternalAccess().equals(caller))
 				{
 					IComponentIdentifier callerplat = caller.getId().getRoot();
-					Boolean issim = (Boolean) Starter.getPlatformValue(callerplat, IClockService.SIMULATION_CLOCK_FLAG);
-					if (Boolean.TRUE.equals(issim) && !callerplat.equals(getInternalAccess().getId().getRoot()))
+					if (SSimulation.isSimulating(caller) && !callerplat.equals(getInternalAccess().getId().getRoot()))
 						((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
 					
 					IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller)

@@ -26,12 +26,12 @@ public class SSimulation
 	public static void	addBlocker(IFuture<?> adblock)
 	{
 		IInternalAccess	ia	= ExecutionComponentFeature.LOCAL.get();
-		if(ia!=null && Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG)))
+		if(isSimulating(ia))
 		{
 			ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
 				.addAdvanceBlocker(adblock).get();
 		}
-		else if(ia!=null && ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IExecutionService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW)).toString().startsWith("Bisim"))
+		else if(isBisimulating(ia))
 		{
 			try
 			{
@@ -59,13 +59,13 @@ public class SSimulation
 	{
 		Future<Void>	adblock	= null;
 		IInternalAccess	ia	= ExecutionComponentFeature.LOCAL.get();
-		if(ia!=null && Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG)))
+		if(isSimulating(ia))
 		{
 			adblock	= new Future<>();
 			ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
 				.addAdvanceBlocker(adblock).get();
 		}
-		else if(ia!=null && ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IExecutionService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW)).toString().startsWith("Bisim"))
+		else if(isBisimulating(ia))
 		{
 			try
 			{
@@ -93,4 +93,19 @@ public class SSimulation
 		return adblock;
 	}
 
+	/**
+	 *  Check if running in bisimulation.
+	 */
+	public static boolean	isBisimulating(IInternalAccess ia)
+	{
+		return ia!=null && ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IExecutionService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW)).toString().startsWith("Bisim");
+	}
+	
+	/**
+	 *  Check if running in (single platform) simulation.
+	 */
+	public static boolean	isSimulating(IInternalAccess ia)
+	{
+		return ia!=null && Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG));
+	}
 }

@@ -6,15 +6,14 @@ import java.util.Set;
 
 import org.junit.Ignore;
 
-import jadex.base.Starter;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClock;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -108,8 +107,7 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
      */
     protected IFuture<Void> disableLocalSimulationMode()
     {
-		Boolean issim = (Boolean) Starter.getPlatformValue(agent.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
-		if(Boolean.TRUE.equals(issim))
+		if(SSimulation.isSimulating(agent))
 		{
 	    	final Future<Void> ret = new Future<>();
 	    	ISimulationService simserv = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ISimulationService.class); 

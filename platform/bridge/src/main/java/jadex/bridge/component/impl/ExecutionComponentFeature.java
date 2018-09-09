@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -60,6 +59,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
@@ -2120,8 +2120,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public <T> void addSimulationBlocker(IFuture<T> remotefuture)
 	{
-		Boolean issim = (Boolean) Starter.getPlatformValue(component.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
-		if (Boolean.TRUE.equals(issim))
+		if (SSimulation.isSimulating(component))
 		{
 			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
 			// there is no way of known how long to hold the clock.
