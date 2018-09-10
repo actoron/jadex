@@ -431,19 +431,20 @@ public class SComponentManagementService
 		// Hack!!! May be null on platform init
 		
 		final IInternalAccess pad = getParentComponent(cinfo, agent);
-		final IExternalAccess parent = pad.getExternalAccess();
+//		final IExternalAccess parent = pad.getExternalAccess();
 		
-		parent.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, ClassLoader>>(ret)
-		{
-			public void customResultAvailable(IModelInfo model)
-			{
+		IModelInfo model = pad.getModel();
+//		parent.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, ClassLoader>>(ret)
+//		{
+//			public void customResultAvailable(IModelInfo model)
+//			{
 				if(libservice!=null)
 				{
 					libservice.getClassLoader(rid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<ClassLoader, Tuple2<String, ClassLoader>>(ret)
 					{
 						public void customResultAvailable(ClassLoader cl)
 						{
-							final IInternalAccess pad = getParentComponent(cinfo, agent);
+//							final IInternalAccess pad = getParentComponent(cinfo, agent);
 //							final IExternalAccess parent = pad.getExternalAccess();
 							
 							String filename = modelname;
@@ -513,7 +514,7 @@ public class SComponentManagementService
 						// Try to find file for local type.
 						String	localtype = modelname!=null ? modelname : cinfo.getLocalType();
 						filename = null;
-						IInternalAccess pad = getParentComponent(cinfo, agent);
+//						IInternalAccess pad = getParentComponent(cinfo, agent);
 //						IExternalAccess parent = pad.getExternalAccess();
 						final SubcomponentTypeInfo[] subcomps = model.getSubcomponentTypes();
 						
@@ -534,9 +535,8 @@ public class SComponentManagementService
 //					ret.setResult(new Tuple2<String, ClassLoader>(filename, null));
 					ret.setResult(new Tuple2<String, ClassLoader>(filename, SComponentManagementService.class.getClassLoader()));
 				}
-			}
-			
-		}));
+//			}
+//		}));
 		
 		return ret;
 	}
