@@ -54,7 +54,7 @@ public class TagFilter<T> implements IAsyncFilter<T>
 	public IFuture<Boolean> filter(T ts)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
-		IFuture<Collection<String>> fut = SNFPropertyProvider.getNFPropertyValue(component, ((IService)ts).getId(), TagProperty.NAME);
+		IFuture<Collection<String>> fut = component.getNFPropertyValue(((IService)ts).getId(), TagProperty.NAME);
 		fut.addResultListener(new ExceptionDelegationResultListener<Collection<String>, Boolean>(ret)
 		{
 			public void customResultAvailable(Collection<String> result)

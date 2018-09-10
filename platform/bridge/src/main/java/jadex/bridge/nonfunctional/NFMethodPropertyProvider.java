@@ -118,7 +118,7 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 			{
 				public void customResultAvailable(IExternalAccess component) 
 				{
-					SNFPropertyProvider.getNFAllPropertyNames(component).addResultListener(new DelegationResultListener<String[]>(ret)
+					component.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
 					{
 						public void customResultAvailable(String[] result)
 						{

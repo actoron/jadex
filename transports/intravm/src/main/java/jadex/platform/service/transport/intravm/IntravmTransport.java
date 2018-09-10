@@ -23,15 +23,18 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	//-------- constants --------
 	
 	/** Priority of transport. */
-	public static final int	PRIORITY	= 10000;
+	public static final int	PRIORITY = 10000;
 	
 	/** The "ports". */
-	protected static final Map<Integer, IntravmTransport>	ports	= Collections.synchronizedMap(new LinkedHashMap<>());
+	protected static final Map<Integer, IntravmTransport> ports = Collections.synchronizedMap(new LinkedHashMap<>());
+	
+	/** Active flag. */
+	protected volatile boolean active = true;
 	
 	// -------- attributes --------
 
 	/** The transport handler, e.g. for delivering received messages. */
-	protected ITransportHandler<HandlerHolder>	handler;
+	protected ITransportHandler<HandlerHolder> handler;
 //	
 //	/** Flag indicating the thread should be running (set to false for shutdown). */
 //	protected boolean	running;
@@ -69,9 +72,13 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public void	shutdown()
 	{
+		active = false;
 		Object key;
-		while((key=SUtil.findKeyForValue(ports, this))!=null)
-			ports.remove(key);
+		synchronized(ports)
+		{
+			while((key=SUtil.findKeyForValue(ports, this))!=null)
+				ports.remove(key);
+		}
 	}
 	
 	/**
@@ -87,25 +94,29 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public IFuture<Integer>	openPort(int port)
 	{
-		final Future<Integer>	ret	= new Future<>();
-		if(port<0)
+		final Future<Integer> ret = new Future<>();
+		synchronized(ports)
 		{
-			ret.setException(new IllegalArgumentException("Port must be greater or equal to zero: "+port));
-		}
-		else if(port==0)
-		{
-			// Find free port
-			while(ports.containsKey(++port));
-		}
+			if(port<0)
+			{
+				ret.setException(new IllegalArgumentException("Port must be greater or equal to zero: "+port));
+			}
+			else if(port==0)
+			{
+				// Find free port
+				while(ports.containsKey(++port));
+			}
 		
-		if(ports.containsKey(port))
-		{
-			ret.setException(new IllegalArgumentException("Port already in use: "+port));
-		}
-		else
-		{
-			ports.put(port, this);
-			ret.setResult(port);
+		
+			if(ports.containsKey(port))
+			{
+				ret.setException(new IllegalArgumentException("Port already in use: "+port));
+			}
+			else
+			{
+				ports.put(port, this);
+				ret.setResult(port);
+			}
 		}
 		
 		return new Future<Integer>(port);
@@ -167,14 +178,21 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 	 */
 	public IFuture<Integer> sendMessage(HandlerHolder con, byte[] header, byte[] body)
 	{
-		if(con.isActive())
+		try
 		{
-			con.target.handler.messageReceived(con.other, header, body);
-			return new Future<>(PRIORITY);
+			if(con.isActive())
+			{
+				con.target.handler.messageReceived(con.other, header, body);
+				return new Future<>(PRIORITY);
+			}
+			else
+			{
+				return new Future<>(new ComponentTerminatedException(con.target.handler.getAccess().getId()));
+			}
 		}
-		else
+		catch (Exception e)
 		{
-			return new Future<>(new ComponentTerminatedException(con.target.handler.getAccess().getId()));
+			return new Future<>(e);
 		}
 	}
 	
@@ -196,9 +214,13 @@ public class IntravmTransport implements ITransport<IntravmTransport.HandlerHold
 			this.target = transport;
 		}
 		
-		protected boolean	isActive()
+		/**
+		 *  Check if active.
+		 *  @return True, if active.
+		 */
+		protected boolean isActive()
 		{
-			return ports.containsValue(target);
+			return target.active;
 		}
 	}
 }

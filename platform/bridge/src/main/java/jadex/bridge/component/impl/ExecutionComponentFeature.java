@@ -76,7 +76,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -813,6 +812,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		Future<Void> ret = new Future<Void>();
 		synchronized(this)
 		{
+//			System.out.println("is sus: "+getComponent().getDescription().getState()+" "+getComponent());
 			if(!IComponentDescription.STATE_SUSPENDED.equals(getComponent().getDescription().getState()))
 			{
 				ret.setException(new IllegalStateException("Component not suspended: "+getComponent().getId()));
@@ -2124,8 +2124,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
 			// there is no way of known how long to hold the clock.
-			if (!(remotefuture instanceof IIntermediateFuture))
-			{
+			// Update: Doing it anyway, relying on blocker realtime timeout to catch errors.
+//			if (!(remotefuture instanceof IIntermediateFuture))
+//			{
 				component.scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
@@ -2136,11 +2137,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 							Future<Void> blocker = new Future<>();
 							simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
 							{
+								@SuppressWarnings("unchecked")
 								public void resultAvailable(Void result)
 								{
-									remotefuture.addResultListener(new IResultListener<T>()
+									@SuppressWarnings({ "rawtypes" })
+									IIntermediateResultListener rs = new IIntermediateResultListener()
 									{
-										public void resultAvailable(T result)
+										public void resultAvailable(Object result)
 										{
 											blocker.setResult(null);
 										}
@@ -2148,7 +2151,19 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										{
 											resultAvailable(null);
 										}
-									});
+										public void intermediateResultAvailable(Object result)
+										{
+										}
+										public void finished()
+										{
+											resultAvailable(null);
+										}
+									};
+									
+									if (remotefuture instanceof ISubscriptionIntermediateFuture)
+										((ISubscriptionIntermediateFuture<T>) remotefuture).addQuietListener(rs);
+									else
+										remotefuture.addResultListener(rs);
 								}
 								public void exceptionOccurred(Exception exception)
 								{
@@ -2158,7 +2173,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						return IFuture.DONE;
 					}
 				});
-			}
+//			}
 		}
 	}
 	

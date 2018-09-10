@@ -207,6 +207,7 @@ public class NFLatencyTestAgent extends TestAgent
 //			null, null, null, SReflect.getInnerClassName(this.getClass()));
 //		awa.addAwarenessInfo(info).get();
 		
+		
 		IIntermediateFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
 		fut.addResultListener(new IIntermediateResultListener<ITestService>()
 		{
@@ -215,8 +216,11 @@ public class NFLatencyTestAgent extends TestAgent
 			{
 				if(cid.equals(((IService)result).getId().getProviderId()))
 				{
-					called = true;
-					callService(result);
+					if(!called)
+					{
+						called = true;
+						callService(result);
+					}
 				}
 			}
 			public void finished()
@@ -237,7 +241,7 @@ public class NFLatencyTestAgent extends TestAgent
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				ret.setExceptionIfUndone(exception);
 			}
 			
 			protected void callService(final ITestService ts)
@@ -251,7 +255,8 @@ public class NFLatencyTestAgent extends TestAgent
 						{
 							MethodInfo mi = new MethodInfo(ITestService.class.getMethod("methodA", new Class[]{long.class}));
 							System.out.println("service: "+ts);
-							Long lat = (Long)SNFPropertyProvider.getRequiredMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ts).getId(), mi, LatencyProperty.NAME).get();
+							Long lat = (Long)agent.getRequiredMethodNFPropertyValue(((IService)ts).getId(), mi, LatencyProperty.NAME).get();
+//							Long lat = (Long)SNFPropertyProvider.getRequiredMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ts).getId(), mi, LatencyProperty.NAME).get();
 //							INFMixedPropertyProvider pp = ((INFRPropertyProvider)ts).getRequiredServicePropertyProvider().get();
 //							Long lat = (Long)pp.getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();
 							System.out.println("latency: "+lat);

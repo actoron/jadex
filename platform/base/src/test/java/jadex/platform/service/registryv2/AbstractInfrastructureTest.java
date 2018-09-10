@@ -89,7 +89,9 @@ public abstract class AbstractInfrastructureTest
 	 */
 	protected void waitALittle(IExternalAccess platform)
 	{
-		platform.waitForDelay(Starter.getScaledDefaultTimeout(platform.getId(), WAITFACTOR), new IComponentStep<Void>()
+		long delay = Starter.getScaledDefaultTimeout(platform.getId(), WAITFACTOR);
+		delay = delay <= 0 ? 3000 : delay;
+		platform.waitForDelay(delay, new IComponentStep<Void>()
 		{
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)

@@ -420,7 +420,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 					{
 //							System.out.println("search childs: "+ea);
 						
-						SNFPropertyProvider.getNFPropertyNames(ea)
+						ea.getNFPropertyNames()
 //								((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyNames()
 							.addResultListener(new SwingResultListener<String[]>(new IResultListener<String[]>()
 						{
@@ -618,7 +618,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			NFPropertyNode nfpn	= (NFPropertyNode)getModel().getNode(id);
 			if(nfpn==null)
 			{
-				SNFPropertyProvider.getNFPropertyMetaInfo(provider, name)
+				provider.getNFPropertyMetaInfo(name)
 //				((INFPropertyProvider)provider.getExternalComponentFeature(INFPropertyComponentFeature.class))
 					.addResultListener(new SwingResultListener<INFPropertyMetaInfo>(new IResultListener<INFPropertyMetaInfo>()
 				{

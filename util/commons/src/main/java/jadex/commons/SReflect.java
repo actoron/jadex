@@ -1835,7 +1835,7 @@ public class SReflect
 				}
 			}
 			CICACHE.put(key, ret);
-			System.out.println("scanned class infos cache size: "+CICACHE.size());
+//			System.out.println("scanned class infos cache size: "+CICACHE.size());
 		}
 		
 		return ret;
