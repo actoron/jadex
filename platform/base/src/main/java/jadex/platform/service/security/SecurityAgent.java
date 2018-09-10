@@ -1786,6 +1786,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			}
 		}));
 		
+		((IInternalExecutionFeature) execfeat).addSimulationBlocker(ret);
 		return ret;
 	}
 	
