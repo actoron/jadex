@@ -48,12 +48,6 @@
 		</plan>
 	</plans>
 	
-	<services>
-		<requiredservice name="cms" class="IComponentManagementService">
-			<binding scope="platform"/>
-		</requiredservice>
-	</services>
-	
 	<properties>
 		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
 		<property name="debugging">false</property>
