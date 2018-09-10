@@ -20,6 +20,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
@@ -51,6 +52,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.collection.IRwMap;
@@ -114,6 +116,12 @@ public class Starter
     /** The CMS cleanup commands. */
     /**	The local filename cache (tuple(parent filename, child filename) -> local typename)*/
     public static String  DATA_LOCALTYPES = "localtypes";
+    
+    /**	The CMS classloader cache (rid -> classloader)*/
+    public static String  DATA_CLASSLOADERS = "classloaders";
+    
+    /**	The CMS model cache (Tuple2<String, ClassLoader> -> Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>)*/
+    public static String  DATA_MODELCACHE = "modelcache";
     
     /** The CMS cid counts. */
     public static String DATA_CIDCOUNTS = "cidcounts";
@@ -500,6 +508,8 @@ public class Starter
 				putPlatformValue(cid, DATA_CHILDCOUNTS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Integer>(), lock));
 				putPlatformValue(cid, DATA_CLEANUPFUTURES, new RwMapWrapper<>(new HashMap<IComponentIdentifier, IFuture<Map<String, Object>>>(), lock));
 				putPlatformValue(cid, DATA_LOCALTYPES, new RwMapWrapper<>(new HashMap<Tuple, String>(), lock));
+				putPlatformValue(cid, DATA_CLASSLOADERS, new RwMapWrapper<>(new LRU<IResourceIdentifier, ClassLoader>(500), lock));
+				putPlatformValue(cid, DATA_MODELCACHE, new RwMapWrapper<>(new LRU<Tuple2<String, ClassLoader>, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(500), lock));
 				putPlatformValue(cid, DATA_CIDCOUNTS, new RwMapWrapper<>(new HashMap<String, Integer>(), lock));
 				putPlatformValue(cid, DATA_CHILDCOUNTS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Integer>(), lock));
 				putPlatformValue(cid, DATA_LOCKENTRIES, new RwMapWrapper<>(new HashMap<IComponentIdentifier, LockEntry>(), lock));
