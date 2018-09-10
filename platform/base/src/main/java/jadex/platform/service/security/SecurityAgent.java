@@ -39,6 +39,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IUntrustedMessageHandler;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -64,6 +65,7 @@ import jadex.commons.transformation.traverser.SCloner;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Autostart;
@@ -113,6 +115,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** Component access. */
 	@Agent
 	protected IInternalAccess agent;
+	
+	@AgentFeature
+	protected IExecutionFeature execfeat;
 	
 	/** Flag whether to use the platform secret for authentication. */
 	protected boolean usesecret = true;
@@ -554,7 +559,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (cs != null && !isSecurityMessage(header) && !cs.isExpiring())
 			return new Future<byte[]>(cs.encryptAndSign(content));
 		
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<byte[]>()
+		IFuture<byte[]> ret = agent.getExternalAccess().scheduleStep(new IComponentStep<byte[]>()
 		{
 			public IFuture<byte[]> execute(IInternalAccess ia)
 			{
@@ -622,6 +627,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				return ret;
 			}
 		});
+		((IInternalExecutionFeature) execfeat).addSimulationBlocker(ret);
+		return ret;
 	}
 	
 	/**
