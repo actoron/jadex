@@ -2107,8 +2107,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
 			// there is no way of known how long to hold the clock.
-			if (!(remotefuture instanceof IIntermediateFuture))
-			{
+			// Update: Doing it anyway, relying on blocker realtime timeout to catch errors.
+//			if (!(remotefuture instanceof IIntermediateFuture))
+//			{
 				component.scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
@@ -2141,7 +2142,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						return IFuture.DONE;
 					}
 				});
-			}
+//			}
 		}
 	}
 	
