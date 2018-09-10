@@ -43,7 +43,8 @@ public class NullTagAgent extends JunitAgentTest
 		TestReport tr1 = new TestReport("#1", "Test if tag null.");
 		try
 		{
-			Object tagval = SNFPropertyProvider.getNFPropertyValue(agent.getExternalAccess(), TagProperty.NAME).get();
+//			Object tagval = SNFPropertyProvider.getNFPropertyValue(agent.getExternalAccess(), TagProperty.NAME).get();
+			Object tagval = agent.getNFPropertyValue(TagProperty.NAME).get();
 			if(tagval instanceof Collection && ((Collection)tagval).size()==1 && ((Collection)tagval).iterator().next()==null)
 			{
 				tr1.setSucceeded(true);

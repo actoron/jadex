@@ -440,9 +440,9 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	/**
 	 *  Get the clients that are currently registered to super peer.
 	 */
-	public ISubscriptionIntermediateFuture<IComponentIdentifier>	getRegisteredClients()
+	public ISubscriptionIntermediateFuture<IComponentIdentifier> getRegisteredClients()
 	{
-		SubscriptionIntermediateFuture<IComponentIdentifier>	reglis	= new SubscriptionIntermediateFuture<>();
+		SubscriptionIntermediateFuture<IComponentIdentifier> reglis = new SubscriptionIntermediateFuture<>();
 		reglis.setTerminationCommand(new TerminationCommand()
 		{
 			@Override
@@ -459,6 +459,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			reglis.addIntermediateResult(client);
 		}
 		
+		SFuture.avoidCallTimeouts(reglis, agent);
 		return reglis;
 	}
 }

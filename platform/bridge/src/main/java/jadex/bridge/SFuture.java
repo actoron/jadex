@@ -137,7 +137,13 @@ public class SFuture
 					return IFuture.DONE;
 				}
 			};
-			ia.getFeature(IExecutionFeature.class).waitForDelay(w, step, realtime);
+//			ia.getFeature(IExecutionFeature.class).waitForDelay(w, step, realtime);
+			
+			// Send the first update immediately since the avoid is set up at
+			// the receiver and some time may have already passed until the receiver
+			// gets the call. Otherwise the call only has 0.2*timeout to get to the
+			// receiver in the first place.
+			ia.scheduleStep(step);
 		}
 	}
 	

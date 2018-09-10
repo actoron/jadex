@@ -204,13 +204,25 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	{
 		impl.shutdown();
 		
-		establishedconnections.writeLock().lock();
-		List<Con> cons = new ArrayList<>(establishedconnections.values());
-		establishedconnections.clear();
-		cons.addAll(handshakingconnections.keySet());
-		handshakingconnections.clear();
-		commandswaitingforcons.clear();
-		establishedconnections.writeLock().unlock();
+		List<Con> cons = new ArrayList<>();
+		try
+		{
+			establishedconnections.writeLock().lock();
+			for (Con con : establishedconnections.values())
+			{
+				if (con != null)
+					cons.add(con);
+			}
+			establishedconnections.clear();
+			cons.addAll(handshakingconnections.keySet());
+			handshakingconnections.clear();
+			commandswaitingforcons.clear();
+		}
+		finally
+		{
+			establishedconnections.writeLock().unlock();
+		}
+		
 		for (Con con : cons)
 			impl.closeConnection(con);
 		
@@ -322,10 +334,16 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 								if (canDecide(remotepf))
 								{
 									establishedconnections.writeLock().lock();
-									notconnected = !establishedconnections.containsKey(remotepf);
-									if (notconnected)
-										establishedconnections.put(remotepf, null);
-									establishedconnections.writeLock().unlock();
+									try
+									{
+										notconnected = !establishedconnections.containsKey(remotepf);
+										if (notconnected)
+											establishedconnections.put(remotepf, null);
+									}
+									finally
+									{
+										establishedconnections.writeLock().unlock();
+									}
 								}
 								else
 								{
@@ -429,6 +447,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 				}
 			});
 		}
+//		System.out.println("CON REMOVED: " + con + " " + e);
 	}
 	
 	/**
@@ -527,10 +546,18 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 				meminf.put("transport", impl.getProtocolName());
 				meminf.put("subscribercnt", infosubscribers!=null ? infosubscribers.size() : 0);
 				
-				establishedconnections.readLock().lock();
-				Map<IComponentIdentifier, Con> cons = new HashMap<>(establishedconnections);
-				Map<Con, IComponentIdentifier> hscons = new HashMap<>(handshakingconnections);
-				establishedconnections.readLock().unlock();
+				Map<IComponentIdentifier, Con> cons = null;
+				Map<Con, IComponentIdentifier> hscons = null;
+				try
+				{
+					establishedconnections.readLock().lock();
+					cons = new HashMap<>(establishedconnections);
+					hscons = new HashMap<>(handshakingconnections);
+				}
+				finally
+				{
+					establishedconnections.readLock().unlock();
+				}
 				
 				meminf.put("cons", cons);
 				meminf.put("hscons", hscons);
@@ -570,11 +597,18 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 							{
 								if (canDecide(remotepf))
 								{
-									establishedconnections.writeLock().lock();
-									boolean notconnected = !establishedconnections.containsKey(remotepf);
-									if (notconnected)
-										establishedconnections.put(remotepf, null);
-									establishedconnections.writeLock().unlock();
+									boolean notconnected = false;
+									try
+									{
+										establishedconnections.writeLock().lock();
+										notconnected = !establishedconnections.containsKey(remotepf);
+										if (notconnected)
+											establishedconnections.put(remotepf, null);
+									}
+									finally
+									{
+										establishedconnections.writeLock().unlock();
+									}
 									
 									if (notconnected)
 									{
@@ -710,10 +744,18 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		
 		List<PlatformData> ret = new ArrayList<>();
 		
-		establishedconnections.readLock().lock();
-		Map<IComponentIdentifier, Con> cons = new HashMap<>(establishedconnections);
-		Map<Con, IComponentIdentifier> hscons = new HashMap<>(handshakingconnections);
-		establishedconnections.readLock().unlock();
+		Map<IComponentIdentifier, Con> cons = null;
+		Map<Con, IComponentIdentifier> hscons = null;
+		try
+		{
+			establishedconnections.readLock().lock();
+			cons = new HashMap<>(establishedconnections);
+			hscons = new HashMap<>(handshakingconnections);
+		}
+		finally
+		{
+			establishedconnections.readLock().unlock();
+		}
 		
 		for(Map.Entry<Con, IComponentIdentifier> entry : hscons.entrySet())
 		{ 

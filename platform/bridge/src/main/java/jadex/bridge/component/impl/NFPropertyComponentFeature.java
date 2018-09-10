@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.INFPropertyComponentFeature;
@@ -15,6 +17,7 @@ import jadex.bridge.modelinfo.NFPropertyInfo;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
 import jadex.bridge.nonfunctional.NFPropertyProvider;
@@ -33,9 +36,11 @@ import jadex.commons.collection.LRU;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 
 /**
  *  Feature for non functional properties of the component, provided/required services and methods.
@@ -370,6 +375,915 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 //		return ret;
 //	}
 	
+	
+	/**
+	 *  Returns the declared names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getNFPropertyNames()
+	{
+		return getComponentPropertyProvider().getNFPropertyNames();
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getNFAllPropertyNames()
+	{
+		return getComponentPropertyProvider().getNFAllPropertyNames();
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos()
+	{
+		return getComponentPropertyProvider().getNFPropertyMetaInfos();
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(String name)
+	{
+		return getNFPropertyMetaInfo(name);
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public <T> IFuture<T> getNFPropertyValue(String name)
+	{
+		return getComponentPropertyProvider().getNFPropertyValue(name);
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public <T, U> IFuture<T> getNFPropertyValue(String name, U unit)
+	{
+		return getComponentPropertyProvider().getNFPropertyValue(name, unit);
+	}
+	
+	/**
+	 *  Add a non-functional property.
+	 *  @param nfprop The property.
+	 */
+	public IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop)
+	{
+		return getComponentPropertyProvider().addNFProperty(nfprop);
+	}
+	
+	/**
+	 *  Remove a non-functional property.
+	 *  @param The name.
+	 */
+	public IFuture<Void> removeNFProperty(String name)
+	{
+		return getComponentPropertyProvider().removeNFProperty(name);
+	}
+	
+	/**
+	 *  Shutdown the provider.
+	 */
+	public IFuture<Void> shutdownNFPropertyProvider()
+	{
+		return getComponentPropertyProvider().shutdownNFPropertyProvider();
+	}
+	
+	//-------- service methods --------
+	
+	/**
+	 *  Returns the declared names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getNFPropertyNames(IServiceIdentifier sid)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			 return getProvidedServicePropertyProvider(sid).getNFPropertyNames();
+		}
+		else
+		{
+			final Future<String[]> ret = new Future<String[]>();
+
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<String[]>()
+					{
+						@Classname("getNFPropertyNames9")
+						public IFuture<String[]> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyNames();
+						}
+					}).addResultListener(new DelegationResultListener<String[]>(ret));
+				}
+			});
+
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getNFAllPropertyNames(final IServiceIdentifier sid)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			 return getProvidedServicePropertyProvider(sid).getNFAllPropertyNames();
+		}
+		else
+		{
+			final Future<String[]> ret = new Future<String[]>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<String[]>()
+					{
+						@Classname("getNFAllPropertyNames10")
+						public IFuture<String[]> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getNFAllPropertyNames();
+						}
+					}).addResultListener(new DelegationResultListener<String[]>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos(IServiceIdentifier sid)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(sid);
+			if(prov!=null)
+			{
+				IFuture<Map<String, INFPropertyMetaInfo>> metainf = prov.getNFPropertyMetaInfos();
+				if(metainf!=null)
+				{
+					return metainf;
+				}
+			}
+			return new Future<Map<String,INFPropertyMetaInfo>>(new HashMap<String,INFPropertyMetaInfo>());
+		}
+		else
+		{
+			final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, INFPropertyMetaInfo>>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
+					{
+						@Classname("getNFPropertyMetaInfos11")
+						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							INFMixedPropertyProvider prov = nfp.getProvidedServicePropertyProvider(sid);
+							if(prov!=null)
+							{
+								IFuture<Map<String, INFPropertyMetaInfo>> metainf = prov.getNFPropertyMetaInfos();
+								if(metainf!=null)
+								{
+									return metainf;
+								}
+							}
+							return new Future<Map<String,INFPropertyMetaInfo>>(new HashMap<String,INFPropertyMetaInfo>());
+						}
+					}).addResultListener(new DelegationResultListener<Map<String, INFPropertyMetaInfo>>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(final IServiceIdentifier sid, final String name)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getNFPropertyMetaInfo(name);
+		}
+		else
+		{
+			final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
+					{
+						@Classname("getNFPropertyMetaInfo12")
+						public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyMetaInfo(name);
+						}
+					}).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public <T> IFuture<T> getNFPropertyValue(final IServiceIdentifier sid, final String name)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getNFPropertyValue(name);
+		}
+		else
+		{
+			final Future<T> ret = new Future<T>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<T>()
+					{
+						@Classname("getNFPropertyValue13")
+						public IFuture<T> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyValue(name);
+						}
+					}).addResultListener(new DelegationResultListener<T>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public <T, U> IFuture<T> getNFPropertyValue(final IServiceIdentifier sid, final String name, final U unit)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getNFPropertyValue(name, unit);
+		}
+		else
+		{
+			final Future<T> ret = new Future<T>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<T>()
+					{
+						@Classname("getNFPropertyValue14")
+						public IFuture<T> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyValue(name, unit);
+						}
+					}).addResultListener(new DelegationResultListener<T>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Add a non-functional property.
+	 *  @param nfprop The property.
+	 */
+	public IFuture<Void> addNFProperty(final IServiceIdentifier sid, final INFProperty<?, ?> nfprop)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).addNFProperty(nfprop);
+		}
+		else
+		{
+			final Future<Void> ret = new Future<Void>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<Void>()
+					{
+						@Classname("addNFProperty15")
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).addNFProperty(nfprop);
+						}
+					}).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Remove a non-functional property.
+	 *  @param The name.
+	 */
+	public IFuture<Void> removeNFProperty(final IServiceIdentifier sid, final String name)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).removeNFProperty(name);
+		}
+		else
+		{
+			final Future<Void> ret = new Future<Void>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<Void>()
+					{
+						@Classname("removeNFProperty16")
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).removeNFProperty(name);
+						}
+					}).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Shutdown the provider.
+	 */
+	public IFuture<Void> shutdownNFPropertyProvider(final IServiceIdentifier sid)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).shutdownNFPropertyProvider();
+		}
+		else
+		{
+			final Future<Void> ret = new Future<Void>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<Void>()
+					{
+						@Classname("shutdownNFPropertyProvider17")
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).shutdownNFPropertyProvider();
+						}
+					}).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	//-------- provided service methods --------
+	
+	/**
+	 *  Returns meta information about a non-functional properties of all methods.
+	 *  @return The meta information about a non-functional properties.
+	 */
+	public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> getMethodNFPropertyMetaInfos(final IServiceIdentifier sid)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfos();
+		}
+		else
+		{
+			final Future<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> ret = new Future<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>();
+
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>()
+					{
+						@Classname("getMethodNFPropertyMetaInfos18")
+						public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfos();
+						}
+					}).addResultListener(new DelegationResultListener<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of the specified method.
+	 *  @param method The method targeted by this operation.
+	 *  @return The names of the non-functional properties of the specified method.
+	 */
+	public IFuture<String[]> getMethodNFPropertyNames(final IServiceIdentifier sid, final MethodInfo method)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getMethodNFPropertyNames(method);
+		}
+		else
+		{
+			final Future<String[]> ret = new Future<String[]>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<String[]>()
+					{
+						@Classname("getMethodNFPropertyNames19")
+						public IFuture<String[]> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyNames(method);
+						}
+					}).addResultListener(new DelegationResultListener<String[]>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this method.
+	 *  This includes the properties of all parent components.
+	 *  @return The names of the non-functional properties of this method.
+	 */
+	public IFuture<String[]> getMethodNFAllPropertyNames(final IServiceIdentifier sid, final MethodInfo method)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getMethodNFPropertyNames(method);
+		}
+		else
+		{
+			final Future<String[]> ret = new Future<String[]>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<String[]>()
+					{
+						@Classname("getMethodNFAllPropertyNames20")
+						public IFuture<String[]> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getMethodNFAllPropertyNames(method);
+						}
+					}).addResultListener(new DelegationResultListener<String[]>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Returns meta information about a non-functional properties of a method.
+	 *  @return The meta information about a non-functional properties.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getMethodNFPropertyMetaInfos(final IServiceIdentifier sid, final MethodInfo method)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfos(method);
+		}
+		else
+		{
+			final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, INFPropertyMetaInfo>>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<Map<String, INFPropertyMetaInfo>>()
+					{
+						@Classname("getMethodNFPropertyMetaInfos21")
+						public IFuture<Map<String, INFPropertyMetaInfo>> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfos(method);
+						}
+					}).addResultListener(new DelegationResultListener<Map<String, INFPropertyMetaInfo>>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of the specified method.
+	 *  @param method The method targeted by this operation.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of the specified method.
+	 */
+	public IFuture<INFPropertyMetaInfo> getMethodNFPropertyMetaInfo(final IServiceIdentifier sid, final MethodInfo method, final String name)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfo(method, name);
+		}
+		else
+		{
+			final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<INFPropertyMetaInfo>()
+					{
+						@Classname("getMethodNFPropertyMetaInfo22")
+						public IFuture<INFPropertyMetaInfo> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyMetaInfo(method, name);
+						}
+					}).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of the specified method.
+	 *  @param method The method targeted by this operation.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of the specified method.
+	 */
+	public <T> IFuture<T> getMethodNFPropertyValue(final IServiceIdentifier sid, final MethodInfo method, final String name)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getMethodNFPropertyValue(method, name);
+		}
+		else
+		{
+			final Future<T> ret = new Future<T>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<T>()
+					{
+						@Classname("getMethodNFPropertyValue23")
+						public IFuture<T> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyValue(method, name);
+						}
+					}).addResultListener(new DelegationResultListener<T>(ret));
+				}
+			});
+			return ret;
+		}
+		
+//		ret.addResultListener(new IResultListener<T>()
+//		{
+//			public void resultAvailable(T result)
+//			{
+//				System.out.println("t: "+result);
+//			}
+//
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex: "+exception);
+//			}
+//		});
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of the specified method, performs unit conversion.
+	 *  @param method The method targeted by this operation.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of the specified method.
+	 */
+//	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, Class<U> unit);
+	public <T, U> IFuture<T> getMethodNFPropertyValue(final IServiceIdentifier sid, final MethodInfo method, final String name, final U unit)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getMethodNFPropertyValue(method, name, unit);
+		}
+		else
+		{
+			final Future<T> ret = new Future<T>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<T>()
+					{
+						@Classname("getMethodNFPropertyValue24")
+						public IFuture<T> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyValue(method, name, unit);
+						}
+					}).addResultListener(new DelegationResultListener<T>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Add a non-functional property.
+	 *  @param method The method targeted by this operation.
+	 *  @param nfprop The property.
+	 */
+	public IFuture<Void> addMethodNFProperty(final IServiceIdentifier sid, final MethodInfo method, final INFProperty<?, ?> nfprop)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).addMethodNFProperty(method, nfprop);
+		}
+		else
+		{
+			final Future<Void> ret = new Future<Void>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<Void>()
+					{
+						@Classname("addMethodNFProperty25")
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).addMethodNFProperty(method, nfprop);
+						}
+					}).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Remove a non-functional property.
+	 *  @param method The method targeted by this operation.
+	 *  @param The name.
+	 */
+	public IFuture<Void> removeMethodNFProperty(final IServiceIdentifier sid, final MethodInfo method, final String name)
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).removeMethodNFProperty(method, name);
+		}
+		else
+		{
+			final Future<Void> ret = new Future<Void>();
+			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<Void>()
+					{
+						@Classname("removeMethodNFProperty26")
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).removeMethodNFProperty(method, name);
+						}
+					}).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+
+	//-------- required properties --------
+	
+	/**
+	 *  Returns the declared names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getRequiredNFPropertyNames(final IServiceIdentifier sid)
+	{
+		return getRequiredServicePropertyProvider(sid).getNFPropertyNames();
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getRequiredNFAllPropertyNames(final IServiceIdentifier sid)
+	{
+		return getRequiredServicePropertyProvider(sid).getNFAllPropertyNames();
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getRequiredNFPropertyMetaInfos(final IServiceIdentifier sid)
+	{
+		return getRequiredServicePropertyProvider(sid).getNFPropertyMetaInfos();
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<INFPropertyMetaInfo> getRequiredNFPropertyMetaInfo(final IServiceIdentifier sid, final String name)
+	{
+		return getRequiredServicePropertyProvider(sid).getNFPropertyMetaInfo(name);
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public <T> IFuture<T> getRequiredNFPropertyValue(final IServiceIdentifier sid, final String name)
+	{
+		return getRequiredServicePropertyProvider(sid).getNFPropertyValue(name);
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+//	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit);
+	public <T, U> IFuture<T> getRequiredNFPropertyValue(final IServiceIdentifier sid, final String name, final U unit)
+	{
+		return getRequiredServicePropertyProvider(sid).getNFPropertyValue(name, unit);
+	}
+	
+	/**
+	 *  Add a non-functional property.
+	 *  @param nfprop The property.
+	 */
+	public IFuture<Void> addRequiredNFProperty(final IServiceIdentifier sid, final INFProperty<?, ?> nfprop)
+	{
+		return getRequiredServicePropertyProvider(sid).addNFProperty(nfprop);
+	}
+	
+	/**
+	 *  Remove a non-functional property.
+	 *  @param The name.
+	 */
+	public IFuture<Void> removeRequiredNFProperty(final IServiceIdentifier sid, final String name)
+	{
+		return getRequiredServicePropertyProvider(sid).removeNFProperty(name);
+	}
+	
+	/**
+	 *  Shutdown the provider.
+	 */
+	public IFuture<Void> shutdownRequiredNFPropertyProvider(final IServiceIdentifier sid)
+	{
+		return getRequiredServicePropertyProvider(sid).shutdownNFPropertyProvider();
+	}
+	
+	/**
+	 *  Returns meta information about a non-functional properties of all methods.
+	 *  @return The meta information about a non-functional properties.
+	 */
+	public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> getRequiredMethodNFPropertyMetaInfos(final IServiceIdentifier sid)
+	{
+		return getRequiredServicePropertyProvider(sid).getMethodNFPropertyMetaInfos();
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of the specified method.
+	 *  @param method The method targeted by this operation.
+	 *  @return The names of the non-functional properties of the specified method.
+	 */
+	public IFuture<String[]> getRequiredMethodNFPropertyNames(final IServiceIdentifier sid, final MethodInfo method)
+	{
+		return getRequiredServicePropertyProvider(sid).getMethodNFPropertyNames(method);
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this method.
+	 *  This includes the properties of all parent components.
+	 *  @return The names of the non-functional properties of this method.
+	 */
+	public IFuture<String[]> getRequiredMethodNFAllPropertyNames(final IServiceIdentifier sid, final MethodInfo method)
+	{
+		return getRequiredServicePropertyProvider(sid).getMethodNFAllPropertyNames(method);
+	}
+	
+	/**
+	 *  Returns meta information about a non-functional properties of a method.
+	 *  @return The meta information about a non-functional properties.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getRequiredMethodNFPropertyMetaInfos(final IServiceIdentifier sid, final MethodInfo method)
+	{
+		return getRequiredServicePropertyProvider(sid).getMethodNFPropertyMetaInfos(method);
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of the specified method.
+	 *  @param method The method targeted by this operation.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of the specified method.
+	 */
+	public IFuture<INFPropertyMetaInfo> getRequiredMethodNFPropertyMetaInfo(final IServiceIdentifier sid, final MethodInfo method, final String name)
+	{
+		return getRequiredServicePropertyProvider(sid).getMethodNFPropertyMetaInfo(method, name);
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of the specified method.
+	 *  @param method The method targeted by this operation.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of the specified method.
+	 */
+	public <T> IFuture<T> getRequiredMethodNFPropertyValue(final IServiceIdentifier sid, final MethodInfo method, final String name)
+	{
+		return getRequiredServicePropertyProvider(sid).getMethodNFPropertyValue(method, name);
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of the specified method, performs unit conversion.
+	 *  @param method The method targeted by this operation.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of the specified method.
+	 */
+//	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, Class<U> unit);
+	public <T, U> IFuture<T> getRequiredMethodNFPropertyValue(final IServiceIdentifier sid, final MethodInfo method, final String name, final U unit)
+	{
+		return getRequiredServicePropertyProvider(sid).getMethodNFPropertyValue(method, name, unit);
+	}
+	
+	/**
+	 *  Add a non-functional property.
+	 *  @param method The method targeted by this operation.
+	 *  @param nfprop The property.
+	 */
+	public IFuture<Void> addRequiredMethodNFProperty(final IServiceIdentifier sid, final MethodInfo method, final INFProperty<?, ?> nfprop)
+	{
+		return getRequiredServicePropertyProvider(sid).addMethodNFProperty(method, nfprop);
+	}
+	
+	/**
+	 *  Remove a non-functional property.
+	 *  @param method The method targeted by this operation.
+	 *  @param The name.
+	 */
+	public IFuture<Void> removeRequiredMethodNFProperty(final IServiceIdentifier sid, final MethodInfo method, final String name)
+	{
+		return getRequiredServicePropertyProvider(sid).removeMethodNFProperty(method, name);
+	}
+	
+	
+	
 	/**
 	 *  Counter listener that allows to set the max after usage.
 	 */
@@ -409,5 +1323,5 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			this.max = max;
 			check();
 		}
-	};
+	}
 }
