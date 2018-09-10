@@ -102,11 +102,20 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 //		return ret;
 	}
 	
-	 /**
+	/**
      *  Enables an agent to disable simulation mode on its platform.
      *  @return Null, when done.
      */
     protected IFuture<Void> disableLocalSimulationMode()
+    {
+    	return disableLocalSimulationMode(agent);
+    }
+	
+	/**
+     *  Enables an agent to disable simulation mode on its platform.
+     *  @return Null, when done.
+     */
+    protected static final IFuture<Void> disableLocalSimulationMode(IInternalAccess agent)
     {
     	final Future<Void> ret = new Future<>();
     	agent.scheduleStep(new IComponentStep<Void>()
