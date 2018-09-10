@@ -16,6 +16,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IUntrustedMessageHandler;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MsgHeader;
 import jadex.bridge.service.BasicService;
@@ -53,6 +54,7 @@ import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Feature;
@@ -102,6 +104,10 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	
 	/** The security service. */
 	protected ISecurityService secservice;
+	
+	/** Execution feature. */
+	@AgentFeature
+	protected IExecutionFeature execfeat;
 	
 	/** Relay transport agent's internal message feature. */
 	protected IInternalMessageFeature intmsgfeat;
@@ -538,6 +544,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			}
 		});
 		
+		((IInternalExecutionFeature) execfeat).addSimulationBlocker(ret);
 		return ret;
 	}
 	

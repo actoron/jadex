@@ -3,6 +3,7 @@ package jadex.platform.service.simulation;
 import java.util.ArrayList;
 import java.util.List;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
@@ -15,6 +16,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
@@ -28,6 +30,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.TimeoutException;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -425,7 +428,33 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	 */
 	public IFuture<Void> addAdvanceBlocker(IFuture<?> blocker)
 	{
-		advanceblockers.add(blocker);
+		long rttimeout = Starter.getDefaultTimeout(access.getId().getRoot());
+		if (rttimeout <= 0)
+			rttimeout = 30000;
+		final long frttimeout = rttimeout;
+		
+		Future<?> toblocker = FutureFunctionality.getDelegationFuture(blocker, new FutureFunctionality(access.getLogger())
+		{
+			public boolean isUndone(boolean undone)
+			{
+				return true;
+			}
+		});
+		
+		access.waitForDelay(frttimeout, new ImmediateComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				if (!toblocker.isDone())
+				{
+					access.getLogger().severe("Simulation blocker released after realtime timeout " + frttimeout + ".");
+					toblocker.setExceptionIfUndone(new TimeoutException("Simulation blocker released after realtime timeout " + frttimeout + "."));
+				}
+				return IFuture.DONE;
+			}
+		}, true);
+		
+		advanceblockers.add(toblocker);
 		System.out.println(advanceblockers.size());
 		System.out.println("addBlocker: "+ServiceCall.getCurrentInvocation()+" "+access);
 		return IFuture.DONE;
