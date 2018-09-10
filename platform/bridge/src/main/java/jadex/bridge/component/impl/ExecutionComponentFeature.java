@@ -2120,11 +2120,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 							Future<Void> blocker = new Future<>();
 							simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
 							{
+								@SuppressWarnings("unchecked")
 								public void resultAvailable(Void result)
 								{
-									remotefuture.addResultListener(new IResultListener<T>()
+									@SuppressWarnings({ "rawtypes" })
+									IIntermediateResultListener rs = new IIntermediateResultListener()
 									{
-										public void resultAvailable(T result)
+										public void resultAvailable(Object result)
 										{
 											blocker.setResult(null);
 										}
@@ -2132,7 +2134,19 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										{
 											resultAvailable(null);
 										}
-									});
+										public void intermediateResultAvailable(Object result)
+										{
+										}
+										public void finished()
+										{
+											resultAvailable(null);
+										}
+									};
+									
+									if (remotefuture instanceof ISubscriptionIntermediateFuture)
+										((ISubscriptionIntermediateFuture<T>) remotefuture).addQuietListener(rs);
+									else
+										remotefuture.addResultListener(rs);
 								}
 								public void exceptionOccurred(Exception exception)
 								{

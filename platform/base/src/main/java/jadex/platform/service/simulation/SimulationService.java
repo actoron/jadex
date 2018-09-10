@@ -426,7 +426,6 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	 *  @param blocker The blocking future.
 	 *  @return Null, when added.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public IFuture<Void> addAdvanceBlocker(IFuture<?> blocker)
 	{
 		long rttimeout = Starter.getDefaultTimeout(access.getId().getRoot());
