@@ -957,50 +957,81 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			 *  @param infut Input future.
 			 *  @return 
 			 */
-			protected <T> IFuture<T> getDecoupledFuture(IFuture<T> infut)
+			protected <T> IFuture<T> getDecoupledFuture(final IFuture<T> infut)
 			{
 				IFuture<T> ret = infut;
 				IInternalAccess caller = IInternalExecutionFeature.LOCAL.get();
-				if(caller != null && !getInternalAccess().equals(caller))
+				if(caller != null)
 				{
-					IComponentIdentifier callerplat = caller.getId().getRoot();
-					Boolean issim = (Boolean) Starter.getPlatformValue(callerplat, IClockService.SIMULATION_CLOCK_FLAG);
-					if (Boolean.TRUE.equals(issim) && !callerplat.equals(getInternalAccess().getId().getRoot()))
-						((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
-					
-					IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller)
+					if (!getInternalAccess().equals(caller))
 					{
-						public void scheduleBackward(ICommand<Void> command)
+						IComponentIdentifier callerplat = caller.getId().getRoot();
+						Boolean issim = (Boolean) Starter.getPlatformValue(callerplat, IClockService.SIMULATION_CLOCK_FLAG);
+						if (Boolean.TRUE.equals(issim) && !callerplat.equals(getInternalAccess().getId().getRoot()))
+							((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
+						
+						IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller)
 						{
-							if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
+							public void scheduleBackward(ICommand<Void> command)
 							{
-								getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+								if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
 								{
-									public IFuture<Void> execute(IInternalAccess intaccess)
+									getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
-										command.execute(null);
-										return IFuture.DONE;
-									}
-								}).addResultListener(new IResultListener<Void>()
+										public IFuture<Void> execute(IInternalAccess intaccess)
+										{
+											command.execute(null);
+											return IFuture.DONE;
+										}
+									}).addResultListener(new IResultListener<Void>()
+									{
+										public void exceptionOccurred(Exception exception)
+										{
+											System.err.println("Unexpected Exception: "+command);
+											exception.printStackTrace();
+										}
+										
+										public void resultAvailable(Void result)
+										{
+										}
+									});
+								}
+								else
 								{
-									public void exceptionOccurred(Exception exception)
-									{
-										System.err.println("Unexpected Exception: "+command);
-										exception.printStackTrace();
-									}
-									
-									public void resultAvailable(Void result)
-									{
-									}
-								});
+									command.execute(null);
+								}
 							}
-							else
+						});
+						ret = newret;
+					}
+				}
+				else
+				{
+					// External thread in simulation mode, add blocker.
+					Boolean issim = (Boolean) Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
+					if(Boolean.TRUE.equals(issim))
+					{
+						ia.scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								command.execute(null);
+								IFuture<?> blocker = infut;
+								if (infut instanceof ITuple2Future)
+								{
+									// Hack for createComponent()
+									Future<Object> newblocker = new Future<>();
+									blocker = newblocker;
+									@SuppressWarnings("unchecked")
+									ITuple2Future<Object, Object> tupfut = ((ITuple2Future<Object, Object>) infut);
+									tupfut.addTuple2ResultListener(new DelegationResultListener<>(newblocker), null);
+								}
+								
+								((IInternalExecutionFeature) ia.getFeature(IExecutionFeature.class)).addSimulationBlocker(blocker);
+								
+								return IFuture.DONE;
 							}
-						}
-					});
-					ret = newret;
+						});
+					}
 				}
 				
 				return ret;
