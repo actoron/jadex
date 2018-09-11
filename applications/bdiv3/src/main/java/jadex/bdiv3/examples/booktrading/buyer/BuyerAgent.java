@@ -80,18 +80,15 @@ public class BuyerAgent implements INegotiationAgent
 			}
 		}
 		
+		gui	= new Future<>();
 		SwingUtilities.invokeLater(()->
 		{
-			gui	= new Future<>();
-			if(agent!=null)
+			try
 			{
-				try
-				{
-					gui.setResult(new Gui(agent.getExternalAccess()));
-				}
-				catch(ComponentTerminatedException cte)
-				{
- 				}
+				gui.setResult(new Gui(agent.getExternalAccess()));
+			}
+			catch(ComponentTerminatedException cte)
+			{
 			}
 		});
 	}
@@ -102,7 +99,6 @@ public class BuyerAgent implements INegotiationAgent
 	@AgentKilled
 	public void shutdown()
 	{
-		agent	= null;
 		if(gui!=null)
 		{
 			gui.addResultListener(thegui ->
