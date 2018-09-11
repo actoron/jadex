@@ -28,8 +28,15 @@ public class SSimulation
 		IInternalAccess	ia	= ExecutionComponentFeature.LOCAL.get();
 		if(isSimulating(ia))
 		{
-			ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
-				.addAdvanceBlocker(adblock).get();
+			try
+			{
+				ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
+					.addAdvanceBlocker(adblock).get();
+			}
+			catch(ThreadDeath td)
+			{
+				// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
+			}
 		}
 		else if(isBisimulating(ia))
 		{
@@ -37,8 +44,15 @@ public class SSimulation
 			{
 				Field	f	= Class.forName("jadex.platform.service.simulation.SimulationAgent").getDeclaredField("bisimservice");
 				f.setAccessible(true);
-				ISimulationService	simserv	= (ISimulationService)f.get(null);  
-				simserv.addAdvanceBlocker(adblock).get();
+				ISimulationService	simserv	= (ISimulationService)f.get(null);
+				try
+				{
+					simserv.addAdvanceBlocker(adblock).get();
+				}
+				catch(ThreadDeath td)
+				{
+					// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
+				}
 			}
 			catch(Exception e)
 			{
@@ -47,8 +61,6 @@ public class SSimulation
 		}
 	}
 
-//	protected static final Map<Future<Void>, String>	openfuts	= Collections.synchronizedMap(new LinkedHashMap<>());
-	
 	/**
 	 *  Create future as simulation blocker, if currently in simulation mode.
 	 *  Simulation blocking means the clock will not advance until the future is done.
@@ -62,8 +74,15 @@ public class SSimulation
 		if(isSimulating(ia))
 		{
 			adblock	= new Future<>();
-			ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
-				.addAdvanceBlocker(adblock).get();
+			try
+			{
+				ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
+					.addAdvanceBlocker(adblock).get();
+			}
+			catch(ThreadDeath td)
+			{
+				// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
+			}
 		}
 		else if(isBisimulating(ia))
 		{
@@ -73,22 +92,20 @@ public class SSimulation
 				f.setAccessible(true);
 				ISimulationService	simserv	= (ISimulationService)f.get(null);  
 				adblock	= new Future<>();
-				simserv.addAdvanceBlocker(adblock).get();
+				try
+				{
+					simserv.addAdvanceBlocker(adblock).get();
+				}
+				catch(ThreadDeath td)
+				{
+					// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
+				}
 			}
 			catch(Exception e)
 			{
 				e.printStackTrace();
 			}
 		}
-		
-		// For debugging when simulation hangs due to leftover adblocker.
-//		if(adblock!=null)
-//		{
-//			openfuts.put(adblock, SUtil.getExceptionStacktrace(new RuntimeException("Stacktrace")));
-//			Future<Void>	fadblock	= adblock;
-//			adblock.addResultListener(result -> {openfuts.remove(fadblock);});
-//			System.out.println("adblocks: "+openfuts);
-//		}
 		
 		return adblock;
 	}
@@ -98,7 +115,14 @@ public class SSimulation
 	 */
 	public static boolean	isBisimulating(IInternalAccess ia)
 	{
-		return ia!=null && ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IExecutionService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW)).toString().startsWith("Bisim");
+		boolean	ret	= false;
+		if(ia!=null)
+		{
+			// Called maybe from external thread so allow for exe being null.
+			IExecutionService	exe	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IExecutionService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW));
+			ret	= exe!=null && exe.toString().startsWith("Bisim");
+		}
+		return ret;
 	}
 	
 	/**

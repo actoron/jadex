@@ -1,7 +1,10 @@
 package jadex.platform.service.simulation;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
@@ -30,6 +33,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
@@ -418,6 +422,8 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		return exeservice;
 	}
 	
+	protected static final Map<Future<?>, String>	openfuts	= Collections.synchronizedMap(new LinkedHashMap<>());
+
 	/**
 	 *  Adds a blocker to the clock that prevents the clock from
 	 *  advancing until the future is triggered either by result
@@ -455,8 +461,16 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		}, true);
 		
 		advanceblockers.add(toblocker);
-		System.out.println(advanceblockers.size());
-		System.out.println("addBlocker: "+ServiceCall.getCurrentInvocation()+" "+access);
+		
+//		// -------- For debugging when simulation hangs due to leftover adblocker.
+//		openfuts.put(toblocker, SUtil.getExceptionStacktrace(new RuntimeException("Stacktrace")));
+//		Future<?>	fadblock	= toblocker;
+//		toblocker.addResultListener(result -> {openfuts.remove(fadblock);}, exception -> {openfuts.remove(fadblock);});
+//		System.out.println("adblocks: "+openfuts);
+////		System.out.println(advanceblockers.size());
+////		System.out.println("addBlocker: "+ServiceCall.getCurrentInvocation()+" "+access);
+//		// -------- End debugging
+		
 		return IFuture.DONE;
 	}
 
@@ -610,12 +624,12 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 				bar.addFuture(oblocker);
 			}
 			advanceblockers.clear();
-			System.out.println("waitForBlockers start");
+//			System.out.println("waitForBlockers start");
 			bar.waitForIgnoreFailures(null).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
-					System.out.println("waitForBlockers end");
+//					System.out.println("waitForBlockers end");
 					waitForBlockers().addResultListener(new DelegationResultListener<>(futret));
 				}
 				public void exceptionOccurred(Exception exception)
