@@ -795,7 +795,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 			{
-				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 				
 				if("getId".equals(method.getName()))
 				{
@@ -825,18 +825,25 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				{
 					if(!getFeature(IExecutionFeature.class).isComponentThread())
 					{
-						return getInternalAccess().scheduleStep(new IComponentStep<Object>()
+//						System.out.println("scheduleStep: "+method.getName());
+						final Future<Object> ret = (Future<Object>)SFuture.getFuture(method.getReturnType());
+						
+						getInternalAccess().scheduleStep(new IComponentStep<Void>()
 						{
 							@Override
-							public IFuture<Object> execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								return doInvoke(ia, method, args);
+								doInvoke(ia, method, args).addResultListener(new DelegationResultListener<>(ret));
+								return IFuture.DONE;
 							}
 						});
+						
+						return ret;
 					}
 					else
 					{
 						return doInvoke(getInternalAccess(), method, args);
+//						System.out.println("res2: "+res.getClass());
 					}
 				}
 			}
@@ -847,6 +854,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //					System.out.println("call");
 				
 				Future<Object> ret = new Future<>();
+				
 				try
 				{
 					Class<?> iface = method.getDeclaringClass();
