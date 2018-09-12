@@ -455,8 +455,8 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		}, true);
 		
 		advanceblockers.add(toblocker);
-		System.out.println(advanceblockers.size());
-		System.out.println("addBlocker: "+ServiceCall.getCurrentInvocation()+" "+access);
+//		System.out.println(advanceblockers.size());
+//		System.out.println("addBlocker: "+ServiceCall.getCurrentInvocation()+" "+access);
 		return IFuture.DONE;
 	}
 
@@ -610,12 +610,12 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 				bar.addFuture(oblocker);
 			}
 			advanceblockers.clear();
-			System.out.println("waitForBlockers start");
+//			System.out.println("waitForBlockers start");
 			bar.waitForIgnoreFailures(null).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
-					System.out.println("waitForBlockers end");
+//					System.out.println("waitForBlockers end");
 					waitForBlockers().addResultListener(new DelegationResultListener<>(futret));
 				}
 				public void exceptionOccurred(Exception exception)
