@@ -627,25 +627,32 @@ public class StarterPluginPanel extends JPanel
 			{
 //				System.out.println("fetching mpanel properties");
 				final ISettingsService	settings	= (ISettingsService)result;
-				mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+				try
 				{
-					public void customResultAvailable(Object result)
+					mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 					{
-//						System.out.println("fetched mpanel properties");
-						final Properties	props	= new Properties();
-						props.addSubproperties("mpanel", (Properties)result);
-						spanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+						public void customResultAvailable(Object result)
 						{
-							public void customResultAvailable(Object result)
+							System.out.println("fetched mpanel properties");
+							final Properties	props	= new Properties();
+							props.addSubproperties("mpanel", (Properties)result);
+							spanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 							{
-//								System.out.println("fetched spanel properties");
-								props.addSubproperties("spanel", (Properties)result);
-								settings.setProperties("StarterServicePanel", props)
-									.addResultListener(new SwingDelegationResultListener(ret));
-							}
-						});
-					}
-				});
+								public void customResultAvailable(Object result)
+								{
+	//								System.out.println("fetched spanel properties");
+									props.addSubproperties("spanel", (Properties)result);
+									settings.setProperties("StarterServicePanel", props)
+										.addResultListener(new SwingDelegationResultListener(ret));
+								}
+							});
+						}
+					});
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 			
 			public void customExceptionOccurred(Exception exception)
