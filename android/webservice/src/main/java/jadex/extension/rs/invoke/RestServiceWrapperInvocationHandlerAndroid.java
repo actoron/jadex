@@ -114,8 +114,9 @@ public class RestServiceWrapperInvocationHandlerAndroid implements InvocationHan
 //			public void customResultAvailable(final IComponentManagementService cms)
 //			{
 				CreationInfo ci = new CreationInfo(agent.getId());
+				ci.setFilename("jadex/extension/rs/invoke/RestServiceInvocationAgent.class");
 //				cms.createComponent(null, "invocation", ci, null)
-				agent.createComponent("jadex/extension/rs/invoke/RestServiceInvocationAgent.class", ci, null)
+				agent.createComponent(ci, null)
 					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 				{
 					public void customResultAvailable(IExternalAccess exta) 

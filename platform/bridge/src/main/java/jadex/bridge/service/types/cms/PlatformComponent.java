@@ -809,7 +809,26 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 			{
 //				if(method.getName().indexOf("killComponent")!=-1)
-//					System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+				
+				Class<?> rettype = method.getReturnType();
+				
+				// Hack, use step return type
+				if("scheduleStep".equals(method.getName()))
+				{
+					IComponentStep<?> step = null;
+					for(int i=0; i<args.length; i++)
+					{
+						if(args[i] instanceof IComponentStep<?>)
+						{
+							step = (IComponentStep<?>)args[i];
+							break;
+						}
+					}
+					
+					Method m = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
+					rettype = m.getReturnType();
+				}
 				
 				if("getId".equals(method.getName()))
 				{
@@ -845,13 +864,13 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					int prio = IExecutionFeature.STEP_PRIORITY_NORMAL;
 					
 					// Allow getting results from dead components.
-					if ("getResultsAsync".equals(method.getName()))
+					if("getResultsAsync".equals(method.getName()))
 						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
 					
 					if(!getFeature(IExecutionFeature.class).isComponentThread())
 					{
-//						System.out.println("scheduleStep: "+method.getName());
-						final Future<Object> ret = (Future<Object>)SFuture.getFuture(method.getReturnType());
+						final Future<Object> ret = (Future<Object>)SFuture.getFuture(rettype);
+//						System.out.println("scheduleStep: "+method.getName()+" "+method.getReturnType());
 						
 						getInternalAccess().scheduleStep(prio, new IComponentStep<Void>()
 						{
@@ -873,7 +892,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							}
 						});;
 						
-						return getDecoupledFuture(ret);
+						
+						return getDecoupledFuture(ret);						
 					}
 					else
 					{
@@ -953,6 +973,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				}
 				
 //				return getDecoupledFuture(ret);
+				
 				return ret;
 			}
 			
