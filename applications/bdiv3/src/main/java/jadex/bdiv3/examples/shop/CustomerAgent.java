@@ -21,4 +21,13 @@ public class CustomerAgent
 	/** The money. */
 	@Belief
 	protected double	money	= 100;
+
+	/**
+	 *  Get the capability.
+	 *  @return the cap
+	 */
+	public CustomerCapability getCapability()
+	{
+		return cap;
+	}
 }
