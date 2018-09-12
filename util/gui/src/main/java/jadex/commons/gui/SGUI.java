@@ -1076,7 +1076,8 @@ public class SGUI
 				}
 				finally
 				{
-					adblock.setResult(null);
+					if(adblock!=null)
+						adblock.setResult(null);
 				}
 			});
 		}
