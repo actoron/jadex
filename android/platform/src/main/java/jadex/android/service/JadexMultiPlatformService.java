@@ -260,6 +260,7 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 			creationInfo.setResourceIdentifier(rid);
 		}
 		creationInfo.setName(name);
+		creationInfo.setFilename(modelPath);
 		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 //		getCMS(platformId)
@@ -268,7 +269,7 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 //			public void customResultAvailable(final IComponentManagementService cms)
 //			{
 				ITuple2Future<IComponentIdentifier,Map<String,Object>> fut = jadexPlatformManager.getExternalPlatformAccess(platformId)
-					.createComponent(modelPath, creationInfo);
+					.createComponent(creationInfo);
 				
 				fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>() {
 
