@@ -1428,14 +1428,14 @@ public class ExternalAccess implements IExternalAccess
 	 *  Add a new component as subcomponent of this component.
 	 *  @param component The model or pojo of the component.
 	 */
-	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
+	public IFuture<IExternalAccess> createComponent(CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{
 		return (IFuture<IExternalAccess>)scheduleStep(new IComponentStep<IExternalAccess>()
 		{
 			@Override
 			public IFuture<IExternalAccess> execute(IInternalAccess ia)
 			{
-				return ia.createComponent(component, info, resultlistener);
+				return ia.createComponent(info, resultlistener);
 			}
 		});
 	}
@@ -1444,7 +1444,7 @@ public class ExternalAccess implements IExternalAccess
 	 *  Add a new component as subcomponent of this component.
 	 *  @param component The model or pojo of the component.
 	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info)
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(CreationInfo info)
 	{
 		return (ISubscriptionIntermediateFuture<CMSStatusEvent>)scheduleStep(new IComponentStep<Collection<CMSStatusEvent>>()
 		{
@@ -1453,7 +1453,7 @@ public class ExternalAccess implements IExternalAccess
 			@Override
 			public ISubscriptionIntermediateFuture<CMSStatusEvent> execute(IInternalAccess ia)
 			{
-				return ia.createComponentWithResults(component, info);
+				return ia.createComponentWithResults(info);
 			}
 		});
 	}
@@ -1465,14 +1465,14 @@ public class ExternalAccess implements IExternalAccess
 	 *  @param info Additional start information such as parent component or arguments (optional).
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info)
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(CreationInfo info)
 	{
 		return (ITuple2Future<IComponentIdentifier, Map<String, Object>>)scheduleStep(new IComponentStep<Collection<TupleResult>>()
 		{
 			@Override
 			public ITuple2Future<IComponentIdentifier, Map<String, Object>> execute(IInternalAccess ia)
 			{
-				return ia.createComponent(component, info);
+				return ia.createComponent(info);
 			}
 		});
 	}

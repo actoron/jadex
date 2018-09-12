@@ -48,7 +48,7 @@ public class ServiceImplTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport(""+no, "Test if creating service without explicit implementation works.");
 		try
 		{
-			IExternalAccess exta = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model), null).get();
+			IExternalAccess exta = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model), null).get();
 			IInfoService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInfoService.class).setProvider(exta.getId())).get();
 			String res = ser.getInfo().get();
 			tr.setSucceeded(true);

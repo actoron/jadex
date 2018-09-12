@@ -74,6 +74,9 @@ public class CreationInfo
 	/** The local component type name. */
 	protected String localtype;
 	
+	/** The pojo (optional). */
+	protected Object pojo;
+	
 	//-------- constructors --------
 	
 	/**
@@ -107,6 +110,7 @@ public class CreationInfo
 			this.pinfos	= info.getProvidedServiceInfos();
 			this.rid = info.getResourceIdentifier();
 			this.localtype = info.getLocalType();
+			this.pojo = info.getPojo();
 		}
 	}
 
@@ -641,6 +645,25 @@ public class CreationInfo
 	public CreationInfo setName(String name)
 	{
 		this.name = name;
+		return this;
+	}
+
+	/**
+	 *  Get the pojo.
+	 *  @return The pojo
+	 */
+	public Object getPojo()
+	{
+		return pojo;
+	}
+
+	/**
+	 *  Set the pojo.
+	 *  @param pojo The pojo to set
+	 */
+	public CreationInfo setPojo(Object pojo)
+	{
+		this.pojo = pojo;
 		return this;
 	}
 	

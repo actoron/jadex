@@ -114,7 +114,7 @@ public class RestInvocationHelper
 			CreationInfo info = new CreationInfo();
 			info.addArgument("restargs", restargs);
 			info.setFilename("jadex.extension.rs.invoke.RestInvocationAgent.class");
-			component.createComponent(null, info, new IResultListener<Collection<Tuple2<String,Object>>>()
+			component.createComponent(info, new IResultListener<Collection<Tuple2<String,Object>>>()
 			{
 				public void resultAvailable(Collection<Tuple2<String, Object>> result)
 				{

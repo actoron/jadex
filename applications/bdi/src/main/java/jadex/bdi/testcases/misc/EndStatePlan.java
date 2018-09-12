@@ -29,7 +29,7 @@ public class EndStatePlan extends Plan
 		// Create worker agent.
 		Map<String, Object> args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
-		IComponentIdentifier	worker	= getAgent().createComponent(null,
+		IComponentIdentifier	worker	= getAgent().createComponent(
 			new CreationInfo(args, getComponentIdentifier()).setFilename("/jadex/bdi/testcases/misc/EndStateWorker.agent.xml")).getFirstResult();
 		
 		// Wait for reports from worker agent.

@@ -82,7 +82,7 @@ public class MegaParallelStarterAgent
 				{
 					args.put("num", Integer.valueOf(i));
 //					System.out.println("Created agent: "+i);
-					agent.createComponent(null, new CreationInfo(new HashMap(args), agent.getId()).setName(subname+"_#"+i).setFilename(model), 
+					agent.createComponent(new CreationInfo(new HashMap(args), agent.getId()).setName(subname+"_#"+i).setFilename(model), 
 						agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)

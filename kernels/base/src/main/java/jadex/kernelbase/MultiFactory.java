@@ -399,7 +399,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				ci.setFilename(f.getFirstEntity()+".class");
 				
 //				System.out.println("create compo start: "+f.getFirstEntity());
-				agent.createComponent(null, ci, new IResultListener<Collection<Tuple2<String, Object>>>()
+				agent.createComponent(ci, new IResultListener<Collection<Tuple2<String, Object>>>()
 				{
 					public void resultAvailable(Collection<Tuple2<String, Object>> result)
 					{

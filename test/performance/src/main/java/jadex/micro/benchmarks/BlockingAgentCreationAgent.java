@@ -89,7 +89,7 @@ public class BlockingAgentCreationAgent
 			args.put("num", Integer.valueOf(num));
 			args.put("starttime", Long.valueOf(starttime));
 			args.put("startmem", Long.valueOf(startmem));
-			agent.createComponent(null,
+			agent.createComponent(
 				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
 				.setName(createPeerName(num+1, agent.getId())).setFilename(BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"), null);
 		}

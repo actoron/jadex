@@ -1696,7 +1696,7 @@ public class StarterPanel extends JLayeredPane
 		ci.setName(name);
 		ci.setFilename(type);
 		
-		jcc.getPlatformAccess().createComponent(null, ci, killlistener).addResultListener(new IResultListener<IExternalAccess>()
+		jcc.getPlatformAccess().createComponent(ci, killlistener).addResultListener(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(IExternalAccess result)
 			{

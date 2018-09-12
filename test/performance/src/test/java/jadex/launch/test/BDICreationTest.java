@@ -47,7 +47,7 @@ public class BDICreationTest //extends TestCase
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", Integer.valueOf(1000));
-		platform.createComponent(null, new CreationInfo(args).setFilename("jadex.bdi.benchmarks.AgentCreation.agent.xml"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+		platform.createComponent(new CreationInfo(args).setFilename("jadex.bdi.benchmarks.AgentCreation.agent.xml"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
 		{
 			public void customResultAvailable(IExternalAccess result)

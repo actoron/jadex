@@ -238,7 +238,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 //		System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
 		CreationInfo ci	= new CreationInfo(local ? agent.getId() : root, rid).setFilename(PullResultProviderAgent.class.getName()+".class");
-		agent.createComponent(null, ci, null)
+		agent.createComponent(ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
@@ -341,7 +341,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 //		System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
 		CreationInfo	ci	= new CreationInfo(local ? agent.getId() : root, rid).setFilename(PullResultProviderAgent.class.getName()+".class");
-		agent.createComponent(null, ci, null)
+		agent.createComponent(ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)

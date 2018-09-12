@@ -26,7 +26,7 @@ public class KillAgent
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();
-		agent.createComponent(null, new CreationInfo(agent.getId()).setFilename("jadex.micro.MicroAgent.class"), null)
+		agent.createComponent(new CreationInfo(agent.getId()).setFilename("jadex.micro.MicroAgent.class"), null)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(IExternalAccess result) 
@@ -56,7 +56,7 @@ public class KillAgent
 		
 		for(int i=0; i<1000; i++)
 		{
-			IComponentIdentifier cid = pl.createComponent(null, new CreationInfo().setFilename(KillAgent.class.getName()+".class")).getFirstResult();
+			IComponentIdentifier cid = pl.createComponent(new CreationInfo().setFilename(KillAgent.class.getName()+".class")).getFirstResult();
 			try
 			{
 				pl.killComponent(cid).get();

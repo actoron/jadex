@@ -106,7 +106,7 @@ public class EchoChatAgent
 			System.out.print(".");
 			if(i%100==0)
 				System.out.println("\n "+i+": ");
-			IComponentIdentifier cid = pl.createComponent(null, new CreationInfo().setFilename(EchoChatAgent.class.getName()+".class")).getFirstResult();
+			IComponentIdentifier cid = pl.createComponent(new CreationInfo().setFilename(EchoChatAgent.class.getName()+".class")).getFirstResult();
 			try
 			{
 				pl.killComponent(cid).get();

@@ -82,8 +82,8 @@ public class TesterAgent implements ITestService
 						ci.setResourceIdentifier(agent.getModel().getResourceIdentifier());
 						final String name =  TesterAgent.class.getName()+".class";
 						
-						IExternalAccess eaa = agent.createComponent(name, ci, null).get();
-						IExternalAccess eab = agent.createComponent(name, ci, null).get();
+						IExternalAccess eaa = agent.createComponent(ci.setFilename(name), null).get();
+						IExternalAccess eab = agent.createComponent(ci.setFilename(name), null).get();
 					
 						IComponentDescription desca = eaa.scheduleStep(new IComponentStep<IComponentDescription>()
 						{

@@ -263,7 +263,7 @@ public class IntermediateTestAgent
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
 		
 		try
 		{
@@ -301,7 +301,7 @@ public class IntermediateTestAgent
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
 		CreationInfo ci = new CreationInfo(agent.getId()).setFilename(model);
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, ci);
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(ci);
 		fut.getFirstResult();
 		
 //		// For debugging to receive error messages, when thread hangs before fut.get().
@@ -358,7 +358,7 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
 		fut.getFirstResult();
 
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
@@ -402,7 +402,7 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
 		fut.getFirstResult();
 
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
@@ -449,7 +449,7 @@ public class IntermediateTestAgent
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(model));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
 		
 		try
 		{

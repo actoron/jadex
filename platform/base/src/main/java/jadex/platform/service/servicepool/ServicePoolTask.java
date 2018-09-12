@@ -84,7 +84,7 @@ public class ServicePoolTask implements ITask
 
 		CreationInfo ci = new CreationInfo(process.getId()).setFilename(ServicePoolAgent.class.getName()+".class");
 		
-		process.createComponent(null, ci, null)
+		process.createComponent(ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			public void customResultAvailable(IExternalAccess ea) 

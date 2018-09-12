@@ -843,8 +843,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			
 			public IFuture<Object> doInvoke(IInternalAccess ia, Method method, Object[] args)
 			{
-				if(method.getName().indexOf("createCompo")!=-1)
-					System.out.println("call");
+//				if(method.getName().indexOf("createCompo")!=-1)
+//					System.out.println("call");
 				
 				Future<Object> ret = new Future<>();
 				try
@@ -1307,16 +1307,17 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  Add a new component as subcomponent of this component.
 	 *  @param component The model or pojo of the component.
 	 */
-	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
+	public IFuture<IExternalAccess> createComponent(CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{
 		// todo: parameter for name
 		
+		Object component = info!=null? info.getPojo(): null;
 		if(component==null && (info==null || info.getFilename()==null))
 			return new Future<>(new RuntimeException("Component must not null."));
 		
 		final Future<IExternalAccess> ret = new Future<>();
 		
-		info = prepare(component, info);
+		info = prepare(info);
 		
 		IFuture<IComponentIdentifier> fut = SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, resultlistener, getInternalAccess());
 		
@@ -1344,14 +1345,15 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  Add a new component as subcomponent of this component.
 	 *  @param component The model or pojo of the component.
 	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info)
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(CreationInfo info)
 	{
 		// todo: resultlistener for results?!
 		
+		Object component = info!=null? info.getPojo(): null;
 		if(component==null && (info==null || info.getFilename()==null))
 			return new SubscriptionIntermediateFuture<>(new RuntimeException("Component must not null."));
 		
-		info = prepare(component, info);
+		info = prepare(info);
 		
 		return SComponentManagementService.createComponent(info, info.getName(), info.getFilename(), getInternalAccess());
 	}
@@ -1363,16 +1365,17 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  @param info Additional start information such as parent component or arguments (optional).
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info)
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(CreationInfo info)
 	{
 		// todo: resultlistener for results?!
 		
 		System.out.println("tuplecreate: "+info.getFilename());
 		
+		Object component = info!=null? info.getPojo(): null;
 		if(component==null && (info==null || info.getFilename()==null))
 			return new Tuple2Future<IComponentIdentifier, Map<String, Object>>(new RuntimeException("Component must not null."));
 				
-		info = prepare(component, info);
+		info = prepare(info);
 		
 		return SComponentManagementService.createComponent(info.getName(), info.getFilename(), info, getInternalAccess());
 	}
@@ -1383,13 +1386,14 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  @param info The creation info. 
 	 *  @return The creation info.
 	 */
-	public CreationInfo prepare(Object component, CreationInfo info)
+	public CreationInfo prepare(CreationInfo info)
 	{
 		if(info==null)
 			info = new CreationInfo();
 //		if(info.getParent()==null)
 //			info.setParent(getId());
 		
+		Object component = info.getPojo();
 		String modelname = null;
 		
 		if(component instanceof String)

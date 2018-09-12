@@ -1962,18 +1962,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 *  Add a new component as subcomponent of this component.
 	 *  @param component The model or pojo of the component.
 	 */
-	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
+	public IFuture<IExternalAccess> createComponent(CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{
-		return getComponent().createComponent(component, info, resultlistener);
+		return getComponent().createComponent(info, resultlistener);
 	}
 	
 	/**
 	 *  Add a new component as subcomponent of this component.
 	 *  @param component The model or pojo of the component.
 	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info)
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(CreationInfo info)
 	{
-		return getComponent().createComponentWithResults(component, info);
+		return getComponent().createComponentWithResults(info);
 	}
 	
 	/**
@@ -1983,9 +1983,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 *  @param info Additional start information such as parent component or arguments (optional).
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info)
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(CreationInfo info)
 	{
-		return getComponent().createComponent(component, info);
+		return getComponent().createComponent(info);
 	}
 	
 	/**

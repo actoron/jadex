@@ -103,7 +103,7 @@ public class AgentCreationAgent
 			args.put("num", Integer.valueOf(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-			agent.createComponent(null,
+			agent.createComponent(
 				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, agent.getDescription().getResourceIdentifier())
 				.setName(createPeerName(num+1, agent.getId())).setFilename(AgentCreationAgent.this.getClass().getName()+".class"), null);
 		}
@@ -254,6 +254,6 @@ public class AgentCreationAgent
 			"-cli", "false",
 //			"-awareness", "false"
 		}).get();
-		ea.createComponent(null, new CreationInfo().setFilename(AgentCreationAgent.class.getName()+".class")).get();
+		ea.createComponent(new CreationInfo().setFilename(AgentCreationAgent.class.getName()+".class")).get();
 	}	
 }

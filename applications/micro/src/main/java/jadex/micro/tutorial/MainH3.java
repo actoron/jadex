@@ -40,7 +40,7 @@ public class MainH3
 		// Get the CMS service from the platform
 		// Start the chat component
 		
-		IExternalAccess ea = platform.createComponent(null, new CreationInfo().setFilename(ChatD2Agent.class.getName()+".class"), null).get();
+		IExternalAccess ea = platform.createComponent(new CreationInfo().setFilename(ChatD2Agent.class.getName()+".class"), null).get();
 		System.out.println("Started chat component: "+ea);
 	}
 }

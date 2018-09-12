@@ -207,7 +207,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		ITuple2Future<IComponentIdentifier,Map<String,Object>> cmsfut = agent.createComponent(null, ci);
+		ITuple2Future<IComponentIdentifier,Map<String,Object>> cmsfut = agent.createComponent(ci);
 		cmsfut.addTuple2ResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IComponentIdentifier result)
@@ -238,7 +238,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> cmsfut = agent.createComponent(null, ci);
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> cmsfut = agent.createComponent(ci);
 		cmsfut.addTuple2ResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IComponentIdentifier result)

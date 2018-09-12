@@ -40,7 +40,7 @@ public class PojoDService implements IDService
 		
 		if("first".equals(agent.getConfiguration()))
 		{
-			agent.createComponent(null, 
+			agent.createComponent(
 				new CreationInfo("second", null, agent.getId()).setFilename( "jadex.micro.testcases.ServiceParameterAgent.class"), null)
 				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{

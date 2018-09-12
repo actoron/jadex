@@ -42,7 +42,7 @@ public class ShutdownAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(BlockAgent.class.getName()+".class"))
+		agent.createComponent(new CreationInfo(agent.getId()).setFilename(BlockAgent.class.getName()+".class"))
 			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
 			public void firstResultAvailable(final IComponentIdentifier cid)

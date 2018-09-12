@@ -39,7 +39,7 @@ public class ClientMain  {
 		fut.addResultListener(access -> {
 
 			access.scheduleStep(ia -> {
-				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut2 = access.createComponent(null, new CreationInfo().setName("CDClient").setFilename(ClientAgent.class.getName() + ".class"));
+				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut2 = access.createComponent(new CreationInfo().setName("CDClient").setFilename(ClientAgent.class.getName() + ".class"));
 				fut2.addTuple2ResultListener(cid -> System.out.println("Client Agent created"), SResultListener.ignoreResults());
 				return Future.getEmptyFuture();
 			});

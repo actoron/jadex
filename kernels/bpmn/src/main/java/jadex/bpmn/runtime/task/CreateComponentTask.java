@@ -231,7 +231,7 @@ public class CreateComponentTask implements ITask
 			instance.getModel().getResourceIdentifier());
 		ci.setFilename(model);
 		ci.setName(name);
-		instance.createComponent(null, ci, lis)
+		instance.createComponent(ci, lis)
 			.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(creationfuture)
 		{
 			@Override
