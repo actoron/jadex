@@ -629,7 +629,7 @@ public class SRemoteGui
 	 */
 	public static IIntermediateFuture<String>	convertPathsToRelative(final String[] paths, IExternalAccess exta)
 	{
-		return (IIntermediateFuture<String>)exta.scheduleStep(new IComponentStep<Collection<String>>()
+		Object ret = exta.scheduleStep(new IComponentStep<Collection<String>>()
 		{
 			@Classname("convertPathToRelative")
 			public IIntermediateFuture<String> execute(IInternalAccess ia)
@@ -654,6 +654,11 @@ public class SRemoteGui
 				return ret;
 			}
 		});
+		
+		if(!(ret instanceof IIntermediateFuture))
+			System.out.println("hrrrrrr");
+		
+		return (IIntermediateFuture<String>)ret;
 	}
 	
 	/**

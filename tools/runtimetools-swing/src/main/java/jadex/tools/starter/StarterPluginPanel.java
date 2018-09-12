@@ -633,7 +633,7 @@ public class StarterPluginPanel extends JPanel
 					{
 						public void customResultAvailable(Object result)
 						{
-							System.out.println("fetched mpanel properties");
+//							System.out.println("fetched mpanel properties");
 							final Properties	props	= new Properties();
 							props.addSubproperties("mpanel", (Properties)result);
 							spanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
