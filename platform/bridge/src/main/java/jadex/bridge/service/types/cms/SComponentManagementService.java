@@ -370,9 +370,9 @@ public class SComponentManagementService
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	alis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(null)));
 		slis.addAll(alis);
 		
-		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: alis)
+		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slis)
 		{
-			sub.addIntermediateResult(new CMSCreatedEvent(desc));
+			sub.addIntermediateResultIfUndone(new CMSCreatedEvent(desc));
 		}
 	}
     
@@ -389,9 +389,9 @@ public class SComponentManagementService
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	alis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(null)));
 		slis.addAll(alis);
 		
-		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: alis)
+		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slis)
 		{
-			sub.addIntermediateResult(new CMSStatusEvent(desc));
+			sub.addIntermediateResultIfUndone(new CMSStatusEvent(desc));
 		}
 	}
 	
@@ -408,9 +408,9 @@ public class SComponentManagementService
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	alis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(null)));
 		slis.addAll(alis);
 		
-		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: alis)
+		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slis)
 		{
-			sub.addIntermediateResult(new CMSTerminatedEvent(desc, results));
+			sub.addIntermediateResultIfUndone(new CMSTerminatedEvent(desc, results));
 		}
 		
 		// remove the listeners of the terminated component
