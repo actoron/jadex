@@ -232,7 +232,7 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.createComponent(null, new CreationInfo().setFilename(LazyInjectTestAgent.class.getCanonicalName() + ".class")).getSecondResult();
+					ia.createComponent(new CreationInfo().setFilename(LazyInjectTestAgent.class.getCanonicalName() + ".class")).getSecondResult();
 					System.out.println("Step done.");
 					return IFuture.DONE;
 				}

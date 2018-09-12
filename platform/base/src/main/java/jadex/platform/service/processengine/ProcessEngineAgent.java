@@ -519,7 +519,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		info.setArguments(args);
 		info.setFilename(det.getModel());
 		
-		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = agent.createComponentWithResults(null, info);
+		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = agent.createComponentWithResults(info);
 		fut.addResultListener(new ConversionListener(new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid()), det.getFuture())); // Add converion listener for addmodel() future 
 		
 		fut.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()

@@ -22,6 +22,6 @@ public class StartAgentCreation
 			"-cli", "false",
 //			"-awareness", "false"
 		}).get();
-		ea.createComponent(null, new CreationInfo().setFilename("jadex.bdi.benchmarks.AgentCreation.agent.xml")).get();
+		ea.createComponent(new CreationInfo().setFilename("jadex.bdi.benchmarks.AgentCreation.agent.xml")).get();
 	}
 }

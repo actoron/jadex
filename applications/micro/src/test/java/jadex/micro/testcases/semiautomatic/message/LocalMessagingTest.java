@@ -27,7 +27,7 @@ public class LocalMessagingTest
 		
 		final IExternalAccess	access	= Starter.createPlatform(config).get();
 		//cms.createComponent(SenderAgent.class.getName()+".class",
-		access.createComponent(null,
+		access.createComponent(
 			new CreationInfo(new HashMap<String, Object>(){{
 				put("receiver", (Object)new BasicComponentIdentifier("Receiver", access.getId()));
 				put("count", 100000);

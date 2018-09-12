@@ -7,7 +7,6 @@ import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.util.STest;
-import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;

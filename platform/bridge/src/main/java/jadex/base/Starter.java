@@ -851,7 +851,7 @@ public class Starter
 			ci.setName(name);
 			ci.setFilename(comp);
 			
-			instance.createComponent(null, ci, null)
+			instance.createComponent(ci, null)
 				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
@@ -1031,7 +1031,7 @@ public class Starter
 										Map<String, Object>	args = new HashMap<String, Object>();
 										args.put("component", remote.getId().getRoot());
 										CreationInfo ci = new CreationInfo(args);
-										local.createComponent("jadex/platform/service/remote/ProxyAgent.class", ci, null).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+										local.createComponent(ci.setFilename("\"jadex/platform/service/remote/ProxyAgent.class\""), null).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 										
 //										local.searchService( new ServiceQuery<>(IComponentManagementService.class))
 //											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)

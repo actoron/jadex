@@ -26,7 +26,7 @@ public class ConfigElementRefPlan extends Plan
 		// Create worker agent (kills itself automatically).
 		Map<String, Object> args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
-		getAgent().createComponent(null,
+		getAgent().createComponent(
 			new CreationInfo(args, getComponentIdentifier()).setFilename("/jadex/bdi/testcases/misc/ConfigElementRefWorker.agent.xml")).getFirstResult();
 		
 		// Wait for init reports from worker agent.

@@ -54,7 +54,7 @@ public class DirectConnectionDemo
 		Map<String, Object>	args = new HashMap<String, Object>();
 		args.put("component", remote_cid);
 		CreationInfo ci = new CreationInfo(args).setFilename("jadex/platform/service/remote/ProxyAgent.class");
-		platform.createComponent(null, ci).getFirstResult();
+		platform.createComponent(ci).getFirstResult();
 	}
 	
 	public static void	main(String[] args)

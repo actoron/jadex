@@ -79,7 +79,7 @@ public class Main
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
 		fut.addResultListener(access -> {
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut2 = access.createComponent(null ,new CreationInfo().setName("CDDisplay").setFilename(CountdownAgent.class.getName() + ".class"));
+			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut2 = access.createComponent(new CreationInfo().setName("CDDisplay").setFilename(CountdownAgent.class.getName() + ".class"));
 			fut2.addTuple2ResultListener((IComponentIdentifier created) -> {
 				System.out.println("CDDisplay Component created.");
 			}, (Map<String, Object> terminated) -> {

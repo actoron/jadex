@@ -61,8 +61,8 @@ public class RemoteMessagingTest
 		
 		// Start sender with receiver CID on remote platform.
 //		cms.createComponent(SenderAgent.class.getName()+".class",
-		access2.createComponent(BenchmarkAgent.class.getName()+".class",
+		access2.createComponent(
 			new CreationInfo(Collections.singletonMap("receiver",
-				(Object)new BasicComponentIdentifier("Receiver", access1.getId())))).get();
+				(Object)new BasicComponentIdentifier("Receiver", access1.getId()))).setFilename(BenchmarkAgent.class.getName()+".class")).get();
 	}
 }

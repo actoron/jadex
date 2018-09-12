@@ -1249,7 +1249,7 @@ public class TestCenterPanel extends JSplitPanel
 					CreationInfo ci = new CreationInfo(args, plugin.getJCC().getPlatformAccess().getId());
 					ci.setResourceIdentifier(name.getSecondEntity());
 					ci.setFilename(name.getFirstEntity());
-					plugin.getJCC().getPlatformAccess().createComponent(null, ci, res)
+					plugin.getJCC().getPlatformAccess().createComponent(ci, res)
 						.addResultListener(new SwingDelegationResultListener(ret));
 					
 					// Todo: timeout -> force destroy of component

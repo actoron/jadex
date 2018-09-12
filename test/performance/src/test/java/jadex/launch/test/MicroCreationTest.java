@@ -59,7 +59,7 @@ public class MicroCreationTest //extends TestCase
 		args.put("max", Integer.valueOf(10000));
 //		cms.createComponent(null, "jadex/micro/benchmarks/ParallelAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 //		cms.createComponent(null, "jadex/micro/benchmarks/PojoAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-		platform.createComponent(null, new CreationInfo(args).setFilename("jadex/micro/benchmarks/BlockingAgentCreationAgent.class"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+		platform.createComponent(new CreationInfo(args).setFilename("jadex/micro/benchmarks/BlockingAgentCreationAgent.class"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 //		cms.createComponent(null, "jadex/micro/benchmarks/AgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
 		{

@@ -178,7 +178,7 @@ public class ServiceHandler implements InvocationHandler
 		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
 		ci.setFilename(componentname);
 		
-		component.createComponent(null, ci, null)
+		component.createComponent(ci, null)
 			.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IService>(ret)
 		{
 			public void customResultAvailable(IExternalAccess ea)

@@ -155,7 +155,7 @@ public class SWebSocket
 			@Override
 			public void customResultAvailable(IExternalAccess platform) throws Exception
 			{				
-				platform.createComponent(null, new CreationInfo().setFilename(model)).addTuple2ResultListener(new IFunctionalResultListener<IComponentIdentifier>()
+				platform.createComponent(new CreationInfo().setFilename(model)).addTuple2ResultListener(new IFunctionalResultListener<IComponentIdentifier>()
 				{
 					@Override
 					public void resultAvailable(IComponentIdentifier cid)

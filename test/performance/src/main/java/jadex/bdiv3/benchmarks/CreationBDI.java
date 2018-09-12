@@ -134,7 +134,7 @@ public class CreationBDI
 			args.put("startmem", Long.valueOf(startmem));
 //			System.out.println("Args: "+num+" "+args);
 
-			agent.createComponent(null,
+			agent.createComponent(
 				new CreationInfo().setArguments(args).setResourceIdentifier(agent.getDescription().getResourceIdentifier())
 				.setFilename("jadex.bdiv3.benchmarks.CreationBDI.class").setName(createPeerName(num+1, agent.getId())), null);
 		}
