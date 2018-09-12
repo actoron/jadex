@@ -210,6 +210,10 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 								//System.out.println(SyncExecutionService.this+" Executing task: "+task+", "+this);
 								again = task.execute();
 							}
+							catch(ThreadDeath e)
+							{
+								// used to shut down blocked threads of killed agents -> ignore
+							}									
 							catch(Throwable e)
 							{
 								System.out.println("Exception during executing task: "+task);
