@@ -1,13 +1,13 @@
 @REM perform all tests
 @rem set jadex_timeout=90000
 
-CMD /C gradlew -Pdist=publishdists cleanTest :applications:micro:test test -x javadoc -x processSchemas --continue
+CMD /C gradlew -Pdist=publishdists cleanTest test test:integration:test -x javadoc -x processSchemas --continue
 
 @set builderror=%ERRORLEVEL%
-IF "%builderror%" NEQ "0" (
+@IF "%builderror%" NEQ "0" (
     echo Generating Test Report... & CMD /C gradlew testReport >NUL & START "" "testreport\index.html"
 ) ELSE (
-    echo Running performance tests... & CMD /C gradlew performanceTest
+    echo Running performance tests... & CMD /C gradlew performanceTest -Dorg.gradle.parallel=false
 )
 
 @pause
