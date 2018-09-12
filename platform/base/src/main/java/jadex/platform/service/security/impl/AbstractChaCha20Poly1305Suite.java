@@ -263,9 +263,6 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs(), agent.getInternalNetworks());
 			setupSecInfos(remoteid, authnets, platformauth, authenticatedpfname, agent);
 			
-			if (agent.getInternalRefuseUnauth() && !secinf.hasDefaultAuthorization())
-				throw new SecurityException("Unauthenticated connection not allowed.");
-			
 			ephemeralkey = createEphemeralKey();
 			byte[] pubkey = getPubKey();
 			

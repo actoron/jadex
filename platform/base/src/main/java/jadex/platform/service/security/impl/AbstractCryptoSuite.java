@@ -132,5 +132,11 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 		
 		if (!agent.getInternalAllowNoNetwork() && secinf.getNetworks().isEmpty())
 			throw new SecurityException("Connections to platforms with no authenticated networks are not allowed: " + remoteid);
+		
+		if (agent.getInternalRefuseUnauth() && 
+			(secinf.getAuthenticatedPlatformName() == null &&
+			 secinf.getNetworks().isEmpty() &&
+			 !secinf.isAdminPlatform()))
+			throw new SecurityException("Unauthenticated connection not allowed: " + remoteid);
 	}
 }
