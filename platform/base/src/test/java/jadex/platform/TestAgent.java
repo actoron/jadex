@@ -246,7 +246,7 @@ public abstract class TestAgent
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		agent.createComponent(null, ci, reslis)
+		agent.createComponent(ci, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)

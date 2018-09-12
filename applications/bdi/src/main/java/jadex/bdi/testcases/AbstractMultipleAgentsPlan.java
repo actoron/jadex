@@ -56,7 +56,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 		{
 			for(int i=0; i<args.length; i++)
 			{
-				ITuple2Future<IComponentIdentifier, Map<String, Object>> ret = getAgent().createComponent(null, new CreationInfo(config, args[i], getComponentIdentifier()).setFilename(type));
+				ITuple2Future<IComponentIdentifier, Map<String, Object>> ret = getAgent().createComponent(new CreationInfo(config, args[i], getComponentIdentifier()).setFilename(type));
 				IComponentIdentifier aid = (IComponentIdentifier)ret.getFirstResult();
 				agents.add(aid);
 			}

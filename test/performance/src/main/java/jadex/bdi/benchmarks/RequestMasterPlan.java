@@ -18,6 +18,6 @@ public class RequestMasterPlan extends Plan
 		args.put("max", getBeliefbase().getBelief("max").getFact());
 		args.put("receiver", getComponentIdentifier());
 		
-		getAgent().createComponent(null, new CreationInfo("default", args, getComponentIdentifier()).setFilename("jadex/bdi/benchmarks/RequestPerformance.agent.xml"));
+		getAgent().createComponent(new CreationInfo("default", args, getComponentIdentifier()).setFilename("jadex/bdi/benchmarks/RequestPerformance.agent.xml"));
 	}	
 }

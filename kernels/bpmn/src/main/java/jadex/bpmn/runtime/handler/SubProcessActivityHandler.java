@@ -216,7 +216,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			info.setFilename(file);	
 //					System.out.println("parent is: "+parent.getAddresses());	
 
-			instance.createComponentWithResults(null, info)
+			instance.createComponentWithResults(info)
 				.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 			{
 				protected SubprocessResultHandler handler = new SubprocessResultHandler(thread, activity);	

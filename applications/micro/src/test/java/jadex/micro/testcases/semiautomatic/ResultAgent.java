@@ -49,7 +49,7 @@ public class ResultAgent
 		{
 			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "not last: "+agent.getId()+": "+Math.random());
 			
-			agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(ResultAgent.this.getClass().getName()+".class"), 
+			agent.createComponent(new CreationInfo(agent.getId()).setFilename(ResultAgent.this.getClass().getName()+".class"), 
 				agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Tuple2<String, Object>>>()
 			{
 				public void resultAvailable(Collection<Tuple2<String, Object>> result)

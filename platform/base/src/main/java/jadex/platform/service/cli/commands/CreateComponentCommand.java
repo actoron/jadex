@@ -209,7 +209,7 @@ public class CreateComponentCommand extends ACliCommand
 								
 								for(int i=0; i<(count==null? 1: count.intValue()); i++)
 								{
-									comp.createComponent(null, info, null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+									comp.createComponent(info, null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 									{
 										public void customResultAvailable(IExternalAccess result) throws Exception
 										{

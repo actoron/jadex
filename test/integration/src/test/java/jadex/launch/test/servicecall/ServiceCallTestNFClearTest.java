@@ -301,7 +301,7 @@ public class ServiceCallTestNFClearTest
 	private IExternalAccess createServiceAgent(IExternalAccess platform, Class< ? > clazz)
 	{
 		final Future<IComponentIdentifier> future = new Future<IComponentIdentifier>();
-		platform.createComponent(null, new CreationInfo().setFilename(clazz.getName() + ".class")).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+		platform.createComponent(new CreationInfo().setFilename(clazz.getName() + ".class")).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
 			@Override
 			public void firstResultAvailable(IComponentIdentifier result)

@@ -79,7 +79,7 @@ public class BPMNRecoveryTestAgent
 		CreationInfo ci = new CreationInfo(agent.getId());
 		ci.setFilename(model);
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, ci);
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(ci);
 		IExternalAccess	exta = agent.getExternalAccess(fut.getFirstResult()).get();
 		ISubscriptionIntermediateFuture<Tuple2<String, Object>>	res	= exta.subscribeToResults();
 		if(!exta.getResultsAsync().get().containsKey("running"))

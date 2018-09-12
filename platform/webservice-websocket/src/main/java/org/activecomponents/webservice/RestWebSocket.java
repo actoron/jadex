@@ -1236,7 +1236,7 @@ public class RestWebSocket extends Endpoint
 					{
 						session.getUserProperties().put(key, ret);
 
-						platform.createComponent(null, new CreationInfo().setFilename(filename)).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+						platform.createComponent(new CreationInfo().setFilename(filename)).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 						{
 							public void firstResultAvailable(IComponentIdentifier cid)
 							{

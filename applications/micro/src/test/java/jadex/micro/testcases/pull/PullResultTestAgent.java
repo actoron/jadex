@@ -123,6 +123,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 	 */
 	protected IFuture<TestReport[]> testLocal(final int testno, final long delay, final int max)
 	{
+		disableLocalSimulationMode().get();
 		final Future<TestReport[]> ret = new Future<TestReport[]>();
 		performTestA(agent.getId().getRoot(), testno, delay, max)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
@@ -160,7 +161,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
 				"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-printpass", "false",
+				"-gui", "false", "-simulation", "false", "-simul", "false", "-printpass", "false",
 				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport[]>(ret)
@@ -240,7 +241,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 //		System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
 		CreationInfo ci	= new CreationInfo(local ? agent.getId() : root, rid).setFilename(PullResultProviderAgent.class.getName()+".class");
-		agent.createComponent(null, ci, null)
+		agent.createComponent(ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
@@ -343,7 +344,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 //		System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
 		CreationInfo	ci	= new CreationInfo(local ? agent.getId() : root, rid).setFilename(PullResultProviderAgent.class.getName()+".class");
-		agent.createComponent(null, ci, null)
+		agent.createComponent(ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)

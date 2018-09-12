@@ -63,7 +63,7 @@ public class StartScenario
 //						{
 //							public void resultAvailable(final IComponentManagementService rcms)
 //							{
-								rplat.createComponent(null, new CreationInfo().setName("math").setFilename("MathAgent.class"), null)
+								rplat.createComponent(new CreationInfo().setName("math").setFilename("MathAgent.class"), null)
 									.addResultListener(new DefaultResultListener<IExternalAccess>()
 								{
 									public void resultAvailable(IExternalAccess result)
@@ -73,13 +73,13 @@ public class StartScenario
 										IComponentIdentifier rrms = new ComponentIdentifier("rms@remote", 
 											new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 										
-										lplat.createComponent(null,
+										lplat.createComponent(
 											new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{rrms})).setName("proxy").setFilename("jadex.platform.service.remote.ProxyAgent.class"), null)
 											.addResultListener(new DefaultResultListener<IExternalAccess>()
 										{
 											public void resultAvailable(IExternalAccess result)
 											{
-												lplat.createComponent(null, new CreationInfo().setName("user").setFilename("UserAgent.class"), new DefaultResultListener<Collection<Tuple2<String, Object>>>()
+												lplat.createComponent(new CreationInfo().setName("user").setFilename("UserAgent.class"), new DefaultResultListener<Collection<Tuple2<String, Object>>>()
 												{
 													public void resultAvailable(Collection<Tuple2<String, Object>> res)
 													{

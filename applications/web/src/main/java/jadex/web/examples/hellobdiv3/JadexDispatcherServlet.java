@@ -48,7 +48,7 @@ public class JadexDispatcherServlet extends HttpServlet
 		};
 //		ThreadSuspendable	sus	= new ThreadSuspendable();
 		this.platform	= Starter.createPlatform(args).get(30000);
-		platform.createComponent(null, new CreationInfo().setFilename("jadex.web.examples.hellobdiv3.SayHelloBDI.class")).getFirstResult();
+		platform.createComponent(new CreationInfo().setFilename("jadex.web.examples.hellobdiv3.SayHelloBDI.class")).getFirstResult();
 	}
 	
 	/**

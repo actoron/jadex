@@ -144,4 +144,12 @@ public class CustomerCapability
 		// Update the account
 		setMoney(getMoney() - big.price);
 	}
+
+	/**
+	 * @return the capa
+	 */
+	public ICapability getCapability()
+	{
+		return capa;
+	}
 }

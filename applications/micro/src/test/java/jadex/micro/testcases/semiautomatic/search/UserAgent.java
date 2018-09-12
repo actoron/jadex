@@ -45,7 +45,7 @@ public class UserAgent
 		final int[] cnt = new int[1];
 		for(int i=0; i<max; i++)
 		{
-			plat.createComponent(null, new CreationInfo().setFilename(ProviderAgent.class.getName()+".class")).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+			plat.createComponent(new CreationInfo().setFilename(ProviderAgent.class.getName()+".class")).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 			{
 				public void firstResultAvailable(IComponentIdentifier result)
 				{
@@ -70,6 +70,6 @@ public class UserAgent
 		
 		fut.get();
 		
-		plat.createComponent(null, new CreationInfo().setFilename(UserAgent.class.getName()+".class")).get();
+		plat.createComponent(new CreationInfo().setFilename(UserAgent.class.getName()+".class")).get();
 	}
 }

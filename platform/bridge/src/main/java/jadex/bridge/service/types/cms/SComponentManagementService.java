@@ -431,19 +431,20 @@ public class SComponentManagementService
 		// Hack!!! May be null on platform init
 		
 		final IInternalAccess pad = getParentComponent(cinfo, agent);
-		final IExternalAccess parent = pad.getExternalAccess();
+//		final IExternalAccess parent = pad.getExternalAccess();
 		
-		parent.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, ClassLoader>>(ret)
-		{
-			public void customResultAvailable(IModelInfo model)
-			{
+		IModelInfo model = pad.getModel();
+//		parent.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, ClassLoader>>(ret)
+//		{
+//			public void customResultAvailable(IModelInfo model)
+//			{
 				if(libservice!=null)
 				{
-					libservice.getClassLoader(rid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<ClassLoader, Tuple2<String, ClassLoader>>(ret)
+					getClassLoader(libservice, rid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<ClassLoader, Tuple2<String, ClassLoader>>(ret)
 					{
 						public void customResultAvailable(ClassLoader cl)
 						{
-							final IInternalAccess pad = getParentComponent(cinfo, agent);
+//							final IInternalAccess pad = getParentComponent(cinfo, agent);
 //							final IExternalAccess parent = pad.getExternalAccess();
 							
 							String filename = modelname;
@@ -513,7 +514,7 @@ public class SComponentManagementService
 						// Try to find file for local type.
 						String	localtype = modelname!=null ? modelname : cinfo.getLocalType();
 						filename = null;
-						IInternalAccess pad = getParentComponent(cinfo, agent);
+//						IInternalAccess pad = getParentComponent(cinfo, agent);
 //						IExternalAccess parent = pad.getExternalAccess();
 						final SubcomponentTypeInfo[] subcomps = model.getSubcomponentTypes();
 						
@@ -534,9 +535,8 @@ public class SComponentManagementService
 //					ret.setResult(new Tuple2<String, ClassLoader>(filename, null));
 					ret.setResult(new Tuple2<String, ClassLoader>(filename, SComponentManagementService.class.getClassLoader()));
 				}
-			}
-			
-		}));
+//			}
+//		}));
 		
 		return ret;
 	}
@@ -2098,7 +2098,7 @@ public class SComponentManagementService
 			{
 				cinfo.setName(oname);
 				cinfo.setFilename(modelname);
-				platform.createComponentWithResults(null, cinfo).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				platform.createComponentWithResults(cinfo).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 				{
 					Collection<Tuple2<String, Object>> results;
 					
@@ -2188,6 +2188,16 @@ public class SComponentManagementService
 				{
 					public void customResultAvailable(final Tuple2<String, ClassLoader> tup)
 					{
+						@SuppressWarnings("unchecked")
+						final Map<Tuple2<String, ClassLoader>, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>> modelcache =
+							(Map<Tuple2<String, ClassLoader>, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>) Starter.getPlatformValue(agent.getId().getRoot(), Starter.DATA_MODELCACHE);
+						Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>> cacheres = modelcache.get(tup);
+						if (cacheres != null)
+						{
+							ret.setResult(cacheres);
+							return;
+						}
+						
 						final String model = tup.getFirstEntity();
 						getComponentFactory(model, cinfo, rid, false, false, agent)
 							.addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentFactory, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(ret)
@@ -2213,7 +2223,9 @@ public class SComponentManagementService
 											{
 												public void customResultAvailable(Collection<IComponentFeatureFactory> features)
 												{
-													ret.setResult(new Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>(result, tup.getSecondEntity(), features));
+													Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>> res = new Tuple3<>(result, tup.getSecondEntity(), features);
+													modelcache.put(tup, res);
+													ret.setResult(res);
 												}
 											}));
 										}
@@ -3139,6 +3151,30 @@ public class SComponentManagementService
 		
 		releaseReadLock(cid);
 		
+		return ret;
+	}
+	
+	/** Gets the classloader from libservice. */
+	protected static final IFuture<ClassLoader> getClassLoader(ILibraryService libser, IResourceIdentifier rid)
+	{
+		IComponentIdentifier plat = ((IService) libser).getId().getProviderId().getRoot();
+		ClassLoader cl = ((Map<IResourceIdentifier, ClassLoader>)Starter.getPlatformValue(plat, Starter.DATA_CLASSLOADERS)).get(rid);
+		if (cl != null)
+			return new Future<>(cl);
+		
+		final Future<ClassLoader> ret = new Future<>();
+		libser.getClassLoader(rid).addResultListener(new IResultListener<ClassLoader>()
+		{
+			public void resultAvailable(ClassLoader result)
+			{
+				((Map<IResourceIdentifier, ClassLoader>)Starter.getPlatformValue(plat, Starter.DATA_CLASSLOADERS)).put(rid, result);
+				ret.setResult(result);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
 		return ret;
 	}
 	

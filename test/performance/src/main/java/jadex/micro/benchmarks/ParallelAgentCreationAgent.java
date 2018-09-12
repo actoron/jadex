@@ -184,7 +184,7 @@ public class ParallelAgentCreationAgent
 					{
 						CreationInfo cinfo = new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()).setName(createPeerName(i)).setFilename(ParallelAgentCreationAgent.this.getClass().getName()+".class");
 						
-						agent.createComponent(null, cinfo, killlis)
+						agent.createComponent(cinfo, killlis)
 							.addResultListener(creationlis);
 					}
 				}

@@ -133,7 +133,7 @@ public class JadexGatewayServlet extends HttpServlet
 		{
 			String model = (String)entry.getValue().remove("__model");
 			CreationInfo cinfo = new CreationInfo(entry.getValue()).setFilename(model);
-			platform.createComponent(null, cinfo).getFirstResult();
+			platform.createComponent(cinfo).getFirstResult();
 		}
 		
 		System.out.println("Found init commands: "+initcmds);

@@ -29,7 +29,7 @@ public class AppLoop
 			if(i%100==0)
 				System.out.println(i);
 			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut
-				= platform.createComponent(null, new CreationInfo("jadex/bdi/examples/hunterprey_classic/HunterPrey.application.xml"));
+				= platform.createComponent(new CreationInfo("jadex/bdi/examples/hunterprey_classic/HunterPrey.application.xml"));
 			platform.killComponent(fut.getFirstResult()).get();
 			fut.getSecondResult();
 		}
