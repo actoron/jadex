@@ -131,7 +131,7 @@ public class CapabilityPojoWrapper implements ICapability
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 			{
-				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 				
 				if("getFeature".equals(method.getName()))
 				{
