@@ -447,8 +447,10 @@ public class ClockService extends BasicService implements IClockService, IProper
 				}
 			}
 			clock	= bisimclock;
-			// Sim flag false to disable auto-adblockers (not required for bisim).
+			// Sim flag false to disable auto-adblockers for bisim.
 			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
+			// Separate bisim flag for platform bootstrap w/o rescue thread
+			Starter.putPlatformValue(component.getId().getRoot(), BISIMULATION_CLOCK_FLAG, Boolean.TRUE);
 		}
 		else
 		{

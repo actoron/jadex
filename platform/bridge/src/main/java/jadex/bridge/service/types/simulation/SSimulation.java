@@ -115,14 +115,7 @@ public class SSimulation
 	 */
 	public static boolean	isBisimulating(IInternalAccess ia)
 	{
-		boolean	ret	= false;
-		if(ia!=null)
-		{
-			// Called maybe from external thread so allow for exe being null.
-			IExecutionService	exe	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IExecutionService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW));
-			ret	= exe!=null && exe.toString().startsWith("Bisim");
-		}
-		return ret;
+		return ia!=null && Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.BISIMULATION_CLOCK_FLAG));
 	}
 	
 	/**

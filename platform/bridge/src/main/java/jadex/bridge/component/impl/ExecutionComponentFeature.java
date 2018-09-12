@@ -322,14 +322,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 
 		if(!ret.isDone())
 		{
-			try
-			{
-				// may fail when killed in mean time.
-				wakeup();
-			}
-			catch(Exception e)
-			{
-			}
+			wakeup();
 		}
 		
 		return ret;
@@ -692,8 +685,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			IExecutionService exe	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
 			
-			// Do not use rescue thread in platform init for bisimulation to avoid clock running out.
-			if(exe==null && Boolean.TRUE.equals(cinfo.getArguments().get("bisimulation")))
+			// Do not use rescue thread for bisimulation of platform init/shutdown/zombie agents to avoid clock running out.
+			if(exe==null && SSimulation.isBisimulating(getInternalAccess()))
 			{
 				try
 				{
