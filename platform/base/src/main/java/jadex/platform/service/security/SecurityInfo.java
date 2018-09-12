@@ -18,6 +18,9 @@ public class SecurityInfo implements ISecurityInfo
 	/** Flag if the platform has a trusted name. */
 	protected boolean trustedplatform;
 	
+	/** Flag if default authorization is allowed. */
+	protected boolean allowdefaultauthorization;
+	
 	/** Platform name if authenticated. */
 	protected String platformname;
 	
@@ -44,7 +47,7 @@ public class SecurityInfo implements ISecurityInfo
 	 */
 	public boolean hasDefaultAuthorization()
 	{
-		return trustedplatform || adminplatform || (sharednetworks != null && sharednetworks.size() > 0);
+		return allowdefaultauthorization && (trustedplatform || adminplatform || (sharednetworks != null && sharednetworks.size() > 0));
 	}
 	
 	/**
@@ -125,6 +128,26 @@ public class SecurityInfo implements ISecurityInfo
 	public void setTrustedPlatform(boolean trustedplatform)
 	{
 		this.trustedplatform = trustedplatform;
+	}
+	
+	/**
+	 *  Checks if default authorization is allowed.
+	 *
+	 *  @return True, if allowed.
+	 */
+	public boolean isAllowDefaultAuthorization()
+	{
+		return allowdefaultauthorization;
+	}
+	
+	/**
+	 *  Sets if default authorization is allowed.
+	 *
+	 *  @param allowdefaultauthorization True, if allowed.
+	 */
+	public void setAllowDefaultAuthorization(boolean allowdefaultauthorization)
+	{
+		this.allowdefaultauthorization = allowdefaultauthorization;
 	}
 
 	/**

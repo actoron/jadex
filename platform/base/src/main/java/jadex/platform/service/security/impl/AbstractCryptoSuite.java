@@ -101,6 +101,8 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 		if (authenticatedplatformname != null && agent.getInternalTrustedPlatforms().contains(authenticatedplatformname))
 			secinf.setTrustedPlatform(true);
 		
+		secinf.setAllowDefaultAuthorization(agent.getInternalDefaultAuthorization());
+		
 		Map<String, Set<String>> rolemap = agent.getInternalRoles();
 		Set<String> roles = new HashSet<String>();
 		
@@ -124,5 +126,11 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 		}
 		
 		secinf.setRoles(roles);
+		
+		if (!agent.getInternalAllowNoAuthName() && secinf.getAuthenticatedPlatformName() == null)
+			throw new SecurityException("Connections to platforms with unauthenticated platform names are not allowed: " + remoteid);
+		
+		if (!agent.getInternalAllowNoNetwork() && secinf.getNetworks().isEmpty())
+			throw new SecurityException("Connections to platforms with no authenticated networks are not allowed: " + remoteid);
 	}
 }
