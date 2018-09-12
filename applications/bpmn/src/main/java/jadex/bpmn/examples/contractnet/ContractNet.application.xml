@@ -11,7 +11,7 @@
 	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd
 	                    http://www.activecomponents.org/jadex-envspace 
 	                    http://www.activecomponents.org/jadex-envspace-${jadex_build_version}.xsd"
-	name="ContractNet" package="jadex.bpmn.examples.contractnet" autoshutdown="true">
+	name="ContractNet" package="jadex.bpmn.examples.contractnet">
 	
 	<componenttypes>
 		<componenttype name="CNPProtocol" filename="jadex/bpmn/examples/contractnet/ContractNet.bpmn2"/>

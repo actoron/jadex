@@ -12,7 +12,6 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -108,20 +107,21 @@ public class PojoAgentCreationAgent
 		
 		if(num<max)
 		{
-			getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-			{
-				public void resultAvailable(IComponentManagementService cms)
-				{
+//			getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+//			{
+//				public void resultAvailable(IComponentManagementService cms)
+//				{
 					Map<String, Object>	args	= new HashMap<String, Object>();
 					args.put("max", Integer.valueOf(max));
 					args.put("num", Integer.valueOf(num));
 					args.put("starttime", Long.valueOf(starttime));
 					args.put("startmem", Long.valueOf(startmem));
-					cms.createComponent(createPeerName(num+1, agent.getId()),
+					agent.createComponent(
 						PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
-						new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()), null);
-				}
-			});
+						new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
+							.setName(createPeerName(num+1, agent.getId())), null);
+//				}
+//			});
 		}
 		else
 		{
@@ -150,13 +150,13 @@ public class PojoAgentCreationAgent
 					System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 				
 					// Use initial component to kill others
-					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-					{
-						public void resultAvailable(IComponentManagementService cms)
-						{
+//					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+//					{
+//						public void resultAvailable(IComponentManagementService cms)
+//						{
 							String	initial	= createPeerName(1, agent.getId());
 							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+							agent.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess exta)
 								{
@@ -181,8 +181,8 @@ public class PojoAgentCreationAgent
 									});
 								}
 							});
-						}
-					});
+//						}
+//					});
 				}
 			});
 		}
@@ -214,12 +214,12 @@ public class PojoAgentCreationAgent
 		final long omem, final double upera)
 	{
 		final String name = createPeerName(cnt, agent.getId());
-		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-		{
-			public void resultAvailable(IComponentManagementService cms)
-			{
+//		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+//		{
+//			public void resultAvailable(IComponentManagementService cms)
+//			{
 				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
-				cms.destroyComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
+				agent.killComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
 				{
 					public void resultAvailable(Map<String, Object> result)
 					{
@@ -235,8 +235,8 @@ public class PojoAgentCreationAgent
 						}
 					}
 				});
-			}
-		});
+//			}
+//		});
 	}
 	
 	/**
@@ -276,10 +276,10 @@ public class PojoAgentCreationAgent
 		});
 	}
 	
-	protected IFuture<IComponentManagementService>	getCMS()
-	{
-		return agent.getFeature(IRequiredServicesFeature.class).getService(IComponentManagementService.class);
-	}
+//	protected IFuture<IComponentManagementService>	getCMS()
+//	{
+//		return agent.getFeature(IRequiredServicesFeature.class).getService(IComponentManagementService.class);
+//	}
 	
 	
 	protected IFuture<IClockService> getClock()

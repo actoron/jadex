@@ -63,4 +63,56 @@ public interface IRequiredServicesFeature extends IExternalRequiredServicesFeatu
 	 *  @return A collection of services.
 	 */
 	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query);
+	
+	
+	// Would be nice having methods below in external variant but requires special required proxy handling
+	
+	/**
+	 *  Add a query for a declared required service.
+	 *  Continuously searches for matching services.
+	 *  @param name The name of the required service declaration.
+	 *  @return Future providing the corresponding services as intermediate results.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(String name);
+	
+	/**
+	 *  Add a query for a declared required service.
+	 *  Continuously searches for matching services.
+	 *  @param type The type of the required service declaration.
+	 *  @return Future providing the corresponding services as intermediate results.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(Class<T> type);
+	
+	/**
+	 *  Resolve a declared required service of a given name.
+	 *  Asynchronous method for locally as well as remotely available services.
+	 *  @param name The service name.
+	 *  @return Future with the service or ServiceNotFoundException
+	 */
+	public <T> IFuture<T> getService(String name);
+	
+	/**
+	 *  Resolve a declared required service of a given type.
+	 *  Asynchronous method for locally as well as remotely available services.
+	 *  @param type The service type.
+	 *  @return Future with the service or ServiceNotFoundException
+	 */
+	public <T> IFuture<T> getService(Class<T> type);
+	
+	/**
+	 *  Resolve a declared required services of a given name.
+	 *  Asynchronous method for locally as well as remotely available services.
+	 *  @param name The services name.
+	 *  @return Each service as an intermediate result or a collection of services as final result.
+	 */
+	public <T> ITerminableIntermediateFuture<T> getServices(String name);
+	
+	/**
+	 *  Resolve a declared required services of a given type.
+	 *  Asynchronous method for locally as well as remotely available services.
+	 *  @param type The services type.
+	 *  @return Each service as an intermediate result or a collection of services as final result.
+	 */
+	public <T> ITerminableIntermediateFuture<T> getServices(Class<T> type);
+	
 }

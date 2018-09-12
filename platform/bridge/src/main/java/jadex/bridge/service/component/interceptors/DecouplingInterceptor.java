@@ -485,13 +485,14 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				// Add timeout handling for local case.
 				if(!((IFuture<?>)res).isDone() && !sic.isRemoteCall())
 				{
-					boolean	realtime = sic.getNextServiceCall().getRealtime();
+//					boolean	realtime = sic.getNextServiceCall().getRealtime();
 					
 					if(timeout>=0)
 					{
 						if(fut instanceof IIntermediateFuture)
 						{
-							TimeoutIntermediateResultListener	tirl	= new TimeoutIntermediateResultListener(timeout, ea, realtime, sic.getMethod(), new IIntermediateFutureCommandResultListener()
+//							TimeoutIntermediateResultListener	tirl	= new TimeoutIntermediateResultListener(timeout, ea, realtime, sic.getMethod(), new IIntermediateFutureCommandResultListener()
+							TimeoutIntermediateResultListener	tirl	= new TimeoutIntermediateResultListener(timeout, ea, false, sic.getMethod(), new IIntermediateFutureCommandResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -535,7 +536,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						else
 						{
 //							SIC.set(sic);
-							fut.addResultListener(new TimeoutResultListener(timeout, ea, realtime, sic.getMethod(), new IFutureCommandResultListener()
+//							fut.addResultListener(new TimeoutResultListener(timeout, ea, realtime, sic.getMethod(), new IFutureCommandResultListener()
+							fut.addResultListener(new TimeoutResultListener(timeout, ea, false, sic.getMethod()+", "+sic.getArguments(), new IFutureCommandResultListener()
 							{
 								public void resultAvailable(Object result)
 								{

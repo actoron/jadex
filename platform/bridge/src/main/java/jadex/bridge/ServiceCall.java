@@ -241,28 +241,37 @@ public class ServiceCall
 	 *  @return True, if the timeout is a real time (i.e. system time)
 	 *    instead of platform time. 
 	 */
-	public Boolean	getRealtime()
-	{
-		return (Boolean)properties.get(REALTIME);
-	}
+//	public Boolean	getRealtime()
+//	{
+//		return (Boolean)properties.get(REALTIME);
+//	}
 	
 	/**
 	 *  Set the realtime property.
 	 */
-	public void setRealtime(Boolean realtime)
-	{
-		lastmod	= IComponentIdentifier.LOCAL.get();
-		properties.put(REALTIME, realtime);
-	}
+//	public void setRealtime(Boolean realtime)
+//	{
+//		lastmod	= IComponentIdentifier.LOCAL.get();
+//		properties.put(REALTIME, realtime);
+//	}
 	
 	/**
 	 *  Get the realtime flag.
 	 *  @return True, if the timeout is a real time (i.e. system time)
 	 *    instead of platform time. 
 	 */
-	public boolean isRealtime()
+//	public boolean isRealtime()
+//	{
+//		return getRealtime().booleanValue();
+//	}
+	
+	/**
+	 *  Test if a call is remote.
+	 */
+	public boolean isRemoteCall(IComponentIdentifier callee)
 	{
-		return getRealtime().booleanValue();
+		IComponentIdentifier platform = callee.getRoot();
+		return caller==null? false: !caller.getRoot().equals(platform);
 	}
 	
 //	/**

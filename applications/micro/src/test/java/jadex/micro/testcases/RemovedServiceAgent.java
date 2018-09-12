@@ -165,6 +165,7 @@ public class RemovedServiceAgent extends JunitAgentTest
 											{
 												final TestReport	tr3	= new TestReport("#"+(++cnt), "Test if service of destroyed "+agentname+" can be called.");
 												testfut.addIntermediateResult(tr3);
+												System.out.println("calling: "+scs);
 												scs.call().addResultListener(new IResultListener<Void>()
 												{
 													public void exceptionOccurred(Exception exception)

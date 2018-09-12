@@ -38,7 +38,8 @@ public class SFuture
 	public static void avoidCallTimeouts(final Future<?> ret, IInternalAccess ia)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
-		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
+//		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
+		boolean	realtime = sc != null ? sc.isRemoteCall(ia.getId()) : false;
 		avoidCallTimeouts(ret, ia, realtime);
 	}
 	
@@ -73,7 +74,8 @@ public class SFuture
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		long to = sc!=null? sc.getTimeout(): Starter.getDefaultTimeout(ea.getId()); // Hack!!! find out in which cases service call can null
-		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
+//		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
+		boolean	realtime = sc != null ? sc.isRemoteCall(ea.getId()) : false;
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
 	//	to = 5000;
@@ -135,7 +137,13 @@ public class SFuture
 					return IFuture.DONE;
 				}
 			};
-			ia.getFeature(IExecutionFeature.class).waitForDelay(w, step, realtime);
+//			ia.getFeature(IExecutionFeature.class).waitForDelay(w, step, realtime);
+			
+			// Send the first update immediately since the avoid is set up at
+			// the receiver and some time may have already passed until the receiver
+			// gets the call. Otherwise the call only has 0.2*timeout to get to the
+			// receiver in the first place.
+			ia.scheduleStep(step);
 		}
 	}
 	

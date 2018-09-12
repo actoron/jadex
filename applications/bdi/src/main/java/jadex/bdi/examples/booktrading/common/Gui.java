@@ -3,6 +3,7 @@ package jadex.bdi.examples.booktrading.common;
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Date;
 
 import javax.swing.JFrame;
 
@@ -34,7 +35,7 @@ public class Gui extends JFrame
 	{
 		super((GuiPanel.isBuyer(agent)? "Buyer: ": "Seller: ")+agent.getId().getName());
 		
-//			System.out.println("booktrading0: "+agent.getComponentIdentifier());
+		System.out.println("booktrading0: "+agent.getId());
 		GuiPanel gp = new GuiPanel(agent);
 		
 		add(gp, BorderLayout.CENTER);
@@ -69,7 +70,7 @@ public class Gui extends JFrame
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				System.out.println("booktrading2: "+agent.getComponentIdentifier());
+				System.out.println("booktrading2: "+agent.getId()+" "+new Date());
 				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{

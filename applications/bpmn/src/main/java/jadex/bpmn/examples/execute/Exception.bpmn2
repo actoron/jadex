@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>Exception</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="_y65Nd2pBEd6JtKkNrnCCNQ">
     <semantic:subProcess name="Exception Process" id="_2BX2MWpBEd6JtKkNrnCCNQ">

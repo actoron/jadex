@@ -223,10 +223,10 @@ public class LongcallTestAgent extends TestAgent
 //					ServiceCall.setInvocationProperties(to, true);
 					ServiceCall call = ServiceCall.getOrCreateNextInvocation();
 					call.setTimeout(to);
-					call.setRealtime(Boolean.TRUE);
+//					call.setRealtime(Boolean.FALSE);
 				}				
 				
-				System.out.println("calling method: "+ServiceCall.getOrCreateNextInvocation());
+//				System.out.println("calling method: "+ServiceCall.getOrCreateNextInvocation());
 				
 				callMethod(ts, 1, ret).addResultListener(new IResultListener<Void>()
 				{
@@ -262,7 +262,7 @@ public class LongcallTestAgent extends TestAgent
 			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
 			
 			// set timeout to low value to avoid long waiting in test
-			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(agent.getId(), 0.01));
+			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(agent.getId(), 0.1));
 			
 			final long start	= System.currentTimeMillis();
 			Object	fut	= m.invoke(ts, new Object[0]);
@@ -291,6 +291,7 @@ public class LongcallTestAgent extends TestAgent
 					public void exceptionOccurred(Exception exception)
 					{
 						System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						exception.printStackTrace();
 						tr.setFailed("Exception: "+exception);
 						ret.addIntermediateResult(tr);
 						proceed();
@@ -329,6 +330,7 @@ public class LongcallTestAgent extends TestAgent
 					public void exceptionOccurred(Exception exception)
 					{
 						System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+						exception.printStackTrace();
 						tr.setFailed("Exception: "+exception);
 						ret.addIntermediateResult(tr);
 						proceed();

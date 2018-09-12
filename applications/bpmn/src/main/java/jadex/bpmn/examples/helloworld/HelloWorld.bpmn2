@@ -11,7 +11,7 @@
     <jadex:modelname>HelloWorld</jadex:modelname>
     <jadex:description>&lt;h3&gt;HelloWorld Process&lt;/h3&gt;The HelloWorld example starts a process, which prints a welcome message and then terminates.</jadex:description>
     <jadex:package>jadex.bpmn.examples.helloworld</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="_1cEzRxZEEd-yC473XtaJZQ">
     <semantic:task name="Print Hello" id="_1cOkQRZEEd-yC473XtaJZQ">

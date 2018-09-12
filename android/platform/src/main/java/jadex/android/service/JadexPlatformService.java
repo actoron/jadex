@@ -14,7 +14,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.future.DelegationResultListener;
@@ -166,10 +165,10 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 		return startJadexPlatform(platformConfiguration);
 	}
 	
-	public IFuture<IComponentManagementService> getCMS()
-	{
-		return getCMS(platformId);
-	}
+//	public IFuture<IComponentManagementService> getCMS()
+//	{
+//		return getCMS(platformId);
+//	}
 	
 	public IExternalAccess getExternalPlatformAccess()
 	{

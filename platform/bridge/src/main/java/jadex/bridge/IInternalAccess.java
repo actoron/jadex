@@ -1,33 +1,24 @@
 package jadex.bridge;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
+import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.CMSStatusEvent;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
-import jadex.commons.Tuple2;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITuple2Future;
 
 /**
  *  Common interface for all component types.
  *  Provides the user view of the component, i.e.,
  *  methods the component can call on itself.
  */
-public interface IInternalAccess extends IExternalAccess, IExecutionFeature, IArgumentsResultsFeature, IProvidedServicesFeature, IRequiredServicesFeature, ISubcomponentsFeature, IMonitoringComponentFeature //extends INFPropertyProvider//extends IRemotable
+public interface IInternalAccess extends IExternalAccess, IExecutionFeature, IArgumentsResultsFeature, IProvidedServicesFeature, IRequiredServicesFeature, ISubcomponentsFeature, IMonitoringComponentFeature, INFPropertyComponentFeature //extends INFPropertyProvider//extends IRemotable
 {
 	/**
 	 *  Get the model of the component.
@@ -36,16 +27,16 @@ public interface IInternalAccess extends IExternalAccess, IExecutionFeature, IAr
 	public IModelInfo getModel();
 
 	/**
-	 *  Get the configuration.
-	 *  @return	The configuration.
-	 */
-	public String getConfiguration();
-	
-	/**
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
 	public IComponentIdentifier	getId();
+	
+	/**
+	 *  Get the configuration.
+	 *  @return	The configuration.
+	 */
+	public String getConfiguration();
 	
 	/**
 	 *  Get a feature of the component.

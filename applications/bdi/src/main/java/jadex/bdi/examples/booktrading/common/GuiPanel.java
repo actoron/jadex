@@ -757,9 +757,8 @@ public class GuiPanel extends JPanel
 
 			// Add some default entries for easy testing of the gui.
 			// These orders are not added to the agent (see manager.agent.xml).
-			try
+			agent.searchService( new ServiceQuery<>(IClockService.class)).addResultListener(clock ->
 			{
-				IClockService clock	= agent.searchService( new ServiceQuery<>(IClockService.class)).get();
 				if(buy)
 				{
 					orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));
@@ -774,11 +773,7 @@ public class GuiPanel extends JPanel
 					orders.addItem(new Order("Harry Potter", null, 15, 9, buy, clock));
 					orders.addItem(new Order("Agents in the real world", null, 100, 60, buy, clock));
 				}
-			}
-			catch(Exception e)
-			{
-				// happens when killed during startup
-			}
+			});
 			
 			JPanel center = new JPanel(new GridBagLayout());
 			center.setBorder(new EmptyBorder(5, 5, 5, 5));

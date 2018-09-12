@@ -57,19 +57,21 @@ public class STest {
 		config.setAwareness(false);	// disable old awareness
 		
         config.getExtendedPlatformConfiguration().setSecurity(true);
-        config.getExtendedPlatformConfiguration().setTcpTransport(true);
+//        config.getExtendedPlatformConfiguration().setTcpTransport(true);
+        config.setValue("intravm", true);
         config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
         config.getExtendedPlatformConfiguration().setSimulation(true);
         
         config.setValue("settings.readonly", true);
         
 //        config.setLogging(true);
-        
-        config.setWelcome(true);
-                
+        config.getExtendedPlatformConfiguration().setDebugFutures(false);
+		config.setWelcome(true);
+		
+		
         return config;
     }
-
+    
     public static void terminatePlatform(IExternalAccess platform) 
     {
         platform.killComponent().get();

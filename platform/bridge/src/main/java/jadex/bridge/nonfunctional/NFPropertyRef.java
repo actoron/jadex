@@ -57,15 +57,15 @@ public class NFPropertyRef<T, U> extends AbstractNFProperty<T, U>
 		IFuture<T> fut;
 		if(sid==null && method==null)
 		{
-			fut = SNFPropertyProvider.getNFPropertyValue(comp, getName(), unit);
+			fut = comp.getNFPropertyValue(getName(), unit);
 		}
 		else if(sid!=null && method==null)
 		{
-			fut = SNFPropertyProvider.getNFPropertyValue(comp, sid, getName(), unit);
+			fut = comp.getNFPropertyValue(sid, getName(), unit);
 		}
 		else
 		{
-			fut = SNFPropertyProvider.getMethodNFPropertyValue(comp, sid, method, getName(), unit);
+			fut = comp.getMethodNFPropertyValue(sid, method, getName(), unit);
 		}
 		
 		fut.addResultListener(new IResultListener<T>()
@@ -85,15 +85,15 @@ public class NFPropertyRef<T, U> extends AbstractNFProperty<T, U>
 				
 				if(sid==null && method==null)
 				{
-					SNFPropertyProvider.removeNFProperty(comp, getName());
+					comp.removeNFProperty(getName());
 				}
 				else if(sid!=null && method==null)
 				{
-					SNFPropertyProvider.removeNFProperty(comp, sid, getName());
+					comp.removeNFProperty(sid, getName());
 				}
 				else
 				{
-					SNFPropertyProvider.removeMethodNFProperty(comp, sid, method, getName());
+					comp.removeMethodNFProperty(sid, method, getName());
 				}
 				
 				ret.setException(exception);

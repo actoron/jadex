@@ -7,7 +7,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.platform.IJadexMultiPlatformBinder;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -42,10 +41,10 @@ public class JadexMultiPlatformBinder extends Binder implements IJadexMultiPlatf
 		return service.isPlatformRunning(platformID);
 	}
 
-	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID)
-	{
-		return service.getCMS(platformID);
-	}
+//	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID)
+//	{
+//		return service.getCMS(platformID);
+//	}
 	
 	public void shutdownJadexPlatforms()
 	{

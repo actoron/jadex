@@ -28,7 +28,8 @@ public class NFPropertyTestAgent
 		ICoreDependentService cds = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICoreDependentService.class)).get();
 		IService iscds = (IService)cds;
 //		INFPropertyProvider prov = (INFPropertyProvider)iscds.getExternalComponentFeature(INFPropertyComponentFeature.class);
-		String[] names = SNFPropertyProvider.getNFPropertyNames(agent.getExternalAccess(), iscds.getId()).get();
+//		String[] names = SNFPropertyProvider.getNFPropertyNames(agent.getExternalAccess(), iscds.getId()).get();
+		String[] names = agent.getNFPropertyNames(iscds.getId()).get();
 		
 		System.out.println("Begin list of non-functional properties:");
 		for(String name : names)
@@ -37,9 +38,9 @@ public class NFPropertyTestAgent
 		}
 		System.out.println("Finished list of non-functional properties.");
 		
-		System.out.println("Service Value: " + SNFPropertyProvider.getNFPropertyValue(agent.getExternalAccess(), iscds.getId(), "cores").get());
+		System.out.println("Service Value: " + agent.getNFPropertyValue(iscds.getId(), "cores").get());
 		
-		System.out.println("Component Value, requested from Service: " + SNFPropertyProvider.getNFPropertyValue(agent.getExternalAccess(), iscds.getId(), "componentcores").get());
+		System.out.println("Component Value, requested from Service: " + agent.getNFPropertyValue(iscds.getId(), "componentcores").get());
 //		try
 //		{
 //			System.out.println("Speed Value for method: " +iscds.getNFPropertyValue(ICoreDependentService.class.getMethod("testMethod", new Class<?>[0]), "methodspeed").get());

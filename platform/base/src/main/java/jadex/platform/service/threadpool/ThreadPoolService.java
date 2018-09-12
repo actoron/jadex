@@ -59,15 +59,18 @@ public class ThreadPoolService extends BasicService implements IThreadPoolServic
 		
 		final Timer	t	= new Timer(true);
 		long delay = Starter.getScaledDefaultTimeout(getProviderId(), 1.0 / 3); // hack!!! hard coded to 1/3 of default timeout
-		t.schedule(new TimerTask()
+		if (delay >= 0)
 		{
-			public void run()
+			t.schedule(new TimerTask()
 			{
-				System.out.println("Shutdown threadpool timeout: "+this+", "+new Date());
-				// stop waiting for threadpool if still no notifaction
-				ret.setResultIfUndone(null);
-			}
-		}, delay > -1 ? delay : 0);
+				public void run()
+				{
+					System.out.println("Shutdown threadpool timeout: "+this+", "+new Date());
+					// stop waiting for threadpool if still no notifaction
+					ret.setResultIfUndone(null);
+				}
+			}, delay);
+		}
 		
 		threadpool.addFinishListener(new IChangeListener<Void>()
 		{

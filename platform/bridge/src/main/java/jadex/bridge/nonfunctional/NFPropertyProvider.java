@@ -76,7 +76,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 			{
 				public void customResultAvailable(IExternalAccess component) 
 				{
-					SNFPropertyProvider.getNFAllPropertyNames(component).addResultListener(new DelegationResultListener<String[]>(ret)
+					component.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
 					{
 						public void customResultAvailable(String[] result)
 						{
@@ -180,7 +180,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 				{
 					public void customResultAvailable(IExternalAccess component) 
 					{
-						SNFPropertyProvider.getNFPropertyMetaInfo(component, name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+						component.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 					}
 				});
 			}
@@ -225,7 +225,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 				{
 					public void customResultAvailable(IExternalAccess pacomponent) 
 					{
-						IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(pacomponent, name);
+						IFuture<T> res = pacomponent.getNFPropertyValue(name);
 						res.addResultListener(new ComponentResultListener<T>(new DelegationResultListener<T>(ret), component));
 					}
 				}, component));
@@ -273,7 +273,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 				{
 					public void customResultAvailable(IExternalAccess component) 
 					{
-						IFuture<T> res = SNFPropertyProvider.getNFPropertyValue(component, name, unit);
+						IFuture<T> res = component.getNFPropertyValue(name, unit);
 						res.addResultListener(new DelegationResultListener<T>(ret));
 					}
 				});

@@ -8,9 +8,12 @@ import jadex.android.controlcenter.componentViewer.tree.IAndroidTreeNode;
 import jadex.android.service.JadexPlatformService;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -214,13 +217,13 @@ public class ComponentViewer extends MetaActivity implements ServiceConnection
 	{
 		final Future<AsyncTreeModel> result = new Future<AsyncTreeModel>();
 
-		IFuture<IComponentManagementService> fut = platformService.getCMS(platformId);
-		fut.addResultListener(new DefaultResultListener<IComponentManagementService>()
+		IExternalAccess access = platformService.getExternalPlatformAccess(platformId);
+		access.scheduleStep(new IComponentStep<Void>()
 		{
 			@Override
-			public void resultAvailable(final IComponentManagementService cms)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IFuture<IComponentDescription[]> fut = cms.getComponentDescriptions();
+				IFuture<IComponentDescription[]> fut = SComponentManagementService.getComponentDescriptions(ia);
 				fut.addResultListener(new DefaultResultListener<IComponentDescription[]>()
 				{
 
@@ -236,11 +239,13 @@ public class ComponentViewer extends MetaActivity implements ServiceConnection
 							}
 						}
 						AsyncTreeModel model = new AsyncTreeModel();
-						model.setRoot(new ComponentTreeNode(null, model, root, cms, platformService.getExternalPlatformAccess(platformId)));
+						model.setRoot(new ComponentTreeNode(null, model, root, platformService.getExternalPlatformAccess(platformId)));
 						result.setResult(model);
 					}
 
 				});
+				
+				return IFuture.DONE;
 			}
 		});
 

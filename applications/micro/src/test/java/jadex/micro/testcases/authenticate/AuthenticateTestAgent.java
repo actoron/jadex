@@ -97,8 +97,7 @@ public class AuthenticateTestAgent extends TestAgent
 							{
 								if(test<tests.length-1)
 								{
-									performTest(tc, tests, test+1)
-										.addResultListener(new DelegationResultListener<Void>(ret));
+									performTest(tc, tests, test+1).addResultListener(new DelegationResultListener<Void>(ret));
 								}
 								else
 								{
@@ -121,6 +120,8 @@ public class AuthenticateTestAgent extends TestAgent
 	 */
 	protected	IFuture<IExternalAccess> setupTestPlatform(boolean def, final boolean cus)
 	{
+		disableLocalSimulationMode().get();
+		
 		IPlatformConfiguration	conf	= STest.getDefaultTestConfig();
 		// use different platform name / key etc.
 		conf.setPlatformName("other_*");
@@ -159,6 +160,8 @@ public class AuthenticateTestAgent extends TestAgent
 								@Override
 								public void customResultAvailable(ISecurityService result) throws Exception
 								{
+//									System.out.println("is compo:"+agent.isComponentThread());
+									
 									result.addRole(STest.testnetwork_name, "custom")
 										.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 									{

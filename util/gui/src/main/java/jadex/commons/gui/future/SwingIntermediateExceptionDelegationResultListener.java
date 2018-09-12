@@ -31,6 +31,7 @@ public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> i
 	{
 		this.future = future;
 //		this.ex	= new DebugException();
+		SwingDelegationResultListener.block(future);
 	}
 	
 	//-------- methods --------

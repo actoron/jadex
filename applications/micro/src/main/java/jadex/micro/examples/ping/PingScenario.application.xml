@@ -11,8 +11,8 @@
 	name="PingScenario" package="jadex.micro.examples.ping">
 	
 	<componenttypes>
-		<componenttype name="Ping" filename="jadex/micro/examples/ping/PingAgent.class" master="true"/>
-		<componenttype name="Pinging" filename="jadex/micro/examples/ping/PingingAgent.class" master="true"/>
+		<componenttype name="Ping" filename="jadex/micro/examples/ping/PingAgent.class"/>
+		<componenttype name="Pinging" filename="jadex/micro/examples/ping/PingingAgent.class"/>
 	</componenttypes>
 	
 	<configurations>

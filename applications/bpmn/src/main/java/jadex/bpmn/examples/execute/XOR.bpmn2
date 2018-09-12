@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>XOR</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="_kGs10WpAEd6JtKkNrnCCNQ">
     <semantic:startEvent id="_lYWq8WpAEd6JtKkNrnCCNQ">

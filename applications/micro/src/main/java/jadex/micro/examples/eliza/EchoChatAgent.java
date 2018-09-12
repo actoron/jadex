@@ -99,8 +99,7 @@ public class EchoChatAgent
 	 */
 	public static void main(String[] args)
 	{
-		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get();
-		
+		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false"}).get();		
 		for(int i=0; i<10000; i++)
 		{
 			System.out.print(".");

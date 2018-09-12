@@ -49,6 +49,18 @@ public interface IInternalExecutionFeature
 	public boolean execute();
 	
 	/**
+	 *  Adds a simulation blocker for remote actions that have
+	 *  a definite end (i.e. regular futures), so remote calls
+	 *  work in simulation mode.
+	 *  
+	 *  Does not work for intermediates. Noop if simulation is
+	 *  disabled
+	 *  
+	 *  @param remotefuture The future of the remote action.
+	 */
+	public <T> void addSimulationBlocker(IFuture<T> remotefuture);
+	
+	/**
 	 *  Add a synchronous subcomponent that will run on its parent's thread.
 	 *  @param sub The subcomponent.
 	 */

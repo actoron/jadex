@@ -10,9 +10,6 @@ import jadex.bridge.ISearchConstraints;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.IFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -20,9 +17,9 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 
 /**
- * 
+ *  External perspective of the execution feature. 
  */
-public interface IExternalExecutionFeature
+public interface IExternalExecutionFeature extends IExternalComponentFeature
 {	
 	/**
 	 *  Execute a component step.

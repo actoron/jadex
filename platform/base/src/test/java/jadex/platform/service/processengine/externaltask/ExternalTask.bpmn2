@@ -9,7 +9,7 @@
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
     <jadex:modelname>ExternalTask</jadex:modelname>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="uUo+E7Iz86Nazznz">
     <semantic:startEvent id="g0NDzyLMXStBG1xs">
@@ -47,9 +47,6 @@
         <jadex:parameter direction="in" name="subcomponent" type="java.lang.Boolean">true</jadex:parameter>
         <jadex:parameter direction="in" name="wait" type="java.lang.Boolean"/>
         <jadex:parameter direction="in" name="suspend" type="java.lang.Boolean"/>
-        <jadex:parameter direction="in" name="master" type="java.lang.Boolean"/>
-        <jadex:parameter direction="in" name="daemon" type="java.lang.Boolean"/>
-        <jadex:parameter direction="in" name="autoshutdown" type="java.lang.Boolean"/>
         <jadex:parameter direction="in" name="monitoring" type="java.lang.Boolean"/>
         <jadex:parameter direction="in" name="synchronous" type="java.lang.Boolean"/>
         <jadex:parameter direction="in" name="persistable" type="java.lang.Boolean"/>

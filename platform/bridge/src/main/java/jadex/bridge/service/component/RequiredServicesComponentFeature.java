@@ -14,8 +14,10 @@ import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
@@ -507,7 +509,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 		try
 		{
-			return resolveLocalService(new ServiceQuery<>(type).setMultiplicity(Multiplicity.ZERO_ONE), null);
+			ServiceQuery<T> query = new ServiceQuery<>(type).setMultiplicity(Multiplicity.ZERO_ONE);
+			query.setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW);
+			return resolveLocalService(query, createServiceInfo(query));
 		}
 		catch(ServiceNotFoundException snfe)
 		{
@@ -520,7 +524,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public <T> Collection<T> getRawServices(Class<T> type)
 	{
-		return resolveLocalServices(new ServiceQuery<>(type), null);
+		ServiceQuery<T> query = new ServiceQuery<>(type);
+		query.setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW);
+		return resolveLocalServices(query, createServiceInfo(query));
 	}
 
 	
@@ -564,7 +570,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					{
 						return createServiceProxy(result, info);
 					}
-				}); 			
+				});
+				((IInternalExecutionFeature) component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
 			}
 		}
 		
@@ -857,7 +864,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	protected <T> RequiredServiceInfo createServiceInfo(ServiceQuery<T> query)
 	{
 		// TODO: multiplicity required here for info? should not be needed for proxy creation
-		return new RequiredServiceInfo(null, query.getServiceType(), false, null, null, query.getServiceTags()==null ? null : Arrays.asList(query.getServiceTags()));
+		RequiredServiceBinding binding = new RequiredServiceBinding(SUtil.createUniqueId(), query.getScope());
+		binding.setProxytype(query.getRequiredProxyType());
+		return new RequiredServiceInfo(null, query.getServiceType(), false, binding, null, query.getServiceTags()==null ? null : Arrays.asList(query.getServiceTags()));
 	}
 	
 	/**

@@ -380,13 +380,6 @@ In the configurations section, predefined
 			<xs:documentation>Base type for any startable element.</xs:documentation>
 		</xs:annotation>
 		<xs:attribute name="suspend" type="xs:boolean" use="optional" default="false"/>
-		<xs:attribute name="master" type="xs:boolean" use="optional" default="false">
-			<xs:annotation>
-				<xs:documentation>A master agent ist required for the application, thus, if a master agent is killed, the application will be closed down. Default is false.</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="daemon" type="xs:boolean" use="optional" default="false"/>
-		<xs:attribute name="autoshutdown" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="monitoring" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="synchronous" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>

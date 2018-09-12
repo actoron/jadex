@@ -517,7 +517,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 			}
 		};
 		
-		SNFPropertyProvider.getNFPropertyValue(ea, CoreNumberProperty.NAME)
+		ea.getNFPropertyValue(CoreNumberProperty.NAME)
 			.addResultListener(new IResultListener<Object>()
 		{
 			public void resultAvailable(Object result)
@@ -532,7 +532,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 			}
 		});
 		
-		SNFPropertyProvider.getNFPropertyValue(ea, MaxMemoryProperty.NAME, MemoryUnit.MB)
+		ea.getNFPropertyValue(MaxMemoryProperty.NAME, MemoryUnit.MB)
 			.addResultListener(new IResultListener<Object>()
 		{
 			public void resultAvailable(Object result)
@@ -547,7 +547,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 			}
 		});
 		
-		SNFPropertyProvider.getNFPropertyValue(ea, ComponentUptimeProperty.NAME, TimeUnit.SECONDS)
+		ea.getNFPropertyValue(ComponentUptimeProperty.NAME, TimeUnit.SECONDS)
 			.addResultListener(new IResultListener<Object>()
 		{
 			public void resultAvailable(Object result)

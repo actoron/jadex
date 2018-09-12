@@ -3,13 +3,16 @@ package jadex.micro.testcases.nflatency;
 import java.util.Collection;
 import java.util.Map;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -28,6 +31,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.TupleResult;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -43,6 +47,7 @@ import jadex.micro.testcases.TestAgent;
 	@RequiredService(name="aser", type=ITestService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL,
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))
 })
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class NFLatencyTestAgent extends TestAgent
 {
 	/**
@@ -100,7 +105,13 @@ public class NFLatencyTestAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(null).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+		disableLocalSimulationMode().get();
+		
+//		createPlatform(null)
+		IPlatformConfiguration config = STest.getDefaultTestConfig();
+		config.getExtendedPlatformConfiguration().setSimul(false);
+		config.getExtendedPlatformConfiguration().setSimulation(false);
+		createPlatform(config, null).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -196,6 +207,7 @@ public class NFLatencyTestAgent extends TestAgent
 //			null, null, null, SReflect.getInnerClassName(this.getClass()));
 //		awa.addAwarenessInfo(info).get();
 		
+		
 		IIntermediateFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
 		fut.addResultListener(new IIntermediateResultListener<ITestService>()
 		{
@@ -204,8 +216,11 @@ public class NFLatencyTestAgent extends TestAgent
 			{
 				if(cid.equals(((IService)result).getId().getProviderId()))
 				{
-					called = true;
-					callService(result);
+					if(!called)
+					{
+						called = true;
+						callService(result);
+					}
 				}
 			}
 			public void finished()
@@ -226,7 +241,7 @@ public class NFLatencyTestAgent extends TestAgent
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				ret.setExceptionIfUndone(exception);
 			}
 			
 			protected void callService(final ITestService ts)
@@ -240,7 +255,8 @@ public class NFLatencyTestAgent extends TestAgent
 						{
 							MethodInfo mi = new MethodInfo(ITestService.class.getMethod("methodA", new Class[]{long.class}));
 							System.out.println("service: "+ts);
-							Long lat = (Long)SNFPropertyProvider.getRequiredMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ts).getId(), mi, LatencyProperty.NAME).get();
+							Long lat = (Long)agent.getRequiredMethodNFPropertyValue(((IService)ts).getId(), mi, LatencyProperty.NAME).get();
+//							Long lat = (Long)SNFPropertyProvider.getRequiredMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ts).getId(), mi, LatencyProperty.NAME).get();
 //							INFMixedPropertyProvider pp = ((INFRPropertyProvider)ts).getRequiredServicePropertyProvider().get();
 //							Long lat = (Long)pp.getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();
 							System.out.println("latency: "+lat);

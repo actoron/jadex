@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -279,9 +280,10 @@ public class TcpTransport	implements ITransport<SocketChannel>
 						{
 							// Convert message into buffer.
 							ByteBuffer buf = ByteBuffer.allocateDirect(8 + header.length + body.length);
-							buf.put(SUtil.intToBytes(header.length));
+							buf.order(ByteOrder.BIG_ENDIAN);
+							buf.putInt(header.length);
 							buf.put(header);
-							buf.put(SUtil.intToBytes(body.length));
+							buf.putInt(body.length);
 							buf.put(body);
 							buf.rewind();
 							

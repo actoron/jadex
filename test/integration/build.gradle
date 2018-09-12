@@ -28,6 +28,7 @@ dependencies
 										   ':platform:webservice-desktop-jetty',
 										   ':platform:webservice-desktop-grizzly',
 
+										   ':transports:intravm',
 										   ':transports:websockettransport',
 										   ':transports:relaytransport',
 										   ])

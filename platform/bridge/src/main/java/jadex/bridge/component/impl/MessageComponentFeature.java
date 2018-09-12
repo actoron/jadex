@@ -295,7 +295,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			{
 				public void resultAvailable(Integer result)
 				{
-					ret.setResult(null);
+					ret.setResultIfUndone(null);
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -310,11 +310,15 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			sendToAllTransports(rplat, header, encheader, encryptedbody).addResultListener(new DelegationResultListener<>(ret, true));
 		}
 		
-		component.getFeature(IExecutionFeature.class).waitForDelay(Starter.getDefaultTimeout(platformid), new IComponentStep<Void>()
+		long timeout = Starter.getDefaultTimeout(platformid);
+		timeout = timeout != -1 ? timeout : 30000;
+		component.getFeature(IExecutionFeature.class).waitForDelay(timeout, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ret.setExceptionIfUndone(new TimeoutException("Timeout occured by " + component.getId().toString() + " while sending message to " + rplat));
+				// Check first to avoid creating an exception.
+				if (!ret.isDone())
+					ret.setExceptionIfUndone(new TimeoutException("Timeout occured by " + component.getId().toString() + " while sending message to " + rplat));
 				return IFuture.DONE;
 			}
 		}, true);

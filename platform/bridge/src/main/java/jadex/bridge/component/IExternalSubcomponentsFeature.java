@@ -4,9 +4,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  External perspective of the subcomponents feature.
  */
-public interface IExternalSubcomponentsFeature
+public interface IExternalSubcomponentsFeature extends IExternalComponentFeature
 {
 	/**
 	 *  Get the model name of a component type.

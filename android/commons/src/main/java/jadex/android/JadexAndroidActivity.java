@@ -12,7 +12,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.bridge.service.types.platform.IJadexPlatformInterface;
@@ -306,15 +305,15 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 		}
 	}
 	
-	/**
-	 * @deprecated use getPlatformService().getSservice() instead.
-	 * @return
-	 */
-	protected IFuture<IComponentManagementService> getCMS()
-	{
-		checkIfJadexIsRunning("getCMS");
-		return platformService.getCMS(platformId);
-	}
+//	/**
+//	 * @deprecated use getPlatformService().getSservice() instead.
+//	 * @return
+//	 */
+//	protected IFuture<IComponentManagementService> getCMS()
+//	{
+//		checkIfJadexIsRunning("getCMS");
+//		return platformService.getCMS(platformId);
+//	}
 
 	public void onServiceConnected(ComponentName name, IBinder service)
 	{

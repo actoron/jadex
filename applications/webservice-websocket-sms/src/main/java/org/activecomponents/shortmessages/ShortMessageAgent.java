@@ -72,7 +72,8 @@ public class ShortMessageAgent
 			{
 				try
 				{
-					Collection<String> tags = (Collection<String>)SNFPropertyProvider.getNFPropertyValue(component.getExternalAccess(), ((IService)service).getId(), TagProperty.NAME).get();
+					Collection<String> tags = (Collection<String>)component.getNFPropertyValue(((IService)service).getId(), TagProperty.NAME).get();
+//					Collection<String> tags = (Collection<String>)SNFPropertyProvider.getNFPropertyValue(component.getExternalAccess(), ((IService)service).getId(), TagProperty.NAME).get();
 					if(tags!=null)
 					{
 //						final User user = us.getUser(tags.iterator().next()).get();

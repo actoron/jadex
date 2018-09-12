@@ -73,11 +73,14 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 		{
 //			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 //			IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
-//				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", //"-awareness", "false",
+//				"-saveonexit", "false", "-welcome", "false", //"-awareness", "false",
 //			//	"-logging_level", "java.util.logging.Level.INFO",
 //				"-gui", "false", "-simulation", "false", "-printpass", "false", "-wstransport", "false",
 //				"-superpeerclient", "false",
 //			}).get();
+			
+			disableLocalSimulationMode().get();
+			
 			IExternalAccess plat = STest.createPlatform();
 			
 			createProxies(plat).get();

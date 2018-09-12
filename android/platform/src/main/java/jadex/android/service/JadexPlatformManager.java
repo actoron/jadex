@@ -94,7 +94,6 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		config.getExtendedPlatformConfiguration().setRsPublish(false);
 		config.getExtendedPlatformConfiguration().setBinaryMessages(true);
 		config.getExtendedPlatformConfiguration().setConfigurationFile("jadex.platform.PlatformAgent");
-		config.getExtendedPlatformConfiguration().setAutoShutdown(false);
 		config.getExtendedPlatformConfiguration().setSaveOnExit(true);
 		config.setGui(false);
 		config.getExtendedPlatformConfiguration().setChat(false);

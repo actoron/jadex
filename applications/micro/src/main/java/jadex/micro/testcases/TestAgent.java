@@ -269,64 +269,35 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	}
 	
 	/**
-	 *  Setup a local test.
-	 */
-	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename,  IResultListener<Map<String,Object>> reslis)
-	{
-		return createComponent(filename, agent.getId().getRoot(), reslis);
-	}
-	
-	/**
-	 *  Setup a remote test.
-	 */
-	protected IFuture<IComponentIdentifier>	setupRemoteTest(final String filename, final String config,
-		final  IResultListener<Map<String,Object>> reslis, final boolean remove)
-	{
-		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
-		
-		setupRemotePlatform(remove)
-			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
-		{
-			public void customResultAvailable(final IExternalAccess exta)
-			{
-//				ComponentIdentifier.getTransportIdentifier(exta)
-//					.addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
-//                {
-//                    public void customResultAvailable(ITransportComponentIdentifier cid)
-//                    {
-						createComponent(filename, null, config, exta.getId(), reslis)
-							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-//                    }
-//                });
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
 	 *  Setup a remote test.
 	 */
 	protected IFuture<IExternalAccess>	setupRemotePlatform(final boolean manualremove)
 	{
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
 		
+		disableLocalSimulationMode().get();
+		
 //		agent.getLogger().severe("Testagent setup remote platform: "+agent.getComponentDescription());
-		createPlatform(null).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
+		IPlatformConfiguration conf = STest.getDefaultTestConfig();
+		conf.getExtendedPlatformConfiguration().setSimul(false);
+		conf.getExtendedPlatformConfiguration().setSimulation(false);
+		createPlatform(conf, null).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 				if(manualremove)
 					platforms.remove(exta);
 				
-				createProxies(exta).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
-				{
-					@Override
-					public void customResultAvailable(Void result) throws Exception
-					{
-						ret.setResult(exta);
-					}
-				});
+				ret.setResult(exta);
+				
+//				createProxies(exta).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+//				{
+//					@Override
+//					public void customResultAvailable(Void result) throws Exception
+//					{
+//						ret.setResult(exta);
+//					}
+//				});
 			}
 		});
 		

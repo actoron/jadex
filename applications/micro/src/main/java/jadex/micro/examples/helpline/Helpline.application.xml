@@ -6,8 +6,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
 	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
-	name="Helpline" package="jadex.micro.examples.helpline"
-	autoshutdown="true">
+	name="Helpline" package="jadex.micro.examples.helpline">
 	
 	<imports>
 		<import>jadex.bridge.service.*</import>

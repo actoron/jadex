@@ -3,6 +3,7 @@ package jadex.bridge;
 import jadex.bridge.component.IExternalArgumentsResultsFeature;
 import jadex.bridge.component.IExternalExecutionFeature;
 import jadex.bridge.component.IExternalMonitoringComponentFeature;
+import jadex.bridge.component.IExternalNFPropertyComponentFeature;
 import jadex.bridge.component.IExternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Reference;
@@ -16,9 +17,15 @@ import jadex.commons.future.IFuture;
  *  Methods may be called from any thread, but the result listener will not be scheduled back to the calling thread!
  */
 @Reference
-public interface IExternalAccess extends IExternalExecutionFeature, IExternalArgumentsResultsFeature, IExternalProvidedServicesFeature, IExternalRequiredServicesFeature, IExternalSubcomponentsFeature, IExternalMonitoringComponentFeature //extends INFPropertyProvider//extends IRemotable
+public interface IExternalAccess extends IExternalExecutionFeature, IExternalArgumentsResultsFeature, IExternalProvidedServicesFeature, IExternalRequiredServicesFeature, IExternalSubcomponentsFeature, IExternalMonitoringComponentFeature, IExternalNFPropertyComponentFeature //extends INFPropertyProvider//extends IRemotable
 {
 	//-------- cache --------
+	
+	/**
+	 *  Get the model of the component.
+	 *  @return	The model.
+	 */
+	public IFuture<IModelInfo> getModelAsync();
 	
 	/**
 	 *  Get the id of the component.
@@ -27,10 +34,11 @@ public interface IExternalAccess extends IExternalExecutionFeature, IExternalArg
 	public IComponentIdentifier getId();
 	
 	/**
-	 *  Get the model of the component.
-	 *  @return	The model.
+	 *  Get a feature of the component.
+	 *  @param feature	The type of the feature.
+	 *  @return The feature instance.
 	 */
-	public IFuture<IModelInfo> getModelAsync();
+	public <T> T getExternalFeature(Class<? extends T> type);
 	
 //	/**
 //	 *  Test if current thread is an external thread.

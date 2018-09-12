@@ -20,8 +20,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
-
 import jadex.base.Starter;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
@@ -39,21 +37,29 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IExternalComponentFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.IPropertiesFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.ComponentFutureFunctionality;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RequiredServicesComponentFeature;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.ICommand;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -64,11 +70,15 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.ExceptionResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
 
@@ -246,27 +256,30 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getDescription().getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
 								IMonitoringEvent.TYPE_COMPONENT_DISPOSED, System.currentTimeMillis(), PublishEventLevel.COARSE);
 							event.setProperty("details", getDescription());
-							getFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL).addResultListener(new IResultListener<Void>()
-							{
-								public void resultAvailable(Void result)
-								{
-//									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-//										System.out.println("shutdown component features end2: "+getComponentIdentifier()+", "+ex);
-									if(ex!=null)
-										ret.setExceptionIfUndone(ex);
-									else
-										ret.setResultIfUndone(null);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-//									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
-//										System.out.println("shutdown component features end3: "+getComponentIdentifier()+", "+ex);
-									ret.setExceptionIfUndone(exception);
-								}
-							});
+							getFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL);
+//								.addResultListener(new IResultListener<Void>()
+//							{
+//								public void resultAvailable(Void result)
+//								{
+////									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+////										System.out.println("shutdown component features end2: "+getComponentIdentifier()+", "+ex);
+//									if(ex!=null)
+//										ret.setExceptionIfUndone(ex);
+//									else
+//										ret.setResultIfUndone(null);
+//								}
+//								
+//								public void exceptionOccurred(Exception exception)
+//								{
+////									if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
+////										System.out.println("shutdown component features end3: "+getComponentIdentifier()+", "+ex);
+//									ret.setExceptionIfUndone(exception);
+//								}
+//							});
 						}
-						else
+						
+						// Do not wait for monitoring event but directly terminate to avoid having all return steps being scheduled immediately (see DecouplingReturnInterceptor) 
+//						else
 						{
 //							if(getComponentIdentifier().getName().indexOf("Feature")!=-1)
 //								System.out.println("shutdown component features end4: "+getComponentIdentifier()+", "+ex);
@@ -710,7 +723,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	{
 		return features!=null? type.cast(features.get(type)): null;
 	}
-
+	
 	/**
 	 *  Kill the component.
 	 */
@@ -795,7 +808,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 			{
-//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+//				if(method.getName().indexOf("killComponent")!=-1)
+//					System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 				
 				if("getId".equals(method.getName()))
 				{
@@ -821,28 +835,49 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					return cid == null? 0 : cid.hashCode();
 //					return getId() == null? 0 : getId().hashCode();
 				}
+				else if("getExternalFeature".equals(method.getName()))
+				{
+					Class<?> iface = (Class<?>)args[0];
+					return getExternalFeature(iface, getClassLoader(), getInternalAccess());
+				}
 				else
 				{
+					int prio = IExecutionFeature.STEP_PRIORITY_NORMAL;
+					
+					// Allow getting results from dead components.
+					if ("getResultsAsync".equals(method.getName()))
+						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+					
 					if(!getFeature(IExecutionFeature.class).isComponentThread())
 					{
 //						System.out.println("scheduleStep: "+method.getName());
 						final Future<Object> ret = (Future<Object>)SFuture.getFuture(method.getReturnType());
 						
-						getInternalAccess().scheduleStep(new IComponentStep<Void>()
+						getInternalAccess().scheduleStep(prio, new IComponentStep<Void>()
 						{
 							@Override
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								doInvoke(ia, method, args).addResultListener(new DelegationResultListener<>(ret));
+								boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType());
+								if(!intermediate)
+									doInvoke(ia, method, args).addResultListener(new DelegationResultListener<>(ret));
+								else
+									doInvoke(ia, method, args).addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
 								return IFuture.DONE;
 							}
-						});
+						}).addResultListener(new ExceptionResultListener<Void>()
+						{
+							public void exceptionOccurred(Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});;
 						
-						return ret;
+						return getDecoupledFuture(ret);
 					}
 					else
 					{
-						return doInvoke(getInternalAccess(), method, args);
+						return getDecoupledFuture(doInvoke(getInternalAccess(), method, args));
 //						System.out.println("res2: "+res.getClass());
 					}
 				}
@@ -854,6 +889,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //					System.out.println("call");
 				
 				Future<Object> ret = new Future<>();
+//				IFuture<Object> ret = null;
 				
 				try
 				{
@@ -877,24 +913,163 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					}
 					else
 					{
+						// todo: create generic (double) hook (also in RMI proxy) mechanism
+						
+						if(feat instanceof IRequiredServicesFeature)
+						{
+							if("searchService".equals(method.getName()))
+							{
+								method = RequiredServicesComponentFeature.class.getMethod("resolveService",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
+								args = Arrays.copyOf(args, 2);
+							}
+							else if("searchServices".equals(method.getName()))
+							{
+								method = RequiredServicesComponentFeature.class.getMethod("resolveServices",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
+								args = Arrays.copyOf(args, 2);
+							}
+							else if("addQuery".equals(method.getName()))
+							{
+								method = RequiredServicesComponentFeature.class.getMethod("resolveQuery",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
+								args = Arrays.copyOf(args, 2);
+							}
+						}
+						
 						res = method.invoke(feat, args);
 					}
 					
 					if(res instanceof IFuture)
 					{
-						return (IFuture<Object>)res;
+						ret = (IFuture<Object>)res;
 					}
 					else
 					{
-						ret.setResult(res);
+						((Future)ret).setResult(res);
 					}
 				}
 				catch(Exception e)
 				{
-					ret.setException(e);
+					ret = new Future<Object>();
+					((Future)ret).setException(e);
+				}
+				
+//				return getDecoupledFuture(ret);
+				return ret;
+			}
+			
+			/**
+			 *  Returns a future that schedules back to calling component if necessary..
+			 *  @param infut Input future.
+			 *  @return 
+			 */
+			protected <T> IFuture<T> getDecoupledFuture(final IFuture<T> infut)
+			{
+				IFuture<T> ret = infut;
+				IInternalAccess caller = IInternalExecutionFeature.LOCAL.get();
+				if(caller != null)
+				{
+					if (!getInternalAccess().equals(caller))
+					{
+						IComponentIdentifier callerplat = caller.getId().getRoot();
+						Boolean issim = (Boolean) Starter.getPlatformValue(callerplat, IClockService.SIMULATION_CLOCK_FLAG);
+						if (Boolean.TRUE.equals(issim) && !callerplat.equals(getInternalAccess().getId().getRoot()))
+							((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
+						
+						IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller)
+						{
+							public void scheduleBackward(ICommand<Void> command)
+							{
+								if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
+								{
+									getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									{
+										public IFuture<Void> execute(IInternalAccess intaccess)
+										{
+											command.execute(null);
+											return IFuture.DONE;
+										}
+									}).addResultListener(new IResultListener<Void>()
+									{
+										public void exceptionOccurred(Exception exception)
+										{
+											System.err.println("Unexpected Exception: "+command);
+											exception.printStackTrace();
+										}
+										
+										public void resultAvailable(Void result)
+										{
+										}
+									});
+								}
+								else
+								{
+									command.execute(null);
+								}
+							}
+						});
+						ret = newret;
+					}
+				}
+				else
+				{
+					// External thread in simulation mode, add blocker.
+					Boolean issim = (Boolean) Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
+					if(Boolean.TRUE.equals(issim))
+					{
+						ia.scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								IFuture<?> blocker = infut;
+								if (infut instanceof ITuple2Future)
+								{
+									// Hack for createComponent()
+									Future<Object> newblocker = new Future<>();
+									blocker = newblocker;
+									@SuppressWarnings("unchecked")
+									ITuple2Future<Object, Object> tupfut = ((ITuple2Future<Object, Object>) infut);
+									tupfut.addTuple2ResultListener(new DelegationResultListener<>(newblocker), null);
+								}
+								
+								((IInternalExecutionFeature) ia.getFeature(IExecutionFeature.class)).addSimulationBlocker(blocker);
+								
+								return IFuture.DONE;
+							}
+						});
+					}
 				}
 				
 				return ret;
+			}
+			
+//			/**
+//			 *  Returns a future that schedules back to calling component if necessary..
+//			 *  @param infut Input future.
+//			 *  @return 
+//			 */
+//			protected <T> ISubscriptionIntermediateFuture<T> getDecoupledSubscriptionFuture(final ISubscriptionIntermediateFuture<T> infut)
+//			{
+//				return (ISubscriptionIntermediateFuture<T>) getDecoupledFuture(infut);
+//			}
+		});
+	}
+	
+	/**
+	 *  Get external feature wrapper.
+	 *  @param iface
+	 *  @param args
+	 *  @return The proxy.
+	 */
+	public static <T> T getExternalFeature(Class<T> iface, ClassLoader cl, Object original)
+	{
+		if(!SReflect.isSupertype(IExternalComponentFeature.class, iface))
+			throw new IllegalArgumentException("Must be external feature interface (extend IExternalComponentFeature)");
+		
+		return (T)ProxyFactory.newProxyInstance(cl, new Class[]{iface, IExternalAccess.class}, new InvocationHandler()
+		{
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+			{
+				return method.invoke(original, args);
 			}
 		});
 	}
@@ -1377,7 +1552,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	{
 		// todo: resultlistener for results?!
 		
-		System.out.println("tuplecreate: "+info.getFilename());
+//		System.out.println("tuplecreate: "+info.getFilename());
 		
 		Object component = info!=null? info.getPojo(): null;
 		if(component==null && (info==null || info.getFilename()==null))

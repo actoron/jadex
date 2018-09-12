@@ -48,12 +48,6 @@ parameters={
 	description="Flag indicating if the task should wait for the subcomponent to terminate (default=false, true if result mappings are available)."),
 	@TaskParameter(name="suspend", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
 	description="Flag indicating if the new component instance is started in suspended mode (default=false)."),
-	@TaskParameter(name="master", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
-	description="Flag indicating if the new component instance is started as a master (default=false)."),
-	@TaskParameter(name="daemon", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
-	description="Flag indicating if the new component instance is started as daemon (default=false)."),
-	@TaskParameter(name="autoshutdown", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
-	description="Flag indicating if the platform should shutdown when the component terminates (default=false)."),
 	@TaskParameter(name="monitoring", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
 	description="Flag indicating if monitoring should be enabled for the new component (default=false)."),
 	@TaskParameter(name="synchronous", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
@@ -104,9 +98,6 @@ public class CreateComponentTask implements ITask
 		final IResultListener killlistener = (IResultListener)context.getParameterValue("killlistener");
 		final String[] resultmapping = (String[])context.getParameterValue("resultmapping");
 		final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): resultmapping!=null;
-		Boolean master = context.getParameterValue("master")!=null? (Boolean)context.getParameterValue("master"): null;
-		Boolean daemon = context.getParameterValue("daemon")!=null? (Boolean)context.getParameterValue("daemon"): null;
-		Boolean autoshutdown = context.getParameterValue("autoshutdown")!=null? (Boolean)context.getParameterValue("autoshutdown"): null;
 		Boolean synchronous = context.getParameterValue("synchronous")!=null? (Boolean)context.getParameterValue("synchronous"): null;
 		Boolean persistable = context.getParameterValue("persistable")!=null? (Boolean)context.getParameterValue("persistable"): null;
 		Boolean monitoring = context.getParameterValue("monitoring")!=null? (Boolean)context.getParameterValue("monitoring"): null;

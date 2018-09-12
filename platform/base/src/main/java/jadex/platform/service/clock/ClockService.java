@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
+import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -32,6 +34,11 @@ import jadex.commons.future.IFuture;
  */
 public class ClockService extends BasicService implements IClockService, IPropertiesProvider
 {
+	//-------- static part --------
+	
+	/** Shared clock for bisimulation, if any. */
+	protected static volatile IClock	bisimclock;	
+	
 	//-------- attributes --------
 	
 	/** The clock. */
@@ -325,8 +332,9 @@ public class ClockService extends BasicService implements IClockService, IProper
 //			public void customResultAvailable(IThreadPoolService result)
 //			{
 //				threadpool = result;
-				clock = createClock(cinfo, threadpool);
+				setClock(cinfo, threadpool);
 				clock.start();
+				
 				ClockService.super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
@@ -408,27 +416,55 @@ public class ClockService extends BasicService implements IClockService, IProper
 	}*/
 	
 	/**
-	 *  Set the clock.
-	 *  @param clock The new clock.
+	 *  Change the clock.
+	 *  @param type The new clock type
 	 */
 	public void setClock(String type, IThreadPool tp)
 	{
-		IClock clock;
+		assert	clock!=null; // Initially created in startService...
+		setClock(new ClockCreationInfo(type, null, clock.getTime(), clock.getDelta(), clock instanceof IContinuousClock ? ((IContinuousClock)clock).getDilation() : 1), tp);
+	}
+	
+	/**
+	 *  Create and set a new clock.
+	 */
+	public void	setClock(ClockCreationInfo cinfo, IThreadPool tp)
+	{
+		IClock old	= clock;
+		boolean	start	= old!=null && IClock.STATE_RUNNING.equals(old.getState());
 		
-		if(IClock.TYPE_CONTINUOUS.equals(type))
-			clock = new ContinuousClock(this.clock, tp);
-		else if(IClock.TYPE_SYSTEM.equals(type))
-			clock = new SystemClock(this.clock, tp);
-		else if(IClock.TYPE_TIME_DRIVEN.equals(type))
-			clock = new SimulationTickClock(this.clock);
-		else if(IClock.TYPE_EVENT_DRIVEN.equals(type))
-			clock = new SimulationEventClock(this.clock);
+		Object	bisimulation	= component.getFeature(IArgumentsResultsFeature.class).getArguments().get("bisimulation");
+		if(Boolean.TRUE.equals(bisimulation))
+		{
+			synchronized(ClockService.class)
+			{
+				if(bisimclock==null)
+				{
+					// HACK!!! first setting wins
+					bisimclock	= createClock(cinfo, tp);
+				}
+				clock	= bisimclock;
+			}
+		}
 		else
-			throw new RuntimeException("Unknown clock type: "+type);
+		{
+			clock	= createClock(cinfo, tp);
+		}
 		
-		this.clock.dispose();
+		if (clock instanceof ISimulationClock)
+			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.TRUE);
+		else
+			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
 		
-		this.clock = clock;
+		if(old!=null)
+		{
+			old.dispose();
+		}
+		if(start)
+		{
+			this.clock.start();
+		}
+		
 		for(int i=0; i<listeners.size(); i++)
 		{
 			this.clock.addChangeListener((IChangeListener)listeners.get(i));
@@ -436,12 +472,11 @@ public class ClockService extends BasicService implements IClockService, IProper
 	}
 	
 	/**
-	 *  Create a clock.
+	 *  Create a clock based on creation info.
 	 */
-	public static IClock createClock(ClockCreationInfo cinfo, IThreadPool tp)
+	protected static IClock	createClock(ClockCreationInfo cinfo, IThreadPool tp)
 	{
-		IClock ret;
-		
+		IClock	ret;
 		if(IClock.TYPE_CONTINUOUS.equals(cinfo.getClockType()))
 		{
 			ret = new ContinuousClock(cinfo.getName(), cinfo.getStart(), cinfo.getDilation(), tp);
@@ -462,7 +497,6 @@ public class ClockService extends BasicService implements IClockService, IProper
 		{
 			throw new RuntimeException("Unknown clock type: "+cinfo.getClockType());
 		}
-		
 		return ret;
 	}
 

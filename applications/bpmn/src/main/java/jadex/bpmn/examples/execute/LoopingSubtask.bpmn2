@@ -11,7 +11,7 @@
     <jadex:modelname>LoopingSubtask</jadex:modelname>
     <jadex:description>&lt;H1&gt;Looping Subtask&lt;/H1&gt; Test if looping subtasks work. Should print A, B, C with 2 seconds delay in between.</jadex:description>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="_7GnScUdBEeG8rbYlagcQXQ">
     <semantic:subProcess name="Loop" id="_BaPMoUdCEeG8rbYlagcQXQ">

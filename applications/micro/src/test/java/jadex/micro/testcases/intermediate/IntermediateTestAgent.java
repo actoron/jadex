@@ -152,11 +152,13 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 //			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 //	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 //			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
-//				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
+//				"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
 //	//			"-logging_level", "java.util.logging.Level.INFO",
 //				"-gui", "false", "-simulation", "false", "-printpass", "false",
 //				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
 //			})
+			
+			disableLocalSimulationMode().get();
 			
 			IPlatformConfiguration	config	= STest.getDefaultTestConfig();
 			config.getExtendedPlatformConfiguration().setSimulation(false);	// No simulaton, because we need to measure in real time

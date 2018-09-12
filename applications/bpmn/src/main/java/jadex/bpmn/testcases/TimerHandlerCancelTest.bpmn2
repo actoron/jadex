@@ -11,7 +11,7 @@
     <jadex:modelname>TimerHandlerCancelTest</jadex:modelname>
     <jadex:description>Test if a timer is cancelled when subprocess normally continues.</jadex:description>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:imports>
       <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
       <jadex:import>jadex.base.test.*</jadex:import>

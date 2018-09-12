@@ -52,7 +52,7 @@ public class KillAgent
 	public static void main(String[] args)
 	{
 //		ThreadSuspendable sus = new ThreadSuspendable();
-		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get();
+		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false"}).get();
 		
 		for(int i=0; i<1000; i++)
 		{

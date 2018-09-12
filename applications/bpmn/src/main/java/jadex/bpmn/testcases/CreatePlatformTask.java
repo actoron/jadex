@@ -35,7 +35,7 @@ public class CreatePlatformTask implements ITask
 		Starter.createPlatform(new String[]{"-platformname", process.getId().getPlatformPrefix()+"_*",
 //			"-logging", "true",
 			"-libpath", "new String[]{\""+url+"\"}",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
+			"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
 			"-gui", "false"
 //			"-usepass", "false"//, "-simulation", "false"
 			})

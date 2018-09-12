@@ -13,12 +13,12 @@ import java.util.logging.Logger;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
@@ -52,11 +52,13 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminationCommand;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
@@ -123,6 +125,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	/** Listeners from transport info service. */
 	protected Collection<SubscriptionIntermediateFuture<PlatformData>>	infosubscribers;
 	
+	/** Flag to indicate that the component is killed. After the agent is killed it needs to ignore input from the external transport impl. */
+	protected boolean 	killed;
+	
 
 	// -------- abstract methods to be provided by concrete transport --------
 
@@ -150,6 +155,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public void messageReceived(final Con con, final byte[] header, final byte[] body)
 	{
+		if(killed)
+			return;
+		
 		ConnectionCandidate cand = getConnectionCandidate(con);
 		
 		// Race condition between con result future in handleConnect and received CID from server.
@@ -182,6 +190,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public void connectionEstablished(final Con con)
 	{
+		if(killed)
+			return;
+
 		createConnectionCandidate(con, false);
 	}
 
@@ -193,6 +204,9 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	 */
 	public void connectionClosed(Con con, Exception e)
 	{
+		if(killed)
+			return;
+
 //		System.out.println("Close connection called: " + System.identityHashCode(con) + " " + con + " " + e);
 		ConnectionCandidate cand = getConnectionCandidate(con);
 		
@@ -223,17 +237,22 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		if(port >= 0)
 		{
 			final Future<Void>	ret	= new Future<Void>();
-			impl.openPort(port)
-				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-			{
-				@Override
-				public void customResultAvailable(Integer port)
-				{
+			
+			// Hack!!! Hard block of component while waiting for external thread avoid simulation clock being advanced.
+			ISuspendable	sus	= ISuspendable.SUSPENDABLE.get();
+			ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+			Integer iport	= impl.openPort(port).get();
+			ISuspendable.SUSPENDABLE.set(sus);
+			
+//				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+//			{
+//				@Override
+//				public void customResultAvailable(Integer iport)
+//				{
 					try
 					{
 						// Announce connection addresses.
 						InetAddress[] addresses = SUtil.getNetworkAddresses();
-//						String[] saddresses = new String[addresses.length];
 						IComponentIdentifier platformid = agent.getId().getRoot();
 						List<TransportAddress> saddresses = new ArrayList<TransportAddress>();
 						for(int i = 0; i < addresses.length; i++)
@@ -241,21 +260,17 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 							String addrstr = null;
 							if(addresses[i] instanceof Inet6Address)
 							{
-//								saddresses[i] = "[" + addresses[i].getHostAddress() + "]:" + port;
-								addrstr = "[" + addresses[i].getHostAddress() + "]:" + port;
+								addrstr = "[" + addresses[i].getHostAddress() + "]:" + iport;
 							}
 							else // if (address instanceof Inet4Address)
 							{
-//								saddresses[i] = addresses[i].getHostAddress() + ":" + port;
-								addrstr = addresses[i].getHostAddress() + ":" + port;
+								addrstr = addresses[i].getHostAddress() + ":" + iport;
 							}
 							saddresses.add(new TransportAddress(platformid, impl.getProtocolName(), addrstr));
 						}
 						
-						agent.getLogger().info("Platform "+agent.getId().getPlatformName()+" listening to port " + port + " for " + impl.getProtocolName() + " transport.");
+						agent.getLogger().info("Platform "+agent.getId().getPlatformName()+" listening to port " + iport + " for " + impl.getProtocolName() + " transport.");
 
-//						TransportAddressBook tab = TransportAddressBook.getAddressBook(agent);
-//						tab.addPlatformAddresses(agent.getComponentIdentifier(), impl.getProtocolName(), saddresses);
 						ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
 						
 //						System.out.println("Transport addresses: "+agent+", "+saddresses);
@@ -265,8 +280,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					{
 						ret.setException(e);
 					}
-				}
-			}));
+//				}
+//			}));
 			
 			return ret;
 		}
@@ -282,6 +297,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	@AgentKilled
 	protected void shutdown()
 	{
+		this.killed	= true;
 		impl.shutdown();
 	}
 
@@ -300,7 +316,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	{
 		
 		final TerminableFuture<Integer> ret = new TerminableFuture<>();
-		final IComponentIdentifier	target	= (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
+		final IComponentIdentifier	target	= header.getReceiver();
 		assert target!=null; // Message feature should disallow sending without receiver.
 		
 //		System.out.println(agent+".sendMessage to "+target);
@@ -596,6 +612,11 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 	protected IIntermediateFuture<String> getAddresses(IComponentIdentifier target)
 	{
 		ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
+		if (tas == null)
+		{
+			agent.getLogger().warning(agent + " did not find transport address service.");
+			return new IntermediateFuture<>(new ArrayList<>());
+		}
 		
 		final IntermediateFuture<String> ret = new IntermediateFuture<String>();
 		tas.resolveAddresses(target, impl.getProtocolName()).addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Collection<String>>(ret)
@@ -644,6 +665,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					final IMsgHeader header = (IMsgHeader)serser.decode(null, agent, tup.getSecondEntity());
 					final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
 					
+//					System.out.println("rec msg: "+header);
+					
 					// Cannot use agent/cms.getExternalAccess(cid) because when remote call
 					// is in init the call will be delayed after init has finished (deadlock)
 					SComponentManagementService.scheduleStep(rec, new IComponentStep<Void>()
@@ -669,7 +692,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
-							logger.warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+							System.out.println("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+//							logger.warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
 							
 							// For undeliverable conversation messages -> send error reply (only for non-error messages). 
 							if((header.getProperty(IMsgHeader.CONVERSATION_ID)!=null || header.getProperty(RemoteExecutionComponentFeature.RX_ID)!=null)
@@ -995,6 +1019,12 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		 */
 		protected void	sendMessage(byte[] header, byte[] body, TerminableFuture<Integer> ret)
 		{
+			if(killed)
+			{
+				ret.setExceptionIfUndone(new ComponentTerminatedException(agent.getId()));
+				return;
+			}
+			
 			ConnectionCandidate	con	= null;
 			IFuture<ConnectionCandidate>	fut	= null;
 			synchronized(this)
@@ -1046,8 +1076,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			}
 			else
 			{
-				fut.addResultListener(fcon -> impl.sendMessage(fcon.getConnection(), header, body)
-					.addResultListener(new DelegationResultListener<>(ret)));
+				fut.addResultListener(fcon -> sendMessage(header, body, ret));
 			}
 		}
 		

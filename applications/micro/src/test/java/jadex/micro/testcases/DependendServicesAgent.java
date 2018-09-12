@@ -87,7 +87,7 @@ public class DependendServicesAgent extends JunitAgentTest
 							Collection<TestReport> tmp = (Collection<TestReport>)it.next();
 							tests.addAll(tmp);
 						}
-						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tests.size(), (TestReport[])tests.toArray(new TestReport[tests.size()])));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, (TestReport[])tests.toArray(new TestReport[tests.size()])));
 						
 						agent.killComponent();
                     }
@@ -110,9 +110,9 @@ public class DependendServicesAgent extends JunitAgentTest
                             {
                                 public void resultAvailable(Map<String, Object> res)
                                 {
-                                  System.out.println("del: "+child.getId()+" "+res);
-//                                    Map res = (Map)result;
-                                    List<TestReport> tests = (List<TestReport>)res.get("testcases");
+                                	System.out.println("del: "+child.getId()+" "+res);
+                                    @SuppressWarnings("unchecked")
+									List<TestReport> tests = (List<TestReport>)res.get("testcases");
                                     lis.resultAvailable(tests);
                                 }
                                 public void exceptionOccurred(Exception exception)

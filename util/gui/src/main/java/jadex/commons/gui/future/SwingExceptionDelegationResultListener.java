@@ -30,6 +30,7 @@ public abstract class SwingExceptionDelegationResultListener<E, T> implements IU
 	public SwingExceptionDelegationResultListener(Future<T> future)
 	{
 		this.future = future;
+		SwingDelegationResultListener.block(future);
 	}
 	
 	//-------- IResultListener --------

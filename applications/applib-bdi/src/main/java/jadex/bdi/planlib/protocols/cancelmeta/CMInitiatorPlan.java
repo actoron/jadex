@@ -43,7 +43,14 @@ public class CMInitiatorPlan extends Plan
 		try
 		{
 			getWaitqueue().addReply(cancel);
-			sendMessage(cancel);
+			try
+			{
+				sendMessage(cancel).get();
+			}
+			catch(Exception e)
+			{
+				fail(e);
+			}
 			while(rec.size()>0)
 			{
 				// Wait for the replies.

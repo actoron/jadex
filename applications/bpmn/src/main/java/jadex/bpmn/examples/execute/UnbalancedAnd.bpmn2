@@ -11,7 +11,7 @@
     <jadex:modelname>UnbalancedAnd</jadex:modelname>
     <jadex:description>&lt;H1&gt;Unbalanced AND&lt;/H1&gt; Test if unbalanced AND splits and joins work as expected.</jadex:description>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="_NnWKR0dkEeG8rbYlagcQXQ">
     <semantic:parallelGateway name="split a" id="_QujLwUdkEeG8rbYlagcQXQ">
