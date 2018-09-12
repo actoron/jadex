@@ -1,4 +1,4 @@
-package jadex.launch.test.servicecall;
+package jadex.platform.servicecall;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;

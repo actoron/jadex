@@ -1,4 +1,4 @@
-package jadex.launch.test.remotereference.servicecallback;
+package jadex.platform.remotereference.servicecallback;
 
 import java.util.Map;
 
@@ -20,7 +20,7 @@ import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
-import jadex.micro.testcases.TestAgent;
+import jadex.platform.TestAgent;
 
 /**
  *  Agent to test authentication checks for service invocation. 

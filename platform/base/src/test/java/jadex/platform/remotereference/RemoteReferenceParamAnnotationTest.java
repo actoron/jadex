@@ -1,4 +1,4 @@
-package jadex.launch.test.remotereference;
+package jadex.platform.remotereference;
 
 import org.junit.After;
 import org.junit.Assert;

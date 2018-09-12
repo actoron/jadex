@@ -1,4 +1,4 @@
-package jadex.launch.test;
+package jadex.platform;
 
 import java.util.Arrays;
 import java.util.Collection;

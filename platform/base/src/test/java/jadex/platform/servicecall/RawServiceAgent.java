@@ -1,4 +1,4 @@
-package jadex.launch.test.servicecall;
+package jadex.platform.servicecall;
 
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.micro.annotation.Agent;

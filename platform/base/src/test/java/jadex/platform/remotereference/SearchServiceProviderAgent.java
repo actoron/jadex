@@ -1,4 +1,4 @@
-package jadex.launch.test.remotereference;
+package jadex.platform.remotereference;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;

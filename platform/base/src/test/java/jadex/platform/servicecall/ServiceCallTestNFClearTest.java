@@ -1,4 +1,4 @@
-package jadex.launch.test.servicecall;
+package jadex.platform.servicecall;
 
 import static org.junit.Assert.assertNotEquals;
 
