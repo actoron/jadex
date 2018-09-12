@@ -38,7 +38,7 @@ public class BisimulationTest
 			FutureBarrier<Collection<CMSStatusEvent>>	fubar	= new FutureBarrier<>();
 			
 			// Start local agent
-			fubar.addFuture(ia.createComponentWithResults(CounterAgent.class, null));
+			fubar.addFuture(ia.createComponentWithResults(new CreationInfo().setFilename(CounterAgent.class.getName()+".class")));
 			
 			// Start other platforms
 			for(int i=1; i<3; i++)
@@ -49,8 +49,8 @@ public class BisimulationTest
 				IExternalAccess	p2	= fp2.get();
 				
 				// Start agent on other platform
-				fubar.addFuture(p2.createComponentWithResults(CounterAgent.class,
-					new CreationInfo(Collections.singletonMap("offset", i))));
+				fubar.addFuture(p2.createComponentWithResults(
+					new CreationInfo(Collections.singletonMap("offset", i)).setFilename(CounterAgent.class.getName()+".class")));
 			}
 			
 			// Wait for all agents.

@@ -39,7 +39,7 @@ public class MainH4
 		System.out.println("Started platform: "+platform.getId());
 		
 		// Start the chat component
-		IExternalAccess exta = platform.createComponent(null, new CreationInfo().setFilename(ChatD2Agent.class.getName()+".class"), null).get();
+		IExternalAccess exta = platform.createComponent(new CreationInfo().setFilename(ChatD2Agent.class.getName()+".class"), null).get();
 		System.out.println("Started chat component: "+exta);
 		
 		// Fetch the chat service

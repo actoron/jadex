@@ -22,6 +22,6 @@ public class StartCreationBDI
 			"-cli", "false",
 //			"-awareness", "false"
 		}).get();
-		ea.createComponent(null, new CreationInfo().setFilename("CreationBDI.class")).get();
+		ea.createComponent(new CreationInfo().setFilename("CreationBDI.class")).get();
 	}
 }

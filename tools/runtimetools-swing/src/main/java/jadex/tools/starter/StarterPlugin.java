@@ -254,7 +254,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 				CreationInfo ci = new CreationInfo(args);
 				ci.setName(cid.getLocalName());
 				ci.setFilename("jadex/platform/service/remote/ProxyAgent.class");
-				getJCC().getPlatformAccess().createComponent(null, ci, null).addResultListener(new IResultListener()
+				getJCC().getPlatformAccess().createComponent(ci, null).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

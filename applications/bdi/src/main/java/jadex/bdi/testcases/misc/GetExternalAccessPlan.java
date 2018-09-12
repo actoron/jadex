@@ -39,7 +39,7 @@ public class GetExternalAccessPlan extends Plan
 		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', ':'));
 		Map<String, Object>	args	= new HashMap<>();
 		args.put("future", wait);
-		IFuture<IExternalAccess> init = getAgent().createComponent(null,
+		IFuture<IExternalAccess> init = getAgent().createComponent(
 			new CreationInfo(null, args, getComponentIdentifier(), false).setName(cid.getLocalName()).setFilename("jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml"), null);
 		final boolean[]	gotexta	= new boolean[3];	// 0: got exception, 1: got access, 2: got belief value.	
 		

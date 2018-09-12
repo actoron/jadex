@@ -146,7 +146,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 					{
 						getActiveComponent().killComponent(((IService)sps).getId().getProviderId());
 						
-						getActiveComponent().createComponent(null, new CreationInfo().setFilename(PeerRegistrySynchronizationAgent.class.getName()+".class").setName("registrypeer"));
+						getActiveComponent().createComponent(new CreationInfo().setFilename(PeerRegistrySynchronizationAgent.class.getName()+".class").setName("registrypeer"));
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -157,7 +157,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 							public void resultAvailable(IPeerRegistrySynchronizationService ps)
 							{
 								getActiveComponent().killComponent(((IService)ps).getId().getProviderId());
-								getActiveComponent().createComponent(null, new CreationInfo().setFilename(SuperpeerRegistrySynchronizationAgent.class.getName()+".class").setName("registrysuperpeer"));
+								getActiveComponent().createComponent(new CreationInfo().setFilename(SuperpeerRegistrySynchronizationAgent.class.getName()+".class").setName("registrysuperpeer"));
 							}
 							
 							public void exceptionOccurred(Exception exception)

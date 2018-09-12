@@ -182,7 +182,7 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
 //					{
-						ia.createComponent(agent, new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+						ia.createComponent(new CreationInfo(args).setName(agent), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
 						{
 							public void customResultAvailable(IExternalAccess result)

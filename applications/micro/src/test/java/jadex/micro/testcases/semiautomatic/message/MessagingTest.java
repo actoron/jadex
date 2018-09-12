@@ -37,7 +37,7 @@ public class MessagingTest
 		
 		// Start receiver.
 		IExternalAccess	pf_receiver	= Starter.createPlatform(config).get();		
-		IComponentIdentifier cid_receiver = pf_receiver.createComponent(receiver.getName()+".class", null).getFirstResult();
+		IComponentIdentifier cid_receiver = pf_receiver.createComponent(new CreationInfo().setFilename(receiver.getName()+".class")).getFirstResult();
 				
 		// Start sender with receiver CID.
 		IExternalAccess	pf_sender;
@@ -50,7 +50,7 @@ public class MessagingTest
 			// Start second platform
 			pf_sender	= Starter.createPlatform(config).get();
 		}
-		pf_sender.createComponent(null,
+		pf_sender.createComponent(
 			new CreationInfo(Collections.singletonMap("receiver", (Object)cid_receiver)).setFilename(sender.getName()+".class")).get();
 	}
 }

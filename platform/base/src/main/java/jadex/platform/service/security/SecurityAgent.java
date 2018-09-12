@@ -120,16 +120,39 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected IExecutionFeature execfeat;
 	
 	/** Flag whether to use the platform secret for authentication. */
+	@AgentArgument
 	protected boolean usesecret = true;
 	
 	/** Flag whether the platform secret should be printed during start. */
+	@AgentArgument
 	protected boolean printsecret = true;
 	
+	/** 
+	 *  Flag whether to grant default authorization
+	 *  (allow basic service calls if name, network or platform is authenticated).
+	 */
+	@AgentArgument
+	protected boolean defaultauthorization = true;
+	
 	/** Flag whether to refuse unauthenticated connections. */
+	@AgentArgument
 	protected boolean refuseunauth = false;
 	
+	/** Flag if connection with platforms without authenticated names are allowed. */
+	@AgentArgument
+	protected boolean allownoauthname = true;
+	
+	/** Flag if connection with platforms without authenticated networks are allowed. */
+	@AgentArgument
+	protected boolean allownonetwork = true;
+	
 	/** Flag whether to use the default Java trust store. */
+	@AgentArgument
 	protected boolean loadjavatruststore = true;
+	
+	/** Default timeout. */
+	@AgentArgument
+	protected long timeout = -1;
 	
 	/** Local platform authentication secret. */
 	protected AbstractAuthenticationSecret platformsecret;
@@ -180,10 +203,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	
 	/** The list of network names (used by all service identifiers). */
 	protected Set<String> networknames;
-	
-	/** Default timeout. */
-	@AgentArgument
-	protected long timeout = -1;
 	
 	/**
 	 *  Initialization.
@@ -1426,6 +1445,36 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	/**
+	 *  Checks whether to allow connections without name authentication.
+	 *  
+	 *  @return True, if used.
+	 */
+	public boolean getInternalAllowNoAuthName()
+	{
+		return allownoauthname;
+	}
+	
+	/**
+	 *  Checks whether to allow connections without network authentication.
+	 *  
+	 *  @return True, if used.
+	 */
+	public boolean getInternalAllowNoNetwork()
+	{
+		return allownonetwork;
+	}
+	
+	/**
+	 *  Checks whether to allow the default authorization.
+	 *  
+	 *  @return True, if used.
+	 */
+	public boolean getInternalDefaultAuthorization()
+	{
+		return defaultauthorization;
+	}
+	
+	/**
 	 *  Get component ID.
 	 */
 	public IComponentIdentifier getComponentIdentifier()
@@ -1581,8 +1630,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
-				System.out.println("removing suite for: "+receiver.getRoot().toString());
+//				exception.printStackTrace();
+//				System.out.println("removing suite for: "+receiver.getRoot().toString());
 				
 				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
 				if(state != null)

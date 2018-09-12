@@ -49,7 +49,7 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport("#1", "Test if service with scope application can be found when provider is child of user");
 		try
 		{
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, new CreationInfo(agent.getId()).setFilename(ProviderAgent.class.getName()+".class"));
+			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(ProviderAgent.class.getName()+".class"));
 			cid = fut.getFirstResult();
 			IExampleService ser = (IExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("exaser").get();
 //			System.out.println("Correct: could find service: "+ser.getInfo().get());
@@ -79,7 +79,7 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		tr = new TestReport("#1", "Test if service with scope application can be found when provider is sibling");
 		try
 		{
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(null, new CreationInfo(agent.getModel().getResourceIdentifier()).setFilename(ProviderAgent.class.getName()+".class"));
+			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getModel().getResourceIdentifier()).setFilename(ProviderAgent.class.getName()+".class"));
 			cid = fut.getFirstResult();
 			IExampleService ser = (IExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("exaser").get();
 			System.out.println("Problem: could find hidden service: "+ser.getInfo().get());

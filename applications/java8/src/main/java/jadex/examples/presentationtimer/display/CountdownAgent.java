@@ -89,7 +89,7 @@ public class CountdownAgent implements ICountdownService, ICountdownGUIService {
 		controller.start();
 		
 //		IComponentManagementService cms = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class)).get();
-		agent.createComponent(null, new CreationInfo().setFilename("jadex.examples.presentationtimer.display.CountdownAgent.class")).addTuple2ResultListener(
+		agent.createComponent(new CreationInfo().setFilename("jadex.examples.presentationtimer.display.CountdownAgent.class")).addTuple2ResultListener(
 			t -> System.out.println(t),
 			ex -> System.out.println(ex));
 		return Future.DONE;

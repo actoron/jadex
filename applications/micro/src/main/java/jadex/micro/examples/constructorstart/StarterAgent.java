@@ -2,6 +2,7 @@ package jadex.micro.examples.constructorstart;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
@@ -36,6 +37,6 @@ public class StarterAgent
 	public static void main(String[] args)
 	{
 		IExternalAccess platform = Starter.createPlatform().get();
-		IExternalAccess agent = platform.createComponent(new StarterAgent(), null, null).get();
+		IExternalAccess agent = platform.createComponent(new CreationInfo().setPojo(new StarterAgent()), null).get();
 	}
 }

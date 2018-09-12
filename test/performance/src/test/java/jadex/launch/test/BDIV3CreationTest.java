@@ -45,7 +45,7 @@ public class BDIV3CreationTest //extends TestCase
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", Integer.valueOf(10000));
-		platform.createComponent(null, new CreationInfo(args).setFilename("jadex.bdiv3.benchmarks.CreationBDI.class"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+		platform.createComponent(new CreationInfo(args).setFilename("jadex.bdiv3.benchmarks.CreationBDI.class"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
 		{
 			public void customResultAvailable(IExternalAccess result)

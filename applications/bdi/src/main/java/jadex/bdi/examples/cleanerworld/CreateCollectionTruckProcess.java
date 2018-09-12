@@ -83,7 +83,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				final Map<String, Object> params = new HashMap<String, Object>();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
-				IFuture<IExternalAccess> ret = space.getExternalAccess().createComponent(null,
+				IFuture<IExternalAccess> ret = space.getExternalAccess().createComponent(
 					new CreationInfo().setArguments(params).setParent(space.getExternalAccess().getId()).setImports(space.getExternalAccess().getModelAsync().get().getAllImports()).setName("Truck"), null);
 				
 				IResultListener<IExternalAccess> lis = new IResultListener<IExternalAccess>()

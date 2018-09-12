@@ -28,6 +28,8 @@ public class RSChartTest
 		config.setAwareness(false);
 		config.addComponent(ChartProviderAgent.class);
 		config.setValue("settings.readonly", true);
+		config.getExtendedPlatformConfiguration().setSimulation(false);
+		config.getExtendedPlatformConfiguration().setSimul(false);
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
 		extAcc = fut.get();

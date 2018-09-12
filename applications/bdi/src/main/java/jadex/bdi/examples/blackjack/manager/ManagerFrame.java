@@ -418,7 +418,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				final Future<Void>	ret	= new Future<Void>();
 				final IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				
-				ia.createComponent(null,
+				ia.createComponent(
 					new CreationInfo(ia.getId().getParent()).setName("BlackjackDealer").setFilename("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml"))
 				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 				{
@@ -629,7 +629,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						Map<String, Object> args = new HashMap<String, Object>();
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
-						ia.createComponent(null,
+						ia.createComponent(
 							new CreationInfo(args, ia.getId().getParent()).setName(player.getName()).setFilename("jadex/bdi/examples/blackjack/player/Player.agent.xml"))
 						.addResultListener(new DefaultTuple2ResultListener<IExternalAccess, Map<String, Object>>()
 						{

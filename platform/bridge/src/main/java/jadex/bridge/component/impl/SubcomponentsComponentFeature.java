@@ -236,7 +236,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 					ci.setName(getName(components[i], model, j+1));
 					ci.setFilename(getFilename(components[i], model));
 					
-					getComponent().createComponent(null, ci, null).addResultListener(new IResultListener<IExternalAccess>()
+					getComponent().createComponent(ci, null).addResultListener(new IResultListener<IExternalAccess>()
 					{
 						public void resultAvailable(IExternalAccess result) 
 						{

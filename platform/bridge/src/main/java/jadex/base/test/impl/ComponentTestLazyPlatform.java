@@ -179,7 +179,7 @@ public class ComponentTestLazyPlatform extends TestCase
 		// (hack???)
 		ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
 
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = platform.createComponent(null, new CreationInfo(rid).setFilename(filename));
+		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = platform.createComponent(new CreationInfo(rid).setFilename(filename));
 		componentStarted(fut);
 		fut.addResultListener(new IntermediateDefaultResultListener<TupleResult>()
 		{

@@ -75,7 +75,7 @@ public class ComponentPlanBody extends AbstractPlanBody
 	public Object invokeBody(Object[] params) throws BodyAborted
 	{
 		Future<Void>	ret	= new Future<>();
-		ia.createComponent(null, new CreationInfo(ia.getId()).setFilename(component))
+		ia.createComponent(new CreationInfo(ia.getId()).setFilename(component))
 			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 		{
 			@Override
