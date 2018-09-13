@@ -45,7 +45,7 @@ public class SimulationAgent
 				}
 			}
 			if(create)
-				Starter.createPlatform(STest.getDefaultTestConfig()).get();
+				Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-bisimulation", "true"}).get();
 					
 			synchronized(SimulationAgent.class)
 			{
