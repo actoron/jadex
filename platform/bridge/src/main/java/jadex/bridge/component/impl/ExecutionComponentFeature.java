@@ -702,7 +702,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				System.err.println(getInternalAccess()+" bisim exe is"+exe);
 			}
 
-			// Hack!!! service is foudn before it is started, grrr.
+			// Hack!!! service is found before it is started, grrr.
 			if(exe!=null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
 				if(bootstrap)
