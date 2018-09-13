@@ -265,7 +265,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		IComponentIdentifier fwdest = (IComponentIdentifier) header.getProperty(FORWARD_DEST);
 		if(debug)
 		{
-			IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot();
+			IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(FORWARD_SENDER)).getRoot();
 			System.out.println(agent+": processing forward package for " + fwdest + " from " + fwsender);
 		}
 		
