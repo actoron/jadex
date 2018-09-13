@@ -41,6 +41,7 @@ public class CounterAgent
 	public void count(IInternalAccess agent)
 	{
 		long	start	= clock.getTime();
+		System.out.println(agent+" started at "+start);
 		
 		for(int i=0; i<3; i++)
 		{
