@@ -865,7 +865,11 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					
 					// Allow getting results from dead components.
 					if("getResultsAsync".equals(method.getName()))
+					{
+						if (shutdown)
+							return new Future<>(getFeature(IArgumentsResultsFeature.class).getResults());
 						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+					}
 					
 					if(!getFeature(IExecutionFeature.class).isComponentThread())
 					{

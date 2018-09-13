@@ -54,7 +54,9 @@ import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -154,6 +156,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	@AgentArgument
 	protected long timeout = -1;
 	
+	/** Flag enabling debug printouts. */
+	@AgentArgument
+	protected boolean debug = false;
+	
 	/** Local platform authentication secret. */
 	protected AbstractAuthenticationSecret platformsecret;
 	
@@ -186,7 +192,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected Map<String, HandshakeState> initializingcryptosuites = new HashMap<String, HandshakeState>();
 	
 	/** CryptoSuites currently in use. */
-	protected Map<String, ICryptoSuite> currentcryptosuites = Collections.synchronizedMap(new HashMap<String, ICryptoSuite>());
+	protected IRwMap<String, ICryptoSuite> currentcryptosuites = new RwMapWrapper<>(new HashMap<String, ICryptoSuite>());
 	
 	/** CryptoSuites that are expiring with expiration time. */
 	protected MultiCollection<String, Tuple2<ICryptoSuite, Long>> expiringcryptosuites = new MultiCollection<String, Tuple2<ICryptoSuite,Long>>();
@@ -596,14 +602,26 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				else
 				{
 					String rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot().toString();
+					
 					ICryptoSuite cs = currentcryptosuites.get(rplat);
 					
 					if (cs != null && cs.isExpiring())
 					{
-						System.out.println("Expiring: "+rplat);
-						expiringcryptosuites.add(rplat, new Tuple2<ICryptoSuite, Long>(cs, System.currentTimeMillis() + timeout));
-						currentcryptosuites.remove(rplat);
-						cs = null;
+						currentcryptosuites.writeLock().lock();
+						try
+						{
+							if (cs.equals(currentcryptosuites.get(rplat)))
+							{
+								if (debug)
+									System.out.println("Expiring: "+rplat);
+								expireCryptosuite(rplat);
+								cs = null;
+							}
+						}
+						finally
+						{
+							currentcryptosuites.writeLock().unlock();
+						}
 					}
 					
 					if (cs != null)
@@ -1559,31 +1577,32 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				if (cryptoreset != null)
+				if (cryptoreset == null)
 				{
 					long resetdelay = timeout >>> 3;
 					cryptoreset = ia.getFeature(IExecutionFeature.class).waitForDelay(resetdelay, new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							Map<String, ICryptoSuite> expire = new HashMap<String, ICryptoSuite>(currentcryptosuites);
-							
-							synchronized (currentcryptosuites)
+							List<String> pfnames = new ArrayList<>();
+							currentcryptosuites.writeLock().lock();
+							try
 							{
-								long exptime = System.currentTimeMillis() + timeout;
-								for (Map.Entry<String, ICryptoSuite> suite : expire.entrySet())
-								{
-									expiringcryptosuites.add(suite.getKey(), new Tuple2<ICryptoSuite, Long>(suite.getValue(), exptime));
-									
-									// Reinitialize handshakes.
-									String rplat = suite.getKey();
-									initializeHandshake(rplat);
-								}
-								System.out.println("Resetting suites");
-								currentcryptosuites.clear();
+								pfnames.addAll(currentcryptosuites.keySet());
+								for (String pfname : pfnames)
+									expireCryptosuite(pfname);
 							}
+							finally
+							{
+								currentcryptosuites.writeLock().unlock();
+							}
+							for (String pfname : pfnames)
+								initializeHandshake(pfname);
 							
 							cryptoreset = null;
+							
+							if (debug)
+								System.out.println("Cryptosuites reset.");
 							
 							return IFuture.DONE;
 						}
@@ -1618,6 +1637,30 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	/**
+	 *  Expires a cryptosuite.
+	 * 
+	 *  @param pfname Platform name.
+	 */
+	protected void expireCryptosuite(String pfname)
+	{
+		assert agent.isComponentThread();
+		currentcryptosuites.writeLock().lock();
+		try
+		{
+			ICryptoSuite cs = currentcryptosuites.get(pfname);
+			if (cs != null)
+			{
+				expiringcryptosuites.add(pfname, new Tuple2<ICryptoSuite, Long>(cs, System.currentTimeMillis() + timeout));
+				currentcryptosuites.remove(pfname);
+			}
+		}
+		finally
+		{
+			currentcryptosuites.writeLock().unlock();
+		}
+	}
+	
+	/**
 	 *  Sends a security handshake message.
 	 * 
 	 *  @param receiver Receiver of the message.
@@ -1631,7 +1674,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			public void exceptionOccurred(Exception exception)
 			{
 //				exception.printStackTrace();
-//				System.out.println("removing suite for: "+receiver.getRoot().toString());
+				if (debug)
+					System.out.println("Failure send message to and removing suite for: "+receiver.getRoot().toString());
 				
 				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
 				if(state != null)
@@ -1801,14 +1845,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	protected IFuture<byte[]> requestReencryption(String platformname, byte[] content)
 	{
-		synchronized(currentcryptosuites)
-		{
-			ICryptoSuite cur = currentcryptosuites.remove(platformname);
-			if (cur != null)
-				expiringcryptosuites.add(platformname, new Tuple2<>(cur, System.currentTimeMillis() + timeout));
-		}
+		if (debug)
+			System.out.println("reencryption: "+platformname+" "+Arrays.hashCode(content) + " " + currentcryptosuites.get(platformname));
+		expireCryptosuite(platformname);
 		
-		System.out.println("reencryption: "+platformname+" "+Arrays.hashCode(content) + " " + currentcryptosuites.get(platformname));
 //		Thread.dumpStack();
 		
 		ReencryptionRequest req = new ReencryptionRequest();
@@ -1917,12 +1957,30 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				state.setExpirationTime(System.currentTimeMillis() + timeout);
 				initializingcryptosuites.put(rplat.toString(), state);
 				
-				ICryptoSuite oldcs = currentcryptosuites.remove(rplat.toString());
+				ICryptoSuite oldcs = currentcryptosuites.get(rplat.toString());
 				if (oldcs != null)
 				{
-					System.out.println("Removing suite: "+rplat);
-					expiringcryptosuites.add(rplat.toString(), new Tuple2<ICryptoSuite, Long>(oldcs, System.currentTimeMillis() + timeout));
+					currentcryptosuites.writeLock().lock();
+					try
+					{
+						if (oldcs.equals(currentcryptosuites.get(rplat.toString())))
+						{
+							if (debug)
+								System.out.println("New handshake, removing existing suite: "+rplat);
+							expireCryptosuite(rplat.toString());
+						}
+					}
+					finally
+					{
+						currentcryptosuites.writeLock().unlock();
+					}
 				}
+//				ICryptoSuite oldcs = currentcryptosuites_old.remove(rplat.toString());
+//				if (oldcs != null)
+//				{
+//					System.out.println("Removing suite: "+rplat);
+//					expiringcryptosuites.add(rplat.toString(), new Tuple2<ICryptoSuite, Long>(oldcs, System.currentTimeMillis() + timeout));
+//				}
 				
 				InitialHandshakeReplyMessage reply = new InitialHandshakeReplyMessage(getComponentIdentifier(), state.getConversationId(), chosensuite);
 				
@@ -1977,7 +2035,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							state.setCryptoSuite(suite);
 							if (!suite.handleHandshake(SecurityAgent.this, fm))
 							{
-//								System.out.println(agent.getId()+" finished handshake: " + fm.getSender());
+								if (debug)
+									System.out.println(agent.getId()+" finished handshake: " + fm.getSender());
 								currentcryptosuites.put(fm.getSender().getRoot().toString(), state.getCryptoSuite());
 								initializingcryptosuites.remove(fm.getSender().getRoot().toString());
 								state.getResultFuture().setResult(state.getCryptoSuite());
@@ -1997,7 +2056,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
 						{
-//							System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().isTrustedPlatform());
+							if (debug)
+								System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().isTrustedPlatform());
 							currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
 							initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 							state.getResultFuture().setResult(state.getCryptoSuite());

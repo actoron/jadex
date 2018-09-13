@@ -2,6 +2,7 @@ package jadex.platform.service.registryv2;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -16,7 +17,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.registryv2.ISuperpeerStatusService;
 import jadex.commons.future.IFuture;
@@ -116,7 +116,11 @@ public abstract class AbstractInfrastructureTest
 		}
 		while(!platformids.isEmpty())
 		{
-			IComponentIdentifier	cid	= connected.getNextIntermediateResult(Timeout.UNSET, true);
+			long timeout = Starter.getScaledDefaultTimeout(sp.getId().getRoot(), 0.25);
+			if (timeout <= 0)
+				timeout = 7500;
+			System.out.println("Waiting for next cid, remaining: " + Arrays.toString(platformids.toArray()));
+			IComponentIdentifier	cid	= connected.getNextIntermediateResult(timeout, true);
 			platformids.remove(cid.getRoot());
 			System.out.println("Client "+cid+" connected to SP: "+sp.getId());
 		}

@@ -30,6 +30,7 @@ public class BisimulationTest
 		IPlatformConfiguration	config	= STest.getDefaultTestConfig();
 		config.setValue("bisimulation", true);
 		config.setValue("tcp", false);
+		config.setLogging(true);
 		
 		// Run test on first platform such that clock cannot advance
 		IExternalAccess	p1	= Starter.createPlatform(config).get();
