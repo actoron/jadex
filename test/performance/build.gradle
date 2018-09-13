@@ -7,3 +7,9 @@ dependencies
 }
 
 task performanceTest(dependsOn:test)
+
+test
+{
+	// No benchmarking in parallel ;)
+	maxParallelForks = 1
+}

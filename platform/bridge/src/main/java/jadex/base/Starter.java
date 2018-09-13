@@ -382,6 +382,9 @@ public class Starter
 	{
 		final IPlatformConfiguration config = pconfig!=null? pconfig: PlatformConfigurationHandler.getDefault();
 		
+//		if(!Boolean.TRUE.equals(config.getValues().get("bisimulation")))
+//			System.out.println("no bisim");
+		
 		config.setReadOnly(true);
 		
 		if(config.getExtendedPlatformConfiguration().isDropPrivileges())

@@ -15,6 +15,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -117,29 +118,35 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
      */
     protected static final IFuture<Void> disableLocalSimulationMode(IInternalAccess agent)
     {
-    	final Future<Void> ret = new Future<>();
-    	agent.scheduleStep(new IComponentStep<Void>()
+		if(SSimulation.isSimulating(agent))
 		{
-    		public IFuture<Void> execute(IInternalAccess ia)
-    		{
-    			ISimulationService simserv = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class)); 
-    			simserv.pause().addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
-    			{
-    				public void customResultAvailable(Void result) throws Exception
-    				{
-    					simserv.setClockType(IClock.TYPE_SYSTEM).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
-    					{
-    						public void customResultAvailable(Void result) throws Exception
-    						{
-    							simserv.start().addResultListener(agent.createResultListener(new DelegationResultListener<>(ret)));
-    						}
-    					}));
-    				}
-    			}));
-    			return IFuture.DONE;
-    		}
-		});
-    	
-		return ret;
+	    	final Future<Void> ret = new Future<>();
+	    	agent.scheduleStep(new IComponentStep<Void>()
+			{
+	    		public IFuture<Void> execute(IInternalAccess ia)
+	    		{
+	    			ISimulationService simserv = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class)); 
+	    			simserv.pause().addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
+	    			{
+	    				public void customResultAvailable(Void result) throws Exception
+	    				{
+	    					simserv.setClockType(IClock.TYPE_SYSTEM).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
+	    					{
+	    						public void customResultAvailable(Void result) throws Exception
+	    						{
+	    							simserv.start().addResultListener(agent.createResultListener(new DelegationResultListener<>(ret)));
+	    						}
+	    					}));
+	    				}
+	    			}));
+	    			return IFuture.DONE;
+	    		}
+			});
+			return ret;
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
     }
 }

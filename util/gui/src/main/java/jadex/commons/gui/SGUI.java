@@ -73,7 +73,10 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
+import jadex.bridge.service.types.simulation.SSimulation;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
 
 
 /**
@@ -1052,6 +1055,34 @@ public class SGUI
 	{
 		SwingUtilities.invokeLater(runnable);
 	}
+	
+	/**
+	 *  Invoke on swing thread and sync with simulation if any.
+	 */
+	public static void invokeLaterSimBlock(Runnable runnable) 
+	{
+		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())
+		{
+			runnable.run();
+		}
+		else
+		{
+			Future<Void>	adblock	= SSimulation.block();
+			SwingUtilities.invokeLater(() ->
+			{
+				try
+				{
+					runnable.run();
+				}
+				finally
+				{
+					if(adblock!=null)
+						adblock.setResult(null);
+				}
+			});
+		}
+	}
+
 	
 	/**
 	 *  Shortcut method.

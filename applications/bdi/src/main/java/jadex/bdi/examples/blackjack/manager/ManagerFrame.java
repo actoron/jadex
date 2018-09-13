@@ -130,6 +130,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan = new JPanel();
 		dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
 		dealerpan.setBackground(Color.WHITE);
+		dealertf = new JTextField(20);
 		access.scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("dealerpan")
@@ -142,7 +143,6 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			}
 		});
 		
-		dealertf = new JTextField(20);
 		dealertf.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)

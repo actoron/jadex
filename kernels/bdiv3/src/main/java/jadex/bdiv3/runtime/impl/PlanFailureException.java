@@ -1,12 +1,14 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.runtime.BDIFailureException;
+
 /**
  *  An exception that may be thrown by a plan to
  *  indicate its failure.
  *  Note: This exception will not be logged by the logger
  *  as it occurs in plans (normal plain failure).
  */
-public class PlanFailureException extends RuntimeException
+public class PlanFailureException extends BDIFailureException
 {
 	//-------- constructors --------
 

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITypedComponentStep;
 import jadex.bridge.ProxyFactory;
@@ -16,12 +17,8 @@ import jadex.bridge.component.impl.remotecommands.IMethodReplacement;
 import jadex.bridge.component.impl.remotecommands.ProxyInfo;
 import jadex.bridge.component.impl.remotecommands.ProxyReference;
 import jadex.bridge.component.impl.remotecommands.RemoteReference;
-import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.annotation.Raw;
-import jadex.bridge.service.component.ISwitchCall;
-import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 
@@ -98,6 +95,12 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		else if((args==null || args.length==0) && "toString".equals(method.getName()))
 		{
 			return pr.getRemoteReference().getTargetIdentifier().toString();
+		}
+		else if(args!=null && args.length==1 && "equals".equals(method.getName()) && Object.class.equals(method.getParameterTypes()[0]))
+		{
+			return pr.getRemoteReference().getTargetIdentifier().equals(
+				args[0] instanceof IService ? ((IService)args[0]).getId()
+				: args[0] instanceof IExternalAccess ? ((IExternalAccess)args[0]).getId() : args[0]);
 		}
 
 		

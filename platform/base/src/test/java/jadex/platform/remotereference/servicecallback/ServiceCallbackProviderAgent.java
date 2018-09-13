@@ -1,4 +1,4 @@
-package jadex.launch.test.remotereference.servicecallback;
+package jadex.platform.remotereference.servicecallback;
 
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.Boolean3;
