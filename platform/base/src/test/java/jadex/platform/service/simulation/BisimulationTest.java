@@ -44,7 +44,7 @@ public class BisimulationTest
 			for(int i=1; i<3; i++)
 			{
 				IPlatformConfiguration config2	= config.clone();
-//				config2.setLogging(true);
+				config2.setLogging(true);
 				IFuture<IExternalAccess>	fp2	= Starter.createPlatform(config2);
 				IExternalAccess	p2	= fp2.get();
 				
