@@ -34,7 +34,7 @@
   <script>
     // Current page data
     var mkdocs_page_name = {{ page.title|tojson|safe }};
-    var mkdocs_page_input_path = {{ page.input_path|tojson|safe }};
+    var mkdocs_page_input_path = {{ page.file.src_path|string|tojson|safe }};
     var mkdocs_page_url = {{ page.abs_url|tojson|safe }};
   </script>
   {% endif %}
