@@ -1,18 +1,12 @@
 package jadex.bdi.examples.hunterprey_classic.creature.actsense;
 
+import jadex.bdi.examples.hunterprey_classic.environment.IEnvironmentService;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.fipa.DFComponentDescription;
-import jadex.bridge.fipa.DFServiceDescription;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.df.IDF;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.bridge.service.IService;
 
 
 /**
@@ -50,6 +44,7 @@ public abstract class RemoteActionPlan extends Plan
 	public void failed()
 	{
 		// Received a timeout. Probably the environment agent has died.
+		
 		getBeliefbase().getBelief("environmentagent").setFact(null);
 	}
 	
@@ -58,30 +53,43 @@ public abstract class RemoteActionPlan extends Plan
 	/**
 	 *  Search the environent agent and store its AID in the beliefbase.
 	 */
-	protected IComponentIdentifier	searchEnvironmentAgent()
+	protected IComponentIdentifier searchEnvironmentAgent()
 	{
-		IComponentIdentifier	res	= (IComponentIdentifier)getBeliefbase().getBelief("environmentagent").getFact();
+		IComponentIdentifier res = (IComponentIdentifier)getBeliefbase().getBelief("environmentagent").getFact();
 
 		if(res==null)
 		{
-			IDF df = (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-			IDFServiceDescription sd = new DFServiceDescription(null, "hunter-prey environment", null);
-			IDFComponentDescription ad = new DFComponentDescription(null, sd);
-			IDFComponentDescription[] tas = df.search(ad, null).get();
-
-			if(tas.length!=0)
+			try
 			{
-				// Found.
-				res	= tas[0].getName();
+				IEnvironmentService es = getAgent().getLocalService(IEnvironmentService.class);
+//				System.out.println("env agent: "+((IService)es).getId().getProviderId());
+				res = ((IService)es).getId().getProviderId();
 				getBeliefbase().getBelief("environmentagent").setFact(res);
-				if(tas.length>1)
-					getLogger().warning("More than environment agent found.");
+//				System.out.println("env set: "+res);
 			}
-			else
+			catch(Exception e)
 			{
-				// Not found.
 				throw new PlanFailureException();
 			}
+			
+//			IDF df = (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//			IDFServiceDescription sd = new DFServiceDescription(null, "hunter-prey environment", null);
+//			IDFComponentDescription ad = new DFComponentDescription(null, sd);
+//			IDFComponentDescription[] tas = df.search(ad, null).get();
+//
+//			if(tas.length!=0)
+//			{
+//				// Found.
+//				res	= tas[0].getName();
+//				getBeliefbase().getBelief("environmentagent").setFact(res);
+//				if(tas.length>1)
+//					getLogger().warning("More than environment agent found.");
+//			}
+//			else
+//			{
+//				// Not found.
+//				throw new PlanFailureException();
+//			}
 		}
 
 		return res;

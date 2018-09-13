@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	<H3>Booktrading application based on protocols capability.</H3>
+	<H3>Booktrading application based on service interface.</H3>
 
 	Can be used to start the booktrading example with different
 	initial configurations of buyer and seller agents.

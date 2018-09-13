@@ -159,10 +159,10 @@
 			<!--<precondition>$beliefbase.players.length>0</precondition>-->
 		</plan>
 		
-		<plan name="df_keep_registered">
+		<!-- <plan name="df_keep_registered">
 	        <parameter name="description" class="IDFComponentDescription"/>
 	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
-	    </plan>
+	    </plan>-->
 		
 	</plans>
 	
@@ -381,6 +381,12 @@
 
 	</expressions>
 	
+	<services>
+		<providedservice class="IDealerService">
+			<implementation class="DealerService"></implementation>
+		</providedservice>
+	</services>
+	
 	<properties>
 		<!--  logging-properties, needed to debug the application.
  	     Start the Jadex-Logging-Agent to see whats going on behind the scenes -->
@@ -399,7 +405,7 @@
 					<fact>new DealerFrame($beliefbase.myself, $scope.getExternalAccess())</fact>
 				</initialbelief>
 			</beliefs> -->
-			<plans>
+			<!-- <plans>
 				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
@@ -410,7 +416,7 @@
  						</value>
 					</parameter>
 				</initialplan>
-			</plans>
+			</plans> -->
 			<goals>
 				<initialgoal ref="play_game"/>
 			</goals>
@@ -422,7 +428,7 @@
 					<fact>null</fact>
 				</initialbelief>
 			</beliefs>
-			<plans>
+			<!-- <plans>
 				<initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
@@ -433,7 +439,7 @@
  						</value>
 					</parameter>
 				</initialplan>
-			</plans>
+			</plans> -->
 			<goals>
 				<initialgoal ref="play_game"/>
 			</goals>

@@ -1,6 +1,6 @@
-package jadex.bdi.examples.booktrading.serviceimpl.seller;
+package jadex.bdi.examples.booktrading.seller;
 
-import jadex.bdi.examples.booktrading.serviceimpl.IBuyBookService;
+import jadex.bdi.examples.booktrading.IBuyBookService;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bridge.service.annotation.Service;

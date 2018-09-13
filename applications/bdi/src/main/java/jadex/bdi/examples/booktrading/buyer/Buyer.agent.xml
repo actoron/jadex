@@ -16,18 +16,12 @@
 
 	<imports>
 		<import>jadex.bdi.examples.booktrading.common.*</import>
-		<import>jadex.bridge.fipa.*</import>
+		<import>jadex.bdi.examples.booktrading.*</import>
 		<import>java.util.*</import>
-		<import>jadex.bridge.service.types.df.*</import>
-		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.bdiv3.runtime.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 		<import>jadex.bridge.service.types.clock.*</import>
 	</imports>
-
-	<capabilities>
-		<capability name="procap" file="jadex.bdi.planlib.protocols.contractnet.ContractNet"/>
-	</capabilities>
 
 	<beliefs>
 		<beliefset name="orders" class="Order" evaluationmode="push">
@@ -67,13 +61,6 @@
 			</targetcondition>
 		</achievegoal>
 		
-		<achievegoalref name="cnp_initiate">
-			<concrete ref="procap.cnp_initiate"/>
-		</achievegoalref>
-		
-		<querygoalref name="cnp_evaluate_proposals">
-			<concrete ref="procap.cnp_evaluate_proposals"/>
-		</querygoalref>
 	</goals>
 
 	<plans>
@@ -85,29 +72,7 @@
 			<trigger>
 				<goal ref="purchase_book"/>
 			</trigger>
-		</plan>
-		
-		<plan name="evaluate_proposals_plan">
-			<parameter name="cfp" class="Object">
-				<goalmapping ref="cnp_evaluate_proposals.cfp"/>
-			</parameter>
-			<parameter name="cfp_info" class="Object" optional="true">
-				<goalmapping ref="cnp_evaluate_proposals.cfp_info"/>
-			</parameter>
-			<parameterset name="proposals" class="Object">
-				<goalmapping ref="cnp_evaluate_proposals.proposals"/>
-			</parameterset>
-			<parameterset name="history" class="NegotiationRecord" optional="true">
-				<goalmapping ref="cnp_evaluate_proposals.history"/>
-			</parameterset>
-			<parameterset name="acceptables" class="Object" direction="out">
-				<goalmapping ref="cnp_evaluate_proposals.acceptables"/>
-			</parameterset>
-			<body class="EvaluateProposalsPlan" />
-			<trigger>
-				<goal ref="cnp_evaluate_proposals"/>
-			</trigger>
-		</plan>
+		</plan>		
 	</plans>
 	
 	<expressions>
@@ -120,8 +85,8 @@
 	</expressions>
 
 	<services>
-		<requiredservice name="dfservice" class="IDF">
-			<binding scope="platform"/>
+		<requiredservice name="buyservice" class="IBuyBookService" multiple="true">
+			<binding scope="global"/>
 		</requiredservice>
 	</services>
 
@@ -137,19 +102,11 @@
 				 <initialbelief ref="gui">
 					<fact>
 						new jadex.commons.gui.GuiCreator(Gui.class, 
-						new Class[]{jadex.bridge.IExternalAccess.class}, 
-						new Object[]{$scope.getExternalAccess()})
+							new Class[]{jadex.bridge.IExternalAccess.class}, 
+							new Object[]{$scope.getExternalAccess()})
 					</fact>
 				</initialbelief> 
 			</beliefs>
-			<!-- <goals>
-				<initialgoal ref="purchase_book">
-					<parameter ref="order">
-						<value>new Order("All about agents", new java.util.Date($scope.getTime()+60000),
-							75, 110, true, (IClockService)$scope.getServiceProvider().getService(IClockService.class))</value>
-					</parameter>
-				</initialgoal>
-			</goals> -->
 		</configuration>
 	</configurations>
 

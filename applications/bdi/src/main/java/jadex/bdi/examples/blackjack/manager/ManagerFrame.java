@@ -497,7 +497,6 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		 */
 		private Timer enableTimer;
 
-
 		//-------- constructors --------
 
 		/**
@@ -557,8 +556,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			if(e.getSource()==colorButton)
 			{
-				Color newColor = JColorChooser.showDialog(this, "Choose Agent Color",
-						colorButton.getBackground());
+				Color newColor = JColorChooser.showDialog(this, "Choose Agent Color", colorButton.getBackground());
 				if((newColor!=null) && (!newColor.equals(Color.WHITE)))
 					colorButton.setBackground(newColor);
 			}
@@ -629,14 +627,14 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						Map<String, Object> args = new HashMap<String, Object>();
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
-						ia.createComponent(
-							new CreationInfo(args, ia.getId().getParent()).setName(player.getName()).setFilename("jadex/bdi/examples/blackjack/player/Player.agent.xml"))
-						.addResultListener(new DefaultTuple2ResultListener<IExternalAccess, Map<String, Object>>()
+						
+						ia.createComponent(new CreationInfo(args, ia.getId().getParent()).setName(player.getName()).setFilename("jadex/bdi/examples/blackjack/player/Player.agent.xml"))
+							.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 						{
 							@Override
-							public void firstResultAvailable(IExternalAccess playerid)
+							public void firstResultAvailable(IComponentIdentifier playerid)
 							{
-								player.setAgentID(playerid.getId());
+								player.setAgentID(playerid);
 								ret.setResult(null);
 							}
 							

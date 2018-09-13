@@ -33,6 +33,8 @@ public class UpdateVisionPlan extends Plan
 	 */
 	public void body()
 	{
+//		System.out.println("update vision: "+getAgent());
+		
 		IMessageEvent req = (IMessageEvent)getReason();
 		CurrentVision cv = (CurrentVision)req.getParameter(SFipa.CONTENT).getValue();
 		// todo:
