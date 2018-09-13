@@ -937,7 +937,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					{
 						try
 						{
-							relayupdatefuture.get(keepaliveinterval, true);
+							relayupdatefuture.get(keepaliveinterval >>> 1, true);
 						}
 						catch (Exception e)
 						{
