@@ -938,11 +938,11 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 						try
 						{
 							relayupdatefuture.get(keepaliveinterval, true);
-							agent.getFeature(IExecutionFeature.class).scheduleStep(this);
 						}
 						catch (Exception e)
 						{
 						}
+						agent.getFeature(IExecutionFeature.class).scheduleStep(this);
 					}
 					else
 					{
