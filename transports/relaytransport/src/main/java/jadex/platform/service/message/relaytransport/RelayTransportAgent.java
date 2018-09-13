@@ -122,7 +122,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	
 	/** Delay of keepalive messages. */
 	@AgentArgument
-	protected long keepaliveinterval = 30000;
+	protected long keepaliveinterval = -1;
 	
 	/** Maximum time spent on finding routing services. */
 	@AgentArgument
@@ -182,6 +182,11 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		if (keepaliveinterval < 0)
+			keepaliveinterval = Starter.getDefaultTimeout(agent.getId().getRoot());
+		if (keepaliveinterval < 0)
+			keepaliveinterval = 30000;
+		
 //		this.cms = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		intmsgfeat = (IInternalMessageFeature) agent.getFeature(IMessageFeature.class);
 		if(debug)
