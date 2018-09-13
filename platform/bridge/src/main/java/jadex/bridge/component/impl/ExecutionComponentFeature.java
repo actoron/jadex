@@ -699,6 +699,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					e.printStackTrace();
 				}
+				System.err.println(getInternalAccess()+" bisim exe is"+exe);
 			}
 
 			// Hack!!! service is foudn before it is started, grrr.
@@ -716,7 +717,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 			else
 			{
-//				System.out.println("rescue");
+				System.err.println(getInternalAccess()+" rescue "+SSimulation.isBisimulating(getInternalAccess())+", "+Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IClockService.BISIMULATION_CLOCK_FLAG));
 				available	= false;
 				// Happens during platform bootstrapping -> execute on platform rescue thread.
 				if(!bootstrap)
