@@ -1648,8 +1648,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		try
 		{
 			ICryptoSuite cs = currentcryptosuites.get(pfname);
-			expiringcryptosuites.add(pfname, new Tuple2<ICryptoSuite, Long>(cs, System.currentTimeMillis() + timeout));
-			currentcryptosuites.remove(pfname);
+			if (cs != null)
+			{
+				expiringcryptosuites.add(pfname, new Tuple2<ICryptoSuite, Long>(cs, System.currentTimeMillis() + timeout));
+				currentcryptosuites.remove(pfname);
+			}
 		}
 		finally
 		{
