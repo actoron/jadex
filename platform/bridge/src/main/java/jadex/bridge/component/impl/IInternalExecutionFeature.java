@@ -1,6 +1,8 @@
 package jadex.bridge.component.impl;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
 
 
@@ -86,5 +88,10 @@ public interface IInternalExecutionFeature
 	 *  @return The step cnt.
 	 */
 	public int getEndstateStart();
+	
+	/**
+	 *  Called when a child was terminated.
+	 */
+	public void childTerminated(IComponentDescription desc, Exception ex);
 	
 }

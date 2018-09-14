@@ -1,19 +1,12 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
+import jadex.bdi.examples.cleanerworld_classic.environment.IEnvironmentService;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
-import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.fipa.DFComponentDescription;
-import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.IComponentAction;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.df.IDF;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.bridge.service.IService;
 
 
 /**
@@ -64,24 +57,36 @@ public abstract class RemoteActionPlan extends Plan
 
 		if(res==null)
 		{
-			IDF df = (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-			IDFServiceDescription sd = new DFServiceDescription(null, "dispatch vision", null);
-			IDFComponentDescription ad = new DFComponentDescription(null, sd);
-			IDFComponentDescription[] tas = df.search(ad, null).get();
-			
-			if(tas.length!=0)
+			try
 			{
-				// Found.
-				res	= tas[0].getName();
+				IEnvironmentService es = getAgent().getLocalService(IEnvironmentService.class);
+				res = ((IService)es).getId().getProviderId();
 				getBeliefbase().getBelief("environmentagent").setFact(res);
-				if(tas.length>1)
-					getLogger().warning("More than environment agent found.");
 			}
-			else
+			catch(Exception e)
 			{
 				// Not found.
-				throw new PlanFailureException();
+//				throw new PlanFailureException();
 			}
+			
+//			IDF df = (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//			IDFServiceDescription sd = new DFServiceDescription(null, "dispatch vision", null);
+//			IDFComponentDescription ad = new DFComponentDescription(null, sd);
+//			IDFComponentDescription[] tas = df.search(ad, null).get();
+//			
+//			if(tas.length!=0)
+//			{
+//				// Found.
+//				res	= tas[0].getName();
+//				getBeliefbase().getBelief("environmentagent").setFact(res);
+//				if(tas.length>1)
+//					getLogger().warning("More than environment agent found.");
+//			}
+//			else
+//			{
+//				// Not found.
+//				throw new PlanFailureException();
+//			}
 		}
 
 		return res;

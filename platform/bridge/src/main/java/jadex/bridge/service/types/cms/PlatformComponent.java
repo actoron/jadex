@@ -328,6 +328,23 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	}
 	
 	/**
+	 *  Called when a child had an exception and was terminated.
+	 */
+	public IFuture<Void> childTerminated(IComponentDescription desc, final Exception exception)
+	{
+		final IExecutionFeature exe = getFeature(IExecutionFeature.class);
+
+		return exe.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				((IInternalExecutionFeature)exe).childTerminated(desc, exception);
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
 	 *  Recursively init the features.
 	 */
 	protected IFuture<Void>	executeInitOnFeatures(final Iterator<IComponentFeature> features)

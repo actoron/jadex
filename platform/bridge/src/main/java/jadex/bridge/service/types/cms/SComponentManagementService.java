@@ -1628,6 +1628,10 @@ public class SComponentManagementService
 											if(!(exception instanceof ComponentTerminatedException)
 												|| !((ComponentTerminatedException)exception).getComponentIdentifier().equals(adapter.getInternalAccess().getId()))
 											{
+												IComponentIdentifier pid = adapter.getInternalAccess().getId().getParent();
+												IPlatformComponentAccess pacom = getComponent(pid);
+												// hmm wait for call to finish?!
+												pacom.childTerminated(adapter.getInternalAccess().getDescription(), exception); 
 												adapter.getInternalAccess().killComponent(exception);
 											}
 										}

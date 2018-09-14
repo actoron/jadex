@@ -117,15 +117,21 @@
 				</goal>
 			</trigger>
 		</plan>
-	    <plan name="df_keep_registered">
+	    <!-- <plan name="df_keep_registered">
 	        <parameter name="description" class="IDFComponentDescription"/>
 	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
-	    </plan>
+	    </plan>  -->
 	    
 		<plan name="clear_plan">
 			<body class="ClearPlan"/>
 		</plan>
 	</plans>
+
+	<services>
+		<providedservice class="IEnvironmentService">
+			<implementation class="EnvironmentService"></implementation>
+		</providedservice>
+	</services>
 
 	<properties>
 		<property name="logging.level">Level.SEVERE</property>
@@ -139,7 +145,7 @@
 				</initialbelief>
 			</beliefs>
 			<plans>
-				<initialplan ref="df_keep_registered">
+				<!-- <initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
 							((IDF)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))).createDFComponentDescription($component.getId(),
@@ -148,7 +154,7 @@
 								20000)
  						</value>
 					</parameter>
-				</initialplan>
+				</initialplan> -->
 				<endplan ref="clear_plan"/>
 			</plans>
 		</configuration>
