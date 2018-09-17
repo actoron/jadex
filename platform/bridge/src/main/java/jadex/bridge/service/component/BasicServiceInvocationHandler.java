@@ -224,6 +224,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					ser = si.getDomainService();
 				}
 			}
+			else if(ProxyFactory.isProxyClass(service.getClass()) && 
+				RemoteMethodInvocationHandler.class.equals(ProxyFactory.getInvocationHandler(service).getClass()))
+			{
+				ser = service;
+			}
 			else
 			{
 				throw new RuntimeException("Raw service cannot be invoked on: "+service);

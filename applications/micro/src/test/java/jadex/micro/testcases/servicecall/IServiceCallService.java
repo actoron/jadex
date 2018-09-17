@@ -3,6 +3,7 @@ package jadex.micro.testcases.servicecall;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.sensor.service.TagProperty;
+import jadex.bridge.service.annotation.Raw;
 import jadex.commons.future.IFuture;
 
 /**
@@ -14,5 +15,11 @@ public interface IServiceCallService
 	/**
 	 *  Dummy method for service call benchmark.
 	 */
-	public IFuture<Void>	call();
+	public IFuture<Void> call();
+	
+	/**
+	 *  Dummy method for service call benchmark.
+	 */
+	@Raw
+	public IFuture<Void> rawcall();
 }
