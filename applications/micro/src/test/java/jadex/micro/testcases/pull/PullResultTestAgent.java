@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -157,13 +158,17 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 			disableLocalSimulationMode().get();
 			
 			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
-	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
-				"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
-	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-simul", "false", "-printpass", "false",
-				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
-			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+//	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
+//			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
+//				"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
+//	//			"-logging_level", "java.util.logging.Level.INFO",
+//				"-gui", "false", "-simulation", "false", "-simul", "false", "-printpass", "false",
+//				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
+//			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+			IPlatformConfiguration conf = STest.getDefaultTestConfig();
+			conf.getExtendedPlatformConfiguration().setSimul(false);
+			conf.getExtendedPlatformConfiguration().setSimulation(false);
+			Starter.createPlatform(conf).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport[]>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess platform)
