@@ -16,7 +16,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
- *  Calls a method on an object and returns the result.
+ *  Interceptor for observing method calls start and end e.g. for timing.
  */
 public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 {

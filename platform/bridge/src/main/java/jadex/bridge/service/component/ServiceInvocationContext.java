@@ -456,7 +456,7 @@ public class ServiceInvocationContext
 //			if(method.getName().equals("shutdownService") && sid.toString().indexOf("Context")!=-1 && sid.getProviderId().getParent()==null)
 //			if(method.getName().indexOf("performSteps")!=-1)
 //				System.out.println("invoke before: "+method.getName()+" "+interceptor+", "+platform.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
-			IFuture<Void>	fut	= interceptor.execute(this);
+			IFuture<Void> fut = interceptor.execute(this);
 			if(fut.isDone())
 			{
 				pop();
@@ -464,7 +464,7 @@ public class ServiceInvocationContext
 			}
 			else
 			{
-				final Future<Void>	fret	= new Future<Void>();
+				final Future<Void> fret = new Future<Void>();
 				ret	= fret;
 				fut.addResultListener(new IResultListener<Void>()
 				{

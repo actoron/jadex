@@ -812,7 +812,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
 			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, service, ia.getLogger(), true); // ia.getDescription().getCause()
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, true));
+//			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, true));
 			// Dropped for v4???
 //			if(binding!=null && binding.isRecover())
 //				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ia.getExternalAccess(), info, binding, fetcher));
@@ -821,7 +821,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //			else
 //				System.out.println("hurz: "+service);
 			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, service.getId()));
-			handler.addFirstServiceInterceptor(new NFRequiredServicePropertyProviderInterceptor(ia, service.getId()));
+//			handler.addFirstServiceInterceptor(new NFRequiredServicePropertyProviderInterceptor(ia, service.getId()));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
 			if(interceptors!=null && interceptors.length>0)
 			{
