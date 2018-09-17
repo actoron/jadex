@@ -1,6 +1,8 @@
 package jadex.micro.testcases.errorpropagation;
 
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
@@ -22,12 +24,14 @@ public class ChildAgent
 	{
 		System.out.println("Child started");
 		agent.waitForDelay(2000).get();
-		throw new RuntimeException()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			public void printStackTrace() 
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				super.printStackTrace();
+				throw new RuntimeException();
+//				return IFuture.DONE;
 			}
-		};
+		}).get();
 	}
 }
