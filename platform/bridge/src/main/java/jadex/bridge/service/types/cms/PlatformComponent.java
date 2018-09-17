@@ -880,11 +880,17 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				{
 					int prio = IExecutionFeature.STEP_PRIORITY_NORMAL;
 					
-					// Allow getting results from dead components.
+					// Allow getting arguments and results from dead components.
 					if("getResultsAsync".equals(method.getName()))
 					{
-						if (shutdown)
+						if(shutdown)
 							return new Future<>(getFeature(IArgumentsResultsFeature.class).getResults());
+						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+					}
+					if("getArgumentsAsync".equals(method.getName()))
+					{
+						if(shutdown)
+							return new Future<>(getFeature(IArgumentsResultsFeature.class).getArguments());
 						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
 					}
 					
