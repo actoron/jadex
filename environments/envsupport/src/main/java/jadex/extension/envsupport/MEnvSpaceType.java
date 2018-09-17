@@ -2962,7 +2962,7 @@ public class MEnvSpaceType
 		public Object convertString(String val, Object context)
 		{
 			Object ret = SReflect.findClass0((String)val, ((IModelInfo)
-					((IContext)context).getRootObject()).getAllImports(), ((IContext)context).getClassLoader());
+				((IContext)context).getRootObject()).getAllImports(), ((IContext)context).getClassLoader());
 			if(ret==null)
 			{
 				reportError((IContext)context, "Class not found: "+val);

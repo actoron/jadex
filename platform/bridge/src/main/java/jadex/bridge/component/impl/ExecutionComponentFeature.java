@@ -702,7 +702,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //				System.err.println(getInternalAccess()+" bisim exe is"+exe);
 			}
 
-			// Hack!!! service is foudn before it is started, grrr.
+			// Hack!!! service is found before it is started, grrr.
 			if(exe!=null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
 				if(bootstrap)
@@ -1346,7 +1346,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				
 				if(!(t instanceof ThreadDeath) && !(t instanceof StepAborted))
 				{
-					StringWriter	sw	= new StringWriter();
+					StringWriter sw	= new StringWriter();
 					t.printStackTrace(new PrintWriter(sw));
 					getComponent().getLogger().warning("Component step threw hard exception: "+step.getStep()+"\n"+sw);
 				}
@@ -1500,6 +1500,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //													});
 //												}
 //											}
+											
 											StringWriter	sw	= new StringWriter();
 											exception.printStackTrace(new PrintWriter(sw));
 											getComponent().getLogger().severe("No listener for component step exception: "+step.getStep()+"\n"+sw);
@@ -2091,7 +2092,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		return getComponent().getDescription(cid);
 	}
-
 	
 	/**
 	 *  Get the step number when endstate began.
@@ -2100,6 +2100,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public int getEndstateStart()
 	{
 		return endstepcnt;
+	}
+	
+	/**
+	 *  Called when a child was terminated.
+	 */
+	public void childTerminated(IComponentDescription desc, Exception ex)
+	{
+		System.out.println("Child terminated: "+desc.getName());
+		// does nothing per default
+		// kernels need to override 
 	}
 	
 	/**

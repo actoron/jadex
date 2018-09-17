@@ -1,4 +1,4 @@
-package jadex.bdi.examples.booktrading.serviceimpl;
+package jadex.bdi.examples.booktrading;
 
 import jadex.commons.future.IFuture;
 

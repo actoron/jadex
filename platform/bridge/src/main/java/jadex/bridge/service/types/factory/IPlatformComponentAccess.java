@@ -62,6 +62,11 @@ public interface IPlatformComponentAccess
 	public IFuture<Void> shutdown();
 	
 	/**
+	 *  Called when a child had an exception and was terminated.
+	 */
+	public IFuture<Void> childTerminated(IComponentDescription desc, Exception exception);
+	
+	/**
 	 *  Get the user view of this platform component.
 	 *  
 	 *  @return An internal access exposing user operations of the component.

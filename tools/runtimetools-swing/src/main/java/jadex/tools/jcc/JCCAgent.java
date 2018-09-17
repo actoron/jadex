@@ -33,6 +33,7 @@ import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Properties;
 import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
+import jadex.tools.libtool.LibraryServicePlugin;
 import jadex.tools.registry.RegistryComponentPlugin;
 import jadex.tools.security.SecurityServicePlugin;
 import jadex.tools.simcenter.SimulationServicePlugin;
@@ -245,17 +246,17 @@ public class JCCAgent	implements IComponentStep<Void>
 	//				DFServicePlugin.class.getName(),
 	//				ConversationPlugin.class.getName(),
 	//				"jadex.tools.comanalyzer.ComanalyzerPlugin",
-					TestCenterPlugin.class.getName(),
+//					TestCenterPlugin.class.getName(),
 	//				JadexdocPlugin.class.getName(),
 					SimulationServicePlugin.class.getName(),
 					DebuggerPlugin.class.getName(),
 	//				RuleProfilerPlugin.class.getName(),
-	//				LibraryServicePlugin.class.getName(),
+					LibraryServicePlugin.class.getName(),
 //					AwarenessComponentPlugin.class.getName(),
 //					AwarenessServicePlugin.class.getName(),
 					ComponentViewerPlugin.class.getName(),
 					SecurityServicePlugin.class.getName(),
-					RegistryComponentPlugin.class.getName()
+//					RegistryComponentPlugin.class.getName()
 	//				DeployerPlugin.class.getName()
 				},
 			saveonexit).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
