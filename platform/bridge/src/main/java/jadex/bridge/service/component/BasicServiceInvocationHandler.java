@@ -762,6 +762,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, Starter.isParameterCopy(sid.getProviderId()), false));
 			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
+			
+			// used only by global service pool, todo add contionally
 			handler.addFirstServiceInterceptor(new IntelligentProxyInterceptor(ia.getExternalAccess(), sid));
 		}
 		

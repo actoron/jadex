@@ -594,6 +594,7 @@ public class ServiceInvocationContext
 			object.remove(object.size()-1);
 			method.remove(method.size()-1);
 			arguments.remove(arguments.size()-1);
+			// result is copied back
 			Object res = this.result.remove(this.result.size()-1);
 			result.set(result.size()-1, res);
 		}
