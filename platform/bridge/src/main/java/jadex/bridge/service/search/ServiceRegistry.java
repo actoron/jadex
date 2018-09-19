@@ -535,7 +535,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		try
 		{
 			Set<ServiceQueryInfo<?>> qi = queries.getValues(QueryInfoExtractor.KEY_TYPE_ID, query.getId());
-			queries.removeValue(qi.iterator().next());
+			if(qi!=null)
+			{
+				queries.removeValue(qi.iterator().next());
+			}
+			else
+			{
+				System.out.println("query not found for removeQuery(): "+query.getId());
+			}
 		}
 		finally
 		{
