@@ -571,6 +571,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				{
 					if(running && superpeer==null)	// Hack!!! Bug in query deduplication -> receiving same ssp over and over !?
 					{
+						System.out.println(agent+" query result: "+queryfut.hashCode()+", "+sp);
+						
 						agent.getLogger().info("Requesting super peer connection for network "+networkname+" from super peer: "+sp);
 						ISubscriptionIntermediateFuture<Void>	regfut	= sp.registerClient(networkname);
 						regfut.addResultListener(new IIntermediateResultListener<Void>()
@@ -750,7 +752,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					// Todo: remove after query bug fixed.
 					else if(running)
 					{
-						System.out.println("Unexpected query result (duplicate?): "+queryfut.hashCode()+", "+sp);
+						System.out.println(agent+" unexpected query result (duplicate?): "+queryfut.hashCode()+", "+sp+", previous sp="+superpeer);
 					}
 				}
 				
@@ -821,7 +823,15 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				assert connection!=null;
 				assert superpeer!=null;
 
-				localquery.terminate();
+				try
+				{
+					localquery.terminate();
+				}
+				catch(Exception e)
+				{
+					System.err.println(agent+" error in registry: please fix.");
+					e.printStackTrace();
+				}
 				if(!connection.isDone())
 					connection.terminate();
 
