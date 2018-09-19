@@ -559,8 +559,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			agent.getLogger().info(agent+" searching for super peers for network "+networkname);
 			
 			// Also finds and adds locally available super peers -> locaL registry only contains local services, (local/remote) super peer manages separate registry
-			ISubscriptionIntermediateFuture<ISuperpeerService>	queryfut	= agent.getFeature(IRequiredServicesFeature.class)
-				.addQuery(new ServiceQuery<>(ISuperpeerService.class, RequiredService.SCOPE_GLOBAL).setNetworkNames(networkname));
+			ServiceQuery<ISuperpeerService>	sq	= new ServiceQuery<>(ISuperpeerService.class, RequiredService.SCOPE_GLOBAL).setNetworkNames(networkname);
+			ISubscriptionIntermediateFuture<ISuperpeerService>	queryfut	= agent.getFeature(IRequiredServicesFeature.class).addQuery(sq);
 			superpeerquery	= queryfut;	// Remember current query.
 			queryfut.addResultListener(new IntermediateDefaultResultListener<ISuperpeerService>()
 			{
@@ -571,7 +571,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				{
 					if(running && superpeer==null)	// Hack!!! Bug in query deduplication -> receiving same ssp over and over !?
 					{
-						System.out.println(agent+" query result: "+queryfut.hashCode()+", "+sp);
+						System.out.println(agent+" query result: "+sq.getId()+", "+sp);
 						
 						agent.getLogger().info("Requesting super peer connection for network "+networkname+" from super peer: "+sp);
 						ISubscriptionIntermediateFuture<Void>	regfut	= sp.registerClient(networkname);
@@ -711,6 +711,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								// Connection still current but ended?
 								if(running && superpeer==sp)
 								{
+									stopSuperpeerSubscription();
+									
 									// On error -> restart search after e.g. 300 millis (realtime) (very small delay to prevent busy loop on persistent immediate error)
 									agent.getFeature(IExecutionFeature.class).waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 0.01), new IComponentStep<Void>()
 									{
@@ -718,7 +720,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											// Still no other connection in between?
-											if(running && superpeer==sp)
+											if(running && superpeer==null)
 											{
 												// Restart connection attempt
 												lis.intermediateResultAvailable(sp);
@@ -823,15 +825,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				assert connection!=null;
 				assert superpeer!=null;
 
-				try
-				{
-					localquery.terminate();
-				}
-				catch(Exception e)
-				{
-					System.err.println(agent+" error in registry: please fix.");
-					e.printStackTrace();
-				}
+				localquery.terminate();
 				if(!connection.isDone())
 					connection.terminate();
 
