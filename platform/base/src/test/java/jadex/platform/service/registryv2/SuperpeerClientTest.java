@@ -114,7 +114,6 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		svc	= results2.getNextIntermediateResult();
 		Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getId().getProviderId().getRoot());
 
-		// TODO
 		// 7) kill SP, start remote platform, wait for service on both queries -> test if re-fallback to awa works for queries
 		System.out.println("7) kill SP, start remote platform, wait for service on both queries");
 		removePlatform(sp);
@@ -164,7 +163,6 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 		Assert.assertEquals(""+result, 1, result.size());
 
-		// TODO
 		// 6) kill SP, search for service -> test if re-fallback to awa works
 		System.out.println("6) kill SP, search for service");
 		removePlatform(sp);
