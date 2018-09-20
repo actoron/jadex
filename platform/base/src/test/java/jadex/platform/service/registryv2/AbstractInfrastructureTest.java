@@ -102,6 +102,24 @@ public abstract class AbstractInfrastructureTest
 	}
 	
 	/**
+	 *  Wait longer than the default timeout.
+	 */
+	protected void waitLonger(IExternalAccess platform)
+	{
+		long delay = Starter.getScaledDefaultTimeout(platform.getId(), 2.2);
+		delay = delay <= 0 ? 36000 : delay;
+		System.out.println("Waiting for "+delay);
+		platform.waitForDelay(delay, new IComponentStep<Void>()
+		{
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				return IFuture.DONE;
+			}
+		}, true).get();
+	}
+	
+	/**
 	 *  Wait until all clients have connected to superpeer.
 	 *  @param platforms The superpeer (first value) and other platforms that need to connect.
 	 */
