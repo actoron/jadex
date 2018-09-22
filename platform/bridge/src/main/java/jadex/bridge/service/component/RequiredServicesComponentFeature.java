@@ -13,6 +13,7 @@ import java.util.Set;
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
@@ -43,7 +44,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -624,125 +625,74 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public <T>  ITerminableIntermediateFuture<T> resolveServices(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
-		enhanceQuery(query, true);
+		ITerminableIntermediateFuture<T> ret;
 		
-		TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<>();
+		// Check if remote
+		ISearchQueryManagerService sqms = isRemote(query) ? searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE)) : null;
 		
-		int[] finishcount = new int[1];
-		finishcount[0] = 1;
-		
-		// Find remote matches
-		if(isRemote(query))
+		// Local only -> create future, fill results, and set to finished.
+		if(sqms==null)
 		{
-			ISearchQueryManagerService sqms = searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-			if(sqms!=null)
+			TerminableIntermediateFuture<T>	fut	= new TerminableIntermediateFuture<>();
+			ret	= fut;
+			
+			// Find local matches (also enhances query, hack!?)
+			Collection<T>	locals	= resolveLocalServices(query, info);
+			for(T result: locals)
 			{
-				++finishcount[0];
-				ITerminableIntermediateFuture<IServiceIdentifier> remotes = sqms.searchServices(query);
-				
-				remotes.addResultListener(new IIntermediateResultListener<IServiceIdentifier>()
-				{
-
-					public void resultAvailable(Collection<IServiceIdentifier> result)
-					{
-						finished();
-					}
-
-					public void exceptionOccurred(Exception exception)
-					{
-						finished();
-					}
-					
-					public void intermediateResultAvailable(IServiceIdentifier result)
-					{
-						@SuppressWarnings("unchecked")
-						T t = (T)createServiceProxy(result, info);
-						ret.addIntermediateResultIfUndone(t);
-					}
-
-					public void finished()
-					{
-						--finishcount[0];
-						if (finishcount[0] == 0)
-							ret.setFinishedIfUndone();
-					}
-				});
+				fut.addIntermediateResult(result);
 			}
+			fut.setFinished();
 		}
 		
-		// Find local matches.
-		IServiceRegistry registry = ServiceRegistry.getRegistry(getInternalAccess());
-		Collection<IServiceIdentifier> localresults =  registry.searchServices(query);
-		
-		for(IServiceIdentifier result: localresults)
+		// Find remote matches, if needed
+		else
 		{
+			enhanceQuery(query, true);
+			SlidingCuckooFilter scf = new SlidingCuckooFilter();
+
+			// Combined delegation future for local and remote results.
 			@SuppressWarnings("unchecked")
-			T t = (T)createServiceProxy(result, info);
-			ret.addIntermediateResult(t);
+			IntermediateFuture<IServiceIdentifier>	fut	= (IntermediateFuture<IServiceIdentifier>)FutureFunctionality
+				.getDelegationFuture(ITerminableIntermediateFuture.class, new ComponentFutureFunctionality(getInternalAccess())
+			{
+				@Override
+				public Object handleIntermediateResult(Object result) throws Exception
+				{
+					// Drop result when already in cuckoo filter
+					if(scf.contains(result.toString()))
+					{
+						return DROP_INTERMEDIATE_RESULT;
+					}
+					else
+					{
+						scf.insert(result.toString());
+						return createServiceProxy(result, info);
+					}
+				}
+			});
+			
+			// Manually add local results to delegation future
+			IServiceRegistry registry = ServiceRegistry.getRegistry(getInternalAccess());
+			Collection<IServiceIdentifier> results =  registry.searchServices(query);
+			for(IServiceIdentifier result: results)
+			{
+				fut.addIntermediateResult(result);
+			}
+			
+			// Search remotely and connect to delegation future.
+			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(getComponent().getId(), 1.2));
+			ITerminableIntermediateFuture<IServiceIdentifier> remotes = sqms.searchServices(query);
+//			System.out.println("Search: "+query);
+//			remotes.addResultListener(res -> System.out.println("Search finished: "+query));
+			FutureFunctionality.connectDelegationFuture(fut, remotes);
+			
+			@SuppressWarnings("unchecked")
+			IIntermediateFuture<T>	casted	= (IIntermediateFuture<T>)fut;
+			ret	= (ITerminableIntermediateFuture<T>)casted;
+//			ret.addResultListener(res -> System.out.println("ret finished: "+query));
 		}
-		--finishcount[0];
-		if (finishcount[0] == 0)
-			ret.setFinished();
 		
-//		ITerminableIntermediateFuture<T> ret = null;
-//		
-//		// Find remote matches
-//		if(isRemote(query))
-//		{
-//			ISearchQueryManagerService sqms = searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-//			if(sqms!=null)
-//			{
-//				@SuppressWarnings("rawtypes")
-//				ITerminableIntermediateFuture remotes = sqms.searchServices(query);
-//				@SuppressWarnings("unchecked")
-//				ITerminableIntermediateFuture<T> castedremotes = (ITerminableIntermediateFuture<T>) remotes;
-//				Future<Collection<T>> fut = FutureFunctionality.getDelegationFuture(castedremotes, new FutureFunctionality(getComponent().getLogger())
-//				{
-//					@Override
-//					public Object handleIntermediateResult(Object result) throws Exception
-//					{
-//						return createServiceProxy(result, info);
-//					}
-//				});
-//				
-//				@SuppressWarnings("unchecked")
-//				ITerminableIntermediateFuture<T> tmp = (ITerminableIntermediateFuture<T>)fut;
-//				ret = tmp;
-//			}
-//		}
-//		
-//		// Find local matches.
-//		IServiceRegistry registry = ServiceRegistry.getRegistry(getComponent());
-//		Collection<IServiceIdentifier> localresults =  registry.searchServices(query);
-//		
-//		// No remote matches -> create simple result future.
-//		if(ret==null)
-//		{
-//			TerminableIntermediateFuture<T> fut = new TerminableIntermediateFuture<>();
-//			for(IServiceIdentifier result: localresults)
-//			{
-//				@SuppressWarnings("unchecked")
-//				T t = (T)createServiceProxy(result, info);
-//				fut.addIntermediateResult(t);
-//			}
-//			fut.setFinished();
-//			ret = fut;
-//		}
-//		
-//		// Merge remote and local matches using delegation future functionality  (on same thread, thus local before remote results, if any)
-//		else
-//		{
-//			@SuppressWarnings("unchecked")
-//			IntermediateFuture<T> fut = (IntermediateFuture<T>)ret;
-//			
-//			for(IServiceIdentifier result: localresults)
-//			{
-//				@SuppressWarnings("unchecked")
-//				T t = (T)result; // Hack!!! Isn't really <T> but ignored at runtime anyways and converted by future functionality
-//				fut.addIntermediateResultIfUndone(t);
-//			}
-//		}
-//				
 		return ret;
 	}
 	

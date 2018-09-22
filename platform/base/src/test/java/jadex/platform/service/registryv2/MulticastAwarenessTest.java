@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -33,6 +34,7 @@ public class MulticastAwarenessTest	extends AbstractInfrastructureTest
 		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// -> 750 millis.
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenessmulticast", true);
+		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*2));
 
 		// Remote only -> no simulation please
 		baseconf.getExtendedPlatformConfiguration().setSimul(false);
@@ -66,24 +68,18 @@ public class MulticastAwarenessTest	extends AbstractInfrastructureTest
 		System.out.println("2) start remote platform, search for service");
 		IExternalAccess	pro1	= createPlatform(PROCONF);
 		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		// TODO
-//		Assert.assertEquals(""+result, 1, result.size());
-		System.out.println("found (duplicates?): "+result);
+		Assert.assertEquals(""+result, 1, result.size());
 		
 		// 3) start remote platform, search for service -> test if awa fallback works with two platforms 
 		System.out.println("3) start remote platform, search for service");
 		/*IExternalAccess	pro2	=*/ createPlatform(PROCONF);
 		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		// TODO
-//		Assert.assertEquals(""+result, 2, result.size());
-		System.out.println("found (duplicates?): "+result);
+		Assert.assertEquals(""+result, 2, result.size());
 		
 		// 4) kill one remote platform, search for service -> test if remote disconnection and service removal works
 		System.out.println("4) kill one remote platform, search for service");
 		removePlatform(pro1);
 		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		// TODO
-//		Assert.assertEquals(""+result, 1, result.size());
-		System.out.println("found (duplicates?): "+result);
+		Assert.assertEquals(""+result, 1, result.size());
 	}
 }

@@ -107,7 +107,7 @@ public abstract class AbstractInfrastructureTest
 	protected void waitLonger(IExternalAccess platform)
 	{
 		long delay = Starter.getScaledDefaultTimeout(platform.getId(), 2.2);
-		delay = delay <= 0 ? 36000 : delay;
+		delay = delay <= 0 ? 66000 : delay;
 		System.out.println("Waiting for "+delay);
 		platform.waitForDelay(delay, new IComponentStep<Void>()
 		{
