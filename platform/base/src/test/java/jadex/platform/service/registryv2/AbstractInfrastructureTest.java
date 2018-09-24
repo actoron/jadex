@@ -135,9 +135,9 @@ public abstract class AbstractInfrastructureTest
 		System.out.println("Waiting for cids: " + Arrays.toString(platformids.toArray()));
 		while(!platformids.isEmpty())
 		{
-			long timeout = Starter.getScaledDefaultTimeout(sp.getId().getRoot(), 0.25);
+			long timeout = Starter.getDefaultTimeout(sp.getId().getRoot());
 			if (timeout <= 0)
-				timeout = 7500;
+				timeout = 30000;
 			System.out.println("Waiting for next cid, remaining: " + Arrays.toString(platformids.toArray()));
 			IComponentIdentifier	cid	= connected.getNextIntermediateResult(timeout, true);
 			platformids.remove(cid.getRoot());
