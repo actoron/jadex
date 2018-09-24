@@ -132,6 +132,7 @@ public abstract class AbstractInfrastructureTest
 		{
 			platformids.add(ea.getId());
 		}
+		System.out.println("Waiting for cids: " + Arrays.toString(platformids.toArray()));
 		while(!platformids.isEmpty())
 		{
 			long timeout = Starter.getScaledDefaultTimeout(sp.getId().getRoot(), 0.25);
