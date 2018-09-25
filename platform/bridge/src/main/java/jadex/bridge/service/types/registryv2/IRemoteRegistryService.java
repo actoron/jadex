@@ -16,8 +16,7 @@ import jadex.commons.future.IFuture;
  *  For remote queries use the extended ISuperpeerService, if available.
  */
 @Service(system=true)
-//TODO: change supersuperpeer to globalsuperpeer?
-@Security(roles="%{true.equals($platformargs.supersuperpeer)? jadex.bridge.service.annotation.Security.UNRESTRICTED: jadex.bridge.service.annotation.Security.DEFAULT}")
+@Security(roles=Security.UNRESTRICTED)	// Allow invocation and check in impl.
 public interface IRemoteRegistryService
 {
 	/** Name of the remote registry component and service. */

@@ -15,12 +15,13 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 @Service
 public interface ITimeService
 {
-	/**
-	 *  Get the location of the platform, where the time service runs.
-	 *  The location is a constant value for each service, therefore it can be cached
-	 *  and no future is needed.
-	 */
-	public String	getLocation();
+//	/**
+//	 *  Get the location of the platform, where the time service runs.
+//	 *  The location is a constant value for each service, therefore it can be cached
+//	 *  and no future is needed.
+//	 */
+	// TODO: support for cached methods, yes or no? -> otherwise forbid or support sync?
+//	public String	getLocation();
 	
 	/**
 	 *  Subscribe to the time service.
