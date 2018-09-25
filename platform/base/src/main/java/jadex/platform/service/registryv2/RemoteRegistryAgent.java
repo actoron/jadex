@@ -110,11 +110,12 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	// TODO: change query to unrestricted instead and always succeed by returning allowed subset of results. 
 	protected void checkSecurity(ServiceQuery<?> query)
 	{
-		boolean allowed	= false;
+		boolean allowed	= true;
 		
 		ISecurityInfo	secinfos	= (ISecurityInfo)ServiceCall.getCurrentInvocation().getProperty(ServiceCall.SECURITY_INFOS);
 		if(secinfos==null || !secinfos.hasDefaultAuthorization())
 		{
+			allowed	= false;
 			if(query.getServiceType()!=null)
 			{
 				Class<?>	type	= query.getServiceType().getType(ia.getClassLoader());
