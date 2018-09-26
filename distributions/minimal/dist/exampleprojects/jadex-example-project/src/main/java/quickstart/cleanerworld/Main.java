@@ -1,15 +1,15 @@
-package cleanerworld.single;
+package quickstart.cleanerworld;
 
 import java.util.logging.Level;
 
 import javax.swing.SwingUtilities;
 
-import cleanerworld.gui.EnvironmentGui;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.IFuture;
+import jadex.quickstart.cleanerworld.gui.EnvironmentGui;
 
 /**
  *  Main class for starting a cleanerworld scenario
@@ -40,8 +40,8 @@ public class Main
 		conf.setValue("kernel_bdi", true);
         
         // Add your cleaner agent(s)
-//		conf.addComponent("my/package/MyAgent.class");
-//		conf.addComponent("my/package/MyOtherAgent.class");
+		conf.addComponent("quickstart/cleanerworld/SimpleCleanerAgent.class");
+		conf.addComponent("quickstart/cleanerworld/SimpleCleanerBDIAgent.class");
 
 		// Start a Jadex platform (asynchronously in background).
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(conf);

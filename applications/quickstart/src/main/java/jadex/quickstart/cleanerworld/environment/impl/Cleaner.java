@@ -59,7 +59,6 @@ public class Cleaner extends LocationObject	implements ICleaner
 
 	/**
 	 *  Set the associated agent.
-	 *  @return The id of the associated agent.
 	 */
 	public void	setAgentIdentifier(IComponentIdentifier cid)
 	{

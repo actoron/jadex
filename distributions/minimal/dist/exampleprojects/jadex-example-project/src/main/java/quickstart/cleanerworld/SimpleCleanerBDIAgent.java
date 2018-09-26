@@ -1,14 +1,8 @@
-package cleanerworld.single;
+package quickstart.cleanerworld;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import cleanerworld.environment.IChargingstation;
-import cleanerworld.environment.ICleaner;
-import cleanerworld.environment.IWaste;
-import cleanerworld.environment.IWastebin;
-import cleanerworld.environment.SensorActuator;
-import cleanerworld.gui.SensorGui;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalDropCondition;
@@ -21,6 +15,12 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.quickstart.cleanerworld.environment.IChargingstation;
+import jadex.quickstart.cleanerworld.environment.ICleaner;
+import jadex.quickstart.cleanerworld.environment.IWaste;
+import jadex.quickstart.cleanerworld.environment.IWastebin;
+import jadex.quickstart.cleanerworld.environment.SensorActuator;
+import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
  *  Simple example of using the environment sensor.
@@ -29,7 +29,7 @@ import jadex.micro.annotation.AgentBody;
  *
  */
 @Agent(type="bdi")
-public class SimpleCleanerAgent
+public class SimpleCleanerBDIAgent
 {
 	//-------- beliefs that can be used in plan and goal conditions --------
 	

@@ -60,13 +60,13 @@ public class EnvironmentGui	extends JFrame
 	/** The image icons. */
 	private static UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"waste",	SGUI.makeIcon(EnvironmentGui.class, "/cleanerworld/gui/images/waste.png"),
-		"wastebin",	SGUI.makeIcon(EnvironmentGui.class, "/cleanerworld/gui/images/wastebin.png"),
-		"wastebin_full", SGUI.makeIcon(EnvironmentGui.class, "/cleanerworld/gui/images/wastebin_full.png"),
-		"chargingstation", SGUI.makeIcon(EnvironmentGui.class, "/cleanerworld/gui/images/chargingstation.png"),
-		"cleaner", SGUI.makeIcon(EnvironmentGui.class, "/cleanerworld/gui/images/cleaner.png"),
-		"background", SGUI.makeIcon(EnvironmentGui.class, "/cleanerworld/gui/images/background.png"),
-		"background_night", SGUI.makeIcon(EnvironmentGui.class, "/cleanerworld/gui/images/background_night.png")
+		"waste",	SGUI.makeIcon(EnvironmentGui.class, "/jadex/quickstart/cleanerworld/gui/images/waste.png"),
+		"wastebin",	SGUI.makeIcon(EnvironmentGui.class, "/jadex/quickstart/cleanerworld/gui/images/wastebin.png"),
+		"wastebin_full", SGUI.makeIcon(EnvironmentGui.class, "/jadex/quickstart/cleanerworld/gui/images/wastebin_full.png"),
+		"chargingstation", SGUI.makeIcon(EnvironmentGui.class, "/jadex/quickstart/cleanerworld/gui/images/chargingstation.png"),
+		"cleaner", SGUI.makeIcon(EnvironmentGui.class, "/jadex/quickstart/cleanerworld/gui/images/cleaner.png"),
+		"background", SGUI.makeIcon(EnvironmentGui.class, "/jadex/quickstart/cleanerworld/gui/images/background.png"),
+		"background_night", SGUI.makeIcon(EnvironmentGui.class, "/jadex/quickstart/cleanerworld/gui/images/background_night.png")
 	});
 	
 	//-------- attributes --------

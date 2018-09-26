@@ -1,19 +1,23 @@
 apply plugin: 'java'
 
-//def jadex_version	= "${jadex_build_version}"
-def jadex_version	= "4.0.83"
+def jadex_version	= "${jadex_build_version}"
+//def jadex_version	= "4.0.9999-SNAPSHOT"
 
 dependencies {
-	compile 'org.activecomponents.jadex:jadex-distribution-standard:'+jadex_version
-	//api 'org.activecomponents.jadex:jadex-distribution-minimal:'+jadex_version
-	//api 'org.activecomponents.jadex:jadex-distribution-server:'+jadex_version
-	//api 'org.activecomponents.jadex:jadex-distribution-pro:'+jadex_version
+	compile 'org.activecomponents.jadex:jadex-distribution-minimal:'+jadex_version
+	
+	//compile 'org.activecomponents.jadex:jadex-distribution-standard:'+jadex_version
+	//compile 'org.activecomponents.jadex:jadex-distribution-server:'+jadex_version
+	//compile 'org.activecomponents.jadex:jadex-distribution-pro:'+jadex_version
 
-	api 'org.activecomponents.jadex:jadex-applications-quickstart:'+jadex_version
+	// required for cleanerworld scenario
+	compile 'org.activecomponents.jadex:jadex-kernel-bdiv3:'+jadex_version
+	compile 'org.activecomponents.jadex:jadex-applications-quickstart:'+jadex_version
 }
 
 repositories {
 	jcenter()
+//	mavenLocal()
 	mavenCentral()
 	// Additional repositories (only required when using nightlies and/or pro version of Jadex).
 	maven {

@@ -1,13 +1,13 @@
-package cleanerworld.single;
+package quickstart.cleanerworld;
 
 import java.util.HashSet;
 
-import cleanerworld.environment.IWaste;
-import cleanerworld.environment.IWastebin;
-import cleanerworld.environment.SensorActuator;
-import cleanerworld.gui.SensorGui;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.quickstart.cleanerworld.environment.IWaste;
+import jadex.quickstart.cleanerworld.environment.IWastebin;
+import jadex.quickstart.cleanerworld.environment.SensorActuator;
+import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
  *  Simple solution not using BDI at all.
@@ -16,7 +16,7 @@ import jadex.micro.annotation.AgentBody;
  *  @version 1.0 (2017/10/26)
  */
 @Agent
-public class CleanerNonBDIAgent
+public class SimpleCleanerAgent
 {
 	//-------- simple example behavior --------
 	
