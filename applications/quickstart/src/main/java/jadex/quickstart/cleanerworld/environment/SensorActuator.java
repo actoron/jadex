@@ -338,7 +338,7 @@ public class SensorActuator
 	 *  Update the sensor based on current vision.
 	 *  Called from activities like moveTo().
 	 */
-	protected void	update()
+	void	update()
 	{
 		updateObjects(cleaners, Environment.getInstance().getCleaners());
 		updateObjects(wastes, Environment.getInstance().getWastes());
@@ -351,7 +351,7 @@ public class SensorActuator
 	 *  @param oldset	The old set of objects, i.e. the previous knowledge.
 	 *  @param newset	The new set of objects, i.e. the current perception.
 	 */
-	protected <T extends ILocationObject> void updateObjects(Set<T> oldset, T[] newset)
+	<T extends ILocationObject> void updateObjects(Set<T> oldset, T[] newset)
 	{
 		Map<T, T>	newmap	= new LinkedHashMap<>();
 		for(T o: newset)
