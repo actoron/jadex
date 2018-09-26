@@ -40,7 +40,7 @@ public class Main
 		conf.setValue("kernel_bdi", true);
         
         // Add your cleaner agent(s)
-		conf.addComponent("quickstart/cleanerworld/SimpleCleanerAgent.class");
+//		conf.addComponent("quickstart/cleanerworld/SimpleCleanerAgent.class");
 		conf.addComponent("quickstart/cleanerworld/SimpleCleanerBDIAgent.class");
 
 		// Start a Jadex platform (asynchronously in background).

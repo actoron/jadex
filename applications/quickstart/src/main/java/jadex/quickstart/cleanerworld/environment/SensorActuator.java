@@ -74,10 +74,10 @@ public class SensorActuator
 		}
 
 		self	= Environment.getInstance().createCleaner(agent);
-		this.cleaners	= cleaners;
-		this.wastes	= wastes;
-		this.stations	= stations;
-		this.wastebins	= wastebins;
+		this.cleaners	= cleaners!=null ? cleaners : new LinkedHashSet<>();
+		this.wastes	= wastes!=null ? wastes : new LinkedHashSet<>();
+		this.stations	= stations!=null ? stations : new LinkedHashSet<>();
+		this.wastebins	= wastebins!=null ? wastebins : new LinkedHashSet<>();
 	}
 	
 	//-------- sensor methods --------
