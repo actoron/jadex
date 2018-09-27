@@ -1028,15 +1028,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			parenta.unblock(monitor, exception);
 		}
-		else
+		else if(blocked!=null) // can be null when rescue thread
 		{
 //			System.out.println("unblock: "+monitor);
 			Executor exe = blocked.remove(monitor);
 			if(blocked.isEmpty())
 				blocked	= null;
 					
-			if(exe!=null) // can be rescue thread
-				exe.switchThread(monitor, exception);
+			exe.switchThread(monitor, exception);
 		}
 	}
 	

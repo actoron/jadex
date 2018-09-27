@@ -1817,7 +1817,18 @@ public class SComponentManagementService
 	protected static void destroyComponent(final IComponentIdentifier cid,	final Future<Map<String, Object>> ret, IInternalAccess agent)
 	{
 //		if(cid.toString().indexOf("Vis")!=-1)
-//			System.out.println("kill: "+cid);
+			System.out.println("kill: "+cid);
+		ret.addResultListener(new IResultListener<Map<String,Object>>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("kill fini ex: "+cid);
+			}
+			public void resultAvailable(Map<String, Object> result)
+			{
+				System.out.println("kill fini: "+cid);
+			}
+		});
 		
 		if(isRemoteComponent(cid, agent))
 		{
@@ -1873,15 +1884,15 @@ public class SComponentManagementService
 				final CMSComponentDescription	desc = (CMSComponentDescription)comp.getInternalAccess().getDescription();
 				final IComponentIdentifier[] achildren = desc.getChildren();
 				
-//				if(achildren.length>0)
-//					System.out.println("kill childs start: "+cid+" "+achildren.length+" "+SUtil.arrayToString(achildren));
+				if(achildren.length>0)
+					System.out.println("kill childs start: "+cid+" "+achildren.length+" "+SUtil.arrayToString(achildren));
 				
 				destroyComponentLoop(cid, achildren, achildren.length-1, agent).addResultListener(createResultListener(agent, new IResultListener<List<Exception>>()
 				{
 					public void resultAvailable(List<Exception> result)
 					{
-//						if(achildren.length>0)
-//							System.out.println("kill childs end: "+cid);
+						if(achildren.length>0)
+							System.out.println("kill childs end: "+cid);
 						
 //						if(cid.toString().startsWith("Initiator"))
 //							System.out.println("Terminated component structure: "+cid.getName());
