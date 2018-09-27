@@ -297,17 +297,25 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		{
 			header.addProperty(IMsgHeader.RECEIVER, getRtComponent(fwdest));
 			
+			if (debug)
+				System.out.println(agent + ": Found direct connection for package destination " + fwdest + " new header: " + header);
+			
 			encryptHeader(header).addResultListener(new ExceptionDelegationResultListener<byte[], Integer>(ret)
 			{
 				public void customResultAvailable(byte[] encheader) throws Exception
 				{
 					if (notcanceled.get())
 					{
+						if (debug)
+							System.out.println(agent + ": header encrypted, forwarding to " + fwdest + " via transports...");
 						IFuture<Void> msgfut = intmsgfeat.sendToTransports(header, encheader, body);
 						msgfut.addResultListener(new ExceptionResultListener<Void>()
 						{
 							public void exceptionOccurred(Exception exception)
 							{
+								if (debug)
+									exception.printStackTrace();
+								
 								synchronized(directconns)
 								{
 									directconns.checkStale();
@@ -882,7 +890,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					final IComponentIdentifier source = (IComponentIdentifier) header.getProperty(FORWARD_SENDER);
 					final ISerializationServices serser = (ISerializationServices) Starter.getPlatformValue(agent.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 					
-//					System.out.println("Final receiver, delivering to component: " + body);
+					if (debug)
+						System.out.println(agent + ": Final receiver, delivering to component: " + fwdest);
 					AbstractTransportAgent.deliverRemoteMessage(agent, secservice, serser, source, unpacked.get(0), unpacked.get(1));
 				}
 			}
