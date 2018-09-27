@@ -70,6 +70,26 @@ public class RequiredServiceInfo
 		LOCAL_SCOPES = Collections.unmodifiableSet(localscopes);
 	}
 	
+	/** The global scopes. */
+	public static final Set<String> GLOBAL_SCOPES;
+	static
+	{
+		Set<String> localscopes = new HashSet<>();
+		localscopes.add(SCOPE_GLOBAL);
+		localscopes.add(SCOPE_APPLICATION_GLOBAL);
+		GLOBAL_SCOPES = Collections.unmodifiableSet(localscopes);
+	}
+	
+	/** The network scopes. */
+	public static final Set<String> NETWORK_SCOPES;
+	static
+	{
+		Set<String> localscopes = new HashSet<>();
+		localscopes.add(SCOPE_NETWORK);
+		localscopes.add(SCOPE_APPLICATION_NETWORK);
+		NETWORK_SCOPES = Collections.unmodifiableSet(localscopes);
+	}
+	
 	
 //	/** Global application scope. */
 //	public static final String SCOPE_GLOBAL_APPLICATION = "global_application";
@@ -319,7 +339,21 @@ public class RequiredServiceInfo
 	public static final boolean isScopeOnLocalPlatform(String scope)
 	{
 		return LOCAL_SCOPES.contains(scope);
-//		return scope==null || SCOPE_NONE.equals(scope) || SCOPE_COMPONENT_ONLY.equals(scope) || SCOPE_COMPONENT.equals(scope)
-//			|| SCOPE_APPLICATION.equals(scope) || SCOPE_PLATFORM.equals(scope) || SCOPE_PARENT.equals(scope);
+	}
+	
+	/**
+	 *  Check if the scope is global.
+	 */
+	public static final boolean isGlobalScope(String scope)
+	{
+		return GLOBAL_SCOPES.contains(scope);
+	}
+	
+	/**
+	 *  Check if the scope is a network scope.
+	 */
+	public static final boolean isNetworkScope(String scope)
+	{
+		return NETWORK_SCOPES.contains(scope);
 	}
 }
