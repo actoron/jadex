@@ -500,6 +500,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		/** The managed network (i.e. network name). */
 		protected String	networkname;
 		
+		/** The flag indicating that the network is actually the global network (cached for speed/readability). */
+		protected boolean	global;
+		
 		/** The flag to indicate the manager should be active. */
 		protected boolean	running;
 		
@@ -526,6 +529,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		protected NetworkManager(String networkname)
 		{
 			this.networkname	= networkname;
+			this.global	= GLOBAL_NETWORK_NAME.equals(networkname);
 		}
 		
 		//------- helper methods ---------
@@ -616,8 +620,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									// Local query uses registry directly (w/o feature) -> only service identifiers needed and also removed events
 									ServiceQuery<ServiceEvent<IServiceIdentifier>>	lquery	= new ServiceQuery<>((Class<IServiceIdentifier>)null)
 										.setEventMode()
-										.setOwner(spid);	// Only find services that are visible to SP
-									if(GLOBAL_NETWORK_NAME.equals(networkname))
+										.setOwner(agent.getId())
+										.setSearchStart(spid);	// Only find services that are visible to SP
+									if(global)
 									{
 										// SSP connection -> global scope and no network name
 										lquery.setScope(RequiredServiceInfo.SCOPE_GLOBAL);
@@ -648,7 +653,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		
 										public void intermediateResultAvailable(final ServiceEvent<IServiceIdentifier> event)
 										{
-											if (!RequiredServiceInfo.isScopeOnLocalPlatform(event.getService().getScope()))
+											if(global && RequiredServiceInfo.isGlobalScope(event.getService().getScope())
+												|| !global && !RequiredServiceInfo.isScopeOnLocalPlatform(event.getService().getScope()))	// TODO: hack!!! global vs network should be exclusive???
+//												|| !global && RequiredServiceInfo.isNetworkScope(event.getService().getScope()))
 											{
 												agent.scheduleStep(new IComponentStep<Void>()
 												{

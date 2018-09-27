@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
@@ -168,7 +169,9 @@ public class TimeProviderAgent	implements ITimeService
 	public static void	main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
+		config.setPlatformName("timeprovider_*");
 		config.addComponent(TimeProviderAgent.class);
+		config.setLoggingLevel(Level.WARNING);
 		Starter.createPlatform(config, args).get();
 	}
 }

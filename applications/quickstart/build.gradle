@@ -1,0 +1,7 @@
+description 'The Jadex quickstart package contains the ready to use "Cleanerworld" environment as a testbed for experimenting with autonomous agents and intelligent behavior.'
+
+dependencies
+{
+	api project(':util:gui')
+	api project(':platform:bridge')
+}

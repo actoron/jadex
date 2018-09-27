@@ -1,5 +1,7 @@
 package jadex.micro.quickstart;
 
+import java.util.logging.Level;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
@@ -26,7 +28,7 @@ public class TimeUserAgent
 		{
 			String time = subscription.getNextIntermediateResult();
 			String platform	= ((IService)timeservice).getId().getProviderId().getPlatformName();
-			System.out.println("New time received from "+platform+" at "+timeservice.getLocation()+": "+time);
+			System.out.println("New time received from "+platform+/*" at "+timeservice.getLocation()+*/": "+time);
 		}
 	}
 	
@@ -36,7 +38,9 @@ public class TimeUserAgent
 	public static void main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
+		config.setPlatformName("timeuser_*");
 		config.addComponent(TimeUserAgent.class);
+		config.setLoggingLevel(Level.WARNING);
 		Starter.createPlatform(config, args).get();
 	}
 }

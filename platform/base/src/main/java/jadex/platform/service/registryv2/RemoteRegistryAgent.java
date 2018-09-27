@@ -5,13 +5,17 @@ import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -61,7 +65,10 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	 */
 	public IFuture<IServiceIdentifier> searchService(ServiceQuery<?> query)
 	{
+		checkSecurity(query);
+		
 		IServiceIdentifier ret = null;
+		
 		// Scope check why?
 //		boolean localowner = query.getOwner().getRoot().equals(platformid);
 //		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
@@ -71,7 +78,7 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 		
 		return new Future<>(ret);
 	}
-	
+
 	/**
 	 *  Search remote registry for services.
 	 *  
@@ -80,6 +87,8 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	 */
 	public IFuture<Set<IServiceIdentifier>> searchServices(ServiceQuery<?> query)
 	{
+		checkSecurity(query);
+		
 		Set<IServiceIdentifier> ret = Collections.emptySet();
 		
 		// Scope check why?
@@ -90,5 +99,38 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 		}
 		
 		return new Future<>(ret);
+	}
+
+	//-------- helper methods --------
+	
+	/**
+	 *  Check if a query is allowed by caller.
+	 *  @throws SecurityExcpetion if not allowed.
+	 */
+	// TODO: change query to unrestricted instead and always succeed by returning allowed subset of results. 
+	protected void checkSecurity(ServiceQuery<?> query)
+	{
+		boolean allowed	= true;
+		
+		ISecurityInfo	secinfos	= (ISecurityInfo)ServiceCall.getCurrentInvocation().getProperty(ServiceCall.SECURITY_INFOS);
+		if(secinfos==null || !secinfos.hasDefaultAuthorization())
+		{
+			allowed	= false;
+			if(query.getServiceType()!=null)
+			{
+				Class<?>	type	= query.getServiceType().getType(ia.getClassLoader());
+				Security	level	= type.getAnnotation(Security.class);
+				if(level!=null)
+				{
+					Set<String>	roles	= ServiceIdentifier.getRoles(level, ia);
+					allowed	= roles.contains(Security.UNRESTRICTED);
+				}
+			}
+		}
+		
+		if(!allowed)
+		{
+			throw new SecurityException("Query not allowed: "+query);
+		}
 	}
 }

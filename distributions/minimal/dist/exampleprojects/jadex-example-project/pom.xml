@@ -66,6 +66,15 @@
 			<!-- <artifactId>jadex-distribution-pro</artifactId> -->
 			<version>${jadex.version}</version>
 		</dependency>
+
+		<!-- Quickstart example scenario for tutorial.
+			 Not needed for other applications.
+		 -->
+		<dependency>
+			<groupId>org.activecomponents.jadex</groupId>
+			<artifactId>jadex-applications-quickstart</artifactId>
+			<version>${jadex.version}</version>
+		</dependency>
 		
 		<!-- Webservice extension (enable if needed) -->
 		<!--
