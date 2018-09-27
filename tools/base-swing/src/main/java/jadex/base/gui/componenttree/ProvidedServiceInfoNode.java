@@ -147,7 +147,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 			public void resultAvailable(final IService ser)
 			{
 //				((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyMetaInfos()
-				ea.getNFPropertyMetaInfos(ser.getId())
+				ea.getNFPropertyMetaInfos(ser.getServiceId())
 					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 //					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 				{
@@ -164,7 +164,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 						
 						final NFPropertyContainerNode sercon = cn;
 						
-						ea.getMethodNFPropertyMetaInfos(ser.getId())
+						ea.getMethodNFPropertyMetaInfos(ser.getServiceId())
 //						((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getMethodNFPropertyMetaInfos()
 //						ser.getMethodNFPropertyMetaInfos()
 							.addResultListener(new SwingResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>(new IResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>()

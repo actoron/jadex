@@ -74,8 +74,13 @@ public class InformNewTargetPlan extends Plan
 			//action.setAction(it);
 			//action.setActor(new AID("dummy", true)); // Hack!! What to do with more than one receiver?
 			IMessageEvent mevent = createMessageEvent("inform_target");
+<<<<<<< Updated upstream
 			for(int i=0; i<sentries.length; i++)
 				mevent.getParameterSet(SFipa.RECEIVERS).addValue(sentries[i].getName());
+=======
+			for(ISentryService ss: sentries)
+				mevent.getParameterSet(SFipa.RECEIVERS).addValue(((IService)ss).getServiceId().getProviderId());
+>>>>>>> Stashed changes
 			mevent.getParameter(SFipa.CONTENT).setValue(target);
 			sendMessage(mevent);
 			//System.out.println("Informing sentries: "+getScope().getPlatformAgent().getLocalName());

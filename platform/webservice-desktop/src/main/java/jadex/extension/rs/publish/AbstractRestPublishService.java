@@ -1411,7 +1411,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			ret.append("<div class=\"header\">");
 			ret.append("\n");
 			ret.append("<h1>");//Service Info for: ");
-			String ifacename = ((IService)service).getId().getServiceType().getTypeName();
+			String ifacename = ((IService)service).getServiceId().getServiceType().getTypeName();
 			ret.append(SReflect.getUnqualifiedTypeName(ifacename));
 			ret.append("</h1>");
 			ret.append("\n");

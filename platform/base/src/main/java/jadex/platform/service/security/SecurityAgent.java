@@ -2039,7 +2039,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  Get the service identifier.
 	 *  @return The service identifier.
 	 */
-	public IServiceIdentifier getId()
+	public IServiceIdentifier getServiceId()
 	{
 		return sid;
 	}

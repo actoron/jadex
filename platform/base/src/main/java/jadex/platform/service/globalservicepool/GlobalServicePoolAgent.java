@@ -169,7 +169,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 				IService service = (IService)agent.getFeature(IProvidedServicesFeature.class).getProvidedService(servicetype);
 				if(service!=null)
 				{
-					agent.getFeature(IProvidedServicesFeature.class).removeService(service.getId()).addResultListener(new DelegationResultListener<Void>(ret));
+					agent.getFeature(IProvidedServicesFeature.class).removeService(service.getServiceId()).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 				else
 				{
@@ -235,7 +235,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
 			IService poolser = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IServicePoolService.class));
-			IService ser = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(poolser.getId().getProviderId()));
+			IService ser = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(poolser.getServiceId().getProviderId()));
 			return method.invoke(ser, args);
 		}
 	}

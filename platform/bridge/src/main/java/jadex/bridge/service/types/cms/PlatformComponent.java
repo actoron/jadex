@@ -888,8 +888,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //				if(method.getName().indexOf("createCompo")!=-1)
 //					System.out.println("call");
 				
-				Future<Object> ret = new Future<>();
-//				IFuture<Object> ret = null;
+//				Future<Object> ret = new Future<>();
+				IFuture<Object> ret = null;
 				
 				try
 				{

@@ -100,7 +100,7 @@ public class DefaultWebServicePublishService implements IPublishService
 		
 		if(endpoints==null)
 			endpoints = new HashMap<IServiceIdentifier, Endpoint>();
-		endpoints.put(service.getId(), endpoint);
+		endpoints.put(service.getServiceId(), endpoint);
 		return IFuture.DONE;
 		
 //		try

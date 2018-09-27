@@ -38,7 +38,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 	{
 		super(comp, new NFPropertyMetaInfo(NAME, int.class, Void.class, true, -1, true, null));
 		this.method = method;
-		this.sid = service.getId();
+		this.sid = service.getServiceId();
 		
 		if(ProxyFactory.isProxyClass(service.getClass()))
 		{

@@ -41,7 +41,7 @@ public class PeerRegistrySynchronizationAgent
 			
 			if(spser!=null)
 			{
-				component.killComponent(((IService)spser).getId().getProviderId());
+				component.killComponent(((IService)spser).getServiceId().getProviderId());
 			}
 		}
 		catch(ServiceNotFoundException e)

@@ -114,7 +114,7 @@ public class RelayMessageComponentFeature extends MicroMessageComponentFeature
 			for (Iterator<ITransportService> it = all.iterator(); it.hasNext(); )
 			{
 				IService serv = (IService) it.next();
-				if (!component.getId().equals(serv.getId().getProviderId()))
+				if (!component.getId().equals(serv.getServiceId().getProviderId()))
 					ret.add((ITransportService) serv);
 			}
 		}

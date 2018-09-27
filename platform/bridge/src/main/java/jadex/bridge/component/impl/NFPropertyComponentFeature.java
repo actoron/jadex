@@ -248,7 +248,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		final Future<Void> ret = new Future<Void>();
 		
 		List<Class<?>> classes = new ArrayList<Class<?>>();
-		Class<?> superclazz = ser.getId().getServiceType().getType(getComponent().getClassLoader());
+		Class<?> superclazz = ser.getServiceId().getServiceType().getType(getComponent().getClassLoader());
 		while(superclazz != null && !Object.class.equals(superclazz))
 		{
 			classes.add(superclazz);
@@ -311,7 +311,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	public IFuture<Void> addNFProperties(NFProperties nfprops, IService ser)
 	{
 		Future<Void> ret = new Future<Void>();
-		INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(ser.getId());
+		INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(ser.getServiceId());
 		
 		CounterResultListener<Void> lis = new CounterResultListener<Void>(nfprops.value().length, new DelegationResultListener<Void>(ret));
 		for(NFProperty nfprop : nfprops.value())
@@ -331,7 +331,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(ser.getId());
+		INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(ser.getServiceId());
 		CounterResultListener<Void> lis = new CounterResultListener<Void>(nfprops.value().length, new DelegationResultListener<Void>(ret));
 		for(NFProperty nfprop : nfprops.value())
 		{
@@ -352,7 +352,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		if(context instanceof IService)
 		{
 //			IServiceIdentifier sid = (IServiceIdentifier)context;
-			ret = (T)getProvidedServicePropertyProvider(((IService)context).getId());
+			ret = (T)getProvidedServicePropertyProvider(((IService)context).getServiceId());
 		}
 		else 
 		{

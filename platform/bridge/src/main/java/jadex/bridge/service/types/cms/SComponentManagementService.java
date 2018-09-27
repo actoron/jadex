@@ -620,7 +620,7 @@ public class SComponentManagementService
 	protected static boolean isMultiFactory(IComponentFactory fac)
 	{
 //		if(fac.toString().toLowerCase().indexOf("multi")!=-1)
-		return ((IService)fac).getId().getProviderId().getLocalName().indexOf("multi")!=-1;
+		return ((IService)fac).getServiceId().getProviderId().getLocalName().indexOf("multi")!=-1;
 	}
 	
 	// r: init infos
@@ -3157,7 +3157,7 @@ public class SComponentManagementService
 	/** Gets the classloader from libservice. */
 	protected static final IFuture<ClassLoader> getClassLoader(ILibraryService libser, IResourceIdentifier rid)
 	{
-		IComponentIdentifier plat = ((IService) libser).getId().getProviderId().getRoot();
+		IComponentIdentifier plat = ((IService) libser).getServiceId().getProviderId().getRoot();
 		ClassLoader cl = ((Map<IResourceIdentifier, ClassLoader>)Starter.getPlatformValue(plat, Starter.DATA_CLASSLOADERS)).get(rid);
 		if (cl != null)
 			return new Future<>(cl);

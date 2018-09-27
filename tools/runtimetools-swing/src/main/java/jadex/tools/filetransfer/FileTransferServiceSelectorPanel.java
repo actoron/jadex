@@ -54,7 +54,7 @@ public class FileTransferServiceSelectorPanel extends AbstractServiceSelectorPan
 	{
 		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		
-		jcc.getJCCAccess().getExternalAccess((IComponentIdentifier)service.getId().getProviderId())
+		jcc.getJCCAccess().getExternalAccess((IComponentIdentifier)service.getServiceId().getProviderId())
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result) 

@@ -391,7 +391,7 @@ public class ServiceHandler implements InvocationHandler
 	//						System.out.println("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
 	//						exception.printStackTrace();
 						boolean remove	= strategy.taskFinished();
-						boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getId().getProviderId());
+						boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getServiceId().getProviderId());
 						proceed(remove || killed);
 					}
 					
@@ -440,7 +440,7 @@ public class ServiceHandler implements InvocationHandler
 	//					System.out.println("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
 	//					exception.printStackTrace();
 						boolean remove	= strategy.taskFinished();
-						boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getId().getProviderId());
+						boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getServiceId().getProviderId());
 						proceed(remove || killed);
 					}
 					
@@ -479,7 +479,7 @@ public class ServiceHandler implements InvocationHandler
 		assert component.getFeature(IExecutionFeature.class).isComponentThread();
 		final IInternalAccess inta = component;
 		
-		final IComponentIdentifier workercid = service.getId().getProviderId();
+		final IComponentIdentifier workercid = service.getServiceId().getProviderId();
 
 //		System.out.println("removing worker: "+workercid+" "+servicepool);
 		

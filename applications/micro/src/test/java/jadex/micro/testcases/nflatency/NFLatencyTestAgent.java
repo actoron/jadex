@@ -214,7 +214,7 @@ public class NFLatencyTestAgent extends TestAgent
 			boolean called;
 			public void intermediateResultAvailable(ITestService result)
 			{
-				if(cid.equals(((IService)result).getId().getProviderId()))
+				if(cid.equals(((IService)result).getServiceId().getProviderId()))
 				{
 					if(!called)
 					{
@@ -255,7 +255,7 @@ public class NFLatencyTestAgent extends TestAgent
 						{
 							MethodInfo mi = new MethodInfo(ITestService.class.getMethod("methodA", new Class[]{long.class}));
 							System.out.println("service: "+ts);
-							Long lat = (Long)agent.getRequiredMethodNFPropertyValue(((IService)ts).getId(), mi, LatencyProperty.NAME).get();
+							Long lat = (Long)agent.getRequiredMethodNFPropertyValue(((IService)ts).getServiceId(), mi, LatencyProperty.NAME).get();
 //							Long lat = (Long)SNFPropertyProvider.getRequiredMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ts).getId(), mi, LatencyProperty.NAME).get();
 //							INFMixedPropertyProvider pp = ((INFRPropertyProvider)ts).getRequiredServicePropertyProvider().get();
 //							Long lat = (Long)pp.getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();

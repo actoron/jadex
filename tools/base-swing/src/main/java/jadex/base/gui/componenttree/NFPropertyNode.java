@@ -255,13 +255,13 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 							{
 //								((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeMethodNFProperty(mi, propmi.getName())
 //									.addResultListener(new DelegationResultListener<Void>(ret));
-								ea.removeMethodNFProperty(ser.getId(), mi, propmi.getName())
+								ea.removeMethodNFProperty(ser.getServiceId(), mi, propmi.getName())
 									.addResultListener(new DelegationResultListener<Void>(ret));
 							}
 							else
 							{
 //								((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
-								ea.removeNFProperty(ser.getId(), propmi.getName())
+								ea.removeNFProperty(ser.getServiceId(), propmi.getName())
 									.addResultListener(new DelegationResultListener<Void>(ret));
 							}
 						}

@@ -94,7 +94,7 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 			}
 		};
 		
-		getPropertyValue(((IService)service).getId()).addResultListener(listener);
+		getPropertyValue(((IService)service).getServiceId()).addResultListener(listener);
 		
 		return ret;
 	}

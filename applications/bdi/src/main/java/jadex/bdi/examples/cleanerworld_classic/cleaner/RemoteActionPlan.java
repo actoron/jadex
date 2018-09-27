@@ -71,8 +71,13 @@ public abstract class RemoteActionPlan extends Plan
 			
 			if(tas.length!=0)
 			{
+<<<<<<< Updated upstream
 				// Found.
 				res	= tas[0].getName();
+=======
+				IEnvironmentService es = getAgent().getLocalService(IEnvironmentService.class);
+				res = ((IService)es).getServiceId().getProviderId();
+>>>>>>> Stashed changes
 				getBeliefbase().getBelief("environmentagent").setFact(res);
 				if(tas.length>1)
 					getLogger().warning("More than environment agent found.");

@@ -49,6 +49,9 @@ public class PlayerSearchDealerPlan extends Plan
 			// choose one dealer randomly out of all the dealer-agents
 			IComponentIdentifier dealer = result[new Random().nextInt(result.length)].getName();
 			getBeliefbase().getBelief("dealer").setFact(dealer);
+
+			//			IComponentIdentifier dealer = result[new Random().nextInt(result.length)].getName();
+			getBeliefbase().getBelief("dealer").setFact(((IService)ds).getServiceId().getProviderId());
 		}
 
 	}

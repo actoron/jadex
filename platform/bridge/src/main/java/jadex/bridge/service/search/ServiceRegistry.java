@@ -211,14 +211,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		proxyrwlock.writeLock().lock();
 		try
 		{
-			localserviceproxies.put(service.getId(), service);
+			localserviceproxies.put(service.getServiceId(), service);
 		}
 		finally
 		{
 			proxyrwlock.writeLock().unlock();
 		}
 		
-		addService(service.getId());
+		addService(service.getServiceId());
 	}
 	
 	/**

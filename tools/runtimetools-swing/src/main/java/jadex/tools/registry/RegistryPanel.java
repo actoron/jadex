@@ -144,7 +144,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 				{
 					public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
 					{
-						getActiveComponent().killComponent(((IService)sps).getId().getProviderId());
+						getActiveComponent().killComponent(((IService)sps).getServiceId().getProviderId());
 						
 						getActiveComponent().createComponent(new CreationInfo().setFilename(PeerRegistrySynchronizationAgent.class.getName()+".class").setName("registrypeer"));
 					}
@@ -156,7 +156,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 						{
 							public void resultAvailable(IPeerRegistrySynchronizationService ps)
 							{
-								getActiveComponent().killComponent(((IService)ps).getId().getProviderId());
+								getActiveComponent().killComponent(((IService)ps).getServiceId().getProviderId());
 								getActiveComponent().createComponent(new CreationInfo().setFilename(SuperpeerRegistrySynchronizationAgent.class.getName()+".class").setName("registrysuperpeer"));
 							}
 							
@@ -708,34 +708,34 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			}
 			else if(column == 1)
 			{
-				value = ser.getId().getServiceType();
+				value = ser.getServiceId().getServiceType();
 			}
 			else if(column == 2)
 			{
-				value = ser.getId().getProviderId();
+				value = ser.getServiceId().getProviderId();
 			}
 			else if(column == 3)
 			{
-				value = ser.getId().getProviderId().getRoot();
+				value = ser.getServiceId().getProviderId().getRoot();
 			}
 			else if(column == 4)
 			{
-				value = ser.getId();
+				value = ser.getServiceId();
 			}
 			else if(column == 5)
 			{
 //				Map<String, Object> sprops = ser.getPropertyMap();
 //				if(sprops != null)
 //					value = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
-				value = ser.getId().getTags();
+				value = ser.getServiceId().getTags();
 			}
 			else if(column == 6)
 			{
-				value = ser.getId().getNetworkNames();
+				value = ser.getServiceId().getNetworkNames();
 			}
 			else if(column == 7)
 			{
-				value = ser.getId().isUnrestricted();
+				value = ser.getServiceId().isUnrestricted();
 			}
 			return value;
 		}

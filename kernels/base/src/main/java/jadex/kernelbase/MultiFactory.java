@@ -202,7 +202,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			for(IComponentFactory fac : getFactories())
 			{
-				if(!((IService)fac).getId().equals(sid))
+				if(!((IService)fac).getServiceId().equals(sid))
 				{
 					icon = fac.getComponentTypeIcon(type).get();
 				

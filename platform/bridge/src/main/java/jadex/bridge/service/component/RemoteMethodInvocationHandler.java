@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ITypedComponentStep;
 import jadex.bridge.ProxyFactory;
@@ -98,6 +99,12 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		else if((args==null || args.length==0) && "toString".equals(method.getName()))
 		{
 			return pr.getRemoteReference().getTargetIdentifier().toString();
+		}
+		else if(args!=null && args.length==1 && "equals".equals(method.getName()) && Object.class.equals(method.getParameterTypes()[0]))
+		{
+			return pr.getRemoteReference().getTargetIdentifier().equals(
+				args[0] instanceof IService ? ((IService)args[0]).getServiceId()
+				: args[0] instanceof IExternalAccess ? ((IExternalAccess)args[0]).getId() : args[0]);
 		}
 
 		

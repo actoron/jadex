@@ -31,7 +31,7 @@ public class NonblockingTimeUserAgent
 			 */
 			public void intermediateResultAvailable(String time)
 			{
-				String	platform	= ((IService)timeservice).getId().getProviderId().getPlatformName();
+				String	platform	= ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
 				System.out.println("New time received from "+platform+" at "+timeservice.getLocation()+": "+time);
 			}
 		});				

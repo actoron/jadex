@@ -110,7 +110,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				// has results from search?
 				else if(pos<res.size())
 				{
-					ret.setResult(((IService)res.get(pos++)).getId().getProviderId());
+					ret.setResult(((IService)res.get(pos++)).getServiceId().getProviderId());
 				}
 				// no search running? -> create
 				else if(currentsearch==null)
@@ -191,7 +191,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				while(opencalls.size()>0 && pos<res.size() && futs!=null && futs.size()>0)
 				{
 					Future<IComponentIdentifier> fut = futs.remove(0);
-					fut.setResult(((IService)res.get(pos++)).getId().getProviderId());
+					fut.setResult(((IService)res.get(pos++)).getServiceId().getProviderId());
 				}
 				
 				if(fini)
@@ -299,7 +299,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 										System.out.println("Information about new superpeers, refreshing superpeer");
 										superpeers.clear();
 										for(ISuperpeerRegistrySynchronizationService ser: re.getSuperpeers())
-											superpeers.add(((IService)ser).getId().getProviderId());
+											superpeers.add(((IService)ser).getServiceId().getProviderId());
 										
 										// Does a new search to refresh superpeer
 										getSuperpeerService(true).addResultListener(searchlis);

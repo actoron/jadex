@@ -783,7 +783,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	 *  Get the service identifier.
 	 *  @return The service identifier.
 	 */
-	public IServiceIdentifier getId()
+	public IServiceIdentifier getServiceId()
 	{
 		return sid;
 	}

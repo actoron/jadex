@@ -107,8 +107,13 @@ public class ProductionPlan extends Plan
 			//action.setAction(rc);
 			//action.setActor(new AID("dummy", true)); // Hack!! What to do with more than one receiver?
 			IMessageEvent mevent = createMessageEvent("request_carries");
+<<<<<<< Updated upstream
 				for(int i=0; i<carriers.length; i++)
 				mevent.getParameterSet(SFipa.RECEIVERS).addValue(carriers[i].getName());
+=======
+			for(ICarryService cs: carriers)
+				mevent.getParameterSet(SFipa.RECEIVERS).addValue(((IService)cs).getServiceId().getProviderId());
+>>>>>>> Stashed changes
 			mevent.getParameter(SFipa.CONTENT).setValue(rc);
 			sendMessage(mevent);
 			//System.out.println("Production Agent sent target to: "+carriers.length);

@@ -76,13 +76,13 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		System.out.println("2) start remote platform, wait for service");
 		IExternalAccess	pro1	= createPlatform(PROCONF);
 		ITestService	svc	= results.getNextIntermediateResult();
-		Assert.assertEquals("2) "+svc, pro1.getId(), ((IService)svc).getId().getProviderId().getRoot());
+		Assert.assertEquals("2) "+svc, pro1.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 		
 		// 3) start remote platform, wait for service -> test if awa fallback works with two platforms 
 		System.out.println("3) start remote platform, wait for service");
 		IExternalAccess	pro2	= createPlatform(PROCONF);
 		svc	= results.getNextIntermediateResult();
-		Assert.assertEquals("3) "+svc, pro2.getId(), ((IService)svc).getId().getProviderId().getRoot());
+		Assert.assertEquals("3) "+svc, pro2.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 		
 		// 4) start SP, wait for connection from remote platforms and local platform -> should get no service; test if duplicate removal works with SP
 		System.out.println("4) start SP, wait for connection from remote platforms and local platform");
@@ -96,9 +96,9 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		ISubscriptionIntermediateFuture<ITestService>	results2	= client.addQuery(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 		Set<IComponentIdentifier>	providers1	= new LinkedHashSet<>();
 		svc	= results2.getNextIntermediateResult();
-		providers1.add(((IService)svc).getId().getProviderId().getRoot());
+		providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
 		svc	= results2.getNextIntermediateResult();
-		providers1.add(((IService)svc).getId().getProviderId().getRoot());
+		providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
 		Set<IComponentIdentifier>	providers2	= new LinkedHashSet<>();
 		providers2.add(pro1.getId());
 		providers2.add(pro2.getId());
@@ -110,9 +110,9 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		System.out.println("6) start remote platform, wait for service in both queries");
 		IExternalAccess	pro3	= createPlatform(PROCONF);
 		svc	= results.getNextIntermediateResult();
-		Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getId().getProviderId().getRoot());
+		Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 		svc	= results2.getNextIntermediateResult();
-		Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getId().getProviderId().getRoot());
+		Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 
 		// TODO
 //		// 7) kill SP, start remote platform, wait for service on both queries -> test if re-fallback to awa works for queries
@@ -123,6 +123,14 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 //		Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getId().getProviderId().getRoot());
 //		svc	= results2.getNextIntermediateResult();
 //		Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getId().getProviderId().getRoot());
+		// 7) kill SP, start remote platform, wait for service on both queries -> test if re-fallback to awa works for queries
+		System.out.println("7) kill SP, start remote platform, wait for service on both queries");
+		removePlatform(sp);
+		IExternalAccess	pro4	= createPlatform(PROCONF);
+		svc	= results.getNextIntermediateResult();
+		Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
+		svc	= results2.getNextIntermediateResult();
+		Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 	}
 	
 	/**

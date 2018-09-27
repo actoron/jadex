@@ -262,7 +262,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 					{
 						if(mi!=null)
 						{
-							ea.getMethodNFPropertyMetaInfos(ser.getId(), mi)
+							ea.getMethodNFPropertyMetaInfos(ser.getServiceId(), mi)
 //							((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getMethodNFPropertyMetaInfos(mi)
 								.addResultListener(new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 							{
@@ -278,7 +278,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 						}
 						else
 						{
-							ea.getNFPropertyMetaInfos(ser.getId())
+							ea.getNFPropertyMetaInfos(ser.getServiceId())
 //							((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyMetaInfos()
 								.addResultListener(new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 							{

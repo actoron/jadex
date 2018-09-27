@@ -155,7 +155,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				// Hack!!! Skip shutdown of platform executor for "boot unstrapping" -> executor will finish after no more steps
 				public IFuture<Void> shutdown()
 				{
-					if(task instanceof AbstractComponentFeature && ((AbstractComponentFeature)task).getComponent().getId().equals(getId().getProviderId()))
+					if(task instanceof AbstractComponentFeature && ((AbstractComponentFeature)task).getComponent().getId().equals(getServiceId().getProviderId()))
 					{
 						return IFuture.DONE;
 					}

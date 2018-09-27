@@ -89,12 +89,22 @@ public class UpdateEnvironmentPlan extends Plan
 	{
 		try
 		{
+<<<<<<< Updated upstream
 			IDF df = (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 			IDFServiceDescription sd = new DFServiceDescription(null, "dispatch vision", null);
 			IDFComponentDescription ad = new DFComponentDescription(null, sd);
 			IDFComponentDescription[] tas = df.search(ad, null).get();
 	
 			if(tas.length!=0)
+=======
+			try
+			{
+				IEnvironmentService es = getAgent().getLocalService(IEnvironmentService.class);
+				res = ((IService)es).getServiceId().getProviderId();
+				getBeliefbase().getBelief("environmentagent").setFact(res);
+			}
+			catch(Exception e)
+>>>>>>> Stashed changes
 			{
 				getBeliefbase().getBelief("environmentagent").setFact(tas[0].getName());
 				if(tas.length>1)

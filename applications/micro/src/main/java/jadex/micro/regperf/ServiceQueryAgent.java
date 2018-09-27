@@ -59,7 +59,7 @@ public class ServiceQueryAgent
 					
 					public void intermediateResultAvailable(IExampleService result)
 					{
-						plats.add(((IService)result).getId().getProviderId().getRoot());
+						plats.add(((IService)result).getServiceId().getProviderId().getRoot());
 						cnt++;
 					}
 					

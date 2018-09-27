@@ -118,7 +118,7 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 	 */
 	public String convertToString(IService element)
 	{
-		return element.getId().toString();
+		return element.getServiceId().toString();
 	}
 
 	/**

@@ -582,7 +582,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								agent.getLogger().info("Established super peer connection for network "+networkname+" with super peer: "+sp);
 								
 								// Check if the superpeer is genuine, i.e it is local or network is authenticated.
-								IComponentIdentifier	spid	= ((IService)sp).getId().getProviderId();
+								IComponentIdentifier	spid	= ((IService)sp).getServiceId().getProviderId();
 								if(!spid.getRoot().equals(agent.getId().getRoot()))
 								{
 									ISecurityInfo secinfo = (ISecurityInfo) ServiceCall.getLastInvocation().getProperty(ServiceCall.SECURITY_INFOS);

@@ -573,7 +573,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	 */
 	protected void newPlatformFound(final ISuperpeerRegistrySynchronizationService regser, final long leasetime)
 	{
-		final IComponentIdentifier cid = ((IService)regser).getId().getProviderId().getRoot();
+		final IComponentIdentifier cid = ((IService)regser).getServiceId().getProviderId().getRoot();
 
 		// Do not announce platform itself
 		if(cid.equals(component.getId().getRoot()))
@@ -621,7 +621,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					if(level==result.intValue())
 					{
 						// Subscribe to the new remote registry
-						boolean unr = ((IService)regser).getId().isUnrestricted();
+						boolean unr = ((IService)regser).getServiceId().isUnrestricted();
 
 						System.out.println("Found registry service on: "+cid+(unr? " unrestricted": " default")+" (I am: "+component.getId()+")");
 						
@@ -684,7 +684,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					}
 					else
 					{	
-						System.out.println("Found superpeer of other level: "+level+" "+((IService)regser).getId()+" "+result);
+						System.out.println("Found superpeer of other level: "+level+" "+((IService)regser).getServiceId()+" "+result);
 					}
 				}
 
@@ -785,7 +785,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					if(checkScope(ser))
 					{
 						System.out.println("added ser: "+ser);
-						reg.addService(ser.getId());
+						reg.addService(ser.getServiceId());
 					}
 					else
 					{
@@ -793,7 +793,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 					}
 					
 					if(plat==null)
-						plat = ser.getId().getProviderId().getRoot();
+						plat = ser.getServiceId().getProviderId().getRoot();
 				}
 			}
 			
@@ -803,10 +803,10 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				for(IService ser: removed)
 				{
 					System.out.println("removed ser due to event: "+ser);
-					reg.removeService(ser.getId());
+					reg.removeService(ser.getServiceId());
 					
 					if(plat==null)
-						plat = ser.getId().getProviderId().getRoot();
+						plat = ser.getServiceId().getProviderId().getRoot();
 				}
 			}
 			
@@ -834,7 +834,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	{
 		boolean ret = true;
 		
-		String scope = ser.getId().getScope();
+		String scope = ser.getServiceId().getScope();
 		// SSP L0
 		if(level==0)
 		{
@@ -1140,7 +1140,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				added = new HashSet<IService>();
 				for(IService ser: event.getAddedServices())
 				{
-					String scope = ser.getId().getScope();
+					String scope = ser.getServiceId().getScope();
 					if(RequiredService.SCOPE_GLOBAL.equals(scope)
 						|| RequiredService.SCOPE_APPLICATION_GLOBAL.equals((scope)))
 					{
@@ -1155,7 +1155,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				rem = new HashSet<IService>();
 				for(IService ser: event.getRemovedServices())
 				{
-					String scope = ser.getId().getScope();
+					String scope = ser.getServiceId().getScope();
 					if(RequiredService.SCOPE_GLOBAL.equals(scope)
 						|| RequiredService.SCOPE_APPLICATION_GLOBAL.equals((scope)))
 					{

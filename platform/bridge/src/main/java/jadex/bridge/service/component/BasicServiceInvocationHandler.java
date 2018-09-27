@@ -403,8 +403,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			ServiceCall	sc	= CallAccess.getNextInvocation();
 			CallAccess.resetNextInvocation();
 			
-			sid = service instanceof ServiceInfo? ((ServiceInfo)service).getManagementService().getId():
-				((IService)service).getId();
+			sid = service instanceof ServiceInfo? ((ServiceInfo)service).getManagementService().getServiceId():
+				((IService)service).getServiceId();
 			
 			CallAccess.setNextInvocation(sc);
 		}
@@ -517,6 +517,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		String name, Class<?> type, String proxytype, IServiceInvocationInterceptor[] ics, 
 		boolean monitoring, ProvidedServiceInfo info, String scope)
 	{
+		IServiceIdentifier sid = null;
+		
 		if(isProvidedServiceProxy(service))
 		{
 			System.out.println("Already provided service proxy: "+service);
@@ -530,8 +532,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 		if(service instanceof IInternalService)
 		{
-			((IInternalService)service).setServiceIdentifier(BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), scope));
+			sid = BasicService.createServiceIdentifier(ia, name, type, service.getClass(), ia.getModel().getResourceIdentifier(), scope);
+			((IInternalService)service).setServiceIdentifier(sid);
 		}
+			
 		
 //		if(type.getName().indexOf("IServiceCallService")!=-1)
 //			System.out.println("hijijij");
@@ -539,6 +543,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
 			BasicServiceInvocationHandler handler = createProvidedHandler(name, ia, type, service, info, scope);
+			if(sid==null)
+			{
+				Object ser = handler.getService();
+				if(ser instanceof ServiceInfo)
+					sid = ((ServiceInfo)ser).getManagementService().getServiceId();
+			}
 			ret	= (IInternalService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 //			try
 //			{
@@ -549,7 +559,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //				e.printStackTrace();
 //			}
 			
-			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, ia, proxytype, monitoring, ret.getId());
+			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, ia, proxytype, monitoring, sid!=null? sid: ret.getServiceId());
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 //				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			if(!(service instanceof IService))
@@ -668,7 +678,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 									try
 									{
 										fields[i].setAccessible(true);
-										fields[i].set(service, mgmntservice.getId());
+										fields[i].set(service, mgmntservice.getServiceId());
 									}
 									catch(Exception e)
 									{
@@ -820,8 +830,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
 //			else
 //				System.out.println("hurz: "+service);
-			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, service.getId()));
-			handler.addFirstServiceInterceptor(new NFRequiredServicePropertyProviderInterceptor(ia, service.getId()));
+			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, service.getServiceId()));
+//			handler.addFirstServiceInterceptor(new NFRequiredServicePropertyProviderInterceptor(ia, service.getId()));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
 			if(interceptors!=null && interceptors.length>0)
 			{
@@ -890,7 +900,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			for(Iterator<IService> it=pojoproxies.values().iterator(); it.hasNext(); )
 			{
 				IService proxy = it.next();
-				if(sid.equals(proxy.getId()))
+				if(sid.equals(proxy.getServiceId()))
 				{
 					it.remove();
 //					System.out.println("rem: "+pojosids.size());	

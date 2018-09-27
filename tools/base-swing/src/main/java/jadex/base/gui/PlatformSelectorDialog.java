@@ -231,7 +231,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 		{
 			public void resultAvailable(IComponentIdentifier cid)
 			{
-				IComponentIdentifier key = ((IService)ser).getId().getProviderId();
+				IComponentIdentifier key = ((IService)ser).getServiceId().getProviderId();
 				if(!valmap.containsKey(key))
 				{
 					valmap.put(key, cid);

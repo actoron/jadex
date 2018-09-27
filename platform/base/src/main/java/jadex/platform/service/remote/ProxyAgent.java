@@ -92,7 +92,7 @@ public class ProxyAgent	implements IProxyAgentService
 								Boolean b = (Boolean)args.get("sensors");
 								if(b!=null && b.booleanValue())
 								{
-									INFMixedPropertyProvider nfpp = agent.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getId());
+									INFMixedPropertyProvider nfpp = agent.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getServiceId());
 									LatencyProperty lt = new LatencyProperty(agent, (IService)rcms, null);
 									nfpp.addNFProperty(lt).addResultListener(new IResultListener<Void>()
 									{
@@ -275,7 +275,7 @@ public class ProxyAgent	implements IProxyAgentService
 	{
 		if(rcms!=null && injected)
 		{
-			INFMixedPropertyProvider nfpp = agent.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getId());
+			INFMixedPropertyProvider nfpp = agent.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(((IService)rcms).getServiceId());
 			return nfpp.getNFPropertyValue(LatencyProperty.NAME);
 		}
 		else

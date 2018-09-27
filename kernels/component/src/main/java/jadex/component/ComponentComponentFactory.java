@@ -190,7 +190,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 					try
 					{
 						ret.setResult(loader.loadComponentModel(model, imports, cl, 
-							new Object[]{rid, getId().getProviderId().getRoot()}).getModelInfo());
+							new Object[]{rid, getServiceId().getProviderId().getRoot()}).getModelInfo());
 					}
 					catch(Exception e)
 					{

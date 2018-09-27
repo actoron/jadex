@@ -938,10 +938,10 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			
 			
 			// Check if no property provider has been created before and then create and init properties
-			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(((IService)service).getId()))
+			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(((IService)service).getServiceId()))
 			{
 				INFMixedPropertyProvider nfpp = getComponent().getFeature(INFPropertyComponentFeature.class)
-					.getRequiredServicePropertyProvider(((IService)service).getId());
+					.getRequiredServicePropertyProvider(((IService)service).getServiceId());
 				
 				List<NFRPropertyInfo> nfprops = info.getNFRProperties();
 				if(nfprops!=null && nfprops.size()>0)

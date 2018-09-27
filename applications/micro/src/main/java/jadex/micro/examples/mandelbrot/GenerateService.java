@@ -80,7 +80,7 @@ public class GenerateService implements IGenerateService
 				
 				final AreaData	ad	= (AreaData)task;	// single cutout of area
 				final AreaData	data	= (AreaData)user;	// global area
-				ad.setCalculatorId((IComponentIdentifier)service.getId().getProviderId());
+				ad.setCalculatorId((IComponentIdentifier)service.getServiceId().getProviderId());
 				
 //				System.out.println("invoke: "+service);
 				agent.getFeature(IRequiredServicesFeature.class).getService("displayservice").addResultListener(new DefaultResultListener()

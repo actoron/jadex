@@ -36,14 +36,14 @@ public class RSHelloTest //extends TestCase
 	{
 		hello = new Hello();
 //		hello.createServiceIdentifier("hello", Hello.class, null, Hello.class, null); // ???
-		sid	= hello.getId();
+		sid	= hello.getServiceId();
 		
 		pservice = new GrizzlyRestServicePublishService();
 		// Grizzly breaks without trailing '/murks' !?
 		PublishInfo pi = new PublishInfo("http://localhost:9123/murks", "", IRSHelloService.class);
 		pi.addProperty("generate", "false");
 //		
-		IFuture<Void> publishService = pservice.publishService(hello.getId(), pi);
+		IFuture<Void> publishService = pservice.publishService(hello.getServiceId(), pi);
 //		
 //		ThreadSuspendable sus = new ThreadSuspendable();
 		publishService.get();
