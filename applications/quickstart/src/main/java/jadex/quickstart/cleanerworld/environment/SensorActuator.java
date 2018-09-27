@@ -65,6 +65,14 @@ public class SensorActuator
 	/**
 	 *  Create a sensor for a new cleaner robot.
 	 */
+	public SensorActuator()
+	{
+		this(null, null, null, null);
+	}
+	
+	/**
+	 *  Create a sensor for a new cleaner robot.
+	 */
 	public SensorActuator(Set<IWaste> wastes, Set<IWastebin> wastebins, Set<IChargingstation> stations, Set<ICleaner> cleaners)
 	{
 		this.agent	= ExecutionComponentFeature.LOCAL.get();
