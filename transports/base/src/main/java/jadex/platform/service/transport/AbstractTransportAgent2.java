@@ -758,31 +758,31 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	 */
 	protected List<PlatformData> collectConnectionStatus()
 	{
-		assert execfeat.isComponentThread();
+//		assert execfeat.isComponentThread();
 		
 		List<PlatformData> ret = new ArrayList<>();
 		
 		Map<IComponentIdentifier, Con> cons = null;
-		Map<Con, IComponentIdentifier> hscons = null;
+//		Map<Con, IComponentIdentifier> hscons = null;
 		try
 		{
 			establishedconnections.readLock().lock();
 			cons = new HashMap<>(establishedconnections);
-			hscons = new HashMap<>(handshakingconnections);
+//			hscons = new HashMap<>(handshakingconnections);
 		}
 		finally
 		{
 			establishedconnections.readLock().unlock();
 		}
 		
-		for(Map.Entry<Con, IComponentIdentifier> entry : hscons.entrySet())
-		{ 
-			if (entry.getValue() != null)
-			{
-				PlatformData data = new PlatformData(entry.getValue(), impl.getProtocolName(), false);
-				ret.add(data);
-			}
-		}
+//		for(Map.Entry<Con, IComponentIdentifier> entry : hscons.entrySet())
+//		{ 
+//			if (entry.getValue() != null)
+//			{
+//				PlatformData data = new PlatformData(entry.getValue(), impl.getProtocolName(), false);
+//				ret.add(data);
+//			}
+//		}
 		
 		for(Map.Entry<IComponentIdentifier, Con> entry : cons.entrySet())
 		{ 
