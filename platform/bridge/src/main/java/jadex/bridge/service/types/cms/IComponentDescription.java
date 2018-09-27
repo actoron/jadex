@@ -1,6 +1,5 @@
 package jadex.bridge.service.types.cms;
 
-import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -49,6 +48,12 @@ public interface IComponentDescription
 	 *  @return The model name.
 	 */
 	public String getModelName();
+	
+	/**
+	 *  Get the file name.
+	 *  @return The file name.
+	 */
+	public String getFilename();
 	
 	/**
 	 *  Get the resource identifier.

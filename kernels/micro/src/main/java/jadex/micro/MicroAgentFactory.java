@@ -35,6 +35,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.features.impl.MicroExecutionComponentFeature;
 import jadex.micro.features.impl.MicroInjectionComponentFeature;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.micro.features.impl.MicroMessageComponentFeature;
@@ -63,6 +64,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/** The specific component features for micro agents. */
 	public static final Collection<IComponentFeatureFactory> MICRO_FEATURES = Collections.unmodifiableCollection(
 		Arrays.asList(
+			MicroExecutionComponentFeature.FACTORY,
 			MicroPojoComponentFeature.FACTORY,
 			MicroInjectionComponentFeature.FACTORY,
 			MicroServiceInjectionComponentFeature.FACTORY,

@@ -117,9 +117,8 @@ public class PojoAgentCreationAgent
 					args.put("starttime", Long.valueOf(starttime));
 					args.put("startmem", Long.valueOf(startmem));
 					agent.createComponent(
-						PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
 						new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
-							.setName(createPeerName(num+1, agent.getId())), null);
+							.setName(createPeerName(num+1, agent.getId())).setFilename(PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"), null);
 //				}
 //			});
 		}

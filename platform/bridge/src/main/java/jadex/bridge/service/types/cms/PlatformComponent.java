@@ -52,13 +52,13 @@ import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.ICommand;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
@@ -323,6 +323,23 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				}
 
 				return ret;
+			}
+		});
+	}
+	
+	/**
+	 *  Called when a child had an exception and was terminated.
+	 */
+	public IFuture<Void> childTerminated(IComponentDescription desc, final Exception exception)
+	{
+		final IExecutionFeature exe = getFeature(IExecutionFeature.class);
+
+		return exe.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				((IInternalExecutionFeature)exe).childTerminated(desc, exception);
+				return IFuture.DONE;
 			}
 		});
 	}
@@ -809,7 +826,26 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 			{
 //				if(method.getName().indexOf("killComponent")!=-1)
-//					System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+				
+				Class<?> rettype = method.getReturnType();
+				
+				// Hack, use step return type
+				if("scheduleStep".equals(method.getName()))
+				{
+					IComponentStep<?> step = null;
+					for(int i=0; i<args.length; i++)
+					{
+						if(args[i] instanceof IComponentStep<?>)
+						{
+							step = (IComponentStep<?>)args[i];
+							break;
+						}
+					}
+					
+					Method m = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
+					rettype = m.getReturnType();
+				}
 				
 				if("getId".equals(method.getName()))
 				{
@@ -844,14 +880,24 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				{
 					int prio = IExecutionFeature.STEP_PRIORITY_NORMAL;
 					
-					// Allow getting results from dead components.
-					if ("getResultsAsync".equals(method.getName()))
+					// Allow getting arguments and results from dead components.
+					if("getResultsAsync".equals(method.getName()))
+					{
+						if(shutdown)
+							return new Future<>(getFeature(IArgumentsResultsFeature.class).getResults());
 						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+					}
+					if("getArgumentsAsync".equals(method.getName()))
+					{
+						if(shutdown)
+							return new Future<>(getFeature(IArgumentsResultsFeature.class).getArguments());
+						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+					}
 					
 					if(!getFeature(IExecutionFeature.class).isComponentThread())
 					{
-//						System.out.println("scheduleStep: "+method.getName());
-						final Future<Object> ret = (Future<Object>)SFuture.getFuture(method.getReturnType());
+						final Future<Object> ret = (Future<Object>)SFuture.getFuture(rettype);
+//						System.out.println("scheduleStep: "+method.getName()+" "+method.getReturnType());
 						
 						getInternalAccess().scheduleStep(prio, new IComponentStep<Void>()
 						{
@@ -873,7 +919,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 							}
 						});;
 						
-						return getDecoupledFuture(ret);
+						return getDecoupledFuture(ret);						
 					}
 					else
 					{
@@ -953,6 +999,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				}
 				
 //				return getDecoupledFuture(ret);
+				
 				return ret;
 			}
 			
@@ -970,8 +1017,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					if (!getInternalAccess().equals(caller))
 					{
 						IComponentIdentifier callerplat = caller.getId().getRoot();
-						Boolean issim = (Boolean) Starter.getPlatformValue(callerplat, IClockService.SIMULATION_CLOCK_FLAG);
-						if (Boolean.TRUE.equals(issim) && !callerplat.equals(getInternalAccess().getId().getRoot()))
+						if (SSimulation.isSimulating(caller) && !callerplat.equals(getInternalAccess().getId().getRoot()))
 							((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
 						
 						IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller)
@@ -1012,9 +1058,9 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				else
 				{
 					// External thread in simulation mode, add blocker.
-					Boolean issim = (Boolean) Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
-					if(Boolean.TRUE.equals(issim))
+					if(SSimulation.isSimulating(ia))
 					{
+//						Thread.dumpStack();
 						ia.scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)

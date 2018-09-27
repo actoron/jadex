@@ -4,7 +4,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -59,6 +58,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	
 	/** The model name. */
 	protected String modelname;
+	
+	/** The file name. */
+	protected String filename;
 	
 	/** The local type name (from parent). */
 	protected String localtype;
@@ -455,6 +457,8 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		return this;
 	}
 	
+	
+	
 //	/**
 //	 *  Get the persistable flag.
 //	 *  @return	The persistable flag.
@@ -493,6 +497,8 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		return this;
 	}
 	
+	
+	
 //	/**
 //	 *  Get the stepinfo.
 //	 *  @return The stepinfo.
@@ -511,6 +517,23 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 //		this.stepinfo = stepinfo;
 //	}
 	
+	/**
+	 * @return the filename
+	 */
+	public String getFilename()
+	{
+		return filename;
+	}
+
+	/**
+	 * @param filename the filename to set
+	 */
+	public CMSComponentDescription setFilename(String filename)
+	{
+		this.filename = filename;
+		return this;
+	}
+
 	/**
 	 *  Test if it is a system component.
 	 *  @return True, if it is a system component.

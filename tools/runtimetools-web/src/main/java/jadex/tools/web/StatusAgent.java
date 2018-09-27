@@ -135,7 +135,7 @@ public class StatusAgent implements IStatusService
 			}
 		});
 		
-		// TODO: Use query for dynamically added platforms
+		// TODO: Use query for dynamically added transports
 		for(final ITransportInfoService tis: agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITransportInfoService.class)))
 		{
 			ISubscriptionIntermediateFuture<PlatformData>	fut	= tis.subscribeToConnections();

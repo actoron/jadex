@@ -29,6 +29,7 @@ import jadex.micro.testcases.TestAgent;
  */
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
+// not really a timeout issue but helps when starting massively parallel for debugging
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class VisibilityTestAgent extends JunitAgentTest
 {

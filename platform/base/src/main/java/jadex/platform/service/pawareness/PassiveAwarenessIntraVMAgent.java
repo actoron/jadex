@@ -98,6 +98,7 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 		
 		if(remote!=null)
 		{
+			
 			return remote.agent.getExternalAccess().scheduleStep(new IComponentStep<List<TransportAddress>>()
 			{
 				public IFuture<List<TransportAddress>> execute(IInternalAccess ia)

@@ -435,18 +435,25 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	 */
 	public void	connectionClosed(Con con, Exception e)
 	{
-		IComponentIdentifier remotepf = restablishedconnections.remove(con);
-		if (remotepf == null)
+		final IComponentIdentifier remotepf = restablishedconnections.remove(con);
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			agent.scheduleStep(new IComponentStep<Void>()
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				if (remotepf == null)
 				{
 					handshakingconnections.remove(con);
-					return IFuture.DONE;
 				}
-			});
-		}
+				else
+				{
+					PlatformData data = new PlatformData(remotepf, impl.getProtocolName(), false);
+					for (SubscriptionIntermediateFuture<PlatformData> sub : infosubscribers)
+						sub.addIntermediateResult(data);
+				}
+				
+				return IFuture.DONE;
+			}
+		});
 //		System.out.println("CON REMOVED: " + con + " " + e);
 	}
 	

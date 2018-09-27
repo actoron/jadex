@@ -122,7 +122,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	
 	/** Delay of keepalive messages. */
 	@AgentArgument
-	protected long keepaliveinterval = 30000;
+	protected long keepaliveinterval = -1;
 	
 	/** Maximum time spent on finding routing services. */
 	@AgentArgument
@@ -182,6 +182,11 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		if (keepaliveinterval < 0)
+			keepaliveinterval = Starter.getDefaultTimeout(agent.getId().getRoot());
+		if (keepaliveinterval < 0)
+			keepaliveinterval = 30000;
+		
 //		this.cms = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
 		intmsgfeat = (IInternalMessageFeature) agent.getFeature(IMessageFeature.class);
 		if(debug)
@@ -260,7 +265,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		IComponentIdentifier fwdest = (IComponentIdentifier) header.getProperty(FORWARD_DEST);
 		if(debug)
 		{
-			IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot();
+			IComponentIdentifier fwsender = ((IComponentIdentifier) header.getProperty(FORWARD_SENDER)).getRoot();
 			System.out.println(agent+": processing forward package for " + fwdest + " from " + fwsender);
 		}
 		
@@ -937,12 +942,12 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					{
 						try
 						{
-							relayupdatefuture.get(keepaliveinterval, true);
-							agent.getFeature(IExecutionFeature.class).scheduleStep(this);
+							relayupdatefuture.get(keepaliveinterval >>> 1, true);
 						}
 						catch (Exception e)
 						{
 						}
+						agent.getFeature(IExecutionFeature.class).scheduleStep(this);
 					}
 					else
 					{

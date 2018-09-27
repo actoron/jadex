@@ -61,7 +61,7 @@ public class ABDI extends AABDI
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+				System.out.println("failed: "+exception);
 			}
 		});
 		
@@ -75,7 +75,7 @@ public class ABDI extends AABDI
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+				System.out.println("failed: "+exception);
 			}
 		});
 		

@@ -17,12 +17,8 @@ import jadex.bridge.component.impl.remotecommands.IMethodReplacement;
 import jadex.bridge.component.impl.remotecommands.ProxyInfo;
 import jadex.bridge.component.impl.remotecommands.ProxyReference;
 import jadex.bridge.component.impl.remotecommands.RemoteReference;
-import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.annotation.Raw;
-import jadex.bridge.service.component.ISwitchCall;
-import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 

@@ -172,11 +172,11 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 		Assert.assertEquals(""+result, 1, result.size());
 
-		// TODO
-//		// 6) kill SP, search for service -> test if re-fallback to awa works
-//		System.out.println("6) kill SP, search for service");
-//		removePlatform(sp);
-//		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-//		Assert.assertEquals(""+result, 1, result.size());
+		// 6) kill SP, search for service -> test if re-fallback to awa works
+		System.out.println("6) kill SP, search for service");
+		removePlatform(sp);
+		waitLonger(client);
+		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+		Assert.assertEquals(""+result, 1, result.size());
 	}
 }

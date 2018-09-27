@@ -1,25 +1,20 @@
 package jadex.bdi.examples.marsworld_classic.producer;
 
+import java.util.Collection;
+
 import jadex.bdi.examples.marsworld_classic.AgentInfo;
 import jadex.bdi.examples.marsworld_classic.Environment;
 import jadex.bdi.examples.marsworld_classic.Location;
 import jadex.bdi.examples.marsworld_classic.RequestCarry;
 import jadex.bdi.examples.marsworld_classic.RequestProduction;
 import jadex.bdi.examples.marsworld_classic.Target;
+import jadex.bdi.examples.marsworld_classic.carrier.ICarryService;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalDroppedException;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.ISearchConstraints;
-import jadex.bridge.fipa.DFComponentDescription;
-import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.df.IDF;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.bridge.service.IService;
 
 /**
  *  The main plan for the Production Agent. <br>
@@ -88,16 +83,18 @@ public class ProductionPlan extends Plan
 	{
 		// Search for Carry_Service
 		// Create a service description to search for.
-		IDF	df	= (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		IDFServiceDescription sd = new DFServiceDescription("service_carry", null, null);
-		IDFComponentDescription dfadesc = new DFComponentDescription(null, sd);
+//		IDF	df	= (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//		IDFServiceDescription sd = new DFServiceDescription("service_carry", null, null);
+//		IDFComponentDescription dfadesc = new DFComponentDescription(null, sd);
+//
+//		// A hack - default is 2! to reach more Agents, we have
+//		// to increase the number of possible results.
+//		ISearchConstraints constraints = df.createSearchConstraints(-1, 0);
+//		IDFComponentDescription[] carriers = df.search(dfadesc, constraints).get();
 
-		// A hack - default is 2! to reach more Agents, we have
-		// to increase the number of possible results.
-		ISearchConstraints constraints = df.createSearchConstraints(-1, 0);
-		IDFComponentDescription[] carriers = df.search(dfadesc, constraints).get();
-
-		if(carriers.length>0)
+		Collection<ICarryService> carriers = getAgent().getLocalServices(ICarryService.class);
+		
+		if(carriers.size()>0)
 		{
 			//System.out.println("Carry Agent: Found Carry Agents: "+carriers.length);
 
@@ -107,6 +104,7 @@ public class ProductionPlan extends Plan
 			//action.setAction(rc);
 			//action.setActor(new AID("dummy", true)); // Hack!! What to do with more than one receiver?
 			IMessageEvent mevent = createMessageEvent("request_carries");
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 				for(int i=0; i<carriers.length; i++)
 				mevent.getParameterSet(SFipa.RECEIVERS).addValue(carriers[i].getName());
@@ -114,6 +112,10 @@ public class ProductionPlan extends Plan
 			for(ICarryService cs: carriers)
 				mevent.getParameterSet(SFipa.RECEIVERS).addValue(((IService)cs).getServiceId().getProviderId());
 >>>>>>> Stashed changes
+=======
+			for(ICarryService cs: carriers)
+				mevent.getParameterSet(SFipa.RECEIVERS).addValue(((IService)cs).getId().getProviderId());
+>>>>>>> master
 			mevent.getParameter(SFipa.CONTENT).setValue(rc);
 			sendMessage(mevent);
 			//System.out.println("Production Agent sent target to: "+carriers.length);

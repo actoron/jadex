@@ -1,19 +1,13 @@
 package jadex.bdi.examples.marsworld_classic.producer;
 
+import java.util.Collection;
+
 import jadex.bdi.examples.marsworld_classic.Target;
+import jadex.bdi.examples.marsworld_classic.sentry.ISentryService;
 import jadex.bdiv3x.runtime.IMessageEvent;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.ISearchConstraints;
-import jadex.bridge.fipa.DFComponentDescription;
-import jadex.bridge.fipa.DFServiceDescription;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.fipa.SearchConstraints;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.df.IDF;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.bridge.service.IService;
 import jadex.commons.SUtil;
 
 /**
@@ -57,16 +51,18 @@ public class InformNewTargetPlan extends Plan
 
 		// Search for Production_Service
 		// Create a service description to search for.
-		IDF	df	= (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		IDFServiceDescription sd = new DFServiceDescription("service_sentry", null, null);
-		IDFComponentDescription dfadesc = new DFComponentDescription(null, sd);
-
-		// A hack - default is 2! to reach more Agents, we have
-		// to increase the number of possible results.
-		ISearchConstraints constraints = new SearchConstraints(-1, 0);
-		IDFComponentDescription[] sentries = df.search(dfadesc, constraints).get();
-
-		if(sentries.length>0)
+//		IDF	df	= (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//		IDFServiceDescription sd = new DFServiceDescription("service_sentry", null, null);
+//		IDFComponentDescription dfadesc = new DFComponentDescription(null, sd);
+//
+//		// A hack - default is 2! to reach more Agents, we have
+//		// to increase the number of possible results.
+//		ISearchConstraints constraints = new SearchConstraints(-1, 0);
+//		IDFComponentDescription[] sentries = df.search(dfadesc, constraints).get();
+		
+		Collection<ISentryService> sentries = getAgent().getLocalServices(ISentryService.class);
+		
+		if(sentries.size()>0)
 		{
 			//InformTarget it = new InformTarget();
 			//it.setTarget(target);
@@ -74,15 +70,11 @@ public class InformNewTargetPlan extends Plan
 			//action.setAction(it);
 			//action.setActor(new AID("dummy", true)); // Hack!! What to do with more than one receiver?
 			IMessageEvent mevent = createMessageEvent("inform_target");
-<<<<<<< Updated upstream
-			for(int i=0; i<sentries.length; i++)
-				mevent.getParameterSet(SFipa.RECEIVERS).addValue(sentries[i].getName());
-=======
 			for(ISentryService ss: sentries)
 				mevent.getParameterSet(SFipa.RECEIVERS).addValue(((IService)ss).getServiceId().getProviderId());
->>>>>>> Stashed changes
 			mevent.getParameter(SFipa.CONTENT).setValue(target);
 			sendMessage(mevent);
+			//System.out.println("Informing sentries: "+getScope().getPlatformAgent().getLocalName());
 		}
 	}
 }

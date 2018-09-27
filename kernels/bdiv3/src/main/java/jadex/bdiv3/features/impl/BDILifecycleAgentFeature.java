@@ -32,6 +32,7 @@ import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bdiv3.runtime.BDIFailureException;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.EasyDeliberationStrategy;
 import jadex.bdiv3.runtime.IDeliberationStrategy;
@@ -398,7 +399,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					@Override
 					public void execute(Exception e)
 					{
-						component.getLogger().severe("Failure during config plan execution: "+SUtil.getExceptionStacktrace(e));
+						if(e instanceof BDIFailureException)
+						{
+							component.getLogger().info("Failure during config plan execution: "+SUtil.getExceptionStacktrace(e));
+						}
+						else
+						{
+							component.getLogger().severe("Failure during config plan execution: "+SUtil.getExceptionStacktrace(e));
+						}
 					}
 				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}

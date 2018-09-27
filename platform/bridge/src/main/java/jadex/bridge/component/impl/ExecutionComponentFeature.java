@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -60,6 +59,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
@@ -76,7 +76,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -288,7 +287,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Todo: synchronize with last step!
 			int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
 //			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
-			if(endagenda.isDone() && STEP_PRIORITY_IMMEDIATE < prio)
+			if(endagenda.isDone() && prio<STEP_PRIORITY_IMMEDIATE)
 			{
 				ret.setException(new ComponentTerminatedException(getComponent().getId()));
 			}
@@ -684,9 +683,27 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			IExecutionService exe = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
-			// Hack!!! service is foudn before it is started, grrr.
-			if(exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
+			IExecutionService exe	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+			
+			// Do not use rescue thread for bisimulation of platform init/shutdown/zombie agents to avoid clock running out.
+			if(exe==null && SSimulation.isBisimulating(getInternalAccess()))
+			{
+				try
+				{
+					Field	f	= Class.forName("jadex.platform.service.execution.BisimExecutionService")
+						.getDeclaredField("instance");
+					f.setAccessible(true);
+					exe	= (IExecutionService)f.get(null);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+//				System.err.println(getInternalAccess()+" bisim exe is"+exe);
+			}
+
+			// Hack!!! service is found before it is started, grrr.
+			if(exe!=null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
 				if(bootstrap)
 				{
@@ -698,15 +715,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					exe.execute(ExecutionComponentFeature.this);
 				}
 			}
-			else if(Boolean.TRUE.equals(cinfo.getArguments().get("bisimulation"))
-				&& LOCAL.get()!=null && LOCAL.get()!=getComponent())
-			{
-				// Do not use rescue thread for bisimulation to avoid clock running out.
-				exe = LOCAL.get().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IExecutionService.class));
-				exe.execute(ExecutionComponentFeature.this);
-			}
 			else
 			{
+//				System.err.println(getInternalAccess()+" rescue "+SSimulation.isBisimulating(getInternalAccess())+", "+Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IClockService.BISIMULATION_CLOCK_FLAG));
 				available	= false;
 				// Happens during platform bootstrapping -> execute on platform rescue thread.
 				if(!bootstrap)
@@ -1022,11 +1033,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //			System.out.println("unblock: "+monitor);
 			Executor exe = blocked.remove(monitor);
 			if(blocked.isEmpty())
-			{
 				blocked	= null;
-			}
 					
-			exe.switchThread(monitor, exception);
+			if(exe!=null) // can be rescue thread
+				exe.switchThread(monitor, exception);
 		}
 	}
 	
@@ -1292,13 +1302,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					step.getTransfer().afterSwitch();
 					
-					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
-						System.out.println("executing: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
+//					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
+//						System.out.println("executing: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
 					
 					stepfut	= step.getStep().execute(component);
 					
-					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
-						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
+//					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
+//						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
 				}
 				else
 				{
@@ -1335,7 +1345,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				
 				if(!(t instanceof ThreadDeath) && !(t instanceof StepAborted))
 				{
-					StringWriter	sw	= new StringWriter();
+					StringWriter sw	= new StringWriter();
 					t.printStackTrace(new PrintWriter(sw));
 					getComponent().getLogger().warning("Component step threw hard exception: "+step.getStep()+"\n"+sw);
 				}
@@ -1448,46 +1458,48 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										{
 											// Todo: fail fast vs robust components.
 											
-											IExecutionService	exe	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
-											// Hack!!! service is foudn before it is started, grrr.
-											if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
-											{
-												if(bootstrap)
-												{
-													// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
-													available	= true;
-												}
-												else
-												{
-													exe.execute(ExecutionComponentFeature.this);
-												}
-											}
-											else
-											{
-												// Happens during platform bootstrapping -> execute on platform rescue thread.
-												if(!bootstrap)
-												{
-													bootstrap	= true;
-													Starter.scheduleRescueStep(getComponent().getId().getRoot(), new Runnable()
-													{
-														public void run()
-														{
-															boolean	again	= true;
-															while(!available && again)
-															{
-																again	= execute();
-															}
-															bootstrap	= false;
-															
-															if(again)
-															{					
-																// Bootstrapping finished -> do real kickoff
-																wakeup();
-															}
-														}
-													});
-												}
-											}
+											// TODO: why is this code here???
+//											IExecutionService	exe	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+//											// Hack!!! service is foudn before it is started, grrr.
+//											if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
+//											{
+//												if(bootstrap)
+//												{
+//													// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+//													available	= true;
+//												}
+//												else
+//												{
+//													exe.execute(ExecutionComponentFeature.this);
+//												}
+//											}
+//											else
+//											{
+//												// Happens during platform bootstrapping -> execute on platform rescue thread.
+//												if(!bootstrap)
+//												{
+//													bootstrap	= true;
+//													Starter.scheduleRescueStep(getComponent().getId().getRoot(), new Runnable()
+//													{
+//														public void run()
+//														{
+//															boolean	again	= true;
+//															while(!available && again)
+//															{
+//																again	= execute();
+//															}
+//															bootstrap	= false;
+//															
+//															if(again)
+//															{					
+//																// Bootstrapping finished -> do real kickoff
+//																wakeup();
+//															}
+//														}
+//													});
+//												}
+//											}
+											
 											StringWriter	sw	= new StringWriter();
 											exception.printStackTrace(new PrintWriter(sw));
 											getComponent().getLogger().severe("No listener for component step exception: "+step.getStep()+"\n"+sw);
@@ -2079,7 +2091,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		return getComponent().getDescription(cid);
 	}
-
 	
 	/**
 	 *  Get the step number when endstate began.
@@ -2088,6 +2099,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public int getEndstateStart()
 	{
 		return endstepcnt;
+	}
+	
+	/**
+	 *  Called when a child was terminated.
+	 */
+	public void childTerminated(IComponentDescription desc, Exception ex)
+	{
+		System.out.println("Child terminated: "+desc.getName());
+		// does nothing per default
+		// kernels need to override 
 	}
 	
 	/**
@@ -2102,8 +2123,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public <T> void addSimulationBlocker(IFuture<T> remotefuture)
 	{
-		Boolean issim = (Boolean) Starter.getPlatformValue(component.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG);
-		if(Boolean.TRUE.equals(issim))
+		if (SSimulation.isSimulating(component))
 		{
 			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
 			// there is no way of known how long to hold the clock.

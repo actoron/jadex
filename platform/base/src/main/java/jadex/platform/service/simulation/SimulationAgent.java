@@ -1,6 +1,8 @@
 package jadex.platform.service.simulation;
 
 
+import jadex.base.Starter;
+import jadex.base.test.util.STest;
 import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
@@ -23,6 +25,7 @@ public class SimulationAgent
 {
 	/** Global simulation service instance for bisimulation, if any. */
 	protected static volatile ISimulationService	bisimservice;
+	protected static volatile boolean	started;
 	
 	/**
 	 *  Create the simulation service or check for bisimulation.
@@ -31,12 +34,24 @@ public class SimulationAgent
 	{
 		if(Boolean.TRUE.equals(bisimulation))
 		{
+			boolean	create	= false;
+			synchronized(SimulationAgent.class)
+			{
+				if(!started)
+				{
+					// On first start -> create extra platform for running the sim service singleton.
+					started	= true;
+					create	= true;
+				}
+			}
+			if(create)
+				Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-bisimulation", "true"}).get();
+					
 			synchronized(SimulationAgent.class)
 			{
 				if(bisimservice!=null)
 				{
 					// Only the first platform has the simulation service.
-					// todo: what if first platform gets shut down first???
 					return null;
 				}
 				else

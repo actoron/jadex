@@ -10,15 +10,9 @@ import jadex.bdi.examples.cleanerworld_classic.Wastebin;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.GoalFailureException;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.fipa.DFComponentDescription;
-import jadex.bridge.fipa.DFServiceDescription;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.Done;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.df.IDF;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.bridge.service.IService;
 
 /**
  *  Update the environment belief.
@@ -87,16 +81,10 @@ public class UpdateEnvironmentPlan extends Plan
 	 */
 	protected void searchEnvironmentAgent()
 	{
-		try
+		IComponentIdentifier	res	= (IComponentIdentifier)getBeliefbase().getBelief("environmentagent").getFact();
+
+		if(res==null)
 		{
-<<<<<<< Updated upstream
-			IDF df = (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-			IDFServiceDescription sd = new DFServiceDescription(null, "dispatch vision", null);
-			IDFComponentDescription ad = new DFComponentDescription(null, sd);
-			IDFComponentDescription[] tas = df.search(ad, null).get();
-	
-			if(tas.length!=0)
-=======
 			try
 			{
 				IEnvironmentService es = getAgent().getLocalService(IEnvironmentService.class);
@@ -104,16 +92,30 @@ public class UpdateEnvironmentPlan extends Plan
 				getBeliefbase().getBelief("environmentagent").setFact(res);
 			}
 			catch(Exception e)
->>>>>>> Stashed changes
 			{
-				getBeliefbase().getBelief("environmentagent").setFact(tas[0].getName());
-				if(tas.length>1)
-					System.out.println("WARNING: more than environment agent found.");
+				// Not found.
+				getLogger().warning("Environment search failed: "+e);
+//				throw new PlanFailureException();
 			}
 		}
-		catch(GoalFailureException gfe)
-		{
-			getLogger().warning("DF search failed: "+gfe);
-		}
+		
+//		try
+//		{
+//			IDF df = (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//			IDFServiceDescription sd = new DFServiceDescription(null, "dispatch vision", null);
+//			IDFComponentDescription ad = new DFComponentDescription(null, sd);
+//			IDFComponentDescription[] tas = df.search(ad, null).get();
+//	
+//			if(tas.length!=0)
+//			{
+//				getBeliefbase().getBelief("environmentagent").setFact(tas[0].getName());
+//				if(tas.length>1)
+//					System.out.println("WARNING: more than environment agent found.");
+//			}
+//		}
+//		catch(GoalFailureException gfe)
+//		{
+//			getLogger().warning("DF search failed: "+gfe);
+//		}
 	}
 }

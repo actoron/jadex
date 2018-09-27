@@ -41,6 +41,7 @@ public class DealerGameRoundPlayerPlan extends Plan
 		
 		// Ask player for her bet.
 		getLogger().info("Asking for bet from player: "+player);
+		
 		RequestBet rb = new RequestBet();
 		IMessageEvent msg = createMessageEvent("request_bet");
 		msg.getParameter(SFipa.CONTENT).setValue(rb);

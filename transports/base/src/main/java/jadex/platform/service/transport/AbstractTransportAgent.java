@@ -16,7 +16,6 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IMessageFeature;
@@ -692,8 +691,8 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
-							System.out.println("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
-//							logger.warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+//							System.out.println("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+							logger.warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
 							
 							// For undeliverable conversation messages -> send error reply (only for non-error messages). 
 							if((header.getProperty(IMsgHeader.CONVERSATION_ID)!=null || header.getProperty(RemoteExecutionComponentFeature.RX_ID)!=null)

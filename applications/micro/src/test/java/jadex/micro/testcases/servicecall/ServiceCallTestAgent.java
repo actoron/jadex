@@ -14,9 +14,11 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.commons.IResultCommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
@@ -157,6 +159,8 @@ public class ServiceCallTestAgent extends TestAgent
 	protected IFuture<Void>	performSingleTest(final String tag, final String servicename, final int factor)
 	{
 		final Future<Void> ret	= new Future<Void>();
+		final Future<Void> ret1	= new Future<Void>();
+		final Future<Void> ret2	= new Future<Void>();
 //		IFuture<IServiceCallService> fut = getServiceCallService(servicename, 0, 2, 3000);
 //		IFuture<IServiceCallService> fut = SServiceProvider.waitForService(agent, new IResultCommand<IFuture<IServiceCallService>, Void>()
 //		{
@@ -176,66 +180,37 @@ public class ServiceCallTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final IServiceCallService service)
 			{
-				IResultListener<Void>	lis	= new DelegationResultListener<Void>(ret)
+				IResultListener<Void> lis = new CallListener(max, factor, servicename, tag, new IResultCommand<IFuture<Void>, Void>()
 				{
-					int	count = 0;
-					int	num	= max*factor;
-					long start;
-					
-					public void customResultAvailable(Void result)
+					@Override
+					public IFuture<Void> execute(Void args)
 					{
-//						if(ag.getAgentAdapter().isExternalThread())
-//							System.out.println("wrong thread");
-						
-						if(count==0)
-						{
-							// To start profiling after setup.
-							if(WAIT && "raw".equals(tag) && "raw".equals(servicename))
-							{
-								try
-								{
-									System.out.println("Press [RETURN] to start...");
-									while(System.in.read()!='\n');
-								}
-								catch(IOException e)
-								{
-								}
-							}
-							start = System.nanoTime();
-						}
-						
-						if(count==num)
-						{
-							long	end	= System.nanoTime();
-							System.out.println(servicename+" service call on "+tag+" service took "+((end-start)/10/((long)max*factor))/100.0+" microseconds per call ("+(max*factor)+" calls in "+(end-start)+" nanos).");
-							// To stop profiling after finished.
-							if(WAIT && "decoupled".equals(tag) && "decoupled".equals(servicename))
-							{
-								try
-								{
-									System.out.println("Press [RETURN] to continue...");
-									while(System.in.read()!='\n');
-								}
-								catch(IOException e)
-								{
-								}
-							}
-							ret.setResult(null);
-						}
-						else
-						{
-							count++;
-							service.call().addResultListener(this);
-						}
+						return service.call();
 					}
 					
-					public void exceptionOccurred(Exception exception)
+					public String toString()
 					{
-						exception.printStackTrace();
-						super.exceptionOccurred(exception);
+						return "call";
 					}
-				};
+				}, ret1);
+				
 				service.call().addResultListener(lis);
+				
+				IResultListener<Void> lis2 = new CallListener(max, factor, servicename, tag, new IResultCommand<IFuture<Void>, Void>()
+				{
+					@Override
+					public IFuture<Void> execute(Void args)
+					{
+						return service.rawcall();
+					}
+					
+					public String toString()
+					{
+						return "rawcall";
+					}
+				}, ret2);
+				
+				service.rawcall().addResultListener(lis2);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -245,7 +220,93 @@ public class ServiceCallTestAgent extends TestAgent
 			}
 		});
 		
+		ret1.get();
+		ret2.get();
+		ret.setResultIfUndone(null);
+		
 		return ret;
+	}
+	
+	/**
+	 *  Call listener for recursively calling the service.
+	 */
+	public static class CallListener extends DelegationResultListener<Void>
+	{
+		IResultCommand<IFuture<Void>, Void> call;
+		String servicename;
+		String tag;
+		int factor;
+		int max;
+		int	count = 0;
+		int	num;
+		long start;
+		
+		public CallListener(int max, int factor, String servicename, String tag, IResultCommand<IFuture<Void>, Void> call, Future<Void> ret)
+		{
+			super(ret);
+			this.servicename = servicename;
+			this.max = max;
+			this.factor = factor;
+			this.num = max*factor;
+			this.tag = tag;
+			this.call = call;
+		}
+			
+		public void customResultAvailable(Void result)
+		{
+//			if(ag.getAgentAdapter().isExternalThread())
+//				System.out.println("wrong thread");
+			
+			if(count==0)
+			{
+				// To start profiling after setup.
+				if(WAIT && "raw".equals(tag) && "raw".equals(servicename))
+				{
+					try
+					{
+						System.out.println("Press [RETURN] to start...");
+						while(System.in.read()!='\n');
+					}
+					catch(IOException e)
+					{
+					}
+				}
+				start = System.nanoTime();
+			}
+			
+			if(count==num)
+			{
+				long end = System.nanoTime();
+				
+				System.out.println(servicename+" service "+call.toString()+" on "+tag+" service took "+((end-start)/10/((long)max*factor))/100.0+" microseconds per call ("+(max*factor)+" calls in "+(end-start)+" nanos).");
+				// To stop profiling after finished.
+				if(WAIT && "decoupled".equals(tag) && "decoupled".equals(servicename))
+				{
+					try
+					{
+						System.out.println("Press [RETURN] to continue...");
+						while(System.in.read()!='\n');
+					}
+					catch(IOException e)
+					{
+					}
+				}
+				super.customResultAvailable(null);
+//				ret.setResult(null);
+			}
+			else
+			{
+				count++;
+				call.execute(null).addResultListener(this);
+//				service.call().addResultListener(this);
+			}
+		}
+		
+		public void exceptionOccurred(Exception exception)
+		{
+			exception.printStackTrace();
+			super.exceptionOccurred(exception);
+		}
 	}
 	
 	/**

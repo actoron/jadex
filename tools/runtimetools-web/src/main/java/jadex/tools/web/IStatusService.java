@@ -18,7 +18,7 @@ public interface IStatusService
 	 *  Get the established connections.
 	 *  @return A list of connections.
 	 */
-	// No intermediate for easier REST?
+	// No intermediate for easier REST -> get all platforms in single response
 	public IFuture<Collection<PlatformData>>	getConnectedPlatforms();
 
 	/**

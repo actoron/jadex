@@ -10,7 +10,8 @@ import jadex.commons.SUtil;
 /**
  * 
  */
-public class STest {
+public class STest 
+{
 
     public static IExternalAccess createPlatform() 
     {
@@ -61,13 +62,13 @@ public class STest {
         config.setValue("intravm", true);
         config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
         config.getExtendedPlatformConfiguration().setSimulation(true);
+//        config.setValue("bisimulation", true);
         
         config.setValue("settings.readonly", true);
         
 //        config.setLogging(true);
-        config.getExtendedPlatformConfiguration().setDebugFutures(false);
+//        config.getExtendedPlatformConfiguration().setDebugFutures(true);
 		config.setWelcome(true);
-		
 		
         return config;
     }

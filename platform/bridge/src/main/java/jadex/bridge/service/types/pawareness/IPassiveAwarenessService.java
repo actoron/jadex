@@ -18,7 +18,7 @@ public interface IPassiveAwarenessService
 	 *  Try to find other platforms and finish after timeout.
 	 *  Immediately returns known platforms and concurrently issues a new search, waiting for replies until the timeout.
 	 */
-	public IIntermediateFuture<IComponentIdentifier>	searchPlatforms();
+	public IIntermediateFuture<IComponentIdentifier> searchPlatforms();
 	
 	/**
 	 *  Gets the address for a platform ID using the awareness mechanism.

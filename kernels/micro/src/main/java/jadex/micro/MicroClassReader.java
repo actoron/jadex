@@ -68,6 +68,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentBreakpoint;
+import jadex.micro.annotation.AgentChildKilled;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentKilled;
@@ -1001,6 +1002,11 @@ public class MicroClassReader
 					checkMethodReturnType(AgentMessageArrived.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentMessageArrived.class, new MethodInfo(methods[i]));
 				}
+				if(isAnnotationPresent(methods[i], AgentChildKilled.class, cl))
+				{
+					checkMethodReturnType(AgentChildKilled.class, methods[i], cl);
+					micromodel.setAgentMethod(AgentChildKilled.class, new MethodInfo(methods[i]));
+				}
 				
 				if(isAnnotationPresent(methods[i], Arguments.class, cl))
 				{
@@ -1127,7 +1133,7 @@ public class MicroClassReader
 	{
 		// Todo: allow other return types than void 
 		boolean	isvoid	= m.getReturnType().equals(void.class);
-		boolean isfuture	= !isvoid && SReflect.isSupertype(getClass(IFuture.class, cl), m.getReturnType());
+		boolean isfuture = !isvoid && SReflect.isSupertype(getClass(IFuture.class, cl), m.getReturnType());
 		if(isfuture)
 		{
 			Type	t	= m.getGenericReturnType();
@@ -1141,9 +1147,7 @@ public class MicroClassReader
 		}
 		
 		if(!isvoid)
-		{
 			throw new RuntimeException("@"+ann.getSimpleName()+" method requires return type 'void' or 'IFuture<Void>': "+m);
-		}
 	}
 	
 	/**

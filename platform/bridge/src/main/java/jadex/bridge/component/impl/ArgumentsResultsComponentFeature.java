@@ -169,7 +169,7 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 		results.put(IComponentIdentifier.RESULTCID, getComponent().getId());
 		
 		initDefaultResults();
-
+		
 		return IFuture.DONE;
 	}
 	

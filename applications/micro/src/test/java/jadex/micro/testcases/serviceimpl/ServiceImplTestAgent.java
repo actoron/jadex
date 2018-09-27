@@ -1,5 +1,7 @@
 package jadex.micro.testcases.serviceimpl;
 
+import org.junit.Ignore;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
@@ -18,6 +20,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test if service implementations can be omitted when the agent implements them.
  */
+@Ignore
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ServiceImplTestAgent extends JunitAgentTest

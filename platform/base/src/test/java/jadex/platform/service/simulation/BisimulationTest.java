@@ -30,6 +30,7 @@ public class BisimulationTest
 		IPlatformConfiguration	config	= STest.getDefaultTestConfig();
 		config.setValue("bisimulation", true);
 		config.setValue("tcp", false);
+		config.setLogging(true);
 		
 		// Run test on first platform such that clock cannot advance
 		IExternalAccess	p1	= Starter.createPlatform(config).get();
@@ -44,13 +45,13 @@ public class BisimulationTest
 			for(int i=1; i<3; i++)
 			{
 				IPlatformConfiguration config2	= config.clone();
-//				config2.setLogging(true);
+				config2.setLogging(true);
 				IFuture<IExternalAccess>	fp2	= Starter.createPlatform(config2);
 				IExternalAccess	p2	= fp2.get();
 				
 				// Start agent on other platform
-				fubar.addFuture(p2.createComponentWithResults(new CreationInfo().setFilename(CounterAgent.class.getName()+".class")
-					.setArguments(Collections.singletonMap("offset", i))));
+				fubar.addFuture(p2.createComponentWithResults(
+					new CreationInfo(Collections.singletonMap("offset", i)).setFilename(CounterAgent.class.getName()+".class")));
 			}
 			
 			// Wait for all agents.

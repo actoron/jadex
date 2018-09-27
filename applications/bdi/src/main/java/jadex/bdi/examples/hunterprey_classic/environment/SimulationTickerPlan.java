@@ -37,6 +37,7 @@ public class SimulationTickerPlan extends Plan
 			// Dispatch new visions.
 			Creature[]	creatures	= env.getCreatures();
 //			System.out.println("Knows creatures: "+creatures.length);
+
 			for(int i=0; i<creatures.length; i++)
 			{
 				//System.out.println("Sending to: "+creatures[i].getName()+" "+creatures[i].getAID());
@@ -47,6 +48,7 @@ public class SimulationTickerPlan extends Plan
 				mevent.getParameter(SFipa.CONTENT).setValue(cv);
 				try
 				{
+//					System.out.println("sending vision to: "+creatures[i].getAID());
 					sendMessage(mevent);
 				}
 				catch(Exception e)

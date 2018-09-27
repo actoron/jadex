@@ -5,13 +5,7 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
-import jadex.base.Starter;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.impl.ExecutionComponentFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -35,9 +29,6 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	
 	/** Custom result listener */
 	protected IFunctionalExceptionListener	customExceptionListener;
-	
-	/** Future for clock advancement blocking. */
-	protected Future<Void>	adblock;
 	
 	//-------- constructors --------
 	
@@ -77,19 +68,6 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 		this.customExceptionListener = customExceptionListener;
 	}
 
-	protected static Future<Void>	block()
-	{
-		Future<Void>	adblock	= null;
-		IInternalAccess	ia	= ExecutionComponentFeature.LOCAL.get();
-		if(ia != null && Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG)))
-		{
-			adblock	= new Future<>();
-			ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
-				.addAdvanceBlocker(adblock).get();
-		}
-		return adblock;
-	}
-	
 	protected static void	unblock(Future<Void> adblock)
 	{
 		if(adblock!=null)
@@ -102,7 +80,6 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	public SwingDefaultResultListener()
 	{
 //		Thread.dumpStack();
-		adblock	= block();
 	}
 	
 	/**
@@ -112,7 +89,6 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	public SwingDefaultResultListener(Component parent)
 	{
 		this.parent	= parent;
-		adblock	= block();
 //		Thread.dumpStack();
 	}
 	
@@ -123,7 +99,6 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	public SwingDefaultResultListener(Logger logger)
 	{
 		super(logger);
-		adblock	= block();
 //		Thread.dumpStack();
 	}
 	
@@ -135,37 +110,13 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	 */
 	final public void resultAvailable(final E result)
 	{
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-//		if(SwingUtilities.isEventDispatchThread())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			try
+			public void run()
 			{
 				customResultAvailable(result);
 			}
-			finally
-			{
-				unblock(adblock);
-			}
-		}
-		else
-		{
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					try
-					{
-						customResultAvailable(result);
-					}
-					finally
-					{
-						unblock(adblock);
-					}
-				}
-			});
-		}
+		});
 	}
 	
 	/**
@@ -174,39 +125,13 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	 */
 	final public void exceptionOccurred(final Exception exception)
 	{
-//		exception.printStackTrace();
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-//		if(SwingUtilities.isEventDispatchThread())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			try
+			public void run()
 			{
 				customExceptionOccurred(exception);			
 			}
-			finally
-			{
-				unblock(adblock);
-			}
-		}
-		else
-		{
-//			Thread.dumpStack();
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					try
-					{
-						customExceptionOccurred(exception);			
-					}
-					finally
-					{
-						unblock(adblock);
-					}
-				}
-			});
-		}
+		});
 	}
 	
 	/**
@@ -246,24 +171,13 @@ public class SwingDefaultResultListener<E> extends DefaultResultListener<E>	impl
 	 */
 	final public void commandAvailable(final Object command)
 	{
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-//		if(SwingUtilities.isEventDispatchThread())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			customCommandAvailable(command);			
-		}
-		else
-		{
-//			Thread.dumpStack();
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					customCommandAvailable(command);
-				}
-			});
-		}
+				customCommandAvailable(command);
+			}
+		});
 	}
 	
 	/**

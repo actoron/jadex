@@ -34,6 +34,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -382,6 +383,9 @@ public class Starter
 	{
 		final IPlatformConfiguration config = pconfig!=null? pconfig: PlatformConfigurationHandler.getDefault();
 		
+//		if(!Boolean.TRUE.equals(config.getValues().get("bisimulation")))
+//			System.out.println("no bisim");
+		
 		config.setReadOnly(true);
 		
 		if(config.getExtendedPlatformConfiguration().isDropPrivileges())
@@ -579,7 +583,7 @@ public class Starter
 				
 				final CMSComponentDescription desc = new CMSComponentDescription(cid).setType(ctype).setModelName(model.getFullName())
 					.setResourceIdentifier(model.getResourceIdentifier()).setCreationTime(System.currentTimeMillis()).setCreator(caller)
-					.setMonitoring(monitoring);
+					.setMonitoring(monitoring).setFilename(model.getFilename());
 
 				putPlatformValue(cid, DATA_REALTIMETIMEOUT, config.getValue(DATA_REALTIMETIMEOUT, model));
 //					rootConfig.setValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
@@ -602,6 +606,7 @@ public class Starter
 				putPlatformValue(cid, DATA_TRANSPORTCACHE, Collections.synchronizedMap(new LRU<IComponentIdentifier, Tuple2<ITransportService, Integer>>(2000)));
 				
 				putPlatformValue(cid, DATA_DEFAULT_TIMEOUT, config.getDefaultTimeout());
+				putPlatformValue(cid, IClockService.BISIMULATION_CLOCK_FLAG, config.getValue("bisimulation", model));
 
 				Map<String, Object> argsmap = config==null? new HashMap<String, Object>(): config.getValues();
 				if(args!=null)

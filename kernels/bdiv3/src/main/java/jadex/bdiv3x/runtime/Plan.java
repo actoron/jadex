@@ -172,7 +172,7 @@ public abstract class Plan
 		{
 			ret.get(timeout);
 		}
-		catch(BDIFailureException e)
+		catch(GoalFailureException e)
 		{
 			throw e;
 		}
@@ -182,7 +182,7 @@ public abstract class Plan
 		}
 		catch(Exception e)
 		{
-			throw new GoalFailureException(null, e);
+			throw new GoalFailureException(rgoal.toString(), e);
 		}
 	}
 	

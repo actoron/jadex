@@ -29,10 +29,10 @@ import jadex.micro.annotation.AgentKilled;
 <H3>TranslationAgent: Lesson G1.</H3>
 Using a separate thread to accept http connections.
 <H4>Explanation</H4>
-The agent opens a server connection at port 9099 and waits
+The agent opens a server connection at port 9199 and waits
 for translation requests.<br>
 Direct your browser to e.g.
-<a href="http://localhost:9099/dog">http://localhost:9099/dog</a>
+<a href="http://localhost:9199/dog">http://localhost:9199/dog</a>
 to perform a translation.
 */
 @Agent(type=BDIAgentFactory.TYPE)
@@ -106,7 +106,7 @@ public class TranslationBDI
 		this.wordtable.put("cat", "Katze");
 		this.wordtable.put("dog", "Hund");
 		
-		final int port = 9099;
+		final int port = 9199;
 		
 		try
 		{

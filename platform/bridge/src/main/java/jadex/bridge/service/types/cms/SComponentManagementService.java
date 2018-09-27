@@ -370,9 +370,9 @@ public class SComponentManagementService
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	alis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(null)));
 		slis.addAll(alis);
 		
-		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: alis)
+		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slis)
 		{
-			sub.addIntermediateResult(new CMSCreatedEvent(desc));
+			sub.addIntermediateResultIfUndone(new CMSCreatedEvent(desc));
 		}
 	}
     
@@ -389,9 +389,9 @@ public class SComponentManagementService
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	alis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(null)));
 		slis.addAll(alis);
 		
-		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: alis)
+		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slis)
 		{
-			sub.addIntermediateResult(new CMSStatusEvent(desc));
+			sub.addIntermediateResultIfUndone(new CMSStatusEvent(desc));
 		}
 	}
 	
@@ -408,9 +408,9 @@ public class SComponentManagementService
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	alis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(null)));
 		slis.addAll(alis);
 		
-		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: alis)
+		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slis)
 		{
-			sub.addIntermediateResult(new CMSTerminatedEvent(desc, results));
+			sub.addIntermediateResultIfUndone(new CMSTerminatedEvent(desc, results));
 		}
 		
 		// remove the listeners of the terminated component
@@ -1628,6 +1628,10 @@ public class SComponentManagementService
 											if(!(exception instanceof ComponentTerminatedException)
 												|| !((ComponentTerminatedException)exception).getComponentIdentifier().equals(adapter.getInternalAccess().getId()))
 											{
+												IComponentIdentifier pid = adapter.getInternalAccess().getId().getParent();
+												IPlatformComponentAccess pacom = getComponent(pid);
+												// hmm wait for call to finish?!
+												pacom.childTerminated(adapter.getInternalAccess().getDescription(), exception); 
 												adapter.getInternalAccess().killComponent(exception);
 											}
 										}
@@ -2568,7 +2572,7 @@ public class SComponentManagementService
 //						lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), cs!=null? cs.getTime(): System.currentTimeMillis(), creator, systemcomponent);
 					final CMSComponentDescription ad = new CMSComponentDescription(cid).setType(lmodel.getType()).setModelName(lmodel.getFullName()).setLocalType(cinfo.getLocalType())
 						.setResourceIdentifier(lmodel.getResourceIdentifier()).setCreator(creator).setSystemComponent(systemcomponent).setCreationTime(cs!=null? cs.getTime(): System.currentTimeMillis())
-						.setSynchronous(sync!=null ? sync.booleanValue() : false);
+						.setSynchronous(sync!=null ? sync.booleanValue() : false).setFilename(lmodel.getFilename());
 					
 					// Use first configuration if no config specified.
 					String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()

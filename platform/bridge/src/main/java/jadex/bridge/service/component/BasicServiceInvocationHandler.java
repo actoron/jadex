@@ -224,6 +224,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					ser = si.getDomainService();
 				}
 			}
+			else if(ProxyFactory.isProxyClass(service.getClass()) && 
+				RemoteMethodInvocationHandler.class.equals(ProxyFactory.getInvocationHandler(service).getClass()))
+			{
+				ser = service;
+			}
 			else
 			{
 				throw new RuntimeException("Raw service cannot be invoked on: "+service);
@@ -772,6 +777,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, Starter.isParameterCopy(sid.getProviderId()), false));
 			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
+			
+			// used only by global service pool, todo add contionally
 			handler.addFirstServiceInterceptor(new IntelligentProxyInterceptor(ia.getExternalAccess(), sid));
 		}
 		
@@ -822,7 +829,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
 			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, service, ia.getLogger(), true); // ia.getDescription().getCause()
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, true));
+//			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, true));
 			// Dropped for v4???
 //			if(binding!=null && binding.isRecover())
 //				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ia.getExternalAccess(), info, binding, fetcher));
