@@ -1,6 +1,5 @@
 package jadex.bdiv3;
 
-import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -580,7 +579,7 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 * 
 	 */
-	protected MTrigger buildPlanTrigger(BDIModel bdimodel, Trigger trigger, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
+	protected MTrigger buildPlanTrigger(BDIModel bdimodel, String name, Trigger trigger, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
 	{
 		MTrigger tr = null;
 		
@@ -599,6 +598,10 @@ public class BDIClassReader extends MicroClassReader
 			for(int j=0; j<gs.length; j++)
 			{
 				Goal ga = getAnnotation(gs[j], Goal.class, cl);
+				if(ga==null)
+				{
+					throw new IllegalArgumentException("Goal trigger class '"+gs[j].getName()+"' in plan '"+name+"' misses @Goal annotation.");
+				}
 				MGoal mgoal = getMGoal(bdimodel, ga, gs[j], cl, pubs);
 				tr.addGoal(mgoal);
 			}
@@ -606,6 +609,10 @@ public class BDIClassReader extends MicroClassReader
 			for(int j=0; j<gfs.length; j++)
 			{
 				Goal ga = getAnnotation(gfs[j], Goal.class, cl);
+				if(ga==null)
+				{
+					throw new IllegalArgumentException("Goal trigger class '"+gs[j].getName()+"' in plan '"+name+"' misses @Goal annotation.");
+				}
 				MGoal mgoal = getMGoal(bdimodel, ga, gfs[j], cl, pubs);
 				tr.addGoalFinished(mgoal);
 			}
@@ -769,19 +776,19 @@ public class BDIClassReader extends MicroClassReader
 		
 		if(mplan==null)
 		{
-			MTrigger mtr = buildPlanTrigger(bdimodel, p.trigger(), cl, pubs);
-			MTrigger wmtr = buildPlanTrigger(bdimodel, p.waitqueue(), cl, pubs);
+			MTrigger mtr = buildPlanTrigger(bdimodel, name, p.trigger(), cl, pubs);
+			MTrigger wmtr = buildPlanTrigger(bdimodel, name, p.waitqueue(), cl, pubs);
 			
 			// Check if external plan has a trigger defined
 			if(mtr==null && !Object.class.equals(body.value()))
 			{
 				Class<?> bcl = body.value();
 				Plan pl = getAnnotation(bcl, Plan.class, cl);
-				mtr = buildPlanTrigger(bdimodel, pl.trigger(), cl, pubs);
+				mtr = buildPlanTrigger(bdimodel, name, pl.trigger(), cl, pubs);
 				
 				if(wmtr==null)
 				{
-					wmtr = buildPlanTrigger(bdimodel, pl.waitqueue(), cl, pubs);
+					wmtr = buildPlanTrigger(bdimodel, name, pl.waitqueue(), cl, pubs);
 				}
 			}
 			
