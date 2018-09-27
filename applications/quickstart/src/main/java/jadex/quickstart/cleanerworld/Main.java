@@ -41,7 +41,7 @@ public class Main
         
         // Add your cleaner agent(s)
 //		conf.addComponent("quickstart/cleanerworld/SimpleCleanerAgent.class");
-		conf.addComponent("jadex/quickstart/cleanerworld/CleanerBDIAgentA2.class");
+		conf.addComponent("jadex/quickstart/cleanerworld/CleanerBDIAgentA3.class");
 
 		// Start a Jadex platform (asynchronously in background).
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(conf);

@@ -17,7 +17,7 @@ import jadex.quickstart.cleanerworld.gui.SensorGui;
  *
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
-public class CleanerBDIAgentA2
+public class CleanerBDIAgentA3
 {
 	//-------- fields holding agent data --------
 	
@@ -56,11 +56,27 @@ public class CleanerBDIAgentA2
 	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
 	private void	performPatrolPlan()
 	{
-		// Follow a simple path around the four corners of the museum.
+		// Follow a simple path around the four corners of the museum and back to the first corner.
 		actsense.moveTo(0.1, 0.1);
 		actsense.moveTo(0.1, 0.9);
 		actsense.moveTo(0.9, 0.9);
 		actsense.moveTo(0.9, 0.1);
+		actsense.moveTo(0.1, 0.1);
+		throw new PlanFailureException();
+	}
+
+	/**
+	 *  Declare a second plan for the same goal.
+	 */
+	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
+	private void	performPatrolPlan2()
+	{
+		// Follow another path around the middle of the museum.
+		actsense.moveTo(0.3, 0.3);
+		actsense.moveTo(0.3, 0.6);
+		actsense.moveTo(0.6, 0.6);
+		actsense.moveTo(0.6, 0.3);
+		actsense.moveTo(0.3, 0.3);
 		throw new PlanFailureException();
 	}
 }
