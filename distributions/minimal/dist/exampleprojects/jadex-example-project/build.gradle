@@ -1,28 +1,25 @@
 apply plugin: 'java'
 
 def jadex_version	= "${jadex_build_version}"
-//def jadex_version	= "4.0.9999-SNAPSHOT"
 
 dependencies {
-	compile 'org.activecomponents.jadex:jadex-distribution-minimal:'+jadex_version
+	implementation 'org.activecomponents.jadex:jadex-distribution-minimal:'+jadex_version
 	
-	//compile 'org.activecomponents.jadex:jadex-distribution-standard:'+jadex_version
-	//compile 'org.activecomponents.jadex:jadex-distribution-server:'+jadex_version
-	//compile 'org.activecomponents.jadex:jadex-distribution-pro:'+jadex_version
+	//implementation 'org.activecomponents.jadex:jadex-distribution-standard:'+jadex_version
+	//implementation 'org.activecomponents.jadex:jadex-distribution-server:'+jadex_version
+	//implementation 'org.activecomponents.jadex:jadex-distribution-pro:'+jadex_version
 
 	// required for cleanerworld scenario
-	compile 'org.activecomponents.jadex:jadex-kernel-bdiv3:'+jadex_version
-	compile 'org.activecomponents.jadex:jadex-applications-quickstart:'+jadex_version
+	implementation 'org.activecomponents.jadex:jadex-kernel-bdiv3:'+jadex_version
+	implementation 'org.activecomponents.jadex:jadex-applications-quickstart:'+jadex_version
 }
 
 repositories {
-	jcenter()
-//	mavenLocal()
+	// Some default repositories for open source Java artifacts
 	mavenCentral()
+	jcenter()
+	
 	// Additional repositories (only required when using nightlies and/or pro version of Jadex).
-	maven {
-		url "https://nexus.actoron.com/content/repositories/oss"
-	}
 	maven {
 		url "https://nexus.actoron.com/content/repositories/oss-nightlies"
 	}
