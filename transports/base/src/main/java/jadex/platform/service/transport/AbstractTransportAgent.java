@@ -977,10 +977,10 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 			boolean	contained;
 			synchronized(AbstractTransportAgent.this)
 			{
-				// Not contained? removed connection -> ready=null.
+				// Not contained? removed connection
 				contained	= virtuals.containsKey(target);
 			}
-			return new PlatformData(target, impl.getProtocolName(), contained ? con!=null : null);
+			return new PlatformData(target, impl.getProtocolName(), contained && con!=null);
 		}
 
 		/**

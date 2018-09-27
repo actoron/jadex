@@ -21,9 +21,9 @@ public class PlatformData
 	@Include
 	protected String	protocol; 
 	
-	/** The connection state (false=connecting, true=connected, null=disconnected-> i.e. offline event). */
+	/** The connection state (true=connected event, false=disconnected event). */
 	@Include
-	protected Boolean	connected; 
+	protected boolean	connected;
 	
 	//-------- constructors --------
 	
@@ -38,7 +38,7 @@ public class PlatformData
 	/**
 	 *  Create a new platform data.
 	 */
-	public PlatformData(IComponentIdentifier platform, String protocol, Boolean connected)
+	public PlatformData(IComponentIdentifier platform, String protocol, boolean connected)
 	{
 		this.platform	= platform;
 		this.protocol	= protocol;
