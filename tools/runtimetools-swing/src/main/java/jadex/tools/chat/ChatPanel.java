@@ -290,6 +290,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
 					{
 						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+						
+						// Bug workaround: https://bugs.openjdk.java.net/browse/JDK-8041559
+						if (value == null)
+							return this;
+						
 						ChatUser cu = (ChatUser)value;
 						this.setText(cu.getNick()+" ["+cu.getComponentIdentifier()+"]");
 						if(cu.getComponentIdentifier()==null)
