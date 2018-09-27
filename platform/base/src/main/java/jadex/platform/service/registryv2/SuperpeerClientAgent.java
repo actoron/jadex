@@ -620,7 +620,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									// Local query uses registry directly (w/o feature) -> only service identifiers needed and also removed events
 									ServiceQuery<ServiceEvent<IServiceIdentifier>>	lquery	= new ServiceQuery<>((Class<IServiceIdentifier>)null)
 										.setEventMode()
-										.setOwner(spid);	// Only find services that are visible to SP
+										.setOwner(agent.getId())
+										.setSearchStart(spid);	// Only find services that are visible to SP
 									if(global)
 									{
 										// SSP connection -> global scope and no network name
