@@ -19,7 +19,7 @@ public abstract class LocationObject implements ILocationObject, Cloneable
 	private Location location;
 
 	/** The property change support. */
-	private SimplePropertyChangeSupport pcs;
+	SimplePropertyChangeSupport pcs;
 	
 	//-------- constructors --------
 

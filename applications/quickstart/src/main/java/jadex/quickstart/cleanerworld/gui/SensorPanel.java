@@ -189,7 +189,7 @@ class SensorPanel extends JPanel
 				ret.daytime	= sensor.isDaytime();
 				ret.cleaners	= Environment.cloneList(sensor.getCleaners(), ICleaner.class);
 				ret.wastes	= Environment.cloneList(sensor.getWastes(), IWaste.class);
-				ret.stations	= Environment.cloneList(sensor.getStations(), IChargingstation.class);
+				ret.stations	= Environment.cloneList(sensor.getChargingstations(), IChargingstation.class);
 				ret.wastebins	= Environment.cloneList(sensor.getWastebins(), IWastebin.class);
 				ret.pheromones	= Environment.cloneList(sensor.getPheromones(), IPheromone.class);
 				return new Future<>(ret);

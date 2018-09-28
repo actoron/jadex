@@ -1,10 +1,9 @@
-package jadex.quickstart.cleanerworld;
+package jadex.quickstart.cleanerworld.single;
 
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
@@ -12,12 +11,9 @@ import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
  *  First BDI agent with a goal and a plan.
- *  @author Alexander Pokahr
- *  @version 1.0 (2018/09/27)
- *
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
-public class CleanerBDIAgentA3
+public class CleanerBDIAgentA1
 {
 	//-------- fields holding agent data --------
 	
@@ -45,7 +41,7 @@ public class CleanerBDIAgentA3
 	/**
 	 *  A goal to patrol around in the museum.
 	 */
-	@Goal(recur=true, recurdelay=0)	// The goal annotation allows instances of a Java class to be dispatched as goals of the agent. 
+	@Goal	// The goal annotation allows instances of a Java class to be dispatched as goals of the agent. 
 	class PerformPatrol {}
 	
 	//-------- simple examples of using belief and goal events --------
@@ -56,27 +52,10 @@ public class CleanerBDIAgentA3
 	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
 	private void	performPatrolPlan()
 	{
-		// Follow a simple path around the four corners of the museum and back to the first corner.
+		// Follow a simple path around the four corners of the museum.
 		actsense.moveTo(0.1, 0.1);
 		actsense.moveTo(0.1, 0.9);
 		actsense.moveTo(0.9, 0.9);
 		actsense.moveTo(0.9, 0.1);
-		actsense.moveTo(0.1, 0.1);
-		throw new PlanFailureException();
-	}
-
-	/**
-	 *  Declare a second plan for the same goal.
-	 */
-	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
-	private void	performPatrolPlan2()
-	{
-		// Follow another path around the middle of the museum.
-		actsense.moveTo(0.3, 0.3);
-		actsense.moveTo(0.3, 0.6);
-		actsense.moveTo(0.6, 0.6);
-		actsense.moveTo(0.6, 0.3);
-		actsense.moveTo(0.3, 0.3);
-		throw new PlanFailureException();
 	}
 }

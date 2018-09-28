@@ -80,7 +80,9 @@ public class Cleaner extends LocationObject	implements ICleaner
 	 */
 	public void setChargestate(double chargestate)
 	{
+		double	oldcs	= this.chargestate;
 		this.chargestate = chargestate;
+		pcs.firePropertyChange("chargestate", oldcs, chargestate);
 	}
 
 	/**
