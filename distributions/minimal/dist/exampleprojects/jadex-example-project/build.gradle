@@ -1,6 +1,7 @@
 apply plugin: 'java'
 
 def jadex_version	= "${jadex_build_version}"
+sourceCompatibility = 1.8
 
 dependencies {
 	implementation 'org.activecomponents.jadex:jadex-distribution-minimal:'+jadex_version
