@@ -10,7 +10,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import jadex.base.Starter;
-import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicService;
