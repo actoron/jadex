@@ -41,7 +41,7 @@ public class Environment
 	private List<Wastebin> wastebins;
 
 	/** The charging stations. */
-	private List<Chargingstation> stations;
+	private List<Chargingstation> chargingstations;
 
 	/** The pheromones. */
 	private List<Pheromone> pheromones;
@@ -57,7 +57,7 @@ public class Environment
 		this.cleaners = new LinkedHashMap<IComponentIdentifier, Cleaner>();
 		this.wastes = new ArrayList<Waste>();
 		this.wastebins = new ArrayList<Wastebin>();
-		this.stations = new ArrayList<Chargingstation>();
+		this.chargingstations = new ArrayList<Chargingstation>();
 		this.pheromones = new ArrayList<Pheromone>();
 
 		// Add some things to our world.
@@ -67,8 +67,8 @@ public class Environment
 		addWaste(new Waste(new Location(0.9, 0.9)));
 		addWastebin(new Wastebin(new Location(0.2, 0.2), 20));
 		addWastebin(new Wastebin(new Location(0.8, 0.1), 20));
-		addChargingStation(new Chargingstation(new Location(0.8, 0.8)));
-		addChargingStation(new Chargingstation(new Location(0.2, 0.4)));
+		addChargingStation(new Chargingstation(new Location(0.775, 0.775)));
+		addChargingStation(new Chargingstation(new Location(0.15, 0.4)));
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class Environment
 	 */
 	public synchronized void addChargingStation(Chargingstation station)
 	{
-		stations.add(station.clone());
+		chargingstations.add(station.clone());
 	}
 
 	/**
@@ -238,7 +238,7 @@ public class Environment
 	 */
 	public synchronized Chargingstation[] getChargingstations()
 	{
-		return cloneList(stations, Chargingstation.class);
+		return cloneList(chargingstations, Chargingstation.class);
 	}
 
 	/**
@@ -353,6 +353,7 @@ public class Environment
 			throw new RuntimeException("Cleaner not in drop range: "+mycleaner+", "+mywastebin);
 		}
 	}
+
 
 	/**
 	 *  Get a wastebin for a name.

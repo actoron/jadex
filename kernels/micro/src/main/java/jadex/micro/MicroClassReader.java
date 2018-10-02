@@ -1,6 +1,5 @@
 package jadex.micro;
 
-import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -2062,7 +2061,7 @@ public class MicroClassReader
 	{
 		T ret = null;
 		
-		if(isClassLoaderCompatible(an.getClass(), cl))
+		if(an==null || isClassLoaderCompatible(an.getClass(), cl))
 		{
 			ret = an;
 		}

@@ -1,4 +1,4 @@
-package quickstart.cleanerworld;
+package jadex.quickstart.cleanerworld;
 
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;

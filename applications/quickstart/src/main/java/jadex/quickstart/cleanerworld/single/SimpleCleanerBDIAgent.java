@@ -1,6 +1,5 @@
-package quickstart.cleanerworld;
+package jadex.quickstart.cleanerworld.single;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

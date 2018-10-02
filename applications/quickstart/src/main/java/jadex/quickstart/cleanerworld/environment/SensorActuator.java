@@ -19,6 +19,7 @@ import jadex.commons.ErrorException;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.quickstart.cleanerworld.environment.impl.Cleaner;
 import jadex.quickstart.cleanerworld.environment.impl.Environment;
 import jadex.quickstart.cleanerworld.environment.impl.Location;
@@ -55,7 +56,7 @@ public class SensorActuator
 	private Set<IWaste>	wastes;
 	
 	/** The known charging stations. */
-	private Set<IChargingstation>	stations;
+	private Set<IChargingstation>	chargingstations;
 	
 	/** The known waste boins. */
 	private Set<IWastebin>	wastebins;
@@ -84,7 +85,7 @@ public class SensorActuator
 		self	= Environment.getInstance().createCleaner(agent);
 		this.cleaners	= cleaners!=null ? cleaners : new LinkedHashSet<>();
 		this.wastes	= wastes!=null ? wastes : new LinkedHashSet<>();
-		this.stations	= stations!=null ? stations : new LinkedHashSet<>();
+		this.chargingstations	= stations!=null ? stations : new LinkedHashSet<>();
 		this.wastebins	= wastebins!=null ? wastebins : new LinkedHashSet<>();
 	}
 	
@@ -143,13 +144,13 @@ public class SensorActuator
 	 *  Get the known charging stations.
 	 *  @return a Set of Chargingstation objects. 
 	 */
-	public Set<IChargingstation>	getStations()
+	public Set<IChargingstation>	getChargingstations()
 	{
 		if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
 		{
 			throw new IllegalStateException("Error: Must be called on agent thread.");
 		}
-		return stations;
+		return chargingstations;
 	}
 		
 	/**
@@ -194,6 +195,16 @@ public class SensorActuator
 	/**
 	 *  Move to the given location.
 	 *  Blocks until the location is reached or a failure occurs.
+	 *  @param location	The location.
+	 */
+	public void moveTo(ILocation location)
+	{
+		moveTo(location.getX(), location.getY());
+	}
+	
+	/**
+	 *  Move to the given location.
+	 *  Blocks until the location is reached or a failure occurs.
 	 *  @param x	X coordinate.
 	 *  @param y	Y coordinate.
 	 */
@@ -234,7 +245,13 @@ public class SensorActuator
 							double	delta	= (currenttime-lasttime)/1000.0;
 							
 							// Set new charge state
-							self.setChargestate(self.getChargestate()-delta/100);	// drop ~ 1%/sec while moving.
+							double	chargestate	= self.getChargestate()-delta/100; 	// drop ~ 1%/sec while moving.
+							if(chargestate<0)
+							{
+								self.setChargestate(0);
+								throw new IllegalStateException("Out of battery!");
+							}
+							self.setChargestate(chargestate);
 							
 							// Set new location
 							double total_dist	= self.getLocation().getDistance(target);
@@ -270,6 +287,16 @@ public class SensorActuator
 							}
 							return null;
 						}
+					}).addResultListener(new IResultListener<Void>()
+					{
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							reached.setExceptionIfUndone(exception);
+						}
+						
+						@Override
+						public void resultAvailable(Void result){}
 					});
 				}
 			}
@@ -290,6 +317,104 @@ public class SensorActuator
 			// After move finished/failed always reset state.
 			target	= null;
 			pheromone	= null;
+		}
+	}
+	
+	
+	
+	/**
+	 *  Recharge a cleaner at a charging station to a desired charging level.
+	 *  The cleaner needs to be at the location of the charging station
+	 *  Note, the charging rate gets slower over 70% charge state.
+	 *  @param chargingstation The charging station to recharge at.
+	 *  @param level	The desired charging level between 0 and 1.
+	 */
+	public synchronized void	recharge(IChargingstation chargingstation, double level)
+	{
+		if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
+		{
+			throw new IllegalStateException("Error: Must be called on agent thread.");
+		}
+		
+		// Signal variable to check when level is reached.
+		final Future<Void>	reached	= new Future<>();
+		
+		// Wait for clock ticks and recharge the cleaner. (asynchronous!)
+		final IClockService	clock	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+		clock.createTickTimer(new ITimedObject()
+		{
+			long lasttime	= clock.getTime();
+			ITimedObject	timer	= this;
+			
+			@Override
+			public void timeEventOccurred(long currenttime)
+			{
+				if(!reached.isDone())	// no new timer when future is terminated from outside (e.g. agent killed)
+				{
+					// Run update on agent thread to avoid synchronization issues.
+					agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+					{
+						@Override
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							// Check the location.
+							if(!self.getLocation().isNear(chargingstation.getLocation()))
+							{
+								throw new IllegalStateException("Cannot not recharge. Charging station out of reach!");
+							}
+							
+							// Calculate time passed as fraction of a second.
+							double	delta	= (currenttime-lasttime)/1000.0;
+							
+							// Set new charge state
+							double	inc	= delta/10; 	// increase ~ 10%/sec while recharging.
+							if(self.getChargestate()>0.7)	// when >70% linearily decrease charging rate to 0 at 100%.
+							{
+								inc	= inc * 10/3.0 * (1-self.getChargestate());
+							}
+							self.setChargestate(self.getChargestate()+inc);
+							
+							// Post new own state to environment
+							Environment.getInstance().updateCleaner(self);
+							
+							// Finish or repeat?
+							if(self.getChargestate()>=level)
+							{
+								// Release block.
+								reached.setResultIfUndone(null);
+							}
+							else
+							{
+								// Wait for next tick.
+								lasttime	= currenttime;
+								clock.createTickTimer(timer);
+							}
+							return null;
+						}
+					}).addResultListener(new IResultListener<Void>()
+					{
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+							reached.setExceptionIfUndone(exception);
+						}
+						
+						@Override
+						public void resultAvailable(Void result){}
+					});
+				}
+			}
+		});
+		
+		try
+		{
+			reached.get();	// Block agent/plan until level is reached.
+		}
+		catch(Throwable t)
+		{
+			// Move interrupted -> set exception to abort recharge steps.
+			reached.setExceptionIfUndone(t instanceof Exception ? (Exception)t : new ErrorException((Error)t));
+			SUtil.throwUnchecked(t);
 		}
 	}
 
@@ -350,7 +475,7 @@ public class SensorActuator
 	{
 		updateObjects(cleaners, Environment.getInstance().getCleaners());
 		updateObjects(wastes, Environment.getInstance().getWastes());
-		updateObjects(stations, Environment.getInstance().getChargingstations());
+		updateObjects(chargingstations, Environment.getInstance().getChargingstations());
 		updateObjects(wastebins, Environment.getInstance().getWastebins());
 	}
 	

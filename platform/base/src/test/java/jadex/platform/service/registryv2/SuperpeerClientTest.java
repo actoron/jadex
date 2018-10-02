@@ -43,6 +43,9 @@ public class SuperpeerClientTest	extends AbstractInfrastructureTest
 		// Remote only -> no simulation please
 		baseconf.getExtendedPlatformConfiguration().setSimul(false);
 		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
+		baseconf.setLogging(true);
+		baseconf.setValue("rt.debug", true);
+
 		
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client_*");

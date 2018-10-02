@@ -36,7 +36,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.MethodInfo;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -770,91 +769,73 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 //		if(getPojoElement().getClass().getName().indexOf("PatrolPlan")!=-1)
 //			System.out.println("pips");
 		
-		// create reasoning step depending on the processable element type
-
 		// Check procedural success semantics
 		if(isProceduralSucceeded())
 		{
-			setProcessingState(ia, GoalProcessingState.SUCCEEDED);
+			// succeeded leads to lifecycle state dropping!
+			setProcessingState(ia, isRecur() ? GoalProcessingState.PAUSED : GoalProcessingState.SUCCEEDED);
 		}
-				
-		if(GoalLifecycleState.ACTIVE.equals(getLifecycleState()) && GoalProcessingState.INPROCESS.equals(getProcessingState()))
+		
+		// Continue goal processing if still active
+		if(GoalLifecycleState.ACTIVE.equals(getLifecycleState()))
 		{
-			if(!isSucceeded() && !isFailed())
+			// Retry if plan executed and more plans available.
+			if(rplan!=null && isRetry() && RProcessableElement.State.CANDIDATESSELECTED.equals(getState()))
 			{
-				// Test if is retry
-				if(isRetry() && rplan!=null)
+				IComponentStep<Void>	step	= getMGoal().isRebuild() ? new FindApplicableCandidatesAction(this) : new SelectCandidatesAction(this); 
+				if(getMGoal().getRetryDelay()>-1)
 				{
-					if(RProcessableElement.State.CANDIDATESSELECTED.equals(getState()))
-					{
-						if(getMGoal().getRetryDelay()>-1)
-						{
-							if(getMGoal().isRebuild())
-							{
-								ia.getFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRetryDelay(), new FindApplicableCandidatesAction(this));
-							}
-							else
-							{
-								ia.getFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRetryDelay(), new SelectCandidatesAction(this));
-							}
-						}
-						else
-						{
-							if(getMGoal().isRebuild())
-							{
-								ia.getFeature(IExecutionFeature.class).scheduleStep(new FindApplicableCandidatesAction(this));
-							}
-							else
-							{
-								ia.getFeature(IExecutionFeature.class).scheduleStep(new SelectCandidatesAction(this));
-							}
-						}
-					}
-					else if(RProcessableElement.State.NOCANDIDATES.equals(getState()))
-					{
-						if(getException()==null)
-						{
-							setException(new GoalFailureException("No more candidates: "+this));
-						}
-						setProcessingState(ia, GoalProcessingState.FAILED);
-					}
-//					else
-//					{
-//						System.out.println("??? "+getState());
-//					}
+					ia.getFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRetryDelay(), step);
 				}
 				else
 				{
-					if(isRecur())
+					ia.getFeature(IExecutionFeature.class).scheduleStep(step);
+				}
+			}
+			
+			// No retry but not finished. 
+			else if(!isFinished())
+			{				
+				// Recur when possible
+				if(isRecur())
+				{
+					setProcessingState(ia, GoalProcessingState.PAUSED);
+					
+					// Auto-recur, when delay explicitly set or no recur condition defined.
+					if(getMGoal().getRecurDelay()>-1 || getMGoal().getConditions(MGoal.CONDITION_RECUR)==null)
 					{
-						setProcessingState(ia, GoalProcessingState.PAUSED);
+						IComponentStep<Void>	step	= new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								if(RGoal.GoalLifecycleState.ACTIVE.equals(getLifecycleState())
+									&& RGoal.GoalProcessingState.PAUSED.equals(getProcessingState()))
+								{
+									setProcessingState(ia, RGoal.GoalProcessingState.INPROCESS);
+								}
+								return IFuture.DONE;
+							}
+						};
+						
 						if(getMGoal().getRecurDelay()>-1)
 						{
-							ia.getFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRecurDelay(),
-								new IComponentStep<Void>()
-							{
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									if(RGoal.GoalLifecycleState.ACTIVE.equals(getLifecycleState())
-										&& RGoal.GoalProcessingState.PAUSED.equals(getProcessingState()))
-									{
-										setTriedPlans(null);
-										setApplicablePlanList(null);
-										setProcessingState(ia, RGoal.GoalProcessingState.INPROCESS);
-									}
-									return IFuture.DONE;
-								}
-							});
+							ia.getFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRecurDelay(), step);
 						}
-					}
-					else
-					{
-						if(getException()==null)
+						else
 						{
-							setException(new GoalFailureException("No more candidates: "+this));
+							ia.getFeature(IExecutionFeature.class).scheduleStep(step);
 						}
-						setProcessingState(ia, GoalProcessingState.FAILED);
 					}
+				}
+				
+				// Else no more plans -> fail.
+				else //if(!isRetry() || RProcessableElement.State.NOCANDIDATES.equals(getState()))
+				{
+					if(getException()==null)
+					{
+						setException(new GoalFailureException("No more candidates: "+this));
+					}
+					setProcessingState(ia, GoalProcessingState.FAILED);
 				}
 			}
 		}
@@ -1190,7 +1171,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/**
 	 *  Set the goal result from a plan.
 	 */
-	public void setGoalResult(Object result, ClassLoader cl, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
+	public void setGoalResult(Object result, ClassLoader cl, ChangeEvent<?> event, RPlan rplan, RProcessableElement rpe)
 	{
 //		System.out.println("set goal result: "+result);
 		
@@ -1252,7 +1233,9 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 					Object res = m.invoke(pojo, params);
 					if(res instanceof IFuture)
 					{
-						((IFuture<Object>)res).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+						@SuppressWarnings("unchecked")
+						IFuture<Object>	fut	= (IFuture<Object>)res;
+						fut.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 						{
 							public void customResultAvailable(Object result)
 							{

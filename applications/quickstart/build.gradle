@@ -2,6 +2,8 @@ description 'The Jadex quickstart package contains the ready to use "Cleanerworl
 
 dependencies
 {
-	api project(':util:gui')
-	api project(':platform:bridge')
+	implementation project(':util:gui')
+	implementation project(':platform:bridge')
+	implementation project(':kernels:micro')
+	implementation project(':kernels:bdiv3')
 }

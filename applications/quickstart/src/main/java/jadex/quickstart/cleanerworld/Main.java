@@ -1,4 +1,4 @@
-package quickstart.cleanerworld;
+package jadex.quickstart.cleanerworld;
 
 import java.util.logging.Level;
 

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jadex.bridge.service.annotation.Timeout;
+import jadex.commons.SUtil;
 import jadex.commons.future.ThreadLocalTransferHelper;
 
 
@@ -212,7 +213,8 @@ public class ServiceCall
 	 */
 	public long	getTimeout()
 	{
-		return properties.containsKey(TIMEOUT)? ((Long)properties.get(TIMEOUT)).longValue(): ((Long)properties.get(DEFTIMEOUT)).longValue();
+		return properties.containsKey(TIMEOUT)? ((Long)properties.get(TIMEOUT)).longValue():
+			properties.containsKey(DEFTIMEOUT)? ((Long)properties.get(DEFTIMEOUT)).longValue() : SUtil.DEFTIMEOUT;
 	}
 	
 	/**
