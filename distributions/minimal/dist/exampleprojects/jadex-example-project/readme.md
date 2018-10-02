@@ -31,7 +31,7 @@ Installation (for Eclipse)
   *Run As -> Java Application*.
   Select the `Main` class from either package `tutorial` for the [Active Components Tutorial](https://download.actoron.com/docs/nightlies/jadex-${jadex_build_version}/jadex-mkdocs/getting-started/getting-started/)
   or from the package `quickstart.cleanerworld` for the [BDI Quickstart Tutorial](https://download.actoron.com/docs/nightlies/jadex-${jadex_build_version}/jadex-mkdocs/getting-started/bdi-quickstart/01 Introduction/)
-  Click *Run* and the Jadex program should start.
+  Click *OK* and the Jadex program should start.
   
 4. Eclipse remembers the launch configuration. Therefore in the future,
   you can simply select the *Main* configuration from the run history

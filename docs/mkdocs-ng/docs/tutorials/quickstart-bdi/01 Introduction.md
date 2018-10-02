@@ -24,7 +24,7 @@ Choose *File/Import... -> Gradle/Existing Gradle Projects* and select the unzipp
 
 ## Starting the Cleanerworld
 
-To start the Cleanerworld application, open the imported project, right-click on the `src/main/java` folder and choose  *Run As -> Java Application*. Select the `Main` class from package `quickstart.cleanerworld`. Click *Run* and the application should start.
+To start the Cleanerworld application, open the imported project, right-click on the `src/main/java` folder and choose  *Run As -> Java Application*. Select the `Main` class from package `quickstart.cleanerworld`. Click *OK* and the application should start.
   
 ![01 Introduction@menu-runas.png](menu-runas.png)
 
