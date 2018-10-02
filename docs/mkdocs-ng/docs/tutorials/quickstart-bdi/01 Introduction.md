@@ -4,11 +4,11 @@ This tutorial introduces the notion of autonomous software agents by using a sim
 
 # Setting up the Cleanerworld Project in Eclipse
 
-The easiest way to start with the Cleanerworld scenario is to import the Jadex example project from the download server to an IDE of your choice. The following description explains the import process for the Eclipse IDE and the Gradle project support of Eclipse. You can download Eclipse from `[https://www.eclipse.org/downloads/packages/installer](https://www.eclipse.org/downloads/packages/installer)`.
+The easiest way to start with the Cleanerworld scenario is to import the Jadex example project from the download server to an IDE of your choice. The following description explains the import process for the Eclipse IDE and the Gradle project support of Eclipse. You can download Eclipse from [https://www.eclipse.org/downloads/packages/installer](https://www.eclipse.org/downloads/packages/installer).
 
 ## Fetching the Project Files
 
-Download the `[jadex-example-project.zip](https://download.actoron.com/nightlies/oss/${jadexversiontitle}/jadex-example-project.zip)` and extract the contents to an directory of your choice. 
+Download the [jadex-example-project.zip](https://download.actoron.com/nightlies/oss/${jadexversiontitle}/jadex-example-project.zip) and extract the contents to an directory of your choice. 
 
 ## Importing the Project
 
