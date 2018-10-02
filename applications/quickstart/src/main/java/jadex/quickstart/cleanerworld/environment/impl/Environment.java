@@ -366,7 +366,7 @@ public class Environment
 		{
 			if(wb.getId().equals(name))
 			{
-				ret = wb.clone();
+				ret = wb;//.clone();	// No clone as only used from gui and needs to change original object.
 				break;
 			}
 		}
