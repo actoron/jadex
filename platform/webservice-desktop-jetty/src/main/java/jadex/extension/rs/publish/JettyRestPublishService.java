@@ -34,6 +34,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
 
 /**
  *  Publish service without Jersey directly using Jetty container.
@@ -72,7 +73,26 @@ public class JettyRestPublishService extends AbstractRestPublishService
     @AgentCreated
     public void start()
     {
-    	System.out.println("Jetyy sta");
+    	System.out.println("Jetty started");
+    }
+    
+    @AgentKilled
+    public void stop()
+    {
+    	if (portservers != null)
+    	{
+    		for (Map.Entry<Integer, Server> entry : portservers.entrySet())
+    		{
+    			try
+				{
+					entry.getValue().stop();
+				}
+				catch (Exception e)
+				{
+				}
+    		}
+    	}
+    	System.out.println("Jetty stopped");
     }
     
     /**
