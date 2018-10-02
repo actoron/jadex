@@ -37,3 +37,8 @@ To start the Cleanerworld application, open the imported project, right-click on
 Eclipse remembers the launch configuration. Therefore in the future,
   you can simply select the *Main* configuration from the run history
   to start the program.
+
+![01 Introduction@launch-main.png](launch-main.png)
+
+*Figure 5: Quick access to the created launch config*
+  
