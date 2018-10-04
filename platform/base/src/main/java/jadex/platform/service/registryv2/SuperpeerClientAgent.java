@@ -373,7 +373,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					@Override
 					public void intermediateResultAvailable(final IComponentIdentifier platform)
 					{
-	//					System.out.println(agent + " searching remote platform: "+platform+", "+query);
+						System.out.println(agent + " searching remote platform: "+platform+", "+query);
 						
 						// Only (continue to) search remote when future not yet finished or cancelled.
 						if(!ret.isDone())
@@ -389,7 +389,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							{
 								public void resultAvailable(final Set<IServiceIdentifier> result)
 								{
-	//								System.out.println(agent + " searched remote platform: "+platform+", "+result);
+									System.out.println(agent + " searched remote platform: "+platform+", "+result);
 									if(result != null)
 									{
 										for(Iterator<IServiceIdentifier> it = result.iterator(); it.hasNext(); )
@@ -404,7 +404,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	
 								public void exceptionOccurred(Exception exception)
 								{
-	//								System.out.println(agent + " searched remote platform: "+platform+", "+exception);
+									System.out.println(agent + " searched remote platform: "+platform+", "+exception);
 									doFinished();
 								}
 							});
@@ -1051,7 +1051,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							});
 						}
 						
-						// else if superpeer found or future finished -> silently drop polling by not rescheduling
+						// else if super peer found or future finished -> silently drop polling by not rescheduling
 						// todo: terminate ongoing searches, but may be more overhead than just letting them run out. 
 						
 						return IFuture.DONE;
