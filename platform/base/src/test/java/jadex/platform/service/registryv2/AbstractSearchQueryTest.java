@@ -21,7 +21,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  Test basic search and query managing functionality with a client and some providers.
  *  Abstract base implementation to be overriden for testing different infrastructure scenarios.
  */
-public class AbstractSearchQueryTest	extends AbstractInfrastructureTest
+public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 {
 	//-------- attributes --------
 	
@@ -251,8 +251,7 @@ public class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			// 6) kill SP, search for service -> test if re-fallback to awa works
 			System.out.println("6) kill SP, search for service");
 			removePlatform(sp);
-//			waitALittle(client);
-			waitLonger(client);	// TODO: fail faster for SP/client connection
+			waitALittle(client);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 			Assert.assertEquals(""+result, 1, result.size());
 		}
