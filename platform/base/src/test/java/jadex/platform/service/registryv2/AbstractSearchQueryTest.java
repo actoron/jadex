@@ -63,6 +63,12 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	@Test
 	public void	testQueries()
 	{
+		// SSP is optional (TODO: support ssp started after client)
+		if(sspconf!=null)
+		{
+			createPlatform(sspconf);
+		}
+		
 		// 1) start client platform and add query -> not found (test if works with no superpeers and no other platforms)
 		System.out.println("1) start client platform and add query");
 		IExternalAccess	client	= createPlatform(clientconf);
@@ -101,15 +107,6 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		
 		if(spconf!=null)
 		{
-			// SSP is optional
-			if(sspconf!=null)
-			{
-				// 4a) start SSP, wait for connection from provider platforms and client platform
-				System.out.println("4a) start SSP, wait for connection from provider platforms and client platform");
-				IExternalAccess ssp	= createPlatform(sspconf);
-				waitForSuperpeerConnections(ssp, client, pro1, pro2);
-			}
-			
 			// 4) start SP, wait for connection from provider platforms and client platform 
 			System.out.println("4) start SP, wait for connection from provider platforms and client platform");
 			IExternalAccess	sp	= createPlatform(spconf);
@@ -186,6 +183,12 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	@Test
 	public void	testServices()
 	{
+		// SSP is optional (TODO: support ssp started after client)
+		if(sspconf!=null)
+		{
+			createPlatform(sspconf);
+		}
+		
 		//-------- Tests with awareness fallback only (no SP) --------
 		
 		// 1) start client platform and search for service -> not found (test if works with no super peers and no other platforms)
@@ -217,15 +220,6 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		
 		if(spconf!=null)
 		{
-			// SSP is optional
-			if(sspconf!=null)
-			{
-				// 5a) start SSP, wait for connection from provider platforms and client platform
-				System.out.println("5a) start SSP, wait for connection from provider platforms and client platform");
-				IExternalAccess ssp	= createPlatform(sspconf);
-				waitForSuperpeerConnections(ssp, client, pro1, pro2);
-			}
-	
 			// 5) start SP, wait for connection from provider platforms and client platform, search for service -> test if SP connection works
 			System.out.println("5) start SP, wait for connection from provider platforms and client platform, search for service");
 			IExternalAccess	sp	= createPlatform(spconf);
