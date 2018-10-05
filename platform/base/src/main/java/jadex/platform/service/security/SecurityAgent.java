@@ -1914,6 +1914,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			if (msg instanceof InitialHandshakeMessage)
 			{
+				if(debug)
+					System.out.println(agent+" initial handshake message: "+msg);
+				
 				final InitialHandshakeMessage imsg = (InitialHandshakeMessage) msg;
 				IComponentIdentifier rplat = imsg.getSender().getRoot();
 				

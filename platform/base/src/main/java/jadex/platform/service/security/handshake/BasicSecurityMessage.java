@@ -69,4 +69,10 @@ public class BasicSecurityMessage
 	{
 		this.conversationid = conversationid;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return getClass().getSimpleName()+"(sender="+getSender()+", convid="+getConversationId()+")";
+	}
 }
