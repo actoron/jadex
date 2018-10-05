@@ -213,7 +213,6 @@ public class PlatformAgent
 					
 					if(getAgentStart(name.toLowerCase())!=null)
 					{	
-						
 						ok = getAgentStart(name.toLowerCase());
 					}
 					else
@@ -231,9 +230,16 @@ public class PlatformAgent
 					}
 				}
 				
+				if(ci.getClassName().toLowerCase().indexOf("super")!=-1)
+				{
+					System.out.println("deac: "+ci.getClassName());
+					ok = false;
+				}
+				
 				if(ok)
 				{
 					String cname = ci.getClassName();
+					
 					dr.addNode(cname);
 					Object[] pres = (Object[])autostart.getValue("predecessors");
 					if(pres!=null)
@@ -261,7 +267,7 @@ public class PlatformAgent
 				}
 				else
 				{
-//					System.out.println("Not starting: "+name);
+					System.out.println("Not starting: "+name);
 				}
 //			}
 		}
