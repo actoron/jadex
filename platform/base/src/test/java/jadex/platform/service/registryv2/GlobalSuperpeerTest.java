@@ -56,11 +56,12 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		// Remote only -> no simulation please
 		baseconf.getExtendedPlatformConfiguration().setSimul(false);
 		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
+//		baseconf.setValue("security.debug", true);
 			
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client_*");
-		CLIENTCONF.setLogging(true);
-		CLIENTCONF.setValue("rt.debug", true);
+//		CLIENTCONF.setLogging(true);
+//		CLIENTCONF.setValue("rt.debug", true);
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(ProviderAgent.class);
@@ -70,8 +71,8 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		SPCONF	= baseconf.clone();
 		SPCONF.setValue("superpeer", true);
 		SPCONF.setPlatformName("SP_*");
-		SPCONF.setValue("rt.debug", true);
-		SPCONF.setLogging(true);
+//		SPCONF.setValue("rt.debug", true);
+//		SPCONF.setLogging(true);
 		
 		RELAYCONF	= baseconf.clone();
 		RELAYCONF.setValue("superpeer", true);
@@ -81,8 +82,8 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		RELAYCONF.setPlatformName("ssp");
 		RELAYCONF.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME);
 		RELAYCONF.setNetworkSecrets(serversecret.toString());
-		RELAYCONF.setLogging(true);
-		RELAYCONF.setValue("rt.debug", true);
+//		RELAYCONF.setLogging(true);
+//		RELAYCONF.setValue("rt.debug", true);
 //		RELAYCONF.setValue("status", true);
 //		RELAYCONF.setValue("jettyrspublish", true);
 	}
