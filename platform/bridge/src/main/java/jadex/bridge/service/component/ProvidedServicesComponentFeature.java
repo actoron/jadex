@@ -234,13 +234,13 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public IFuture<Void> shutdown()
 	{
-		Future<Void>	ret	= new Future<Void>();
+		Future<Void> ret = new Future<Void>();
 		
 		// Shutdown the services.
-		Collection<IInternalService>	allservices	= getAllServices();
+		Collection<IInternalService> allservices = getAllServices();
 		if(!allservices.isEmpty())
 		{
-			LinkedList<IInternalService>	list	= new LinkedList<IInternalService>(allservices);
+			LinkedList<IInternalService> list = new LinkedList<IInternalService>(allservices);
 			shutdownServices(list.descendingIterator()).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
@@ -711,12 +711,15 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			// Remove service from registry before shutdown.
 			removeService(is);
 			
-			component.getLogger().info("Stopping service: "+is.getServiceId());
+//			component.getLogger().info("Stopping service: "+is.getServiceId());
+			if(is instanceof IExternalAccess)
+				System.out.println("Stopping service: "+is.getServiceId());
 			is.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
-					component.getLogger().info("Stopped service: "+is.getServiceId());
+//					component.getLogger().info("Stopped service: "+is.getServiceId());
+					System.out.println("Stopped service: "+is.getServiceId());
 					serviceShutdowned(is).addResultListener(new DelegationResultListener<Void>(ret)
 					{
 						public void customResultAvailable(Void result)

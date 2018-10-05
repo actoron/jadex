@@ -936,7 +936,6 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			service = BasicServiceInvocationHandler.createRequiredServiceProxy(getInternalAccess(), 
 				(IService)service, null, info, info.getDefaultBinding(), Starter.isRealtimeTimeout(getComponent().getId()));
 			
-			
 			// Check if no property provider has been created before and then create and init properties
 			if(!getComponent().getFeature(INFPropertyComponentFeature.class).hasRequiredServicePropertyProvider(((IService)service).getServiceId()))
 			{

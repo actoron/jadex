@@ -470,8 +470,8 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 */
 	public IFuture<Void>	shutdownService()
 	{
-//		if(getClass().getName().indexOf("ContextSer")!=-1)
-//			System.out.println("shutdown service: "+getId());
+//		if(getClass().getName().toLowerCase().indexOf("super")!=-1)
+//			System.out.println("shutdown service: "+getServiceId());
 
 		// Deregister pojo->sid mapping in shutdown.
 		BasicServiceInvocationHandler.removePojoServiceProxy(sid);

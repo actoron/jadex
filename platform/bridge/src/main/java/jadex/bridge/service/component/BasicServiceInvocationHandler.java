@@ -196,7 +196,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		
 //		ServiceInvocationContext sicon = null;
 		
-		if((args==null || args.length==0) && "getId".equals(method.getName()))
+		// IT IS IMPORTANT TO HANDLE getSericeId() HERE. Otherwise random bug behavior might occur
+		if((args==null || args.length==0) && "getServiceId".equals(method.getName()))
 		{
 			ret	= getServiceIdentifier();
 		}
@@ -887,9 +888,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		synchronized(BasicServiceInvocationHandler.class)
 		{
 			if(pojoproxies==null)
-			{
 				pojoproxies = new IdentityHashMap<Object, IService>();
-			}
 			pojoproxies.put(pojo, proxy);
 		}
 	}
@@ -900,20 +899,32 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public static void removePojoServiceProxy(IServiceIdentifier sid)
 	{
-//		System.out.println("remove pojoproxy: "+sid);
+		if(sid.toString().toLowerCase().indexOf("ext")!=-1)
+			System.out.println("remove pojoproxy start: "+sid+" "+pojoproxies.size());
 
 		synchronized(BasicServiceInvocationHandler.class)
 		{
+			if(sid.toString().toLowerCase().indexOf("ext")!=-1)
+				System.out.println("remove pojoproxy lock: "+sid+" "+pojoproxies.size());
+			
 			for(Iterator<IService> it=pojoproxies.values().iterator(); it.hasNext(); )
 			{
 				IService proxy = it.next();
+				
+				if(sid.toString().toLowerCase().indexOf("ext")!=-1)
+					System.out.println("remove pojoproxy loop: "+sid+" "+proxy.getServiceId());
+				
 				if(sid.equals(proxy.getServiceId()))
 				{
 					it.remove();
+					break;
 //					System.out.println("rem: "+pojosids.size());	
 				}
 			}
 		}
+		
+		if(sid.toString().toLowerCase().indexOf("ext")!=-1)
+			System.out.println("remove pojoproxy end: "+sid+" "+pojoproxies.size());
 	}
 	
 	/**

@@ -127,7 +127,7 @@ public class PlatformAgent
 	protected IInternalAccess agent;
 	
 	// enable startup monkey for randomized sequential component startup (dependency testing).
-	boolean STARTUP_MONKEY	= true;
+	boolean STARTUP_MONKEY	= false;
 	
 	// where should the defaults be defined (here or in the config)
 //	@Arguments
@@ -230,11 +230,11 @@ public class PlatformAgent
 					}
 				}
 				
-				if(ci.getClassName().toLowerCase().indexOf("super")!=-1)
-				{
-					System.out.println("deac: "+ci.getClassName());
-					ok = false;
-				}
+//				if(ci.getClassName().toLowerCase().indexOf("super")!=-1)
+//				{
+//					System.out.println("deac: "+ci.getClassName());
+//					ok = false;
+//				}
 				
 				if(ok)
 				{
@@ -265,10 +265,10 @@ public class PlatformAgent
 					
 					names.put(cname, name);
 				}
-				else
-				{
-					System.out.println("Not starting: "+name);
-				}
+//				else
+//				{
+//					System.out.println("Not starting: "+name);
+//				}
 //			}
 		}
 		catch(Exception e)
