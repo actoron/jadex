@@ -53,4 +53,18 @@ public interface ICryptoSuite
 	 *  @throws SecurityException if handshake failed.
 	 */
 	public boolean handleHandshake(SecurityAgent agent, BasicSecurityMessage incomingmessage);
+	
+	/**
+	 *  Gets the ID used to identify the handshake of the suite.
+	 *  
+	 *  @return Handshake ID.
+	 */
+	public String getHandshakeId();
+	
+	/**
+	 *  Sets the ID used to identify the handshake of the suite.
+	 *  
+	 *  @param id Handshake ID.
+	 */
+	public void setHandshakeId(String id);
 }
