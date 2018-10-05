@@ -406,7 +406,17 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							{
 								public void resultAvailable(final Set<IServiceIdentifier> result)
 								{
-//									System.out.println(agent + " searched remote platform: "+platform+", "+result);
+//									try
+//									{
+//										System.out.println(agent + " searched remote platform: "+platform+", "+result);
+//									}
+//									catch(RuntimeException e)
+//									{
+//										System.err.println(agent + " searched remote platform: "+platform);
+//										e.printStackTrace();
+//										throw e;
+//									}
+									
 									if(result != null)
 									{
 										for(Iterator<IServiceIdentifier> it = result.iterator(); it.hasNext(); )

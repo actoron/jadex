@@ -49,6 +49,9 @@ public class LocalSuperpeerTest	extends AbstractSearchQueryTest
 
 	//-------- constructors --------
 	
+	/**
+	 *  Create the test.
+	 */
 	public LocalSuperpeerTest()
 	{
 		super(true, CLIENTCONF, PROCONF, SPCONF, null);

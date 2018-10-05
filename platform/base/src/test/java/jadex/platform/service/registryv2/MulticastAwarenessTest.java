@@ -43,6 +43,9 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 	
 	//-------- constructors --------
 	
+	/**
+	 *  Create the test.
+	 */
 	public MulticastAwarenessTest()
 	{
 		super(true, CLIENTCONF, PROCONF, null, null);
