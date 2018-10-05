@@ -1927,10 +1927,18 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				// Check if handshake is already happening. 
 				if (state != null)
 				{
-					if (getComponentIdentifier().getRoot().toString().compareTo(rplat.toString()) < 0)
-						fut.addResultListener(new DelegationResultListener<ICryptoSuite>(state.getResultFuture()));
+					// Check if duplicate
+					if (!state.getConversationId().equals(imsg.getConversationId()))
+					{
+						if (getComponentIdentifier().getRoot().toString().compareTo(rplat.toString()) < 0)
+							fut.addResultListener(new DelegationResultListener<ICryptoSuite>(state.getResultFuture()));
+						else
+							return;
+					}
 					else
+					{
 						return;
+					}
 				}
 				
 				if (imsg.getCryptoSuites() == null || imsg.getCryptoSuites().length < 1)
