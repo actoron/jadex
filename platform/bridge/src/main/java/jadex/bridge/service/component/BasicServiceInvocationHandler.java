@@ -836,8 +836,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ia.getExternalAccess(), info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
 				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
-//			else
-//				System.out.println("hurz: "+service);
 			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, service.getServiceId()));
 //			handler.addFirstServiceInterceptor(new NFRequiredServicePropertyProviderInterceptor(ia, service.getId()));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
@@ -899,20 +897,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public static void removePojoServiceProxy(IServiceIdentifier sid)
 	{
-		if(sid.toString().toLowerCase().indexOf("ext")!=-1)
-			System.out.println("remove pojoproxy start: "+sid+" "+pojoproxies.size());
-
 		synchronized(BasicServiceInvocationHandler.class)
 		{
-			if(sid.toString().toLowerCase().indexOf("ext")!=-1)
-				System.out.println("remove pojoproxy lock: "+sid+" "+pojoproxies.size());
-			
 			for(Iterator<IService> it=pojoproxies.values().iterator(); it.hasNext(); )
 			{
 				IService proxy = it.next();
-				
-				if(sid.toString().toLowerCase().indexOf("ext")!=-1)
-					System.out.println("remove pojoproxy loop: "+sid+" "+proxy.getServiceId());
 				
 				if(sid.equals(proxy.getServiceId()))
 				{
@@ -922,9 +911,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				}
 			}
 		}
-		
-		if(sid.toString().toLowerCase().indexOf("ext")!=-1)
-			System.out.println("remove pojoproxy end: "+sid+" "+pojoproxies.size());
 	}
 	
 	/**

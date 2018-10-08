@@ -2497,8 +2497,8 @@ public class SComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + oname + " : Modelname must not be null."));
 
-		if(modelname.indexOf("Super")!=-1)
-			System.out.println("create: "+oname+" "+modelname+" on "+agent.getId());
+//		if(modelname.indexOf("Super")!=-1)
+//			System.out.println("create: "+oname+" "+modelname+" on "+agent.getId());
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();

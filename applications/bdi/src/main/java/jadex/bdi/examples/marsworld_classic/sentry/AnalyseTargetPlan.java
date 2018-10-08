@@ -83,15 +83,7 @@ public class AnalyseTargetPlan extends Plan
 			//action.setAction(rp);
 			//action.setActor(SJade.convertAIDtoJade(producers[sel].getName()));
 			IMessageEvent mevent = createMessageEvent("request_producer");
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-			mevent.getParameterSet(SFipa.RECEIVERS).addValue(producers[sel].getName());
-=======
 			mevent.getParameterSet(SFipa.RECEIVERS).addValue(((IService)ps.get(sel)).getServiceId().getProviderId());
->>>>>>> Stashed changes
-=======
-			mevent.getParameterSet(SFipa.RECEIVERS).addValue(((IService)ps.get(sel)).getId().getProviderId());
->>>>>>> master
 			mevent.getParameter(SFipa.CONTENT).setValue(rp);
 			sendMessage(mevent);
 //			System.out.println("Sentry Agent: sent location to: "+producers[sel].getName());

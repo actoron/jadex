@@ -88,7 +88,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 			return pr;
 		
 		// Hack until cleanup of remote references
-		if((args==null || args.length==0) && "getId".equals(method.getName()))
+		if((args==null || args.length==0) && "getServiceId".equals(method.getName()))
 		{
 			return pr.getRemoteReference().getTargetIdentifier();
 		}

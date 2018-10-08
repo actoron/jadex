@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -39,7 +40,6 @@ import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.cms.PlatformComponent;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.publish.IPublishService;
@@ -135,10 +135,19 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 				sermap.put(key, newpsi);
 			}
 			
-			// Add external access service
-			ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, 
-				new ProvidedServiceImplementation(), RequiredServiceInfo.SCOPE_PLATFORM, null, null);
-			sermap.put("externalaccessservice", psi);
+			// Add external access service when not turned off
+			
+			Map<String, Object> args = getComponent().getInternalAccess().getArguments();
+			Boolean extaarg = (Boolean)args.get("externalaccess");
+			Boolean extaplatarg = (Boolean)((Map<String, Object>)Starter.getPlatformValue(getComponent().getId(), IPlatformConfiguration.PLATFORMARGS)).get("externalaccess");
+			boolean on = extaarg!=null? extaarg.booleanValue(): extaplatarg!=null? extaplatarg.booleanValue(): true;
+//			System.out.println("on: "+on+" "+extaarg+" "+extaplatarg);
+			if(on)
+			{
+				ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, 
+					new ProvidedServiceImplementation(), RequiredServiceInfo.SCOPE_PLATFORM, null, null);
+				sermap.put("externalaccessservice", psi);
+			}
 			
 			// Instantiate service objects
 			for(ProvidedServiceInfo info: sermap.values())
@@ -712,14 +721,14 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			removeService(is);
 			
 //			component.getLogger().info("Stopping service: "+is.getServiceId());
-			if(is instanceof IExternalAccess)
-				System.out.println("Stopping service: "+is.getServiceId());
+//			if(is instanceof IExternalAccess)
+//				System.out.println("Stopping service: "+is.getServiceId());
 			is.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
 //					component.getLogger().info("Stopped service: "+is.getServiceId());
-					System.out.println("Stopped service: "+is.getServiceId());
+//					System.out.println("Stopped service: "+is.getServiceId());
 					serviceShutdowned(is).addResultListener(new DelegationResultListener<Void>(ret)
 					{
 						public void customResultAvailable(Void result)

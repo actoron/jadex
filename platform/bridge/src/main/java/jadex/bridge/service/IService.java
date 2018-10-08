@@ -20,7 +20,7 @@ public interface IService //extends INFMixedPropertyProvider //extends IRemotabl
 
 	//-------- methods --------
 
-	// IMPORTANT: If name is changed, adapt also in BasicServiceInvocationHandler!
+	// IMPORTANT: If name is changed, adapt also in BasicServiceInvocationHandler and in RemoteMethodInvocationHandler!
 	/**
 	 *  Get the service identifier.
 	 *  @return The service identifier.

@@ -220,7 +220,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		shutdown	= true;
 //		state = ComponentLifecycleState.END;
 		
-		System.out.println("shutdown component features start: "+getId());
+//		System.out.println("shutdown component features start: "+getId());
 		IExecutionFeature exe	= getFeature(IExecutionFeature.class);
 		return exe.scheduleStep(new ImmediateComponentStep<Void>()
 		{
@@ -245,8 +245,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					
 					public void proceed(final Exception ex)
 					{
-						if(getId().getName().toLowerCase().indexOf("super")!=-1)
-							System.out.println("shutdown component features end: "+getId()+", "+ex);
+//						if(getId().getName().toLowerCase().indexOf("super")!=-1)
+//							System.out.println("shutdown component features end: "+getId()+", "+ex);
 						if(getFeature0(IMonitoringComponentFeature.class)!=null 
 							&& getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 						{
@@ -517,8 +517,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				getLogger().warning("Exception during component cleanup of "+getId()+": "+fut.getException());
 				getLogger().info(sw.toString());
 			}
-			if(getId().getName().toLowerCase().indexOf("super")!=-1)
-				System.out.println("feature shutdown start: "+getId()+" "+features);
+//			if(getId().getName().toLowerCase().indexOf("super")!=-1)
+//				System.out.println("feature shutdown start: "+getId()+" "+features);
 			
 			fut	= features.get(features.size()-1).shutdown();
 			sync = fut.isDone();

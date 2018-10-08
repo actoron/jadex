@@ -72,20 +72,21 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
         IExternalAccess platform = STest.createPlatform(getConfig());
         setPlatform(platform);
         super.runBare();
-        platform.killComponent().addResultListener(new IResultListener<Map<String,Object>>()
-		{
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("exor: "+exception);
-			}
-			
-			@Override
-			public void resultAvailable(Map<String, Object> result)
-			{
-				System.out.println("resa");
-			}
-		});
+        platform.killComponent();
+//        .addResultListener(new IResultListener<Map<String,Object>>()
+//		{
+//			@Override
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("exor: "+exception);
+//			}
+//			
+//			@Override
+//			public void resultAvailable(Map<String, Object> result)
+//			{
+//				System.out.println("resa");
+//			}
+//		});
     }
 
     @Test
