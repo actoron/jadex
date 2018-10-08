@@ -297,7 +297,7 @@ public class SimulationSettings extends AServiceSettings {
 			}
 		};
 
-		final String id = "ClockPanel" + SimulationSettings.this.hashCode() + "@" + simService.getClockService().getId();
+		final String id = "ClockPanel" + SimulationSettings.this.hashCode() + "@" + simService.getClockService().getServiceId();
 
 		getComponentForService().addResultListener(new DefaultResultListener<IExternalAccess>() {
 
@@ -327,7 +327,7 @@ public class SimulationSettings extends AServiceSettings {
 	public IFuture<IExternalAccess> getComponentForService() {
 
 		return JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId)
-			.getExternalAccess((IComponentIdentifier) ((IService)simService).getId().getProviderId());
+			.getExternalAccess((IComponentIdentifier) ((IService)simService).getServiceId().getProviderId());
 	}
 
 	/**
