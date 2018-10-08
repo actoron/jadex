@@ -60,7 +60,7 @@ public class SuperpeerRegistrySynchronizationAgent
 			
 			if(pser!=null)
 			{
-				component.killComponent(((IService)pser).getId().getProviderId());
+				component.killComponent(((IService)pser).getServiceId().getProviderId());
 			}
 		}
 		catch(ServiceNotFoundException e)

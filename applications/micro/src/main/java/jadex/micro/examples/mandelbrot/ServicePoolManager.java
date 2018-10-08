@@ -209,7 +209,7 @@ public class ServicePoolManager
 				{
 //					System.out.println("wurksn3");
 					IService	service	= (IService)result;
-					if(!busy.containsKey(service.getId()) && !free.containsKey(service.getId()) && handler.selectService(service))
+					if(!busy.containsKey(service.getServiceId()) && !free.containsKey(service.getServiceId()) && handler.selectService(service))
 					{
 						addService(service);
 					}
@@ -278,16 +278,16 @@ public class ServicePoolManager
 	 */
 	protected void addService(final IService service)
 	{
-		assert !busy.containsKey(service.getId()) && !free.containsKey(service.getId()); 
+		assert !busy.containsKey(service.getServiceId()) && !free.containsKey(service.getServiceId()); 
 		
 		if(tasks.isEmpty())
 		{
 //			System.out.println("service free: "+service.getId());
-			free.put(service.getId(), service);
+			free.put(service.getServiceId(), service);
 		}
 		else
 		{
-			busy.put(service.getId(), service);
+			busy.put(service.getServiceId(), service);
 			final Object task	=	this.tasks.keySet().iterator().next();
 			final AllocationData	ad	= (AllocationData)this.tasks.remove(task);
 //			System.out.println("started service: "+service.getId()+", "+task);
@@ -303,7 +303,7 @@ public class ServicePoolManager
 					ad.taskFinished(result);
 					
 					// Invoke service again, if there are more tasks.
-					busy.remove(service.getId());
+					busy.remove(service.getServiceId());
 					addService(service);
 				}
 				
@@ -324,7 +324,7 @@ public class ServicePoolManager
 					}
 					
 					// Remove service on failure and do not continue working on tasks with it.
-					busy.remove(service.getId());
+					busy.remove(service.getServiceId());
 				}
 			}));
 		}
@@ -348,7 +348,7 @@ public class ServicePoolManager
 					
 					// Add if not already found by concurrent search.
 					IService	service	= (IService)result;
-					if(!busy.containsKey(service.getId()) && !free.containsKey(service.getId()))
+					if(!busy.containsKey(service.getServiceId()) && !free.containsKey(service.getServiceId()))
 						addService((IService)result);
 					
 					// Create more services, if needed.

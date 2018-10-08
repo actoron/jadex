@@ -108,12 +108,12 @@ public class NFPropertyProperties extends PropertiesPanel
 								if(mi!=null)
 								{
 //									((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getMethodNFPropertyValue(mi, propmi.getName(), u).addResultListener(lis);
-									ea.getMethodNFPropertyValue(ser.getId(), mi, propmi.getName()).addResultListener(lis);
+									ea.getMethodNFPropertyValue(ser.getServiceId(), mi, propmi.getName()).addResultListener(lis);
 								}
 								else
 								{
 //									((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyValue(propmi.getName(), u).addResultListener(lis);
-									ea.getNFPropertyValue(ser.getId(), propmi.getName()).addResultListener(lis);
+									ea.getNFPropertyValue(ser.getServiceId(), propmi.getName()).addResultListener(lis);
 								}
 							}
 							

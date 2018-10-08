@@ -193,7 +193,7 @@ public class ServicePoolAgent implements IServicePoolService
 			ser = (IService)agent.getFeature(IProvidedServicesFeature.class).getProvidedService(servicetype);
 			if(ser!=null)
 			{
-				agent.getFeature(IProvidedServicesFeature.class).removeService(ser.getId());
+				agent.getFeature(IProvidedServicesFeature.class).removeService(ser.getServiceId());
 				ret.setResult(null);
 			}
 		}

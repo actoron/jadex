@@ -138,6 +138,15 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 					stopped	= IFuture.DONE;
 				}
 				
+				if(advanceblockers!=null)
+				{
+					for(IFuture<?> fut: advanceblockers)
+					{
+						((Future<?>)fut).setExceptionIfUndone(new RuntimeException("Simulation service shutdowned"));
+					}
+					advanceblockers.clear();
+				}
+				
 				stopped.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 			}
 		}));

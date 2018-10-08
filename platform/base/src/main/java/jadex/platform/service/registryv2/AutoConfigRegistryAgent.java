@@ -130,7 +130,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 				for (Iterator<ISuperpeerService> it = SUtil.notNull(sps).iterator(); it.hasNext(); )
 				{
 					ISuperpeerService sp = it.next();
-					Set<String> networks = ((IService) sp).getId().getNetworkNames();
+					Set<String> networks = ((IService) sp).getServiceId().getNetworkNames();
 					if (networks == null || (networks.size() == 1 && networks.contains(SuperpeerClientAgent.GLOBAL_NETWORK_NAME)))
 						it.remove();
 				}
@@ -154,7 +154,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 							System.out.println("new superpeer: "+winner);
 							
 							makeSuperpeer(winner.getFirstEntity()==null? agent.getId(): 
-								((IService)winner.getFirstEntity()).getId().getProviderId())
+								((IService)winner.getFirstEntity()).getServiceId().getProviderId())
 								.addResultListener(new IResultListener<Void>()
 							{
 								public void resultAvailable(Void result)
@@ -194,7 +194,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 					FutureBarrier<Double> fb = new FutureBarrier<Double>();
 					for(ISuperpeerService sp: sps)
 					{
-						Future<Double> fut = computePower(((IService)sp).getId());
+						Future<Double> fut = computePower(((IService)sp).getServiceId());
 						fb.addFuture(fut);
 					}
 					
@@ -243,7 +243,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 								Tuple2<ISuperpeerService, Double> loser = ((TreeSet<Tuple2<ISuperpeerService, Double>>)superpeers).last();
 								System.out.println("new downgraded peer (from sp): "+loser);
 								makeClient(loser.getFirstEntity()==null? agent.getId(): 
-									((IService)loser.getFirstEntity()).getId().getProviderId())
+									((IService)loser.getFirstEntity()).getServiceId().getProviderId())
 									.addResultListener(new IResultListener<Void>()
 								{
 									public void resultAvailable(Void result)
@@ -334,7 +334,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 				FutureBarrier<Double> bar = new FutureBarrier<Double>();
 				for(IAutoConfigRegistryService peer: result)
 				{
-					IServiceIdentifier sid = ((IService)peer).getId();
+					IServiceIdentifier sid = ((IService)peer).getServiceId();
 					// .getProviderId().getRoot()
 					Future<Double> fut = computePower(sid);
 					bar.addFuture(fut);
@@ -402,7 +402,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	 */
 	protected IServiceIdentifier getSid()
 	{
-		return ((IService)agent.getFeature(IProvidedServicesFeature.class).getProvidedService(IAutoConfigRegistryService.class)).getId();
+		return ((IService)agent.getFeature(IProvidedServicesFeature.class).getProvidedService(IAutoConfigRegistryService.class)).getServiceId();
 	}
 	
 	/**
@@ -636,7 +636,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		ISuperpeerService sps = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class).setMultiplicity(0));
 		if (sps != null)
 		{
-			agent.killComponent(((IService)sps).getId().getProviderId()).addResultListener(new IResultListener<Map<String,Object>>()
+			agent.killComponent(((IService)sps).getServiceId().getProviderId()).addResultListener(new IResultListener<Map<String,Object>>()
 			{
 				public void resultAvailable(Map<String, Object> result)
 				{
@@ -757,7 +757,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 				{
 					final Map<IComponentIdentifier, ISuperpeerService> spsmap = new HashMap<>();
 					for (ISuperpeerService sp : sps)
-						spsmap.put(((IService) sp).getId().getProviderId().getRoot(), sp);
+						spsmap.put(((IService) sp).getServiceId().getProviderId().getRoot(), sp);
 					
 					ITerminableIntermediateFuture<IAutoConfigRegistryService> search = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 					search.addResultListener(new IResultListener<Collection<IAutoConfigRegistryService>>()
@@ -767,7 +767,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 							// remove all sps that are not configurable
 //							sps.retainAll(acs);
 							for (IAutoConfigRegistryService ac : SUtil.notNull(acs))
-								spsmap.remove(((IService) ac).getId().getProviderId().getRoot());
+								spsmap.remove(((IService) ac).getServiceId().getProviderId().getRoot());
 							ret.setResult(spsmap.values());
 						}
 						
@@ -809,7 +809,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 				{
 					final Map<IComponentIdentifier, IAutoConfigRegistryService> acsmap = new HashMap<>();
 					for (IAutoConfigRegistryService ac : acs)
-						acsmap.put(((IService) ac).getId().getProviderId().getRoot(), ac);
+						acsmap.put(((IService) ac).getServiceId().getProviderId().getRoot(), ac);
 					
 					ITerminableIntermediateFuture<ISuperpeerService> search	= agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ISuperpeerService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 
@@ -820,7 +820,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 							// remove all that are superpeers
 							//acs.removeAll(sps);
 							for (ISuperpeerService sp : SUtil.notNull(sps))
-								acsmap.remove(((IService) sp).getId().getProviderId().getRoot());
+								acsmap.remove(((IService) sp).getServiceId().getProviderId().getRoot());
 							ret.setResult(acsmap.values());
 						}
 						

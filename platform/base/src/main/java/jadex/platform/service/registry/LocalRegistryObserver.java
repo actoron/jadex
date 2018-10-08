@@ -73,7 +73,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 //				{
 //				System.out.println("Local registry changed: "+event);
 				
-				String pubscope = event.getService().getId().getScope();
+				String pubscope = event.getService().getServiceId().getScope();
 				if(!globalscope || !RequiredServiceInfo.isScopeOnLocalPlatform(pubscope))
 				{
 					if(event.getType() == ServiceEvent.SERVICE_ADDED 
@@ -148,7 +148,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 				IService ser = it.next();
 //				clients.add(ser.getId().getProviderId().getRoot());
 				// Remove locally (platform) scoped events
-				if(globalscope && RequiredServiceInfo.isScopeOnLocalPlatform(ser.getId().getScope()))
+				if(globalscope && RequiredServiceInfo.isScopeOnLocalPlatform(ser.getServiceId().getScope()))
 					it.remove();
 			}
 		}

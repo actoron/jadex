@@ -140,7 +140,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 									{
 										// Invoke again and rebind service
 										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
-										invoke(ser.getId(), sic, maxretries, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
+										invoke(ser.getServiceId(), sic, maxretries, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
 									}
 									else
 									{
@@ -188,7 +188,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 									{
 										// Invoke again and rebind service
 										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
-										invoke(ser.getId(), sic, maxretries, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
+										invoke(ser.getServiceId(), sic, maxretries, cnt+1).addResultListener(new DelegationResultListener<Void>(ret));
 									}
 									else
 									{
@@ -347,7 +347,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 									{
 										// Invoke again and rebind service
 										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
-										invoke(ser.getId(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
+										invoke(ser.getServiceId(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
 									}
 									else
 									{
@@ -383,7 +383,7 @@ public class IntelligentProxyInterceptor extends AbstractApplicableInterceptor
 									{
 										// Invoke again and rebind service
 										System.out.println("Exception during service invocation, retrying: "+cnt+"/"+maxretries);
-										invoke(ser.getId(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
+										invoke(ser.getServiceId(), sic, sid, ea, tr, maxretries, cnt+1).addResultListener(new DelegationResultListener<Object>(ret));
 									}
 									else
 									{

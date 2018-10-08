@@ -713,7 +713,7 @@ public class RemoteReferenceModule
 			}
 			else if(target instanceof IService)
 			{
-				ret = new RemoteReference(((IService)target).getId().getProviderId(), ((IService)target).getId());
+				ret = new RemoteReference(((IService)target).getServiceId().getProviderId(), ((IService)target).getServiceId());
 //				System.out.println("service ref: "+ret);
 			}
 			else if(target instanceof ServiceInfo)
@@ -725,7 +725,7 @@ public class RemoteReferenceModule
 				}
 				else
 				{
-					ret = new RemoteReference(((ServiceInfo)target).getManagementService().getId().getProviderId(), ((ServiceInfo)target).getManagementService().getId());
+					ret = new RemoteReference(((ServiceInfo)target).getManagementService().getServiceId().getProviderId(), ((ServiceInfo)target).getManagementService().getServiceId());
 	//				System.out.println("service ref: "+ret);
 				}
 			}
@@ -1725,11 +1725,11 @@ public class RemoteReferenceModule
 			{
 				// Hack!!! Should not need class loader at all?
 				// getType0 required, cf. ServiceCallTest (why wrong class loader?)
-				Class<?> serviceinterface = ((IService)object).getId().getServiceType().getType0();
+				Class<?> serviceinterface = ((IService)object).getServiceId().getServiceType().getType0();
 				if(serviceinterface==null)
 				{
 					// getType(cl) required, cf. RemoteReferenceTest (remote proxy with only typename) -> use ClassInfo in ProxyInfo instead of Class<?>
-					serviceinterface = ((IService)object).getId().getServiceType().getType(cl);
+					serviceinterface = ((IService)object).getServiceId().getServiceType().getType(cl);
 				}
 				assert serviceinterface!=null;
 				if(!ret.contains(serviceinterface))

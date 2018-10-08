@@ -199,7 +199,7 @@ public class UserAgent
 		{
 			ICryptoService ser = tup.getFirstEntity();
 			Double val = tup.getSecondEntity();
-			addValue(((IService)ser).getId().toString(), System.currentTimeMillis(), val);
+			addValue(((IService)ser).getServiceId().toString(), System.currentTimeMillis(), val);
 		}
 	}
 	

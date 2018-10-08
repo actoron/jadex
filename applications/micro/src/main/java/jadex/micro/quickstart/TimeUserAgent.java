@@ -27,7 +27,7 @@ public class TimeUserAgent
 		while(subscription.hasNextIntermediateResult())
 		{
 			String time = subscription.getNextIntermediateResult();
-			String platform	= ((IService)timeservice).getId().getProviderId().getPlatformName();
+			String platform	= ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
 			System.out.println("New time received from "+platform+/*" at "+timeservice.getLocation()+*/": "+time);
 		}
 	}

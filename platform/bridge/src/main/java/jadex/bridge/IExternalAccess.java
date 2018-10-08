@@ -7,6 +7,7 @@ import jadex.bridge.component.IExternalNFPropertyComponentFeature;
 import jadex.bridge.component.IExternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IExternalProvidedServicesFeature;
 import jadex.bridge.service.component.IExternalRequiredServicesFeature;
 import jadex.commons.future.IFuture;
@@ -17,6 +18,7 @@ import jadex.commons.future.IFuture;
  *  Methods may be called from any thread, but the result listener will not be scheduled back to the calling thread!
  */
 @Reference
+@Service
 public interface IExternalAccess extends IExternalExecutionFeature, IExternalArgumentsResultsFeature, IExternalProvidedServicesFeature, IExternalRequiredServicesFeature, IExternalSubcomponentsFeature, IExternalMonitoringComponentFeature, IExternalNFPropertyComponentFeature //extends INFPropertyProvider//extends IRemotable
 {
 	//-------- cache --------

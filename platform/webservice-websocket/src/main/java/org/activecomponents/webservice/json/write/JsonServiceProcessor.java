@@ -47,7 +47,7 @@ public class JsonServiceProcessor implements ITraverseProcessor
 	
 		IService service = (IService)object;
 		Set<String> ms = new HashSet<String>();
-		Class<?> clazz = service.getId().getServiceType().getType(targetcl);
+		Class<?> clazz = service.getServiceId().getServiceType().getType(targetcl);
 		while(clazz!=null)
 		{
 			Method[] methods = clazz.getDeclaredMethods();
@@ -66,7 +66,7 @@ public class JsonServiceProcessor implements ITraverseProcessor
 //		wr.writeNameString("serviceIdentifier", service.getId().toString()).write(", ");
 		
 		wr.write("\"serviceIdentifier\":");
-		traverser.traverse(service.getId(), IServiceIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
+		traverser.traverse(service.getServiceId(), IServiceIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
 		
 		wr.write(",");
 		wr.write("\"methodNames\":");

@@ -141,7 +141,7 @@ public class MessagePerformanceAgent
 						public void intermediateResultAvailable(IEchoService result)
 						{
 							reset();
-							selcb.addItem(((IService)result).getId().getProviderId());
+							selcb.addItem(((IService)result).getServiceId().getProviderId());
 						}
 						public void finished()
 						{
@@ -152,7 +152,7 @@ public class MessagePerformanceAgent
 							reset();
 							for(Iterator<IEchoService> it=result.iterator(); it.hasNext(); )
 							{
-								selcb.addItem(((IService)it.next()).getId().getProviderId());
+								selcb.addItem(((IService)it.next()).getServiceId().getProviderId());
 							}
 						}
 						public void exceptionOccurred(Exception exception)
@@ -347,7 +347,7 @@ public class MessagePerformanceAgent
 			{
 				public void resultAvailable(IEchoService result)
 				{
-					ret.setResult(((IService)result).getId().getProviderId());
+					ret.setResult(((IService)result).getServiceId().getProviderId());
 				}
 				
 				public void exceptionOccurred(Exception exception)

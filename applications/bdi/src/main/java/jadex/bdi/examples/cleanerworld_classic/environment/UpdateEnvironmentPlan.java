@@ -88,7 +88,7 @@ public class UpdateEnvironmentPlan extends Plan
 			try
 			{
 				IEnvironmentService es = getAgent().getLocalService(IEnvironmentService.class);
-				res = ((IService)es).getId().getProviderId();
+				res = ((IService)es).getServiceId().getProviderId();
 				getBeliefbase().getBelief("environmentagent").setFact(res);
 			}
 			catch(Exception e)

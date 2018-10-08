@@ -83,7 +83,7 @@ public class ChoosePlatformTask implements ITask
 						for(int i=0; i<cids.length; i++)
 						{
 							IService	next	= (IService)it.next();
-							cids[i]	= (IComponentIdentifier)next.getId().getProviderId();
+							cids[i]	= (IComponentIdentifier)next.getServiceId().getProviderId();
 							buts[i]	= new JRadioButton(cids[i].getName());
 							bg.add(buts[i]);
 							pmsg.add(buts[i], gbc);

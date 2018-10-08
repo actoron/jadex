@@ -291,7 +291,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 				{
 					public void customResultAvailable(IAService service)
 					{
-						System.out.println("found service: "+((IService)service).getId());
+						System.out.println("found service: "+((IService)service).getServiceId());
 						
 //								IFuture<IFuture<String>> futa = service.methodA();
 //								futa.addResultListener(new DefaultResultListener<IFuture<String>>()

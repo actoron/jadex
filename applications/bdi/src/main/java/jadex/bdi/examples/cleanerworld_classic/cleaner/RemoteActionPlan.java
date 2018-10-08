@@ -59,8 +59,9 @@ public abstract class RemoteActionPlan extends Plan
 		{
 			try
 			{
+				// Found.
 				IEnvironmentService es = getAgent().getLocalService(IEnvironmentService.class);
-				res = ((IService)es).getId().getProviderId();
+				res = ((IService)es).getServiceId().getProviderId();
 				getBeliefbase().getBelief("environmentagent").setFact(res);
 			}
 			catch(Exception e)

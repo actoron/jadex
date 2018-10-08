@@ -10,7 +10,8 @@ import jadex.commons.SUtil;
 /**
  * 
  */
-public class STest {
+public class STest 
+{
 
     public static IExternalAccess createPlatform() 
     {
@@ -50,7 +51,7 @@ public class STest {
 		
 		// Enable new awareness
 		config.setSuperpeerClient(true);
-		config.setValue("superpeerclient.awaonly", true);
+//		config.setValue("superpeerclient.awaonly", true);
 //		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
 		config.setValue("passiveawarenessintravm", true);
 		config.setValue("passiveawarenesscatalog", false);
@@ -68,7 +69,6 @@ public class STest {
 //        config.setLogging(true);
 //        config.getExtendedPlatformConfiguration().setDebugFutures(true);
 //		config.setWelcome(true);
-		
 		
         return config;
     }

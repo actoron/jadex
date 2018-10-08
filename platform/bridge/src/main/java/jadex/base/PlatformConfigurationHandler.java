@@ -851,17 +851,17 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		// rootConfig.setThreadpoolClass(null);
 		// rootConfig.setContextServiceClass(null);
 
-		config.getExtendedPlatformConfiguration().setMonitoringComp(false);
-		config.getExtendedPlatformConfiguration().setDf(false);
-		config.getExtendedPlatformConfiguration().setClock(true);
-		config.getExtendedPlatformConfiguration().setSimul(false);
-		config.getExtendedPlatformConfiguration().setFiletransfer(false);
-		config.getExtendedPlatformConfiguration().setSecurity(true);
-		config.getExtendedPlatformConfiguration().setLibrary(true); // needed by micro
-		config.getExtendedPlatformConfiguration().setSettings(true);
-		config.getExtendedPlatformConfiguration().setContext(true);
-		config.getExtendedPlatformConfiguration().setAddress(true);
-		config.setValue("compregistry", Boolean.TRUE);
+//		config.getExtendedPlatformConfiguration().setMonitoringComp(false);
+//		config.getExtendedPlatformConfiguration().setDf(false);
+//		config.getExtendedPlatformConfiguration().setClock(true);
+//		config.getExtendedPlatformConfiguration().setSimul(false);
+//		config.getExtendedPlatformConfiguration().setFiletransfer(false);
+//		config.getExtendedPlatformConfiguration().setSecurity(true);
+//		config.getExtendedPlatformConfiguration().setLibrary(true); // needed by micro
+//		config.getExtendedPlatformConfiguration().setSettings(true);
+//		config.getExtendedPlatformConfiguration().setContext(true);
+//		config.getExtendedPlatformConfiguration().setAddress(true);
+//		config.setValue("compregistry", Boolean.TRUE);
 		
 		config.setSuperpeer(false);
 		config.setSuperpeerClient(false);

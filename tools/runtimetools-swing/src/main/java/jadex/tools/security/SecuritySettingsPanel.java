@@ -121,7 +121,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		
 		jccaccess = jcc.getJCCAccess();
 		
-		final IServiceIdentifier sid = service.getId();
+		final IServiceIdentifier sid = service.getServiceId();
 		
 		jccaccess.scheduleStep(new IComponentStep<Void>()
 		{

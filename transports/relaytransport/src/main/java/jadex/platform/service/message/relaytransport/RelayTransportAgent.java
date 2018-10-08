@@ -204,7 +204,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		{
 			public void intermediateResultAvailable(IRoutingService result)
 			{
-				relays.add(((IService) result).getId().getProviderId().getRoot());
+				relays.add(((IService) result).getServiceId().getProviderId().getRoot());
 				if (debug)
 					System.out.println(agent + ": Got query update, releasing wait future.");
 				relayupdatefuture.setResult(null);

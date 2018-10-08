@@ -74,7 +74,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		IExternalAccess	client	= createPlatform(clientconf);
 		ISubscriptionIntermediateFuture<ITestService>	results	= client.addQuery(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 		waitALittle(client);
-		Assert.assertEquals("1) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
+		Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		
 		//-------- Tests with awareness fallback only (no SP) --------
 		
@@ -85,13 +85,13 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("2) start provider platform, wait for service");
 			pro1	= createPlatform(proconf);
 			ITestService	svc	= results.getNextIntermediateResult();
-			Assert.assertEquals("2) "+svc, pro1.getId(), ((IService)svc).getId().getProviderId().getRoot());
+			Assert.assertEquals(""+svc, pro1.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 			
 			// 3) start provider platform, wait for service -> test if awa fallback works with two platforms 
 			System.out.println("3) start provider platform, wait for service");
 			pro2	= createPlatform(proconf);
 			svc	= results.getNextIntermediateResult();
-			Assert.assertEquals("3) "+svc, pro2.getId(), ((IService)svc).getId().getProviderId().getRoot());
+			Assert.assertEquals(""+svc, pro2.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 		}
 		else
 		{
@@ -100,7 +100,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			pro1	= createPlatform(proconf);
 			pro2	= createPlatform(proconf);
 			waitALittle(client);
-			Assert.assertEquals("2/3) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
+			Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		}
 
 		//-------- Tests with SP if any --------
@@ -115,20 +115,20 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			if(awa)
 			{
 				// -> should get no service; test if duplicate removal works with SP
-				Assert.assertEquals("4) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
+				Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 			}
 			else
 			{
 				// -> should now receive the two services from query.
 				Set<IComponentIdentifier>	providers1	= new LinkedHashSet<>();
 				ITestService	svc	= results.getNextIntermediateResult();
-				providers1.add(((IService)svc).getId().getProviderId().getRoot());
+				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
 				svc	= results.getNextIntermediateResult();
-				providers1.add(((IService)svc).getId().getProviderId().getRoot());
+				providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
 				Set<IComponentIdentifier>	providers2	= new LinkedHashSet<>();
 				providers2.add(pro1.getId());
 				providers2.add(pro2.getId());
-				Assert.assertEquals("4) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
+				Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 				Assert.assertEquals(providers1, providers2);
 			}
 			
@@ -137,23 +137,23 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			ISubscriptionIntermediateFuture<ITestService>	results2	= client.addQuery(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 			Set<IComponentIdentifier>	providers1	= new LinkedHashSet<>();
 			ITestService	svc	= results2.getNextIntermediateResult();
-			providers1.add(((IService)svc).getId().getProviderId().getRoot());
+			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
 			svc	= results2.getNextIntermediateResult();
-			providers1.add(((IService)svc).getId().getProviderId().getRoot());
+			providers1.add(((IService)svc).getServiceId().getProviderId().getRoot());
 			Set<IComponentIdentifier>	providers2	= new LinkedHashSet<>();
 			providers2.add(pro1.getId());
 			providers2.add(pro2.getId());
 			waitALittle(client);
-			Assert.assertEquals("5) ", Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
-			Assert.assertEquals("5) ", providers1, providers2);
+			Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
+			Assert.assertEquals(providers1, providers2);
 			
 			// 6) start provider platform, wait for service in both queries -> test if works for existing queries (before and after SP)
 			System.out.println("6) start remote platform, wait for service in both queries");
 			IExternalAccess	pro3	= createPlatform(proconf);
 			svc	= results.getNextIntermediateResult();
-			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getId().getProviderId().getRoot());
+			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 			svc	= results2.getNextIntermediateResult();
-			Assert.assertEquals("6) "+svc, pro3.getId(), ((IService)svc).getId().getProviderId().getRoot());
+			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 	
 			// 7) kill SP, start provider platform, wait for service on both queries
 			System.out.println("7) kill SP, start remote platform, wait for service on both queries");
@@ -163,16 +163,16 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			{
 				// -> test if re-fallback to awa works for queries
 				svc	= results.getNextIntermediateResult();
-				Assert.assertEquals("7) "+svc, pro4.getId(), ((IService)svc).getId().getProviderId().getRoot());
+				Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 				svc	= results2.getNextIntermediateResult();
-				Assert.assertEquals("7) "+svc, pro4.getId(), ((IService)svc).getId().getProviderId().getRoot());
+				Assert.assertEquals(""+svc, pro4.getId(), ((IService)svc).getServiceId().getProviderId().getRoot());
 			}
 			else
 			{
 				// -> test if disconnection from SP works (new services not found)
 				waitALittle(client);
-				Assert.assertEquals("7) ", Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
-				Assert.assertEquals("7) ", Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
+				Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
+				Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
 			}
 		}
 	}
@@ -196,7 +196,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		IExternalAccess	client	= createPlatform(clientconf);
 		waitALittle(client);
 		Collection<ITestService>	result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		Assert.assertTrue("1) "+result, result.isEmpty());
+		Assert.assertTrue(""+result, result.isEmpty());
 		
 		IExternalAccess	pro1, pro2;
 		if(awa)
@@ -226,10 +226,10 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			pro1	= createPlatform(proconf);
 			pro2	= createPlatform(proconf);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals("2/3/4) ", 0, result.size());
+			Assert.assertEquals(0, result.size());
 			removePlatform(pro1);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals("2/3/4) ", 0, result.size());
+			Assert.assertEquals(0, result.size());
 		}
 
 		//-------- Tests with SP if any --------
@@ -242,7 +242,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForSuperpeerConnections(sp, client, pro2);
 			waitALittle(client);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals("5) "+result, 1, result.size());
+			Assert.assertEquals(""+result, 1, result.size());
 			
 			// 6) start provider platform, wait for connection, search for service -> test if search works for new platform and existing SP
 			System.out.println("6) start provider platform, search for service");
@@ -250,21 +250,21 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForSuperpeerConnections(sp, pro1);
 			waitALittle(client);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals("6) "+result, 2, result.size());
+			Assert.assertEquals(""+result, 2, result.size());
 			
 			// 7) kill one provider platform, search for service -> test if remote disconnection and service removal works
 			System.out.println("7) kill one provider platform, search for service");
 			removePlatform(pro1);
 			waitALittle(client);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals("7) "+result, 1, result.size());
+			Assert.assertEquals(""+result, 1, result.size());
 	
 			// 8) kill SP, search for service -> test if re-fallback to awa works
 			System.out.println("8) kill SP, search for service");
 			removePlatform(sp);
 			waitALittle(client);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals("8) "+result, awa?1:0, result.size());
+			Assert.assertEquals(""+result, awa?1:0, result.size());
 		}
 	}
 }

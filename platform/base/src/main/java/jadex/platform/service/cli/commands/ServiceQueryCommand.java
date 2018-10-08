@@ -159,7 +159,7 @@ public class ServiceQueryCommand extends ACliCommand
 				{
 					for(IService s: c)
 					{
-						buf.append(s.getId()).append(SUtil.LF);
+						buf.append(s.getServiceId()).append(SUtil.LF);
 					}
 				}
 				

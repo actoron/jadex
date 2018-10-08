@@ -50,7 +50,7 @@ public abstract class AbstractConstraintFilter<T> implements IAsyncFilter<T>
 			return IFuture.TRUE;
 		
 		final Future<Boolean> ret = new Future<Boolean>();
-		component.getNFPropertyValue(((IService)service).getId(), propname)
+		component.getNFPropertyValue(((IService)service).getServiceId(), propname)
 			.addResultListener(new ExceptionDelegationResultListener<Object, Boolean>(ret)
 		{
 			public void customResultAvailable(Object result)

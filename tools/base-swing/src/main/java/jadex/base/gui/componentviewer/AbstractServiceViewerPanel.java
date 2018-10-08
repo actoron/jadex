@@ -104,7 +104,7 @@ public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPan
 	 */
 	public boolean	isLocal()
 	{
-		return ((IService)getService()).getId().getProviderId().getRoot()
+		return ((IService)getService()).getServiceId().getProviderId().getRoot()
 			.equals(getJCC().getJCCAccess().getId().getRoot());
 	}
 	
@@ -115,7 +115,7 @@ public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPan
 	public IFuture<IExternalAccess>	getServiceAccess()
 	{
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
-		getJCC().getJCCAccess().getExternalAccess(((IService)getService()).getId().getProviderId())
+		getJCC().getJCCAccess().getExternalAccess(((IService)getService()).getServiceId().getProviderId())
 			.addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 		return ret;
 	}

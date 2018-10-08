@@ -77,7 +77,7 @@ public class ElizaAgent
 		{
 		}
 		
-		final IComponentIdentifier self = ((IService)chat).getId().getProviderId();
+		final IComponentIdentifier self = ((IService)chat).getServiceId().getProviderId();
 		chat.subscribeToEvents().addResultListener(new IntermediateDefaultResultListener<ChatEvent>()
 		{
 			public void intermediateResultAvailable(ChatEvent event)

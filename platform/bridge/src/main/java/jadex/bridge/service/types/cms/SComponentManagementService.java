@@ -620,7 +620,7 @@ public class SComponentManagementService
 	protected static boolean isMultiFactory(IComponentFactory fac)
 	{
 //		if(fac.toString().toLowerCase().indexOf("multi")!=-1)
-		return ((IService)fac).getId().getProviderId().getLocalName().indexOf("multi")!=-1;
+		return ((IService)fac).getServiceId().getProviderId().getLocalName().indexOf("multi")!=-1;
 	}
 	
 	// r: init infos
@@ -1818,6 +1818,17 @@ public class SComponentManagementService
 	{
 //		if(cid.toString().indexOf("Vis")!=-1)
 //			System.out.println("kill: "+cid);
+//		ret.addResultListener(new IResultListener<Map<String,Object>>()
+//		{
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("kill fini ex: "+cid);
+//			}
+//			public void resultAvailable(Map<String, Object> result)
+//			{
+//				System.out.println("kill fini: "+cid);
+//			}
+//		});
 		
 		if(isRemoteComponent(cid, agent))
 		{
@@ -1875,6 +1886,8 @@ public class SComponentManagementService
 				
 //				if(achildren.length>0)
 //					System.out.println("kill childs start: "+cid+" "+achildren.length+" "+SUtil.arrayToString(achildren));
+//				else
+//					System.out.println("no children: "+cid);
 				
 				destroyComponentLoop(cid, achildren, achildren.length-1, agent).addResultListener(createResultListener(agent, new IResultListener<List<Exception>>()
 				{
@@ -1882,8 +1895,8 @@ public class SComponentManagementService
 					{
 //						if(achildren.length>0)
 //							System.out.println("kill childs end: "+cid);
-						
-//						if(cid.toString().startsWith("Initiator"))
+//						
+//						if(cid.toString().toLowerCase().indexOf("super")!=-1)
 //							System.out.println("Terminated component structure: "+cid.getName());
 						
 						agent.getLogger().info("Terminated component structure: "+cid.getName());
@@ -2484,7 +2497,7 @@ public class SComponentManagementService
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + oname + " : Modelname must not be null."));
 
-//		if(modelname.indexOf("Flag")!=-1)
+//		if(modelname.indexOf("Super")!=-1)
 //			System.out.println("create: "+oname+" "+modelname+" on "+agent.getId());
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
@@ -3161,7 +3174,7 @@ public class SComponentManagementService
 	/** Gets the classloader from libservice. */
 	protected static final IFuture<ClassLoader> getClassLoader(ILibraryService libser, IResourceIdentifier rid)
 	{
-		IComponentIdentifier plat = ((IService) libser).getId().getProviderId().getRoot();
+		IComponentIdentifier plat = ((IService) libser).getServiceId().getProviderId().getRoot();
 		ClassLoader cl = ((Map<IResourceIdentifier, ClassLoader>)Starter.getPlatformValue(plat, Starter.DATA_CLASSLOADERS)).get(rid);
 		if (cl != null)
 			return new Future<>(cl);

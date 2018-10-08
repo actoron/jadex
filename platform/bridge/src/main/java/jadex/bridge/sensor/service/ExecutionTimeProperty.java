@@ -47,7 +47,7 @@ public class ExecutionTimeProperty extends TimedProperty
 		
 		if(service!=null)
 		{
-			this.sid = service.getId();
+			this.sid = service.getServiceId();
 		
 			clock = comp.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 		
@@ -78,7 +78,7 @@ public class ExecutionTimeProperty extends TimedProperty
 					}
 				});
 	//			System.out.println("installing lis: "+comp.getComponentIdentifier().getName());
-				comp.getFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getId(), method, listener);
+				comp.getFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getServiceId(), method, listener);
 			}
 			else
 			{

@@ -1,10 +1,13 @@
 package jadex.base.test.impl;
 
+import java.util.Map;
+
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
+import jadex.commons.future.IResultListener;
 
 /**
  * Junit compatible test class to be extended either by agents that provide test results
@@ -70,6 +73,20 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
         setPlatform(platform);
         super.runBare();
         platform.killComponent();
+//        .addResultListener(new IResultListener<Map<String,Object>>()
+//		{
+//			@Override
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("exor: "+exception);
+//			}
+//			
+//			@Override
+//			public void resultAvailable(Map<String, Object> result)
+//			{
+//				System.out.println("resa");
+//			}
+//		});
     }
 
     @Test

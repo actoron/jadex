@@ -24,6 +24,7 @@ public class ChildAgent
 	{
 		System.out.println("Child started");
 		agent.waitForDelay(2000).get();
+		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@Override

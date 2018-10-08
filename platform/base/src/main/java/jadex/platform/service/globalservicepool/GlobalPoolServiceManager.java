@@ -136,10 +136,10 @@ public class GlobalPoolServiceManager
 		{
 			for(IService ser: ownsers)
 			{
-				if(!ser.getId().getProviderId().equals(component.getId()))
+				if(!ser.getServiceId().getProviderId().equals(component.getId()))
 				{
 //					System.out.println("Added own global service pool worker: "+ser);
-					services.put(ser.getId(), ser);
+					services.put(ser.getServiceId(), ser);
 					// currently no timer for own service pool?!
 				}
 //				else
@@ -180,8 +180,8 @@ public class GlobalPoolServiceManager
 		{
 			public int compare(IService s1, IService s2) 
 			{
-				UsageInfo ui1 = usages.get(s1.getId());
-				UsageInfo ui2 = usages.get(s1.getId());
+				UsageInfo ui1 = usages.get(s1.getServiceId());
+				UsageInfo ui2 = usages.get(s1.getServiceId());
 				return ui1==null && ui2==null? (int)(s1.hashCode()-s2.hashCode()): ui1==null? -1: ui2==null? 1: (int)Math.round(ui1.usages-ui2.usages);
 			}
 		});
@@ -311,7 +311,7 @@ public class GlobalPoolServiceManager
 			{
 				public void customIntermediateResultAvailable(ILibraryService cms) 
 				{
-					IComponentIdentifier cid = ((IService)cms).getId().getProviderId().getRoot();
+					IComponentIdentifier cid = ((IService)cms).getServiceId().getProviderId().getRoot();
 					if(!platforms.containsKey(cid))
 					{
 						platforms.put(cid, new PlatformInfo(cms, null));
@@ -349,8 +349,8 @@ public class GlobalPoolServiceManager
 			{
 				public void intermediateResultAvailable(ILibraryService cms) 
 				{
-					IComponentIdentifier cid = ((IService)cms).getId().getProviderId().getRoot();
-					if(!((IService)cms).getId().getProviderId().getRoot().equals(component.getId().getRoot())
+					IComponentIdentifier cid = ((IService)cms).getServiceId().getProviderId().getRoot();
+					if(!((IService)cms).getServiceId().getProviderId().getRoot().equals(component.getId().getRoot())
 						&& platforms.get(cid).getWorker()==null)
 					{
 //						System.out.println("found free platform2: "+cid+" "+platforms);
@@ -403,10 +403,10 @@ public class GlobalPoolServiceManager
 			public void intermediateResultAvailable(final ILibraryService cms) 
 			{
 //				System.out.println("create service on: "+cms+" "+component.getComponentIdentifier().getRoot()+" "+freeplatforms);
-				if(strategy.isCreateWorkerOn(((IService)cms).getId().getProviderId().getRoot()) 
+				if(strategy.isCreateWorkerOn(((IService)cms).getServiceId().getProviderId().getRoot()) 
 					&& creating[0]++<n)
 				{
-					IComponentIdentifier cid = ((IService)cms).getId().getProviderId().getRoot();
+					IComponentIdentifier cid = ((IService)cms).getServiceId().getProviderId().getRoot();
 					freeplatforms.remove(cid);
 //					System.out.println("free are: "+freeplatforms+" "+cid);
 					
@@ -422,7 +422,7 @@ public class GlobalPoolServiceManager
 					ci.setArguments(args);
 					ci.setFilename(ServicePoolAgent.class.getName()+".class");
 					
-					IExternalAccess ea = SServiceProvider.getExternalAccessProxy(component, ((IService)cms).getId().getProviderId());
+					IExternalAccess ea = SServiceProvider.getExternalAccessProxy(component, ((IService)cms).getServiceId().getProviderId());
 					ea.createComponent(ci, null)
 //					cms.createComponent(null, componentname, ci, null)
 						.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
@@ -437,7 +437,7 @@ public class GlobalPoolServiceManager
 									// update worker infos
 									updateServiceAdded(ser);
 									
-									updateWorkerTimer(ser.getId()).addResultListener(new IResultListener<Void>() 
+									updateWorkerTimer(ser.getServiceId()).addResultListener(new IResultListener<Void>() 
 									{
 										public void resultAvailable(Void result) 
 										{
@@ -623,8 +623,8 @@ public class GlobalPoolServiceManager
 	 */
 	protected void updateServiceAdded(IService ser)
 	{
-		services.put(ser.getId(), ser);
-		IComponentIdentifier cid = ser.getId().getProviderId().getRoot();
+		services.put(ser.getServiceId(), ser);
+		IComponentIdentifier cid = ser.getServiceId().getProviderId().getRoot();
 		PlatformInfo pi = platforms.get(cid);
 		pi.setWorker(ser);
 		strategy.workersAdded(cid);

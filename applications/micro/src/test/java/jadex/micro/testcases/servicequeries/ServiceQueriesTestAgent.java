@@ -97,9 +97,9 @@ public class ServiceQueriesTestAgent extends TestAgent
 				
 				public void intermediateResultAvailable(IExampleService result)
 				{
-					System.out.println("received: "+result+" "+platform.getId().getRoot()+" "+((IService)result).getId().getProviderId().getRoot());
+					System.out.println("received: "+result+" "+platform.getId().getRoot()+" "+((IService)result).getServiceId().getProviderId().getRoot());
 //					System.out.println("thread: " + IComponentIdentifier.LOCAL.get() +" on comp thread: " + agent.getFeature0(IExecutionFeature.class).isComponentThread());
-					if(platform.getId().getRoot().equals(((IService)result).getId().getProviderId().getRoot()))
+					if(platform.getId().getRoot().equals(((IService)result).getServiceId().getProviderId().getRoot()))
 					{
 						num++;
 					}

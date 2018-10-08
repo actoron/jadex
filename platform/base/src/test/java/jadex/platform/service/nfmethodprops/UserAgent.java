@@ -96,7 +96,7 @@ public class UserAgent
 			Method ma = ser.getClass().getMethod("methodA", new Class[]{long.class});
 			
 //			INFMixedPropertyProvider prov = ((INFMixedPropertyProvider)((IService)ser).getExternalComponentFeature(INFPropertyComponentFeature.class));
-			double w = ((Long)agent.getMethodNFPropertyValue(((IService)ser).getId(), new MethodInfo(ma), ExecutionTimeProperty.NAME).get()).doubleValue();
+			double w = ((Long)agent.getMethodNFPropertyValue(((IService)ser).getServiceId(), new MethodInfo(ma), ExecutionTimeProperty.NAME).get()).doubleValue();
 //			double w = ((Long)((IService)ser).getMethodNFPropertyValue(new MethodInfo(ma), ExecutionTimeProperty.NAME).get()).doubleValue();
 			double d = Math.abs(w-wa)/wa;
 			if(d<0.15)
@@ -112,7 +112,7 @@ public class UserAgent
 			results.add(tr2);
 			Method mb = ser.getClass().getMethod("methodB", new Class[]{long.class});
 //			prov = ((INFMixedPropertyProvider)((IService)ser).getExternalComponentFeature(INFPropertyComponentFeature.class));
-			w = ((Long)agent.getMethodNFPropertyValue(((IService)ser).getId(), new MethodInfo(mb), ExecutionTimeProperty.NAME).get()).doubleValue();
+			w = ((Long)agent.getMethodNFPropertyValue(((IService)ser).getServiceId(), new MethodInfo(mb), ExecutionTimeProperty.NAME).get()).doubleValue();
 //			w = ((Long)((IService)ser).getMethodNFPropertyValue(new MethodInfo(mb), ExecutionTimeProperty.NAME).get()).doubleValue();
 			d = Math.abs(w-wb)/wb;
 			if(d<0.15)
@@ -127,7 +127,7 @@ public class UserAgent
 			TestReport tr3 = new TestReport("#3", "Test if wait time of service is ok");
 			results.add(tr3);
 //			prov = ((INFMixedPropertyProvider)((IService)ser).getExternalComponentFeature(INFPropertyComponentFeature.class));
-			w = ((Long)agent.getNFPropertyValue(((IService)ser).getId(), ExecutionTimeProperty.NAME).get()).doubleValue();
+			w = ((Long)agent.getNFPropertyValue(((IService)ser).getServiceId(), ExecutionTimeProperty.NAME).get()).doubleValue();
 //			w = ((Long)((IService)ser).getNFPropertyValue(ExecutionTimeProperty.NAME).get()).doubleValue();
 			long wab = (wa+wb)/2;
 			d = Math.abs(w-wab)/wab;

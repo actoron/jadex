@@ -87,7 +87,7 @@ public class SwitchPlatformCommand extends ACliCommand
 				boolean found = false;
 				public void intermediateResultAvailable(final IInternalCliService cliser)
 				{
-					final IComponentIdentifier plat = ((IService)cliser).getId().getProviderId().getRoot();
+					final IComponentIdentifier plat = ((IService)cliser).getServiceId().getProviderId().getRoot();
 					if(plat.equals(cid) && !ret.isDone())
 					{
 						found = true;
@@ -150,7 +150,7 @@ public class SwitchPlatformCommand extends ACliCommand
 		{
 			public String convertObject(Object val, Object context)
 			{
-				return val!=null? ((IService)val).getId().getProviderId().getRoot().getName(): "";
+				return val!=null? ((IService)val).getServiceId().getProviderId().getRoot().getName(): "";
 			}
 		});
 	}

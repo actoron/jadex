@@ -269,7 +269,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  Get the service id.
 	 *  @return The service id.
 	 */
-	public IServiceIdentifier getId()
+	public IServiceIdentifier getServiceId()
 	{
 		if(sid==null)
 			throw new RuntimeException("No service identifier: "+this);
@@ -322,7 +322,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			final INFPropertyComponentFeature nfcf = getInternalAccess().getFeature(INFPropertyComponentFeature.class);
 			IProvidedServicesFeature psf = getInternalAccess().getFeature(IProvidedServicesFeature.class);
 			IInternalService ser = (IInternalService)getInternalAccess().getFeature(IProvidedServicesFeature.class).getProvidedService(type);
-			Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getId())!=null? psf.getProvidedServiceRawImpl(ser.getId()).getClass(): null;
+			Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceId())!=null? psf.getProvidedServiceRawImpl(ser.getServiceId()).getClass(): null;
 			// todo: make internal interface for initProperties
 //			if(type!=null && type.getName().indexOf("ITest")!=-1)
 //				System.out.println("sdfsdf");
@@ -470,8 +470,8 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 */
 	public IFuture<Void>	shutdownService()
 	{
-//		if(getClass().getName().indexOf("ContextSer")!=-1)
-//			System.out.println("shutdown service: "+getId());
+//		if(getClass().getName().toLowerCase().indexOf("super")!=-1)
+//			System.out.println("shutdown service: "+getServiceId());
 
 		// Deregister pojo->sid mapping in shutdown.
 		BasicServiceInvocationHandler.removePojoServiceProxy(sid);
@@ -560,7 +560,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	{
 		if(obj instanceof IService)
 		{
-			return getId().equals(((IService) obj).getId());
+			return getServiceId().equals(((IService) obj).getServiceId());
 		}
 		return false;
 	}
@@ -570,7 +570,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 */
 	public int hashCode()
 	{
-		return 31 + getId().hashCode();
+		return 31 + getServiceId().hashCode();
 	}
 	
 	/**

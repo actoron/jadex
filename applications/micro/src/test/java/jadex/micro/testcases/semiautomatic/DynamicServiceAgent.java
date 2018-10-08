@@ -53,7 +53,7 @@ public class DynamicServiceAgent
 		
 		public String toString()
 		{
-			return getId().getServiceName();
+			return getServiceId().getServiceName();
 		}
 	}
 	

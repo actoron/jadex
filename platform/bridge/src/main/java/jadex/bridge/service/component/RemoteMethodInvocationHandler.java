@@ -88,7 +88,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 			return pr;
 		
 		// Hack until cleanup of remote references
-		if((args==null || args.length==0) && "getId".equals(method.getName()))
+		if((args==null || args.length==0) && "getServiceId".equals(method.getName()))
 		{
 			return pr.getRemoteReference().getTargetIdentifier();
 		}
@@ -99,7 +99,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		else if((args==null || args.length==0) && "hashCode".equals(method.getName()))
 		{
 			Object	id	= pr.getRemoteReference().getTargetIdentifier();
-			id	= id instanceof IService ? ((IService)id).getId()
+			id	= id instanceof IService ? ((IService)id).getServiceId()
 					: id instanceof IExternalAccess	? ((IExternalAccess)id).getId()
 					: id;
 			return 31 + id.hashCode();	// TODO: hashCode() of internal/external access???
@@ -107,7 +107,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		else if(args!=null && args.length==1 && "equals".equals(method.getName()) && Object.class.equals(method.getParameterTypes()[0]))
 		{
 			return pr.getRemoteReference().getTargetIdentifier().equals(
-				args[0] instanceof IService ? ((IService)args[0]).getId()
+				args[0] instanceof IService ? ((IService)args[0]).getServiceId()
 				: args[0] instanceof IExternalAccess ? ((IExternalAccess)args[0]).getId() : args[0]);
 		}
 

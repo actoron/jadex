@@ -119,8 +119,8 @@ public class SRemoteGui
 						{
 							IService	service	= it.next();
 							// todo: implementation?
-							sis[i] = service.getId();
-							pis[i]	= new ProvidedServiceInfo(service.getId().getServiceName(), 
+							sis[i] = service.getServiceId();
+							pis[i]	= new ProvidedServiceInfo(service.getServiceId().getServiceName(), 
 //								service.getId().getServiceType(), null, null);
 								sis[i].getServiceType().getType(ia.getClassLoader(), ia.getModel().getAllImports()), null, sis[i].getScope(), null, null);
 						}

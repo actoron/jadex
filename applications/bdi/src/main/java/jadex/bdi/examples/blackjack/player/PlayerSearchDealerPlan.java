@@ -39,10 +39,9 @@ public class PlayerSearchDealerPlan extends Plan
 //			getLogger().info(result.length + " blackjack-dealer found");
 			getLogger().info(ds + " blackjack-dealer found");
 
-			// choose one dealer randomly out of all the dealer-agents
 //			IComponentIdentifier dealer = result[new Random().nextInt(result.length)].getName();
-			getBeliefbase().getBelief("dealer").setFact(((IService)ds).getId().getProviderId());
-		}
+			getBeliefbase().getBelief("dealer").setFact(((IService)ds).getServiceId().getProviderId());
+			}
 
 	}
 

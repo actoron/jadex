@@ -65,7 +65,7 @@ import jadex.micro.annotation.RequiredService;
 /**
  *  The super peer client agent is responsible for managing connections to super peers for each network.
  */
-@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(Boolean3.TRUE))
+@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(Boolean3.FALSE))
 @Service
 public class SuperpeerClientAgent implements ISearchQueryManagerService
 {
@@ -606,7 +606,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				{
 					if(running && superpeer==null)	// Hack!!! Bug in query deduplication -> receiving same ssp over and over !?
 					{
-//						System.err.println(agent+" query result: "+sq.getId()+", "+sp);
+//						System.out.println(agent+" query result: "+sq.getId()+", "+sp);
 						
 						adjustConnectionTimeout();
 						agent.getLogger().info("Requesting super peer connection for network "+networkname+" from super peer: "+sp);
@@ -620,7 +620,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								agent.getLogger().info("Established super peer connection for network "+networkname+" with super peer: "+sp);
 								
 								// Check if the superpeer is genuine, i.e it is local or network is authenticated.
-								IComponentIdentifier	spid	= ((IService)sp).getId().getProviderId();
+								IComponentIdentifier	spid	= ((IService)sp).getServiceId().getProviderId();
 								if(!spid.getRoot().equals(agent.getId().getRoot()))
 								{
 									ISecurityInfo secinfo = (ISecurityInfo) ServiceCall.getLastInvocation().getProperty(ServiceCall.SECURITY_INFOS);
