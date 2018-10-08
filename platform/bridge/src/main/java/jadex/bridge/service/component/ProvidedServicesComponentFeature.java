@@ -144,8 +144,10 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 //			System.out.println("on: "+on+" "+extaarg+" "+extaplatarg);
 			if(on)
 			{
+				ProvidedServiceImplementation impl = new ProvidedServiceImplementation();
+				impl.setValue("$component.getExternalAccess()");
 				ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, 
-					new ProvidedServiceImplementation(), RequiredServiceInfo.SCOPE_PLATFORM, null, null);
+					impl, RequiredServiceInfo.SCOPE_PLATFORM, null, null);
 				sermap.put("externalaccessservice", psi);
 			}
 			
@@ -370,10 +372,10 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 				throw new RuntimeException("Could not load service implementation class: "+impl.getClazz());
 			}
 		}
-		else if(IExternalAccess.class.equals(info.getType().getType(getComponent().getClassLoader())))
-		{
-			ser = getComponent().getExternalAccess();
-		}
+//		else if(IExternalAccess.class.equals(info.getType().getType(getComponent().getClassLoader())))
+//		{
+//			ser = getComponent().getExternalAccess();
+//		}
 		
 		return ser;
 	}
