@@ -66,7 +66,7 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 //		CLIENTCONF.setValue("rt.debug", true);
 		
 		PROCONF	= baseconf.clone();
-		PROCONF.addComponent(ProviderAgent.class);
+		PROCONF.addComponent(GlobalProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
 		PROCONF.setPlatformName("provider_*");
 		

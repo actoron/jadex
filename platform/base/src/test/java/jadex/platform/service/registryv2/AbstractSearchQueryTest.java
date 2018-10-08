@@ -198,24 +198,40 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		Collection<ITestService>	result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 		Assert.assertTrue(""+result, result.isEmpty());
 		
-		// 2) start provider platform, search for service -> test if awa fallback works with one platform 
-		System.out.println("2) start provider platform, search for service");
-		IExternalAccess	pro1	= createPlatform(proconf);
-		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		Assert.assertEquals(""+result, 1, result.size());
-		
-		// 3) start provider platform, search for service -> test if awa fallback works with two platforms 
-		System.out.println("3) start provider platform, search for service");
-		IExternalAccess	pro2	= createPlatform(proconf);
-		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		Assert.assertEquals(""+result, 2, result.size());
-		
-		// 4) kill one provider platform, search for service -> test if platform is removed from awareness
-		System.out.println("4) kill one provider platform, search for service");
-		removePlatform(pro1);
-		result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		Assert.assertEquals(""+result, 1, result.size());
-		
+		IExternalAccess	pro1, pro2;
+		if(awa)
+		{
+			// 2) start provider platform, search for service -> test if awa fallback works with one platform 
+			System.out.println("2) start provider platform, search for service");
+			pro1	= createPlatform(proconf);
+			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+			Assert.assertEquals(""+result, 1, result.size());
+			
+			// 3) start provider platform, search for service -> test if awa fallback works with two platforms 
+			System.out.println("3) start provider platform, search for service");
+			pro2	= createPlatform(proconf);
+			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+			Assert.assertEquals(""+result, 2, result.size());
+			
+			// 4) kill one provider platform, search for service -> test if platform is removed from awareness
+			System.out.println("4) kill one provider platform, search for service");
+			removePlatform(pro1);
+			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+			Assert.assertEquals(""+result, 1, result.size());
+		}
+		else
+		{
+			// -> test if platforms don't see each other without SP.
+			System.out.println("2/3) start provider platforms, wait for services");
+			pro1	= createPlatform(proconf);
+			pro2	= createPlatform(proconf);
+			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+			Assert.assertEquals("2/3) ", 0, result.size());
+			removePlatform(pro1);
+			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+			Assert.assertEquals("2/3) ", 0, result.size());
+		}
+
 		//-------- Tests with SP if any --------
 		
 		if(spconf!=null)

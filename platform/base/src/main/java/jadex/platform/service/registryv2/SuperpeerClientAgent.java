@@ -390,7 +390,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					@Override
 					public void intermediateResultAvailable(final IComponentIdentifier platform)
 					{
-//						System.out.println(agent + " searching remote platform: "+platform+", "+query);
+						System.out.println(agent + " searching remote platform: "+platform+", "+query);
 						
 						// Only (continue to) search remote when future not yet finished or cancelled.
 						if(!ret.isDone())
@@ -408,7 +408,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								{
 //									try
 //									{
-//										System.out.println(agent + " searched remote platform: "+platform+", "+result);
+										System.out.println(agent + " searched remote platform: "+platform+", "+result);
 //									}
 //									catch(RuntimeException e)
 //									{

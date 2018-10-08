@@ -10,7 +10,7 @@ import jadex.micro.annotation.RequiredService;
  */
 @Agent
 @ProvidedServices(@ProvidedService(type=ITestService.class, scope=RequiredService.SCOPE_GLOBAL))
-public class ProviderAgent	implements ITestService
+public class GlobalProviderAgent	implements ITestService
 {
 
 }
