@@ -145,7 +145,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			providers2.add(pro2.getId());
 			waitALittle(client);
 			Assert.assertEquals("5) ", Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
-			Assert.assertEquals(providers1, providers2);
+			Assert.assertEquals("5) ", providers1, providers2);
 			
 			// 6) start provider platform, wait for service in both queries -> test if works for existing queries (before and after SP)
 			System.out.println("6) start remote platform, wait for service in both queries");
@@ -153,7 +153,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			svc	= results.getNextIntermediateResult();
 			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getId().getProviderId().getRoot());
 			svc	= results2.getNextIntermediateResult();
-			Assert.assertEquals(""+svc, pro3.getId(), ((IService)svc).getId().getProviderId().getRoot());
+			Assert.assertEquals("6) "+svc, pro3.getId(), ((IService)svc).getId().getProviderId().getRoot());
 	
 			// 7) kill SP, start provider platform, wait for service on both queries
 			System.out.println("7) kill SP, start remote platform, wait for service on both queries");
@@ -196,7 +196,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		IExternalAccess	client	= createPlatform(clientconf);
 		waitALittle(client);
 		Collection<ITestService>	result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-		Assert.assertTrue(""+result, result.isEmpty());
+		Assert.assertTrue("1) "+result, result.isEmpty());
 		
 		IExternalAccess	pro1, pro2;
 		if(awa)
@@ -222,14 +222,14 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		else
 		{
 			// -> test if platforms don't see each other without SP.
-			System.out.println("2/3) start provider platforms, wait for services");
+			System.out.println("2/3/4) start provider platforms, wait for services");
 			pro1	= createPlatform(proconf);
 			pro2	= createPlatform(proconf);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals("2/3) ", 0, result.size());
+			Assert.assertEquals("2/3/4) ", 0, result.size());
 			removePlatform(pro1);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals("2/3) ", 0, result.size());
+			Assert.assertEquals("2/3/4) ", 0, result.size());
 		}
 
 		//-------- Tests with SP if any --------
@@ -242,7 +242,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForSuperpeerConnections(sp, client, pro2);
 			waitALittle(client);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals(""+result, 1, result.size());
+			Assert.assertEquals("5) "+result, 1, result.size());
 			
 			// 6) start provider platform, wait for connection, search for service -> test if search works for new platform and existing SP
 			System.out.println("6) start provider platform, search for service");
@@ -250,20 +250,21 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitForSuperpeerConnections(sp, pro1);
 			waitALittle(client);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals(""+result, 2, result.size());
+			Assert.assertEquals("6) "+result, 2, result.size());
 			
 			// 7) kill one provider platform, search for service -> test if remote disconnection and service removal works
-			System.out.println("5) kill one provider platform, search for service");
+			System.out.println("7) kill one provider platform, search for service");
 			removePlatform(pro1);
+			waitALittle(client);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals(""+result, 1, result.size());
+			Assert.assertEquals("7) "+result, 1, result.size());
 	
-			// 6) kill SP, search for service -> test if re-fallback to awa works
-			System.out.println("6) kill SP, search for service");
+			// 8) kill SP, search for service -> test if re-fallback to awa works
+			System.out.println("8) kill SP, search for service");
 			removePlatform(sp);
 			waitALittle(client);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
-			Assert.assertEquals(""+result, 1, result.size());
+			Assert.assertEquals("8) "+result, awa?1:0, result.size());
 		}
 	}
 }

@@ -140,7 +140,7 @@ public abstract class AbstractInfrastructureTest
 //			System.out.println("Waiting for next cid, remaining: " + Arrays.toString(platformids.toArray()));
 			IComponentIdentifier	cid	= connected.getNextIntermediateResult(timeout, true);
 			platformids.remove(cid.getRoot());
-			System.out.println(sp.getId()+" got connection from "+cid.getRoot());
+//			System.out.println(sp.getId()+" got connection from "+cid.getRoot());
 		}
 	}
 }
