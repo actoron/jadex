@@ -99,7 +99,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		else if((args==null || args.length==0) && "hashCode".equals(method.getName()))
 		{
 			Object	id	= pr.getRemoteReference().getTargetIdentifier();
-			id	= id instanceof IService ? ((IService)id).getId()
+			id	= id instanceof IService ? ((IService)id).getServiceId()
 					: id instanceof IExternalAccess	? ((IExternalAccess)id).getId()
 					: id;
 			return 31 + id.hashCode();	// TODO: hashCode() of internal/external access???
