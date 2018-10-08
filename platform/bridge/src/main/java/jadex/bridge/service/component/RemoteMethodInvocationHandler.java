@@ -96,6 +96,14 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		{
 			return pr.getRemoteReference().getTargetIdentifier().toString();
 		}
+		else if((args==null || args.length==0) && "hashCode".equals(method.getName()))
+		{
+			Object	id	= pr.getRemoteReference().getTargetIdentifier();
+			id	= id instanceof IService ? ((IService)id).getId()
+					: id instanceof IExternalAccess	? ((IExternalAccess)id).getId()
+					: id;
+			return 31 + id.hashCode();	// TODO: hashCode() of internal/external access???
+		}
 		else if(args!=null && args.length==1 && "equals".equals(method.getName()) && Object.class.equals(method.getParameterTypes()[0]))
 		{
 			return pr.getRemoteReference().getTargetIdentifier().equals(

@@ -341,25 +341,21 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		
 		// Start service agent
 		// Hack!!! TODO: use some internal/external access for fetching service???
-		@SuppressWarnings("unchecked")
-		IClockService clock	= (IClockService)ServiceRegistry.getRegistry(root)
-			.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class).setNetworkNames(null)));
 		IResourceIdentifier	rid	= new ResourceIdentifier(
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-//		System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
 		CreationInfo	ci	= new CreationInfo(local ? agent.getId() : root, rid).setFilename(PullResultProviderAgent.class.getName()+".class");
+		System.out.println("create: "+ci.getParent()+", "+rid);
 		agent.createComponent(ci, null)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-//				System.out.println("cid is: "+exta);
+				System.out.println("cid is: "+exta);
 				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPullResultService.class).setProvider(exta.getId()))
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IPullResultService, TestReport>(ret)
 				{
 					public void customResultAvailable(IPullResultService service)
-
 					{
 						// Invoke service agent
 						System.out.println("Invoking B");

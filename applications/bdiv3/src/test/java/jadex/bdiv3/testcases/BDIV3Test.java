@@ -24,6 +24,7 @@ public class BDIV3Test	extends	ComponentTestSuite
 			"HelloWorldGoal",	// uses dispatchGoal().get() in body which causes agent to fail on shutdown, depending on race condition
 			"INegotiationAgent",	// Not an agent.
 			"QuickstartBDI",	// blocks due to opened dialog
+			"Rich",	// sub agent -> throws goal dropped on exit because no one painted him any euros ;)
 			"Ambulance",	// sub agent
 			"Commander",	// sub agent
 			"FireBrigade",	// sub agent

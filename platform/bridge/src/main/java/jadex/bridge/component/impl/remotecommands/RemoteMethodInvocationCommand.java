@@ -10,6 +10,8 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
@@ -168,6 +170,19 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		return fret;
 	}
 	
+	protected static final Method	SEARCHMETHOD;
+	static
+	{
+		try
+		{
+			SEARCHMETHOD	= IRemoteRegistryService.class.getMethod("searchServices", ServiceQuery.class);
+		}
+		catch(NoSuchMethodException e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+	}
+	
 	/**
 	 *  Method to provide the required security level.
 	 *  Overridden by subclasses.
@@ -178,8 +193,14 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		Security	level	= null;
 		Method	m0	= method.getMethod(access.getClassLoader());
 		
+//		// Special case for service search -> use security settings of service type, if any (hack???) -> changed IRemoteRegistryService to unrestricted instead
+//		if(SEARCHMETHOD.equals(m0) && ((ServiceQuery<?>)args[0]).getServiceType()!=null)
+//		{
+//			level	=  ((ServiceQuery<?>)args[0]).getServiceType().getType(access.getClassLoader()).getAnnotation(Security.class);
+//		}
+		
 		// For service call -> look for annotation in impl class hierarchy
-		if(target instanceof IServiceIdentifier)
+		if(level==null && target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
 			Object	impl	= access.getFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
@@ -220,7 +241,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		}
 		
 		// Default: use method annotation, if any.
-		else
+		else if(level==null)
 		{
 			level	= m0.getAnnotation(Security.class);
 		}

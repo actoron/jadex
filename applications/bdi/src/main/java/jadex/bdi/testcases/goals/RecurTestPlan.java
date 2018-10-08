@@ -1,6 +1,7 @@
 package jadex.bdi.testcases.goals;
 
 import jadex.base.test.TestReport;
+import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 
@@ -55,10 +56,14 @@ public class RecurTestPlan extends Plan
 			report.setReason("Goal not active.");
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
+		// Necessary for perform goal to finish after plan execution. Hack!?
+		((MGoal)perf.getModelElement()).setRecur(false);
+		((MGoal)achi.getModelElement()).setRecur(false);
+		((MGoal)quer.getModelElement()).setRecur(false);
+		((MGoal)perf2.getModelElement()).setRecur(false);
 		
 		// Check state when plans are applicable.
 		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);
-//		perf.setRecur(false);	// Necessary for perform goal to finish after plan execution.
 		waitFor(250);
 
 		report	= new TestReport("perform_succeeded", "Test if perform goal succeeds after plan is found.");

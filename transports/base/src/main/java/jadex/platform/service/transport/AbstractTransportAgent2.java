@@ -159,43 +159,54 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		
 		Future<Void> ret = new Future<>();
 		impl.init(this);
-		impl.openPort(port).addResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+		
+		// Set up server, if port given.
+		// If port==0 -> any free port
+		if(port >= 0)
 		{
-			public void customResultAvailable(Integer iport) throws Exception
+			impl.openPort(port).addResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 			{
-				try
+				public void customResultAvailable(Integer iport) throws Exception
 				{
-					// Announce connection addresses.
-					InetAddress[] addresses = SUtil.getNetworkAddresses();
-					IComponentIdentifier platformid = agent.getId().getRoot();
-					List<TransportAddress> saddresses = new ArrayList<TransportAddress>();
-					for(int i = 0; i < addresses.length; i++)
+					try
 					{
-						String addrstr = null;
-						if(addresses[i] instanceof Inet6Address)
+						// Announce connection addresses.
+						InetAddress[] addresses = SUtil.getNetworkAddresses();
+						IComponentIdentifier platformid = agent.getId().getRoot();
+						List<TransportAddress> saddresses = new ArrayList<TransportAddress>();
+						for(int i = 0; i < addresses.length; i++)
 						{
-							addrstr = "[" + addresses[i].getHostAddress() + "]:" + iport;
+							String addrstr = null;
+							if(addresses[i] instanceof Inet6Address)
+							{
+								addrstr = "[" + addresses[i].getHostAddress() + "]:" + iport;
+							}
+							else // if (address instanceof Inet4Address)
+							{
+								addrstr = addresses[i].getHostAddress() + ":" + iport;
+							}
+							saddresses.add(new TransportAddress(platformid, impl.getProtocolName(), addrstr));
 						}
-						else // if (address instanceof Inet4Address)
-						{
-							addrstr = addresses[i].getHostAddress() + ":" + iport;
-						}
-						saddresses.add(new TransportAddress(platformid, impl.getProtocolName(), addrstr));
+						
+						agent.getLogger().info("Platform "+agent.getId().getPlatformName()+" listening to port " + iport + " for " + impl.getProtocolName() + " transport.");
+	
+						ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
+						
+	//					System.out.println("Transport addresses: "+agent+", "+saddresses);
+						tas.addLocalAddresses(saddresses).addResultListener(new DelegationResultListener<Void>(ret));
 					}
-					
-					agent.getLogger().info("Platform "+agent.getId().getPlatformName()+" listening to port " + iport + " for " + impl.getProtocolName() + " transport.");
-
-					ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
-					
-//					System.out.println("Transport addresses: "+agent+", "+saddresses);
-					tas.addLocalAddresses(saddresses).addResultListener(new DelegationResultListener<Void>(ret));
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
 				}
-				catch(Exception e)
-				{
-					ret.setException(e);
-				}
-			}
-		});
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
 		return ret;
 	}
 	
@@ -747,31 +758,31 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	 */
 	protected List<PlatformData> collectConnectionStatus()
 	{
-		assert execfeat.isComponentThread();
+//		assert execfeat.isComponentThread();
 		
 		List<PlatformData> ret = new ArrayList<>();
 		
 		Map<IComponentIdentifier, Con> cons = null;
-		Map<Con, IComponentIdentifier> hscons = null;
+//		Map<Con, IComponentIdentifier> hscons = null;
 		try
 		{
 			establishedconnections.readLock().lock();
 			cons = new HashMap<>(establishedconnections);
-			hscons = new HashMap<>(handshakingconnections);
+//			hscons = new HashMap<>(handshakingconnections);
 		}
 		finally
 		{
 			establishedconnections.readLock().unlock();
 		}
 		
-		for(Map.Entry<Con, IComponentIdentifier> entry : hscons.entrySet())
-		{ 
-			if (entry.getValue() != null)
-			{
-				PlatformData data = new PlatformData(entry.getValue(), impl.getProtocolName(), false);
-				ret.add(data);
-			}
-		}
+//		for(Map.Entry<Con, IComponentIdentifier> entry : hscons.entrySet())
+//		{ 
+//			if (entry.getValue() != null)
+//			{
+//				PlatformData data = new PlatformData(entry.getValue(), impl.getProtocolName(), false);
+//				ret.add(data);
+//			}
+//		}
 		
 		for(Map.Entry<IComponentIdentifier, Con> entry : cons.entrySet())
 		{ 

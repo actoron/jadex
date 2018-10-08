@@ -1617,9 +1617,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  Creates a crypto suite of a particular name.
 	 * 
 	 *  @param name Name of the suite.
+	 *  @param convid Conversation ID of handshake.
 	 *  @return The suite, null if not found.
 	 */
-	protected ICryptoSuite createCryptoSuite(String name)
+	protected ICryptoSuite createCryptoSuite(String name, String convid)
 	{
 		ICryptoSuite ret = null;
 		try
@@ -1628,6 +1629,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			if (clazz != null)
 			{
 				ret = (ICryptoSuite) clazz.newInstance();
+				ret.setHandshakeId(convid);
 			}
 		}
 		catch (Exception e)
@@ -1914,6 +1916,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			if (msg instanceof InitialHandshakeMessage)
 			{
+				if(debug)
+					System.out.println(agent+" initial handshake message: "+msg);
+				
 				final InitialHandshakeMessage imsg = (InitialHandshakeMessage) msg;
 				IComponentIdentifier rplat = imsg.getSender().getRoot();
 				
@@ -1924,10 +1929,18 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				// Check if handshake is already happening. 
 				if (state != null)
 				{
-					if (getComponentIdentifier().getRoot().toString().compareTo(rplat.toString()) < 0)
-						fut.addResultListener(new DelegationResultListener<ICryptoSuite>(state.getResultFuture()));
+					// Check if duplicate
+					if (!state.getConversationId().equals(imsg.getConversationId()))
+					{
+						if (getComponentIdentifier().getRoot().toString().compareTo(rplat.toString()) < 0)
+							fut.addResultListener(new DelegationResultListener<ICryptoSuite>(state.getResultFuture()));
+						else
+							return;
+					}
 					else
+					{
 						return;
+					}
 				}
 				
 				if (imsg.getCryptoSuites() == null || imsg.getCryptoSuites().length < 1)
@@ -1955,7 +1968,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				state.setResultFuture(fut);
 				state.setConversationId(imsg.getConversationId());
 				state.setExpirationTime(System.currentTimeMillis() + timeout);
-				initializingcryptosuites.put(rplat.toString(), state);
 				
 				ICryptoSuite oldcs = currentcryptosuites.get(rplat.toString());
 				if (oldcs != null)
@@ -1965,6 +1977,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						if (oldcs.equals(currentcryptosuites.get(rplat.toString())))
 						{
+							// Test for duplicate.
+							if (oldcs.getHandshakeId().equals(imsg.getConversationId()))
+								return;
+							
 							if (debug)
 								System.out.println("New handshake, removing existing suite: "+rplat);
 							expireCryptosuite(rplat.toString());
@@ -1975,6 +1991,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						currentcryptosuites.writeLock().unlock();
 					}
 				}
+				
+				initializingcryptosuites.put(rplat.toString(), state);
+				
 //				ICryptoSuite oldcs = currentcryptosuites_old.remove(rplat.toString());
 //				if (oldcs != null)
 //				{
@@ -1996,7 +2015,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					String convid = state.getConversationId();
 					if (convid != null && convid.equals(rm.getConversationId()))
 					{
-						ICryptoSuite suite = createCryptoSuite(rm.getChosenCryptoSuite());
+						ICryptoSuite suite = createCryptoSuite(rm.getChosenCryptoSuite(), convid);
 						
 						if (suite == null)
 						{
@@ -2022,7 +2041,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					String convid = state.getConversationId();
 					if (convid != null && convid.equals(fm.getConversationId()))
 					{
-						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite());
+						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite(), convid);
 						agent.getLogger().info("Suite: " + (suite != null?suite.getClass().toString():"null"));
 						
 						if (suite == null)

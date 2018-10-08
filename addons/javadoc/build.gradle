@@ -2,7 +2,8 @@ description 'Jadex API Javadoc as addon.'
 
 dependencies
 {
-	api project(':applications:bdi')
+	api project(':applications:applib-bdi')
+	api project(':applications:quickstart')
 	api project(':platform:bridge')
 	api project(':util:commons')
 	api project(':util:gui')

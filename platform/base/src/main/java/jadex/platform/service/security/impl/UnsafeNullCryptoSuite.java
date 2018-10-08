@@ -25,6 +25,9 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	/** The security infos. */
 	protected SecurityInfo secinf;
 	
+	/** The handshake ID. */
+	protected String handshakeid;
+	
 	public UnsafeNullCryptoSuite()
 	{
 		Logger.getLogger("security").warning("Unsafe crypto suite enabled: " + getClass().getName());
@@ -121,6 +124,26 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), new NullMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId()));
 		
 		return false;
+	}
+	
+	/**
+	 *  Gets the ID used to identify the handshake of the suite.
+	 *  
+	 *  @return Handshake ID.
+	 */
+	public String getHandshakeId()
+	{
+		return handshakeid;
+	}
+	
+	/**
+	 *  Sets the ID used to identify the handshake of the suite.
+	 *  
+	 *  @param id Handshake ID.
+	 */
+	public void setHandshakeId(String id)
+	{
+		handshakeid = id;
 	}
 	
 	/**

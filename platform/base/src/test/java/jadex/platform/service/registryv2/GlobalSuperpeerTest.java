@@ -50,29 +50,31 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenesscatalog", true);
 		baseconf.setValue("rt", true);
+//		baseconf.setValue("rt.keepaliveinterval", 3000);
 		baseconf.setValue("platformurls", "intravm://ssp@localhost:"+sspport);
 		baseconf.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
 		baseconf.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass);
 		// Remote only -> no simulation please
 		baseconf.getExtendedPlatformConfiguration().setSimul(false);
 		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
-
+//		baseconf.setValue("security.debug", true);
+//		baseconf.setLogging(true);
 			
 		CLIENTCONF	= baseconf.clone();
 		CLIENTCONF.setPlatformName("client_*");
-		CLIENTCONF.setLogging(true);
-		CLIENTCONF.setValue("rt.debug", true);
+//		CLIENTCONF.setLogging(true);
+//		CLIENTCONF.setValue("rt.debug", true);
 		
 		PROCONF	= baseconf.clone();
-		PROCONF.addComponent(ProviderAgent.class);
+		PROCONF.addComponent(GlobalProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
 		PROCONF.setPlatformName("provider_*");
 		
 		SPCONF	= baseconf.clone();
 		SPCONF.setValue("superpeer", true);
 		SPCONF.setPlatformName("SP_*");
-		SPCONF.setValue("rt.debug", true);
-		SPCONF.setLogging(true);
+//		SPCONF.setValue("rt.debug", true);
+//		SPCONF.setLogging(true);
 		
 		RELAYCONF	= baseconf.clone();
 		RELAYCONF.setValue("superpeer", true);
@@ -82,8 +84,8 @@ public class GlobalSuperpeerTest	extends AbstractInfrastructureTest
 		RELAYCONF.setPlatformName("ssp");
 		RELAYCONF.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME);
 		RELAYCONF.setNetworkSecrets(serversecret.toString());
-		RELAYCONF.setLogging(true);
-		RELAYCONF.setValue("rt.debug", true);
+//		RELAYCONF.setLogging(true);
+//		RELAYCONF.setValue("rt.debug", true);
 //		RELAYCONF.setValue("status", true);
 //		RELAYCONF.setValue("jettyrspublish", true);
 	}

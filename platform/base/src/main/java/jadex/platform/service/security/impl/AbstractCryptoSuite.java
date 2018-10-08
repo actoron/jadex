@@ -36,6 +36,9 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	/** The message security info used after key exchange and authentication. */
 	protected SecurityInfo secinf;
 	
+	/** The handshake ID. */
+	protected String handshakeid;
+	
 	/** Checks if a message ID is valid */
 	protected synchronized boolean isValid(long msgid)
 	{
@@ -138,5 +141,25 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 			 secinf.getNetworks().isEmpty() &&
 			 !secinf.isAdminPlatform()))
 			throw new SecurityException("Unauthenticated connection not allowed: " + remoteid);
+	}
+	
+	/**
+	 *  Gets the ID used to identify the handshake of the suite.
+	 *  
+	 *  @return Handshake ID.
+	 */
+	public String getHandshakeId()
+	{
+		return handshakeid;
+	}
+	
+	/**
+	 *  Sets the ID used to identify the handshake of the suite.
+	 *  
+	 *  @param id Handshake ID.
+	 */
+	public void setHandshakeId(String id)
+	{
+		handshakeid = id;
 	}
 }

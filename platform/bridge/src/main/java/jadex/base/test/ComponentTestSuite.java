@@ -41,6 +41,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SNonAndroid;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -414,7 +415,12 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 						}
 						catch(final RuntimeException e)
 						{
-							if(load)
+							if(e instanceof TimeoutException)
+							{
+								throw e;
+							}
+							
+							else if(load)
 							{
 								ComponentLoadTest test = new ComponentLoadTest(abspath, new IErrorReport()
 								{

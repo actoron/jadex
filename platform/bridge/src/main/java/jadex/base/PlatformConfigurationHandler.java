@@ -876,26 +876,48 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	}
 
 	/**
-	 * Returns a minimal platform configuration that allows communication.
+	 *  Returns a minimal platform configuration that allows service discovery and platform communication
+	 *  in local (intranet via multicast/tcp) and global (internet via superpeer/relay over websockets) networks.
 	 */
 	public static IPlatformConfiguration getMinimalComm()
 	{
-		IPlatformConfiguration config = getMinimal();
-		
+		return addInternetComm(addIntranetComm(getMinimal()));	// default: intranet and internet
+//		return addIntranetComm(getMinimal());	// Use this for internet (registry/relay) only tests
+//		return addInternetComm(getMinimal());	// Use this for intranet (multicat/tcp) only tests
+	}
+	
+	/**
+	 *  Add global (internet) communication settings to configuration.
+	 *  @return Supplied configuration for builder pattern.
+	 */
+	public static IPlatformConfiguration	addInternetComm(IPlatformConfiguration config)
+	{		
 		// Security & Transports
 		config.getExtendedPlatformConfiguration().setSecurity(true); // enable security when remote comm.
-		config.getExtendedPlatformConfiguration().setTcpTransport(true);
-		config.getExtendedPlatformConfiguration().setWsTransport(true);
-		config.getExtendedPlatformConfiguration().setWsPort(-1);
+		config.getExtendedPlatformConfiguration().setWsTransport(true);	// WS unidirectional for relay communication
+		config.getExtendedPlatformConfiguration().setWsPort(-1);	// set WS to unidirectional
 		config.getExtendedPlatformConfiguration().setRelayTransport(true);
-//		config.setValue("rtdebug", true);
 
 		// Registry & Awareness
 		config.setSuperpeerClient(true);
-		config.setValue("superpeerclient.awaonly", true);
-//		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
-//		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
-		config.setAwareness(false);	// disable old awareness
+		config.setValue("passiveawarenesscatalog", true);	// Catalog for SSPs
+
+		return config;
+	}
+	
+	/**
+	 *  Add local (intranet) communication settings to configuration.
+	 *  @return Supplied configuration for builder pattern.
+	 */
+	public static IPlatformConfiguration	addIntranetComm(IPlatformConfiguration config)
+	{
+		// Security & Transports
+		config.getExtendedPlatformConfiguration().setSecurity(true); // enable security when remote comm.
+		config.getExtendedPlatformConfiguration().setTcpTransport(true);	// TCP bidirectional for intranet communication
+		
+		// Registry & Awareness
+		config.setSuperpeerClient(true);
+		config.setValue("passiveawarenessmulticast", true);
 
 		return config;
 	}

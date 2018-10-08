@@ -2,11 +2,9 @@ package jadex.platform.service.settings;
 
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,6 +14,7 @@ import java.util.logging.Level;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -34,12 +33,12 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Autostart;
-import jadex.platform.service.context.ContextAgent;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  Agent that provides the settings service.
  */
+@Service
 @Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE, predecessors="jadex.platform.service.context.ContextAgent"))
 public class SettingsAgent	implements ISettingsService
 {
