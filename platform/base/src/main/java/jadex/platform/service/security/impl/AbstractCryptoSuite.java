@@ -106,29 +106,7 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 		
 		secinf.setAllowDefaultAuthorization(agent.getInternalDefaultAuthorization());
 		
-		Map<String, Set<String>> rolemap = agent.getInternalRoles();
-		Set<String> roles = new HashSet<String>();
-		
-		Set<String> platformroles = rolemap.get(secinf.getAuthenticatedPlatformName());
-		if (platformroles != null)
-			roles.addAll(platformroles);
-		else
-			roles.add(secinf.getAuthenticatedPlatformName());
-		
-		
-		if (secinf.getNetworks() != null)
-		{
-			for (String network : secinf.getNetworks())
-			{
-				Set<String> r = rolemap.get(network);
-				if (r != null)
-					roles.addAll(r);
-				else
-					roles.add(network);
-			}
-		}
-		
-		secinf.setRoles(roles);
+		agent.setSecInfoRoles(secinf);
 		
 		if (!agent.getInternalAllowNoAuthName() && secinf.getAuthenticatedPlatformName() == null)
 			throw new SecurityException("Connections to platforms with unauthenticated platform names are not allowed: " + remoteid);

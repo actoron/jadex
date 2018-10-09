@@ -31,7 +31,7 @@ public class SecurityInfo implements ISecurityInfo
 	protected Set<String> networks;
 	
 	/** Roles of the sender. */
-	protected Set<String> roles;
+	protected volatile Set<String> roles;
 	
 	/**
 	 *  Creates the infos.
