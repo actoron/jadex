@@ -584,7 +584,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (cs != null && !isSecurityMessage(header) && !cs.isExpiring())
 			return new Future<byte[]>(cs.encryptAndSign(content));
 		
-		IFuture<byte[]> ret = agent.getExternalAccess().scheduleStep(new IComponentStep<byte[]>()
+		IFuture<byte[]> ret = agent.scheduleStep(new IComponentStep<byte[]>()
 		{
 			public IFuture<byte[]> execute(IInternalAccess ia)
 			{
@@ -693,7 +693,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				return new Future<Tuple2<ISecurityInfo,byte[]>>(new Tuple2<ISecurityInfo, byte[]>(cs.getSecurityInfos(), cleartext));
 		}
 		
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Tuple2<ISecurityInfo,byte[]>>()
+		return agent.scheduleStep(new IComponentStep<Tuple2<ISecurityInfo,byte[]>>()
 		{
 			public IFuture<Tuple2<ISecurityInfo, byte[]>> execute(IInternalAccess ia)
 			{
@@ -852,7 +852,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Boolean> isUsePlatformSecret()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Boolean>()
+		return agent.scheduleStep(new IComponentStep<Boolean>()
 		{
 			public IFuture<Boolean> execute(IInternalAccess ia)
 			{
@@ -869,7 +869,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> setUsePlatformSecret(final boolean useplatformsecret)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -888,7 +888,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Boolean> isPrintPlatformSecret()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Boolean>()
+		return agent.scheduleStep(new IComponentStep<Boolean>()
 		{
 			public IFuture<Boolean> execute(IInternalAccess ia)
 			{
@@ -905,7 +905,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> setPrintPlatformSecret(final boolean printplatformsecret)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -928,7 +928,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (secret == null)
 			return new Future<>(new IllegalArgumentException("Secret is null."));
 		
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -962,7 +962,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> removeNetwork(String networkname, String secret)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1014,7 +1014,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<MultiCollection<String, String>> getAllKnownNetworks()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<MultiCollection<String, String>>()
+		return agent.scheduleStep(new IComponentStep<MultiCollection<String, String>>()
 		{
 			public IFuture<MultiCollection<String, String>> execute(IInternalAccess ia)
 			{
@@ -1043,7 +1043,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 //		if (!(asecret instanceof AbstractX509PemSecret))
 //			return new Future<>(new IllegalArgumentException("Only X509 secrets allowed as name authorities"));
 		final X509CertificateHolder cert = SSecurity.readCertificateFromPEM(pemcertificate);
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1066,7 +1066,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public IFuture<Void> removeNameAuthority(String pemcertificate)
 	{
 		final X509CertificateHolder cert = SSecurity.readCertificateFromPEM(pemcertificate);
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1088,7 +1088,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Set<String>> getNameAuthorities()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Set<String>>()
+		return agent.scheduleStep(new IComponentStep<Set<String>>()
 		{
 			public IFuture<Set<String>> execute(IInternalAccess ia)
 			{
@@ -1107,7 +1107,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Set<String>> getCustomNameAuthorities()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Set<String>>()
+		return agent.scheduleStep(new IComponentStep<Set<String>>()
 		{
 			public IFuture<Set<String>> execute(IInternalAccess ia)
 			{
@@ -1125,7 +1125,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 //	 */
 //	public IFuture<String[]> getNetworkNames()
 //	{
-//		return agent.getExternalAccess().scheduleStep(new IComponentStep<String[]>()
+//		return agent.scheduleStep(new IComponentStep<String[]>()
 //		{
 //			public IFuture<String[]> execute(IInternalAccess ia)
 //			{
@@ -1148,7 +1148,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Set<String>> getNetworkNames()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Set<String>>()
+		return agent.scheduleStep(new IComponentStep<Set<String>>()
 		{
 			public IFuture<Set<String>> execute(IInternalAccess ia)
 			{
@@ -1166,7 +1166,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> addTrustedPlatform(String name)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1187,7 +1187,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> removeTrustedPlatform(String name)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1206,7 +1206,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Set<String>> getTrustedPlatforms()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Set<String>>()
+		return agent.scheduleStep(new IComponentStep<Set<String>>()
 		{
 			public IFuture<Set<String>> execute(IInternalAccess ia)
 			{
@@ -1242,7 +1242,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<String> getPlatformSecret(final IComponentIdentifier cid)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<String>()
+		return agent.scheduleStep(new IComponentStep<String>()
 		{
 			public IFuture<String> execute(IInternalAccess ia)
 			{
@@ -1264,7 +1264,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> setPlatformSecret(final IComponentIdentifier cid, final String secret)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1305,7 +1305,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> addRole(final String entity, final String role)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1320,7 +1320,19 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				saveSettings();
 				
-				resetCryptoSuites();
+				currentcryptosuites.writeLock().lock();
+				try
+				{
+					for (Map.Entry<String, ICryptoSuite> entry : currentcryptosuites.entrySet())
+					{
+						SecurityInfo secinfo = ((SecurityInfo) entry.getValue().getSecurityInfos());
+						setSecInfoRoles(secinfo);
+					}
+				}
+				finally
+				{
+					currentcryptosuites.writeLock().unlock();
+				}
 				
 				return IFuture.DONE;
 			}
@@ -1336,7 +1348,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> removeRole(final String entity, final String role)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1350,7 +1362,19 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				saveSettings();
 				
-				resetCryptoSuites();
+				currentcryptosuites.writeLock().lock();
+				try
+				{
+					for (Map.Entry<String, ICryptoSuite> entry : currentcryptosuites.entrySet())
+					{
+						SecurityInfo secinfo = ((SecurityInfo) entry.getValue().getSecurityInfos());
+						setSecInfoRoles(secinfo);
+					}
+				}
+				finally
+				{
+					currentcryptosuites.writeLock().unlock();
+				}
 				
 				return IFuture.DONE;
 			}
@@ -1364,7 +1388,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Map<String, Set<String>>> getRoleMap()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Map<String, Set<String>>>()
+		return agent.scheduleStep(new IComponentStep<Map<String, Set<String>>>()
 		{
 			@SuppressWarnings("unchecked")
 			public IFuture<Map<String, Set<String>>> execute(IInternalAccess ia)
@@ -1433,13 +1457,32 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	/**
-	 *  Gets the role map.
-	 * 
-	 *  @return The role map.
+	 *  Sets the roles of a security info object.
+	 *  @param secinf Security info.
 	 */
-	public Map<String, Set<String>> getInternalRoles()
+	public void setSecInfoRoles(SecurityInfo secinf)
 	{
-		return roles;
+		Set<String> siroles = new HashSet<String>();
+		
+		Set<String> platformroles = roles.get(secinf.getAuthenticatedPlatformName());
+		if (platformroles != null)
+			siroles.addAll(platformroles);
+		else
+			siroles.add(secinf.getAuthenticatedPlatformName());
+		
+		
+		if (secinf.getNetworks() != null)
+		{
+			for (String network : secinf.getNetworks())
+			{
+				Set<String> r = roles.get(network);
+				if (r != null)
+					siroles.addAll(r);
+				else
+					siroles.add(network);
+			}
+		}
+		secinf.setRoles(siroles);
 	}
 	
 	/**
@@ -1510,7 +1553,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				if (cleanuptask == null)
 				{
-					cleanuptask = agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+					cleanuptask = agent.scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
@@ -1573,7 +1616,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	protected void resetCryptoSuites()
 	{
-		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
