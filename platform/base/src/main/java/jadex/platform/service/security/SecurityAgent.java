@@ -162,7 +162,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	
 	/** Handshake reset scale factor. */
 	@AgentArgument
-	protected double resetimeoutscale = 0.02;
+	protected double resettimeoutscale = 0.02;
 	
 	/** Flag enabling debug printouts. */
 	@AgentArgument
@@ -1600,7 +1600,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				if (cryptoreset == null)
 				{
-					long resetdelay = (long) (handshaketimeout * resetimeoutscale);
+					long resetdelay = (long) (handshaketimeout * resettimeoutscale);
 					cryptoreset = ia.getFeature(IExecutionFeature.class).waitForDelay(resetdelay, new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
