@@ -875,8 +875,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				usesecret = useplatformsecret;
 				saveSettings();
-				resetCryptoSuites();
-				return IFuture.DONE;
+				return resetCryptoSuites();
 			}
 		});
 	}
@@ -944,11 +943,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				saveSettings();
 				
-				resetCryptoSuites();
-				
-				//TODO: RESET keys / sessions?
-				
-				return IFuture.DONE;
+				return resetCryptoSuites();
 			}
 		});
 	}
@@ -998,11 +993,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				saveSettings();
 				
-				resetCryptoSuites();
-				
-				//TODO: RESET keys / sessions?
-				
-				return IFuture.DONE;
+				return resetCryptoSuites();
 			}
 		});
 	}
@@ -1289,9 +1280,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				saveSettings();
 				
 				if (usesecret)
-					resetCryptoSuites();
-				
-				return IFuture.DONE;
+					return resetCryptoSuites();
+				else
+					return IFuture.DONE;
 			}
 		});
 	}
@@ -1593,9 +1584,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Resets the crypto suite in case of security state change (network secret changes etc.).
 	 */
-	protected void resetCryptoSuites()
+	protected IFuture<Void> resetCryptoSuites()
 	{
-		agent.scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1630,7 +1621,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 					}, true);
 				}
-				return IFuture.DONE;
+				return cryptoreset;
 			}
 		});
 	}
