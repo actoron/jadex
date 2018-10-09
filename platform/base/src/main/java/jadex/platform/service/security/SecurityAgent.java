@@ -1320,19 +1320,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				saveSettings();
 				
-				currentcryptosuites.writeLock().lock();
-				try
-				{
-					for (Map.Entry<String, ICryptoSuite> entry : currentcryptosuites.entrySet())
-					{
-						SecurityInfo secinfo = ((SecurityInfo) entry.getValue().getSecurityInfos());
-						setSecInfoRoles(secinfo);
-					}
-				}
-				finally
-				{
-					currentcryptosuites.writeLock().unlock();
-				}
+				refreshCryptosuiteRoles();
 				
 				return IFuture.DONE;
 			}
@@ -1362,19 +1350,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				saveSettings();
 				
-				currentcryptosuites.writeLock().lock();
-				try
-				{
-					for (Map.Entry<String, ICryptoSuite> entry : currentcryptosuites.entrySet())
-					{
-						SecurityInfo secinfo = ((SecurityInfo) entry.getValue().getSecurityInfos());
-						setSecInfoRoles(secinfo);
-					}
-				}
-				finally
-				{
-					currentcryptosuites.writeLock().unlock();
-				}
+				refreshCryptosuiteRoles();
 				
 				return IFuture.DONE;
 			}
@@ -1456,34 +1432,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		return platformnamecertificate;
 	}
 	
-	/**
-	 *  Sets the roles of a security info object.
-	 *  @param secinf Security info.
-	 */
-	public void setSecInfoRoles(SecurityInfo secinf)
-	{
-		Set<String> siroles = new HashSet<String>();
-		
-		Set<String> platformroles = roles.get(secinf.getAuthenticatedPlatformName());
-		if (platformroles != null)
-			siroles.addAll(platformroles);
-		else
-			siroles.add(secinf.getAuthenticatedPlatformName());
-		
-		
-		if (secinf.getNetworks() != null)
-		{
-			for (String network : secinf.getNetworks())
-			{
-				Set<String> r = roles.get(network);
-				if (r != null)
-					siroles.addAll(r);
-				else
-					siroles.add(network);
-			}
-		}
-		secinf.setRoles(siroles);
-	}
+	
 	
 	/**
 	 *  Checks whether to use platform secret.
@@ -1533,6 +1482,36 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public boolean getInternalDefaultAuthorization()
 	{
 		return defaultauthorization;
+	}
+	
+	/**
+	 *  Sets the roles of a security info object.
+	 *  @param secinf Security info.
+	 */
+	public void setSecInfoRoles(SecurityInfo secinf)
+	{
+		assert agent.isComponentThread();
+		Set<String> siroles = new HashSet<String>();
+		
+		Set<String> platformroles = roles.get(secinf.getAuthenticatedPlatformName());
+		if (platformroles != null)
+			siroles.addAll(platformroles);
+		else
+			siroles.add(secinf.getAuthenticatedPlatformName());
+		
+		
+		if (secinf.getNetworks() != null)
+		{
+			for (String network : secinf.getNetworks())
+			{
+				Set<String> r = roles.get(network);
+				if (r != null)
+					siroles.addAll(r);
+				else
+					siroles.add(network);
+			}
+		}
+		secinf.setRoles(siroles);
 	}
 	
 	/**
@@ -1697,6 +1676,42 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				expiringcryptosuites.add(pfname, new Tuple2<ICryptoSuite, Long>(cs, System.currentTimeMillis() + timeout));
 				currentcryptosuites.remove(pfname);
+			}
+		}
+		finally
+		{
+			currentcryptosuites.writeLock().unlock();
+		}
+	}
+	
+	/**
+	 *  Refreshed crypto suite roles.
+	 */
+	protected void refreshCryptosuiteRoles()
+	{
+		assert agent.isComponentThread();
+		currentcryptosuites.writeLock().lock();
+		try
+		{
+			for (Map.Entry<String, ICryptoSuite> entry : currentcryptosuites.entrySet())
+			{
+				SecurityInfo secinfo = ((SecurityInfo) entry.getValue().getSecurityInfos());
+				setSecInfoRoles(secinfo);
+			}
+			
+			for (Map.Entry<String, HandshakeState> entry : initializingcryptosuites.entrySet())
+			{
+				HandshakeState state = entry.getValue();
+				if (state != null)
+				{
+					ICryptoSuite suite = state.getCryptoSuite();
+					if (suite != null)
+					{
+						SecurityInfo secinfo = (SecurityInfo) suite.getSecurityInfos();
+						if (secinfo != null)
+							setSecInfoRoles(secinfo);
+					}
+				}
 			}
 		}
 		finally
