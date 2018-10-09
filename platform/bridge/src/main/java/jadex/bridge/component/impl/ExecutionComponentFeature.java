@@ -30,6 +30,7 @@ import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ITypedComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
@@ -2129,6 +2130,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			// Update: Doing it anyway, relying on blocker realtime timeout to catch errors.
 //			if (!(remotefuture instanceof IIntermediateFuture))
 //			{
+				ServiceCall	sc	= SSimulation.debugBlocker();
 				component.scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
@@ -2137,6 +2139,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						if (simserv != null)
 						{
 							Future<Void> blocker = new Future<>();
+							if(sc!=null) CallAccess.setNextInvocation(sc);
 							simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
 							{
 								@SuppressWarnings("unchecked")

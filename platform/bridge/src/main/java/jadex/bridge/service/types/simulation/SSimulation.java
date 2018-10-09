@@ -4,11 +4,13 @@ import java.lang.reflect.Field;
 
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.execution.IExecutionService;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -18,6 +20,8 @@ import jadex.commons.future.IFuture;
  */
 public class SSimulation
 {
+	public static final boolean	DEBUG_BLOCKERS	= false;
+	
 	/**
 	 *  Add the future as simulation blocker, if currently in simulation mode.
 	 *  Simulation blocking means the clock will not advance until the future is done.
@@ -30,6 +34,7 @@ public class SSimulation
 		{
 			try
 			{
+				debugBlocker();
 				ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
 					.addAdvanceBlocker(adblock).get();
 			}
@@ -76,6 +81,7 @@ public class SSimulation
 			adblock	= new Future<>();
 			try
 			{
+				debugBlocker();
 				ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class))
 					.addAdvanceBlocker(adblock).get();
 			}
@@ -124,5 +130,19 @@ public class SSimulation
 	public static boolean	isSimulating(IInternalAccess ia)
 	{
 		return ia!=null && Boolean.TRUE.equals(Starter.getPlatformValue(ia.getId().getRoot(), IClockService.SIMULATION_CLOCK_FLAG));
+	}
+	
+	/**
+	 *  Add caller stack to service call on debug.
+	 */
+	public static ServiceCall	debugBlocker()
+	{
+		ServiceCall	sc	= null;
+		if(DEBUG_BLOCKERS)
+		{
+			sc	= ServiceCall.getOrCreateNextInvocation();
+			sc.setProperty("adblockerstack", SUtil.getExceptionStacktrace(new RuntimeException()));
+		}
+		return sc;
 	}
 }

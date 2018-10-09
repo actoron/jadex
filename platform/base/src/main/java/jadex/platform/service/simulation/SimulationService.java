@@ -10,6 +10,7 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -26,6 +27,7 @@ import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -460,7 +462,8 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			{
 				if (!toblocker.isDone())
 				{
-					access.getLogger().severe("Simulation blocker released after realtime timeout " + frttimeout + ".");
+					String	debug	= openfuts.get(toblocker);
+					access.getLogger().severe("Simulation blocker released after realtime timeout " + frttimeout + (debug!=null?", "+debug:"."));
 					toblocker.setExceptionIfUndone(new TimeoutException("Simulation blocker released after realtime timeout " + frttimeout + "."));
 				}
 				return IFuture.DONE;
@@ -469,14 +472,16 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		
 		advanceblockers.add(toblocker);
 		
-//		// -------- For debugging when simulation hangs due to leftover adblocker.
-//		openfuts.put(toblocker, SUtil.getExceptionStacktrace(new RuntimeException("Stacktrace")));
-//		Future<?>	fadblock	= toblocker;
-//		toblocker.addResultListener(result -> {openfuts.remove(fadblock);}, exception -> {openfuts.remove(fadblock);});
-//		System.out.println("adblocks: "+openfuts);
-////		System.out.println(advanceblockers.size());
-////		System.out.println("addBlocker: "+ServiceCall.getCurrentInvocation()+" "+access);
-//		// -------- End debugging
+		// -------- For debugging when simulation hangs due to leftover adblocker.
+		if(SSimulation.DEBUG_BLOCKERS)
+		{
+			openfuts.put(toblocker, ""+ServiceCall.getCurrentInvocation());
+			toblocker.addResultListener(result -> {openfuts.remove(toblocker);}, exception -> {openfuts.remove(toblocker);});
+//			System.out.println("adblocks: "+openfuts);
+//			System.out.println(advanceblockers.size());
+//			System.out.println("addBlocker: "+ServiceCall.getCurrentInvocation()+" "+access);
+		}
+		// -------- End debugging
 		
 		return IFuture.DONE;
 	}
