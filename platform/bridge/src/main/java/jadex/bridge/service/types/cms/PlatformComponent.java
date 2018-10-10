@@ -1010,81 +1010,92 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			 */
 			protected <T> IFuture<T> getDecoupledFuture(final IFuture<T> infut)
 			{
-				IFuture<T> ret = infut;
+				FutureFunctionality	func	= null;
 				IInternalAccess caller = IInternalExecutionFeature.LOCAL.get();
-				if(caller != null)
+				
+				// Called from other component?
+				if(caller!=null && !getInternalAccess().equals(caller))
 				{
-					if (!getInternalAccess().equals(caller))
+					// Add blocker to caller platform, when called from other platform
+					IComponentIdentifier callerplat = caller.getId().getRoot();
+					if (SSimulation.isSimulating(caller) && !callerplat.equals(getInternalAccess().getId().getRoot()))
+						((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
+					
+					// bidirectional decoupling (forward/backward).
+					func	= new ComponentFutureFunctionality(caller)
 					{
-						IComponentIdentifier callerplat = caller.getId().getRoot();
-						if (SSimulation.isSimulating(caller) && !callerplat.equals(getInternalAccess().getId().getRoot()))
-							((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
-						
-						IFuture<T> newret = FutureFunctionality.getDelegationFuture(infut, new ComponentFutureFunctionality(caller)
+						public void scheduleBackward(ICommand<Void> command)
 						{
-							public void scheduleBackward(ICommand<Void> command)
+							if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
 							{
-								if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
+								getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 								{
-									getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									public IFuture<Void> execute(IInternalAccess intaccess)
 									{
-										public IFuture<Void> execute(IInternalAccess intaccess)
-										{
-											command.execute(null);
-											return IFuture.DONE;
-										}
-									}).addResultListener(new IResultListener<Void>()
-									{
-										public void exceptionOccurred(Exception exception)
-										{
-											System.err.println("Unexpected Exception: "+command);
-											exception.printStackTrace();
-										}
-										
-										public void resultAvailable(Void result)
-										{
-										}
-									});
-								}
-								else
+										command.execute(null);
+										return IFuture.DONE;
+									}
+								}).addResultListener(new IResultListener<Void>()
 								{
-									command.execute(null);
-								}
+									public void exceptionOccurred(Exception exception)
+									{
+										System.err.println("Unexpected Exception: "+command);
+										exception.printStackTrace();
+									}
+									
+									public void resultAvailable(Void result)
+									{
+									}
+								});
 							}
-						});
-						ret = newret;
-					}
-				}
-				else
-				{
-					// External thread in simulation mode, add blocker.
-					if(SSimulation.isSimulating(ia))
-					{
-//						Thread.dumpStack();
-						ia.scheduleStep(new IComponentStep<Void>()
-						{
-							public IFuture<Void> execute(IInternalAccess ia)
+							else
 							{
-								IFuture<?> blocker = infut;
-								if (infut instanceof ITuple2Future)
-								{
-									// Hack for createComponent()
-									Future<Object> newblocker = new Future<>();
-									blocker = newblocker;
-									@SuppressWarnings("unchecked")
-									ITuple2Future<Object, Object> tupfut = ((ITuple2Future<Object, Object>) infut);
-									tupfut.addTuple2ResultListener(new DelegationResultListener<>(newblocker), null);
-								}
-								
-								((IInternalExecutionFeature) ia.getFeature(IExecutionFeature.class)).addSimulationBlocker(blocker);
-								
-								return IFuture.DONE;
+								command.execute(null);
 							}
-						});
-					}
+						}
+					};
 				}
 				
-				return ret;
+				// Called from external thread.
+				else if(caller==null)
+				{
+					// backward decoupling only (caller to callee).
+					func	= new FutureFunctionality(getInternalAccess().getLogger())
+					{
+						public void scheduleBackward(ICommand<Void> command)
+						{
+							if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
+							{
+								getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+								{
+									public IFuture<Void> execute(IInternalAccess intaccess)
+									{
+										command.execute(null);
+										return IFuture.DONE;
+									}
+								}).addResultListener(new IResultListener<Void>()
+								{
+									public void exceptionOccurred(Exception exception)
+									{
+										System.err.println("Unexpected Exception: "+command);
+										exception.printStackTrace();
+									}
+									
+									public void resultAvailable(Void result)
+									{
+									}
+								});
+							}
+							else
+							{
+								command.execute(null);
+							}
+						}
+					};					
+				}
+				
+				// Create delegation future if necessary.
+				return func!=null ? FutureFunctionality.getDelegationFuture(infut, func) : infut;
 			}
 			
 //			/**
