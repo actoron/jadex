@@ -167,12 +167,13 @@ public class ServiceCall
 //				Thread.dumpStack();
 //			}
 			
-//			if(ret!=null && ret.getCause()==null)
+//			if((""+ret.getCaller()).indexOf("ServiceCallAgent")!=-1)
 //			{
-//				System.out.println(Thread.currentThread().hashCode()+": create: "+ret+", "+Thread.currentThread());
+//				System.out.println(ret.hashCode()+": set next: "+ret+", "+IComponentIdentifier.LOCAL.get());
 //			}
 
 			NEXT.set(ret);
+//			ret.setProperty("nextstack1", jadex.commons.SUtil.getExceptionStacktrace(new RuntimeException()));
 			
 //			if(getCurrentInvocation()!=null)
 //			{

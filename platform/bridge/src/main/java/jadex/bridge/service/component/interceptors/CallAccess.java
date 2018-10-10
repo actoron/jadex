@@ -60,12 +60,14 @@ public abstract class CallAccess	extends ServiceCall
 	 */
 	public static void	setNextInvocation(ServiceCall call)
 	{
-//		if(call!=null && call.getCause()==null)
+//		if((""+call).indexOf("ServiceCallAgent")!=-1)
 //		{
-//			System.out.println(Thread.currentThread().hashCode()+": set next: "+call+", "+Thread.currentThread());
+//			System.out.println(call.hashCode()+": set next: "+call+", "+IComponentIdentifier.LOCAL.get());
 //		}
 
 		NEXT.set(call);
+//		if(call!=null)
+//			call.setProperty("nextstack1", jadex.commons.SUtil.getExceptionStacktrace(new RuntimeException()));
 	}
 
 	/**

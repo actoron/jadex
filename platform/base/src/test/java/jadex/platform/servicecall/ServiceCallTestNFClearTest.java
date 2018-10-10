@@ -294,7 +294,7 @@ public class ServiceCallTestNFClearTest
 		if(nextInvocation.hasUserTimeout())
 		{
 			timeout2 = nextInvocation.getTimeout();
-			assertNotEquals(2015, timeout2);
+			assertNotEquals(USER_TIMEOUT, timeout2);
 		}
 	}
 

@@ -87,9 +87,6 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 				if(ProxyFactory.getInvocationHandler(sic.getObject()).getClass().getName().indexOf("RemoteMethodInvocationHandler")!=-1)
 					ServiceInvocationContext.SICS.set(sic);
 				
-//				if(sic.getMethod().getName().indexOf("test")!=-1)
-//					System.out.println("setting to b: "+sic.getLastServiceCall());
-				
 				// Set the saved service calls in the thread locals for the callee
 				CallAccess.setCurrentInvocation(sic.getCurrentServiceCall());
 				CallAccess.setNextInvocation(sic.getNextServiceCall());
@@ -146,6 +143,13 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 				
 				sic.setNextCall(CallAccess.getLastInvocation()); // remember invocation made
 			}
+			
+//			if(sic.getMethod().getName().indexOf("call")!=-1)
+//			{
+//				ServiceCall	call	= ServiceCall.getNextInvocation();
+//				if(call!=null)
+//					System.out.println(call.hashCode()+" next after call: "+call+", "+IComponentIdentifier.LOCAL.get());
+//			}
 			
 			sic.setResult(res);
 		}
