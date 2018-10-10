@@ -152,9 +152,17 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	@AgentArgument
 	protected boolean loadjavatruststore = true;
 	
-	/** Default timeout. */
+	/** Handshake timeout. */
 	@AgentArgument
-	protected long timeout = -1;
+	protected long handshaketimeout = -1;
+	
+	/** Handshake timeout scale factor. */
+	@AgentArgument
+	protected double handshaketimeoutscale = 2.0;
+	
+	/** Handshake reset scale factor. */
+	@AgentArgument
+	protected double resettimeoutscale = 0.02;
 	
 	/** Flag enabling debug printouts. */
 	@AgentArgument
@@ -216,10 +224,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		if (timeout < 0)
-			timeout = Starter.getDefaultTimeout(agent.getId().getRoot()) << 1;
-		if (timeout <= 0)
-			timeout = 60000;
+		if (handshaketimeout < 0)
+			handshaketimeout = (long) (Starter.getDefaultTimeout(agent.getId().getRoot()) * handshaketimeoutscale);
+		if (handshaketimeout <= 0)
+			handshaketimeout = 60000;
 		final Future<Void> ret = new Future<Void>();
 		
 		loadSettings().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
@@ -1527,7 +1535,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							return ia.getFeature(IExecutionFeature.class).waitForDelay(timeout << 1, new IComponentStep<Void>()
+							return ia.getFeature(IExecutionFeature.class).waitForDelay(handshaketimeout << 1, new IComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
@@ -1592,7 +1600,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				if (cryptoreset == null)
 				{
-					long resetdelay = timeout >>> 3;
+					long resetdelay = (long) (handshaketimeout * resettimeoutscale);
 					cryptoreset = ia.getFeature(IExecutionFeature.class).waitForDelay(resetdelay, new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
@@ -1665,7 +1673,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			ICryptoSuite cs = currentcryptosuites.get(pfname);
 			if (cs != null)
 			{
-				expiringcryptosuites.add(pfname, new Tuple2<ICryptoSuite, Long>(cs, System.currentTimeMillis() + timeout));
+				expiringcryptosuites.add(pfname, new Tuple2<ICryptoSuite, Long>(cs, System.currentTimeMillis() + handshaketimeout));
 				currentcryptosuites.remove(pfname);
 			}
 		}
@@ -1752,7 +1760,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	{
 		String convid = SUtil.createUniqueId(agent.getId().getRoot().toString());
 		HandshakeState hstate = new HandshakeState();
-		hstate.setExpirationTime(System.currentTimeMillis() + timeout);
+		hstate.setExpirationTime(System.currentTimeMillis() + handshaketimeout);
 		hstate.setConversationId(convid);
 		hstate.setResultFuture(new Future<ICryptoSuite>());
 		
@@ -2016,7 +2024,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				state = new HandshakeState();
 				state.setResultFuture(fut);
 				state.setConversationId(imsg.getConversationId());
-				state.setExpirationTime(System.currentTimeMillis() + timeout);
+				state.setExpirationTime(System.currentTimeMillis() + handshaketimeout);
 				
 				ICryptoSuite oldcs = currentcryptosuites.get(rplat.toString());
 				if (oldcs != null)
