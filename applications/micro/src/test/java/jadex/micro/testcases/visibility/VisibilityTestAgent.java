@@ -51,7 +51,7 @@ public class VisibilityTestAgent extends JunitAgentTest
 		
 		Map<String,Object> args = new HashMap<String, Object>();
 		args.put("selfkill", Boolean.TRUE);
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> ag = agent.createComponent(new CreationInfo(null, args, agent.getModel().getResourceIdentifier()).setFilename(FirstAgent.class.getName()+".class"));
+		IFuture<IExternalAccess> ag = agent.createComponent(new CreationInfo(null, args, agent.getModel().getResourceIdentifier()).setFilename(FirstAgent.class.getName()+".class"));
 		ag.addTuple2ResultListener(null, new IFunctionalResultListener<Map<String,Object>>()
 		{
 			public void resultAvailable(Map<String, Object> result)

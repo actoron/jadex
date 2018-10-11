@@ -44,7 +44,7 @@ public class StartNotEnhancedBDI	extends ConstructorsSuper
 			try
 			{
 				IResourceIdentifier rid = agent.getModel().getResourceIdentifier();
-				IComponentIdentifier cid = agent.createComponent(new CreationInfo(rid).setFilename(NotEnhancedBDI.class.getName()+".class")).getFirstResult();
+				IComponentIdentifier cid = agent.createComponent(new CreationInfo(rid).setFilename(NotEnhancedBDI.class.getName()+".class")).get().getId();
 				System.out.println("cid: "+cid);
 				tr.setFailed("BDI agent was created although class was not enhanced.");
 			}

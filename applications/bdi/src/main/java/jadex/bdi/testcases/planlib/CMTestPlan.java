@@ -31,7 +31,7 @@ public class CMTestPlan extends Plan
 	{
 		// Create receiver agent.
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
-		IComponentIdentifier receiver = getAgent().createComponent(new CreationInfo(getComponentIdentifier()).setFilename(agenttype)).getFirstResult();
+		IComponentIdentifier receiver = getAgent().createComponent(new CreationInfo(getComponentIdentifier()).setFilename(agenttype)).get().getId();
 		
 		// Dispatch request goal.
 		IGoal	request	= createGoal("procap.rp_initiate");
@@ -72,7 +72,7 @@ public class CMTestPlan extends Plan
 	{
 		// Create receiver agent.
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
-		IComponentIdentifier receiver = getAgent().createComponent(new CreationInfo(getComponentIdentifier()).setFilename(agenttype)).getFirstResult();
+		IComponentIdentifier receiver = getAgent().createComponent(new CreationInfo(getComponentIdentifier()).setFilename(agenttype)).get().getId();
 		
 		// Dispatch request goal.
 		IGoal	request	= createGoal("procap.rp_initiate");

@@ -121,8 +121,8 @@ public class ServiceQueriesTestAgent extends TestAgent
 
 			for(int i=0; i<cnt; i++)
 			{
-				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = platform.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
-				cids[i] = fut.getFirstResult(Starter.getDefaultTimeout(agent.getId()), true);
+				IFuture<IExternalAccess> fut = platform.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
+				cids[i] = fut.get(Starter.getDefaultTimeout(agent.getId()), true).getId();
 			}
 			
 			// Wait some time and then terminate query

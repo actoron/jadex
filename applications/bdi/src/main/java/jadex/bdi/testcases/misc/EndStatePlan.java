@@ -30,7 +30,7 @@ public class EndStatePlan extends Plan
 		Map<String, Object> args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
 		IComponentIdentifier	worker	= getAgent().createComponent(
-			new CreationInfo(args, getComponentIdentifier()).setFilename("/jadex/bdi/testcases/misc/EndStateWorker.agent.xml")).getFirstResult();
+			new CreationInfo(args, getComponentIdentifier()).setFilename("/jadex/bdi/testcases/misc/EndStateWorker.agent.xml")).get().getId();
 		
 		// Wait for reports from worker agent.
 		IMessageEvent	msg	= waitForMessageEvent("inform_reports");
