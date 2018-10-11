@@ -35,6 +35,7 @@ import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -67,6 +68,7 @@ import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.MutableObject;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -637,7 +639,18 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public IFuture<Map<String, Object>> waitForTermination()
 	{
 		final Future<Map<String, Object>> ret = new Future<>();
-//		SComponentManagementService.getCleanupFutures(component.getId().getRoot()).get(key)
+		SComponentManagementService.linkResults(new IResultListener<Collection<Tuple2<String,Object>>>()
+		{
+			public void resultAvailable(Collection<Tuple2<String, Object>> result)
+			{
+				ret.setResult(new HashMap<>(getComponent().getFeature(IArgumentsResultsFeature.class).getResults()));
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		}, getComponent(), component);
+		return ret;
 	}
 	
 	// todo:?

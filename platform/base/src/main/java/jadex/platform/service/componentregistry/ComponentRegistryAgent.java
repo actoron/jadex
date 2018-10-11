@@ -271,28 +271,18 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 //          final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
             if(info.getParent()==null)
             	info.setParent(agent.getId());
-            agent.createComponent(info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
-            {
-                public void firstResultAvailable(IComponentIdentifier cid)
-                {
-                	agent.getExternalAccessAsync(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
-                	{
-                		public void customResultAvailable(IExternalAccess exta)
-                		{
-                			components.put(info.getFilename(), exta);
-                			super.customResultAvailable(exta);
-                		}
-                	});
-                }
-
-                public void secondResultAvailable(Map<String, Object> result)
-                {
-                }
-                
-                public void exceptionOccurred(Exception exception)
-                {
-                }
-            });
+            agent.createComponent(info).addResultListener(new IResultListener<IExternalAccess>()
+			{
+            	public void resultAvailable(IExternalAccess exta)
+            	{
+        			components.put(info.getFilename(), exta);
+        			ret.setResult(exta);
+            	}
+            	
+            	public void exceptionOccurred(Exception exception)
+            	{
+            	}
+			});
         }
 
         return ret;

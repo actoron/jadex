@@ -156,8 +156,7 @@ public class PlatformAgent
 //		System.out.println("urls: "+urls.length);
 		
 		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
-		IExternalAccess a;
-		a.createComponent(info)
+		
 		for(ClassInfo ci: cis)
 		{
 //			System.out.println("Found: "+ci.getClassname());
