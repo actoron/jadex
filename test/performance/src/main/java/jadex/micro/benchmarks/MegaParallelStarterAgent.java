@@ -182,7 +182,7 @@ public class MegaParallelStarterAgent
 				exception.printStackTrace();
 			}
 		};
-		IFuture ret = agent.killComponent(aid);
+		IFuture ret = agent.getExternalAccess(aid).killComponent();
 		ret.addResultListener(lis);
 	}
 	

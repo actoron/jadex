@@ -89,7 +89,7 @@ public class ParallelAgentCreationAgent
 										String name = createPeerName(i);
 //												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
 										final IComponentIdentifier cid = new BasicComponentIdentifier(name, agent.getId().getRoot());
-										agent.killComponent(cid).addResultListener(new IResultListener<Map<String, Object>>()
+										agent.getExternalAccess(cid).killComponent().addResultListener(new IResultListener<Map<String, Object>>()
 										{
 											public void resultAvailable(Map<String, Object> result)
 											{

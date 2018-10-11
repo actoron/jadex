@@ -208,7 +208,7 @@ public class MinimalAgentCreationAgent
 		final String name = createPeerName(cnt, agent.getId());
 //			System.out.println("Destroying peer: "+name);
 		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
-		agent.killComponent(aid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Map<String, Object>>()
+		agent.getExternalAccess(aid).killComponent().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Map<String, Object>>()
 		{
 			public void resultAvailable(Map<String, Object> results)
 			{
