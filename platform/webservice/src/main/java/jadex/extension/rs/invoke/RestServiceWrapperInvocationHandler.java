@@ -103,7 +103,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 			
 		CreationInfo ci = new CreationInfo(agent.getId());
 		ci.setFilename("jadex/extension/rs/invoke/RestServiceInvocationAgent.class");
-		agent.createComponent(ci, null)
+		agent.createComponent(ci)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 		{
 			public void customResultAvailable(IExternalAccess exta) 

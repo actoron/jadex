@@ -47,6 +47,7 @@ import jadex.base.SRemoteGui;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -1249,8 +1250,19 @@ public class TestCenterPanel extends JSplitPanel
 					CreationInfo ci = new CreationInfo(args, plugin.getJCC().getPlatformAccess().getId());
 					ci.setResourceIdentifier(name.getSecondEntity());
 					ci.setFilename(name.getFirstEntity());
-					plugin.getJCC().getPlatformAccess().createComponent(ci, res)
-						.addResultListener(new SwingDelegationResultListener(ret));
+					plugin.getJCC().getPlatformAccess().createComponent(ci)
+						.addResultListener(new IResultListener<IExternalAccess>()
+						{
+							public void resultAvailable(IExternalAccess result)
+							{
+								result.waitForTermination().addResultListener(res);
+								ret.setResult(result.getId());
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});
 					
 					// Todo: timeout -> force destroy of component
 					ret.addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
@@ -1344,18 +1356,19 @@ public class TestCenterPanel extends JSplitPanel
 			/**
 			 *  Result of test execution.
 			 */
-			public void resultAvailable(Collection<Tuple2<String, Object>> result)
+			public void resultAvailable(Map<String, Object> result)
 			{
 				Map<String, Object> resmap = null;
 				Testcase res = null;
 				if(result!=null)
 				{
-					resmap = new HashMap<String, Object>();
-					for(Iterator<Tuple2<String, Object>> it=result.iterator(); it.hasNext(); )
-					{
-						Tuple2<String, Object> tup = it.next();
-						resmap.put(tup.getFirstEntity(), tup.getSecondEntity());
-					}
+					resmap = result;
+//							new HashMap<String, Object>();
+//					for(Iterator<Tuple2<String, Object>> it=result.iterator(); it.hasNext(); )
+//					{
+//						Tuple2<String, Object> tup = it.next();
+//						resmap.put(tup.getFirstEntity(), tup.getSecondEntity());
+//					}
 					res = (Testcase)resmap.get("testresults");
 				}
 //				Testcase	res	= (Testcase)((Map)result).get("testresults");

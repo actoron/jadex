@@ -334,7 +334,7 @@ public class PlatformAgent
 				CreationInfo ci = new CreationInfo();
 				ci.setName(names.get(c));
 				ci.setFilename(c+".class");
-				IFuture<IExternalAccess> fut = agent.createComponent(ci, null);
+				IFuture<IExternalAccess> fut = agent.createComponent(ci);
 				fut.addResultListener(
 					res -> {lis.resultAvailable(null);},
 					exception -> {lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c+".class", exception));});
@@ -378,7 +378,7 @@ public class PlatformAgent
 			Future<Void>	ret	= new Future<>();
 			
 			String	c	= level.next();
-			IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setName(names.get(c)).setFilename(c+".class"), null);
+			IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setName(names.get(c)).setFilename(c+".class"));
 			fut.addResultListener(
 				res -> {startComponentsDebug(levels, level, names).addResultListener(new DelegationResultListener<>(ret));},
 				exception -> {ret.setException(new RuntimeException("Cannot autostart "+c+".class", exception));});

@@ -1,6 +1,7 @@
 package jadex.micro.testcases.semiautomatic;
 
 import java.util.Collection;
+import java.util.Map;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -49,26 +50,26 @@ public class ResultAgent
 		{
 			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "not last: "+agent.getId()+": "+Math.random());
 			
-			agent.createComponent(new CreationInfo(agent.getId()).setFilename(ResultAgent.this.getClass().getName()+".class"), 
-				agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Tuple2<String, Object>>>()
-			{
-				public void resultAvailable(Collection<Tuple2<String, Object>> result)
-				{
-					System.out.println(agent.getId()+" got result: "+result);
-					ret.setResult(null);
-//							killAgent();
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					System.out.println("exception occurred: "+exception);
-//							killAgent();
-					ret.setResult(null);
-				}
-			})).addResultListener(new IResultListener<IExternalAccess>()
+			agent.createComponent(new CreationInfo(agent.getId()).setFilename(ResultAgent.this.getClass().getName()+".class")).addResultListener(new IResultListener<IExternalAccess>()
 			{
 				public void resultAvailable(IExternalAccess result)
 				{
+					result.waitForTermination().addResultListener(new IResultListener<Map<String, Object>>()
+					{
+						public void resultAvailable(Map<String, Object> result)
+						{
+							System.out.println(agent.getId()+" got result: "+result);
+							ret.setResult(null);
+		//							killAgent();
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							System.out.println("exception occurred: "+exception);
+		//							killAgent();
+							ret.setResult(null);
+						}
+					});
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -78,6 +79,36 @@ public class ResultAgent
 					ret.setResult(null);
 				}
 			});
+			
+//			agent.createComponent(new CreationInfo(agent.getId()).setFilename(ResultAgent.this.getClass().getName()+".class"), 
+//				agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Tuple2<String, Object>>>()
+//			{
+//				public void resultAvailable(Collection<Tuple2<String, Object>> result)
+//				{
+//					System.out.println(agent.getId()+" got result: "+result);
+//					ret.setResult(null);
+////							killAgent();
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					System.out.println("exception occurred: "+exception);
+////							killAgent();
+//					ret.setResult(null);
+//				}
+//			})).addResultListener(new IResultListener<IExternalAccess>()
+//			{
+//				public void resultAvailable(IExternalAccess result)
+//				{
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					System.out.println("Could not create agent: "+exception);
+////					killAgent();
+//					ret.setResult(null);
+//				}
+//			});
 		}
 		
 		return ret;
