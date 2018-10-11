@@ -33,7 +33,7 @@ public class SubResultsTestAgent extends JunitAgentTest
 	@AgentBody
 	public void body()
 	{
-		IExternalAccess ea = agent.createComponent(new CreationInfo(agent.getId()).setFilename("producer"), null).get();
+		IExternalAccess ea = agent.createComponent(new CreationInfo(agent.getId()).setFilename("producer")).get();
 		
 		final TestReport tr = new TestReport("#1", "Test if intermediate results are retrieved.");
 		

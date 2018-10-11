@@ -1,7 +1,5 @@
 package jadex.micro.testcases;
 
-import java.util.Collection;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
@@ -10,7 +8,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -114,14 +111,7 @@ public class BrokenInitTestAgent extends JunitAgentTest
 	protected IFuture<Void> testBrokenComponent(final String model)
 	{
 		final Future<Void>	fut1	= new Future<Void>();
-		agent.createComponent(new CreationInfo(agent.getId()).setFilename(model), new IResultListener<Collection<Tuple2<String,Object>>>()
-		{
-			// Dummy listener to avoid fatal error being printed.
-			@Override
-			public void exceptionOccurred(Exception exception){}
-			@Override					
-			public void resultAvailable(Collection<Tuple2<String,Object>> result) {};
-		})
+		agent.createComponent(new CreationInfo(agent.getId()).setFilename(model))
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(IExternalAccess result)

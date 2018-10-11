@@ -107,7 +107,7 @@ public class ServiceCallTestAgent extends TestAgent
 		final String tag = an.indexOf("raw")!=-1? "raw": an.indexOf("direct")!=-1? "direct": an.indexOf("decoupled")!=-1? "decoupled": null;	
 //		System.out.println("Tag is: "+tag+" "+agentname);	
 		
-		platform.createComponent(ci.setFilename(agentname), null)
+		platform.createComponent(ci.setFilename(agentname))
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)

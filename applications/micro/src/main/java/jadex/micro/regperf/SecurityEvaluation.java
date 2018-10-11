@@ -200,8 +200,8 @@ public class SecurityEvaluation
 		{
 			for(int j=0; j<cnt; j++)
 			{
-				fubar.addFuture(platforms[i].createComponent(new CreationInfo().setFilename(ServiceProviderAgent.class.getName()+".class"), null));
-				fubar.addFuture(platforms[i].createComponent(new CreationInfo().setFilename(ServiceQueryAgent.class.getName()+".class"), null));
+				fubar.addFuture(platforms[i].createComponent(new CreationInfo().setFilename(ServiceProviderAgent.class.getName()+".class")));
+				fubar.addFuture(platforms[i].createComponent(new CreationInfo().setFilename(ServiceQueryAgent.class.getName()+".class")));
 			}
 		}
 		fubar.waitFor().get();

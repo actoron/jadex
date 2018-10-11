@@ -205,7 +205,7 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 		IResourceIdentifier	rid	= new ResourceIdentifier(
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		
-		agent.createComponent(new CreationInfo(root, rid).setFilename("jadex/micro/testcases/terminate/TerminableProviderAgent.class"), null)
+		agent.createComponent(new CreationInfo(root, rid).setFilename("jadex/micro/testcases/terminate/TerminableProviderAgent.class"))
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
