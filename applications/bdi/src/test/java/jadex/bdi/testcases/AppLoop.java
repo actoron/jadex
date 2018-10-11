@@ -30,7 +30,7 @@ public class AppLoop
 				System.out.println(i);
 			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut
 				= platform.createComponent(new CreationInfo("jadex/bdi/examples/hunterprey_classic/HunterPrey.application.xml"));
-			platform.killComponent(fut.getFirstResult()).get();
+			platform.getExternalAccess(fut.getFirstResult()).killComponent().get();
 			fut.getSecondResult();
 		}
 	}

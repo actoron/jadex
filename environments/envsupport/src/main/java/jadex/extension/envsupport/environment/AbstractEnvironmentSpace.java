@@ -1869,7 +1869,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
 				if(mapping.isKillComponent())
 				{
-					getExternalAccess().killComponent(desc.getName());
+					getExternalAccess().getExternalAccess(desc.getName()).killComponent();
 				}
 			}
 		}

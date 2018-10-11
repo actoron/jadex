@@ -191,7 +191,7 @@ public class AgentCreationAgent
 //		System.out.println("Destroying peer: "+name);
 //		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
-		agent.killComponent(aid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Map<String, Object>>()
+		agent.getExternalAccess(aid).killComponent().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Map<String, Object>>()
 		{
 			public void resultAvailable(Map<String, Object> results)
 			{

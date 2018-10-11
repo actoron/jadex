@@ -263,7 +263,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		agent.killComponent(cid).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+		agent.getExternalAccess(cid).killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 		
 		return ret;
 	}

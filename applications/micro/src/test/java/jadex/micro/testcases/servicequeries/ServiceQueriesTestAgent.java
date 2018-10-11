@@ -147,7 +147,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 			{
 				for(int i=0; i<cids.length; i++)
 				{
-					platform.killComponent(cids[i]).get();
+					platform.getExternalAccess(cids[i]).killComponent().get();
 				}
 			}
 			catch(Exception e)

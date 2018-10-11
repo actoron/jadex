@@ -35,7 +35,7 @@ public class EndStateAbortPlan extends Plan
 		try
 		{
 //			System.out.println("destroying worker: "+worker);
-			agent.killComponent(worker).get();
+			agent.getExternalAccess(worker).killComponent().get();
 //			System.out.println("destroyed worker: "+worker);
 			report.setFailed("Worker agent terminated without timeout.");
 		}

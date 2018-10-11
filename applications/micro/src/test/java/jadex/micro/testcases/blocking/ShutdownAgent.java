@@ -66,7 +66,7 @@ public class ShutdownAgent
 						{
 							public void customResultAvailable(Void result)
 							{
-								agent.killComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+								agent.getExternalAccess(cid).killComponent().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 								{
 									public void customResultAvailable(Map<String, Object> result)
 									{

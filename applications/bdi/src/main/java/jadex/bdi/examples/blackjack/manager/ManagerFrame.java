@@ -350,7 +350,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("close")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.killComponent(agent.getId().getParent());
+						ia.getExternalAccess(agent.getId().getParent()).killComponent();
 
 						return IFuture.DONE;
 					}
@@ -468,7 +468,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				IComponentIdentifier dealer = (IComponentIdentifier)bia.getBeliefbase().getBelief("localDealerAID").getFact();
 				if(dealer!=null)
 				{
-					ia.killComponent(dealer);
+					ia.getExternalAccess(dealer).killComponent();
 					bia.getBeliefbase().getBelief("localDealerAID").setFact(null);
 				}
 				return IFuture.DONE;
@@ -669,7 +669,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				@Classname("stop")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.killComponent(player.getAgentID());
+					ia.getExternalAccess(player.getAgentID()).killComponent();
 					return IFuture.DONE;
 				}
 			});

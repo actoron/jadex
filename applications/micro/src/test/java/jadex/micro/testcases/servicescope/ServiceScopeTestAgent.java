@@ -66,7 +66,7 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 			try
 			{
 				if(cid!=null)
-					agent.killComponent(cid).get();
+					agent.getExternalAccess(cid).killComponent().get();
 			}
 			catch(Exception e)
 			{
@@ -96,7 +96,7 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 			try
 			{
 				if(cid!=null)
-					agent.killComponent(cid).get();
+					agent.getExternalAccess(cid).killComponent().get();
 			}
 			catch(Exception e)
 			{

@@ -265,7 +265,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 								{
 									tr.setReason("Results did arrive too fast (in bunch at the end (needed/expected): ("+needed+" / "+expected);
 								}
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 							public void resultAvailable(Collection<String> result)
@@ -273,7 +273,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 //										System.out.println("resultAvailable: "+result);
 								TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
 								tr.setReason("resultAvailable was called");
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 							public void exceptionOccurred(Exception exception)

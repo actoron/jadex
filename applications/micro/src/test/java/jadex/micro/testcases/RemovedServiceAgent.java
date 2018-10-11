@@ -132,7 +132,7 @@ public class RemovedServiceAgent extends JunitAgentTest
 								tr1.setSucceeded(true);
 								
 								// Now kill the agent.
-								agent.killComponent(exta.getId()).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Collection<TestReport>>(testfut)
+								agent.getExternalAccess(exta.getId()).killComponent().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Collection<TestReport>>(testfut)
 								{
 									public void customResultAvailable(Map<String, Object> result)
 									{

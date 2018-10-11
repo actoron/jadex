@@ -597,7 +597,7 @@ public class GlobalPoolServiceManager
 
 //		System.out.println("removing worker: "+workercid+" "+servicepool);
 		
-		component.killComponent(workercid).addResultListener(
+		component.getExternalAccess(workercid).killComponent().addResultListener(
 			inta.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{
 			public void customResultAvailable(Map<String, Object> result) 

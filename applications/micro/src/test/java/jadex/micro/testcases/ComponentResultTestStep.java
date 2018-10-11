@@ -86,7 +86,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				ia.killComponent(result.getId())
+				ia.getExternalAccess(result.getId()).killComponent()
 					.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(fut)
 				{
 					public void customResultAvailable(Map<String, Object> results)
