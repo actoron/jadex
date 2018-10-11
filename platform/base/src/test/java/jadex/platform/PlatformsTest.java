@@ -122,7 +122,7 @@ public class PlatformsTest //extends TestCase
 			
 			final Future<Void>	fut	= new Future<Void>();
 			
-			platform.listenToComponent(platform.getId()).addIntermediateResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+			platform.listenToComponent().addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 			{
 				@Override
 				public void exceptionOccurred(Exception exception)
