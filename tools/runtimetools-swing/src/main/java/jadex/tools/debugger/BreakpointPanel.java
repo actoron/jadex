@@ -286,8 +286,8 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 					{
 						bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
 					}
-					access.setComponentBreakpoints(
-						description.getName(), (String[])bps.toArray(new String[bps.size()]));
+					access.getExternalAccess(description.getName())
+						.setComponentBreakpoints((String[])bps.toArray(new String[bps.size()]));
 				}
 			});
 			return	ret;

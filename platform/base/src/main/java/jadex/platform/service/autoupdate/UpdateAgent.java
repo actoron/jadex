@@ -174,7 +174,7 @@ public class UpdateAgent implements IUpdateService
 												public void resultAvailable(Void result) 
 												{
 													// Kill platform.
-													agent.killComponent(agent.getId().getRoot());	
+													agent.getExternalAccess(agent.getId().getRoot()).killComponent();	
 												}
 												
 												public void exceptionOccurred(Exception exception) 

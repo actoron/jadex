@@ -176,7 +176,7 @@ public class StartPeerPlan extends Plan
 		
 //		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 		IComponentIdentifier aid = new BasicComponentIdentifier(name, getComponentIdentifier().getRoot());
-		IFuture<Map<String, Object>> ret = getAgent().killComponent(aid);
+		IFuture<Map<String, Object>> ret = getAgent().getExternalAccess(aid).killComponent();
 		ret.get();
 	}
 }

@@ -63,7 +63,7 @@ public class ServiceCallbackTestAgent extends TestAgent	implements ICalledServic
 			ICallerService	service	= local ? agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class)).get()
 				: agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class, RequiredService.SCOPE_GLOBAL)).get(); // Search globally in remote case.
 			service.doCall(this).get();
-			platform.killComponent(provider).get();
+			platform.getExternalAccess(provider).killComponent().get();
 			ret.get().setSucceeded(true);
 		}
 		catch(Exception e)

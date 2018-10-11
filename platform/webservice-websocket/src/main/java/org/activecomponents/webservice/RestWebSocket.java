@@ -264,7 +264,7 @@ public class RestWebSocket extends Endpoint
 					if(cid!=null)
 					{
 //						IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
-						platform.killComponent(cid);
+						platform.getExternalAccess(cid).killComponent();
 						System.out.println("Killing session component: "+((IService)val).getServiceId().getProviderId());
 					}
 				}

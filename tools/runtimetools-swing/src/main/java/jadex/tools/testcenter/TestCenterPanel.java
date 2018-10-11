@@ -1292,7 +1292,7 @@ public class TestCenterPanel extends JSplitPanel
 //				public void customResultAvailable(IComponentManagementService cms)
 //				{
 //					System.out.println("destroying: "+testcase);
-					plugin.getJCC().getJCCAccess().killComponent(testcase)
+					plugin.getJCC().getJCCAccess().getExternalAccess(testcase).killComponent()
 //					cms.destroyComponent(testcase)
 						.addResultListener(new SwingExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 					{

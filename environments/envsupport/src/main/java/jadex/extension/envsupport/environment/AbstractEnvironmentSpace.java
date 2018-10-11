@@ -646,8 +646,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						ia.getClassLoader(), killonexit!=null ? killonexit.booleanValue() : true);
 					observercenters.add(oc);
 					
-					getExternalAccess().listenToComponent(getExternalAccess().getId())
-						.addIntermediateResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+					getExternalAccess().listenToComponent()
+						.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 					{
 						@Override
 						public void exceptionOccurred(Exception exception)
