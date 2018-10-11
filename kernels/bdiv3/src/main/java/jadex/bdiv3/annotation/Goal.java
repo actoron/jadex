@@ -8,38 +8,25 @@ import java.lang.annotation.Target;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 
 /**
- *
+ *  Let a class be used to represent goals of a BDI agent.
+ *  Can be annotated to inner classes of an agent or in a {@link Goals}
+ *  annotation to refer to external classes.
+ *  
+ *  Settings of this annotation give detailed control over the means-end reasoning
+ *  and goal deliberation processes (see {@link Deliberation}) with regard to the annotated goal.
+ *  
+ *  The means-end reasoning is the process of plan selection and execution and is based
+ *  on the notion of an "applicable plans list" (APL). When the goal needs processing,
+ *  the agent determines the applicable plans and stores them in the APL.
+ *  By default the plans are tried sequentially in the given order.
+ *  Several goal flags like {@link #randomselection() randomselection} and {@link #posttoall() posttoall} allow changing this behavior.
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Goal
 {
-	/** The exclude mode. */
-//	public enum ExcludeMode
-//	{
-//		Never(MProcessableElement.EXCLUDE_NEVER), 
-//		WhenTried(MProcessableElement.EXCLUDE_WHEN_TRIED), 
-//		WhenSucceeded(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED), 
-//		WhenFailed(MProcessableElement.EXCLUDE_WHEN_FAILED);
-//		
-//		protected String str;
-//		ExcludeMode(String str)
-//		{
-//			this.str = str;
-//		}
-//		
-//		/**
-//		 *  Get the string representation.
-//		 *  @return The string representation.
-//		 */
-//		public String getString()
-//		{
-//			return str;
-//		}
-//	}
-	
 	/**
-	 *  The goal class.
+	 *  The goal class, when used inside a  {@link Goals} annotation.
 	 */
 	public Class<?> clazz() default Object.class;
 	
@@ -63,10 +50,10 @@ public @interface Goal
 	 *  Default is to execute it after it has been tried without consideration
 	 *  of its success state.
 	 */
-	public ExcludeMode excludemode() default ExcludeMode.WhenTried;//MProcessableElement.EXCLUDE_WHEN_TRIED;
+	public ExcludeMode excludemode() default ExcludeMode.WhenTried;
 	
 	/** 
-	 *  The retry flag. Is means-end reasoning allowed to select a new plan and execute it.
+	 *  The retry flag. If true (default) means-end reasoning is allowed to select a new plan and execute it.
 	 */
 	public boolean retry() default true;
 	

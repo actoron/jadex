@@ -25,8 +25,8 @@ public class Main
 		// Start from minimal configuration
 		IPlatformConfiguration	conf	= PlatformConfigurationHandler.getMinimal();
 		
-		// Simulation service for switching execution modes.
-		conf.getExtendedPlatformConfiguration().setSimul(true);
+//		// Simulation service for switching execution modes.
+//		conf.getExtendedPlatformConfiguration().setSimul(true);
 		
 		// Optional: open JCC for runtime tools.
 //		conf.setGui(true);
@@ -38,7 +38,7 @@ public class Main
 		conf.setValue("kernel_bdi", true);
         
         // Add your cleaner agent(s)
-		conf.addComponent("jadex/quickstart/cleanerworld/SimpleCleanerAgent.class");
+		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA0.class");
 
 		// Start a Jadex platform (asynchronously in background).
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(conf);
