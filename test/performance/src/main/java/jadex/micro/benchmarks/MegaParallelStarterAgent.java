@@ -5,6 +5,7 @@ import java.util.Map;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -82,42 +83,9 @@ public class MegaParallelStarterAgent
 				{
 					args.put("num", Integer.valueOf(i));
 //					System.out.println("Created agent: "+i);
-					agent.createComponent(new CreationInfo(new HashMap(args), agent.getId()).setName(subname+"_#"+i).setFilename(model), 
-						agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+					agent.createComponent(new CreationInfo(new HashMap(args), agent.getId()).setName(subname+"_#"+i).setFilename(model)).addResultListener(new IResultListener<IExternalAccess>()
 					{
-						public void resultAvailable(Object result)
-						{
-							if(--agents==0)
-							{
-								getClock().addResultListener(new DefaultResultListener()
-								{
-									public void resultAvailable(final Object result)
-									{
-										IClockService cs = (IClockService)result;
-										long killend = cs.getTime();
-										System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
-										double killdur = ((double)killend-killstarttime)/1000.0;
-										final double killpera = killdur/(max-1);
-										
-										long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
-										
-										System.out.println("\nCumulated results:");
-										System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-										System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
-										System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-										System.out.println("Still used memory: "+stillused+"kB.");
-										
-										agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
-										agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
-										agent.getFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
-										agent.killComponent();
-									}
-								});
-							}
-						}
-					})).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(IExternalAccess result)
 						{
 							if(++agents==max)
 							{
@@ -141,6 +109,39 @@ public class MegaParallelStarterAgent
 									}
 								});
 							}
+							result.waitForTermination().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									if(--agents==0)
+									{
+										getClock().addResultListener(new DefaultResultListener()
+										{
+											public void resultAvailable(final Object result)
+											{
+												IClockService cs = (IClockService)result;
+												long killend = cs.getTime();
+												System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
+												double killdur = ((double)killend-killstarttime)/1000.0;
+												final double killpera = killdur/(max-1);
+												
+												long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+												
+												System.out.println("\nCumulated results:");
+												System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+												System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+												System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+												System.out.println("Still used memory: "+stillused+"kB.");
+												
+												agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+												agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+												agent.getFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+												agent.killComponent();
+											}
+										});
+									}
+								}
+							}));
 						}
 						public void exceptionOccurred(Exception exception)
 						{
@@ -149,7 +150,75 @@ public class MegaParallelStarterAgent
 							// and immediately terminated but already has scheduled
 							// all creation actions to the cms.
 						}
-					}));
+					});
+//					agent.createComponent(new CreationInfo(new HashMap(args), agent.getId()).setName(subname+"_#"+i).setFilename(model), 
+//						agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+//					{
+//						public void resultAvailable(Object result)
+//						{
+//							if(--agents==0)
+//							{
+//								getClock().addResultListener(new DefaultResultListener()
+//								{
+//									public void resultAvailable(final Object result)
+//									{
+//										IClockService cs = (IClockService)result;
+//										long killend = cs.getTime();
+//										System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
+//										double killdur = ((double)killend-killstarttime)/1000.0;
+//										final double killpera = killdur/(max-1);
+//										
+//										long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+//										
+//										System.out.println("\nCumulated results:");
+//										System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+//										System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+//										System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+//										System.out.println("Still used memory: "+stillused+"kB.");
+//										
+//										agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+//										agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+//										agent.getFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+//										agent.killComponent();
+//									}
+//								});
+//							}
+//						}
+//					})).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+//					{
+//						public void resultAvailable(Object result)
+//						{
+//							if(++agents==max)
+//							{
+//								getClock().addResultListener(new DefaultResultListener()
+//								{
+//									public void resultAvailable(final Object result)
+//									{
+//										final IClockService	clock	= (IClockService)result;
+//										final long end = clock.getTime();
+//										final long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+//										omem = (used-startmem)/1024;
+//										upera = ((long)(1000*(used-startmem/max/1024)))/1000.0;
+//										System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+//										System.out.println("Last peer created. "+max+" agents started.");
+//										dur = ((double)end-starttime)/1000.0;
+//										pera = dur/max;
+//										System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+//
+//										killstarttime = clock.getTime();
+//										deletePeers(max);
+//									}
+//								});
+//							}
+//						}
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							// ignore
+//							// In case of ComponentStartTest the agent will be started
+//							// and immediately terminated but already has scheduled
+//							// all creation actions to the cms.
+//						}
+//					}));
 				}
 			}
 		});
