@@ -408,12 +408,12 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 //		System.out.println("name: "+desc.getName());
 		
 		IComponentIdentifier root = access.getId().getRoot();//.addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
-		access.getExternalAccess(root)
+		access.getExternalAccessAsync(root)
 			.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(final IExternalAccess rootea)
 			{
-				access.getExternalAccess(cid)
+				access.getExternalAccessAsync(cid)
 					.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(final IExternalAccess ea)

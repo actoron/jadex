@@ -80,7 +80,7 @@ public class ProxyAgent	implements IProxyAgentService
 //				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
 //				next.setProperty("debugsource", "ProxyAgent.agentCreated()");
 				
-				agent.getExternalAccess(agent.getId().getRoot())
+				agent.getExternalAccessAsync(agent.getId().getRoot())
 					.addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess pl)
@@ -210,7 +210,7 @@ public class ProxyAgent	implements IProxyAgentService
 //				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
 //				next.setProperty("debugsource", "ProxyAgent.getConnectionState()");
 //				
-				agent.getExternalAccess(rcid).addResultListener(new IResultListener<IExternalAccess>()
+				agent.getExternalAccessAsync(rcid).addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess result) 
 					{
@@ -251,7 +251,7 @@ public class ProxyAgent	implements IProxyAgentService
 //			next.setProperty("debugsource", "ProxyAgent.refreshLatency()");
 			
 //			rcms.getExternalAccess(rcid)
-			agent.getExternalAccess(rcid)
+			agent.getExternalAccessAsync(rcid)
 				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)

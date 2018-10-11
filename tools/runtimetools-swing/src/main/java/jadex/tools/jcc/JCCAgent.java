@@ -142,7 +142,7 @@ public class JCCAgent	implements IComponentStep<Void>
 						if(cid.getName().startsWith(platforms))
 						{
 							connected = true;
-							agent.getExternalAccess(cid)
+							agent.getExternalAccessAsync(cid)
 								.addResultListener(new IResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess platform)

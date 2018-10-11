@@ -2602,7 +2602,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	protected IFuture getComponentType(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
-		getExternalAccess().getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+		getExternalAccess().getExternalAccessAsync(cid).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{

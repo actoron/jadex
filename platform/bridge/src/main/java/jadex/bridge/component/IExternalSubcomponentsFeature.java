@@ -1,7 +1,15 @@
 package jadex.bridge.component;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ITuple2Future;
 
 /**
  *  External perspective of the subcomponents feature.
@@ -26,6 +34,36 @@ public interface IExternalSubcomponentsFeature extends IExternalComponentFeature
 	 *  @return The type of this component type.
 	 */
 	public IFuture<String> getLocalTypeAsync();
+	
+	/**
+	 *  Starts a new component.
+	 *  
+	 *  @param infos Start information.
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public IFuture<IExternalAccess> createComponent(CreationInfo info);
+	
+	/**
+	 *  Starts a set of new components, in order of dependencies.
+	 *  
+	 *  @param infos Start information.
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public IIntermediateFuture<IExternalAccess> createComponents(CreationInfo... infos);
+	
+	/**
+	 *  Stops a set of components, in order of dependencies.
+	 *  
+	 *  @param infos Start information.
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public IIntermediateFuture<Map<String, Object>> killComponents(CreationInfo... infos);
+	
+	/**
+	 * Search for subcomponents matching the given description.
+	 * @return An array of matching component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con);
 	
 	/**
 	 *  Get the children (if any) component identifiers.

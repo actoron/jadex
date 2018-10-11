@@ -43,7 +43,7 @@ public class JCCTest //extends TestCase
 		IExternalAccess	platform	= fut.get(timeout);
 		timeout	= Starter.getDefaultTimeout(platform.getId());
 		
-		IExternalAccess	jcc	= (IExternalAccess)platform.getExternalAccess(
+		IExternalAccess	jcc	= (IExternalAccess)platform.getExternalAccessAsync(
 			new BasicComponentIdentifier("jcc", platform.getId())).get(timeout);
 		
 		jcc.scheduleStep(new IComponentStep<Void>()

@@ -115,7 +115,7 @@ public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPan
 	public IFuture<IExternalAccess>	getServiceAccess()
 	{
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
-		getJCC().getJCCAccess().getExternalAccess(((IService)getService()).getServiceId().getProviderId())
+		getJCC().getJCCAccess().getExternalAccessAsync(((IService)getService()).getServiceId().getProviderId())
 			.addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 		return ret;
 	}

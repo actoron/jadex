@@ -1803,7 +1803,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		{
 			Component	comp	= (Component)added.get(i);
 			final IComponentIdentifier	cid	= comp.getDescription().getName();
-			jcc.getJCCAccess().getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>()
+			jcc.getJCCAccess().getExternalAccessAsync(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>()
 			{
 				public void customResultAvailable(IExternalAccess ea)
 				{

@@ -599,16 +599,11 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 //			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			CreationInfo ci = new CreationInfo().setName("spreg").setFilename(SuperpeerRegistryAgent.class.getName()+".class");
 			
-			agent.createComponent(ci)
-				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+			agent.createComponent(ci).addResultListener(new IResultListener<IExternalAccess>()
 			{
-				public void firstResultAvailable(IComponentIdentifier result)
+				public void resultAvailable(IExternalAccess result)
 				{
 					ret.setResult(null);
-				}
-				
-				public void secondResultAvailable(Map<String, Object> result)
-				{
 				}
 				
 				public void exceptionOccurred(Exception exception)

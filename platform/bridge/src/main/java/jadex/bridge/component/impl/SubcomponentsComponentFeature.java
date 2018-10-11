@@ -9,6 +9,7 @@ import java.util.Map;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
@@ -35,6 +36,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -134,61 +136,115 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	}
 	
 	/**
-	 *  Create the subcomponents.
+	 *  Starts a new component.
+	 *  
+	 *  @param infos Start information.
+	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	protected IFuture<List<IComponentIdentifier>> createComponents(final ComponentInstanceInfo[] components)
+	public IFuture<IExternalAccess> createComponent(CreationInfo info)
 	{
-//		System.out.println("create subcompos: ");
-//		for(ComponentInstanceInfo cii: components)
+		if (info.getParent() == null || component.getId().equals(info.getParent()))
+			return getComponent().createComponent(info, null);
+		else
+			return component.getExternalAccessAsync(info.getParent()).get().createComponent(info);
+	}
+	
+	/**
+	 *  Starts a set of new components, in order of dependencies.
+	 *  
+	 *  @param infos Start information.
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public IIntermediateFuture<IExternalAccess> createComponents(CreationInfo... infos);
+	
+	/**
+	 *  Stops a set of components, in order of dependencies.
+	 *  
+	 *  @param infos Start information.
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public IIntermediateFuture<Map<String, Object>> killComponents(CreationInfo... infos);
+	
+//	/**
+//	 *  Starts a new child as subcomponent.
+//	 *  
+//	 *  @param infos Start information.
+//	 *  @return The id of the component and the results after the component has been killed.
+//	 */
+//	public IFuture<IExternalAccess> createChild(CreationInfo info)
+//	{
+//		if (info.getParent() != null && !component.getId().equals(info.getParent()))
+//			return new Future<>(new IllegalArgumentException("Subcomponent cannot be created if parent is specified: " + info + ", specified parent " + info.getParent()));
+//		
+//		info.setParent(component.getId());
+//		return component.createComponent(info, null);
+//	}
+	
+//	/**
+//	 *  Create the subcomponents.
+//	 */
+//	protected IFuture<List<IComponentIdentifier>> createComponents(final ComponentInstanceInfo[] components)
+//	{
+////		System.out.println("create subcompos: ");
+////		for(ComponentInstanceInfo cii: components)
+////		{
+////			System.out.println(cii.getName()+" "+cii.getTypeName());
+////		}
+//		
+//		final Future<Void> res = new Future<Void>();
+//		final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
+////		IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+//		// NOTE: in current implementation application waits for subcomponents
+//		// to be finished and cms implements a hack to get the external
+//		// access of an uninited parent.
+//		
+//		// (NOTE1: parent cannot wait for subcomponents to be all created
+//		// before setting itself inited=true, because subcomponents need
+//		// the parent external access.)
+//		
+//		// (NOTE2: subcomponents must be created one by one as they
+//		// might depend on each other (e.g. bdi factory must be there for jcc)).
+//		
+//		createComponent(components, component.getModel(), 0, res, cids);
+//		
+//		final Future<List<IComponentIdentifier>> ret = new Future<List<IComponentIdentifier>>();
+//		res.addResultListener(new ExceptionDelegationResultListener<Void, List<IComponentIdentifier>>(ret)
 //		{
-//			System.out.println(cii.getName()+" "+cii.getTypeName());
-//		}
-		
-		final Future<Void> res = new Future<Void>();
-		final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
-//		IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-		// NOTE: in current implementation application waits for subcomponents
-		// to be finished and cms implements a hack to get the external
-		// access of an uninited parent.
-		
-		// (NOTE1: parent cannot wait for subcomponents to be all created
-		// before setting itself inited=true, because subcomponents need
-		// the parent external access.)
-		
-		// (NOTE2: subcomponents must be created one by one as they
-		// might depend on each other (e.g. bdi factory must be there for jcc)).
-		
-		createComponent(components, component.getModel(), 0, res, cids);
-		
-		final Future<List<IComponentIdentifier>> ret = new Future<List<IComponentIdentifier>>();
-		res.addResultListener(new ExceptionDelegationResultListener<Void, List<IComponentIdentifier>>(ret)
-		{
-			public void customResultAvailable(Void result)
-			{
-				ret.setResult(cids);
-			}
-		});
-		
-		return ret;
+//			public void customResultAvailable(Void result)
+//			{
+//				ret.setResult(cids);
+//			}
+//		});
+//		
+//		return ret;
+//	}
+	
+	/**
+	 * Search for components matching the given description.
+	 * @return An array of matching component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con)
+	{
+		return getComponent().searchComponents(adesc, con);
 	}
 	
 	/**
 	 *  Create a subcomponent.
 	 *  @param component The instance info.
 	 */
-	public IFuture<IComponentIdentifier> createChild(final ComponentInstanceInfo component)
-	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		createComponents(new ComponentInstanceInfo[]{component}).addResultListener(createResultListener(
-			new ExceptionDelegationResultListener<List<IComponentIdentifier>, IComponentIdentifier>(ret)
-			{
-				public void customResultAvailable(List<IComponentIdentifier> cids)
-				{
-					ret.setResult(cids.get(0));
-				}
-			}));
-		return ret;
-	}
+//	public IFuture<IComponentIdentifier> createChild(final ComponentInstanceInfo component)
+//	{
+//		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+//		createComponents(new ComponentInstanceInfo[]{component}).addResultListener(createResultListener(
+//			new ExceptionDelegationResultListener<List<IComponentIdentifier>, IComponentIdentifier>(ret)
+//			{
+//				public void customResultAvailable(List<IComponentIdentifier> cids)
+//				{
+//					ret.setResult(cids.get(0));
+//				}
+//			}));
+//		return ret;
+//	}
 	
 	/**
 	 *  Create subcomponents.

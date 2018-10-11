@@ -166,7 +166,7 @@ public class CreationBDI
 					// Use initial component to kill others
 					String	initial	= createPeerName(0, agent.getId());
 					IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-					agent.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+					agent.getExternalAccessAsync(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 					{
 						public void resultAvailable(IExternalAccess exta)
 						{

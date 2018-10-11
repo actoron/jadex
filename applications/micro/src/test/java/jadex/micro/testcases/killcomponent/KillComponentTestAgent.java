@@ -112,7 +112,7 @@ public class KillComponentTestAgent extends TestAgent
 			public void customResultAvailable(final IComponentIdentifier cid)
 			{
 				agent.getLogger().severe("Testagent create provider done: " + agent.getDescription());
-				IExternalAccess exta = agent.getExternalAccess(cid).get();
+				IExternalAccess exta = agent.getExternalAccessAsync(cid).get();
 				final TestReport tr = new TestReport("#" + testno, "Test if kill returns result");
 				System.out.println("Killing my subcomponent...");
 				exta.killComponent().addResultListener(new IResultListener<Map<String, Object>>()

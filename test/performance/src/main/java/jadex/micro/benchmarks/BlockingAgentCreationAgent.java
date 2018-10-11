@@ -118,7 +118,7 @@ public class BlockingAgentCreationAgent
 //			IComponentManagementService cms	= getCMS(agent);
 			String	initial	= createPeerName(1, agent.getId());
 			IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-			IExternalAccess exta	= agent.getExternalAccess(cid).get();
+			IExternalAccess exta	= agent.getExternalAccessAsync(cid).get();
 			exta.scheduleStep(new IComponentStep<Void>()
 			{
 				@Classname("deletePeers")

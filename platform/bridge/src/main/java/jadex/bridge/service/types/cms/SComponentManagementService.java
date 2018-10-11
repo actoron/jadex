@@ -2108,7 +2108,7 @@ public class SComponentManagementService
 	{
 		final Future<IComponentIdentifier> ret = new Future<>();
 		
-		agent.getExternalAccess(cinfo.getParent().getRoot()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+		agent.getExternalAccessAsync(cinfo.getParent().getRoot()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			@Override
 			public void customResultAvailable(IExternalAccess platform) throws Exception

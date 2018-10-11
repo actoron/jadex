@@ -294,7 +294,7 @@ public class UpdateAgent implements IUpdateService
 	{
 		// Todo: version service!?
 		final Future<String>	ret	= new Future<String>();
-		agent.getExternalAccess(newcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
+		agent.getExternalAccessAsync(newcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
 		{
 			public void customResultAvailable(IExternalAccess exta)
 			{
@@ -529,7 +529,7 @@ public class UpdateAgent implements IUpdateService
 		
 //		String cmd = System.getProperty("sun.java.command");
 		
-		agent.getExternalAccess(agent.getId().getRoot())
+		agent.getExternalAccessAsync(agent.getId().getRoot())
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, StartOptions>(ret)
 		{
 			public void customResultAvailable(IExternalAccess plat)

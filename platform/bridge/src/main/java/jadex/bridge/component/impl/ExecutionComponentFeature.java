@@ -54,6 +54,7 @@ import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -626,6 +627,17 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		timers.add(ts[0]);
 		
 		return ret;
+	}
+	
+	/**
+	 *  Waits for the components to finish.
+	 * 
+	 *  @return Component results.
+	 */
+	public IFuture<Map<String, Object>> waitForTermination()
+	{
+		final Future<Map<String, Object>> ret = new Future<>();
+//		SComponentManagementService.getCleanupFutures(component.getId().getRoot()).get(key)
 	}
 	
 	// todo:?
@@ -1952,18 +1964,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 *  The listener is registered for component changes.
 	 *  @param cid	The component to be listened.
 	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid)
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent()
 	{
-		return getComponent().listenToComponent(cid);
-	}
-	
-	/**
-	 * Search for components matching the given description.
-	 * @return An array of matching component descriptions.
-	 */
-	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con)
-	{
-		return getComponent().searchComponents(adesc, con);
+		return getComponent().listenToComponent(component.getId());
 	}
 	
 	/**
@@ -1971,9 +1974,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 *  @param componentid The component identifier.
 	 *  @param listener Called when the step is finished (result will be the component description).
 	 */
-	public IFuture<Void> stepComponent(IComponentIdentifier componentid, String stepinfo)
+	public IFuture<Void> stepComponent(String stepinfo)
 	{
-		return getComponent().stepComponent(componentid, stepinfo);
+		return getComponent().stepComponent(component.getId(), stepinfo);
 	}
 	
 	/**
@@ -1983,58 +1986,58 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 *  @param componentid The component identifier.
 	 *  @param breakpoints The new breakpoints (if any).
 	 */
-	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints)
+	public IFuture<Void> setComponentBreakpoints(String[] breakpoints)
 	{
-		return getComponent().setComponentBreakpoints(componentid, breakpoints);
+		return getComponent().setComponentBreakpoints(component.getId(), breakpoints);
 	}
 	
 	/**
 	 *  Suspend the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture<Void> suspendComponent(IComponentIdentifier componentid)
+	public IFuture<Void> suspendComponent()
 	{
-		return getComponent().suspendComponent(componentid);
+		return getComponent().suspendComponent(component.getId());
 	}
 	
 	/**
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture<Void> resumeComponent(IComponentIdentifier componentid)
+	public IFuture<Void> resumeComponent()
 	{
-		return getComponent().resumeComponent(componentid);
+		return getComponent().resumeComponent(component.getId());
 	}
 	
-	/**
-	 *  Add a new component as subcomponent of this component.
-	 *  @param component The model or pojo of the component.
-	 */
-	public IFuture<IExternalAccess> createComponent(CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
-	{
-		return getComponent().createComponent(info, resultlistener);
-	}
-	
-	/**
-	 *  Add a new component as subcomponent of this component.
-	 *  @param component The model or pojo of the component.
-	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(CreationInfo info)
-	{
-		return getComponent().createComponentWithResults(info);
-	}
-	
-	/**
-	 *  Create a new component on the platform.
-	 *  @param name The component name or null for automatic generation.
-	 *  @param model The model identifier (e.g. file name).
-	 *  @param info Additional start information such as parent component or arguments (optional).
-	 *  @return The id of the component and the results after the component has been killed.
-	 */
-	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(CreationInfo info)
-	{
-		return getComponent().createComponent(info);
-	}
+//	/**
+//	 *  Add a new component as subcomponent of this component.
+//	 *  @param component The model or pojo of the component.
+//	 */
+//	public IFuture<IExternalAccess> createComponent(CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
+//	{
+//		return getComponent().createComponent(info, resultlistener);
+//	}
+//	
+//	/**
+//	 *  Add a new component as subcomponent of this component.
+//	 *  @param component The model or pojo of the component.
+//	 */
+//	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(CreationInfo info)
+//	{
+//		return getComponent().createComponentWithResults(info);
+//	}
+//	
+//	/**
+//	 *  Create a new component on the platform.
+//	 *  @param name The component name or null for automatic generation.
+//	 *  @param model The model identifier (e.g. file name).
+//	 *  @param info Additional start information such as parent component or arguments (optional).
+//	 *  @return The id of the component and the results after the component has been killed.
+//	 */
+//	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(CreationInfo info)
+//	{
+//		return getComponent().createComponent(info);
+//	}
 	
 	/**
 	 *  Kill the component.
@@ -2053,21 +2056,21 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		return getComponent().killComponent(e);
 	}
 	
-	/**
-	 *  Kill the component.
-	 *  @param e The failure reason, if any.
-	 */
-	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid)
-	{
-		return getComponent().killComponent(cid);
-	}
+//	/**
+//	 *  Kill the component.
+//	 *  @param e The failure reason, if any.
+//	 */
+//	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid)
+//	{
+//		return getComponent().killComponent(cid);
+//	}
 	
 	/**
 	 *  Get the external access for a component id.
 	 *  @param cid The component id.
 	 *  @return The external access.
 	 */
-	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid)
+	public IFuture<IExternalAccess> getExternalAccessAsync(IComponentIdentifier cid)
 	{
 		return getComponent().getExternalAccess(cid);
 	}

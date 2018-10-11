@@ -1240,7 +1240,7 @@ public class RestWebSocket extends Endpoint
 						{
 							public void firstResultAvailable(IComponentIdentifier cid)
 							{
-								platform.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+								platform.getExternalAccessAsync(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 							}
 
 							public void secondResultAvailable(Map<String, Object> result)

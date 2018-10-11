@@ -160,7 +160,7 @@ public class MinimalAgentCreationAgent
 //				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				String	initial	= createPeerName(1, agent.getId());
 				IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-				agent.getExternalAccess(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
+				agent.getExternalAccessAsync(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)
 					{

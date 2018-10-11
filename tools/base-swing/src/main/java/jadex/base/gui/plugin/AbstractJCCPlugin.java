@@ -256,7 +256,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	{
 		final Future<ClassLoader>	ret	= new Future<ClassLoader>();
 		
-		jcc.getJCCAccess().getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, ClassLoader>(ret)
+		jcc.getJCCAccess().getExternalAccessAsync(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, ClassLoader>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
@@ -355,7 +355,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 							for(int i=0; i<nodes.length; i++)
 							{
 								final IComponentIdentifier	cid	= ((ProxyComponentTreeNode)nodes[i]).getComponentIdentifier();
-								jcc.getPlatformAccess().getExternalAccess(cid)
+								jcc.getPlatformAccess().getExternalAccessAsync(cid)
 									.addResultListener(new SwingDefaultResultListener<IExternalAccess>(panel)
 								{
 									public void customResultAvailable(IExternalAccess ea)

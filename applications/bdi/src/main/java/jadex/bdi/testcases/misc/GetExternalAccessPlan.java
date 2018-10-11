@@ -88,7 +88,7 @@ public class GetExternalAccessPlan extends Plan
 		wait.setResult(null);
 		init.get();
 		done	= new Future<>();
-		getAgent().getExternalAccess(cid).addResultListener(lis);
+		getAgent().getExternalAccessAsync(cid).addResultListener(lis);
 		done.get();
 		if(gotexta[0] && gotexta[1])
 			tr.setSucceeded(true);

@@ -91,7 +91,7 @@ public class SwitchPlatformCommand extends ACliCommand
 					if(plat.equals(cid) && !ret.isDone())
 					{
 						found = true;
-						comp.getExternalAccess(plat).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IInternalCliService>(ret)
+						comp.getExternalAccessAsync(plat).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IInternalCliService>(ret)
 						{
 							public void customResultAvailable(IExternalAccess exta)
 							{

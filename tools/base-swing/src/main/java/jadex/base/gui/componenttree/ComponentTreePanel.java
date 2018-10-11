@@ -250,11 +250,11 @@ public class ComponentTreePanel extends JSplitPane
 	//						final IActiveComponentTreeNode sel = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 	//						final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
-					access.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+					access.getExternalAccess(cid).resumeComponent().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 					{
 						public void customResultAvailable(Object result)
 						{
-							access.killComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+							access.getExternalAccess(cid).killComponent().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 	//								cms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 							{
 								public void customResultAvailable(Object result)
@@ -319,7 +319,7 @@ public class ComponentTreePanel extends JSplitPane
 				{
 					final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 					final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
-					access.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+					access.getExternalAccess(cid).suspendComponent().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -342,7 +342,7 @@ public class ComponentTreePanel extends JSplitPane
 				{
 					final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 					final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
-					access.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+					access.getExternalAccess(cid).resumeComponent().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -365,7 +365,7 @@ public class ComponentTreePanel extends JSplitPane
 					final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 
 					final ISwingTreeNode sel = (ISwingTreeNode)paths[i].getLastPathComponent();
-					access.stepComponent(cid, null).addResultListener(new SwingDefaultResultListener<Void>(ComponentTreePanel.this)
+					access.getExternalAccess(cid).stepComponent(null).addResultListener(new SwingDefaultResultListener<Void>(ComponentTreePanel.this)
 					{
 						public void customResultAvailable(Void result)
 						{
@@ -466,7 +466,7 @@ public class ComponentTreePanel extends JSplitPane
 					{
 						//IComponentDescription desc = ((IActiveComponentTreeNode)node).getDescription();
 						IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getDescription().getName();
-						access.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>((Component)null)
+						access.getExternalAccessAsync(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>((Component)null)
 						{
 							public void customResultAvailable(IExternalAccess ea)
 							{
@@ -1133,7 +1133,7 @@ public class ComponentTreePanel extends JSplitPane
 				final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 				final IComponentIdentifier cid = node.getComponentIdentifier();
 				
-				jcc.getJCCAccess().getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, JComponent>(ret)
+				jcc.getJCCAccess().getExternalAccessAsync(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, JComponent>(ret)
 				{
 					public void customResultAvailable(final IExternalAccess exta)
 					{
@@ -1254,7 +1254,7 @@ public class ComponentTreePanel extends JSplitPane
 				{
 					// Unknown -> start search to find out asynchronously
 							
-					jcc.getJCCAccess().getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+					jcc.getJCCAccess().getExternalAccessAsync(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 					{
 						public void resultAvailable(final IExternalAccess exta)
 						{
@@ -1298,7 +1298,7 @@ public class ComponentTreePanel extends JSplitPane
 	protected static IFuture<Void>	killComponent(IExternalAccess access, final IComponentIdentifier cid)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		access.killComponent(cid)
+		access.getExternalAccess(cid).killComponent()
 //				cms.destroyComponent(cid)
 			.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{

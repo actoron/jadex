@@ -80,7 +80,7 @@ public class BPMNRecoveryTestAgent
 		ci.setFilename(model);
 		
 		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(ci);
-		IExternalAccess	exta = agent.getExternalAccess(fut.getFirstResult()).get();
+		IExternalAccess	exta = agent.getExternalAccessAsync(fut.getFirstResult()).get();
 		ISubscriptionIntermediateFuture<Tuple2<String, Object>>	res	= exta.subscribeToResults();
 		if(!exta.getResultsAsync().get().containsKey("running"))
 		{
@@ -99,7 +99,7 @@ public class BPMNRecoveryTestAgent
 		ps.restore(info).get();
 		
 		Future<Collection<Tuple2<String,Object>>>	cres	= new Future<Collection<Tuple2<String,Object>>>();
-		IExternalAccess	exta2	= agent.getExternalAccess(fut.getFirstResult()).get();
+		IExternalAccess	exta2	= agent.getExternalAccessAsync(fut.getFirstResult()).get();
 		exta2.subscribeToResults().addResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres));
 //		cms.addComponentResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres), fut.getFirstResult()).get();
 		

@@ -275,7 +275,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
             {
                 public void firstResultAvailable(IComponentIdentifier cid)
                 {
-                	agent.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
+                	agent.getExternalAccessAsync(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
                 	{
                 		public void customResultAvailable(IExternalAccess exta)
                 		{

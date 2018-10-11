@@ -324,7 +324,7 @@ public class ServiceCallTestNFClearTest
 		// wait for creation
 		IComponentIdentifier identifier = future.get();
 
-		IExternalAccess ret = platform.getExternalAccess(identifier).get();
+		IExternalAccess ret = platform.getExternalAccessAsync(identifier).get();
 	
 		return ret;
 	}

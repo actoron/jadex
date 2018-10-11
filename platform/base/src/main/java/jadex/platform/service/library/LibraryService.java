@@ -980,7 +980,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		final Future<Void>	ret	= new Future<Void>();
 		final IComponentIdentifier	remote	= rid.getLocalIdentifier().getComponentIdentifier();
-		component.getExternalAccess(remote).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+		component.getExternalAccessAsync(remote).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			public void customResultAvailable(IExternalAccess exta)
 			{

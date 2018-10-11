@@ -54,7 +54,7 @@ public class ProviderAgent implements ITestService
 			return new Future<Void>(new RuntimeException("Current service call after schedule internal has changed: "+ServiceCall.getCurrentInvocation()+", "+sc));
 		}
 
-		IExternalAccess	rootacc	= agent.getExternalAccess(agent.getId().getRoot()).get();
+		IExternalAccess	rootacc	= agent.getExternalAccessAsync(agent.getId().getRoot()).get();
 		rootacc.scheduleStep(new IComponentStep<Void>() {
 			@Override
 			@Classname("myuniquestepname")

@@ -1582,7 +1582,7 @@ public class SServiceProvider
 						ret = SFuture.getFuture(method.getReturnType());
 						final Future<IExternalAccess> sret = (Future<IExternalAccess>)ret;
 						
-						component.getExternalAccess(providerid).addResultListener(new IResultListener<IExternalAccess>()
+						component.getExternalAccessAsync(providerid).addResultListener(new IResultListener<IExternalAccess>()
 						{
 							public void resultAvailable(IExternalAccess result) 
 							{
@@ -1608,7 +1608,7 @@ public class SServiceProvider
 					}
 					else
 					{
-						access = component.getExternalAccess(providerid).get();
+						access = component.getExternalAccessAsync(providerid).get();
 						ret = method.invoke(access, args);
 					}
 				}

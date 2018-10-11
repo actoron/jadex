@@ -92,7 +92,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		if(invoke)
 		{
 			// HACK!!! todo
-			IFuture<IExternalAccess> fut = space.getExternalAccess().getExternalAccess(agent.getName());
+			IFuture<IExternalAccess> fut = space.getExternalAccess().getExternalAccessAsync(agent.getName());
 			fut.addResultListener(new IResultListener<IExternalAccess>()
 			{
 				public void exceptionOccurred(Exception exception)

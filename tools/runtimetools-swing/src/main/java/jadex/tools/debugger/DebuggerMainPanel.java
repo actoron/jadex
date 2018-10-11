@@ -95,7 +95,7 @@ public class DebuggerMainPanel extends JSplitPane
 		
 		final JTabbedPane tabs = new JTabbedPane();	
 		
-		jcc.getPlatformAccess().getExternalAccess(desc.getName())
+		jcc.getPlatformAccess().getExternalAccessAsync(desc.getName())
 			.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 		{			
 			public void resultAvailable(final IExternalAccess exta)
