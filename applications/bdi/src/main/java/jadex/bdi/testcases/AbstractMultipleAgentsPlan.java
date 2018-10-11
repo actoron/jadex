@@ -10,7 +10,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ITuple2Future;
 
 /**
  *  Base class for test plans that create other agents.
@@ -56,8 +55,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 		{
 			for(int i=0; i<args.length; i++)
 			{
-				ITuple2Future<IComponentIdentifier, Map<String, Object>> ret = getAgent().createComponent(new CreationInfo(config, args[i], getComponentIdentifier()).setFilename(type));
-				IComponentIdentifier aid = (IComponentIdentifier)ret.getFirstResult();
+				IComponentIdentifier aid = getAgent().createComponent(new CreationInfo(config, args[i], getComponentIdentifier()).setFilename(type)).get().getId();
 				agents.add(aid);
 			}
 		}

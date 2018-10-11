@@ -207,12 +207,13 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		ITuple2Future<IComponentIdentifier,Map<String,Object>> cmsfut = agent.createComponent(ci);
-		cmsfut.addTuple2ResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+		IFuture<IExternalAccess> cmsfut = agent.createComponent(ci);
+		cmsfut.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				super.customResultAvailable(result);
+				ret.setResult(result.getId());
+				result.waitForTermination().addResultListener(reslis);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -220,7 +221,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 				exception.printStackTrace();
 				super.exceptionOccurred(exception);
 			}
-		}, reslis);
+		});
 		
 		return ret;
 	}
@@ -238,20 +239,21 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> cmsfut = agent.createComponent(ci);
-		cmsfut.addTuple2ResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+		IFuture<IExternalAccess> cmsfut = agent.createComponent(ci);
+		cmsfut.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				super.customResultAvailable(result);
+				ret.setResult(result.getId());
+				result.waitForTermination().addResultListener(reslis);
 			}
-
+			
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
 				super.exceptionOccurred(exception);
 			}
-		}, reslis);
+		});
 
 		return ret;
 	}

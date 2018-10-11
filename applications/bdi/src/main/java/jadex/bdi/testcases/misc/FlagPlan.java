@@ -26,7 +26,7 @@ public class FlagPlan extends Plan
 		TestReport tr = new TestReport("#1", "Start agent externally as suspended.");
 		CreationInfo ci =  new CreationInfo("donothing", null, getComponentIdentifier());
 		ci.setSuspend(Boolean.TRUE);
-		IExternalAccess ea = getAgent().createComponent(ci.setFilename("jadex/bdi/testcases/misc/Flag.agent.xml") , null).get();
+		IExternalAccess ea = getAgent().createComponent(ci.setFilename("jadex/bdi/testcases/misc/Flag.agent.xml")).get();
 		IComponentDescription desc = getComponentDescription(ea);
 		if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 		{
@@ -41,7 +41,7 @@ public class FlagPlan extends Plan
 		
 		tr = new TestReport("#1", "Start agent that has suspended flag.");
 		ci =  new CreationInfo("suspend", null, getComponentIdentifier());
-		ea = getAgent().createComponent(ci.setFilename("jadex/bdi/testcases/misc/Flag.agent.xml") , null).get();
+		ea = getAgent().createComponent(ci.setFilename("jadex/bdi/testcases/misc/Flag.agent.xml")).get();
 		desc = getComponentDescription(ea);
 		if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 		{

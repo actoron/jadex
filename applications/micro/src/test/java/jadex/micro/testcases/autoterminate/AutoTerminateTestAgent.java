@@ -238,7 +238,7 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.createComponent(new CreationInfo().setFilename(AutoTerminateTestAgent.class.getCanonicalName() + ".class")).getSecondResult();
+					ia.createComponent(new CreationInfo().setFilename(AutoTerminateTestAgent.class.getCanonicalName() + ".class")).get().waitForTermination().get();
 					System.out.println("Step done.");
 					return IFuture.DONE;
 				}

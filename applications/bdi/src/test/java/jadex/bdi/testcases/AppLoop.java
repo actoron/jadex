@@ -1,14 +1,11 @@
 package jadex.bdi.testcases;
 
-import java.util.Map;
-
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.util.STest;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Start hunter prey in a loop to find heisenbug.
@@ -28,10 +25,10 @@ public class AppLoop
 		{
 			if(i%100==0)
 				System.out.println(i);
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut
+			IFuture<IExternalAccess> fut
 				= platform.createComponent(new CreationInfo("jadex/bdi/examples/hunterprey_classic/HunterPrey.application.xml"));
-			platform.getExternalAccess(fut.getFirstResult()).killComponent().get();
-			fut.getSecondResult();
+			fut.get().killComponent().get();
+			fut.get().getResultsAsync().get();
 		}
 	}
 }
