@@ -71,7 +71,7 @@ public class ComponentStartTestLazyPlatform extends	ComponentTestLazyPlatform
 //							System.out.println("destroying1 "+cid);
 						try
 						{
-							platform.killComponent(cid).get();
+							platform.getExternalAccess(cid).killComponent().get();
 						}
 						catch(ComponentTerminatedException e)
 						{

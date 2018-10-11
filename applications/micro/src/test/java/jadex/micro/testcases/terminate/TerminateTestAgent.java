@@ -214,11 +214,11 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 				{
 					public void resultAvailable(Collection<TestReport> result)
 					{
-						agent.killComponent(exta.getId());
+						agent.getExternalAccess(exta.getId()).killComponent();
 					}
 					public void exceptionOccurred(Exception exception)
 					{
-						agent.killComponent(exta.getId());
+						agent.getExternalAccess(exta.getId()).killComponent();
 					}
 				});
 				

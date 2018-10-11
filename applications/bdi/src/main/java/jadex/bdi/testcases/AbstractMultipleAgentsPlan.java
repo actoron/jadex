@@ -82,7 +82,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //			System.out.println("Killing " + ((IComponentIdentifier)agents.get(i)).getName());
 			try
 			{
-				IFuture<Map<String, Object>> ret = getAgent().killComponent((IComponentIdentifier)agents.get(i));
+				IFuture<Map<String, Object>> ret = getAgent().getExternalAccess((IComponentIdentifier)agents.get(i)).killComponent();
 				ret.get();
 			}
 			catch(GoalFailureException e)

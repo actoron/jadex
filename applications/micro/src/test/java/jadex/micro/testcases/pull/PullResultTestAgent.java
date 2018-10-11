@@ -375,7 +375,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 								System.out.println("finished: ");
 								TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
 								tr.setReason("Exception did not occur");
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 							public void resultAvailable(Collection<String> result)
@@ -383,7 +383,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 								System.out.println("resultAvailable: "+result);
 								TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
 								tr.setReason("Exception did not occur");
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 							public void exceptionOccurred(Exception exception)
@@ -399,7 +399,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 								{
 									tr.setReason("Other exception: ("+exception);
 								}
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 						}));

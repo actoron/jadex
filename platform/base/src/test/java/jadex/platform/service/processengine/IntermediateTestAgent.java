@@ -275,7 +275,7 @@ public class IntermediateTestAgent
 			tr.setFailed("Timeout exception.");
 			try
 			{
-				agent.killComponent(fut.getFirstResult());
+				agent.getExternalAccess(fut.getFirstResult()).killComponent();
 			}
 			catch(Exception ex)
 			{
@@ -333,7 +333,7 @@ public class IntermediateTestAgent
 			tr.setFailed("Timeout exception.");
 			try
 			{
-				agent.killComponent(fut.getFirstResult());
+				agent.getExternalAccess(fut.getFirstResult()).killComponent();
 			}
 			catch(Exception ex)
 			{
@@ -377,7 +377,7 @@ public class IntermediateTestAgent
 			tr.setSucceeded(true);
 			try
 			{
-				agent.killComponent(fut.getFirstResult());
+				agent.getExternalAccess(fut.getFirstResult()).killComponent();
 			}
 			catch(Exception ex)
 			{
@@ -421,7 +421,7 @@ public class IntermediateTestAgent
 			tr.setSucceeded(true);
 			try
 			{
-				agent.killComponent(fut.getFirstResult());
+				agent.getExternalAccess(fut.getFirstResult()).killComponent();
 			}
 			catch(Exception ex)
 			{
@@ -461,7 +461,7 @@ public class IntermediateTestAgent
 			tr.setSucceeded(true);
 			try
 			{
-				agent.killComponent(fut.getFirstResult());
+				agent.getExternalAccess(fut.getFirstResult()).killComponent();
 			}
 			catch(Exception ex)
 			{

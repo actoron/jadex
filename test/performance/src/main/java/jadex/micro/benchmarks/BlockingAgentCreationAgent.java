@@ -131,7 +131,7 @@ public class BlockingAgentCreationAgent
 					{
 						String name = createPeerName(i, ia.getId());
 						IComponentIdentifier cid = new BasicComponentIdentifier(name, ia.getId().getRoot());
-						agent.killComponent(cid).get();
+						agent.getExternalAccess(cid).killComponent().get();
 						System.out.println("Successfully destroyed peer: "+name);
 					}
 					

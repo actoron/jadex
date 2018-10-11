@@ -262,7 +262,7 @@ public class CreateComponentTask implements ITask
 		{
 			public void resultAvailable(final IComponentIdentifier cid)
 			{
-				IFuture<Map<String, Object>> fut = instance.killComponent(cid);
+				IFuture<Map<String, Object>> fut = instance.getExternalAccess(cid).killComponent();
 				fut.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 				{
 					public void customResultAvailable(Map<String, Object> result)

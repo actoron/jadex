@@ -208,7 +208,7 @@ public class CreationBDI
 	{
 		final String name = createPeerName(cnt, agent.getId());
 		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
-		agent.killComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
+		agent.getExternalAccess(aid).killComponent().addResultListener(new DefaultResultListener<Map<String, Object>>()
 		{
 			public void resultAvailable(Map<String, Object> result)
 			{

@@ -64,7 +64,7 @@ public class SubscriberAgent
 						if("platform".equals(agent.getConfiguration()))
 						{
 //							agent.getLogger().severe("destroy platform: "+agent.getComponentIdentifier().getRoot());
-							agent.killComponent(agent.getId().getRoot());
+							agent.getExternalAccess(agent.getId().getRoot()).killComponent();
 						}
 						else
 						{

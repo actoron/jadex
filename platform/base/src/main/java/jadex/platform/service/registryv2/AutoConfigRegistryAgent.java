@@ -17,7 +17,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.cpu.CoreNumberProperty;
 import jadex.bridge.sensor.memory.MaxMemoryProperty;
 import jadex.bridge.sensor.time.ComponentUptimeProperty;
@@ -33,15 +32,12 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.registryv2.IAutoConfigRegistryService;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
-import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -631,7 +627,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		ISuperpeerService sps = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class).setMultiplicity(0));
 		if (sps != null)
 		{
-			agent.killComponent(((IService)sps).getServiceId().getProviderId()).addResultListener(new IResultListener<Map<String,Object>>()
+			agent.getExternalAccess(((IService)sps).getServiceId().getProviderId()).killComponent().addResultListener(new IResultListener<Map<String,Object>>()
 			{
 				public void resultAvailable(Map<String, Object> result)
 				{

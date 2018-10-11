@@ -169,7 +169,7 @@ public class ComponentTestLazyPlatform extends TestCase
 					boolean b = finished.setExceptionIfUndone(new TimeoutException(ComponentTestLazyPlatform.this + " did not finish in " + timeout + " ms."));
 					if(b && cid[0] != null && platform != null)
 					{
-						platform.killComponent(cid[0]);
+						platform.getExternalAccess(cid[0]).killComponent();
 					}
 				}
 			}, timeout);
@@ -226,7 +226,7 @@ public class ComponentTestLazyPlatform extends TestCase
 
 		// cleanup platform?
 		if(conf != null)
-			platform.killComponent(platform.getId().getRoot()).get(timeout, true);
+			platform.killComponent().get(timeout, true);
 
 		// Remove references to Jadex resources to aid GC cleanup.
 		suite = null;

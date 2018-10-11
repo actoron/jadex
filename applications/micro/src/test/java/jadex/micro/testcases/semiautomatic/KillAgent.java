@@ -59,7 +59,7 @@ public class KillAgent
 			IComponentIdentifier cid = pl.createComponent(new CreationInfo().setFilename(KillAgent.class.getName()+".class")).getFirstResult();
 			try
 			{
-				pl.killComponent(cid).get();
+				pl.getExternalAccess(cid).killComponent().get();
 			}
 			catch(Exception e)
 			{

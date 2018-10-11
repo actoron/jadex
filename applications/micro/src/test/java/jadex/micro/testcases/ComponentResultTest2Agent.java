@@ -98,7 +98,7 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				agent.killComponent(result.getId())
+				agent.getExternalAccess(result.getId()).killComponent()
 					.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(fut)
 				{
 					public void customResultAvailable(Map<String, Object> results)

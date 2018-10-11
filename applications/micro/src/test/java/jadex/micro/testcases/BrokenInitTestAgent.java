@@ -127,7 +127,7 @@ public class BrokenInitTestAgent extends JunitAgentTest
 			public void resultAvailable(IExternalAccess result)
 			{
 				fut1.setException(new RuntimeException("Creation unexpectedly succeded."));
-				agent.killComponent(result.getId());
+				agent.getExternalAccess(result.getId()).killComponent();
 			}
 			
 			public void exceptionOccurred(Exception exception)

@@ -108,7 +108,7 @@ public class EchoChatAgent
 			IComponentIdentifier cid = pl.createComponent(new CreationInfo().setFilename(EchoChatAgent.class.getName()+".class")).getFirstResult();
 			try
 			{
-				pl.killComponent(cid).get();
+				pl.getExternalAccess(cid).killComponent().get();
 			}
 			catch(Exception e)
 			{

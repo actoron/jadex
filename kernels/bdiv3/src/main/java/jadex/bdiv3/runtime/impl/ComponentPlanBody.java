@@ -133,7 +133,7 @@ public class ComponentPlanBody extends AbstractPlanBody
 		if(cid!=null)
 		{
 			// todo: fix synchronous subcomponents!? may be called from inner or outer component.
-			ia.killComponent(cid);
+			ia.getExternalAccess(cid).killComponent();
 		}
 		
 		super.abort();

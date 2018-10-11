@@ -86,7 +86,7 @@ public class ComponentStartTest extends ComponentTest
 						// System.out.println("destroying1 "+cid);
 						try
 						{
-							platform.killComponent(cid).get();
+							platform.getExternalAccess(cid).killComponent().get();
 						}
 						catch(ComponentTerminatedException e)
 						{
