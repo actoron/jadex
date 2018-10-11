@@ -894,6 +894,13 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
 					}
 					
+					if("waitForTermination".equals(method.getName()))
+					{
+						if(shutdown)
+							return new Future<>(getFeature(IArgumentsResultsFeature.class).getResults());
+						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+					}
+					
 					if(!getFeature(IExecutionFeature.class).isComponentThread())
 					{
 						final Future<Object> ret = (Future<Object>)SFuture.getFuture(rettype);

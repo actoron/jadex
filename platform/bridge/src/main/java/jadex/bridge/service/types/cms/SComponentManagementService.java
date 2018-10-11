@@ -2376,7 +2376,7 @@ public class SComponentManagementService
 	/**
 	 * 
 	 */
-	protected static void linkResults(IResultListener<Collection<Tuple2<String, Object>>> resultlistener, IPlatformComponentAccess component, IInternalAccess agent)
+	public static void linkResults(IResultListener<Collection<Tuple2<String, Object>>> resultlistener, IPlatformComponentAccess component, IInternalAccess agent)
 	{
 		if(resultlistener!=null)
 		{
