@@ -136,7 +136,7 @@ public class CreationBDI
 
 			agent.createComponent(
 				new CreationInfo().setArguments(args).setResourceIdentifier(agent.getDescription().getResourceIdentifier())
-				.setFilename("jadex.bdiv3.benchmarks.CreationBDI.class").setName(createPeerName(num+1, agent.getId())), null);
+				.setFilename("jadex.bdiv3.benchmarks.CreationBDI.class").setName(createPeerName(num+1, agent.getId())));
 		}
 		else
 		{

@@ -91,7 +91,7 @@ public class BlockingAgentCreationAgent
 			args.put("startmem", Long.valueOf(startmem));
 			agent.createComponent(
 				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
-				.setName(createPeerName(num+1, agent.getId())).setFilename(BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"), null);
+				.setName(createPeerName(num+1, agent.getId())).setFilename(BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"));
 		}
 		else
 		{

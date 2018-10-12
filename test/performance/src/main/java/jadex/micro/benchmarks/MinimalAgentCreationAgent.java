@@ -123,7 +123,7 @@ public class MinimalAgentCreationAgent
 //				System.out.println("Args: "+num+" "+args);
 
 			agent.createComponent(
-				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()).setName(createPeerName(num+1, agent.getId())).setFilename(MinimalAgentCreationAgent.this.getClass().getName()+".class"), null);
+				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()).setName(createPeerName(num+1, agent.getId())).setFilename(MinimalAgentCreationAgent.this.getClass().getName()+".class"));
 		}
 		else
 		{

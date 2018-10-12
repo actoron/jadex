@@ -423,7 +423,7 @@ public class GlobalPoolServiceManager
 					ci.setFilename(ServicePoolAgent.class.getName()+".class");
 					
 					IExternalAccess ea = SServiceProvider.getExternalAccessProxy(component, ((IService)cms).getServiceId().getProviderId());
-					ea.createComponent(ci, null)
+					ea.createComponent(ci)
 //					cms.createComponent(null, componentname, ci, null)
 						.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
 					{

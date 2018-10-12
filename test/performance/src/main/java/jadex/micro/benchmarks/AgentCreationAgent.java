@@ -105,7 +105,7 @@ public class AgentCreationAgent
 
 			agent.createComponent(
 				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, agent.getDescription().getResourceIdentifier())
-				.setName(createPeerName(num+1, agent.getId())).setFilename(AgentCreationAgent.this.getClass().getName()+".class"), null);
+				.setName(createPeerName(num+1, agent.getId())).setFilename(AgentCreationAgent.this.getClass().getName()+".class"));
 		}
 		else
 		{

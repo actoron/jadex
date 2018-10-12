@@ -40,7 +40,7 @@ public class TreeStressTestAgent
 			CreationInfo	ci	= new CreationInfo(args, agent.getId()).setFilename(TreeStressTestAgent.this.getClass().getName()+".class");
 			for(int i=0; i<depth; i++)
 			{
-				agent.createComponent(ci, null);
+				agent.createComponent(ci);
 			}
 		}
 		
