@@ -126,10 +126,10 @@ The following sections show how to add more useful behavior using goals and plan
 ## Exercise A1: A Goal and a Plan
 
 Now we want to make the agent do something useful like performing patrol rounds. Create a copy of the
-`SimpleCleanerAgent.java` and name it `SimpleCleanerAgentA0.java` to keep the result of
+`CleanerBDIAgent.java` and name it `CleanerBDIAgentA0.java` to keep the result of
 the last exercise for future reference. Do this from now on after every completed exercise such that
 you can go back to a previous solution in case you messed up. This way you can keep editing the
-`SimpleCleanerAgent.java`, but you won't lose any previously working version.
+`CleanerBDIAgent.java`, but you won't lose any previously working version.
 
 Now add a goal and a plan specification to the agent as shown below:
 
@@ -235,7 +235,7 @@ this object as a goal, like we did in the  `exampleBehavior()` method.
 ## Exercise A2: Execute the Goal Periodically
 
 The result of the previous exercise is a cleaner agent that performs a single patrol round and then stops.
-Create a copy of the `SimpleCleanerAgent.java` named `SimpleCleanerAgentA1.java` to keep your code
+Create a copy of the `CleanerBDIAgent.java` named `CleanerBDIAgentA1.java` to keep your code
 of the previous exercise.
 
 Now we want to make the agent start over with a new patrol round whenever a patrol round is finished.
@@ -250,10 +250,75 @@ This behavior can be changed with the `recur` flag. When `recur` is set to true,
 restarts after each completion of the goal. As a result, in our revised cleaner agent the process is as follows:
 1. We create the goal and add it with `dispatchTopLevelGoal()`.
 2. The Jadex framework selects the `exampleBehavior()` as a suitable plan and executes the method.
-3. Our plan implementation in that method causes the agent to move to the specified locations on after another and finally the plan method returns.
+3. Our plan implementation in that method causes the agent to move to the specified locations on after another
+    and finally the plan method returns.
 4. The Jadex framework notices that the plan is finished and considers the goal processing to be complete.
-5. In Exercise A1 the goal would now be dropped because processing is finished. Due to the `recur=true` flag, in this exercise, the goal processing restarts at step 2.
+5. In Exercise A1 the goal would now be dropped because processing is finished. Due to the `recur=true` flag,
+    in this exercise, the goal processing restarts at step 2.
 
 
 
 ## Exercise A3: Multiple Plans for a Goal
+
+Backup you current solution as `CleanerBDIAgentA2.java`.
+
+One advantage of the BDI model is the clean separation between *what* an agent should achieve (goals)
+and *how* it can achieve it (plans). Often, there a many different ways to achieve the same result.
+In BDI agents this is naturally reflected by the possibility to have many plans that all are suitable candidates
+for pursuing the same goal.
+
+In this exercise, we want to specify alternative patrol rounds (i.e. sequences of locations), that the agent
+should choose from for pursuing the `PerformPatrol` goal. We can just add more methods with a corresponding
+`@Plan` annotation as shown below.
+
+```java
+	/**
+	 *  Declare a second plan for the PerformPatrol goal.
+	 */
+	@Plan(trigger=@Trigger(goals=PerformPatrol.class))
+	private void	performPatrolPlan2()
+	{
+		// Follow another path around the middle of the museum.
+		actsense.moveTo(0.3, 0.3);
+		actsense.moveTo(0.3, 0.7);
+		actsense.moveTo(0.7, 0.7);
+		actsense.moveTo(0.7, 0.3);
+		actsense.moveTo(0.3, 0.3);
+	}
+	
+	/**
+	 *  Declare a third plan for the PerformPatrol goal.
+	 */
+	@Plan(trigger=@Trigger(goals=PerformPatrol.class))
+	private void	performPatrolPlan3()
+	{
+		// Follow a zig-zag path in the museum.
+		actsense.moveTo(0.3, 0.3);
+		actsense.moveTo(0.7, 0.7);
+		actsense.moveTo(0.3, 0.7);
+		actsense.moveTo(0.7, 0.3);
+		actsense.moveTo(0.3, 0.3);
+	}
+```
+
+Add the methods above into your `CleanerBDIAgent.java`. Execute the agent by starting the `Main` class.
+Do you notice a difference?
+
+## The `orsuccess` Flag for Goals
+
+Probably you haven't noticed any difference. The agent still only executes the first plan repeatedly.
+The reason is that the agent starts with the first plan and continues executing plans until it
+considers the goal to be achieved. As the first plan completes without errors (i.e. not throwing a Java exception)
+it is considered a success (cf. step 4 in the process described in Exercise A2) and the goal processing
+restarts with an empty slate (cf. step 2).
+
+One option for telling the agent to look for other plans after a plan is completed is stating that not only *one*, but *all* available plans should be executed. This can be done with the `orsuccess` flag, that allows changing the processing semantics from *OR* (= only one of many plans needs to be executed) to *AND* (= all of the available plans need to be executed). The *OR* semantics (flag is `true`) is the default behavior that our agent currently exhibits.
+Setting the flag to `false` enables the *AND* semantics and lets the agent execute our additional patrol plans.
+
+Thus change the `@Goal` annotation of the `PerformPatrol` goal to
+
+```java
+	@Goal(recur=true, orsuccess=false)
+```
+
+Execute the agent by starting the `Main` class and check that now all three plans are executed after each other.

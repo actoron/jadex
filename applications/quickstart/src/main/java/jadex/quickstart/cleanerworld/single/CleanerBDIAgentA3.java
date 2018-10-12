@@ -4,7 +4,6 @@ import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
@@ -42,7 +41,7 @@ public class CleanerBDIAgentA3
 	/**
 	 *  A goal to patrol around in the museum.
 	 */
-	@Goal(recur=true)	// The goal annotation allows instances of a Java class to be dispatched as goals of the agent. 
+	@Goal(recur=true, orsuccess=false)	// The goal annotation allows instances of a Java class to be dispatched as goals of the agent. 
 	class PerformPatrol {}
 	
 	//-------- methods that represent plans (i.e. predefined recipes for working on certain goals) --------
@@ -59,7 +58,6 @@ public class CleanerBDIAgentA3
 		actsense.moveTo(0.9, 0.9);
 		actsense.moveTo(0.9, 0.1);
 		actsense.moveTo(0.1, 0.1);
-		throw new PlanFailureException();
 	}
 
 	/**
@@ -74,7 +72,6 @@ public class CleanerBDIAgentA3
 		actsense.moveTo(0.7, 0.7);
 		actsense.moveTo(0.7, 0.3);
 		actsense.moveTo(0.3, 0.3);
-		throw new PlanFailureException();
 	}
 	
 	/**
@@ -89,6 +86,5 @@ public class CleanerBDIAgentA3
 		actsense.moveTo(0.3, 0.7);
 		actsense.moveTo(0.7, 0.3);
 		actsense.moveTo(0.3, 0.3);
-		throw new PlanFailureException();
 	}
 }
