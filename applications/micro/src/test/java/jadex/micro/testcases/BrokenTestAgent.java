@@ -1,6 +1,6 @@
 package jadex.micro.testcases;
 
-import java.util.Collection;
+import java.util.Map;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -11,7 +11,6 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.TimeoutException;
-import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -119,9 +118,9 @@ public class BrokenTestAgent extends JunitAgentTest
 	protected IFuture<Void> testBrokenComponent(final String model)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		IResultListener<Collection<Tuple2<String, Object>>> lis = new IResultListener<Collection<Tuple2<String, Object>>>()
+		IResultListener<Map<String, Object>> lis = new IResultListener<Map<String, Object>>()
 		{
-			public void resultAvailable(Collection<Tuple2<String, Object>> result)
+			public void resultAvailable(Map<String, Object> result)
 			{
 //						System.out.println("res: "+result);
 				ret.setException(new RuntimeException("Terminated gracefully."));
@@ -142,11 +141,12 @@ public class BrokenTestAgent extends JunitAgentTest
 			}
 		};
 		
-		agent.createComponent(new CreationInfo(agent.getId()).setFilename(model), lis)
+		agent.createComponent(new CreationInfo(agent.getId()).setFilename(model))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
+				result.waitForTermination().addResultListener(lis);
 			}
 		});
 		return ret;

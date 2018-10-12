@@ -6,6 +6,7 @@ import java.util.Map;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -64,10 +65,59 @@ public class ParallelAgentCreationAgent
 					final double[]	dur	= new double[1];
 					final long[]	killstarttime	= new long[1];
 					
+					IResultListener	killlis	= new CounterResultListener(num, new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("last")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									long killend = clock.getTime();
+									System.out.println("Last peer destroyed. "+num+" agents killed.");
+									double killdur = ((double)killend-killstarttime[0])/1000.0;
+									double killpera = killdur/num;
+									
+									Runtime.getRuntime().gc();
+									long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+									double pera = dur[0]/num;
+									double upera = ((long)(1000*omem[0]/num))/1000.0;
+
+									System.out.println("\nCumulated results:");
+									System.out.println("Creation needed: "+dur[0]+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+									System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+									System.out.println("Overall memory usage: "+omem[0]+"kB. Per agent: "+upera+" kB.");
+									System.out.println("Still used memory: "+stillused+"kB.");
+							
+									agent.killComponent();
+									
+									return IFuture.DONE;
+								}
+							});
+						}
+						
+						public void exceptionOccurred(final Exception exception)
+						{
+							agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("destroyMe")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									if(exception instanceof RuntimeException)
+										throw (RuntimeException)exception;
+									else
+										throw new RuntimeException(exception);
+								}
+							});
+						}
+					});
+					
 					IResultListener	creationlis	= new CounterResultListener(num, new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
+							((IExternalAccess) result).waitForTermination().addResultListener(killlis);
 							agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 							{
 								@Classname("destroy1")
@@ -129,62 +179,13 @@ public class ParallelAgentCreationAgent
 						}
 					};
 					
-					
-					IResultListener	killlis	= new CounterResultListener(num, new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-							{
-								@Classname("last")
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									long killend = clock.getTime();
-									System.out.println("Last peer destroyed. "+num+" agents killed.");
-									double killdur = ((double)killend-killstarttime[0])/1000.0;
-									double killpera = killdur/num;
-									
-									Runtime.getRuntime().gc();
-									long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
-									double pera = dur[0]/num;
-									double upera = ((long)(1000*omem[0]/num))/1000.0;
-
-									System.out.println("\nCumulated results:");
-									System.out.println("Creation needed: "+dur[0]+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-									System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
-									System.out.println("Overall memory usage: "+omem[0]+"kB. Per agent: "+upera+" kB.");
-									System.out.println("Still used memory: "+stillused+"kB.");
-							
-									agent.killComponent();
-									
-									return IFuture.DONE;
-								}
-							});
-						}
-						
-						public void exceptionOccurred(final Exception exception)
-						{
-							agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-							{
-								@Classname("destroyMe")
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									if(exception instanceof RuntimeException)
-										throw (RuntimeException)exception;
-									else
-										throw new RuntimeException(exception);
-								}
-							});
-						}
-					});
-					
 					Map	args	= new HashMap();
 					args.put("num", Integer.valueOf(0));
 					for(int i=1; i<=num; i++)
 					{
 						CreationInfo cinfo = new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()).setName(createPeerName(i)).setFilename(ParallelAgentCreationAgent.this.getClass().getName()+".class");
 						
-						agent.createComponent(cinfo, killlis)
+						agent.createComponent(cinfo)
 							.addResultListener(creationlis);
 					}
 				}

@@ -42,20 +42,22 @@ public class BDIV3CreationTest //extends TestCase
 			}
 			).get();
 		
-		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
-		Map<String, Object>	args	= new HashMap<String, Object>();
+		Future<Map<String, Object>> fut = new Future<Map<String, Object>>();
+		Future<Map<String, Object>> ffut = fut;
+		Map<String, Object>	args = new HashMap<String, Object>();
 		args.put("max", Integer.valueOf(10000));
-		platform.createComponent(new CreationInfo(args).setFilename("jadex.bdiv3.benchmarks.CreationBDI.class"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
+		platform.createComponent(new CreationInfo(args).setFilename("jadex.bdiv3.benchmarks.CreationBDI.class"))
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, Object>>(fut)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
+				result.waitForTermination().addResultListener(new DelegationResultListener<Map<String, Object>>(ffut));
 				// Agent created. Kill listener waits for result.
 			}
 		});
 		
 		// timeout should do on all build servers. if test fails, check if platform has become slower ;-)
-		Collection<Tuple2<String, Object>>	results	= fut.get();
+		Map<String, Object> results = fut.get();
 		
 //		// Write values to property files for hudson plot plugin.
 //		Collection<Tuple2<String, Object>>	results	= fut.get(sus, timeout);
