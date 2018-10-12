@@ -279,19 +279,32 @@ public class APL
 	{
 		List<ICandidateInfo> ret = new ArrayList<ICandidateInfo>();
 		
-		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
-		// todo: include a number of retries...
-		int numcandidates = 1;
-		if(mpe.isPostToAll())
-		{
-			numcandidates = Integer.MAX_VALUE;
-		}
+//		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
+//		// todo: include a number of retries...
+//		int numcandidates = 1;
+//		if(mpe.isPostToAll())
+//		{
+//			numcandidates = Integer.MAX_VALUE;
+//		}
+//		
+//		// todo: test if this works with posttoall because getNextCandidate() does not remove a candidate?!
+//		
+//		for(int i=0; i<numcandidates && candidates!=null && candidates.size()>0; i++)
+//		{
+//			ret.add(getNextCandidate(mcapa, ia));
+//		}
 		
-		// todo: test if this works with posttoall because getNextCandidate() does not remove a candidate?!
-		
-		for(int i=0; i<numcandidates && candidates!=null && candidates.size()>0; i++)
+		if(candidates!=null && candidates.size()>0)
 		{
-			ret.add(getNextCandidate(mcapa, ia));
+			MProcessableElement mpe = (MProcessableElement)element.getModelElement();
+			if(mpe.isPostToAll())
+			{
+				ret.addAll(candidates);
+			}
+			else
+			{
+				ret.add(getNextCandidate(mcapa, ia));
+			}
 		}
 		
 		return ret;

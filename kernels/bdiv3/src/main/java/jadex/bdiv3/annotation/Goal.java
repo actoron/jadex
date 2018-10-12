@@ -53,23 +53,23 @@ public @interface Goal
 	public ExcludeMode excludemode() default ExcludeMode.WhenTried;
 	
 	/** 
-	 *  The retry flag. If true (default) means-end reasoning is allowed to select a new plan and execute it.
+	 *  If true (default) means-end reasoning is allowed to select another plan after a plan has already been executed.
 	 */
 	public boolean retry() default true;
 	
 	/** 
-	 *  The recur flag. Starts over a new round of means-end reasoning. The APL
-	 *  is rebuild and the exclude set is cleared.
+	 *  If true (defaults to false), a new round of means-end reasoning is started after each plan execution.
+	 *  As a result, the APL is rebuild and the exclude set is cleared.
 	 */
 	public boolean recur() default false;
 	
 	/** 
-	 *  The retry delay. 
+	 *  The delay between two plan executions (in milliseconds). 
 	 */
 	public long retrydelay() default -1;
 	
 	/** 
-	 *  The recur delay. 
+	 *  The delay before restarting goal processing if recur is set to true (in milliseconds).
 	 */
 	public long recurdelay() default -1;
 
@@ -95,13 +95,13 @@ public @interface Goal
 	public Deliberation deliberation() default @Deliberation();
 	
 	/**
-	 *  The publication settings. Can be used to export goal
+	 *  The publication settings can be used to export goal
 	 *  as a component service.
 	 */
 	public Publish publish() default @Publish(type=Object.class);
 
 	/**
-	 *  The goal trigger. Used in case the goal should be used as plan for another goal.
+	 *  The goal trigger is used in case the goal should be considered as plan for another goal.
 	 */
 	public Class<?>[] triggergoals() default {};
 }

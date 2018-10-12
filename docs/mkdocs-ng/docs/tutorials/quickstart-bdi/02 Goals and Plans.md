@@ -151,6 +151,7 @@ Now add a goal and a plan specification to the agent as shown below:
 	private void	performPatrolPlan()
 	{
 		// Follow a simple path around the four corners of the museum and back to the first corner.
+		System.out.println("Starting performPatrolPlan()");
 		actsense.moveTo(0.1, 0.1);
 		actsense.moveTo(0.1, 0.9);
 		actsense.moveTo(0.9, 0.9);
@@ -279,6 +280,7 @@ should choose from for pursuing the `PerformPatrol` goal. We can just add more m
 	private void	performPatrolPlan2()
 	{
 		// Follow another path around the middle of the museum.
+		System.out.println("Starting performPatrolPlan2()");
 		actsense.moveTo(0.3, 0.3);
 		actsense.moveTo(0.3, 0.7);
 		actsense.moveTo(0.7, 0.7);
@@ -293,6 +295,7 @@ should choose from for pursuing the `PerformPatrol` goal. We can just add more m
 	private void	performPatrolPlan3()
 	{
 		// Follow a zig-zag path in the museum.
+		System.out.println("Starting performPatrolPlan3()");
 		actsense.moveTo(0.3, 0.3);
 		actsense.moveTo(0.7, 0.7);
 		actsense.moveTo(0.3, 0.7);
@@ -304,7 +307,7 @@ should choose from for pursuing the `PerformPatrol` goal. We can just add more m
 Add the methods above into your `CleanerBDIAgent.java`. Execute the agent by starting the `Main` class.
 Do you notice a difference?
 
-## The `orsuccess` Flag for Goals
+### The `orsuccess` Flag for Goals
 
 Probably you haven't noticed any difference. The agent still only executes the first plan repeatedly.
 The reason is that the agent starts with the first plan and continues executing plans until it
@@ -312,8 +315,12 @@ considers the goal to be achieved. As the first plan completes without errors (i
 it is considered a success (cf. step 4 in the process described in Exercise A2) and the goal processing
 restarts with an empty slate (cf. step 2).
 
-One option for telling the agent to look for other plans after a plan is completed is stating that not only *one*, but *all* available plans should be executed. This can be done with the `orsuccess` flag, that allows changing the processing semantics from *OR* (= only one of many plans needs to be executed) to *AND* (= all of the available plans need to be executed). The *OR* semantics (flag is `true`) is the default behavior that our agent currently exhibits.
-Setting the flag to `false` enables the *AND* semantics and lets the agent execute our additional patrol plans.
+One option for telling the agent to look for other plans after a plan is completed is stating that not only *one*,
+but *all* available plans should be executed. This can be done with the `orsuccess` flag,
+that allows changing the processing semantics from *OR* (= only one of many plans needs to be executed)
+to *AND* (= all of the available plans need to be executed). The *OR* semantics (flag is `true`) is the
+default behavior that our agent currently exhibits. Setting the flag to `false` enables the *AND* semantics
+and lets the agent execute our additional patrol plans.
 
 Thus change the `@Goal` annotation of the `PerformPatrol` goal to
 
@@ -322,3 +329,50 @@ Thus change the `@Goal` annotation of the `PerformPatrol` goal to
 ```
 
 Execute the agent by starting the `Main` class and check that now all three plans are executed after each other.
+
+
+
+## Exercise A4: Means-end Reasoning Flags
+
+In the last exercise (which you should now backup as `CleanerBDIAgentA3.java`, btw) we already introduced one
+flag for controlling the means-end reasoning (a.k.a. goal processing, a.k.a. plan selection) behavior of a BDI agent.
+You can find many more flags in the Javadoc of the
+[@Goal annotation](${URLJavaDoc}/index.html?jadex/bdiv3/annotation/Goal.html).
+
+Lets say we want the cleaner to stop between patrol rounds. We find two flags that seem to support this functionality:
+`recurdelay` and `retrydelay`. Both represent a waiting time in milliseconds. Add a `retrydelay` of 3000 (i.e. three seconds) to the goal like so:
+
+```java
+	@Goal(recur=true, orsuccess=false, retrydelay=3000)	// Goal flags: variation 1
+```
+
+Execute the agent by starting the `Main` class and observe the behavior. What happens if you change 
+`retrydelay` to `recurdelay` (1)? Try experimenting with other flags. Here are some suggestions:
+
+* Replace `orsuccess=false` with `randomselection=true`. What is the difference (2)?
+   What happens to the retry delay and why (3)?
+* Instead of restarting goal processing with recur, you can also tell the agent to consider the same plan
+   multiple times in the same goal processing cycle. Try the following settings. Can you explain what these flags do (4)?
+
+```java
+	@Goal(orsuccess=false, excludemode=ExcludeMode.WhenFailed, randomselection=true, retrydelay=3000) // Goal flags variation 3
+```
+
+* What happens if you use the `posttoall` flag for the `PerformPatrol` goal and why (5)?
+   
+### Answers (try not to cheat!)
+
+1. The recur delay only applies after all plans have been executed, the retry delay appears between the plans. 
+2. With the or-success flag removed, only one plan is executed. Due to the random selection flag,
+    one of the three plans is chosen randomly for each goal processing cycle.
+3. The retry delay has no meaning without the or-success, because only one plan is executed and no retry happens.
+    You can instead specify a recur delay, to add some waiting time before executing the next randomly selected plan.
+4. With or-success set to false, the *AND* semantics is enabled meaning that the agent continues executing plans
+    as long as there are plans in the APL. With the exclude mode *when-failed*, all of the patrol plans
+    remain in the APL even after they have been executed, and thus can be selected again and again.
+    Random selection causes the cleaner to select a random plan from the APL instead of the first. Without
+    random selection, only the first plan would be executed over and over. Finally, the retry delay stops the cleaner
+    after each execution of a plan.
+5. All three plans get executed in parallel and try move the cleaner to different locations at once.
+    One of the plan "wins" and is allowed to execute its `moveTo()` action, while the other two are stopped
+    with an error message. Therefore, only one of the patrol rounds is actually performed.

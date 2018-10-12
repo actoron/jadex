@@ -53,6 +53,7 @@ public class CleanerBDIAgentA3
 	private void	performPatrolPlan()
 	{
 		// Follow a simple path around the four corners of the museum and back to the first corner.
+		System.out.println("Starting performPatrolPlan()");
 		actsense.moveTo(0.1, 0.1);
 		actsense.moveTo(0.1, 0.9);
 		actsense.moveTo(0.9, 0.9);
@@ -67,6 +68,7 @@ public class CleanerBDIAgentA3
 	private void	performPatrolPlan2()
 	{
 		// Follow another path around the middle of the museum.
+		System.out.println("Starting performPatrolPlan2()");
 		actsense.moveTo(0.3, 0.3);
 		actsense.moveTo(0.3, 0.7);
 		actsense.moveTo(0.7, 0.7);
@@ -81,6 +83,7 @@ public class CleanerBDIAgentA3
 	private void	performPatrolPlan3()
 	{
 		// Follow a zig-zag path in the museum.
+		System.out.println("Starting performPatrolPlan3()");
 		actsense.moveTo(0.3, 0.3);
 		actsense.moveTo(0.7, 0.7);
 		actsense.moveTo(0.3, 0.7);
