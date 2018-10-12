@@ -4,6 +4,8 @@ This exercise introduces the BDI model and shows how to generate agent actions b
 goal and plan concepts of Jadex. Specifically, you will learn how add goals and plans to an agent
 and how to control the plan selection and plan execution processes with goal flags.
 
+
+
 ## Quick Introduction to the BDI Model
 
 The belief-desire-intention (BDI) model of agency is based on Stanford philosopher
@@ -25,6 +27,8 @@ Instead of abstract desires, a software agent in Jadex has a dynamic set of conc
 Instead of forming arbitrary intentions, a Jadex agent selects existing plans from its so called *plan library*
 in response to the currently active goals. The means-end reasoning process is then the decision logic
 for finding an appropriate plan (*means*) for a given goal (*end*). 
+
+
 
 ## Exercise A0: Structure of a BDI Agent
 
@@ -116,6 +120,8 @@ BDI features of Jadex. We will use it later, e.g. to add goals to the agent. You
 
 We added a single `moveTo()` call as a place-holder, so that the agent would move a little, when it is started.
 The following sections show how to add more useful behavior using goals and plans.
+
+
 
 ## Exercise A1: A Goal and a Plan
 
@@ -223,3 +229,31 @@ We had an instance of this class automatically fed into our `exampleBehavior()` 
 Like any other Java class, we can create instances of the `PerformPatrol` class with the `new` keyword.
 The result is a Java object that can be used as an agent goal. We just need to tell the agent to pursue
 this object as a goal, like we did in the  `exampleBehavior()` method.
+
+
+
+## Exercise A2: Execute the Goal Periodically
+
+The result of the previous exercise is a cleaner agent that performs a single patrol round and then stops.
+Create a copy of the `SimpleCleanerAgent.java` named `SimpleCleanerAgentA1.java` to keep your code
+of the previous exercise.
+
+Now we want to make the agent start over with a new patrol round whenever a patrol round is finished.
+This is very easy in Jadex. Just change the `@Goal` annotation to `@Goal(recur=true)`.
+Execute the `Main` class and observe that the agent restarts to patrol after having completed a patrol round.
+
+### The `recur` Flag for Goals
+
+By default, a goal is considered to be finished after it has been processed by the agent. As a result
+the goal is removed from the agent and does not trigger new plans (cf. Exercise A1).
+This behavior can be changed with the `recur` flag. When `recur` is set to true, the goal processing
+restarts after each completion of the goal. As a result, in our revised cleaner agent the process is as follows:
+1. We create the goal and add it with `dispatchTopLevelGoal()`.
+2. The Jadex framework selects the `exampleBehavior()` as a suitable plan and executes the method.
+3. Our plan implementation in that method causes the agent to move to the specified locations on after another and finally the plan method returns.
+4. The Jadex framework notices that the plan is finished and considers the goal processing to be complete.
+5. In Exercise A1 the goal would now be dropped because processing is finished. Due to the `recur=true` flag, in this exercise, the goal processing restarts at step 2.
+
+
+
+## Exercise A3: Multiple Plans for a Goal
