@@ -10,7 +10,6 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.sensor.service.LatencyProperty;
@@ -24,6 +23,7 @@ import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
@@ -123,17 +123,20 @@ public class NFLatencyTestAgent extends TestAgent
 //					{
 						CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getId()})).setFilename("jadex.platform.service.remote.ProxyAgent.class");
 						agent.createComponent(ci).addResultListener(
-							new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
+							new IResultListener<IExternalAccess>()
 //							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 						{
-							public void firstResultAvailable(IComponentIdentifier result)
+							public void resultAvailable(IExternalAccess result)
 							{
-								performTest(result, testno, false)
+								result.waitForTermination().addResultListener(new IFunctionalResultListener<Map<String, Object>>()
+								{
+									public void resultAvailable(Map<String, Object> result)
+									{
+										System.out.println("sec");
+									}
+								});
+								performTest(result.getId(), testno, false)
 									.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
-							}
-							public void secondResultAvailable(Map<String,Object> result) 
-							{
-								System.out.println("sec");
 							}
 							public void exceptionOccurred(Exception exception)
 							{

@@ -16,6 +16,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -52,19 +53,25 @@ public class VisibilityTestAgent extends JunitAgentTest
 		Map<String,Object> args = new HashMap<String, Object>();
 		args.put("selfkill", Boolean.TRUE);
 		IFuture<IExternalAccess> ag = agent.createComponent(new CreationInfo(null, args, agent.getModel().getResourceIdentifier()).setFilename(FirstAgent.class.getName()+".class"));
-		ag.addTuple2ResultListener(null, new IFunctionalResultListener<Map<String,Object>>()
+		ag.addResultListener(new IFunctionalResultListener<IExternalAccess>()
 		{
-			public void resultAvailable(Map<String, Object> result)
+			public void resultAvailable(IExternalAccess result)
 			{
-				IServiceIdentifier[] sers = (IServiceIdentifier[])result.get("found");
-//				System.out.println("res: "+Arrays.toString(sers));
-				
-				plat.killComponent();
-				
-				TestReport tr1 = new TestReport("#1", "Test provided scope platform is respected.", sers.length == 2, sers.length != 2 ? "Found " + sers.length + " services" : null);
+				result.waitForTermination().addResultListener(new IFunctionalResultListener<Map<String,Object>>()
+				{
+					public void resultAvailable(Map<String, Object> result)
+					{
+						IServiceIdentifier[] sers = (IServiceIdentifier[])result.get("found");
+//						System.out.println("res: "+Arrays.toString(sers));
+						
+						plat.killComponent();
+						
+						TestReport tr1 = new TestReport("#1", "Test provided scope platform is respected.", sers.length == 2, sers.length != 2 ? "Found " + sers.length + " services" : null);
 
-				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr1}));
-				agent.killComponent();
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr1}));
+						agent.killComponent();
+					}
+				});
 			}
 		});
 		
