@@ -3,6 +3,7 @@ package jadex.micro.testcases.blocking;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
@@ -15,6 +16,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.ComponentType;
@@ -43,13 +45,13 @@ public class ShutdownAgent
 		final Future<Void> ret = new Future<Void>();
 		
 		agent.createComponent(new CreationInfo(agent.getId()).setFilename(BlockAgent.class.getName()+".class"))
-			.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+			.addResultListener(new IResultListener<IExternalAccess>()
 		{
-			public void firstResultAvailable(final IComponentIdentifier cid)
+			public void resultAvailable(final IExternalAccess exta)
 			{
 				// call several times a blocking method on the agent and then terminate it
 				
-				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IBlockService.class).setProvider(cid))
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IBlockService.class).setProvider(exta.getId()))
 					.addResultListener(new ExceptionDelegationResultListener<IBlockService, Void>(ret)
 				{
 					public void customResultAvailable(IBlockService bs)
@@ -66,7 +68,7 @@ public class ShutdownAgent
 						{
 							public void customResultAvailable(Void result)
 							{
-								agent.getExternalAccess(cid).killComponent().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+								exta.killComponent().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 								{
 									public void customResultAvailable(Map<String, Object> result)
 									{

@@ -1226,29 +1226,37 @@ public class SComponentManagementService
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
 			)
 		{
-			getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), true, agent)
-				.addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IExternalAccess, IResourceIdentifier>(ret)
+			IExternalAccess ea = getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), true, agent);
+			ea.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, IResourceIdentifier>(ret)
 			{
-				public void customResultAvailable(IExternalAccess ea)
+				public void customResultAvailable(IModelInfo model)
 				{
-//					System.err.println("Model class loader: "+ea.getModel().getName()+", "+ea.getModel().getClassLoader());
-//						classloadercache.put(ci.getParent(), ea.getModel().getClassLoader());
-					ea.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, IResourceIdentifier>(ret)
-					{
-						public void customResultAvailable(IModelInfo model)
-						{
-							ret.setResult(model.getResourceIdentifier());
-						}
-					}));
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-					// External access of parent not found, because already terminated (hack!!! fix creation/destroy structure lock)
-					if(ci.getParent()!=null)
-						exception 	= new ComponentTerminatedException(ci.getParent());
-					super.exceptionOccurred(exception);
+					ret.setResult(model.getResourceIdentifier());
 				}
 			}));
+//			getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), true, agent)
+//				.addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IExternalAccess, IResourceIdentifier>(ret)
+//			{
+//				public void customResultAvailable(IExternalAccess ea)
+//				{
+////					System.err.println("Model class loader: "+ea.getModel().getName()+", "+ea.getModel().getClassLoader());
+////						classloadercache.put(ci.getParent(), ea.getModel().getClassLoader());
+//					ea.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, IResourceIdentifier>(ret)
+//					{
+//						public void customResultAvailable(IModelInfo model)
+//						{
+//							ret.setResult(model.getResourceIdentifier());
+//						}
+//					}));
+//				}
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					// External access of parent not found, because already terminated (hack!!! fix creation/destroy structure lock)
+//					if(ci.getParent()!=null)
+//						exception 	= new ComponentTerminatedException(ci.getParent());
+//					super.exceptionOccurred(exception);
+//				}
+//			}));
 		}
 		
 		// Remote or no parent or platform as parent
@@ -1259,23 +1267,18 @@ public class SComponentManagementService
 		}
 		return ret;
 	}
-
 	
 	/**
 	 *  Get the external access of a component.
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
-	// todo: return IExternalAccess directly and defer calls when in init
-	public static IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid, boolean internal, IInternalAccess agent)
+	public static IExternalAccess getExternalAccess(final IComponentIdentifier cid, boolean internal, IInternalAccess agent)
 	{
-		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+		IExternalAccess ret = null;
 		
 		if(cid==null)
-		{
-			ret.setException(new IllegalArgumentException("Identifier is null."));
-			return ret;
-		}
+			throw new IllegalArgumentException("Identifier is null.");
 		
 		if(isRemoteComponent(cid, agent))
 		{
@@ -1321,29 +1324,12 @@ public class SComponentManagementService
 				InvocationHandler handler = new RemoteMethodInvocationHandler(agent, pr);
 				IExternalAccess ea = (IExternalAccess)ProxyFactory.newProxyInstance(agent.getClassLoader(), 
 					interfaces, handler);
-				ret.setResult(ea);
+				ret = ea;
 			}
 			catch(Exception e)
 			{
-				ret.setException(e);
+				throw SUtil.throwUnchecked(e);
 			}
-			
-//			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
-//			{
-//				public void customResultAvailable(IComponentManagementService rcms)
-//				{
-//					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
-//				}
-//			}));
-		
-//			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<IExternalAccess>()
-//			{
-//				@Override
-//				public IFuture<IExternalAccess> execute(IInternalAccess ia)
-//				{
-//					return SComponentManagementService.getExternalAccess(cid, agent);
-//				}
-//			});
 		}
 		else
 		{
@@ -1352,74 +1338,201 @@ public class SComponentManagementService
 //			System.out.println("getExternalAccess: local");
 			IPlatformComponentAccess component = null;
 //			System.out.println("getExternalAccess: adapters");
-			boolean delayed = false;
 			component = SComponentManagementService.getComponents(agent.getId()).get(cid);
 			
 			if(component==null)
 			{
-				// Hack? Allows components to getExternalAccess in init phase from parent but also from component itself
 				InitInfo ii = getInitInfo(cid);
 				if(ii!=null)
-				{
-//					if(!internal && (ii.getAdapter()==null || ii.getAdapter().isExternalThread())) // cannot work because of decoupling
-					IComponentIdentifier caller = ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getCaller() : null;
-					if(internal || (caller!=null && (cid.equals(caller.getParent()) || cid.equals(caller))))
-					{
-//						System.out.println("getExternalAccess: not delayed");
-						component = ii.getComponent();
-					}
-					else
-					{
-//						System.out.println("getExternalAccess: delayed");
-						delayed = true;
-						IFuture<Void> fut = ii.getInitFuture();
-						
-						fut.addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
-						{
-							public void customResultAvailable(Void result)
-							{
-								try
-								{
-									ret.setResult(SComponentManagementService.getComponents(agent.getId()).get(cid).getInternalAccess().getExternalAccess());
-								}
-								catch(Exception e)
-								{
-									ret.setException(e);
-								}
-							}
-						}));
-					}
-				}
+					component = ii.getComponent();
 			}
 			
+			Exception exception = null;
 			if(component!=null)
 			{
 				try
 				{
-					ret.setResult(component.getInternalAccess().getExternalAccess());
+					ret = component.getInternalAccess().getExternalAccess();
 				}
 				catch(Exception e)
 				{
-					ret.setException(e);
+					exception = e;
 				}
 			}
-			else if(!delayed)
+			else
 			{
-				ret.setException(new ComponentNotFoundException("No local component found for component identifier: "+cid));
+				exception = new ComponentNotFoundException("No local component found for component identifier: "+cid);
 			}
 			
 			releaseReadLock(agent.getId());
+			
+			// Delayed throw to allow singly point lock release.
+			if (exception != null)
+				throw SUtil.throwUnchecked(exception);
 		}
 		
 		return ret;
 	}
+	
+//	/**
+//	 *  Get the external access of a component.
+//	 *  @param cid The component identifier.
+//	 *  @param listener The result listener.
+//	 */
+	// todo: return IExternalAccess directly and defer calls when in init
+//	public static IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid, boolean internal, IInternalAccess agent)
+//	{
+//		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+//		
+//		if(cid==null)
+//		{
+//			ret.setException(new IllegalArgumentException("Identifier is null."));
+//			return ret;
+//		}
+//		
+//		if(isRemoteComponent(cid, agent))
+//		{
+////			System.out.println("getExta remote: "+cid);
+//			try
+//			{
+//				Class<?>[] interfaces = new Class[]{IExternalAccess.class};
+//				ProxyInfo pi = new ProxyInfo(interfaces);
+//				pi.addMethodReplacement(new MethodInfo("equals", new Class[]{Object.class}), new IMethodReplacement()
+//				{
+//					public Object invoke(Object obj, Object[] args)
+//					{
+//						return Boolean.valueOf(args[0]!=null && ProxyFactory.isProxyClass(args[0].getClass())
+//							&& ProxyFactory.getInvocationHandler(obj).equals(ProxyFactory.getInvocationHandler(args[0])));
+//					}
+//				});
+//				pi.addMethodReplacement(new MethodInfo("hashCode", new Class[0]), new IMethodReplacement()
+//				{
+//					public Object invoke(Object obj, Object[] args)
+//					{
+//						return Integer.valueOf(ProxyFactory.getInvocationHandler(obj).hashCode());
+//					}
+//				});
+//				pi.addMethodReplacement(new MethodInfo("toString", new Class[0]), new IMethodReplacement()
+//				{
+//					public Object invoke(Object obj, Object[] args)
+//					{
+//						return "Fake proxy for external access("+cid+")";
+//					}
+//				});
+//				pi.addMethodReplacement(new MethodInfo("getId", new Class[0]), new IMethodReplacement()
+//				{
+//					public Object invoke(Object obj, Object[] args)
+//					{
+//						return cid;
+//					}
+//				});
+//				Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
+//				pi.addExcludedMethod(new MethodInfo(getclass));
+//				
+//				RemoteReference rr = new RemoteReference(cid, cid);
+//				ProxyReference pr = new ProxyReference(pi, rr);
+//				InvocationHandler handler = new RemoteMethodInvocationHandler(agent, pr);
+//				IExternalAccess ea = (IExternalAccess)ProxyFactory.newProxyInstance(agent.getClassLoader(), 
+//					interfaces, handler);
+//				ret.setResult(ea);
+//			}
+//			catch(Exception e)
+//			{
+//				ret.setException(e);
+//			}
+//			
+////			getRemoteCMS(agent, cid).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+////			{
+////				public void customResultAvailable(IComponentManagementService rcms)
+////				{
+////					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+////				}
+////			}));
+//		
+////			getRemotePlatform(agent, cid).scheduleStep(new IComponentStep<IExternalAccess>()
+////			{
+////				@Override
+////				public IFuture<IExternalAccess> execute(IInternalAccess ia)
+////				{
+////					return SComponentManagementService.getExternalAccess(cid, agent);
+////				}
+////			});
+//		}
+//		else
+//		{
+//			setReadLock(agent.getId());
+//			
+////			System.out.println("getExternalAccess: local");
+//			IPlatformComponentAccess component = null;
+////			System.out.println("getExternalAccess: adapters");
+//			boolean delayed = false;
+//			component = SComponentManagementService.getComponents(agent.getId()).get(cid);
+//			
+//			if(component==null)
+//			{
+//				// Hack? Allows components to getExternalAccess in init phase from parent but also from component itself
+//				InitInfo ii = getInitInfo(cid);
+//				if(ii!=null)
+//				{
+////					if(!internal && (ii.getAdapter()==null || ii.getAdapter().isExternalThread())) // cannot work because of decoupling
+//					IComponentIdentifier caller = ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getCaller() : null;
+//					if(internal || (caller!=null && (cid.equals(caller.getParent()) || cid.equals(caller))))
+//					{
+////						System.out.println("getExternalAccess: not delayed");
+//						component = ii.getComponent();
+//					}
+//					else
+//					{
+////						System.out.println("getExternalAccess: delayed");
+//						delayed = true;
+//						IFuture<Void> fut = ii.getInitFuture();
+//						
+//						fut.addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+//						{
+//							public void customResultAvailable(Void result)
+//							{
+//								try
+//								{
+//									ret.setResult(SComponentManagementService.getComponents(agent.getId()).get(cid).getInternalAccess().getExternalAccess());
+//								}
+//								catch(Exception e)
+//								{
+//									ret.setException(e);
+//								}
+//							}
+//						}));
+//					}
+//				}
+//			}
+//			
+//			if(component!=null)
+//			{
+//				try
+//				{
+//					ret.setResult(component.getInternalAccess().getExternalAccess());
+//				}
+//				catch(Exception e)
+//				{
+//					ret.setException(e);
+//				}
+//			}
+//			else if(!delayed)
+//			{
+//				ret.setException(new ComponentNotFoundException("No local component found for component identifier: "+cid));
+//			}
+//			
+//			releaseReadLock(agent.getId());
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the external access of a component.
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
-	public static IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid, IInternalAccess agent)
+	public static IExternalAccess getExternalAccess(final IComponentIdentifier cid, IInternalAccess agent)
 	{
 		return getExternalAccess(cid, false, agent);
 	}

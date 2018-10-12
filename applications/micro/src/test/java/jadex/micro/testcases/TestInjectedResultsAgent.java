@@ -6,12 +6,14 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -43,28 +45,37 @@ public class TestInjectedResultsAgent extends JunitAgentTest
 		
 		IFuture<IExternalAccess> fut = agent
 			.createComponent(new CreationInfo(agent.getId()).setFilename(InjectedResultsAgent.class.getName()+".class"));
-		fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+		fut.addResultListener(new IResultListener<IExternalAccess>()
 		{
-			public void firstResultAvailable(IComponentIdentifier result)
+			public void resultAvailable(IExternalAccess result)
 			{
-			}
-			
-			public void secondResultAvailable(Map<String, Object> result)
-			{
-				Object myres = result.get("myres");
-				Object myint = result.get("myint");
-				
-				if("def_val".equals(myres) && Integer.valueOf(99).equals(myint))
+				final IResultListener<IExternalAccess> origlis = this;
+				result.waitForTermination().addResultListener(new IResultListener<Map<String,Object>>()
 				{
-					tr.setSucceeded(true);
-				}
-				else
-				{
-					tr.setFailed("Wrong result values: myres="+myres+", myint="+myint);
-				}
-				
-				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
-				ret.setResult(null);
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						origlis.exceptionOccurred(exception);
+					}
+					
+					public void resultAvailable(Map<String, Object> result)
+					{
+						Object myres = result.get("myres");
+						Object myint = result.get("myint");
+						
+						if("def_val".equals(myres) && Integer.valueOf(99).equals(myint))
+						{
+							tr.setSucceeded(true);
+						}
+						else
+						{
+							tr.setFailed("Wrong result values: myres="+myres+", myint="+myint);
+						}
+						
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+						ret.setResult(null);
+					}
+				});
 			}
 			
 			public void exceptionOccurred(Exception exception)

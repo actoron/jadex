@@ -1467,12 +1467,10 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					{
 						public void customResultAvailable(IComponentIdentifier[] children)
 						{
-							IResultListener<IExternalAccess> crl = new CollectionResultListener<IExternalAccess>(children.length, true,
-								new DelegationResultListener<Collection<IExternalAccess>>(childaccesses));
+							List<IExternalAccess> childextas = new ArrayList<>();
 							for(int i=0; !ret.isDone() && i<children.length; i++)
-							{
-								getExternalAccess(children[i]).addResultListener(crl);
-							}
+								childextas.add(getExternalAccess(children[i]));
+							childaccesses.setResult(childextas);
 						}
 					});
 					
@@ -1545,7 +1543,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  @param cid The component id.
 	 *  @return The external access.
 	 */
-	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid)
+	public IExternalAccess getExternalAccess(IComponentIdentifier cid)
 	{
 		return SComponentManagementService.getExternalAccess(cid, getInternalAccess());
 	}
@@ -1581,7 +1579,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			public void resultAvailable(IComponentIdentifier result)
 			{
 //				System.out.println("created: "+result);
-				SComponentManagementService.getExternalAccess(result, getInternalAccess()).addResultListener(new DelegationResultListener<>(ret));
+				ret.setResult(getExternalAccess(result));
 			}
 		}, getExternalAccess()));
 		

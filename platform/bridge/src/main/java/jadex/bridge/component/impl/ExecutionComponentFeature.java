@@ -26,7 +26,6 @@ import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IPriorityComponentStep;
-import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ITypedComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
@@ -53,7 +52,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
-import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
@@ -68,14 +66,12 @@ import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.MutableObject;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.functional.Consumer;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
@@ -84,7 +80,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
-import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.ThreadLocalTransferHelper;
@@ -677,27 +672,16 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				// Todo w/o proxy???
 //				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				getComponent().getExternalAccess(getComponent().getId().getParent())
+				IExternalAccess exta = getComponent().getExternalAccess(getComponent().getId().getParent());
 				// raw because called from scheduleStep also on external thread.
-					.addResultListener(new DefaultResultListener<IExternalAccess>()
+				exta.scheduleStep(new IComponentStep<Void>()
 				{
-					public void resultAvailable(IExternalAccess exta)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						exta.scheduleStep(new IComponentStep<Void>()
-						{
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								parenta	= (IInternalExecutionFeature)ia.getFeature(IExecutionFeature.class);
-								parenta.addSubcomponent(ExecutionComponentFeature.this);
-								parenta.wakeup();
-								return IFuture.DONE;
-							}
-						});
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
+						parenta	= (IInternalExecutionFeature)ia.getFeature(IExecutionFeature.class);
+						parenta.addSubcomponent(ExecutionComponentFeature.this);
+						parenta.wakeup();
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -2083,9 +2067,20 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 *  @param cid The component id.
 	 *  @return The external access.
 	 */
+	public IExternalAccess getExternalAccess(IComponentIdentifier cid)
+	{
+		return getComponent().getExternalAccess();
+	}
+	
+	/**
+	 *  Get the external access for a component id.
+	 *  @param cid The component id.
+	 *  @return The external access.
+	 */
 	public IFuture<IExternalAccess> getExternalAccessAsync(IComponentIdentifier cid)
 	{
-		return getComponent().getExternalAccess(cid);
+		// TODO FIXME: REMOVE
+		return new Future<>(getExternalAccess(cid));
 	}
 	
 	/**

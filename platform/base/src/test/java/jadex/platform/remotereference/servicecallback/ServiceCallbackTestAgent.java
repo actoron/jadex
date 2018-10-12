@@ -58,8 +58,8 @@ public class ServiceCallbackTestAgent extends TestAgent	implements ICalledServic
 			if(local) 
 				ci.setParent(agent.getId());
 			
-			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut	= platform.createComponent(ci);	// Start as subcomponent in local case
-			IComponentIdentifier	provider	= fut.getFirstResult();
+			IFuture<IExternalAccess> fut = platform.createComponent(ci);	// Start as subcomponent in local case
+			IComponentIdentifier provider = fut.get().getId();
 			ICallerService	service	= local ? agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class)).get()
 				: agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class, RequiredService.SCOPE_GLOBAL)).get(); // Search globally in remote case.
 			service.doCall(this).get();
