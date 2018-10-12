@@ -79,8 +79,8 @@ public class BPMNRecoveryTestAgent
 		CreationInfo ci = new CreationInfo(agent.getId());
 		ci.setFilename(model);
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(ci);
-		IExternalAccess	exta = agent.getExternalAccessAsync(fut.getFirstResult()).get();
+		IFuture<IExternalAccess> fut = agent.createComponent(ci);
+		IExternalAccess	exta = fut.get();
 		ISubscriptionIntermediateFuture<Tuple2<String, Object>>	res	= exta.subscribeToResults();
 		if(!exta.getResultsAsync().get().containsKey("running"))
 		{
@@ -93,19 +93,19 @@ public class BPMNRecoveryTestAgent
 			System.out.println("Already running.");
 		}
 
-		IPersistInfo	info	= ps.snapshot(fut.getFirstResult()).get();
+		IPersistInfo	info	= ps.snapshot(fut.get().getId()).get();
 		exta.killComponent().get();
 
 		ps.restore(info).get();
 		
 		Future<Collection<Tuple2<String,Object>>>	cres	= new Future<Collection<Tuple2<String,Object>>>();
-		IExternalAccess	exta2	= agent.getExternalAccessAsync(fut.getFirstResult()).get();
+		IExternalAccess	exta2	= fut.get();
 		exta2.subscribeToResults().addResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres));
 //		cms.addComponentResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres), fut.getFirstResult()).get();
 		
 		Map<String, Object>	msg	= new HashMap<String, Object>();
 //		msg.put(SFipa.RECEIVERS, fut.getFirstResult());
-		agent.getFeature(IMessageFeature.class).sendMessage(msg, fut.getFirstResult()).get();
+		agent.getFeature(IMessageFeature.class).sendMessage(msg, fut.get().getId()).get();
 		
 		cres.get();
 		

@@ -154,7 +154,7 @@ public class StartPeerPlan extends Plan
 		
 		IComponentIdentifier aid = getAgent().createComponent(
 			new CreationInfo(null, args, getComponentDescription().getResourceIdentifier()).setName(name).setFilename("/jadex/bdi/benchmarks/AgentCreation.agent.xml"))
-			.getFirstResult();
+			.get().getId();
 		return aid;
 	}
 	
