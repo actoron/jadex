@@ -793,16 +793,16 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				}
 			}
 			
-			// No retry but not finished. 
-			else if(!isFinished())
+			// No retry but not finished (or idle for  maintain goals). 
+			else if(!isFinished() && !GoalProcessingState.IDLE.equals(getProcessingState()))
 			{				
 				// Recur when possible
 				if(isRecur())
 				{
 					setProcessingState(ia, GoalProcessingState.PAUSED);
 					
-					// Auto-recur, when delay explicitly set or no recur condition defined.
-					if(getMGoal().getRecurDelay()>-1 || getMGoal().getConditions(MGoal.CONDITION_RECUR)==null)
+					// Auto-recur, when no recur condition defined.
+					if(getMGoal().getConditions(MGoal.CONDITION_RECUR)==null)
 					{
 						IComponentStep<Void>	step	= new IComponentStep<Void>()
 						{
@@ -817,7 +817,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 							}
 						};
 						
-						if(getMGoal().getRecurDelay()>-1)
+						if(getMGoal().getRecurDelay()>0)
 						{
 							ia.getFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRecurDelay(), step);
 						}
@@ -826,6 +826,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 							ia.getFeature(IExecutionFeature.class).scheduleStep(step);
 						}
 					}
+					
+					// else condition will trigger recur
 				}
 				
 				// Else no more plans -> fail.

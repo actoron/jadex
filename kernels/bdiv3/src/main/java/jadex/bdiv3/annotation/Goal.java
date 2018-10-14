@@ -69,9 +69,9 @@ public @interface Goal
 	public long retrydelay() default -1;
 	
 	/** 
-	 *  The delay before restarting goal processing if recur is set to true (in milliseconds).
+	 *  The delay (default 0 for no delay) before restarting goal processing if recur is set to true (in milliseconds).
 	 */
-	public long recurdelay() default -1;
+	public long recurdelay() default 0;
 
 	/**
 	 *  Should a procedural goal succeed when first plan executed successfully
