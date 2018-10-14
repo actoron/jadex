@@ -222,85 +222,94 @@ public class SensorActuator
 		
 		// Signal variable to check when location is reached.
 		final Future<Void>	reached	= new Future<>();
-		
-		// Wait for clock ticks and move the cleaner. (asynchronous!)
-		final IClockService	clock	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
-		clock.createTickTimer(new ITimedObject()
-		{
-			long lasttime	= clock.getTime();
-			ITimedObject	timer	= this;
-			
-			@Override
-			public void timeEventOccurred(long currenttime)
-			{
-				if(!reached.isDone())	// no new timer when future is terminated from outside (e.g. agent killed)
-				{
-					// Run update on agent thread to avoid synchronization issues.
-					agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-					{
-						@Override
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-							// Calculate time passed as fraction of a second.
-							double	delta	= (currenttime-lasttime)/1000.0;
-							
-							// Set new charge state
-							double	chargestate	= self.getChargestate()-delta/100; 	// drop ~ 1%/sec while moving.
-							if(chargestate<0)
-							{
-								self.setChargestate(0);
-								throw new IllegalStateException("Out of battery!");
-							}
-							self.setChargestate(chargestate);
-							
-							// Set new location
-							double total_dist	= self.getLocation().getDistance(target);
-							double move_dist	= Math.min(total_dist, 0.1*delta);	// speed ~ 0.1 units/sec 
-							double dx = (target.getX()-self.getLocation().getX())*move_dist/total_dist;
-							double dy = (target.getY()-self.getLocation().getY())*move_dist/total_dist;
-							self.setLocation(new Location(self.getLocation().getX()+dx, self.getLocation().getY()+dy));
-							
-							// Post new own state to environment
-							Environment.getInstance().updateCleaner(self);
-							
-							// Add pheromone (if any).
-							if(pheromone!=null)
-							{
-								Pheromone	ph	= new Pheromone(self.getLocation(), pheromone);
-								Environment.getInstance().addPheromone(ph);
-							}
 
-							// Get new external state from environment.
-							update();
-							
-							// Finish or repeat?
-							if(self.getLocation().isNear(target))
-							{
-								// Release block.
-								reached.setResultIfUndone(null);
-							}
-							else
-							{
-								// Wait for next tick.
-								lasttime	= currenttime;
-								clock.createTickTimer(timer);
-							}
-							return null;
-						}
-					}).addResultListener(new IResultListener<Void>()
+		// Finish or repeat?
+		if(self.getLocation().isNear(target))
+		{
+			// Release block.
+			reached.setResultIfUndone(null);
+		}
+		else
+		{
+			// Wait for clock ticks and move the cleaner. (asynchronous!)
+			final IClockService	clock	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+			clock.createTickTimer(new ITimedObject()
+			{
+				long lasttime	= clock.getTime();
+				ITimedObject	timer	= this;
+				
+				@Override
+				public void timeEventOccurred(long currenttime)
+				{
+					if(!reached.isDone())	// no new timer when future is terminated from outside (e.g. agent killed)
 					{
-						@Override
-						public void exceptionOccurred(Exception exception)
+						// Run update on agent thread to avoid synchronization issues.
+						agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 						{
-							reached.setExceptionIfUndone(exception);
-						}
-						
-						@Override
-						public void resultAvailable(Void result){}
-					});
+							@Override
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								// Calculate time passed as fraction of a second.
+								double	delta	= (currenttime-lasttime)/1000.0;
+								
+								// Set new charge state
+								double	chargestate	= self.getChargestate()-delta/100; 	// drop ~ 1%/sec while moving.
+								if(chargestate<0)
+								{
+									self.setChargestate(0);
+									throw new IllegalStateException("Out of battery!");
+								}
+								self.setChargestate(chargestate);
+								
+								// Set new location
+								double total_dist	= self.getLocation().getDistance(target);
+								double move_dist	= Math.min(total_dist, 0.1*delta);	// speed ~ 0.1 units/sec 
+								double dx = (target.getX()-self.getLocation().getX())*move_dist/total_dist;
+								double dy = (target.getY()-self.getLocation().getY())*move_dist/total_dist;
+								self.setLocation(new Location(self.getLocation().getX()+dx, self.getLocation().getY()+dy));
+								
+								// Post new own state to environment
+								Environment.getInstance().updateCleaner(self);
+								
+								// Add pheromone (if any).
+								if(pheromone!=null)
+								{
+									Pheromone	ph	= new Pheromone(self.getLocation(), pheromone);
+									Environment.getInstance().addPheromone(ph);
+								}
+	
+								// Get new external state from environment.
+								update();
+								
+								// Finish or repeat?
+								if(self.getLocation().isNear(target))
+								{
+									// Release block.
+									reached.setResultIfUndone(null);
+								}
+								else
+								{
+									// Wait for next tick.
+									lasttime	= currenttime;
+									clock.createTickTimer(timer);
+								}
+								return IFuture.DONE;
+							}
+						}).addResultListener(new IResultListener<Void>()
+						{
+							@Override
+							public void exceptionOccurred(Exception exception)
+							{
+								reached.setExceptionIfUndone(exception);
+							}
+							
+							@Override
+							public void resultAvailable(Void result){}
+						});
+					}
 				}
-			}
-		});
+			});
+		}
 		
 		try
 		{
