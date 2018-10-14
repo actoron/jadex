@@ -123,12 +123,12 @@ public class CleanerBDIAgentFinal
 	//-------- cleanup waste --------
 	
 	@Goal(deliberation=@Deliberation(inhibits= {PerformLookForWaste.class, AchieveCleanupWaste.class}), unique=true)
-	public class AchieveCleanupWaste
+	class AchieveCleanupWaste
 	{
 		private IWaste	waste;
 		
 		@GoalCreationCondition(beliefs="wastes")
-		public AchieveCleanupWaste(@CheckNotNull IWaste waste)
+		AchieveCleanupWaste(@CheckNotNull IWaste waste)
 		{
 			System.out.println("achieve cleanup: "+waste);
 			this.waste	= waste;
