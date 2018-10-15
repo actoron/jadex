@@ -35,6 +35,7 @@ for finding an appropriate plan (*means*) for a given goal (*end*).
 ```java
 package quickstart.cleanerworld;
 
+import jadex.bdiv3.annotation.*;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;

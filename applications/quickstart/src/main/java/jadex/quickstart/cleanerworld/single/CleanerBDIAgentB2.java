@@ -4,7 +4,6 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
-import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
@@ -16,7 +15,7 @@ import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
- *  Use goal settings to control plan selection.
+ *  Using Deliberation Settings for Managing Conflicting Goals.
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
 public class CleanerBDIAgentB2
@@ -42,7 +41,7 @@ public class CleanerBDIAgentB2
 		// Open a window showing the agent's perceptions
 		new SensorGui(actsense).setVisible(true);
 		
-		// Create and dispatch a goal.
+		// Create and dispatch agent goals.
 		bdi.dispatchTopLevelGoal(new PerformPatrol());
 		bdi.dispatchTopLevelGoal(new MaintainBatteryLoaded());
 	}
@@ -62,20 +61,14 @@ public class CleanerBDIAgentB2
 	/**
 	 *  A goal to recharge whenever the battery is low.
 	 */
-	@Goal(recur=true,
-		deliberation=@Deliberation(inhibits=PerformPatrol.class))	// Pause patrol goal while loading battery
+	@Goal(recur=true, recurdelay=3000,
+			deliberation=@Deliberation(inhibits=PerformPatrol.class))	// Pause patrol goal while loading battery
 	class MaintainBatteryLoaded
 	{
 		@GoalMaintainCondition	// The cleaner aims to maintain the following expression, i.e. act to restore the condition, whenever it changes to false.
 		boolean isBatteryLoaded()
 		{
 			return self.getChargestate()>=0.2; // Everything is fine as long as the charge state is above 20%, otherwise the cleaner needs to recharge.
-		}
-			
-		@GoalTargetCondition	// Only stop charging, when this condition is true
-		boolean isBatteryFullyLoaded()
-		{
-			return self.getChargestate()>=0.9; // Charge until 90%
 		}
 	}
 	

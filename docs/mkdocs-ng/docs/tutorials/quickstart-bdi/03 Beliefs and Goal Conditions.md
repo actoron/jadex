@@ -3,6 +3,8 @@
 This exercise introduces beliefs that let an agent automatically perceive and react to changes.
 It also shows how to use goal conditions to control goal processing behavior based on belief values and belief changes.
 
+
+
 ## Exercise B1: Using a Belief to Control a Declarative Goal
 
 Up to now, our cleaner only *acted* in the environment, but did not *perceive* anything.
@@ -137,4 +139,70 @@ If you are interested in more details, e.g. for augmenting your own belief objec
 you can have a look at a simple example from the official
 [Javadoc](https://docs.oracle.com/javase/8/docs/api/index.html?java/beans/PropertyChangeSupport.html).
 
+
+
 ## Exercise B2: Using Deliberation Settings for Managing Conflicting Goals
+
+Lets tackle the remaining problem. Currently the cleaner tries to load its battery but doesn't stop
+the active patrol round. As the cleaner can not move in two directions at once, there is a conflict
+between the previous perform patrol goal and the new maintain battery loaded goal.
+
+We somehow want to tell the cleaner to prioritize the latter and stop executing plans for the former
+until the battery is loaded again. This is actually quite simple with Jadex. Change the `@Goal`
+annotation of the `MaintainBatteryLoaded` class to the following code:
+
+```java
+	@Goal(recur=true, recurdelay=3000,
+		deliberation=@Deliberation(inhibits=PerformPatrol.class))	// Pause patrol goal while loading battery
+```
+
+### The `@Deliberation` Annotation and the `inhibits` Setting
+
+The code above introduces deliberation settings that can be added to `@Goal` annotations.
+Deliberation means that the agent keeps track of its current goals and decides (i.e. deliberates)
+if some of them need to be suspended in favor of other more important goals.
+When the more important goals are completed, the agent can resume the previously suspended less
+important goals.
+
+In Jadex, deliberation criteria can be specified by so called *inhibition arcs*, which can be seen
+as pointers from the more important goals to the less important goals. As long as such a more important
+goal is actively processed (i.e. plans are executed for the goal), all other goals connected by#
+the inhibition arcs are *inhibited*, i.e. prevented from executing plans.
+
+In our cleaner example, the maintain battery loaded goal now inhibits the perform patrol goal.
+As a result, any active patrol plan will be aborted as soon as the maintain battery loaded goal
+becomes active. Thus now the load battery plan should succeed, because the patrol plan cannot interfere
+anymore.
+
+Execute the program and test the behavior. What do you observe?
+
+
+
+## Exercise B3: Separate Maintain and Target Conditions
+
+Another improvement but still not quite there. Now the charging plan works in the sense that
+the cleaner moves to a charging station and starts charging. As soon as it reaches 20% the goal
+condition is satisfied again. The maintain battery loaded goal is a declarative goal due to its
+maintain condition. Therefore the agent notices the condition to be true again and thus stops
+executing the `loadBattery()` method. Anyways, executing a plan when the goal is already achieved
+would be a waste of time, right?
+
+Well, in general: yes. But in this case we want the cleaner to load the battery some more before
+resuming the patrol round. We can specify this by adding an explicit *achieve* condition as another
+method of the `MaintainBatteryLoaded` class:  
+
+```java
+		@GoalTargetCondition	// Only stop charging, when this condition is true
+		boolean isBatteryFullyLoaded()
+		{
+			return self.getChargestate()>=0.9; // Charge until 90%
+		}
+```
+
+So now we have `isBatteryLoaded()` to state when the agent should *start* charging (*maintain condition*)
+and `isBatteryFullyLoaded()` to state when the agent should *stop* charging (*achieve condition*).
+Here we stop at 90%. Remember that the plan tried to load until 100%. So still the plan never completes
+but now it isn't stopped at 20% but only at 90%.
+
+Execute the program to observe that the agent now exhibits a somewhat useful periodic sequence of
+patrol/recharge behaviors.
