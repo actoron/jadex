@@ -147,6 +147,14 @@ subprojects
 //						version: "3.0-DEVELOPMENT"
 			}
 		}
+		
+		repositories {
+			mavenCentral()
+			maven
+			{
+				url "https://maven.google.com"
+			}
+		}
 
 		// Disable Android lint nonsense.
 		tasks.whenTaskAdded {task ->
