@@ -283,27 +283,16 @@ should choose from for pursuing the `PerformPatrol` goal. We can just add more m
 	{
 		// Follow another path around the middle of the museum.
 		System.out.println("Starting performPatrolPlan2()");
-		actsense.moveTo(0.3, 0.3);
-		actsense.moveTo(0.3, 0.7);
-		actsense.moveTo(0.7, 0.7);
-		actsense.moveTo(0.7, 0.3);
-		actsense.moveTo(0.3, 0.3);
+		
+		// Fill in moveTo() commands, e.g. according to the path from figure 2
 	}
-	
+```
+
+```java	
 	/**
 	 *  Declare a third plan for the PerformPatrol goal.
 	 */
-	@Plan(trigger=@Trigger(goals=PerformPatrol.class))
-	private void	performPatrolPlan3()
-	{
-		// Follow a zig-zag path in the museum.
-		System.out.println("Starting performPatrolPlan3()");
-		actsense.moveTo(0.3, 0.3);
-		actsense.moveTo(0.7, 0.7);
-		actsense.moveTo(0.3, 0.7);
-		actsense.moveTo(0.7, 0.3);
-		actsense.moveTo(0.3, 0.3);
-	}
+	// Fill in @Plan annotation and method body for third patrol plan, e.g. according to the path from figure 3
 ```
 
 Add the methods above into your `CleanerBDIAgent.java`. Execute the agent by starting the `Main` class.

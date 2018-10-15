@@ -2,11 +2,51 @@
 
 ${SorryNotYetAvailable}
 
-## Answers to Questions
+## Solutions and Answers to Questions
 
-Here you can find the answers to questions from different exercises.
+Here you can find solutions for code you had to write yourself and the answers to questions from different exercises.
 
-### Exercise A4: Means-end Reasoning Flags
+### Exercise A3: Additional Patrol Plan Code
+
+```java
+	/**
+	 *  Declare a second plan for the PerformPatrol goal.
+	 */
+	@Plan(trigger=@Trigger(goals=PerformPatrol.class))
+	private void	performPatrolPlan2()
+	{
+		// Follow another path around the middle of the museum.
+		System.out.println("Starting performPatrolPlan2()");
+		
+		// Fill in moveTo() commands, e.g. according to the path from figure 2
+		actsense.moveTo(0.3, 0.3);
+		actsense.moveTo(0.3, 0.7);
+		actsense.moveTo(0.7, 0.7);
+		actsense.moveTo(0.7, 0.3);
+		actsense.moveTo(0.3, 0.3);
+	}
+```
+
+```java	
+	/**
+	 *  Declare a third plan for the PerformPatrol goal.
+	 */
+	// Fill in @Plan annotation and method body for third patrol plan, e.g. according to the path from figure 3
+	@Plan(trigger=@Trigger(goals=PerformPatrol.class))
+	private void	performPatrolPlan3()
+	{
+		// Follow a zig-zag path in the museum.
+		System.out.println("Starting performPatrolPlan3()");
+		actsense.moveTo(0.3, 0.3);
+		actsense.moveTo(0.7, 0.7);
+		actsense.moveTo(0.3, 0.7);
+		actsense.moveTo(0.7, 0.3);
+		actsense.moveTo(0.3, 0.3);
+	}
+```
+
+
+### Exercise A4: Questions about Means-end Reasoning Flags
 
 1. The recur delay only applies after all plans have been executed, the retry delay appears between the plans. 
 2. With the or-success flag removed, only one plan is executed. Due to the random selection flag,
