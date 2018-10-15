@@ -126,13 +126,13 @@ The following sections show how to add more useful behavior using goals and plan
 
 ## Exercise A1: A Goal and a Plan
 
-Now we want to make the agent do something useful like performing patrol rounds. Create a copy of the
-`CleanerBDIAgent.java` and name it `CleanerBDIAgentA0.java` to keep the result of
-the last exercise for future reference. Do this from now on after every completed exercise such that
-you can go back to a previous solution in case you messed up. This way you can keep editing the
+Now we want to make the agent do something useful like performing patrol rounds. But before you continue:
+keep the result of the last exercise for future reference by creating a copy of the `CleanerBDIAgent.java`
+and naming it `CleanerBDIAgentA0.java` (for the last exercise A0). Do this from now on after every completed exercise
+such that you can go back to a previous solution in case you messed up. This way you can keep editing the
 `CleanerBDIAgent.java`, but you won't lose any previously working version.
 
-Now add a goal and a plan specification to the agent as shown below:
+Now add a goal and a plan specification to the agent (i.e. to `CleanerBDIAgent.java`) as shown below:
 
 ```java
 	//-------- inner classes that represent agent goals --------
