@@ -267,8 +267,13 @@ agent the process is as follows:
 Backup you current solution as `CleanerBDIAgentA2.java`.
 
 <div style="float:right;">
-<img style="max-width:75%;" src="patrol-plan2.png"><br/>
-<img style="max-width:75%;" src="patrol-plan3.png">
+
+![](patrol-plan2.png)
+
+<br/>
+
+![](patrol-plan3.png)
+
 </div>
 
 One advantage of the BDI model is the clean separation between *what* an agent should achieve (goals)
