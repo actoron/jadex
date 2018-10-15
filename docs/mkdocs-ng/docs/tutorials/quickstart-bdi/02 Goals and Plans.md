@@ -92,7 +92,7 @@ conf.addComponent("quickstart/cleanerworld/SimpleCleanerAgent.class");
  and change it to
 
 ```java
-conf.addComponent("quickstart/cleanerworld/CleanerBDIAgent.class");`
+conf.addComponent("quickstart/cleanerworld/CleanerBDIAgent.class");
 ```
 
 The relevant aspects of the agent file are explained in the following subsections.

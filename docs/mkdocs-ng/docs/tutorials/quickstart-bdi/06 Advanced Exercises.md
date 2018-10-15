@@ -1,3 +1,3 @@
-# Beliefs and Goal Conditions
+# Advanced Exercises
 
 ${SorryNotYetAvailable}

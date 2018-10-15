@@ -130,6 +130,11 @@ to deduce many events automatically as long as your condition code refers to fie
 Therefore having the annotation at the `self` field allows Jadex to see that the maintain condition, that also refers
 to this field, should be re-checked whenever the `self` belief value changes.
 
-So thats all there is to know, right? Well, almost. Actually the value of the `self` field does not change,
-because the value is of type `ICleaner`...
+So thats all there is to know, right? Well, almost. Actually the value of the `self` field does not change.
+The field holds a reference to an object of type `ICleaner`. The reference (`self` field) itself does not change,
+but an attribute of the referenced cleaner object. This change is published as a *bean property change*.
+If you are interested in more details, e.g. for augmenting your own belief objects with property change support
+you can have a look at a simple example from the official
+[Javadoc](https://docs.oracle.com/javase/8/docs/api/index.html?java/beans/PropertyChangeSupport.html).
 
+## Exercise B2: Using Deliberation Settings for Managing Conflicting Goals

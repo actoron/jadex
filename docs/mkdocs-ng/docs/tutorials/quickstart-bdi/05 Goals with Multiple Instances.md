@@ -1,3 +1,3 @@
-# Beliefs and Goal Conditions
+# Goals with Multiple Instances
 
 ${SorryNotYetAvailable}
