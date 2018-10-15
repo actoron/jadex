@@ -2228,7 +2228,7 @@ public class SComponentManagementService
 			{
 				cinfo.setName(oname);
 				cinfo.setFilename(modelname);
-				platform.createComponentWithResults(cinfo).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				platform.createComponentWithEvents(cinfo).addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 				{
 					Collection<Tuple2<String, Object>> results;
 					

@@ -5,10 +5,12 @@ import java.util.Map;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 
 /**
@@ -39,9 +41,17 @@ public interface IExternalSubcomponentsFeature extends IExternalComponentFeature
 	 *  Starts a new component.
 	 *  
 	 *  @param infos Start information.
-	 *  @return The id of the component and the results after the component has been killed.
+	 *  @return The acces to the component.
 	 */
 	public IFuture<IExternalAccess> createComponent(CreationInfo info);
+	
+	/**
+	 *  Starts a new component while continuously receiving status events (create, result updates, termination).
+	 *  
+	 *  @param infos Start information.
+	 *  @return Status events.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithEvents(CreationInfo info);
 	
 	/**
 	 *  Starts a set of new components, in order of dependencies.

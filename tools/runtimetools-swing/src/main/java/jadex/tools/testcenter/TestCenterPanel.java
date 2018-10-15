@@ -1325,7 +1325,7 @@ public class TestCenterPanel extends JSplitPanel
 		/**
 		 *  Callback result listener for (local or remote) test results.
 		 */
-		public class TestResultListener		implements IRemoteResultListener<Collection<Tuple2<String, Object>>>
+		public class TestResultListener implements IRemoteResultListener<Map<String, Object>>
 		{
 			//-------- attributes --------
 			

@@ -11,6 +11,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.IntermediateComponentResultListener;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -22,9 +24,11 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
@@ -38,6 +42,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -147,6 +153,41 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 			return getComponent().createComponent(info, null);
 		else
 			return component.getExternalAccessAsync(info.getParent()).get().createComponent(info);
+	}
+	
+	/**
+	 *  Starts a new component while continuously receiving status events (create, result updates, termination).
+	 *  
+	 *  @param infos Start information.
+	 *  @return Status events.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithEvents(CreationInfo info)
+	{
+		final SubscriptionIntermediateFuture<CMSStatusEvent> ret = new SubscriptionIntermediateFuture<>();
+		
+		final boolean keepsusp = Boolean.TRUE.equals(info.getSuspend());
+		info.setSuspend(true);
+		createComponent(info).addResultListener(new IResultListener<IExternalAccess>()
+		{
+			public void resultAvailable(IExternalAccess result)
+			{
+				info.setSuspend(keepsusp);
+				
+				ISubscriptionIntermediateFuture<CMSStatusEvent> fut = SComponentManagementService.listenToComponent(result.getId(), component);
+				FutureFunctionality.connectDelegationFuture(ret, fut);
+				
+				if (!keepsusp)
+					result.resumeComponent();
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		SFuture.avoidCallTimeouts(ret, component);
+		return ret;
 	}
 	
 	/**

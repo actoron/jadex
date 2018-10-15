@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -13,8 +14,10 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Test starting two platforms using the same simulation clock.
@@ -36,10 +39,10 @@ public class BisimulationTest
 		IExternalAccess	p1	= Starter.createPlatform(config).get();
 		p1.scheduleStep(ia ->
 		{
-			FutureBarrier<Collection<CMSStatusEvent>>	fubar	= new FutureBarrier<>();
+			FutureBarrier<IExternalAccess> startfubar = new FutureBarrier<>();
 			
 			// Start local agent
-			fubar.addFuture(ia.createComponentWithResults(new CreationInfo().setFilename(CounterAgent.class.getName()+".class")));
+			startfubar.addFuture(ia.createComponent(new CreationInfo().setFilename(CounterAgent.class.getName()+".class")));
 			
 			// Start other platforms
 			for(int i=1; i<3; i++)
@@ -50,9 +53,14 @@ public class BisimulationTest
 				IExternalAccess	p2	= fp2.get();
 				
 				// Start agent on other platform
-				fubar.addFuture(p2.createComponentWithResults(
+				startfubar.addFuture(p2.createComponent(
 					new CreationInfo(Collections.singletonMap("offset", i)).setFilename(CounterAgent.class.getName()+".class")));
 			}
+			
+			Collection<IExternalAccess> extas = startfubar.waitForResults().get();
+			FutureBarrier<Map<String, Object>> fubar = new FutureBarrier<>();
+			for (IExternalAccess exta : extas)
+				fubar.addFuture(exta.waitForTermination());
 			
 			// Wait for all agents.
 			return fubar.waitFor();
