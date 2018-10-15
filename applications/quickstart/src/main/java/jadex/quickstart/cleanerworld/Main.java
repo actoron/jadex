@@ -38,7 +38,7 @@ public class Main
 		conf.setValue("kernel_bdi", true);
         
         // Add your cleaner agent(s)
-		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentB3.class");
+		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgent.class");
 
 		// Start a Jadex platform (asynchronously in background).
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(conf);
