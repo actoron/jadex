@@ -14,7 +14,7 @@ import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
- *  Use goal settings to control plan selection.
+ *  Use a belief to control a declarative goal.
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
 public class CleanerBDIAgentB1
@@ -25,7 +25,7 @@ public class CleanerBDIAgentB1
 	private SensorActuator	actsense	= new SensorActuator();
 	
 	/** Knowledge of the cleaner about itself (e.g. location and charge state). */
-	@Belief
+//	@Belief
 	private ICleaner	self	= actsense.getSelf();
 	
 	//-------- simple example behavior --------
@@ -40,7 +40,7 @@ public class CleanerBDIAgentB1
 		// Open a window showing the agent's perceptions
 		new SensorGui(actsense).setVisible(true);
 		
-		// Create and dispatch a goal.
+		// Create and dispatch agent goals.
 		bdi.dispatchTopLevelGoal(new PerformPatrol());
 		bdi.dispatchTopLevelGoal(new MaintainBatteryLoaded());
 	}

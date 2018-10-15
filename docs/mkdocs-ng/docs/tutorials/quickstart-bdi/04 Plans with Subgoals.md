@@ -1,3 +1,3 @@
-# Summary
+# Plans with Subgoals
 
 ${SorryNotYetAvailable}
