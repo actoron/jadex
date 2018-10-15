@@ -8,6 +8,10 @@ Here you can find solutions for code you had to write yourself and the answers t
 
 ### Exercise A3: Additional Patrol Plan Code
 
+<div style="float:right;">
+<img style="max-width:75%;" src="patrol-plan2.png">
+</div>
+
 ```java
 	/**
 	 *  Declare a second plan for the PerformPatrol goal.
@@ -18,7 +22,7 @@ Here you can find solutions for code you had to write yourself and the answers t
 		// Follow another path around the middle of the museum.
 		System.out.println("Starting performPatrolPlan2()");
 		
-		// Fill in moveTo() commands, e.g. according to the path from figure 2
+		// Fill in moveTo() commands, e.g. according to figure 2
 		actsense.moveTo(0.3, 0.3);
 		actsense.moveTo(0.3, 0.7);
 		actsense.moveTo(0.7, 0.7);
@@ -27,11 +31,16 @@ Here you can find solutions for code you had to write yourself and the answers t
 	}
 ```
 
+<div style="float:right;">
+<img style="max-width:75%;" src="patrol-plan3.png">
+</div>
+
 ```java	
 	/**
 	 *  Declare a third plan for the PerformPatrol goal.
 	 */
-	// Fill in @Plan annotation and method body for third patrol plan, e.g. according to the path from figure 3
+	// Fill in @Plan annotation and method body for third patrol plan,
+	// e.g. according to figure 3
 	@Plan(trigger=@Trigger(goals=PerformPatrol.class))
 	private void	performPatrolPlan3()
 	{
