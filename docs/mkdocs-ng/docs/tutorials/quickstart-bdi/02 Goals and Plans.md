@@ -188,7 +188,7 @@ and replace it with
 Execute the agent again by starting the `Main` class and observe it performing a patrol round as specified in the
 `performPatrolPlan()` method.
 
-### The '@Goal' Annotation and the `PerformPatrol` Class
+### The `@Goal` Annotation and the `PerformPatrol` Class
 
 We wanted our agent to have a goal to perform patrol rounds. Therefore we added the `PerformPatrol` class to represent the goal object.
 Having Java classes for goals allows treating them as instances like any other object in Java. Thus, goals can be created,
@@ -199,8 +199,7 @@ the `PerformPatrol` class should be able to represent goals. This is done by pla
 
 Try removing the `@Goal` annotation. You will notice that the code still compiles without errors.
 Try executing the agent without the `@Goal` annotation by starting the `Main`class. An error occurs while starting the agent,
-because the Jadex framework cannot use `PerformPatrol` as a goal class. Therefore, better add the `@Goal` annotation again
-before continuing.
+because the Jadex framework cannot use `PerformPatrol` as a goal class.
 
 ### The `@Plan` Annotation and the `performPatrolPlan()` Method
 
@@ -249,7 +248,9 @@ Execute the `Main` class and observe that the agent restarts to patrol after hav
 By default, a goal is considered to be finished after it has been processed by the agent. As a result
 the goal is removed from the agent and does not trigger new plans (cf. Exercise A1).
 This behavior can be changed with the `recur` flag. When `recur` is set to true, the goal processing
-restarts after each completion of the goal. As a result, in our revised cleaner agent the process is as follows:
+restarts after all available plans have been executed for the goal. As a result, in our revised cleaner
+agent the process is as follows:
+
 1. We create the goal and add it with `dispatchTopLevelGoal()`.
 2. The Jadex framework selects the `exampleBehavior()` as a suitable plan and executes the method.
 3. Our plan implementation in that method causes the agent to move to the specified locations on after another
