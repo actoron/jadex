@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 
 import javax.swing.JPanel;
 
+import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
@@ -98,7 +99,7 @@ class SensorPanel extends JPanel
 		Point	p	= onScreenLocation(data.self.getLocation(), bounds);
 		int w	= (int)(data.self.getVisionRange()*bounds.width);
 		int h	= (int)(data.self.getVisionRange()*bounds.height);
-		int colorcode	= Math.abs(data.self.getAgentIdentifier().getParent().getLocalName().hashCode()%8);
+		int colorcode	= Math.abs(BasicComponentIdentifier.getPlatformPrefix(data.self.getAgentIdentifier().getParent().getLocalName()).hashCode()%8);
 		g.setColor(new Color((colorcode&1)!=0?255:100, (colorcode&2)!=0?255:100, (colorcode&4)!=0?255:100, 192));	// Vision range
 		g.fillOval(p.x-w, p.y-h, w*2, h*2);
 		g.setColor(Color.black);	// Agent
