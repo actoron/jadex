@@ -31,6 +31,22 @@ public interface IModelInfo
 	public String getName();
 	
 	/**
+	 *  Get the default instance name.
+	 *  @return The instance name.
+	 */
+	public String getInstanceName();
+	
+	/**
+	 *  Get required predecessors (dependencies).
+	 */
+	public String[] getPredecessors();
+	
+	/**
+	 *  Get declared successors (dependencies).
+	 */
+	public String[] getSuccessors();
+	
+	/**
 	 *  Get the package name.
 	 *  @return The package name.
 	 */

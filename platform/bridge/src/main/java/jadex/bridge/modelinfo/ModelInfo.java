@@ -28,8 +28,17 @@ public class ModelInfo extends Startable implements IModelInfo
 	/** The name. */
 	protected String name;
 	
+	/** Default instance name. */
+	protected String instancename;
+	
 	/** The package. */
 	protected String packagename;
+	
+	/** The predecessors. */
+	protected String[] predecessors;
+	
+	/** The predecessors. */
+	protected String[] successors;
 	
 	/** The imports. */
 	protected List<String> imports;
@@ -153,6 +162,31 @@ public class ModelInfo extends Startable implements IModelInfo
 	public String getName()
 	{
 		return name;
+	}
+	
+	/**
+	 *  Get the default instance name.
+	 *  @return The instance name.
+	 */
+	public String getInstanceName()
+	{
+		return instancename;
+	}
+	
+	/**
+	 *  Get required predecessors (dependencies).
+	 */
+	public String[] getPredecessors()
+	{
+		return predecessors;
+	}
+	
+	/**
+	 *  Get declared successors (dependencies).
+	 */
+	public String[] getSuccessors()
+	{
+		return successors;
 	}
 	
 	/**
@@ -450,6 +484,31 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+	
+	/**
+	 *  Set the default instance name.
+	 *  @param instancename The instance name.
+	 */
+	public void setInstanceName(String instancename)
+	{
+		this.instancename = instancename;
+	}
+	
+	/**
+	 *  Set required predecessors (dependencies).
+	 */
+	public void setPredecessors(String[] predecessors)
+	{
+		this.predecessors = predecessors;
+	}
+	
+	/**
+	 *  Set declared successors (dependencies).
+	 */
+	public void setSuccessors(String[] successors)
+	{
+		this.successors = successors;
 	}
 
 	/**

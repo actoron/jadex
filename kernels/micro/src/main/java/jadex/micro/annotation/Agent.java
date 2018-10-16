@@ -30,13 +30,13 @@ public @interface Agent
 	public Boolean3 suspend() default Boolean3.NULL;
 	
 	/**
-	 *  Name for the started component.
+	 *  Required predecessors (dependencies).
 	 */
 //	public Class<?>[] predecessors() default {};
 	public String[] predecessors() default {};
 	
 	/**
-	 *  Name for the started component.
+	 *  Declared successors (dependencies).
 	 */
 //	public Class<?>[] successors() default {};
 	public String[] successors() default {};
