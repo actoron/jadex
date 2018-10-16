@@ -48,15 +48,16 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Autostart;
 
 /**
  *  Agent that observes the environment and decides to
  *  a) make this platform to a SP registry (upgrade)
  *  b) make this platform from a SP registry to a normal client (downgrade) 
  */
-@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE, name="spautoconf", 
-predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
+@Agent(name="spautoconf",
+	autoprovide=Boolean3.TRUE,
+	predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent", 
+	autostart=Boolean3.FALSE)
 @Service
 public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 {

@@ -59,13 +59,12 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.RequiredService;
 
 /**
  *  The super peer client agent is responsible for managing connections to super peers for each network.
  */
-@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(Boolean3.FALSE))
+@Agent(autoprovide=Boolean3.TRUE, autostart=Boolean3.FALSE)
 @Service
 public class SuperpeerClientAgent implements ISearchQueryManagerService
 {

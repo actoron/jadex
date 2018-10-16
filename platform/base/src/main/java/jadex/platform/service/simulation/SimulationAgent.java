@@ -8,7 +8,6 @@ import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -17,7 +16,7 @@ import jadex.micro.annotation.RequiredService;
 /**
  *  Agent that provides the simulation service.
  */
-@Agent(autostart=@Autostart(Boolean3.TRUE))
+@Agent(autostart=Boolean3.TRUE)
 @Arguments(@Argument(name="bisimulation", clazz=boolean.class))
 @ProvidedServices(@ProvidedService(type=ISimulationService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="SimulationAgent.create($args.bisimulation)")))
 //@Properties(value=@NameValue(name="system", value="true"))

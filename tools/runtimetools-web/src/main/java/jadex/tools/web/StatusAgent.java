@@ -40,7 +40,6 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -61,7 +60,8 @@ import jadex.micro.annotation.RequiredService;
 	))
 )
 // TODO: service dependencies instead of predecessors
-@Agent(autostart=@Autostart(value=Boolean3.FALSE, predecessors="jadex.extension.rs.publish.JettyRSPublishAgent"))
+@Agent(autostart=Boolean3.FALSE,
+	predecessors="jadex.extension.rs.publish.JettyRSPublishAgent")
 public class StatusAgent implements IStatusService
 {
 	@Agent

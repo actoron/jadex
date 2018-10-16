@@ -35,15 +35,15 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.Autostart;
 
 /**
  *  Implements passive awareness via multicast.
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE,
+@Agent(autoprovide = Boolean3.TRUE,
 	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
+	successors="jadex.platform.service.registryv2.SuperpeerClientAgent",
+	autostart=Boolean3.FALSE
 )
 public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveAwarenessService
 {

@@ -54,8 +54,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.micro.annotation.Agent;
-import jadex.platform.service.security.SecurityAgent;
 
 /**
  *  This feature provides subcomponents.

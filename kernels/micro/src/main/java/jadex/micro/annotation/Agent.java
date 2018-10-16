@@ -79,7 +79,12 @@ public @interface Agent
 	/**
 	 *  Auto-start this agent on platform startup.
 	 */
-	public Autostart autostart() default @Autostart();
+	public Boolean3 autostart() default Boolean3.NULL;
+	
+	/**
+	 *  Default name for the started component.
+	 */
+	public String name() default "";
 	
 	/**
 	 *  The agent type. 

@@ -7,7 +7,6 @@ import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
@@ -29,7 +28,7 @@ import jadex.micro.annotation.RequiredServices;
 	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=RequiredService.SCOPE_GLOBAL)
 )
 @Arguments(@Argument(name="nosave", clazz=boolean.class, description="Don't save settings."))
-@Agent(autostart=@Autostart(Boolean3.TRUE))
+@Agent(autostart=Boolean3.TRUE)
 //@Properties(@NameValue(name="system", value="\"system\".equals($config)"))
 @Configurations({@Configuration(name="system"), @Configuration(name="user")})
 public class ChatAgent

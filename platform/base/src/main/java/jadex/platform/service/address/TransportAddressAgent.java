@@ -36,7 +36,6 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -44,7 +43,7 @@ import jadex.micro.annotation.RequiredService;
 /**
  *  Agent that provides the security service.
  */
-@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE, name="address"))
+@Agent(name="address", autoprovide=Boolean3.TRUE, autostart=Boolean3.TRUE)
 @ProvidedServices(@ProvidedService(type=ITransportAddressService.class, scope=RequiredService.SCOPE_PLATFORM))
 @Service(system=true)
 public class TransportAddressAgent implements ITransportAddressService
