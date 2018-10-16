@@ -24,15 +24,4 @@ public @interface Autostart
 	 */
 	public String name() default "";
 	
-	/**
-	 *  Name for the started component.
-	 */
-//	public Class<?>[] predecessors() default {};
-	public String[] predecessors() default {};
-	
-	/**
-	 *  Name for the started component.
-	 */
-//	public Class<?>[] successors() default {};
-	public String[] successors() default {};
 }

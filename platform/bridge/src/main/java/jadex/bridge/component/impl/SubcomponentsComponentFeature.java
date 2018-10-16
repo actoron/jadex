@@ -33,6 +33,7 @@ import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
@@ -641,12 +642,13 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	 *  Add a components to the dependency resolver to build start levels.
 	 *  Components of the same level can be started in parallel.
 	 */
-	protected void addComponentToLevels(DependencyResolver<String> dr, String model, Map<String, String> names)
+	protected void addComponentToLevels(DependencyResolver<String> dr, CreationInfo cinfo, Map<String, String> names)
 	{
 		try
 		{
-			if (model != null && model.endsWith(".class"))
-			{CreationInfo
+			if (cinfo.getFilename().endsWith(".class"))
+			{
+				cinfo.getResourceIdentifier().g
 				SUtil.getResource0(model, Cl)
 				SClassReader.getClassInfo(inputstream)
 				AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
@@ -687,6 +689,25 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 		catch(Exception e)
 		{
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Gets the classloader for a creation info.
+	 *  @param cinfo The info.
+	 *  @return The classloader.
+	 */
+	protected ClassLoader getClassLoader(CreationInfo cinfo)
+	{
+		ClassLoader ret = component.getClassLoader();
+		if (cinfo.getResourceIdentifier() != null)
+		{
+			ILibraryService libser = component.searchLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(0));
+			if (libser != null)
+			{
+				ret = libser.getClassLoader(cinfo.getResourceIdentifier());
+				
+			}
 		}
 	}
 }

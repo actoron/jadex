@@ -29,6 +29,18 @@ public @interface Agent
 	 */
 	public Boolean3 suspend() default Boolean3.NULL;
 	
+	/**
+	 *  Name for the started component.
+	 */
+//	public Class<?>[] predecessors() default {};
+	public String[] predecessors() default {};
+	
+	/**
+	 *  Name for the started component.
+	 */
+//	public Class<?>[] successors() default {};
+	public String[] successors() default {};
+	
 //	/**
 //	 *  Specify if the component is a master and leads to killing of parent when stopped.
 //	 */
