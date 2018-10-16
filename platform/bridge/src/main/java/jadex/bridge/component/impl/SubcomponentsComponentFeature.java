@@ -14,6 +14,7 @@ import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
@@ -35,6 +36,12 @@ import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.AnnotationInfo;
+import jadex.commons.SClassReader.ClassInfo;
+import jadex.commons.SClassReader.EnumInfo;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -46,6 +53,8 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.micro.annotation.Agent;
+import jadex.platform.service.security.SecurityAgent;
 
 /**
  *  This feature provides subcomponents.
@@ -74,7 +83,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 		{
 			ConfigurationInfo conf = component.getModel().getConfiguration(component.getConfiguration());
 			final ComponentInstanceInfo[] components = conf.getComponentInstances();
-			createComponents(components).addResultListener(createResultListener(
+			createInitialComponents(components).addResultListener(createResultListener(
 				new ExceptionDelegationResultListener<List<IComponentIdentifier>, Void>(ret)
 			{
 				public void customResultAvailable(List<IComponentIdentifier> cids)
@@ -196,7 +205,10 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	 *  @param infos Start information.
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public IIntermediateFuture<IExternalAccess> createComponents(CreationInfo... infos);
+	public IIntermediateFuture<IExternalAccess> createComponents(CreationInfo... infos)
+	{
+		
+	}
 	
 	/**
 	 *  Stops a set of components, in order of dependencies.
@@ -204,7 +216,9 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	 *  @param infos Start information.
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public IIntermediateFuture<Map<String, Object>> killComponents(CreationInfo... infos);
+	public IIntermediateFuture<Map<String, Object>> killComponents(CreationInfo... infos)
+	{
+	}
 	
 //	/**
 //	 *  Starts a new child as subcomponent.
@@ -221,44 +235,55 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 //		return component.createComponent(info, null);
 //	}
 	
-//	/**
-//	 *  Create the subcomponents.
-//	 */
-//	protected IFuture<List<IComponentIdentifier>> createComponents(final ComponentInstanceInfo[] components)
-//	{
-////		System.out.println("create subcompos: ");
-////		for(ComponentInstanceInfo cii: components)
-////		{
-////			System.out.println(cii.getName()+" "+cii.getTypeName());
-////		}
-//		
-//		final Future<Void> res = new Future<Void>();
-//		final List<IComponentIdentifier> cids = new ArrayList<IComponentIdentifier>();
-////		IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-//		// NOTE: in current implementation application waits for subcomponents
-//		// to be finished and cms implements a hack to get the external
-//		// access of an uninited parent.
-//		
-//		// (NOTE1: parent cannot wait for subcomponents to be all created
-//		// before setting itself inited=true, because subcomponents need
-//		// the parent external access.)
-//		
-//		// (NOTE2: subcomponents must be created one by one as they
-//		// might depend on each other (e.g. bdi factory must be there for jcc)).
-//		
-//		createComponent(components, component.getModel(), 0, res, cids);
-//		
-//		final Future<List<IComponentIdentifier>> ret = new Future<List<IComponentIdentifier>>();
-//		res.addResultListener(new ExceptionDelegationResultListener<Void, List<IComponentIdentifier>>(ret)
+	/**
+	 *  Create the initial subcomponents.
+	 */
+	protected IFuture<List<IComponentIdentifier>> createInitialComponents(final ComponentInstanceInfo[] components)
+	{
+//		System.out.println("create subcompos: ");
+//		for(ComponentInstanceInfo cii: components)
 //		{
-//			public void customResultAvailable(Void result)
-//			{
-//				ret.setResult(cids);
-//			}
-//		});
-//		
-//		return ret;
-//	}
+//			System.out.println(cii.getName()+" "+cii.getTypeName());
+//		}
+		
+		final Future<Void> res = new Future<Void>();
+		final List<CreationInfo> cinfos = new ArrayList<CreationInfo>();
+//		IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+		// NOTE: in current implementation application waits for subcomponents
+		// to be finished and cms implements a hack to get the external
+		// access of an uninited parent.
+		
+		// (NOTE1: parent cannot wait for subcomponents to be all created
+		// before setting itself inited=true, because subcomponents need
+		// the parent external access.)
+		
+		// (NOTE2: subcomponents must be created one by one as they
+		// might depend on each other (e.g. bdi factory must be there for jcc)).
+		
+//		createInitialComponent(components, component.getModel(), 0, res, cids);
+		createInitialCreationInfos(components, component.getModel(), 0, res, cinfos);
+		
+		final Future<List<IComponentIdentifier>> ret = new Future<List<IComponentIdentifier>>();
+		res.addResultListener(new ExceptionDelegationResultListener<Void, List<IComponentIdentifier>>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				createComponents(cinfos.toArray(new CreationInfo[cinfos.size()])).addResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, List<IComponentIdentifier>>(ret)
+				{
+					public void customResultAvailable(Collection<IExternalAccess> result)
+					{
+						List<IComponentIdentifier> cids = new ArrayList<>();
+						for (IExternalAccess exta : SUtil.notNull(result))
+							cids.add(exta.getId());
+						ret.setResult(cids);
+					}
+				});
+				
+			}
+		});
+		
+		return ret;
+	}
 	
 	/**
 	 * Search for components matching the given description.
@@ -288,9 +313,9 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 //	}
 	
 	/**
-	 *  Create subcomponents.
+	 *  Create initial subcomponents.
 	 */
-	protected void	createComponent(final ComponentInstanceInfo[] components, final IModelInfo model, final int i, final Future<Void> fut, final List<IComponentIdentifier> cids)
+	protected void	createInitialCreationInfos(final ComponentInstanceInfo[] components, final IModelInfo model, final int i, final Future<Void> fut, final List<CreationInfo> cinfos)
 	{
 		if(i<components.length)
 		{			
@@ -299,15 +324,15 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 //			if(num>0)
 //				System.out.println("create comp: "+components[i].getName());
 			
-			IResultListener<IComponentIdentifier> crl = new CollectionResultListener<IComponentIdentifier>(num, false, 
-				component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IComponentIdentifier>, Void>(fut)
+			IResultListener<CreationInfo> crl = new CollectionResultListener<CreationInfo>(num, false, 
+				component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<CreationInfo>, Void>(fut)
 			{
-				public void customResultAvailable(Collection<IComponentIdentifier> result)
+				public void customResultAvailable(Collection<CreationInfo> result)
 				{
 //					if(num>0)
 //						System.out.println("created comp: "+components[i].getName());
-					cids.addAll(result);
-					createComponent(components, model, i+1, fut, cids);
+					cinfos.addAll(result);
+					createInitialCreationInfos(components, model, i+1, fut, cinfos);
 				}
 			}));
 			for(int j=0; j<num; j++)
@@ -333,18 +358,19 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 					ci.setName(getName(components[i], model, j+1));
 					ci.setFilename(getFilename(components[i], model));
 					
-					getComponent().createComponent(ci, null).addResultListener(new IResultListener<IExternalAccess>()
-					{
-						public void resultAvailable(IExternalAccess result) 
-						{
-							crl.resultAvailable(result.getId());
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							crl.exceptionOccurred(exception);
-						}
-					});
+					crl.resultAvailable(ci);
+//					getComponent().createComponent(ci, null).addResultListener(new IResultListener<IExternalAccess>()
+//					{
+//						public void resultAvailable(IExternalAccess result) 
+//						{
+//							crl.resultAvailable(result.getId());
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							crl.exceptionOccurred(exception);
+//						}
+//					});
 //					cms.createComponent(getName(components[i], model, j+1), getFilename(components[i], model),
 //						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getId(),
 //						suspend, master, daemon, autoshutdown, synchronous, persistable, monitoring, model.getAllImports(), bindings, null),
@@ -609,5 +635,58 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	public IFuture<String> getLocalTypeAsync()
 	{
 		return new Future<String>(getLocalType());
+	}
+	
+	/**
+	 *  Add a components to the dependency resolver to build start levels.
+	 *  Components of the same level can be started in parallel.
+	 */
+	protected void addComponentToLevels(DependencyResolver<String> dr, String model, Map<String, String> names)
+	{
+		try
+		{
+			if (model != null && model.endsWith(".class"))
+			{CreationInfo
+				SUtil.getResource0(model, Cl)
+				SClassReader.getClassInfo(inputstream)
+				AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
+				AnnotationInfo autostart = (AnnotationInfo)ai.getValue("autostart");
+				
+				String name = autostart.getValue("name")==null || ((String)autostart.getValue("name")).length()==0? null: (String)autostart.getValue("name");
+				
+				AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
+				
+				String cname = ci.getClassName();
+				
+				dr.addNode(cname);
+				Object[] pres = (Object[])autostart.getValue("predecessors");
+				if(pres!=null)
+				{
+					for(Object pre: pres)
+					{
+						// Object as placeholder for no deps, because no entries should not mean no deps
+						if(!Object.class.getName().equals(pre))
+							dr.addDependency(cname, (String)pre);
+					}
+				}
+				
+				Object[] sucs = (Object[])autostart.getValue("successors");
+				if(sucs!=null)
+				{
+					for(Object suc: sucs)
+						dr.addDependency((String)suc, cname);
+				}
+			
+				// if no predecessors are defined add SecurityAgent
+				if(pres==null || pres.length==0)
+					dr.addDependency(cname, SecurityAgent.class.getName());
+				
+				names.put(cname, name);
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

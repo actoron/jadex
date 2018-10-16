@@ -11,10 +11,10 @@ public interface IInternalSubcomponentsFeature
 	/**
 	 *  Called, when a subcomponent has been created.
 	 */
-//	public IFuture<Void> componentCreated(IComponentDescription desc);
+	public IFuture<Void> componentCreated(IComponentDescription desc);
 	
 	/**
 	 *  Called, when a subcomponent has been removed.
 	 */
-//	public IFuture<Void> componentRemoved(IComponentDescription desc);
+	public IFuture<Void> componentRemoved(IComponentDescription desc);
 }

@@ -25,6 +25,8 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.TupleResult;
@@ -215,25 +217,25 @@ public class ComponentTest extends TestCase
 			}
 		}
 		 
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = platform.createComponent(new CreationInfo(rid).setFilename(filename));
+		IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo(rid).setFilename(filename));
 		componentStarted(fut);
-		fut.addResultListener(new IntermediateDefaultResultListener<TupleResult>()
+		fut.addResultListener(new IResultListener<IExternalAccess>()
 		{
-			@SuppressWarnings("unchecked")
-			public void intermediateResultAvailable(TupleResult result)
+			public void resultAvailable(IExternalAccess result)
 			{
-				if(result.getNum()==0)
+				cid[0] = result.getId();
+				result.waitForTermination().addResultListener(new IResultListener<Map<String,Object>>()
 				{
-					cid[0]	= (IComponentIdentifier)result.getResult();
-				}
-				else
-				{
-//					if(filename.toString().indexOf("Feature")!=-1)
-//						Thread.dumpStack();
-					finished.setResultIfUndone((Map<String, Object>)result.getResult());
-				}
+					public void resultAvailable(Map<String, Object> result)
+					{
+						finished.setResultIfUndone(result);
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						finished.setExceptionIfUndone(exception);
+					}
+				});
 			}
-			
 			public void exceptionOccurred(Exception exception)
 			{
 				finished.setExceptionIfUndone(exception);
@@ -272,7 +274,7 @@ public class ComponentTest extends TestCase
 	 *  Called when a component has been started.
 	 *  @param cid	The cid, set as soon as known.
 	 */
-	protected void componentStarted(ITuple2Future<IComponentIdentifier, Map<String, Object>> fut)
+	protected void componentStarted(IFuture<IExternalAccess> fut)
 	{
 	}
 
