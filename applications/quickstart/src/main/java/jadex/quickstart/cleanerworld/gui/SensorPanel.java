@@ -17,7 +17,6 @@ import jadex.commons.future.IFuture;
 import jadex.quickstart.cleanerworld.environment.IChargingstation;
 import jadex.quickstart.cleanerworld.environment.ICleaner;
 import jadex.quickstart.cleanerworld.environment.ILocation;
-import jadex.quickstart.cleanerworld.environment.IPheromone;
 import jadex.quickstart.cleanerworld.environment.IWaste;
 import jadex.quickstart.cleanerworld.environment.IWastebin;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
@@ -111,15 +110,15 @@ class SensorPanel extends JPanel
 		g.drawString("waste: " + (data.self.getCarriedWaste()!=null ? "yes" : "no"),
 			p.x+5, p.y+15);
 		
-		// Paint pheromones.
-		for(IPheromone pheromone: data.pheromones)
-		{
-			colorcode	= Math.abs(pheromone.getType().hashCode()%8);
-			g.setColor(new Color((colorcode&1)!=0?192:0, (colorcode&2)!=0?192:0, (colorcode&4)!=0?192:0, (int)(192*pheromone.getStrength())));
-			p	= onScreenLocation(pheromone.getLocation(), bounds);
-			int size	= (int)(pheromone.getStrength()*7);
-			g.fillOval(p.x-size, p.y-size, size*2+1, size*2+1);
-		}
+//		// Paint pheromones.
+//		for(IPheromone pheromone: data.pheromones)
+//		{
+//			colorcode	= Math.abs(pheromone.getType().hashCode()%8);
+//			g.setColor(new Color((colorcode&1)!=0?192:0, (colorcode&2)!=0?192:0, (colorcode&4)!=0?192:0, (int)(192*pheromone.getStrength())));
+//			p	= onScreenLocation(pheromone.getLocation(), bounds);
+//			int size	= (int)(pheromone.getStrength()*7);
+//			g.fillOval(p.x-size, p.y-size, size*2+1, size*2+1);
+//		}
 
 		// Paint charge stations.
 		for(IChargingstation station: data.stations)
@@ -192,7 +191,7 @@ class SensorPanel extends JPanel
 				ret.wastes	= Environment.cloneList(sensor.getWastes(), IWaste.class);
 				ret.stations	= Environment.cloneList(sensor.getChargingstations(), IChargingstation.class);
 				ret.wastebins	= Environment.cloneList(sensor.getWastebins(), IWastebin.class);
-				ret.pheromones	= Environment.cloneList(sensor.getPheromones(), IPheromone.class);
+//				ret.pheromones	= Environment.cloneList(sensor.getPheromones(), IPheromone.class);
 				return new Future<>(ret);
 			}
 		}).get();
@@ -224,7 +223,7 @@ class SensorPanel extends JPanel
 		/** The known waste bins. */
 		public IWastebin[]	wastebins;
 		
-		/** The perceived pheromones. */
-		public IPheromone[]	pheromones;
+//		/** The perceived pheromones. */
+//		public IPheromone[]	pheromones;
 	}
 }

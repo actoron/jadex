@@ -1,7 +1,5 @@
 package jadex.quickstart.cleanerworld.environment;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -68,14 +66,6 @@ public class SensorActuator
 	 */
 	public SensorActuator()
 	{
-		this(null, null, null, null);
-	}
-	
-	/**
-	 *  Create a sensor for a new cleaner robot.
-	 */
-	public SensorActuator(Set<IWaste> wastes, Set<IWastebin> wastebins, Set<IChargingstation> stations, Set<ICleaner> cleaners)
-	{
 		this.agent	= ExecutionComponentFeature.LOCAL.get();
 		if(agent==null)
 		{
@@ -83,10 +73,10 @@ public class SensorActuator
 		}
 
 		self	= Environment.getInstance().createCleaner(agent);
-		this.cleaners	= cleaners!=null ? cleaners : new LinkedHashSet<>();
-		this.wastes	= wastes!=null ? wastes : new LinkedHashSet<>();
-		this.chargingstations	= stations!=null ? stations : new LinkedHashSet<>();
-		this.wastebins	= wastebins!=null ? wastebins : new LinkedHashSet<>();
+		this.cleaners	= new LinkedHashSet<>();
+		this.wastes	= new LinkedHashSet<>();
+		this.chargingstations	= new LinkedHashSet<>();
+		this.wastebins	= new LinkedHashSet<>();
 	}
 	
 	//-------- sensor methods --------
@@ -166,28 +156,68 @@ public class SensorActuator
 		return wastebins;
 	}
 		
+//	/**
+//	 *  Get the currently perceived pheromones.
+//	 *  @return a Set of Pheromone objects. 
+//	 */
+//	public Set<IPheromone>	getPheromones()
+//	{
+//		if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
+//		{
+//			throw new IllegalStateException("Error: Must be called on agent thread.");
+//		}
+//		
+//		Set<IPheromone>	ret	= new LinkedHashSet<>(Arrays.asList(Environment.getInstance().getPheromones()));
+//		for(Iterator<IPheromone> phi= ret.iterator(); phi.hasNext(); )
+//		{
+//			IPheromone	ph	= phi.next();
+//			if(ph.getLocation().getDistance(self.getLocation())>self.getVisionRange())
+//			{
+//				phi.remove();
+//			}
+//		}
+//		
+//		return ret;
+//	}
+	
 	/**
-	 *  Get the currently perceived pheromones.
-	 *  @return a Set of Pheromone objects. 
+	 *  Use the provided set to manage the known waste objects.
+	 *  Allows using custom data structures such as BDI belief sets directly.
 	 */
-	public Set<IPheromone>	getPheromones()
+	public void	manageWastesIn(Set<IWaste> wastes)
 	{
-		if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
-		{
-			throw new IllegalStateException("Error: Must be called on agent thread.");
-		}
+		wastes.addAll(this.wastes);
+		this.wastes	= wastes;
+	}
 		
-		Set<IPheromone>	ret	= new LinkedHashSet<>(Arrays.asList(Environment.getInstance().getPheromones()));
-		for(Iterator<IPheromone> phi= ret.iterator(); phi.hasNext(); )
-		{
-			IPheromone	ph	= phi.next();
-			if(ph.getLocation().getDistance(self.getLocation())>self.getVisionRange())
-			{
-				phi.remove();
-			}
-		}
+	/**
+	 *  Use the provided set to manage the known waste bin objects.
+	 *  Allows using custom data structures such as BDI belief sets directly.
+	 */
+	public void	manageWastebinsIn(Set<IWastebin> wastebins)
+	{
+		wastebins.addAll(this.wastebins);
+		this.wastebins	= wastebins;
+	}
 		
-		return ret;
+	/**
+	 *  Use the provided set to manage the known charging station objects.
+	 *  Allows using custom data structures such as BDI belief sets directly.
+	 */
+	public void	manageChargingstationsIn(Set<IChargingstation> chargingstations)
+	{
+		chargingstations.addAll(this.chargingstations);
+		this.chargingstations	= chargingstations;
+	}
+	
+	/**
+	 *  Use the provided set to manage the known cleaner objects.
+	 *  Allows using custom data structures such as BDI belief sets directly.
+	 */
+	public void	manageCleanersIn(Set<ICleaner> cleaners)
+	{
+		cleaners.addAll(this.cleaners);
+		this.cleaners	= cleaners;
 	}
 		
 	//-------- actuator methods --------
@@ -464,15 +494,15 @@ public class SensorActuator
 		((Wastebin)wastebin).addWaste(waste);
 	}
 	
-	/**
-	 *  Disperse pheromones when moving.
-	 *  The dispersion happens during the current/next movoTo() operation and stops automatically afterwards.
-	 *  @param type	The pheromone type (can be an arbitrary string).
-	 */
-	public void	dispersePheromones(String type)
-	{
-		this.pheromone	= type;
-	}
+//	/**
+//	 *  Disperse pheromones when moving.
+//	 *  The dispersion happens during the current/next movoTo() operation and stops automatically afterwards.
+//	 *  @param type	The pheromone type (can be an arbitrary string).
+//	 */
+//	public void	dispersePheromones(String type)
+//	{
+//		this.pheromone	= type;
+//	}
 	
 	//-------- internal methods --------
 	

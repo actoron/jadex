@@ -15,9 +15,6 @@ import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
  *  Simple example of using the environment sensor.
- *  @author Alexander Pokahr
- *  @version 1.0 (2017/10/19)
- *
  */
 @Agent(type="bdi")
 public class SimpleCleanerBDIAgent
@@ -29,7 +26,7 @@ public class SimpleCleanerBDIAgent
 	private Set<IWaste>	wastes	= new LinkedHashSet<>();
 	
 	/** The sensor gives access to the environment. */
-	private SensorActuator	actsense	= new SensorActuator(wastes, null, null, null);
+	private SensorActuator	actsense	= new SensorActuator();
 	
 	//-------- simple example behavior --------
 	
@@ -40,6 +37,9 @@ public class SimpleCleanerBDIAgent
 	@AgentBody
 	private void	exampleBehavior(IBDIAgentFeature bdifeature)
 	{
+		// Tell the sensor to update the belief sets
+		actsense.manageWastesIn(wastes);
+		
 		// Open a window showing the agent's perceptions
 		new SensorGui(actsense).setVisible(true);
 		
