@@ -267,13 +267,9 @@ agent the process is as follows:
 Backup you current solution as `CleanerBDIAgentA2.java`.
 
 <div style="float:right;">
-
-![](patrol-plan2.png)
-
-<br/>
-
-![](patrol-plan3.png)
-
+	<img src="../patrol-plan2.png">
+	<br/>
+	<img src="../patrol-plan3.png">
 </div>
 
 One advantage of the BDI model is the clean separation between *what* an agent should achieve (goals)
@@ -295,16 +291,15 @@ should choose from for pursuing the `PerformPatrol` goal. We can just add more m
 		// Follow another path around the middle of the museum.
 		System.out.println("Starting performPatrolPlan2()");
 		
-		// Fill in moveTo() commands, e.g. according to figure 2
+		// Fill in moveTo() commands, e.g. according to the figure
 	}
-```
-
-```java	
+	
 	/**
 	 *  Declare a third plan for the PerformPatrol goal.
 	 */
 	// Fill in @Plan annotation and method body for third patrol plan,
-	// e.g. according to figure 3
+	// e.g. according to the figure
+	
 ```
 
 Add the methods above into your `CleanerBDIAgent.java`. Execute the agent by starting the `Main` class.
