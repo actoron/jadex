@@ -76,4 +76,16 @@ The code compiles fine, but if you run the program, the following error will occ
 
 To avoid this error, remember using the interface types (`Collection`, `Set`, `List` or `Map`) for the field,
 when you want to use Java collection classes as beliefs.
+
+### The `manageChargingstationsIn()` Method
+
+The `SensorActuator` object provides this method to simplify using belief sets for the perceptions from the environment.
+Whenever the sensor perceives a previously unknown charging station, it is added to the set that you provided as a parameter in the method.
+
+Similar methods are available for waste, waste bins, and other cleaners. The sensor also updates the belief sets on the
+disappearance of objects: E.g. when the the cleaner is in vision range of a location where previously a waste object was detected,
+but the waste object is no longer there, the sensor will remove the waste object from the set that has been provided
+by the `manageWastesIn()` method.
+
+Note that the beliefs are not immediately updated when an object changes that is not currently in vision range of the cleaner. 
  
