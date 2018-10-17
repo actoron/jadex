@@ -481,8 +481,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				throw new RuntimeException(e);
+				SUtil.throwUnchecked(e);
 			}
 		}
 	}

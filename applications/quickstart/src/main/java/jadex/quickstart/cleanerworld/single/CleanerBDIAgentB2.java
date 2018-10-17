@@ -15,7 +15,7 @@ import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
- *  Using Deliberation Settings for Managing Conflicting Goals.
+ *  Using deliberation settings for managing conflicting goals.
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
 public class CleanerBDIAgentB2

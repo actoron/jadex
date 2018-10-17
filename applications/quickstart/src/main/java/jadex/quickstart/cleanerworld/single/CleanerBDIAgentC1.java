@@ -11,6 +11,7 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.runtime.IPlan;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.quickstart.cleanerworld.environment.IChargingstation;
@@ -89,6 +90,26 @@ public class CleanerBDIAgentC1
 		}
 	}
 	
+	/**
+	 *  A goal to know a charging station.
+	 */
+	@Goal
+	class QueryChargingStation
+	{
+		// TODO: Support @GoalResult instead of target condition
+		
+		// Remember the station when found
+		IChargingstation	station;
+		
+		// Check if there is a station in the beliefs
+		@GoalTargetCondition
+		boolean checkTarget()
+		{
+			station	= stations.isEmpty() ? null : stations.iterator().next();
+			return station!=null;
+		}
+	}
+	
 	//-------- methods that represent plans (i.e. predefined recipes for working on certain goals) --------
 	
 	/**
@@ -140,12 +161,17 @@ public class CleanerBDIAgentC1
 	 *  Move to charging station and load battery.
 	 */
 	@Plan(trigger=@Trigger(goals=MaintainBatteryLoaded.class))
-	private void loadBattery()
+	private void loadBattery(IPlan plan)
 	{
 		System.out.println("Starting loadBattery() plan");
 		
+		// Dispatch a subgoal to find a charging station
+		QueryChargingStation	querygoal	= new QueryChargingStation();
+		plan.dispatchSubgoal(querygoal).get();
+		IChargingstation	chargingstation	= querygoal.station;
+		
 		// Move to first known charging station -> fails when no charging station known.
-		IChargingstation	chargingstation	= stations.iterator().next();
+//		IChargingstation	chargingstation	= stations.iterator().next();
 		actsense.moveTo(chargingstation.getLocation());
 		
 		// Load until 100% (never reached, but plan is aborted when goal succeeds).

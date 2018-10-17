@@ -110,20 +110,20 @@ public class CleanerBDIAgentC2
 	
 	//-------- methods that represent plans (i.e. predefined recipes for working on certain goals) --------
 	
-	/**
-	 *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
-	 */
-	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
-	private void	performPatrolPlan()
-	{
-		// Follow a simple path around the four corners of the museum and back to the first corner.
-		System.out.println("Starting performPatrolPlan()");
-		actsense.moveTo(0.1, 0.1);
-		actsense.moveTo(0.1, 0.9);
-		actsense.moveTo(0.9, 0.9);
-		actsense.moveTo(0.9, 0.1);
-		actsense.moveTo(0.1, 0.1);
-	}
+//	/**
+//	 *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
+//	 */
+//	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
+//	private void	performPatrolPlan()
+//	{
+//		// Follow a simple path around the four corners of the museum and back to the first corner.
+//		System.out.println("Starting performPatrolPlan()");
+//		actsense.moveTo(0.1, 0.1);
+//		actsense.moveTo(0.1, 0.9);
+//		actsense.moveTo(0.9, 0.9);
+//		actsense.moveTo(0.9, 0.1);
+//		actsense.moveTo(0.1, 0.1);
+//	}
 
 	/**
 	 *  Declare a second plan for the PerformPatrol goal.
@@ -174,5 +174,20 @@ public class CleanerBDIAgentC2
 		
 		// Load until 100% (never reached, but plan is aborted when goal succeeds).
 		actsense.recharge(chargingstation, 1.0);
+	}
+	
+	/**
+	 *  Use code of first patrol plan when searching for charging station.
+	 */
+	@Plan(trigger=@Trigger(goals=QueryChargingStation.class))
+	private void	searchChargingStation()
+	{
+		// Follow a simple path around the four corners of the museum and back to the first corner.
+		System.out.println("Starting searchChargingStation() plan");
+		actsense.moveTo(0.1, 0.1);
+		actsense.moveTo(0.1, 0.9);
+		actsense.moveTo(0.9, 0.9);
+		actsense.moveTo(0.9, 0.1);
+		actsense.moveTo(0.1, 0.1);
 	}
 }

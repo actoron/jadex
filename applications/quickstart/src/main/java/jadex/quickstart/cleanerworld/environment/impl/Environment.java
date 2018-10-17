@@ -142,7 +142,7 @@ public class Environment
 		}
 		else
 		{
-			throw new IllegalStateException("Cleaner for agent "+cid+" alreqady exists (duplicate actsense?).");
+			throw new IllegalStateException("Cleaner for agent "+cid+" already exists (duplicate actsense?).");
 		}
 		
 		return ret.clone();

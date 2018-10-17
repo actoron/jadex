@@ -11,7 +11,6 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.runtime.IPlan;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.quickstart.cleanerworld.environment.IChargingstation;
@@ -20,10 +19,10 @@ import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
- *  Separate Maintain and Target Conditions.
+ *  Managing known charging stations in a belief set.
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
-public class CleanerBDIAgentC3
+public class CleanerBDIAgentC0
 {
 	//-------- fields holding agent data --------
 	
@@ -37,6 +36,7 @@ public class CleanerBDIAgentC3
 	/** Set of the known charging stations. Managed by SensorActuator object. */
 	@Belief
 	private Set<IChargingstation>	stations	= new LinkedHashSet<>();
+//	private LinkedHashSet<IChargingstation>	stations	= new LinkedHashSet<>();
 	
 	//-------- simple example behavior --------
 	
@@ -90,40 +90,22 @@ public class CleanerBDIAgentC3
 		}
 	}
 	
-	/**
-	 *  A goal to know a charging station.
-	 */
-	@Goal
-	class QueryChargingStation
-	{
-		// Remember the station when found
-		IChargingstation	station;
-		
-		// Check if there is a station in the beliefs
-		@GoalTargetCondition
-		boolean checkTarget()
-		{
-			station	= stations.isEmpty() ? null : stations.iterator().next();
-			return station!=null;
-		}
-	}
-	
 	//-------- methods that represent plans (i.e. predefined recipes for working on certain goals) --------
 	
-//	/**
-//	 *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
-//	 */
-//	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
-//	private void	performPatrolPlan()
-//	{
-//		// Follow a simple path around the four corners of the museum and back to the first corner.
-//		System.out.println("Starting performPatrolPlan()");
-//		actsense.moveTo(0.1, 0.1);
-//		actsense.moveTo(0.1, 0.9);
-//		actsense.moveTo(0.9, 0.9);
-//		actsense.moveTo(0.9, 0.1);
-//		actsense.moveTo(0.1, 0.1);
-//	}
+	/**
+	 *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
+	 */
+	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
+	private void	performPatrolPlan()
+	{
+		// Follow a simple path around the four corners of the museum and back to the first corner.
+		System.out.println("Starting performPatrolPlan()");
+		actsense.moveTo(0.1, 0.1);
+		actsense.moveTo(0.1, 0.9);
+		actsense.moveTo(0.9, 0.9);
+		actsense.moveTo(0.9, 0.1);
+		actsense.moveTo(0.1, 0.1);
+	}
 
 	/**
 	 *  Declare a second plan for the PerformPatrol goal.
@@ -159,35 +141,17 @@ public class CleanerBDIAgentC3
 	 *  Move to charging station and load battery.
 	 */
 	@Plan(trigger=@Trigger(goals=MaintainBatteryLoaded.class))
-	private void loadBattery(IPlan plan)
+	private void loadBattery()
 	{
 		System.out.println("Starting loadBattery() plan");
 		
-		// Dispatch a subgoal to find a charging station
-		QueryChargingStation	querygoal	= new QueryChargingStation();
-		plan.dispatchSubgoal(querygoal).get();
-		IChargingstation	chargingstation	= querygoal.station;
-		
 		// Move to first known charging station -> fails when no charging station known.
-//		IChargingstation	chargingstation	= stations.iterator().next();
+//		IChargingstation	chargingstation	= actsense.getChargingstations().iterator().next();
+		IChargingstation	chargingstation	= stations.iterator().next();
+		System.out.println("Class of the belief set is: "+stations.getClass());
 		actsense.moveTo(chargingstation.getLocation());
 		
 		// Load until 100% (never reached, but plan is aborted when goal succeeds).
 		actsense.recharge(chargingstation, 1.0);
-	}
-	
-	/**
-	 *  Use code of first patrol plan when searching for charging station.
-	 */
-	@Plan(trigger=@Trigger(goals=QueryChargingStation.class))
-	private void	searchChargingStation()
-	{
-		// Follow a simple path around the four corners of the museum and back to the first corner.
-		System.out.println("Starting searchCharginStation() plan");
-		actsense.moveTo(0.1, 0.1);
-		actsense.moveTo(0.1, 0.9);
-		actsense.moveTo(0.9, 0.9);
-		actsense.moveTo(0.9, 0.1);
-		actsense.moveTo(0.1, 0.1);
 	}
 }

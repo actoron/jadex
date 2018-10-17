@@ -135,7 +135,7 @@ public class Cleaner extends LocationObject	implements ICleaner
 		if(SUtil.equals(getCarriedWaste(), cl.getCarriedWaste()))
 			setCarriedWaste(cl.getCarriedWaste());
 	}
-
+	
 	//-------- object methods --------
 
 	/**
