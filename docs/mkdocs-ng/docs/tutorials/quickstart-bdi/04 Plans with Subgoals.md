@@ -75,7 +75,7 @@ The code compiles fine, but if you run the program, the following error will occ
 *java.lang.IllegalArgumentException: Can not set java.util.LinkedHashSet field jadex.quickstart.cleanerworld.single.CleanerBDIAgent.stations to jadex.bdiv3.runtime.wrappers.SetWrapper*
 
 To avoid this error, remember using the interface types (`Collection`, `Set`, `List` or `Map`) for the field,
-when you want to use Java collection classes as beliefs.
+when you want to use Java collection classes as beliefs, because Jadex needs to wrap the collections.
 
 ### The `manageChargingstationsIn()` Method
 
