@@ -71,3 +71,12 @@ Here you can find solutions for code you had to write yourself and the answers t
 5. All three plans get executed in parallel and try move the cleaner to different locations at once.
     One of the plan "wins" and is allowed to execute its `moveTo()` action, while the other two are stopped
     with an error message. Therefore, only one of the patrol rounds is actually performed.
+
+### Exercise C2: A Plan for Finding a Charging Station
+
+#### Alternative 1
+
+Reusing the first patrol plan, you could just add the new goal to the plan trigger:
+
+```java
+```
