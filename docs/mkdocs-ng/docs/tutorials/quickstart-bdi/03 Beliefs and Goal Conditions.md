@@ -1,7 +1,7 @@
 # Beliefs and Goal Conditions
 
 This exercise introduces beliefs that let an agent automatically perceive and react to changes.
-It also shows how to use goal conditions to control goal processing behavior based on belief values and belief changes.
+It also shows how to use goal conditions for controlling goal processing behavior based on belief values and belief changes.
 
 
 
@@ -71,6 +71,7 @@ Try to answer these questions to yourself before starting the program and readin
 Have your executed the agent and observed its behavior? Watch the console output and try to understand what went *wrong*,
 but also what already went *right*. In the following subsections, we will discuss the code somewhat backwards, starting with the plan.
 
+
 ### The `loadBattery()` Plan
 
 This plan is quite straight-forward. The plan handles the new `MaintainBatteryLoaded` goal as stated in the trigger.
@@ -95,6 +96,7 @@ patrol round thus trying to move to two directions at once. This caused the abov
 
 But first, we want to understand how the cleaner decided, when to start reloading.
 
+
 ### The `@GoalMaintainCondition` and Declarative Goals
 
 Unlike the empty class of the `PerformPatrol` goal, our new `MaintainBatteryLoaded` class had a method `isBatteryLoaded()`
@@ -105,13 +107,14 @@ This is why the agent didn't start executing the `loadBattery()` plan right from
 
 Thanks to the maintain condition, the goal becomes *declarative*, which means that the agent can check
 (with the boolean expression implemented in the method) if the goal is currently succeeded or not.
-This is quite different to the perform patrol goal, which is only *procedural* meaning that the agent will always execute plans
-for the perform patrol goal and consider it succeeded after successful plan execution.
+This is quite different to the perform patrol goal, which is only *procedural*, meaning that the agent will
+always execute plans for the perform patrol goal and always consider it succeeded after successful plan execution.
 
 Declarative goals capture the desired state already in their specification and are thus more decoupled from their plans.
 E.g. when the condition is `true`, no plan needs to be executed, whereas a procedural goal will always lead to plan execution.
 Also, when the condition is `false` and stays `false` even after plan execution, the agent will look for other plans to pursue the goal,
 whereas a procedural goal is always considered to have succeeded after plans (i.e. procedures) are completed.
+
 
 ### The `@Belief` Annotation
 
@@ -128,7 +131,7 @@ checks the affected conditions of the affected goals of the affected agents. Tha
 with a lot of agents that can have a lot of goals with a lot of conditions without the need for a supercomputer.
 
 The drawback is, that Jadex needs to know for which events to look. Thankfully, Jadex analyzes your code and is able
-to deduce many events automatically as long as your condition code refers to field marked as `@Belief`.
+to deduce many events automatically as long as your condition code refers to fields marked as `@Belief`.
 Therefore having the annotation at the `self` field allows Jadex to see that the maintain condition, that also refers
 to this field, should be re-checked whenever the `self` belief value changes.
 
@@ -144,7 +147,7 @@ you can have a look at a simple example from the official
 ## Exercise B2: Using Deliberation Settings for Managing Conflicting Goals
 
 Lets tackle the remaining problem. Currently the cleaner tries to load its battery but doesn't stop
-the active patrol round. As the cleaner can not move in two directions at once, there is a conflict
+the active patrol round. As the cleaner cannot move in two directions at once, there is a conflict
 between the previous perform patrol goal and the new maintain battery loaded goal.
 
 We somehow want to tell the cleaner to prioritize the latter and stop executing plans for the former
@@ -156,23 +159,28 @@ annotation of the `MaintainBatteryLoaded` class to the following code:
 		deliberation=@Deliberation(inhibits=PerformPatrol.class))	// Pause patrol goal while loading battery
 ```
 
+
 ### The `@Deliberation` Annotation and the `inhibits` Setting
 
 The code above introduces deliberation settings that can be added to `@Goal` annotations.
-Deliberation means that the agent keeps track of its current goals and decides (i.e. deliberates)
+Deliberation means that the agent keeps track of its current goals and decides (i.e. *deliberates*)
 if some of them need to be suspended in favor of other more important goals.
 When the more important goals are completed, the agent can resume the previously suspended less
 important goals.
 
 In Jadex, deliberation criteria can be specified by so called *inhibition arcs*, which can be seen
 as pointers from the more important goals to the less important goals. As long as such a more important
-goal is actively processed (i.e. plans are executed for the goal), all other goals connected by#
+goal is actively processed (i.e. plans are executed for the goal), all other goals connected by
 the inhibition arcs are *inhibited*, i.e. prevented from executing plans.
 
 In our cleaner example, the maintain battery loaded goal now inhibits the perform patrol goal.
 As a result, any active patrol plan will be aborted as soon as the maintain battery loaded goal
 becomes active. Thus now the load battery plan should succeed, because the patrol plan cannot interfere
-anymore.
+anymore:
+
+![](deliberation-inhibits.png)
+
+*Figure B.1: Inhibition arcs explained*
 
 Execute the program and test the behavior. What do you observe?
 

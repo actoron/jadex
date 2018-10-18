@@ -11,6 +11,7 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -80,7 +81,7 @@ public class CleanerBDIAgentC2
 		@GoalMaintainCondition	// The cleaner aims to maintain the following expression, i.e. act to restore the condition, whenever it changes to false.
 		boolean isBatteryLoaded()
 		{
-			return self.getChargestate()>=0.2; // Everything is fine as long as the charge state is above 20%, otherwise the cleaner needs to recharge.
+			return self.getChargestate()>=0.3; // Everything is fine as long as the charge state is above 20%, otherwise the cleaner needs to recharge.
 		}
 			
 		@GoalTargetCondition	// Only stop charging, when this condition is true
@@ -93,7 +94,7 @@ public class CleanerBDIAgentC2
 	/**
 	 *  A goal to know a charging station.
 	 */
-	@Goal
+	@Goal(excludemode=ExcludeMode.Never)
 	class QueryChargingStation
 	{
 		// Remember the station when found
@@ -101,7 +102,7 @@ public class CleanerBDIAgentC2
 		
 		// Check if there is a station in the beliefs
 		@GoalTargetCondition
-		boolean checkTarget()
+		boolean isStationKnown()
 		{
 			station	= stations.isEmpty() ? null : stations.iterator().next();
 			return station!=null;
@@ -163,13 +164,16 @@ public class CleanerBDIAgentC2
 	{
 		System.out.println("Starting loadBattery() plan");
 		
-		// Dispatch a subgoal to find a charging station
+//		// Move to first known charging station -> fails when no charging station known.
+//		IChargingstation	chargingstation	= actsense.getChargingstations().iterator().next();	// from Exercise B1
+//		IChargingstation	chargingstation	= stations.iterator().next();	// from Exercise C0
+		
+		// Dispatch a subgoal to find a charging station (from Exercise C1)
 		QueryChargingStation	querygoal	= new QueryChargingStation();
 		plan.dispatchSubgoal(querygoal).get();
 		IChargingstation	chargingstation	= querygoal.station;
 		
-		// Move to first known charging station -> fails when no charging station known.
-//		IChargingstation	chargingstation	= stations.iterator().next();
+		// Move to charging station as provided by subgoal
 		actsense.moveTo(chargingstation.getLocation());
 		
 		// Load until 100% (never reached, but plan is aborted when goal succeeds).
@@ -177,17 +181,13 @@ public class CleanerBDIAgentC2
 	}
 	
 	/**
-	 *  Use code of first patrol plan when searching for charging station.
+	 *  A plan to move randomly in the environment.
 	 */
 	@Plan(trigger=@Trigger(goals=QueryChargingStation.class))
-	private void	searchChargingStation()
+	private void	moveAround()
 	{
-		// Follow a simple path around the four corners of the museum and back to the first corner.
-		System.out.println("Starting searchChargingStation() plan");
-		actsense.moveTo(0.1, 0.1);
-		actsense.moveTo(0.1, 0.9);
-		actsense.moveTo(0.9, 0.9);
-		actsense.moveTo(0.9, 0.1);
-		actsense.moveTo(0.1, 0.1);
+		// Choose a random location and move there.
+		System.out.println("Starting moveAroundPlan() plan");
+		actsense.moveTo(Math.random(), Math.random());
 	}
 }

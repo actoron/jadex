@@ -20,7 +20,7 @@ import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
- *  Separate Maintain and Target Conditions.
+ *   A subgoal for knowing charging stations
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
 public class CleanerBDIAgentC1
@@ -103,7 +103,7 @@ public class CleanerBDIAgentC1
 		
 		// Check if there is a station in the beliefs
 		@GoalTargetCondition
-		boolean checkTarget()
+		boolean isStationKnown()
 		{
 			station	= stations.isEmpty() ? null : stations.iterator().next();
 			return station!=null;
@@ -112,20 +112,20 @@ public class CleanerBDIAgentC1
 	
 	//-------- methods that represent plans (i.e. predefined recipes for working on certain goals) --------
 	
-	/**
-	 *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
-	 */
-	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
-	private void	performPatrolPlan()
-	{
-		// Follow a simple path around the four corners of the museum and back to the first corner.
-		System.out.println("Starting performPatrolPlan()");
-		actsense.moveTo(0.1, 0.1);
-		actsense.moveTo(0.1, 0.9);
-		actsense.moveTo(0.9, 0.9);
-		actsense.moveTo(0.9, 0.1);
-		actsense.moveTo(0.1, 0.1);
-	}
+//	/**
+//	 *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
+//	 */
+//	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
+//	private void	performPatrolPlan()
+//	{
+//		// Follow a simple path around the four corners of the museum and back to the first corner.
+//		System.out.println("Starting performPatrolPlan()");
+//		actsense.moveTo(0.1, 0.1);
+//		actsense.moveTo(0.1, 0.9);
+//		actsense.moveTo(0.9, 0.9);
+//		actsense.moveTo(0.9, 0.1);
+//		actsense.moveTo(0.1, 0.1);
+//	}
 
 	/**
 	 *  Declare a second plan for the PerformPatrol goal.
@@ -165,13 +165,16 @@ public class CleanerBDIAgentC1
 	{
 		System.out.println("Starting loadBattery() plan");
 		
-		// Dispatch a subgoal to find a charging station
+//		// Move to first known charging station -> fails when no charging station known.
+//		IChargingstation	chargingstation	= actsense.getChargingstations().iterator().next();	// from Exercise B1
+//		IChargingstation	chargingstation	= stations.iterator().next();	// from Exercise C0
+		
+		// Dispatch a subgoal to find a charging station (from Exercise C1)
 		QueryChargingStation	querygoal	= new QueryChargingStation();
 		plan.dispatchSubgoal(querygoal).get();
 		IChargingstation	chargingstation	= querygoal.station;
 		
-		// Move to first known charging station -> fails when no charging station known.
-//		IChargingstation	chargingstation	= stations.iterator().next();
+		// Move to charging station as provided by subgoal
 		actsense.moveTo(chargingstation.getLocation());
 		
 		// Load until 100% (never reached, but plan is aborted when goal succeeds).

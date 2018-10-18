@@ -36,7 +36,7 @@ public class CleanerBDIAgentC0
 	/** Set of the known charging stations. Managed by SensorActuator object. */
 	@Belief
 	private Set<IChargingstation>	stations	= new LinkedHashSet<>();
-//	private LinkedHashSet<IChargingstation>	stations	= new LinkedHashSet<>();
+//	private LinkedHashSet<IChargingstation>	stations	= new LinkedHashSet<>();	// -> error
 	
 	//-------- simple example behavior --------
 	
@@ -92,20 +92,20 @@ public class CleanerBDIAgentC0
 	
 	//-------- methods that represent plans (i.e. predefined recipes for working on certain goals) --------
 	
-	/**
-	 *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
-	 */
-	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
-	private void	performPatrolPlan()
-	{
-		// Follow a simple path around the four corners of the museum and back to the first corner.
-		System.out.println("Starting performPatrolPlan()");
-		actsense.moveTo(0.1, 0.1);
-		actsense.moveTo(0.1, 0.9);
-		actsense.moveTo(0.9, 0.9);
-		actsense.moveTo(0.9, 0.1);
-		actsense.moveTo(0.1, 0.1);
-	}
+//	/**
+//	 *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
+//	 */
+//	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
+//	private void	performPatrolPlan()
+//	{
+//		// Follow a simple path around the four corners of the museum and back to the first corner.
+//		System.out.println("Starting performPatrolPlan()");
+//		actsense.moveTo(0.1, 0.1);
+//		actsense.moveTo(0.1, 0.9);
+//		actsense.moveTo(0.9, 0.9);
+//		actsense.moveTo(0.9, 0.1);
+//		actsense.moveTo(0.1, 0.1);
+//	}
 
 	/**
 	 *  Declare a second plan for the PerformPatrol goal.
@@ -146,8 +146,8 @@ public class CleanerBDIAgentC0
 		System.out.println("Starting loadBattery() plan");
 		
 		// Move to first known charging station -> fails when no charging station known.
-//		IChargingstation	chargingstation	= actsense.getChargingstations().iterator().next();
-		IChargingstation	chargingstation	= stations.iterator().next();
+//		IChargingstation	chargingstation	= actsense.getChargingstations().iterator().next();	// from Exercise B1
+		IChargingstation	chargingstation	= stations.iterator().next();	// from Exercise C0
 		System.out.println("Class of the belief set is: "+stations.getClass());
 		actsense.moveTo(chargingstation.getLocation());
 		
