@@ -30,7 +30,7 @@ import jadex.quickstart.cleanerworld.gui.SensorGui;
  *  Separate Maintain and Target Conditions.
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
-public class CleanerBDIAgent
+public class CleanerBDIAgentD3a
 {
 	//-------- fields holding agent data --------
 	
@@ -91,7 +91,7 @@ public class CleanerBDIAgent
 	 *  A goal to recharge whenever the battery is low.
 	 */
 	@Goal(recur=true, recurdelay=3000,
-		deliberation=@Deliberation(inhibits={PerformPatrol.class, AchieveCleanupWaste.class}))	// Pause patrol goal while loading battery
+		deliberation=@Deliberation(inhibits=PerformPatrol.class))	// Pause patrol goal while loading battery
 	class MaintainBatteryLoaded
 	{
 		@GoalMaintainCondition	// The cleaner aims to maintain the following expression, i.e. act to restore the condition, whenever it changes to false.
@@ -146,8 +146,7 @@ public class CleanerBDIAgent
 	/**
 	 *  A goal to cleanup waste.
 	 */
-	@Goal(recur=true, recurdelay=3000,
-		deliberation=@Deliberation(inhibits={PerformPatrol.class, AchieveCleanupWaste.class}))
+	@Goal(recur=true, recurdelay=3000)
 	class AchieveCleanupWaste
 	{
 		// Remember the waste item to clean up
@@ -167,10 +166,7 @@ public class CleanerBDIAgent
 		@GoalTargetCondition
 		boolean	isClean()
 		{
-			// Test if the waste is not believed to be in the environment
-			return !wastes.contains(waste)
-				// and also not the waste we just picked up.
-				&& !waste.equals(self.getCarriedWaste());
+			return !wastes.contains(waste);
 		}
 	}
 	
@@ -249,10 +245,10 @@ public class CleanerBDIAgent
 	 *  A plan to move randomly in the environment.
 	 */
 	@Plan(trigger=@Trigger(goals={QueryChargingStation.class, QueryWastebin.class}))
-	private void	moveAround(IPlan plan)
+	private void	moveAround()
 	{
 		// Choose a random location and move there.
-		System.out.println("Starting moveAround() plan for goal "+plan.getReason());
+		System.out.println("Starting moveAround() plan");
 		actsense.moveTo(Math.random(), Math.random());
 	}
 	
@@ -274,12 +270,9 @@ public class CleanerBDIAgent
 	{
 		System.out.println("Starting cleanupWaste() plan");
 		
-		// Move to waste and pick it up, if not yet done
-		if(!cleanup.waste.equals(self.getCarriedWaste()))
-		{
-			actsense.moveTo(cleanup.waste.getLocation());
-			actsense.pickUpWaste(cleanup.waste);
-		}
+		// Move to waste and pick it up
+		actsense.moveTo(cleanup.waste.getLocation());
+		actsense.pickUpWaste(cleanup.waste);
 		
 		// Dispatch a subgoal to find a waste bin
 		QueryWastebin	querygoal	= new QueryWastebin();

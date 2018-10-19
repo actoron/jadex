@@ -56,7 +56,7 @@ public class CleanerBDIAgentFinal
 	private Set<ICleaner>	others	= new LinkedHashSet<>();
 	
 	/** The sensor gives access to the environment. */
-	private SensorActuator	actsense	= new SensorActuator(wastes, wastebins, stations, others);
+	private SensorActuator	actsense	= new SensorActuator();
 	
 	/** Knowledge about myself. Managed by SensorActuator object. */
 	@Belief
@@ -78,6 +78,12 @@ public class CleanerBDIAgentFinal
 	@AgentBody
 	private void	exampleBehavior(IBDIAgentFeature bdifeature)
 	{
+		// Tell the sensor to update the belief sets
+		actsense.manageWastesIn(wastes);
+		actsense.manageWastebinsIn(wastebins);
+		actsense.manageChargingstationsIn(stations);
+		actsense.manageCleanersIn(others);
+		
 		// Open a window showing the agent's perceptions
 		if(sensorgui)
 			new SensorGui(actsense).setVisible(true);
@@ -123,12 +129,12 @@ public class CleanerBDIAgentFinal
 	//-------- cleanup waste --------
 	
 	@Goal(deliberation=@Deliberation(inhibits= {PerformLookForWaste.class, AchieveCleanupWaste.class}), unique=true)
-	public class AchieveCleanupWaste
+	class AchieveCleanupWaste
 	{
 		private IWaste	waste;
 		
 		@GoalCreationCondition(beliefs="wastes")
-		public AchieveCleanupWaste(@CheckNotNull IWaste waste)
+		AchieveCleanupWaste(@CheckNotNull IWaste waste)
 		{
 			System.out.println("achieve cleanup: "+waste);
 			this.waste	= waste;

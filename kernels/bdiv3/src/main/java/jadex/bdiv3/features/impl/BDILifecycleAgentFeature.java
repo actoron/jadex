@@ -1058,6 +1058,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										
 										if(ok)
 										{
+											c.setAccessible(true);
 											pojogoal = c.newInstance(pvals);
 										}
 									}
@@ -1956,7 +1957,16 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						RGoal goal = (RGoal)event.getContent();
-						return delstr.goalIsOption(goal);
+						
+						// For subgoals, check if parent still adopted (hack!!!) TODO: fix connected goal/plan lifecycles!!!
+						if(goal.isAdopted())
+						{
+							return delstr.goalIsOption(goal);							
+						}
+						else
+						{
+							return IFuture.DONE;
+						}
 					}
 				});
 //				rule.addEvent(new EventType(new String[]{ChangeEvent.GOALNOTINHIBITED, EventType.MATCHALL}));

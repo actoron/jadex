@@ -481,8 +481,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				throw new RuntimeException(e);
+				SUtil.throwUnchecked(e);
 			}
 		}
 	}
@@ -1024,6 +1023,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			{
 				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME);
 //				System.out.println("res: "+res);
+				res.getFirstEntity().setAccessible(true);
 				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
 				if(agent==null) 
 				{
@@ -1054,19 +1054,15 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					catch(Exception e)
 					{
 						e.printStackTrace();
-						throw new RuntimeException(e);
+						SUtil.throwUnchecked(e);
 					}					
 					
 					return;
 				}
 			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
 			catch(Exception e)
 			{
-				throw new RuntimeException(e);
+				SUtil.throwUnchecked(e);
 			}
 		}
 

@@ -45,6 +45,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.ComponentFutureFunctionality;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -809,305 +810,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //			}
 //		});
 		
-		return (IExternalAccess)ProxyFactory.newProxyInstance(getClassLoader(), new Class[]{IExternalAccess.class}, new InvocationHandler()
-		{
-			/** The component identifier. */
-			protected IComponentIdentifier	cid;
-			
-			/** The toString value. */
-			protected String tostring;
-			
-			{
-				this.cid	= getId();
-				this.tostring = cid.getLocalName();
-			}
-			
-			@Override
-			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-			{
-//				if(method.getName().indexOf("killComponent")!=-1)
-//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
-				
-				Class<?> rettype = method.getReturnType();
-				
-				// Hack, use step return type
-				if("scheduleStep".equals(method.getName()))
-				{
-					IComponentStep<?> step = null;
-					for(int i=0; i<args.length; i++)
-					{
-						if(args[i] instanceof IComponentStep<?>)
-						{
-							step = (IComponentStep<?>)args[i];
-							break;
-						}
-					}
-					
-					Method m = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
-					rettype = m.getReturnType();
-				}
-				
-				if("getId".equals(method.getName()))
-				{
-					return cid;
-//					return getId();
-				}
-				else if("toString".equals(method.getName()))
-				{
-					return tostring;
-//					return getId().getLocalName();
-				}
-				else if("equals".equals(method.getName()))
-				{
-					boolean ret = false;
-					
-					if(args[0] instanceof IExternalAccess)
-						ret = ((IExternalAccess)args[0]).getId().equals(getId());
-					
-					return ret;
-				}
-				else if("hashCode".equals(method.getName()))
-				{
-					return cid == null? 0 : cid.hashCode();
-//					return getId() == null? 0 : getId().hashCode();
-				}
-				else if("getExternalFeature".equals(method.getName()))
-				{
-					Class<?> iface = (Class<?>)args[0];
-					return getExternalFeature(iface, getClassLoader(), getInternalAccess());
-				}
-				else
-				{
-					int prio = IExecutionFeature.STEP_PRIORITY_NORMAL;
-					
-					// Allow getting arguments and results from dead components.
-					if("getResultsAsync".equals(method.getName()))
-					{
-						if(shutdown)
-							return new Future<>(getFeature(IArgumentsResultsFeature.class).getResults());
-						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
-					}
-					if("getArgumentsAsync".equals(method.getName()))
-					{
-						if(shutdown)
-							return new Future<>(getFeature(IArgumentsResultsFeature.class).getArguments());
-						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
-					}
-					
-					if(!getFeature(IExecutionFeature.class).isComponentThread())
-					{
-						final Future<Object> ret = (Future<Object>)SFuture.getFuture(rettype);
-//						System.out.println("scheduleStep: "+method.getName()+" "+method.getReturnType());
-						
-						getInternalAccess().scheduleStep(prio, new IComponentStep<Void>()
-						{
-							@Override
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType());
-								if(!intermediate)
-									doInvoke(ia, method, args).addResultListener(new DelegationResultListener<>(ret));
-								else
-									doInvoke(ia, method, args).addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
-								return IFuture.DONE;
-							}
-						}).addResultListener(new ExceptionResultListener<Void>()
-						{
-							public void exceptionOccurred(Exception exception)
-							{
-								ret.setException(exception);
-							}
-						});;
-						
-						return getDecoupledFuture(ret);						
-					}
-					else
-					{
-						return getDecoupledFuture(doInvoke(getInternalAccess(), method, args));
-//						System.out.println("res2: "+res.getClass());
-					}
-				}
-			}
-			
-			public IFuture<Object> doInvoke(IInternalAccess ia, Method method, Object[] args)
-			{
-//				if(method.getName().indexOf("createCompo")!=-1)
-//					System.out.println("call");
-				
-//				Future<Object> ret = new Future<>();
-				IFuture<Object> ret = null;
-				
-				try
-				{
-					Class<?> iface = method.getDeclaringClass();
-					String name = SReflect.getClassName(iface);
-					String intname = SUtil.replaceLast(name, "External", "");
-//					System.out.println(name+" "+intname);
-					
-					Class<?> clazz = SReflect.findClass0(intname, null, ia.getClassLoader());
-					Object feat = clazz!=null? ia.getFeature0(clazz): null;
-					
-					Object res;
-					if(feat==null)
-					{
-						String mname = method.getName();
-//						int idx = mname.lastIndexOf("Async");
-//						if(idx>0)
-//							mname = mname.substring(0, idx);
-						Method m = IInternalAccess.class.getMethod(mname, method.getParameterTypes());
-						res = m.invoke(ia, args);
-					}
-					else
-					{
-						// todo: create generic (double) hook (also in RMI proxy) mechanism
-						
-						if(feat instanceof IRequiredServicesFeature)
-						{
-							if("searchService".equals(method.getName()))
-							{
-								method = RequiredServicesComponentFeature.class.getMethod("resolveService",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
-								args = Arrays.copyOf(args, 2);
-							}
-							else if("searchServices".equals(method.getName()))
-							{
-								method = RequiredServicesComponentFeature.class.getMethod("resolveServices",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
-								args = Arrays.copyOf(args, 2);
-							}
-							else if("addQuery".equals(method.getName()))
-							{
-								method = RequiredServicesComponentFeature.class.getMethod("resolveQuery",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
-								args = Arrays.copyOf(args, 2);
-							}
-						}
-						
-						res = method.invoke(feat, args);
-					}
-					
-					if(res instanceof IFuture)
-					{
-						ret = (IFuture<Object>)res;
-					}
-					else
-					{
-						((Future)ret).setResult(res);
-					}
-				}
-				catch(Exception e)
-				{
-					ret = new Future<Object>();
-					((Future)ret).setException(e);
-				}
-				
-//				return getDecoupledFuture(ret);
-				
-				return ret;
-			}
-			
-			/**
-			 *  Returns a future that schedules back to calling component if necessary..
-			 *  @param infut Input future.
-			 *  @return 
-			 */
-			protected <T> IFuture<T> getDecoupledFuture(final IFuture<T> infut)
-			{
-				FutureFunctionality	func	= null;
-				IInternalAccess caller = IInternalExecutionFeature.LOCAL.get();
-				
-				// Called from other component?
-				if(caller!=null && !getInternalAccess().equals(caller))
-				{
-					// Add blocker to caller platform, when called from other platform
-					IComponentIdentifier callerplat = caller.getId().getRoot();
-					if (SSimulation.isSimulating(caller) && !callerplat.equals(getInternalAccess().getId().getRoot()))
-						((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
-					
-					// bidirectional decoupling (forward/backward).
-					func	= new ComponentFutureFunctionality(caller)
-					{
-						public void scheduleBackward(ICommand<Void> command)
-						{
-							if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
-							{
-								getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-								{
-									public IFuture<Void> execute(IInternalAccess intaccess)
-									{
-										command.execute(null);
-										return IFuture.DONE;
-									}
-								}).addResultListener(new IResultListener<Void>()
-								{
-									public void exceptionOccurred(Exception exception)
-									{
-										System.err.println("Unexpected Exception: "+command);
-										exception.printStackTrace();
-									}
-									
-									public void resultAvailable(Void result)
-									{
-									}
-								});
-							}
-							else
-							{
-								command.execute(null);
-							}
-						}
-					};
-				}
-				
-				// Called from external thread.
-				else if(caller==null)
-				{
-					// backward decoupling only (caller to callee).
-					func	= new FutureFunctionality(getInternalAccess().getLogger())
-					{
-						public void scheduleBackward(ICommand<Void> command)
-						{
-							if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
-							{
-								getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-								{
-									public IFuture<Void> execute(IInternalAccess intaccess)
-									{
-										command.execute(null);
-										return IFuture.DONE;
-									}
-								}).addResultListener(new IResultListener<Void>()
-								{
-									public void exceptionOccurred(Exception exception)
-									{
-										System.err.println("Unexpected Exception: "+command);
-										exception.printStackTrace();
-									}
-									
-									public void resultAvailable(Void result)
-									{
-									}
-								});
-							}
-							else
-							{
-								command.execute(null);
-							}
-						}
-					};					
-				}
-				
-				// Create delegation future if necessary.
-				return func!=null ? FutureFunctionality.getDelegationFuture(infut, func) : infut;
-			}
-			
-//			/**
-//			 *  Returns a future that schedules back to calling component if necessary..
-//			 *  @param infut Input future.
-//			 *  @return 
-//			 */
-//			protected <T> ISubscriptionIntermediateFuture<T> getDecoupledSubscriptionFuture(final ISubscriptionIntermediateFuture<T> infut)
-//			{
-//				return (ISubscriptionIntermediateFuture<T>) getDecoupledFuture(infut);
-//			}
-		});
+		return (IExternalAccess)ProxyFactory.newProxyInstance(getClassLoader(), new Class[]{IExternalAccess.class}, new ExternalAccessInvocationHandler());
 	}
 	
 	/**
@@ -1729,5 +1432,300 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	public String	toString()
 	{
 		return getId()!=null? getId().getName(): "n/a";
+	}
+	
+	//-------- helper classes --------
+	
+	/**
+	 *  Nested class fopr service annotation.
+	 */
+	@Service
+	protected class ExternalAccessInvocationHandler implements InvocationHandler
+	{
+		/** The component identifier. */
+		protected IComponentIdentifier	cid;
+
+		/** The toString value. */
+		protected String tostring;
+		{
+			this.cid	= getId();
+			this.tostring = cid.getLocalName();
+		}
+
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+		{
+//				if(method.getName().indexOf("killComponent")!=-1)
+//				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+			
+			Class<?> rettype = method.getReturnType();
+			
+			// Hack, use step return type
+			if("scheduleStep".equals(method.getName()))
+			{
+				IComponentStep<?> step = null;
+				for(int i=0; i<args.length; i++)
+				{
+					if(args[i] instanceof IComponentStep<?>)
+					{
+						step = (IComponentStep<?>)args[i];
+						break;
+					}
+				}
+				
+				Method m = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
+				rettype = m.getReturnType();
+			}
+			
+			if("getId".equals(method.getName()))
+			{
+				return cid;
+//					return getId();
+			}
+			else if("toString".equals(method.getName()))
+			{
+				return tostring;
+//					return getId().getLocalName();
+			}
+			else if("equals".equals(method.getName()))
+			{
+				boolean ret = false;
+				
+				if(args[0] instanceof IExternalAccess)
+					ret = ((IExternalAccess)args[0]).getId().equals(getId());
+				
+				return ret;
+			}
+			else if("hashCode".equals(method.getName()))
+			{
+				return cid == null? 0 : cid.hashCode();
+//					return getId() == null? 0 : getId().hashCode();
+			}
+			else if("getExternalFeature".equals(method.getName()))
+			{
+				Class<?> iface = (Class<?>)args[0];
+				return getExternalFeature(iface, getClassLoader(), getInternalAccess());
+			}
+			else
+			{
+				int prio = IExecutionFeature.STEP_PRIORITY_NORMAL;
+				
+				// Allow getting arguments and results from dead components.
+				if("getResultsAsync".equals(method.getName()))
+				{
+					if(shutdown)
+						return new Future<>(getFeature(IArgumentsResultsFeature.class).getResults());
+					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+				}
+				if("getArgumentsAsync".equals(method.getName()))
+				{
+					if(shutdown)
+						return new Future<>(getFeature(IArgumentsResultsFeature.class).getArguments());
+					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+				}
+				
+				if(!getFeature(IExecutionFeature.class).isComponentThread())
+				{
+					final Future<Object> ret = (Future<Object>)SFuture.getFuture(rettype);
+//						System.out.println("scheduleStep: "+method.getName()+" "+method.getReturnType());
+					
+					getInternalAccess().scheduleStep(prio, new IComponentStep<Void>()
+					{
+						@Override
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType());
+							if(!intermediate)
+								doInvoke(ia, method, args).addResultListener(new DelegationResultListener<>(ret));
+							else
+								doInvoke(ia, method, args).addResultListener(new IntermediateDelegationResultListener<>((IntermediateFuture)ret));
+							return IFuture.DONE;
+						}
+					}).addResultListener(new ExceptionResultListener<Void>()
+					{
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});;
+					
+					return getDecoupledFuture(ret);						
+				}
+				else
+				{
+					return getDecoupledFuture(doInvoke(getInternalAccess(), method, args));
+//						System.out.println("res2: "+res.getClass());
+				}
+			}
+		}
+
+		public IFuture<Object> doInvoke(IInternalAccess ia, Method method, Object[] args)
+		{
+//				if(method.getName().indexOf("createCompo")!=-1)
+//					System.out.println("call");
+			
+//				Future<Object> ret = new Future<>();
+			IFuture<Object> ret = null;
+			
+			try
+			{
+				Class<?> iface = method.getDeclaringClass();
+				String name = SReflect.getClassName(iface);
+				String intname = SUtil.replaceLast(name, "External", "");
+//					System.out.println(name+" "+intname);
+				
+				Class<?> clazz = SReflect.findClass0(intname, null, ia.getClassLoader());
+				Object feat = clazz!=null? ia.getFeature0(clazz): null;
+				
+				Object res;
+				if(feat==null)
+				{
+					String mname = method.getName();
+//						int idx = mname.lastIndexOf("Async");
+//						if(idx>0)
+//							mname = mname.substring(0, idx);
+					Method m = IInternalAccess.class.getMethod(mname, method.getParameterTypes());
+					res = m.invoke(ia, args);
+				}
+				else
+				{
+					// todo: create generic (double) hook (also in RMI proxy) mechanism
+					
+					if(feat instanceof IRequiredServicesFeature)
+					{
+						if("searchService".equals(method.getName()))
+						{
+							method = RequiredServicesComponentFeature.class.getMethod("resolveService",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
+							args = Arrays.copyOf(args, 2);
+						}
+						else if("searchServices".equals(method.getName()))
+						{
+							method = RequiredServicesComponentFeature.class.getMethod("resolveServices",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
+							args = Arrays.copyOf(args, 2);
+						}
+						else if("addQuery".equals(method.getName()))
+						{
+							method = RequiredServicesComponentFeature.class.getMethod("resolveQuery",new Class[]{ServiceQuery.class, RequiredServiceInfo.class});
+							args = Arrays.copyOf(args, 2);
+						}
+					}
+					
+					res = method.invoke(feat, args);
+				}
+				
+				if(res instanceof IFuture)
+				{
+					ret = (IFuture<Object>)res;
+				}
+				else
+				{
+					((Future)ret).setResult(res);
+				}
+			}
+			catch(Exception e)
+			{
+				ret = new Future<Object>();
+				((Future)ret).setException(e);
+			}
+			
+//				return getDecoupledFuture(ret);
+			
+			return ret;
+		}
+
+		/**
+		 *  Returns a future that schedules back to calling component if necessary..
+		 *  @param infut Input future.
+		 *  @return 
+		 */
+		protected <T> IFuture<T> getDecoupledFuture(final IFuture<T> infut)
+		{
+			FutureFunctionality	func	= null;
+			IInternalAccess caller = IInternalExecutionFeature.LOCAL.get();
+			
+			// Called from other component?
+			if(caller!=null && !getInternalAccess().equals(caller))
+			{
+				// Add blocker to caller platform, when called from other platform
+				IComponentIdentifier callerplat = caller.getId().getRoot();
+				if (SSimulation.isSimulating(caller) && !callerplat.equals(getInternalAccess().getId().getRoot()))
+					((IInternalExecutionFeature) caller.getFeature(IExecutionFeature.class)).addSimulationBlocker(infut);
+				
+				// bidirectional decoupling (forward/backward).
+				func	= new ComponentFutureFunctionality(caller)
+				{
+					public void scheduleBackward(ICommand<Void> command)
+					{
+						if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
+						{
+							getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+							{
+								public IFuture<Void> execute(IInternalAccess intaccess)
+								{
+									command.execute(null);
+									return IFuture.DONE;
+								}
+							}).addResultListener(new IResultListener<Void>()
+							{
+								public void exceptionOccurred(Exception exception)
+								{
+									System.err.println("Unexpected Exception: "+command);
+									exception.printStackTrace();
+								}
+								
+								public void resultAvailable(Void result)
+								{
+								}
+							});
+						}
+						else
+						{
+							command.execute(null);
+						}
+					}
+				};
+			}
+			
+			// Called from external thread.
+			else if(caller==null)
+			{
+				// backward decoupling only (caller to callee).
+				func	= new FutureFunctionality(getInternalAccess().getLogger())
+				{
+					public void scheduleBackward(ICommand<Void> command)
+					{
+						if(!getInternalAccess().getFeature(IExecutionFeature.class).isComponentThread())
+						{
+							getInternalAccess().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+							{
+								public IFuture<Void> execute(IInternalAccess intaccess)
+								{
+									command.execute(null);
+									return IFuture.DONE;
+								}
+							}).addResultListener(new IResultListener<Void>()
+							{
+								public void exceptionOccurred(Exception exception)
+								{
+									System.err.println("Unexpected Exception: "+command);
+									exception.printStackTrace();
+								}
+								
+								public void resultAvailable(Void result)
+								{
+								}
+							});
+						}
+						else
+						{
+							command.execute(null);
+						}
+					}
+				};					
+			}
+			
+			// Create delegation future if necessary.
+			return func!=null ? FutureFunctionality.getDelegationFuture(infut, func) : infut;
+		}
 	}
 }

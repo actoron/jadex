@@ -53,6 +53,7 @@ public class CleanerBDIAgentA2
 	private void	performPatrolPlan()
 	{
 		// Follow a simple path around the four corners of the museum and back to the first corner.
+		System.out.println("Starting performPatrolPlan()");
 		actsense.moveTo(0.1, 0.1);
 		actsense.moveTo(0.1, 0.9);
 		actsense.moveTo(0.9, 0.9);

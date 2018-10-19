@@ -445,6 +445,10 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				ret.addAll(classes);
 			}
 		}
+		catch(JadexBDIGenerationException e)
+		{
+			throw e;
+		}
 		catch(Throwable e)
 		{
 			throw new JadexBDIGenerationException("Error generating BDI class:" + clname, e);

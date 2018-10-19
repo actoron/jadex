@@ -14,7 +14,7 @@ Download the [jadex-example-project.zip](https://download.actoron.com/nightlies/
 
 Choose *File/Import... -> Gradle/Existing Gradle Projects* and select the unzipped example directory as root directory.
 
-![01 Introduction@menu-import.png](menu-import.png)
+![](menu-import.png)
 
 *Figure 1: Eclipse import menu*
 

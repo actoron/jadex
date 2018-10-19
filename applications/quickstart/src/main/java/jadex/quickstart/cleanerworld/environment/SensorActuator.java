@@ -1,7 +1,5 @@
 package jadex.quickstart.cleanerworld.environment;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -68,14 +66,6 @@ public class SensorActuator
 	 */
 	public SensorActuator()
 	{
-		this(null, null, null, null);
-	}
-	
-	/**
-	 *  Create a sensor for a new cleaner robot.
-	 */
-	public SensorActuator(Set<IWaste> wastes, Set<IWastebin> wastebins, Set<IChargingstation> stations, Set<ICleaner> cleaners)
-	{
 		this.agent	= ExecutionComponentFeature.LOCAL.get();
 		if(agent==null)
 		{
@@ -83,10 +73,10 @@ public class SensorActuator
 		}
 
 		self	= Environment.getInstance().createCleaner(agent);
-		this.cleaners	= cleaners!=null ? cleaners : new LinkedHashSet<>();
-		this.wastes	= wastes!=null ? wastes : new LinkedHashSet<>();
-		this.chargingstations	= stations!=null ? stations : new LinkedHashSet<>();
-		this.wastebins	= wastebins!=null ? wastebins : new LinkedHashSet<>();
+		this.cleaners	= new LinkedHashSet<>();
+		this.wastes	= new LinkedHashSet<>();
+		this.chargingstations	= new LinkedHashSet<>();
+		this.wastebins	= new LinkedHashSet<>();
 	}
 	
 	//-------- sensor methods --------
@@ -166,28 +156,68 @@ public class SensorActuator
 		return wastebins;
 	}
 		
+//	/**
+//	 *  Get the currently perceived pheromones.
+//	 *  @return a Set of Pheromone objects. 
+//	 */
+//	public Set<IPheromone>	getPheromones()
+//	{
+//		if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
+//		{
+//			throw new IllegalStateException("Error: Must be called on agent thread.");
+//		}
+//		
+//		Set<IPheromone>	ret	= new LinkedHashSet<>(Arrays.asList(Environment.getInstance().getPheromones()));
+//		for(Iterator<IPheromone> phi= ret.iterator(); phi.hasNext(); )
+//		{
+//			IPheromone	ph	= phi.next();
+//			if(ph.getLocation().getDistance(self.getLocation())>self.getVisionRange())
+//			{
+//				phi.remove();
+//			}
+//		}
+//		
+//		return ret;
+//	}
+	
 	/**
-	 *  Get the currently perceived pheromones.
-	 *  @return a Set of Pheromone objects. 
+	 *  Use the provided set to manage the known waste objects.
+	 *  Allows using custom data structures such as BDI belief sets directly.
 	 */
-	public Set<IPheromone>	getPheromones()
+	public void	manageWastesIn(Set<IWaste> wastes)
 	{
-		if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
-		{
-			throw new IllegalStateException("Error: Must be called on agent thread.");
-		}
+		wastes.addAll(this.wastes);
+		this.wastes	= wastes;
+	}
 		
-		Set<IPheromone>	ret	= new LinkedHashSet<>(Arrays.asList(Environment.getInstance().getPheromones()));
-		for(Iterator<IPheromone> phi= ret.iterator(); phi.hasNext(); )
-		{
-			IPheromone	ph	= phi.next();
-			if(ph.getLocation().getDistance(self.getLocation())>self.getVisionRange())
-			{
-				phi.remove();
-			}
-		}
+	/**
+	 *  Use the provided set to manage the known waste bin objects.
+	 *  Allows using custom data structures such as BDI belief sets directly.
+	 */
+	public void	manageWastebinsIn(Set<IWastebin> wastebins)
+	{
+		wastebins.addAll(this.wastebins);
+		this.wastebins	= wastebins;
+	}
 		
-		return ret;
+	/**
+	 *  Use the provided set to manage the known charging station objects.
+	 *  Allows using custom data structures such as BDI belief sets directly.
+	 */
+	public void	manageChargingstationsIn(Set<IChargingstation> chargingstations)
+	{
+		chargingstations.addAll(this.chargingstations);
+		this.chargingstations	= chargingstations;
+	}
+	
+	/**
+	 *  Use the provided set to manage the known cleaner objects.
+	 *  Allows using custom data structures such as BDI belief sets directly.
+	 */
+	public void	manageCleanersIn(Set<ICleaner> cleaners)
+	{
+		cleaners.addAll(this.cleaners);
+		this.cleaners	= cleaners;
 	}
 		
 	//-------- actuator methods --------
@@ -222,85 +252,94 @@ public class SensorActuator
 		
 		// Signal variable to check when location is reached.
 		final Future<Void>	reached	= new Future<>();
-		
-		// Wait for clock ticks and move the cleaner. (asynchronous!)
-		final IClockService	clock	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
-		clock.createTickTimer(new ITimedObject()
-		{
-			long lasttime	= clock.getTime();
-			ITimedObject	timer	= this;
-			
-			@Override
-			public void timeEventOccurred(long currenttime)
-			{
-				if(!reached.isDone())	// no new timer when future is terminated from outside (e.g. agent killed)
-				{
-					// Run update on agent thread to avoid synchronization issues.
-					agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-					{
-						@Override
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-							// Calculate time passed as fraction of a second.
-							double	delta	= (currenttime-lasttime)/1000.0;
-							
-							// Set new charge state
-							double	chargestate	= self.getChargestate()-delta/100; 	// drop ~ 1%/sec while moving.
-							if(chargestate<0)
-							{
-								self.setChargestate(0);
-								throw new IllegalStateException("Out of battery!");
-							}
-							self.setChargestate(chargestate);
-							
-							// Set new location
-							double total_dist	= self.getLocation().getDistance(target);
-							double move_dist	= Math.min(total_dist, 0.1*delta);	// speed ~ 0.1 units/sec 
-							double dx = (target.getX()-self.getLocation().getX())*move_dist/total_dist;
-							double dy = (target.getY()-self.getLocation().getY())*move_dist/total_dist;
-							self.setLocation(new Location(self.getLocation().getX()+dx, self.getLocation().getY()+dy));
-							
-							// Post new own state to environment
-							Environment.getInstance().updateCleaner(self);
-							
-							// Add pheromone (if any).
-							if(pheromone!=null)
-							{
-								Pheromone	ph	= new Pheromone(self.getLocation(), pheromone);
-								Environment.getInstance().addPheromone(ph);
-							}
 
-							// Get new external state from environment.
-							update();
-							
-							// Finish or repeat?
-							if(self.getLocation().isNear(target))
-							{
-								// Release block.
-								reached.setResultIfUndone(null);
-							}
-							else
-							{
-								// Wait for next tick.
-								lasttime	= currenttime;
-								clock.createTickTimer(timer);
-							}
-							return null;
-						}
-					}).addResultListener(new IResultListener<Void>()
+		// Finish or repeat?
+		if(self.getLocation().isNear(target))
+		{
+			// Release block.
+			reached.setResultIfUndone(null);
+		}
+		else
+		{
+			// Wait for clock ticks and move the cleaner. (asynchronous!)
+			final IClockService	clock	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
+			clock.createTickTimer(new ITimedObject()
+			{
+				long lasttime	= clock.getTime();
+				ITimedObject	timer	= this;
+				
+				@Override
+				public void timeEventOccurred(long currenttime)
+				{
+					if(!reached.isDone())	// no new timer when future is terminated from outside (e.g. agent killed)
 					{
-						@Override
-						public void exceptionOccurred(Exception exception)
+						// Run update on agent thread to avoid synchronization issues.
+						agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 						{
-							reached.setExceptionIfUndone(exception);
-						}
-						
-						@Override
-						public void resultAvailable(Void result){}
-					});
+							@Override
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								// Calculate time passed as fraction of a second.
+								double	delta	= (currenttime-lasttime)/1000.0;
+								
+								// Set new charge state
+								double	chargestate	= self.getChargestate()-delta/100; 	// drop ~ 1%/sec while moving.
+								if(chargestate<0)
+								{
+									self.setChargestate(0);
+									throw new IllegalStateException("Out of battery!");
+								}
+								self.setChargestate(chargestate);
+								
+								// Set new location
+								double total_dist	= self.getLocation().getDistance(target);
+								double move_dist	= Math.min(total_dist, 0.1*delta);	// speed ~ 0.1 units/sec 
+								double dx = (target.getX()-self.getLocation().getX())*move_dist/total_dist;
+								double dy = (target.getY()-self.getLocation().getY())*move_dist/total_dist;
+								self.setLocation(new Location(self.getLocation().getX()+dx, self.getLocation().getY()+dy));
+								
+								// Post new own state to environment
+								Environment.getInstance().updateCleaner(self);
+								
+								// Add pheromone (if any).
+								if(pheromone!=null)
+								{
+									Pheromone	ph	= new Pheromone(self.getLocation(), pheromone);
+									Environment.getInstance().addPheromone(ph);
+								}
+	
+								// Get new external state from environment.
+								update();
+								
+								// Finish or repeat?
+								if(self.getLocation().isNear(target))
+								{
+									// Release block.
+									reached.setResultIfUndone(null);
+								}
+								else
+								{
+									// Wait for next tick.
+									lasttime	= currenttime;
+									clock.createTickTimer(timer);
+								}
+								return IFuture.DONE;
+							}
+						}).addResultListener(new IResultListener<Void>()
+						{
+							@Override
+							public void exceptionOccurred(Exception exception)
+							{
+								reached.setExceptionIfUndone(exception);
+							}
+							
+							@Override
+							public void resultAvailable(Void result){}
+						});
+					}
 				}
-			}
-		});
+			});
+		}
 		
 		try
 		{
@@ -308,6 +347,8 @@ public class SensorActuator
 		}
 		catch(Throwable t)
 		{
+			if(t instanceof Exception)
+				t.printStackTrace();
 			// Move interrupted -> set exception to abort move steps.
 			reached.setExceptionIfUndone(t instanceof Exception ? (Exception)t : new ErrorException((Error)t));
 			SUtil.throwUnchecked(t);
@@ -436,9 +477,9 @@ public class SensorActuator
 		// Try action in environment
 		Environment.getInstance().pickupWaste(self, (Waste)waste);
 		
-		// Update local knowledge
-		wastes.remove(waste);
+		// Update local knowledge (order is important for goal conditions! TODO atomic?)
 		self.setCarriedWaste((Waste)waste);
+		wastes.remove(waste);
 		((Waste)waste).setLocation(null);
 	}
 
@@ -455,15 +496,15 @@ public class SensorActuator
 		((Wastebin)wastebin).addWaste(waste);
 	}
 	
-	/**
-	 *  Disperse pheromones when moving.
-	 *  The dispersion happens during the current/next movoTo() operation and stops automatically afterwards.
-	 *  @param type	The pheromone type (can be an arbitrary string).
-	 */
-	public void	dispersePheromones(String type)
-	{
-		this.pheromone	= type;
-	}
+//	/**
+//	 *  Disperse pheromones when moving.
+//	 *  The dispersion happens during the current/next movoTo() operation and stops automatically afterwards.
+//	 *  @param type	The pheromone type (can be an arbitrary string).
+//	 */
+//	public void	dispersePheromones(String type)
+//	{
+//		this.pheromone	= type;
+//	}
 	
 	//-------- internal methods --------
 	

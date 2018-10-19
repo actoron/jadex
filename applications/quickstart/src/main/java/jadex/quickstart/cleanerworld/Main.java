@@ -8,6 +8,10 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClock;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.IFuture;
 import jadex.quickstart.cleanerworld.gui.EnvironmentGui;
 
@@ -16,6 +20,9 @@ import jadex.quickstart.cleanerworld.gui.EnvironmentGui;
  */
 public class Main
 {
+	/** Use higher values (e.g. 2.0) for faster cleaner movement and lower values (e.g. 0.5) for slower movement. */
+	protected static double	CLOCK_SPEED	= 3;
+	
 	/**
 	 *  Main method for starting the scenario.
 	 *  @param args	ignored for now.
@@ -25,8 +32,8 @@ public class Main
 		// Start from minimal configuration
 		IPlatformConfiguration	conf	= PlatformConfigurationHandler.getMinimal();
 		
-		// Simulation service for switching execution modes.
-		conf.getExtendedPlatformConfiguration().setSimul(true);
+//		// Simulation service for switching execution modes.
+//		conf.getExtendedPlatformConfiguration().setSimul(true);
 		
 		// Optional: open JCC for runtime tools.
 //		conf.setGui(true);
@@ -38,7 +45,7 @@ public class Main
 		conf.setValue("kernel_bdi", true);
         
         // Add your cleaner agent(s)
-		conf.addComponent("jadex/quickstart/cleanerworld/SimpleCleanerAgent.class");
+		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgent.class");
 
 		// Start a Jadex platform (asynchronously in background).
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(conf);
@@ -46,7 +53,11 @@ public class Main
 		// IFuture.get() will block until background startup is complete.
 		// Without this, errors might not get shown.
 		fut.get();
-		
+
+		IClockService	cs	= fut.get().searchService(new ServiceQuery<>(IClockService.class)).get();
+		cs.setClock(IClock.TYPE_CONTINUOUS, fut.get().searchService(new ServiceQuery<>(IThreadPoolService.class)).get());
+		cs.setDilation(CLOCK_SPEED);
+
 		// Open world view window on Swing Thread
 		SwingUtilities.invokeLater(new Runnable()
 		{

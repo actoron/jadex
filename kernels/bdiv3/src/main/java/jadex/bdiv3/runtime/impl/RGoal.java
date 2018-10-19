@@ -12,6 +12,7 @@ import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
@@ -138,7 +139,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	/**
 	 *  Get parent (goal or plan).
 	 */
-	public RElement getParent()
+	public RParameterElement getParent()
 	{
 		return parentplan!=null? parentplan: parentgoal;
 	}
@@ -793,16 +794,16 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 				}
 			}
 			
-			// No retry but not finished. 
-			else if(!isFinished())
+			// No retry but not finished (or idle for  maintain goals). 
+			else if(!isFinished() && !GoalProcessingState.IDLE.equals(getProcessingState()))
 			{				
 				// Recur when possible
 				if(isRecur())
 				{
 					setProcessingState(ia, GoalProcessingState.PAUSED);
 					
-					// Auto-recur, when delay explicitly set or no recur condition defined.
-					if(getMGoal().getRecurDelay()>-1 || getMGoal().getConditions(MGoal.CONDITION_RECUR)==null)
+					// Auto-recur, when no recur condition defined.
+					if(getMGoal().getConditions(MGoal.CONDITION_RECUR)==null)
 					{
 						IComponentStep<Void>	step	= new IComponentStep<Void>()
 						{
@@ -817,7 +818,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 							}
 						};
 						
-						if(getMGoal().getRecurDelay()>-1)
+						if(getMGoal().getRecurDelay()>0)
 						{
 							ia.getFeature(IExecutionFeature.class).waitForDelay(getMGoal().getRecurDelay(), step);
 						}
@@ -826,6 +827,8 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 							ia.getFeature(IExecutionFeature.class).scheduleStep(step);
 						}
 					}
+					
+					// else condition will trigger recur
 				}
 				
 				// Else no more plans -> fail.
@@ -1470,6 +1473,16 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 			aborted = plan.isAborted();
 		}
 		return aborted;
+	}
+	
+	/**
+	 *  Check if the element is currently part of the agent's reasoning.
+	 *  E.g. the bases are always adopted and all of their contents such as goals, plans and beliefs.
+	 */
+	public boolean	isAdopted()
+	{
+		return super.isAdopted() && agent.getFeature(IBDIAgentFeature.class).getGoals().contains(this)
+			&& (getParent()==null || getParent().isAdopted()); 	// Hack!!! Subgoals removed to late, TODO: fix hierarchic goal plan lifecycle management
 	}
 
 	

@@ -6,31 +6,23 @@ import java.util.Set;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
-import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
-import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
-import jadex.bdiv3.runtime.ChangeEvent;
-import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3.runtime.IPlan;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.quickstart.cleanerworld.environment.IChargingstation;
 import jadex.quickstart.cleanerworld.environment.ICleaner;
-import jadex.quickstart.cleanerworld.environment.IWaste;
-import jadex.quickstart.cleanerworld.environment.IWastebin;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
- *  Separate Maintain and Target Conditions.
+ *  Managing known charging stations in a belief set.
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
-public class CleanerBDIAgent
+public class CleanerBDIAgentC0
 {
 	//-------- fields holding agent data --------
 	
@@ -44,14 +36,7 @@ public class CleanerBDIAgent
 	/** Set of the known charging stations. Managed by SensorActuator object. */
 	@Belief
 	private Set<IChargingstation>	stations	= new LinkedHashSet<>();
-	
-	/** Set of the known waste bins. Managed by SensorActuator object. */
-	@Belief
-	private Set<IWastebin>	wastebins	= new LinkedHashSet<>();
-	
-	/** Set of the known waste items. Managed by SensorActuator object. */
-	@Belief
-	private Set<IWaste>	wastes	= new LinkedHashSet<>();
+//	private LinkedHashSet<IChargingstation>	stations	= new LinkedHashSet<>();	// -> error
 	
 	//-------- simple example behavior --------
 	
@@ -64,8 +49,6 @@ public class CleanerBDIAgent
 	{
 		// Tell the sensor to update the belief sets
 		actsense.manageChargingstationsIn(stations);
-		actsense.manageWastesIn(wastes);
-		actsense.manageWastebinsIn(wastebins);
 
 		// Open a window showing the agent's perceptions
 		new SensorGui(actsense).setVisible(true);
@@ -91,86 +74,19 @@ public class CleanerBDIAgent
 	 *  A goal to recharge whenever the battery is low.
 	 */
 	@Goal(recur=true, recurdelay=3000,
-		deliberation=@Deliberation(inhibits={PerformPatrol.class, AchieveCleanupWaste.class}))	// Pause patrol goal while loading battery
+		deliberation=@Deliberation(inhibits=PerformPatrol.class))	// Pause patrol goal while loading battery
 	class MaintainBatteryLoaded
 	{
 		@GoalMaintainCondition	// The cleaner aims to maintain the following expression, i.e. act to restore the condition, whenever it changes to false.
 		boolean isBatteryLoaded()
 		{
-			return self.getChargestate()>=0.4; // Everything is fine as long as the charge state is above 20%, otherwise the cleaner needs to recharge.
+			return self.getChargestate()>=0.2; // Everything is fine as long as the charge state is above 20%, otherwise the cleaner needs to recharge.
 		}
 			
 		@GoalTargetCondition	// Only stop charging, when this condition is true
 		boolean isBatteryFullyLoaded()
 		{
 			return self.getChargestate()>=0.9; // Charge until 90%
-		}
-	}
-	
-	/**
-	 *  A goal to know a charging station.
-	 */
-	@Goal(excludemode=ExcludeMode.Never)
-	class QueryChargingStation
-	{
-		// Remember the station when found
-		IChargingstation	station;
-		
-		// Check if there is a station in the beliefs
-		@GoalTargetCondition
-		boolean isStationKnown()
-		{
-			station	= stations.isEmpty() ? null : stations.iterator().next();
-			return station!=null;
-		}
-	}
-
-	/**
-	 *  A goal to know a waste bin.
-	 */
-	@Goal(excludemode=ExcludeMode.Never)
-	class QueryWastebin
-	{
-		// Remember the waste bin when found
-		IWastebin	wastebin;
-		
-		// Check if there is a waste bin in the beliefs
-		@GoalTargetCondition
-		boolean isWastebinKnown()
-		{
-			wastebin	= wastebins.isEmpty() ? null : wastebins.iterator().next();
-			return wastebin!=null;
-		}
-	}
-
-	/**
-	 *  A goal to cleanup waste.
-	 */
-	@Goal(recur=true, recurdelay=3000,
-		deliberation=@Deliberation(inhibits={PerformPatrol.class, AchieveCleanupWaste.class}))
-	class AchieveCleanupWaste
-	{
-		// Remember the waste item to clean up
-		IWaste	waste;
-		
-		// Create a new goal instance for each new waste item
-//		@GoalCreationCondition(beliefs="wastes")	// Bad: reacts also on fact removed and initial empty event.
-//		@GoalCreationCondition(factadded="wastes")	// TODO: support this
-		@GoalCreationCondition(rawevents=@RawEvent(value=ChangeEvent.FACTADDED, second="wastes"))
-		public AchieveCleanupWaste(IWaste waste)
-		{
-			System.out.println("Created achieve cleanup goal for "+waste);
-			this.waste = waste;
-		}
-		
-		// The goal is achieved, when the waste is gone.
-		@GoalTargetCondition
-		boolean	isClean()
-		{
-			// Test if the waste is not believed to be in the environment
-			return !wastes.contains(waste)
-				// and also not the waste we just picked up.
-				&& !waste.equals(self.getCarriedWaste());
 		}
 	}
 	
@@ -225,71 +141,17 @@ public class CleanerBDIAgent
 	 *  Move to charging station and load battery.
 	 */
 	@Plan(trigger=@Trigger(goals=MaintainBatteryLoaded.class))
-	private void loadBattery(IPlan plan)
+	private void loadBattery()
 	{
 		System.out.println("Starting loadBattery() plan");
 		
-//		// Move to first known charging station -> fails when no charging station known.
+		// Move to first known charging station -> fails when no charging station known.
 //		IChargingstation	chargingstation	= actsense.getChargingstations().iterator().next();	// from Exercise B1
-//		IChargingstation	chargingstation	= stations.iterator().next();	// from Exercise C0
-		
-		// Dispatch a subgoal to find a charging station (from Exercise C1)
-		QueryChargingStation	querygoal	= new QueryChargingStation();
-		plan.dispatchSubgoal(querygoal).get();
-		IChargingstation	chargingstation	= querygoal.station;
-		
-		// Move to charging station as provided by subgoal
+		IChargingstation	chargingstation	= stations.iterator().next();	// from Exercise C0
+		System.out.println("Class of the belief set is: "+stations.getClass());
 		actsense.moveTo(chargingstation.getLocation());
 		
 		// Load until 100% (never reached, but plan is aborted when goal succeeds).
 		actsense.recharge(chargingstation, 1.0);
-	}
-	
-	/**
-	 *  A plan to move randomly in the environment.
-	 */
-	@Plan(trigger=@Trigger(goals={QueryChargingStation.class, QueryWastebin.class}))
-	private void	moveAround(IPlan plan)
-	{
-		// Choose a random location and move there.
-		System.out.println("Starting moveAround() plan for goal "+plan.getReason());
-		actsense.moveTo(Math.random(), Math.random());
-	}
-	
-	/**
-	 *  A plan to boast about achieved goals.
-	 */
-	@Plan(trigger=@Trigger(goalfinisheds=AchieveCleanupWaste.class))
-	private void	finishedCleanup(IGoal goal, AchieveCleanupWaste cleanup)
-	{
-		String	state	= goal.getProcessingState().toString();
-		System.out.println("finished goal with state "+state+" for "+cleanup.waste);
-	}
-
-	/**
-	 *  Pickup waste and drop it in a waste bin.
-	 */
-	@Plan(trigger=@Trigger(goals=AchieveCleanupWaste.class))
-	private void cleanupWaste(IPlan plan, AchieveCleanupWaste cleanup)
-	{
-		System.out.println("Starting cleanupWaste() plan");
-		
-		// Move to waste and pick it up, if not yet done
-		if(!cleanup.waste.equals(self.getCarriedWaste()))
-		{
-			actsense.moveTo(cleanup.waste.getLocation());
-			actsense.pickUpWaste(cleanup.waste);
-		}
-		
-		// Dispatch a subgoal to find a waste bin
-		QueryWastebin	querygoal	= new QueryWastebin();
-		plan.dispatchSubgoal(querygoal).get();
-		IWastebin	wastebin	= querygoal.wastebin;
-		
-		// Move to waste bin as provided by subgoal
-		actsense.moveTo(wastebin.getLocation());
-		
-		// Finally drop the waste into the bin
-		actsense.dropWasteInWastebin(cleanup.waste, wastebin);
 	}
 }

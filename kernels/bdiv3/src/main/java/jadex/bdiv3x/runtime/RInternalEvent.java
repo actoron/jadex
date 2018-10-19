@@ -28,4 +28,14 @@ public class RInternalEvent extends RProcessableElement implements IInternalEven
 	{
 		return "$event";
 	}
+
+	/**
+	 *  Check if the element is currently part of the agent's reasoning.
+	 *  E.g. the bases are always adopted and all of their contents such as goals, plans and beliefs.
+	 */
+	public boolean	isAdopted()
+	{
+		// TODO: Is this right?
+		return false;
+	}
 }
