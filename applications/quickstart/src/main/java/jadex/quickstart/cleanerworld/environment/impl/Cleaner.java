@@ -100,7 +100,9 @@ public class Cleaner extends LocationObject	implements ICleaner
 	 */
 	public void setCarriedWaste(Waste carriedwaste)
 	{
+		Waste	oldcw	= this.carriedwaste;
 		this.carriedwaste = carriedwaste;
+		pcs.firePropertyChange("carriedWaste", oldcw, carriedwaste);
 	}
 
 	/**
@@ -118,7 +120,9 @@ public class Cleaner extends LocationObject	implements ICleaner
 	 */
 	public void setVisionRange(double visionrange)
 	{
+		double	oldvr	= this.visionrange;
 		this.visionrange = visionrange;
+		pcs.firePropertyChange("visionRange", oldvr, visionrange);
 	}
 
 	/**

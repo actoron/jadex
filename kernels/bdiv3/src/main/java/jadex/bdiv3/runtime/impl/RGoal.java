@@ -207,7 +207,7 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public void setProcessingState(GoalProcessingState processingstate)
 	{
-		System.out.println("procstate: "+getId()+", "+processingstate);
+//		System.out.println("procstate: "+getId()+", "+processingstate);
 		this.processingstate = processingstate;
 		publishToolGoalEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
 	}

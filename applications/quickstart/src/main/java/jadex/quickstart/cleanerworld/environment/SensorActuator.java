@@ -347,6 +347,8 @@ public class SensorActuator
 		}
 		catch(Throwable t)
 		{
+			if(t instanceof Exception)
+				t.printStackTrace();
 			// Move interrupted -> set exception to abort move steps.
 			reached.setExceptionIfUndone(t instanceof Exception ? (Exception)t : new ErrorException((Error)t));
 			SUtil.throwUnchecked(t);
@@ -475,9 +477,9 @@ public class SensorActuator
 		// Try action in environment
 		Environment.getInstance().pickupWaste(self, (Waste)waste);
 		
-		// Update local knowledge
-		wastes.remove(waste);
+		// Update local knowledge (order is important for goal conditions! TODO atomic?)
 		self.setCarriedWaste((Waste)waste);
+		wastes.remove(waste);
 		((Waste)waste).setLocation(null);
 	}
 

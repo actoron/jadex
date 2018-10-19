@@ -167,7 +167,10 @@ public class CleanerBDIAgent
 		@GoalTargetCondition
 		boolean	isClean()
 		{
-			return !wastes.contains(waste);
+			// Test if the waste is not believed to be in the environment
+			return !wastes.contains(waste)
+				// and also not the waste we just picked up.
+				&& !waste.equals(self.getCarriedWaste());
 		}
 	}
 	
@@ -271,9 +274,12 @@ public class CleanerBDIAgent
 	{
 		System.out.println("Starting cleanupWaste() plan");
 		
-		// Move to waste and pick it up
-		actsense.moveTo(cleanup.waste.getLocation());
-		actsense.pickUpWaste(cleanup.waste);
+		// Move to waste and pick it up, if not yet done
+		if(!cleanup.waste.equals(self.getCarriedWaste()))
+		{
+			actsense.moveTo(cleanup.waste.getLocation());
+			actsense.pickUpWaste(cleanup.waste);
+		}
 		
 		// Dispatch a subgoal to find a waste bin
 		QueryWastebin	querygoal	= new QueryWastebin();
