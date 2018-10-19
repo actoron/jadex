@@ -10,6 +10,7 @@ import java.util.Map;
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBody;
@@ -2039,6 +2040,16 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public boolean	isSucceeded()
 	{
 		return isPassed();
+	}
+	
+	/**
+	 *  Check if the element is currently part of the agent's reasoning.
+	 *  E.g. the bases are always adopted and all of their contents such as goals, plans and beliefs.
+	 */
+	public boolean	isAdopted()
+	{
+	 	// Hack!!! Subgoals removed to late, TODO: fix hierarchic goal plan lifecycle management
+		return !(getReason() instanceof RParameterElement) || ((RParameterElement) getReason()).isAdopted();
 	}
 	
 //	/**
