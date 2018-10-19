@@ -5,16 +5,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ImmediateComponentStep;
-import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.DependencyResolver;
+import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
@@ -33,24 +34,22 @@ import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.SClassReader;
-import jadex.commons.SClassReader.AnnotationInfo;
-import jadex.commons.SClassReader.ClassInfo;
-import jadex.commons.SClassReader.EnumInfo;
+import jadex.commons.Tuple3;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -204,19 +203,188 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	 *  @param infos Start information.
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public IIntermediateFuture<IExternalAccess> createComponents(CreationInfo... infos)
+	public IIntermediateFuture<IExternalAccess> createComponents(final CreationInfo... infos)
 	{
+		if (infos == null || infos.length == 0)
+			return new IntermediateFuture<>(new IllegalArgumentException("Creation infos must not be null or empty."));
 		
+		FutureBarrier<Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>> modelbar = new FutureBarrier<>();
+		
+		final Map<Integer, IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>>> modelmap = new HashMap<>();
+		for (int i = 0; i < infos.length; ++i)
+		{
+			IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>> fut = 
+				SComponentManagementService.loadModel(infos[i].getFilename(), infos[i], component);
+			modelmap.put(i, fut);
+			modelbar.addFuture(fut);
+		}
+		
+		final IntermediateFuture<IExternalAccess> ret = new IntermediateFuture<>();
+		
+		modelbar.waitFor().addResultListener(new IResultListener<Void>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+			
+			public void resultAvailable(Void result)
+			{
+				DependencyResolver<String> dr = new DependencyResolver<>();
+				final MultiCollection<String, CreationInfo> instances = new MultiCollection<>();
+				
+				for (Map.Entry<Integer, IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>>> entry : modelmap.entrySet())
+					addComponentToLevels(dr, infos[entry.getKey()], entry.getValue().get().getFirstEntity(), instances);
+				
+				final List<Set<String>> levels = dr.resolveDependenciesWithLevel();
+				
+				int[] levelnum = new int[1];
+				levelnum[0] = -1;
+				
+				IResultListener<Void> levelrl = new IResultListener<Void>()
+				{
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setExceptionIfUndone(exception);
+					}
+					
+					public void resultAvailable(Void result)
+					{
+						++levelnum[0];
+						if (levelnum[0] < levels.size())
+						{
+							FutureBarrier<IExternalAccess> levelbar = new FutureBarrier<>();
+							Set<String> level = levels.get(levelnum[0]);
+							for (String mname : level)
+							{
+								Collection<CreationInfo> insts = instances.get(mname);
+								for (CreationInfo inst : insts)
+								{
+									IFuture<IExternalAccess> createfut = createComponent(inst);
+									levelbar.addFuture(createfut);
+									createfut.addResultListener(new IResultListener<IExternalAccess>()
+									{
+										public void exceptionOccurred(Exception exception)
+										{
+											ret.setExceptionIfUndone(exception);
+										}
+										
+										public void resultAvailable(IExternalAccess result)
+										{
+											ret.addIntermediateResultIfUndone(result);
+										};
+									});
+									levelbar.addFuture(createfut);
+								}
+							}
+							levelbar.waitFor().addResultListener(this);
+						}
+						else
+						{
+							if (!ret.isDone())
+								ret.setFinished();
+						}
+					}
+				};
+				levelrl.resultAvailable(null);
+			}
+		});
+		return ret;
 	}
 	
 	/**
 	 *  Stops a set of components, in order of dependencies.
 	 *  
-	 *  @param infos Start information.
+	 *  @param cids The component identifiers.
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public IIntermediateFuture<Map<String, Object>> killComponents(CreationInfo... infos)
+	public IIntermediateFuture<Map<String, Object>> killComponents(IComponentIdentifier... cids)
 	{
+		if (cids == null || cids.length == 0)
+			return new IntermediateFuture<>(new IllegalArgumentException("Creation infos must not be null or empty."));
+		
+		FutureBarrier<IModelInfo> modelbar = new FutureBarrier<>();
+		
+		final Map<Integer, IFuture<IModelInfo>> modelmap = new HashMap<>();
+		for (int i = 0; i < cids.length; ++i)
+		{
+			IExternalAccess exta = component.getExternalAccess(cids[i]);
+			IFuture<IModelInfo> fut = exta.getModelAsync();
+			modelmap.put(i, fut);
+			modelbar.addFuture(fut);
+		}
+		
+		final IntermediateFuture<IExternalAccess> ret = new IntermediateFuture<>();
+		
+		modelbar.waitFor().addResultListener(new IResultListener<Void>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+			
+			public void resultAvailable(Void result)
+			{
+				DependencyResolver<String> dr = new DependencyResolver<>();
+				final MultiCollection<String, CreationInfo> instances = new MultiCollection<>();
+				
+				for (Map.Entry<Integer, IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>>> entry : modelmap.entrySet())
+					addComponentToLevels(dr, infos[entry.getKey()], entry.getValue().get().getFirstEntity(), instances);
+				
+				final List<Set<String>> levels = dr.resolveDependenciesWithLevel();
+				
+				int[] levelnum = new int[1];
+				levelnum[0] = -1;
+				
+				IResultListener<Void> levelrl = new IResultListener<Void>()
+				{
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setExceptionIfUndone(exception);
+					}
+					
+					public void resultAvailable(Void result)
+					{
+						++levelnum[0];
+						if (levelnum[0] < levels.size())
+						{
+							FutureBarrier<IExternalAccess> levelbar = new FutureBarrier<>();
+							Set<String> level = levels.get(levelnum[0]);
+							for (String mname : level)
+							{
+								Collection<CreationInfo> insts = instances.get(mname);
+								for (CreationInfo inst : insts)
+								{
+									IFuture<IExternalAccess> createfut = createComponent(inst);
+									levelbar.addFuture(createfut);
+									createfut.addResultListener(new IResultListener<IExternalAccess>()
+									{
+										public void exceptionOccurred(Exception exception)
+										{
+											ret.setExceptionIfUndone(exception);
+										}
+										
+										public void resultAvailable(IExternalAccess result)
+										{
+											ret.addIntermediateResultIfUndone(result);
+										};
+									});
+									levelbar.addFuture(createfut);
+								}
+							}
+							levelbar.waitFor().addResultListener(this);
+						}
+						else
+						{
+							if (!ret.isDone())
+								ret.setFinished();
+						}
+					}
+				};
+				levelrl.resultAvailable(null);
+			}
+		});
+		return ret;
 	}
 	
 //	/**
@@ -640,72 +808,37 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 	 *  Add a components to the dependency resolver to build start levels.
 	 *  Components of the same level can be started in parallel.
 	 */
-	protected void addComponentToLevels(DependencyResolver<String> dr, CreationInfo cinfo, Map<String, String> names)
+	protected <T> void addComponentToLevels(DependencyResolver<String> dr, T instanceinfo, IModelInfo minfo, MultiCollection<String, T> instances)
 	{
 		try
 		{
-			if (cinfo.getFilename().endsWith(".class"))
-			{
-				cinfo.getResourceIdentifier().g
-				SUtil.getResource0(model, Cl)
-				SClassReader.getClassInfo(inputstream)
-				AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
-				AnnotationInfo autostart = (AnnotationInfo)ai.getValue("autostart");
-				
-				String name = autostart.getValue("name")==null || ((String)autostart.getValue("name")).length()==0? null: (String)autostart.getValue("name");
-				
-				AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
-				
-				String cname = ci.getClassName();
-				
-				dr.addNode(cname);
-				Object[] pres = (Object[])autostart.getValue("predecessors");
-				if(pres!=null)
-				{
-					for(Object pre: pres)
-					{
-						// Object as placeholder for no deps, because no entries should not mean no deps
-						if(!Object.class.getName().equals(pre))
-							dr.addDependency(cname, (String)pre);
-					}
-				}
-				
-				Object[] sucs = (Object[])autostart.getValue("successors");
-				if(sucs!=null)
-				{
-					for(Object suc: sucs)
-						dr.addDependency((String)suc, cname);
-				}
+			String cname = minfo.getFilename();
 			
-				// if no predecessors are defined add SecurityAgent
-				if(pres==null || pres.length==0)
-					dr.addDependency(cname, SecurityAgent.class.getName());
-				
-				names.put(cname, name);
+			dr.addNode(cname);
+			String[] pres = minfo.getPredecessors();
+			if(pres!=null)
+			{
+				for(String pre: pres)
+					dr.addDependency(cname, (String)pre);
 			}
+			
+			Object[] sucs = minfo.getSuccessors();
+			if(sucs!=null)
+			{
+				for(Object suc: sucs)
+					dr.addDependency((String)suc, cname);
+			}
+		
+			// if no predecessors are defined add SecurityAgent
+			if(pres==null || pres.length==0)
+				System.err.println("NO DEPS: " + cname);
+//				dr.addDependency(cname, SecurityAgent.class.getName());
+			
+			instances.add(cname, instanceinfo);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 *  Gets the classloader for a creation info.
-	 *  @param cinfo The info.
-	 *  @return The classloader.
-	 */
-	protected ClassLoader getClassLoader(CreationInfo cinfo)
-	{
-		ClassLoader ret = component.getClassLoader();
-		if (cinfo.getResourceIdentifier() != null)
-		{
-			ILibraryService libser = component.searchLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(0));
-			if (libser != null)
-			{
-				ret = libser.getClassLoader(cinfo.getResourceIdentifier());
-				
-			}
 		}
 	}
 }

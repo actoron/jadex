@@ -2306,7 +2306,7 @@ public class SComponentManagementService
 	 *  - load the model with that factory
 	 *  - check if the model has errors and convert to exception
 	 */
-	protected static IFuture<Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>> loadModel(String modelname, CreationInfo cinfo, IInternalAccess agent)
+	public static IFuture<Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>> loadModel(String modelname, CreationInfo cinfo, IInternalAccess agent)
 	{
 		Future<Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>> ret = new Future<>();
 		

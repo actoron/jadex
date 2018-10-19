@@ -67,7 +67,7 @@ public interface IExternalSubcomponentsFeature extends IExternalComponentFeature
 	 *  @param infos Start information.
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public IIntermediateFuture<Map<String, Object>> killComponents(CreationInfo... infos);
+	public IIntermediateFuture<Map<String, Object>> killComponents(IComponentIdentifier... infos);
 	
 	/**
 	 * Search for subcomponents matching the given description.
