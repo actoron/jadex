@@ -6,17 +6,21 @@ import java.util.Set;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.quickstart.cleanerworld.environment.IChargingstation;
 import jadex.quickstart.cleanerworld.environment.ICleaner;
+import jadex.quickstart.cleanerworld.environment.IWaste;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
@@ -24,7 +28,7 @@ import jadex.quickstart.cleanerworld.gui.SensorGui;
  *  Separate Maintain and Target Conditions.
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
-public class CleanerBDIAgentC2
+public class CleanerBDIAgentD1
 {
 	//-------- fields holding agent data --------
 	
@@ -39,6 +43,10 @@ public class CleanerBDIAgentC2
 	@Belief
 	private Set<IChargingstation>	stations	= new LinkedHashSet<>();
 	
+	/** Set of the known waste items. Managed by SensorActuator object. */
+	@Belief
+	private Set<IWaste>	wastes	= new LinkedHashSet<>();
+	
 	//-------- simple example behavior --------
 	
 	/**
@@ -50,6 +58,7 @@ public class CleanerBDIAgentC2
 	{
 		// Tell the sensor to update the belief sets
 		actsense.manageChargingstationsIn(stations);
+		actsense.manageWastesIn(wastes);
 
 		// Open a window showing the agent's perceptions
 		new SensorGui(actsense).setVisible(true);
@@ -106,6 +115,26 @@ public class CleanerBDIAgentC2
 		{
 			station	= stations.isEmpty() ? null : stations.iterator().next();
 			return station!=null;
+		}
+	}
+
+	/**
+	 *  A goal to cleanup waste.
+	 */
+	@Goal
+	class AchieveCleanupWaste
+	{
+		// Remember the waste item to clean up
+		IWaste	waste;
+		
+		// Create a new goal instance for each new waste item
+//		@GoalCreationCondition(beliefs="wastes")	// Bad: reacts also on fact removed and initial empty event.
+//		@GoalCreationCondition(factadded="wastes")	// TODO: support this
+		@GoalCreationCondition(rawevents=@RawEvent(value=ChangeEvent.FACTADDED, second="wastes"))
+		public AchieveCleanupWaste(IWaste waste)
+		{
+			System.out.println("Created achieve cleanup goal for "+waste);
+			this.waste = waste;
 		}
 	}
 	

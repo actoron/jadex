@@ -61,8 +61,8 @@ public class Environment
 		this.pheromones = new ArrayList<Pheromone>();
 
 		// Add some things to our world.
-		addWaste(new Waste(new Location(0.1, 0.5)));
-		addWaste(new Waste(new Location(0.2, 0.5)));
+//		addWaste(new Waste(new Location(0.1, 0.5)));
+//		addWaste(new Waste(new Location(0.2, 0.5)));
 		addWaste(new Waste(new Location(0.3, 0.5)));
 		addWaste(new Waste(new Location(0.9, 0.9)));
 		addWastebin(new Wastebin(new Location(0.2, 0.2), 20));

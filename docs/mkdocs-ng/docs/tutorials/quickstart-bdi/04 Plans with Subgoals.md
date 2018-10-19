@@ -122,7 +122,7 @@ Now we can add a goal that checks if a charging station is known:
 		
 		// Check if there is a station in the beliefs
 		@GoalTargetCondition
-		boolean checkStationKnown()
+		boolean isStationKnown()
 		{
 			station	= stations.isEmpty() ? null : stations.iterator().next();
 			return station!=null;
