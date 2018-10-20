@@ -21,7 +21,7 @@ import jadex.quickstart.cleanerworld.gui.EnvironmentGui;
 public class Main
 {
 	/** Use higher values (e.g. 2.0) for faster cleaner movement and lower values (e.g. 0.5) for slower movement. */
-	protected static double	CLOCK_SPEED	= 3;
+	protected static double	CLOCK_SPEED	= 1;
 	
 	/**
 	 *  Main method for starting the scenario.
