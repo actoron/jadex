@@ -2,9 +2,7 @@ package jadex.tools.jcc;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import jadex.base.gui.componentviewer.ComponentViewerPlugin;
 import jadex.base.gui.plugin.SJCC;
@@ -44,11 +42,9 @@ import jadex.micro.annotation.Properties;
 import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
 import jadex.tools.libtool.LibraryServicePlugin;
-import jadex.tools.registry.RegistryComponentPlugin;
 import jadex.tools.security.SecurityServicePlugin;
 import jadex.tools.simcenter.SimulationServicePlugin;
 import jadex.tools.starter.StarterPlugin;
-import jadex.tools.testcenter.TestCenterPlugin;
 
 /**
  *  Micro component for opening the JCC gui.
@@ -59,7 +55,7 @@ import jadex.tools.testcenter.TestCenterPlugin;
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true", description="Save settings on exit?"),
 	@Argument(name="platforms", clazz=String.class, defaultvalue="null", description="Show JCC for platforms matching this name.")
 })
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="jcc"))
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="jcc", predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
 @Properties(@NameValue(name="system", value="true"))
 public class JCCAgent implements IComponentStep<Void>
 {
@@ -113,13 +109,20 @@ public class JCCAgent implements IComponentStep<Void>
 		{
 			public void intermediateResultAvailable(IExternalAccess result)
 			{
-				System.out.println("found platform: "+result.getId()+" "+SComponentManagementService.containsComponent(result.getId()));
-				if(!SComponentManagementService.containsComponent(result.getId()))
+				try
 				{
-					Map<String, Object> args = new HashMap<>();
-					args.put("component", result.getId());
-					agent.createComponent(new CreationInfo().setFilename("jadex.platform.service.remote.ProxyAgent.class")
-						.setArguments(args).setName(result.getId().toString()));
+					System.out.println("found platform: "+result.getId()+" "+SComponentManagementService.containsComponent(result.getId()));
+					if(!SComponentManagementService.containsComponent(result.getId()))
+					{
+						Map<String, Object> args = new HashMap<>();
+						args.put("component", result.getId());
+						agent.createComponent(new CreationInfo().setFilename("jadex.platform.service.remote.ProxyAgent.class")
+							.setArguments(args).setName(result.getId().toString()));
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
 				}
 			}
 
