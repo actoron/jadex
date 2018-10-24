@@ -1959,14 +1959,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						RGoal goal = (RGoal)event.getContent();
 						
 						// For subgoals, check if parent still adopted (hack!!!) TODO: fix connected goal/plan lifecycles!!!
-						if(goal.isAdopted())
+//						if(goal.isAdopted())
 						{
 							return delstr.goalIsOption(goal);							
 						}
-						else
-						{
-							return IFuture.DONE;
-						}
+//						else
+//						{
+//							return IFuture.DONE;
+//						}
 					}
 				});
 //				rule.addEvent(new EventType(new String[]{ChangeEvent.GOALNOTINHIBITED, EventType.MATCHALL}));
