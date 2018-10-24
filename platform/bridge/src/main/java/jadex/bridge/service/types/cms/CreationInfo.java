@@ -637,6 +637,16 @@ public class CreationInfo
 	{
 		return name;
 	}
+	
+	/**
+	 *  Set the filename.
+	 *  @param filename The filename to set
+	 */
+	public CreationInfo setFilenameClass(Class<?> clazz)
+	{
+		this.filename = clazz.getName()+".class";
+		return this;
+	}
 
 	/**
 	 *  Set the name.
