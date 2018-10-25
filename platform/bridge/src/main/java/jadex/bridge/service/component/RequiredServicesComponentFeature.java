@@ -629,6 +629,10 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		// Check if remote
 		ISearchQueryManagerService sqms = isRemote(query) ? searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE)) : null;
+		if(isRemote(query) && sqms==null)
+		{
+			return new TerminableIntermediateFuture<>(new IllegalStateException("No ISearchQueryManagerService found for remote query: "+query));
+		}
 		
 		// Local only -> create future, fill results, and set to finished.
 		if(sqms==null)
@@ -735,6 +739,10 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		// Query remote
 		ISearchQueryManagerService sqms = searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+		if(isRemote(query) && sqms==null)
+		{
+			return new SubscriptionIntermediateFuture<>(new IllegalStateException("No ISearchQueryManagerService found for remote query: "+query));
+		}
 		ISubscriptionIntermediateFuture<T> remotes = isRemote(query) && sqms!=null ? sqms.addQuery(query) : null;
 		
 		// Query local registry

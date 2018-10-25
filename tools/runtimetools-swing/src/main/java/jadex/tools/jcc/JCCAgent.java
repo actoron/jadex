@@ -132,6 +132,7 @@ public class JCCAgent implements IComponentStep<Void>
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 			}
 			
 			public void resultAvailable(Collection<IExternalAccess> result)
