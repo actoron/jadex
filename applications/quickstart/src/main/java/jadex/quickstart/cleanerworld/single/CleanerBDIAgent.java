@@ -6,7 +6,9 @@ import java.util.Set;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalCreationCondition;
+import jadex.bdiv3.annotation.GoalInhibit;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
@@ -147,7 +149,8 @@ public class CleanerBDIAgent
 	 *  A goal to cleanup waste.
 	 */
 	@Goal(recur=true, recurdelay=3000,
-		deliberation=@Deliberation(inhibits={PerformPatrol.class, AchieveCleanupWaste.class}))
+//		deliberation=@Deliberation(inhibits={PerformPatrol.class, AchieveCleanupWaste.class}))
+		deliberation=@Deliberation(inhibits=PerformPatrol.class, cardinalityone=true))
 	class AchieveCleanupWaste
 	{
 		// Remember the waste item to clean up
@@ -171,6 +174,34 @@ public class CleanerBDIAgent
 			return !wastes.contains(waste)
 				// and also not the waste we just picked up.
 				&& !waste.equals(self.getCarriedWaste());
+		}
+		
+//		// Use an instance-level inhibition to decide between cleanup goals
+//		// TODO: should not require goal type in annotation?
+//		@GoalInhibit(AchieveCleanupWaste.class)
+//		boolean	shouldInhibit(AchieveCleanupWaste other)
+//		{
+//			// Prefer this goal when the waste was already picked up.
+//			boolean test	= waste.equals(self.getCarriedWaste());
+//			System.out.println("Inhibit of "+this+" for "+other+" is "+test);
+//			return test;
+//		}
+		
+		// Goal should only be pursued when carrying no waste
+		// or when goal is resumed after recharging and carried waste is of this goal.
+		@GoalContextCondition
+		boolean isPossible()
+		{
+			return self.getCarriedWaste()==null || self.getCarriedWaste().equals(waste);
+		}
+		
+		/**
+		 *  String representation of this goal to aid debug output.
+		 */
+		@Override
+		public String toString()
+		{
+			return getClass().getSimpleName()+"("+waste+")";
 		}
 	}
 	

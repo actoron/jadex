@@ -253,7 +253,7 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 			// todo: max ip datagram length (is there a better way to determine length?)
 			byte[]	buffer = new byte[8192];
 			
-			while(true)
+			while(!socket.isClosed())
 			{
 				try
 				{
@@ -263,7 +263,7 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 					@SuppressWarnings("unchecked")
 					List<TransportAddress>	addresses	= (List<TransportAddress>)SBinarySerializer.readObjectFromStream(is, agent.getClassLoader());
 					
-//					System.out.println("receiving: "+addresses);
+//					System.out.println(agent +" receiving: "+addresses);
 					
 					// Ignore my own addresses.
 					// TODO: what if data source and platform(s) of addresses differ (e.g. no point-to-point awareness)
@@ -296,7 +296,8 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 				}
 				catch(Throwable e)
 				{
-					agent.getLogger().warning("Multicast awareness failed to read datagram: "+e);//SUtil.getExceptionStacktrace(e));
+//					System.out.println(agent +" failed to read datagram: "+e+", "+this);
+					agent.getLogger().warning("Awareness failed to read datagram: "+e);//SUtil.getExceptionStacktrace(e));
 				}
 			}
 		}

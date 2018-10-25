@@ -4,10 +4,13 @@ import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -28,14 +31,15 @@ import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.filetree.RIDNode;
 import jadex.base.gui.filetree.RootNode;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -45,7 +49,9 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -288,7 +294,7 @@ public class ModelTreePanel extends FileTreePanel
 			}
 		});
 		
-		exta.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		exta.searchService( new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

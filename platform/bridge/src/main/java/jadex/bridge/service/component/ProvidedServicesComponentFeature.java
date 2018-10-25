@@ -146,10 +146,9 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			{
 				ProvidedServiceImplementation impl = new ProvidedServiceImplementation();
 				impl.setValue("$component.getExternalAccess()");
-				// external access of platform is published in network
-				boolean platform = getComponent().getId().equals(getComponent().getId().getRoot());
-				ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, 
-					impl, platform? RequiredServiceInfo.SCOPE_NETWORK: RequiredServiceInfo.SCOPE_PLATFORM, null, null);
+				// platform external access service will be published network wide, all others only on platform
+				ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, impl, 
+					getComponent().getId().equals(getComponent().getId().getRoot())? RequiredServiceInfo.SCOPE_NETWORK: RequiredServiceInfo.SCOPE_PLATFORM, null, null);
 				sermap.put("externalaccessservice", psi);
 			}
 			

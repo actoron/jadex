@@ -25,6 +25,7 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MPlanParameter;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.IParameter;
 import jadex.bdiv3x.runtime.IParameterSet;
@@ -1481,8 +1482,20 @@ public class RGoal extends RFinishableElement implements IGoal, IInternalPlan
 	 */
 	public boolean	isAdopted()
 	{
-		return super.isAdopted() && agent.getFeature(IBDIAgentFeature.class).getGoals().contains(this)
+		boolean	ret	= super.isAdopted() 
 			&& (getParent()==null || getParent().isAdopted()); 	// Hack!!! Subgoals removed to late, TODO: fix hierarchic goal plan lifecycle management
+		if(ret)
+		{
+			if(agent.getFeature0(IBDIAgentFeature.class)!=null)
+			{
+				ret	= agent.getFeature(IBDIAgentFeature.class).getGoals().contains(this);
+			}
+			else //if(agent.getFeature0(IBDIXAgentFeature.class)!=null)
+			{
+				ret	= agent.getFeature(IBDIXAgentFeature.class).getGoalbase().containsGoal(this);
+			}
+		}
+		return ret;
 	}
 
 	

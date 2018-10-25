@@ -21,7 +21,7 @@ import jadex.quickstart.cleanerworld.gui.EnvironmentGui;
 public class Main
 {
 	/** Use higher values (e.g. 2.0) for faster cleaner movement and lower values (e.g. 0.5) for slower movement. */
-	protected static double	CLOCK_SPEED	= 3;
+	protected static double	CLOCK_SPEED	= 1;
 	
 	/**
 	 *  Main method for starting the scenario.
@@ -45,7 +45,21 @@ public class Main
 		conf.setValue("kernel_bdi", true);
         
         // Add your cleaner agent(s)
-		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgent.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA0.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA1.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA2.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA3.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA4.class");
+		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentB1.class");
+		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentB2.class");
+		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentB3.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentC0.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentC1.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentC2.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD1.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD2.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD3a.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgent.class");
 
 		// Start a Jadex platform (asynchronously in background).
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(conf);

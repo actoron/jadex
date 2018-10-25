@@ -1,5 +1,9 @@
 package jadex.tools.jcc;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.base.gui.componentviewer.ComponentViewerPlugin;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IComponentIdentifier;
@@ -13,13 +17,16 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.micro.annotation.Agent;
@@ -34,11 +41,9 @@ import jadex.micro.annotation.Properties;
 import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
 import jadex.tools.libtool.LibraryServicePlugin;
-import jadex.tools.registry.RegistryComponentPlugin;
 import jadex.tools.security.SecurityServicePlugin;
 import jadex.tools.simcenter.SimulationServicePlugin;
 import jadex.tools.starter.StarterPlugin;
-import jadex.tools.testcenter.TestCenterPlugin;
 
 /**
  *  Micro component for opening the JCC gui.
@@ -49,9 +54,9 @@ import jadex.tools.testcenter.TestCenterPlugin;
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true", description="Save settings on exit?"),
 	@Argument(name="platforms", clazz=String.class, defaultvalue="null", description="Show JCC for platforms matching this name.")
 })
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="jcc"))
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="jcc", predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
 @Properties(@NameValue(name="system", value="true"))
-public class JCCAgent	implements IComponentStep<Void>
+public class JCCAgent implements IComponentStep<Void>
 {
 	//-------- constants --------
 	
@@ -63,22 +68,29 @@ public class JCCAgent	implements IComponentStep<Void>
 	
 	//-------- attributes --------
 	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
+	
 	/** The saveonexit argument. */
 	@AgentArgument
-	protected boolean	saveonexit;
+	protected boolean saveonexit;
 	
 	/** The platforms argument. */
 	@AgentArgument
-	protected String	platforms;
+	protected String platforms;
 	
 	/** The control center. */
 	protected ControlCenter	cc;
 	
 	/** Number of tries, when connecting initially to remote platforms. */
-	protected int	tries;
+	protected int tries;
 	
 	/** True when initially connected to a remote platform.. */
-	protected boolean	connected;
+	protected boolean connected;
+	
+	/** The query. */
+	ISubscriptionIntermediateFuture<IExternalAccess> query;
 	
 	//-------- micro agent methods --------
 	
@@ -88,6 +100,45 @@ public class JCCAgent	implements IComponentStep<Void>
 	@AgentCreated
 	public IFuture<Void>	execute(final IInternalAccess agent)
 	{
+		// scope network or global?!
+		query = agent.addQuery(new ServiceQuery<>(IExternalAccess.class)
+			.setScope(RequiredServiceInfo.SCOPE_NETWORK));
+//			.setScope(RequiredServiceInfo.SCOPE_GLOBAL));
+		query.addResultListener(new IIntermediateResultListener<IExternalAccess>()
+		{
+			public void intermediateResultAvailable(IExternalAccess result)
+			{
+				try
+				{
+					if(!result.getId().getRoot().equals(agent.getId().getRoot()))
+					{
+						System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
+						Map<String, Object> args = new HashMap<>();
+						args.put("component", result.getId());
+						agent.createComponent(new CreationInfo().setFilename("jadex.platform.service.remote.ProxyAgent.class")
+							.setArguments(args).setName(result.getId().toString()));
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+			public void finished()
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+			
+			public void resultAvailable(Collection<IExternalAccess> result)
+			{
+			}
+		});
+		
 		final Future<Void>	ret	= new Future<Void>();
 		
 		if(platforms==null)
@@ -200,7 +251,7 @@ public class JCCAgent	implements IComponentStep<Void>
 	 *  Close the gui on agent shutdown.
 	 */
 	@AgentKilled
-	public IFuture<Void>	agentKilled(IInternalAccess agent)
+	public IFuture<Void> agentKilled(IInternalAccess agent)
 	{
 //		System.out.println("JCC agent killed");
 		Future<Void>	ret	= new Future<Void>();
@@ -213,6 +264,9 @@ public class JCCAgent	implements IComponentStep<Void>
 		{
 			ret.setResult(null);
 		}
+		
+		if(query!=null)
+			query.terminate();
 
 		return ret;
 	}
@@ -221,7 +275,7 @@ public class JCCAgent	implements IComponentStep<Void>
 	 *  Get the control center.
 	 */
 	// Used for test case.
-	public ControlCenter	getControlCenter()
+	public ControlCenter getControlCenter()
 	{
 		return cc;
 	}

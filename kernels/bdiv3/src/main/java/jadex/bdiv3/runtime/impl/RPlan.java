@@ -10,7 +10,6 @@ import java.util.Map;
 import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.features.impl.IInternalBDIAgentFeature;
 import jadex.bdiv3.model.IBDIModel;
 import jadex.bdiv3.model.MBody;
@@ -31,7 +30,6 @@ import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -2048,8 +2046,10 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public boolean	isAdopted()
 	{
-	 	// Hack!!! Subgoals removed to late, TODO: fix hierarchic goal plan lifecycle management
-		return !(getReason() instanceof RParameterElement) || ((RParameterElement) getReason()).isAdopted();
+		return true;
+//	 	// Hack!!! Subgoals removed to late, TODO: fix hierarchic goal plan lifecycle management
+//		System.out.println(this + " isAdopted(): "+(!(getReason() instanceof RParameterElement) || ((RParameterElement) getReason()).isAdopted()));
+//		return !(getReason() instanceof RParameterElement) || ((RParameterElement) getReason()).isAdopted();
 	}
 	
 //	/**
