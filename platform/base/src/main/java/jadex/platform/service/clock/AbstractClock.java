@@ -354,7 +354,10 @@ public abstract class AbstractClock implements IClock
 	 */
 	public ITimer[] getTickTimers()
 	{
-		return (ITimer[])ticktimers.toArray(new ITimer[0]);
+		synchronized(this)
+		{
+			return (ITimer[])ticktimers.toArray(new ITimer[0]);
+		}
 	}
 	
 	/**

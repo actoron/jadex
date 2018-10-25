@@ -464,6 +464,8 @@ public class ClockService extends BasicService implements IClockService, IProper
 		
 		if(old!=null)
 		{
+			old.stop();
+			((AbstractClock)clock).copyFromClock(old);
 			old.dispose();
 		}
 		if(start)
