@@ -146,8 +146,10 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			{
 				ProvidedServiceImplementation impl = new ProvidedServiceImplementation();
 				impl.setValue("$component.getExternalAccess()");
+				// external access of platform is published in network
+				boolean platform = getComponent().getId().equals(getComponent().getId().getRoot());
 				ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, 
-					impl, RequiredServiceInfo.SCOPE_PLATFORM, null, null);
+					impl, platform? RequiredServiceInfo.SCOPE_NETWORK: RequiredServiceInfo.SCOPE_PLATFORM, null, null);
 				sermap.put("externalaccessservice", psi);
 			}
 			
@@ -369,6 +371,14 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			}
 			else
 			{
+				try
+				{
+					Class.forName("jadex.extension.rs.publish.JettyRestPublishService");
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 				throw new RuntimeException("Could not load service implementation class: "+impl.getClazz());
 			}
 		}
