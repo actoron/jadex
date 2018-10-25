@@ -18,7 +18,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
 import jadex.commons.TimeoutException;
@@ -111,9 +110,9 @@ public class JCCAgent implements IComponentStep<Void>
 			{
 				try
 				{
-					System.out.println("found platform: "+result.getId()+" "+SComponentManagementService.containsComponent(result.getId()));
-					if(!SComponentManagementService.containsComponent(result.getId()))
+					if(!result.getId().getRoot().equals(agent.getId().getRoot()))
 					{
+						System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
 						Map<String, Object> args = new HashMap<>();
 						args.put("component", result.getId());
 						agent.createComponent(new CreationInfo().setFilename("jadex.platform.service.remote.ProxyAgent.class")
