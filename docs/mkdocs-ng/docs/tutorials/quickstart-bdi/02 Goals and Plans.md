@@ -37,12 +37,12 @@ package quickstart.cleanerworld;
 
 import java.util.*;
 import jadex.bdiv3.annotation.*;
-import jadex.bdiv3.features.IBDIAgentFeature;
+import jadex.bdiv3.features.*;
+import jadex.bdiv3.runtime.*;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
-import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.quickstart.cleanerworld.environment.SensorActuator;
-import jadex.quickstart.cleanerworld.gui.SensorGui;
+import jadex.micro.annotation.*;
+import jadex.quickstart.cleanerworld.environment.*;
+import jadex.quickstart.cleanerworld.gui.*;
 
 /**
  *  BDI agent template.

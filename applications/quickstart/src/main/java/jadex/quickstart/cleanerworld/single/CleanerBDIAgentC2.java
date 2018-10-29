@@ -112,9 +112,10 @@ public class CleanerBDIAgentC2
 	//-------- methods that represent plans (i.e. predefined recipes for working on certain goals) --------
 	
 //	/**
-//	 *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
+//	 *  Declare the same plan for the PerformPatrol and QueryChargingStation goals
+//	 *  by using a method with @Plan and @Trigger annotation.
 //	 */
-//	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
+//	@Plan(trigger=@Trigger(goals={PerformPatrol.class, QueryChargingStation.class}))
 //	private void	performPatrolPlan()
 //	{
 //		// Follow a simple path around the four corners of the museum and back to the first corner.

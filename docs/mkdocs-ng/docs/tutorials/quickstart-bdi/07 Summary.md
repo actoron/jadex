@@ -79,4 +79,43 @@ Here you can find solutions for code you had to write yourself and the answers t
 Reusing the first patrol plan, you could just add the new goal to the plan trigger:
 
 ```java
+	/**
+	 *  Declare the same plan for the PerformPatrol and QueryChargingStation goals
+	 *  by using a method with @Plan and @Trigger annotation.
+	 */
+	@Plan(trigger=@Trigger(goals={PerformPatrol.class, QueryChargingStation.class}))
+	private void	performPatrolPlan()
+	{
+		// Follow a simple path around the four corners of the museum and back to the first corner.
+		System.out.println("Starting performPatrolPlan()");
+		actsense.moveTo(0.1, 0.1);
+		actsense.moveTo(0.1, 0.9);
+		actsense.moveTo(0.9, 0.9);
+		actsense.moveTo(0.9, 0.1);
+		actsense.moveTo(0.1, 0.1);
+	}
+```
+
+### Alternative 2
+
+A simple alternative is to plan that does just one random move.
+To allow this plan being executed repeatedly, you can set `ExcludeMode.Never` on the goal.
+
+```java
+	@Goal(excludemode=ExcludeMode.Never)
+	class QueryChargingStation
+	{
+		...
+	}
+	
+	/**
+	 *  A plan to move randomly in the environment.
+	 */
+	@Plan(trigger=@Trigger(goals=QueryChargingStation.class))
+	private void	moveAround()
+	{
+		// Choose a random location and move there.
+		System.out.println("Starting moveAround() plan");
+		actsense.moveTo(Math.random(), Math.random());
+	}
 ```
