@@ -60,6 +60,11 @@ public class Main
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD2.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD3a.class");
 		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgent.class");
+		
+//		conf.addComponent("quickstart/cleanerworld/multi/messaging/SimpleMessagingCleanerAgent.class");
+//		conf.addComponent("quickstart/cleanerworld/multi/messaging/SimpleMessagingCleanerAgent.class");
+//		conf.addComponent("quickstart/cleanerworld/multi/messaging/SimpleMessagingCleanerAgent.class");
+//		conf.addComponent("quickstart/cleanerworld/multi/messaging/SimpleMessagingCleanerAgent.class");
 
 		// Start a Jadex platform (asynchronously in background).
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(conf);

@@ -370,6 +370,14 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			}
 			else
 			{
+				try
+				{
+					Class.forName("jadex.extension.rs.publish.JettyRestPublishService");
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 				throw new RuntimeException("Could not load service implementation class: "+impl.getClazz());
 			}
 		}
