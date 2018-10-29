@@ -82,6 +82,7 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
+import jadex.commons.transformation.annotations.Classname;
 
 /**
  *  Standalone platform component implementation.
@@ -1124,6 +1125,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		{
 			return SServiceProvider.getExternalAccessProxy(getInternalAccess(), parent).scheduleStep(new IComponentStep<IComponentIdentifier[]>()
 			{
+				@Classname("getChildren")
 				public IFuture<IComponentIdentifier[]> execute(IInternalAccess ia)
 				{
 					return ia.getChildren(type, null);
@@ -1455,7 +1457,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
-//				if(method.getName().indexOf("killComponent")!=-1)
+//			if(method.getName().indexOf("searchService")!=-1)
 //				System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 			
 			Class<?> rettype = method.getReturnType();
@@ -1534,6 +1536,9 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						@Override
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
+//							if(method.getName().indexOf("searchService")!=-1 && ((ServiceQuery)args[0]).getServiceType().getTypeName().indexOf("Proxy")!=-1)
+//								System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
+							
 							boolean intermediate = SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType());
 							if(!intermediate)
 								doInvoke(ia, method, args).addResultListener(new DelegationResultListener<>(ret));

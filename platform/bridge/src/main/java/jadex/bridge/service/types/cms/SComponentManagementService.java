@@ -163,6 +163,16 @@ public class SComponentManagementService
 	}
 	
 	/**
+	 *  Get the components map.
+	 *  @param cid The platform id.
+	 *  @return The component map.
+	 */
+	public static boolean containsComponent(IComponentIdentifier cid)
+	{
+		return ((Map<IComponentIdentifier, IPlatformComponentAccess>)Starter.getPlatformValue(cid, Starter.DATA_COMPONENTMAP)).containsKey(cid);
+	}
+	
+	/**
 	 *  Get the init infos..
 	 *  @param cid The platform id.
 	 *  @return The init infos.
