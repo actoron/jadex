@@ -8,7 +8,6 @@ import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalCreationCondition;
-import jadex.bdiv3.annotation.GoalInhibit;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
