@@ -150,7 +150,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 	 */
 	protected void	searchChildren()
 	{
-		System.out.println("searchChildren: "+ProxyComponentTreeNode.this.hashCode());
+//		System.out.println("searchChildren: "+ProxyComponentTreeNode.this.hashCode());
 		busy = true;
 		
 		getConnectionState().addResultListener(new DefaultResultListener<IProxyAgentService.State>()
@@ -168,12 +168,12 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 			{
 				if(result!=null)
 				{
-					System.out.println("search: "+ProxyComponentTreeNode.this.hashCode());
+//					System.out.println("search: "+ProxyComponentTreeNode.this.hashCode());
 					searchChildren(access, result).addResultListener(new IResultListener<List<ITreeNode>>()
 					{
 						public void resultAvailable(List<ITreeNode> result)
 						{
-							System.out.println("search end: "+ProxyComponentTreeNode.this.hashCode()+" "+result.size());
+//							System.out.println("search end: "+ProxyComponentTreeNode.this.hashCode()+" "+result.size());
 							Collections.sort(result, new Comparator<ITreeNode>()
 							{
 								public int compare(ITreeNode o1, ITreeNode o2) 
@@ -274,7 +274,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 		IFuture<IProxyAgentService> fut = access.searchService(new ServiceQuery<>(IProxyAgentService.class).setProvider(desc.getName()));
 
 		String id = SUtil.createUniqueId();
-		System.out.println("got fut: "+fut+" "+fut.isDone()+" "+desc.getName()+" "+access.getId()+" "+id);	
+//		System.out.println("got fut: "+fut+" "+fut.isDone()+" "+desc.getName()+" "+access.getId()+" "+id);	
 			
 		fut.addResultListener(new IResultListener<IProxyAgentService>()
 //			.addResultListener(new SwingResultListener<IProxyAgentService>(new IResultListener<IProxyAgentService>()

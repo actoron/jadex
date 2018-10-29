@@ -196,7 +196,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			ret.addResultListener(trl);
 		}
 		
-		((IInternalExecutionFeature) component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
+		((IInternalExecutionFeature)component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
 
 		if(outcommands==null)
 		{
@@ -246,6 +246,9 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		Class<IFuture<T>>	clazz	= (Class<IFuture<T>>)(IFuture.class.isAssignableFrom(method.getReturnType())
 			? (Class<IFuture<T>>)method.getReturnType()
 			: IFuture.class);
+		
+//		if(method.toString().toLowerCase().indexOf("getdesc")!=-1)
+//			System.out.println("Executing requested remote method invocation: "+method);
 		
 		return execute(ref.getRemoteComponent(), new RemoteMethodInvocationCommand<T>(ref.getTargetIdentifier(), method, args, nonfunc), clazz, timeout);
 	}
@@ -478,7 +481,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 							}
 						}
 						
-						if (msg instanceof IRemoteConversationCommand)
+						if(msg instanceof IRemoteConversationCommand)
 						{
 							IRemoteConversationCommand<?> cmd = (IRemoteConversationCommand<?>)msg;
 							cmd.execute(component, (IFuture)fut, secinfos);

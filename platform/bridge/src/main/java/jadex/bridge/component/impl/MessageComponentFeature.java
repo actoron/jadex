@@ -387,7 +387,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 						try
 						{
 							message = deserializeMessage(header, result.getSecondEntity());
-//							System.out.println("decoded: "+message);
+							System.out.println("decoded: "+message);
 						}
 						catch(Exception e)
 						{

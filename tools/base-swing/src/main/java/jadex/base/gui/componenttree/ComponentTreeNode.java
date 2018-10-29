@@ -331,14 +331,14 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		final List<ITreeNode> children = new ArrayList<ITreeNode>();
 		final boolean ready[] = new boolean[2];	// 0: children, 1: services;
 
-		if(ComponentTreeNode.this instanceof ProxyComponentTreeNode)
-			System.out.println("searchChildren 1: "+this);
+//		if(ComponentTreeNode.this instanceof ProxyComponentTreeNode)
+//			System.out.println("searchChildren 1: "+this);
 		
 		access.getChildren(null, cid).addResultListener(new SwingResultListener<>(new IResultListener<IComponentIdentifier[]>()
 		{
 			public void resultAvailable(IComponentIdentifier[] result)
 			{
-				System.out.println("searchChildren 1 end: "+result.length);
+//				System.out.println("searchChildren 1 end: "+result.length);
 				Arrays.sort(result, new java.util.Comparator<IComponentIdentifier>()
 				{
 					public int compare(IComponentIdentifier o1, IComponentIdentifier o2)
@@ -363,7 +363,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("searchChildren 1 end ex: ");
+//				System.out.println("searchChildren 1 end ex: ");
 				exception.printStackTrace();
 			}
 		}));
@@ -422,7 +422,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 				{
 					public void resultAvailable(final IExternalAccess ea)
 					{
-						System.out.println("search childs 2: "+ea);
+//						System.out.println("search childs 2: "+ea);
 						
 						ea.getNFPropertyNames()
 //							((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyNames()
@@ -430,7 +430,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 						{
 							public void resultAvailable(String[] names)
 							{
-								System.out.println("nfprops ready");
+//								System.out.println("nfprops ready");
 								if(names!=null && names.length>0)
 								{
 									NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
@@ -482,13 +482,13 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 					
 					public void cont(final IExternalAccess ea)
 					{
-						System.out.println("getServiceInfos start");
+//						System.out.println("getServiceInfos start");
 						SRemoteGui.getServiceInfos(ea)
 							.addResultListener(new SwingResultListener<Object[]>(new IResultListener<Object[]>()
 						{
 							public void resultAvailable(final Object[] res)
 							{
-								System.out.println("getServiceInfos end");
+//								System.out.println("getServiceInfos end");
 								
 								final ProvidedServiceInfo[] pros = (ProvidedServiceInfo[])res[0];
 								final RequiredServiceInfo[] reqs = (RequiredServiceInfo[])res[1];
