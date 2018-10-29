@@ -11,6 +11,8 @@ import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
@@ -28,10 +30,10 @@ import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
- *  Separate Maintain and Target Conditions.
+ *  Using inner classes for plans with conditions.
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
-public class CleanerBDIAgent
+public class CleanerBDIAgentE1
 {
 	//-------- fields holding agent data --------
 	
@@ -296,30 +298,90 @@ public class CleanerBDIAgent
 		System.out.println("finished goal with state "+state+" for "+cleanup.waste);
 	}
 
+	// -------- cleanup behavior alternative 1: a single plan with an 'if' --------
+
+//	/**
+//	 *  Pickup waste and drop it in a waste bin.
+//	 */
+//	@Plan(trigger=@Trigger(goals=AchieveCleanupWaste.class))
+//	private void cleanupWaste(IPlan plan, AchieveCleanupWaste cleanup)
+//	{
+//		System.out.println("Starting cleanupWaste() plan");
+//		
+//		// Move to waste and pick it up, if not yet done
+//		if(!cleanup.waste.equals(self.getCarriedWaste()))
+//		{
+//			actsense.moveTo(cleanup.waste.getLocation());
+//			actsense.pickUpWaste(cleanup.waste);
+//		}
+//		
+//		// Dispatch a subgoal to find a waste bin
+//		QueryWastebin	querygoal	= new QueryWastebin();
+//		plan.dispatchSubgoal(querygoal).get();
+//		IWastebin	wastebin	= querygoal.wastebin;
+//		
+//		// Move to waste bin as provided by subgoal
+//		actsense.moveTo(wastebin.getLocation());
+//		
+//		// Finally drop the waste into the bin
+//		actsense.dropWasteInWastebin(cleanup.waste, wastebin);
+//	}
+	
+	// -------- cleanup behavior alternative 2: two plans with different preconditions --------
+
 	/**
-	 *  Pickup waste and drop it in a waste bin.
+	 *  First part of cleanup behavior -> move to waste and pick it up.
 	 */
+	// Plan as inner class allows writing precondition as method.
 	@Plan(trigger=@Trigger(goals=AchieveCleanupWaste.class))
-	private void cleanupWaste(IPlan plan, AchieveCleanupWaste cleanup)
+	class PickupWastePlan
 	{
-		System.out.println("Starting cleanupWaste() plan");
-		
-		// Move to waste and pick it up, if not yet done
-		if(!cleanup.waste.equals(self.getCarriedWaste()))
+		// Only select this plan when waste is not yet picked up
+		@PlanPrecondition
+		boolean	notYetPickedUp()
 		{
+			return self.getCarriedWaste()==null;
+		}
+		
+		// Move to waste and pick it up
+		@PlanBody
+		void body(AchieveCleanupWaste cleanup)
+		{
+			System.out.println("Starting PickupWastePlan");
 			actsense.moveTo(cleanup.waste.getLocation());
 			actsense.pickUpWaste(cleanup.waste);
 		}
+	}
+
+	/**
+	 *  Second part of cleanup behavior -> move to waste bin and drop the waste.
+	 */
+	@Plan(trigger=@Trigger(goals=AchieveCleanupWaste.class))
+	class DropWastePlan
+	{
+		// Only select this plan when waste is already picked up
+		@PlanPrecondition
+		boolean	alreadyPickedUp()
+		{
+			return self.getCarriedWaste()!=null;
+		}
 		
-		// Dispatch a subgoal to find a waste bin
-		QueryWastebin	querygoal	= new QueryWastebin();
-		plan.dispatchSubgoal(querygoal).get();
-		IWastebin	wastebin	= querygoal.wastebin;
-		
-		// Move to waste bin as provided by subgoal
-		actsense.moveTo(wastebin.getLocation());
-		
-		// Finally drop the waste into the bin
-		actsense.dropWasteInWastebin(cleanup.waste, wastebin);
+		// Move to waste and pick it up
+		@PlanBody
+		void body(IPlan plan, AchieveCleanupWaste cleanup)
+		{
+			System.out.println("Starting DropWastePlan");
+			
+			// Dispatch a subgoal to find a waste bin
+			QueryWastebin	querygoal	= new QueryWastebin();
+			plan.dispatchSubgoal(querygoal).get();
+			IWastebin	wastebin	= querygoal.wastebin;
+			
+			// Move to waste bin as provided by subgoal
+			actsense.moveTo(wastebin.getLocation());
+			
+			// Finally drop the waste into the bin
+			actsense.dropWasteInWastebin(cleanup.waste, wastebin);
+		}
 	}
 }

@@ -31,7 +31,7 @@ import jadex.quickstart.cleanerworld.gui.SensorGui;
  *  Separate Maintain and Target Conditions.
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
-public class CleanerBDIAgent
+public class CleanerBDIAgentD3b
 {
 	//-------- fields holding agent data --------
 	
@@ -148,7 +148,6 @@ public class CleanerBDIAgent
 	 *  A goal to cleanup waste.
 	 */
 	@Goal(recur=true, recurdelay=3000,
-//		deliberation=@Deliberation(inhibits={PerformPatrol.class, AchieveCleanupWaste.class}))
 		deliberation=@Deliberation(inhibits=PerformPatrol.class, cardinalityone=true))
 	class AchieveCleanupWaste
 	{
@@ -174,17 +173,6 @@ public class CleanerBDIAgent
 				// and also not the waste we just picked up.
 				&& !waste.equals(self.getCarriedWaste());
 		}
-		
-//		// Use an instance-level inhibition to decide between cleanup goals
-//		// TODO: should not require goal type in annotation?
-//		@GoalInhibit(AchieveCleanupWaste.class)
-//		boolean	shouldInhibit(AchieveCleanupWaste other)
-//		{
-//			// Prefer this goal when the waste was already picked up.
-//			boolean test	= waste.equals(self.getCarriedWaste());
-//			System.out.println("Inhibit of "+this+" for "+other+" is "+test);
-//			return test;
-//		}
 		
 		// Goal should only be pursued when carrying no waste
 		// or when goal is resumed after recharging and carried waste is of this goal.
