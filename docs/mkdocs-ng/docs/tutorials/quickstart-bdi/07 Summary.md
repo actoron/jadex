@@ -6,6 +6,72 @@ ${SorryNotYetAvailable}
 
 Here you can find solutions for code you had to write yourself and the answers to questions from different exercises.
 
+### Exercise Zero: A Simple Java Cleaner Agent
+
+Here is a solution with a single loop and nested if-then-else statements for the different tasks and phases of the robot.
+Note that the solution has some problems, e.g., not immediately stopping a move action when finding a needed waste bin
+and a severe bug that the agent will try to pick up waste that no longer exists, when it was removed in the mean time.
+ 
+```java
+		// Agent uses one main loop for its behavior
+		while(true)
+		{
+			// Need to recharge (less than 20% battery)?
+			if(actsense.getSelf().getChargestate()<0.2)
+			{
+				// Charging station known?
+				if(!actsense.getChargingstations().isEmpty())
+				{
+					// Move to charging station and recharge
+					IChargingstation	station	= actsense.getChargingstations().iterator().next();
+					actsense.moveTo(station.getLocation());
+					actsense.recharge(station, 0.9);
+				}
+				else
+				{
+					// Move around to find charging station
+					actsense.moveTo(Math.random(), Math.random());					
+				}
+			}
+			
+			// Waste picked up?
+			else if(actsense.getSelf().getCarriedWaste()!=null)
+			{
+				// Waste bin known?
+				if(!actsense.getWastebins().isEmpty())
+				{
+					// Move to waste bin and drop waste
+					IWastebin	bin	= actsense.getWastebins().iterator().next();
+					actsense.moveTo(bin.getLocation());
+					actsense.dropWasteInWastebin(actsense.getSelf().getCarriedWaste(), bin);
+				}
+				else
+				{
+					// Move around to find waste bin
+					actsense.moveTo(Math.random(), Math.random());					
+				}
+			}
+			
+			// Not carrying waste
+			else
+			{
+				// Waste known?
+				if(!actsense.getWastes().isEmpty())
+				{
+					// Move to waste and pick it up
+					IWaste	waste	= actsense.getWastes().iterator().next();
+					actsense.moveTo(waste.getLocation());
+					actsense.pickUpWaste(waste);
+				}
+				else
+				{
+					// Move around to find waste
+					actsense.moveTo(Math.random(), Math.random());					
+				}
+			}
+		}
+```
+
 ### Exercise A3: Additional Patrol Plan Code
 
 <div style="float:right;">

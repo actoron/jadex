@@ -8,6 +8,10 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClock;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.IFuture;
 import jadex.quickstart.cleanerworld.gui.EnvironmentGui;
 
@@ -16,6 +20,9 @@ import jadex.quickstart.cleanerworld.gui.EnvironmentGui;
  */
 public class Main
 {
+	/** Use higher values (e.g. 2.0) for faster cleaner movement and lower values (e.g. 0.5) for slower movement. */
+	protected static double	CLOCK_SPEED	= 1;
+	
 	/**
 	 *  Main method for starting the scenario.
 	 *  @param args	ignored for now.
@@ -47,6 +54,11 @@ public class Main
 		// Without this, errors might not get shown.
 		fut.get();
 		
+		// Apply the chosen clock speed.
+		IClockService	cs	= fut.get().searchService(new ServiceQuery<>(IClockService.class)).get();
+		cs.setClock(IClock.TYPE_CONTINUOUS, fut.get().searchService(new ServiceQuery<>(IThreadPoolService.class)).get());
+		cs.setDilation(CLOCK_SPEED);
+
 		// Open world view window on Swing Thread
 		SwingUtilities.invokeLater(new Runnable()
 		{

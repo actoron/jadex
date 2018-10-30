@@ -45,6 +45,8 @@ public class Main
 		conf.setValue("kernel_bdi", true);
         
         // Add your cleaner agent(s)
+		conf.addComponent("jadex/quickstart/cleanerworld/SimpleCleanerAgentZero.class");
+
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA0.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA1.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA2.class");
@@ -59,7 +61,7 @@ public class Main
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD1.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD2.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD3a.class");
-		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgent.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgent.class");
 		
 //		conf.addComponent("quickstart/cleanerworld/multi/messaging/SimpleMessagingCleanerAgent.class");
 //		conf.addComponent("quickstart/cleanerworld/multi/messaging/SimpleMessagingCleanerAgent.class");
@@ -73,6 +75,7 @@ public class Main
 		// Without this, errors might not get shown.
 		fut.get();
 
+		// Apply the chosen clock speed.
 		IClockService	cs	= fut.get().searchService(new ServiceQuery<>(IClockService.class)).get();
 		cs.setClock(IClock.TYPE_CONTINUOUS, fut.get().searchService(new ServiceQuery<>(IThreadPoolService.class)).get());
 		cs.setDilation(CLOCK_SPEED);
