@@ -27,6 +27,7 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenessmulticast", true);
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*2));
+		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 
 		// Remote only -> no simulation please
 		baseconf.getExtendedPlatformConfiguration().setSimul(false);
