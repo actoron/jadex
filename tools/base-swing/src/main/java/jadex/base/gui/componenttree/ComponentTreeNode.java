@@ -39,6 +39,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
 /**
@@ -356,19 +357,25 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 						fubar.addFuture(wait);
 //						System.out.println("------getDescription "+rescid);
 						IFuture<IComponentDescription>	fut	= access.getDescription(rescid);
-						fut.addResultListener(
-							desc ->	{
-//								System.out.println("++++++getDescription "+rescid);
-								ISwingTreeNode node = createComponentNode(desc);						
+						fut.addResultListener(new SwingDefaultResultListener<IComponentDescription>()
+						{
+							@Override
+							public void customResultAvailable(IComponentDescription desc)
+							{
+//									System.out.println("++++++getDescription "+rescid);
+								ISwingTreeNode node = createComponentNode(desc);	
 								children.add(node);
 								wait.setResult(null);
-							},
-							ex -> {
+							}
+							
+							@Override
+							public void customExceptionOccurred(Exception ex)
+							{
 								ex.printStackTrace();
 								// TODO: OK to ignore failures?
 								wait.setResult(null);
 							}
-						);
+						});
 					}
 				}
 				fubar.waitFor().addResultListener(v->

@@ -23,6 +23,7 @@ import jadex.commons.Boolean3;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -131,7 +132,8 @@ public class JCCAgent implements IComponentStep<Void>
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+				if(!(exception instanceof FutureTerminatedException))
+					exception.printStackTrace();
 			}
 			
 			public void resultAvailable(Collection<IExternalAccess> result)
