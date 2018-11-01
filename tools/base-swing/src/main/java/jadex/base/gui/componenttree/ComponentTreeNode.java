@@ -22,7 +22,6 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -33,6 +32,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -347,17 +347,27 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 					}
 				});
 				
+				FutureBarrier<Void>	fubar	= new FutureBarrier<>();
 				for(int i=0; i<result.length; i++)
 				{
-					// todo: avoid get()
-					ISwingTreeNode node = createComponentNode(access.getDescription(result[i]).get());
-					children.add(node);
+					Future<Void>	wait	= new Future<>();
+					fubar.addFuture(wait);
+					IFuture<IComponentDescription>	fut	= access.getDescription(result[i]);
+					fut.addResultListener(desc ->
+					{
+						ISwingTreeNode node = createComponentNode(desc);						
+						children.add(node);
+						wait.setResult(null);
+					}, ex -> wait.setResult(null));	// TODO: OK to ignore failures?
 				}
-				ready[0]	= true;
-				if(ready[0] &&  ready[1])
+				fubar.waitFor().addResultListener(v->
 				{
-					ret.setResult(children);
-				}
+					ready[0]	= true;
+					if(ready[0] &&  ready[1])
+					{
+						ret.setResult(children);
+					}					
+				});
 			}
 			
 			@Override

@@ -1439,7 +1439,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	//-------- helper classes --------
 	
 	/**
-	 *  Nested class fopr service annotation.
+	 *  Nested class for service annotation.
 	 */
 	@Service
 	protected class ExternalAccessInvocationHandler implements InvocationHandler
