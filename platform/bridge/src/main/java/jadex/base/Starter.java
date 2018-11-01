@@ -375,6 +375,25 @@ public class Starter
 	}
 
 	/**
+	 *  Get a boolean value from args (otherwise return default value passed as arg).
+	 *  @param args The args map.
+	 *  @param argname The argument name.
+	 *  @param def The default value.
+	 *  @return The args value.
+	 */
+	public static boolean getBooleanValueWithArgs(Map<String, Object> args, String argname, boolean def)
+	{
+		boolean ret = def;
+		if(args!=null)
+		{
+			Object val = args.get(argname);
+			if(val!=null && val instanceof Boolean)
+				ret = ((Boolean)val).booleanValue();
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Create the platform.
 	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
@@ -394,11 +413,11 @@ public class Starter
 //		IRootComponentConfiguration rootconf = config.getRootConfig();
 		
 		// pass configuration parameters to static fields:
-		MethodInvocationInterceptor.DEBUG = config.getExtendedPlatformConfiguration().getDebugServices();
-		ExecutionComponentFeature.DEBUG = config.getExtendedPlatformConfiguration().getDebugSteps();
+		MethodInvocationInterceptor.DEBUG = getBooleanValueWithArgs(args, "debugservices", config.getExtendedPlatformConfiguration().getDebugServices());
+		ExecutionComponentFeature.DEBUG = getBooleanValueWithArgs(args, "debugsteps", config.getExtendedPlatformConfiguration().getDebugSteps());
 //		Future.NO_STACK_COMPACTION	= true;
-		Future.NO_STACK_COMPACTION	= config.getExtendedPlatformConfiguration().getNoStackCompaction();
-		Future.DEBUG = config.getExtendedPlatformConfiguration().getDebugFutures(); 
+		Future.NO_STACK_COMPACTION	= getBooleanValueWithArgs(args, "nostackcompaction", config.getExtendedPlatformConfiguration().getNoStackCompaction());
+		Future.DEBUG = getBooleanValueWithArgs(args, "debugfutures", config.getExtendedPlatformConfiguration().getDebugFutures()); 
 		
 //		new FastClasspathScanner(new String[]
 //		      {"com.xyz.widget", "com.xyz.gizmo" })  // Whitelisted package prefixes

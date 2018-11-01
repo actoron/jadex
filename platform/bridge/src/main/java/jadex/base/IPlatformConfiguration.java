@@ -223,6 +223,12 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
       // boolean
       // default:
       // true
+      
+      /** Flag if CIDs may be reused (true for not). **/
+      public static final String	PLATFORMPROXIES = "platformproxies";								// class:
+      // boolean
+      // default:
+      // true
 
       /** Flag for deferring thread creation/deletion in thread pool **/
       public static final String	THREADPOOLDEFER		= "threadpooldefer";						// class:

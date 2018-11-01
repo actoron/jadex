@@ -89,9 +89,6 @@ public class JCCAgent implements IComponentStep<Void>
 	/** True when initially connected to a remote platform.. */
 	protected boolean connected;
 	
-	/** The query. */
-	ISubscriptionIntermediateFuture<IExternalAccess> query;
-	
 	//-------- micro agent methods --------
 	
 	/**
@@ -100,45 +97,6 @@ public class JCCAgent implements IComponentStep<Void>
 	@AgentCreated
 	public IFuture<Void>	execute(final IInternalAccess agent)
 	{
-		// scope network or global?!
-		query = agent.addQuery(new ServiceQuery<>(IExternalAccess.class)
-			.setScope(RequiredServiceInfo.SCOPE_NETWORK));
-//			.setScope(RequiredServiceInfo.SCOPE_GLOBAL));
-		query.addResultListener(new IIntermediateResultListener<IExternalAccess>()
-		{
-			public void intermediateResultAvailable(IExternalAccess result)
-			{
-				try
-				{
-					if(!result.getId().getRoot().equals(agent.getId().getRoot()))
-					{
-						System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
-						Map<String, Object> args = new HashMap<>();
-						args.put("component", result.getId());
-						agent.createComponent(new CreationInfo().setFilename("jadex.platform.service.remote.ProxyAgent.class")
-							.setArguments(args).setName(result.getId().toString()));
-					}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-
-			public void finished()
-			{
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-			
-			public void resultAvailable(Collection<IExternalAccess> result)
-			{
-			}
-		});
-		
 		final Future<Void>	ret	= new Future<Void>();
 		
 		if(platforms==null)
@@ -265,9 +223,6 @@ public class JCCAgent implements IComponentStep<Void>
 			ret.setResult(null);
 		}
 		
-		if(query!=null)
-			query.terminate();
-
 		return ret;
 	}
 	

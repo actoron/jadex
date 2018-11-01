@@ -2,6 +2,7 @@ package jadex.platform;
 
 import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
 import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
+import static jadex.base.IPlatformConfiguration.PLATFORMPROXIES;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -21,6 +22,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -37,9 +40,12 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.security.SSecurity;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -61,6 +67,7 @@ import jadex.platform.service.security.SecurityAgent;
 {
 	@Argument(name=LOGGING_LEVEL, clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
 	@Argument(name=UNIQUEIDS, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name=PLATFORMPROXIES, clazz=boolean.class, defaultvalue="true")
 })
 
 @ProvidedServices({
@@ -84,6 +91,10 @@ import jadex.platform.service.security.SecurityAgent;
 @Agent
 public class PlatformAgent
 {
+	/** Boolean if platform proxies should be created. */
+	@AgentArgument
+	protected boolean platformproxies;
+	
 	//-------- service creation helpers --------
 	
 	/** Create execution service. */
@@ -142,9 +153,10 @@ public class PlatformAgent
 	@AgentCreated
 	public IFuture<Void> init()
 	{
+		Future<Void> ret = new Future<>();
 //		System.out.println("Start scanning...");
 		long start = System.currentTimeMillis();
-		
+				
 		// Class name -> instance name
 		Map<String, String> names = new HashMap<String, String>();
 		DependencyResolver<String> dr = new DependencyResolver<String>();
@@ -172,7 +184,64 @@ public class PlatformAgent
 		
 		Collection<Set<String>> levels = dr.resolveDependenciesWithLevel();
 		
-		return startComponents(levels.iterator(), names);
+		startComponents(levels.iterator(), names).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			@Override
+			public void customResultAvailable(Void result)
+			{
+				if(platformproxies)
+					addQueryForPlatformProxies();
+				super.customResultAvailable(result);
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Add query for creating platform proxies.
+	 */
+	protected void addQueryForPlatformProxies()
+	{
+		System.out.println("creating platform proxies for remote platforms");
+		
+		// scope network or global?!
+		ISubscriptionIntermediateFuture<IExternalAccess> query = agent.addQuery(new ServiceQuery<>(IExternalAccess.class)
+			.setScope(RequiredServiceInfo.SCOPE_NETWORK));
+//					.setScope(RequiredServiceInfo.SCOPE_GLOBAL));
+		query.addResultListener(new IIntermediateResultListener<IExternalAccess>()
+		{
+			public void intermediateResultAvailable(IExternalAccess result)
+			{
+				try
+				{
+					if(!result.getId().getRoot().equals(agent.getId().getRoot()))
+					{
+						System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
+						Map<String, Object> args = new HashMap<>();
+						args.put("component", result.getId());
+						agent.createComponent(new CreationInfo().setFilename("jadex.platform.service.remote.ProxyAgent.class")
+							.setArguments(args).setName(result.getId().toString()));
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+			public void finished()
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+			
+			public void resultAvailable(Collection<IExternalAccess> result)
+			{
+			}
+		});
 	}
 	
 	/**
@@ -394,5 +463,14 @@ public class PlatformAgent
 //	public void body()
 //	{
 //		System.out.println("Start scanning...");
+//	}
+
+	// todo?! remove platform proxy query on termination 
+	// BUG: currently not called
+//	@AgentTerminated
+//	public void terminated()
+//	{
+//		if(query!=null)
+//			query.terminate();
 //	}
 }
