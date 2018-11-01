@@ -348,17 +348,28 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 				});
 				
 				FutureBarrier<Void>	fubar	= new FutureBarrier<>();
-				for(int i=0; i<result.length; i++)
+				for(IComponentIdentifier rescid: result)
 				{
-					Future<Void>	wait	= new Future<>();
-					fubar.addFuture(wait);
-					IFuture<IComponentDescription>	fut	= access.getDescription(result[i]);
-					fut.addResultListener(desc ->
+//					if(!rescid.getLocalName().equals("rt"))
 					{
-						ISwingTreeNode node = createComponentNode(desc);						
-						children.add(node);
-						wait.setResult(null);
-					}, ex -> wait.setResult(null));	// TODO: OK to ignore failures?
+						Future<Void>	wait	= new Future<>();
+						fubar.addFuture(wait);
+						System.out.println("------getDescription "+rescid);
+						IFuture<IComponentDescription>	fut	= access.getDescription(rescid);
+						fut.addResultListener(
+							desc ->	{
+								System.out.println("++++++getDescription "+rescid);
+								ISwingTreeNode node = createComponentNode(desc);						
+								children.add(node);
+								wait.setResult(null);
+							},
+							ex -> {
+								ex.printStackTrace();
+								// TODO: OK to ignore failures?
+								wait.setResult(null);
+							}
+						);
+					}
 				}
 				fubar.waitFor().addResultListener(v->
 				{
