@@ -46,20 +46,15 @@ public class STest
 		config.setValue("kernel_bpmn", true);
 		config.setValue("kernel_bdix", true);
 		config.setValue("kernel_bdi", true);
+		
+		// Enable intravm awareness, transport and security
+		config.setSuperpeerClient(true);
+		config.setValue("passiveawarenessintravm", true);
+        config.setValue("intravm", true);
+        config.getExtendedPlatformConfiguration().setSecurity(true);
 		config.setNetworkNames(new String[] { testnetwork_name });
 		config.setNetworkSecrets(new String[] { testnetwork_pass });
-		
-		// Enable new awareness
-		config.setSuperpeerClient(true);
-//		config.setValue("superpeerclient.awaonly", true);
-//		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
-		config.setValue("passiveawarenessintravm", true);
-		config.setValue("passiveawarenesscatalog", false);
-		config.setAwareness(false);	// disable old awareness
-		
-        config.getExtendedPlatformConfiguration().setSecurity(true);
-//        config.getExtendedPlatformConfiguration().setTcpTransport(true);
-        config.setValue("intravm", true);
+
         config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
         config.getExtendedPlatformConfiguration().setSimulation(true);
 //        config.setValue("bisimulation", true);

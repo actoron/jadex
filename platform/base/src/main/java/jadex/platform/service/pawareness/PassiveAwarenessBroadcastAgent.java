@@ -3,7 +3,6 @@ package jadex.platform.service.pawareness;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
-import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
@@ -13,7 +12,7 @@ import jadex.micro.annotation.Autostart;
  *  Implements passive awareness via broadcast.
  */
 //@Service
-@Agent(autoprovide = Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE,
+@Agent(autoprovide = Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE,
 	predecessors="jadex.platform.service.address.TransportAddressAgent",
 	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
 )

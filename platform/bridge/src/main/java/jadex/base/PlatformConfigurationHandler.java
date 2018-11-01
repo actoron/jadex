@@ -845,6 +845,10 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.getExtendedPlatformConfiguration().setWsTransport(false);
 		config.getExtendedPlatformConfiguration().setRelayTransport(false);
 		// rootConfig.setSslTcpTransport(false);
+		config.setValue("passiveawarenessintravm", false);
+		config.setValue("passiveawarenesscatalog", false);
+		config.setValue("passiveawarenessmulticast", false);
+		config.setValue("passiveawarenessbroadcast", false);
 
 		config.setValue("kernel_multi", false);
 		config.setValue("kernel_micro", true);
