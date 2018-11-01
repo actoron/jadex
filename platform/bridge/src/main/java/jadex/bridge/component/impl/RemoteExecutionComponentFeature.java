@@ -413,7 +413,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 								@Override
 								public void exceptionOccurred(Exception exception)
 								{
-//									getComponent().getLogger().severe("sending result failed: "+rxid+", "+result+", "+exception);
+									getComponent().getLogger().severe("sending result failed: "+rxid+", "+result+", "+exception);
 									// Serialization of result failed -> send back exception.
 									RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
 									rc.setResultCount(msgcounter);
