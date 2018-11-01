@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -168,6 +169,7 @@ public class PlatformAgent
 //		System.out.println("urls: "+urls.length);
 		
 		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
+		Set<String>	comps	= new LinkedHashSet<>();
 		
 		for(ClassInfo ci: cis)
 		{
@@ -176,15 +178,17 @@ public class PlatformAgent
 //			if(clazz==null)
 //				agent.getLogger().warning("Could not load agent class: "+ci.getClassname());
 //			else
-				addComponentToLevels(dr, ci, names);
+				addComponentToLevels(dr, ci, names, comps);
 		}
 		
 //		System.out.println("cls: "+files.size()+" "+components.size());
 //		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
 		
 		Collection<Set<String>> levels = dr.resolveDependenciesWithLevel();
+//		System.out.println("levels: "+levels);
+//		System.out.println("names: "+names);
 		
-		startComponents(levels.iterator(), names).addResultListener(new DelegationResultListener<Void>(ret)
+		startComponents(levels.iterator(), names, comps).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			@Override
 			public void customResultAvailable(Void result)
@@ -202,7 +206,7 @@ public class PlatformAgent
 	 */
 	protected void addQueryForPlatformProxies()
 	{
-		System.out.println("creating platform proxies for remote platforms");
+//		System.out.println("creating platform proxies for remote platforms");
 		
 		// scope network or global?!
 		ISubscriptionIntermediateFuture<IExternalAccess> query = agent.addQuery(new ServiceQuery<>(IExternalAccess.class)
@@ -248,7 +252,7 @@ public class PlatformAgent
 	 *  Add a components to the dependency resolver to build start levels.
 	 *  Components of the same level can be started in parallel.
 	 */
-	protected void addComponentToLevels(DependencyResolver<String> dr, ClassInfo ci, Map<String, String> names)
+	protected void addComponentToLevels(DependencyResolver<String> dr, ClassInfo ci, Map<String, String> names, Set<String> comps)
 	{
 		try
 		{
@@ -308,8 +312,9 @@ public class PlatformAgent
 				if(ok)
 				{
 					String cname = ci.getClassName();
-					
+					comps.add(cname);
 					dr.addNode(cname);
+					
 					Object[] pres = (Object[])autostart.getValue("predecessors");
 					if(pres!=null)
 					{
@@ -370,10 +375,10 @@ public class PlatformAgent
 	/**
 	 *  Start components in levels.
 	 */
-	protected IFuture<Void> startComponents(Iterator<Set<String>> levels, Map<String, String> names)
+	protected IFuture<Void> startComponents(Iterator<Set<String>> levels, Map<String, String> names, Set<String> comps)
 	{
 		if(STARTUP_MONKEY)
-			return startComponentsDebug(levels, null, names);
+			return startComponentsDebug(levels, null, names, comps);
 		
 		final Future<Void> ret = new Future<>();
 		
@@ -385,30 +390,43 @@ public class PlatformAgent
 			{
 				public void resultAvailable(Void result)
 				{
-					startComponents(levels, names).addResultListener(new DelegationResultListener<>(ret));
+					startComponents(levels, names, comps).addResultListener(new DelegationResultListener<>(ret));
 				}
 
 				public void exceptionOccurred(Exception exception)
 				{
 					agent.getLogger().warning(SUtil.getExceptionStacktrace(exception));
-					startComponents(levels, names).addResultListener(new DelegationResultListener<>(ret));
+					startComponents(levels, names, comps).addResultListener(new DelegationResultListener<>(ret));
 				}
 			});
 			
 			for(String c: level)
 			{
-				//ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(names.get(c), c.getName()+".class", (CreationInfo)null);
-				//fut.addTuple2ResultListener(res -> {lis.resultAvailable(null);}, res -> {});
-				
-				CreationInfo ci = new CreationInfo();
-				ci.setName(names.get(c));
-				ci.setFilename(c+".class");
-				IFuture<IExternalAccess> fut = agent.createComponent(ci, null);
-				fut.addResultListener(
-					res -> {lis.resultAvailable(null);},
-					exception -> {lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c+".class", exception));});
-				
-//				System.out.println("Auto starting: "+names.get(c));
+				if(comps.contains(c))
+				{
+					//ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(names.get(c), c.getName()+".class", (CreationInfo)null);
+					//fut.addTuple2ResultListener(res -> {lis.resultAvailable(null);}, res -> {});
+					
+					CreationInfo ci = new CreationInfo();
+					ci.setName(names.get(c));
+					ci.setFilename(c+".class");
+					IFuture<IExternalAccess> fut = agent.createComponent(ci, null);
+					fut.addResultListener(
+						res -> {
+//							System.out.println("Auto started: "+c+", "+names.get(c));
+							lis.resultAvailable(null);
+						},
+						exception -> {
+//							System.out.println("Auto start failed: "+c+", "+names.get(c)+", "+exception);
+							lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c+".class", exception));
+						});
+					
+//					System.out.println("Auto starting: "+c+", "+names.get(c));
+				}
+				else
+				{
+					lis.resultAvailable(null);					
+				}
 			}
 		}
 		else
@@ -420,9 +438,9 @@ public class PlatformAgent
 	}
 
 	/**
-	 *  Start components synhcronized using random order to find implicit dependencies. 
+	 *  Start components synchronized using random order to find implicit dependencies. 
 	 */
-	protected IFuture<Void> startComponentsDebug(Iterator<Set<String>> levels, Iterator<String> level, Map<String, String> names)
+	protected IFuture<Void> startComponentsDebug(Iterator<Set<String>> levels, Iterator<String> level, Map<String, String> names, Set<String> comps)
 	{
 		// Initial level or finished with last level -> start next level
 		if(level==null || !level.hasNext())
@@ -433,7 +451,7 @@ public class PlatformAgent
 				// Chaos monkey -> randomize list of components to find implicit dependencies
 				List<String>	list	= new ArrayList<>(levels.next());
 				Collections.shuffle(list, SSecurity.getSecureRandom());
-				return startComponentsDebug(levels, list.iterator(), names);
+				return startComponentsDebug(levels, list.iterator(), names, comps);
 			}
 			else
 			{
@@ -447,10 +465,17 @@ public class PlatformAgent
 			Future<Void>	ret	= new Future<>();
 			
 			String	c	= level.next();
-			IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setName(names.get(c)).setFilename(c+".class"), null);
-			fut.addResultListener(
-				res -> {startComponentsDebug(levels, level, names).addResultListener(new DelegationResultListener<>(ret));},
-				exception -> {ret.setException(new RuntimeException("Cannot autostart "+c+".class", exception));});
+			if(comps.contains(c))
+			{
+				IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setName(names.get(c)).setFilename(c+".class"), null);
+				fut.addResultListener(
+					res -> startComponentsDebug(levels, level, names, comps).addResultListener(new DelegationResultListener<>(ret)),
+					exception -> ret.setException(new RuntimeException("Cannot autostart "+c+".class", exception)));
+			}
+			else
+			{
+				startComponentsDebug(levels, level, names, comps).addResultListener(new DelegationResultListener<>(ret));
+			}
 			return ret;
 		}
 	}

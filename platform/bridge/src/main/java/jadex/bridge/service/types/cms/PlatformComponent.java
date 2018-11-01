@@ -3,6 +3,7 @@ package jadex.bridge.service.types.cms;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.bridge.service.types.simulation.SSimulation;
+import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
@@ -1530,6 +1532,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				{
 					final Future<Object> ret = (Future<Object>)SFuture.getFuture(rettype);
 //						System.out.println("scheduleStep: "+method.getName()+" "+method.getReturnType());
+					final Exception ex	= Future.DEBUG ? new DebugException() : null;
 					
 					getInternalAccess().scheduleStep(prio, new IComponentStep<Void>()
 					{
@@ -1550,6 +1553,24 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					{
 						public void exceptionOccurred(Exception exception)
 						{
+							if(ex!=null)
+							{
+								Throwable root	= exception;
+								while(root.getCause()!=null)
+								{
+									root	= root.getCause();
+								}
+								try
+								{
+									Field	cause	= Throwable.class.getDeclaredField("cause");
+									cause.setAccessible(true);
+									cause.set(root, ex);
+								}
+								catch(Exception e)
+								{
+									// ignore
+								}
+							}
 							ret.setException(exception);
 						}
 					});;
