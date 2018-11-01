@@ -281,7 +281,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 		{
 			public void resultAvailable(IProxyAgentService pas)
 			{
-				System.out.println("res: "+id);
+//				System.out.println("res: "+id);
 				// SServiceProvider returns on platform thread and returns only a provided proxy
 				// For this reason it works because no rescheduling occurs
 				pas.refreshLatency(); // Hack!!! perform new latency measurement.

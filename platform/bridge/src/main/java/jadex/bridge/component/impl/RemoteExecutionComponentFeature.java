@@ -54,12 +54,18 @@ import jadex.commons.future.ITerminableFuture;
 public class RemoteExecutionComponentFeature extends AbstractComponentFeature implements IRemoteExecutionFeature, IInternalRemoteExecutionFeature
 {
 	//-------- constants ---------
+	
+	/** Put string representation of command in message header. */
+	public static final boolean	DEBUG	= false;
 
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IRemoteExecutionFeature.class, RemoteExecutionComponentFeature.class);
 	
 	/** ID of the remote execution command in progress. */
 	public static final String RX_ID = "__rx_id__";
+	
+	/** Debug info of the remote execution command. */
+	public static final String RX_DEBUG = "__rx_debug__";
 	
 	/** Commands safe to use with untrusted clients. */
 	@SuppressWarnings("serial")
@@ -266,6 +272,8 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	{
 		Map<String, Object> header = new HashMap<String, Object>();
 		header.put(RX_ID, rxid);
+		if(DEBUG)
+			header.put(RX_DEBUG, msg!=null ? msg.toString() : null);
 		
 		IFuture<Void> ret = component.getFeature(IMessageFeature.class).sendMessage(msg, header, receiver);
 //		ret.addResultListener(new IResultListener<Void>()

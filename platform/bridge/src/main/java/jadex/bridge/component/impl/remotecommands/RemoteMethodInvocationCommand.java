@@ -1,7 +1,6 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
@@ -18,7 +17,6 @@ import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 /**
  *  Invoke a remote method.

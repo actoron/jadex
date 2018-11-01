@@ -354,11 +354,11 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 					{
 						Future<Void>	wait	= new Future<>();
 						fubar.addFuture(wait);
-						System.out.println("------getDescription "+rescid);
+//						System.out.println("------getDescription "+rescid);
 						IFuture<IComponentDescription>	fut	= access.getDescription(rescid);
 						fut.addResultListener(
 							desc ->	{
-								System.out.println("++++++getDescription "+rescid);
+//								System.out.println("++++++getDescription "+rescid);
 								ISwingTreeNode node = createComponentNode(desc);						
 								children.add(node);
 								wait.setResult(null);
