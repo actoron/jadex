@@ -166,15 +166,19 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
-							search.setFinished();
+							// null first, set later as it might trigger new search
+							IntermediateFuture<IComponentIdentifier>	fut	= search;
 							search = null;
+							fut.setFinished();
 						}
 
 						@Override
 						public void resultAvailable(Void result)
 						{
-							search.setFinished();
+							// null first, set later as it might trigger new search
+							IntermediateFuture<IComponentIdentifier>	fut	= search;
 							search = null;
+							fut.setFinished();
 						}
 					});
 				}
@@ -182,15 +186,17 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
-					search.setFinished();
+					// null first, set later as it might trigger new search
+					IntermediateFuture<IComponentIdentifier>	fut	= search;
 					search = null;
+					fut.setFinished();
 				}
 			});
 		}
-		else
-		{
-			System.out.println("old search");
-		}
+//		else
+//		{
+//			System.out.println("old search");
+//		}
 
 		return search;
 	}
