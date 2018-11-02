@@ -37,7 +37,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @Plans({
 	@Plan(trigger=@Trigger(goals=ProducerAgent.ProduceOre.class), body=@Body(ProduceOrePlan.class)),
-	@Plan(trigger=@Trigger(factaddeds="movecapa.mytargets"), body=@Body(InformNewTargetPlan.class))
+	@Plan(trigger=@Trigger(factadded="movecapa.mytargets"), body=@Body(InformNewTargetPlan.class))
 })
 public class ProducerAgent extends BaseAgent implements IProduceService
 {

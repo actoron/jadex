@@ -2445,6 +2445,20 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	}
 	
 	/**
+	 *  Create belief event from a belief name.
+	 *  Checks if belief exists and creates event type.
+	 */
+	public static EventType	createBeliefEvent(MCapability mcapa, String belname, String eventname)
+	{
+		belname = belname.replace(".", "/");
+		MBelief mbel = mcapa.getBelief(belname);
+		if(mbel==null)
+			throw new RuntimeException("No such belief: "+belname);
+		
+		return new EventType(new String[]{eventname, belname});
+	}
+	
+	/**
 	 *  Create parameter events from a belief name.
 	 */
 //	public static void addParameterEvents(MParameterElement mpelem, MCapability mcapa, List<EventType> events, String paramname, String elemname, ClassLoader cl)

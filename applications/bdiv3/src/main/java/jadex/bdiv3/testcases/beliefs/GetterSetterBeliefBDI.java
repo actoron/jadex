@@ -83,7 +83,7 @@ public class GetterSetterBeliefBDI
 	/**
 	 * 
 	 */
-	@Plan(trigger=@Trigger(factchangeds="number"))
+	@Plan(trigger=@Trigger(factchanged="number"))
 	protected void plan()
 	{
 		System.out.println("plan: "+getNumber());

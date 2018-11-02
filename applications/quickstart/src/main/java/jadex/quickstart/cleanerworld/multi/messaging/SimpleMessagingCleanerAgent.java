@@ -67,7 +67,7 @@ public class SimpleMessagingCleanerAgent
 	 *  @param other The other cleaner (info object provided by sensor).
 	 *  @param agent Internal API object of this agent used to send a message.
 	 */
-	@Plan(trigger=@Trigger(factaddeds="others"))
+	@Plan(trigger=@Trigger(factadded="others"))
 	public void cleanerAdded(Cleaner other, IInternalAccess agent)
 	{
 		// Messages can be sent to any agent.

@@ -153,9 +153,7 @@ public class CleanerBDIAgentD3a
 		IWaste	waste;
 		
 		// Create a new goal instance for each new waste item
-//		@GoalCreationCondition(beliefs="wastes")	// Bad: reacts also on fact removed and initial empty event.
-//		@GoalCreationCondition(factadded="wastes")	// TODO: support this
-		@GoalCreationCondition(rawevents=@RawEvent(value=ChangeEvent.FACTADDED, second="wastes"))
+		@GoalCreationCondition(factadded="wastes")
 		public AchieveCleanupWaste(IWaste waste)
 		{
 			System.out.println("Created achieve cleanup goal for "+waste);
