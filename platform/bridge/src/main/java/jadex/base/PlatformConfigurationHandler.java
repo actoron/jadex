@@ -850,6 +850,8 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.setValue("passiveawarenessmulticast", false);
 		config.setValue("passiveawarenessbroadcast", false);
 
+		config.setValue("platformproxies", false);
+
 		config.setValue("kernel_multi", false);
 		config.setValue("kernel_micro", true);
 		// rootConfig.setThreadpoolClass(null);
