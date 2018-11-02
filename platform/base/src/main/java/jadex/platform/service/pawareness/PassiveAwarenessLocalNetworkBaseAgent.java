@@ -56,7 +56,7 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 	
 	/** The receiver port. */
 	@AgentArgument
-	protected int port = 32091;
+	protected int port;
 	
 	//-------- attributes --------
 

@@ -30,7 +30,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 	public static final IPlatformConfiguration	RELAYCONF;
 	
 	/** Fixed port for SSP platform. */
-	public static final int sspport	= SSecurity.getSecureRandom().nextInt(Short.MAX_VALUE*2-1024)+1025; 
+	public static final int sspport	= SSecurity.getSecureRandom().nextInt(Short.MAX_VALUE*2-1024)+1025;
 
 	static
 	{

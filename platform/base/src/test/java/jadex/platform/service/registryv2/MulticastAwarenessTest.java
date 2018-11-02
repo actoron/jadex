@@ -4,6 +4,7 @@ package jadex.platform.service.registryv2;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.util.STest;
+import jadex.commons.security.SSecurity;
 
 /**
  *  Test basic search functionality with multicast awareness only
@@ -18,6 +19,9 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 
 	/** Plain provider configuration. */
 	public static final IPlatformConfiguration	PROCONF;
+	
+	/** Fixed custom port for multicast. */
+	public static final int customport	= SSecurity.getSecureRandom().nextInt(Short.MAX_VALUE*2-1024)+1025;
 
 	static
 	{
@@ -26,6 +30,7 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// -> 750 millis.
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenessmulticast", true);
+		baseconf.setValue("passiveawarenessmulticast.port", customport);
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*2));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 
