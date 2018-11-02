@@ -16,6 +16,7 @@ import jadex.binary.SBinarySerializer;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -55,7 +56,7 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 	
 	/** The receiver port. */
 	@AgentArgument
-	protected int port = 32091;
+	protected int port;
 	
 	//-------- attributes --------
 
@@ -141,6 +142,8 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 	{
 		if(search == null)
 		{
+			long	timeout	= ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
+			
 //			System.out.println("New search");
 			search = new IntermediateFuture<IComponentIdentifier>();
 
@@ -155,23 +158,27 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 				@Override
 				public void resultAvailable(Void result)
 				{
-					// TODO: timeout from service call
+					// Search for other platforms
 					agent.getFeature(IExecutionFeature.class)
-						.waitForDelay(Starter.getDefaultTimeout(agent.getId()), true)
+						.waitForDelay(timeout>0 ? (long)(timeout*0.9) : Starter.getDefaultTimeout(agent.getId()), true)
 						.addResultListener(new IResultListener<Void>()
 					{
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
-							search.setFinished();
+							// null first, set later as it might trigger new search
+							IntermediateFuture<IComponentIdentifier>	fut	= search;
 							search = null;
+							fut.setFinished();
 						}
 
 						@Override
 						public void resultAvailable(Void result)
 						{
-							search.setFinished();
+							// null first, set later as it might trigger new search
+							IntermediateFuture<IComponentIdentifier>	fut	= search;
 							search = null;
+							fut.setFinished();
 						}
 					});
 				}
@@ -179,8 +186,10 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
-					search.setFinished();
+					// null first, set later as it might trigger new search
+					IntermediateFuture<IComponentIdentifier>	fut	= search;
 					search = null;
+					fut.setFinished();
 				}
 			});
 		}

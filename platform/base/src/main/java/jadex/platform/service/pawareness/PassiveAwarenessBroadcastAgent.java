@@ -6,6 +6,8 @@ import java.net.InetSocketAddress;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Autostart;
 
 /**
@@ -16,6 +18,10 @@ import jadex.micro.annotation.Autostart;
 	predecessors="jadex.platform.service.address.TransportAddressAgent",
 	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
 )
+@Arguments({
+	@Argument(name="address", clazz=String.class, defaultvalue="\"255.255.255.255\""),
+	@Argument(name="port", clazz=int.class, defaultvalue="33091")
+})
 public class PassiveAwarenessBroadcastAgent	extends PassiveAwarenessLocalNetworkBaseAgent
 {
 	/**
@@ -24,9 +30,6 @@ public class PassiveAwarenessBroadcastAgent	extends PassiveAwarenessLocalNetwork
 	@ServiceStart
 	public void	start() throws Exception
 	{
-		address = "255.255.255.255";
-		port = 33091;
-		
 		sendsocket = new DatagramSocket(0);
 		sendsocket.setBroadcast(true);
 		sendsocket.setReuseAddress(true);

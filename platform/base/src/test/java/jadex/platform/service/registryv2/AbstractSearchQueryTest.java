@@ -19,7 +19,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  Test basic search and query managing functionality with a client and some providers.
- *  Abstract base implementation to be overriden for testing different infrastructure scenarios.
+ *  Abstract base implementation to be overridden for testing different infrastructure scenarios.
  */
 public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 {
