@@ -13,7 +13,6 @@ import java.util.Set;
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
@@ -685,7 +684,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			}
 			
 			// Search remotely and connect to delegation future.
-			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(getComponent().getId(), 1.2));
+//			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(getComponent().getId(), 1.2));	// Done in SuperpeerClient
 			ITerminableIntermediateFuture<IServiceIdentifier> remotes = sqms.searchServices(query);
 //			System.out.println("Search: "+query);
 //			remotes.addResultListener(res -> System.out.println("Search finished: "+query));
