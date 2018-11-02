@@ -3,7 +3,6 @@ package jadex.bridge.service.types.cms;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -1539,6 +1538,26 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						@Override
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
+							if(ex!=null)
+							{
+								try
+								{
+									DebugException.ADDITIONAL.set(ex);
+									return doExecute(ia);
+								}
+								finally
+								{
+									DebugException.ADDITIONAL.set(null);									
+								}
+							}
+							else
+							{
+								return doExecute(ia);
+							}
+						}
+						
+						IFuture<Void>	doExecute(IInternalAccess ia)
+						{
 //							if(method.getName().indexOf("searchService")!=-1 && ((ServiceQuery)args[0]).getServiceType().getTypeName().indexOf("Proxy")!=-1)
 //								System.out.println(method.getName()+" "+method.getReturnType()+" "+Arrays.toString(args));
 							
@@ -1553,27 +1572,9 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					{
 						public void exceptionOccurred(Exception exception)
 						{
-							if(ex!=null)
-							{
-								Throwable root	= exception;
-								while(root.getCause()!=null)
-								{
-									root	= root.getCause();
-								}
-								try
-								{
-									Field	cause	= Throwable.class.getDeclaredField("cause");
-									cause.setAccessible(true);
-									cause.set(root, ex);
-								}
-								catch(Exception e)
-								{
-									// ignore
-								}
-							}
 							ret.setException(exception);
 						}
-					});;
+					});
 					
 					return getDecoupledFuture(ret);						
 				}

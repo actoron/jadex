@@ -195,6 +195,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		System.out.println("1) start client platform and search for service");
 		IExternalAccess	client	= createPlatform(clientconf);
 		waitALittle(client);
+		waitALittle(client);	// Hack for slow parallel build!?
 		Collection<ITestService>	result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 		Assert.assertTrue(""+result, result.isEmpty());
 		
