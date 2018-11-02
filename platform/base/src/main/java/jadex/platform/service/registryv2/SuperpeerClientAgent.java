@@ -374,6 +374,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		// TODO: termination? currently not used
 		final TerminableIntermediateFuture<IServiceIdentifier> ret = new TerminableIntermediateFuture<IServiceIdentifier>();
 		
+		long	timeout	= ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
+		
 		// Check for awareness service
 		Collection<IPassiveAwarenessService>	pawas	= agent.getFeature(IRequiredServicesFeature.class)
 			.searchLocalServices(new ServiceQuery<>(IPassiveAwarenessService.class));
@@ -387,6 +389,10 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 //				System.out.println(agent+" pawa.searchPlatforms(): "+pawa);
 				
 				// Search for other platforms
+				if(timeout>0)
+				{
+					ServiceCall.getOrCreateNextInvocation().setTimeout((long)(timeout*0.9));
+				}
 				pawa.searchPlatforms().addResultListener(new IntermediateDefaultResultListener<IComponentIdentifier>()
 				{
 					@Override
@@ -401,6 +407,10 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							
 							IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new BasicComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform), new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, RequiredService.SCOPE_NETWORK, null, true);
 							IRemoteRegistryService rrs = (IRemoteRegistryService) RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
+							if(timeout>0)
+							{
+								ServiceCall.getOrCreateNextInvocation().setTimeout((long)(timeout*0.9));
+							}
 							final IFuture<Set<IServiceIdentifier>> remotesearch = rrs.searchServices(query);
 							
 	//						System.out.println(agent + " searching remote platform3: "+platform+", "+query);
