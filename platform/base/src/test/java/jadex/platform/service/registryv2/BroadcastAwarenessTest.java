@@ -2,7 +2,6 @@ package jadex.platform.service.registryv2;
 
 
 import jadex.base.IPlatformConfiguration;
-import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.commons.security.SSecurity;
 
