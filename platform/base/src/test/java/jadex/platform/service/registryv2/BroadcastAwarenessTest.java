@@ -1,8 +1,19 @@
 package jadex.platform.service.registryv2;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
+
+import org.junit.Test;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.util.STest;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
 import jadex.commons.security.SSecurity;
 
 /**
@@ -54,5 +65,24 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 	public BroadcastAwarenessTest()
 	{
 		super(true, CLIENTCONF, PROCONF, null, null);
+	}
+	
+	//-------- methods --------
+
+	/**
+	 *  Test bare awareness results.
+	 */
+	@Test
+	public void	testBareAwareness()
+	{
+		IExternalAccess	client	= createPlatform(CLIENTCONF);		
+		createPlatform(PROCONF);	
+		createPlatform(PROCONF);
+		
+		IPassiveAwarenessService	pawa	= client.searchService(new ServiceQuery<>(IPassiveAwarenessService.class)).get();
+		assertTrue("Found broadcast awareness? "+pawa, pawa.toString().toLowerCase().contains("broadcast"));
+		
+		Collection<IComponentIdentifier>	found	= pawa.searchPlatforms().get();
+		assertEquals(found.toString(), 2, found.size());
 	}
 }
