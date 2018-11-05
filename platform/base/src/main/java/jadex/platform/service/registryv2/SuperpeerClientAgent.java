@@ -37,6 +37,7 @@ import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
 import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
 import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
 import jadex.bridge.service.types.registryv2.ISuperpeerService;
+import jadex.bridge.service.types.registryv2.SlidingCuckooFilter;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
@@ -382,6 +383,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		{
 			// Count awa search + platform searches (+ async filtering, if any).
 			final AtomicInteger	cnt	= new AtomicInteger(pawas.size());
+			SlidingCuckooFilter	filter	= new SlidingCuckooFilter();
 			
 			for(IPassiveAwarenessService pawa: pawas)
 			{
@@ -398,6 +400,13 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					@Override
 					public void intermediateResultAvailable(final IComponentIdentifier platform)
 					{
+						if(filter.contains(platform.toString()))
+						{
+							// no increment -> no doFinished()
+							return;
+						}
+						
+						filter.insert(platform.toString());
 						if(query.toString().indexOf("ITestService")!=-1)
 							System.out.println(agent + " searching remote platform: "+platform+", "+query);
 						

@@ -26,6 +26,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.bridge.service.types.registryv2.SlidingCuckooFilter;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.Boolean3;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -58,6 +59,10 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 	@AgentArgument
 	protected int port;
 	
+	/** The search delay (time that is waited for responses from platforms) as factor of default/service call timeout (default 0.333..., i.e. a third of default/service call timeout). */
+	@AgentArgument
+	protected double waitfactor	= 0.3333333333333333;
+	
 	//-------- attributes --------
 
 	/** The agent. */
@@ -66,6 +71,9 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 
 	/** The current search, if any. */
 	protected IntermediateFuture<IComponentIdentifier> search;
+	
+	/** The duplicate filter of the current search, if any. */
+	protected SlidingCuckooFilter	filter;
 
 	/** The currently known platforms. */
 	protected Map<IComponentIdentifier, List<TransportAddress>>	platforms;
@@ -145,12 +153,17 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 			long	timeout	= ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
 			
 //			System.out.println("New search");
-			search = new IntermediateFuture<IComponentIdentifier>();
+			search	= new IntermediateFuture<IComponentIdentifier>();
+			filter	= new SlidingCuckooFilter(); 
 
 			// Add initial results
 			for(IComponentIdentifier platform : platforms.keySet())
 			{
-				search.addIntermediateResult(platform);
+				if(!filter.contains(platform.toString()))
+				{
+					filter.insert(platform.toString());
+					search.addIntermediateResult(platform);
+				}
 			}
 			// issue search request to trigger replies from platforms
 			sendInfo(address, port).addResultListener(new IResultListener<Void>()
@@ -160,25 +173,19 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 				{
 					// Search for other platforms
 					agent.getFeature(IExecutionFeature.class)
-						.waitForDelay(timeout>0 ? (long)(timeout*0.9) : Starter.getDefaultTimeout(agent.getId()), true)
+						.waitForDelay(timeout>0 ? (long)(timeout*waitfactor) : Starter.getScaledDefaultTimeout(agent.getId(), waitfactor), true)
 						.addResultListener(new IResultListener<Void>()
 					{
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
-							// null first, set later as it might trigger new search
-							IntermediateFuture<IComponentIdentifier>	fut	= search;
-							search = null;
-							fut.setFinished();
+							done();
 						}
 
 						@Override
 						public void resultAvailable(Void result)
 						{
-							// null first, set later as it might trigger new search
-							IntermediateFuture<IComponentIdentifier>	fut	= search;
-							search = null;
-							fut.setFinished();
+							done();
 						}
 					});
 				}
@@ -186,10 +193,16 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
+					done();
+				}
+				
+				private void	done()
+				{
 					// null first, set later as it might trigger new search
 					IntermediateFuture<IComponentIdentifier>	fut	= search;
 					search = null;
-					fut.setFinished();
+					filter	= null;
+					fut.setFinishedIfUndone();
 				}
 			});
 		}
@@ -288,8 +301,9 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
 									platforms.put(sender, addresses);
-									if(search!=null)
+									if(search!=null && !filter.contains(sender.toString()))
 									{
+										filter.insert(sender.toString());
 										search.addIntermediateResultIfUndone(sender);
 									}
 									
