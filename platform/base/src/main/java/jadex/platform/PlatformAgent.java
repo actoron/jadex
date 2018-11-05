@@ -1,8 +1,8 @@
 package jadex.platform;
 
 import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
-import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
 import static jadex.base.IPlatformConfiguration.PLATFORMPROXIES;
+import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -25,9 +25,11 @@ import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IFilter;
@@ -206,6 +208,12 @@ public class PlatformAgent
 	 */
 	protected void addQueryForPlatformProxies()
 	{
+		// No query when no search query manager service
+		if(agent.searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE))==null)
+		{
+			return;
+		}
+		
 //		System.out.println("creating platform proxies for remote platforms");
 		
 		// scope network or global?!
