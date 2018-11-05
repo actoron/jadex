@@ -2,10 +2,7 @@ package jadex.bridge.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
@@ -17,78 +14,78 @@ import jadex.commons.SReflect;
  */
 public class RequiredServiceInfo
 {
-	//-------- constants --------
-	
-	/** None component scope (nothing will be searched, forces required service creation). */
-	public static final String SCOPE_NONE = "none";
-
-	/** Parent scope. */
-	public static final String SCOPE_PARENT = "parent";
-	
-	// todo: rename (COMPONENT_LOCAL)
-	/** Local component scope (component only). */
-	public static final String SCOPE_COMPONENT_ONLY = "component_only";
-	
-	/** Component scope (component and subcomponents). */
-	public static final String SCOPE_COMPONENT = "component";
-	
-	// todo: rename (APPLICATION_PLATFORM) or remove
-	/** Application scope (local application, i.e. second level component plus all subcomponents). */
-	public static final String SCOPE_APPLICATION = "application";
-
-	/** Platform scope (all components on the local platform). */
-	public static final String SCOPE_PLATFORM = "platform";
-
-	
-	/** Application network scope (any platform with which a secret is shared and application tag must be shared). */
-	public static final String SCOPE_APPLICATION_NETWORK = "application_network";
-//	public static final String SCOPE_APPLICATION_CLOUD = "application_cloud";
-	
-	/** Network scope (any platform with which a secret is shared). */
-	public static final String SCOPE_NETWORK = "network";
-//	public static final String SCOPE_CLOUD = "cloud";
-		
-	// needed?!
-	/** Global application scope. */
-	public static final String SCOPE_APPLICATION_GLOBAL = "application_global";
-	
-	/** Global scope (any reachable platform including those with unrestricted services). */
-	public static final String SCOPE_GLOBAL = "global";
-	
-	/** The scopes local to a platform. */
-	public static final Set<String> LOCAL_SCOPES;
-	static
-	{
-		Set<String> localscopes = new HashSet<>();
-		localscopes.add(null);
-		localscopes.add(SCOPE_NONE);
-		localscopes.add(SCOPE_COMPONENT_ONLY);
-		localscopes.add(SCOPE_COMPONENT);
-		localscopes.add(SCOPE_APPLICATION);
-		localscopes.add(SCOPE_PLATFORM);
-		localscopes.add(SCOPE_PARENT);
-		LOCAL_SCOPES = Collections.unmodifiableSet(localscopes);
-	}
-	
-	/** The global scopes. */
-	public static final Set<String> GLOBAL_SCOPES;
-	static
-	{
-		Set<String> localscopes = new HashSet<>();
-		localscopes.add(SCOPE_GLOBAL);
-		localscopes.add(SCOPE_APPLICATION_GLOBAL);
-		GLOBAL_SCOPES = Collections.unmodifiableSet(localscopes);
-	}
-	
-	/** The network scopes. */
-	public static final Set<String> NETWORK_SCOPES;
-	static
-	{
-		Set<String> localscopes = new HashSet<>();
-		localscopes.add(SCOPE_NETWORK);
-		localscopes.add(SCOPE_APPLICATION_NETWORK);
-		NETWORK_SCOPES = Collections.unmodifiableSet(localscopes);
-	}
+//	//-------- constants --------
+//	
+//	/** None component scope (nothing will be searched, forces required service creation). */
+//	public static final String SCOPE_NONE = "none";
+//
+//	/** Parent scope. */
+//	public static final String SCOPE_PARENT = "parent";
+//	
+//	// todo: rename (COMPONENT_LOCAL)
+//	/** Local component scope (component only). */
+//	public static final String SCOPE_COMPONENT_ONLY = "component_only";
+//	
+//	/** Component scope (component and subcomponents). */
+//	public static final String SCOPE_COMPONENT = "component";
+//	
+//	// todo: rename (APPLICATION_PLATFORM) or remove
+//	/** Application scope (local application, i.e. second level component plus all subcomponents). */
+//	public static final String SCOPE_APPLICATION = "application";
+//
+//	/** Platform scope (all components on the local platform). */
+//	public static final String SCOPE_PLATFORM = "platform";
+//
+//	
+//	/** Application network scope (any platform with which a secret is shared and application tag must be shared). */
+//	public static final String SCOPE_APPLICATION_NETWORK = "application_network";
+////	public static final String SCOPE_APPLICATION_CLOUD = "application_cloud";
+//	
+//	/** Network scope (any platform with which a secret is shared). */
+//	public static final String SCOPE_NETWORK = "network";
+////	public static final String SCOPE_CLOUD = "cloud";
+//		
+//	// needed?!
+//	/** Global application scope. */
+//	public static final String SCOPE_APPLICATION_GLOBAL = "application_global";
+//	
+//	/** Global scope (any reachable platform including those with unrestricted services). */
+//	public static final String SCOPE_GLOBAL = "global";
+//	
+//	/** The scopes local to a platform. */
+//	public static final Set<String> LOCAL_SCOPES;
+//	static
+//	{
+//		Set<String> localscopes = new HashSet<>();
+//		localscopes.add(null);
+//		localscopes.add(SCOPE_NONE);
+//		localscopes.add(SCOPE_COMPONENT_ONLY);
+//		localscopes.add(SCOPE_COMPONENT);
+//		localscopes.add(SCOPE_APPLICATION);
+//		localscopes.add(SCOPE_PLATFORM);
+//		localscopes.add(SCOPE_PARENT);
+//		LOCAL_SCOPES = Collections.unmodifiableSet(localscopes);
+//	}
+//	
+//	/** The global scopes. */
+//	public static final Set<String> GLOBAL_SCOPES;
+//	static
+//	{
+//		Set<String> localscopes = new HashSet<>();
+//		localscopes.add(SCOPE_GLOBAL);
+//		localscopes.add(SCOPE_APPLICATION_GLOBAL);
+//		GLOBAL_SCOPES = Collections.unmodifiableSet(localscopes);
+//	}
+//	
+//	/** The network scopes. */
+//	public static final Set<String> NETWORK_SCOPES;
+//	static
+//	{
+//		Set<String> localscopes = new HashSet<>();
+//		localscopes.add(SCOPE_NETWORK);
+//		localscopes.add(SCOPE_APPLICATION_NETWORK);
+//		NETWORK_SCOPES = Collections.unmodifiableSet(localscopes);
+//	}
 	
 	
 //	/** Global application scope. */
@@ -149,7 +146,7 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class<?> type)
 	{
-		this(name, type, RequiredServiceInfo.SCOPE_APPLICATION);
+		this(name, type, ServiceScope.APPLICATION);
 	}
 	
 	/**
@@ -157,13 +154,13 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(Class<?> type)
 	{
-		this(null, type, RequiredServiceInfo.SCOPE_APPLICATION);
+		this(null, type, ServiceScope.APPLICATION);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class<?> type, String scope)
+	public RequiredServiceInfo(String name, Class<?> type, ServiceScope scope)
 	{
 		this(name, type, false, new RequiredServiceBinding(name, scope), null, null);
 	}
@@ -331,29 +328,29 @@ public class RequiredServiceInfo
 	{
 		this.tags = tags;
 	}
-	
-	/**
-	 *  Check if the scope not remote.
-	 *  @return True, scope on the local platform.
-	 */
-	public static final boolean isScopeOnLocalPlatform(String scope)
-	{
-		return LOCAL_SCOPES.contains(scope);
-	}
-	
-	/**
-	 *  Check if the scope is global.
-	 */
-	public static final boolean isGlobalScope(String scope)
-	{
-		return GLOBAL_SCOPES.contains(scope);
-	}
-	
-	/**
-	 *  Check if the scope is a network scope.
-	 */
-	public static final boolean isNetworkScope(String scope)
-	{
-		return NETWORK_SCOPES.contains(scope);
-	}
+//	
+//	/**
+//	 *  Check if the scope not remote.
+//	 *  @return True, scope on the local platform.
+//	 */
+//	public static final boolean isScopeOnLocalPlatform(String scope)
+//	{
+//		return LOCAL_SCOPES.contains(scope);
+//	}
+//	
+//	/**
+//	 *  Check if the scope is global.
+//	 */
+//	public static final boolean isGlobalScope(String scope)
+//	{
+//		return GLOBAL_SCOPES.contains(scope);
+//	}
+//	
+//	/**
+//	 *  Check if the scope is a network scope.
+//	 */
+//	public static final boolean isNetworkScope(String scope)
+//	{
+//		return NETWORK_SCOPES.contains(scope);
+//	}
 }

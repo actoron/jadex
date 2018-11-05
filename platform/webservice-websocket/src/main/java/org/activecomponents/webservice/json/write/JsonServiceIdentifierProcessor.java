@@ -46,7 +46,7 @@ public class JsonServiceIdentifierProcessor implements ITraverseProcessor
 		
 		wr.write("{");
 		wr.writeNameString("name", sid.getServiceName()).write(", ");
-		wr.writeNameString("scope", sid.getScope()).write(", ");
+		wr.writeNameString("scope", sid.getScope().name()).write(", ");
 		wr.writeNameString("type", sid.getServiceType().getTypeName()).write(", ");
 		wr.write("\"providerId\":");
 		traverser.traverse(sid.getProviderId(), IComponentIdentifier.class, conversionprocessors, processors, mode, targetcl, context);

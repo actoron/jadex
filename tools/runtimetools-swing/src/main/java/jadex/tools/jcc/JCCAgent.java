@@ -1,9 +1,5 @@
 package jadex.tools.jcc;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.base.gui.componentviewer.ComponentViewerPlugin;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IComponentIdentifier;
@@ -14,20 +10,16 @@ import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.micro.annotation.Agent;
@@ -142,7 +134,7 @@ public class JCCAgent implements IComponentStep<Void>
 			{
 				agent.getLogger().info("Searching for platforms matching '"+platforms+"'.");
 				
-				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ILibraryService.class, ServiceScope.GLOBAL))
 					.addResultListener(new TimeoutIntermediateResultListener<ILibraryService>(RETRY_DELAY, agent.getExternalAccess(),
 						new IntermediateExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{

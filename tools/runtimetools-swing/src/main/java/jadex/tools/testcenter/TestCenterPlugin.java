@@ -29,8 +29,7 @@ import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Properties;
@@ -332,7 +331,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	public IFuture loadPlatformProperties()
 	{
 		final Future	ret	= new Future();
-		getJCC().getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		getJCC().getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -380,7 +379,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	public IFuture pushPlatformSettings()
 	{
 		final Future	ret	= new Future();
-		getJCC().getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		getJCC().getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -695,7 +694,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		return ModelTreePanel.createResourceIdentifier(jcc.getPlatformAccess(), filepath);
 		
 //		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-//		jcc.getPlatformAccess().getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//		jcc.getPlatformAccess().getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
 //		{
 //			public void customResultAvailable(ILibraryService ls)

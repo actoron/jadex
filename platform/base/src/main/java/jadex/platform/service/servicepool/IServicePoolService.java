@@ -1,6 +1,7 @@
 package jadex.platform.service.servicepool;
 
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IPoolStrategy;
 import jadex.commons.future.IFuture;
@@ -55,7 +56,7 @@ public interface IServicePoolService
 	 *  @param pi The worker publish info. 
 	 *  @param scope The service publication scope.
 	 */
-	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi, String scope);
+	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi, ServiceScope scope);
 
 	
 	/**

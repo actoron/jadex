@@ -8,6 +8,7 @@ import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -146,7 +147,7 @@ public class ServicePoolAgent implements IServicePoolService
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi)
 	{
-		return addServiceType(servicetype, strategy, componentmodel, info, pi, null);
+		return addServiceType(servicetype, strategy, componentmodel, info, pi, ServiceScope.DEFAULT);
 	}
 	
 	/**
@@ -154,7 +155,7 @@ public class ServicePoolAgent implements IServicePoolService
 	 *  @param servicetype The service type.
 	 *  @param strategy The service pool strategy.
 	 */
-	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi, String scope)
+	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi, ServiceScope scope)
 	{
 		if(servicetypes==null)
 			servicetypes = new HashMap<Class<?>, ServiceHandler>();

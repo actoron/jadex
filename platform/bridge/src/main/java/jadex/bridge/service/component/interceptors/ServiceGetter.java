@@ -1,6 +1,7 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.Future;
@@ -22,7 +23,7 @@ public class ServiceGetter<T>
 	protected T service;
 
 	/** The scope. */
-	protected String scope;
+	protected ServiceScope scope;
 	
 	/** The time of the last search. */
 	protected long lastsearch;
@@ -36,7 +37,7 @@ public class ServiceGetter<T>
 	/**
 	 *  Create a new service getter.
 	 */
-	public ServiceGetter(IInternalAccess component, Class<T> type, String scope)
+	public ServiceGetter(IInternalAccess component, Class<T> type, ServiceScope scope)
 	{
 		this(component, 30000, type, scope);
 	}
@@ -44,7 +45,7 @@ public class ServiceGetter<T>
 	/**
 	 *  Create a new service getter.
 	 */
-	public ServiceGetter(IInternalAccess component, long delay, Class<T> type, String scope)
+	public ServiceGetter(IInternalAccess component, long delay, Class<T> type, ServiceScope scope)
 	{
 		this.component = component;
 		this.delay = delay;

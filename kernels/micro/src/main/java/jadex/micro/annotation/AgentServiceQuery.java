@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import jadex.bridge.service.ServiceScope;
+
 /**
  *  Injects a service into a field or a method of a component.
  *  The referenced service must be declared with a {@link RequiredService} annotation.
@@ -62,5 +64,5 @@ public @interface AgentServiceQuery
 	/**
 	 *  The search scope.
 	 */
-	public String scope() default "";
+	public ServiceScope scope() default ServiceScope.DEFAULT;
 }

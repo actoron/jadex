@@ -14,7 +14,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.CreationInfo;

@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -84,7 +85,7 @@ public class BDIDemoActivity extends JadexAndroidActivity
 		{
 			// Get DisplayService
 			IExternalAccess platformAccess = getPlatformAccess();
-			platformAccess.searchService( new ServiceQuery<>( IDisplayTextService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			platformAccess.searchService( new ServiceQuery<>( IDisplayTextService.class, ServiceScope.PLATFORM))
 			.addResultListener(
 					new DefaultResultListener<IDisplayTextService>()
 					{

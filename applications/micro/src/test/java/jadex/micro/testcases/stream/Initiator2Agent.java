@@ -24,9 +24,9 @@ import jadex.micro.testcases.TestAgent;
 //@RequiredServices(
 //{
 //	@RequiredService(name="msgservice", type=IMessageService.class, 
-//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+//		binding=@Binding(scope=ServiceScope.PLATFORM)),
 //	@RequiredService(name="cms", type=IComponentManagementService.class, 
-//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+//		binding=@Binding(scope=ServiceScope.PLATFORM))
 //})
 //@ComponentTypes(
 //	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/Receiver2Agent.class")

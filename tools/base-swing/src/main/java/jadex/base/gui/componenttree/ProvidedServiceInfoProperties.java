@@ -63,7 +63,7 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 	{
 		getTextField("Name").setText(service.getName());
 		getTextField("Type").setText(service.getType().getTypeName());
-		getTextField("Scope").setText(sid!=null? sid.getScope(): "");
+		getTextField("Scope").setText(sid!=null? sid.getScope().name(): "");
 //		getTextField("Implementation").setText();
 
 		if(service.getType().getType0()==null)

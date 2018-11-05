@@ -16,7 +16,6 @@ import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Description;
 
 /**

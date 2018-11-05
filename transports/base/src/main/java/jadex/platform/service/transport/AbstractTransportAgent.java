@@ -26,6 +26,7 @@ import jadex.bridge.component.impl.MsgHeader;
 import jadex.bridge.component.impl.RemoteExecutionComponentFeature;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -65,7 +66,6 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 
 /**
  * Base class for transports.
@@ -75,9 +75,9 @@ import jadex.micro.annotation.RequiredService;
  */
 @Agent
 @ProvidedServices({
-	@ProvidedService(scope=RequiredService.SCOPE_PLATFORM, type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(scope=RequiredService.SCOPE_PLATFORM, type=ITransportInfoService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(scope=RequiredService.SCOPE_PLATFORM, type=IMemstatService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW))
+	@ProvidedService(scope=ServiceScope.PLATFORM, type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(scope=ServiceScope.PLATFORM, type=ITransportInfoService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(scope=ServiceScope.PLATFORM, type=IMemstatService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW))
 })
 public abstract class AbstractTransportAgent<Con> implements ITransportService, ITransportInfoService, IMemstatService,	IInternalService, ITransportHandler<Con>
 {

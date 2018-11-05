@@ -20,7 +20,7 @@ import jadex.bridge.component.impl.remotecommands.RemoteReference;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceQuery;
@@ -120,7 +120,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 		{
 			try
 			{
-				final IServiceIdentifier sid = BasicService.createServiceIdentifier(providerid, new ClassInfo(servicetype), null, "NULL", null, RequiredServiceInfo.SCOPE_GLOBAL, null, true);
+				final IServiceIdentifier sid = BasicService.createServiceIdentifier(providerid, new ClassInfo(servicetype), null, "NULL", null, ServiceScope.GLOBAL, null, true);
 
 				Class<?>[] interfaces = new Class[]{servicetype, IService.class};
 				ProxyInfo pi = new ProxyInfo(interfaces);

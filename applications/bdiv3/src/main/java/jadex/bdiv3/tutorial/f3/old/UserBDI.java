@@ -20,7 +20,7 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.tutorial.f3.TranslationGoal;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PropertiesPanel;
@@ -35,7 +35,7 @@ import jadex.micro.annotation.RequiredServices;
  * 
  */
 @Agent(type=BDIAgentFactory.TYPE)
-@RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, scope=ServiceScope.PLATFORM))
 @Goals(@Goal(clazz=TranslationGoal.class))
 @Plans(@Plan(trigger=@Trigger(goals=TranslationGoal.class), 
 	body=@Body(service=@ServicePlan(name="transser", mapper=TranslationGoalMapper.class))))

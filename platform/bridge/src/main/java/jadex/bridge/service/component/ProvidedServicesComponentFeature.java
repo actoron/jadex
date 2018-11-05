@@ -35,6 +35,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -148,16 +149,17 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 				impl.setValue("$component.getExternalAccess()");
 				// platform external access service will be published network wide, all others only on platform
 				ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, impl, 
-					getComponent().getId().equals(getComponent().getId().getRoot())? RequiredServiceInfo.SCOPE_NETWORK: RequiredServiceInfo.SCOPE_PLATFORM, null, null);
+					getComponent().getId().equals(getComponent().getId().getRoot())? ServiceScope.NETWORK: ServiceScope.PLATFORM, null, null);
 				sermap.put("externalaccessservice", psi);
 			}
 			
 			// Instantiate service objects
 			for(ProvidedServiceInfo info: sermap.values())
 			{
-				String scope = info.getScope();
-				scope = (String)SJavaParser.evaluateExpressionPotentially(scope, component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
-				info.setScope(scope);
+				// support scopeexp="..." or sufficient when custom scope in manual addService(...)?
+//				ServiceScope scope = info.getScope();
+//				scope = (String)SJavaParser.evaluateExpressionPotentially(scope, component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
+//				info.setScope(scope);
 				
 				final ProvidedServiceImplementation	impl = info.getImplementation();
 				// Virtual service (e.g. promoted)
@@ -668,7 +670,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	 *  @param services The iterator of publish services (can be null).
 	 *  @return The publish service.
 	 */
-	public static IFuture<IPublishService> getPublishService(final IInternalAccess instance, final String type, final String scope, final Iterator<IPublishService> services)
+	public static IFuture<IPublishService> getPublishService(final IInternalAccess instance, final String type, final ServiceScope scope, final Iterator<IPublishService> services)
 	{
 		final Future<IPublishService> ret = new Future<IPublishService>();
 		
@@ -991,7 +993,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	 *  @param service The service.
 	 *  @param scope	The service scope.
 	 */
-	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi, String scope)
+	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi, ServiceScope scope)
 	{
 		ProvidedServiceInfo psi = pi!=null? new ProvidedServiceInfo(null, type, null, null, pi, null): null;
 		return addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, psi, scope);
@@ -1244,7 +1246,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
 	public IFuture<Void> addService(final String name, final Class<?> type, final String proxytype, 
-		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info, String scope)
+		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info, ServiceScope scope)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -1257,7 +1259,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 			getInternalAccess(), service, name, type, proxytype, ics, moni, 
-			info, scope!=null ? scope : info!=null? info.getScope(): null);
+			info, ServiceScope.DEFAULT.equals(scope) ? info.getScope() : scope);
 		
 		addService(proxy, info);
 		initService(proxy).addResultListener(new DelegationResultListener<Void>(ret));

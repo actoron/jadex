@@ -196,7 +196,7 @@ To declare subcomponents, you may use the ```@ComponentTypes``` annotation and t
 public class ParentAgent { …
 ```
 
-Any services provided by subcomponents using the scope [RequiredServiceInfo.SCOPE_COMPONENT](${URLJavaDoc}/jadex/bridge/service/RequiredServiceInfo.html) can then be accessed using the same scope in the parent component or any other subcomponents.
+Any services provided by subcomponents using the scope [ServiceScope.COMPONENT](${URLJavaDoc}/jadex/bridge/service/RequiredServiceInfo.html) can then be accessed using the same scope in the parent component or any other subcomponents.
 Please refer to the [AC Tutorial](../tutorials/ac/06 Composition/) for a more complete example.
 
 ## More Annotations

@@ -27,8 +27,7 @@ import javax.swing.table.DefaultTableModel;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.appstore.AppMetaInfo;
 import jadex.bridge.service.types.appstore.IAppGui;
@@ -139,7 +138,7 @@ public class AppStorePanel extends JPanel
 		final Future<Void> ret = new Future<Void>();
 		
 		apps.clear();
-		IIntermediateFuture<IAppProviderService> fut = access.searchServices( new ServiceQuery<>(IAppProviderService.class, RequiredServiceInfo.SCOPE_GLOBAL));
+		IIntermediateFuture<IAppProviderService> fut = access.searchServices( new ServiceQuery<>(IAppProviderService.class, ServiceScope.GLOBAL));
 		fut.addResultListener(new SwingIntermediateExceptionDelegationResultListener<IAppProviderService, Void>(ret)
 		{
 			protected boolean fin = false;

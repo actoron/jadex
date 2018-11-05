@@ -2,8 +2,6 @@ package jadex.micro.testcases;
 
 import java.io.File;
 
-import org.junit.Ignore;
-
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;

@@ -27,7 +27,7 @@ public class PublishInfo
 	protected String publishtype;
 	
 	/** The publish scope. */
-	protected String publishscope = RequiredServiceInfo.SCOPE_PLATFORM;
+	protected ServiceScope publishscope = ServiceScope.PLATFORM;
 	
 	/** Flag for allowing publishing to multiple locations. */
 	protected boolean multi = false;
@@ -54,7 +54,7 @@ public class PublishInfo
 	 */
 	public PublishInfo(String pid, String publishtype, Class<?> mapping)
 	{
-		this(pid, publishtype, RequiredServiceInfo.SCOPE_PLATFORM, false, mapping, (UnparsedExpression[])null);
+		this(pid, publishtype, ServiceScope.PLATFORM, false, mapping, (UnparsedExpression[])null);
 	}
 		
 	/**
@@ -62,7 +62,7 @@ public class PublishInfo
 	 *  @param pid The publish id, e.g. url.
 	 *  @param publishtype The publish type.
 	 */
-	public PublishInfo(String pid, String publishtype, String publishscope, boolean multi,
+	public PublishInfo(String pid, String publishtype, ServiceScope publishscope, boolean multi,
 		Class<?> mapping, UnparsedExpression[] properties)
 	{
 		this.pid = pid;
@@ -82,7 +82,7 @@ public class PublishInfo
 	 *  @param pid The publish id, e.g. url.
 	 *  @param publishtype The publish type.
 	 */
-	public PublishInfo(String pid, String publishtype, String publishscope, boolean multi,
+	public PublishInfo(String pid, String publishtype, ServiceScope publishscope, boolean multi,
 		Class<?> mapping, Object[] props)
 	{
 		this.pid = pid;
@@ -159,7 +159,7 @@ public class PublishInfo
 	 *  Gets the publish scope.
 	 *  @return The publish scope.
 	 */
-	public String getPublishScope()
+	public ServiceScope getPublishScope()
 	{
 		return publishscope;
 	}
@@ -168,7 +168,7 @@ public class PublishInfo
 	 *  Set the publish scope.
 	 *  @param publishscope The publish scope.
 	 */
-	public void setPublishScope(String publishscope)
+	public void setPublishScope(ServiceScope publishscope)
 	{
 		this.publishscope = publishscope;
 	}

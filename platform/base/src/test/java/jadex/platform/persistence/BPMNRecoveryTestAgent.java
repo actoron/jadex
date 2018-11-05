@@ -14,7 +14,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.modelinfo.IPersistInfo;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -74,8 +74,8 @@ public class BPMNRecoveryTestAgent
 	{
 		Future<TestReport> ret = new Future<TestReport>();
 		
-//		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
-		IPersistenceService	ps	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, ServiceScope.PLATFORM)).get();
+		IPersistenceService	ps	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPersistenceService.class, ServiceScope.PLATFORM)).get();
 		CreationInfo ci = new CreationInfo(agent.getId());
 		ci.setFilename(model);
 		

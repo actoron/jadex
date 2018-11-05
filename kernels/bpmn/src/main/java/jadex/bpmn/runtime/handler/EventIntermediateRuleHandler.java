@@ -182,7 +182,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 //			{
 //				public void resultAvailable(final String id)
 //				{
-//					instance.getServiceContainer().searchService(IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION)
+//					instance.getServiceContainer().searchService(IInternalProcessEngineService.class, ServiceScope.APPLICATION)
 //						.addResultListener(new IResultListener<IInternalProcessEngineService>()
 //					{
 //						public void resultAvailable(IInternalProcessEngineService ipes)

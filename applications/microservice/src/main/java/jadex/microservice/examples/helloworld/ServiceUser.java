@@ -1,11 +1,11 @@
 package jadex.microservice.examples.helloworld;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.RequiredService;
 
 /**
  *  Simple agent that searches and uses the service.
@@ -24,7 +24,7 @@ public class ServiceUser
 	public void body()
 	{
 		// Search the service.
-		IHelloService ser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IHelloService.class, RequiredService.SCOPE_PLATFORM));
+		IHelloService ser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IHelloService.class, ServiceScope.PLATFORM));
 		
 		// Invoke and print the result.
 		System.out.println(ser.sayHello(agent.getId().getLocalName()));

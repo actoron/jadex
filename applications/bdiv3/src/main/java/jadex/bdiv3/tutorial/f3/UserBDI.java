@@ -21,7 +21,7 @@ import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
@@ -37,7 +37,7 @@ import jadex.micro.annotation.RequiredServices;
  *  via goal delegation to the translation agent.
  */
 @Agent(type=BDIAgentFactory.TYPE)
-@RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, scope=ServiceScope.PLATFORM))
 @Goals(@Goal(clazz=TranslationGoal.class))
 @Plans(@Plan(trigger=@Trigger(goals=TranslationGoal.class), body=@Body(service=@ServicePlan(name="transser"))))
 public class UserBDI

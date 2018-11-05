@@ -31,7 +31,7 @@ public class RequiredServiceBinding
 //	protected boolean dynamic;
 
 	/** The search scope. */
-	protected String scope;
+	protected ServiceScope scope;
 	
 //	/** The create flag. */
 //	protected boolean create;
@@ -59,7 +59,7 @@ public class RequiredServiceBinding
 	/**
 	 *  Create a new binding. 
 	 */
-	public RequiredServiceBinding(String name, String scope)
+	public RequiredServiceBinding(String name, ServiceScope scope)
 	{
 		this(name, null, null,
 			scope, null, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
@@ -69,7 +69,7 @@ public class RequiredServiceBinding
 	 *  Create a new binding.
 	 */
 	public RequiredServiceBinding(String name, String componentname, String componenttype,
-		String scope, UnparsedExpression[] interceptors, String proxytype)
+		ServiceScope scope, UnparsedExpression[] interceptors, String proxytype)
 	{
 		this.name = name;
 		this.componentname = componentname;
@@ -172,7 +172,7 @@ public class RequiredServiceBinding
 	 *  Get the scope.
 	 *  @return the scope.
 	 */
-	public String getScope()
+	public ServiceScope getScope()
 	{
 		return scope;
 	}
@@ -181,7 +181,7 @@ public class RequiredServiceBinding
 	 *  Set the scope.
 	 *  @param scope The scope to set.
 	 */
-	public void setScope(String scope)
+	public void setScope(ServiceScope scope)
 	{
 		this.scope = scope;
 	}

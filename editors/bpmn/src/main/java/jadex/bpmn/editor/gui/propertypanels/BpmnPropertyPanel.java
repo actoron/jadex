@@ -64,6 +64,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
@@ -107,15 +108,6 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected String[] PROXY_TYPES = { BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED,
 									   BasicServiceInvocationHandler.PROXYTYPE_DIRECT,
 									   BasicServiceInvocationHandler.PROXYTYPE_RAW };
-	
-	/** The scope types. */
-	protected String[] SCOPE_TYPES = { RequiredServiceInfo.SCOPE_APPLICATION,
-									   RequiredServiceInfo.SCOPE_COMPONENT,
-									   RequiredServiceInfo.SCOPE_PARENT,
-									   RequiredServiceInfo.SCOPE_COMPONENT_ONLY,
-									   RequiredServiceInfo.SCOPE_PLATFORM,
-									   RequiredServiceInfo.SCOPE_GLOBAL};
-//									   RequiredServiceInfo.SCOPE_UPWARDS };
 	
 	/** Cache for handling configurations. */
 	protected List<ConfigurationInfo> confcache;
@@ -1080,11 +1072,10 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		gc.weighty = 1.0;
 		gc.fill = GridBagConstraints.BOTH;
 		gc.insets = new Insets(0, 5, 5, 0);
-		String[] scopeboxscopes = new String[SCOPE_TYPES.length];
-		for (int i = 0; i < SCOPE_TYPES.length; ++i)
+		String[] scopeboxscopes = new String[ServiceScope.values().length];
+		for(int i=0; i<scopeboxscopes.length; ++i)
 		{
-			String firstchar = SCOPE_TYPES[i].substring(0, 1);
-			scopeboxscopes[i] = SCOPE_TYPES[i].replaceFirst(firstchar, firstchar.toUpperCase());
+			scopeboxscopes[i] = ServiceScope.values()[i].name();
 		}
 		JComboBox scopebox = new JComboBox(scopeboxscopes);
 		final DefaultCellEditor scopeeditor = new DefaultCellEditor(scopebox);
@@ -2371,15 +2362,15 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 				case 3:
 				{
-					String ret = RequiredServiceInfo.SCOPE_COMPONENT;
+					ServiceScope ret = ServiceScope.COMPONENT;
 					if(cs != null)
 						rs = cs;
 					if(rs != null && rs.getDefaultBinding() != null && rs.getDefaultBinding().getScope() != null)
 					{
 						ret = rs.getDefaultBinding().getScope();
 					}
-					String firstchar = ret.substring(0, 1);
-					ret = ret.replaceFirst(firstchar, firstchar.toUpperCase());
+//					String firstchar = ret.substring(0, 1);
+//					ret = ret.replaceFirst(firstchar, firstchar.toUpperCase());
 					return ret;
 				}
 				case 4:
@@ -2466,7 +2457,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					if (cs != null)
 					{
 						createBinding(cs);
-						cs.getDefaultBinding().setScope(val);
+						cs.getDefaultBinding().setScope(ServiceScope.valueOf(val));
 						if(compareService(rs, cs))
 						{
 							conf.removeRequiredService(cs);
@@ -2475,7 +2466,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					else
 					{
 						createBinding(rs);
-						rs.getDefaultBinding().setScope(val);
+						rs.getDefaultBinding().setScope(ServiceScope.valueOf(val));
 						for (ConfigurationInfo itconf : getModelInfo().getConfigurations())
 						{
 							cs = getReqService(rs.getName(), itconf);

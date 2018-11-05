@@ -10,7 +10,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.sensor.service.TagProperty;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -93,7 +93,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr4 = new TestReport("#4", "Test if can find service via SServiceProvider.getServices()");
 		try
 		{
-			Collection<ITestService> sers = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(new String[]{TagProperty.PLATFORM_NAME}, agent.getExternalAccess()));
+			Collection<ITestService> sers = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITestService.class, ServiceScope.PLATFORM).setServiceTags(new String[]{TagProperty.PLATFORM_NAME}, agent.getExternalAccess()));
 			if(sers.isEmpty())
 			{
 				tr4.setFailed("No service found");
@@ -112,7 +112,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr5 = new TestReport("#5", "Test if can find service via SServiceProvider.getService()");
 		try
 		{
-			agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(new String[]{TagProperty.PLATFORM_NAME}, agent.getExternalAccess())); 
+			agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, ServiceScope.PLATFORM).setServiceTags(new String[]{TagProperty.PLATFORM_NAME}, agent.getExternalAccess())); 
 			tr5.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -124,7 +124,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr6 = new TestReport("#6", "Test if can find null tagged service service via SServiceProvider.getService()");
 		try
 		{
-			agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(new String[]{null})); 
+			agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, ServiceScope.PLATFORM).setServiceTags(new String[]{null})); 
 			tr6.setSucceeded(true);
 		}
 		catch(Exception e)

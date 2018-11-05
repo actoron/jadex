@@ -15,6 +15,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -93,7 +94,7 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 		try
 		{
 			// Search multi (i.e. multiplicity 0..)
-			Collection<ITestService>	results	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceQuery.SCOPE_GLOBAL)).get();
+			Collection<ITestService>	results	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			assertTrue(results.isEmpty());
 			System.out.println("Search multi: "+results);
 			
@@ -101,7 +102,7 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 			// Search single (i.e. multiplicity 1)
 			try
 			{
-				ITestService	result	= client.searchService(new ServiceQuery<>(ITestService.class, ServiceQuery.SCOPE_GLOBAL)).get();
+				ITestService	result	= client.searchService(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 				System.out.println("Search single: "+result);
 				assertFalse("Search should throw ServiceNotFoundException", true);
 			}

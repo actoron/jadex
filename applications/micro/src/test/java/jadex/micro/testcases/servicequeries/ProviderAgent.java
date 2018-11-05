@@ -12,7 +12,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IExampleService.class))//, scope=RequiredServiceInfo.SCOPE_APPLICATION))
+@ProvidedServices(@ProvidedService(type=IExampleService.class))//, scope=ServiceScope.APPLICATION))
 public class ProviderAgent implements IExampleService
 {
 	/**

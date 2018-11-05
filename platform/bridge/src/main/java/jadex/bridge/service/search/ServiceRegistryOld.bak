@@ -138,7 +138,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 	 */
 	protected boolean isSuperpeer()
 	{
-		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, cid, null))!=null;
+		return searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, ServiceScope.PLATFORM, null, cid, null))!=null;
 	}
 	
 //	/**
@@ -240,7 +240,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 	 */
 	protected <T> ISubscriptionIntermediateFuture<T> addQueryOnPlatform(final IComponentIdentifier spcid, final ServiceQueryInfo<T> sqi)
 	{
-		if(RequiredServiceInfo.SCOPE_NONE.equals(sqi.getQuery().getScope()))
+		if(ServiceScope.NONE.equals(sqi.getQuery().getScope()))
 		{
 			return new SubscriptionIntermediateFuture<T>(new ServiceNotFoundException(sqi.getQuery().getServiceType() != null? sqi.getQuery().getServiceType().getTypeName() : sqi.getQuery().toString()));
 		}
@@ -349,7 +349,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 //		if(getLocalServiceByClass(new ClassInfo(IPeerRegistrySynchronizationService.class))!=null)
 //		{
 ////			System.out.println("ask all");
-//			searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, cid, null))
+//			searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, ServiceScope.GLOBAL, null, cid, null))
 //				.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
 //			{
 //				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
@@ -532,7 +532,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 		enhanceQuery(query, false);
 		
 		T ret = null;
-		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(!ServiceScope.NONE.equals(query.getScope()))
 		{
 			if(query.getFilter() instanceof IAsyncFilter)
 				throw new IllegalArgumentException("Synchronous search call with asynchronous filter in query: " + query);
@@ -581,7 +581,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 		enhanceQuery(query, true);
 		
 		Set<T> ret = null;
-		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(!ServiceScope.NONE.equals(query.getScope()))
 		{
 			if(query.getFilter() instanceof IAsyncFilter)
 				throw new IllegalArgumentException("Synchronous search call with asynchronous filter in query: " + query);
@@ -684,7 +684,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 		
 		final Future<T> ret = new Future<T>();
 		
-		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(ServiceScope.NONE.equals(query.getScope()))
 		{
 			ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
 		}
@@ -745,7 +745,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 		
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
-		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(ServiceScope.NONE.equals(query.getScope()))
 		{
 			ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
 		}
@@ -808,7 +808,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 			}
 		});
 		
-		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(ServiceScope.NONE.equals(query.getScope()))
 		{
 			ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
 		}
@@ -928,7 +928,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 //		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 //		
 //		final ServiceQuery<T> query = sqi.getQuery();
-//		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+//		if(ServiceScope.NONE.equals(query.getScope()))
 //		{
 //			ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
 //		}
@@ -989,7 +989,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<T>();
 		
 		// Emulate persistent query by searching periodically
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
+		if(ServiceScope.GLOBAL.equals(query.getScope()))
 		{
 			final DuplicateRemovalIntermediateResultListener<T> lis = new DuplicateRemovalIntermediateResultListener<T>(new UnlimitedIntermediateDelegationResultListener<T>(ret))
 			{
@@ -1024,7 +1024,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 	{
 		enhanceQuery(query, false);
 		
-		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(ServiceScope.NONE.equals(query.getScope()))
 			return null;
 
 		T ret = null;
@@ -1591,49 +1591,49 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 			return ret;
 		
 		if(scope==null)
-			scope = RequiredServiceInfo.SCOPE_APPLICATION;
+			scope = ServiceScope.APPLICATION;
 		
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		if(ServiceScope.GLOBAL.equals(scope))
 		{
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_NETWORK.equals(scope))
-		{
-			// todo: fixme
-			ret = true;
-		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope))
+		else if(ServiceScope.NETWORK.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_NETWORK.equals(scope))
+		else if(ServiceScope.APPLICATION_GLOBAL.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+		else if(ServiceScope.APPLICATION_NETWORK.equals(scope))
+		{
+			// todo: fixme
+			ret = true;
+		}
+		else if(ServiceScope.PLATFORM.equals(scope))
 		{
 			// Test if searcher and service are on same platform
 			ret = cid.getPlatformName().equals(ser.getServiceIdentifier().getProviderId().getPlatformName());
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
+		else if(ServiceScope.APPLICATION.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
 			ret = sercid.getPlatformName().equals(cid.getPlatformName())
 				&& getApplicationName(sercid).equals(getApplicationName(cid));
 		}
-		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
+		else if(ServiceScope.COMPONENT.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
 			ret = getDotName(sercid).endsWith(getDotName(cid));
 		}
-		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		else if(ServiceScope.LOCAL.equals(scope))
 		{
 			// only the component itself
 			ret = ser.getServiceIdentifier().getProviderId().equals(cid);
 		}
-		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
+		else if(ServiceScope.PARENT.equals(scope))
 		{
 			// check if parent of searcher reaches the service
 			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
@@ -1651,52 +1651,52 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 	{
 		boolean ret = false;
 		
-		String scope = ser.getServiceIdentifier().getScope()!=null? ser.getServiceIdentifier().getScope(): RequiredServiceInfo.SCOPE_GLOBAL;
+		String scope = ser.getServiceIdentifier().getScope()!=null? ser.getServiceIdentifier().getScope(): ServiceScope.GLOBAL;
 		
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		if(ServiceScope.GLOBAL.equals(scope))
 		{
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_NETWORK.equals(scope))
-		{
-			// todo: fixme
-			ret = true;
-		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope))
+		else if(ServiceScope.NETWORK.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_NETWORK.equals(scope))
+		else if(ServiceScope.APPLICATION_GLOBAL.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+		else if(ServiceScope.APPLICATION_NETWORK.equals(scope))
+		{
+			// todo: fixme
+			ret = true;
+		}
+		else if(ServiceScope.PLATFORM.equals(scope))
 		{if (ser.toString().startsWith("MessageService")) {
 			System.out.println("PROV SCOPE IS PLATFORM + " + ser.getServiceIdentifier() + " , CID IS " + cid); 
 			}
 			// Test if searcher and service are on same platform
 			ret = cid.getPlatformName().equals(ser.getServiceIdentifier().getProviderId().getPlatformName());
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
+		else if(ServiceScope.APPLICATION.equals(scope))
 		{
 			// todo: special case platform service with app scope
 			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
 			ret = sercid.getPlatformName().equals(cid.getPlatformName())
 				&& getApplicationName(sercid).equals(getApplicationName(cid));
 		}
-		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
+		else if(ServiceScope.COMPONENT.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
 			ret = getDotName(cid).endsWith(getDotName(sercid));
 		}
-		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		else if(ServiceScope.LOCAL.equals(scope))
 		{
 			// only the component itself
 			ret = ser.getServiceIdentifier().getProviderId().equals(cid);
 		}
-		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
+		else if(ServiceScope.PARENT.equals(scope))
 		{
 			// check if parent of service reaches the searcher
 			IComponentIdentifier sercid = ser.getServiceIdentifier().getProviderId();
@@ -1858,7 +1858,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 	// read
 	protected <T> ISubscriptionIntermediateFuture<T> searchServicesAsyncByOnePlatform(final ServiceQuery<T> query, final IComponentIdentifier cid)
 	{
-		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(ServiceScope.NONE.equals(query.getScope()))
 		{
 			return new SubscriptionIntermediateFuture<T>(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
 		}
@@ -1887,7 +1887,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 	{	
 		SubscriptionIntermediateFuture<T> ret = null;
 		
-		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(ServiceScope.NONE.equals(query.getScope()))
 		{
 			ret = new SubscriptionIntermediateFuture<T>();
 			ret.setFinished();
@@ -1936,7 +1936,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 	{
 		final Future<T> ret = new Future<T>();
 		
-		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(ServiceScope.NONE.equals(query.getScope()))
 		{
 			ret.setException(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
 		}
@@ -2035,7 +2035,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 	// Todo: public because needed by CMS to get remote CMS for external access
 	public <T> IFuture<T> searchServiceAsyncByAskOnePlatform(final ServiceQuery<T> query, final IComponentIdentifier spcid)
 	{
-		if(RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(ServiceScope.NONE.equals(query.getScope()))
 		{
 			return	new Future<T>(new ServiceNotFoundException(query.getServiceType() != null? query.getServiceType().getTypeName() : query.toString()));
 		}
@@ -2121,7 +2121,7 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 //				if((""+query.getServiceType()).indexOf("ISuper")!=-1)
 //					System.out.println("ex on: "+query+" "+exception);
 				// TODO: what about other network scopes?
-				if(RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()))
+				if(ServiceScope.GLOBAL.equals(query.getScope()))
 				{
 //					if((""+query.getServiceType()).indexOf("AutoTerminate")!=-1)
 //						System.out.println("searchServiceAsyncByAskAll1: "+query);
@@ -2718,8 +2718,8 @@ public class ServiceRegistryOld implements IServiceRegistry // extends AbstractS
 		/*IComponentIdentifier target = targetpl!=null? targetpl: query.getTargetPlatform();
 
 		ServiceQuery<T> ret = new ServiceQuery<T>(query);
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(ret.getScope()))
-			ret.setScope(RequiredServiceInfo.SCOPE_PLATFORM);
+		if(ServiceScope.GLOBAL.equals(ret.getScope()))
+			ret.setScope(ServiceScope.PLATFORM);
 		if(ret.getOwner()!=null && !target.equals(ret.getOwner().getRoot()))
 			ret.setOwner(target);
 		return ret;*/

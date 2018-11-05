@@ -29,6 +29,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceEvent;
@@ -949,11 +950,11 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		}
 		
 		// Set scope if not set
-		if(query.getScope()==null)
+		if(ServiceScope.DEFAULT.equals(query.getScope()))
 		{
 			// Default to application if service type not set or not system service
 			query.setScope(query.getServiceType()!=null && ServiceIdentifier.isSystemService(query.getServiceType().getType(getComponent().getClassLoader()))
-				? RequiredServiceInfo.SCOPE_PLATFORM : RequiredServiceInfo.SCOPE_APPLICATION);
+				? ServiceScope.PLATFORM : ServiceScope.APPLICATION);
 		}
 		
 		if(query.getMultiplicity()==null)
@@ -989,6 +990,6 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	public boolean isRemote(ServiceQuery<?> query)
 	{
 		return query.getSearchStart()!=null && query.getSearchStart().getRoot()!=getComponent().getId().getRoot()
-			|| !RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope());
+			|| !query.getScope().isLocal();
 	}
 }

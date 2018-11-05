@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
@@ -32,7 +33,7 @@ import jadex.micro.annotation.RequiredServices;
 	implementation=@Implementation(value=ChatServiceD5.class)))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class),
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=RequiredService.SCOPE_GLOBAL),
+	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=ServiceScope.GLOBAL),
 	@RequiredService(name="regservice", type=IRegistryServiceE3.class)
 })
 @Arguments({

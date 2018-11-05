@@ -20,7 +20,7 @@ import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.VersionInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -62,10 +62,10 @@ import jadex.xml.writer.XMLWriterFactory;
 @Agent
 @RequiredServices(
 {	
-	@RequiredService(name="chatser", type=IChatGuiService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-	@RequiredService(name="emailser", type=IEmailService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-	@RequiredService(name="depser", type=IDependencyService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-	@RequiredService(name="daeser", type=IDaemonService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
+	@RequiredService(name="chatser", type=IChatGuiService.class, scope=ServiceScope.PLATFORM),
+	@RequiredService(name="emailser", type=IEmailService.class, scope=ServiceScope.PLATFORM),
+	@RequiredService(name="depser", type=IDependencyService.class, scope=ServiceScope.PLATFORM),
+	@RequiredService(name="daeser", type=IDaemonService.class, scope=ServiceScope.PLATFORM)
 })
 @Arguments(
 {

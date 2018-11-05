@@ -7,8 +7,7 @@ import javax.swing.JComboBox;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
@@ -46,7 +45,7 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 	{
 		// Hack!!! Search locally at (potentially remote) platform, as scope global is set to platform when transferring search request.
 		final Class<IService>	type	= (Class<IService>)servicetype;
-		final String	scope	= isRemote() ? RequiredServiceInfo.SCOPE_GLOBAL: RequiredServiceInfo.SCOPE_PLATFORM;
+		final ServiceScope	scope	= isRemote() ? ServiceScope.GLOBAL: ServiceScope.PLATFORM;
 		platform.searchServices( new ServiceQuery<>(type, scope))
 			.addResultListener(new SwingIntermediateResultListener<IService>(new IIntermediateResultListener<IService>()
 		{

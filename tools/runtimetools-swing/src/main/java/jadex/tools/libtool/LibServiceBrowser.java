@@ -52,8 +52,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -744,7 +743,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		
 		if(tp==null)
 		{
-			jcc.getJCCAccess().searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			jcc.getJCCAccess().searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, ServiceScope.PLATFORM))
 				.addResultListener(new SwingDefaultResultListener<IDaemonThreadPoolService>()
 			{
 				public void customResultAvailable(IDaemonThreadPoolService result)

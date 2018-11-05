@@ -6,8 +6,8 @@ import java.util.List;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.ComposedRemoteFilter;
@@ -253,7 +253,7 @@ public class RHardConstraints
 		unboundconstantfilters = newunboundconstantfilters;
 	}
 	
-	public static <T> ITerminableIntermediateFuture<T> getServices(final IInternalAccess ia, final Class<T> type, final String scope, final MethodInfo method, final RHardConstraints hardconstraints)
+	public static <T> ITerminableIntermediateFuture<T> getServices(final IInternalAccess ia, final Class<T> type, final ServiceScope scope, final MethodInfo method, final RHardConstraints hardconstraints)
 	{
 		if(hardconstraints == null)
 		{

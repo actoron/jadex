@@ -6,7 +6,7 @@ import java.util.Map;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SUtil;
@@ -66,7 +66,7 @@ public class AddResourceCommand extends ACliCommand
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
-		comp.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		comp.searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(final ILibraryService ls)

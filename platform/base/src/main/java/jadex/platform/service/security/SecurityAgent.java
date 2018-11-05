@@ -43,6 +43,7 @@ import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -75,7 +76,6 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 import jadex.platform.service.registryv2.SuperpeerClientAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.AbstractX509PemSecret;
@@ -101,7 +101,7 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
 	@Argument(name="roles", clazz=String.class, defaultvalue="null")
 })
 //@Service // This causes problems because the wrong preprocessor is used (for pojo services instead of remote references)!!!
-@ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
+@ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
 public class SecurityAgent implements ISecurityService, IInternalService
 {

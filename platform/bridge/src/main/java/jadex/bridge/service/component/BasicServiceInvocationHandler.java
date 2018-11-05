@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import jadex.base.Starter;
-import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.ServiceCall;
@@ -26,6 +25,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.CheckIndex;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.CheckState;
@@ -33,7 +33,6 @@ import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
-import jadex.bridge.service.component.interceptors.AuthenticationInterceptor;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
@@ -41,7 +40,6 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.interceptors.IntelligentProxyInterceptor;
 import jadex.bridge.service.component.interceptors.MethodCallListenerInterceptor;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
-import jadex.bridge.service.component.interceptors.NFRequiredServicePropertyProviderInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.commons.SReflect;
@@ -521,7 +519,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, Object service, 
 		String name, Class<?> type, String proxytype, IServiceInvocationInterceptor[] ics, 
-		boolean monitoring, ProvidedServiceInfo info, String scope)
+		boolean monitoring, ProvidedServiceInfo info, ServiceScope scope)
 	{
 		IServiceIdentifier sid = null;
 		
@@ -599,7 +597,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Create a basic invocation handler.
 	 */
-	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, ProvidedServiceInfo info, String scope)
+	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, ProvidedServiceInfo info, ServiceScope scope)
 	{
 //		if(type.getName().indexOf("ITestService")!=-1 && ia.getComponentIdentifier().getName().startsWith("Global"))
 //			System.out.println("gaga");

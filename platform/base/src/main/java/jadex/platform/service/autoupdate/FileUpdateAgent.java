@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.zip.ZipFile;
 
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -47,7 +46,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @RequiredServices(
 {
-	@RequiredService(name="libservice", type=ILibraryService.class)//, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="libservice", type=ILibraryService.class)//, binding=@Binding(scope=ServiceScope.PLATFORM))
 })
 @Agent
 public class FileUpdateAgent extends UpdateAgent

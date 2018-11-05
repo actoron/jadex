@@ -20,7 +20,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -143,7 +143,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		final Tuple2<String, IResourceIdentifier> key = new Tuple2<String, IResourceIdentifier>(model, urid);
 
 		// find classloader for rid
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 			.addResultListener(new DefaultResultListener<ILibraryService>()
 		{
 			public void resultAvailable(ILibraryService libs)

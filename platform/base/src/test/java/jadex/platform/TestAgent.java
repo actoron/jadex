@@ -20,7 +20,6 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -43,7 +42,7 @@ import jadex.micro.annotation.Results;
 @RequiredServices(
 {
 //	@RequiredService(name="msgservice", type=IMessageService.class, 
-//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+//		binding=@Binding(scope=ServiceScope.PLATFORM)),
 //	@RequiredService(name="cms", type=IComponentManagementService.class),
 	@RequiredService(name="clock", type=IClockService.class)
 })
@@ -297,7 +296,7 @@ public abstract class TestAgent
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 				
-//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)

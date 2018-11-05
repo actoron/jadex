@@ -38,7 +38,7 @@ import jadex.micro.annotation.Results;
 @RequiredServices(
 {
 //	@RequiredService(name="msgservice", type=IMessageService.class,
-//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+//		binding=@Binding(scope=ServiceScope.PLATFORM)),
 	@RequiredService(name="clock", type=IClockService.class)
 })
 //@ComponentTypes(

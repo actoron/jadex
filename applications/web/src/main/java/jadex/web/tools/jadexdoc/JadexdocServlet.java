@@ -23,8 +23,7 @@ import jadex.base.JarAsDirectory;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -223,7 +222,7 @@ public class JadexdocServlet extends HttpServlet
 		{
 			public void customResultAvailable(final IExternalAccess ea)
 			{
-				ea.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				ea.searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Collection<IModelInfo>>(ret)
 				{
 					public void customResultAvailable(ILibraryService ls)

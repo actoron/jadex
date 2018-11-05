@@ -9,6 +9,7 @@ import jadex.base.IPlatformConfiguration;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
@@ -156,7 +157,7 @@ public class RestDemoActivity extends JadexAndroidActivity
 					}
 				});
 				final Future<byte[]> fut = new Future<byte[]>();
-				getPlatformAccess().searchService( new ServiceQuery<>( IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
+				getPlatformAccess().searchService( new ServiceQuery<>( IChartService.class, ServiceScope.PLATFORM)).addResultListener(
 						new DefaultResultListener<IChartService>()
 						{
 

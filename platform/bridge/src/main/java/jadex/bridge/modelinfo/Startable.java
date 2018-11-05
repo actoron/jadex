@@ -1,5 +1,6 @@
 package jadex.bridge.modelinfo;
 
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 
 /**
@@ -37,7 +38,7 @@ public class Startable
 //	private Boolean persistable;
 	
 	/** The scope. */
-	private String scope;
+	private ServiceScope scope;
 	
 	//-------- methods --------
 	
@@ -208,7 +209,7 @@ public class Startable
 	 *  Get the scope.
 	 *  @return The scope
 	 */
-	public String getScope()
+	public ServiceScope getScope()
 	{
 		return scope;
 	}
@@ -217,7 +218,7 @@ public class Startable
 	 *  Set the scope.
 	 *  @param scope The scope to set
 	 */
-	public void setScope(String scope)
+	public void setScope(ServiceScope scope)
 	{
 		this.scope = scope;
 	}

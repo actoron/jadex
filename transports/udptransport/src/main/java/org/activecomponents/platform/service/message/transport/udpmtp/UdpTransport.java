@@ -193,7 +193,7 @@ public class UdpTransport implements ITransport
 	 */
 	public IFuture<Void> start()
 	{
-		IDaemonThreadPoolService dtps = getLocalServiceCompat(component, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IDaemonThreadPoolService dtps = getLocalServiceCompat(component, IDaemonThreadPoolService.class, ServiceScope.PLATFORM);
 		DaemonThreadPoolServiceExecutor dtpse = new DaemonThreadPoolServiceExecutor(dtps);
 		IIncomingListener inclistener = new IIncomingListener()
 		{
@@ -211,7 +211,7 @@ public class UdpTransport implements ITransport
 //								System.out.println("DEL " + data);
 						if (msgser == null)
 						{
-							msgser = getLocalServiceCompat(ia, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+							msgser = getLocalServiceCompat(ia, IMessageService.class, ServiceScope.PLATFORM);
 						}
 						msgser.deliverMessage(data);
 						return null;

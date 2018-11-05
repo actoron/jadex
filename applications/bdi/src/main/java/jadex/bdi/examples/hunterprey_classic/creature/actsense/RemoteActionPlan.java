@@ -72,7 +72,7 @@ public abstract class RemoteActionPlan extends Plan
 				throw new PlanFailureException();
 			}
 			
-//			IDF df = (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//			IDF df = (IDF)getAgent().getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IDF.class, ServiceScope.PLATFORM)).get();
 //			IDFServiceDescription sd = new DFServiceDescription(null, "hunter-prey environment", null);
 //			IDFComponentDescription ad = new DFComponentDescription(null, sd);
 //			IDFComponentDescription[] tas = df.search(ad, null).get();

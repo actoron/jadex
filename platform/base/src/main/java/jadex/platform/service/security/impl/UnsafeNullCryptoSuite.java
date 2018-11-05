@@ -7,8 +7,8 @@ import org.bouncycastle.util.Pack;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.platform.service.security.ICryptoSuite;
-import jadex.platform.service.security.SecurityInfo;
 import jadex.platform.service.security.SecurityAgent;
+import jadex.platform.service.security.SecurityInfo;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 
 /**
