@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.ServiceIdentifier;
@@ -14,6 +13,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.ServiceCallEvent;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
@@ -82,13 +82,30 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							{
 								try
 								{
+									final Exception ex	= Future.DEBUG ? new DebugException() : null;									
 									caller.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 //									caller.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()	// immediate was required for return of monitoring event component disposed. disabled waiting for last monitoring event instead. 
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											com.execute(args);
-											return IFuture.DONE;
+											if(ex!=null)
+											{
+												try
+												{
+													DebugException.ADDITIONAL.set(ex);
+													com.execute(args);
+													return IFuture.DONE;
+												}
+												finally
+												{
+													DebugException.ADDITIONAL.set(null);									
+												}
+											}
+											else
+											{
+												com.execute(args);
+												return IFuture.DONE;
+											}
 										}
 									}).addResultListener(new IResultListener<Void>()
 									{

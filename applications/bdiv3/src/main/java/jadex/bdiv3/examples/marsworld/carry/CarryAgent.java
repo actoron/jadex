@@ -33,7 +33,7 @@ import jadex.micro.annotation.RequiredServices;
 @RequiredServices(@RequiredService(name="targetser", type=ITargetAnnouncementService.class, multiple=true))
 @Plans({
 	@Plan(trigger=@Trigger(goals=CarryAgent.CarryOre.class), body=@Body(CarryOrePlan.class)),
-	@Plan(trigger=@Trigger(factaddeds="movecapa.mytargets"), body=@Body(InformNewTargetPlan.class))
+	@Plan(trigger=@Trigger(factadded="movecapa.mytargets"), body=@Body(InformNewTargetPlan.class))
 })
 public class CarryAgent extends BaseAgent implements ICarryService
 {

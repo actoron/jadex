@@ -54,12 +54,18 @@ import jadex.commons.future.ITerminableFuture;
 public class RemoteExecutionComponentFeature extends AbstractComponentFeature implements IRemoteExecutionFeature, IInternalRemoteExecutionFeature
 {
 	//-------- constants ---------
+	
+	/** Put string representation of command in message header. */
+	public static final boolean	DEBUG	= false;
 
 	/** The factory. */
 	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IRemoteExecutionFeature.class, RemoteExecutionComponentFeature.class);
 	
 	/** ID of the remote execution command in progress. */
 	public static final String RX_ID = "__rx_id__";
+	
+	/** Debug info of the remote execution command. */
+	public static final String RX_DEBUG = "__rx_debug__";
 	
 	/** Commands safe to use with untrusted clients. */
 	@SuppressWarnings("serial")
@@ -196,7 +202,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			ret.addResultListener(trl);
 		}
 		
-		((IInternalExecutionFeature) component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
+		((IInternalExecutionFeature)component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
 
 		if(outcommands==null)
 		{
@@ -247,6 +253,9 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			? (Class<IFuture<T>>)method.getReturnType()
 			: IFuture.class);
 		
+//		if(method.toString().toLowerCase().indexOf("getdesc")!=-1)
+//			System.out.println("Executing requested remote method invocation: "+method);
+		
 		return execute(ref.getRemoteComponent(), new RemoteMethodInvocationCommand<T>(ref.getTargetIdentifier(), method, args, nonfunc), clazz, timeout);
 	}
 
@@ -263,6 +272,8 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 	{
 		Map<String, Object> header = new HashMap<String, Object>();
 		header.put(RX_ID, rxid);
+		if(DEBUG)
+			header.put(RX_DEBUG, msg!=null ? msg.toString() : null);
 		
 		IFuture<Void> ret = component.getFeature(IMessageFeature.class).sendMessage(msg, header, receiver);
 //		ret.addResultListener(new IResultListener<Void>()
@@ -402,7 +413,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 								@Override
 								public void exceptionOccurred(Exception exception)
 								{
-//									getComponent().getLogger().severe("sending result failed: "+rxid+", "+result+", "+exception);
+									getComponent().getLogger().severe("sending result failed: "+rxid+", "+result+", "+exception);
 									// Serialization of result failed -> send back exception.
 									RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
 									rc.setResultCount(msgcounter);
@@ -478,7 +489,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 							}
 						}
 						
-						if (msg instanceof IRemoteConversationCommand)
+						if(msg instanceof IRemoteConversationCommand)
 						{
 							IRemoteConversationCommand<?> cmd = (IRemoteConversationCommand<?>)msg;
 							cmd.execute(component, (IFuture)fut, secinfos);

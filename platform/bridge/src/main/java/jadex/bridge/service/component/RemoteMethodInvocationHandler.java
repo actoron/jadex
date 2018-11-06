@@ -92,6 +92,10 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		{
 			return pr.getRemoteReference().getTargetIdentifier();
 		}
+		else if((args==null || args.length==0) && "getId".equals(method.getName()))
+		{
+			return pr.getRemoteReference().getRemoteComponent();
+		}
 		else if((args==null || args.length==0) && "toString".equals(method.getName()))
 		{
 			return pr.getRemoteReference().getTargetIdentifier().toString();

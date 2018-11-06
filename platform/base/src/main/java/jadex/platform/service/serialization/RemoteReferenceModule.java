@@ -244,7 +244,7 @@ public class RemoteReferenceModule
 
 //		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
 		// todo: repair cache for external access
-		Object tcid = target instanceof IExternalAccess? null: target.getClass();
+		Object tcid = target instanceof IService? target.getClass(): null;
 		
 //		ProxyInfo pi;
 		ProxyReference ret;
@@ -706,12 +706,7 @@ public class RemoteReferenceModule
 		// Create a remote reference if not yet available.
 //		if(ret==null)
 		{
-			if(target instanceof IExternalAccess)
-			{
-				ret = new RemoteReference(((IExternalAccess)target).getId(), ((IExternalAccess)target).getId());
-//				System.out.println("component ref: "+ret);
-			}
-			else if(target instanceof IService)
+			if(target instanceof IService)
 			{
 				ret = new RemoteReference(((IService)target).getServiceId().getProviderId(), ((IService)target).getServiceId());
 //				System.out.println("service ref: "+ret);
@@ -748,6 +743,11 @@ public class RemoteReferenceModule
 			{
 				RemoteMethodInvocationHandler rmih = (RemoteMethodInvocationHandler)ProxyFactory.getInvocationHandler(target);
 				ret	= rmih.getProxyReference().getRemoteReference();
+			}
+			else if(target instanceof IExternalAccess)
+			{
+				ret = new RemoteReference(((IExternalAccess)target).getId(), ((IExternalAccess)target).getId());
+//				System.out.println("component ref: "+ret);
 			}
 			else
 			{

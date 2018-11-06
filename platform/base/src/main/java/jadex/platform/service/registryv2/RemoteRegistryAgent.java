@@ -129,7 +129,7 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 		
 		if(!allowed)
 		{
-			throw new SecurityException("Query not allowed: "+query);
+			throw new SecurityException("Search not allowed: "+query);
 		}
 	}
 }

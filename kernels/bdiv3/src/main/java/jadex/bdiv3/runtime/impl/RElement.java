@@ -10,7 +10,7 @@ import jadex.rules.eca.RuleSystem;
 /**
  *  Base element for all runtime elements.
  */
-public class RElement
+public abstract class RElement
 {
 	protected static long cnt;
 	
@@ -142,5 +142,4 @@ public class RElement
 	{
 		return SReflect.getInnerClassName(this.getClass())+"(modelelement=" + modelelement + ", id=" + id + ")";
 	}
-
 }

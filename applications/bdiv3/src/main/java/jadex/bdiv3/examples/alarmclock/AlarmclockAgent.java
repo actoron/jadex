@@ -39,7 +39,7 @@ import jadex.micro.annotation.RequiredServices;
 	@Plan(trigger=@Trigger(goals=AlarmGoal.class), body=@Body(AlarmPlan.class)),
 	@Plan(trigger=@Trigger(goals={PlaySongGoal.class, NotifyGoal.class}), body=@Body(PlaySongPlan.class)),
 	@Plan(trigger=@Trigger(goals=NotifyGoal.class), body=@Body(BeepPlan.class)),
-	@Plan(trigger=@Trigger(factaddeds="alarms", factremoveds="alarms"), body=@Body(SyncSettingsAlarmsPlan.class))
+	@Plan(trigger=@Trigger(factadded="alarms", factremoved="alarms"), body=@Body(SyncSettingsAlarmsPlan.class))
 })
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class),

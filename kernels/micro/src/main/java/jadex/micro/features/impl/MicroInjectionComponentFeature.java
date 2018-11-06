@@ -238,8 +238,8 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 					val = SJavaParser.evaluateExpression(convert, getComponent().getModel().getAllImports(), fetcher, getComponent().getClassLoader());
 				}
 				field.setAccessible(true);
-				if(field.getName().equals("address"))
-					System.out.println("setVal: "+getComponent().getId()+" "+val+" "+field.getName());
+//				if(field.getName().equals("address"))
+//					System.out.println("setVal: "+getComponent().getId()+" "+val+" "+field.getName());
 				field.set(agent, val);
 			}
 			catch(Exception e)

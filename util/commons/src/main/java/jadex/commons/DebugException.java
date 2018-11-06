@@ -4,9 +4,13 @@ package jadex.commons;
  *  Helper class to remember stack traces.
  *  Prints out a warning, when used.
  */
+@SuppressWarnings("serial")
 public class DebugException extends RuntimeException
 {
 	//-------- static part --------
+	
+	/** Additional debug exception on current thread to use as cause. */
+	public static final ThreadLocal<Exception>	ADDITIONAL	= new ThreadLocal<>();
 	
 	/**
 	 *  Print out warning, when class is loaded.
@@ -28,6 +32,7 @@ public class DebugException extends RuntimeException
 	 */
 	public DebugException()
 	{
+		super(ADDITIONAL.get());
 		fillInStackTrace();
 	}
 	
@@ -36,7 +41,7 @@ public class DebugException extends RuntimeException
 	 */
 	public DebugException(String msg)
 	{
-		super(msg);
+		super(msg, ADDITIONAL.get());
 		fillInStackTrace();
 	}
 	

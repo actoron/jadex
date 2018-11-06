@@ -44,18 +44,20 @@ public class CleanerBDIAgentA1
 	@Goal	// The goal annotation allows instances of a Java class to be dispatched as goals of the agent. 
 	class PerformPatrol {}
 	
-	//-------- simple examples of using belief and goal events --------
+	//-------- methods that represent plans (i.e. predefined recipes for working on certain goals) --------
 	
 	/**
-	 *  Declare a plan using a method with @Plan and @Trigger annotation.
+	 *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
 	 */
 	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
 	private void	performPatrolPlan()
 	{
-		// Follow a simple path around the four corners of the museum.
+		// Follow a simple path around the four corners of the museum and back to the first corner.
+		System.out.println("Starting performPatrolPlan()");
 		actsense.moveTo(0.1, 0.1);
 		actsense.moveTo(0.1, 0.9);
 		actsense.moveTo(0.9, 0.9);
 		actsense.moveTo(0.9, 0.1);
+		actsense.moveTo(0.1, 0.1);
 	}
 }

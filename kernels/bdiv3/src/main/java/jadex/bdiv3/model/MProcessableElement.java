@@ -10,12 +10,19 @@ public class MProcessableElement extends MParameterElement
 {
 	public static Map<String, ExcludeMode> modes = new HashMap<String, ExcludeMode>();
 	
-	/** The message direction. */
+	/** The exclude mode determines when and if a plan is removed from the applicable plans list (APL). */
 	public enum ExcludeMode
 	{
+		/** The plan is never removed. */
 		Never("never"),
+
+		/** The plan is removed after it has been executed once, regardless of success or failure or abortion. */
 		WhenTried("when_tried"),
+		
+		/** The plan is removed after it has been executed once, but only when it exited with an exception. */
 		WhenFailed("when_failed"),
+		
+		/** The plan is removed after it has been executed once, but only when it exited without an exception. */
 		WhenSucceeded("when_succeeded");
 		
 		protected String str;

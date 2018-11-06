@@ -230,13 +230,13 @@ public class JokeAgent
 		}
 	}
 	
-	@Plan(trigger=@Trigger(factaddeds="slogans"))
+	@Plan(trigger=@Trigger(factadded="slogans"))
 	public void printNewSlogan(ChangeInfo<String> ci)
 	{
 		System.out.println("Added new slogan: "+ci.getValue());
 	}
 	
-	@Plan(trigger=@Trigger(factchangeds="usermood"))
+	@Plan(trigger=@Trigger(factchanged="usermood"))
 	public void adaptMoodGui()
 	{
 		gui.setMood(usermood);

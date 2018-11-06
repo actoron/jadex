@@ -101,7 +101,7 @@ public class Environment
 			create	= ret==null;
 			if(create)
 			{
-				ret	= new Cleaner(cid, new Location(Math.random(), Math.random()), null, 0.1, 0.8);
+				ret	= new Cleaner(cid, new Location(Math.random()*0.4+0.3, Math.random()*0.4+0.3), null, 0.1, 0.8);
 				cleaners.put(cid, ret);
 			}
 		}
@@ -142,7 +142,7 @@ public class Environment
 		}
 		else
 		{
-			throw new IllegalStateException("Cleaner for agent "+cid+" alreqady exists (duplicate actsense?).");
+			throw new IllegalStateException("Cleaner for agent "+cid+" already exists (duplicate actsense?).");
 		}
 		
 		return ret.clone();

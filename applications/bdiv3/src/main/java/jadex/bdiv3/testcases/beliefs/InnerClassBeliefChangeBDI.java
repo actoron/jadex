@@ -99,7 +99,7 @@ public class InnerClassBeliefChangeBDI
 //		this.ack = ack;
 //	}
 	
-	@Plan(trigger=@Trigger(factchangeds="ack"))
+	@Plan(trigger=@Trigger(factchanged="ack"))
 	private class AckPlan
 	{
 	    @PlanAPI
