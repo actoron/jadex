@@ -104,10 +104,10 @@ The simple cleaner is just a starting point that does not perceive anything and 
 		}
 ```
 
-As a preliminary exercise in this tutorial, you could try to implement a cleaner in Java that
+As a preliminary exercise in this tutorial, you could try to implement a cleaner in Java that:
 
 * picks up waste,
 * drops waste in a waste bin,
 * recharges at a charging station before the battery is empty.
 
-In the following exercises we will use features of the Jadex BDI model
+In the following exercises we will use features of the Jadex BDI model to build a more sophisticated agent step by step. 
