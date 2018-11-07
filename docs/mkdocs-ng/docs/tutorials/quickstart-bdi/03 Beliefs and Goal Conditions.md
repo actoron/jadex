@@ -178,7 +178,7 @@ As a result, any active patrol plan will be aborted as soon as the maintain batt
 becomes active. Thus now the load battery plan should succeed, because the patrol plan cannot interfere
 anymore:
 
-![](deliberation-inhibits.png)
+![](deliberation-inhibits.svg)
 
 *Figure B.1: Inhibition arcs explained*
 

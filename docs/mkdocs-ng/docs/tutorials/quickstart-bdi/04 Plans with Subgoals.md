@@ -10,7 +10,7 @@ The goal plan tree is an *AND/OR* decomposition of the problem.
 To achieve a goal, *only one* of the available plans needs to work (*OR* decomposition, e.g. "throw pancake" *or* "flip with spatula").
 For a plan to complete, *all* subgoals of the plan need to be successful (*AND* decomposition, e.g. "pancake mix ready" *and* "pancake flipped").
 
-![](example-goalplantree.png)
+![](example-goalplantree.svg)
 
 *Figure C.1: Example Goal Plan Tree (inspired by a [paper of Broekens et al.](https://link.springer.com/chapter/10.1007%2F978-3-642-16178-0_5))*
  

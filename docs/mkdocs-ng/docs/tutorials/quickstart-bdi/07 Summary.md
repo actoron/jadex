@@ -8,6 +8,12 @@ Here you can find solutions for code you had to write yourself and the answers t
 
 ### Exercise Zero: A Simple Java Cleaner Agent
 
+A possible way of structuring the cleaner behavior is shown in the following flow chart:
+
+![](behavior-simplecleaner.svg)
+
+*Figure F.1: Decision tree for simple cleaner behavior*
+
 Here is a solution with a single loop and nested if-then-else statements for the different tasks and phases of the robot.
 Note that the solution has some problems, e.g., not immediately stopping a move action when finding a needed waste bin
 and a severe bug that the agent will try to pick up waste that no longer exists, when it was removed in the mean time.
@@ -75,7 +81,7 @@ and a severe bug that the agent will try to pick up waste that no longer exists,
 ### Exercise A3: Additional Patrol Plan Code
 
 <div style="float:right;">
-<img src="../patrol-plan2.png">
+<img src="../patrol-plan2.svg">
 </div>
 
 ```java
@@ -98,7 +104,7 @@ and a severe bug that the agent will try to pick up waste that no longer exists,
 ```
 
 <div style="float:right;">
-<img src="../patrol-plan3.png">
+<img src="../patrol-plan3.svg">
 </div>
 
 ```java	
