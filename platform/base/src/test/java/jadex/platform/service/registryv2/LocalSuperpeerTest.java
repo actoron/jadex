@@ -25,7 +25,7 @@ public class LocalSuperpeerTest	extends AbstractSearchQueryTest
 	{
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
 		baseconf.setValue("superpeerclient.awaonly", false);
-		baseconf.setValue("superpeerclient.contimeout", WAITFACTOR/2); 	// -> 1500 millis.
+		baseconf.setValue("superpeerclient.contimeout", WAITFACTOR*2);
 		// Remote only -> no simulation please
 		baseconf.getExtendedPlatformConfiguration().setSimul(false);
 		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
