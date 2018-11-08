@@ -41,7 +41,7 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenessbroadcast", true);
 		baseconf.setValue("passiveawarenessbroadcast.port", customport);
-		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*2));
+		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*3));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 
 		// Remote only -> no simulation please
