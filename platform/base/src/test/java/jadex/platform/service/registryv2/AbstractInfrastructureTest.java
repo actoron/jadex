@@ -2,6 +2,7 @@ package jadex.platform.service.registryv2;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -132,7 +133,7 @@ public abstract class AbstractInfrastructureTest
 		{
 			platformids.add(ea.getId());
 		}
-//		System.out.println("Waiting for cids: " + Arrays.toString(platformids.toArray()));
+		System.out.println("Waiting for cids: " + Arrays.toString(platformids.toArray()));
 		while(!platformids.isEmpty())
 		{
 			long timeout = Starter.getDefaultTimeout(sp.getId().getRoot());
@@ -141,7 +142,7 @@ public abstract class AbstractInfrastructureTest
 //			System.out.println("Waiting for next cid, remaining: " + Arrays.toString(platformids.toArray()));
 			IComponentIdentifier	cid	= connected.getNextIntermediateResult(timeout, true);
 			platformids.remove(cid.getRoot());
-//			System.out.println(sp.getId()+" got connection from "+cid.getRoot());
+			System.out.println(sp.getId()+" got connection from "+cid.getRoot());
 		}
 	}
 }
