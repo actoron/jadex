@@ -675,6 +675,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									stopSuperpeerSearch();
 									superpeer	= sp;
 									connection	= regfut;
+									System.out.println(agent+" accepted super peer connection for network "+networkname+" from super peer: "+sp);
 									
 									// Activate waiting queries if any.
 									for(QueryManager<?> qmanager: waitingqueries)
@@ -783,7 +784,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							 */
 							protected void	checkConnectionRetry(Exception reason)
 							{
-//								System.out.println(agent+" super peer disconnected: "+sp+", ex="+reason);
+								System.out.println(agent+" super peer disconnected: "+sp+", ex="+reason);
 								
 								// Connection still current but ended?
 								if(running && superpeer==sp)

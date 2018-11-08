@@ -20,7 +20,7 @@ public class NetworkProviderAgent	implements ITestService
 		while(true)
 		{
 			System.out.println(agent+" alive");
-			agent.waitForDelay(500).get();
+			agent.waitForDelay(1000).get();
 		}
 	}
 }
