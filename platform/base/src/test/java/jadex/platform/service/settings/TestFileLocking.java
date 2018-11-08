@@ -58,7 +58,7 @@ public class TestFileLocking
 //			e.printStackTrace();
 		}
 
-		raf.write("Hallo\n".getBytes());
+		raf.write("TestFileLocking\n".getBytes());
 		
 		// Concurrent read/write access with lock should fail.
 		try
