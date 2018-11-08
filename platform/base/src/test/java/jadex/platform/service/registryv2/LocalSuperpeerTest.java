@@ -31,6 +31,7 @@ public class LocalSuperpeerTest	extends AbstractSearchQueryTest
 		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
 //		baseconf.setLogging(true);
 //		baseconf.setValue("rt.debug", true);
+		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 
 		
 		CLIENTCONF	= baseconf.clone();

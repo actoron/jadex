@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.clock.IClockService;
@@ -235,7 +234,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 											{
 												public IFuture<Void> execute(IInternalAccess ia)
 												{
-													TimeoutException te	= new TimeoutException("Timeout was: "+timeout+" "+message+(Future.DEBUG ? "" : ". Use PlatformConfiguration.setDebugFutures(true) for timeout cause."), ex);
+													TimeoutException te	= new TimeoutException("Timeout was: "+timeout+" "+message+(Future.DEBUG ? "" : ". Use PlatformConfiguration.getExtendedPlatformConfiguration().setDebugFutures(true) for timeout cause."), ex);
 													timeoutOccurred(te);
 													return IFuture.DONE;
 												}
