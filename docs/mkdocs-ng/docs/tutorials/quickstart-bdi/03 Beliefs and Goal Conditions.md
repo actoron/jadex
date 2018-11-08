@@ -196,7 +196,7 @@ executing the `loadBattery()` method. Anyways, executing a plan when the goal is
 would be a waste of time, right?
 
 Well, in general: yes. But in this case we want the cleaner to load the battery some more before
-resuming the patrol round. We can specify this by adding an explicit *achieve* condition as another
+resuming the patrol round. We can specify this by adding an explicit *target* condition as another
 method of the `MaintainBatteryLoaded` class:  
 
 ```java
@@ -208,7 +208,7 @@ method of the `MaintainBatteryLoaded` class:
 ```
 
 So now we have `isBatteryLoaded()` to state when the agent should *start* charging (*maintain condition*)
-and `isBatteryFullyLoaded()` to state when the agent should *stop* charging (*achieve condition*).
+and `isBatteryFullyLoaded()` to state when the agent should *stop* charging (*target condition*).
 Here we stop at 90%. Remember that the plan tried to load until 100%. So still the plan never completes
 but now it isn't stopped at 20% but only at 90%.
 
