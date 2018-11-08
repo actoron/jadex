@@ -45,7 +45,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenesscatalog", true);
 		baseconf.setValue("rt", true);
-		baseconf.setValue("platformurls", "intravm://ssp@localhost:"+sspport);
+		baseconf.setValue("platformurls", "intravm://GlobalSuperpeerTestSSP@localhost:"+sspport);
 		baseconf.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
 		baseconf.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass);
 		// Remote only -> no simulation please
@@ -54,18 +54,18 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 //		baseconf.setValue("security.debug", true);
 			
 		CLIENTCONF	= baseconf.clone();
-		CLIENTCONF.setPlatformName("client_*");
+		CLIENTCONF.setPlatformName("GlobalSuperpeerTestClient_*");
 //		CLIENTCONF.setLogging(true);
 //		CLIENTCONF.setValue("rt.debug", true);
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(NetworkProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
-		PROCONF.setPlatformName("provider_*");
+		PROCONF.setPlatformName("GlobalSuperpeerTestProvider_*");
 		
 		SPCONF	= baseconf.clone();
 		SPCONF.setValue("superpeer", true);
-		SPCONF.setPlatformName("SP_*");
+		SPCONF.setPlatformName("GlobalSuperpeerTestSP_*");
 //		SPCONF.setValue("rt.debug", true);
 //		SPCONF.setLogging(true);
 		
@@ -74,7 +74,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		RELAYCONF.setValue("supersuperpeer", true);
 		RELAYCONF.setValue("rt.forwarding", true);
 		RELAYCONF.setValue("intravm.port", sspport);
-		RELAYCONF.setPlatformName("ssp");
+		RELAYCONF.setPlatformName("GlobalSuperpeerTestSSP");
 		RELAYCONF.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME);
 		RELAYCONF.setNetworkSecrets(serversecret.toString());
 //		RELAYCONF.setLogging(true);

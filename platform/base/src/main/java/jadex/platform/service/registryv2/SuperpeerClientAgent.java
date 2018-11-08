@@ -283,6 +283,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			{
 				if(manager.superpeer!=null)
 				{
+					if(query.toString().indexOf("ITestService")!=-1)
+						System.out.println(agent+" searchServices() at superpeer: "+manager.superpeer);
+					
 					foundsuperpeer	= true;
 					// Todo: remember searches for termination? -> more efficient to just let searches run out an ignore result?
 					track.incrementAndGet();
@@ -292,6 +295,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
+							if(query.toString().indexOf("ITestService")!=-1)
+								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" failed: "+exception);
+
 							if(track.decrementAndGet()==0)
 							{
 								ret.setFinishedIfUndone();
@@ -301,6 +307,10 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						@Override
 						public void resultAvailable(Set<IServiceIdentifier> result)
 						{
+							if(query.toString().indexOf("ITestService")!=-1)
+								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" succeeded: "+result);
+
+							
 							if(!ret.isDone())
 							{
 								for(IServiceIdentifier sid: result)
@@ -720,7 +730,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 													{
 														try
 														{
-//															System.out.println(agent+ " sending service event to superpeer "+sp+": "+event);
+															if(event.toString().indexOf("ITestService")!=-1)
+																System.out.println(agent+ " sending service event to superpeer "+sp+": "+event);
 															regfut.sendBackwardCommand(event);
 														}
 														catch (Exception e)
