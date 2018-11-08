@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
 
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -18,12 +18,12 @@ import org.junit.Test;
 // http://javabeat.net/locking-files-using-java/
 public class TestFileLocking
 {
-	private static final File TESTFILE = new File("testfile"+Math.random()+".txt");
+	private static final File TESTFILE = new File(System.getProperty("java.io.tmpdir"), "testfile"+Math.random()+".txt");
 
-	@Before
-	public void setup()
+	@After
+	public void cleanup()
 	{
-		TESTFILE.delete();
+		TESTFILE.deleteOnExit();
 	}
 
 	@Test
@@ -105,8 +105,5 @@ public class TestFileLocking
 			e.printStackTrace();
 			Assert.fail("Sequential read access failed: "+e);
 		}
-		
-		
-		TESTFILE.delete();
 	}
 }
