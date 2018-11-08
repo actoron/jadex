@@ -264,6 +264,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("8) kill SP, search for service");
 			removePlatform(sp);
 			waitALittle(client);
+			waitALittle(client);	// two waits for disconnection, because contimeout = 2* WAITFACTOR
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 			Assert.assertEquals(""+result, awa?1:0, result.size());
 		}
