@@ -388,8 +388,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			
 			for(IPassiveAwarenessService pawa: pawas)
 			{
-				if(query.toString().indexOf("ITestService")!=-1)
-					System.out.println(agent+" pawa.searchPlatforms(): "+pawa);
+//				if(query.toString().indexOf("ITestService")!=-1)
+//					System.out.println(agent+" pawa.searchPlatforms(): "+pawa);
 				
 				// Search for other platforms
 				if(timeout>0)
@@ -408,8 +408,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						}
 						
 						filter.insert(platform.toString());
-						if(query.toString().indexOf("ITestService")!=-1)
-							System.out.println(agent + " searching remote platform: "+platform+", "+query);
+//						if(query.toString().indexOf("ITestService")!=-1)
+//							System.out.println(agent + " searching remote platform: "+platform+", "+query);
 						
 						// Only (continue to) search remote when future not yet finished or cancelled.
 						if(!ret.isDone())
@@ -431,8 +431,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								{
 //									try
 //									{
-										if(query.toString().indexOf("ITestService")!=-1)
-											System.out.println(agent + " searched remote platform: "+platform+", "+result);
+//										if(query.toString().indexOf("ITestService")!=-1)
+//											System.out.println(agent + " searched remote platform: "+platform+", "+result);
 //									}
 //									catch(RuntimeException e)
 //									{
@@ -455,8 +455,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	
 								public void exceptionOccurred(Exception exception)
 								{
-									if(query.toString().indexOf("ITestService")!=-1)
-										System.out.println(agent + " searched remote platform: "+platform+", "+exception);
+//									if(query.toString().indexOf("ITestService")!=-1)
+//										System.out.println(agent + " searched remote platform: "+platform+", "+exception);
 									doFinished();
 								}
 							});
@@ -466,16 +466,16 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					@Override
 					public void finished()
 					{
-						if(query.toString().indexOf("ITestService")!=-1)
-							System.out.println(agent+" pawa.searchPlatforms() done: "+pawa);
+//						if(query.toString().indexOf("ITestService")!=-1)
+//							System.out.println(agent+" pawa.searchPlatforms() done: "+pawa);
 						doFinished();
 					}
 					
 					@Override
 					public void exceptionOccurred(Exception exception)
 					{
-						if(query.toString().indexOf("ITestService")!=-1)
-							System.out.println(agent+" pawa.searchPlatforms() exception: "+pawa+", "+exception);
+//						if(query.toString().indexOf("ITestService")!=-1)
+//							System.out.println(agent+" pawa.searchPlatforms() exception: "+pawa+", "+exception);
 						// ignore exception
 						doFinished();
 					}

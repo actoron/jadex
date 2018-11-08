@@ -38,7 +38,6 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 	{
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
 		baseconf.setValue("superpeerclient.awaonly", true);
-//		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// -> 1500 millis.
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenessmulticast", true);
 		baseconf.setValue("passiveawarenessmulticast.port", customport);

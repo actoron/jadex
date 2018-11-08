@@ -18,7 +18,7 @@ import org.junit.Test;
 // http://javabeat.net/locking-files-using-java/
 public class TestFileLocking
 {
-	private static final File TESTFILE = new File("testfile.txt");
+	private static final File TESTFILE = new File("testfile"+Math.random()+".txt");
 
 	@Before
 	public void setup()
@@ -48,9 +48,8 @@ public class TestFileLocking
 		}
 		
 		// Concurrent write access should fail.
-		try
+		try(RandomAccessFile raf2 = new RandomAccessFile(TESTFILE, "rw"))
 		{
-			RandomAccessFile	raf2	= new RandomAccessFile(TESTFILE, "rw");
 			lock	= raf2.getChannel().lock();
 			Assert.fail("Concurrent write access succeeded: "+raf2);
 		}
@@ -106,5 +105,8 @@ public class TestFileLocking
 			e.printStackTrace();
 			Assert.fail("Sequential read access failed: "+e);
 		}
+		
+		
+		TESTFILE.delete();
 	}
 }

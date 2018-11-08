@@ -38,7 +38,6 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 	{
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
 		baseconf.setValue("superpeerclient.awaonly", true);
-//		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// -> 1500 millis.
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenessbroadcast", true);
 		baseconf.setValue("passiveawarenessbroadcast.port", customport);

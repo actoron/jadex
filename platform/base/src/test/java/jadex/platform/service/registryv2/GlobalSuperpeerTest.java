@@ -41,7 +41,6 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
 		baseconf.setValue("superpeerclient.awaonly", false);
-		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// -> 1500 millis.
 		baseconf.setValue("superpeerclient.contimeout", WAITFACTOR/2); 	// -> 1500 millis.
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenesscatalog", true);
