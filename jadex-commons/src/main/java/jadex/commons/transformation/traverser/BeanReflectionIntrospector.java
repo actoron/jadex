@@ -2,6 +2,7 @@ package jadex.commons.transformation.traverser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -151,9 +152,11 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 				fields = SReflect.getAllFields(clazz);
 				for(int i = 0; i < fields.length; i++)
 				{
+					int modifiers = fields[i].getModifiers();
 					String property_java_name = fields[i].getName();
 					if(((includefields && includePrivateFields)|| fields[i].isAnnotationPresent(Include.class))
-							&& fields[i].getAnnotation(Exclude.class) == null && !ret.containsKey(property_java_name))
+							&& fields[i].getAnnotation(Exclude.class) == null && !ret.containsKey(property_java_name)
+							&& !(Modifier.isNative(modifiers) || Modifier.isStatic(modifiers)))
 					{
 						ret.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
 					}
