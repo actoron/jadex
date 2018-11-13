@@ -203,7 +203,7 @@ publishing {
         if (signedJar != null) {
             sigFiles += [archive: signedJar,     classifier: null,      extension: 'jar.asc']
         }
-        if (signedJar != null) {
+        if (signedAar != null) {
             sigFiles += [archive: signedAar,     classifier: null,      extension: 'aar.asc']
         }
 
