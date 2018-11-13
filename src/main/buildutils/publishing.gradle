@@ -188,11 +188,13 @@ publishing {
         def signedJar = (allFiles - [signedSources, signedJavadoc, signedWar])[0]
         def sigFiles = [
                 [archive: signedSources, classifier: 'sources', extension: 'jar.asc'],
-                [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc'],
-                [archive: signedJar,     classifier: null,      extension: 'jar.asc']
+                [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc']
         ]
         if (signedWar != null) {
             sigFiles += [archive: signedWar,     classifier: null,      extension: 'war.asc']
+        }
+        if (signedJar != null) {
+            sigFiles += [archive: signedJar,     classifier: null,      extension: 'jar.asc']
         }
 
         return sigFiles
