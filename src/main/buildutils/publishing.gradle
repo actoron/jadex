@@ -223,6 +223,10 @@ publishing {
 
         // Publish signatures separately because gradle 4.8 maven-publish DOES NOT SUPPORT IT BY DEFAULT
         signatures (MavenPublication) {
+            groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
+            artifactId getArtifactName(project)
+            version project.version
+
             // give signature files to rtifact method
             getSignatureFiles().each {signature ->
                 artifact (signature.archive) {
