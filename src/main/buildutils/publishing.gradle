@@ -194,16 +194,25 @@ publishing {
         def signedSources = allFiles.find { it.name.contains('-sources') }
         def signedJavadoc = allFiles.find { it.name.contains('-javadoc') }
         def signedWar = allFiles.find {it.name.endsWith('war.asc')}
-        def signedJar = (allFiles - [signedSources, signedJavadoc, signedWar])[0]
-        def sigFiles = [
-                [archive: signedSources, classifier: 'sources', extension: 'jar.asc'],
-                [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc']
-        ]
+        def signedAar = allFiles.find {it.name.endsWith('aar.asc')}
+        def signedJar = (allFiles - [signedSources, signedJavadoc, signedWar, signedAar])[0]
+        def sigFiles = []
         if (signedWar != null) {
             sigFiles += [archive: signedWar,     classifier: null,      extension: 'war.asc']
         }
         if (signedJar != null) {
             sigFiles += [archive: signedJar,     classifier: null,      extension: 'jar.asc']
+        }
+        if (signedJar != null) {
+            sigFiles += [archive: signedAar,     classifier: null,      extension: 'aar.asc']
+        }
+
+        if (signedSources != null) {
+            sigFiles += [archive: signedSources, classifier: 'sources', extension: 'jar.asc']
+        }
+
+        if (signedJavadoc != null) {
+            sigFiles +=  [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc']
         }
 
         return sigFiles
