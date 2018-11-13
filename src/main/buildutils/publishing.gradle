@@ -137,22 +137,21 @@ if (project.hasProperty('signing.secretKeyRingFile')) {
 
 def configurePom(pom) {
     pom.withXml {
-        def root = asNode ()
-
+        def root = asNode()
         root.appendNode('description', project.description)
         root.appendNode('name', project.name)
         if (isAndroidProject(project)) {
-        root.get('packaging').get(0).setValue('aar')
-        def dependenciesNode = asNode().appendNode('dependencies')
-        project.configurations.implementation.allDependencies.each {
-            // Ensure dependencies such as fileTree are not included.
-            if (it.name != 'unspecified') {
-                def dependencyNode = dependenciesNode.appendNode('dependency')
-                dependencyNode.appendNode('groupId', it.group)
-                dependencyNode.appendNode('artifactId', it.name)
-                dependencyNode.appendNode('version', it.version)
+            root.get('packaging').get(0).setValue('aar')
+            def dependenciesNode = asNode().appendNode('dependencies')
+            project.configurations.implementation.allDependencies.each {
+                // Ensure dependencies such as fileTree are not included.
+                if (it.name != 'unspecified') {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                }
             }
-        }
         }
         root.children().last() + PomConfig.common
         root.children().last() + PomConfig.gpl
