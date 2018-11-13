@@ -128,22 +128,21 @@ if (project.hasProperty('signing.secretKeyRingFile')) {
 
 def configurePom(pom) {
     pom.withXml {
-        def root = asNode ()
-
+        def root = asNode()
         root.appendNode('description', project.description)
         root.appendNode('name', project.name)
         if (isAndroidProject(project)) {
-        root.get('packaging').get(0).setValue('aar')
-        def dependenciesNode = asNode().appendNode('dependencies')
-        project.configurations.compile.allDependencies.each {
-            // Ensure dependencies such as fileTree are not included.
-            if (it.name != 'unspecified') {
-                def dependencyNode = dependenciesNode.appendNode('dependency')
-                dependencyNode.appendNode('groupId', it.group)
-                dependencyNode.appendNode('artifactId', it.name)
-                dependencyNode.appendNode('version', it.version)
+            root.get('packaging').get(0).setValue('aar')
+            def dependenciesNode = asNode().appendNode('dependencies')
+            project.configurations.compile.allDependencies.each {
+                // Ensure dependencies such as fileTree are not included.
+                if (it.name != 'unspecified') {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                }
             }
-        }
         }
         root.children().last() + PomConfig.common
         root.children().last() + PomConfig.gpl
@@ -303,7 +302,7 @@ if (!isCommercial(project)) {
                         sync = false //[Default: true] Determines whether to sync the version to Maven Central.
                         user = getVar('centraluser', project) //OSS user token: mandatory
                         password = getVar('centralpassword', project) //OSS user password: mandatory
-                        close = '1'
+                        close = '0'
                         //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
                     }
                 }
