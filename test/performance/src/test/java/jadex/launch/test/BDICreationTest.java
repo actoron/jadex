@@ -57,7 +57,8 @@ public class BDICreationTest //extends TestCase
 		});
 		
 		// 2 times timeout should do on all build servers. if test fails, check if platform has become slower ;-)
-		Collection<Tuple2<String, Object>>	results	= fut.get(timeout*2);
+//		Collection<Tuple2<String, Object>>	results	= 
+			fut.get(timeout*2);
 		
 //		// Write values to property files for hudson plot plugin.
 //		Collection<Tuple2<String, Object>>	results	= fut.get(sus, timeout);

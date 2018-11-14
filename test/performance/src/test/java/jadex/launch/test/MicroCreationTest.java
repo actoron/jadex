@@ -12,10 +12,10 @@ import java.util.Properties;
 import org.junit.Test;
 
 import jadex.base.Starter;
+import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -35,23 +35,24 @@ public class MicroCreationTest //extends TestCase
 	{
 		long timeout	= Starter.getDefaultTimeout(null);
 //		ISuspendable	sus	= 	new ThreadSuspendable();
-		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
-//			"-kernels", "\"micro\"",
-//			"-logging_level", "java.util.logging.Level.INFO",
-			//"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
-			"-libpath", SUtil.getOutputDirsExpression("jadex-integration-performance-test", true),
-			"-awareness", "false",	// otherwise influences performance measure
-			"-gui", "false",
-			"-saveonexit", "false",
-			"-welcome", "false",
-			"-extensions", "null",
-			"-chat", "false",
-			"-cli", "false",
-//			"-autoshutdown", "true",
-//			"-componentfactory", "jadex.component.ComponentComponentFactory",
-//			"-conf", "jadex.standalone.Platform.component.xml",
-//			"-deftimeout", "-1",
-			"-printpass", "false"}).get(timeout);
+//		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
+////			"-kernels", "\"micro\"",
+////			"-logging_level", "java.util.logging.Level.INFO",
+//			//"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
+//			"-libpath", SUtil.getOutputDirsExpression("jadex-integration-performance-test", true),
+//			"-awareness", "false",	// otherwise influences performance measure
+//			"-gui", "false",
+//			"-saveonexit", "false",
+//			"-welcome", "false",
+//			"-extensions", "null",
+//			"-chat", "false",
+//			"-cli", "false",
+////			"-autoshutdown", "true",
+////			"-componentfactory", "jadex.component.ComponentComponentFactory",
+////			"-conf", "jadex.standalone.Platform.component.xml",
+////			"-deftimeout", "-1",
+//			"-printpass", "false"}).get(timeout);
+		IExternalAccess	platform	= Starter.createPlatform(STest.getLocalTestConfig(getClass())).get(timeout);
 		timeout	= Starter.getDefaultTimeout(platform.getId());
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
