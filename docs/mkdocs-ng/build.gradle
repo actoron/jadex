@@ -141,9 +141,11 @@ class PandocTask extends DockerTask {
     def action() {
         // copy doc source to work dir
         java.nio.file.Path target = Paths.get(project.buildDir.path,"work")
+
         jadex.commons.SUtil.deleteDirectory(target.toFile())
 
         org.apache.commons.io.FileUtils.copyDirectory(Paths.get(project.buildDir.path, "mkdocs", "docs").toFile(), target.toFile())
+        target.toFile().setWritable(true, false)
 
         Map<String,List<String>> mdFiles = new HashMap<String,List<String>>()
 
@@ -188,9 +190,12 @@ class PandocTask extends DockerTask {
         String indexContents = new File(target.toFile(), indexMd).text
         mdArgs.add(indexMd)
 
-        Pattern matchChapter = Pattern.compile('^\\[[^\\]]*\\]\\((.*)\\/.*\\)', Pattern.MULTILINE)
+        println mdFiles
+
+        Pattern matchChapter = Pattern.compile('\\[[^\\]]*\\]\\((.*)\\/.+\\)', Pattern.MULTILINE)
         def matcher = matchChapter.matcher(indexContents)
         while (matcher.find()) {
+            println "found chapter " + matcher.group(1)
             def mds = mdFiles.get(matcher.group(1))
             if (mds != null) {
                 for (md in mds.sort()) {
