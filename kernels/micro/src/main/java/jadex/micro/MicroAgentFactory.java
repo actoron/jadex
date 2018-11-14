@@ -162,7 +162,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //	public IFuture<Void> startService()
 //	{
 //		final Future<Void> ret = new Future<Void>();
-//		provider.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//		provider.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 //		{
 //			public void customResultAvailable(ILibraryService result)

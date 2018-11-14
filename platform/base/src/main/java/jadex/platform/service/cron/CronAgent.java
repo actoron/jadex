@@ -10,7 +10,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
@@ -70,7 +70,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @Service
 @ProvidedServices(@ProvidedService(type=ICronService.class, implementation=@Implementation(expression="$pojoagent")))
-@RequiredServices(@RequiredService(name="clockser", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="clockser", type=IClockService.class, scope=ServiceScope.PLATFORM))
 @Configurations(
 {
 	@Configuration(name="realtime clock"),

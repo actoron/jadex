@@ -2,6 +2,7 @@ package jadex.bridge.service.component;
 
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.future.IFuture;
 
 /**
@@ -37,7 +38,7 @@ public interface IExternalProvidedServicesFeature
 	 *  @param service The service.
 	 *  @param scope	The service scope.
 	 */
-	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi, String scope);
+	public IFuture<Void> addService(String name, Class<?> type, Object service, PublishInfo pi, ServiceScope scope);
 	
 	/**
 	 *  Sets the tags of a service.

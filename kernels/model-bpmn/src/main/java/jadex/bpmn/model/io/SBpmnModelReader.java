@@ -39,6 +39,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -1066,7 +1067,7 @@ public class SBpmnModelReader
 					rs.setMultiple(multi.booleanValue());
 				}
 				rs.setDefaultBinding(new RequiredServiceBinding());
-				rs.getDefaultBinding().setScope(scope);
+				rs.getDefaultBinding().setScope(ServiceScope.valueOf(scope.toUpperCase()));
 				// Dropped in v4??
 //				if(dyn!=null)
 //					rs.getDefaultBinding().setDynamic(Boolean.parseBoolean(dyn));
@@ -1088,7 +1089,7 @@ public class SBpmnModelReader
 				RequiredServiceInfo rs = new RequiredServiceInfo();
 				rs.setName(name);
 				rs.setDefaultBinding(new RequiredServiceBinding());
-				rs.getDefaultBinding().setScope(scope);
+				rs.getDefaultBinding().setScope(ServiceScope.valueOf(scope));
 				vals.add(rs);
 			}
 			else if ("configuration".equals(tag.getLocalPart()))

@@ -147,7 +147,7 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode implements IAndroi
 		
 //		if(service.getType().getType(null)==null)
 //		{
-//			ea.getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			ea.getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 //				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
 //			{
 //				public void customResultAvailable(ILibraryService ls)

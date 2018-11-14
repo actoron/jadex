@@ -30,7 +30,7 @@ public class ProvidedServiceInfo
 	protected PublishInfo publish;
 	
 	/** The scope. */
-	protected String scope;
+	protected ServiceScope scope;
 	
 	/** The service properties. */
 	protected List<UnparsedExpression> properties;
@@ -51,7 +51,7 @@ public class ProvidedServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, String scope, PublishInfo publish, List<UnparsedExpression> properties)
+	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, ServiceScope scope, PublishInfo publish, List<UnparsedExpression> properties)
 	{
 		this(name, type!=null? new ClassInfo(SReflect.getClassName(type)): null, implementation, scope, publish, properties, ServiceIdentifier.isSystemService(type));
 	}
@@ -59,7 +59,7 @@ public class ProvidedServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation, String scope, PublishInfo publish, List<UnparsedExpression> properties, boolean systemservice)
+	public ProvidedServiceInfo(String name, ClassInfo type, ProvidedServiceImplementation implementation, ServiceScope scope, PublishInfo publish, List<UnparsedExpression> properties, boolean systemservice)
 	{
 		this.name = name;
 		this.implementation = implementation;
@@ -172,7 +172,7 @@ public class ProvidedServiceInfo
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public String getScope()
+	public ServiceScope getScope()
 	{
 		return scope;
 	}
@@ -181,7 +181,7 @@ public class ProvidedServiceInfo
 	 *  Set the scope.
 	 *  @param scope The scope to set.
 	 */
-	public void setScope(String scope)
+	public void setScope(ServiceScope scope)
 	{
 		this.scope = scope;
 	}

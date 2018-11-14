@@ -1,7 +1,6 @@
 package jadex.micro.testcases.semiautomatic.nfproperties;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.service.IService;

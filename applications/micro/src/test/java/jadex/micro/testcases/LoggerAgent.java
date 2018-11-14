@@ -12,7 +12,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
@@ -37,7 +37,7 @@ import jadex.micro.testcases.LoggerAgent.TestLogHandler;
 @Imports({"java.util.logging.*"})
 @Description("Tests the logger.")
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
-@RequiredServices({@RequiredService(name="clockservice", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)})
+@RequiredServices({@RequiredService(name="clockservice", type=IClockService.class, scope=ServiceScope.PLATFORM)})
 @Properties({
 	@NameValue(name="logging.level", value="Level.FINEST"),
 //	@NameValue(name="logging.useParentHandlers", value="true"),

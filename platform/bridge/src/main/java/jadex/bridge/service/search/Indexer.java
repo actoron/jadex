@@ -14,7 +14,7 @@ import java.util.Set;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SUtil;
@@ -565,7 +565,7 @@ public class Indexer<T>
 				}
 				else if(QueryInfoExtractor.KEY_TYPE_PROVIDER.equals(keytype))
 				{
-					if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(query.getScope()))
+					if(ServiceScope.COMPONENT_ONLY.equals(query.getScope()))
 						ret = new SetWrapper<String>(query.getSearchStart() != null ? query.getSearchStart().toString() : query.getOwner().toString());
 				}
 				else if(QueryInfoExtractor.KEY_TYPE_PLATFORM.equals(keytype))

@@ -1,5 +1,6 @@
 package jadex.micro.tutorial;
 
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.RequiredServices;
 	implementation=@Implementation(value=ChatServiceD5.class)))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class),
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=RequiredService.SCOPE_GLOBAL)
+	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=ServiceScope.GLOBAL)
 })
 public class ChatD5Agent
 {

@@ -16,6 +16,7 @@ import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceEvent;
@@ -41,7 +42,6 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 
 /**
  *  Super peer collects services from client and answers search requests and queries.
@@ -49,9 +49,9 @@ import jadex.micro.annotation.RequiredService;
 @Agent(autostart=@Autostart(name="superpeer", value=Boolean3.FALSE))
 @Service
 @ProvidedServices(replace=true,
-	value={@ProvidedService(type=ISuperpeerService.class, scope=RequiredService.SCOPE_GLOBAL),
-		   @ProvidedService(type=ISuperpeerCollaborationService.class, scope=RequiredService.SCOPE_GLOBAL),
-		   @ProvidedService(type=ISuperpeerStatusService.class, scope=RequiredService.SCOPE_PLATFORM)})
+	value={@ProvidedService(type=ISuperpeerService.class, scope=ServiceScope.GLOBAL),
+		   @ProvidedService(type=ISuperpeerCollaborationService.class, scope=ServiceScope.GLOBAL),
+		   @ProvidedService(type=ISuperpeerStatusService.class, scope=ServiceScope.PLATFORM)})
 public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerCollaborationService, ISuperpeerStatusService
 {
 	/** The agent. */

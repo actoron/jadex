@@ -9,6 +9,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -230,7 +231,7 @@ public class MessagePerformanceAgent
 		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 //		if(auto)
 //		{
-//			agent.getFeature(IRequiredServicesFeature.class).searchService(IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+//			agent.getFeature(IRequiredServicesFeature.class).searchService(IEchoService.class, ServiceScope.GLOBAL)
 //				.addResultListener(new IResultListener<IEchoService>()
 //			{
 //				public void resultAvailable(IEchoService result)
@@ -297,6 +298,6 @@ public class MessagePerformanceAgent
 	 */
 	public IFuture<Long> getTime()
 	{
-		return new Future<Long>(new Long(agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()));
+		return new Future<Long>(new Long(agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM)).getTime()));
 	}
 }

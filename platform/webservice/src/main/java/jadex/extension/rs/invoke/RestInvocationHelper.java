@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -88,7 +88,7 @@ public class RestInvocationHelper
 										 			  final Class<?> resttype,
 										 			  final boolean inurlparams)
 	{
-		IDaemonThreadPoolService tp = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IDaemonThreadPoolService tp = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IDaemonThreadPoolService.class, ServiceScope.PLATFORM));
 		final Future<String> ret = new Future<String>();
 		final IExternalAccess exta = component.getExternalAccess();
 		Runnable runnable = new Runnable()

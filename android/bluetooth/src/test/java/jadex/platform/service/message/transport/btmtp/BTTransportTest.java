@@ -117,9 +117,9 @@ public class BTTransportTest {
 	public void testEncodeDecodeComplex() {
 
 //		ISearchManager sm = SServiceProvider.getSearchManager(false,
-//				RequiredServiceInfo.SCOPE_GLOBAL);
+//				ServiceScope.GLOBAL);
 //		IVisitDecider vd = SServiceProvider.getVisitDecider(false,
-//				RequiredServiceInfo.SCOPE_GLOBAL);
+//				ServiceScope.GLOBAL);
 //		BasicResultSelector rs = new BasicResultSelector();
 //
 //		RemoteSearchCommand rsc = new RemoteSearchCommand("rms@anywhere", sm,
@@ -197,9 +197,9 @@ public class BTTransportTest {
 //	@Test
 //	public void testSendMessage() {
 //		ISearchManager sm = SServiceProvider.getSearchManager(false,
-//				RequiredServiceInfo.SCOPE_GLOBAL);
+//				ServiceScope.GLOBAL);
 //		IVisitDecider vd = SServiceProvider.getVisitDecider(false,
-//				RequiredServiceInfo.SCOPE_GLOBAL);
+//				ServiceScope.GLOBAL);
 //		BasicResultSelector rs = new BasicResultSelector();
 //
 //		RemoteSearchCommand rsc = new RemoteSearchCommand("rms@anywhere", sm,

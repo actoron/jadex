@@ -26,7 +26,7 @@ public class RawBlockingTestAgent extends JunitAgentTest
 	public void	execute(final IInternalAccess agent)
 	{
 //		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
-//			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//			IComponentManagementService.class, ServiceScope.PLATFORM));
 		
 //		cms.getComponentDescriptions().get();
 		SComponentManagementService.getComponentDescriptions(agent).get();

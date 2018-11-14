@@ -10,6 +10,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
@@ -40,7 +41,7 @@ import jadex.micro.examples.messagequeue.Event;
 @Service
 @ProvidedServices({@ProvidedService(type = IMessageQueueReplicableService.class, implementation = @Implementation(expression = "$pojoagent")),
 	@ProvidedService(type = IMessageQueueReplicationService.class, implementation = @Implementation(expression = "$pojoagent")) })
-@RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, multiple = true, scope = RequiredService.SCOPE_GLOBAL, name = "replication"))
+@RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, multiple = true, scope = ServiceScope.GLOBAL, name = "replication"))
 @Arguments(@Argument(name = "searchinterval", clazz = Integer.class, defaultvalue = "1000"))
 public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableService, IMessageQueueReplicationService 
 {

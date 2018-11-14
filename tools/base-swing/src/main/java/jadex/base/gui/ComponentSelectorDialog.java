@@ -42,7 +42,6 @@ import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.IResultListener;

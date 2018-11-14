@@ -6,6 +6,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -36,7 +37,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @RequiredServices({
 	@RequiredService(name="chat_intern", type=IChatGuiService.class),
-	@RequiredService(name="chat_extern", type=IChatGuiService.class, scope=RequiredService.SCOPE_PLATFORM)
+	@RequiredService(name="chat_extern", type=IChatGuiService.class, scope=ServiceScope.PLATFORM)
 })
 public class EchoChatAgent
 {

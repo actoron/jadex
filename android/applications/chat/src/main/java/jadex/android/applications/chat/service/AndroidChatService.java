@@ -14,6 +14,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
@@ -270,7 +271,7 @@ public class AndroidChatService extends JadexPlatformService
 	private IFuture<Void> subscribe()
 	{
 		final Future<Void> fut = new Future<Void>();
-		platform.searchService( new ServiceQuery<>( IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		platform.searchService( new ServiceQuery<>( IChatGuiService.class, ServiceScope.PLATFORM))
 				.addResultListener(new IResultListener<IChatGuiService>()
 				{
 					public void resultAvailable(IChatGuiService service)
@@ -380,7 +381,7 @@ public class AndroidChatService extends JadexPlatformService
 	private IFuture<Void> sendMessage(final String message)
 	{
 		final Future<Void> fut = new Future<Void>();
-		platform.searchService( new ServiceQuery<>( IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
+		platform.searchService( new ServiceQuery<>( IChatGuiService.class, ServiceScope.PLATFORM)).addResultListener(
 				new DefaultResultListener<IChatGuiService>()
 				{
 					public void resultAvailable(IChatGuiService chat)

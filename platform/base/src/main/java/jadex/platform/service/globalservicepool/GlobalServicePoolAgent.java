@@ -18,7 +18,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -127,11 +127,11 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 		{
 			info.setResourceIdentifier(agent.getModel().getResourceIdentifier());
 		}
-		ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null);
+		ProvidedServiceInfo psi = new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null);
 		info.setProvidedServiceInfos(new ProvidedServiceInfo[]{psi});
 		ser.addServiceType(servicetype,
 			new DefaultPoolStrategy(strategy.getWorkersPerProxy(), 35000, strategy.getWorkersPerProxy()),	// Is this correct???
-			componentmodel, info, null, RequiredServiceInfo.SCOPE_PARENT).addResultListener(new DelegationResultListener<Void>(ret)
+			componentmodel, info, null, ServiceScope.PARENT).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result) 
 			{
@@ -141,7 +141,7 @@ public class GlobalServicePoolAgent implements IGlobalServicePoolService, IGloba
 				props.add(new UnparsedExpression(ITargetResolver.TARGETRESOLVER, GlobalServicePoolTargetResolver.class.getName()+".class"));
 				psi.setProperties(props);
 				Object service = ProxyFactory.newProxyInstance(agent.getClassLoader(), new Class[]{servicetype}, new ForwardHandler(servicetype));
-				agent.getFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, null, RequiredServiceInfo.SCOPE_PARENT).addResultListener(new DelegationResultListener<Void>(ret));
+				agent.getFeature(IProvidedServicesFeature.class).addService(null, servicetype, service, null, ServiceScope.PARENT).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception) 

@@ -133,7 +133,7 @@ public abstract class AbstractEnvironmentService
 //		{
 //			public void customResultAvailable(Void result)
 //			{
-//				component.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				component.getServiceContainer().searchService(IComponentManagementService.class, ServiceScope.PLATFORM)
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentDescription>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)

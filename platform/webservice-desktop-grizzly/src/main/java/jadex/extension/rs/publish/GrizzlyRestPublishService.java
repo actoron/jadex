@@ -25,7 +25,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -70,7 +70,7 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
     {
         try
         {
-        	final IService service = component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null, RequiredServiceInfo.SCOPE_PLATFORM).setServiceIdentifier(serviceid)).get();
+        	final IService service = component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null, ServiceScope.PLATFORM).setServiceIdentifier(serviceid)).get();
         	
             final URI uri = new URI(getCleanPublishId(info.getPublishId()));
             HttpServer server = (HttpServer)getHttpServer(uri, info);

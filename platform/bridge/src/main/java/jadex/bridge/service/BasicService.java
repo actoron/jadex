@@ -515,7 +515,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  Create a new service identifier for the own component.
 	 */
 	public static IServiceIdentifier createServiceIdentifier(IInternalAccess provider, String servicename, 
-		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope)
+		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, ServiceScope scope)
 	{
 		return new ServiceIdentifier(provider, servicetype, servicename!=null? servicename: generateServiceName(servicetype), rid, scope);
 	}
@@ -523,7 +523,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	/**
 	 *  Create a new service identifier for a potentially remote component.
 	 */
-	public static ServiceIdentifier	createServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)
+	public static ServiceIdentifier	createServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, ServiceScope scope, Set<String> networknames, boolean unrestricted)
 	{
 		return new ServiceIdentifier(providerid, type, supertypes, servicename, rid, scope, networknames, unrestricted);
 	}

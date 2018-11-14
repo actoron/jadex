@@ -35,8 +35,7 @@ import javax.swing.filechooser.FileFilter;
 import jadex.base.gui.AboutDialog;
 import jadex.base.gui.StatusBar;
 import jadex.bridge.VersionInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.SUtil;
@@ -163,7 +162,7 @@ public class ControlCenterWindow extends JFrame
 			{
 				final boolean sel = soe.isSelected();
 				controlcenter.setSaveOnExit(sel);
-				controlcenter.getPCC().getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				controlcenter.getPCC().getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM))
 					.addResultListener(new IResultListener<ISettingsService>()
 				{
 					public void resultAvailable(ISettingsService setser)

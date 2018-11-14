@@ -729,7 +729,7 @@ public class SComponentManagementService
 //	 */
 //	protected static IFuture<IComponentManagementService> getRemoteCMS(IInternalAccess agent, final IComponentIdentifier cid)
 //	{
-//		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+//		ServiceQuery<IComponentManagementService> sq = new ServiceQuery<IComponentManagementService>(IComponentManagementService.class, ServiceScope.GLOBAL);
 //		sq.setPlatform(cid.getRoot());
 //		return agent.getFeature(IRequiredServicesFeature.class).searchService(sq);
 //	}
@@ -910,7 +910,7 @@ public class SComponentManagementService
 		boolean remote = false;
 		if(remote)
 		{
-//			IFuture<Collection<IComponentManagementService>> futi = agent.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(RequiredServiceInfo.SCOPE_GLOBAL)));
+//			IFuture<Collection<IComponentManagementService>> futi = agent.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(ServiceScope.GLOBAL)));
 //			futi.addResultListener(createResultListener(agent, new IResultListener<Collection<IComponentManagementService>>()
 //			{
 //				public void resultAvailable(Collection<IComponentManagementService> result)
@@ -3002,7 +3002,7 @@ public class SComponentManagementService
 //		else
 //		{
 ////			ILibraryService	ls	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class));
-//			Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>( IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//			Collection<IComponentFactory> facs = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>( IComponentFactory.class, ServiceScope.PLATFORM));
 //			FactoryFilter facfilter = new FactoryFilter(filename, null, rid);
 //			
 //			SFilter.applyFilter(facs, facfilter).addResultListener(new IResultListener<Collection<IComponentFactory>>()

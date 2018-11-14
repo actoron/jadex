@@ -11,7 +11,7 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -35,7 +35,7 @@ import jadex.micro.annotation.Results;
  *  Simple test agent with one service for testing parameter and result copying.
  */
 @ProvidedServices(@ProvidedService(type=ICService.class, implementation=@Implementation(expression="$pojoagent")))
-@RequiredServices(@RequiredService(name="cservice", type=ICService.class, scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY))
+@RequiredServices(@RequiredService(name="cservice", type=ICService.class, scope=ServiceScope.COMPONENT_ONLY))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Service(ICService.class)
 @Agent

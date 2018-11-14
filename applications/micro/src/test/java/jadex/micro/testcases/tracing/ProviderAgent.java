@@ -2,7 +2,7 @@ package jadex.micro.testcases.tracing;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -44,7 +44,7 @@ public class ProviderAgent implements ITestService
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		System.out.println("Called method1: "+msg+" "+sc+" "+Thread.currentThread());
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ITestService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ITestService.class, ServiceScope.COMPONENT_ONLY))
 			.addResultListener(new ExceptionDelegationResultListener<ITestService, Void>(ret)
 		{
 			public void customResultAvailable(ITestService ts)

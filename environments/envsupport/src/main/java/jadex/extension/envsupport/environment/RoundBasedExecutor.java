@@ -9,8 +9,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -93,12 +92,12 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		
-		space.getExternalAccess().searchService( new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		space.getExternalAccess().searchService( new ServiceQuery<>( IExecutionService.class, ServiceScope.PLATFORM))
 			.addResultListener(new DefaultResultListener<IExecutionService>()
 		{
 			public void resultAvailable(final IExecutionService exeservice)
 			{
-				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM))
 					.addResultListener(new DefaultResultListener<IClockService>()
 				{
 					public void resultAvailable(final IClockService clockservice)

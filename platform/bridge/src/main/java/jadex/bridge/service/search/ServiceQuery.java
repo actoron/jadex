@@ -12,57 +12,16 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
-import jadex.commons.transformation.annotations.Include;
 
 /**
  *  Service query definition. T is the return type for search methods.
  */
 public class ServiceQuery<T>
-{
-	//-------- constants --------
-	
-	/** None component scope (nothing will be searched, forces required service creation). */
-	public static final String SCOPE_NONE = RequiredServiceInfo.SCOPE_NONE;
-	
-	/** Parent scope. */
-	public static final String SCOPE_PARENT = RequiredServiceInfo.SCOPE_PARENT;
-	
-	// todo: rename (COMPONENT_LOCAL)
-	/** Local component scope. */
-	public static final String SCOPE_COMPONENT_ONLY = RequiredServiceInfo.SCOPE_COMPONENT_ONLY;
-	
-	/** Component scope (component and subcomponents). */
-	public static final String SCOPE_COMPONENT = RequiredServiceInfo.SCOPE_COMPONENT;
-	
-	// todo: rename (APPLICATION_PLATFORM) or remove
-	/** Application scope (local application, i.e. second level component plus all subcomponents). */
-	public static final String SCOPE_APPLICATION = RequiredServiceInfo.SCOPE_APPLICATION;
-
-	/** Platform scope (all components on the local platform). */
-	public static final String SCOPE_PLATFORM = RequiredServiceInfo.SCOPE_PLATFORM;
-
-	
-	
-	/** Application network scope (any platform with which a secret is shared and application tag must be shared). */
-	public static final String SCOPE_APPLICATION_NETWORK = RequiredServiceInfo.SCOPE_APPLICATION_NETWORK;
-//	public static final String SCOPE_APPLICATION_CLOUD = "application_cloud";
-	
-	/** Network scope (any platform with which a secret is shared). */
-	public static final String SCOPE_NETWORK = RequiredServiceInfo.SCOPE_NETWORK;
-//	public static final String SCOPE_CLOUD = "cloud";
-		
-	// needed?!
-	/** Global application scope. */
-	public static final String SCOPE_APPLICATION_GLOBAL = RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL;
-		
-	/** Global scope (any reachable platform including those with unrestricted services). */
-	public static final String SCOPE_GLOBAL = RequiredServiceInfo.SCOPE_GLOBAL;
-	
-	
+{	
 	/** The raw proxy type (i.e. no proxy). */
 	public static final String	PROXYTYPE_RAW	= BasicServiceInvocationHandler.PROXYTYPE_RAW;
 	
@@ -212,7 +171,7 @@ public class ServiceQuery<T>
 	protected Boolean unrestricted;
 	
 	/** The search scope. */
-	protected String scope;
+	protected ServiceScope scope;
 	
 	/** The query owner. (rename queryowner?) */
 	protected IComponentIdentifier owner;
@@ -279,7 +238,7 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(Class<T> servicetype, String scope)
+	public ServiceQuery(Class<T> servicetype, ServiceScope scope)
 	{
 		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, null);
 	}
@@ -294,7 +253,7 @@ public class ServiceQuery<T>
 //		this.servicetype = new ClassInfo(servicetype);
 //		this.returntype = this.servicetype;
 //		// todo: what is the best place for this?
-//		this.scope = scope==null && ServiceIdentifier.isSystemService(servicetype)? RequiredServiceInfo.SCOPE_PLATFORM: scope;
+//		this.scope = scope==null && ServiceIdentifier.isSystemService(servicetype)? ServiceScope.PLATFORM: scope;
 //		this.filter = filter;
 //		this.provider = provider;
 //		this.owner = owner;
@@ -361,7 +320,7 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier owner)
+	public ServiceQuery(Class<T> servicetype, ServiceScope scope, IComponentIdentifier owner)
 	{
 		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, owner);
 	}
@@ -369,17 +328,18 @@ public class ServiceQuery<T>
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner)
+	public ServiceQuery(ClassInfo servicetype, ServiceScope scope, IComponentIdentifier owner)
 	{
 //		if(owner==null)
 //			throw new IllegalArgumentException("Owner must not null");
 		
 		this.servicetype = servicetype;
-		this.scope = scope;
 		this.owner = owner;
 		
 		this.id = SUtil.createUniqueId();
 		this.networknames = NETWORKS_NOT_SET;
+		
+		setScope(scope);
 	}
 	
 	/**
@@ -457,7 +417,7 @@ public class ServiceQuery<T>
 	 *  Get the scope.
 	 *  @return The scope
 	 */
-	public String getScope()
+	public ServiceScope getScope()
 	{
 		return scope;
 	}
@@ -466,9 +426,9 @@ public class ServiceQuery<T>
 	 *  Set the scope.
 	 *  @param scope The scope to set
 	 */
-	public ServiceQuery<T> setScope(String scope)
+	public ServiceQuery<T> setScope(ServiceScope scope)
 	{
-		this.scope = scope;
+		this.scope = scope!=null?scope:ServiceScope.DEFAULT;
 		return this;
 	}
 	
@@ -512,7 +472,7 @@ public class ServiceQuery<T>
 	public ServiceQuery<T> setProvider(IComponentIdentifier provider)
 	{
 		this.searchstart = provider;
-		this.scope = RequiredServiceInfo.SCOPE_COMPONENT_ONLY;
+		this.scope = ServiceScope.COMPONENT_ONLY;
 		return this;
 	}
 	
@@ -690,7 +650,7 @@ public class ServiceQuery<T>
 		if(platform != null)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[]{platform.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PLATFORM)));
 		
-		if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
+		if(ServiceScope.COMPONENT_ONLY.equals(scope))
 		{
 			if (searchstart != null)
 				ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[]{searchstart.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PROVIDER)));
@@ -786,7 +746,7 @@ public class ServiceQuery<T>
 			}
 		}
 		
-		if (RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope) &&
+		if (ServiceScope.COMPONENT_ONLY.equals(scope) &&
 			!((searchstart != null && service.getProviderId().equals(searchstart)) ||
 			service.getProviderId().equals(owner)))
 			return false;
@@ -900,7 +860,7 @@ public class ServiceQuery<T>
 		if (getPlatform()!=null)
 			return getPlatform().getRoot();
 		
-		if (RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
+		if (ServiceScope.COMPONENT_ONLY.equals(scope))
 			return searchstart != null ? searchstart.getRoot() : owner.getRoot();
 			
 		return null;
@@ -965,7 +925,7 @@ public class ServiceQuery<T>
 			ret.append(unrestricted);
 		}
 
-		if(scope!=null)
+		if(scope!=null && !ServiceScope.DEFAULT.equals(scope))
 		{
 			ret.append(ret.length()==13?"":", ");
 			ret.append("scope=");

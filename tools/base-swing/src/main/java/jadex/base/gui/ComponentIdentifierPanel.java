@@ -22,8 +22,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
@@ -136,7 +135,7 @@ public class ComponentIdentifierPanel extends JPanel
 		add(content, BorderLayout.CENTER);
 		add(help, BorderLayout.SOUTH);
 		
-		access.searchService( new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		access.searchService( new ServiceQuery<>( ITransportAddressService.class, ServiceScope.PLATFORM))
 			.addResultListener(new IResultListener<ITransportAddressService>()
 		{
 			public void resultAvailable(ITransportAddressService tas)

@@ -136,7 +136,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 //			// or just a name? Then find the ttp security service by searching (and comparing names)
 //			else
 //			{
-//				SServiceProvider.getServices(secser.getComponent(), ISecurityService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+//				SServiceProvider.getServices(secser.getComponent(), ISecurityService.class, ServiceScope.GLOBAL)
 //					.addResultListener(new IIntermediateResultListener<ISecurityService>()
 //				{
 //					// Flag that indicates if ttpservice was found and is checked now

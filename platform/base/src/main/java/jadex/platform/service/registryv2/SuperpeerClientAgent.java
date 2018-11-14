@@ -24,7 +24,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RemoteMethodInvocationHandler;
@@ -61,7 +61,6 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Autostart;
-import jadex.micro.annotation.RequiredService;
 
 /**
  *  The super peer client agent is responsible for managing connections to super peers for each network.
@@ -426,7 +425,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						{
 							cnt.incrementAndGet();
 							
-							IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new BasicComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform), new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, RequiredService.SCOPE_NETWORK, null, true);
+							IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new BasicComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform), new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, ServiceScope.NETWORK, null, true);
 							IRemoteRegistryService rrs = (IRemoteRegistryService) RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
 							if(timeout>0)
 							{
@@ -522,8 +521,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		// If networks set, but query has global scope -> add global network
 		if(ret!=null)
 		{
-			if (RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope()) ||
-				RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope()))
+			if (ServiceScope.GLOBAL.equals(query.getScope()) ||
+				ServiceScope.APPLICATION_GLOBAL.equals(query.getScope()))
 			{
 				Set<String> retset = new LinkedHashSet<>(Arrays.asList(ret));
 				retset.add(GLOBAL_NETWORK_NAME);
@@ -536,8 +535,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		{
 			Set<String> retset;
 			if(connections.containsKey(GLOBAL_NETWORK_NAME)
-				&& !RequiredServiceInfo.SCOPE_GLOBAL.equals(query.getScope())
-				&& !RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(query.getScope()))
+				&& !ServiceScope.GLOBAL.equals(query.getScope())
+				&& !ServiceScope.APPLICATION_GLOBAL.equals(query.getScope()))
 			{
 				// use all connections but exclude global
 				retset = new LinkedHashSet<>(connections.keySet());
@@ -629,7 +628,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			agent.getLogger().info(agent+" searching for super peers for network "+networkname);
 			
 			// Also finds and adds locally available super peers -> locaL registry only contains local services, (local/remote) super peer manages separate registry
-			ServiceQuery<ISuperpeerService>	sq	= new ServiceQuery<>(ISuperpeerService.class, RequiredService.SCOPE_GLOBAL).setNetworkNames(networkname);
+			ServiceQuery<ISuperpeerService>	sq	= new ServiceQuery<>(ISuperpeerService.class, ServiceScope.GLOBAL).setNetworkNames(networkname);
 			ISubscriptionIntermediateFuture<ISuperpeerService>	queryfut	= agent.getFeature(IRequiredServicesFeature.class).addQuery(sq);
 			superpeerquery	= queryfut;	// Remember current query.
 			queryfut.addResultListener(new IntermediateDefaultResultListener<ISuperpeerService>()
@@ -693,13 +692,13 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									if(global)
 									{
 										// SSP connection -> global scope and no network name
-										lquery.setScope(RequiredServiceInfo.SCOPE_GLOBAL);
+										lquery.setScope(ServiceScope.GLOBAL);
 										lquery.setNetworkNames((String[])null);
 									}
 									else
 									{
 										// Local SP connection -> network scope and network name
-										lquery.setScope(RequiredServiceInfo.SCOPE_NETWORK);
+										lquery.setScope(ServiceScope.NETWORK);
 										lquery.setNetworkNames(networkname);
 									}
 									localquery = ServiceRegistry.getRegistry(agent.getId()).addQuery(lquery);									
@@ -721,8 +720,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		
 										public void intermediateResultAvailable(final ServiceEvent<IServiceIdentifier> event)
 										{
-											if(global && RequiredServiceInfo.isGlobalScope(event.getService().getScope())
-												|| !global && !RequiredServiceInfo.isScopeOnLocalPlatform(event.getService().getScope()))	// TODO: hack!!! global vs network should be exclusive???
+											if(global && event.getService().getScope().isGlobal()
+												|| !global && !event.getService().getScope().isLocal())	// TODO: hack!!! global vs network should be exclusive???
 //												|| !global && RequiredServiceInfo.isNetworkScope(event.getService().getScope()))
 											{
 												agent.scheduleStep(new IComponentStep<Void>()

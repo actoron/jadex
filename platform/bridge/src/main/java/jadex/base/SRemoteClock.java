@@ -45,7 +45,7 @@ public class SRemoteClock
 				cs.setDilation(dilation);
 				ret.setResult(null);
 				
-//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
@@ -89,7 +89,7 @@ public class SRemoteClock
 				cs.setDelta(delta);
 				ret.setResult(null);
 				
-//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)

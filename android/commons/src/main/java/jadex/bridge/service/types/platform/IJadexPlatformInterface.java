@@ -5,6 +5,7 @@ import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.commons.future.IFuture;
@@ -67,7 +68,7 @@ public interface IJadexPlatformInterface
 	 * @param scope Search scope. See {@link RequiredServiceInfo} constants.
 	 * @return Future of the service.
 	 */
-	public <S> IFuture<S> getService(final Class<S> serviceClazz, final String scope);
+	public <S> IFuture<S> getService(final Class<S> serviceClazz, final ServiceScope scope);
 	
 	/**
 	 * Retrieves the platformId of the last started Platform, if any.

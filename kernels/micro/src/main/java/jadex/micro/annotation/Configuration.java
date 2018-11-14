@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.Boolean3;
 
 
@@ -51,7 +51,7 @@ public @interface Configuration
 	/**
 	 *  The scope flag.
 	 */
-	public String scope() default RequiredServiceInfo.SCOPE_GLOBAL;
+	public ServiceScope scope() default ServiceScope.GLOBAL;
 	
 //	/**
 //	 *  The master flag.

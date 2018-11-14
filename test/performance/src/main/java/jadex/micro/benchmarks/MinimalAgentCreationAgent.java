@@ -15,7 +15,7 @@ import jadex.bridge.component.ILifecycleComponentFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
@@ -82,7 +82,7 @@ public class MinimalAgentCreationAgent
 		
 		if(args.get("num")==null)
 		{
-			IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+			IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 			System.gc();
 			try
 			{
@@ -127,7 +127,7 @@ public class MinimalAgentCreationAgent
 		}
 		else
 		{
-			IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+			IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 			final long end = clock.getTime();
 			
 			System.gc();
@@ -157,7 +157,7 @@ public class MinimalAgentCreationAgent
 			// If nested, use initial component to kill others
 //				else
 			{
-//				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 				String	initial	= createPeerName(1, agent.getId());
 				IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
 				agent.getExternalAccess(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
@@ -169,7 +169,7 @@ public class MinimalAgentCreationAgent
 							@Classname("deletePeers")
 							public IFuture<Void> execute(final IInternalAccess ia)
 							{
-								IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+								IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 								((MinimalAgentCreationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
 								return IFuture.DONE;
 							}
@@ -232,7 +232,7 @@ public class MinimalAgentCreationAgent
 	protected void killLastPeer(final int max, final long killstarttime, final double dur, final double pera, 
 		final long omem, final double upera)
 	{
-		IClockService cs = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IClockService cs = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 		long killend = cs.getTime();
 		System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 		double killdur = ((double)killend-killstarttime)/1000.0;

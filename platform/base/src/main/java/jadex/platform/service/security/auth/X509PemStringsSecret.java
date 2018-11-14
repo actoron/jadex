@@ -3,7 +3,6 @@ package jadex.platform.service.security.auth;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import jadex.commons.Base64;
 import jadex.commons.SUtil;
 
 /**

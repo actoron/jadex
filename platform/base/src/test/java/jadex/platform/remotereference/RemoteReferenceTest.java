@@ -7,7 +7,7 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 
 /**
@@ -33,7 +33,7 @@ public class RemoteReferenceTest //extends TestCase
 		timeout	= Starter.getDefaultTimeout(platform1.getId());
 		
 		// Find local service (as local provided service proxy).
-		ILocalService	service1	= platform1.searchService( new ServiceQuery<>(ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
+		ILocalService	service1	= platform1.searchService( new ServiceQuery<>(ILocalService.class, ServiceScope.PLATFORM)).get(timeout);
 		
 		// Start platform2 with (remote) search service.
 		IPlatformConfiguration	config2	= STest.getDefaultTestConfig(getClass());
@@ -45,7 +45,7 @@ public class RemoteReferenceTest //extends TestCase
 //		Starter.createProxy(platform2, platform1).get(timeout);
 		
 		// Search for remote search service from local platform
-		ISearchService	search = platform1.searchService( new ServiceQuery<>( ISearchService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get(timeout);
+		ISearchService	search = platform1.searchService( new ServiceQuery<>( ISearchService.class, ServiceScope.GLOBAL)).get(timeout);
 
 		// Invoke service to obtain reference to local service.
 		ILocalService	service2	= search.searchService("dummy").get(timeout);

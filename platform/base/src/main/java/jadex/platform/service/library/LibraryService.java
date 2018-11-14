@@ -37,7 +37,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
@@ -703,7 +703,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
-		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, ServiceScope.PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -984,7 +984,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			public void customResultAvailable(IExternalAccess exta)
 			{
-				exta.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				exta.searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{
 					public void customResultAvailable(ILibraryService ls)
@@ -1071,7 +1071,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				final PipedOutputStream	pos	= new PipedOutputStream();
 				is	= new PipedInputStream(pos, 8192*4);
 				
-				component.getExternalAccess().searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				component.getExternalAccess().searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, ServiceScope.PLATFORM))
 					.addResultListener(new IResultListener<IDaemonThreadPoolService>()
 				{
 					public void resultAvailable(IDaemonThreadPoolService tps)
@@ -1150,7 +1150,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		final Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> ret = new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>();
 		
-		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, ServiceScope.PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -1292,7 +1292,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
-		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, ServiceScope.PLATFORM))
 			.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)

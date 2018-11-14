@@ -392,7 +392,7 @@ public class BTTransport implements ITransport<BTChannel>, AndroidContextChangeL
 					});
 
 //			SServiceProvider.getService(container, IMessageService.class,
-//					RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+//					ServiceScope.PLATFORM).addResultListener(
 //					new DelegationResultListener<IMessageService>(
 //							new Future<IMessageService>()) {
 //						@Override

@@ -9,7 +9,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.CounterResultListener;
@@ -30,7 +30,7 @@ import jadex.micro.annotation.RequiredServices;
  *  when a watchdog becomes unavailable.
  */
 @ProvidedServices(@ProvidedService(type=IWatchdogService.class, implementation=@Implementation(expression="$pojoagent")))
-@RequiredServices(@RequiredService(name="watchdogs", type=IWatchdogService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL))
+@RequiredServices(@RequiredService(name="watchdogs", type=IWatchdogService.class, multiple=true, scope=ServiceScope.GLOBAL))
 @Arguments(@Argument(clazz=long.class, name="delay", description="Delay between pings.", defaultvalue="3000"))
 @Service
 @Agent

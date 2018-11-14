@@ -6,7 +6,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -19,7 +19,7 @@ import jadex.webservice.examples.ws.banking.client.gen.ProxyIWSBankingServiceSer
 import jadex.webservice.examples.ws.banking.client.gen.Request;
 
 @Agent
-@RequiredServices(@RequiredService(name="qs", type=IBankingService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="qs", type=IBankingService.class, scope=ServiceScope.PLATFORM))
 public class UserAgent
 {
 	//-------- attributes --------

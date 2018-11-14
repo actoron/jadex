@@ -39,11 +39,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -342,7 +341,7 @@ public class RestWebSocket extends Endpoint
 				}
 				
 //				final ServiceSearchMessage ssc = (ServiceSearchMessage)msg;
-//				IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+//				IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, ServiceScope.PLATFORM).get();
 				final Class<?> type = ssc.getType().getType(RestWebSocket.class.getClassLoader()); // todo: support default loader when using null
 				
 				if(type==null)
@@ -351,7 +350,7 @@ public class RestWebSocket extends Endpoint
 					return;
 				}
 				
-				String scope = ssc.getScope()!=null? ssc.getScope(): RequiredServiceInfo.SCOPE_GLOBAL;
+				String scope = ssc.getScope()!=null? ssc.getScope(): ServiceScope.GLOBAL.name();
 //				System.out.println("Search service with scope: "+scope);
 				
 				if(!ssc.isMultiple())
@@ -371,7 +370,7 @@ public class RestWebSocket extends Endpoint
 							{
 								public void customResultAvailable(IExternalAccess access) throws Exception
 								{
-									IFuture<IService> res = (IFuture<IService>)access.searchService(new ServiceQuery<>((Class<IService>)type, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
+									IFuture<IService> res = (IFuture<IService>)access.searchService(new ServiceQuery<>((Class<IService>)type, ServiceScope.COMPONENT_ONLY));
 									res.addResultListener(new ExceptionDelegationResultListener<IService, String>(ret)
 									{
 										public void customResultAvailable(IService service)
@@ -385,7 +384,7 @@ public class RestWebSocket extends Endpoint
 					}
 					else
 					{
-						IFuture<IService> res = (IFuture<IService>)platform.searchService(new ServiceQuery<>(type, scope));
+						IFuture<IService> res = (IFuture<IService>)platform.searchService(new ServiceQuery<>(type, ServiceScope.valueOf(scope)));
 						res.addResultListener(new ExceptionDelegationResultListener<IService, String>(ret)
 						{
 							public void customResultAvailable(IService service)
@@ -400,7 +399,7 @@ public class RestWebSocket extends Endpoint
 				}
 				else
 				{
-					ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)platform.searchService(new ServiceQuery<>( type, scope));
+					ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)platform.searchService(new ServiceQuery<>( type, ServiceScope.valueOf(scope)));
 					res.addResultListener(new IIntermediateResultListener<IService>()
 					{
 						public void intermediateResultAvailable(IService service)

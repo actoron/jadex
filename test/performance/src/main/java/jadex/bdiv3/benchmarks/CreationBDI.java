@@ -16,7 +16,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
@@ -268,7 +268,7 @@ public class CreationBDI
 	 */
 	protected IFuture<IClockService> getClock()
 	{
-		return agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		return agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, ServiceScope.PLATFORM));
 	}
 
 //	/**
@@ -276,6 +276,6 @@ public class CreationBDI
 //	 */
 //	protected IFuture<IComponentManagementService>	getCMS()
 //	{
-//		return agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		return agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, ServiceScope.PLATFORM));
 //	}
 }

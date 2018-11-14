@@ -12,7 +12,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -37,7 +37,7 @@ import jadex.micro.testcases.TestAgent;
 @Agent(keepalive=Boolean3.FALSE)
 @RequiredServices(
 {
-	//@RequiredService(name="exaser", type=IExampleService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	//@RequiredService(name="exaser", type=IExampleService.class, binding=@Binding(scope=ServiceScope.PLATFORM))
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
 // Todo: long timeouts really necessary?
@@ -67,7 +67,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 		final TestReport tr = new TestReport("#1", "Test if ");
 		try
 		{
-			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(new ServiceQuery<>(IExampleService.class, local? RequiredServiceInfo.SCOPE_PLATFORM: RequiredServiceInfo.SCOPE_GLOBAL));
+			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(new ServiceQuery<>(IExampleService.class, local? ServiceScope.PLATFORM: ServiceScope.GLOBAL));
 			queryfut.addResultListener(new IIntermediateResultListener<IExampleService>()
 			{
 				int num = 0;

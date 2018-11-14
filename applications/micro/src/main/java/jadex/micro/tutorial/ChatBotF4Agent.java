@@ -1,5 +1,6 @@
 package jadex.micro.tutorial;
 
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -20,7 +21,7 @@ import jadex.micro.annotation.RequiredServices;
 @ProvidedServices(@ProvidedService(type=IChatService.class, 
 	implementation=@Implementation(ChatServiceF4.class)))
 @RequiredServices({
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=RequiredService.SCOPE_PLATFORM)
+	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=ServiceScope.PLATFORM)
 })
 @Arguments({
 	@Argument(name="keyword", clazz=String.class, defaultvalue="\"nerd\"", description="The keyword to react to."),

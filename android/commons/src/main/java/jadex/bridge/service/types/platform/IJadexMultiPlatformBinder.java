@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -70,7 +71,7 @@ public interface IJadexMultiPlatformBinder
 	 * @param scope Search scope. See {@link RequiredServiceInfo} constants.
 	 * @return Future of the service.
 	 */
-	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz, final String scope);
+	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz, final ServiceScope scope);
 	
 
 	// ---------- starting / stopping ----------

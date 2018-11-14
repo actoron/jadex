@@ -16,7 +16,7 @@ config.setCli(false);
 config.setPrintPass(false);
 IFuture<IExternalAccess> platfut = Starter.createPlatform(config);
 IExternalAccess platform = platfut.get();
-IComponentManagementService cms = SServiceProvider.searchService(platform, new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+IComponentManagementService cms = SServiceProvider.searchService(platform, new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM)).get();
 ```
 
 ### Creating Agent and Service
@@ -154,7 +154,7 @@ This Application XML can be loaded by starting it with the previously acquired C
 ```java
 final ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent = cms.createComponent("jadex.example.Example.application.xml", null);
 createComponent.getFirstResult(); // Wait for space creation
-final IEnvironmentService spaceService = SServiceProvider.searchService(platform, new ServiceQuery<>( IEnvironmentService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+final IEnvironmentService spaceService = SServiceProvider.searchService(platform, new ServiceQuery<>( IEnvironmentService.class, ServiceScope.PLATFORM)).get();
 ContinuousSpace2D mySpace = (ContinuousSpace2D) spaceService.getSpace("gc2dspace").get();
 ```
 
@@ -168,7 +168,7 @@ The creation of the avatar has do be done manually. Therefore the description of
         properties.put("myColor", myColor);
         properties.put(ISpaceObject.PROPERTY_OWNER, agent.getComponentDescription());
 
-        final IEnvironmentService spaceService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IEnvironmentService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+        final IEnvironmentService spaceService = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IEnvironmentService.class, ServiceScope.PLATFORM)).get();
         ContinuousSpace2D space = (ContinuousSpace2D) spaceService.getSpace("mygc2dspace").get();
         avatar = space.createSpaceObject("ExampleAvatar", properties, new LinkedList<>());
         avatar.setProperty(Space2D.PROPERTY_POSITION, position);

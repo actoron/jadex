@@ -14,6 +14,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -39,13 +40,12 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 
 /**
  *  Agent that provides the security service.
  */
 @Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE, name="address"))
-@ProvidedServices(@ProvidedService(type=ITransportAddressService.class, scope=RequiredService.SCOPE_PLATFORM))
+@ProvidedServices(@ProvidedService(type=ITransportAddressService.class, scope=ServiceScope.PLATFORM))
 @Service(system=true)
 public class TransportAddressAgent implements ITransportAddressService
 {
@@ -422,7 +422,7 @@ public class TransportAddressAgent implements ITransportAddressService
 		List<TransportAddress> ret = null;
 		try
 		{
-			ServiceQuery<ITransportAddressService> query = new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, RequiredService.SCOPE_COMPONENT, platformid);
+			ServiceQuery<ITransportAddressService> query = new ServiceQuery<ITransportAddressService>(ITransportAddressService.class, ServiceScope.COMPONENT, platformid);
 			
 			ITransportAddressService rtas = agent.getFeature(IRequiredServicesFeature.class).searchService(query).get();
 			if (rtas != null)
@@ -515,7 +515,7 @@ public class TransportAddressAgent implements ITransportAddressService
 			return null;
 		
 		final Future<List<TransportAddress>> ret = new Future<List<TransportAddress>>();
-		ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(RequiredService.SCOPE_GLOBAL);
+		ServiceQuery<ITransportAddressService> query = (new ServiceQuery<>(ITransportAddressService.class)).setScope(ServiceScope.GLOBAL);
 		final ITerminableIntermediateFuture<ITransportAddressService> fut = agent.getFeature(IRequiredServicesFeature.class).searchServices(query);
 		fut.addIntermediateResultListener(new IIntermediateResultListener<ITransportAddressService>()
 		{

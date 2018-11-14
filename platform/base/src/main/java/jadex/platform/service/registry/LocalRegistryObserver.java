@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
@@ -15,7 +16,6 @@ import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.commons.collection.IDelayRunner;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.micro.annotation.RequiredService;
 
 /**
  *  Observe the local registry for changes and notify interested observers.
@@ -73,8 +73,8 @@ public abstract class LocalRegistryObserver extends EventCollector
 //				{
 //				System.out.println("Local registry changed: "+event);
 				
-				String pubscope = event.getService().getServiceId().getScope();
-				if(!globalscope || !RequiredServiceInfo.isScopeOnLocalPlatform(pubscope))
+				ServiceScope pubscope = event.getService().getServiceId().getScope();
+				if(!globalscope || !pubscope.isLocal())
 				{
 					if(event.getType() == ServiceEvent.SERVICE_ADDED 
 						|| event.getType() == ServiceEvent.SERVICE_CHANGED)
@@ -135,7 +135,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 	public RegistryEvent getCurrentStateEvent(IComponentIdentifier owner)
 	{
 		// Is the scope correct?! global should impose no scope restrictions. owner dictates which services
-		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, RequiredService.SCOPE_GLOBAL, owner==null? cid: owner);
+		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, ServiceScope.GLOBAL, owner==null? cid: owner);
 //		ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, owner==null? cid: owner, null);
 		Collection<IService> added = component.getFeature(IRequiredServicesFeature.class).searchLocalServices(query);
 		
@@ -148,7 +148,7 @@ public abstract class LocalRegistryObserver extends EventCollector
 				IService ser = it.next();
 //				clients.add(ser.getId().getProviderId().getRoot());
 				// Remove locally (platform) scoped events
-				if(globalscope && RequiredServiceInfo.isScopeOnLocalPlatform(ser.getServiceId().getScope()))
+				if(globalscope && ser.getServiceId().getScope().isLocal())
 					it.remove();
 			}
 		}

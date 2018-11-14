@@ -151,7 +151,7 @@ public class PlatformsTest //extends TestCase
 				}
 			});
 			
-//			IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
+//			IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class, ServiceScope.PLATFORM)).get(timeout);
 //			cms.listenToComponent(platform.getId()).addIntermediateResultListener(new IIntermediateResultListener<IComponentManagementService.CMSStatusEvent>()
 //			{
 //				@Override

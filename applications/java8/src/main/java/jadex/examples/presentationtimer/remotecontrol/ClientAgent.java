@@ -5,7 +5,7 @@ import javax.swing.SwingUtilities;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.Future;
@@ -27,7 +27,7 @@ import jadex.micro.annotation.RequiredServices;
 
 
 @Agent
-@RequiredServices({@RequiredService(type = ICountdownService.class, name = "cds", scope = RequiredServiceInfo.SCOPE_GLOBAL)})
+@RequiredServices({@RequiredService(type = ICountdownService.class, name = "cds", scope = ServiceScope.GLOBAL)})
 public class ClientAgent
 {
 
@@ -68,7 +68,7 @@ public class ClientAgent
 
 	private ISubscriptionIntermediateFuture<ICountdownService> searchCdServices()
 	{
-		IIntermediateFuture<ICountdownService> searchServices = access.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ICountdownService.class, RequiredServiceInfo.SCOPE_GLOBAL));
+		IIntermediateFuture<ICountdownService> searchServices = access.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ICountdownService.class, ServiceScope.GLOBAL));
 		searchServices.addIntermediateResultListener(cdService -> {
 			subscription.addIntermediateResult(cdService);
 		}, () -> {

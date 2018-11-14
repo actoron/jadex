@@ -4,6 +4,7 @@ import jadex.android.IEventReceiver;
 import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
@@ -104,7 +105,7 @@ public class JadexPlatformBinder extends JadexMultiPlatformBinder implements IJa
 		return service.getService(serviceClazz);
 	}
 
-	public <S> IFuture<S> getService(Class<S> serviceClazz, String scope)
+	public <S> IFuture<S> getService(Class<S> serviceClazz, ServiceScope scope)
 	{
 		return service.getService(serviceClazz, scope);
 	}

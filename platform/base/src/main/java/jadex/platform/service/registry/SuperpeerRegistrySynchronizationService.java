@@ -19,7 +19,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -52,7 +52,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.micro.annotation.RequiredService;
 
 /**
  *  Registry service for synchronization with remote platforms. 
@@ -334,7 +333,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		{
 			try
 			{
-				IAwarenessManagementService awas = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+				IAwarenessManagementService awas = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IAwarenessManagementService.class, ServiceScope.PLATFORM));
 				
 				awas.subscribeToPlatformList(true).addIntermediateResultListener(new IIntermediateResultListener<DiscoveryInfo>()
 				{
@@ -373,7 +372,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						Collection<IProxyAgentService> sers = component.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+						Collection<IProxyAgentService> sers = component.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IProxyAgentService.class, ServiceScope.PLATFORM));
 	
 						if(sers!=null && sers.size()>0)
 						{
@@ -594,7 +593,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 			addBlacklistedPlatform(cid, leasetime);
 			
 //			boolean ssp = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(SuperpeerRegistrySynchronizationAgent.class).isSupersuperpeer();
-//			final ServiceQuery<ISuperpeerRegistrySynchronizationService> query = new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier(), null);
+//			final ServiceQuery<ISuperpeerRegistrySynchronizationService> query = new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, ServiceScope.PLATFORM, null, component.getComponentIdentifier(), null);
 //			query.setUnrestricted(ssp); // ssp means offers unrestricted
 //			query.setPlatform(cid); // target platform on which to search
 //			
@@ -602,7 +601,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 //			{
 //				public IFuture<ISuperpeerRegistrySynchronizationService> execute(Void args)
 //				{
-////					return component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, RequiredServiceInfo.SCOPE_PLATFORM, ISuperpeerRegistrySynchronizationService.class, false));
+////					return component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, ServiceScope.PLATFORM, ISuperpeerRegistrySynchronizationService.class, false));
 //					return component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( query));
 //				}
 //			}, 3, 10000).addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
@@ -834,13 +833,13 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 	{
 		boolean ret = true;
 		
-		String scope = ser.getServiceId().getScope();
+		ServiceScope scope = ser.getServiceId().getScope();
 		// SSP L0
 		if(level==0)
 		{
 			// SSP L0 should not store local data  
-			if(!RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope)
-				&& !RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			if(!ServiceScope.APPLICATION_GLOBAL.equals(scope)
+				&& !ServiceScope.GLOBAL.equals(scope))
 			{
 				ret = false;
 			}
@@ -848,8 +847,8 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		else
 		{
 			// SSP L1 should not store global data
-			if(RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope)
-				|| RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+			if(ServiceScope.APPLICATION_GLOBAL.equals(scope)
+				|| ServiceScope.GLOBAL.equals(scope))
 			{
 				ret = false;
 			}
@@ -1140,9 +1139,9 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				added = new HashSet<IService>();
 				for(IService ser: event.getAddedServices())
 				{
-					String scope = ser.getServiceId().getScope();
-					if(RequiredService.SCOPE_GLOBAL.equals(scope)
-						|| RequiredService.SCOPE_APPLICATION_GLOBAL.equals((scope)))
+					ServiceScope scope = ser.getServiceId().getScope();
+					if(ServiceScope.GLOBAL.equals(scope)
+						|| ServiceScope.APPLICATION_GLOBAL.equals((scope)))
 					{
 						added.add(ser);
 					}
@@ -1155,9 +1154,9 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 				rem = new HashSet<IService>();
 				for(IService ser: event.getRemovedServices())
 				{
-					String scope = ser.getServiceId().getScope();
-					if(RequiredService.SCOPE_GLOBAL.equals(scope)
-						|| RequiredService.SCOPE_APPLICATION_GLOBAL.equals((scope)))
+					ServiceScope scope = ser.getServiceId().getScope();
+					if(ServiceScope.GLOBAL.equals(scope)
+						|| ServiceScope.APPLICATION_GLOBAL.equals((scope)))
 					{
 						rem.add(ser);
 					}
@@ -1190,7 +1189,7 @@ public class SuperpeerRegistrySynchronizationService implements ISuperpeerRegist
 		// If I am a level 0 superpeer, I inform others about all known level 1 registries
 		if(level==0)
 		{
-			ServiceQuery<IService> query = new ServiceQuery<IService>(new ClassInfo(ISuperpeerRegistrySynchronizationService.class), RequiredService.SCOPE_GLOBAL, component.getId());
+			ServiceQuery<IService> query = new ServiceQuery<IService>(new ClassInfo(ISuperpeerRegistrySynchronizationService.class), ServiceScope.GLOBAL, component.getId());
 //			IMsgSecurityInfos secinfo = (IMsgSecurityInfos)ServiceCall.getCurrentInvocation().getProperty("securityinfo");
 			query.setNetworkNames(networknames);
 			

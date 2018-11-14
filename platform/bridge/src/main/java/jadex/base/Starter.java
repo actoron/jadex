@@ -273,7 +273,7 @@ public class Starter
 //				args.put("component", remotecid);
 //				CreationInfo ci = new CreationInfo(args);
 //				ci.setDaemon(true);
-//				IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//				IComponentManagementService	cms	= ia.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 //				cms.createComponent(platformname, "jadex/platform/service/remote/ProxyAgent.class", ci).getFirstResult();
 //				return IFuture.DONE;
 //			}
@@ -1080,7 +1080,7 @@ public class Starter
 				});
 			}
 		});
-		/*remote.searchService( new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+		/*remote.searchService( new ServiceQuery<>( ITransportAddressService.class, ServiceScope.PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(ITransportAddressService remotetas) throws Exception
 			{
@@ -1088,7 +1088,7 @@ public class Starter
 				{
 					public void customResultAvailable(final List<TransportAddress> remoteaddrs) throws Exception
 					{
-						local.searchService( new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
+						local.searchService( new ServiceQuery<>( ITransportAddressService.class, ServiceScope.PLATFORM)).addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, IComponentIdentifier>(ret)
 						{
 							public void customResultAvailable(ITransportAddressService localtas) throws Exception
 							{
@@ -1096,7 +1096,7 @@ public class Starter
 								{
 									public void customResultAvailable(Void result) throws Exception
 									{
-										local.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+										local.searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 										{
 											public void customResultAvailable(final IComponentManagementService localcms)

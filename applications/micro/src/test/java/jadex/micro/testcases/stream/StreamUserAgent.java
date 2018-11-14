@@ -13,7 +13,7 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
@@ -33,7 +33,7 @@ import jadex.micro.testcases.TestAgent;
  *  Agent that provides a service with a stream.
  */
 @Agent
-@RequiredServices(@RequiredService(name="ss", type=IStreamService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL))
+@RequiredServices(@RequiredService(name="ss", type=IStreamService.class, scope=ServiceScope.GLOBAL))
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class StreamUserAgent extends TestAgent
 {

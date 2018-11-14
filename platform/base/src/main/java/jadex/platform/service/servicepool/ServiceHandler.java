@@ -20,7 +20,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -175,7 +175,7 @@ public class ServiceHandler implements InvocationHandler
 		ci.setParent(component.getId());
 		ci.setImports(component.getModel().getAllImports());
 		// Worker services are exposed with scope parent only to hinder others finding directly the worker services
-		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, RequiredServiceInfo.SCOPE_PARENT, null, null)});
+		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null)});
 		ci.setFilename(componentname);
 		
 		component.createComponent(ci, null)
@@ -183,7 +183,7 @@ public class ServiceHandler implements InvocationHandler
 		{
 			public void customResultAvailable(IExternalAccess ea)
 			{
-				Future<IService> fut = (Future<IService>)ea.searchService(new ServiceQuery<>(servicetype, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
+				Future<IService> fut = (Future<IService>)ea.searchService(new ServiceQuery<>(servicetype, ServiceScope.COMPONENT_ONLY));
 				fut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IService>(ret)
 				{
 					public void customResultAvailable(IService ser)
@@ -514,7 +514,7 @@ public class ServiceHandler implements InvocationHandler
 		else
 		{
 			component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( 
-				IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				IClockService.class, ServiceScope.PLATFORM))
 				.addResultListener(new DelegationResultListener<IClockService>(ret)
 			{
 				public void customResultAvailable(IClockService cs)

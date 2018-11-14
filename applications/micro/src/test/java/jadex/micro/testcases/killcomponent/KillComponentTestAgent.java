@@ -164,7 +164,7 @@ public class KillComponentTestAgent extends TestAgent
 	// Future<IComponentManagementService>();
 	// agent.getFeature(IRequiredServicesFeature.class).searchService(new
 	// ServiceQuery<>(IComponentManagementService.class,
-	// RequiredServiceInfo.SCOPE_PLATFORM))
+	// ServiceScope.PLATFORM))
 	// .addResultListener(new
 	// DelegationResultListener<IComponentManagementService>(ret));
 	// return ret;

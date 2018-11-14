@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cli.ICliService;
@@ -86,7 +86,7 @@ public class CliJob extends CronJob<String>
 			final SubscriptionIntermediateFuture<String> ret = new SubscriptionIntermediateFuture<String>();
 //			final Future<String> ret = new Future<String>();
 			final IInternalAccess ia = args.getFirstEntity();
-			ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICliService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICliService.class, ServiceScope.PLATFORM))
 				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<ICliService>()
 			{
 				public void resultAvailable(ICliService clis)

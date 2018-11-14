@@ -1,13 +1,12 @@
 package jadex.micro;
 
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.commons.Boolean3;
 import jadex.kernelbase.MultiFactory;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
@@ -18,14 +17,13 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 
 /**
  *  Multi kernel.
  */
 @ProvidedServices({
-	@ProvidedService(type=IComponentFactory.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(MultiFactory.class)),
-	@ProvidedService(type=IMultiKernelNotifierService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.factory.IComponentFactory.class)"))
+	@ProvidedService(type=IComponentFactory.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(MultiFactory.class)),
+	@ProvidedService(type=IMultiKernelNotifierService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(jadex.bridge.service.types.factory.IComponentFactory.class)"))
 })
 @ComponentTypes({
 	@ComponentType(name="KernelMicro", filename="jadex/micro/KernelMicroAgent.class")

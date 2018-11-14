@@ -14,6 +14,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IResultCommand;
@@ -33,9 +34,9 @@ import jadex.micro.testcases.TestAgent;
  *  Agent providing a direct service.
  */
 @RequiredServices({
-	@RequiredService(name="raw", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_RAW, scope=RequiredService.SCOPE_GLOBAL),
-	@RequiredService(name="direct", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_DIRECT, scope=RequiredService.SCOPE_GLOBAL),
-	@RequiredService(name="decoupled", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_DECOUPLED, scope=RequiredService.SCOPE_GLOBAL),
+	@RequiredService(name="raw", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_RAW, scope=ServiceScope.GLOBAL),
+	@RequiredService(name="direct", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_DIRECT, scope=ServiceScope.GLOBAL),
+	@RequiredService(name="decoupled", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_DECOUPLED, scope=ServiceScope.GLOBAL),
 })
 @Agent
 //@Arguments(replace=false, value=@Argument(name="max", clazz=int.class, defaultvalue="10"))

@@ -509,7 +509,7 @@ To dispatch events in an Agent, the *IContextService* is needed, which provides 
 To use it, add a service declaration to your agent type:
 ```java
 @RequiredServices({
-	@RequiredService(name="context", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="context", type=IContextService.class, binding=@Binding(scope=ServiceScope.PLATFORM))
 })
 public class...
 ```

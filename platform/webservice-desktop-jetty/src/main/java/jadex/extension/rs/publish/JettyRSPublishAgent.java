@@ -2,6 +2,7 @@ package jadex.extension.rs.publish;
 
 
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
@@ -10,7 +11,6 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 
 /**
  *  Agent that publishes the rs publication service.
@@ -19,7 +19,7 @@ import jadex.micro.annotation.RequiredService;
 @ProvidedServices(
 {
 	@ProvidedService(name="publish_rs", type=IWebPublishService.class,
-		scope=RequiredService.SCOPE_PLATFORM,
+		scope=ServiceScope.PLATFORM,
 		implementation=@Implementation(JettyRestPublishService.class))
 })
 @Properties(@NameValue(name="system", value="true"))

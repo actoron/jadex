@@ -89,7 +89,7 @@ public class SuperpeerRegistrySynchronizationAgent
 //		reg.removeServicesExcept(component.getComponentIdentifier().getRoot());
 		
 		// Produces problems in platform shutdown
-//		IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 //		cms.createComponent("registrypeer", PeerRegistrySynchronizationAgent.class.getName()+".class", null);
 	}
 }

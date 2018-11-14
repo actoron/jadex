@@ -14,7 +14,7 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -36,7 +36,7 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
+	@RequiredService(name="ts", type=ITestService.class, scope=ServiceScope.GLOBAL)
 })
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class AuthenticateTestAgent extends TestAgent
@@ -190,7 +190,7 @@ public class AuthenticateTestAgent extends TestAgent
 		final Future<boolean[]>	ret	= new Future<boolean[]>();
 //		System.out.println("invokeServices "+IComponentIdentifier.LOCAL.get());
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class, RequiredService.SCOPE_GLOBAL))
+		agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL))
 			.addResultListener(new ExceptionDelegationResultListener<Collection<ITestService>, boolean[]>(ret)
 		{
 			@Override

@@ -8,7 +8,7 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -43,7 +43,7 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 		timeout	= Starter.getDefaultTimeout(platform1.getId());
 		
 		// Find local service (as local provided service proxy).
-		ILocalService service1 = platform1.searchService( new ServiceQuery<>( ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
+		ILocalService service1 = platform1.searchService( new ServiceQuery<>( ILocalService.class, ServiceScope.PLATFORM)).get(timeout);
 
 		platform2 = Starter.createPlatform(
 			new String[]{"-platformname", "testcases_*", "-saveonexit", "false", "-welcome", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
@@ -65,7 +65,7 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 //			public IFuture<Void> execute(IInternalAccess ia)
 //			{
 //				Future<Void> ret = new Future<Void>();
-//				ILocalService locService = ia.getExternalAccess().searchService( new ServiceQuery<>( ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+//				ILocalService locService = ia.getExternalAccess().searchService( new ServiceQuery<>( ILocalService.class, ServiceScope.GLOBAL)).get();
 //				// call service with @Reference Object
 //				locService.executeCallback(new MyCallbackReference()).addResultListener(new DelegationResultListener<Void>(ret));
 //				;
@@ -85,7 +85,7 @@ public class RemoteReferenceParamAnnotationTest // extends TestCase
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				Future<Void> ret = new Future<Void>();
-				ILocalService locService = ia.getExternalAccess().searchService( new ServiceQuery<>( ILocalService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
+				ILocalService locService = ia.getExternalAccess().searchService( new ServiceQuery<>( ILocalService.class, ServiceScope.GLOBAL)).get();
 				// call service without @Reference Object
 				locService.executeCallback(new MyCallback()).addResultListener(new DelegationResultListener<Void>(ret));
 				;

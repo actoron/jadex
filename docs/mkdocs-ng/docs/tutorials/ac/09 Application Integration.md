@@ -120,7 +120,7 @@ In this exercise, we use the platform access to obtain the component management 
 ```java
 
 IComponentManagementService cms = SServiceProvider.getService(platform.getServiceProvider(),
-  IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+  IComponentManagementService.class, ServiceScope.PLATFORM).get();
 
 ```
 

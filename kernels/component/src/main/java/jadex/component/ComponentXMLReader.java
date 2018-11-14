@@ -31,6 +31,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -136,6 +137,24 @@ public class ComponentXMLReader
 				}
 			}
 			return ret;
+		}
+	};
+	
+	public static final IStringObjectConverter scopeconv	= new IStringObjectConverter()
+	{
+		@Override
+		public Object convertString(String val, Object context) throws Exception
+		{
+			return val!=null ? ServiceScope.valueOf(val.toUpperCase()) : ServiceScope.DEFAULT;
+		}
+	};
+	
+	public static final IObjectStringConverter rescopeconv	= new IObjectStringConverter()
+	{
+		@Override
+		public String convertObject(Object val, Object context)
+		{
+			return ((ServiceScope)val).name().toLowerCase();
 		}
 	};
 	
@@ -402,7 +421,8 @@ public class ComponentXMLReader
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "providedservice")}), 
 			new ObjectInfo(ProvidedServiceInfo.class),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
+					new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
+					new AttributeInfo(new AccessInfo("scope", "scope"), new AttributeConverter(scopeconv, rescopeconv))
 			}, null), null, new BeanObjectReaderHandler()));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "implementation")), new ObjectInfo(ProvidedServiceImplementation.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
@@ -432,6 +452,7 @@ public class ComponentXMLReader
 			new MappingInfo(null, null, null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("componentname", "componentName")),
 				new AttributeInfo(new AccessInfo("componenttype", "componentType")),
+				new AttributeInfo(new AccessInfo("scope", "scope"), new AttributeConverter(scopeconv, rescopeconv))
 //				new AttributeInfo(new AccessInfo("creationname", "creationName")),
 //				new AttributeInfo(new AccessInfo("creationtype", "creationType")),
 			},

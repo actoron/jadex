@@ -17,6 +17,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -79,7 +80,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //			System.out.println("sdgo");
 		
 		IServiceIdentifier ret = null;
-		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(!ServiceScope.NONE.equals(query.getScope()))
 		{
 			Set<IServiceIdentifier> sers = getServices(query);
 			
@@ -119,7 +120,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public Set<IServiceIdentifier> searchServices(ServiceQuery<?> query)
 	{
 		Set<IServiceIdentifier> ret = null;
-		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
+		if(!ServiceScope.NONE.equals(query.getScope()))
 		{
 			ret = getServices(query);
 			
@@ -761,53 +762,53 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		boolean ret = false;
 		
-		String scope = query.getScope();
+		ServiceScope scope = query.getScope();
 		
 //		IComponentIdentifier searchstart	= query.getProvider()!=null ? query.getProvider()
 //			: query.getPlatform()!=null ? query.getPlatform() : query.getOwner();
 		IComponentIdentifier searchstart = query.getSearchStart() != null ? query.getSearchStart() : query.getOwner();
 		
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		if(ServiceScope.GLOBAL.equals(scope))
 		{
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_NETWORK.equals(scope))
-		{
-			// todo: fixme
-			ret = true;
-		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope))
+		else if(ServiceScope.NETWORK.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_NETWORK.equals(scope))
+		else if(ServiceScope.APPLICATION_GLOBAL.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+		else if(ServiceScope.APPLICATION_NETWORK.equals(scope))
+		{
+			// todo: fixme
+			ret = true;
+		}
+		else if(ServiceScope.PLATFORM.equals(scope))
 		{
 			// Test if searcher and service are on same platform
 			ret = searchstart.getPlatformName().equals(ser.getProviderId().getPlatformName());
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
+		else if(ServiceScope.APPLICATION.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getProviderId();
 			ret = sercid.getPlatformName().equals(searchstart.getPlatformName())
 				&& getApplicationName(sercid).equals(getApplicationName(searchstart));
 		}
-		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
+		else if(ServiceScope.COMPONENT.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getProviderId();
 			ret = getDotName(sercid).endsWith(getDotName(searchstart));
 		}
-		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
+		else if(ServiceScope.COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
 			ret = ser.getProviderId().equals(searchstart);
 		}
-		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
+		else if(ServiceScope.PARENT.equals(scope))
 		{
 			// check if parent of searcher reaches the service
 			IComponentIdentifier sercid = ser.getProviderId();
@@ -825,50 +826,50 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		boolean ret = false;
 		
-		String scope = ser.getScope()!=null? ser.getScope(): RequiredServiceInfo.SCOPE_PLATFORM;
+		ServiceScope scope = ser.getScope()!=null? ser.getScope(): ServiceScope.PLATFORM;
 		
-		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
+		if(ServiceScope.GLOBAL.equals(scope))
 		{
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_NETWORK.equals(scope))
-		{
-			// todo: fixme
-			ret = true;
-		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL.equals(scope))
+		else if(ServiceScope.NETWORK.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION_NETWORK.equals(scope))
+		else if(ServiceScope.APPLICATION_GLOBAL.equals(scope))
 		{
 			// todo: fixme
 			ret = true;
 		}
-		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+		else if(ServiceScope.APPLICATION_NETWORK.equals(scope))
+		{
+			// todo: fixme
+			ret = true;
+		}
+		else if(ServiceScope.PLATFORM.equals(scope))
 		{
 			// Test if searcher and service are on same platform
 			ret = query.getOwner().getPlatformName().equals(ser.getProviderId().getPlatformName());
 		}
-		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
+		else if(ServiceScope.APPLICATION.equals(scope))
 		{
 			// todo: special case platform service with app scope
 			IComponentIdentifier sercid = ser.getProviderId();
 			ret = sercid.getPlatformName().equals(query.getOwner().getPlatformName())
 				&& getApplicationName(sercid).equals(getApplicationName(query.getOwner()));
 		}
-		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
+		else if(ServiceScope.COMPONENT.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getProviderId();
 			ret = getDotName(query.getOwner()).endsWith(getDotName(sercid));
 		}
-		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
+		else if(ServiceScope.COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
 			ret = ser.getProviderId().equals(query.getOwner());
 		}
-		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
+		else if(ServiceScope.PARENT.equals(scope))
 		{
 			// check if parent of service reaches the searcher
 			IComponentIdentifier sercid = ser.getProviderId();

@@ -17,7 +17,7 @@ import javax.swing.SwingUtilities;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -61,8 +61,8 @@ import jadex.micro.annotation.RequiredServices;
 })
 @ProvidedServices(
 {
-	@ProvidedService(name="cliser", scope=RequiredService.SCOPE_PLATFORM, type=ICliService.class, implementation=@Implementation(expression="$pojoagent")),
-	@ProvidedService(type=IInternalCliService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"cliser\")"))
+	@ProvidedService(name="cliser", scope=ServiceScope.PLATFORM, type=ICliService.class, implementation=@Implementation(expression="$pojoagent")),
+	@ProvidedService(type=IInternalCliService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"cliser\")"))
 })
 @RequiredServices(
 	@RequiredService(name="dtp", type=IDaemonThreadPoolService.class)
