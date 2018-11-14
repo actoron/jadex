@@ -38,7 +38,7 @@ public class RSChartTest
 		new SReflectSub().setIsAndroid(true, true);
 
 //		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-		IPlatformConfiguration config = jadex.base.test.util.STest.getDefaultTestConfig();
+		IPlatformConfiguration config = jadex.base.test.util.STest.getDefaultTestConfig(getClass());
 		config.setAwareness(false);
 		config.addComponent(ChartProviderAgent.class);
 		config.setLogging(true);
@@ -58,7 +58,7 @@ public class RSChartTest
 //		});
 
 //		extAcc = fut.get();
-		extAcc = jadex.base.test.util.STest.createPlatform(config);
+		extAcc = jadex.base.Starter.createPlatform(config).get();
 	}
 	
 	@Test
