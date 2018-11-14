@@ -120,7 +120,8 @@ public abstract class AbstractInfrastructureTest
 	
 	/**
 	 *  Wait until all clients have connected to super peer.
-	 *  @param platforms The super peer (first value) and other platforms that need to connect.
+	 *  @param sp	The super peer.
+	 *  @param clients Platforms that need to connect.
 	 */
 	protected void	waitForSuperpeerConnections(IExternalAccess sp, IExternalAccess... clients)
 	{

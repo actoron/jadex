@@ -34,6 +34,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -52,6 +53,7 @@ import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -605,7 +607,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (cs != null && !isSecurityMessage(header) && !cs.isExpiring())
 			return new Future<byte[]>(cs.encryptAndSign(content));
 		
-		IFuture<byte[]> ret = agent.scheduleStep(new IComponentStep<byte[]>()
+		return agent.scheduleStep(new IComponentStep<byte[]>()
 		{
 			public IFuture<byte[]> execute(IInternalAccess ia)
 			{
@@ -647,14 +649,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					
 					if (cs != null)
 					{
-						try
-						{
-							ret.setResult(cs.encryptAndSign(content));
-						}
-						catch (Exception e)
-						{
-							ret.setException(e);
-						}
+						ret.setResult(cs.encryptAndSign(content));
 					}
 					else
 					{
@@ -665,18 +660,23 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							hstate = initializingcryptosuites.get(rplat);
 						}
 						
-						hstate.getResultFuture().addResultListener(new ExceptionDelegationResultListener<ICryptoSuite, byte[]>(ret)
+						// Add sim blocker and print error msg when handshake doesn't work
+						SSimulation.addBlocker(ret);
+						ia.waitForDelay(Starter.getScaledDefaultTimeout(ia.getId(), 0.5), true)
+							.addResultListener(v ->
+						{
+							if(!ret.isDone())
+							{
+								System.out.println("Security handshake timeout from "+agent+" to "+rplat);
+								ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
+							}
+						});
+							
+						hstate.getResultFuture().addResultListener(new ExceptionDelegationResultListener<ICryptoSuite, byte[]>(ret, true)
 						{
 							public void customResultAvailable(ICryptoSuite result) throws Exception
 							{
-								try
-								{
-									ret.setResult(result.encryptAndSign(content));
-								}
-								catch (Exception e)
-								{
-									ret.setException(e);
-								}
+								ret.setResultIfUndone(result.encryptAndSign(content));
 							}
 						});
 					}
@@ -685,8 +685,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				return ret;
 			}
 		});
-		((IInternalExecutionFeature) execfeat).addSimulationBlocker(ret);
-		return ret;
 	}
 	
 	/**

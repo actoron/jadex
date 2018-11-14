@@ -2,24 +2,20 @@ package jadex.micro.testcases.terminate;
 
 import java.util.Collection;
 
-import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -31,12 +27,11 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.micro.testcases.RemoteTestBaseAgent;
+import jadex.micro.testcases.TestAgent;
 
 /**
  *  The invoker agent tests if futures can be terminated
@@ -47,7 +42,7 @@ import jadex.micro.testcases.RemoteTestBaseAgent;
 @Description("The invoker agent tests if futures can be terminated " +
 	"in local and remote cases.")
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
-public class TerminateTestAgent extends RemoteTestBaseAgent
+public class TerminateTestAgent extends TestAgent
 {
 	//-------- attributes --------
 	
@@ -56,13 +51,9 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 
 	//-------- methods --------
 	
-	/**
-	 *  The agent body.
-	 */
-	@AgentBody
-	public void body()
+	@Override
+	protected IFuture<Void> performTests(Testcase tc)
 	{
-		final Testcase tc = new Testcase();
 		if(SReflect.isAndroid()) 
 		{
 			tc.setTestCount(2);
@@ -72,34 +63,18 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 			tc.setTestCount(4);	
 		}
 		
+		final Future<Void>	ret	= new Future<Void>();
 		
-		final Future<Void> ret = new Future<Void>();
-		ret.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+		testLocal(1, 100).addResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
-			public void resultAvailable(Void result)
+			@Override
+			public void intermediateResultAvailable(TestReport result)
 			{
-				System.out.println("tests finished: "+tc);
-				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
-				agent.killComponent();				
+				tc.addReport(result);
 			}
-			public void exceptionOccurred(Exception exception)
+			
+			public void finished()
 			{
-				tc.addReport(new TestReport("#0", "Unexpected exception", exception));
-				System.out.println("tests finished: "+tc);
-				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
-				agent.killComponent();
-			}
-		}));
-		
-		testLocal(1, 100).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
-		{
-			public void customResultAvailable(Collection<TestReport> result)
-			{
-				for(TestReport rep: result)
-				{
-					tc.addReport(rep);
-				}
-				
 				if (SReflect.isAndroid()) 
 				{
 					ret.setResult(null);
@@ -121,8 +96,10 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 				}
 			}
 		});
+		
+		return ret;
 	}
-	
+
 	/**
 	 *  Test if local intermediate results are correctly delivered
 	 *  (not as bunch when finished has been called). 
@@ -141,52 +118,29 @@ public class TerminateTestAgent extends RemoteTestBaseAgent
 		final Future<Collection<TestReport>> ret = new Future<Collection<TestReport>>();
 		
 		// Start platform
-		try
+		setupRemotePlatform(false)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{
-			disableLocalSimulationMode().get();
-			
-			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
-	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-			Starter.createPlatform(STest.getDefaultTestConfig(), new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
-				"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
-	//			"-logging_level", "java.util.logging.Level.INFO",
-				"-gui", "false", "-simulation", "false", "-printpass", "false",
-				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
-			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
-				new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
+			public void customResultAvailable(final IExternalAccess platform)
 			{
-				public void customResultAvailable(final IExternalAccess platform)
+				performTest(platform.getId(), testno, delay)
+					.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
 				{
-					createProxies(platform)
-						.addResultListener(new ExceptionDelegationResultListener<Void, Collection<TestReport>>(ret)
+					public void customResultAvailable(final Collection<TestReport> result)
 					{
-						public void customResultAvailable(Void result)
-						{
-							performTest(platform.getId(), testno, delay)
-								.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
-							{
-								public void customResultAvailable(final Collection<TestReport> result)
-								{
-									platform.killComponent();
-			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-			//						{
-			//							public void customResultAvailable(Map<String, Object> v)
-			//							{
-			//								ret.setResult(result);
-			//							}
-			//						});
-									ret.setResult(result);
-								}
-							});
-						}
-					});
-				}
-			}));
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
+						platform.killComponent();
+//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+//						{
+//							public void customResultAvailable(Map<String, Object> v)
+//							{
+//								ret.setResult(result);
+//							}
+//						});
+						ret.setResult(result);
+					}
+				});
+			}
+		});
 		
 		return ret;
 	}

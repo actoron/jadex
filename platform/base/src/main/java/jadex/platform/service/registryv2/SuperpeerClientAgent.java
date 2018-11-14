@@ -282,6 +282,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			{
 				if(manager.superpeer!=null)
 				{
+//					if(query.toString().indexOf("ITestService")!=-1)
+//						System.out.println(agent+" searchServices() at superpeer: "+manager.superpeer);
+					
 					foundsuperpeer	= true;
 					// Todo: remember searches for termination? -> more efficient to just let searches run out an ignore result?
 					track.incrementAndGet();
@@ -291,6 +294,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
+//							if(query.toString().indexOf("ITestService")!=-1)
+//								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" failed: "+exception);
+
 							if(track.decrementAndGet()==0)
 							{
 								ret.setFinishedIfUndone();
@@ -300,6 +306,10 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						@Override
 						public void resultAvailable(Set<IServiceIdentifier> result)
 						{
+//							if(query.toString().indexOf("ITestService")!=-1)
+//								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" succeeded: "+result);
+
+							
 							if(!ret.isDone())
 							{
 								for(IServiceIdentifier sid: result)
@@ -387,8 +397,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			
 			for(IPassiveAwarenessService pawa: pawas)
 			{
-				if(query.toString().indexOf("ITestService")!=-1)
-					System.out.println(agent+" pawa.searchPlatforms(): "+pawa);
+//				if(query.toString().indexOf("ITestService")!=-1)
+//					System.out.println(agent+" pawa.searchPlatforms(): "+pawa);
 				
 				// Search for other platforms
 				if(timeout>0)
@@ -407,8 +417,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						}
 						
 						filter.insert(platform.toString());
-						if(query.toString().indexOf("ITestService")!=-1)
-							System.out.println(agent + " searching remote platform: "+platform+", "+query);
+//						if(query.toString().indexOf("ITestService")!=-1)
+//							System.out.println(agent + " searching remote platform: "+platform+", "+query);
 						
 						// Only (continue to) search remote when future not yet finished or cancelled.
 						if(!ret.isDone())
@@ -430,8 +440,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								{
 //									try
 //									{
-										if(query.toString().indexOf("ITestService")!=-1)
-											System.out.println(agent + " searched remote platform: "+platform+", "+result);
+//										if(query.toString().indexOf("ITestService")!=-1)
+//											System.out.println(agent + " searched remote platform: "+platform+", "+result);
 //									}
 //									catch(RuntimeException e)
 //									{
@@ -454,8 +464,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	
 								public void exceptionOccurred(Exception exception)
 								{
-									if(query.toString().indexOf("ITestService")!=-1)
-										System.out.println(agent + " searched remote platform: "+platform+", "+exception);
+//									if(query.toString().indexOf("ITestService")!=-1)
+//										System.out.println(agent + " searched remote platform: "+platform+", "+exception);
 									doFinished();
 								}
 							});
@@ -465,16 +475,16 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					@Override
 					public void finished()
 					{
-						if(query.toString().indexOf("ITestService")!=-1)
-							System.out.println(agent+" pawa.searchPlatforms() done: "+pawa);
+//						if(query.toString().indexOf("ITestService")!=-1)
+//							System.out.println(agent+" pawa.searchPlatforms() done: "+pawa);
 						doFinished();
 					}
 					
 					@Override
 					public void exceptionOccurred(Exception exception)
 					{
-						if(query.toString().indexOf("ITestService")!=-1)
-							System.out.println(agent+" pawa.searchPlatforms() exception: "+pawa+", "+exception);
+//						if(query.toString().indexOf("ITestService")!=-1)
+//							System.out.println(agent+" pawa.searchPlatforms() exception: "+pawa+", "+exception);
 						// ignore exception
 						doFinished();
 					}
@@ -664,6 +674,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									stopSuperpeerSearch();
 									superpeer	= sp;
 									connection	= regfut;
+//									System.out.println(agent+" accepted super peer connection for network "+networkname+" from super peer: "+sp);
 									
 									// Activate waiting queries if any.
 									for(QueryManager<?> qmanager: waitingqueries)
@@ -719,7 +730,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 													{
 														try
 														{
-//															System.out.println(agent+ " sending service event to superpeer "+sp+": "+event);
+//															if(event.toString().indexOf("ITestService")!=-1)
+//																System.out.println(agent+ " sending service event to superpeer "+sp+": "+event);
 															regfut.sendBackwardCommand(event);
 														}
 														catch (Exception e)

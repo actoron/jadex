@@ -7,7 +7,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentStreamArrived;
 
 @Agent
@@ -16,11 +15,11 @@ public class Receiver2Agent
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentCreated
-	public void created()
-	{
-		agent.getLogger().severe("Agent created: "+agent.getDescription());
-	}
+//	@AgentCreated
+//	public void created()
+//	{
+//		agent.getLogger().severe("Agent created: "+agent.getDescription());
+//	}
 
 	/**
 	 * 

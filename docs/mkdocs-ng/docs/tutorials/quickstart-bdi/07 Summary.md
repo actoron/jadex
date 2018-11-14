@@ -8,6 +8,12 @@ Here you can find solutions for code you had to write yourself and the answers t
 
 ### Exercise Zero: A Simple Java Cleaner Agent
 
+A possible way of structuring the cleaner behavior is shown in the following flow chart:
+
+![](behavior-simplecleaner.svg)
+
+*Figure F.1: Decision tree for simple cleaner behavior*
+
 Here is a solution with a single loop and nested if-then-else statements for the different tasks and phases of the robot.
 Note that the solution has some problems, e.g., not immediately stopping a move action when finding a needed waste bin
 and a severe bug that the agent will try to pick up waste that no longer exists, when it was removed in the mean time.
@@ -75,7 +81,7 @@ and a severe bug that the agent will try to pick up waste that no longer exists,
 ### Exercise A3: Additional Patrol Plan Code
 
 <div style="float:right;">
-<img src="../patrol-plan2.png">
+<img src="../patrol-plan2.svg">
 </div>
 
 ```java
@@ -98,7 +104,7 @@ and a severe bug that the agent will try to pick up waste that no longer exists,
 ```
 
 <div style="float:right;">
-<img src="../patrol-plan3.png">
+<img src="../patrol-plan3.svg">
 </div>
 
 ```java	
@@ -132,9 +138,9 @@ and a severe bug that the agent will try to pick up waste that no longer exists,
     as long as there are plans in the APL. With the exclude mode *when-failed*, all of the patrol plans
     remain in the APL even after they have been executed, and thus can be selected again and again.
     Random selection causes the cleaner to select a random plan from the APL instead of the first. Without
-    random selection, only the first plan would be executed over and over. Finally, the retry delay stops the cleaner
+    random selection, only the first plan would be executed over and over. Finally, the retry delay halts the cleaner
     after each execution of a plan.
-5. All three plans get executed in parallel and try move the cleaner to different locations at once.
+5. All three plans get executed in parallel and try moving the cleaner to different locations at once.
     One of the plan "wins" and is allowed to execute its `moveTo()` action, while the other two are stopped
     with an error message. Therefore, only one of the patrol rounds is actually performed.
 
@@ -164,7 +170,7 @@ Reusing the first patrol plan, you could just add the new goal to the plan trigg
 
 ### Alternative 2
 
-A simple alternative is to plan that does just one random move.
+A simple alternative is a plan that does just one random move.
 To allow this plan being executed repeatedly, you can set `ExcludeMode.Never` on the goal.
 
 ```java

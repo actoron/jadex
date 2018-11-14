@@ -12,5 +12,13 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices(@ProvidedService(type=ITestService.class, scope=ServiceScope.NETWORK))
 public class NetworkProviderAgent	implements ITestService
 {
-
+//	@AgentBody
+//	void body(IInternalAccess agent)
+//	{
+//		while(true)
+//		{
+//			System.out.println(agent+" alive");
+//			agent.waitForDelay(1000).get();
+//		}
+//	}
 }

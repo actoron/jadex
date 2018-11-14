@@ -30,19 +30,19 @@ public class KillComponentTestAgent extends TestAgent
 		tc.setTestCount(2);
 		final Future<Void> ret = new Future<Void>();
 
-		agent.getLogger().severe("Testagent test local: " + agent.getDescription());
+//		agent.getLogger().severe("Testagent test local: " + agent.getDescription());
 		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test remote: " + agent.getDescription());
+//				agent.getLogger().severe("Testagent test remote: " + agent.getDescription());
 				tc.addReport(result);
 				// ret.setResult(null);
 				testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: " + agent.getDescription());
+//						agent.getLogger().severe("Testagent tests finished: " + agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -106,12 +106,12 @@ public class KillComponentTestAgent extends TestAgent
 		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
 		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String, Object>>(resfut);
 
-		agent.getLogger().severe("Testagent create provider: " + agent.getDescription());
+//		agent.getLogger().severe("Testagent create provider: " + agent.getDescription());
 		createComponent(ProviderAgent.class.getName() + ".class", root, reslis).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid)
 			{
-				agent.getLogger().severe("Testagent create provider done: " + agent.getDescription());
+//				agent.getLogger().severe("Testagent create provider done: " + agent.getDescription());
 				IExternalAccess exta = agent.getExternalAccess(cid).get();
 				final TestReport tr = new TestReport("#" + testno, "Test if kill returns result");
 				System.out.println("Killing my subcomponent...");

@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
@@ -84,11 +85,21 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	{
 		final IComponentIdentifier client = ServiceCall.getCurrentInvocation().getCaller();
 		clients.add(client);
-		for(SubscriptionIntermediateFuture<IComponentIdentifier> reglis: reglisteners)
+		
+		// Listener notification as step to improve test behavior (e.g. AbstractSearchQueryTest)
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			reglis.addIntermediateResult(client);
-		}
-//		System.out.println(agent+": Initiating super peer connection with client "+client+" for network "+networkname);
+			@Override
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+//				System.out.println(agent+": Initiated super peer connection with client "+client+" for network "+networkname);
+				for(SubscriptionIntermediateFuture<IComponentIdentifier> reglis: reglisteners)
+				{
+					reglis.addIntermediateResult(client);
+				}
+				return IFuture.DONE;
+			}
+		});
 		
 		SubscriptionIntermediateFuture<Void>	ret	= new SubscriptionIntermediateFuture<>(new TerminationCommand()
 		{
@@ -415,8 +426,9 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 		switch(event.getType())
 		{
 			case ServiceEvent.SERVICE_ADDED:
-//				System.out.println("Superpeer added service: " + event.getService());
 				registry.addService(event.getService());
+//				if(event.toString().indexOf("ITestService")!=-1)
+//					System.out.println(agent+" added service: " + event.getService());
 				break;
 				
 			case ServiceEvent.SERVICE_CHANGED:

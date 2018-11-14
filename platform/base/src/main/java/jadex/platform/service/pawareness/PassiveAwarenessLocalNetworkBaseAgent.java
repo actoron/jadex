@@ -78,6 +78,9 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 	/** The currently known platforms. */
 	protected Map<IComponentIdentifier, List<TransportAddress>>	platforms;
 
+	/** The newly found platforms. */
+	protected Map<IComponentIdentifier, List<TransportAddress>>	newplatforms;
+
 	/** The socket to send. */
 	protected DatagramSocket sendsocket;
 	
@@ -154,6 +157,7 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 			
 //			System.out.println("New search");
 			search	= new IntermediateFuture<IComponentIdentifier>();
+			newplatforms	= new LinkedHashMap<>();	// always remember platforms from last search
 			filter	= new SlidingCuckooFilter(); 
 
 			// Add initial results
@@ -202,6 +206,11 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 					IntermediateFuture<IComponentIdentifier>	fut	= search;
 					search = null;
 					filter	= null;
+					
+					// Forget older platforms not found again.
+					platforms	= newplatforms;
+					newplatforms	= null;
+					
 					fut.setFinishedIfUndone();
 				}
 			});
@@ -304,6 +313,7 @@ public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveA
 									if(search!=null && !filter.contains(sender.toString()))
 									{
 										filter.insert(sender.toString());
+										newplatforms.put(sender, addresses);	// only add when search is running
 										search.addIntermediateResultIfUndone(sender);
 									}
 									

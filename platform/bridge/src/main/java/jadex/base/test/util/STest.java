@@ -1,5 +1,7 @@
 package jadex.base.test.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
@@ -35,9 +37,34 @@ public class STest
     	testnetwork_pass = "key:" + new String(Base64.encodeNoPadding(key), SUtil.UTF8);
     }
     
-    public static IPlatformConfiguration getDefaultTestConfig() 
+    /** Counter for unique platform numbers. */
+	static AtomicInteger	platno	= new AtomicInteger(0);
+
+    /**
+     *  Get the test configuration using a unique platform name derived from the caller class.
+     */
+    public static IPlatformConfiguration getLocalTestConfig()
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
+        
+        // Set platform name based on caller class / code line
+        boolean	found	= false;
+    	for(StackTraceElement stack: Thread.currentThread().getStackTrace())
+    	{
+    		// If STest -> skip and set found to true
+    		if(stack.getClassName().equals(STest.class.getName()))
+    		{
+    			found	= true;
+    		}
+    		
+    		// If found previously but not in current stack element(!) -> use stack element as name (i.e. class that called some STest method)
+    		else if(found)
+    		{
+    			config.setPlatformName(stack.getClassName()+":"+stack.getLineNumber()+"-"+platno.getAndIncrement());
+    			break;
+    		}
+    	}
+
         // Do not use multi factory as it is much too slow now :(
 //		config.setValue("kernel_multi", true);
 //		config.setValue("kernel_micro", false);
@@ -47,14 +74,6 @@ public class STest
 		config.setValue("kernel_bdix", true);
 		config.setValue("kernel_bdi", true);
 		
-		// Enable intravm awareness, transport and security
-		config.setSuperpeerClient(true);
-		config.setValue("passiveawarenessintravm", true);
-        config.setValue("intravm", true);
-        config.getExtendedPlatformConfiguration().setSecurity(true);
-		config.setNetworkNames(new String[] { testnetwork_name });
-		config.setNetworkSecrets(new String[] { testnetwork_pass });
-
         config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
         config.getExtendedPlatformConfiguration().setSimulation(true);
 //        config.setValue("bisimulation", true);
@@ -64,6 +83,26 @@ public class STest
 //        config.setLogging(true);
 //        config.getExtendedPlatformConfiguration().setDebugFutures(true);
 //		config.setWelcome(true);
+		
+		return config;
+    }
+    
+    /**
+     *  Get the test configuration using a unique platform name derived from the test objects class.
+     *  @param test	The test instance.
+     *  @return	The configuration.
+     */
+    public static IPlatformConfiguration getDefaultTestConfig()
+    {
+    	IPlatformConfiguration config = getLocalTestConfig();
+    	
+		// Enable intravm awareness, transport and security
+		config.setSuperpeerClient(true);
+		config.setValue("passiveawarenessintravm", true);
+        config.setValue("intravm", true);
+        config.getExtendedPlatformConfiguration().setSecurity(true);
+		config.setNetworkNames(new String[] { testnetwork_name });
+		config.setNetworkSecrets(new String[] { testnetwork_pass });
 		
         return config;
     }

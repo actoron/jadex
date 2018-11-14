@@ -62,7 +62,7 @@ public class LongcallTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+//		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
 		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(Collection<TestReport> result)
@@ -91,7 +91,7 @@ public class LongcallTestAgent extends TestAgent
 				} 
 				else 
 				{
-					agent.getLogger().severe("Testagent test rmeote: "+agent.getDescription());
+//					agent.getLogger().severe("Testagent test rmeote: "+agent.getDescription());
 					testRemote(3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
 					{
 						public void customResultAvailable(Collection<TestReport> result)
@@ -103,7 +103,7 @@ public class LongcallTestAgent extends TestAgent
 						
 						public void finished()
 						{
-							agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
+//							agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 							ret.setResult(null);
 						}
 						

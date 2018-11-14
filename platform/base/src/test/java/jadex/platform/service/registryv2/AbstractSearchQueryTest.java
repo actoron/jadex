@@ -243,7 +243,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			waitALittle(client);
 //			waitLonger(client);	// Hack for timeout in CI Pipeline!?
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
-			Assert.assertEquals(""+result, 1, result.size());
+			Assert.assertEquals(client.toString()+": "+result, 1, result.size());
 			
 			// 6) start provider platform, wait for connection, search for service -> test if search works for new platform and existing SP
 			System.out.println("6) start provider platform, search for service");
@@ -264,6 +264,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("8) kill SP, search for service");
 			removePlatform(sp);
 			waitALittle(client);
+			waitALittle(client);	// two waits for disconnection, because contimeout = 2* WAITFACTOR
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(""+result, awa?1:0, result.size());
 		}

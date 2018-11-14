@@ -3,10 +3,7 @@ package jadex.commons.transformation.traverser;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -164,9 +161,11 @@ public class DefaultBeanIntrospector implements IBeanIntrospector
 				Field[] fields = clazz.getFields();
 				for(int i = 0; i < fields.length; i++)
 				{
+					int modifiers = fields[i].getModifiers();
 					String property_java_name = fields[i].getName();
 					if((includefields || fields[i].isAnnotationPresent(Include.class)) 
-						&& fields[i].getAnnotation(Exclude.class) == null && !beanprops.containsKey(property_java_name))
+						&& fields[i].getAnnotation(Exclude.class) == null && !beanprops.containsKey(property_java_name)
+						&& !(Modifier.isNative(modifiers) || Modifier.isStatic(modifiers)))
 					{
 						beanprops.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
 					}
