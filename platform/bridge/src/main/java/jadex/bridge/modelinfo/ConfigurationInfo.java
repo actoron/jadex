@@ -288,7 +288,7 @@ public class ConfigurationInfo extends Startable
 	 *  Get the required services.
 	 *  @return The required services.
 	 */
-	public RequiredServiceInfo[] getRequiredServices()
+	public RequiredServiceInfo[] getServices()
 	{
 		return requiredservices==null? new RequiredServiceInfo[0]: 
 			requiredservices.toArray(new RequiredServiceInfo[requiredservices.size()]);

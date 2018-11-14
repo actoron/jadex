@@ -169,7 +169,7 @@ If exceptions cannot be handled or need not to be handled default result listene
 
 ```java
 
-IIntermediateFuture<IChatService> fut = ia.getServiceContainer().getRequiredServices("chatservices");
+IIntermediateFuture<IChatService> fut = ia.getServiceContainer().getServices("chatservices");
 fut.addResultListener(new IIntermediateResultListener<IChatService>()
 {
   public void resultAvailable(Collection<IChatService> result)
@@ -203,7 +203,7 @@ In Java methods can either use try-catch blocks to handle exceptions themselves 
 
 ```java
 
-IFuture<IClockService> fut = agent.getServiceContainer().getRequiredService("clockservice");
+IFuture<IClockService> fut = agent.getServiceContainer().getService("clockservice");
 fut.addResultListener(new DefaultResultListener<IClockService>()
 {
   public void resultAvailable(IClockService cs)
@@ -453,7 +453,7 @@ String msg;
 @AgentBody
 public void body()
 {
-  IFuture<IHelloService> fhello = agent.getServiceContainer().getRequiredService("hello");
+  IFuture<IHelloService> fhello = agent.getServiceContainer().getService("hello");
   fhello.addResultListener(new DefaultResultListener<IHelloService>()
   {
     public void resultAvailable(IHelloService hello)

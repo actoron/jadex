@@ -35,6 +35,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.gui.JBusyRing;
 import jadex.commons.gui.JPlaceholderTextField;
 import jadex.commons.gui.SGUI;
+import jadex.commons.security.PemKeyPair;
 import jadex.commons.security.SSecurity;
 
 /**
@@ -43,6 +44,9 @@ import jadex.commons.security.SSecurity;
 @SuppressWarnings("rawtypes") // Bad JComboBox, BAD!
 public class AddCertPanel extends JPanel
 {
+	/** Serial */
+	private static final long serialVersionUID = 8626220123653845241L;
+
 	/** Shorthand for GL-size. */
 	protected static final int PS = GroupLayout.PREFERRED_SIZE;
 	
@@ -50,7 +54,7 @@ public class AddCertPanel extends JPanel
 	protected static final int DS = GroupLayout.DEFAULT_SIZE;
 	
 	/** Certificate of the issuer, if available. */
-	protected Tuple2<String, String> issuercert;
+	protected PemKeyPair issuercert;
 	
 	/** Button group of certificate type (CA, self-signed, etc.). */
 	protected ButtonGroup certtypes;
@@ -88,7 +92,7 @@ public class AddCertPanel extends JPanel
 	/**
 	 * 
 	 */
-	public AddCertPanel(Tuple2<String, String> selectedcert, ActionListener listener)
+	public AddCertPanel(PemKeyPair selectedcert, ActionListener listener)
 	{
 		this.listener = listener;
 		this.issuercert = selectedcert;
@@ -170,13 +174,18 @@ public class AddCertPanel extends JPanel
 	/**
 	 *  Gets the certificate from the panel.
 	 */
-	public Tuple2<String, String> getCertificate()
+	public PemKeyPair getCertificate()
 	{
-		Tuple2<String, String> ret = null;
+		PemKeyPair ret = null;
 		String cert = ((JTextArea) certarea.getViewport().getView()).getText();
 		String key = ((JTextArea) keyarea.getViewport().getView()).getText();
-		if (cert != null && cert.length() > 0 && key != null && key.length() > 0)
-			ret = new Tuple2<String, String>(cert, key);
+		if (cert != null && cert.length() > 0)
+		{
+			ret = new PemKeyPair();
+			ret.setCertificate(cert);
+			if (key != null && key.length() > 0)
+				ret.setKey(key);
+		}
 		return ret;
 	}
 	
@@ -184,7 +193,7 @@ public class AddCertPanel extends JPanel
 	{
 		if (issuercert != null)
 		{
-			if (!SSecurity.isCaCertificate(issuercert.getFirstEntity()))
+			if (!SSecurity.isCaCertificate(issuercert.getCertificate()))
 			{
 				issuercert = null;
 			}
@@ -248,15 +257,16 @@ public class AddCertPanel extends JPanel
 		GroupLayout layout = createGroupLayout(cryptsettings);
 		cryptsettings.setLayout(layout);
 		
-		JLabel sigalgstrlb = new JLabel("Key Strength");
+		JLabel sigalgstrlb = new JLabel("Key Strength (min.)");
 		sigalgstr = new JComboBox();
 		sigalgstr.setEditable(false);
 		sigalgstr.setLightWeightPopupEnabled(false);
 		
 		JLabel sigalgconflb = new JLabel("Curve");
 		sigalgconf = new JComboBox();
+		sigalgconf.addItem("NIST P");
+		sigalgconf.addItem("NIST K");
 		sigalgconf.addItem("Brainpool");
-		sigalgconf.addItem("NIST");
 		sigalgconf.setLightWeightPopupEnabled(false);
 		
 		JLabel sigalglb = new JLabel("Algorithm");
@@ -503,10 +513,10 @@ public class AddCertPanel extends JPanel
 								tmp = SSecurity.createRootCaCertificate(subjectdn, -1, sigalgtxt, sigalgcfg, hashalgtxt, strength, daysvalid);
 								break;
 							case 2:
-								tmp = SSecurity.createIntermediateCaCertificate(issuercert.getFirstEntity(), issuercert.getSecondEntity(), subjectdn, 0, sigalgtxt, sigalgcfg, hashalgtxt, strength, daysvalid);
+								tmp = SSecurity.createIntermediateCaCertificate(issuercert.getCertificate(), issuercert.getKey(), subjectdn, 0, sigalgtxt, sigalgcfg, hashalgtxt, strength, daysvalid);
 								break;
 							case 3:
-								tmp = SSecurity.createCertificate(issuercert.getFirstEntity(), issuercert.getSecondEntity(), subjectdn, sigalgtxt, sigalgcfg, hashalgtxt, strength, daysvalid);
+								tmp = SSecurity.createCertificate(issuercert.getCertificate(), issuercert.getKey(), subjectdn, sigalgtxt, sigalgcfg, hashalgtxt, strength, daysvalid);
 						}
 						final Tuple2<String, String> res = tmp;
 						
@@ -560,7 +570,8 @@ public class AddCertPanel extends JPanel
 					try
 					{
 						boolean check = SSecurity.readCertificateChainFromPEM(((JTextArea) certarea.getViewport().getView()).getText()) != null;
-						check &= SSecurity.readPrivateKeyFromPEM(((JTextArea) keyarea.getViewport().getView()).getText()) != null;
+						if (((JTextArea) keyarea.getViewport().getView()).getText().length() > 0)
+							check &= SSecurity.readPrivateKeyFromPEM(((JTextArea) keyarea.getViewport().getView()).getText()) != null;
 						
 						if (!check)
 							throw new IllegalArgumentException();

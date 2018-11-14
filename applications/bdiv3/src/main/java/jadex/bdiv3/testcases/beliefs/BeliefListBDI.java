@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -24,7 +25,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test plan is activated when a belief list is modified.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class BeliefListBDI
 {
@@ -51,7 +52,7 @@ public class BeliefListBDI
 		names.set(0, "c");
 		names.remove("c");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -72,25 +73,25 @@ public class BeliefListBDI
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 	}
 	
 	// todo: plan creation condition?!
-	@Plan(trigger=@Trigger(factaddeds="names"))
+	@Plan(trigger=@Trigger(factadded="names"))
 	protected void printAddedFact(ChangeEvent event, RPlan rplan)
 	{
 		System.out.println("fact added: "+event.getValue()+" "+event.getSource()+" "+rplan);
 		tr[0].setSucceeded(true);
 	}
 	
-	@Plan(trigger=@Trigger(factchangeds="names"))
+	@Plan(trigger=@Trigger(factchanged="names"))
 	protected void printChFact(ChangeEvent event, RPlan rplan)
 	{
 		System.out.println("fact change: "+event.getValue()+" "+event.getSource()+" "+rplan);
 		tr[1].setSucceeded(true);
 	}
 	
-	@Plan(trigger=@Trigger(factremoveds="names"))
+	@Plan(trigger=@Trigger(factremoved="names"))
 	protected void printRemFact(ChangeEvent event, RPlan rplan)
 	{
 		System.out.println("fact removed: "+event.getValue()+" "+event.getSource()+" "+rplan);

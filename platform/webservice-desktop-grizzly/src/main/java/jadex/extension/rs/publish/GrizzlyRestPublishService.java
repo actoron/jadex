@@ -25,8 +25,10 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -68,13 +70,13 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
     {
         try
         {
-        	final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
+        	final IService service = component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null, RequiredServiceInfo.SCOPE_PLATFORM).setServiceIdentifier(serviceid)).get();
         	
             final URI uri = new URI(getCleanPublishId(info.getPublishId()));
             HttpServer server = (HttpServer)getHttpServer(uri, info);
             System.out.println("Adding http handler to server: "+uri.getPath());
 
-            final MultiCollection<String, MappingInfo> mappings = evaluateMapping(service.getServiceIdentifier(), info);
+            final MultiCollection<String, MappingInfo> mappings = evaluateMapping(service.getServiceId(), info);
 
         	HttpHandler handler = new HttpHandler()
 			{
@@ -136,7 +138,7 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
 
             if(sidservers==null)
                 sidservers = new HashMap<IServiceIdentifier, HttpServer>();
-            sidservers.put(service.getServiceIdentifier(), server);
+            sidservers.put(service.getServiceId(), server);
         }
         catch(Exception e)
         {

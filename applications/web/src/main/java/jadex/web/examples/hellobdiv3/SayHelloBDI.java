@@ -21,7 +21,7 @@ public abstract class SayHelloBDI implements ISayHelloService, IBDIAgent
 	public IFuture<String> sayHello()
 	{
 		String text = Math.random()>0.5? "Hello User, I am ": "Hallo Nutzer, ich bin ";
-		text += getComponentIdentifier();
+		text += getId();
 		return new Future<String>(text);
 	}
 }

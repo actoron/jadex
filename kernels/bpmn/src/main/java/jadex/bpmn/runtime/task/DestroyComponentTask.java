@@ -9,11 +9,6 @@ import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -41,61 +36,54 @@ public class DestroyComponentTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(instance, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		final IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
+		final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): false;
+		
+		IComponentIdentifier cid = (IComponentIdentifier)context.getParameterValue("componentid");
+		if(cid==null)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			String name = (String)context.getParameterValue("name");
+//			cid = ces.createComponentIdentifier(name, true, null);
+			if(name.indexOf("@")==-1)
+				cid = new BasicComponentIdentifier(name);
+			else
+				cid = new BasicComponentIdentifier(name, instance.getId().getParent());
+		}
+		
+		IFuture<Map<String, Object>> tmp = instance.killComponent(cid);
+		if(wait || resultlistener!=null)
+		{
+			tmp.addResultListener(new IResultListener<Map<String, Object>>()
 			{
-				final IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
-				final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): false;
-				
-				IComponentIdentifier cid = (IComponentIdentifier)context.getParameterValue("componentid");
-				if(cid==null)
+				public void resultAvailable(Map<String, Object> result)
 				{
-					String name = (String)context.getParameterValue("name");
-//					cid = ces.createComponentIdentifier(name, true, null);
-					if(name.indexOf("@")==-1)
-						cid = new BasicComponentIdentifier(name);
-					else
-						cid = new BasicComponentIdentifier(name, instance.getComponentIdentifier().getParent());
-				}
-				
-				IFuture<Map<String, Object>> tmp = cms.destroyComponent(cid);
-				if(wait || resultlistener!=null)
-				{
-					tmp.addResultListener(new IResultListener<Map<String, Object>>()
+					if(resultlistener!=null)
+						resultlistener.resultAvailable(result);
+					if(wait)
 					{
-						public void resultAvailable(Map<String, Object> result)
-						{
-							if(resultlistener!=null)
-								resultlistener.resultAvailable(result);
-							if(wait)
-							{
-								ret.setResult(null);
+						ret.setResult(null);
 //								listener.resultAvailable(DestroyComponentTask.this, result);
-							}
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							if(resultlistener!=null)
-								resultlistener.exceptionOccurred(exception);
-							if(wait)
-							{
-								ret.setException(exception);
-//								listener.exceptionOccurred(DestroyComponentTask.this, exception);
-							}
-						}
-					});
+					}
 				}
-
-				if(!wait)
+				
+				public void exceptionOccurred(Exception exception)
 				{
-					ret.setResult(null);
-//					listener.resultAvailable(this, null);
+					if(resultlistener!=null)
+						resultlistener.exceptionOccurred(exception);
+					if(wait)
+					{
+						ret.setException(exception);
+//								listener.exceptionOccurred(DestroyComponentTask.this, exception);
+					}
 				}
-			}
-		}));
+			});
+		}
+
+		if(!wait)
+		{
+			ret.setResult(null);
+//					listener.resultAvailable(this, null);
+		}
 		
 		return ret;
 	}

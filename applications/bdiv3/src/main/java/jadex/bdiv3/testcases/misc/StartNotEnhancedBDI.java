@@ -2,14 +2,12 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -19,13 +17,13 @@ import jadex.micro.annotation.Results;
 /**
  *  Test using injected values in init expressions or constructors.
  */
-@Agent(keepalive=Boolean3.FALSE)
+@Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class StartNotEnhancedBDI	extends ConstructorsSuper
 {
 	/** The agent. */
 	@Agent
-	protected IInternalAccess	agent;
+	protected IInternalAccess agent;
 	
 	/**
 	 *  Agent body.
@@ -34,7 +32,6 @@ public class StartNotEnhancedBDI	extends ConstructorsSuper
 	public void	body()
 	{
 		TestReport	tr	= new TestReport("#1", "Test if constructor calls work.");
-		IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		try
 		{
 			Class<?> cl = NotEnhancedBDI.class;
@@ -47,7 +44,7 @@ public class StartNotEnhancedBDI	extends ConstructorsSuper
 			try
 			{
 				IResourceIdentifier rid = agent.getModel().getResourceIdentifier();
-				IComponentIdentifier cid = cms.createComponent(NotEnhancedBDI.class.getName()+".class", new CreationInfo(rid)).getFirstResult();
+				IComponentIdentifier cid = agent.createComponent(new CreationInfo(rid).setFilename(NotEnhancedBDI.class.getName()+".class")).getFirstResult();
 				System.out.println("cid: "+cid);
 				tr.setFailed("BDI agent was created although class was not enhanced.");
 			}
@@ -57,6 +54,6 @@ public class StartNotEnhancedBDI	extends ConstructorsSuper
 	//			e.printStackTrace();
 			}
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

@@ -13,11 +13,11 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IProxyAgentService.State;
+import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -80,9 +80,10 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 	 *  Create a new service container node.
 	 */
 	public ProxyComponentTreeNode(final ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, IComponentDescription desc,
-		IComponentManagementService cms, ComponentIconCache iconcache, IExternalAccess access)
+		//IComponentManagementService cms, 
+		ComponentIconCache iconcache, IExternalAccess access)
 	{
-		super(parent, model, tree, desc, cms, iconcache, access);
+		super(parent, model, tree, desc, iconcache, access);
 		this.state = State.UNCONNECTED;
 		
 		// Add CMS listener for remote proxy node.
@@ -149,7 +150,8 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 	 */
 	protected void	searchChildren()
 	{
-		busy	= true;
+//		System.out.println("searchChildren: "+ProxyComponentTreeNode.this.hashCode());
+		busy = true;
 		
 		getConnectionState().addResultListener(new DefaultResultListener<IProxyAgentService.State>()
 		{
@@ -167,7 +169,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 				if(result!=null)
 				{
 //					System.out.println("search: "+ProxyComponentTreeNode.this.hashCode());
-					searchChildren(cms, result).addResultListener(new IResultListener<List<ITreeNode>>()
+					searchChildren(access, result).addResultListener(new IResultListener<List<ITreeNode>>()
 					{
 						public void resultAvailable(List<ITreeNode> result)
 						{
@@ -189,7 +191,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 						public void exceptionOccurred(Exception exception)
 						{
 //							exception.printStackTrace();
-//							System.out.println("search ex: "+ProxyComponentTreeNode.this.hashCode()+" "+exception.getClass().getName()+" "+cid);
+							System.out.println("search ex: "+ProxyComponentTreeNode.this.hashCode()+" "+exception.getClass().getName()+" "+cid);
 //							System.out.println("ex: "+exception);
 							busy	= false;
 //							state	= exception instanceof SecurityException? STATE_LOCKED : STATE_UNCONNECTED;
@@ -210,7 +212,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 			
 			public void exceptionOccurred(Exception exception)
 			{
-//				System.out.println("ex: "+exception);
+				System.out.println("ex: "+exception);
 //				state	= exception instanceof SecurityException? STATE_LOCKED : STATE_UNCONNECTED;
 				List<ITreeNode> list	= Collections.emptyList();
 				setChildren(list);
@@ -238,7 +240,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 		
 		if(cid==null)
 		{
-			SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
+			access.searchService( new ServiceQuery<>(IProxyAgentService.class).setProvider(desc.getName()))
 				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, IComponentIdentifier>(ret)
 			{
 				public void customResultAvailable(IProxyAgentService pas)
@@ -268,12 +270,18 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 	protected IFuture<State> getConnectionState()
 	{
 		final Future<State> ret = new Future<State>();
-		SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
-			.addResultListener(new IResultListener<IProxyAgentService>()
+		
+		IFuture<IProxyAgentService> fut = access.searchService(new ServiceQuery<>(IProxyAgentService.class).setProvider(desc.getName()));
+
+		String id = SUtil.createUniqueId();
+//		System.out.println("got fut: "+fut+" "+fut.isDone()+" "+desc.getName()+" "+access.getId()+" "+id);	
+			
+		fut.addResultListener(new IResultListener<IProxyAgentService>()
 //			.addResultListener(new SwingResultListener<IProxyAgentService>(new IResultListener<IProxyAgentService>()
 		{
 			public void resultAvailable(IProxyAgentService pas)
 			{
+//				System.out.println("res: "+id);
 				// SServiceProvider returns on platform thread and returns only a provided proxy
 				// For this reason it works because no rescheduling occurs
 				pas.refreshLatency(); // Hack!!! perform new latency measurement.
@@ -294,6 +302,7 @@ public class ProxyComponentTreeNode extends PlatformTreeNode
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("res ex: "+id+" "+exception);
 				ret.setResult(State.UNCONNECTED);
 			}
 		});

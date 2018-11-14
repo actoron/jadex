@@ -18,7 +18,7 @@ public class MicroserviceModelLoader extends AbstractModelLoader
 	//-------- constants --------
 	
 	/** The component file extension. */
-	public static final String	FILE_EXTENSION_MICROSERVICE = "Microservice.class";
+	public static final String	FILE_EXTENSION_MICROSERVICE = ".class";
 	
 	//-------- attributes --------
 	

@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalFinished;
 import jadex.bdiv3.annotation.GoalParameter;
@@ -26,7 +27,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that uses a goal with a goal as plan (direct subgoal).
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalGoalBDI
 {
@@ -134,10 +135,10 @@ public class GoalGoalBDI
 //			}
 //		});
 		
-		Object res = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal1()).get();
+		Object res = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal1()).get();
 		System.out.println("Goal success: "+res);
 		tr.setSucceeded(true);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killComponent();
 	}
 }

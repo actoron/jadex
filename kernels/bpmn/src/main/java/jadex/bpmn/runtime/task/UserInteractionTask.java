@@ -76,7 +76,7 @@ public class UserInteractionTask implements ITask
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = instance.getComponentFeature0(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.FINE);
+		final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = instance.getFeature0(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.FINE);
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent result)

@@ -5,12 +5,9 @@ import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
@@ -35,30 +32,17 @@ public class TreeStressTestAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class)
-			.addResultListener(new IResultListener()
+		int	depth	= ((Number)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("depth")).intValue();
+		if(depth>0)
 		{
-			public void resultAvailable(Object result)
+			Map	args	= new HashMap();
+			args.put("depth", Integer.valueOf(depth-1));
+			CreationInfo	ci	= new CreationInfo(args, agent.getId()).setFilename(TreeStressTestAgent.this.getClass().getName()+".class");
+			for(int i=0; i<depth; i++)
 			{
-				IComponentManagementService	cms	= (IComponentManagementService)result;
-				int	depth	= ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("depth")).intValue();
-				if(depth>0)
-				{
-					Map	args	= new HashMap();
-					args.put("depth", Integer.valueOf(depth-1));
-					CreationInfo	ci	= new CreationInfo(args, agent.getComponentIdentifier());
-					for(int i=0; i<depth; i++)
-					{
-						cms.createComponent(null, TreeStressTestAgent.this.getClass().getName()+".class", ci, null);
-					}
-				}
+				agent.createComponent(ci, null);
 			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-//				exception.printStackTrace();
-			}
-		});
+		}
 		
 		return new Future<Void>(); // never kill?!
 	}

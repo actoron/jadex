@@ -21,10 +21,10 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.IBootstrapFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -35,7 +35,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.kernelbase.IBootstrapFactory;
 
 
 /**
@@ -106,7 +105,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public BpmnFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getComponentIdentifier(), IComponentFactory.class, null);
+		super(provider.getId(), IComponentFactory.class, null);
 
 		this.provider = provider;
 		this.loader = new BpmnModelLoader();
@@ -135,7 +134,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = provider.getComponentIdentifier();
+		this.providerid = provider.getId();
 		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
@@ -145,18 +144,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public IFuture<Void> startService()
 	{
-		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
-		{
-			public void customResultAvailable(ILibraryService result)
-			{
-				libservice = result;
-				libservice.addLibraryServiceListener(libservicelistener);
-				BpmnFactory.super.startService().addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
-		return ret;
+		libservice = provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
+		return BpmnFactory.super.startService();
 	}
 	
 	//-------- methods --------

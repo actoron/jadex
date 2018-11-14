@@ -1,6 +1,5 @@
 package jadex.micro;
 
-import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -68,6 +67,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentBreakpoint;
+import jadex.micro.annotation.AgentChildKilled;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentKilled;
@@ -79,7 +79,6 @@ import jadex.micro.annotation.AgentServiceValue;
 import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
@@ -127,6 +126,7 @@ public class MicroClassReader
 			clname = model.substring(0, model.indexOf(".class"));
 		clname = clname.replace('\\', '.');
 		clname = clname.replace('/', '.');
+		//clname = clname.replace("..", ".");
 		
 		Class<?> cma = getMicroAgentClass(clname, imports, classloader);
 		
@@ -147,22 +147,13 @@ public class MicroClassReader
 //		System.out.println("read micro: "+cma);
 		
 		String name = SReflect.getUnqualifiedClassName(cma);
-		if(name.endsWith("Agent"))
-			name = name.substring(0, name.lastIndexOf("Agent"));
+		//if(name.endsWith("Agent"))
+		//	name = name.substring(0, name.lastIndexOf("Agent"));
 		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
 		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);
 		
-		// in robolectric testcases, location is null
-		URL sourceLocation = (cma.getProtectionDomain()!=null 
-			&& cma.getProtectionDomain().getCodeSource().getLocation() != null) 
-			? cma.getProtectionDomain().getCodeSource().getLocation() : null;
-			
-		String src = (sourceLocation != null) 
-			? SUtil.convertURLToString(sourceLocation) + File.separator : "/";
-//			: ('/' + cma.getPackage().getName().replace('.', '/') + '/');
-//		modelinfo.setFilename(src+File.separatorChar+model);
-		modelinfo.setFilename(src+SReflect.getClassName(cma).replace('.', cma.getProtectionDomain()!=null? File.separatorChar: '/')+".class");
+		modelinfo.setFilename(SUtil.getClassFileLocation(cma));
 //		System.out.println("mircor: "+src+File.separatorChar+model);
 		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
 		modelinfo.setStartable(true);
@@ -174,6 +165,9 @@ public class MicroClassReader
 			URL url	= null;
 			try
 			{
+				URL sourceLocation = cma.getProtectionDomain()==null ? null 
+					: cma.getProtectionDomain().getCodeSource().getLocation();
+
 				url	= (sourceLocation != null) 
 					? sourceLocation 
 					: new URL("file://" + cma.getPackage().getName().replace('.', '/') + '/');
@@ -224,7 +218,7 @@ public class MicroClassReader
 //			IArgument[] arguments = metainfo!=null? metainfo.getArguments(): null;
 //			IArgument[] results = metainfo!=null? metainfo.getResults(): null;
 //			Map properties = metainfo!=null && metainfo.getProperties()!=null? new HashMap(metainfo.getProperties()): new HashMap();
-//			RequiredServiceInfo[] required = metainfo!=null? metainfo.getRequiredServices(): null;
+//			RequiredServiceInfo[] required = metainfo!=null? metainfo.getServices(): null;
 //			ProvidedServiceInfo[] provided = metainfo!=null? metainfo.getProvidedServices(): null;
 //			IModelValueProvider master = metainfo!=null? metainfo.getMaster(): null;
 //			IModelValueProvider daemon= metainfo!=null? metainfo.getDaemon(): null;
@@ -298,11 +292,11 @@ public class MicroClassReader
 			{
 				Agent	val	= getAnnotation(cma, Agent.class, cl);
 				Boolean	susp	= val.suspend().toBoolean();
-				Boolean	mast	= val.master().toBoolean();
-				Boolean	daem	= val.daemon().toBoolean();
-				Boolean	auto	= val.autoshutdown().toBoolean();
+//				Boolean	mast	= val.master().toBoolean();
+//				Boolean	daem	= val.daemon().toBoolean();
+//				Boolean	auto	= val.autoshutdown().toBoolean();
 				Boolean	sync	= val.synchronous().toBoolean();
-				Boolean	persist	= val.persistable().toBoolean();
+//				Boolean	persist	= val.persistable().toBoolean();
 				Boolean	keep	= val.keepalive().toBoolean();
 				
 				// Use most specific autoprovide setting.
@@ -312,26 +306,26 @@ public class MicroClassReader
 				{
 					modelinfo.setSuspend(susp);
 				}
-				if(mast!=null && modelinfo.getMaster()==null)
-				{
-					modelinfo.setMaster(mast);
-				}
-				if(daem!=null && modelinfo.getDaemon()==null)
-				{
-					modelinfo.setDaemon(daem);
-				}
-				if(auto!=null && modelinfo.getAutoShutdown()==null)
-				{
-					modelinfo.setAutoShutdown(auto);
-				}
+//				if(mast!=null && modelinfo.getMaster()==null)
+//				{
+//					modelinfo.setMaster(mast);
+//				}
+//				if(daem!=null && modelinfo.getDaemon()==null)
+//				{
+//					modelinfo.setDaemon(daem);
+//				}
+//				if(auto!=null && modelinfo.getAutoShutdown()==null)
+//				{
+//					modelinfo.setAutoShutdown(auto);
+//				}
 				if(sync!=null && modelinfo.getSynchronous()==null)
 				{
 					modelinfo.setSynchronous(sync);
 				}
-				if(persist!=null && modelinfo.getPersistable()==null)
-				{
-					modelinfo.setPersistable(persist);
-				}
+//				if(persist!=null && modelinfo.getPersistable()==null)
+//				{
+//					modelinfo.setPersistable(persist);
+//				}
 				if(keep!=null && modelinfo.getKeepalive()==null)
 				{
 					modelinfo.setKeepalive(keep);
@@ -690,16 +684,16 @@ public class MicroClassReader
 							confs.put(config.name(), configinfo);
 						}
 						
-						if(configinfo.getMaster()==null)
-							configinfo.setMaster(config.master().toBoolean());
-						if(configinfo.getDaemon()==null)
-							configinfo.setDaemon(config.daemon().toBoolean());
-						if(configinfo.getAutoShutdown()==null)
-							configinfo.setAutoShutdown(config.autoshutdown().toBoolean());
+//						if(configinfo.getMaster()==null)
+//							configinfo.setMaster(config.master().toBoolean());
+//						if(configinfo.getDaemon()==null)
+//							configinfo.setDaemon(config.daemon().toBoolean());
+//						if(configinfo.getAutoShutdown()==null)
+//							configinfo.setAutoShutdown(config.autoshutdown().toBoolean());
 						if(configinfo.getSynchronous()==null)
 							configinfo.setSynchronous(config.synchronous().toBoolean());
-						if(configinfo.getPersistable()==null)
-							configinfo.setPersistable(config.persistable().toBoolean());
+//						if(configinfo.getPersistable()==null)
+//							configinfo.setPersistable(config.persistable().toBoolean());
 						if(configinfo.getSuspend()==null)
 							configinfo.setSuspend(config.suspend().toBoolean());
 						if(configinfo.getScope()==null && !RequiredServiceInfo.SCOPE_GLOBAL.equals(config.scope()))
@@ -735,7 +729,7 @@ public class MicroClassReader
 										interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
 									}
 								}
-								RequiredServiceBinding bind = createBinding(im.binding());
+								RequiredServiceBinding bind = null;//createBinding(im.binding());
 								ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 									im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 								Publish p = provs[j].publish();
@@ -757,7 +751,7 @@ public class MicroClassReader
 						{
 							if(!configinfo.hasRequiredService(reqs[j].name()))
 							{
-								RequiredServiceBinding binding = createBinding(reqs[j].binding());
+								RequiredServiceBinding binding = createBinding(reqs[j]);
 								List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
 								RequiredServiceInfo rsi = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
 									binding, nfprops, Arrays.asList(reqs[j].tags()));
@@ -1007,6 +1001,11 @@ public class MicroClassReader
 					checkMethodReturnType(AgentMessageArrived.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentMessageArrived.class, new MethodInfo(methods[i]));
 				}
+				if(isAnnotationPresent(methods[i], AgentChildKilled.class, cl))
+				{
+					checkMethodReturnType(AgentChildKilled.class, methods[i], cl);
+					micromodel.setAgentMethod(AgentChildKilled.class, new MethodInfo(methods[i]));
+				}
 				
 				if(isAnnotationPresent(methods[i], Arguments.class, cl))
 				{
@@ -1133,7 +1132,7 @@ public class MicroClassReader
 	{
 		// Todo: allow other return types than void 
 		boolean	isvoid	= m.getReturnType().equals(void.class);
-		boolean isfuture	= !isvoid && SReflect.isSupertype(getClass(IFuture.class, cl), m.getReturnType());
+		boolean isfuture = !isvoid && SReflect.isSupertype(getClass(IFuture.class, cl), m.getReturnType());
 		if(isfuture)
 		{
 			Type	t	= m.getGenericReturnType();
@@ -1147,9 +1146,7 @@ public class MicroClassReader
 		}
 		
 		if(!isvoid)
-		{
 			throw new RuntimeException("@"+ann.getSimpleName()+" method requires return type 'void' or 'IFuture<Void>': "+m);
-		}
 	}
 	
 	/**
@@ -1157,7 +1154,7 @@ public class MicroClassReader
 	 */
 	protected RequiredServiceInfo createRequiredServiceInfo(RequiredService rs, ClassLoader cl)
 	{
-		RequiredServiceBinding binding = createBinding(rs.binding());
+		RequiredServiceBinding binding = createBinding(rs);
 		List<NFRPropertyInfo> nfprops = createNFRProperties(rs.nfprops());
 		
 		for(NFRProperty prop: rs.nfprops())
@@ -1715,19 +1712,29 @@ public class MicroClassReader
 			exp = "$pojoagent!=null? $pojoagent: $component";
 			System.out.println("Warning: ignoring implementation class because agent is service implementation");
 		}
-		return new ProvidedServiceImplementation(cl, exp, impl.proxytype(), createBinding(impl.binding()), 
+		return new ProvidedServiceImplementation(cl, exp, impl.proxytype(), null, //createBinding(impl.binding()), 
 			createUnparsedExpressions(impl.interceptors()));
 	}
+	
+//	/**
+//	 *  Create a service binding.
+//	 */
+//	public static RequiredServiceBinding createBinding(Binding bd)
+//	{
+//		return bd==null || Implementation.BINDING_NULL.equals(bd.name()) ? null: new RequiredServiceBinding(bd.name(), 
+//			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
+//			bd.scope().length()==0? null: bd.scope(), createUnparsedExpressions(bd.interceptors()),
+//			bd.proxytype());
+//	}
 	
 	/**
 	 *  Create a service binding.
 	 */
-	public static RequiredServiceBinding createBinding(Binding bd)
+	public static RequiredServiceBinding createBinding(RequiredService rq)
 	{
-		return bd==null || Implementation.BINDING_NULL.equals(bd.name()) ? null: new RequiredServiceBinding(bd.name(), 
-			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
-			bd.scope().length()==0? null: bd.scope(), createUnparsedExpressions(bd.interceptors()),
-			bd.proxytype());
+		return new RequiredServiceBinding(null, null, null,
+			rq.scope().length()==0? null: rq.scope(), createUnparsedExpressions(rq.interceptors()),
+			rq.proxytype());
 	}
 	
 	/**
@@ -1752,11 +1759,11 @@ public class MicroClassReader
 		ComponentInstanceInfo ret = new ComponentInstanceInfo();
 		
 		ret.setSuspend(comp.suspend().toBoolean());
-		ret.setMaster(comp.master().toBoolean());
-		ret.setDaemon(comp.daemon().toBoolean());
-		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
+//		ret.setMaster(comp.master().toBoolean());
+//		ret.setDaemon(comp.daemon().toBoolean());
+//		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
 		ret.setSynchronous(comp.synchronous().toBoolean());
-		ret.setPersistable(comp.persistable().toBoolean());
+//		ret.setPersistable(comp.persistable().toBoolean());
 		
 		if(comp.name().length()>0)
 			ret.setName(comp.name());
@@ -1774,16 +1781,16 @@ public class MicroClassReader
 			ret.setArguments(exps);
 		}
 		
-		Binding[] binds = comp.bindings();
-		if(binds.length>0)
-		{
-			RequiredServiceBinding[] bds = new RequiredServiceBinding[binds.length];
-			for(int k=0; k<binds.length; k++)
-			{
-				bds[k] = createBinding(binds[k]);
-			}
-			ret.setBindings(bds);
-		}
+//		Binding[] binds = comp.bindings();
+//		if(binds.length>0)
+//		{
+//			RequiredServiceBinding[] bds = new RequiredServiceBinding[binds.length];
+//			for(int k=0; k<binds.length; k++)
+//			{
+//				bds[k] = createBinding(binds[k]);
+//			}
+//			ret.setBindings(bds);
+//		}
 		
 		return ret;
 	}
@@ -1796,11 +1803,11 @@ public class MicroClassReader
 		ComponentInstanceInfo ret = new ComponentInstanceInfo();
 		
 		ret.setSuspend(comp.suspend().toBoolean());
-		ret.setMaster(comp.master().toBoolean());
-		ret.setDaemon(comp.daemon().toBoolean());
-		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
+//		ret.setMaster(comp.master().toBoolean());
+//		ret.setDaemon(comp.daemon().toBoolean());
+//		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
 		ret.setSynchronous(comp.synchronous().toBoolean());
-		ret.setPersistable(comp.persistable().toBoolean());
+//		ret.setPersistable(comp.persistable().toBoolean());
 		ret.setMonitoring(comp.monitoring());
 		
 		if(comp.name().length()>0)
@@ -1843,10 +1850,10 @@ public class MicroClassReader
 	 * Get the mirco agent class.
 	 */
 	// todo: make use of cache
-	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
+	protected Class<?> getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
 	{
 		String	oclname	= clname;
-		Class ret = SReflect.findClass0(clname, imports, classloader);
+		Class<?> ret = SReflect.findClass0(clname, imports, classloader);
 //		System.out.println(clname+" "+ret+" "+classloader);
 		int idx;
 		while(ret == null && (idx = clname.indexOf('.')) != -1)
@@ -1863,6 +1870,9 @@ public class MicroClassReader
 			}
 			// System.out.println(clname+" "+cma+" "+ret);
 		}
+		
+//		System.out.println(clname+" "+ret+" "+classloader.hashCode());
+		
 		if(ret == null)
 		{
 			throw new RuntimeException("Micro agent class not found: " + oclname + ", " + SUtil.arrayToString(imports) + ", " + classloader);
@@ -2051,7 +2061,7 @@ public class MicroClassReader
 	{
 		T ret = null;
 		
-		if(isClassLoaderCompatible(an.getClass(), cl))
+		if(an==null || isClassLoaderCompatible(an.getClass(), cl))
 		{
 			ret = an;
 		}

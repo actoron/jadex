@@ -102,10 +102,10 @@
 			</trigger>
 		</plan>
 		
-		<plan name="df_keep_registered">
+		<!-- <plan name="df_keep_registered">
 	        <parameter name="description" class="IDFComponentDescription"/>
 	        <body class="jadex.bdi.planlib.df.DFKeepRegisteredPlan"/>
-	    </plan>
+	    </plan> -->
 		
 	</plans>
 
@@ -137,6 +137,12 @@
    		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 		<property name="debugging">false</property>
 	</properties>
+	
+	<services>
+		<providedservice class="ICarryService">
+			<implementation class="CarryService"></implementation>
+		</providedservice>
+	</services>
 
 	<configurations>
 		<configuration name="default">
@@ -159,16 +165,16 @@
 			</goals>
 			<plans>
 				<initialplan ref="carry"/>
-				<initialplan ref="df_keep_registered">
+				<!-- <initialplan ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)).createDFComponentDescription($component.getComponentIdentifier(),
-								((IDF)SServiceProvider.getLocalService($component.getComponentIdentifier(), IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))
+							((IDF)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM))).createDFComponentDescription($component.getId(),
+								((IDF)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)))
 								.createDFServiceDescription("service_carry", "service_carry", "University of Hamburg"),
 								20000)
  						</value>
 					</parameter>
-				</initialplan>
+				</initialplan> -->
 			</plans>
 		</configuration>
 	</configurations>

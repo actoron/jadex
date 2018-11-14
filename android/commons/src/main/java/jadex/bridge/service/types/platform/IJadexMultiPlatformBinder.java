@@ -9,7 +9,6 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
@@ -34,12 +33,12 @@ public interface IJadexMultiPlatformBinder
 	 */
 	public boolean isPlatformRunning(IComponentIdentifier platformID);
 
-	/**
-	 * Retrieves the CMS of the Platform with the given ID.
-	 * 
- 	 * @deprecated use getService() or getsService() instead.
-	 */
-	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID);
+//	/**
+//	 * Retrieves the CMS of the Platform with the given ID.
+//	 * 
+// 	 * @deprecated use getService() or getsService() instead.
+//	 */
+//	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID);
 	
 	/**
 	 * Looks up a service and returns it synchronously.
@@ -83,27 +82,27 @@ public interface IJadexMultiPlatformBinder
 	 */
 //	public IFuture<IExternalAccess> startJadexPlatform();
 
-	/**
-	 * Starts a Jadex Platform.
-	 * @param kernels
-	 *            String array of kernel Identifiers (see constants in
-	 *            {@link JadexPlatformManager}).
-	 * 
-	 * @return IFuture<IExternalAccess> The external platform access
-	 */
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels);
-
-	/**
-	 * Starts a Jadex Platform.
-	 * 
-	 * @param kernels
-	 *            String array of kernel Identifiers (see constants in
-	 *            {@link JadexPlatformManager}).
-	 * @param platformId
-	 *            Identifier of the new platform
-	 * @return IFuture<IExternalAccess> The external platform access
-	 */
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId);
+//	/**
+//	 * Starts a Jadex Platform.
+//	 * @param kernels
+//	 *            String array of kernel Identifiers (see constants in
+//	 *            {@link JadexPlatformManager}).
+//	 * 
+//	 * @return IFuture<IExternalAccess> The external platform access
+//	 */
+//	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels);
+//
+//	/**
+//	 * Starts a Jadex Platform.
+//	 * 
+//	 * @param kernels
+//	 *            String array of kernel Identifiers (see constants in
+//	 *            {@link JadexPlatformManager}).
+//	 * @param platformId
+//	 *            Identifier of the new platform
+//	 * @return IFuture<IExternalAccess> The external platform access
+//	 */
+//	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId);
 
 	/**
 	 * Starts a Jadex Platform with default configuration

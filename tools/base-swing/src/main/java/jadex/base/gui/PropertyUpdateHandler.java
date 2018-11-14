@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.commons.ICommand;
@@ -43,7 +44,7 @@ public class PropertyUpdateHandler
 	{
 		this.access	= access;
 	
-		SServiceProvider.getService(access, IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		access.searchService( new ServiceQuery<>( IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<IMonitoringService>()
 		{
 			public void resultAvailable(IMonitoringService monser)

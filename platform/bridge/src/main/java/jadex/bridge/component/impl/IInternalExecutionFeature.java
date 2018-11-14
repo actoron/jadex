@@ -1,6 +1,8 @@
 package jadex.bridge.component.impl;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
 
 
@@ -49,6 +51,18 @@ public interface IInternalExecutionFeature
 	public boolean execute();
 	
 	/**
+	 *  Adds a simulation blocker for remote actions that have
+	 *  a definite end (i.e. regular futures), so remote calls
+	 *  work in simulation mode.
+	 *  
+	 *  Does not work for intermediates. Noop if simulation is
+	 *  disabled
+	 *  
+	 *  @param remotefuture The future of the remote action.
+	 */
+	public <T> void addSimulationBlocker(IFuture<T> remotefuture);
+	
+	/**
 	 *  Add a synchronous subcomponent that will run on its parent's thread.
 	 *  @param sub The subcomponent.
 	 */
@@ -74,5 +88,10 @@ public interface IInternalExecutionFeature
 	 *  @return The step cnt.
 	 */
 	public int getEndstateStart();
+	
+	/**
+	 *  Called when a child was terminated.
+	 */
+	public void childTerminated(IComponentDescription desc, Exception ex);
 	
 }

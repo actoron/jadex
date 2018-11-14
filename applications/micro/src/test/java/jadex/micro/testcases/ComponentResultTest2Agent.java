@@ -5,13 +5,11 @@ import java.util.Map;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -19,10 +17,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -32,7 +27,6 @@ import jadex.micro.annotation.Results;
  */
 @Description("Testing results declared in component configurations.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 @Agent
 public class ComponentResultTest2Agent extends JunitAgentTest
 {
@@ -49,7 +43,7 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 		
 		final TestReport	tr1	= new TestReport("#1", "Default configuration.");
 		testComponentResult(null, "initial1")
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -67,7 +61,7 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 			{
 				final TestReport	tr2	= new TestReport("#2", "Custom configuration");
 				testComponentResult("config2", "initial2")
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
@@ -83,7 +77,7 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 					
 					protected void next()
 					{
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 //						killAgent();
 						ret.setResult(null);
 					}
@@ -99,36 +93,29 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 	protected IFuture<Void> testComponentResult(final String config, final String expected)
 	{
 		final Future<Void>	fut	= new Future<Void>();
-		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").addResultListener(new ExceptionDelegationResultListener<Object, Void>(fut)
+		agent.createComponent(new CreationInfo(config, null, agent.getId()).setFilename("jadex/micro/testcases/Result.component.xml"), null)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(fut)
 		{
-			@SuppressWarnings("deprecation")
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				final IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.createComponent(null, "jadex/micro/testcases/Result.component.xml", new CreationInfo(config, null, agent.getComponentIdentifier()), null)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
+				agent.killComponent(result.getId())
+					.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(fut)
 				{
-					public void customResultAvailable(IComponentIdentifier result)
+					public void customResultAvailable(Map<String, Object> results)
 					{
-						cms.destroyComponent(result)
-							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(fut)
+						System.out.println("setting results: "+results);
+						if(results!=null && SUtil.equals(results.get("res"), expected))
 						{
-							public void customResultAvailable(Map<String, Object> results)
-							{
-								if(results!=null && SUtil.equals(results.get("res"), expected))
-								{
-									fut.setResult(null);
-								}
-								else
-								{
-									throw new RuntimeException("Results do not match, expected res="+expected+" but got: "+results);
-								}
-							}
-						});
-					}					
-				}));
-			}
-		});
+							fut.setResult(null);
+						}
+						else
+						{
+							throw new RuntimeException("Results do not match, expected res="+expected+" but got: "+results);
+						}
+					}
+				});
+			}					
+		}));
 		return fut;
 	}
 }

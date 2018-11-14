@@ -3,6 +3,7 @@ package jadex.bdiv3.benchmarks;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
@@ -17,9 +18,9 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -34,7 +35,7 @@ import jadex.micro.annotation.Description;
 /**
  *  Agent creation benchmark BDI V3.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Description("This agents benchmarks BDI V3 agent creation and termination.")
 @Arguments(
 {
@@ -94,23 +95,6 @@ public class CreationBDI
 	@Plan
 	protected void startPeer(RPlan rplan)
 	{
-//		if(starttime==0)
-//		{
-//			IClockService cs = getClock().get();
-//			
-//			System.gc();
-//			try
-//			{
-//				Thread.sleep(500);
-//			}
-//			catch(InterruptedException e){}
-//			
-//			startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-//			starttime = cs.getTime();
-//		}
-//		
-//		step1();
-		
 		if(starttime==0)
 		{
 			getClock().addResultListener(new DefaultResultListener<IClockService>()
@@ -125,7 +109,7 @@ public class CreationBDI
 					catch(InterruptedException e){}
 					
 					startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-					starttime = ((IClockService)result).getTime();
+					starttime = System.currentTimeMillis();
 					
 					step1();
 				}
@@ -150,15 +134,9 @@ public class CreationBDI
 			args.put("startmem", Long.valueOf(startmem));
 //			System.out.println("Args: "+num+" "+args);
 
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DefaultResultListener<IComponentManagementService>()
-			{
-				public void resultAvailable(IComponentManagementService result)
-				{
-					((IComponentManagementService)result).createComponent(createPeerName(num+1, agent.getComponentIdentifier()), "jadex.bdiv3.benchmarks.CreationBDI.class",
-						new CreationInfo(null, args, null, null, null, null, null, null, null, null, null, null, agent.getComponentDescription().getResourceIdentifier()), null);
-				}
-			});
+			agent.createComponent(
+				new CreationInfo().setArguments(args).setResourceIdentifier(agent.getDescription().getResourceIdentifier())
+				.setFilename("jadex.bdiv3.benchmarks.CreationBDI.class").setName(createPeerName(num+1, agent.getId())), null);
 		}
 		else
 		{
@@ -166,7 +144,7 @@ public class CreationBDI
 			{
 				public void resultAvailable(final IClockService clock)
 				{
-					final long end = clock.getTime();
+					final long end = System.currentTimeMillis();
 					
 					System.gc();
 					try
@@ -186,38 +164,32 @@ public class CreationBDI
 					System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 				
 					// Use initial component to kill others
-					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+					String	initial	= createPeerName(0, agent.getId());
+					IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
+					agent.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 					{
-						public void resultAvailable(IComponentManagementService cms)
+						public void resultAvailable(IExternalAccess exta)
 						{
-							String	initial	= createPeerName(0, agent.getComponentIdentifier());
-							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
-							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+							exta.scheduleStep(new IComponentStep<Void>()
 							{
-								public void resultAvailable(IExternalAccess exta)
+								@Classname("deletePeers")
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									exta.scheduleStep(new IComponentStep<Void>()
+//									final CreationBDI	cbdi	= (CreationBDI)((PojoBDIAgent)ia).getPojoAgent();
+									final CreationBDI cbdi = (CreationBDI)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+									cbdi.getClock().addResultListener(new IResultListener<IClockService>()
 									{
-										@Classname("deletePeers")
-										public IFuture<Void> execute(IInternalAccess ia)
+										public void resultAvailable(IClockService clock)
 										{
-//											final CreationBDI	cbdi	= (CreationBDI)((PojoBDIAgent)ia).getPojoAgent();
-											final CreationBDI cbdi = (CreationBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
-											cbdi.getClock().addResultListener(new IResultListener<IClockService>()
-											{
-												public void resultAvailable(IClockService clock)
-												{
-													cbdi.deletePeers(max, clock.getTime(), dur, pera, omem, upera);
-												}
-												
-												public void exceptionOccurred(Exception exception)
-												{
-													exception.printStackTrace();
-												}
-											});
-											return IFuture.DONE;
+											cbdi.deletePeers(max, clock.getTime(), dur, pera, omem, upera);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											exception.printStackTrace();
 										}
 									});
+									return IFuture.DONE;
 								}
 							});
 						}
@@ -234,28 +206,22 @@ public class CreationBDI
 	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera,
 		final long omem, final double upera)
 	{
-		final String name = createPeerName(cnt, agent.getComponentIdentifier());
-		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+		final String name = createPeerName(cnt, agent.getId());
+		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
+		agent.killComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
 		{
-			public void resultAvailable(IComponentManagementService cms)
+			public void resultAvailable(Map<String, Object> result)
 			{
-				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
-				cms.destroyComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
+				System.out.println("Successfully destroyed peer: "+name);
+				
+				if(cnt>1)
 				{
-					public void resultAvailable(Map<String, Object> result)
-					{
-						System.out.println("Successfully destroyed peer: "+name);
-						
-						if(cnt>1)
-						{
-							deletePeers(cnt-1, killstarttime, dur, pera, omem, upera);
-						}
-						else
-						{
-							killLastPeer(killstarttime, dur, pera, omem, upera);
-						}
-					}
-				});
+					deletePeers(cnt-1, killstarttime, dur, pera, omem, upera);
+				}
+				else
+				{
+					killLastPeer(killstarttime, dur, pera, omem, upera);
+				}
 			}
 		});
 	}
@@ -270,7 +236,7 @@ public class CreationBDI
 		{
 			public void resultAvailable(IClockService cs)
 			{
-				long killend = cs.getTime();
+				long killend = System.currentTimeMillis();
 				System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 				double killdur = ((double)killend-killstarttime)/1000.0;
 				final double killpera = killdur/(max-1);
@@ -289,9 +255,9 @@ public class CreationBDI
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				System.out.println("Still used memory: "+stillused+"kB.");
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
 				agent.killComponent();
 			}
 		});
@@ -302,14 +268,14 @@ public class CreationBDI
 	 */
 	protected IFuture<IClockService> getClock()
 	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 	}
 
-	/**
-	 *  Get the cms.
-	 */
-	protected IFuture<IComponentManagementService>	getCMS()
-	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-	}
+//	/**
+//	 *  Get the cms.
+//	 */
+//	protected IFuture<IComponentManagementService>	getCMS()
+//	{
+//		return agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//	}
 }

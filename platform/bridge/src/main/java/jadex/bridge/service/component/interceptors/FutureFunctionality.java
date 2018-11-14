@@ -34,6 +34,13 @@ import jadex.commons.future.TupleResult;
  */
 public class FutureFunctionality
 {
+	//-------- constants --------
+	
+	/** Marker for an intermediate result to be dropped. */
+	public static final String	DROP_INTERMEDIATE_RESULT	= "__drop_intermediate_result__";
+	
+	//-------- attributes --------
+	
 	/** The logger used for notification failure warnings (if any). */
 	protected Logger	logger;
 	protected IResultCommand<Logger, Void> loggerfetcher;
@@ -160,6 +167,13 @@ public class FutureFunctionality
 	 *  Optionally augment termination behavior.
 	 */
 	public void	handleTerminated(Exception reason)
+	{
+	}
+	
+	/**
+	 *  Optionally augment backward command behavior.
+	 */
+	public void	handleBackwardCommand(Object info)
 	{
 	}
 	
@@ -395,7 +409,8 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return DelegatingPullSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+				: DelegatingPullSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
@@ -474,6 +489,7 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			@Override
 			public void execute(Void args)
 			{
+				func.handleBackwardCommand(info);
 				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
 			}	
 		});
@@ -545,7 +561,8 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return DelegatingPullIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+				: DelegatingPullIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
@@ -625,6 +642,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			@Override
 			public void execute(Void args)
 			{
+				func.handleBackwardCommand(info);
 				DelegatingPullIntermediateDelegationFuture.super.sendBackwardCommand(info);
 			}	
 		});
@@ -696,7 +714,8 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return DelegatingSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+				: DelegatingSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
@@ -758,6 +777,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			@Override
 			public void execute(Void args)
 			{
+				func.handleBackwardCommand(info);
 				DelegatingSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
 			}	
 		});
@@ -830,7 +850,8 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return DelegatingTerminableIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+				: DelegatingTerminableIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
@@ -892,6 +913,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			@Override
 			public void execute(Void args)
 			{
+				func.handleBackwardCommand(info);
 				DelegatingTerminableIntermediateDelegationFuture.super.sendBackwardCommand(info);
 			}	
 		});
@@ -919,8 +941,10 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	 */
 	public DelegatingTerminableDelegationFuture(ITerminableFuture<?> src, FutureFunctionality func)
 	{
-		super(src);
+		// Cannot use super because it triggers and func is still null
+//		super(src);
 		this.func = func;
+		src.addResultListener(new TerminableDelegationResultListener(this, src));
 	}
 	
 	/**
@@ -987,6 +1011,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			@Override
 			public void execute(Void args)
 			{
+				func.handleBackwardCommand(info);
 				DelegatingTerminableDelegationFuture.super.sendBackwardCommand(info);
 			}	
 		});
@@ -1045,7 +1070,8 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return DelegatingIntermediateFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+				: DelegatingIntermediateFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{
@@ -1196,7 +1222,8 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		try
 		{
 			result = (TupleResult)func.handleIntermediateResult(result);
-			return DelegatingTupleFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+				: DelegatingTupleFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
 		}
 		catch(Exception e)
 		{

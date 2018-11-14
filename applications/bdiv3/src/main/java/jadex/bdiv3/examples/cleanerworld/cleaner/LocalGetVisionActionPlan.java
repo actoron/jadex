@@ -19,7 +19,7 @@ import jadex.bdiv3.runtime.impl.RProcessableElement;
 public class LocalGetVisionActionPlan
 {
 	@PlanCapability
-	protected CleanerBDI capa;
+	protected CleanerAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -34,13 +34,13 @@ public class LocalGetVisionActionPlan
 	{
 		IEnvironment environment = capa.getEnvironment();
 		Cleaner cl = new Cleaner(capa.getMyLocation(),
-			capa.getAgent().getComponentIdentifier().getLocalName(), capa.getCarriedWaste(),
+			capa.getAgent().getId().getLocalName(), capa.getCarriedWaste(),
 			capa.getMyVision(), capa.getMyChargestate());
 
 		Vision	vision	= (Vision)environment.getVision(cl).clone();
 
 		// hack
-		CleanerBDI.GetVisionAction gva = (CleanerBDI.GetVisionAction)((RProcessableElement)rplan.getReason()).getPojoElement();
+		CleanerAgent.GetVisionAction gva = (CleanerAgent.GetVisionAction)((RProcessableElement)rplan.getReason()).getPojoElement();
 		gva.setVision(vision);
 //		getParameter("vision").setValue(vision);
 	}

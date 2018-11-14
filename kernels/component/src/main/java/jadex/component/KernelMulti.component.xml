@@ -42,7 +42,7 @@
 		
 		<providedservice class="IMultiKernelNotifierService">
 			<implementation>
-				$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(IComponentFactory.class)
+				$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(IComponentFactory.class)
 			</implementation>
 		</providedservice>
 	</services>

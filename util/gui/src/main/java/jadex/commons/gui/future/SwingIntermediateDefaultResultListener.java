@@ -8,6 +8,7 @@ import javax.swing.SwingUtilities;
 
 import jadex.commons.SReflect;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.gui.SGUI;
 
 /**
  *  Default implementation of intermediate result listener
@@ -67,22 +68,13 @@ public abstract class SwingIntermediateDefaultResultListener<E> extends SwingDef
 	 */
 	public final void intermediateResultAvailable(final E result)
 	{
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			customIntermediateResultAvailable(result);			
-		}
-		else
-		{
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					customIntermediateResultAvailable(result);
-				}
-			});
-		}
+				customIntermediateResultAvailable(result);
+			}
+		});
 	}
 
 	/**
@@ -90,22 +82,13 @@ public abstract class SwingIntermediateDefaultResultListener<E> extends SwingDef
 	 */
 	public final void finished()
 	{
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			customFinished();			
-		}
-		else
-		{
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					customFinished();
-				}
-			});
-		}
+				customFinished();
+			}
+		});
 	}
 
 	/**

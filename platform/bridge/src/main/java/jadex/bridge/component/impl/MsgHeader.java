@@ -3,6 +3,7 @@ package jadex.bridge.component.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMsgHeader;
 
 /**
@@ -20,6 +21,26 @@ public class MsgHeader implements IMsgHeader
 	 */
 	public MsgHeader()
 	{
+	}
+	
+	/**
+	 *  Gets the sender of the message.
+	 * 
+	 *  @return The sender.
+	 */
+	public IComponentIdentifier getSender()
+	{
+		return (IComponentIdentifier) getProperty(IMsgHeader.SENDER);
+	}
+	
+	/**
+	 *  Gets the receiver of the message.
+	 * 
+	 *  @return The receiver.
+	 */
+	public IComponentIdentifier getReceiver()
+	{
+		return (IComponentIdentifier) getProperty(IMsgHeader.RECEIVER);
 	}
 	
 	/**

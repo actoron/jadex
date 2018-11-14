@@ -1,6 +1,5 @@
 package jadex.bdiv3;
 
-import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -66,6 +65,7 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.SBDIModel;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -160,13 +160,13 @@ public class BDIClassReader extends MicroClassReader
 		ret.setPojoClass(new ClassInfo(cma.getName()));
 		
 		String name = SReflect.getUnqualifiedClassName(cma);
-		if(name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
-			name = name.substring(0, name.lastIndexOf(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST));
+//		if(name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
+//			name = name.substring(0, name.lastIndexOf(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST));
 		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
 //		modelinfo.setName(name+"BDI");
 		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);
-		modelinfo.setFilename(getFileName(cma, model));
+		modelinfo.setFilename(SUtil.getClassFileLocation(cma));
 //		modelinfo.setStartable(!Modifier.isAbstract(cma.getModifiers()));
 //		modelinfo.setStartable(cma.getName().endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST));
 		modelinfo.setType(BDIAgentFactory.FILETYPE_BDIAGENT);
@@ -195,18 +195,6 @@ public class BDIClassReader extends MicroClassReader
 		initBDIModelAfterClassLoading(ret, classloader);
 		
 		return ret;
-	}
-
-	/**
-	 * Gets the filename for a class.
-	 * @param cma
-	 * @param model 
-	 * @return filename
-	 */
-	protected String getFileName(Class< ? > cma, String model)
-	{
-		String src = SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation());
-		return src+File.separator+SReflect.getClassName(cma)+".class";
 	}
 	
 	/**
@@ -432,11 +420,8 @@ public class BDIClassReader extends MicroClassReader
 						ConfigurationInfo configinfo = new ConfigurationInfo(configs[i].name());
 						confs.put(configs[i].name(), configinfo);
 						
-						configinfo.setMaster(configs[i].master());
-						configinfo.setDaemon(configs[i].daemon());
-						configinfo.setAutoShutdown(configs[i].autoshutdown());
 						configinfo.setSynchronous(configs[i].synchronous());
-						configinfo.setPersistable(configs[i].persistable());
+//						configinfo.setPersistable(configs[i].persistable());
 						configinfo.setSuspend(configs[i].suspend());
 						
 						NameValue[] argvals = configs[i].arguments();
@@ -465,7 +450,7 @@ public class BDIClassReader extends MicroClassReader
 									interceptors[k] = new UnparsedExpression(null, inters[k].clazz().getName(), inters[k].value(), null);
 								}
 							}
-							RequiredServiceBinding bind = createBinding(im.binding());
+							RequiredServiceBinding bind = null;//createBinding(im.binding());
 							ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 							Publish p = provs[j].publish();
@@ -483,10 +468,11 @@ public class BDIClassReader extends MicroClassReader
 						RequiredServiceInfo[] rsis = new RequiredServiceInfo[reqs.length];
 						for(int j=0; j<reqs.length; j++)
 						{
-							RequiredServiceBinding binding = createBinding(reqs[j].binding());
+//							RequiredServiceBinding binding = createBinding(reqs[j].binding());
+							RequiredServiceBinding binding = createBinding(reqs[j]);
 							List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
 							rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
-								Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding, nfprops, Arrays.asList(reqs[j].tags()));
+								binding, nfprops, Arrays.asList(reqs[j].tags()));
 							configinfo.setRequiredServices(rsis);
 						}
 						
@@ -594,18 +580,17 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 * 
 	 */
-	protected MTrigger buildPlanTrigger(BDIModel bdimodel, Trigger trigger, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
+	protected MTrigger buildPlanTrigger(BDIModel bdimodel, String name, Trigger trigger, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
 	{
 		MTrigger tr = null;
 		
 		Class<?>[] gs = trigger.goals();
 		Class<?>[] gfs = trigger.goalfinisheds();
-		String[] fas = trigger.factaddeds();
-		String[] frs = trigger.factremoveds();
-		String[] fcs = trigger.factchangeds();
 		ServiceTrigger st = trigger.service();
 		
-		if(gs.length>0 || gfs.length>0 || fas.length>0 || frs.length>0 || fcs.length>0 
+		if(gs.length>0 || gfs.length>0
+			|| trigger.factadded().length>0 || trigger.factremoved().length>0 || trigger.factchanged().length>0 
+			|| trigger.factaddeds().length>0 || trigger.factremoveds().length>0 || trigger.factchangeds().length>0 
 			|| st.name().length()>0 || !Object.class.equals(st.type()))
 		{
 			tr = new MTrigger();
@@ -613,6 +598,10 @@ public class BDIClassReader extends MicroClassReader
 			for(int j=0; j<gs.length; j++)
 			{
 				Goal ga = getAnnotation(gs[j], Goal.class, cl);
+				if(ga==null)
+				{
+					throw new IllegalArgumentException("Goal trigger class '"+gs[j].getName()+"' in plan '"+name+"' misses @Goal annotation.");
+				}
 				MGoal mgoal = getMGoal(bdimodel, ga, gs[j], cl, pubs);
 				tr.addGoal(mgoal);
 			}
@@ -620,23 +609,39 @@ public class BDIClassReader extends MicroClassReader
 			for(int j=0; j<gfs.length; j++)
 			{
 				Goal ga = getAnnotation(gfs[j], Goal.class, cl);
+				if(ga==null)
+				{
+					throw new IllegalArgumentException("Goal trigger class '"+gs[j].getName()+"' in plan '"+name+"' misses @Goal annotation.");
+				}
 				MGoal mgoal = getMGoal(bdimodel, ga, gfs[j], cl, pubs);
 				tr.addGoalFinished(mgoal);
 			}
 			
-			for(int j=0; j<fas.length; j++)
+			for(String bel: trigger.factadded())
 			{
-				tr.addFactAdded(fas[j]);
+				tr.addFactAdded(bel);
+			}
+			for(String bel: trigger.factaddeds())
+			{
+				tr.addFactAdded(bel);
 			}
 			
-			for(int j=0; j<frs.length; j++)
+			for(String bel: trigger.factremoved())
 			{
-				tr.addFactRemoved(frs[j]);
+				tr.addFactRemoved(bel);
+			}
+			for(String bel: trigger.factremoveds())
+			{
+				tr.addFactRemoved(bel);
 			}
 			
-			for(int j=0; j<fcs.length; j++)
+			for(String bel: trigger.factchanged())
 			{
-				tr.addFactChanged(fcs[j]);
+				tr.addFactChanged(bel);
+			}
+			for(String bel: trigger.factchangeds())
+			{
+				tr.addFactChanged(bel);
 			}
 			
 			MServiceCall sc = getServiceCall(bdimodel, st);
@@ -783,19 +788,19 @@ public class BDIClassReader extends MicroClassReader
 		
 		if(mplan==null)
 		{
-			MTrigger mtr = buildPlanTrigger(bdimodel, p.trigger(), cl, pubs);
-			MTrigger wmtr = buildPlanTrigger(bdimodel, p.waitqueue(), cl, pubs);
+			MTrigger mtr = buildPlanTrigger(bdimodel, name, p.trigger(), cl, pubs);
+			MTrigger wmtr = buildPlanTrigger(bdimodel, name, p.waitqueue(), cl, pubs);
 			
 			// Check if external plan has a trigger defined
 			if(mtr==null && !Object.class.equals(body.value()))
 			{
 				Class<?> bcl = body.value();
 				Plan pl = getAnnotation(bcl, Plan.class, cl);
-				mtr = buildPlanTrigger(bdimodel, pl.trigger(), cl, pubs);
+				mtr = buildPlanTrigger(bdimodel, name, pl.trigger(), cl, pubs);
 				
 				if(wmtr==null)
 				{
-					wmtr = buildPlanTrigger(bdimodel, pl.waitqueue(), cl, pubs);
+					wmtr = buildPlanTrigger(bdimodel, name, pl.waitqueue(), cl, pubs);
 				}
 			}
 			
@@ -999,6 +1004,18 @@ public class BDIClassReader extends MicroClassReader
 				for(String pev: paramevs)
 				{
 					BDIAgentFeature.addParameterEvents(mgoal, model.getCapability(), events, pev, cl);
+				}
+				for(String bel: gc.factadded())
+				{
+					events.add(BDIAgentFeature.createBeliefEvent(model.getCapability(), bel, ChangeEvent.FACTADDED));
+				}
+				for(String bel: gc.factremoved())
+				{
+					events.add(BDIAgentFeature.createBeliefEvent(model.getCapability(), bel, ChangeEvent.FACTREMOVED));
+				}
+				for(String bel: gc.factchanged())
+				{
+					events.add(BDIAgentFeature.createBeliefEvent(model.getCapability(), bel, ChangeEvent.FACTCHANGED));
 				}
 				MCondition cond = new MCondition("creation_"+c.toString(), events);
 				cond.setConstructorTarget(new ConstructorInfo(c));
@@ -1274,7 +1291,7 @@ public class BDIClassReader extends MicroClassReader
 	 */
 	protected void	initBDIModelAfterClassLoading(BDIModel model, ClassLoader cl)
 	{
-		for(MBelief bel: SUtil.safeList(model.getCapability().getBeliefs()))
+		for(MBelief bel: SUtil.notNull(model.getCapability().getBeliefs()))
 		{
 			bel.initEvents(model, cl);
 		}

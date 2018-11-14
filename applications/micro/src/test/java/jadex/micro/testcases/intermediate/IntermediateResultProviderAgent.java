@@ -45,7 +45,7 @@ public class IntermediateResultProviderAgent implements IIntermediateResultServi
 //		final long delay = 200;
 		
 //		System.out.println("start: "+System.currentTimeMillis());
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -57,7 +57,7 @@ public class IntermediateResultProviderAgent implements IIntermediateResultServi
 				}
 				else
 				{
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
+					agent.getFeature(IExecutionFeature.class).waitForDelay(delay, this);
 				}
 				return null;
 			}

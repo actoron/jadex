@@ -37,7 +37,7 @@ public class SetBeliefStep implements IComponentStep<Void>
 	
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
-		IBeliefbase bb = ia.getComponentFeature(IBDIXAgentFeature.class).getBeliefbase();
+		IBeliefbase bb = ia.getFeature(IBDIXAgentFeature.class).getBeliefbase();
 		for (Iterator it = beliefs.entrySet().iterator(); it.hasNext(); )
 		{
 			Map.Entry entry = (Map.Entry) it.next();

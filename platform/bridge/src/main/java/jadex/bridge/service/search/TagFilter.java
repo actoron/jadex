@@ -1,5 +1,9 @@
 package jadex.bridge.service.search;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.service.TagProperty;
@@ -8,10 +12,6 @@ import jadex.commons.IAsyncFilter;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  *  Tag filter class. Allows for filtering according to a collection of tags.
@@ -54,7 +54,7 @@ public class TagFilter<T> implements IAsyncFilter<T>
 	public IFuture<Boolean> filter(T ts)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
-		IFuture<Collection<String>> fut = SNFPropertyProvider.getNFPropertyValue(component, ((IService)ts).getServiceIdentifier(), TagProperty.NAME);
+		IFuture<Collection<String>> fut = component.getNFPropertyValue(((IService)ts).getServiceId(), TagProperty.NAME);
 		fut.addResultListener(new ExceptionDelegationResultListener<Collection<String>, Boolean>(ret)
 		{
 			public void customResultAvailable(Collection<String> result)

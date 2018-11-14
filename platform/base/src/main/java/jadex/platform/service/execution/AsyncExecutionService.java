@@ -5,8 +5,8 @@ import java.util.Map;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
@@ -67,7 +67,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 */
 	public AsyncExecutionService(IInternalAccess component, Map<String, Object> properties)//, int max)
 	{
-		super(component.getComponentIdentifier(), IExecutionService.class, properties);
+		super(component.getId(), IExecutionService.class, properties);
 
 		this.component = component;
 		this.executors	= SCollection.createHashMap();
@@ -155,7 +155,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				// Hack!!! Skip shutdown of platform executor for "boot unstrapping" -> executor will finish after no more steps
 				public IFuture<Void> shutdown()
 				{
-					if(task instanceof AbstractComponentFeature && ((AbstractComponentFeature)task).getComponent().getComponentIdentifier().equals(getServiceIdentifier().getProviderId()))
+					if(task instanceof AbstractComponentFeature && ((AbstractComponentFeature)task).getComponent().getId().equals(getServiceId().getProviderId()))
 					{
 						return IFuture.DONE;
 					}
@@ -263,28 +263,16 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				}
 				else
 				{
-					SServiceProvider.getService(component, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-						.addResultListener(new IResultListener<IThreadPoolService>()
+					threadpool	= ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
+					try
 					{
-						public void resultAvailable(IThreadPoolService result)
-						{
-							try
-							{
-								threadpool = result;
-								state	= State.RUNNING;
-								ret.setResult(null);
-							}
-							catch(RuntimeException e)
-							{
-								ret.setException(e);
-							}
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							ret.setException(exception);
-						}
-					});
+						state	= State.RUNNING;
+						ret.setResult(null);
+					}
+					catch(RuntimeException e)
+					{
+						ret.setException(e);
+					}
 				}
 			}
 		});

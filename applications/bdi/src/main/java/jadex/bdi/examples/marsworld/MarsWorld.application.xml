@@ -68,7 +68,8 @@
 					<env:property name="position" class="IVector2"/>
 				</env:objecttype>
 				<env:objecttype name="sentry">
-					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.1*((((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick())%10),0.01,0.1*((((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick())%10))
+					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.1*((((IClockService)((jadex.bridge.service.component.IInternalRequiredServicesFeature)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class)).getRawService(IClockService.class)).getTick())%10),
+					0.01,0.1*((((IClockService)((jadex.bridge.service.component.IInternalRequiredServicesFeature)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class)).getRawService(IClockService.class)).getTick())%10))
 					</env:property>	
 					<env:property name="rotation" class="IVector2">new Vector2Double(-1.111, -1.111)</env:property>
 					<env:property name="vision" class="double">0.1</env:property>
@@ -95,7 +96,7 @@
 					<env:property name="text" class="String" dynamic="true">
 						"Collected ore: "+$object.getProperty("ore")+" \n"+
 						"Remaining time: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0, $object.getProperty("missiontime")
-							- ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime())))
+							- ((IClockService)((jadex.bridge.service.component.IInternalRequiredServicesFeature)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class)).getRawService(IClockService.class)).getTime())))
 					</env:property>
 				</env:objecttype>
 			</env:objecttypes>
@@ -230,7 +231,7 @@
 							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								90000 + ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
+								90000 + ((IClockService)((jadex.bridge.service.component.IInternalRequiredServicesFeature)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class)).getRawService(IClockService.class)).getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target">
@@ -314,7 +315,7 @@
 						<env:object type="homebase">
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								3000000 + ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
+								3000000 + ((IClockService)((jadex.bridge.service.component.IInternalRequiredServicesFeature)$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class)).getRawService(IClockService.class)).getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target" number="20">

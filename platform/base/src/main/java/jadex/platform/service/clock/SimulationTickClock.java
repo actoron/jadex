@@ -1,5 +1,7 @@
 package jadex.platform.service.clock;
 
+import java.util.logging.Logger;
+
 import jadex.bridge.service.types.clock.IClock;
 import jadex.commons.ChangeEvent;
 
@@ -68,7 +70,14 @@ public class SimulationTickClock extends AbstractClock implements ISimulationClo
 		{
 			removeTimer(t);
 			// Execute due timers.
-			t.getTimedObject().timeEventOccurred(currenttime);
+			try
+			{
+				t.getTimedObject().timeEventOccurred(currenttime);
+			}
+			catch(Exception e)
+			{
+				Logger.getLogger(name).warning("Exception in time event: "+e);
+			}
 		}
 		
 		notifyListeners(new ChangeEvent(this, EVENT_TYPE_NEXT_TIMEPOINT));

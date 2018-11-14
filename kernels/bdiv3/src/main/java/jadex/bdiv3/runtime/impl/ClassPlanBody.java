@@ -21,6 +21,7 @@ import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
 import jadex.rules.eca.ChangeInfo;
 
 /**
@@ -189,8 +190,8 @@ public class ClassPlanBody extends AbstractPlanBody
 
 						// Pojo specific code.
 						Object pojocapa	= capaname!=null
-							? (ia.getComponentFeature0(IInternalBDIAgentFeature.class) instanceof BDIAgentFeature ? ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname) : null)
-							: (ia.getComponentFeature0(IPojoComponentFeature.class)!=null ? ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent() : null);
+							? (ia.getFeature0(IInternalBDIAgentFeature.class) instanceof BDIAgentFeature ? ((BDIAgentFeature)ia.getFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname) : null)
+							: (ia.getFeature0(IPojoComponentFeature.class)!=null ? ia.getFeature(IPojoComponentFeature.class).getPojoAgent() : null);
 
 						
 						if(f.getType().isAssignableFrom(IInternalAccess.class))
@@ -293,17 +294,9 @@ public class ClassPlanBody extends AbstractPlanBody
 			{
 				throw new PlanFailureException("Could not create plan "+getRPlan(), t);
 			}
-			else if(t instanceof Error)
-			{
-				throw (Error)t;
-			}
-			else if(t instanceof RuntimeException)
-			{
-				throw (RuntimeException)t;
-			}
 			else
 			{
-				throw new RuntimeException(t);
+				throw SUtil.throwUnchecked(t);
 			}
 		}
 	}

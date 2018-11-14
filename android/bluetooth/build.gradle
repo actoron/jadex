@@ -4,6 +4,7 @@ dependencies
 {
 	api project(':platform:bridge')
     api project(':platform:base')
+    api project(':transports:base')
     api project(':android:runtimetools')
     api libraries.protobuf
     androidTestImplementation libraries.android_test

@@ -26,10 +26,11 @@ import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IPriorityComponentStep;
+import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ITypedComponentStep;
 import jadex.bridge.IntermediateComponentResultListener;
-import jadex.bridge.SFuture;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
@@ -38,39 +39,41 @@ import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.Breakpoint;
 import jadex.bridge.service.component.ComponentSuspendable;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.MutableObject;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
+import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.functional.Consumer;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
@@ -78,8 +81,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.ThreadLocalTransferHelper;
@@ -211,7 +213,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	protected void doCleanup(Error e)
 	{
-//		System.out.println("shutdown end: "+getComponent().getComponentIdentifier());
+//		System.err.println("shutdown end: "+getComponent().getDescription()+", "+steps.size());
 		
 		// Should not wake up all blocked threads at the same time?!
 		// Could theoretically catch the threaddeath and do sth what is not guarded against concurrent access
@@ -254,11 +256,22 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	protected Map<IComponentStep<?>, Exception>	stepadditions;
 	
 	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IComponentDescription getDescription()
+	{
+		return getComponent().getDescription();
+	}
+	
+	
+	/**
 	 *  Execute a component step.
 	 */
 	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
-		return scheduleStep(IExecutionFeature.STEP_PRIORITY_NOMRAL, step);
+		return scheduleStep(IExecutionFeature.STEP_PRIORITY_NORMAL, step);
 	}
 	
 	/**
@@ -273,13 +286,26 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		synchronized(this)
 		{
 			// Todo: synchronize with last step!
-			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()))
+			int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
+//			if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
+			if(endagenda.isDone() && prio<STEP_PRIORITY_IMMEDIATE)
 			{
-				ret.setException(new ComponentTerminatedException(getComponent().getComponentIdentifier()));
+				ret.setException(new ComponentTerminatedException(getComponent().getId()));
 			}
 			else
 			{
-				int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
+//				int prio = step instanceof IPriorityComponentStep? ((IPriorityComponentStep<?>)step).getPriority(): priority;
+				// Reject non-priority steps if we are already terminating.
+				// Otherwise this leads to a bad interaction with the monitoring:
+				// The step creation/dispose gets reported to the monitoring agent
+				// the return path then decouples onto the external access, which
+				// creates, schedule and aborts a step, creating two more create/dispose
+				// events to be reported etc...
+				if((STEP_PRIORITY_IMMEDIATE > prio && endstepcnt != -1))
+				{
+					ret.setException(new ComponentTerminatedException(getComponent().getId()));
+					return ret;
+				}
 				addStep(new StepInfo(step, ret, new ThreadLocalTransferHelper(true), prio, stepcnt++));
 				
 //				System.out.println("steps: "+steps);
@@ -404,42 +430,36 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 
 		if(delay>=0)
 		{
-			// External access because allowed to by called on non-component thread (cf. ExternalAccess.waitForDelay())
-			SServiceProvider.getService(getComponent().getExternalAccess(), IClockService.class)
-				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
+			// OK to fetch sync even from external access because everything thread safe.
+			IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+			if(cs!=null)
 			{
-				public void customResultAvailable(IClockService cs)
+				ITimedObject	to	= new ITimedObject()
 				{
-					ITimedObject	to	= new ITimedObject()
+					public void timeEventOccurred(long currenttime)
 					{
-						public void timeEventOccurred(long currenttime)
-						{
 	//						System.out.println("step: "+step);
-							scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
-						}
-						
-						public String toString()
-						{
-							return "waitForDelay[Step]("+getComponent().getComponentIdentifier()+")";
-						}
-					};
-					if(realtime)
-					{
-						cs.createRealtimeTimer(delay, to);
+						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
 					}
-					else
+					
+					public String toString()
 					{
-						cs.createTimer(delay, to);					
+						return "waitForDelay["+step+"]("+getComponent().getId()+")";
 					}
-				}
-				
-				@Override
-				public void exceptionOccurred(Exception exception)
+				};
+				if(realtime)
 				{
-					// TODO: why soemtimes happens during shutdown!?
-					getComponent().getLogger().warning(SUtil.getExceptionStacktrace(exception));
+					cs.createRealtimeTimer(delay, to);
 				}
-			}));
+				else
+				{
+					cs.createTimer(delay, to);					
+				}
+			}
+			else
+			{
+				ret.setException(new ServiceNotFoundException("Clock service not found."));
+			}
 		}
 		else
 		{
@@ -464,61 +484,62 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+		IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		if(cs!=null)
 		{
-			public void customResultAvailable(IClockService cs)
+			ITimedObject	to	=  	new ITimedObject()
 			{
-				ITimedObject	to	=  	new ITimedObject()
+				public void timeEventOccurred(long currenttime)
 				{
-					public void timeEventOccurred(long currenttime)
+					scheduleStep(new IComponentStep<Void>()
 					{
-						scheduleStep(new IComponentStep<Void>()
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								ret.setResult(null);
-								return IFuture.DONE;
-							}
-							
-							public String toString()
-							{
-								return "waitForDelay("+getComponent().getComponentIdentifier()+")";
-							}
-						}).addResultListener(new IResultListener<Void>()
+							ret.setResult(null);
+							return IFuture.DONE;
+						}
+						
+						public String toString()
 						{
-							public void resultAvailable(Void result)
-							{
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								// Ignore outdated timer entries when component is already dead.
-								// propblem this can occur on clock thread
-//								if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
-//								{
-									ret.setExceptionIfUndone(exception);									
-//								}
-							}
-						});
-					}
-					
-					public String toString()
+							return "waitForDelay("+getComponent().getId()+")";
+						}
+					}).addResultListener(new IResultListener<Void>()
 					{
-						return "waitForDelay("+getComponent().getComponentIdentifier()+")";
-					}
-				};
+						public void resultAvailable(Void result)
+						{
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// Ignore outdated timer entries when component is already dead.
+							// propblem this can occur on clock thread
+	//								if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
+	//								{
+								ret.setExceptionIfUndone(exception);									
+	//								}
+						}
+					});
+				}
 				
-				if(realtime)
+				public String toString()
 				{
-					cs.createRealtimeTimer(delay, to);
+					return "waitForDelay("+getComponent().getId()+")";
 				}
-				else
-				{
-					cs.createTimer(delay, to);
-				}
+			};
+			
+			if(realtime)
+			{
+				cs.createRealtimeTimer(delay, to);
 			}
-		}));
+			else
+			{
+				cs.createTimer(delay, to);
+			}
+		}
+		else
+		{
+			ret.setException(new IllegalStateException("No clockservice found"));
+		}
 		
 		return ret;
 	}
@@ -530,7 +551,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //	{
 //		final Future<ITimer> ret = new Future<ITimer>();
 //		
-//		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		IClockService	cs	= getRawService(new ServiceQuery<>(IClockService.class));
 //		ITimedObject	to	=  	new ITimedObject()
 //		{
 //			public void timeEventOccurred(long currenttime)
@@ -559,7 +580,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //		final Future<TimerWrapper> ret = new Future<TimerWrapper>();
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
 		final ITimer[] ts = new ITimer[1];
 		ts[0] = cs.createTickTimer(new ITimedObject()
 		{
@@ -591,7 +612,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
 		final ITimer[] ts = new ITimer[1];
 		ts[0] = cs.createTickTimer(new ITimedObject()
 		{
@@ -624,13 +645,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public void	wakeup()
 	{
-		if(getComponent().getComponentDescription().isSynchronous())
+		if(getComponent().getDescription().isSynchronous())
 		{
 			// Add to parent and wake up parent.
 			if(parenta==null)
 			{
-				IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
-				cms.getExternalAccess(getComponent().getComponentIdentifier().getParent())
+				// Todo w/o proxy???
+//				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+				getComponent().getExternalAccess(getComponent().getId().getParent())
+				// raw because called from scheduleStep also on external thread.
 					.addResultListener(new DefaultResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)
@@ -639,7 +662,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								parenta	= (IInternalExecutionFeature)ia.getComponentFeature(IExecutionFeature.class);
+								parenta	= (IInternalExecutionFeature)ia.getFeature(IExecutionFeature.class);
 								parenta.addSubcomponent(ExecutionComponentFeature.this);
 								parenta.wakeup();
 								return IFuture.DONE;
@@ -661,10 +684,27 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			ServiceQuery<IExecutionService> query = new ServiceQuery<IExecutionService>(IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, component.getComponentIdentifier(), null);
-			IExecutionService exe = ServiceRegistry.getRegistry(component).searchService(query);
-			// Hack!!! service is foudn before it is started, grrr.
-			if(exe != null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
+			IExecutionService exe	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+			
+			// Do not use rescue thread for bisimulation of platform init/shutdown/zombie agents to avoid clock running out.
+			if(exe==null && SSimulation.isBisimulating(getInternalAccess()))
+			{
+				try
+				{
+					Field	f	= Class.forName("jadex.platform.service.execution.BisimExecutionService")
+						.getDeclaredField("instance");
+					f.setAccessible(true);
+					exe	= (IExecutionService)f.get(null);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+//				System.err.println(getInternalAccess()+" bisim exe is"+exe);
+			}
+
+			// Hack!!! service is found before it is started, grrr.
+			if(exe!=null && ((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
 			{
 				if(bootstrap)
 				{
@@ -678,12 +718,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			}
 			else
 			{
+//				System.err.println(getInternalAccess()+" rescue "+SSimulation.isBisimulating(getInternalAccess())+", "+Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IClockService.BISIMULATION_CLOCK_FLAG));
 				available	= false;
 				// Happens during platform bootstrapping -> execute on platform rescue thread.
 				if(!bootstrap)
 				{
 					bootstrap	= true;
-					Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
+					Starter.scheduleRescueStep(getComponent().getId().getRoot(), new Runnable()
 					{
 						public void run()
 						{
@@ -703,7 +744,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					});
 				}
 			}
-//			SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+//			component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
 //				.addResultListener(new IResultListener<IExecutionService>()
 //			{
 //				public void resultAvailable(IExecutionService exe)
@@ -766,9 +807,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		Future<Void> ret = new Future<Void>();
 		synchronized(this)
 		{
-			if(!IComponentDescription.STATE_SUSPENDED.equals(getComponent().getComponentDescription().getState()))
+//			System.out.println("is sus: "+getComponent().getDescription().getState()+" "+getComponent());
+			if(!IComponentDescription.STATE_SUSPENDED.equals(getComponent().getDescription().getState()))
 			{
-				ret.setException(new IllegalStateException("Component not suspended: "+getComponent().getComponentIdentifier()));
+				ret.setException(new IllegalStateException("Component not suspended: "+getComponent().getId()));
 			}
 			else if(this.stepinfo!=null || stepfuture!=null)
 			{
@@ -794,8 +836,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public boolean isComponentThread()
 	{
 		return Thread.currentThread()==getComponentThread() || 
-			IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState())
-				&& Starter.isRescueThread(getComponent().getComponentIdentifier());
+//			IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState())
+			endagenda.isDone()
+				&& Starter.isRescueThread(getComponent().getId());
 	}
 	
 	/**
@@ -903,7 +946,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					{
 						if(!unblocked[0])
 						{
-							unblock(monitor, new TimeoutException(Future.DEBUG ? "" : "Use PlatformConfiguration.setDebugFutures(true) for timeout cause.", ex));
+							unblock(monitor, new TimeoutException(Future.DEBUG ? "" : "Use PlatformConfiguration.getExtendedPlatformConfiguration().setDebugFutures(true) for timeout cause.", ex));
 						}
 					}
 					
@@ -920,7 +963,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				wakeup();
 				exe.blockThread(monitor);
 				// Todo: wait for blocked threads to be resumed before terminating component
-				if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState()))
+//				if(IComponentDescription.STATE_TERMINATED.equals(getComponent().getDescription().getState()))
+				if(endagenda.isDone())
 				{
 					throw new ThreadDeath();
 				}
@@ -940,14 +984,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				unblocked[0]	= true;
 				
 				// Todo: should also work for thread death (i.e. blocked threads terminated before component is gone).
-				assert threaddeath || !IComponentDescription.STATE_TERMINATED.equals(getComponent().getComponentDescription().getState());
+				assert threaddeath || !endagenda.isDone();
 				
 				synchronized(this)
 				{
 					if(executing)
 					{
-						System.err.println(getComponent().getComponentIdentifier()+": double execution");
-						new RuntimeException("executing: "+getComponent().getComponentIdentifier()).printStackTrace();
+						System.err.println(getComponent().getId()+": double execution");
+						new RuntimeException("executing: "+getComponent().getId()).printStackTrace();
 					}
 					this.executing	= true;
 				}
@@ -985,14 +1029,12 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			parenta.unblock(monitor, exception);
 		}
-		else
+		else if(blocked!=null) // can be null when rescue thread
 		{
 //			System.out.println("unblock: "+monitor);
 			Executor exe = blocked.remove(monitor);
 			if(blocked.isEmpty())
-			{
 				blocked	= null;
-			}
 					
 			exe.switchThread(monitor, exception);
 		}
@@ -1026,8 +1068,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		{
 			if(executing)
 			{
-				System.err.println(getComponent().getComponentIdentifier()+": double execution"+" "+Thread.currentThread()+" "+getComponentThread());
-				new RuntimeException("executing: "+getComponent().getComponentIdentifier()).printStackTrace();
+				System.err.println(getComponent().getId()+": double execution"+" "+Thread.currentThread()+" "+getComponentThread());
+				new RuntimeException("executing: "+getComponent().getId()).printStackTrace();
 			}
 			executing	= true;
 		}
@@ -1165,10 +1207,10 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 				// Suspend when breakpoint is triggered.
 				// Necessary because component wakeup could be called anytime even if is at breakpoint..
-				if(!priostep && stepfuture==null && !IComponentDescription.STATE_SUSPENDED.equals(getComponent().getComponentDescription().getState())
-					&& getComponent().getComponentDescription().getBreakpoints().length>0)
+				if(!priostep && stepfuture==null && !IComponentDescription.STATE_SUSPENDED.equals(getComponent().getDescription().getState())
+					&& getComponent().getDescription().getBreakpoints().length>0)
 				{
-					if(isAtBreakpoint(getComponent().getComponentDescription().getBreakpoints()))
+					if(isAtBreakpoint(getComponent().getDescription().getBreakpoints()))
 					{
 						breakpoint_triggered = true;
 					}
@@ -1183,7 +1225,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				}
 				else if(!breakpoint_triggered)
 				{
-					if((IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState())))
+					if((IComponentDescription.STATE_ACTIVE.equals(getComponent().getDescription().getState())))
 					{
 						stepi = removeStep();
 					}
@@ -1220,8 +1262,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		if(breakpoint_triggered)
 		{
-			IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			cms.suspendComponent(getComponent().getComponentDescription().getName());
+//			IComponentManagementService	cms	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IComponentManagementService.class);
+			getComponent().suspendComponent(getComponent().getDescription().getName());
 		}
 		
 		boolean	hasstep;
@@ -1245,18 +1287,28 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					valid = ((IConditionalComponentStep<?>)step.getStep()).isValid();
 				
 				// Prio steps are always ok?!
-				int endstart = ((IInternalExecutionFeature)getComponent().getComponentFeature(IExecutionFeature.class)).getEndstateStart();
-				boolean stateok  = priostep || endstart==-1 || step.getStepCount()>=endstart;
-				
+				int endstart = ((IInternalExecutionFeature)getComponent().getFeature(IExecutionFeature.class)).getEndstateStart();
+				boolean stateok  = priostep || endstart==-1 || step.getStepCount()<=endstart;
+//				if (Math.random() < 0.01)
+//				{
+//					if (priostep)
+//						System.out.println(step.getStep());
+//					System.out.println("stateok " + component + " " + priostep + " " + (endstart==-1) + " " + (step.getStepCount()<= endstart) + " " + + step.getStepCount() + " " + endstart);
+//				}
 				// for test execution to ensure that not dropped steps cause problems
 //				stateok = true;
 				
 				if(valid && stateok) 
 				{
 					step.getTransfer().afterSwitch();
-//					if(getComponent().getComponentIdentifier().getName().indexOf("Execute")!=-1)
-//						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getComponentDescription().getState());
+					
+//					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
+//						System.out.println("executing: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
+					
 					stepfut	= step.getStep().execute(component);
+					
+//					if(getComponent().getId().getName().indexOf("Seller@BookTrading:")!=-1)
+//						System.out.println("executed: "+step.getStep()+" "+step.getPriority()+" "+getComponent().getDescription().getState()+" "+new Date());
 				}
 				else
 				{
@@ -1293,7 +1345,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				
 				if(!(t instanceof ThreadDeath) && !(t instanceof StepAborted))
 				{
-					StringWriter	sw	= new StringWriter();
+					StringWriter sw	= new StringWriter();
 					t.printStackTrace(new PrintWriter(sw));
 					getComponent().getLogger().warning("Component step threw hard exception: "+step.getStep()+"\n"+sw);
 				}
@@ -1304,7 +1356,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(ex instanceof StepAborted)
 				{
 					// Todo: plan for other uses of step aborted= -> step terminated exception in addition to step aborted error?
-					ex	= new ComponentTerminatedException(component.getComponentIdentifier());
+					ex	= new ComponentTerminatedException(component.getId());
+					System.err.println(component.getId()+": step after termination: "+step);
 				}
 				else if(ex instanceof ThreadDeath)
 				{
@@ -1318,7 +1371,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				// Hard step failure with uncatched exception is shown also when no debug.
 				if(!step.getFuture().hasResultListener() &&
 					(!(ex instanceof ComponentTerminatedException)
-					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getComponentIdentifier()))
+					|| !((ComponentTerminatedException)ex).getComponentIdentifier().equals(component.getId()))
 					&& !(ex instanceof StepInvalidException) && !(ex instanceof StepAbortedException))
 				{
 					final Throwable fex = ex;
@@ -1359,20 +1412,20 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					FutureFunctionality.connectDelegationFuture(step.getFuture(), stepfut);
 					
 					// Monitoring only when active after step started (outer check) and step completed (inner check).
-					if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
-						getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+					if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getFeature0(IMonitoringComponentFeature.class)!=null && 
+						getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 					{
 						stepfut.thenAccept(new Consumer<Object>()
 						{
 							@Override
 							public void accept(Object t)
 							{
-								if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null && 
-									getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+								if(step.getPriority()<STEP_PRIORITY_IMMEDIATE && getComponent().getFeature0(IMonitoringComponentFeature.class)!=null && 
+									getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 								{
-									getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 
-										getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
-										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, null, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+									getComponent().getFeature(IMonitoringComponentFeature.class).publishEvent(new MonitoringEvent(getComponent().getId(), 
+										getComponent().getDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+										+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 									// null was step.getCause()
 								}
 							}
@@ -1405,57 +1458,48 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 										{
 											// Todo: fail fast vs robust components.
 											
-											SServiceProvider.getService(component, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-												.addResultListener(new IResultListener<IExecutionService>()
-											{
-												public void resultAvailable(IExecutionService exe)
-												{
-													// Hack!!! service is foudn before it is started, grrr.
-													if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
-													{
-														if(bootstrap)
-														{
-															// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
-															available	= true;
-														}
-														else
-														{
-															exe.execute(ExecutionComponentFeature.this);
-														}
-													}
-													else
-													{
-														exceptionOccurred(null);
-													}
-												}
-												
-												public void exceptionOccurred(Exception exception)
-												{
-													// Happens during platform bootstrapping -> execute on platform rescue thread.
-													if(!bootstrap)
-													{
-														bootstrap	= true;
-														Starter.scheduleRescueStep(getComponent().getComponentIdentifier().getRoot(), new Runnable()
-														{
-															public void run()
-															{
-																boolean	again	= true;
-																while(!available && again)
-																{
-																	again	= execute();
-																}
-																bootstrap	= false;
-																
-																if(again)
-																{					
-																	// Bootstrapping finished -> do real kickoff
-																	wakeup();
-																}
-															}
-														});
-													}
-												}
-											});
+											// TODO: why is this code here???
+//											IExecutionService	exe	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+//											// Hack!!! service is foudn before it is started, grrr.
+//											if(((IService)exe).isValid().get().booleanValue())	// Hack!!! service is raw
+//											{
+//												if(bootstrap)
+//												{
+//													// Execution service found during bootstrapping execution -> stop bootstrapping as soon as possible.
+//													available	= true;
+//												}
+//												else
+//												{
+//													exe.execute(ExecutionComponentFeature.this);
+//												}
+//											}
+//											else
+//											{
+//												// Happens during platform bootstrapping -> execute on platform rescue thread.
+//												if(!bootstrap)
+//												{
+//													bootstrap	= true;
+//													Starter.scheduleRescueStep(getComponent().getId().getRoot(), new Runnable()
+//													{
+//														public void run()
+//														{
+//															boolean	again	= true;
+//															while(!available && again)
+//															{
+//																again	= execute();
+//															}
+//															bootstrap	= false;
+//															
+//															if(again)
+//															{					
+//																// Bootstrapping finished -> do real kickoff
+//																wakeup();
+//															}
+//														}
+//													});
+//												}
+//											}
+											
 											StringWriter	sw	= new StringWriter();
 											exception.printStackTrace(new PrintWriter(sw));
 											getComponent().getLogger().severe("No listener for component step exception: "+step.getStep()+"\n"+sw);
@@ -1505,7 +1549,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		
 		boolean	cycle	= false;
-		if(IComponentDescription.STATE_ACTIVE.equals(getComponent().getComponentDescription().getState()) || stepfuture!=null)
+		if(IComponentDescription.STATE_ACTIVE.equals(getComponent().getDescription().getState()) || stepfuture!=null)
 		{
 			try
 			{
@@ -1613,11 +1657,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		// Remember execution thread.
 		setComponentThread(Thread.currentThread());
 //		this.componentthread	= Thread.currentThread();
-		IComponentIdentifier.LOCAL.set(getComponent().getComponentIdentifier());
-		IInternalExecutionFeature.LOCAL.set(getComponent());
+		IComponentIdentifier.LOCAL.set(getComponent().getId());
+		IInternalExecutionFeature.LOCAL.set(getInternalAccess());
 		ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(component.getClassLoader());
-		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(getComponent()));
+		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(getInternalAccess()));
 		return cl;
 	}
 	
@@ -1716,15 +1760,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public void publishStepEvent(StepInfo step, String type)
 	{
-		if(step.getPriority()<IExecutionFeature.STEP_PRIORITY_IMMEDIATE && getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
-			&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(step.getPriority()<IExecutionFeature.STEP_PRIORITY_IMMEDIATE && getComponent().getFeature0(IMonitoringComponentFeature.class)!=null 
+			&& getComponent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{
-			MonitoringEvent event = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(), type+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
+			MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(), type+"."+TYPE_STEP, System.currentTimeMillis(), PublishEventLevel.FINE);
 			// null was step.getCause()
 			event.setProperty("sourcename", SReflect.getUnqualifiedClassName(step.getStep().getClass()));
 			event.setProperty("details", getStepDetails(step));
 			event.setProperty("id", step.getStepCount());
-			getComponent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL);
+			getComponent().getFeature(IMonitoringComponentFeature.class).publishEvent(event, PublishTarget.TOALL);
 		}
 	}
 	
@@ -1823,7 +1867,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		List<IMonitoringEvent> ret = null;
 		
-		IExecutionFeature exef = getComponent().getComponentFeature0(IExecutionFeature.class);
+		IExecutionFeature exef = getComponent().getFeature0(IExecutionFeature.class);
 		if(exef instanceof ExecutionComponentFeature)
 		{
 			List<StepInfo> steps = ((ExecutionComponentFeature)exef).getCurrentSteps();
@@ -1834,7 +1878,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					if(step.getPriority()<IExecutionFeature.STEP_PRIORITY_IMMEDIATE)
 					{
-						MonitoringEvent event = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), step.getStep().toString(),  IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, null, System.currentTimeMillis(), PublishEventLevel.FINE);
+						MonitoringEvent event = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), step.getStep().toString(),  IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, System.currentTimeMillis(), PublishEventLevel.FINE);
 						// null was step.getCause()
 						event.setProperty("sourcename", SReflect.getUnqualifiedClassName(step.getStep().getClass()));
 						event.setProperty("details", getStepDetails(step));
@@ -1904,12 +1948,238 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	}
 	
 	/**
+	 *  Add a component listener for a specific component.
+	 *  The listener is registered for component changes.
+	 *  @param cid	The component to be listened.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid)
+	{
+		return getComponent().listenToComponent(cid);
+	}
+	
+	/**
+	 * Search for components matching the given description.
+	 * @return An array of matching component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con)
+	{
+		return getComponent().searchComponents(adesc, con);
+	}
+	
+	/**
+	 *  Execute a step of a suspended component.
+	 *  @param componentid The component identifier.
+	 *  @param listener Called when the step is finished (result will be the component description).
+	 */
+	public IFuture<Void> stepComponent(IComponentIdentifier componentid, String stepinfo)
+	{
+		return getComponent().stepComponent(componentid, stepinfo);
+	}
+	
+	/**
+	 *  Set breakpoints for a component.
+	 *  Replaces existing breakpoints.
+	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
+	 *  @param componentid The component identifier.
+	 *  @param breakpoints The new breakpoints (if any).
+	 */
+	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints)
+	{
+		return getComponent().setComponentBreakpoints(componentid, breakpoints);
+	}
+	
+	/**
+	 *  Suspend the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> suspendComponent(IComponentIdentifier componentid)
+	{
+		return getComponent().suspendComponent(componentid);
+	}
+	
+	/**
+	 *  Resume the execution of an component.
+	 *  @param componentid The component identifier.
+	 */
+	public IFuture<Void> resumeComponent(IComponentIdentifier componentid)
+	{
+		return getComponent().resumeComponent(componentid);
+	}
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public IFuture<IExternalAccess> createComponent(CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
+	{
+		return getComponent().createComponent(info, resultlistener);
+	}
+	
+	/**
+	 *  Add a new component as subcomponent of this component.
+	 *  @param component The model or pojo of the component.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(CreationInfo info)
+	{
+		return getComponent().createComponentWithResults(info);
+	}
+	
+	/**
+	 *  Create a new component on the platform.
+	 *  @param name The component name or null for automatic generation.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param info Additional start information such as parent component or arguments (optional).
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(CreationInfo info)
+	{
+		return getComponent().createComponent(info);
+	}
+	
+	/**
+	 *  Kill the component.
+	 */
+	public IFuture<Map<String, Object>> killComponent()
+	{
+		return getComponent().killComponent();
+	}
+	
+	/**
+	 *  Kill the component.
+	 *  @param e The failure reason, if any.
+	 */
+	public IFuture<Map<String, Object>> killComponent(Exception e)
+	{
+		return getComponent().killComponent(e);
+	}
+	
+	/**
+	 *  Kill the component.
+	 *  @param e The failure reason, if any.
+	 */
+	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid)
+	{
+		return getComponent().killComponent(cid);
+	}
+	
+	/**
+	 *  Get the external access for a component id.
+	 *  @param cid The component id.
+	 *  @return The external access.
+	 */
+	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid)
+	{
+		return getComponent().getExternalAccess(cid);
+	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription> getDescriptionAsync()
+	{
+		return new Future<>(getComponent().getDescription());
+	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid)
+	{
+		return getComponent().getDescription(cid);
+	}
+	
+	/**
 	 *  Get the step number when endstate began.
 	 *  @return The step cnt.
 	 */
 	public int getEndstateStart()
 	{
 		return endstepcnt;
+	}
+	
+	/**
+	 *  Called when a child was terminated.
+	 */
+	public void childTerminated(IComponentDescription desc, Exception ex)
+	{
+		System.out.println("Child terminated: "+desc.getName());
+		// does nothing per default
+		// kernels need to override 
+	}
+	
+	/**
+	 *  Adds a simulation blocker for remote actions that have
+	 *  a definite end (i.e. regular futures), so remote calls
+	 *  work in simulation mode.
+	 *  
+	 *  Does not work for intermediates. Noop if simulation is
+	 *  disabled
+	 *  
+	 *  @param remotefuture The future of the remote action.
+	 */
+	public <T> void addSimulationBlocker(IFuture<T> remotefuture)
+	{
+		if (SSimulation.isSimulating(component))
+		{
+			// Call A_local -> B_local -Subscription or IIntermediate-> C_remote is still dangerous since
+			// there is no way of known how long to hold the clock.
+			// Update: Doing it anyway, relying on blocker realtime timeout to catch errors.
+//			if (!(remotefuture instanceof IIntermediateFuture))
+//			{
+				ServiceCall	sc	= SSimulation.debugBlocker();
+				component.scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						ISimulationService simserv = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(0));
+						if (simserv != null)
+						{
+							Future<Void> blocker = new Future<>();
+							if(sc!=null) CallAccess.setNextInvocation(sc);
+							simserv.addAdvanceBlocker(blocker).addResultListener(new IResultListener<Void>()
+							{
+								@SuppressWarnings("unchecked")
+								public void resultAvailable(Void result)
+								{
+									@SuppressWarnings({ "rawtypes" })
+									IIntermediateResultListener rs = new IIntermediateResultListener()
+									{
+										public void resultAvailable(Object result)
+										{
+											blocker.setResult(null);
+										}
+										public void exceptionOccurred(Exception exception)
+										{
+											resultAvailable(null);
+										}
+										public void intermediateResultAvailable(Object result)
+										{
+										}
+										public void finished()
+										{
+											resultAvailable(null);
+										}
+									};
+									
+									if (remotefuture instanceof ISubscriptionIntermediateFuture)
+										((ISubscriptionIntermediateFuture<T>) remotefuture).addQuietListener(rs);
+									else
+										remotefuture.addResultListener(rs);
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+								}
+							});
+						}
+						return IFuture.DONE;
+					}
+				});
+//			}
+		}
 	}
 	
 	/**
@@ -2007,8 +2277,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		 */
 		public IFuture<Void> execute(IInternalAccess ia)
 		{
-			assert ((ExecutionComponentFeature)ia.getComponentFeature(IExecutionFeature.class)).timers!=null;
-			((ExecutionComponentFeature)ia.getComponentFeature(IExecutionFeature.class)).timers.remove(ts);
+			assert ((ExecutionComponentFeature)ia.getFeature(IExecutionFeature.class)).timers!=null;
+			((ExecutionComponentFeature)ia.getFeature(IExecutionFeature.class)).timers.remove(ts);
 			run.execute(ia);
 			return IFuture.DONE;
 		}
@@ -2208,6 +2478,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public String toString()
 	{
-		return "ExecutionFeature("+getComponent().getComponentIdentifier()+")";
+		return "ExecutionFeature("+getComponent().getId()+")";
 	}
 }

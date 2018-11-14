@@ -1,78 +1,62 @@
 package jadex.kernelbase;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IGlobalResourceIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
-import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.AnnotationInfo;
+import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.future.CallMultiplexer;
-import jadex.commons.future.CollectionResultListener;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.CallSequentializer;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITerminableIntermediateFuture;
-
+import jadex.javaparser.SJavaParser;
 
 /**
- *  Kernel that delegates calls to sub-kernels it finds using on-demand searches.
- *  
- *  NOTE: This is extremely complex code. Do not touch unless you really, REALLY
- *        know what you are doing.
+ *  Multi factory for dynamically loading kernels.
  */
 @Service
 public class MultiFactory implements IComponentFactory, IMultiKernelNotifierService
@@ -80,129 +64,79 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/** Kernel model property for extensions */
 	protected static final String KERNEL_EXTENSIONS = "kernel.types";
 	
+	/** Filter for scanning for kernel agent class files. */
+	protected static FileFilter ffilter = new FileFilter("$", false, ".class")
+		.addFilenameFilter(new IFilter<String>()
+	{
+		public boolean filter(String fn)
+		{
+			return fn.startsWith("Kernel");
+		}
+	});
+	
+	/** Filter for scanning for kernel agent class infos. */
+	protected static IFilter<ClassInfo>	cfilter	= new IFilter<ClassInfo>()
+	{
+		public boolean filter(ClassInfo ci) 
+		{
+			return ci.hasAnnotation("jadex.micro.annotation.Agent");
+		}
+	};
+	
 	/** The internal access. */
 	@ServiceComponent
-	protected IInternalAccess ia;
-	
-	/** Kernel default locations */
-	protected MultiCollection<String, String> kerneldefaultlocations;
-	
-	/** Cache of known factories */
-	protected Map<String, IComponentFactory> factorycache;
-	
-	/** Cache of kernel locations */
-	protected MultiCollection<String, String> kernellocationcache;
-	
-	/** URLs of the kernels */
-	protected MultiCollection<URI, String> kerneluris;
-	
-	/** Set of potential URLs for kernel searches */
-	protected Set<URI> potentialuris;
-	
-	/** Currently valid URLs */
-	protected Set<URI> validuris;
-	
-	/** Set of kernels that have been active at one point */
-	protected Set<String> activatedkernels;
-	
-	/** Flag if active kernels has changed. */
-	protected boolean activekernelsdirty = true;
-	
-	/** Currently supported types */
-	protected Set<String> componenttypes;
-	
-	/** Cache of component icons */
-	protected Map<String, byte[]> iconcache;
-	
-	/** Base Blacklist of extension for which there is no factory */
-	protected Set<String> baseextensionblacklist;
-
-	/** Blacklist of extension for which there is no factory */
-//	protected Set extensionblacklist;
-	
-	/** Kernel blacklist */
-	protected Set<String> kernelblacklist;
-	
-	/** Unloadable kernel locations that may become loadable later. */
-	protected Set<String> potentialkernellocations;
-	
-	/** Call Multiplexer */
-	protected CallMultiplexer multiplexer;
+	protected IInternalAccess agent;
 	
 	/** The listeners. */
-	protected List<IMultiKernelListener> listeners;
+	protected List<IMultiKernelListener> listeners = new ArrayList<>();
+	
+	/** Cache of component icons */
+	protected Map<String, byte[]> iconcache = new HashMap<>();
 	
 	/** The service identifier. */
 	@ServiceIdentifier(IComponentFactory.class)
 	protected IServiceIdentifier sid;
 	
-	/** Flag whether the service has started */
-	protected boolean started;
+	/** Currently supported types (loadable suffixes) */
+	protected Set<String> componenttypes = new HashSet<>();
 	
-	/** Library service listener */
-	protected ILibraryServiceListener liblistener;
-	
-	/** The library service. */
-	protected ILibraryService libservice;
+	/** The scanned kernel files (suffix -> {(classname, suffixes)} ). */
+	protected Map<String, Collection<Tuple2<String, Set<String>>>> kernelfiles;
 
+	/** The started factories (kernel classname -> kernel component). */
+	protected Map<String, IComponentIdentifier> kernels = new HashMap<>();
+	
+	/** The started flag (because init is invoked twice, service impl for 2 services. */
+	protected boolean inited;
+	
+	/** The dirty flag (when classpath changes). */
+	protected boolean dirty;
+
+	/** The known factories. */
+	protected Set<String> known_kernels = SUtil.createHashSet(new String[]{
+		"jadex/micro/KernelMicroAgent.class", 
+		"jadex/bdiv3/KernelBDIV3Agent.class", 
+		"jadex/bdiv3x/KernelBDIXAgent.class", 
+		"jadex/bpmn/KernelBpmnAgent.class", 
+		"jadex/application/KernelApplicationAgent.class", 
+		"jadex/component/KernelComponentAgent.class",
+		"jadex/microservice/KernelMicroserviceAgent.class"
+	});
+	protected MultiCollection<String, Tuple2<String, Set<String>>> known_kernels_cache;
+	
 	public static final String MULTIFACTORY = "multifactory";
-	
+
+	/** Used in SComponentFactory to reorder checks (multi last). Still necessary?!. */
 	public static final Map<String, Object> props = SUtil.createHashMap(new String[]{MULTIFACTORY}, new Object[]{Boolean.TRUE});
-	
-	/**
-	 *  Creates a new MultiFactory.
-	 *  @param ia Component internal access.
-	 *  @param defaultLocations Known kernel location to be checked first.
-	 *  @param kernelblacklist Kernels the factory should ignore.
-	 *  @param extensionblacklist File extension the factory should not consider to be models 
-	 *  	   (no extension and most files with .class extension are ignored by default)
-	 */
-	public MultiFactory(String[] defaultLocations, String[] potentiallocs, String[] kernelblacklist, String[] extensionblacklist)
+
+	/** The sequentializer to execute getNewFactory() one by one and not interleaved. */
+	protected CallSequentializer<IComponentFactory> getnewfac = new CallSequentializer<IComponentFactory>(new IResultCommand<IFuture<IComponentFactory>, Object[]>()
 	{
-		//super(ia.getServiceContainer().getId(), IComponentFactory.class, null);
-		//this.ia = ia;
-		this.factorycache = new HashMap<String, IComponentFactory>();
-		this.kernellocationcache = new MultiCollection<String, String>();
-		this.kerneluris = new MultiCollection();
-		this.potentialuris = new LinkedHashSet<URI>();
-		this.validuris = new HashSet<URI>();
-		this.multiplexer = new CallMultiplexer();
-		this.baseextensionblacklist = new HashSet<String>();
-//		if (extensionblacklist != null)
-//			Arrays.asList(extensionblacklist);
-//		this.baseextensionblacklist.add(null);
-		
-		kerneldefaultlocations = new MultiCollection<String, String>();
-		if(defaultLocations != null)
+		public IFuture<IComponentFactory> execute(Object[] args)
 		{
-			for (int i = 0; i < defaultLocations.length; ++i)
-			{
-				kerneldefaultlocations.add(null, defaultLocations[i]);
-			}
+			return getNewFactory((String)args[0], (String[])args[1], (IResourceIdentifier)args[2]);
 		}
-		
-		activatedkernels = new HashSet<String>();
-		componenttypes = new HashSet<String>();
-		iconcache = new HashMap<String, byte[]>();
-		this.kernelblacklist = new HashSet<String>();
-		if(kernelblacklist != null)
-		{
-			this.kernelblacklist.addAll(Arrays.asList(kernelblacklist));
-		}
-//		this.extensionblacklist = new HashSet(baseextensionblacklist);
-		this.potentialkernellocations = new HashSet<String>();
-		
-		if (potentiallocs != null)
-		{
-			for (int i = 0; i < potentiallocs.length; ++i)
-				potentialkernellocations.add(potentiallocs[i]);
-			
-		}
-		
-		
-		this.listeners = new ArrayList<IMultiKernelListener>();
-		started = false;
-	}
+	});
 	
 	/**
 	 *  Starts the service.
@@ -210,391 +144,51 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	@ServiceStart
 	public IFuture<Void> startService()
 	{
-		if (started)
+		if(inited)
 			return IFuture.DONE;
+		inited = true;
 		
-		String[] blarray = (String[]) ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("ignoreextensions");
-//		System.out.println(Arrays.toString(blarray));
-		if (blarray != null)
-			baseextensionblacklist.addAll(Arrays.asList(blarray));
+		// add data for implicitly started micro factory
+		componenttypes.add(".class");
+		kernels.put("jadex.micro.KernelMicroAgent", null);
 		
-		final Future ret = new Future()
+		// Rescan on any changes in the library service
+		
+		ILibraryService libservice= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		final IExternalAccess exta = agent.getExternalAccess();
+		ILibraryServiceListener liblistener = new ILibraryServiceListener()
 		{
-			public void setResult(Object result)
-			{
-				started = true;
-				super.setResult(result);
-			}
-		};
-		
-		libservice	= SServiceProvider.getLocalService(ia, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		
-		final IExternalAccess exta = ia.getExternalAccess();
-		liblistener = new ILibraryServiceListener()
-		{
-			public IFuture resourceIdentifierRemoved(IResourceIdentifier parid, final IResourceIdentifier rid)
+			public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier parid, final IResourceIdentifier rid)
 			{
 				exta.scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						URI uri = rid.getLocalIdentifier().getUri();
-						Collection<String> affectedkernels = (Collection<String>)kerneluris.remove(uri);
-						if (affectedkernels != null)
-						{
-							String[] keys = (String[]) kernellocationcache.keySet().toArray(new String[0]);
-							for(int i = 0; i < keys.length; ++i)
-							{
-								for(Iterator<String> it = affectedkernels.iterator(); it.hasNext(); )
-								{
-//									System.out.println("rid removed: "+uri+", "+keys[i]);
-									kernellocationcache.removeObject(keys[i], it.next());
-								}
-							}
-						}
-						potentialuris.remove(uri);
-						validuris.remove(uri);
-						
+						dirty = true;
 						return IFuture.DONE;
 					}
 				});
 				return IFuture.DONE;
 			}
 			
-			public IFuture resourceIdentifierAdded(IResourceIdentifier parid, final IResourceIdentifier rid, boolean rem)
+			public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier parid, final IResourceIdentifier rid, boolean rem)
 			{
-				final URI uri = rid.getLocalIdentifier().getUri();
-				String regex = (String) ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("kerneluriregex");
-				if (Pattern.matches(regex!=null ? regex : "", uri.toString()))
+				exta.scheduleStep(new IComponentStep<Void>()
 				{
-					exta.scheduleStep(new IComponentStep<Void>()
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-//							extensionblacklist = new HashSet(baseextensionblacklist);
-							validuris.add(uri);
-							potentialuris.add(uri);
-							
-							return IFuture.DONE;
-						}
-					});
-				}
+						dirty = true;
+						return IFuture.DONE;
+					}
+				});
 				return IFuture.DONE;
 			}
 		};
-		
 		libservice.addLibraryServiceListener(liblistener);
 		
-		// Add base classpath
-		ClassLoader basecl = MultiFactory.class.getClassLoader();
-		for(URL url: SUtil.getClasspathURLs(basecl, true))
-		{
-			// Hack to avoid at least some Java junk.
-			if (!url.toString().contains("jre/lib/ext"))
-			{
-				try
-				{
-					URI uri = url.toURI();
-					potentialuris.add(uri);
-					validuris.add(uri);
-				}
-				catch (URISyntaxException e)
-				{
-				}
-			}
-		}
-		
-//		while (basecl != null)
-//		{
-//			if (basecl instanceof URLClassLoader)
-//			{
-//				URL[] urls = ((URLClassLoader) basecl).getURLs();
-//				for (URL url : urls)
-//				{
-//					// Hack to avoid at least some Java junk.
-//					if (!url.toString().contains("jre/lib/ext"))
-//					{
-//						try
-//						{
-//							URI uri = url.toURI();
-//							potentialuris.add(uri);
-//							validuris.add(uri);
-//						}
-//						catch (URISyntaxException e)
-//						{
-//						}
-//					}
-//				}
-//			}
-//			basecl = basecl.getParent();
-//		}
-		
-		libservice.getAllURLs().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				String regexstr = (String) ia.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("kerneluriregex");
-				Pattern regex = Pattern.compile(regexstr!=null ? regexstr : "");
-				
-//				potentialurls.addAll();
-//				validurls.addAll((Collection) result);
-				
-				if (result != null)
-				{
-					for (URL url : ((Collection<URL>) result))
-					{
-						try
-						{
-							URI uri = url.toURI();
-							if (regex.matcher(uri.toString()).matches())
-							{
-								potentialuris.add(uri);
-								validuris.add(uri);
-							}
-						}
-						catch (URISyntaxException e)
-						{
-						}
-						
-					}
-				}
-				
-				// Sort uris (for repeatability during debugging)
-//				List	tmp	= new ArrayList(potentialuris);
-//				Collections.sort(tmp);
-//				potentialuris.clear();
-//				potentialuris.addAll(tmp);
-				
-				if(kerneldefaultlocations.isEmpty())
-					ret.setResult(null);
-				else
-				{
-					// Initialize default locations
-//							String[] dl = (String[])kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
-					String[] dl = kerneldefaultlocations.get(null) == null? new String[0] : (String[]) ((Collection) kerneldefaultlocations.get(null)).toArray(new String[kerneldefaultlocations.size()]);
-					kerneldefaultlocations.clear();
-					IResultListener loccounter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
-						new CounterResultListener(dl.length, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-					{
-						public void customResultAvailable(Object result)
-						{
-							ret.setResult(null);
-						}
-					}))
-					{
-						public void intermediateResultAvailable(Object result)
-						{
-							final IModelInfo kernel = (IModelInfo) result;
-							libservice.getClassLoader(kernel.getResourceIdentifier())
-								.addResultListener(new IResultListener<ClassLoader>()
-							{
-								public void resultAvailable(ClassLoader result)
-								{
-									String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS, result);
-									if (exts != null)
-										for (int i = 0; i < exts.length; ++i)
-											kerneldefaultlocations.add(exts[i], kernel.getFilename());
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									// Todo: log warning!?
-								}
-							});
-						}
-					});
-					
-					for(int i = 0; i < dl.length; ++i)
-						loadModel(dl[i], null, null).addResultListener(loccounter);
-				}
-			}
-		}));
-			
-//		ret.addResultListener(new IResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				System.out.println("fettisch");
-//			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//			}
-//		});
-		
-		return ret;
+		return IFuture.DONE;
 	}
 	
-	/**
-	 *  Stops the service.
-	 */
-	@ServiceShutdown
-	public IFuture<Void> shutdownService()
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		ia.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
-		{
-			public void customResultAvailable(ILibraryService ls)
-			{
-				ls.removeLibraryServiceListener(liblistener)
-					.addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 * Load a model.
-	 * 
-	 * @param model The model (e.g. file name).
-	 * @param The imports (if any).
-	 * @return The loaded model.
-	 */
-	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, IResourceIdentifier rid)
-	{
-//		if(model.indexOf("ich")!=-1)
-//			System.out.println("loadModel: "+model);
-		
-		return loadModel(model, imports, rid, false);
-	}
-	
-	/**
-	 * Load a model.
-	 * 
-	 * @param model The model (e.g. file name).
-	 * @param The imports (if any).
-	 * @return The loaded model.
-	 */
-	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid, boolean isrecur)
-	{
-//		if(model.indexOf("ich")!=-1)
-//			System.out.println("loadModel2: "+model);
-		
-		final Future<IModelInfo> ret = new Future<IModelInfo>();
-		
-		findKernel(model, imports, rid, isrecur).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				if (result != null)
-					((IComponentFactory)result).loadModel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-				else
-					ret.setException(new RuntimeException("Factory not found: " + model));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		}));
-		
-		return ret;
-	}
-
-	/**
-	 *  Test if a model can be loaded by the factory.
-	 *  @param model The model (e.g. file name).
-	 *  @param The imports (if any).
-	 *  @return True, if model can be loaded.
-	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
-	{
-//		Collection tfactories = SServiceProvider.getServices((IServiceProvider) ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION).get();
-//		if (tfactories.size() <= 1)
-//		{
-//			System.out.println(ServiceCall.getCurrentInvocation().getCaller());
-//			System.out.println("FALSEs");
-//			return new Future<Boolean>(false);
-//		}
-//		if(model.toString().indexOf("xml")!=-1)
-//			System.out.println("isLoadable: "+model);
-//
-		final Future<Boolean> ret = new Future<Boolean>();
-		findKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				if(result != null)
-					ret.setResult(true);
-				else
-					ret.setResult(false);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setResult(false);
-			}
-		}));
-		return ret;
-	}
-
-	/**
-	 * Test if a model is startable (e.g. an component).
-	 * 
-	 * @param model
-	 *            The model (e.g. file name).
-	 * @param The
-	 *            imports (if any).
-	 * @return True, if startable (and loadable).
-	 */
-	public IFuture<Boolean> isStartable(final String model, final String[] imports, final IResourceIdentifier rid)
-	{
-//		System.out.println("isStartable: "+model);
-
-		final Future<Boolean> ret = new Future<Boolean>();
-		findKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				if(result != null)
-					((IComponentFactory) result).isStartable(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-				else
-					ret.setResult(false);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setResult(false);
-			}
-		}));
-		return ret;
-	}
-
-	/**
-	 *  Get the component type of a model.
-	 *  @param model The model (e.g. file name).
-	 *  @param The imports (if any).
-	 */
-	public IFuture<String> getComponentType(final String model, final String[] imports, final IResourceIdentifier rid)
-	{
-//		if(model.endsWith("agent.xml"))
-//			System.out.println("model: "+model);
-
-		final Future<String> ret = new Future<String>();
-		findKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				if(result != null)
-				{
-					((IComponentFactory)result).getComponentType(model, imports, rid)
-						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-				}
-				else
-				{
-					ret.setException(new ServiceNotFoundException("Factory not found: " + model));
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		}));
-		return ret;
-	}
-
 	/**
 	 * Get a default icon for a component type.
 	 */
@@ -604,23 +198,18 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		byte[] icon = iconcache.get(type);
 		
-		if (icon == null)
+		if(icon == null)
 		{
-			ITerminableIntermediateFuture<IComponentFactory> ffut = SServiceProvider.getServices(ia, IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION);
-			Collection<IComponentFactory> facs = ffut.get();
-			if (facs != null)
+			for(IComponentFactory fac : getFactories())
 			{
-				for (IComponentFactory fac : facs)
+				if(!((IService)fac).getServiceId().equals(sid))
 				{
-					if(!((IService)fac).getServiceIdentifier().equals(sid))
+					icon = fac.getComponentTypeIcon(type).get();
+				
+					if(icon != null)
 					{
-						icon = fac.getComponentTypeIcon(type).get();
-					
-						if (icon != null)
-						{
-							iconcache.put(type, icon);
-							break;
-						}
+						iconcache.put(type, icon);
+						break;
 					}
 				}
 			}
@@ -628,77 +217,567 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		
 		return new Future<byte[]>(icon);
 	}
+	
+	/**
+	 *  Load a  model.
+	 *  @param model The model (e.g. file name or resource name).
+	 *  @param The imports (if any).
+	 *  @return The loaded model.
+	 */
+	public IFuture<IModelInfo> loadModel(String model, String[] imports, IResourceIdentifier rid)
+	{
+		if(!isLoadable(model))
+			return new Future<IModelInfo>(new RuntimeException("Cannot be loaded: "+model));
+		
+		Future<IModelInfo> ret = new Future<>();
+		
+		getFactoryForModel(model, imports, rid, null).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+		{
+			public void customResultAvailable(IComponentFactory fac) throws Exception
+			{
+				fac.loadModel(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a factory for a model.
+	 *  
+	 *  1) will check running factories
+	 *  2) if none was found will check if a new can be started
+	 *  
+	 *  @return A factory that can load the model (or null if none was found).
+	 */
+	protected IFuture<IComponentFactory> getFactoryForModel(String model, String[] imports, IResourceIdentifier rid, Iterator<IComponentFactory> it)
+	{
+		Future<IComponentFactory> ret = new Future<IComponentFactory>();
+		
+		getRunningFactory(model, imports, rid, null).addResultListener(new IResultListener<IComponentFactory>()
+		{
+			public void resultAvailable(IComponentFactory fac)
+			{
+				ret.setResult(fac);
+			}
 
-	// -------- cached --------
+			public void exceptionOccurred(Exception exception)
+			{
+//				getnewfac.call(new Object[]{model, imports, rid}).addResultListener(new DelegationResultListener<>(ret));
+				getNewFactory(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  If there are other kernel specs for the current filename suffix start and test them.
+	 *  Returns a new factory that can load the model (if any).
+	 */
+	protected IFuture<IComponentFactory> getNewFactory(String model, String[] imports, IResourceIdentifier rid)
+	{
+//		System.out.println("getNewFactory: "+model);
+		
+		Future<IComponentFactory> ret = new Future<IComponentFactory>();
+		
+		Map<String, Collection<Tuple2<String, Set<String>>>> kernelfiles = getKnownKernels();
+		Set<Tuple2<String, Set<String>>> found = new HashSet<>();
+		for(Map.Entry<String, Collection<Tuple2<String, Set<String>>>> entry: kernelfiles.entrySet())
+		{
+			if(model.endsWith(entry.getKey()))
+			{
+				found.addAll(entry.getValue());
+			}
+		}
+		final Iterator<Tuple2<String, Set<String>>> it = found.iterator();
+		
+		check(it, model, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret)
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+//				System.out.println("getKernelFiles: "+model);
+				Map<String, Collection<Tuple2<String, Set<String>>>> kernelfiles = getKernelFiles();
+				Set<Tuple2<String, Set<String>>> found = new HashSet<>();
+				for(Map.Entry<String, Collection<Tuple2<String, Set<String>>>> entry: kernelfiles.entrySet())
+				{
+					if(model.endsWith(entry.getKey()))
+					{
+						found.addAll(entry.getValue());
+					}
+				}
+				final Iterator<Tuple2<String, Set<String>>> it = found.iterator();
+				
+				check(it, model, imports, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Scan files for kernel components.
+	 *  @return (suffix -> classname)
+	 */
+	protected Map<String, Collection<Tuple2<String, Set<String>>>> scanForKernels()
+	{
+		MultiCollection<String, Tuple2<String, Set<String>>> ret = new MultiCollection<>();
+		
+//		System.out.println("MultiFactory scanning...");
+		
+//		List<URL> urls = new ArrayList<URL>();
+//		ClassLoader basecl = MultiFactory.class.getClassLoader();
+//		for(URL url: SUtil.getClasspathURLs(basecl, true))
+//		{
+//			// Hack to avoid at least some Java junk.
+//			if(!url.toString().contains("jre/lib/ext"))
+//			{
+//				urls.add(url);
+//			}
+//		}
+//		System.out.println(urls.size());
+		
+		ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).getLocalService(ILibraryService.class);
+		List<URL> urls2 = ls.getAllURLs().get();
 
+//		System.out.println("urls2: "+urls2.size());
+//		for(URL u: urls2)
+//			System.out.println(u);
+		for(Iterator<URL> it=urls2.iterator(); it.hasNext(); )
+		{
+			String u = it.next().toString();
+			if(u.indexOf("jre/lib/ext")!=-1
+			//	|| u.indexOf("jadex")==-1
+				|| u.indexOf("SYSTEMCPRID")!=-1)
+			{
+				it.remove();
+			}
+		}
+		
+		//System.out.println("scan: "+urls2.size());
+		
+//		System.out.println("urls: "+urls);
+		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls2.toArray(new URL[urls2.size()]), ffilter, cfilter);
+
+		for(ClassInfo ci: cis)
+		{
+			String[] types = getKernelTypes(ci);
+			
+			if(types!=null)
+			{
+				for(String type: types)
+				{
+					ret.add(type, new Tuple2<String, Set<String>>(ci.getClassName(), SUtil.arrayToSet(types)));
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Check a factory
+	 *  @param it factory iterator.
+	 */
+	protected IFuture<IComponentFactory> check(Iterator<Tuple2<String, Set<String>>> it, String model, String[] imports, IResourceIdentifier rid)
+	{
+		Future<IComponentFactory> ret = new Future<>();
+		
+		if(it.hasNext())
+		{
+			Tuple2<String, Set<String>> f = it.next();
+			
+			if(kernels.containsKey(f.getFirstEntity()))
+			{
+				check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+			}
+			else
+			{	
+				kernels.put(f.getFirstEntity(), null);
+				
+				CreationInfo ci = new CreationInfo(agent.getId());
+				ci.setFilename(f.getFirstEntity()+".class");
+				
+//				System.out.println("create compo start: "+f.getFirstEntity());
+				agent.createComponent(ci, new IResultListener<Collection<Tuple2<String, Object>>>()
+				{
+					public void resultAvailable(Collection<Tuple2<String, Object>> result)
+					{
+//						System.out.println("Killed kernel: " + f);
+						kernels.remove(f.getFirstEntity());
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+//						System.out.println("Killed kernel: " + f+", "+exception);
+						kernels.remove(f.getFirstEntity());
+					}
+				}).addResultListener(new IResultListener<IExternalAccess>()
+				{
+					public void resultAvailable(IExternalAccess exta)
+					{
+//						System.out.println("Started factory: "+exta);
+						kernels.put(f.getFirstEntity(), exta.getId());
+						
+						ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
+						q.setProvider(exta.getId());
+						final IComponentFactory fac = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(q);
+						
+						// If this is a new kernel, gather types and icons
+						final String[] types = fac.getComponentTypes();
+						componenttypes.addAll(Arrays.asList(types));
+							
+						if(SReflect.HAS_GUI)
+						{
+							fireTypesAdded(types);
+							
+							for(int i = 0; i < types.length; ++i)
+							{
+								final int fi = i;
+								fac.getComponentTypeIcon(types[i]).addResultListener(new IResultListener<byte[]>()
+								{
+									public void resultAvailable(byte[] result)
+									{
+//										System.out.println("adding icon: "+types[fi]);
+										iconcache.put(types[fi], result);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+									}
+								});
+							}
+						}
+						
+						fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
+						{
+							public void resultAvailable(Boolean loadable) 
+							{
+								if(loadable.booleanValue())
+									ret.setResult(fac);
+								else 
+									check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+							}
+		
+							public void exceptionOccurred(Exception exception)
+							{
+//								System.out.println("Kernel cannot load: "+exta.getId()+" "+model);
+								check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception) 
+					{
+						System.out.println("error starting factory: "+exception);
+						check(it, model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+					}
+				});
+			}
+		}
+		else
+		{
+			ret.setException(new RuntimeException("No factory found"));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get known kernels.
+	 */
+	protected Map<String, Collection<Tuple2<String, Set<String>>>> getKnownKernels()
+	{
+		if(known_kernels_cache==null)
+		{
+			known_kernels_cache = new MultiCollection<>();
+		
+			for(String kk: known_kernels)
+			{
+				// todo: use library loader (needs rid besides classname)
+				try
+				{
+					ClassLoader cl = agent.getClassLoader();
+					InputStream is = SUtil.getResource(kk, cl);
+					ClassInfo ci = SClassReader.getClassInfo(is);
+				
+					String[] types = getKernelTypes(ci);
+				
+					if(types!=null)
+					{
+						for(String type: types)
+						{
+							known_kernels_cache.add(type, new Tuple2<String, Set<String>>(ci.getClassName(), SUtil.arrayToSet(types)));
+						}
+					}
+				}
+				catch(Exception e)
+				{
+					System.out.println("Error reading: "+kk);
+				}
+			}
+		}
+		
+		return known_kernels_cache;
+	}
+	
+	/**
+	 *  Add infos about a kernel to the map.
+	 */
+	protected String[] getKernelTypes(ClassInfo ci)
+	{
+		AnnotationInfo ai = ci.getAnnotation("jadex.micro.annotation.Properties");
+		if(ai!=null)
+		{
+			Object[] vals = (Object[])ai.getValue("value");
+			if(vals!=null)
+			{
+				for(Object val: vals)
+				{
+					AnnotationInfo a = (AnnotationInfo)val;
+					String name = (String)a.getValue("name");
+					if("kernel.types".equals(name))
+					{
+						String value = (String)a.getValue("value");
+						String[] types = (String[])SJavaParser.evaluateExpression(value, null);
+//						System.out.println("foound: "+ci.getClassname()+" "+Arrays.toString(types));
+						return types;
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 *  Get all kernel files, i.e. specs to start a kernel.
+	 */
+	protected Map<String, Collection<Tuple2<String, Set<String>>>> getKernelFiles()
+	{
+		if(kernelfiles==null || dirty)
+			kernelfiles = scanForKernels();
+		dirty = false;
+		return kernelfiles;
+	}
+	
+	/**
+	 *  Get a running subfactory.
+	 */
+	protected IFuture<IComponentFactory> getRunningFactory(String model, String[] imports, IResourceIdentifier rid, Iterator<IComponentFactory> it)
+	{		
+		if(!isLoadable(model))
+			return new Future<IComponentFactory>(new RuntimeException());
+		
+//		System.out.println("getRunningFactory: "+model);
+
+		Future<IComponentFactory> ret = new Future<IComponentFactory>();
+		
+		Iterator<IComponentFactory> facs = it!=null? it: getFactories().iterator();
+		
+		if(facs.hasNext())
+		{
+			IComponentFactory fac = facs.next();
+			fac.isLoadable(model, imports, rid).addResultListener(new IResultListener<Boolean>()
+			{
+				public void resultAvailable(Boolean result)
+				{
+					if(result.booleanValue())
+						ret.setResult(fac);
+					else
+						getRunningFactory(model, imports, rid, facs).addResultListener(new DelegationResultListener<>(ret));
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					getRunningFactory(model, imports, rid, facs).addResultListener(new DelegationResultListener<>(ret));
+				}
+			});
+		}
+		else
+		{
+			ret.setException(new RuntimeException("No factory not found for: "+model));
+		}
+		
+		return ret;
+	}	
+
+	/**
+	 *  Test if a model can be loaded by the factory.
+	 *  @param model The model (e.g. file name or resource name).
+	 *  @param The imports (if any).
+	 *  @return True, if model can be loaded.
+	 */
+	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+	{		
+		if(!isLoadable(model))
+			return IFuture.FALSE;
+		
+//		System.out.println("isLoadable: "+model);
+
+		Future<Boolean> ret = new Future<>();
+		
+		getFactoryForModel(model, imports, rid, null).addResultListener(new IResultListener<IComponentFactory>()
+		{
+			public void resultAvailable(IComponentFactory fac)
+			{
+//				System.out.println("facformodel: "+model);
+				fac.isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
+				{
+//					public void customResultAvailable(Boolean result)
+//					{
+//						super.customResultAvailable(result);
+////						if(model.indexOf("Block")!=-1)
+//							System.out.println("model: "+model+" "+result);
+//					}
+				});
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+//				System.out.println("ex: "+exception);
+				ret.setResult(false);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Test if a model is startable (e.g. an component).
+	 *  @param model The model (e.g. file name or resource name).
+	 *  @param The imports (if any).
+	 *  @return True, if startable (and loadable).
+	 */
+	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
+	{		
+		if(!isLoadable(model))
+			return IFuture.FALSE;
+		
+//		System.out.println("isStartable: "+model);
+
+		Future<Boolean> ret = new Future<>();
+		
+		getFactoryForModel(model, imports, rid, null).addResultListener(new IResultListener<IComponentFactory>()
+		{
+			public void resultAvailable(IComponentFactory fac)
+			{
+				fac.isStartable(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(false);
+			}
+		});
+		
+		return ret;
+	}
+
+	/**
+	 *  Get the component type of a model.
+	 *  @param model The model (e.g. file name or resource name).
+	 *  @param The imports (if any).
+	 */
+	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
+	{
+		if(!isLoadable(model))
+			return new Future<String>(new RuntimeException("Model cannot be loaded: "+model));
+		
+//		System.out.println("getComponentType: "+model);
+		
+		Future<String> ret = new Future<>();
+		
+		getFactoryForModel(model, imports, rid, null).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, String>(ret)
+		{
+			public void customResultAvailable(IComponentFactory fac) throws Exception
+			{
+				fac.getComponentType(model, imports, rid).addResultListener(new DelegationResultListener<>(ret));
+			}
+		});
+		
+		return ret;
+	}
+
+	//-------- cached --------
+	
 	/**
 	 * Get the names of component types supported by this factory.
 	 */
 	public String[] getComponentTypes()
 	{
 		return (String[])componenttypes.toArray(new String[componenttypes.size()]);
-		//return (String[]) iconcache.keySet().toArray(new String[iconcache.size()]);
 	}
 
+	//-------- excluded --------
+	
 	/**
-	 * Get the properties (name/value pairs). Arbitrary properties that can e.g.
-	 * be used to define kernel-specific settings to configure tools.
-	 * 
-	 * @param type
-	 *            The component type.
-	 * @return The properties or null, if the component type is not supported by
-	 *         this factory.
+	 *  Get the properties (name/value pairs).
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools.
+	 *  @param type	The component type. 
+	 *  @return The properties or null, if the component type is not supported by this factory.
 	 */
-	public Map getProperties(String type)
+	public Map<String, Object> getProperties(String type)
 	{
 //		return Collections.EMPTY_MAP;
 		return props;
 	}
-
-//	/**
-//	 * Create a component instance.
-//	 * 
-//	 * @param factory	The component adapter factory.
-//	 * @param model	The component model.
-//	 * @param config	The name of the configuration (or null for default configuration)
-//	 * @param arguments	The arguments for the component as name/value pairs.
-//	 * @param parent	The parent component (if any).
-//	 * @return An instance of a component and the corresponding adapter.
-//	 */
-//	@Excluded
-//	public IFuture<Tuple2<IComponentInterpreter, IComponentAdapter>> createComponentInstance(final IComponentDescription desc,
-//			final IPlatformComponentFactory factory, final IModelInfo model, final String config,
-//			final Map<String, Object> arguments, final IExternalAccess parent,
-//			final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
-//			final IPersistInfo persistinfo,
-//			final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> ret)
-//	{
+	
 	/**
 	 *  Get the component features for a model.
 	 *  @param model The component model.
 	 *  @return The component features.
 	 */
-	@Excluded
 	public IFuture<Collection<IComponentFeatureFactory>> getComponentFeatures(final IModelInfo model)
 	{
-//		if(model.getName().indexOf("ich")!=-1)
-//			System.out.println("createComponentInstance: "+model.getName());
+//		System.out.println("getComponentFeatures");
 		
-//		IComponentFactory fac = (IComponentFactory)factorycache.get(getModelExtension(model.getFilename()));
-		IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model.getFilename(), factorycache);
-		if(fac != null)
-			return fac.getComponentFeatures(model);
+		Future<Collection<IComponentFeatureFactory>> ret = new Future<>();
 		
-		final Future<Collection<IComponentFeatureFactory>> res = new Future<Collection<IComponentFeatureFactory>>();
-		
-		findKernel(model.getFilename(), null, model.getResourceIdentifier()).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(res)
+		getFactoryForModel(model.getFilename(), model.getAllImports(), model.getResourceIdentifier(), null).addResultListener(new ExceptionDelegationResultListener<IComponentFactory, Collection<IComponentFeatureFactory>>(ret)
 		{
-			public void customResultAvailable(IComponentFactory result)
+			public void customResultAvailable(IComponentFactory fac) throws Exception
 			{
-				((IComponentFactory)result).getComponentFeatures(model).addResultListener(new DelegationResultListener(res));
+				fac.getComponentFeatures(model).addResultListener(new DelegationResultListener<>(ret));
 			}
-		}));
-		return res;
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the filename suffixes that can be loaded with any of the found factories.
+	 */
+	protected Set<String> getSuffixes()
+	{
+		// todo: add additional suffixes
+		// this hack is important. otherwise the multi factory cannot start its own micro factory subcomponent
+		if(agent.getFeature(ISubcomponentsFeature.class).getChildcount()==0)
+			return Collections.EMPTY_SET;
+		
+//		Map<String, Collection<Tuple2<String, Set<String>>>> types = getKernelFiles();
+		Map<String, Collection<Tuple2<String, Set<String>>>> types = getKnownKernels();
+//		System.out.println("types: "+types.keySet());
+		Set<String> ret = new HashSet<String>(types.keySet());
+		//ret.add(".class"); // Hack :-( add manually for micro (add type in kernel desc?!)
+		return ret;
+	}
+	
+	/**
+	 *  Check if a filename is loadable with respect to the suffixes.
+	 */
+	protected boolean isLoadable(String filename)
+	{
+		boolean ret = false;
+		for(String suffix: getSuffixes())
+		{
+			if(filename.endsWith(suffix))
+			{
+				ret = true;
+				break;
+			}
+		}
+		return ret;
 	}
 	
 	/**
@@ -706,7 +785,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @param listener The listener.
 	 *  @return Null, when done.
 	 */
-	public IFuture addKernelListener(IMultiKernelListener listener)
+	public IFuture<Void> addKernelListener(IMultiKernelListener listener)
 	{
 		listeners.add(listener);
 		return IFuture.DONE;
@@ -717,7 +796,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @param listener The listener.
 	 *  @return Null, when done.
 	 */
-	public IFuture removeKernelListener(IMultiKernelListener listener)
+	public IFuture<Void> removeKernelListener(IMultiKernelListener listener)
 	{
 		listeners.remove(listener);
 		return IFuture.DONE;
@@ -728,15 +807,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @param types The types added.
 	 *  @return Null, when done.
 	 */
-	public IFuture fireTypesAdded(String[] types)
+	public void fireTypesAdded(String[] types)
 	{
-		final Future ret = new Future();
 		IMultiKernelListener[] ls = (IMultiKernelListener[]) listeners.toArray(new IMultiKernelListener[listeners.size()]);
-		IResultListener counter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new CounterResultListener(ls.length, true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret))));
-		for (int i = 0; i < ls.length; ++i)
-			ls[i].componentTypesAdded(types).addResultListener(counter);
-		return ret;
+		for(int i = 0; i < ls.length; ++i)
+			ls[i].componentTypesAdded(types);
 	}
 	
 	/**
@@ -744,1042 +819,43 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @param types The types removed.
 	 *  @return Null, when done.
 	 */
-	public IFuture fireTypesRemoved(String[] types)
+	public void fireTypesRemoved(String[] types)
 	{
-		final Future ret = new Future();
 		IMultiKernelListener[] ls = (IMultiKernelListener[]) listeners.toArray(new IMultiKernelListener[listeners.size()]);
-		IResultListener counter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new CounterResultListener(ls.length, true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret))));
-		for (int i = 0; i < ls.length; ++i)
-			ls[i].componentTypesAdded(types).addResultListener(counter);
-		return ret;
+		for(int i = 0; i < ls.length; ++i)
+			ls[i].componentTypesRemoved(types);
 	}
 	
 	/**
-	 *  Attempts to find an active kernel factory, searching, loading and instantiating as required.
-	 *  
-	 *  @param model The model for which the kernel is needed.
-	 *  @param imports Model imports.
-	 *  @param classloader Model classloader.
-	 *  @return Factory instance of the kernel or null if no matching kernel was found.
+	 *  Get all subfactories except the multi itself.
 	 */
-	protected IFuture<IComponentFactory> findKernel(final String model, final String[] imports, final IResourceIdentifier rid)
+	protected Collection<IComponentFactory> getFactories()
 	{
-		return findKernel(model, imports, rid, false);
+		ServiceQuery<IComponentFactory> q = new ServiceQuery<IComponentFactory>(IComponentFactory.class);
+		q.setExcludeOwner(true);
+		return SUtil.notNull(agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(q));
 	}
 	
-	/**
-	 *  Attempts to find an active kernel factory, searching, loading and instantiating as required.
-	 *  
-	 *  @param model The model for which the kernel is needed.
-	 *  @param imports Model imports.
-	 *  @param classloader Model classloader.
-	 *  @return Factory instance of the kernel or null if no matching kernel was found.
-	 */
-	protected IFuture findKernel(final String model, final String[] imports, final IResourceIdentifier rid, final boolean isrecur)
-	{
-//		final String ext = getModelExtension(model);
-//		System.out.println("EXT: " + ext);
-//		if(extensionblacklist.contains(ext))
-//			return IFuture.DONE;
-		if (isInExtensionBlacklist(model, baseextensionblacklist))
-			return IFuture.DONE;
-		
-//		if(model.toString().indexOf("xml")!=-1)
-//			System.out.println("findKernel: "+model);
-		
-//		IComponentFactory fac = (IComponentFactory)factorycache.get(ext);
-		IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model, factorycache);
-		if(fac != null)
-			return new Future(fac);
-		
-		final Future ret = new Future();
-		
-//		final ClassLoader classloader =  libservice.getClassLoader(rid);
-		
-		findActiveKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				if (result != null)
-				{
-					ret.setResult(result);
-				}
-				else
-				{
-					findLoadableKernel(model, imports, rid, isrecur)
-						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-					{
-						public void customResultAvailable(Object result)
-						{
-//							if(model.toString().indexOf("xml")!=-1)
-//								System.out.println("model: "+model+" "+result);
-							if(result != null)
-							{
-								ret.setResult(result);
-							}
-							else
-							{
-								// FIXME: Blacklist? What if a new factory model is added later?
-//								if (!isrecur)
-//									extensionblacklist.add(ext);
-								ret.setResult(null);
-							}
-						}
-					}));
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// Give warning?
-				// FIXME: Blacklist? What if a new factory model is added later?
-//				if(!isrecur)
-//					extensionblacklist.add(ext);
-				resultAvailable(null);
-			}
-		}));
-		
-		return ret;
-	}
-	
-	/**
-	 *  Attempts to find a running kernel matching the model.
-	 *  
-	 *  @param model The model for which the kernel is needed.
-	 *  @param imports Model imports.
-	 *  @return Factory instance of the kernel or null if no matching kernel was found.
-	 */
-	protected IFuture findActiveKernel(final String model, final String[] imports, final IResourceIdentifier rid)
-	{
-		//SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(kernelmodel, null, classloader))
-		final Future ret = new Future();
-		SServiceProvider.getServices(ia, IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION)
-			.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-		{
-			public void exceptionOccurred(Exception exception)
-			{
-				super.exceptionOccurred(exception);
-			}
-			
-			public void customResultAvailable(Object result)
-			{
-				final Collection factories = (Collection) result;
-//				if(model.indexOf("ich")!=-1)
-//					System.out.println("found factories: "+result);
-				
-				final IResultListener factorypicker = ia.getComponentFeature(IExecutionFeature.class).createResultListener(
-					new CollectionResultListener(factories.size(), true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						Collection viablefactories = (Collection) result;
-						if (!viablefactories.isEmpty())
-							ret.setResult(viablefactories.iterator().next());
-						else
-						{
-							ret.setResult(null);
-						}
-					}
-				})));
-				
-				for (Iterator it = factories.iterator(); it.hasNext(); )
-				{
-					final IComponentFactory factory = (IComponentFactory)it.next();
-					if(((IService)factory).getServiceIdentifier().equals(sid))
-					{
-//						if(model.indexOf("ich")!=-1)
-//							System.out.println("removed: "+factory);
-						factorypicker.exceptionOccurred(new RuntimeException());
-						continue;
-					}
-					
-//					System.out.println("Trying isloadable :" + factory + " for " + model);
-					factory.isLoadable(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							if (Boolean.TRUE.equals(result))
-								factorypicker.resultAvailable(factory);
-							else
-								factorypicker.exceptionOccurred(new RuntimeException());
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							exception.printStackTrace();
-							factorypicker.exceptionOccurred(exception);
-						}
-					}));
-				}
-			}
-		}));
-		return ret; 
-	}
-	
-	/**
-	 *  Attempts to find a kernel which is currently not loaded, matching the model.
-	 *  This method will instantiate the required kernel if it is found.
-	 *  
-	 *  @param model The model for which the kernel is needed.
-	 *  @param imports Model imports.
-	 *  @param classloader Model classloader.
-	 *  @return Factory instance of the activated kernel or null if no matching kernel was found.
-	 */
-	protected IFuture findLoadableKernel(final String model, final String[] imports, final IResourceIdentifier rid, boolean isrecur)
-	{
-//		if(model.toString().indexOf("xml")!=-1)
-//			System.out.println("findLoadableKernel: "+model);
-		
-		IFuture	ret;
-//		String dl = (String) kerneldefaultlocations.get(getModelExtension(model));
-		String dl = (String) getCacheResultForModel(model, kerneldefaultlocations);
-		if (dl != null)
-			ret	= startLoadableKernel(model, imports, rid, dl);
-		else
-			ret	= findKernelInCache(model, imports, rid, isrecur);
-		return ret;
-	}
-	
-	/**
-	 *  Attempts to find a kernel which is currently not loaded in the
-	 *  cache or through search, matching the model.
-	 *  This method will instantiate the required kernel if it is found.
-	 *  
-	 *  @param model The model for which the kernel is needed.
-	 *  @param imports Model imports.
-	 *  @param classloader Model classloader.
-	 *  @return Factory instance of the activated kernel or null if no matching kernel was found.
-	 */
-	protected IFuture findKernelInCache(final String model, final String[] imports, final IResourceIdentifier rid, final boolean isrecur)
-	{
-//		if(model.toString().indexOf("xml")!=-1)
-//			System.out.println("findKernelInCache0: "+model);
-		final Future ret = new Future();
-		
-//		Collection kernels = kernellocationcache.getCollection(getModelExtension(model));
-		Tuple2<String, Object> cachedkernels = getCacheKeyValueForModel(model, (Map) kernellocationcache);
-		final Object kernelsext = cachedkernels != null? cachedkernels.getFirstEntity(): null;
-		Collection kernels = cachedkernels != null? (Collection) cachedkernels.getSecondEntity() : null;
-		String cachedresult = null;
-		if(kernels != null && !kernels.isEmpty())
-			cachedresult = (String) kernels.iterator().next();
-		
-		if(cachedresult != null)
-		{
-//			if(model.toString().indexOf("xml")!=-1)
-//				System.out.println("findKernelInCache1: "+model+", "+cachedresult);
-			final String	kernelmodel	= cachedresult;	
-			startLoadableKernel(model, imports, rid, kernelmodel)
-				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-			{
-				public void exceptionOccurred(Exception exception)
-				{
-//					System.out.println("remove: "+kernelsext+", "+kernelmodel);
-					kernellocationcache.removeObject(kernelsext, kernelmodel);
-					findKernelInCache(model, imports, rid, isrecur)
-						.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-				}
-			}));
-		}
-		else
-		{
-//			if(model.toString().indexOf("xml")!=-1)
-//				System.out.println("findKernelInCache2a: "+model+", "+potentialuris+", "+isrecur);
-			if(potentialuris.isEmpty() && !hasLoadablePotentialKernels() || isrecur)
-//			if(!hasLoadablePotentialKernels() || isrecur)
-			{
-//				if(model.toString().indexOf("xml")!=-1)
-//					System.out.println("findKernelInCache2: "+model+", "+potentialuris+", "+isrecur);
-				ret.setResult(null);
-			}
-			else
-			{
-				multiplexer.doCall(new IResultCommand()
-				{
-					public Object execute(Object args)
-					{
-//						if(model.toString().indexOf("xml")!=-1)
-//							System.out.println("findKernelInCache3: "+model+", "+potentialuris+", "+isrecur);
-						return searchPotentialUrls(rid);
-					}
-				}).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						findKernelInCache(model, imports, rid, isrecur)
-							.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-					}
-				}));
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Check if there is a potential kernel that could be
-	 *  loaded when another kernel from cache is started. 
-	 */
-	protected boolean hasLoadablePotentialKernels()
-	{
-		boolean	ret	= false;
-		for(String loc: potentialkernellocations)
-		{
-//			if(loc.toLowerCase().indexOf("multi")==-1)
-//				System.out.println("loc: "+loc+", "+getCacheKeyValueForModel((String)loc, kernellocationcache)+", "+kernellocationcache);
-
-			ret	= getCacheKeyValueForModel((String)loc, (Map) kernellocationcache)!=null;
-			if(ret)
-			{
-				break;
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Starts a kernel matching the model.
-	 *  
-	 *  @param model The model for which the kernel is needed.
-	 *  @param imports Model imports.
-	 *  @param classloader Model classloader.
-	 *  @param kernelmodel Model of the kernel.
-	 *  @return Factory instance of the activated kernel.
-	 */
-	protected IFuture startLoadableKernel(final String model, final String[] imports, final IResourceIdentifier rid, final String kernelmodel)
-	{
-//		System.out.println("startLoadableKernel: "+model+" "+kernelmodel+" "+kernelmodel.length());
-
-		return multiplexer.doCall(kernelmodel, new IResultCommand()
-		{
-			public Object execute(Object args)
-			{
-//				IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model, factorycache);
-//				if (fac != null)
-//				{
-//					return new Future(fac);
-//				}
-//				else
-//				{
-//					System.out.println("no fac found for: "+model);
-//				}
-				
-//				System.out.println("Starting kernel: " + kernelmodel);
-				final Future ret = new Future();
-//				ret.addResultListener(new IResultListener()
-//				{
-//					public void resultAvailable(Object result)
-//					{
-//						System.out.println("call fini: "+model);
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						System.out.println("call fini ex: "+model+" "+exception);
-//					}
-//				});
-				
-				findActiveKernel(kernelmodel, null, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-//						System.out.println("Starting kernel1: " + kernelmodel);
-						IComponentFactory	fac	= (IComponentFactory)result;
-						fac.loadModel(kernelmodel, null, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-						{
-							public void customResultAvailable(Object result)
-							{
-//								System.out.println("Starting kernel2: " + kernelmodel);
-								final IModelInfo	info	= (IModelInfo)result;
-								SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-								{
-									public void exceptionOccurred(Exception exception)
-									{
-										super.exceptionOccurred(exception);
-									}
-									
-									public void customResultAvailable(Object result)
-									{
-//										System.out.println("Starting kernel3: " + kernelmodel);
-										final IComponentManagementService cms = (IComponentManagementService) result;										
-										final CreationInfo ci = new CreationInfo(ia.getComponentIdentifier());
-										String	name	= info.getName().toLowerCase();
-										if(name.startsWith("kernel"))
-											name	= name.substring(6);
-										final String fname	= "kernel_"+name;
-										
-										libservice.getClassLoader(info.getResourceIdentifier())
-											.addResultListener(new DelegationResultListener<ClassLoader>(ret)
-										{
-											public void customResultAvailable(ClassLoader result)
-											{
-												final String[] kexts = (String[]) info.getProperty(KERNEL_EXTENSIONS, result) == null? new String[0] : (String[]) info.getProperty(KERNEL_EXTENSIONS, result);
-//												System.out.println("multi creates factory: "+kernelmodel);
-												cms.createComponent(fname, kernelmodel, ci, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-												{
-													public void resultAvailable(Object result)
-													{
-//														System.out.println("Killed kernel4: " + kernelmodel);
-														activekernelsdirty = true;
-														for(int i = 0; i < kexts.length; ++i)
-															factorycache.remove(kexts[i]);
-													}
-													
-													public void exceptionOccurred(Exception exception)
-													{
-//														System.out.println("Killed kernel5: " + kernelmodel+", "+exception);
-//														exception.printStackTrace();
-														resultAvailable(null);
-													}
-												})).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-												{
-													public void resultAvailable(Object result)
-													{
-//														System.out.println("Starting kernel6: " + kernelmodel);
-														findActiveKernel(model, imports, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
-														{
-															public void resultAvailable(Object result)
-															{
-																final IComponentFactory kernel = (IComponentFactory) result;
-																if(kernel == null)
-																{
-																	ret.setResult(null);
-																	return;
-																}
-																for(int i = 0; i < kexts.length; ++i)
-																{
-//																	System.out.println("putting in cache: "+kexts[i]+" "+kernel);
-																	factorycache.put(kexts[i], kernel);
-																}
-																
-																// If this is a new kernel, gather types and icons
-																if(!activatedkernels.contains(kernelmodel))
-																{
-																	final String[] types = kernel.getComponentTypes();
-																	componenttypes.addAll(Arrays.asList(types));
-																	
-																	activatedkernels.add(kernelmodel);
-																	
-																	if(SReflect.HAS_GUI)
-																	{
-																		final IResultListener typecounter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(new CounterResultListener(types.length, true, ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-																		{
-																			public void customResultAvailable(Object result)
-																			{
-																				SServiceProvider.getService(ia, IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION)
-																					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-																				{
-																					public void customResultAvailable(Object result)
-																					{
-																						MultiFactory.this.fireTypesAdded(types).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-																						{
-																							public void customResultAvailable(Object result)
-																							{
-																								ret.setResult(kernel);
-																							};
-																						}));
-																					};
-																				}));
-																			};
-																		})));
-																		
-																		for(int i = 0; i < types.length; ++i)
-																		{
-																			final int fi = i;
-																			kernel.getComponentTypeIcon(types[i]).addResultListener(new IResultListener<byte[]>()
-																			{
-																				public void resultAvailable(byte[] result)
-																				{
-//																					System.out.println("adding icon: "+types[fi]);
-																					iconcache.put(types[fi], result);
-																					typecounter.resultAvailable(null);
-																				}
-																				public void exceptionOccurred(Exception exception)
-																				{
-																					typecounter.exceptionOccurred(exception);
-																				}
-																			});
-																		}
-																	}
-																	else
-																	{
-																		ret.setResult(kernel);
-																	}
-																}
-																else
-																{
-																	ret.setResult(kernel);
-																}
-															}
-														}));
-													}
-													
-													public void exceptionOccurred(Exception exception)
-													{
-//														System.out.println("Starting kernel7: " + kernelmodel+", "+exception);
-														ret.setException(exception);
-													}
-												}));
-											}
-										});
-									}
-								}));
-							}
-						}));
-					}
-				}));
-				return ret;
-			}
-		});
-	}
-	
-	/**
-	 *  Searches the set of potential URLs for a kernel supporting the extension,
-	 *  putting it in the cache for use if found.
-	 */
-	protected IFuture searchPotentialUrls(final IResourceIdentifier rid)
-	{
-//		System.out.println("searchPotentialURLs: "+rid+", "+rid);//potentialurls);
-		
-		final Future ret = new Future();
-		final IResultListener reslis = ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				Map kernellocs = (Map) result;
-				if (kernellocs != null && !kernellocs.isEmpty())
-				{
-//					System.out.println("searchPotentialURLs1: "+kernellocs+", "+kernellocationcache);
-//					kernellocationcache.putAll(kernellocs);
-					kernellocationcache.addAll(kernellocs);
-					activekernelsdirty = true;
-//					System.out.println("searchPotentialURLs1b: "+kernellocs+", "+kernellocationcache);
-					ret.setResult(null);
-				}
-				else
-				{
-					final URI uri = potentialuris.iterator().next();
-//					if(url.toString().indexOf("bdi")!=-1)
-//						System.out.println("searchPotentialURLs2: "+url);
-					quickKernelSearch(uri, rid).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, String>>()
-					{
-						public void resultAvailable(Map<String, String> kernelmap)
-						{
-							if(kernelmap != null && validuris.contains(uri))
-							{
-//								System.out.println("searchPotentialURLs3: "+uri+", "+kernelmap+", "+kernellocationcache);
-//								Map kernelmap = (Map) result;
-//								kernellocationcache.putAll(kernelmap);
-								kernellocationcache.addAll(kernelmap);
-								activekernelsdirty = true;
-//								System.out.println("searchPotentialURLs3b: "+uri+", "+kernelmap+", "+kernellocationcache);
-								for (Iterator<String> it = kernelmap.values().iterator(); it.hasNext(); )
-									kerneluris.add(uri, it.next());
-							}
-							potentialuris.remove(uri);
-//							System.out.println("Remove: " + uri + " size " + potentialuris.size());
-							ret.setResult(null);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							potentialuris.remove(uri);
-							resultAvailable(null);
-						}
-					}));
-				}
-			}
-		});
-		
-		ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				if (activekernelsdirty)
-				{
-//					System.out.println("searchPotentialURLs4: ");
-					activekernelsdirty = false;
-					examineKernelModels(new ArrayList(potentialkernellocations), rid).addResultListener(reslis);
-				}
-				else
-				{
-//					System.out.println("searchPotentialURLs5: ");
-					reslis.resultAvailable(null);
-				}
-				
-				return IFuture.DONE;
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Searches supplied URL for a potential kernel. This method calls kernelSearch()
-	 *  with a prefilter that excludes all files except the ones starting with "Kernel".
-	 *  
-	 *  @param url The URL to search
-	 */
-	protected IFuture<Map<String, String>> quickKernelSearch(URI uri, IResourceIdentifier rid)
-	{
-		return kernelSearch(uri, new IFilter()
-		{
-			public boolean filter(Object obj)
-			{
-				String loc = (String) obj;
-//				if (loc.toLowerCase().contains("kernel"))
-//				{
-//					System.out.println("kernel" + loc);
-//					System.out.println(loc.substring(loc.lastIndexOf('/') + 1).toLowerCase().startsWith("kernel"));
-//				}
-				// For jar entries, strip directory part.
-				return loc.substring(loc.lastIndexOf("/") + 1).toLowerCase().startsWith("kernel");
-			}
-		}, rid);
-	}
-	
-	/**
-	 *  Searches supplied URL for a potential kernel matching the filter and containing
-	 *  a description of loadable file extensions.
-	 *  
-	 *  @param url The URL to search
-	 *  @param prefilter Prefilter applied before further restrictions are applied.
-	 */
-	protected IFuture<Map<String, String>> kernelSearch(final URI uri, final IFilter prefilter, IResourceIdentifier rid)
-	{
-//		System.out.println("URLSearhc: " + uri.toString());
-		List<String> modellocs = searchUri(uri, new IFilter()
-		{
-			public boolean filter(Object obj)
-			{
-				if (obj instanceof String)
-				{
-					String loc = (String) obj;
-					
-					for (Object oblstr : baseextensionblacklist)
-					{
-						String blstr = (String) oblstr;
-						
-						if (loc.toLowerCase().endsWith(blstr))
-						{
-//							System.out.println(loc + " false for " + blstr);
-							return false;
-						}
-					}
-					
-					for (Object oblstr : kernelblacklist)
-					{
-						//!kernelblacklist.contains(loc.substring(loc.lastIndexOf(File.separatorChar) + 1))
-						String blstr = (String) oblstr;
-						
-						if (loc.endsWith(blstr))
-						{
-//							System.out.println(loc + " false2 for " + blstr);
-							return false;
-						}
-					}
-					
-					if (!isInExtensionBlacklist(obj, baseextensionblacklist) &&
-						!kernelblacklist.contains(loc.substring(loc.lastIndexOf(File.separatorChar) + 1)) &&
-						prefilter.filter(obj)) 
-					{
-//							System.out.println("Found kernel: " + loc);
-							return true;
-					}
-				}
-//				System.out.println("Decided it's not a kernel: " + obj);
-				return false;
-			}
-		});
-		
-		return examineKernelModels(modellocs, rid);
-	}
-	
-	/**
-	 *  Examines potential kernels whether their model can be loaded or loaded
-	 *  with the help of another kernel that can be found.
-	 *  
-	 *  @param modellocs List of locations of potential kernels.
-	 *  @param libservice Library service.
-	 *  @return Map of viable kernels with extension they support.
-	 */
-	protected IFuture<Map<String, String>> examineKernelModels(final List<String> modellocs, IResourceIdentifier rid)
-	{
-//		if(modellocs.toString().indexOf("ich")!=-1)
-//			System.out.println("examineKernelModels0: "+modellocs);
-		final Map<String, String> kernellocs = new HashMap();
-		if (modellocs.isEmpty())
-			return new Future(kernellocs);
-		
-		final Future<Map<String, String>> ret = new Future<Map<String, String>>();
-		final IResultListener kernelCounter = ia.getComponentFeature(IExecutionFeature.class).createResultListener(new CounterResultListener(modellocs.size(), true,
-			new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-//				if(modellocs.toString().indexOf("ich")!=-1)
-//					System.out.println("examineKernelModels1: "+modellocs+", "+kernellocs);
-				super.customResultAvailable(kernellocs);
-			}
-			public void exceptionOccurred(Exception e)
-			{
-//				e.printStackTrace();
-				super.exceptionOccurred(e);
-			}
-		}));
-
-		for(Iterator<String> it2 = modellocs.iterator(); it2.hasNext();)
-		{
-			final String kernelloc = it2.next();
-			loadModel(kernelloc, null, rid, true)
-				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IModelInfo>()
-			{
-				public void resultAvailable(final IModelInfo modelinfo)
-				{
-//					if(modellocs.toString().indexOf("ich")!=-1)
-//						System.out.println("Tried to load model for kernel: " + kernelloc + " model " + modelinfo);
-					if(modelinfo!=null)
-					{
-						potentialkernellocations.remove(kernelloc);
-						libservice.getClassLoader(modelinfo.getResourceIdentifier())
-							.addResultListener(new IResultListener<ClassLoader>()
-						{
-							public void resultAvailable(ClassLoader result)
-							{
-								String[] exts = (String[])modelinfo.getProperty(KERNEL_EXTENSIONS, result);
-//								if(modellocs.toString().indexOf("ich")!=-1)
-//									System.out.println("Kernel extensions for kernel " + kernelloc + " " + SUtil.arrayToString(exts));
-								if(exts!=null)
-								{
-									for (int i = 0; i < exts.length; ++i)
-									{
-										kernellocs.put(exts[i], modelinfo.getFilename());
-//										System.out.println("fac candidate: "+modelinfo.getFilename()+" "+exts[i]);
-									}
-								}
-								kernelCounter.resultAvailable(result);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								// Todo: log warning!?
-								potentialkernellocations.add(kernelloc);
-								kernelCounter.exceptionOccurred(new RuntimeException());
-							}
-						});
-					}
-					else
-					{
-						potentialkernellocations.add(kernelloc);
-//						if(modellocs.toString().indexOf("bdi")!=-1)
-//						{
-//							System.out.println("potential: "+hasLoadablePotentialKernels());
-//						}
-						kernelCounter.exceptionOccurred(new RuntimeException());
-					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-//					System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. "+exception);
-					resultAvailable(null);
-				}
-			}));
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Searches an URI, accepts both directory and .jar-based URLs.
-	 *  @param uri The URI.
-	 *  @param filter The search filter.
-	 *  @return List of file locations matching the filter.
-	 */
-	protected List<String> searchUri(URI uri, IFilter filter)
-	{
-//		System.out.println("Searing uri " + uri);
-		try
-		{
-			File file = new File(uri);
-			if (file.isDirectory())
-				return searchDirectory(file, filter, false);
-			else if (file.getName().endsWith(".jar"))
-				return searchJar(file, filter);
-			else if (file.getName().endsWith(".apk"))
-				return searchApk(file, filter);
-		}
-		catch (Exception e)
-		{
-		}
-
-		return Collections.EMPTY_LIST;
-	}
-
-	/**
-	 *  Searches a directory for files matching a filter.
-	 *  
-	 *  @param dir The directory.
-	 *  @param filter The filter.
-	 *  @param prependDir Flag whether to prepend the directory name to files found,
-	 *  				  used when unwinding recursions.
-	 * @return List of files matching the filter.
-	 */
-	protected List<String> searchDirectory(File dir, IFilter filter, boolean prependDir)
-	{
-//		System.out.println("Searching dir: " + dir.getAbsolutePath());
-		List<String> ret = new ArrayList<String>();
-		File[] content = dir.listFiles();
-		for (int i = 0; i < content.length; ++i)
-		{
-			if (content[i].isDirectory())
-			{
-				List<String> subList = searchDirectory(content[i], filter, true);
-				for (Iterator<String> it = subList.iterator(); it.hasNext();)
-				{
-					if (prependDir)
-						ret.add(dir.getName().concat(File.separator).concat(
-								(String) it.next()));
-					else
-						ret.add(it.next());
-				}
-			}
-			else if (filter.filter(content[i].getName()))
-			{
-//				System.out.println("May be a kernel: " + content[i].getName());
-				if (prependDir)
-					ret.add(dir.getName().concat(File.separator).concat(
-							content[i].getName()));
-				else
-					ret.add(content[i].getName());
-			}
-//			else
-//			{
-//				System.out.println("Not a kernel: " + content[i].getName());
-//			}
-		}
-
-		return ret;
-	}
-
-	/**
-	 *  Searches a .jar for files matching a filter.
-	 *  
-	 *  @param jar The .jar-file.
-	 *  @param filter The filter.
-	 * @return List of files matching the filter.
-	 */
-	protected List<String> searchJar(File jar, IFilter filter)
-	{
-//		System.out.println("Searching jar: " + jar.getAbsolutePath());
-		List<String> ret = new ArrayList<String>();
-		JarFile jarFile	= null;
-		try
-		{
-			jarFile = new JarFile(jar);
-			for (Enumeration entries = jarFile.entries(); entries
-					.hasMoreElements();)
-			{
-				JarEntry entry = (JarEntry) entries.nextElement();
-				if (filter.filter(entry.getName()))
-					ret.add(entry.getName());
-			}
-		}
-		catch (IOException e)
-		{
-			// Happens for initial jar when starting from jar, because Java adds crappy classpath entry.
-			
-			// TODO: Print warning?
-//			System.out.println("Warning: File not found: " + jar.getAbsolutePath());
-//			e.printStackTrace();
-		}
-		if(jarFile!=null)
-		{
-			try
-			{
-				jarFile.close();
-			}
-			catch(IOException e)
-			{
-				// Ignore
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Searches a .apk for files matching a filter.
-	 *  
-	 *  @param jar The .jar-file.
-	 *  @param filter The filter.
-	 * @return List of files matching the filter.
-	 */
-	protected List<String> searchApk(File apk, IFilter filter)
-	{
-//		System.out.println("Searching apk: " + apk.getAbsolutePath());
-		List<String> ret = new ArrayList<String>();
-		try
-		{
-			// Scan for resource files in .apk
-			ZipFile	zip	= new ZipFile(apk);
-			Enumeration< ? extends ZipEntry>	entries	= zip.entries();
-			while(entries.hasMoreElements())
-			{
-				String	entry	= entries.nextElement().getName();
-				if(filter.filter(entry))
-				{
-					ret.add(entry);
-				}
-			}
-			
-			// Scan for classes in .dex
-			Enumeration<String> dexentries = SUtil.androidUtils().getDexEntries(apk);
-			while(dexentries.hasMoreElements())
-			{
-				String entry = dexentries.nextElement();
-				entry = entry.replace('.', '/') + ".class";
-				if(filter.filter(entry))
-				{
-					ret.add(entry);
-				}					
-			}
-		}
-		catch (IOException e)
-		{
-//			System.out.println("Warning: File not found: " + apk.getAbsolutePath());
-			e.printStackTrace();
-		}
-		return ret;
-	}
-	
-	
-	/**
-	 *  Helper method for generating the file extension of a model.
-	 *  
-	 *  @param model The model.
-	 *  @return The file extension, special case for .class files.
-	 */
-//	protected String getModelExtension(String model)
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
 //	{
-////		int lastpoint = Math.max(Math.max(0, model.lastIndexOf(File.separatorChar)), model.lastIndexOf(this.packageseparator));
-////		lastpoint = model.indexOf('.', lastpoint);
-//		int lastpoint = model.lastIndexOf('.');
-//		
-//		if (lastpoint < 0 || lastpoint == (model.length() - 1))
-//			return null;
-//		
-//		String ext = model.substring(lastpoint + 1);
-//		
-//		// Hack! todo: fix me
-//		if(ext.equals("class"))
+//		FileFilter ff = new FileFilter("$", false, ".class");
+//		ff.addFilenameFilter(new IFilter<String>()
 //		{
-//			if(model.endsWith("Agent.class"))
+//			public boolean filter(String fn)
 //			{
-//				ext = "Agent.class";
+//				int idx = fn.lastIndexOf("/");
+//				if(idx!=-1)
+//					fn = fn.substring(idx+1);
+//				return fn.startsWith("Kernel");
 //			}
-//			else if(model.endsWith("BDI.class"))
-//			{
-//				ext = "BDI.class";
-//			}
-//			else
-//			{
-//				return null;
-//			}
-//		}
+//		});
 //		
-//		if (ext.equals("xml")) {
-//			if(model.endsWith("component.xml")) 
-//			{
-//				ext = "component.xml";
-//			}
-//			else if(model.endsWith("application.xml")) {
-//				ext = "application.xml";
-//			}
-//			else
-//			{
-//				return null;
-//			}
-//		}
+//		ff.filter("hall/das/ist/Klasse.class");
 //		
-//		return ext;
+//		scanForKernels();
 //	}
-	
-	/**
-	 *  Checks if a model matches an extension blacklist.
-	 */
-	protected boolean isInExtensionBlacklist(Object model, Set blacklist)
-	{
-//		if (model instanceof String)
-//		{
-//			if (((String) model).indexOf('.') == -1)
-//			{
-//				return true;
-//			}
-//			
-//			for (Object oblstr : blacklist)
-//			{
-//				String blstr = (String) oblstr;
-//				
-//				if (((String) model).endsWith(blstr))
-//				{
-//					return true;
-//				}
-//			}
-//		}
-		return false;
-	}
-	
-	/**
-	 *  Gets result for a cached object based on model name.
-	 *  
-	 *  @param model The model.
-	 *  @param map The cache.
-	 *  @return A cache hit or null.
-	 */
-	protected Object getCacheResultForModel(String model, Map map)
-	{
-		Tuple2<String, Object> ret = getCacheKeyValueForModel(model, map);
-		return ret != null? ret.getSecondEntity() : null;
-	}
-	
-	/**
-	 *  Gets key/value for a cached object based on model name.
-	 *  
-	 *  @param model The model.
-	 *  @param map The cache.
-	 *  @return A cache hit or null.
-	 */
-	protected Tuple2<String, Object> getCacheKeyValueForModel(String model, Map<String, Object> map)
-	{
-		Tuple2<String, Object> ret = null;
 
-		if (model != null && map != null)
-		{
-			for (Map.Entry<String, Object> entry : map.entrySet())
-			{
-				String ext = entry.getKey();
-				if (model.endsWith(ext))
-				{
-					ret = new Tuple2<String, Object>(entry.getKey(), entry.getValue());
-					
-					break;
-				}
-			}
-		}
-		
-		return ret;
-	}
-	
-	public int hashCode()
-	{
-		return sid.hashCode();
-	}
-	
-	public boolean equals(Object obj)
-	{
-		if(obj instanceof IService)
-			return sid.equals(((IService) obj).getServiceIdentifier());
-		return false;
-	}
 }

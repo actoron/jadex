@@ -17,6 +17,12 @@ import jadex.commons.concurrent.IThreadPool;
 @Service(system=true)
 public interface IClockService extends IService
 {
+	/** Platform value key for flag if the clock is a simulation clock. */
+	public static final String SIMULATION_CLOCK_FLAG = "simclock";
+	
+	/** Platform value key for flag if the clock is the singleton bisimulation clock. */
+	public static final String BISIMULATION_CLOCK_FLAG = "bisimclock";
+	
 	//-------- constants --------
 	
 	/**

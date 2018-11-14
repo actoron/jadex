@@ -7,8 +7,10 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -16,7 +18,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -28,13 +30,14 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
+	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
 })
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class ThreadingTestAgent extends TestAgent
 {
+	private int maxlocal = 10000;
+	private int maxremote = 1000;
 	
-	private int maxLocal = 10000;
-	private int maxRemote = 1000;
 	/**
 	 *  Perform the tests.
 	 */
@@ -42,23 +45,25 @@ public class ThreadingTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if (SReflect.isAndroid()) {
+		if(SReflect.isAndroid()) 
+		{
 			// reduce number of threads for android
-			maxLocal /=100;
-			maxRemote /=100;
+			maxlocal /=100;
+			maxremote /=100;
 		}
-		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
-		testLocal(1, maxLocal).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		
+		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+		testLocal(1, maxlocal).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test rmeote: "+agent.getComponentDescription());
+				agent.getLogger().severe("Testagent test rmeote: "+agent.getDescription());
 				tc.addReport(result);
-				testRemote(2, maxRemote).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2, maxremote).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
+						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -78,8 +83,8 @@ public class ThreadingTestAgent extends TestAgent
 		
 		System.out.println("Test local: "+agent.getModel().getFullName());
 		
-		performTest(agent.getComponentIdentifier().getRoot(), testno, max, true)
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+		performTest(agent.getId().getRoot(), testno, max, true)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(final TestReport result)
 			{
@@ -99,15 +104,15 @@ public class ThreadingTestAgent extends TestAgent
 		
 		System.out.println("Test remote: "+agent.getModel().getFullName());
 		
-		setupRemotePlatform(false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		setupRemotePlatform(false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				System.out.println("Test remote1: "+agent.getModel().getFullName());
+				System.out.println("Test remote1: "+platform+" "+agent.getModel().getFullName());
 				
-				performTest(platform.getComponentIdentifier(), testno, max, false)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+				performTest(platform.getId(), testno, max, false)
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		
@@ -161,7 +166,7 @@ public class ThreadingTestAgent extends TestAgent
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if "+(local? "local": "remote")+" thread decoupling works.");
 		
-		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
+		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(cid));
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 		{
 			public void customResultAvailable(final ITestService ts)

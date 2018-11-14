@@ -6,8 +6,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -51,10 +52,9 @@ public class ProxyComponentTreeNode extends ComponentTreeNode implements IAndroi
 	/**
 	 *  Create a new service container node.
 	 */
-	public ProxyComponentTreeNode(final ITreeNode parent, AsyncTreeModel model, IComponentDescription desc,
-		IComponentManagementService cms, IExternalAccess access)
+	public ProxyComponentTreeNode(final ITreeNode parent, AsyncTreeModel model, IComponentDescription desc, IExternalAccess access)
 	{
-		super(parent, model, desc, cms, access);
+		super(parent, model, desc, access);
 		this.state = STATE_UNCONNECTED;
 		
 		// Add CMS listener for remote proxy node.
@@ -86,7 +86,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode implements IAndroi
 	 *  Get the cid.
 	 *  @return the cid.
 	 */
-	public IComponentIdentifier getComponentIdentifier()
+	public IComponentIdentifier getId()
 	{
 		if(cid==null)
 			getRemoteComponentIdentifier();
@@ -121,7 +121,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode implements IAndroi
 			{
 				if(result!=null)
 				{
-					searchChildren(cms, result).addResultListener(new IResultListener<List<ITreeNode>>()
+					searchChildren(result).addResultListener(new IResultListener<List<ITreeNode>>()
 					{
 						public void resultAvailable(List<ITreeNode> result)
 						{
@@ -188,7 +188,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode implements IAndroi
 		
 		if(cid==null)
 		{
-			SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
+			access.searchService(new ServiceQuery<>(IProxyAgentService.class).setProvider(desc.getName()))
 				.addResultListener(new ExceptionDelegationResultListener<IProxyAgentService, IComponentIdentifier>(ret)
 			{
 				public void customResultAvailable(IProxyAgentService pas)

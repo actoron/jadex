@@ -2,6 +2,8 @@ package jadex.bdiv3.testcases.componentplans;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
+import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
@@ -19,11 +21,11 @@ import jadex.micro.annotation.AgentResult;
 /**
  *  BDI agent that executes a subcomponent as plan
  */
-@Agent(keepalive=Boolean3.FALSE)
+@Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 @Plans(@Plan(trigger=@Trigger(goals=ComponentPlanBDI.AchieveSuccess.class),
 	body=@Body(ComponentPlanAgent.class)))
 //@Results(@Result(name="testresults", clazz=Testcase.class))
-public class ComponentPlanBDI
+public abstract class ComponentPlanBDI implements IBDIAgent
 {
 	//-------- attributes --------
 	
@@ -53,7 +55,7 @@ public class ComponentPlanBDI
 		TestReport	tr	= new TestReport("#1", "Test if goal can be achieved by component plan.");
 		try
 		{
-			agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AchieveSuccess()).get(5000);
+			agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AchieveSuccess()).get(5000);
 			tr.setSucceeded(true);
 		}
 		catch(Exception e)

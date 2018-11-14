@@ -59,11 +59,11 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 	 */
 	public void resultAvailable(final E result)
 	{
-		if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
+		if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{
-				agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -79,7 +79,7 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(agent.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(agent.getId(), new Runnable()
 				{
 					public void run()
 					{
@@ -107,11 +107,11 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 	 */
 	public void exceptionOccurred(final Exception exception)
 	{
-		if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread() && !Starter.isRescueThread(agent.getComponentIdentifier()))
+		if(!agent.getFeature(IExecutionFeature.class).isComponentThread() && !Starter.isRescueThread(agent.getId()))
 		{
 			try
 			{
-				agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -175,7 +175,7 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 		if(rplan!=null)
 		{
 			// Schedule plan code notification on separate component step, as it might be triggered inside other plan execution
-			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				@Override
 				public IFuture<Void> execute(IInternalAccess ia)

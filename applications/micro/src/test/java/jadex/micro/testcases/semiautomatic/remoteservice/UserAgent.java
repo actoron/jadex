@@ -7,7 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -51,42 +51,31 @@ public class UserAgent
 		});
 		
 		// get remote management service 
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener<IComponentManagementService>()
-		{
-			public void resultAvailable(final IComponentManagementService cms)
-			{
 				// get remote management service and fetch service via rms.getProxy()
-				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new IResultListener<IRemoteServiceManagementService>()
-				{
-					public void resultAvailable(IRemoteServiceManagementService rms)
-					{
-						IComponentIdentifier platid = new ComponentIdentifier("remote", 
-							new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			.addResultListener(new IResultListener<IRemoteServiceManagementService>()
+		{
+			public void resultAvailable(IRemoteServiceManagementService rms)
+			{
+				IComponentIdentifier platid = new ComponentIdentifier("remote", 
+					new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 
-						// Search for remote service
-						IFuture<IMathService> fut = rms.getServiceProxy(agent.getComponentIdentifier(), platid, new ClassInfo(IMathService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
-						fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IMathService>()
-						{
-							public void resultAvailable(IMathService service)
-							{
-								invokeAddService("IMathService searched via rms.", service)
-									.addResultListener(lis);
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								exception.printStackTrace();
-								lis.resultAvailable(null);
-							}
-						}));
-					}						
+				// Search for remote service
+				IFuture<IMathService> fut = rms.getServiceProxy(agent.getId(), platid, new ClassInfo(IMathService.class), RequiredServiceInfo.SCOPE_PLATFORM, null);
+				fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IMathService>()
+				{
+					public void resultAvailable(IMathService service)
+					{
+						invokeAddService("IMathService searched via rms.", service)
+							.addResultListener(lis);
+					}
 					public void exceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 						lis.resultAvailable(null);
 					}
-				});
-			}
+				}));
+			}						
 			public void exceptionOccurred(Exception exception)
 			{
 				lis.resultAvailable(null);
@@ -94,7 +83,7 @@ public class UserAgent
 		});
 		
 		// search on local platform and find service via ProxyAgent to other platform
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL))
 			.addResultListener(new IResultListener<IMathService>()
 		{
 			public void resultAvailable(IMathService service)

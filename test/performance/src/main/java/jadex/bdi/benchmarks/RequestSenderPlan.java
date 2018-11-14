@@ -5,8 +5,6 @@ import java.util.Random;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 
 /**
  *	Handle requests and generate reply value.
@@ -57,7 +55,7 @@ public class RequestSenderPlan extends Plan
 		System.out.println("Issued "+max+" protocols in "+time+" millis.");
 		
 		// Kill the receiver (i.e. the request performance master agent.
-		IComponentManagementService	ces	= (IComponentManagementService)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
-		ces.destroyComponent(receiver);
+//		IComponentManagementService	ces	= (IComponentManagementService)getAgent().getFeature(IRequiredServicesFeature.class).getService("cms").get();
+		getAgent().killComponent(receiver);
 	}
 }

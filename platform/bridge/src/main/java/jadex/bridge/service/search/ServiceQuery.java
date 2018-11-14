@@ -7,24 +7,183 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
+import jadex.commons.transformation.annotations.Include;
 
 /**
  *  Service query definition. T is the return type for search methods.
  */
 public class ServiceQuery<T>
 {
+	//-------- constants --------
+	
+	/** None component scope (nothing will be searched, forces required service creation). */
+	public static final String SCOPE_NONE = RequiredServiceInfo.SCOPE_NONE;
+	
+	/** Parent scope. */
+	public static final String SCOPE_PARENT = RequiredServiceInfo.SCOPE_PARENT;
+	
+	// todo: rename (COMPONENT_LOCAL)
+	/** Local component scope. */
+	public static final String SCOPE_COMPONENT_ONLY = RequiredServiceInfo.SCOPE_COMPONENT_ONLY;
+	
+	/** Component scope (component and subcomponents). */
+	public static final String SCOPE_COMPONENT = RequiredServiceInfo.SCOPE_COMPONENT;
+	
+	// todo: rename (APPLICATION_PLATFORM) or remove
+	/** Application scope (local application, i.e. second level component plus all subcomponents). */
+	public static final String SCOPE_APPLICATION = RequiredServiceInfo.SCOPE_APPLICATION;
+
+	/** Platform scope (all components on the local platform). */
+	public static final String SCOPE_PLATFORM = RequiredServiceInfo.SCOPE_PLATFORM;
+
+	
+	
+	/** Application network scope (any platform with which a secret is shared and application tag must be shared). */
+	public static final String SCOPE_APPLICATION_NETWORK = RequiredServiceInfo.SCOPE_APPLICATION_NETWORK;
+//	public static final String SCOPE_APPLICATION_CLOUD = "application_cloud";
+	
+	/** Network scope (any platform with which a secret is shared). */
+	public static final String SCOPE_NETWORK = RequiredServiceInfo.SCOPE_NETWORK;
+//	public static final String SCOPE_CLOUD = "cloud";
+		
+	// needed?!
+	/** Global application scope. */
+	public static final String SCOPE_APPLICATION_GLOBAL = RequiredServiceInfo.SCOPE_APPLICATION_GLOBAL;
+		
+	/** Global scope (any reachable platform including those with unrestricted services). */
+	public static final String SCOPE_GLOBAL = RequiredServiceInfo.SCOPE_GLOBAL;
+	
+	
+	/** The raw proxy type (i.e. no proxy). */
+	public static final String	PROXYTYPE_RAW	= BasicServiceInvocationHandler.PROXYTYPE_RAW;
+	
+	/** The direct proxy type (supports custom interceptors, but uses caller thread). */
+	public static final String	PROXYTYPE_DIRECT	= BasicServiceInvocationHandler.PROXYTYPE_DIRECT;
+	
+	/** The (default) decoupled proxy type (decouples from component thread to caller thread). */
+	public static final String	PROXYTYPE_DECOUPLED	= BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED;
+	
+	//-------- query multiplicity --------
+	
+	/**
+	 *  Define cases for multiplicity.
+	 */
+	public static class	Multiplicity
+	{
+		//-------- constants --------
+		
+		/** '0..1' multiplicity for single optional service. */
+		public static Multiplicity	ZERO_ONE	= new Multiplicity(0, 1);
+		
+		/** '1' multiplicity for required service (default for searchService methods). */
+		public static Multiplicity	ONE			= new Multiplicity(1, 1);
+		
+		/** '0..*' multiplicity for optional multi service (default for searchServices methods). */
+		public static Multiplicity	ZERO_MANY	= new Multiplicity(0, -1);
+
+		/** '1..*' multiplicity for required service (default for searchService methods). */
+		public static Multiplicity	ONE_MANY	= new Multiplicity(1, -1);
+		
+		//-------- attributes --------
+		
+		/** The minimal number of services required. Otherwise search ends with ServiceNotFoundException. */
+		private int	from;
+		
+		/** The maximal number of services returned. Afterwards search/query will terminate. */
+		private int to;
+		
+		//-------- constructors --------
+
+		/**
+		 *  Bean constructor.
+		 *  Not meant for direct use.
+		 *  Defaults to invalid multiplicity ('0..0')!
+		 */
+		public Multiplicity()
+		{
+		}
+		
+		/**
+		 *  Create a multiplicity.
+		 *  @param from The minimal number of services for the search/query being considered successful (positive integer or 0).
+		 *  @param to The maximal number of services returned by the search/query (positive integer or -1 for unlimited).
+		 */
+		public Multiplicity(int from, int to)
+		{
+			setFrom(from);
+			setTo(to);
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  Get the 'from' value, i.e. the minimal number of services required.
+		 *  Otherwise search ends with ServiceNotFoundException. 
+		 */
+		public int getFrom()
+		{
+			return from;
+		}
+		
+		/**
+		 *  Set the 'from' value, i.e. the minimal number of services required.
+		 *  Otherwise search ends with ServiceNotFoundException. 
+		 *  @param from Positive integer or 0
+		 */
+		public void setFrom(int from)
+		{
+			if(from<0)
+				throw new IllegalArgumentException("'from' must be a positive value or 0.");
+				
+			this.from = from;
+		}
+		
+		/**
+		 *  Get the 'to' value, i.e. The maximal number of services returned.
+		 *  Afterwards search/query will terminate.
+		 */
+		public int getTo()
+		{
+			return to;
+		}
+		
+		/**
+		 *  Get the 'to' value, i.e. The maximal number of services returned.
+		 *  Afterwards search/query will terminate.
+		 *  @param to	Positive integer or -1 for unlimited.
+		 */
+		public void setTo(int to)
+		{
+			if(to!=-1 && to<1)
+				throw new IllegalArgumentException("'to' must be a positive value or -1.");
+			
+			this.to = to;
+		}
+		
+		/**
+		 *  Get a string representation of the multiplicity.		
+		 */
+		@Override
+		public String toString()
+		{
+			return from==to ? Integer.toString(from) : from + ".." + (to==-1 ? "*" : Integer.toString(to));
+		}
+	}
+	
+	//-------- constants --------
+	
 	/** Marker for networks not set. */
-	protected static final String[]	NETWORKS_NOT_SET	= new String[]{"__NETWORKS_NOT_SET__"};	// TODO: new String[0] for better performance, but unable to check remotely after marshalling!
+	//Hack!!! should not be public??? 
+	public static final String[]	NETWORKS_NOT_SET	= new String[]{"__NETWORKS_NOT_SET__"};	// TODO: new String[0] for better performance, but unable to check remotely after marshalling!
 	
 	//-------- attributes --------
 	
@@ -35,7 +194,10 @@ public class ServiceQuery<T>
 	protected String[] servicetags;
 	
 	/** The service provider. (rename serviceowner?) */
-	protected IComponentIdentifier provider;
+	//protected IComponentIdentifier provider;
+	
+	/** Starting point for the search scoping. */
+	protected IComponentIdentifier searchstart;
 	
 	/** The service platform. (Find a service from another known platform, e.g. cms) */
 	protected IComponentIdentifier platform;
@@ -61,13 +223,16 @@ public class ServiceQuery<T>
 	protected boolean excludeowner;
 	
 	/** The multiple flag. Search for multiple services */
-	protected boolean multiple;
+	protected Multiplicity	multiplicity;
 	
-	/** The return type. Tell registry to return services or service events. */
-	protected ClassInfo returntype;
+	/** Flag if event mode is enabled on the query. */
+	protected boolean eventmode;
 	
 	/** The matching mode for multivalued terms. True is and and false is or. */
 	protected Map<String, Boolean> matchingmodes;
+	
+	/** Required service proxy type. */
+	protected String requiredproxytype = PROXYTYPE_DECOUPLED;
 	
 	//-------- identification of a query --------
 	
@@ -103,21 +268,22 @@ public class ServiceQuery<T>
 //		this(servicetype, scope, (IFilter<T>) null, provider, owner);
 //	}
 //	
-//	/**
-//	 *  Create a new service query.
-//	 */
-//	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
-//	{
-//		this(servicetype, scope, (IFilter<T>) null, provider, owner);
-//	}
-//	
-//	/**
-//	 *  Create a new service query.
-//	 */
-//	public ServiceQuery(Class<T> servicetype, String scope, IAsyncFilter<T> filter, IComponentIdentifier provider, IComponentIdentifier owner)
-//	{
-//		this(new ClassInfo(servicetype), scope, filter, provider, owner);
-//	}
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(Class<T> servicetype)
+	{
+		this(servicetype, null);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(Class<T> servicetype, String scope)
+	{
+		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, null);
+	}
+	
 //	
 //	/**
 //	 *  Create a new service query.
@@ -187,41 +353,30 @@ public class ServiceQuery<T>
 	 *  Create a new service query.
 	 *  owner = startpoint
 	 */
-	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+//	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
+//	{
+//		this(servicetype, scope, provider, owner, null);
+//	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(Class<T> servicetype, String scope, IComponentIdentifier owner)
 	{
-		this(servicetype, scope, provider, owner, null);
+		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, owner);
 	}
 	
 	/**
 	 *  Create a new service query.
 	 */
-	public ServiceQuery(Class<?> servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, Class<?> returntype)
-	{
-		this(servicetype!=null? new ClassInfo(servicetype): null, scope==null && ServiceIdentifier.isSystemService(servicetype)? RequiredServiceInfo.SCOPE_PLATFORM: scope,
-			provider, owner, returntype!=null? new ClassInfo(returntype): null);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner)
-	{
-		this(servicetype, scope, provider, owner, servicetype);
-	}
-	
-	/**
-	 *  Create a new service query.
-	 */
-	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier provider, IComponentIdentifier owner, ClassInfo returntype)
+	public ServiceQuery(ClassInfo servicetype, String scope, IComponentIdentifier owner)
 	{
 //		if(owner==null)
 //			throw new IllegalArgumentException("Owner must not null");
 		
 		this.servicetype = servicetype;
 		this.scope = scope;
-		this.provider = provider;
 		this.owner = owner;
-		this.returntype = returntype;
 		
 		this.id = SUtil.createUniqueId();
 		this.networknames = NETWORKS_NOT_SET;
@@ -233,7 +388,6 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(ServiceQuery<T> original)
 	{
-		this.returntype = original.returntype;
 		this.servicetype = original.servicetype;
 		this.scope = original.scope;
 		this.servicetags = original.servicetags;
@@ -242,8 +396,9 @@ public class ServiceQuery<T>
 		this.networknames = original.networknames;
 		this.matchingmodes = original.matchingmodes;
 		this.platform	= original.platform;
-		this.provider	= original.provider;
+		this.searchstart	= original.searchstart;
 		this.unrestricted = original.unrestricted;
+		this.requiredproxytype = original.requiredproxytype;
 	}
 
 	/**
@@ -259,27 +414,43 @@ public class ServiceQuery<T>
 	 *  Set the service type.
 	 *  @param type The service type to set
 	 */
-	public void setServiceType(ClassInfo servicetype)
+	public ServiceQuery<T> setServiceType(ClassInfo servicetype)
 	{
 		this.servicetype = servicetype;
+		return this;
 	}
 	
 	/**
-	 *  Get the return type.
-	 *  @return The return type
+	 *  Changes the query to event mode.
+	 *  
+	 *  @param eventmode the event mode state.
+	 *  @deprecated For bean purposes only, use setEventMode().
 	 */
-	public ClassInfo getReturnType()
+	@Deprecated
+	public void setEventMode(boolean eventmode)
 	{
-		return returntype;
+		this.eventmode = eventmode;
 	}
-
+	
 	/**
-	 *  Set the return type.
-	 *  @param type The return type to set
+	 *  Changes the query to event mode.
+	 *  
+	 *  @return The new query.
 	 */
-	public void setReturnType(ClassInfo returntype)
+	@SuppressWarnings("unchecked")
+	public ServiceQuery<ServiceEvent<T>> setEventMode()
 	{
-		this.returntype = returntype;
+		this.eventmode = true;
+		return (ServiceQuery<ServiceEvent<T>>) this;
+	}
+	
+	/**
+	 *  Checks if query is in event mode.
+	 *  @return True, if in event mode
+	 */
+	public boolean isEventMode()
+	{
+		return eventmode;
 	}
 	
 	/**
@@ -295,9 +466,10 @@ public class ServiceQuery<T>
 	 *  Set the scope.
 	 *  @param scope The scope to set
 	 */
-	public void setScope(String scope)
+	public ServiceQuery<T> setScope(String scope)
 	{
 		this.scope = scope;
+		return this;
 	}
 	
 	/**
@@ -314,10 +486,11 @@ public class ServiceQuery<T>
 	 *  Sets the service tags.
 	 *  @param servicetags The service tags. 
 	 */
-	public void setServiceTags(String[] servicetags)
+	public ServiceQuery<T> setServiceTags(String... servicetags)
 	{
 		TagProperty.checkReservedTags(servicetags);
 		this.servicetags = servicetags;
+		return this;
 	}
 	
 	/**
@@ -326,27 +499,40 @@ public class ServiceQuery<T>
 	 *  
 	 *  todo: move or refactor to hide complexity!?
 	 */
-	public void setServiceTags(String[] servicetags, IExternalAccess component)
+	public ServiceQuery<T> setServiceTags(String[] servicetags, IExternalAccess component)
 	{
 		this.servicetags = TagProperty.createRuntimeTags(servicetags, component).toArray(new String[servicetags!=null ? servicetags.length : 0]);
-	}
-	
-	/**
-	 *  Get the provider.
-	 *  @return The provider
-	 */
-	public IComponentIdentifier getProvider()
-	{
-		return provider;
+		return this;
 	}
 
 	/**
 	 *  Set the provider.
 	 *  @param provider The provider to set
 	 */
-	public void setProvider(IComponentIdentifier provider)
+	public ServiceQuery<T> setProvider(IComponentIdentifier provider)
 	{
-		this.provider = provider;
+		this.searchstart = provider;
+		this.scope = RequiredServiceInfo.SCOPE_COMPONENT_ONLY;
+		return this;
+	}
+	
+	/**
+	 *  Get the provider.
+	 *  @return The provider
+	 */
+	public IComponentIdentifier getSearchStart()
+	{
+		return searchstart;
+	}
+
+	/**
+	 *  Set the provider.
+	 *  @param provider The provider to set
+	 */
+	public ServiceQuery<T> setSearchStart(IComponentIdentifier searchstart)
+	{
+		this.searchstart = searchstart;
+		return this;
 	}
 	
 	/**
@@ -362,9 +548,10 @@ public class ServiceQuery<T>
 	 *  Set the platform.
 	 *  @param platform The platform
 	 */
-	public void setPlatform(IComponentIdentifier platform)
+	public ServiceQuery<T> setPlatform(IComponentIdentifier platform)
 	{
 		this.platform = platform;
+		return this;
 	}
 	
 	/**
@@ -379,12 +566,18 @@ public class ServiceQuery<T>
 
 	/**
 	 *  Sets the service identifier.
+	 *  Also sets the corresponding provider when sid!=null.
 	 *
 	 *  @param serviceidentifier The service identifier.
 	 */
-	public void setServiceIdentifier(IServiceIdentifier serviceidentifier)
+	// TODO: looking up sid shouldn't be search/query?
+	public ServiceQuery<T> setServiceIdentifier(IServiceIdentifier serviceidentifier)
 	{
 		this.serviceidentifier = serviceidentifier;
+		// When setting sid also set provider.
+		if(serviceidentifier!=null)
+			setProvider(serviceidentifier.getProviderId());
+		return this;
 	}
 
 	/**
@@ -400,9 +593,10 @@ public class ServiceQuery<T>
 	 *  Set the owner.
 	 *  @param owner The owner to set
 	 */
-	public void setOwner(IComponentIdentifier owner)
+	public ServiceQuery<T> setOwner(IComponentIdentifier owner)
 	{
 		this.owner = owner;
+		return this;
 	}
 	
 	/**
@@ -420,9 +614,10 @@ public class ServiceQuery<T>
 	 *  
 	 *  @param excludeowner True, if the services should be excluded.
 	 */
-	public void setExcludeOwner(boolean excludeowner)
+	public ServiceQuery<T> setExcludeOwner(boolean excludeowner)
 	{
 		this.excludeowner = excludeowner;
+		return this;
 	}
 	
 	/**
@@ -438,32 +633,53 @@ public class ServiceQuery<T>
 	 *  Set the id.
 	 *  @param id The id to set
 	 */
-	public void setId(String id)
+	public ServiceQuery<T> setId(String id)
 	{
 		this.id = id;
+		return this;
 	}
 	
 	/**
-	 *  Get the multiple.
-	 *  @return the multiple
+	 *  Get the multiplicity.
+	 *  @return the multiplicity
 	 */
-	public boolean isMultiple()
+	public Multiplicity	getMultiplicity()
 	{
-		return multiple;
+		return multiplicity;
+	}
+	
+	/**
+	 *  Set the multiplicity.
+	 *  @param multiplicity The minimum multiplicity to set
+	 */
+	public ServiceQuery<T> setMultiplicity(int multiplicity)
+	{
+		return setMultiplicity(multiplicity, -1);
+	}
+	
+	/**
+	 *  Set the multiplicity.
+	 *  @param multiplicitystart The minimum multiplicity to set
+	 *  @param multiplicityend The max multiplicity to set
+	 */
+	public ServiceQuery<T> setMultiplicity(int multiplicitystart, int multiplicityend)
+	{
+		return setMultiplicity(new Multiplicity(multiplicitystart, multiplicityend));
 	}
 
 	/**
-	 *  Set the multiple.
-	 *  @param multiple The multiple to set
+	 *  Set the multiplicity.
+	 *  @param multiplicity The multiplicity to set
 	 */
-	public void setMultiple(boolean multiple)
+	public ServiceQuery<T> setMultiplicity(Multiplicity multiplicity)
 	{
-		this.multiple = multiple;
+		this.multiplicity = multiplicity;
+		return this;
 	}
 
 	/**
 	 *  Gets the specification for the indexer.
-	 *  Query needs to be enhanced before calling this method. See ServiceRegistry.enhanceQuery()
+	 *  Query needs to be enhanced before calling this method. See RequiredServiceFeature.enhanceQuery()
 	 *  
 	 *  @return The specification for the indexer.
 	 */
@@ -474,8 +690,13 @@ public class ServiceQuery<T>
 		if(platform != null)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[]{platform.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PLATFORM)));
 		
-		if(provider != null)
-			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[]{provider.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PROVIDER)));
+		if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
+		{
+			if (searchstart != null)
+				ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[]{searchstart.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PROVIDER)));
+			else
+				ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[]{owner.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PROVIDER)));
+		}
 		
 		if(servicetype != null)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_INTERFACE, new String[]{servicetype.getGenericTypeName()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_INTERFACE)));
@@ -487,8 +708,8 @@ public class ServiceQuery<T>
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_SID, new String[]{serviceidentifier.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_SID)));
 		
 		assert !Arrays.equals(networknames, NETWORKS_NOT_SET) : "Problem: query not enhanced before processing.";
-		
-		if(networknames != null && networknames.length>0)
+	
+		if(networknames != null && networknames.length > 0)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_NETWORKS, networknames, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_NETWORKS)));
 		
 		return ret;
@@ -511,11 +732,12 @@ public class ServiceQuery<T>
 	 *  @param key The key name.
 	 *  @param and True for and.
 	 */
-	public void setMatchingMode(String key, Boolean and)
+	public ServiceQuery<T> setMatchingMode(String key, Boolean and)
 	{
 		if(matchingmodes==null)
 			matchingmodes = new HashMap<String, Boolean>();
 		matchingmodes.put(key, and);
+		return this;
 	}
 	
 	
@@ -532,20 +754,12 @@ public class ServiceQuery<T>
 	 *  Set the unrestricted mode.
 	 *  @param unrestricted the unrestricted to set
 	 */
-	public void setUnrestricted(Boolean unrestricted)
+	public ServiceQuery<T> setUnrestricted(Boolean unrestricted)
 	{
 		this.unrestricted = unrestricted;
+		return this;
 	}
 
-	/**
-	 *  Check if a query is potentially remote.
-	 *  @return True, if scope is set to a remote scope (e.g. global or network).
-	 */
-	public boolean isRemote()
-	{
-		return scope!=null && (scope.contains("global") || scope.contains("network"));
-	}
-	
 	/**
 	 *  Tests if the query keys matches a service.
 	 *  
@@ -572,8 +786,13 @@ public class ServiceQuery<T>
 			}
 		}
 		
-		if (provider != null && !provider.equals(service.getProviderId()))
+		if (RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope) &&
+			!((searchstart != null && service.getProviderId().equals(searchstart)) ||
+			service.getProviderId().equals(owner)))
 			return false;
+		
+//		if (provider != null && !provider.equals(service.getProviderId()))
+//			return false;
 		
 		if (platform != null && !platform.equals(service.getProviderId().getRoot()))
 			return false;
@@ -612,21 +831,6 @@ public class ServiceQuery<T>
 //	}
 	
 	
-	
-	/**
-	 *  Static helper method to get the current network names.
-	 *  @param cid The platform cid.
-	 *  @return The current network names.
-	 */
-	public static String[] getNetworkNames(IComponentIdentifier cid)
-	{
-		if(cid==null)
-			return SUtil.EMPTY_STRING_ARRAY;
-		
-		Set<String> nnames = (Set<String>)Starter.getPlatformValue(cid, Starter.DATA_NETWORKNAMESCACHE);
-		return nnames!=null? nnames.toArray(new String[0]): SUtil.EMPTY_STRING_ARRAY;
-	}
-
 	/**
 	 *  Get the networknames.
 	 *  @return the networknames
@@ -640,9 +844,29 @@ public class ServiceQuery<T>
 	 *  Set the networknames.
 	 *  @param networknames The networknames to set
 	 */
-	public void setNetworkNames(String... networknames)
+	public ServiceQuery<T> setNetworkNames(String... networknames)
 	{
 		this.networknames = networknames;
+		return this;
+	}
+	
+	/**
+	 *  Returns the requested required service proxy type.
+	 *  @return The requested required service proxy type.
+	 */
+	public String getRequiredProxyType()
+	{
+		return requiredproxytype;
+	}
+	
+	/**
+	 *  Sets the requested required service proxy type.
+	 *  @param requiredproxytype The requested required service proxy type.
+	 */
+	public ServiceQuery<T> setRequiredProxyType(String requiredproxytype)
+	{
+		this.requiredproxytype = requiredproxytype;
+		return this;
 	}
 
 	/**
@@ -673,7 +897,13 @@ public class ServiceQuery<T>
 	 */
 	public IComponentIdentifier getTargetPlatform()
 	{
-		return getPlatform()!=null? getPlatform().getRoot(): getProvider()!=null? getProvider().getRoot(): null;
+		if (getPlatform()!=null)
+			return getPlatform().getRoot();
+		
+		if (RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
+			return searchstart != null ? searchstart.getRoot() : owner.getRoot();
+			
+		return null;
 	}
 
 	/**
@@ -681,8 +911,75 @@ public class ServiceQuery<T>
 	 */
 	public String toString()
 	{
-		return "ServiceQuery(servicetype=" + servicetype + ", servicetags=" + Arrays.toString(servicetags) + ", provider=" + provider + ", platform=" + platform 
-			+ ", networknames=" + Arrays.toString(networknames) + ", unrestricted=" + unrestricted + ", scope=" + scope + ", owner=" + owner
-			+ ", id=" + id + ")";
+		StringBuffer	ret	= new StringBuffer("ServiceQuery(");
+		if(servicetype!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("servicetype=");
+			ret.append(servicetype);
+		}
+		
+		if(serviceidentifier!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("serviceidentifier=");
+			ret.append(serviceidentifier);
+		}
+		
+		if(multiplicity!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("multiplicity=");
+			ret.append(multiplicity);
+		}
+		
+		if(servicetags!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("servicetags=");
+			ret.append(Arrays.toString(servicetags));
+		}
+		if(searchstart!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("searchstart=");
+			ret.append(searchstart);
+		}
+		if(platform!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("platform=");
+			ret.append(platform);
+		}
+		if(networknames!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("networknames=");
+			ret.append(Arrays.toString(networknames));
+		}
+
+		if(unrestricted!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("unrestricted=");
+			ret.append(unrestricted);
+		}
+
+		if(scope!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("scope=");
+			ret.append(scope);
+		}
+
+		if(owner!=null)
+		{
+			ret.append(ret.length()==13?"":", ");
+			ret.append("owner=");
+			ret.append(owner);
+		}
+			
+		ret.append(")");
+		return ret.toString();
 	}
 }

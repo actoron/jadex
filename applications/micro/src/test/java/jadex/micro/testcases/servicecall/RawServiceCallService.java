@@ -26,4 +26,12 @@ public class RawServiceCallService extends BasicService	implements IServiceCallS
 	{
 		return IFuture.DONE;
 	}
+	
+	/**
+	 *  Dummy method for service call benchmark.
+	 */
+	public IFuture<Void> rawcall()
+	{
+		return IFuture.DONE;
+	}
 }

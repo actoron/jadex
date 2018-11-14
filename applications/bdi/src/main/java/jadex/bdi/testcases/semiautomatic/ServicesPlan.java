@@ -6,7 +6,9 @@ import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
 
 /**
@@ -23,13 +25,13 @@ public class ServicesPlan extends Plan
 		PublishInfo pi = new PublishInfo("http://localhost:8080/hello/", IPublishService.PUBLISH_RS, IPrintHelloService.class);
 //		ProvidedServiceInfo	psi	= new ProvidedServiceInfo();
 //		psi.setPublish(new PublishInfo("http://localhost:8080/hello/", IPublishService.PUBLISH_RS, IPrintHelloService.class));
-		getAgent().getComponentFeature(IProvidedServicesFeature.class).addService("ser", IPrintHelloService.class, new PrintHelloService(), pi, null);
+		getAgent().getFeature(IProvidedServicesFeature.class).addService("ser", IPrintHelloService.class, new PrintHelloService(), pi, null);
 		
 		waitFor(500);
 		
 		// Call service internally
-		IPrintHelloService phs = (IPrintHelloService)SServiceProvider.getLocalService(getAgent(), 
-			IPrintHelloService.class, RequiredServiceInfo.SCOPE_LOCAL);
+		IPrintHelloService phs = getAgent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(
+			IPrintHelloService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
 		phs.printHello();
 		
 		// Call service via REST

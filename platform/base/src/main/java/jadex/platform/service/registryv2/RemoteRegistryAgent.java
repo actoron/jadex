@@ -1,26 +1,40 @@
 package jadex.platform.service.registryv2;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
+import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
+import jadex.bridge.service.types.security.ISecurityInfo;
+import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Autostart;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
 /**
- *  Service access to a remote registry.
+ *  Plain service access to a remote registry.
+ *  See SuperpeerRegistryAgent for extended implementation supporting also persistent queries.
  */
-@Agent
+@Service
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME))
+@ProvidedServices(@ProvidedService(type=IRemoteRegistryService.class, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME, scope=RequiredServiceInfo.SCOPE_NETWORK))
 public class RemoteRegistryAgent implements IRemoteRegistryService
 {
+	
+	
 	/** Component access. */
 	@Agent
 	protected IInternalAccess ia;
@@ -39,7 +53,7 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	public IFuture<Void> start()
 	{
 		serviceregistry = (ServiceRegistry) ServiceRegistry.getRegistry(ia);
-		platformid = ia.getComponentIdentifier().getRoot();
+		platformid = ia.getId().getRoot();
 		return IFuture.DONE;
 	}
 	
@@ -49,64 +63,74 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	 *  @param query The search query.
 	 *  @return The first matching service or null if not found.
 	 */
-	public <T> IFuture<T> searchService(ServiceQuery<T> query)
+	public IFuture<IServiceIdentifier> searchService(ServiceQuery<?> query)
 	{
-		T ret = null;
-		boolean localowner = query.getOwner().getRoot().equals(platformid);
-		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
+		checkSecurity(query);
+		
+		IServiceIdentifier ret = null;
+		
+		// Scope check why?
+//		boolean localowner = query.getOwner().getRoot().equals(platformid);
+//		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
 		{
-			@SuppressWarnings("unchecked")
-			Set<T> indexerresults = (Set<T>) serviceregistry.getServicesFromIndexer(query);
-			if (localowner)
-			{
-				for (T ser : indexerresults)
-				{
-					if (serviceregistry.checkScope(ser, query.getOwner(), query.getScope()))
-					{
-						ret = ser;
-						break;
-					}
-				}
-				
-			}
-			else if (indexerresults.size() > 0)
-			{
-				ret = indexerresults.iterator().next();
-			}
+			ret = serviceregistry.searchService(query);
 		}
 		
 		return new Future<>(ret);
 	}
-	
+
 	/**
 	 *  Search remote registry for services.
 	 *  
 	 *  @param query The search query.
 	 *  @return The matching services or empty set if none are found.
 	 */
-	public <T> IFuture<Set<T>> searchServices(ServiceQuery<T> query)
+	public IFuture<Set<IServiceIdentifier>> searchServices(ServiceQuery<?> query)
 	{
-		Set<T> ret = Collections.emptySet();
+		checkSecurity(query);
 		
-		boolean localowner = query.getOwner().getRoot().equals(platformid);
-		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
+		Set<IServiceIdentifier> ret = Collections.emptySet();
+		
+		// Scope check why?
+//		boolean localowner = query.getOwner().getRoot().equals(platformid);
+//		if (!RequiredServiceInfo.isScopeOnLocalPlatform(query.getScope()) || localowner)
 		{
-			@SuppressWarnings("unchecked")
-			Set<T> indexerresults = (Set<T>) serviceregistry.getServicesFromIndexer(query);
-			if (localowner)
+			ret = serviceregistry.searchServices(query);
+		}
+		
+		return new Future<>(ret);
+	}
+
+	//-------- helper methods --------
+	
+	/**
+	 *  Check if a query is allowed by caller.
+	 *  @throws SecurityExcpetion if not allowed.
+	 */
+	// TODO: change query to unrestricted instead and always succeed by returning allowed subset of results. 
+	protected void checkSecurity(ServiceQuery<?> query)
+	{
+		boolean allowed	= true;
+		
+		ISecurityInfo	secinfos	= (ISecurityInfo)ServiceCall.getCurrentInvocation().getProperty(ServiceCall.SECURITY_INFOS);
+		if(secinfos==null || !secinfos.hasDefaultAuthorization())
+		{
+			allowed	= false;
+			if(query.getServiceType()!=null)
 			{
-				ret = new HashSet<>();
-				for (T ser : indexerresults)
+				Class<?>	type	= query.getServiceType().getType(ia.getClassLoader());
+				Security	level	= type.getAnnotation(Security.class);
+				if(level!=null)
 				{
-					if (serviceregistry.checkScope(ser, query.getOwner(), query.getScope()))
-						ret.add(ser);
+					Set<String>	roles	= ServiceIdentifier.getRoles(level, ia);
+					allowed	= roles.contains(Security.UNRESTRICTED);
 				}
 			}
-			else
-			{
-				ret = indexerresults;
-			}
 		}
-		return new Future<Set<T>>(ret);
+		
+		if(!allowed)
+		{
+			throw new SecurityException("Search not allowed: "+query);
+		}
 	}
 }

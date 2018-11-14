@@ -2,6 +2,7 @@ package jadex.bdiv3.tutorial.c3;
 
 import java.text.SimpleDateFormat;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -13,7 +14,7 @@ import jadex.micro.annotation.Description;
  *  Getter/setter belief.
  */
 @Description("The clock agent C3. <br>  This agent uses a getter/setter belief.")
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public class ClockBDI
 {
 	/** The time. */
@@ -34,7 +35,7 @@ public class ClockBDI
 	/**
 	 *  Plan that prints the time.
 	 */
-	@Plan(trigger=@Trigger(factchangeds="time"))
+	@Plan(trigger=@Trigger(factchanged="time"))
 	protected void printTime()
 	{
 		System.out.println(formatter.format(getTime()));

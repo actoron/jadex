@@ -17,8 +17,9 @@ import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.TimeoutResultListener;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
@@ -27,6 +28,8 @@ import jadex.commons.Property;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -80,7 +83,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		
 		// Load plugins.
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(controlcenter.getJCCAccess(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		controlcenter.getJCCAccess().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingExceptionDelegationResultListener<ILibraryService, Void>(ret)
 		{
 			public void customResultAvailable(ILibraryService result)
@@ -90,17 +93,24 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 				
 				// todo: what about dynamic plugin loading?
 //				ClassLoader cl = controlcenter.getJCCAccess().getModel().getClassLoader();
-				libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier())
-					.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Void>(ret)
+				
+				controlcenter.getJCCAccess().getModelAsync().addResultListener(new SwingExceptionDelegationResultListener<IModelInfo, Void>(ret)
 				{
-					public void customResultAvailable(ClassLoader cl)
+					public void customResultAvailable(IModelInfo model)
 					{
-						CounterResultListener<IControlCenterPlugin>	crl	= new CounterResultListener<IControlCenterPlugin>(plugin_classes.length,
-							new SwingDelegationResultListener<Void>(ret));
-						for(int i=0; i<plugin_classes.length; i++)
+						libservice.getClassLoader(model.getResourceIdentifier())
+							.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Void>(ret)
 						{
-							addPlugin(plugin_classes[i], cl).addResultListener(crl);
-						}
+							public void customResultAvailable(ClassLoader cl)
+							{
+								CounterResultListener<IControlCenterPlugin>	crl	= new CounterResultListener<IControlCenterPlugin>(plugin_classes.length,
+									new SwingDelegationResultListener<Void>(ret));
+								for(int i=0; i<plugin_classes.length; i++)
+								{
+									addPlugin(plugin_classes[i], cl).addResultListener(crl);
+								}
+							}
+						});
 					}
 				});
 			}
@@ -389,7 +399,17 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid)
 	{
-		return libservice.getClassLoader(rid==null? getJCCAccess().getModel().getResourceIdentifier(): rid);
+		Future<ClassLoader> ret = new Future<>();
+		
+		getJCCAccess().getModelAsync().addResultListener(new ExceptionDelegationResultListener<IModelInfo, ClassLoader>(ret)
+		{
+			public void customResultAvailable(IModelInfo model) throws Exception 
+			{
+				libservice.getClassLoader(rid==null? model.getResourceIdentifier(): rid).addResultListener(new DelegationResultListener<>(ret));
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -415,7 +435,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			public void customResultAvailable(Void result)
 			{
 //				System.out.println("Pushed platform settings");
-				SServiceProvider.getService(getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingExceptionDelegationResultListener<ISettingsService, Void>(ret)
 				{
 					public void customResultAvailable(ISettingsService settings)
@@ -630,24 +650,31 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			final Property[] ps = vis[0].getProperties();
 			if(ps!=null)
 			{
-				libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier())
-					.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Void>(plugfut)
+				controlcenter.getJCCAccess().getModelAsync().addResultListener(new SwingExceptionDelegationResultListener<IModelInfo, Void>(plugfut)
 				{
-					public void customResultAvailable(ClassLoader cl)
+					public void customResultAvailable(IModelInfo model)
 					{
-						final List<Tuple2<IControlCenterPlugin, JComponent>> newpls = new ArrayList<Tuple2<IControlCenterPlugin, JComponent>>();
-						loadPlugins(ps, 0, newpls, cl)
-							.addResultListener(new SwingDelegationResultListener<Void>(plugfut)
+						libservice.getClassLoader(model.getResourceIdentifier())
+							.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Void>(plugfut)
 						{
-							public void customResultAvailable(Void result)
+							public void customResultAvailable(ClassLoader cl)
 							{
-								plugins = newpls;
-								pccpanel.updateToolBar(null);
-								super.customResultAvailable(result);
+								final List<Tuple2<IControlCenterPlugin, JComponent>> newpls = new ArrayList<Tuple2<IControlCenterPlugin, JComponent>>();
+								loadPlugins(ps, 0, newpls, cl)
+									.addResultListener(new SwingDelegationResultListener<Void>(plugfut)
+								{
+									public void customResultAvailable(Void result)
+									{
+										plugins = newpls;
+										pccpanel.updateToolBar(null);
+										super.customResultAvailable(result);
+									}
+								});
 							}
 						});
 					}
 				});
+				
 			}
 			else
 			{

@@ -37,7 +37,7 @@ public class LotteryAgent implements ILotteryService
 		while(true)
 		{
 			int delay = r.nextInt(5)*1000;
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay).get();
+			agent.getFeature(IExecutionFeature.class).waitForDelay(delay).get();
 			
 			String item = SUtil.createUniqueId("Item");
 			

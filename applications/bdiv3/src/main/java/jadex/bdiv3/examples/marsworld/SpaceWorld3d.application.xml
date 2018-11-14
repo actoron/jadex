@@ -41,6 +41,7 @@
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.bridge.service.types.clock.IClockService</import>
+		<import>jadex.bridge.service.component.*</import>
 	</imports>
 	
 	<extensiontypes>
@@ -48,7 +49,7 @@
 			<env:property name="targetradius" class="double">0.0</env:property>
 			<env:objecttypes>
 				<env:objecttype name="target">
-					<env:property name="tick360" class="double" dynamic="true">((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick()%360
+					<env:property name="tick360" class="double" dynamic="true">((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTick()%360
 					</env:property>	
 					<env:property name="abbau" class="boolean" dynamic="true">								
 						$object.getProperty("state").equals("analyzed")
@@ -61,7 +62,7 @@
 				<env:objecttype name="sentry">
 				<env:property name="tick360" class="double" dynamic="true">$properties.clock.getTick()%360
 					</env:property>	
-					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.2*((((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick())%10),0.2*((((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick())%10),0.2*((((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTick())%10))
+					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.2*((((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTick())%10),0.2*((((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTick())%10),0.2*((((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTick())%10))
 					</env:property>	
 					<env:property name="vision" class="double">0.2</env:property>
 					<env:property name="speed" class="double">0.05</env:property>
@@ -84,7 +85,7 @@
 					<env:property name="text" class="String" dynamic="true">
 						"Collected ore: "+$object.getProperty("ore")+" \n"+
 						"Remaining time: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0, $object.getProperty("missiontime")
-							- ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime())))
+							- ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime())))
 					</env:property>
 				</env:objecttype>
 			</env:objecttypes>
@@ -238,14 +239,14 @@
 	</extensiontypes>
 
 	<componenttypes>
-		<componenttype name="Sentry" filename="jadex/bdiv3/examples/marsworld/sentry/SentryBDI.class"/>
-		<componenttype name="Producer" filename="jadex/bdiv3/examples/marsworld/producer/ProducerBDI.class"/>
-		<componenttype name="Carry" filename="jadex/bdiv3/examples/marsworld/carry/CarryBDI.class"/>
+		<componenttype name="Sentry" filename="jadex/bdiv3/examples/marsworld/sentry/SentryAgent.class"/>
+		<componenttype name="Producer" filename="jadex/bdiv3/examples/marsworld/producer/ProducerAgent.class"/>
+		<componenttype name="Carry" filename="jadex/bdiv3/examples/marsworld/carry/CarryAgent.class"/>
 	</componenttypes>
 	
 	<properties>
 		<property name="clock" class="IFuture">
-			SServiceProvider.getService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			$component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchService( new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 		</property>
 	</properties>
 
@@ -258,7 +259,7 @@
 							<env:property name="position">new Vector3Double(0.3,0.3, 0.3)</env:property>
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								900000 + ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
+								900000 + ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()
 							</env:property>
 						</env:object>
 						
@@ -356,7 +357,7 @@
 							<env:property name="space">$space</env:property>
 							<env:property name="position">new Vector3Double(0.0,0.0, 0.0)</env:property>
 							<env:property name="missiontime">
-								3000000 + ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()
+								3000000 + ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target" number="80">

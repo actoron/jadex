@@ -5,9 +5,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
 import jadex.bridge.ClassInfo;
@@ -17,7 +16,6 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
 
@@ -43,19 +41,25 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	{
 		namemappings.put("configurationfile", IPlatformConfiguration.CONFIGURATION_FILE);
 		
+		// hack??? TODO: clean up default configurations
+		namemappings.put("gui", "jcc");
+		namemappings.put("awareness", "awa");
+		namemappings.put("tcptransport", "tcp");
+		namemappings.put("wstransport", "ws");
+		namemappings.put("relaytransport", "rt");
+		
 		// This stuff must be in the configuration because it configures the starter (not the platform component itself)
 //		defvalues.put(IPlatformConfiguration.PLATFORM_NAME, "jadex");
 		defvalues.put(IPlatformConfiguration.CONFIGURATION_NAME, "auto");
-		defvalues.put(IPlatformConfiguration.AUTOSHUTDOWN, Boolean.FALSE);
+//		defvalues.put(IPlatformConfiguration.AUTOSHUTDOWN, Boolean.FALSE);
 		defvalues.put(IPlatformConfiguration.WELCOME, Boolean.TRUE);
 		defvalues.put(IPlatformConfiguration.COMPONENT_FACTORY, IPlatformConfiguration.FALLBACK_COMPONENT_FACTORY);
 		defvalues.put(IPlatformConfiguration.CONFIGURATION_FILE, IPlatformConfiguration.FALLBACK_PLATFORM_CONFIGURATION);
-		defvalues.put("platformcomponent", new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
-		Long	timeout	= PlatformConfigurationHandler.getDefaultTimeout();
-		defvalues.put("localdefaulttimeout", timeout);
-		defvalues.put("remotedefaulttimeout", timeout);
-
-		//		defvalues.put("components", new ArrayList<String>());
+		defvalues.put("defaulttimeout", SUtil.DEFTIMEOUT);
+//		defvalues.put("platformcomponent", new ClassInfo("jadex.platform.service.cms.PlatformComponent"));
+		defvalues.put("platformcomponent", new ClassInfo("jadex.bridge.service.types.cms.PlatformComponent"));
+		
+//		defvalues.put("components", new ArrayList<String>());
 //		defvalues.put(GUI, Boolean.TRUE);
 //		defvalues.put(CLI, Boolean.TRUE);
 //		defvalues.put(CLICONSOLE, Boolean.FALSE);
@@ -190,25 +194,27 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		{
 			ret = readonly;
 		}
-		else if(mname.equals("getSuperpeerClient") || mname.equals("isSuperpeerClient"))
-		{
-			Boolean spc = (Boolean)values.get("superpeerclient");
-			if(spc==null)
-			{
-				Boolean sp = (Boolean)values.get("superpeer");
-				Boolean ssp = (Boolean)values.get("supersuperpeer");
-				spc =  sp==null && ssp==null? true: sp!=null && sp.booleanValue() || ssp!=null && ssp.booleanValue();
-			}
-			return spc;
-		}
+//		else if(mname.equals("getSuperpeerClient") || mname.equals("isSuperpeerClient"))
+//		{
+//			Boolean spc = (Boolean)values.get("superpeerclient");
+//			if(spc==null)
+//			{
+//				Boolean sp = (Boolean)values.get("superpeer");
+//				Boolean ssp = (Boolean)values.get("supersuperpeer");
+//				spc =  sp==null && ssp==null? true: sp!=null && sp.booleanValue() || ssp!=null && ssp.booleanValue();
+//			}
+//			return spc;
+//		}
 		else if(mname.equals("setValue"))
 		{
 			checkReadOnly();
-			values.put((String)args[0], args[1]);
+			String name = getKeyForMethodname((String)args[0], 0);
+			values.put(name, args[1]);
 		}
 		else if(mname.equals("getValue"))
 		{
-			ret = values.get(args[0]);
+			String name = getKeyForMethodname((String)args[0], 0);
+			ret = values.get(name);
 		}
 //		else if(mname.equals("parseArg"))
 //		{
@@ -217,7 +223,16 @@ public class PlatformConfigurationHandler implements InvocationHandler
 //		}
 		else if(mname.equals("getValues"))
 		{
-			ret = new HashMap<String, Object>(values);
+			ret = new HashMap<String, Object>(values)
+			{
+				public Object put(String key, Object value) 
+				{
+					Object ret = super.put(key, value);
+					if(namemappings.containsKey(key))
+						super.put(namemappings.get(key), value);
+					return ret;
+				}
+			};
 			String[] kernels = (String[])values.get("kernels");
 			if(kernels!=null)
 			{
@@ -226,6 +241,13 @@ public class PlatformConfigurationHandler implements InvocationHandler
 					((Map<String, Object>)ret).put("kernel_"+kernel, Boolean.TRUE);
 				}
 			}
+			
+//			for(Map.Entry<String, String> entry: namemappings.entrySet())
+//			{
+//				Map<String, Object> retmap = (Map<String, Object>)ret;
+//				if(retmap.containsKey(entry.getKey()))
+//					retmap.put(entry.getValue(), retmap.get(entry.getKey()));
+//			}
 		}
 		else if(mname.equals("enhanceWith"))
 		{
@@ -240,6 +262,19 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		{
 			PlatformConfigurationHandler h = new PlatformConfigurationHandler();
 			h.values = new HashMap<String, Object>(values);
+			
+			// Copy collections (todo: even deeper copy?)
+			for(String key: h.values.keySet())
+			{
+				if(h.values.get(key) instanceof Collection)
+				{
+					// assume array list is ok.
+					assert h.values.get(key) instanceof List;
+					@SuppressWarnings({"rawtypes", "unchecked"})
+					List	newval	= new ArrayList<>((Collection)h.values.get(key));
+					h.values.put(key, newval);
+				}
+			}
 			ret = getPlatformConfiguration(null, h);
 		}
 //		else if(mname.equals("getComponentFactory"))
@@ -252,6 +287,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		{
 			checkReadOnly();
 			values.put(getKeyForMethodname(mname, 3), args[0]);
+//			System.out.println("setting: "+getKeyForMethodname(mname, 3)+" "+args[0]);
 		}
 		else if(mname.startsWith("add"))
 		{
@@ -743,46 +779,6 @@ public class PlatformConfigurationHandler implements InvocationHandler
 //	}
 	
 	/**
-	 * 
-	 * @return
-	 */
-	public static Long getEnvironmentDefaultTimeout()
-	{
-		// Set deftimeout from environment, if set.
-	    String	dtoprop	= System.getProperty("jadex.deftimeout", System.getenv("jadex.deftimeout"));
-	    if(dtoprop==null)
-	    	dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
-	    if(dtoprop==null)
-	    	dtoprop	= System.getProperty("jadex_timeout", System.getenv("jadex_timeout"));
-//	    if(dtoprop!=null)
-//	    {
-//	        System.out.println("Property jadex.deftimeout is deprecated. Use jadex_deftimeout instead.");
-//	    }
-//	    else
-//	    {
-//	        dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
-//	    }
-	    if(dtoprop!=null)
-	    {
-//	        DEFAULT_REMOTE_TIMEOUT = (Long.parseLong(dtoprop));
-//	        DEFAULT_LOCAL_TIMEOUT = (Long.parseLong(dtoprop));
-	        System.out.println("Setting jadex_timeout: "+dtoprop);
-	    }
-	    return dtoprop!=null? Long.parseLong(dtoprop): null;
-	}
-	
-	/**
-	 * 
-	 */
-	public static Long getDefaultTimeout()
-	{
-		Long ret = getEnvironmentDefaultTimeout();
-		if(ret==null)
-			ret = SReflect.isAndroid() ? 60000L : 30000;
-		return ret;
-	}
-	
-	/**
 	 * Returns a PlatformConfiguration with the default parameters.
 	 */
 	public static IPlatformConfiguration getDefault()
@@ -814,8 +810,12 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		IPlatformConfiguration config = getDefault();
 		config.setGui(false);
 		config.getExtendedPlatformConfiguration().setChat(false);
-		config.setKernels(IPlatformConfiguration.KERNEL_COMPONENT, 
-			IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_BPMN, IPlatformConfiguration.KERNEL_BDIV3);
+		config.setValue("kernel_multi", false);
+		config.setValue("kernel_component", true);
+		config.setValue("kernel_micro", true);
+		config.setValue("kernel_bpmn", true);
+		config.setValue("kernel_bdiv3", true);
+
 		config.setLoggingLevel(Level.INFO);
 		// config.setDebugFutures(true);
 		return config;
@@ -829,7 +829,9 @@ public class PlatformConfigurationHandler implements InvocationHandler
 	{
 		IPlatformConfiguration config = getDefault();
 		config.setWelcome(false);
+		config.setPrintSecret(false);
 		config.setGui(false);
+		config.setSensors(false);
 		config.getExtendedPlatformConfiguration().setCli(false);
 		config.getExtendedPlatformConfiguration().setCliConsole(false);
 
@@ -843,51 +845,85 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.getExtendedPlatformConfiguration().setWsTransport(false);
 		config.getExtendedPlatformConfiguration().setRelayTransport(false);
 		// rootConfig.setSslTcpTransport(false);
+		config.setValue("passiveawarenessintravm", false);
+		config.setValue("passiveawarenesscatalog", false);
+		config.setValue("passiveawarenessmulticast", false);
+		config.setValue("passiveawarenessbroadcast", false);
 
-		config.setKernels(IPlatformConfiguration.KERNEL_MICRO);
+		config.setValue("platformproxies", false);
+
+		config.setValue("kernel_multi", false);
+		config.setValue("kernel_micro", true);
 		// rootConfig.setThreadpoolClass(null);
 		// rootConfig.setContextServiceClass(null);
 
-		config.getExtendedPlatformConfiguration().setMonitoringComp(false);
-		config.getExtendedPlatformConfiguration().setDf(false);
-		config.getExtendedPlatformConfiguration().setClock(true);
-		config.getExtendedPlatformConfiguration().setSimul(false);
-		config.getExtendedPlatformConfiguration().setFiletransfer(false);
-		config.getExtendedPlatformConfiguration().setSecurity(true);
-		config.getExtendedPlatformConfiguration().setLibrary(true); // needed by micro
-		config.getExtendedPlatformConfiguration().setSettings(true);
-		config.getExtendedPlatformConfiguration().setContext(true);
-		config.getExtendedPlatformConfiguration().setAddress(true);
-		config.setValue("compregistry", Boolean.TRUE);
+//		config.getExtendedPlatformConfiguration().setMonitoringComp(false);
+//		config.getExtendedPlatformConfiguration().setDf(false);
+//		config.getExtendedPlatformConfiguration().setClock(true);
+//		config.getExtendedPlatformConfiguration().setSimul(false);
+//		config.getExtendedPlatformConfiguration().setFiletransfer(false);
+//		config.getExtendedPlatformConfiguration().setSecurity(true);
+//		config.getExtendedPlatformConfiguration().setLibrary(true); // needed by micro
+//		config.getExtendedPlatformConfiguration().setSettings(true);
+//		config.getExtendedPlatformConfiguration().setContext(true);
+//		config.getExtendedPlatformConfiguration().setAddress(true);
+//		config.setValue("compregistry", Boolean.TRUE);
 		
 		config.setSuperpeer(false);
 		config.setSuperpeerClient(false);
 		config.setSupersuperpeer(false);
 		config.setValue("acr", false);
 
+		// TODO: not in distribution-standard?
+		config.setValue("grizzlyrspublish", false);
+		config.setValue("jettyrspublish", false);
+		
 		return config;
 	}
 
 	/**
-	 * Returns a minimal platform configuration that allows communication.
+	 *  Returns a minimal platform configuration that allows service discovery and platform communication
+	 *  in local (intranet via multicast/tcp) and global (internet via superpeer/relay over websockets) networks.
 	 */
 	public static IPlatformConfiguration getMinimalComm()
 	{
-		IPlatformConfiguration config = getMinimal();
-		
+		return addInternetComm(addIntranetComm(getMinimal()));	// default: intranet and internet
+//		return addIntranetComm(getMinimal());	// Use this for internet (registry/relay) only tests
+//		return addInternetComm(getMinimal());	// Use this for intranet (multicat/tcp) only tests
+	}
+	
+	/**
+	 *  Add global (internet) communication settings to configuration.
+	 *  @return Supplied configuration for builder pattern.
+	 */
+	public static IPlatformConfiguration	addInternetComm(IPlatformConfiguration config)
+	{		
 		// Security & Transports
 		config.getExtendedPlatformConfiguration().setSecurity(true); // enable security when remote comm.
-		config.getExtendedPlatformConfiguration().setTcpTransport(true);
-		config.getExtendedPlatformConfiguration().setWsTransport(true);
-		config.getExtendedPlatformConfiguration().setWsPort(-1);
+		config.getExtendedPlatformConfiguration().setWsTransport(true);	// WS unidirectional for relay communication
+		config.getExtendedPlatformConfiguration().setWsPort(-1);	// set WS to unidirectional
 		config.getExtendedPlatformConfiguration().setRelayTransport(true);
-//		config.setValue("rtdebug", true);
 
 		// Registry & Awareness
 		config.setSuperpeerClient(true);
-//		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessMulticastAgent.class");
-//		config.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
-		config.setAwareness(false);	// disable old awareness
+		config.setValue("passiveawarenesscatalog", true);	// Catalog for SSPs
+
+		return config;
+	}
+	
+	/**
+	 *  Add local (intranet) communication settings to configuration.
+	 *  @return Supplied configuration for builder pattern.
+	 */
+	public static IPlatformConfiguration	addIntranetComm(IPlatformConfiguration config)
+	{
+		// Security & Transports
+		config.getExtendedPlatformConfiguration().setSecurity(true); // enable security when remote comm.
+		config.getExtendedPlatformConfiguration().setTcpTransport(true);	// TCP bidirectional for intranet communication
+		
+		// Registry & Awareness
+		config.setSuperpeerClient(true);
+		config.setValue("passiveawarenessmulticast", true);
 
 		return config;
 	}

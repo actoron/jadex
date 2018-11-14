@@ -26,7 +26,7 @@ public class BeliefGetter extends BasicService implements IBeliefGetter
 	 */
 	public BeliefGetter(IExternalAccess agent)
 	{
-		super(agent.getComponentIdentifier(), IBeliefGetter.class, null);
+		super(agent.getId(), IBeliefGetter.class, null);
 		this.agent = agent;
 	}
 	
@@ -45,7 +45,7 @@ public class BeliefGetter extends BasicService implements IBeliefGetter
 			@Classname("getter")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature capa = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature capa = ia.getFeature(IBDIXAgentFeature.class);
 				ret.setResult(capa.getBeliefbase().getBelief(belname).getFact());
 				return IFuture.DONE;
 			}

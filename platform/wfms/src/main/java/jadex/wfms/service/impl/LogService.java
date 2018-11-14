@@ -64,13 +64,13 @@ public class LogService implements ILogService
 	public IFuture startService()
 	{
 		final Future ret = new Future();
-		ia.getServiceContainer().getRequiredService("clock_service").addResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getService("clock_service").addResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object result)
 			{
 				final IClockService clockservice = (IClockService) result;
-				ia.getServiceContainer().getRequiredService("cms").addResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().getService("cms").addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -153,7 +153,7 @@ public class LogService implements ILogService
 	public IFuture shutdownService()
 	{
 		final Future ret = new Future();
-		ia.getServiceContainer().getRequiredService("cms").addResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().getService("cms").addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -239,7 +239,7 @@ public class LogService implements ILogService
 	
 	protected static final void dispatchLogServiceEvent(IServiceProvider provider, final IComponentChangeEvent cce)
 	{
-		SServiceProvider.getService(provider, ILogService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new DefaultResultListener()
+		provider.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILogService.class, RequiredServiceInfo.SCOPE_GLOBAL)).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

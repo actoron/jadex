@@ -3,6 +3,7 @@ package jadex.bridge.service.component;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,7 +15,9 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -31,10 +34,11 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -53,7 +57,7 @@ import jadex.javaparser.SJavaParser;
 /**
  *  Feature for provided services.
  */
-public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	implements IProvidedServicesFeature
+public class ProvidedServicesComponentFeature extends AbstractComponentFeature implements IProvidedServicesFeature
 {
 	//-------- attributes --------
 	
@@ -131,9 +135,30 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				sermap.put(key, newpsi);
 			}
 			
+			// Add external access service when not turned off
+			
+			Map<String, Object> args = getComponent().getInternalAccess().getArguments();
+			Boolean extaarg = (Boolean)args.get("externalaccess");
+			Boolean extaplatarg = (Boolean)((Map<String, Object>)Starter.getPlatformValue(getComponent().getId(), IPlatformConfiguration.PLATFORMARGS)).get("externalaccess");
+			boolean on = extaarg!=null? extaarg.booleanValue(): extaplatarg!=null? extaplatarg.booleanValue(): true;
+//			System.out.println("on: "+on+" "+extaarg+" "+extaplatarg);
+			if(on)
+			{
+				ProvidedServiceImplementation impl = new ProvidedServiceImplementation();
+				impl.setValue("$component.getExternalAccess()");
+				// platform external access service will be published network wide, all others only on platform
+				ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, impl, 
+					getComponent().getId().equals(getComponent().getId().getRoot())? RequiredServiceInfo.SCOPE_NETWORK: RequiredServiceInfo.SCOPE_PLATFORM, null, null);
+				sermap.put("externalaccessservice", psi);
+			}
+			
 			// Instantiate service objects
 			for(ProvidedServiceInfo info: sermap.values())
 			{
+				String scope = info.getScope();
+				scope = (String)SJavaParser.evaluateExpressionPotentially(scope, component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
+				info.setScope(scope);
+				
 				final ProvidedServiceImplementation	impl = info.getImplementation();
 				// Virtual service (e.g. promoted)
 				if(impl!=null && impl.getBinding()!=null)
@@ -144,7 +169,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						rsi.getName(), rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()),
 						BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier(), info.getScope());
 					final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
-						component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getComponentIdentifier()));
+						component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getId()));
 					
 					addService(service, info);
 				}
@@ -174,7 +199,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 						}
 						
 						final Class<?> type = info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
-						PublishEventLevel elm = component.getComponentDescription().getMonitoring()!=null? component.getComponentDescription().getMonitoring(): null;
+						PublishEventLevel elm = component.getDescription().getMonitoring()!=null? component.getDescription().getMonitoring(): null;
 //						 todo: remove this? currently the level cannot be turned on due to missing interceptor
 						boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 						final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
@@ -221,13 +246,13 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	public IFuture<Void> shutdown()
 	{
-		Future<Void>	ret	= new Future<Void>();
+		Future<Void> ret = new Future<Void>();
 		
 		// Shutdown the services.
-		Collection<IInternalService>	allservices	= getAllServices();
+		Collection<IInternalService> allservices = getAllServices();
 		if(!allservices.isEmpty())
 		{
-			LinkedList<IInternalService>	list	= new LinkedList<IInternalService>(allservices);
+			LinkedList<IInternalService> list = new LinkedList<IInternalService>(allservices);
 			shutdownServices(list.descendingIterator()).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
@@ -247,11 +272,11 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	{
 		if(serviceinfos==null)
 			serviceinfos = new HashMap<IServiceIdentifier, ProvidedServiceInfo>();
-		serviceinfos.put(service.getServiceIdentifier(), info);
+		serviceinfos.put(service.getServiceId(), info);
 		
 		// Find service types
 //		Class<?>	type	= info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
-		Class<?>	type	= service.getServiceIdentifier().getServiceType().getType(component.getClassLoader(), component.getModel().getAllImports());
+		Class<?>	type	= service.getServiceId().getServiceType().getType(component.getClassLoader(), component.getModel().getAllImports());
 		Set<Class<?>> types = new LinkedHashSet<Class<?>>();
 		types.add(type);
 		for(Class<?> sin: SReflect.getSuperInterfaces(new Class[]{type}))
@@ -283,7 +308,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //			bar.addFuture(SynchronizedServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(new ClassInfo(servicetype), service));
 		}
 		
-		ServiceRegistry.getRegistry(component.getComponentIdentifier()).addService(service.getServiceIdentifier());
+		ServiceRegistry.getRegistry(component.getId()).addLocalService(service);
 //		return bar.waitFor();
 	}
 	
@@ -304,11 +329,11 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	 */
 	protected void	removeService(IInternalService service)
 	{
-		IServiceRegistry	registry	= ServiceRegistry.getRegistry(component.getComponentIdentifier());
+		IServiceRegistry	registry	= ServiceRegistry.getRegistry(component.getId());
 		
 		if(registry!=null) // Maybe null on rescue thread (todo: why remove() on rescue thread?)
 		{
-			registry.removeService(service.getServiceIdentifier());
+			registry.removeService(service.getServiceId());
 		}
 	}
 	
@@ -345,9 +370,21 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}
 			else
 			{
+				try
+				{
+					Class.forName("jadex.extension.rs.publish.JettyRestPublishService");
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 				throw new RuntimeException("Could not load service implementation class: "+impl.getClazz());
 			}
 		}
+//		else if(IExternalAccess.class.equals(info.getType().getType(getComponent().getClassLoader())))
+//		{
+//			ser = getComponent().getExternalAccess();
+//		}
 		
 		return ser;
 	}
@@ -398,7 +435,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 					initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
-//			component.getLogger().info("Starting service: "+is.getServiceIdentifier());
+//			component.getLogger().info("Starting service: "+is.getId());
 //			is.setComponentAccess(component).addResultListener(new DelegationResultListener<Void>(ret)
 //			{
 //				public void customResultAvailable(Void result)
@@ -407,7 +444,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //					{
 //						public void resultAvailable(Void result)
 //						{
-//							component.getLogger().info("Started service: "+is.getServiceIdentifier());
+//							component.getLogger().info("Started service: "+is.getId());
 //							
 //							
 //						}
@@ -433,17 +470,17 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	protected IFuture<Void> initService(final IInternalService is)
 	{
 		final Future<Void> ret = new Future<Void>();
-		component.getLogger().info("Starting service: "+is.getServiceIdentifier()+" "+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
+		component.getLogger().info("Starting service: "+is.getServiceId()+" "+component.getFeature(IExecutionFeature.class).isComponentThread());
 		is.setComponentAccess(component).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
-//				System.out.println("Starting service: "+is.getServiceIdentifier()+" "+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
+//				System.out.println("Starting service: "+is.getId()+" "+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
 				is.startService().addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						component.getLogger().info("Started service: "+is.getServiceIdentifier());
+						component.getLogger().info("Started service: "+is.getServiceId());
 						serviceStarted(is).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
@@ -458,7 +495,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 	public IFuture<Void> serviceStarted(final IInternalService service)
 	{
 		final Future<Void> ret = new Future<Void>();
-		ProvidedServiceInfo info = getProvidedServiceInfo(service.getServiceIdentifier());
+		ProvidedServiceInfo info = getProvidedServiceInfo(service.getServiceId());
 		PublishInfo pit = info==null? null: info.getPublish();
 		if(pit!=null)
 		{
@@ -478,7 +515,9 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			
 			if (pi.isMulti())
 			{
-				SServiceProvider.getServices(getComponent(), IPublishService.class, pi.getPublishScope()).addResultListener(new IIntermediateResultListener<IPublishService>()
+				getComponent().getFeature(IRequiredServicesFeature.class)
+					.searchServices(new ServiceQuery<>(IPublishService.class, pi.getPublishScope()))
+					.addResultListener(new IIntermediateResultListener<IPublishService>()
 				{
 					/** Flag if published at least once. */
 					protected boolean published = false;
@@ -498,7 +537,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 					
 					public void intermediateResultAvailable(final IPublishService result)
 					{
-						result.publishService(service.getServiceIdentifier(), pi).addResultListener(new IResultListener<Void>()
+						result.publishService(service.getServiceId(), pi).addResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void vresult)
 							{
@@ -513,7 +552,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 							{
 								if (finished && !published)
 								{
-									getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier());
+									getComponent().getLogger().severe("Could not publish: "+service.getServiceId());
 									ret.setException(exception);
 								}
 							}
@@ -529,7 +568,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //				{
 //					public void exceptionOccurred(Exception exception)
 //					{
-//						getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
+//						getComponent().getLogger().severe("Could not publish: "+service.getId()+" "+exception.getMessage());
 //						ret.setResult(null);
 //					}
 //					
@@ -537,7 +576,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //					{
 //						for (final IPublishService pubserv : result)
 //						{
-//							pubserv.publishService(service.getServiceIdentifier(), pi).addResultListener(new IResultListener<Void>()
+//							pubserv.publishService(service.getId(), pi).addResultListener(new IResultListener<Void>()
 //							{
 //								public void resultAvailable(Void result)
 //								{
@@ -545,7 +584,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //								
 //								public void exceptionOccurred(Exception exception)
 //								{
-//									getComponent().getLogger().severe("Could not publish to " + pubserv + ": "+service.getServiceIdentifier()+" "+exception.getMessage());
+//									getComponent().getLogger().severe("Could not publish to " + pubserv + ": "+service.getId()+" "+exception.getMessage());
 //								}
 //							});
 //						}
@@ -554,20 +593,20 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			}
 			else
 			{
-				getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), (Iterator<IPublishService>)null)
-					.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class)
+				getPublishService(getInternalAccess(), pi.getPublishType(), pi.getPublishScope(), (Iterator<IPublishService>)null)
+					.addResultListener(getComponent().getFeature(IExecutionFeature.class)
 					.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
 				{
 					public void customResultAvailable(IPublishService ps)
 					{
 						//System.out.println("Got publish service " + ps);
-						ps.publishService(service.getServiceIdentifier(), pi)
-							.addResultListener(getComponent().getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+						ps.publishService(service.getServiceId(), pi)
+							.addResultListener(getComponent().getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 					}
 					public void exceptionOccurred(Exception exception)
 					{
 	//					exception.printStackTrace();
-						getComponent().getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
+						getComponent().getLogger().severe("Could not publish: "+service.getServiceId()+" "+exception.getMessage());
 						ret.setResult(null);
 					}
 				}));
@@ -590,14 +629,14 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //		{
 //			public void run()
 //			{
-				ProvidedServiceInfo info = getProvidedServiceInfo(service.getServiceIdentifier());
+				ProvidedServiceInfo info = getProvidedServiceInfo(service.getServiceId());
 				final PublishInfo pi = info==null? null: info.getPublish();
-//				System.out.println("shutdown ser: "+service.getServiceIdentifier());
+//				System.out.println("shutdown ser: "+service.getId());
 				if(pi!=null)
 				{
-					final IServiceIdentifier sid = service.getServiceIdentifier();
+					final IServiceIdentifier sid = service.getServiceId();
 //					getPublishService(instance, pi.getPublishType(), null).addResultListener(instance.createResultListener(new IResultListener<IPublishService>()
-					getPublishService(getComponent(), pi.getPublishType(), pi.getPublishScope(), null).addResultListener(new IResultListener<IPublishService>()
+					getPublishService(getInternalAccess(), pi.getPublishType(), pi.getPublishScope(), null).addResultListener(new IResultListener<IPublishService>()
 					{
 						public void resultAvailable(IPublishService ps)
 						{
@@ -635,8 +674,8 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		
 		if(services==null)
 		{
-			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(instance, IPublishService.class, scope, null);
-			fut.addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
+			IFuture<Collection<IPublishService>> fut = instance.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IPublishService.class, scope));
+			fut.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
 			{
 				@Override
 				public void exceptionOccurred(Exception exception) {
@@ -655,7 +694,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			if(services.hasNext())
 			{
 				final IPublishService ps = (IPublishService)services.next();
-				ps.isSupported(type).addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Boolean, IPublishService>(ret)
+				ps.isSupported(type).addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Boolean, IPublishService>(ret)
 				{
 					public void customResultAvailable(Boolean supported)
 					{
@@ -692,12 +731,15 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			// Remove service from registry before shutdown.
 			removeService(is);
 			
-			component.getLogger().info("Stopping service: "+is.getServiceIdentifier());
+//			component.getLogger().info("Stopping service: "+is.getServiceId());
+//			if(is instanceof IExternalAccess)
+//				System.out.println("Stopping service: "+is.getServiceId());
 			is.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
-					component.getLogger().info("Stopped service: "+is.getServiceIdentifier());
+//					component.getLogger().info("Stopped service: "+is.getServiceId());
+//					System.out.println("Stopped service: "+is.getServiceId());
 					serviceShutdowned(is).addResultListener(new DelegationResultListener<Void>(ret)
 					{
 						public void customResultAvailable(Void result)
@@ -732,7 +774,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				for(Iterator<IInternalService> it2=sers.iterator(); it2.hasNext() && ret==null; )
 				{
 					IService ser = it2.next();
-					if(ser.getServiceIdentifier().getServiceName().equals(name))
+					if(ser.getServiceId().getServiceName().equals(name))
 					{
 						ret = ser;
 					}
@@ -800,11 +842,11 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 				// Special case for fake proxies, i.e. creating a service proxy for a known component (without knowing cid)
 				if(sid.getServiceName().equals("NULL"))
 				{
-					((IService)ser).getServiceIdentifier().getServiceType().equals(sid.getServiceType());
+					((IService)ser).getServiceId().getServiceType().equals(sid.getServiceType());
 					ret = (IService)ser;
 					break;
 				}
-				else if(((IService)ser).getServiceIdentifier().equals(sid))
+				else if(((IService)ser).getServiceId().equals(sid))
 				{
 					ret = (IService)ser;
 					break;
@@ -831,7 +873,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 			IService service = null;
 			for(Object ser: services)
 			{
-				if(((IService)ser).getServiceIdentifier().equals(sid))
+				if(((IService)ser).getServiceId().equals(sid))
 				{
 					service = (IService)ser;
 					break;
@@ -954,6 +996,69 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		ProvidedServiceInfo psi = pi!=null? new ProvidedServiceInfo(null, type, null, null, pi, null): null;
 		return addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, psi, scope);
 	}
+	
+	/**
+	 *  Sets the tags of a service.
+	 *  
+	 *  @param sid The Service identifier.
+	 *  @param tags The tags.
+	 *  @return New service identifier.
+	 */
+	public IFuture<Void> setTags(IServiceIdentifier sid, String... tags)
+	{
+		Future<Void> ret = new Future<>();
+		
+		if(sid instanceof ServiceIdentifier)
+		{
+			ServiceIdentifier ssid = (ServiceIdentifier) sid;
+			ssid.setTags(new HashSet<String>(Arrays.asList(tags)));
+			
+			Collection<IInternalService> coll = services.get(ssid.getServiceType().getType(component.getClassLoader()));
+			if(coll != null)
+			{
+//				synchronized(coll)
+//				{
+					for(Iterator<IInternalService> it = coll.iterator(); it.hasNext(); )
+					{
+						IInternalService ser = it.next();
+						if(ser.getServiceId().equals(ssid))
+						{
+							ser.setServiceIdentifier(ssid);
+							break;
+						}
+					}
+//				}
+			}
+			
+//			synchronized(servicelisteners)
+//			{
+				if (servicelisteners.containsKey(sid))
+				{
+					MethodListenerHandler hndlr = servicelisteners.get(sid);
+					servicelisteners.put(ssid, hndlr);
+				}
+//			}
+			
+//			synchronized(serviceinfos)
+//			{
+				if (serviceinfos.containsKey(sid))
+				{
+					ProvidedServiceInfo info = serviceinfos.get(sid);
+					serviceinfos.put(ssid, info);
+				}
+//			}
+			
+			ServiceRegistry.getRegistry(component.getId().getRoot()).updateService(ssid);
+			
+			ret.setResult(null);
+		}
+		else
+		{
+			ret.setException(new IllegalArgumentException("Unsupported service identifier type: " + sid));
+		}
+		
+		return ret;
+	}
 
 	/**
 	 *  Removes a service from the platform (shutdowns also the service).
@@ -989,7 +1094,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 							for(Iterator<IInternalService> it=tmp.iterator(); it.hasNext() && service==null; )
 							{
 								final IInternalService tst = it.next();
-								if(tst.getServiceIdentifier().equals(sid))
+								if(tst.getServiceId().equals(sid))
 								{
 									service = tst;
 									tmp.remove(service);
@@ -1030,7 +1135,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 //							{
 //								public void customResultAvailable(Void result)
 //								{
-////									if(fservice.getServiceIdentifier().toString().indexOf("ContextSer")!=-1)
+////									if(fservice.getId().toString().indexOf("ContextSer")!=-1)
 ////										System.out.println("hierda");
 //									
 //									fservice.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
@@ -1118,7 +1223,7 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		}
 		else
 		{
-			ILibraryService ls = SServiceProvider.getLocalService(getComponent(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			ILibraryService ls = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 			ls.getClassLoader(sid.getResourceIdentifier())
 				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Class<?>>(ret)
 			{
@@ -1145,13 +1250,13 @@ public class ProvidedServicesComponentFeature	extends AbstractComponentFeature	i
 		
 //		System.out.println("addS:"+service);
 
-		PublishEventLevel elm = getComponent().getComponentDescription().getMonitoring()!=null? getComponent().getComponentDescription().getMonitoring(): null;
+		PublishEventLevel elm = getComponent().getDescription().getMonitoring()!=null? getComponent().getDescription().getMonitoring(): null;
 		// todo: remove this? currently the level cannot be turned on due to missing interceptor
 //		boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 		
 		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-			getComponent(), service, name, type, proxytype, ics, moni, 
+			getInternalAccess(), service, name, type, proxytype, ics, moni, 
 			info, scope!=null ? scope : info!=null? info.getScope(): null);
 		
 		addService(proxy, info);

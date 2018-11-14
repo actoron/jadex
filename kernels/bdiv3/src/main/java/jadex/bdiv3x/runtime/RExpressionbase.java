@@ -43,7 +43,7 @@ public class RExpressionbase extends RElement implements IExpressionbase
 		
 		if(expressions==null || !expressions.containsKey(name))
 		{
-			RCapability rcapa = agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability();
+			RCapability rcapa = agent.getFeature(IInternalBDIAgentFeature.class).getCapability();
 			MCapability mcapa = (MCapability)rcapa.getModelElement();
 			UnparsedExpression uexp = mcapa.getExpression(name);
 			if(uexp==null)

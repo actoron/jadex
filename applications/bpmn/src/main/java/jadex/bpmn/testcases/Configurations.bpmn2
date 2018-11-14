@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>Configurations</jadex:modelname>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="true"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="true"/>
     <jadex:imports>
       <jadex:import>jadex.commons.*</jadex:import>
     </jadex:imports>

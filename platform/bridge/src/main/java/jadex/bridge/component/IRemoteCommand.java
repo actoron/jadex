@@ -1,7 +1,7 @@
 package jadex.bridge.component;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.future.IFuture;
 
 /**
@@ -15,5 +15,5 @@ public interface IRemoteCommand<T>
 	 *  @param secinf The established security level to e.g. decide if the command is allowed.
 	 *  @return A future for return value(s). May also be intermediate, subscription, etc.
 	 */
-	public IFuture<T>	execute(IInternalAccess access, IMsgSecurityInfos secinf);
+	public IFuture<T>	execute(IInternalAccess access, ISecurityInfo secinf);
 }

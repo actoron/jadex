@@ -187,7 +187,7 @@ public class ChatFragment extends Fragment implements ChatEventListener, ITypedO
 //					chatEventAdapter.add(event);
 //				}
 //			});
-//			IComponentIdentifier cid = event.getComponentIdentifier();
+//			IComponentIdentifier cid = event.getId();
 		}
 		return processed;
 	}

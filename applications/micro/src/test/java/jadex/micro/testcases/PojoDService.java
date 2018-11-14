@@ -1,10 +1,8 @@
 package jadex.micro.testcases;
 
-import java.lang.reflect.Proxy;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -13,8 +11,8 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -42,28 +40,20 @@ public class PojoDService implements IDService
 		
 		if("first".equals(agent.getConfiguration()))
 		{
-			IFuture<IComponentManagementService> cmsfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
-			cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			agent.createComponent(
+				new CreationInfo("second", null, agent.getId()).setFilename( "jadex.micro.testcases.ServiceParameterAgent.class"), null)
+				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
-				public void customResultAvailable(IComponentManagementService cms)
-				{	
-//					IComponentManagementService cms = (IComponentManagementService)result;
-					cms.createComponent(null, "jadex.micro.testcases.ServiceParameterAgent.class", 
-						new CreationInfo("second", null, agent.getComponentIdentifier()), null)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
-					{
-						public void customResultAvailable(IComponentIdentifier cid)
-						{
+				public void customResultAvailable(IExternalAccess exta)
+				{
 //							IComponentIdentifier cid = (IComponentIdentifier)result;
-							IFuture<IDService> serfut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IDService.class, cid);
-							serfut.addResultListener(new ExceptionDelegationResultListener<IDService, Void>(ret)
-							{
-								public void customResultAvailable(IDService otherser)
-								{
-									otherser.testServiceArgument(PojoDService.this)
-										.addResultListener(new DelegationResultListener<Boolean>(res));
-								}
-							});
+					IFuture<IDService> serfut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDService.class).setProvider(exta.getId()));
+					serfut.addResultListener(new ExceptionDelegationResultListener<IDService, Void>(ret)
+					{
+						public void customResultAvailable(IDService otherser)
+						{
+							otherser.testServiceArgument(PojoDService.this)
+								.addResultListener(new DelegationResultListener<Boolean>(res));
 						}
 					});
 				}
@@ -74,7 +64,7 @@ public class PojoDService implements IDService
 			ret.setResult(null);
 		}
 		
-		res.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		res.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -89,7 +79,7 @@ public class PojoDService implements IDService
 					tr.setReason("Wrong parameter value received.");
 				}
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				
 				ret.setResult(null);
 //				if(result!=null)
@@ -98,7 +88,7 @@ public class PojoDService implements IDService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(0, new TestReport[]{}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(0, new TestReport[]{}));
 				ret.setResult(null);
 				agent.killComponent();
 			}

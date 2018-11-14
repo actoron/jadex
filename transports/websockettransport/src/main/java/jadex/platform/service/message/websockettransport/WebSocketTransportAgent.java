@@ -2,24 +2,20 @@ package jadex.platform.service.message.websockettransport;
 
 import com.neovisionaries.ws.client.WebSocketFactory;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
-import jadex.commons.future.IFuture;
+import jadex.commons.Boolean3;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Binding;
-import jadex.platform.service.transport.AbstractTransportAgent;
+import jadex.micro.annotation.Autostart;
+import jadex.platform.service.transport.AbstractTransportAgent2;
 import jadex.platform.service.transport.ITransport;
 
 /**
  *  Agent implementing the web socket transport.
  *
  */
-public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketConnection>
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="ws", predecessors="jadex.platform.service.address.TransportAddressAgent"))
+public class WebSocketTransportAgent extends AbstractTransportAgent2<IWebSocketConnection>
 {
 	/** Maximum size of websocket frame payloads. */
 	@AgentArgument
@@ -36,6 +32,7 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 	/** Daemon thread pool service. */
 	protected IDaemonThreadPoolService threadpoolsrv;
 	
+	/** WebSocket factory. */
 	protected WebSocketFactory websocketfactory;
 	
 	/**
@@ -43,37 +40,6 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
 	 */
 	public WebSocketTransportAgent()
 	{
-		priority = 500;
-	}
-	
-	/**
-	 *  Initializes the agent.
-	 */
-	@AgentCreated
-	public IFuture<Void> start()
-	{
-		websocketfactory = new WebSocketFactory(); //.setConnectionTimeout(5000);
-		websocketfactory.setConnectionTimeout((int) connecttimeout);
-		threadpoolsrv = SServiceProvider.getLocalService0(agent, IDaemonThreadPoolService.class, Binding.SCOPE_PLATFORM, null, false);
-//		threadpoolsrv = SServiceProvider.getLocalService(agent, IDaemonThreadPoolService.class);
-		return super.init();
-	}
-	
-	@AgentKilled
-	public void stop()
-	{
-		super.shutdown();
-		
-		synchronized(this)
-		{
-			if (candidates != null)
-			{
-				for (IWebSocketConnection con : candidates.keySet())
-				{
-					con.forceClose();
-				}
-			}
-		}
 	}
 	
  	/**
@@ -134,8 +100,31 @@ public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketCo
  		return threadpoolsrv;
  	}
  	
+ 	/**
+ 	 *  Sets the thread pool service.
+ 	 * 
+ 	 *  @param tps The thread pool service.
+ 	 */
+ 	public void setThreadPoolService(IDaemonThreadPoolService tps)
+ 	{
+ 		threadpoolsrv = tps;
+ 	}
+ 	
+ 	/**
+ 	 *  Gets the WebSocket factory.
+ 	 *  @return The WebSocket factory.
+ 	 */
  	public WebSocketFactory getWebSocketFactory()
 	{
 		return websocketfactory;
+	}
+ 	
+ 	/**
+ 	 *  Sets the WebSocket factory.
+ 	 *  @param websocketfactory The WebSocket factory.
+ 	 */
+ 	public void setWebsocketFactory(WebSocketFactory websocketfactory)
+	{
+		this.websocketfactory = websocketfactory;
 	}
 }

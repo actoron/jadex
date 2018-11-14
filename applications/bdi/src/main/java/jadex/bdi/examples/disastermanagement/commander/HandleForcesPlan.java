@@ -27,7 +27,7 @@ public abstract class HandleForcesPlan extends Plan
 		while(true)
 		{
 			final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
-			Collection forces = (Collection)getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(servicename).get();
+			Collection forces = (Collection)getAgent().getFeature(IRequiredServicesFeature.class).getServices(servicename).get();
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
 			final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 							
@@ -41,7 +41,7 @@ public abstract class HandleForcesPlan extends Plan
 				while(number>getParameterSet("units").size() && it.hasNext())
 				{
 					final IService force = (IService)it.next();
-					final Object provid = force.getServiceIdentifier().getProviderId();
+					final Object provid = force.getServiceId().getProviderId();
 					if(!busy.containsFact(provid))
 					{
 //						as++;
@@ -65,7 +65,7 @@ public abstract class HandleForcesPlan extends Plan
 							public void exceptionOccurred(Exception exception)
 							{
 //								exception.printStackTrace();
-//								System.out.println("keeping unit busy, goal failed: " + force.getServiceIdentifier().getProviderId() + " " + exception.getMessage());
+//								System.out.println("keeping unit busy, goal failed: " + force.getId().getProviderId() + " " + exception.getMessage());
 								getParameterSet("units").removeValue(force);
 								busy.removeFact(provid);
 //								exception.printStackTrace();
@@ -119,7 +119,7 @@ public abstract class HandleForcesPlan extends Plan
 //			final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 //			String servicename = (String)getParameter("servicename").getValue();
 //			String typename = (String)getParameter("typename").getValue();
-//			Collection forces = (Collection)getScope().getRequiredServices(servicename).get();
+//			Collection forces = (Collection)getScope().getServices(servicename).get();
 //			int number = ((Integer)disaster.getProperty(typename)).intValue();
 //			final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 //							
@@ -133,7 +133,7 @@ public abstract class HandleForcesPlan extends Plan
 //				while(number>getParameterSet("units").size() && it.hasNext())
 //				{
 //					final IService force = (IService)it.next();
-//					final Object provid = force.getServiceIdentifier().getProviderId();
+//					final Object provid = force.getId().getProviderId();
 //					if(!busy.containsFact(provid))
 //					{
 //						as++;

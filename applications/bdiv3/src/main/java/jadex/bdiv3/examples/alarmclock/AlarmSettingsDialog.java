@@ -26,13 +26,14 @@ import javax.swing.UIDefaults;
 
 import com.toedter.calendar.JDateChooser;
 
-import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.PlaySongGoal;
+import jadex.bdiv3.examples.alarmclock.AlarmclockAgent.PlaySongGoal;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -187,7 +188,7 @@ public class AlarmSettingsDialog extends JDialog
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 //						BDIAgent bia = (BDIAgent)ia;
-						long cur = SServiceProvider.getLocalService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+						long cur = ia.getFeature(IRequiredServicesFeature.class).getLocalService(IClockService.class).getTime();
 						Date now = new Date(cur);
 						date.setDate(now);
 						time.setValue(now);								
@@ -232,7 +233,7 @@ public class AlarmSettingsDialog extends JDialog
 							{
 //								BDIAgent bia = (BDIAgent)ia;
 								playing = new PlaySongGoal(song);
-								ia.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(playing)
+								ia.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(playing)
 									.addResultListener(new IResultListener<Object>()
 								{
 									public void resultAvailable(Object result)
@@ -347,7 +348,7 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					long cur = SServiceProvider.getLocalService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+					long cur = ia.getFeature(IRequiredServicesFeature.class).getLocalService(IClockService.class).getTime();
 					al.setTime(new Time(new Date(cur)));
 					setAlarm(al);
 					return IFuture.DONE;
@@ -476,7 +477,7 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				if(playing!=null)
 				{
-					ia.getComponentFeature(IBDIAgentFeature.class).dropGoal(playing);
+					ia.getFeature(IBDIAgentFeature.class).dropGoal(playing);
 				}
 				playing = null;
 				return IFuture.DONE;

@@ -12,7 +12,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ITargetResolver;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -107,7 +107,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 				boolean first=true;
 				public void intermediateResultAvailable(IService result) 
 				{
-					services.put(result.getServiceIdentifier(), result);
+					services.put(result.getServiceId(), result);
 					if(first)
 					{
 						reportUsage(result, agent, sid);
@@ -194,7 +194,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
 		// Fetch the global pools management service via its component id.
-		SServiceProvider.getService(agent, sid.getProviderId(), IGlobalPoolManagementService.class)
+		agent.searchService( new ServiceQuery<>(IGlobalPoolManagementService.class).setProvider(sid.getProviderId()))
 			.addResultListener(new IResultListener<IGlobalPoolManagementService>() 
 		{
 			public void resultAvailable(final IGlobalPoolManagementService pms) 
@@ -219,12 +219,12 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		UsageInfo ui = usageinfos.get(ser.getServiceIdentifier());
+		UsageInfo ui = usageinfos.get(ser.getServiceId());
 		if(ui==null)
 		{
 			ui = new UsageInfo();
-			usageinfos.put(ser.getServiceIdentifier(), ui);
-			ui.setServiceIdentifier(ser.getServiceIdentifier());
+			usageinfos.put(ser.getServiceId(), ui);
+			ui.setServiceIdentifier(ser.getServiceId());
 			ui.setStartTime(System.currentTimeMillis());
 			ui.setUsages(1);
 			ret.setResult(null);
@@ -250,7 +250,7 @@ public class GlobalServicePoolTargetResolver implements ITargetResolver
 				}
 				
 				// send infos to global pool
-				SServiceProvider.getService(agent, sid.getProviderId(), IGlobalPoolManagementService.class)
+				agent.searchService( new ServiceQuery<>(IGlobalPoolManagementService.class).setProvider(sid.getProviderId()))
 					.addResultListener(new ExceptionDelegationResultListener<IGlobalPoolManagementService, Void>(ret) 
 				{
 					public void customResultAvailable(final IGlobalPoolManagementService pms) 

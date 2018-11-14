@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
@@ -19,9 +20,9 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  The time provider periodically sends out time values to all subscribers.
@@ -29,7 +30,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITimeService.class, scope=Binding.SCOPE_GLOBAL))
+@ProvidedServices(@ProvidedService(type=ITimeService.class, scope=RequiredService.SCOPE_GLOBAL))
 public class TimeProviderAgent	implements ITimeService
 {
 	//-------- attributes --------
@@ -91,7 +92,7 @@ public class TimeProviderAgent	implements ITimeService
 	public void body(IInternalAccess ia)
 	{
 		// The execution feature provides methods for controlling the execution of the agent.
-		IExecutionFeature	exe	= ia.getComponentFeature(IExecutionFeature.class);
+		IExecutionFeature	exe	= ia.getFeature(IExecutionFeature.class);
 		
 		// Execute a step every 5000 milliseconds, start from next full 5000 milliseconds
 		exe.repeatStep(5000-System.currentTimeMillis()%5000, 5000, new IComponentStep<Void>()
@@ -168,7 +169,9 @@ public class TimeProviderAgent	implements ITimeService
 	public static void	main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
+		config.setPlatformName("timeprovider_*");
 		config.addComponent(TimeProviderAgent.class);
+		config.setLoggingLevel(Level.WARNING);
 		Starter.createPlatform(config, args).get();
 	}
 }

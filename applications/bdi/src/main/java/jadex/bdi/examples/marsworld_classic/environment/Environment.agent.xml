@@ -13,6 +13,7 @@
 		<import>jadex.bdi.examples.marsworld_classic.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.bridge.service.types.clock.IClockService</import>
+		<import>jadex.bridge.service.component.*</import>
 		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
@@ -21,7 +22,8 @@
 	<beliefs>
 		<!-- The environment as singleton object. -->
 		<belief name="environment" class="Environment">
-			<fact>Environment.createInstance((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))</fact>
+			<!-- Raw service, because it is passed to other agents -->
+			<fact>Environment.createInstance((IClockService)((IInternalRequiredServicesFeature)$component.getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class))</fact>
 	  	</belief>
 
 		<belief name="gui" class="jadex.commons.gui.GuiCreator">

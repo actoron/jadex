@@ -6,7 +6,8 @@ import java.util.Iterator;
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 
 /**
  *  Test fetching a fact via a service.
@@ -20,8 +21,7 @@ public class FactFetcherPlan extends Plan
 	{	
 		TestReport tr = new TestReport("#1", "Tests if own service can be found.");
 		
-		Collection services = (Collection)SServiceProvider.getLocalServices(getAgent(), 
-			IBeliefGetter.class, RequiredServiceInfo.SCOPE_LOCAL);
+		Collection services = getAgent().getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IBeliefGetter.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY));
 //		System.out.println("Found: "+services);
 		if(services!=null)
 		{

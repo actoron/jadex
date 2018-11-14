@@ -22,7 +22,7 @@ public @interface Timeout
 	/** Constant for no timeout. */
 	public static final long NONE = Future.NONE;
 	
-	/** Constant for unset. */
+	/** Constant for unset (i.e. use current default timeout). */
 	public static final long UNSET = Future.UNSET;
 
 	/** Constant for timeout name in non-functional properties. */
@@ -33,14 +33,4 @@ public @interface Timeout
 	 *  are aborted when no result is received.
 	 */
 	public long value() default UNSET;
-	
-	/**
-	 *  The local timeout period for specifying different values for local and remote.
-	 */
-	public long local() default UNSET;
-	
-	/**
-	 *  The remote timeout period for specifying different values for local and remote.
-	 */
-	public long remote() default UNSET;
 }

@@ -1,303 +1,509 @@
 package jadex.platform;
 
-import static jadex.base.IPlatformConfiguration.ASYNCEXECUTION;
-import static jadex.base.IPlatformConfiguration.AWADELAY;
-import static jadex.base.IPlatformConfiguration.AWAEXCLUDES;
-import static jadex.base.IPlatformConfiguration.AWAINCLUDES;
-import static jadex.base.IPlatformConfiguration.AWAMECHANISMS;
-import static jadex.base.IPlatformConfiguration.AWARENESS;
-import static jadex.base.IPlatformConfiguration.BASECLASSLOADER;
-import static jadex.base.IPlatformConfiguration.BINARYMESSAGES;
-import static jadex.base.IPlatformConfiguration.CHAT;
-import static jadex.base.IPlatformConfiguration.CLI;
-import static jadex.base.IPlatformConfiguration.CLICONSOLE;
-import static jadex.base.IPlatformConfiguration.CONTEXTSERVICECLASS;
-import static jadex.base.IPlatformConfiguration.GUI;
-import static jadex.base.IPlatformConfiguration.JCCPLATFORMS;
-import static jadex.base.IPlatformConfiguration.LIBPATH;
-import static jadex.base.IPlatformConfiguration.LOCALTRANSPORT;
-import static jadex.base.IPlatformConfiguration.LOGGING;
 import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
-import static jadex.base.IPlatformConfiguration.MAVEN_DEPENDENCIES;
-import static jadex.base.IPlatformConfiguration.PROGRAM_ARGUMENTS;
-import static jadex.base.IPlatformConfiguration.RELAYADDRESSES;
-import static jadex.base.IPlatformConfiguration.RELAYFORWARDING;
-import static jadex.base.IPlatformConfiguration.RELAYTRANSPORT;
-import static jadex.base.IPlatformConfiguration.RSPUBLISH;
-import static jadex.base.IPlatformConfiguration.RSPUBLISHCOMPONENT;
-import static jadex.base.IPlatformConfiguration.SAVEONEXIT;
-import static jadex.base.IPlatformConfiguration.SIMULATION;
-import static jadex.base.IPlatformConfiguration.STRICTCOM;
-import static jadex.base.IPlatformConfiguration.TCPPORT;
-import static jadex.base.IPlatformConfiguration.TCPTRANSPORT;
-import static jadex.base.IPlatformConfiguration.THREADPOOLCLASS;
-import static jadex.base.IPlatformConfiguration.THREADPOOLDEFER;
+import static jadex.base.IPlatformConfiguration.PLATFORMPROXIES;
 import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
-import static jadex.base.IPlatformConfiguration.WELCOME;
-import static jadex.base.IPlatformConfiguration.WSPORT;
-import static jadex.base.IPlatformConfiguration.WSPUBLISH;
-import static jadex.base.IPlatformConfiguration.WSTRANSPORT;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
-import jadex.bridge.ClassInfo;
+import jadex.base.Starter;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
-import jadex.commons.Boolean3;
-import jadex.micro.KernelComponentAgent;
-import jadex.micro.KernelMicroAgent;
-import jadex.micro.KernelMultiAgent;
+import jadex.commons.IFilter;
+import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.AnnotationInfo;
+import jadex.commons.SClassReader.ClassInfo;
+import jadex.commons.SClassReader.EnumInfo;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.security.SSecurity;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.Component;
-import jadex.micro.annotation.ComponentType;
-import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.Configuration;
-import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.platform.sensor.SensorHolderAgent;
-import jadex.platform.service.address.TransportAddressAgent;
-import jadex.platform.service.awareness.management.AwarenessManagementAgent;
-import jadex.platform.service.clock.ClockAgent;
-import jadex.platform.service.context.ContextAgent;
-import jadex.platform.service.df.DirectoryFacilitatorAgent;
-import jadex.platform.service.filetransfer.FileTransferAgent;
-import jadex.platform.service.library.LibraryAgent;
-import jadex.platform.service.monitoring.MonitoringAgent;
-import jadex.platform.service.registry.AutoConfigRegistryAgent;
-import jadex.platform.service.registry.PeerRegistrySynchronizationAgent;
-import jadex.platform.service.registry.SuperpeerRegistrySynchronizationAgent;
+import jadex.platform.service.execution.AsyncExecutionService;
+import jadex.platform.service.execution.BisimExecutionService;
+import jadex.platform.service.execution.SyncExecutionService;
 import jadex.platform.service.security.SecurityAgent;
-import jadex.platform.service.settings.SettingsAgent;
-import jadex.platform.service.simulation.SimulationAgent;
-import jadex.platform.service.transport.tcp.TcpTransportAgent;
 
 /**
  *	Basic standalone platform services provided as a micro agent. 
  */
 @Arguments(
 {
-	@Argument(name=IPlatformConfiguration.PLATFORM_NAME, clazz=String.class, defaultvalue="\"jadex\""),
-	@Argument(name=IPlatformConfiguration.CONFIGURATION_NAME, clazz=String.class, defaultvalue="\"auto\""),
-	@Argument(name=IPlatformConfiguration.AUTOSHUTDOWN, clazz=boolean.class, defaultvalue="false"), // todo: does not count children hierarchically
-	@Argument(name=IPlatformConfiguration.PLATFORM_COMPONENT, clazz=ClassInfo.class, defaultvalue="new jadex.bridge.ClassInfo(jadex.platform.service.cms.PlatformComponent.class)"),
-	@Argument(name=WELCOME, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=PROGRAM_ARGUMENTS, clazz=String[].class),
-	
-	@Argument(name=GUI, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=CLI, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=CLICONSOLE, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=SAVEONEXIT, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=JCCPLATFORMS, clazz=String.class, defaultvalue="null"),
-	@Argument(name=LOGGING, clazz=boolean.class, defaultvalue="false"),
 	@Argument(name=LOGGING_LEVEL, clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
-	@Argument(name=SIMULATION, clazz=Boolean.class),
-	@Argument(name=ASYNCEXECUTION, clazz=Boolean.class),
-	@Argument(name=THREADPOOLDEFER, clazz=boolean.class, defaultvalue="true"),
-	
 	@Argument(name=UNIQUEIDS, clazz=boolean.class, defaultvalue="true"),
-	
-	@Argument(name=LIBPATH, clazz=String.class),
-	@Argument(name=BASECLASSLOADER, clazz=ClassLoader.class),
-
-	@Argument(name=CHAT, clazz=boolean.class, defaultvalue="true"),
-	
-	@Argument(name=AWARENESS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=AWAMECHANISMS, clazz=String.class, defaultvalue="\"Multicast, Local\""),
-//	@Argument(name=AWAMECHANISMS, clazz=String.class, defaultvalue="\"Broadcast, Multicast, Message, Relay, Local\""),
-	@Argument(name=AWADELAY, clazz=long.class, defaultvalue="20000"),
-	@Argument(name=AWAINCLUDES, clazz=String.class, defaultvalue="\"\""),
-	@Argument(name=AWAEXCLUDES, clazz=String.class, defaultvalue="\"\""),
-
-	@Argument(name=BINARYMESSAGES, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=STRICTCOM, clazz=boolean.class, defaultvalue="false"),
-	
-//	@Argument(name=USESECRET, clazz=Boolean.class),
-//	@Argument(name=PRINTSECRET, clazz=boolean.class, defaultvalue="true"),
-//	@Argument(name=NETWORKNAME, clazz=String.class),
-//	@Argument(name=NETWORKSECRET, clazz=String.class),
-//	@Argument(name=ROLES, clazz=Map.class),
-
-	
-	// TODO. Setting default values here doesn't work any more!
-	@Argument(name=LOCALTRANSPORT, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=TCPTRANSPORT, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=TCPPORT, clazz=int.class, defaultvalue="0"),
-	@Argument(name=WSTRANSPORT, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=WSPORT, clazz=int.class, defaultvalue="-1"),
-	@Argument(name=RELAYTRANSPORT, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=RELAYADDRESSES, clazz=String.class, defaultvalue="\"ws://ssp1@ngrelay1.actoron.com:80\""),	// TODO: wss
-	@Argument(name=RELAYFORWARDING, clazz=boolean.class, defaultvalue="false"),
-//	@Argument(name=RELAYSECURITY, clazz=boolean.class, defaultvalue="$args.relayaddress.indexOf(\"https://\")==-1 ? false : true"),
-//	@Argument(name=RELAYAWAONLY, clazz=boolean.class, defaultvalue="false"),
-//	@Argument(name=SSLTCPTRANSPORT, clazz=boolean.class, defaultvalue="false"),
-//	@Argument(name=SSLTCPPORT, clazz=int.class, defaultvalue="44334"),
-
-	@Argument(name=THREADPOOLCLASS, clazz=String.class),//, defaultvalue="null"),
-
-	@Argument(name=CONTEXTSERVICECLASS, clazz=String.class),//, defaultvalue="null"),
-	
-	@Argument(name=WSPUBLISH, clazz=boolean.class, defaultvalue="false"),
-	
-	@Argument(name=RSPUBLISH, clazz=boolean.class, defaultvalue="false"),
-	@Argument(name=RSPUBLISHCOMPONENT, clazz=String.class, defaultvalue="jadex.commons.SReflect.chooseAvailableResource(jadex.bridge.service.types.publish.IPublishService.DEFAULT_RSPUBLISH_COMPONENTS)"),
-
-	@Argument(name=MAVEN_DEPENDENCIES, clazz=boolean.class, defaultvalue="false"),
-
-	@Argument(name="kernel_multi", clazz=Boolean.class, defaultvalue="true"),
-	@Argument(name="kernel_micro", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_component", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_application", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_bdiv3", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_bdi", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_bpmn", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_bpmn", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_bdibpmn", clazz=Boolean.class, defaultvalue="false"),
-	@Argument(name="kernel_gpmn", clazz=Boolean.class, defaultvalue="false"),
-	
-	@Argument(name="sensors", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="mon", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="df", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="clock", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="simul", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="filetransfer", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="security", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="library", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="settings", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="context", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="address", clazz=boolean.class, defaultvalue="true"),
-	
-	@Argument(name="superpeer", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="supersuperpeer", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="superpeerclient", clazz=boolean.class),//, defaultvalue="$args.superpeer==null && $args.supersuperpeer? true: !$args.superpeer && !$args.supersuperpeer"),
-	@Argument(name="acr", clazz=boolean.class, defaultvalue="false")
-})
-
-@ComponentTypes({
-	@ComponentType(name="monitor", clazz=MonitoringAgent.class), //filename="jadex/platform/service/monitoring/MonitoringAgent.class"),
-	@ComponentType(name="kernel_component", clazz=KernelComponentAgent.class), //filename="jadex/micro/KernelComponentAgent.class"),
-	@ComponentType(name="kernel_application", filename="jadex/application/KernelApplication.component.xml"),
-	@ComponentType(name="kernel_micro", clazz=KernelMicroAgent.class), // filename="jadex/micro/KernelMicroAgent.class"),
-	@ComponentType(name="kernel_bdiv3", filename="jadex/bdiv3/KernelBDIV3Agent.class"),
-	@ComponentType(name="kernel_bdi", filename="jadex/bdiv3x/KernelBDIX.component.xml"),
-	@ComponentType(name="kernel_bdibpmn", filename="jadex/bdibpmn/KernelBDIBPMN.component.xml"),
-	@ComponentType(name="kernel_bpmn", filename="jadex/micro/KernelBpmnAgent.class"),
-	@ComponentType(name="kernel_gpmn", filename="jadex/gpmn/KernelGPMN.component.xml"),
-	@ComponentType(name="kernel_multi", clazz=KernelMultiAgent.class), //filename="jadex/micro/KernelMultiAgent.class"),
-	@ComponentType(name="chat", filename="jadex/platform/service/chat/ChatAgent.class"),
-	@ComponentType(name="awa", clazz=AwarenessManagementAgent.class), //filename="jadex/platform/service/awareness/management/AwarenessManagementAgent.class"),
-	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
-	@ComponentType(name="rspublish", filename="%{$args.rspublishcomponent}"),
-//	@ComponentType(name="rspublish", filename="jadex/extension/rs/publish/ExternalRSPublishAgent.class"),
-//	@ComponentType(name="rspublish_grizzly", filename="jadex/extension/rs/publish/GrizzlyRSPublishAgent.class"),
-//	@ComponentType(name="rspublish_jetty", filename="jadex/extension/rs/publish/JettyRSPublishAgent.class"),
-	@ComponentType(name="wspublish", filename="jadex/extension/ws/publish/WSPublishAgent.class"),
-	@ComponentType(name="cli", filename="jadex/platform/service/cli/CliAgent.class"),
-	@ComponentType(name="sensor", clazz=SensorHolderAgent.class), //filename="jadex/platform/sensor/SensorHolderAgent.class")
-	@ComponentType(name="df", clazz=DirectoryFacilitatorAgent.class),
-	@ComponentType(name="clock", clazz=ClockAgent.class),
-	@ComponentType(name="simulation", clazz=SimulationAgent.class),
-	@ComponentType(name="filetransfer", clazz=FileTransferAgent.class),
-	@ComponentType(name="security", clazz=SecurityAgent.class),
-	@ComponentType(name="library", clazz=LibraryAgent.class),
-	@ComponentType(name="settings", clazz=SettingsAgent.class),
-	@ComponentType(name="address", clazz=TransportAddressAgent.class),
-	@ComponentType(name="context", clazz=ContextAgent.class),
-	@ComponentType(name="registrypeer", clazz=PeerRegistrySynchronizationAgent.class),
-	@ComponentType(name="registrysuperpeer", clazz=SuperpeerRegistrySynchronizationAgent.class),
-	@ComponentType(name="compregistry", filename="jadex/platform/service/componentregistry/ComponentRegistryAgent.class"),
-	@ComponentType(name="tcp", clazz=TcpTransportAgent.class),
-	@ComponentType(name="ws", filename="jadex/platform/service/message/websockettransport/WebSocketTransportAgent.class"),
-	@ComponentType(name="rt", filename="jadex/platform/service/message/relaytransport/RelayTransportAgent.class"),
-	@ComponentType(name="acr", clazz=AutoConfigRegistryAgent.class)
+	@Argument(name=PLATFORMPROXIES, clazz=boolean.class, defaultvalue="true")
 })
 
 @ProvidedServices({
-	@ProvidedService(type=IThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(false), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IThreadPoolService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(false), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	// hack!!! no daemon here (possibly fixed?)
-	@ProvidedService(type=IDaemonThreadPoolService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getComponentIdentifier())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IExecutionService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="($args.asyncexecution!=null && !$args.asyncexecution.booleanValue()) || ($args.asyncexecution==null && $args.simulation!=null && $args.simulation.booleanValue())? new jadex.platform.service.execution.SyncExecutionService($component): new jadex.platform.service.execution.AsyncExecutionService($component)", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.platform.service.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
+	@ProvidedService(type=IDaemonThreadPoolService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IExecutionService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="PlatformAgent.createExecutionServiceImpl($args.asyncexecution, $args.simulation, $args.bisimulation, $component)", proxytype=Implementation.PROXYTYPE_RAW)),
+//	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.bridge.service.types.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
 })
 
 @RequiredServices(
 {
-	@RequiredService(name="factoryservices", type=IComponentFactory.class, multiple=true, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="factoryservices", type=IComponentFactory.class, multiple=true)//, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 })
 
 @Properties(
 {
 	@NameValue(name="componentviewer.viewerclass", value="jadex.commons.SReflect.classForName0(\"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel\", jadex.platform.service.library.LibraryService.class.getClassLoader())"),
-	@NameValue(name="logging.level", value="$args.logging ? java.util.logging.Level.INFO : $args.logging_level")
-})
-
-@Configurations(
-{
-	@Configuration(name="auto", arguments={
-	}, components={
-		@Component(name="library", type="library", daemon=Boolean3.TRUE, number="$args.library? 1 : 0"),
-		@Component(name="context", type="context", daemon=Boolean3.TRUE, number="$args.context? 1 : 0"),
-		@Component(name="settings", type="settings", daemon=Boolean3.TRUE, number="$args.settings? 1 : 0"),
-		//@Component(name="%{jadex.base.IPlatformConfiguration.MONITORINGCOMP}", type="monitor", daemon=Boolean3.TRUE, number="$args.get(jadex.base.IPlatformConfiguration.MONITORINGCOMP)? 1 : 0"),
-		@Component(name="mon", type="monitor", daemon=Boolean3.TRUE, number="$args.mon? 1 : 0"),
-		
-		@Component(name="kernel_multi", type="kernel_multi", daemon=Boolean3.TRUE, number="$args.kernel_multi? 1 : 0"),
-		@Component(name="kernel_micro", type="kernel_micro", daemon=Boolean3.TRUE, number="$args.kernel_micro? 1 : 0"),
-		@Component(name="kernel_component", type="kernel_component", daemon=Boolean3.TRUE, number="$args.kernel_component? 1 : 0"),
-		@Component(name="kernel_application", type="kernel_application", daemon=Boolean3.TRUE, number="$args.kernel_application? 1 : 0"),
-		@Component(name="kernel_bdiv3", type="kernel_bdiv3", daemon=Boolean3.TRUE, number="$args.kernel_bdiv3? 1 : 0"),
-		@Component(name="kernel_bdi", type="kernel_bdi", daemon=Boolean3.TRUE, number="$args.kernel_bdi? 1 : 0"),
-		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=Boolean3.TRUE, number="$args.kernel_bpmn? 1 : 0"),
-		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=Boolean3.TRUE, number="$args.kernel_bdibpmn? 1 : 0"),
-		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=Boolean3.TRUE, number="$args.kernel_gpmn? 1 : 0"),
-
-//		@Component(name="compregistry", type="compregistry", daemon=Boolean3.TRUE, number="$args.compregistry? 1 : 0"),
-		
-		@Component(name="clock", type="clock", daemon=Boolean3.TRUE, number="$args.clock? 1 : 0", arguments=@NameValue(name="simulation", value="$args.simulation")),
-		@Component(name="security", type="security", daemon=Boolean3.TRUE, number="$args.security? 1 : 0"),
-		@Component(name="address", type="address", daemon=Boolean3.TRUE, number="$args.address? 1 : 0"),
-		@Component(name="simulation", type="simulation", daemon=Boolean3.TRUE, number="$args.simul? 1 : 0"),
-		@Component(name="filetransfer", type="filetransfer", daemon=Boolean3.TRUE, number="$args.filetransfer? 1 : 0"),
-		
-		@Component(name="awa", type="awa", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0"),
-		
-		@Component(name="registrysuperpeer", type="registrysuperpeer", daemon=Boolean3.TRUE , number="$args.superpeer || $args.supersuperpeer? 1 : 0"),
-		@Component(name="registrypeer", type="registrypeer", daemon=Boolean3.TRUE , number="$args.superpeerclient? 1: $args.getArguments().get(\"superpeerclient\")==null && !$args.superpeer && !$args.supersuperpeer? 1 : 0"),
-		
-		@Component(name="chat", type="chat", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
-		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0"),
-		@Component(name="rspub", type="rspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
-		@Component(name="wspub", type="wspublish", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
-		@Component(name="cli", type="cli", daemon=Boolean3.TRUE, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0"),
-		
-		@Component(name="df", type="df", daemon=Boolean3.TRUE, number="$args.df? 1 : 0"),
-		@Component(name="sensors", type="sensor", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
-		@Component(name="tcp", type="tcp", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.tcptransport)? 1: 0"),
-		@Component(name="ws", type="ws", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.wstransport)? 1: 0"),
-		@Component(name="rt", type="rt", daemon=Boolean3.TRUE, number="Boolean.TRUE.equals($args.relaytransport)? 1: 0"),
-		
-		@Component(name="acr", type="acr", daemon=Boolean3.TRUE, number="$args.acr? 1 : 0")
-	})
+	@NameValue(name="logging.level", value="$args.logging ? java.util.logging.Level.INFO : $args.logginglevel")
 })
 @Agent
 public class PlatformAgent
 {
+	/** Boolean if platform proxies should be created. */
+	@AgentArgument
+	protected boolean platformproxies;
+	
+	//-------- service creation helpers --------
+	
+	/** Create execution service. */
+	public static synchronized IExecutionService	createExecutionServiceImpl(Object asyncexecution, Object simulation, Object bisimulation, IInternalAccess component)
+	{
+		if(Boolean.TRUE.equals(bisimulation))
+		{
+			return BisimExecutionService.getInstance(component);
+		}
+		else
+		{
+			boolean	sync	= Boolean.FALSE.equals(asyncexecution) || Boolean.TRUE.equals(simulation);
+			return sync ? new SyncExecutionService(component) : new AsyncExecutionService(component);
+		}
+	}
+	
+	//-------- static part --------
+	
+	/** Filter for finding agents to be auto-started. */
+	protected static IFilter<SClassReader.ClassInfo>	filter	= new IFilter<SClassReader.ClassInfo>()
+	{
+		public boolean filter(ClassInfo ci)
+		{
+			boolean ret = false;
+			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
+			if(ai!=null)
+			{
+				AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
+				if(aai!=null)
+				{
+					EnumInfo ei = (EnumInfo)aai.getValue("value");
+					String val = ei.getValue();
+					ret = val==null? false: "true".equals(val.toLowerCase()) || "false".equals(val.toLowerCase()); // include all which define the value (false can be overridden from args)
+				}
+			}
+			return ret;
+		}
+	};
+	
+	@Agent
+	protected IInternalAccess agent;
+	
+	// enable startup monkey for randomized sequential component startup (dependency testing).
+	boolean STARTUP_MONKEY	= false;
+	
 	// where should the defaults be defined (here or in the config)
 //	@Arguments
 //	public static jadex.bridge.modelinfo.Argument[] getArguments()
 //	{
 //		return PlatformConfigurationHandler.getArguments();
+//	}
+	
+	/**
+	 *  Called when platform startup finished.
+	 */
+	@AgentCreated
+	public IFuture<Void> init()
+	{
+		Future<Void> ret = new Future<>();
+//		System.out.println("Start scanning...");
+		long start = System.currentTimeMillis();
+				
+		// Class name -> instance name
+		Map<String, String> names = new HashMap<String, String>();
+		DependencyResolver<String> dr = new DependencyResolver<String>();
+
+		URL[] urls = new URL[0];
+		ClassLoader classloader = PlatformAgent.class.getClassLoader();
+		if(classloader instanceof URLClassLoader)
+			urls = ((URLClassLoader)classloader).getURLs();
+//		System.out.println("urls: "+urls.length);
+		
+		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
+		Set<String>	comps	= new LinkedHashSet<>();
+		
+		for(ClassInfo ci: cis)
+		{
+//			System.out.println("Found: "+ci.getClassname());
+//			Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
+//			if(clazz==null)
+//				agent.getLogger().warning("Could not load agent class: "+ci.getClassname());
+//			else
+				addComponentToLevels(dr, ci, names, comps);
+		}
+		
+//		System.out.println("cls: "+files.size()+" "+components.size());
+//		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
+		
+		Collection<Set<String>> levels = dr.resolveDependenciesWithLevel();
+//		System.out.println("levels: "+levels);
+//		System.out.println("names: "+names);
+		
+		startComponents(levels.iterator(), names, comps).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			@Override
+			public void customResultAvailable(Void result)
+			{
+				if(platformproxies)
+					addQueryForPlatformProxies();
+				super.customResultAvailable(result);
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Add query for creating platform proxies.
+	 */
+	protected void addQueryForPlatformProxies()
+	{
+		// No query when no search query manager service
+		if(agent.searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE))==null)
+		{
+			return;
+		}
+		
+//		System.out.println("creating platform proxies for remote platforms");
+		
+		// scope network or global?!
+		ISubscriptionIntermediateFuture<IExternalAccess> query = agent.addQuery(new ServiceQuery<>(IExternalAccess.class)
+			.setScope(RequiredServiceInfo.SCOPE_NETWORK));
+//					.setScope(RequiredServiceInfo.SCOPE_GLOBAL));
+		query.addResultListener(new IIntermediateResultListener<IExternalAccess>()
+		{
+			public void intermediateResultAvailable(IExternalAccess result)
+			{
+				try
+				{
+					if(!result.getId().getRoot().equals(agent.getId().getRoot()))
+					{
+						System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
+						Map<String, Object> args = new HashMap<>();
+						args.put("component", result.getId());
+						agent.createComponent(new CreationInfo().setFilename("jadex.platform.service.remote.ProxyAgent.class")
+							.setArguments(args).setName(result.getId().toString()));
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+			public void finished()
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+			
+			public void resultAvailable(Collection<IExternalAccess> result)
+			{
+			}
+		});
+	}
+	
+	/**
+	 *  Add a components to the dependency resolver to build start levels.
+	 *  Components of the same level can be started in parallel.
+	 */
+	protected void addComponentToLevels(DependencyResolver<String> dr, ClassInfo ci, Map<String, String> names, Set<String> comps)
+	{
+		try
+		{
+//			System.out.println("Found Agent annotation on class: "+ cl.getName());
+//			Agent aan = cl.getAnnotation(Agent.class);
+//			Autostart autostart = aan.autostart();
+//			if(autostart.value().toBoolean()!=null)
+//			{		
+				AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
+				AnnotationInfo autostart = (AnnotationInfo)ai.getValue("autostart");
+				
+				String name = autostart.getValue("name")==null || ((String)autostart.getValue("name")).length()==0? null: (String)autostart.getValue("name");
+//				String name = autostart.name().length()==0? null: autostart.name();
+				
+				AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
+				
+				EnumInfo ei = (EnumInfo)aai.getValue("value");
+				String val = ei.getValue();
+				boolean ok = "true".equals(val.toLowerCase()); 
+				if(name!=null)
+				{
+					Boolean start = getAgentStart(name);
+					if(start!=null)
+						ok = start.booleanValue();
+				}
+				else
+				{
+					// check classname as parameter
+//					name = SReflect.getInnerClassName(cl);
+					name = SReflect.getUnqualifiedTypeName(ci.getClassName());
+					
+					if(getAgentStart(name.toLowerCase())!=null)
+					{	
+						ok = getAgentStart(name.toLowerCase());
+					}
+					else
+					{
+						// check classname - suffix (BDI/Agent etc) in lowercase
+						int suf = SUtil.inndexOfLastUpperCaseCharacter(name);
+						if(suf>0)
+						{
+							name = name.substring(0, suf).toLowerCase();
+							if(getAgentStart(name)!=null)
+							{	
+								ok = getAgentStart(name);
+							}
+						}
+					}
+				}
+				
+//				if(ci.getClassName().toLowerCase().indexOf("super")!=-1)
+//				{
+//					System.out.println("deac: "+ci.getClassName());
+//					ok = false;
+//				}
+				
+				if(ok)
+				{
+					String cname = ci.getClassName();
+					comps.add(cname);
+					dr.addNode(cname);
+					
+					Object[] pres = (Object[])autostart.getValue("predecessors");
+					if(pres!=null)
+					{
+						for(Object pre: pres)
+						{
+							// Object as placeholder for no deps, because no entries should not mean no deps
+							if(!Object.class.getName().equals(pre))
+								dr.addDependency(cname, (String)pre);
+						}
+					}
+					
+					Object[] sucs = (Object[])autostart.getValue("successors");
+					if(sucs!=null)
+					{
+						for(Object suc: sucs)
+							dr.addDependency((String)suc, cname);
+					}
+					
+					// if no predecessors are defined add SecurityAgent
+					if(pres==null || pres.length==0)
+						dr.addDependency(cname, SecurityAgent.class.getName());
+					
+					names.put(cname, name);
+				}
+//				else
+//				{
+//					System.out.println("Not starting: "+name);
+//				}
+//			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Get the config/argument value of an agent name.
+	 */
+	protected Boolean getAgentStart(String name)
+	{		
+//		Boolean ret = null;
+//		IPlatformConfiguration config = (IPlatformConfiguration)Starter.getPlatformValue(agent.getId().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
+//		if(config.getValue(name, agent.getModel())!=null)
+//			ret = (boolean)config.getValue(name, agent.getModel());
+//		
+//		if(name.indexOf("jcc")!=-1)
+//			System.out.println("getAgentStart: "+name+" "+ret);
+//		
+//		return ret;
+		
+		Map<String, Object> argsmap = (Map<String, Object>)Starter.getPlatformValue(agent.getId(), IPlatformConfiguration.PLATFORMARGS);
+		if(argsmap.containsKey(name))
+			return (Boolean)argsmap.get(name);
+		return null;
+	}
+		
+	/**
+	 *  Start components in levels.
+	 */
+	protected IFuture<Void> startComponents(Iterator<Set<String>> levels, Map<String, String> names, Set<String> comps)
+	{
+		if(STARTUP_MONKEY)
+			return startComponentsDebug(levels, null, names, comps);
+		
+		final Future<Void> ret = new Future<>();
+		
+		if(levels.hasNext())
+		{
+//			System.out.println("---------- LEVEL --------------");
+			Set<String> level = levels.next();
+			CounterResultListener<Void> lis = new CounterResultListener<>(level.size(), new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					startComponents(levels, names, comps).addResultListener(new DelegationResultListener<>(ret));
+				}
+
+				public void exceptionOccurred(Exception exception)
+				{
+					agent.getLogger().warning(SUtil.getExceptionStacktrace(exception));
+					startComponents(levels, names, comps).addResultListener(new DelegationResultListener<>(ret));
+				}
+			});
+			
+			for(String c: level)
+			{
+				if(comps.contains(c))
+				{
+					//ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(names.get(c), c.getName()+".class", (CreationInfo)null);
+					//fut.addTuple2ResultListener(res -> {lis.resultAvailable(null);}, res -> {});
+					
+					CreationInfo ci = new CreationInfo();
+					ci.setName(names.get(c));
+					ci.setFilename(c+".class");
+					IFuture<IExternalAccess> fut = agent.createComponent(ci, null);
+					fut.addResultListener(
+						res -> {
+//							System.out.println("Auto started: "+c+", "+names.get(c));
+							lis.resultAvailable(null);
+						},
+						exception -> {
+//							System.out.println("Auto start failed: "+c+", "+names.get(c)+", "+exception);
+							lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c+".class", exception));
+						});
+					
+//					System.out.println("Auto starting: "+c+", "+names.get(c));
+				}
+				else
+				{
+					lis.resultAvailable(null);					
+				}
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+
+	/**
+	 *  Start components synchronized using random order to find implicit dependencies. 
+	 */
+	protected IFuture<Void> startComponentsDebug(Iterator<Set<String>> levels, Iterator<String> level, Map<String, String> names, Set<String> comps)
+	{
+		// Initial level or finished with last level -> start next level
+		if(level==null || !level.hasNext())
+		{
+			if(levels.hasNext())
+			{
+				//			System.out.println("---------- LEVEL --------------");
+				// Chaos monkey -> randomize list of components to find implicit dependencies
+				List<String>	list	= new ArrayList<>(levels.next());
+				Collections.shuffle(list, SSecurity.getSecureRandom());
+				return startComponentsDebug(levels, list.iterator(), names, comps);
+			}
+			else
+			{
+				return IFuture.DONE;
+			}
+		}
+		
+		// level!=null && level.hasNext() -> Start next component in level
+		else
+		{
+			Future<Void>	ret	= new Future<>();
+			
+			String	c	= level.next();
+			if(comps.contains(c))
+			{
+				IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setName(names.get(c)).setFilename(c+".class"), null);
+				fut.addResultListener(
+					res -> startComponentsDebug(levels, level, names, comps).addResultListener(new DelegationResultListener<>(ret)),
+					exception -> ret.setException(new RuntimeException("Cannot autostart "+c+".class", exception)));
+			}
+			else
+			{
+				startComponentsDebug(levels, level, names, comps).addResultListener(new DelegationResultListener<>(ret));
+			}
+			return ret;
+		}
+	}
+
+	/**
+	 *  Called when platform startup finished.
+	 */
+	// BUG: currently not called because CMS calls it and platform is not created via cms
+//	@AgentBody
+//	public void body()
+//	{
+//		System.out.println("Start scanning...");
+//	}
+
+	// todo?! remove platform proxy query on termination 
+	// BUG: currently not called
+//	@AgentTerminated
+//	public void terminated()
+//	{
+//		if(query!=null)
+//			query.terminate();
 //	}
 }

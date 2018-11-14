@@ -8,8 +8,8 @@ import java.util.Set;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.collection.SCollection;
@@ -18,7 +18,6 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 /**
  *  The synchronous execution service that executes all tasks in zero to one thread.
@@ -42,7 +41,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	protected Executor executor;
 	
 	/** The idle future. */
-	protected Future<Void> idlefuture;
+	protected volatile Future<Void> idlefuture;
 	
 	/** The state of the service. */
 	protected State state;
@@ -74,7 +73,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 */
 	public SyncExecutionService(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getComponentIdentifier(), IExecutionService.class, properties);
+		super(provider.getId(), IExecutionService.class, properties);
 
 		this.provider = provider;
 		this.state	= State.CREATED;
@@ -176,119 +175,113 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		if(state==State.SHUTDOWN)
 		{
 			ret.setResult(null);
-//			ret.setResult(getServiceIdentifier());
+//			ret.setResult(getId());
 			return ret;
 		}
 		
 		super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Void result)
+			public void customResultAvailable(Void v)
 			{
-				SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-					.addResultListener(new IResultListener<IThreadPoolService>()
+				executor = new Executor(getThreadPool(), new IExecutable()
 				{
-					public void resultAvailable(IThreadPoolService result)
+					public boolean execute()
 					{
-						executor = new Executor(result, new IExecutable()
-						{
-							public boolean execute()
-							{
-								// Perform one task a time.
-								
-								// assert task==null;
-								synchronized(SyncExecutionService.this)
-								{
-									if(state==State.RUNNING && !queue.isEmpty())
-									{
-										// Hack!!! Is there a better way to get first element from queue without creating iterator?
-										Iterator<IExecutable> iterator = queue.iterator();
-										task = iterator.next();
-										iterator.remove();
-									}
-								}
-								
-								boolean again = false;
-								if(task!=null)
-								{
-									try
-									{
-//										if(DEBUG)
-//											System.out.println("Executing task: "+task+", "+this);
-										again = task.execute();
-									}
-									catch(Throwable e)
-									{
-										System.out.println("Exception during executing task: "+task);
-										e.printStackTrace();
-									}									
-								}
-
-								Future<Void> idf = null;
-								List<Future<Void>>	remfuts	= null;
-								synchronized(SyncExecutionService.this)
-								{
-									if(removedtask==null)
-									{
-										if(again && state==State.RUNNING)
-										{
-											queue.add(task);
-										}
-									}
-									else if(removedtask==task)
-									{
-										removedtask = null;
-										remfuts	= new ArrayList<Future<Void>>(removedfut);
-										removedfut.clear();
-									}
-									else
-									{
-										throw new RuntimeException("Removedtask!=task: "+task+" "+removedtask);
-									}
-									
-									task = null;
-//									System.out.println("task finished: "+state+", "+queue.isEmpty()+", "+executor.isSwitching());
-									if(state==State.RUNNING && queue.isEmpty() && !executor.isSwitching())
-									{
-										idf = idlefuture;
-										idlefuture = null;
-		//								perform = idlefuture!=null;
-									}
-
-									// Perform next task when queue is not empty and service is running.
-									again	= state==State.RUNNING && !queue.isEmpty() && !executor.isSwitching();
-								}
-
-								
-								// When no more executables, inform idle commands.
-								if(idf!=null)
-								{
-//									System.out.println("Idle");
-									idf.setResult(null);
-		//							Iterator it	= idlecommands.iterator();
-		//							while(it.hasNext())
-		//							{
-		//								((ICommand)it.next()).execute(null);
-		//							}
-								}
-								if(remfuts!=null)
-								{
-									for(int i=0; i<remfuts.size(); i++)
-										remfuts.get(i).setResult(null);									
-								}
-								
-								return again;
-							}
-						});
+						// Perform one task a time.
 						
-						state	= State.RUNNING;
-						ret.setResult(null);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
+						// assert task==null;
+						synchronized(SyncExecutionService.this)
+						{
+							if(state==State.RUNNING && !queue.isEmpty())
+							{
+								// Hack!!! Is there a better way to get first element from queue without creating iterator?
+								Iterator<IExecutable> iterator = queue.iterator();
+								task = iterator.next();
+								iterator.remove();
+							}
+						}
+						
+						boolean again = false;
+						if(task!=null)
+						{
+							try
+							{
+//										if(DEBUG)
+								//System.out.println(SyncExecutionService.this+" Executing task: "+task+", "+this);
+								again = task.execute();
+							}
+							catch(ThreadDeath e)
+							{
+								// used to shut down blocked threads of killed agents -> ignore
+							}									
+							catch(Throwable e)
+							{
+								System.out.println("Exception during executing task: "+task);
+								e.printStackTrace();
+							}									
+						}
+
+						Future<Void> idf = null;
+						List<Future<Void>>	remfuts	= null;
+						synchronized(SyncExecutionService.this)
+						{
+							if(removedtask==null)
+							{
+								if(again && state==State.RUNNING)
+								{
+									queue.add(task);
+								}
+							}
+							else if(removedtask==task)
+							{
+								removedtask = null;
+								remfuts	= new ArrayList<Future<Void>>(removedfut);
+								removedfut.clear();
+							}
+							else
+							{
+								throw new RuntimeException("Removedtask!=task: "+task+" "+removedtask);
+							}
+							
+							task = null;
+//							System.out.println(SyncExecutionService.this+" task finished: "+state+", "+queue.isEmpty()+", "+executor.isSwitching()
+//								+"\n idle: "+(state==State.RUNNING && queue.isEmpty() && !executor.isSwitching())+" idlefuture: "+idlefuture
+//								+"\n again: "+(state==State.RUNNING && !queue.isEmpty() && !executor.isSwitching()));
+							if(state==State.RUNNING && queue.isEmpty() && !executor.isSwitching())
+							{
+								idf = idlefuture;
+								idlefuture = null;
+//								perform = idlefuture!=null;
+							}
+
+							// Perform next task when queue is not empty and service is running.
+							again	= state==State.RUNNING && !queue.isEmpty() && !executor.isSwitching();
+						}
+
+						
+						// When no more executables, inform idle commands.
+						if(idf!=null)
+						{
+//							System.out.println(SyncExecutionService.this+" Idle");
+							idf.setResult(null);
+//							Iterator it	= idlecommands.iterator();
+//							while(it.hasNext())
+//							{
+//								((ICommand)it.next()).execute(null);
+//							}
+						}
+						if(remfuts!=null)
+						{
+							for(int i=0; i<remfuts.size(); i++)
+								remfuts.get(i).setResult(null);									
+						}
+						
+						return again;
 					}
 				});
+				
+				state	= State.RUNNING;
+				ret.setResult(null);
 			}
 		});
 		
@@ -343,10 +336,20 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		}
 		else
 		{
+//			System.out.println(this+" getNextIdleFuture");
 			if(idlefuture==null)
 				idlefuture = new Future<Void>();
 			ret = idlefuture;
+//			System.out.println(this+" getNextIdleFuture: "+ret);
 		}
 		return ret;
+	}
+
+	/**
+	 *  Thread pool template method to support replacment.
+	 */
+	protected IThreadPoolService getThreadPool()
+	{
+		return ((IInternalRequiredServicesFeature)provider.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
 	}
 }

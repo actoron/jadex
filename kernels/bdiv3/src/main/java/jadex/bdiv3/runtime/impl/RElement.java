@@ -10,7 +10,7 @@ import jadex.rules.eca.RuleSystem;
 /**
  *  Base element for all runtime elements.
  */
-public class RElement
+public abstract class RElement
 {
 	protected static long cnt;
 	
@@ -114,7 +114,7 @@ public class RElement
 	 */
 	public RCapability getCapability()
 	{
-		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability();
+		return agent.getFeature(IInternalBDIAgentFeature.class).getCapability();
 	}
 	
 	/**
@@ -132,7 +132,7 @@ public class RElement
 	 */
 	public RuleSystem getRuleSystem()
 	{
-		return agent.getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem();
+		return agent.getFeature(IInternalBDIAgentFeature.class).getRuleSystem();
 	}
 	
 	/** 
@@ -142,5 +142,4 @@ public class RElement
 	{
 		return SReflect.getInnerClassName(this.getClass())+"(modelelement=" + modelelement + ", id=" + id + ")";
 	}
-
 }

@@ -14,7 +14,7 @@ public interface IWebSocketConnection
 	 *  @param body The message body.
 	 *  @return	A future indicating success.
 	 */
-	public IFuture<Void> sendMessage(byte[] header, byte[] body);
+	public IFuture<Integer> sendMessage(byte[] header, byte[] body);
 	
 	/**
 	 *  Closes the connection (ignored if already closed).

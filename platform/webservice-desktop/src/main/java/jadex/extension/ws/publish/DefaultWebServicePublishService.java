@@ -14,15 +14,15 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.SJavassist;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -71,18 +71,17 @@ public class DefaultWebServicePublishService implements IPublishService
 	{
 		// Java dynamic proxy cannot be used as @WebService annotation cannot be added.
 		
-//		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getServiceIdentifier().getServiceType()}, 
+//		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getId().getServiceType()}, 
 //			new WebServiceToJadexWrapperInvocationHandler(service));
 		
-		IService service = (IService) SServiceProvider.getService(component, serviceid.getServiceType(), pi.getPublishScope()).get();
+		IService service = (IService) component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(serviceid.getServiceType(), pi.getPublishScope(), null)).get();
 		
 		ClassLoader cl = null;
-		ILibraryService ls = SServiceProvider.getLocalService(component, ILibraryService.class, Binding.SCOPE_PLATFORM);
-		if (serviceid.getProviderId().getPlatformName().equals(component.getComponentIdentifier().getPlatformName()))
+		ILibraryService ls = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredService.SCOPE_PLATFORM));
+		if (serviceid.getProviderId().getPlatformName().equals(component.getId().getPlatformName()))
 		{
 			// Local publish, get the component's classloader.
-			IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
-			IComponentDescription desc = cms.getComponentDescription(serviceid.getProviderId()).get();
+			IComponentDescription desc = component.getDescription(serviceid.getProviderId()).get();
 			cl = ls.getClassLoader(desc.getResourceIdentifier()).get();
 		}
 		else
@@ -101,7 +100,7 @@ public class DefaultWebServicePublishService implements IPublishService
 		
 		if(endpoints==null)
 			endpoints = new HashMap<IServiceIdentifier, Endpoint>();
-		endpoints.put(service.getServiceIdentifier(), endpoint);
+		endpoints.put(service.getServiceId(), endpoint);
 		return IFuture.DONE;
 		
 //		try
@@ -146,7 +145,7 @@ public class DefaultWebServicePublishService implements IPublishService
 	 */
 	protected Object createProxy(IService service, ClassLoader classloader, Class<?> type)
 	{
-//		System.out.println("createProxy: "+service.getServiceIdentifier());
+//		System.out.println("createProxy: "+service.getId());
 		Object ret = null;
 		try
 		{

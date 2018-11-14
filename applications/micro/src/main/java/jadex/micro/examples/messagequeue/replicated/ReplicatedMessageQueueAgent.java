@@ -23,7 +23,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -41,9 +40,10 @@ import jadex.micro.examples.messagequeue.Event;
 @Service
 @ProvidedServices({@ProvidedService(type = IMessageQueueReplicableService.class, implementation = @Implementation(expression = "$pojoagent")),
 	@ProvidedService(type = IMessageQueueReplicationService.class, implementation = @Implementation(expression = "$pojoagent")) })
-@RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, multiple = true, binding = @Binding(scope = Binding.SCOPE_GLOBAL), name = "replication"))
+@RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, multiple = true, scope = RequiredService.SCOPE_GLOBAL, name = "replication"))
 @Arguments(@Argument(name = "searchinterval", clazz = Integer.class, defaultvalue = "1000"))
-public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableService, IMessageQueueReplicationService {
+public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableService, IMessageQueueReplicationService 
+{
 
 	/** The agent. */
 	@Agent
@@ -74,7 +74,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 		this.localsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
 		this.repsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
 		this.repsubscriptions = new HashMap<String, List<ReplicationSubscription>>();
-		this.id = agent.getComponentIdentifier().getName();
+		this.id = agent.getId().getName();
 	}
 
 	@AgentBody
@@ -104,7 +104,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 							}
 
 							// if it is not and it is not the own service...
-							if(!present && !result.getId().equals(id)) 
+							if(!present && !result.getIdString().equals(id)) 
 							{
 								// subscribe...
 								ISubscriptionIntermediateFuture<Event> subscription = result.subscribeForReplication(topic);
@@ -125,12 +125,12 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 				});
 
 				// repeat
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(searchinterval, this);
+				agent.getFeature(IExecutionFeature.class).waitForDelay(searchinterval, this);
 				return IFuture.DONE;
 			}
 		};
 
-		this.agent.getComponentFeature(IExecutionFeature.class).waitForTick(searchServicesStep);
+		this.agent.getFeature(IExecutionFeature.class).waitForTick(searchServicesStep);
 	}
 
 	/**
@@ -240,7 +240,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 				}
 
 				// if no subscription was found for the given service...
-				if(!present && !result.getId().equals(id)) 
+				if(!present && !result.getIdString().equals(id)) 
 				{
 					// subscribe...
 					ISubscriptionIntermediateFuture<Event> subscription = result.subscribeForReplication(topic);
@@ -313,7 +313,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 */
 	private IIntermediateFuture<IMessageQueueReplicationService> getOtherServices() 
 	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("replication");
+		return agent.getFeature(IRequiredServicesFeature.class).getServices("replication");
 	}
 
 	/**
@@ -332,7 +332,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 * 
 	 * @return the service Id.
 	 */
-	public String getId() 
+	public String getIdString() 
 	{
 		return this.id;
 	}

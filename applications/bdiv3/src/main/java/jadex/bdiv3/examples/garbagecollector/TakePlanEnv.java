@@ -8,9 +8,9 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Go;
-import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Pick;
-import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Take;
+import jadex.bdiv3.examples.garbagecollector.GarbageCollectorAgent.Go;
+import jadex.bdiv3.examples.garbagecollector.GarbageCollectorAgent.Pick;
+import jadex.bdiv3.examples.garbagecollector.GarbageCollectorAgent.Take;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -28,7 +28,7 @@ public class TakePlanEnv
 	//-------- attributes --------
 
 	@PlanCapability
-	protected GarbageCollectorBDI collector;
+	protected GarbageCollectorAgent collector;
 		
 	@PlanAPI
 	protected IPlan rplan;
@@ -63,7 +63,7 @@ public class TakePlanEnv
 		Future<Void> fut = new Future<Void>();
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(ISpaceAction.ACTOR_ID, collector.getAgent().getComponentDescription());
+		params.put(ISpaceAction.ACTOR_ID, collector.getAgent().getDescription());
 		grid.performSpaceAction("drop", params, lis);
 		fut.get();
 		

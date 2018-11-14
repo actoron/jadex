@@ -70,7 +70,7 @@ public class BlockingSokratesBDI
 			System.out.println("Now puzzling:");
 			final long	start	= System.currentTimeMillis();
 			
-			agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MoveGoal()).get();
+			agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MoveGoal()).get();
 			
 			long end = System.currentTimeMillis();
 			System.out.println("Needed: "+(end-start)+" millis.");

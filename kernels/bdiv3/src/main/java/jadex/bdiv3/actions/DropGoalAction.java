@@ -58,7 +58,7 @@ public class DropGoalAction implements IConditionalComponentStep<Void>
 			
 			protected void cont()
 			{
-				ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().removeGoal(goal);
+				ia.getFeature(IInternalBDIAgentFeature.class).getCapability().removeGoal(goal);
 				goal.setLifecycleState(ia, RGoal.GoalLifecycleState.DROPPED);
 				ret.setResult(null);
 			}

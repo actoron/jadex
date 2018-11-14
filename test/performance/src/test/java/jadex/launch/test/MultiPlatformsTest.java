@@ -7,7 +7,9 @@ import java.util.TimerTask;
 
 import org.junit.Test;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
+import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
@@ -58,7 +60,7 @@ public class MultiPlatformsTest //extends TestCase
 //		Thread.sleep(3000000);
 
 		
-		int	number	= 15; // larger numbers cause timeout on www1.
+		int	number	= 15; // TODO: use normal config ???
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
 		for(int i=0; i<number; i++)
@@ -67,8 +69,12 @@ public class MultiPlatformsTest //extends TestCase
 			{
 				System.out.println("Starting platform "+i);
 			}
-			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases_"+i+"*",
-				"-gui", "false", "-printpass", "false", "-cli", "false",
+			
+			IPlatformConfiguration	config	= STest.getDefaultTestConfig();
+			config.setPlatformName("testcases_"+i+"*");
+			futures.add(Starter.createPlatform(config,
+				new String[]{
+//				"-gui", "false", "-printpass", "false", "-cli", "false",
 //				"-logging", "true",
 //				"-awareness", "false",
 //				"-componentfactory", "jadex.micro.MicroAgentFactory",
@@ -78,11 +84,12 @@ public class MultiPlatformsTest //extends TestCase
 //				"-awamechanisms", "\"Multicast\"", 
 //				"-awamechanisms", "\"Relay, Multicast, Message\"", 
 //				"-deftimeout", "60000",
-				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
+//				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"
+				}));
 		}
 		
 		IExternalAccess[]	platforms	= new IExternalAccess[number];
-		long	timeout	= Starter.getScaledLocalDefaultTimeout(null, number);
+		long	timeout	= Starter.getScaledDefaultTimeout(null, number);
 		for(int i=0; i<number; i++)
 		{
 			if(i%10==0)

@@ -7,14 +7,10 @@ import java.util.Map;
 import org.junit.Test;
 
 import jadex.base.Starter;
+import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -31,33 +27,35 @@ public class BDIV3CreationTest //extends TestCase
 	@Test
 	public void	testBDICreation()
 	{
-		long timeout	= -1;//BasicService.getLocalDefaultTimeout();
 //		ISuspendable	sus	= 	new ThreadSuspendable();
-		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
+		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(STest.getDefaultTestConfig(),
+			new String[]{
+//				"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
 //			"-logging", "true",
-			"-libpath", SUtil.getOutputDirsExpression("jadex-integration-performance-test", true),
-			"-awareness", "false",	// otherwise influences performance measure
-			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
-//			"-componentfactory", "jadex.component.ComponentComponentFactory",
-//			"-conf", "jadex.standalone.Platform.component.xml",
-			"-printpass", "false"}).get(timeout);
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
+//			"-libpath", SUtil.getOutputDirsExpression("jadex-integration-performance-test", true),
+//			"-awareness", "false",	// otherwise influences performance measure
+//			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
+////			"-componentfactory", "jadex.component.ComponentComponentFactory",
+////			"-conf", "jadex.standalone.Platform.component.xml",
+//			"-printpass", "false"
+			}
+			).get();
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", Integer.valueOf(10000));
-		cms.createComponent(null, "jadex.bdiv3.benchmarks.CreationBDI.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<Tuple2<String, Object>>>(fut)
+		platform.createComponent(new CreationInfo(args).setFilename("jadex.bdiv3.benchmarks.CreationBDI.class"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void customResultAvailable(IExternalAccess result)
 			{
 				// Agent created. Kill listener waits for result.
 			}
 		});
 		
-		// 2 times timeout should do on all build servers. if test fails, check if platform has become slower ;-)
-		Collection<Tuple2<String, Object>>	results	= fut.get(timeout*2);
+		// timeout should do on all build servers. if test fails, check if platform has become slower ;-)
+		Collection<Tuple2<String, Object>>	results	= fut.get();
 		
 //		// Write values to property files for hudson plot plugin.
 //		Collection<Tuple2<String, Object>>	results	= fut.get(sus, timeout);
@@ -88,7 +86,7 @@ public class BDIV3CreationTest //extends TestCase
 		
 		try
 		{
-			platform.killComponent().get(timeout);
+			platform.killComponent().get();
 		}
 		catch(Exception e)
 		{
@@ -101,7 +99,6 @@ public class BDIV3CreationTest //extends TestCase
 		
 //		sus	= null;
 		platform	= null;
-		cms	= null;
 		fut	= null;
 		
 //		try

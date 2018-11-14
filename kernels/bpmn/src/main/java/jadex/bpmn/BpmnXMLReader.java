@@ -1513,9 +1513,9 @@ public class BpmnXMLReader
 							
 							// todo: interceptors, proxytype
 							
-							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, dynamic, 
-									scope, create, recover, null, proxytype==null || proxytype.length()==0? 
-										BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED: proxytype, null);
+							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, 
+									scope, null, proxytype==null || proxytype.length()==0? 
+										BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED: proxytype);
 							bindings.put(name, binding);
 						}
 
@@ -1731,7 +1731,7 @@ public class BpmnXMLReader
 								RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 								if(binding==null)
 									throw new RuntimeException("Unknown binding: "+bindingname);
-								rsi = new RequiredServiceInfo(name, type, multiple, mtype, binding, null, null);
+								rsi = new RequiredServiceInfo(name, type, multiple, binding, null, null);
 							}
 							else
 							{
@@ -1758,7 +1758,7 @@ public class BpmnXMLReader
 											RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 											if(binding==null)
 												throw new RuntimeException("Unknown binding: "+bindingname);
-											rsi = new RequiredServiceInfo(name, type, multiple, mtype, binding, null, null);
+											rsi = new RequiredServiceInfo(name, type, multiple, binding, null, null);
 										}
 										else
 										{
@@ -1838,18 +1838,18 @@ public class BpmnXMLReader
 								{
 									// ignore? The selected configuration for next editor opening
 								}
-								else if("master".equals(key))
-								{
-									mi.setMaster(Boolean.valueOf(value));
-								}
-								else if("daemon".equals(key))
-								{
-									mi.setDaemon(Boolean.valueOf(value));
-								}
-								else if("autoshutdown".equals(key))
-								{
-									mi.setAutoShutdown(Boolean.valueOf(value));
-								}
+//								else if("master".equals(key))
+//								{
+//									mi.setMaster(Boolean.valueOf(value));
+//								}
+//								else if("daemon".equals(key))
+//								{
+//									mi.setDaemon(Boolean.valueOf(value));
+//								}
+//								else if("autoshutdown".equals(key))
+//								{
+//									mi.setAutoShutdown(Boolean.valueOf(value));
+//								}
 								else if("suspend".equals(key))
 								{
 									mi.setSuspend(Boolean.valueOf(value));

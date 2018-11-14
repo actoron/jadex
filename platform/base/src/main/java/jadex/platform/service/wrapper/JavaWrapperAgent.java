@@ -20,7 +20,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -34,8 +33,8 @@ import jadex.micro.annotation.RequiredServices;
 @ProvidedServices(@ProvidedService(type=IJavaWrapperService.class,
 	implementation=@Implementation(expression="$pojoagent")))
 @RequiredServices({
-	@RequiredService(name="tpservice", type=IThreadPoolService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)),
-	@RequiredService(name="libservice", type=ILibraryService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="tpservice", type=IThreadPoolService.class, scope=RequiredService.SCOPE_PLATFORM),
+	@RequiredService(name="libservice", type=ILibraryService.class, scope=RequiredService.SCOPE_PLATFORM)
 })
 @Service
 public class JavaWrapperAgent	implements	IJavaWrapperService
@@ -120,7 +119,7 @@ public class JavaWrapperAgent	implements	IJavaWrapperService
 		{
 			File	file	= new File(jarfile).getCanonicalFile();
 			IResourceIdentifier	rid	= new ResourceIdentifier(
-				new LocalResourceIdentifier(agent.getComponentIdentifier().getRoot(), file.toURI().toURL()), null);
+				new LocalResourceIdentifier(agent.getId().getRoot(), file.toURI().toURL()), null);
 			ret	= executeJava(rid, args);
 		}
 		catch(Exception e)

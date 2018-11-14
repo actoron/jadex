@@ -7,7 +7,9 @@ import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
@@ -15,7 +17,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -37,9 +39,6 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 
 	/** The component description. */
 	protected IComponentDescription desc;
-
-	/** The component management service. */
-	protected final IComponentManagementService cms;
 
 	/** The platform access. */
 	protected IExternalAccess access;
@@ -67,8 +66,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 	/**
 	 * Create a new service container node.
 	 */
-	public ComponentTreeNode(ITreeNode parent, AsyncTreeModel model, IComponentDescription desc, IComponentManagementService cms,
-			IExternalAccess access)
+	public ComponentTreeNode(ITreeNode parent, AsyncTreeModel model, IComponentDescription desc, IExternalAccess access)
 	{
 		super(parent, model);
 
@@ -77,7 +75,6 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 		// System.out.println("node: "+getClass()+" "+desc.getName()+" "+desc.getType());
 
 		this.desc = desc;
-		this.cms = cms;
 		this.access = access;
 
 		model.registerNode(this);
@@ -138,7 +135,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 		busy = true;
 		getModel().fireNodeChanged(ComponentTreeNode.this);
 
-		cms.getComponentDescription(desc.getName()).addResultListener(
+		access.getDescription(desc.getName()).addResultListener(
 			new IResultListener<IComponentDescription>()
 		{
 			public void resultAvailable(IComponentDescription result)
@@ -168,9 +165,9 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 	{
 		busy = true;
 		getModel().fireNodeChanged(ComponentTreeNode.this);
-		// if(getComponentIdentifier().getName().indexOf("Garbage")!=-1)
+		// if(getId().getName().indexOf("Garbage")!=-1)
 		// System.out.println("searchChildren: "+getId());
-		searchChildren(cms, getComponentIdentifier()).addResultListener(new IResultListener<List<ITreeNode>>()
+		searchChildren(getIdentifier()).addResultListener(new IResultListener<List<ITreeNode>>()
 		{
 			public void resultAvailable(List<ITreeNode> result)
 			{
@@ -205,13 +202,13 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 			boolean proxy = "jadex.platform.service.remote.Proxy".equals(desc.getModelName())
 			// Only create proxy nodes for local proxy components to avoid
 			// infinite nesting.
-					&& ((IActiveComponentTreeNode) getModel().getRoot()).getComponentIdentifier().getName().equals(desc.getName().getPlatformName());
+					&& ((IActiveComponentTreeNode) getModel().getRoot()).getId().equals(desc.getName().getRoot());
 			if (proxy)
 			{
-				node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, access);
+				node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), desc, access);
 			} else
 			{
-				node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, access);
+				node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), desc, access);
 			}
 		}
 		return node;
@@ -236,7 +233,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 	/**
 	 * Get the component id.
 	 */
-	public IComponentIdentifier getComponentIdentifier()
+	public IComponentIdentifier getIdentifier()
 	{
 		return desc != null ? desc.getName() : null;
 	}
@@ -260,59 +257,68 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 	/**
 	 *  Asynchronously search for children.
 	 */
-	protected IFuture<List<ITreeNode>> searchChildren(final IComponentManagementService cms, final IComponentIdentifier cid)
+	protected IFuture<List<ITreeNode>> searchChildren(final IComponentIdentifier cid)
 	{
 		final Future<List<ITreeNode>>	ret	= new Future<List<ITreeNode>>();
 		final List<ITreeNode>	children	= new ArrayList<ITreeNode>();
 		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;
 
-		cms.getChildrenDescriptions(cid).addResultListener(new IResultListener<IComponentDescription[]>()
+		access.scheduleStep(new IComponentStep<Void>()
 		{
-			public void resultAvailable(final IComponentDescription[] achildren)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				Arrays.sort(achildren, new java.util.Comparator<IComponentDescription>()
+				SComponentManagementService.getChildrenDescriptions(cid, ia)
+					.addResultListener(new IResultListener<IComponentDescription[]>()
 				{
-					public int compare(IComponentDescription o1, IComponentDescription o2)
+					public void resultAvailable(final IComponentDescription[] achildren)
 					{
-						return o1.getName().getName().compareTo(o2.getName().getName());
+						Arrays.sort(achildren, new java.util.Comparator<IComponentDescription>()
+						{
+							public int compare(IComponentDescription o1, IComponentDescription o2)
+							{
+								return o1.getName().getName().compareTo(o2.getName().getName());
+							}
+						});
+						
+						for(int i=0; i<achildren.length; i++)
+						{
+							ITreeNode	node	= createComponentNode(achildren[i]);
+							children.add(node);
+						}
+						ready[0]	= true;
+						if(ready[0] &&  ready[1])
+						{
+							ret.setResult(children);
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ready[0]	= true;
+						if(ready[0] &&  ready[1])
+						{
+							ret.setExceptionIfUndone(exception);
+						}
 					}
 				});
 				
-				for(int i=0; i<achildren.length; i++)
-				{
-					ITreeNode	node	= createComponentNode(achildren[i]);
-					children.add(node);
-				}
-				ready[0]	= true;
-				if(ready[0] &&  ready[1])
-				{
-					ret.setResult(children);
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ready[0]	= true;
-				if(ready[0] &&  ready[1])
-				{
-					ret.setExceptionIfUndone(exception);
-				}
+				return IFuture.DONE;
 			}
 		});
 		
 		// Search services and only add container node when services are found.
 //		System.out.println("name: "+desc.getName());
 		
-		cms.getRootIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
-		{
-			public void resultAvailable(IComponentIdentifier root) 
-			{
-				cms.getExternalAccess(root)
-					.addResultListener(new IResultListener<IExternalAccess>()
-				{
-					public void resultAvailable(final IExternalAccess rootea)
-					{
-						cms.getExternalAccess(cid)
+//		cms.getRootIdentifier().addResultListener(new IResultListener<IComponentIdentifier>()
+//		{
+//			public void resultAvailable(IComponentIdentifier root) 
+//			{
+//				cms.getExternalAccess(root)
+//					.addResultListener(new IResultListener<IExternalAccess>()
+//				{
+//					public void resultAvailable(final IExternalAccess rootea)
+//					{
+						access.getExternalAccess(cid)
 							.addResultListener(new IResultListener<IExternalAccess>()
 						{
 							public void resultAvailable(final IExternalAccess ea)
@@ -347,7 +353,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 														String id	= ProvidedServiceInfoNode.getId(scn, pros[i]);
 														ProvidedServiceInfoNode	sn	= (ProvidedServiceInfoNode)getModel().getNode(id);
 														if(sn==null)
-															sn	= new ProvidedServiceInfoNode(scn, getModel(),  pros[i], sis[i], rootea);
+															sn	= new ProvidedServiceInfoNode(scn, getModel(),  pros[i], sis[i], access);
 														subchildren.add(sn);
 													}
 													catch(Exception e)
@@ -381,7 +387,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 												
 												for(int i=0; i<reqs.length; i++)
 												{
-													String nid = ea.getComponentIdentifier()+"."+reqs[i].getName();
+													String nid = ea.getId()+"."+reqs[i].getName();
 													RequiredServiceNode	sn = (RequiredServiceNode)getModel().getNode(nid);
 													if(sn==null)
 														sn	= new RequiredServiceNode(scn, getModel(), reqs[i], nid);
@@ -430,26 +436,26 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 								}
 							}
 						});
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						ready[1]	= true;
-						if(ready[0] &&  ready[1])
-						{
-							ret.setExceptionIfUndone(exception);
-						}
-					}
-				});
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				ready[1]	= true;
-				if(ready[0] &&  ready[1])
-				{
-					ret.setExceptionIfUndone(exception);
-				}
-			}
-		});
+//					}
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						ready[1]	= true;
+//						if(ready[0] &&  ready[1])
+//						{
+//							ret.setExceptionIfUndone(exception);
+//						}
+//					}
+//				});
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				ready[1]	= true;
+//				if(ready[0] &&  ready[1])
+//				{
+//					ret.setExceptionIfUndone(exception);
+//				}
+//			}
+//		});
 		
 		return ret;
 	}
@@ -500,7 +506,7 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 
 						// System.err.println(""+model.hashCode()+" Panel->addChild queued2: "+desc.getName()+", "+desc.getParent());
 						final ComponentTreeNode parentnode = desc.getName().getParent() == null ? null : desc.getName().getParent()
-								.equals(getComponentIdentifier()) ? ComponentTreeNode.this // For
+								.equals(getIdentifier()) ? ComponentTreeNode.this // For
 																							// proxy
 																							// nodes.
 								: (ComponentTreeNode) getModel().getAddedNode(desc.getName().getParent());
@@ -594,10 +600,6 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 		ILocalResourceIdentifier lid = desc.getResourceIdentifier().getLocalIdentifier();
 		props.add(new PropertyItem("Resource Identifier", gid==null? "N/A": gid));
 		props.add(new PropertyItem("(global / local)", lid==null? "n/a": lid.toString()));
-		
-		props.add(new PropertyItem("Master", desc.isMaster()));
-		props.add(new PropertyItem("Daemon", desc.isDaemon()));
-		props.add(new PropertyItem("Auto shutdown", (desc.isAutoShutdown())));
 		
 		return props.toArray(new PropertyItem[props.size()]);
 	}

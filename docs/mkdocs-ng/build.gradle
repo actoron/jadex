@@ -26,7 +26,7 @@ buildscript {
                 }
     }
     dependencies {
-        classpath 'org.activecomponents.jadex:jadex-commons:3.0.+'
+        classpath 'org.activecomponents.jadex:jadex-commons:3.0.95'
         classpath 'commons-io:commons-io:2.4'
     }
 }
@@ -92,7 +92,7 @@ task copyLatexTemplate(type: Copy) {
  */
 task buildDocs (type: MkDocsTask, dependsOn: processDocs) {
     action=ACTION.build
-    dockerImageName = 'andrglo/mkdocs:latest'
+    dockerImageName = 'melopt/mkdocs'
 }
 
 
@@ -112,7 +112,7 @@ task buildDocsZip (type: Zip, dependsOn: buildDocs) {
  */
 task serveDocs (type: MkDocsTask) {
     action=ACTION.serve
-    dockerImageName = 'andrglo/mkdocs:latest'
+    dockerImageName = 'melopt/mkdocs'
 }
 
 /**
@@ -263,7 +263,7 @@ class MkDocsTask extends DockerTask {
             command.add("site")
         }
 
-        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$workDir:/workspace/"];
+        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$workDir:/docs/"];
         def builder =  getProcessBuilderForCommand("mkdocs", null, dockerArgs, true)
         builder.command.addAll(command)
         builder.directory(new File(workDir)) // only works without docker?

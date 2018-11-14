@@ -135,7 +135,7 @@ public class ContextPanel extends JPanel
 	 */
 	public void	setActive(final boolean active)
 	{
-		final String	id	= "ContextPanel"+ContextPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getComponentIdentifier();
+		final String	id	= "ContextPanel"+ContextPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getId();
 		final ISimulationService	simservice	= simp.getSimulationService();
 		if(active)
 		{

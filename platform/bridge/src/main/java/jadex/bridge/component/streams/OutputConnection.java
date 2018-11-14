@@ -8,8 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -113,7 +112,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 			{
 				final IComponentStep<Void> self = this;
 				
-				waitForReady().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Integer>()
+				waitForReady().addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Integer>()
 				{
 					public void resultAvailable(Integer bytes)
 					{
@@ -141,7 +140,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 									Future<Integer>	read	= new Future<Integer>();
 									asyncBlockingRead(read);
 									
-									read.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Integer>()
+									read.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Integer>()
 									{
 										public void resultAvailable(Integer read)
 										{
@@ -217,7 +216,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 //							System.out.println("wrote: "+filesize[0]);
 							ret.addIntermediateResultIfUndone(Long.valueOf(filesize[0]));
 						
-							waitForReady().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Integer>()
+							waitForReady().addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Integer>()
 							{
 								public void resultAvailable(Integer result)
 								{
@@ -241,7 +240,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 					{
 						if(dtps==null)
 						{
-							SServiceProvider.getService(component, IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							component.searchService( new ServiceQuery<>(IDaemonThreadPoolService.class))
 								.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, Integer>(read)
 							{
 								public void customResultAvailable(IDaemonThreadPoolService result)

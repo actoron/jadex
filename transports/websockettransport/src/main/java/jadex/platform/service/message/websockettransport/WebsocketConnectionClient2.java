@@ -10,7 +10,6 @@ import org.java_websocket.framing.DataFrame;
 import org.java_websocket.framing.TextFrame;
 import org.java_websocket.handshake.ServerHandshake;
 
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -152,14 +151,14 @@ public class WebsocketConnectionClient2 extends AWebsocketConnection
 	}
 
 	
-	public IFuture<Void> sendMessage(byte[] header, byte[] body)
+	public IFuture<Integer> sendMessage(byte[] header, byte[] body)
 	{
 		synchronized(this)
 		{
 			sendAsFrames(header);
 			sendAsFrames(body);
 		}
-		return IFuture.DONE;
+		return new Future<Integer>(WebSocketTransport.PRIORITY);
 	}
 	
 	public void close()

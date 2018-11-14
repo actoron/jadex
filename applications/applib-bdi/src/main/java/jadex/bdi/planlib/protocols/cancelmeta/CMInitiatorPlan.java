@@ -10,11 +10,8 @@ import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
-import jadex.micro.annotation.Binding;
 
 /**
  *  Plan to handle protocol abortion according to FIPA cancel meta protocol
@@ -27,9 +24,7 @@ public class CMInitiatorPlan extends Plan
 		// Results of cancellation will be stored in interaction state (if any).
 		InteractionState	state	= null;
 		if(hasParameter("interaction_state"))
-		{
 			state	= (InteractionState)getParameter("interaction_state").getValue();
-		}
 
 		// Copy message properties from initial message.
 		IMessageEvent	message	= (IMessageEvent)getParameter("message").getValue();
@@ -48,7 +43,14 @@ public class CMInitiatorPlan extends Plan
 		try
 		{
 			getWaitqueue().addReply(cancel);
-			sendMessage(cancel);
+			try
+			{
+				sendMessage(cancel).get();
+			}
+			catch(Exception e)
+			{
+				fail(e);
+			}
 			while(rec.size()>0)
 			{
 				// Wait for the replies.
@@ -96,8 +98,7 @@ public class CMInitiatorPlan extends Plan
 //							System.out.println("cancel retry checking if exists: "+arec);
 							try
 							{
-								SServiceProvider.getLocalService(getAgent(), IComponentManagementService.class, Binding.SCOPE_PLATFORM)
-									.getComponentDescription((IComponentIdentifier)it.next()).get(10000);
+								getAgent().getDescription((IComponentIdentifier)it.next()).get(10000);
 //								System.out.println("cancel retry not removed: "+arec);
 							}
 							catch(ComponentNotFoundException ce)

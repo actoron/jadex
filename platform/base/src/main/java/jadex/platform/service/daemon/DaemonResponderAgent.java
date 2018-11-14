@@ -52,6 +52,6 @@ public class DaemonResponderAgent
 		Map<String, Object>	msg	= new HashMap<String, Object>();
 //		msg.put(SFipa.RECEIVERS, cid);
 		msg.put(SFipa.CONTENT, content);
-		return agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, cid);
+		return agent.getFeature(IMessageFeature.class).sendMessage(msg, cid);
 	}
 }

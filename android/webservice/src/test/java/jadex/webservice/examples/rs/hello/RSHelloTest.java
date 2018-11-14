@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 
@@ -91,7 +92,7 @@ public class RSHelloTest
 		}
 
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-		config.setKernels(IPlatformConfiguration.KERNEL_COMPONENT, IPlatformConfiguration.KERNEL_MICRO);
+		config.setValue("kernel_component", true);
 		config.getExtendedPlatformConfiguration().setTcpTransport(false);
 		config.addComponent("jadex.webservice.examples.rs.hello.HelloProvider.component.xml");
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
@@ -113,7 +114,7 @@ public class RSHelloTest
     @Test
 	public void testAccessRestService() throws InterruptedException
 	{
-		IFuture<IHelloService> fut = SServiceProvider.getService(extAcc, IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<IHelloService> fut = extAcc.searchService( new ServiceQuery<>( IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 
 		IHelloService hs = fut.get();
 		

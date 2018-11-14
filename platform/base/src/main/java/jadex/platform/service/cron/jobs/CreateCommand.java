@@ -3,14 +3,10 @@ package jadex.platform.service.cron.jobs;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
@@ -53,20 +49,11 @@ public class CreateCommand implements IResultCommand<IIntermediateFuture<CMSStat
 		final SubscriptionIntermediateDelegationFuture<CMSStatusEvent> ret = (SubscriptionIntermediateDelegationFuture<CMSStatusEvent>)
 			SFuture.getNoTimeoutFuture(SubscriptionIntermediateDelegationFuture.class, ia);
 		
-		SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentManagementService>()
-		{
-			public void resultAvailable(IComponentManagementService cms)
-			{
-				ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, name, model);
-				TerminableIntermediateDelegationResultListener<CMSStatusEvent> lis = new TerminableIntermediateDelegationResultListener<CMSStatusEvent>(ret, fut);
-				fut.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(lis));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-		}));
+		info.setName(name);
+		info.setFilename(model);
+		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = ia.createComponentWithResults(info);
+		TerminableIntermediateDelegationResultListener<CMSStatusEvent> lis = new TerminableIntermediateDelegationResultListener<CMSStatusEvent>(ret, fut);
+		fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(lis));
 				
 		return ret;
 	}

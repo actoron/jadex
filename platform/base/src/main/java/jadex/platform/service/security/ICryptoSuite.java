@@ -1,6 +1,6 @@
 package jadex.platform.service.security;
 
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 
 public interface ICryptoSuite
@@ -34,7 +34,7 @@ public interface ICryptoSuite
 	 *  
 	 *  @return The security infos for decrypted messages.
 	 */
-	public IMsgSecurityInfos getSecurityInfos();
+	public ISecurityInfo getSecurityInfos();
 	
 	/**
 	 *  Returns if the suite is expiring and should be replaced.
@@ -53,4 +53,18 @@ public interface ICryptoSuite
 	 *  @throws SecurityException if handshake failed.
 	 */
 	public boolean handleHandshake(SecurityAgent agent, BasicSecurityMessage incomingmessage);
+	
+	/**
+	 *  Gets the ID used to identify the handshake of the suite.
+	 *  
+	 *  @return Handshake ID.
+	 */
+	public String getHandshakeId();
+	
+	/**
+	 *  Sets the ID used to identify the handshake of the suite.
+	 *  
+	 *  @param id Handshake ID.
+	 */
+	public void setHandshakeId(String id);
 }

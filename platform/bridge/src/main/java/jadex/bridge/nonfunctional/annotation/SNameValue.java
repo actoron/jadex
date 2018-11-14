@@ -1,9 +1,9 @@
 package jadex.bridge.nonfunctional.annotation;
 
-import jadex.bridge.modelinfo.UnparsedExpression;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jadex.bridge.modelinfo.UnparsedExpression;
 
 /**
  *  NameValue converter helper.

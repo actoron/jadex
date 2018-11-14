@@ -6,10 +6,10 @@ import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanFailed;
-import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.ClearChemicals;
-import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.ExtinguishFires;
-import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.HandleDisaster;
-import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.TreatVictims;
+import jadex.bdiv3.examples.disastermanagement.commander.CommanderAgent.ClearChemicals;
+import jadex.bdiv3.examples.disastermanagement.commander.CommanderAgent.ExtinguishFires;
+import jadex.bdiv3.examples.disastermanagement.commander.CommanderAgent.HandleDisaster;
+import jadex.bdiv3.examples.disastermanagement.commander.CommanderAgent.TreatVictims;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -23,7 +23,7 @@ public class HandleDisasterPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected CommanderBDI capa;
+	protected CommanderAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -104,14 +104,14 @@ public class HandleDisasterPlan
 //			if(chemicals>chemicalunits.size())
 //			{
 ////				Collection clearchemser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IClearChemicalsService.class).get(this);
-//				Collection clearchemser = (Collection)getScope().getRequiredServices("clearchemicalsservices").get(this);
+//				Collection clearchemser = (Collection)getScope().getServices("clearchemicalsservices").get(this);
 //				if(clearchemser.size()>0)
 //				{
 //					Iterator it=clearchemser.iterator();
 //					while(chemicals>chemicalunits.size() && it.hasNext())
 //					{
 //						final IClearChemicalsService ccs = (IClearChemicalsService)it.next();
-//						final Object provid = ccs.getServiceIdentifier().getProviderId();
+//						final Object provid = ccs.getId().getProviderId();
 //						if(!busy.containsFact(provid))
 //						{
 //							busy.addFact(provid);
@@ -141,14 +141,14 @@ public class HandleDisasterPlan
 //			if(fire>fireunits.size())
 //			{
 ////				Collection exfireser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IExtinguishFireService.class).get(this);
-//				Collection exfireser = (Collection)getScope().getRequiredServices("extinguishfireservices").get(this);
+//				Collection exfireser = (Collection)getScope().getServices("extinguishfireservices").get(this);
 //				if(exfireser.size()>0)
 //				{
 //					Iterator it=exfireser.iterator();
 //					while(fire>fireunits.size() && it.hasNext())
 //					{
 //						final IExtinguishFireService fes = (IExtinguishFireService)it.next();
-//						final Object provid = fes.getServiceIdentifier().getProviderId();
+//						final Object provid = fes.getId().getProviderId();
 //						if(!busy.containsFact(provid))
 //						{
 //							busy.addFact(provid);
@@ -179,14 +179,14 @@ public class HandleDisasterPlan
 //			if(chemicals==0 && victims>ambulanceunits.size())
 //			{
 ////				Collection treatvicser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), ITreatVictimsService.class).get(this);
-//				Collection treatvicser = (Collection)getScope().getRequiredServices("treatvictimservices").get(this);
+//				Collection treatvicser = (Collection)getScope().getServices("treatvictimservices").get(this);
 //				if(treatvicser.size()>0)
 //				{
 //					Iterator it=treatvicser.iterator();
 //					while(victims>ambulanceunits.size() && it.hasNext())
 //					{
 //						final ITreatVictimsService tvs = (ITreatVictimsService)it.next();
-//						final Object provid = tvs.getServiceIdentifier().getProviderId();
+//						final Object provid = tvs.getId().getProviderId();
 //						if(!busy.containsFact(provid))
 //						{
 //							busy.addFact(provid);

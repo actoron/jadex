@@ -11,11 +11,8 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 
 /**
@@ -43,20 +40,10 @@ public class ExternalTaskWrapper implements ITask
 	 */
 	public IFuture<Void> execute(final ITaskContext context, final IInternalAccess process)
 	{
-		final Future<Void> ret = new Future<Void>();
-		
 		// todo: scope
-		SServiceProvider.getService(process, ITaskExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ITaskExecutionService, Void>(ret)
-		{
-			public void customResultAvailable(ITaskExecutionService tes)
-			{
-				// todo: results
-				tes.execute(task, new ExternalTaskContext((ProcessThread)context)).addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
-		
-		return ret;
+		ITaskExecutionService tes	= process.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITaskExecutionService.class));
+		// todo: results
+		return tes.execute(task, new ExternalTaskContext((ProcessThread)context));
 	}
 	
 	/**

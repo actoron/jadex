@@ -33,10 +33,10 @@ public class ChatServiceF1 implements IChatService
 	public void message(final String sender, final String text)
 	{
 		// Reply if the message contains the keyword.
-		final ChatBotF1Agent	chatbot	= (ChatBotF1Agent)agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		final ChatBotF1Agent	chatbot	= (ChatBotF1Agent)agent.getFeature(IPojoComponentFeature.class).getPojoAgent();
 		if(text.toLowerCase().indexOf(chatbot.getKeyword().toLowerCase())!=-1)
 		{
-			IFuture<Collection<IChatService>> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
+			IFuture<Collection<IChatService>> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 			fut.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 			{
 				public void resultAvailable(Collection<IChatService> result)
@@ -44,7 +44,7 @@ public class ChatServiceF1 implements IChatService
 					for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 					{
 						IChatService cs = it.next();
-						cs.message(agent.getComponentIdentifier().getName(), chatbot.getReply()+": "+sender);
+						cs.message(agent.getId().getName(), chatbot.getReply()+": "+sender);
 					}
 				}
 			});

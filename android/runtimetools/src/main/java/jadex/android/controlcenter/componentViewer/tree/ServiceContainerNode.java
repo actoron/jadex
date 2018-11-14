@@ -7,7 +7,7 @@ import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IExternalAccess;
-
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,7 +123,7 @@ public class ServiceContainerNode	extends AbstractTreeNode implements IAndroidTr
 	{
 		ArrayList<PropertyItem> props = new ArrayList<PropertyItem>();
 		props.add(new PropertyItem("Name", getId()));
-		props.add(new PropertyItem("Type", access.getLocalType()));
+		props.add(new PropertyItem("Type", SComponentManagementService.getDescription(access.getId()).getLocalType()));
 		
 		return props.toArray(new PropertyItem[props.size()]);
 	}

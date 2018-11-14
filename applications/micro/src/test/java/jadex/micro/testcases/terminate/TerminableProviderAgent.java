@@ -47,17 +47,17 @@ public class TerminableProviderAgent implements ITerminableService
 	 */
 	public ITerminableFuture<String> getResult(long delay)
 	{
-		System.out.println(agent.getComponentIdentifier()+": getResult1 "+delay);
+		System.out.println(agent.getId()+": getResult1 "+delay);
 		final TerminableFuture<String> ret = new TerminableFuture<String>(new TerminationCommand()
 		{
 			public void terminated(Exception reason)
 			{
-				System.out.println(agent.getComponentIdentifier()+": getResult2 "+termfut);
+				System.out.println(agent.getId()+": getResult2 "+termfut);
 				if(termfut!=null)
 				{
-					if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
+					if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
 					{
-						System.err.println("adapter0: "+agent.getComponentIdentifier());
+						System.err.println("adapter0: "+agent.getId());
 						System.err.println("adapter0a: "+IInternalExecutionFeature.LOCAL.get());
 						Thread.dumpStack();
 						termfut.setException(new RuntimeException("Terminate called on wrong thread."));
@@ -71,7 +71,7 @@ public class TerminableProviderAgent implements ITerminableService
 			}
 		});
 
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -100,9 +100,9 @@ public class TerminableProviderAgent implements ITerminableService
 				System.out.println("termination command called2: "+termfut);
 				if(termfut!=null)
 				{
-					if(!agent.getComponentFeature(IExecutionFeature.class).isComponentThread())
+					if(!agent.getFeature(IExecutionFeature.class).isComponentThread())
 					{
-						System.err.println("adapter1: "+agent.getComponentIdentifier());
+						System.err.println("adapter1: "+agent.getId());
 						System.err.println("adapter1a: "+IInternalExecutionFeature.LOCAL.get());
 						Thread.dumpStack();
 						termfut.setException(new RuntimeException("Terminate called on wrong thread."));
@@ -123,7 +123,7 @@ public class TerminableProviderAgent implements ITerminableService
 		final int[] cnt = new int[1];
 		
 //		System.out.println("getResult invoked");
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -136,7 +136,7 @@ public class TerminableProviderAgent implements ITerminableService
 					}
 					else
 					{
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
+						agent.getFeature(IExecutionFeature.class).waitForDelay(delay, this);
 					}
 				}
 				return null;

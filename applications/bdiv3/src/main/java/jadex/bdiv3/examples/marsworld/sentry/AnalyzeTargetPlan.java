@@ -11,7 +11,7 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.Move;
 import jadex.bdiv3.examples.marsworld.producer.IProduceService;
-import jadex.bdiv3.examples.marsworld.sentry.SentryBDI.AnalyzeTarget;
+import jadex.bdiv3.examples.marsworld.sentry.SentryAgent.AnalyzeTarget;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -33,7 +33,7 @@ public class AnalyzeTargetPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected SentryBDI sentry;
+	protected SentryAgent sentry;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -91,7 +91,7 @@ public class AnalyzeTargetPlan
 
 		try
 		{
-			IFuture<Collection<IProduceService>> fut = sentry.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("produceser");
+			IFuture<Collection<IProduceService>> fut = sentry.getAgent().getFeature(IRequiredServicesFeature.class).getServices("produceser");
 			Collection<IProduceService> ansers = fut.get();
 			
 			for(IProduceService anser: ansers)

@@ -11,8 +11,7 @@ import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.annotation.Plans;
-import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.SendRescueForce;
+import jadex.bdiv3.examples.disastermanagement.commander.CommanderAgent.SendRescueForce;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -29,7 +28,7 @@ public abstract class HandleForcesPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected CommanderBDI capa;
+	protected CommanderAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -49,7 +48,7 @@ public abstract class HandleForcesPlan
 			
 //			disaster.setProperty("active", true);
 			
-			IIntermediateFuture<IService> fut = capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices(servicename);
+			IIntermediateFuture<IService> fut = capa.getAgent().getFeature(IRequiredServicesFeature.class).getServices(servicename);
 			Collection<IService> forces = (Collection<IService>)fut.get();
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
 			
@@ -63,7 +62,7 @@ public abstract class HandleForcesPlan
 				while(number>goal.getUnits().size() && it.hasNext())
 				{
 					final IService force = (IService)it.next();
-					final Object provid = force.getServiceIdentifier().getProviderId();
+					final Object provid = force.getServiceId().getProviderId();
 					if(!capa.getBusyEntities().contains(provid))
 					{
 //						as++;

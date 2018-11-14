@@ -43,22 +43,22 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 	protected Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
 	{
 		// todo: cleanup this HACK!!!
-		if(getComponent().getComponentFeature0(IPojoComponentFeature.class)!=null)
+		if(getComponent().getFeature0(IPojoComponentFeature.class)!=null)
 		{
 			int i = info.getName()!=null ? info.getName().indexOf(MElement.CAPABILITY_SEPARATOR) : -1;
-			Object	ocapa	= getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+			Object	ocapa	= getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
 			String	capa	= null;
 			if(i!=-1)
 			{
 				capa	= info.getName().substring(0, i); 
 				SimpleValueFetcher fet = new SimpleValueFetcher(fetcher);
-				ocapa = ((BDIAgentFeature)getComponent().getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capa);
+				ocapa = ((BDIAgentFeature)getComponent().getFeature(IBDIAgentFeature.class)).getCapabilityObject(capa);
 				fet.setValue("$pojocapa", ocapa);
 				fetcher = fet;
 				
 				Set<Object> vals = new HashSet<Object>();
 				vals.add(ocapa);
-				vals.add(new CapabilityPojoWrapper(getComponent(), ocapa, capa));
+				vals.add(new CapabilityPojoWrapper(getInternalAccess(), ocapa, capa));
 				hackguesser = new SimpleParameterGuesser(super.getParameterGuesser(), vals);
 			}
 			else
@@ -74,7 +74,7 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 		{
 			Class<?> iface = info.getType().getType(getComponent().getClassLoader());
 			ret = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{iface}, 
-				new BDIServiceInvocationHandler(getComponent(), iface));
+				new BDIServiceInvocationHandler(getInternalAccess(), iface));
 		}
 		else
 		{

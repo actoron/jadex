@@ -25,14 +25,14 @@ public class ResultProducerAgent
 	{
 		final long delay = 1000;
 		final int[] cnt = new int[1];
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("res", Integer.valueOf(cnt[0]));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("res", Integer.valueOf(cnt[0]));
 				if(cnt[0]++<5)
 				{
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, this);
+					agent.getFeature(IExecutionFeature.class).waitForDelay(delay, this);
 				}
 				else
 				{

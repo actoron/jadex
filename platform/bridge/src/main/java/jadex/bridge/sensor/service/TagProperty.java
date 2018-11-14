@@ -1,5 +1,12 @@
 package jadex.bridge.sensor.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.VersionInfo;
@@ -11,13 +18,6 @@ import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  *  Tagging a service with a string for searching specifically
@@ -87,7 +87,7 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 			// get values from component args under name specified in ARGUMENT
 			if(params.containsKey(ARGUMENT))
 			{
-				Map<String, Object> args = component.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+				Map<String, Object> args = component.getFeature(IArgumentsResultsFeature.class).getArguments();
 				Collection<String> tags2 = convertToCollection(args.get((String)params.get(ARGUMENT)));
 				if(tags==null)
 				{
@@ -107,7 +107,7 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 		// directly search argument "tag"
 		if(!found)
 		{
-			Map<String, Object> args = component.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+			Map<String, Object> args = component.getFeature(IArgumentsResultsFeature.class).getArguments();
 			if(args.containsKey(NAME))
 			{
 				Collection<String> tags = createRuntimeTags(args.get(NAME), component.getExternalAccess());
@@ -168,7 +168,7 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 			String tag = it.next();
 			if(PLATFORM_NAME_INTERNAL.equals(tag) || PLATFORM_NAME.equals(tag))
 			{
-				tag = component.getComponentIdentifier().getPlatformPrefix();
+				tag = component.getId().getPlatformPrefix();
 			}
 			else if(JADEX_VERSION_INTERNAL.equals(tag) || JADEX_VERSION.equals(tag))
 			{

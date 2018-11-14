@@ -33,8 +33,8 @@ public class DynamicServiceAgent
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				agent.getComponentFeature(IProvidedServicesFeature.class).addService("dummyservice", IDummyService.class, new DummyService(agent.getComponentIdentifier()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, this);
+				agent.getFeature(IProvidedServicesFeature.class).addService("dummyservice", IDummyService.class, new DummyService(agent.getId()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+				agent.getFeature(IExecutionFeature.class).waitForDelay(3000, this);
 				return IFuture.DONE;
 			}
 		};
@@ -53,7 +53,7 @@ public class DynamicServiceAgent
 		
 		public String toString()
 		{
-			return getServiceIdentifier().getServiceName();
+			return getServiceId().getServiceName();
 		}
 	}
 	

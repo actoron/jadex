@@ -23,8 +23,8 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -141,13 +141,14 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 	 */
 	protected void	searchChildren()
 	{
-		IFuture<IService> fut = SServiceProvider.getService(ea, sid);
+		IFuture<IService> fut = ea.searchService( new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(sid));
 		fut.addResultListener(new IResultListener<IService>()
 		{
 			public void resultAvailable(final IService ser)
 			{
 //				((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyMetaInfos()
-				SNFPropertyProvider.getNFPropertyMetaInfos(ea, ser.getServiceIdentifier())
+				IServiceIdentifier sid = ser.getServiceId();
+				ea.getNFPropertyMetaInfos(sid)
 					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 //					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 				{
@@ -164,7 +165,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 						
 						final NFPropertyContainerNode sercon = cn;
 						
-						SNFPropertyProvider.getMethodNFPropertyMetaInfos(ea, ser.getServiceIdentifier())
+						ea.getMethodNFPropertyMetaInfos(ser.getServiceId())
 //						((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getMethodNFPropertyMetaInfos()
 //						ser.getMethodNFPropertyMetaInfos()
 							.addResultListener(new SwingResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>(new IResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>()
@@ -249,7 +250,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 		
 		if(service.getType().getType0()==null)
 		{
-			SServiceProvider.getService(platformea, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			platformea.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
 			{
 				public void customResultAvailable(ILibraryService ls)

@@ -34,7 +34,7 @@ public class BpmnMonitoringComponentFeature extends MonitoringComponentFeature
 		if(ret==null)
 			ret = new ArrayList<IMonitoringEvent>();
 		
-		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
+		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getFeature(IBpmnComponentFeature.class);
 
 		for(Iterator<ProcessThread> it= bcf.getTopLevelThread().getAllThreads().iterator(); it.hasNext(); )
 		{

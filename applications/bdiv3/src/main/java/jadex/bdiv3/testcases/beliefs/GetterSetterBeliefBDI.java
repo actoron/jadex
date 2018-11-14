@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -19,7 +20,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that has a getter setter belief.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GetterSetterBeliefBDI
 {
@@ -60,7 +61,7 @@ public class GetterSetterBeliefBDI
 	{
 		setNumber(22);
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -76,13 +77,13 @@ public class GetterSetterBeliefBDI
 	@AgentKilled
 	public void	destroy(IInternalAccess agent)
 	{
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	/**
 	 * 
 	 */
-	@Plan(trigger=@Trigger(factchangeds="number"))
+	@Plan(trigger=@Trigger(factchanged="number"))
 	protected void plan()
 	{
 		System.out.println("plan: "+getNumber());

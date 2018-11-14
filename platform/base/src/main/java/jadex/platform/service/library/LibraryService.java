@@ -46,8 +46,8 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -430,7 +430,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			Set<URI> nonmans = getInternalNonManagedURLs();
 			for(URI uri: nonmans)
 			{
-				mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), SUtil.toURL(uri)), null));
+				mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getId().getRoot(), SUtil.toURL(uri)), null));
 			}
 			deps.put(SYSTEMCPRID, mydeps);
 			
@@ -540,7 +540,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		baseloader.addURL(url);
 		nonmanaged = null;
-		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null);
+		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(component.getId().getRoot(), url), null);
 		addLink(SYSTEMCPRID, rid);
 		notifyAdditionListeners(SYSTEMCPRID, rid);
 		return IFuture.DONE;
@@ -558,7 +558,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		baseloader.removeURL(url);
 		nonmanaged = null;
-		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null);
+		IResourceIdentifier rid = new ResourceIdentifier(new LocalResourceIdentifier(component.getId().getRoot(), url), null);
 		removeLink(SYSTEMCPRID, rid);
 		notifyRemovalListeners(SYSTEMCPRID, rid);
 		return IFuture.DONE;
@@ -609,8 +609,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<List<URL>> getAllURLs()
 	{
-		final long	start	= System.currentTimeMillis();
-		
+//		final long	start	= System.currentTimeMillis();
 		final Future<List<URL>> ret = new Future<List<URL>>();
 		
 		getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, List<URL>>(ret)
@@ -641,6 +640,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				ret.setResult(res);
 			}
 		});
+		
 		return ret;
 	}
 		
@@ -670,7 +670,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			ret.setResult(rootloader);
 //			System.out.println("root classloader: "+rid);
 		}
-		else if(ResourceIdentifier.isLocal(rid, component.getComponentIdentifier().getRoot()) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
+		else if(ResourceIdentifier.isLocal(rid, component.getId().getRoot()) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
 		{
 			ret.setResult(baseloader);
 //			System.out.println("base classloader: "+rid);
@@ -703,7 +703,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -754,7 +754,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		// full=(global, local) calls followed by any other call are ok, because global and local can be cached
 		// pure global call followed by pure local call -> would mean rids have not been resolved
 		// pure local call followed by pure global call -> would mean rids have not been resolved
-		if(ResourceIdentifier.isLocal(rid, component.getComponentIdentifier().getRoot()) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
+		if(ResourceIdentifier.isLocal(rid, component.getId().getRoot()) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri()))
 		{
 			ret	= new Future<DelegationURLClassLoader>((DelegationURLClassLoader)null);
 			notifyAdditionListeners(support, rid);
@@ -845,7 +845,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		checkLocalRid(rid);
 		
 		// Class loaders shouldn't be created for local URLs, which are already available in base class loader.
-		assert rid.getLocalIdentifier()==null || !ResourceIdentifier.isLocal(rid, component.getComponentIdentifier().getRoot()) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri());
+		assert rid.getLocalIdentifier()==null || !ResourceIdentifier.isLocal(rid, component.getId().getRoot()) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUri());
 		
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
 		
@@ -919,7 +919,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected URL getRidUrl(final IResourceIdentifier rid)
 	{
 		URL	url;
-		if(ResourceIdentifier.isLocal(rid, component.getComponentIdentifier().getRoot()))
+		if(ResourceIdentifier.isLocal(rid, component.getId().getRoot()))
 		{
 			url	= rid!=null && rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getUri()!=null? SUtil.toURL(rid.getLocalIdentifier().getUri()): null;
 		}
@@ -951,7 +951,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected boolean	isAvailable(IResourceIdentifier rid)	
 	{
 		// Do not check existence of manually added (local) resources
-		return ResourceIdentifier.isLocal(rid, component.getComponentIdentifier().getRoot())
+		return ResourceIdentifier.isLocal(rid, component.getId().getRoot())
 			|| getHashRidFile(rid).exists();
 	}
 
@@ -964,7 +964,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 
 		// http://tools.ietf.org/html/rfc3548#section-4 for local storage of hashed resources
 		String	name	= rid.getGlobalIdentifier().getResourceId().substring(2).replace('+', '-').replace('/', '_') + ".jar";
-		IContextService localService = SServiceProvider.getLocalService(component, IContextService.class);
+		IContextService localService = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IContextService.class));
 		// use contextService to get private data dir on android
 		IFuture<File> future = localService.getFile(SUtil.JADEXDIR + "resources/"+name);
 		File file = future.get();
@@ -980,79 +980,72 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		final Future<Void>	ret	= new Future<Void>();
 		final IComponentIdentifier	remote	= rid.getLocalIdentifier().getComponentIdentifier();
-		SServiceProvider.getService(component.getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		component.getExternalAccess(remote).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess exta)
 			{
-				cms.getExternalAccess(remote).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				exta.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{
-					public void customResultAvailable(IExternalAccess exta)
+					public void customResultAvailable(ILibraryService ls)
 					{
-						SServiceProvider.getService(exta, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
+						ls.getResourceAsStream(rid)
+							.addResultListener(new ExceptionDelegationResultListener<IInputConnection, Void>(ret)
 						{
-							public void customResultAvailable(ILibraryService ls)
+							public void customResultAvailable(IInputConnection icon)
 							{
-								ls.getResourceAsStream(rid)
-									.addResultListener(new ExceptionDelegationResultListener<IInputConnection, Void>(ret)
+								try
 								{
-									public void customResultAvailable(IInputConnection icon)
+									File	f	= getHashRidFile(rid);
+									f.getParentFile().mkdirs();
+									final OutputStream	os	= new BufferedOutputStream(new FileOutputStream(f));
+									icon.writeToOutputStream(os, component.getExternalAccess())
+										.addResultListener(new IIntermediateResultListener<Long>()
 									{
-										try
+										public void exceptionOccurred(Exception exception)
 										{
-											File	f	= getHashRidFile(rid);
-											f.getParentFile().mkdirs();
-											final OutputStream	os	= new BufferedOutputStream(new FileOutputStream(f));
-											icon.writeToOutputStream(os, component.getExternalAccess())
-												.addResultListener(new IIntermediateResultListener<Long>()
+											exception.printStackTrace();
+											try
 											{
-												public void exceptionOccurred(Exception exception)
-												{
-													exception.printStackTrace();
-													try
-													{
-														os.close();
-													}
-													catch(Exception e)
-													{
-														// ignore
-													}
-													ret.setException(null);
-												}
-												
-												public void finished()
-												{
-//													System.out.println("finished");
-													try
-													{
-														os.close();
-													}
-													catch(Exception e)
-													{
-														// ignore
-													}
-													ret.setResult(null);
-												}
-												
-												public void intermediateResultAvailable(Long result)
-												{
-													// ignore
-//													System.out.println("update: "+result);
-												}
-												
-												public void resultAvailable(Collection<Long> result)
-												{
-													// should not be called.
-												}
-											});
+												os.close();
+											}
+											catch(Exception e)
+											{
+												// ignore
+											}
+											ret.setException(null);
 										}
-										catch(FileNotFoundException e)
+										
+										public void finished()
 										{
-											throw new RuntimeException(e);
+//													System.out.println("finished");
+											try
+											{
+												os.close();
+											}
+											catch(Exception e)
+											{
+												// ignore
+											}
+											ret.setResult(null);
 										}
-									}
-								});
+										
+										public void intermediateResultAvailable(Long result)
+										{
+											// ignore
+//													System.out.println("update: "+result);
+										}
+										
+										public void resultAvailable(Collection<Long> result)
+										{
+											// should not be called.
+										}
+									});
+								}
+								catch(FileNotFoundException e)
+								{
+									throw new RuntimeException(e);
+								}
 							}
 						});
 					}
@@ -1078,7 +1071,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				final PipedOutputStream	pos	= new PipedOutputStream();
 				is	= new PipedInputStream(pos, 8192*4);
 				
-				SServiceProvider.getService(component.getExternalAccess(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				component.getExternalAccess().searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new IResultListener<IDaemonThreadPoolService>()
 				{
 					public void resultAvailable(IDaemonThreadPoolService tps)
@@ -1157,7 +1150,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		final Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>> ret = new Future<Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>();
 		
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>>>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -1181,7 +1174,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		// special case that parid is local and already handled by baseloader
-		if(pacl==null && ResourceIdentifier.isLocal(parid, component.getComponentIdentifier().getRoot()) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
+		if(pacl==null && ResourceIdentifier.isLocal(parid, component.getId().getRoot()) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
 		{
 			pacl = rootloader;
 		}
@@ -1216,7 +1209,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		// special case that parid is local and already handled by baseloader
-		if(pacl==null && ResourceIdentifier.isLocal(parid, component.getComponentIdentifier().getRoot()) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
+		if(pacl==null && ResourceIdentifier.isLocal(parid, component.getId().getRoot()) && getInternalNonManagedURLs().contains(parid.getLocalIdentifier().getUri()))
 		{
 			pacl = rootloader;
 		}
@@ -1299,8 +1292,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
+		component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
 			{
@@ -1321,7 +1314,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		try
 		{
-			this.rootrid = new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier(), new URL("http://ROOTRID")), null);
+			this.rootrid = new ResourceIdentifier(new LocalResourceIdentifier(component.getId(), new URL("http://ROOTRID")), null);
 			this.rootloader.setResourceIdentifier(rootrid);
 //			this.classloaders.put(rootrid, rootloader);
 		}
@@ -1351,20 +1344,17 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			public void customResultAvailable(Void result) 
 			{
-				component.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
+				ISettingsService settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+				if(settings!=null)
 				{
-					public void customResultAvailable(ISettingsService settings)
-					{
-						settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
-							.addResultListener(new DelegationResultListener<Void>(ret));
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						// No settings service: ignore
-						ret.setResult(null);
-					}
-				});
+					settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
+						.addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				else
+				{
+					// No settings service: ignore
+					ret.setResult(null);
+				}
 			}
 		});
 		return ret;
@@ -1380,20 +1370,17 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 //		System.out.println("shut");
 		final Future<Void>	saved	= new Future<Void>();
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(saved)
+		ISettingsService settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+		if(settings!=null)
 		{
-			public void customResultAvailable(ISettingsService settings)
-			{
-				settings.deregisterPropertiesProvider(LIBRARY_SERVICE)
-					.addResultListener(new DelegationResultListener<Void>(saved));
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				// No settings service: ignore
-				saved.setResult(null);
-			}
-		});
+			settings.deregisterPropertiesProvider(LIBRARY_SERVICE)
+				.addResultListener(new DelegationResultListener<Void>(saved));
+		}
+		else
+		{
+			// No settings service: ignore
+			saved.setResult(null);
+		}
 		
 		final Future<Void>	ret	= new Future<Void>();
 		saved.addResultListener(new DelegationResultListener<Void>(ret)
@@ -1607,8 +1594,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			Properties pa = links[i].getSubproperty("a");
 			Properties pb = links[i].getSubproperty("b");
 			
-			IResourceIdentifier a = ResourceIdentifier.ridFromProperties(pa, component.getComponentIdentifier().getRoot());
-			IResourceIdentifier b = ResourceIdentifier.ridFromProperties(pb, component.getComponentIdentifier().getRoot());
+			IResourceIdentifier a = ResourceIdentifier.ridFromProperties(pa, component.getId().getRoot());
+			IResourceIdentifier b = ResourceIdentifier.ridFromProperties(pb, component.getId().getRoot());
 			
 			if(SYSTEMCPRID.equals(a))
 			{
@@ -1649,8 +1636,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		for(Tuple2<IResourceIdentifier, IResourceIdentifier> link: addedlinks)
 		{
 			Properties plink = new Properties();
-			Properties a = ResourceIdentifier.ridToProperties(link.getFirstEntity(), component.getComponentIdentifier().getRoot());
-			Properties b = ResourceIdentifier.ridToProperties(link.getSecondEntity(), component.getComponentIdentifier().getRoot());
+			Properties a = ResourceIdentifier.ridToProperties(link.getFirstEntity(), component.getId().getRoot());
+			Properties b = ResourceIdentifier.ridToProperties(link.getSecondEntity(), component.getId().getRoot());
 			plink.addSubproperties("a", a);
 			plink.addSubproperties("b", b);
 			props.addSubproperties("link", plink);

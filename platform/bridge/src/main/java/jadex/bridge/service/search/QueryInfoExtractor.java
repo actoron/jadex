@@ -2,12 +2,16 @@ package jadex.bridge.service.search;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceKeyExtractor.SetWrapper;
+import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 
 /**
  *  Extractor for query infos.
@@ -34,25 +38,25 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 
 	/** Key type for the id. */
 	public static final String KEY_TYPE_NETWORKS = "networks";
-
-	
 	
 	/** Key type for the owner. */
 	public static final String KEY_TYPE_OWNER_PLATORM = "owner";
 	
 	/** Key type for the superpeer boolean. */
-	public static final String KEY_TYPE_ISREMOTE = "isremote";
+//	public static final String KEY_TYPE_IsSREMOTE = "isremote";
 	
-	/** Key type for the id. */
+	/** Key type for the service id. */
+	public static final String KEY_TYPE_SID = "serviceid";
+	
+	/** Key type for the query id. */
 	public static final String KEY_TYPE_ID = "id";
-	
 
 	
 	/** The key types. */
 	public static final String[] QUERY_KEY_TYPES;
 	
 	/** The indexable types. */
-	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_NETWORKS, KEY_TYPE_ISREMOTE};
+	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_SID, KEY_TYPE_NETWORKS};//, KEY_TYPE_ISREMOTE};
 	
 	static
 	{
@@ -93,7 +97,7 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 			}
 			
 			// todo:
-//					ClassInfo[] supertypes = service.getServiceIdentifier().getServiceSuperTypes();
+//					ClassInfo[] supertypes = service.getId().getServiceSuperTypes();
 //					if (supertypes != null)
 //					{
 //						for (ClassInfo supertype : supertypes)
@@ -119,18 +123,19 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 		}
 		else if(KEY_TYPE_PROVIDER.equals(keytype))
 		{
-			if(query.getProvider()!=null)
-				ret = new SetWrapper<String>(query.getProvider().toString());
+			if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(query.getScope()))
+				ret = new SetWrapper<String>(query.getSearchStart() != null ? query.getSearchStart().toString() : query.getOwner().toString());
 		}
 		else if(KEY_TYPE_PLATFORM.equals(keytype))
 		{
-			if(query.getProvider()!=null)
+			//if(query.getProvider()!=null)
 //				ret = new SetWrapper<String>(query.getProvider().getRoot().toString());
+			if(query.getPlatform()!=null)
 				ret = new SetWrapper<String>(query.getPlatform().toString());
 		}
 		else if(KEY_TYPE_SCOPE.equals(keytype))
 		{
-			if(query.getProvider()!=null)
+			//if(query.getProvider()!=null)
 				ret = new SetWrapper<String>(query.getScope());
 		}
 		else if(KEY_TYPE_OWNER_PLATORM.equals(keytype))
@@ -138,13 +143,26 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 			if(query.getOwner()!=null)
 				ret = new SetWrapper<String>(query.getOwner().getRoot().toString());
 		}
-		else if(KEY_TYPE_ISREMOTE.equals(keytype))
+		else if (KEY_TYPE_NETWORKS.equals(keytype))
 		{
-			ret = new SetWrapper<String>(sqi.getQuery().isRemote()? "true": "false");
+			if (query.getNetworkNames() != null)
+				ret = new HashSet<>(Arrays.asList(query.getNetworkNames()));
 		}
-		else if(KEY_TYPE_ID.equals(keytype))
+//		else if(KEY_TYPE_ISREMOTE.equals(keytype))
+//		{
+//			ret = new SetWrapper<String>(sqi.getQuery().isRemote()? "true": "false");
+//		}
+		else if(KEY_TYPE_SID.equals(keytype))
 		{
-			ret = new SetWrapper<String>(sqi.getQuery().getId());
+			if (RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(query.getScope()))
+			{
+				String id = query.getSearchStart() != null ? query.getSearchStart().toString() : query.getOwner().toString();
+				ret = new SetWrapper<String>(id);
+			}
+		}
+		else if (KEY_TYPE_ID.equals(keytype))
+		{
+			ret = new SetWrapper<>(query.getId());
 		}
 		
 		return ret;
@@ -173,5 +191,35 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 	public String[] getKeyNames()
 	{
 		return QUERY_KEY_TYPES;
+	}
+	
+	/**
+	 *  Gets the specification for the indexer.
+	 *  
+	 *  @return The specification for the indexer.
+	 */
+	public List<Tuple2<String, String[]>> getIndexerSpec(IServiceIdentifier sid)
+	{
+		List<Tuple2<String, String[]>> ret = new ArrayList<>();
+		
+		ret.add(new Tuple2<>(KEY_TYPE_PLATFORM, new String[]{sid.getProviderId().getRoot().toString()}));
+		
+		ret.add(new Tuple2<>(KEY_TYPE_PROVIDER, new String[]{sid.getProviderId().toString()}));
+		
+		String[] interfaces = new String[sid.getServiceSuperTypes() == null ? 1 : sid.getServiceSuperTypes().length + 1];
+		interfaces[0] = sid.getServiceType().getGenericTypeName();
+		for (int i = 1; i < interfaces.length; ++i)
+			interfaces[i] = sid.getServiceSuperTypes()[i - 1].getGenericTypeName();
+		ret.add(new Tuple2<>(KEY_TYPE_INTERFACE, interfaces));
+		
+		if (sid.getTags() != null)
+			ret.add(new Tuple2<>(KEY_TYPE_TAGS, sid.getTags().toArray(new String[sid.getTags().size()])));
+		
+		ret.add(new Tuple2<>(KEY_TYPE_SID, new String[]{sid.toString()}));
+		
+		if (sid.getNetworkNames() != null)
+			ret.add(new Tuple2<>(KEY_TYPE_NETWORKS, sid.getNetworkNames().toArray(new String[sid.getNetworkNames().size()])));
+		
+		return ret;
 	}
 }

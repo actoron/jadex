@@ -117,8 +117,8 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		MActivity act = events.get(SReflect.getMethodSignature(method));
 		if(act==null)
 			act = events.get(method.toString());
-		ProcessThread	thread	= new ProcessThread(act, ((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).getTopLevelThread(), instance);
-		((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).getTopLevelThread().addThread(thread);
+		ProcessThread	thread	= new ProcessThread(act, ((IInternalBpmnComponentFeature)instance.getFeature(IBpmnComponentFeature.class)).getTopLevelThread(), instance);
+		((IInternalBpmnComponentFeature)instance.getFeature(IBpmnComponentFeature.class)).getTopLevelThread().addThread(thread);
 
 //		List<MParameter> params	= act.getParameters(new String[]{MParameter.DIRECTION_IN, MParameter.DIRECTION_INOUT});
 //		String[] params	= act.getPropertyNames();
@@ -180,7 +180,7 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		// The signal events otherwise waits on the signal
 		if(act.isSignalEvent())
 		{
-			((IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class)).step(act, instance, thread, null);
+			((IInternalBpmnComponentFeature)instance.getFeature(IBpmnComponentFeature.class)).step(act, instance, thread, null);
 		}
 		
 		return ret;

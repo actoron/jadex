@@ -16,20 +16,21 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.SResultListener;
-import jadex.micro.annotation.Binding;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -240,10 +241,9 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia) {
 				final Future<Void> ret = new Future<>();
-				IServiceRegistry registry = ServiceRegistry.getRegistry(ia);
-				ServiceQuery<IService> query = new ServiceQuery<IService>((Class)null, Binding.SCOPE_PLATFORM, null, null,	ViewableFilter.VIEWABLE_FILTER);
-				ISubscriptionIntermediateFuture<IService> services = registry.searchServicesAsync(query);
-//				ISubscriptionIntermediateFuture services = registry.searchServicesAsync(null, extAcc.getComponentIdentifier(), Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
+				ServiceQuery<IService> query = new ServiceQuery<>((Class<IService>)null);//, Binding.SCOPE_PLATFORM, null, null,	ViewableFilter.VIEWABLE_FILTER);
+				ITerminableIntermediateFuture<IService> services = ia.getFeature(IRequiredServicesFeature.class).searchServices(query);
+//				ISubscriptionIntermediateFuture services = registry.searchServicesAsync(null, extAcc.getId(), Binding.SCOPE_PLATFORM, ViewableFilter.VIEWABLE_FILTER);
 
 				services.addResultListener(new IntermediateExceptionDelegationResultListener<IService, Void>(ret) {
 
@@ -275,50 +275,53 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 		});
 	}
 
-	private void addViewableComponents(IExternalAccess extAcc)
+	private void addViewableComponents(final IExternalAccess extAcc)
 	{
-		SServiceProvider.getService(extAcc, IComponentManagementService.class).addResultListener(
-				new DefaultResultListener<IComponentManagementService>()
+		extAcc.scheduleStep(new IComponentStep<Void>()
+		{
+			@Override
+			public IFuture<Void>	execute(IInternalAccess ia)
+			{
+				SComponentManagementService.getComponentIdentifiers(ia)
+					.addResultListener(new DefaultResultListener<IComponentIdentifier[]>()
 				{
-					public void resultAvailable(final IComponentManagementService cms)
+					public void resultAvailable(IComponentIdentifier[] result)
 					{
-						cms.getComponentIdentifiers().addResultListener(new DefaultResultListener<IComponentIdentifier[]>()
+						for (IComponentIdentifier cid : result)
 						{
-							public void resultAvailable(IComponentIdentifier[] result)
+							extAcc.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 							{
-								for (IComponentIdentifier cid : result)
+								public void resultAvailable(final IExternalAccess acc)
 								{
-									cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+									Object clid = acc.getModelAsync().get().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS,
+											getClassLoader());
+
+									final Class<?> clazz = getGuiClass(clid);
+
+									if (clazz != null)
 									{
-										public void resultAvailable(final IExternalAccess acc)
+										runOnUiThread(new Runnable()
 										{
-											Object clid = acc.getModel().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS,
-													getClassLoader());
-
-											final Class<?> clazz = getGuiClass(clid);
-
-											if (clazz != null)
+											public void run()
 											{
-												runOnUiThread(new Runnable()
+												if (addComponentSettings(componentsCat, acc, clazz))
 												{
-													public void run()
-													{
-														if (addComponentSettings(componentsCat, acc, clazz))
-														{
-															Preference dummyPref = componentsCat.findPreference("dummy");
-															if (dummyPref != null)
-																componentsCat.removePreference(dummyPref);
-														}
-													}
-												});
+													Preference dummyPref = componentsCat.findPreference("dummy");
+													if (dummyPref != null)
+														componentsCat.removePreference(dummyPref);
+												}
 											}
-										}
-									});
+										});
+									}
 								}
-							}
-						});
+							});
+						}
 					}
 				});
+				
+				return IFuture.DONE;
+			}
+		});
 	}
 
 	/**

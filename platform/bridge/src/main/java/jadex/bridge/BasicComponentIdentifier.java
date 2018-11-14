@@ -77,7 +77,7 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 	 */
 	public BasicComponentIdentifier(String name, IComponentIdentifier parent)//, String[] addresses)
 	{
-		this(name+"@"+parent.getName().replace('@', '.'));//, addresses);
+		this(name+"@"+parent.getName().replace('@', ':'));//, addresses);
 	}
 	
 	/**
@@ -255,7 +255,7 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 	{
 		IComponentIdentifier ret = null;
 		int	at = name.indexOf("@");
-		int idx = name.indexOf(".", at);
+		int idx = name.indexOf(":", at);
 		if(idx!=-1)
 		{
 			String paname = name.substring(at+1, idx);
@@ -337,7 +337,7 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 		int idx;
 		if((idx = ret.indexOf('@')) != -1)
 			ret = ret.substring(idx + 1);
-		if((idx = ret.lastIndexOf('.')) != -1)
+		if((idx = ret.lastIndexOf(':')) != -1)
 			ret = ret.substring(idx + 1);
 		return ret;
 	}
@@ -347,8 +347,8 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 	 */
 	public String getDotName()
 	{
-		return getName().replace('@', '.');
-//		return cid.getParent()==null? cid.getName(): cid.getLocalName()+"."+getSubcomponentName(cid);
+		return getName().replace('@', ':');
+//		return cid.getParent()==null? cid.getName(): cid.getLocalName()+":"+getSubcomponentName(cid);
 	}
 	
 //	/**
@@ -361,14 +361,14 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 //		String ret = getName();
 //		int idx;
 //		// If it is a direct subcomponent
-//		if((idx = ret.lastIndexOf('.')) != -1)
+//		if((idx = ret.lastIndexOf(':')) != -1)
 //		{
 //			// cut off platform name
 //			ret = ret.substring(0, idx);
 //			// cut off local name 
 //			if((idx = ret.indexOf('@'))!=-1)
 //				ret = ret.substring(idx + 1);
-//			if((idx = ret.indexOf('.'))!=-1)
+//			if((idx = ret.indexOf(':'))!=-1)
 //				ret = ret.substring(idx + 1);
 //		}
 //		else

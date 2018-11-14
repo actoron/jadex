@@ -914,26 +914,26 @@ public class SBpmnModelReader
 				{
 					((ModelInfo) model.getModelInfo()).setSuspend(Boolean.parseBoolean(attrs.get("suspend")));
 				}
-				if (attrs.containsKey("master"))
-				{
-					((ModelInfo) model.getModelInfo()).setMaster(Boolean.parseBoolean(attrs.get("master")));
-				}
-				if (attrs.containsKey("daemon"))
-				{
-					((ModelInfo) model.getModelInfo()).setDaemon(Boolean.parseBoolean(attrs.get("daemon")));
-				}
-				if (attrs.containsKey("autoshutdown"))
-				{
-					((ModelInfo) model.getModelInfo()).setAutoShutdown(Boolean.parseBoolean(attrs.get("autoshutdown")));
-				}
+//				if (attrs.containsKey("master"))
+//				{
+//					((ModelInfo) model.getModelInfo()).setMaster(Boolean.parseBoolean(attrs.get("master")));
+//				}
+//				if (attrs.containsKey("daemon"))
+//				{
+//					((ModelInfo) model.getModelInfo()).setDaemon(Boolean.parseBoolean(attrs.get("daemon")));
+//				}
+//				if (attrs.containsKey("autoshutdown"))
+//				{
+//					((ModelInfo) model.getModelInfo()).setAutoShutdown(Boolean.parseBoolean(attrs.get("autoshutdown")));
+//				}
 				if (attrs.containsKey("synchronous"))
 				{
 					((ModelInfo) model.getModelInfo()).setSynchronous(Boolean.parseBoolean(attrs.get("synchronous")));
 				}
-				if (attrs.containsKey("persistable"))
-				{
-					((ModelInfo) model.getModelInfo()).setPersistable(Boolean.parseBoolean(attrs.get("persistable")));
-				}
+//				if (attrs.containsKey("persistable"))
+//				{
+//					((ModelInfo) model.getModelInfo()).setPersistable(Boolean.parseBoolean(attrs.get("persistable")));
+//				}
 				if (attrs.containsKey("keepalive"))
 				{
 					model.setKeepAlive(Boolean.parseBoolean(attrs.get("keepalive")));
@@ -1067,10 +1067,11 @@ public class SBpmnModelReader
 				}
 				rs.setDefaultBinding(new RequiredServiceBinding());
 				rs.getDefaultBinding().setScope(scope);
-				if(dyn!=null)
-					rs.getDefaultBinding().setDynamic(Boolean.parseBoolean(dyn));
-				if(create!=null)
-					rs.getDefaultBinding().setCreate(Boolean.parseBoolean(create));
+				// Dropped in v4??
+//				if(dyn!=null)
+//					rs.getDefaultBinding().setDynamic(Boolean.parseBoolean(dyn));
+//				if(create!=null)
+//					rs.getDefaultBinding().setCreate(Boolean.parseBoolean(create));
 				((ModelInfo)model.getModelInfo()).addRequiredService(rs);
 			}
 			else if ("requiredserviceconfiguration".equals(tag.getLocalPart()))
@@ -1098,18 +1099,18 @@ public class SBpmnModelReader
 				{
 					conf.setSuspend(Boolean.parseBoolean(attrs.get("suspend")));
 				}
-				if (attrs.containsKey("master"))
-				{
-					conf.setMaster(Boolean.parseBoolean(attrs.get("master")));
-				}
-				if (attrs.containsKey("daemon"))
-				{
-					conf.setDaemon(Boolean.parseBoolean(attrs.get("daemon")));
-				}
-				if (attrs.containsKey("autoshutdown"))
-				{
-					conf.setAutoShutdown(Boolean.parseBoolean(attrs.get("autoshutdown")));
-				}
+//				if (attrs.containsKey("master"))
+//				{
+//					conf.setMaster(Boolean.parseBoolean(attrs.get("master")));
+//				}
+//				if (attrs.containsKey("daemon"))
+//				{
+//					conf.setDaemon(Boolean.parseBoolean(attrs.get("daemon")));
+//				}
+//				if (attrs.containsKey("autoshutdown"))
+//				{
+//					conf.setAutoShutdown(Boolean.parseBoolean(attrs.get("autoshutdown")));
+//				}
 				
 				if (buffer.containsKey("description"))
 				{
@@ -1455,15 +1456,15 @@ public class SBpmnModelReader
 	{
 		if(cl != null)
 		{
-			try
-			{
+//			try
+//			{
 				SJavaParser.parseExpression(exp, imports, cl);
-			}
-			catch(Exception e)
-			{
-				System.err.println("Error parsing expression, name="+exp.getName()+", expstring="+exp.getValue());
-				throw new RuntimeException(e);
-			}
+//			}
+//			catch(Exception e)
+//			{
+//				System.err.println("Error parsing expression, name="+exp.getName()+", expstring="+exp.getValue());
+//				throw new RuntimeException(e);
+//			}
 		}
 		return exp;
 	}

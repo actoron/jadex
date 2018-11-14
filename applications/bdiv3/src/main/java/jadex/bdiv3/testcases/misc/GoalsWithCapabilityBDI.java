@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test if plans within a capability get executed on goal dispatch.
  */
-@Agent(keepalive=Boolean3.FALSE)
+@Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalsWithCapabilityBDI
 {
@@ -38,7 +39,7 @@ public class GoalsWithCapabilityBDI
 		final TestReport tr	= new TestReport("#1", "Test if capability goals work.");
 		
 		TestGoal goal = testcap.new TestGoal();
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal).get(3000);
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(goal).get(3000);
 		
 		if(goal.getCnt()==2)
 		{
@@ -49,7 +50,7 @@ public class GoalsWithCapabilityBDI
 			tr.setReason("Wrong number of plans executed: "+goal.getCnt());
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	/**

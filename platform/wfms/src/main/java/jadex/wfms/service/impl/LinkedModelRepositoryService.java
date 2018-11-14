@@ -112,7 +112,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	{
 		final Future ret = new Future();
 		
-		ia.getServiceContainer().getRequiredService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
+		ia.getServiceContainer().getService("aaa_service").addResultListener(ia.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -143,7 +143,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 				{
 					public void customResultAvailable(Object result)
 					{
-						ia.getServiceContainer().getRequiredService("libservice").addResultListener(new DelegationResultListener(ret)
+						ia.getServiceContainer().getService("libservice").addResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -192,8 +192,8 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 												for (Iterator it = modelSet.iterator(); it.hasNext(); )
 												{
 													String modelpath = (String) it.next();
-													IServiceIdentifier repid = ia.getServiceContainer().getProvidedService("repository_service").getServiceIdentifier();
-													IServiceIdentifier exid = ia.getServiceContainer().getProvidedService("execution_service").getServiceIdentifier();
+													IServiceIdentifier repid = ia.getServiceContainer().getProvidedService("repository_service").getId();
+													IServiceIdentifier exid = ia.getServiceContainer().getProvidedService("execution_service").getId();
 													ProcessResourceInfo info = new ProcessResourceInfo(repid, exid, rid, modelpath);
 													resources.put(rid, info);
 													fireModelAddedEvent(info);
@@ -253,7 +253,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	public IFuture stopService()
 	{
 		final Future ret = new Future();
-		ia.getServiceContainer().getRequiredService("libservice").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().getService("libservice").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -305,7 +305,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	protected IFuture<Void> addProcessResourceToLibService(final File file)
 	{
 		final Future<Void> ret = new Future<Void>();
-		ia.getServiceContainer().getRequiredService("libservice").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().getService("libservice").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -341,7 +341,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	public IFuture removeProcessResource(final ProcessResourceInfo info)
 	{
 		final Future ret = new Future();
-		ia.getServiceContainer().getRequiredService("libservice").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().getService("libservice").addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -385,7 +385,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 	/*public IFuture getLoadableModels()
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{

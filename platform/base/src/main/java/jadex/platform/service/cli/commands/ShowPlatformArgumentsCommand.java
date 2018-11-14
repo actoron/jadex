@@ -5,13 +5,10 @@ import java.util.Map;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
@@ -63,11 +60,11 @@ public class ShowPlatformArgumentsCommand extends ACliCommand
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
-		Map<String, Object> params = (Map<String, Object>)Starter.getPlatformValue(comp.getComponentIdentifier().getRoot(), IPlatformConfiguration.PLATFORMARGS);
+		Map<String, Object> params = (Map<String, Object>)Starter.getPlatformValue(comp.getId().getRoot(), IPlatformConfiguration.PLATFORMARGS);
 
-		IPlatformConfiguration config = (IPlatformConfiguration)Starter.getPlatformValue(comp.getComponentIdentifier().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
+		IPlatformConfiguration config = (IPlatformConfiguration)Starter.getPlatformValue(comp.getId().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
 		
-		IModelInfo model = (IModelInfo)Starter.getPlatformValue(comp.getComponentIdentifier().getRoot(), IPlatformConfiguration.PLATFORMMODEL);
+		IModelInfo model = (IModelInfo)Starter.getPlatformValue(comp.getId().getRoot(), IPlatformConfiguration.PLATFORMMODEL);
 		
 		Map<String, Object> res = new HashMap<String, Object>();
 		

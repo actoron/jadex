@@ -23,7 +23,7 @@ public class EventMultipleStepHandler implements IStepHandler
 	 */
 	public void step(MActivity activity, IInternalAccess instance, ProcessThread thread, Object event)
 	{
-		assert instance.getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert instance.getFeature(IExecutionFeature.class).isComponentThread();
 		
 		// Hack!!! Should be in interpreter/thread?
 		thread.updateParametersAfterStep(activity, instance);

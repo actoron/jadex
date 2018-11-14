@@ -25,7 +25,7 @@ import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.IMessagePreprocessor;
 import jadex.bridge.component.impl.MessageComponentFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.collection.WeakList;
@@ -75,13 +75,13 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 	 *  Test if there are matching message events in XML description.
 	 */
 	@Override
-	protected void processUnhandledMessage(IMsgSecurityInfos secinf, IMsgHeader header, Object body)
+	protected void processUnhandledMessage(ISecurityInfo secinf, IMsgHeader header, Object body)
 	{
 		MMessageEvent mevent = null;
 			
 //		System.out.println("rec msg: "+body+", "+header);
 			
-		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getComponentFeature(IBDIXAgentFeature.class);
+		IInternalBDIAgentFeature bdif = (IInternalBDIAgentFeature)getComponent().getFeature(IBDIXAgentFeature.class);
 
 		// Find all matching event models for received message.
 		List<MMessageEvent>	events	= SCollection.createArrayList();
@@ -114,20 +114,20 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 
 		if(events.size()==0)
 		{
-			getComponent().getLogger().severe(getComponent().getComponentIdentifier()+" cannot process message, no message event matches: "+body+", "+header);
+			getComponent().getLogger().severe(getComponent().getId()+" cannot process message, no message event matches: "+body+", "+header);
 		}
 		else
 		{
 			if(events.size()>1)
 			{
 				// Multiple matches of highest degree.
-				getComponent().getLogger().severe(getComponent().getComponentIdentifier()+" cannot decide which event matches message, " +
+				getComponent().getLogger().severe(getComponent().getId()+" cannot decide which event matches message, " +
 					"using first: "+body+", "+header+", "+events);
 			}
 			else if(matched.size()>1)
 			{
 				// Multiple matches but different degrees.
-				getComponent().getLogger().info(getComponent().getComponentIdentifier()+" multiple events matching message, using " +
+				getComponent().getLogger().info(getComponent().getId()+" multiple events matching message, using " +
 					"message event with highest specialization degree: "+body+", "+header+" ("+degree+"), "+events.get(0)+", "+matched);
 			}
 				
@@ -136,9 +136,9 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 			
 		if(mevent!=null)
 		{
-			RMessageEvent<Object> revent = new RMessageEvent<Object>(mevent, body, getComponent(), original);
+			RMessageEvent<Object> revent = new RMessageEvent<Object>(mevent, body, getInternalAccess(), original);
 			FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(revent);
-			getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(fac);
+			getComponent().getFeature(IExecutionFeature.class).scheduleStep(fac);
 		}
 	}
 	
@@ -201,7 +201,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 			{
 				Object pvalue = msg.get(param.getName());
 				Object mvalue = SJavaParser.parseExpression(param.getDefaultValue(), getComponent().getModel().getAllImports(), 
-					getComponent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getComponent(), param.getDefaultValue().getLanguage()));
+					getComponent().getClassLoader()).getValue(CapabilityWrapper.getFetcher(getInternalAccess(), param.getDefaultValue().getLanguage()));
 				if(!SUtil.equals(pvalue, mvalue))
 				{
 					match	= false;
@@ -316,7 +316,7 @@ public class BDIXMessageComponentFeature extends MessageComponentFeature	impleme
 //			        System.out.println("added: $"+prop+"/"+snake_case+" -> "+msg.get(prop));
 				}
 				IParsedExpression exp = SJavaParser.parseExpression(matchexp, getComponent().getModel().getAllImports(), getComponent().getClassLoader());
-				match = ((Boolean)exp.getValue(CapabilityWrapper.getFetcher(getComponent(), matchexp.getLanguage(), exparams))).booleanValue();
+				match = ((Boolean)exp.getValue(CapabilityWrapper.getFetcher(getInternalAccess(), matchexp.getLanguage(), exparams))).booleanValue();
 			}
 			catch(Exception e)
 			{

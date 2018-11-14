@@ -2,8 +2,11 @@ package jadex.bridge.service.component;
 
 import java.util.logging.Logger;
 
+import jadex.base.Starter;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.ICommand;
@@ -38,9 +41,9 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	@Override
 	public <T> void scheduleForward(final ICommand<T> command, final T args)
 	{
-		if(!access.getComponentFeature(IExecutionFeature.class).isComponentThread())
+		if(!access.getFeature(IExecutionFeature.class).isComponentThread())
 		{
-			access.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			access.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -52,8 +55,23 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
-					System.err.println("Unexpected Exception: "+command);
-					exception.printStackTrace();
+					// Todo: why rescue thread necessary? (e.g. DependentServicesAgent)
+					if(exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(access.getId()))
+					{
+						Starter.scheduleRescueStep(access.getId(), new Runnable()
+						{
+							public void run()
+							{
+//								System.err.println(access.getId()+": scheduled on rescue thread: "+command);
+								command.execute(args);
+							}
+						});
+					}
+					else
+					{
+						System.err.println("Unexpected Exception: "+command);
+						exception.printStackTrace();
+					}
 				}
 				
 				@Override

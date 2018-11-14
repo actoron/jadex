@@ -47,7 +47,6 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
@@ -56,7 +55,7 @@ import jadex.micro.annotation.RequiredServices;
 /**
  *  Ranking of a requires services via an waitqueue ranker.
  */
-@RequiredServices(@RequiredService(name="aser", type=ICryptoService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, dynamic=true)))
+@RequiredServices(@RequiredService(name="aser", type=ICryptoService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 //ranker="new AverageEvaluator(new WaitqueueEvaluator(new MethodInfo(ICryttoService.class.getMethod(\"encrypt\", new Class[]{String.class}))))"
 
 @Agent
@@ -89,7 +88,7 @@ public class UserAgent
 //			{
 //				ComposedEvaluator<IAService> ranker = new ComposedEvaluator<IAService>();
 //				ranker.addEvaluator(new WaitqueueEvaluator(new MethodInfo(IAService.class.getMethod("test", new Class[0]))));
-//				ITerminableIntermediateFuture<IAService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
+//				ITerminableIntermediateFuture<IAService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getServices("aser");
 //				Collection<Tuple2<IAService, Double>> res = SServiceProvider.rankServicesWithScores(sfut, ranker, null).get();
 //				System.out.println("Found: "+res);
 //				if(agent.getConfiguration().equals("with gui"))
@@ -157,8 +156,8 @@ public class UserAgent
 			}
 		};
 		
-		ITerminableIntermediateFuture<ICryptoService> sfut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
-		SServiceProvider.rankServicesWithScores(sfut, ranker, null).addResultListener(agent.getComponentFeature(IExecutionFeature.class)
+		ITerminableIntermediateFuture<ICryptoService> sfut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
+		SServiceProvider.rankServicesWithScores(sfut, ranker, null).addResultListener(agent.getFeature(IExecutionFeature.class)
 			.createResultListener(new IResultListener<Collection<Tuple2<ICryptoService, Double>>>()
 		{
 			public void resultAvailable(Collection<Tuple2<ICryptoService, Double>> res)
@@ -177,7 +176,7 @@ public class UserAgent
 					{
 //						if(wgui)
 //							exception.printStackTrace();
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, step);
+						agent.getFeature(IExecutionFeature.class).waitForDelay(2000, step);
 					}
 				}, agent.getExternalAccess()));
 			}
@@ -186,7 +185,7 @@ public class UserAgent
 			{
 //				if(wgui)
 //					exception.printStackTrace();
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, step);
+				agent.getFeature(IExecutionFeature.class).waitForDelay(2000, step);
 			}	
 		}));
 	}
@@ -200,7 +199,7 @@ public class UserAgent
 		{
 			ICryptoService ser = tup.getFirstEntity();
 			Double val = tup.getSecondEntity();
-			addValue(((IService)ser).getServiceIdentifier().toString(), System.currentTimeMillis(), val);
+			addValue(((IService)ser).getServiceId().toString(), System.currentTimeMillis(), val);
 		}
 	}
 	

@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -81,12 +82,12 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
 		this.container	= space.getExternalAccess();
 
-		SServiceProvider.getService(container, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		container.searchService( new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new DefaultResultListener<IExecutionService>()
 		{
 			public void resultAvailable(final IExecutionService exeservice)
 			{
-				SServiceProvider.getService(container, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				container.searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new DefaultResultListener<IClockService>()
 				{
 					public void resultAvailable(final IClockService clockservice)
@@ -181,7 +182,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 										@Override
 										public String toString()
 										{
-											return "DeltaTimeExecutor for "+container.getComponentIdentifier();
+											return "DeltaTimeExecutor for "+container.getId();
 										}
 									});
 								}
@@ -228,7 +229,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	public void terminate()
 	{
 		terminated = true;
-		SServiceProvider.getService(container, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		container.searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

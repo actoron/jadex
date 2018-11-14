@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Goals;
@@ -27,16 +28,14 @@ import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 /**
  * 
  */
-@Agent
-@RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@Agent(type=BDIAgentFactory.TYPE)
+@RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 @Goals(@Goal(clazz=TranslationGoal.class))
 @Plans(@Plan(trigger=@Trigger(goals=TranslationGoal.class), 
 	body=@Body(service=@ServicePlan(name="transser", mapper=TranslationGoalMapper.class))))
@@ -78,7 +77,7 @@ public class UserBDI
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						IFuture<String> fut = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TranslationGoal(tfe.getText()));
+						IFuture<String> fut = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TranslationGoal(tfe.getText()));
 						fut.addResultListener(new IResultListener<String>()
 						{
 							public void resultAvailable(String res) 

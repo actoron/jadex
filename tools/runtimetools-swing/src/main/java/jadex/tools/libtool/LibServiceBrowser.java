@@ -54,6 +54,7 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.filetransfer.FileData;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
@@ -204,7 +205,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 							LazyNode ln = (LazyNode)node;
 							Object o = ((LazyNode)node).getMyUserObject();
 							IResourceIdentifier parid = (IResourceIdentifier)(ln.getParent()!=null? ((LazyNode)ln.getParent()).getMyUserObject(): null);
-							final boolean rem = !jcc.getJCCAccess().getComponentIdentifier().getRoot().equals(jcc.getPlatformAccess().getComponentIdentifier().getRoot());
+							final boolean rem = !jcc.getJCCAccess().getId().getRoot().equals(jcc.getPlatformAccess().getId().getRoot());
 							JPopupMenu popup = new JPopupMenu();
 						
 							if(LibraryService.SYSTEMCPRID.equals(parid))
@@ -316,7 +317,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 											if(obj instanceof File)
 											{
 												URL url = ((File)obj).getCanonicalFile().toURI().toURL();
-												IComponentIdentifier cid = getExternalAccess().getComponentIdentifier().getRoot();
+												IComponentIdentifier cid = getExternalAccess().getId().getRoot();
 												ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
 												rid = new ResourceIdentifier(lid, null);
 											}
@@ -743,7 +744,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 		
 		if(tp==null)
 		{
-			SServiceProvider.getService(jcc.getJCCAccess(), IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			jcc.getJCCAccess().searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new SwingDefaultResultListener<IDaemonThreadPoolService>()
 			{
 				public void customResultAvailable(IDaemonThreadPoolService result)
@@ -861,7 +862,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 						ilist.add(icons.getIcon("folder"));
 					}
 					
-					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getComponentIdentifier().getRoot()))
+					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getId().getRoot()))
 					{
 						ilist.add(icons.getIcon("oglobal"));
 					}
@@ -1138,7 +1139,7 @@ public class LibServiceBrowser	extends	JPanel	implements IServiceViewerPanel
 					ILocalResourceIdentifier lrid = ((IResourceIdentifier)o).getLocalIdentifier();
 					ret = lrid.getUri().toString();
 					
-					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getComponentIdentifier().getRoot()))
+					if(!ResourceIdentifier.isLocal((IResourceIdentifier)o, jcc.getPlatformAccess().getId().getRoot()))
 					{
 						ret += " ("+((IResourceIdentifier)o).getLocalIdentifier().getComponentIdentifier()+")";
 					}

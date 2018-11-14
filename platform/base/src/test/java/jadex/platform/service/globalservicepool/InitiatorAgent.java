@@ -17,7 +17,6 @@ import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultTuple2ResultListener;
@@ -31,7 +30,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.TupleResult;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -44,15 +42,13 @@ import jadex.platform.service.servicepool.PoolServiceInfo;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)),
-	@RequiredService(name="aser", type=ITestService.class, multiple=true,
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, dynamic=true),
+	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL),
+	@RequiredService(name="aser", type=ITestService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL,
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))
 })
 // Test requires starting/stopping multiple platforms and many test calls  -> increase test timeout
 @Properties(
-	@NameValue(name="test.timeout", value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 2)"))
+	@NameValue(name="test.timeout", value="jadex.base.Starter.getScaledDefaultTimeout(null, 2)"))
 public class InitiatorAgent extends TestAgent
 {
 	/**
@@ -62,13 +58,13 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
 
-				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
@@ -96,8 +92,8 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(Void result) 
 			{
-				performTest(agent.getComponentIdentifier(), testno, true)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+				performTest(agent.getId(), testno, true)
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
 		
@@ -117,8 +113,8 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(Void result) 
 			{
-				performTest(pls.get(1).getComponentIdentifier(), testno, false)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+				performTest(pls.get(1).getId(), testno, false)
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
 		
@@ -182,20 +178,20 @@ public class InitiatorAgent extends TestAgent
 //		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
 		
 		// Add awarenessinfo for remote platform
-//		IAwarenessManagementService awa = SServiceProvider.getService(agent.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+//		IAwarenessManagementService awa = agent.getServiceProvider().searchService( new ServiceQuery<>( IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 //		AwarenessInfo info = new AwarenessInfo(cid.getRoot(), AwarenessInfo.STATE_ONLINE, -1, 
 //			null, null, null, SReflect.getInnerClassName(this.getClass()));
 //		awa.addAwarenessInfo(info).get();
 		
-		IIntermediateFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("aser");
+		IIntermediateFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).getServices("aser");
 		fut.addResultListener(new IIntermediateResultListener<ITestService>()
 		{
 			boolean called;
 			public void intermediateResultAvailable(ITestService result)
 			{
-				System.out.println("found: "+((IService)result).getServiceIdentifier());
+				System.out.println("found: "+((IService)result).getServiceId());
 //				System.err.println("-------------+++++++++++++--------------- found #"+testno+", "+result);
-				if(cid.equals(((IService)result).getServiceIdentifier().getProviderId()))
+				if(cid.equals(((IService)result).getServiceId().getProviderId()))
 				{
 					called = true;
 					callService(result);
@@ -252,7 +248,7 @@ public class InitiatorAgent extends TestAgent
 						ts.methodA(i*10+j).addResultListener(lis);
 					}
 					
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000).get();
+					agent.getFeature(IExecutionFeature.class).waitForDelay(10000).get();
 				}
 			}
 		});

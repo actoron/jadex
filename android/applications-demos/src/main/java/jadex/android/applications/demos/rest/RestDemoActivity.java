@@ -11,6 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -60,7 +61,7 @@ public class RestDemoActivity extends JadexAndroidActivity
 		setPlatformAutostart(true);
 		IPlatformConfiguration config = getPlatformConfiguration();
 		config.setPlatformName("restDemoPlatform");
-		config.setKernels(IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_COMPONENT);
+		config.setValue("kernel_component", "true");
 	}
 
 	@Override
@@ -155,7 +156,7 @@ public class RestDemoActivity extends JadexAndroidActivity
 					}
 				});
 				final Future<byte[]> fut = new Future<byte[]>();
-				SServiceProvider.getService(getPlatformAccess(), IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+				getPlatformAccess().searchService( new ServiceQuery<>( IChartService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
 						new DefaultResultListener<IChartService>()
 						{
 

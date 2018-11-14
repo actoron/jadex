@@ -13,7 +13,6 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
@@ -25,8 +24,6 @@ import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.search.Indexer;
-import jadex.bridge.service.search.ServiceKeyExtractor;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -255,8 +252,8 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 */
 	public IFuture<Boolean> isValid()
 	{
-//		if(getServiceIdentifier().getServiceName().indexOf("Decoupled")!=-1)
-//			System.out.println("isValid: "+getServiceIdentifier()+": "+(started && !shutdowned));
+//		if(getId().getServiceName().indexOf("Decoupled")!=-1)
+//			System.out.println("isValid: "+getId()+": "+(started && !shutdowned));
 		return started && !shutdowned ? IFuture.TRUE : IFuture.FALSE;
 	}
 	
@@ -272,7 +269,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  Get the service id.
 	 *  @return The service id.
 	 */
-	public IServiceIdentifier getServiceIdentifier()
+	public IServiceIdentifier getServiceId()
 	{
 		if(sid==null)
 			throw new RuntimeException("No service identifier: "+this);
@@ -320,17 +317,17 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	protected IFuture<Void> initNFProperties()
 	{
 		final Future<Void> ret = new Future<Void>();
-		if(getInternalAccess().getComponentFeature0(INFPropertyComponentFeature.class)!=null)
+		if(getInternalAccess().getFeature0(INFPropertyComponentFeature.class)!=null)
 		{
-			final INFPropertyComponentFeature nfcf = getInternalAccess().getComponentFeature(INFPropertyComponentFeature.class);
-			IProvidedServicesFeature psf = getInternalAccess().getComponentFeature(IProvidedServicesFeature.class);
-			IInternalService ser = (IInternalService)getInternalAccess().getComponentFeature(IProvidedServicesFeature.class).getProvidedService(type);
-			Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceIdentifier())!=null? psf.getProvidedServiceRawImpl(ser.getServiceIdentifier()).getClass(): null;
+			final INFPropertyComponentFeature nfcf = getInternalAccess().getFeature(INFPropertyComponentFeature.class);
+			IProvidedServicesFeature psf = getInternalAccess().getFeature(IProvidedServicesFeature.class);
+			IInternalService ser = (IInternalService)getInternalAccess().getFeature(IProvidedServicesFeature.class).getProvidedService(type);
+			Class<?> impltype = psf.getProvidedServiceRawImpl(ser.getServiceId())!=null? psf.getProvidedServiceRawImpl(ser.getServiceId()).getClass(): null;
 			// todo: make internal interface for initProperties
 //			if(type!=null && type.getName().indexOf("ITest")!=-1)
 //				System.out.println("sdfsdf");
 			((NFPropertyComponentFeature)nfcf).initNFProperties(ser, impltype)
-				.addResultListener(getInternalAccess().getComponentFeature(IExecutionFeature.class)	// TODO: why wrong thread (start 2x autoterminate on 6-core) 
+				.addResultListener(getInternalAccess().getFeature(IExecutionFeature.class)	// TODO: why wrong thread (start 2x autoterminate on 6-core) 
 					.createResultListener(new ExceptionDelegationResultListener<Void, Void>(ret)
 			{
 				public void customResultAvailable(Void result) throws Exception
@@ -339,10 +336,10 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 					{
 						public void resultAvailable(Object result)
 						{
-//							System.out.println("Starting serviceINIT: "+getServiceIdentifier()+" "+getInternalAccess().getComponentFeature(IExecutionFeature.class).isComponentThread());
+//							System.out.println("Starting serviceINIT: "+getId()+" "+getInternalAccess().getComponentFeature(IExecutionFeature.class).isComponentThread());
 							Collection<String> coll = result == null ? new ArrayList<String>() : new LinkedHashSet<String>((Collection<String>)result);
 							
-							IValueFetcher vf = (IValueFetcher) internalaccess.getComponentFeature(IArgumentsResultsFeature.class);
+							IValueFetcher vf = (IValueFetcher) internalaccess.getFetcher();
 							Class<?>[] sertypes = new Class<?>[] { type, BasicService.this.impltype };
 							for (int si = 0; si < sertypes.length; ++si)
 							{
@@ -375,19 +372,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 								((ServiceIdentifier)sid).setTags(tags);
 								// Hack!!! re-index
 								ServiceRegistry reg = (ServiceRegistry)ServiceRegistry.getRegistry(sid.getProviderId());
-								Indexer<IServiceIdentifier> indexer = reg.getIndexer();
-								String	sid	= getServiceIdentifier().toString();
-								Set<IServiceIdentifier> origs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_SID, sid);
-								// Hack!!! Race condition bug in init???
-								if(origs!=null)
-								{
-									IServiceIdentifier orig = origs.iterator().next();
-									indexer.addValue(orig);
-								}
-								else
-								{
-									internalaccess.getLogger().severe("Cannot add service to indexer (init bug?): "+this);
-								}
+								reg.updateService(sid);
 							}
 							ret.setResult(null);
 						}
@@ -395,7 +380,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 						public void exceptionOccurred(Exception exception)
 						{
 //							exception.printStackTrace();
-//							System.out.println("Starting serviceINITEX: "+getServiceIdentifier()+" "+getInternalAccess().getComponentFeature(IExecutionFeature.class).isComponentThread());
+//							System.out.println("Starting serviceINITEX: "+getId()+" "+getInternalAccess().getComponentFeature(IExecutionFeature.class).isComponentThread());
 //							ret.setResult(null);
 							resultAvailable(null);
 						}
@@ -473,7 +458,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		else 
 		{
 			ret.setResult(null);
-//			ret.setResult(getServiceIdentifier());
+//			ret.setResult(getId());
 		}
 		
 		return ret;
@@ -485,8 +470,8 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 */
 	public IFuture<Void>	shutdownService()
 	{
-//		if(getClass().getName().indexOf("ContextSer")!=-1)
-//			System.out.println("shutdown service: "+getServiceIdentifier());
+//		if(getClass().getName().toLowerCase().indexOf("super")!=-1)
+//			System.out.println("shutdown service: "+getServiceId());
 
 		// Deregister pojo->sid mapping in shutdown.
 		BasicServiceInvocationHandler.removePojoServiceProxy(sid);
@@ -497,7 +482,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			public void customResultAvailable(Boolean result)
 			{
 //				if(getClass().getName().indexOf("ContextSer")!=-1)
-//					System.out.println("shutdowned service: "+getServiceIdentifier());
+//					System.out.println("shutdowned service: "+getId());
 				
 				if(!result.booleanValue())
 				{
@@ -507,7 +492,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 				{
 					shutdowned = true;
 					ret.setResult(null);
-//					System.out.println("shutdowned service: "+getServiceIdentifier());
+//					System.out.println("shutdowned service: "+getId());
 				}
 			}
 		});
@@ -532,7 +517,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	public static IServiceIdentifier createServiceIdentifier(IInternalAccess provider, String servicename, 
 		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid, String scope)
 	{
-		return new ServiceIdentifier(provider, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid, scope);
+		return new ServiceIdentifier(provider, servicetype, servicename!=null? servicename: generateServiceName(servicetype), rid, scope);
 	}
 	
 	/**
@@ -559,7 +544,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	{
 		Future ret = new Future();
 		if(!isValid())
-			ret.setException(new RuntimeException("Service invalid: "+getServiceIdentifier()));
+			ret.setException(new RuntimeException("Service invalid: "+getId()));
 		else
 			ret.setResult(null);
 		return ret;
@@ -575,7 +560,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	{
 		if(obj instanceof IService)
 		{
-			return getServiceIdentifier().equals(((IService) obj).getServiceIdentifier());
+			return getServiceId().equals(((IService) obj).getServiceId());
 		}
 		return false;
 	}
@@ -585,7 +570,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 */
 	public int hashCode()
 	{
-		return 31 + getServiceIdentifier().hashCode();
+		return 31 + getServiceId().hashCode();
 	}
 	
 	/**
@@ -615,9 +600,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 				SReflect.getMethod(allinterfaces[i], method.getName(), method.getParameterTypes())!=null)
 			{
 				Timeout	ta	= (Timeout)allinterfaces[i].getAnnotation(Timeout.class);
-				deftimeout = remote? ta.remote(): ta.local();
-				if(Timeout.UNSET==deftimeout)
-					deftimeout = ta.value();
+				deftimeout = ta.value();
 			}
 		}
 		
@@ -625,9 +608,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		if(method.isAnnotationPresent(Timeout.class))
 		{
 			Timeout	ta	= method.getAnnotation(Timeout.class);
-			ret = remote? ta.remote(): ta.local();
-			if(Timeout.UNSET==ret)
-				ret = ta.value();
+			ret = ta.value();
 		}
 		
 		if(Timeout.UNSET!=deftimeout && Timeout.UNSET==ret)
@@ -635,7 +616,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			ret = deftimeout;
 		}
 				
-//		return ret==Timeout.UNSET? remote? BasicService.getRemoteDefaultTimeout(): BasicService.getLocalDefaultTimeout(): ret;
+//		return ret==Timeout.UNSET? remote? BasicService.getRemoteDefaultTimeout(): BasicService.getDefaultTimeout(): ret;
 		return ret;
 	}
 	

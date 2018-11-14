@@ -17,7 +17,7 @@ public class AddService extends BasicService implements IAddService
 	 */
 	public AddService(IInternalAccess comp)
 	{
-		super(comp.getComponentIdentifier(), IAddService.class, null);
+		super(comp.getId(), IAddService.class, null);
 	}
 	
 	//-------- methods --------
@@ -30,7 +30,7 @@ public class AddService extends BasicService implements IAddService
 	 */
 	public IFuture<Double> add(double a, double b)
 	{
-		System.out.println("add service called on: "+getServiceIdentifier().getProviderId());
+		System.out.println("add service called on: "+getServiceId().getProviderId());
 		return new Future<Double>(Double.valueOf(a+b));
 	}
 }

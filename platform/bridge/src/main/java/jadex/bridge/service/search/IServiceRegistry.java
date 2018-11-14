@@ -1,10 +1,11 @@
 package jadex.bridge.service.search;
 
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
@@ -29,7 +30,22 @@ public interface IServiceRegistry
 	 *  @param service The service.
 	 */
 	// write
-	public IFuture<Void> addService(IServiceIdentifier service);
+	public void addService(IServiceIdentifier service);
+	
+	/**
+	 *  Add a local service to the registry.
+	 *  @param service The local service.
+	 */
+	// write
+	public void addLocalService(IService service);
+	
+	/**
+	 *  Updates a service if the service meta-information
+	 *  has changes.
+	 *  
+	 *  @param service The service.
+	 */
+	public void updateService(IServiceIdentifier service);
 	
 	/**
 	 *  Remove a service from the registry.
@@ -40,7 +56,7 @@ public interface IServiceRegistry
 	
 	/**
 	 *  Remove services of a platform from the registry.
-	 *  @param platform The platform.
+	 *  @param platform The platform, null for everything.
 	 */
 	// write
 	public void removeServices(IComponentIdentifier platform);
@@ -50,7 +66,7 @@ public interface IServiceRegistry
 	 *  @param platform The platform.
 	 */
 	// write
-	public void removeServicesExcept(IComponentIdentifier platform);
+	//public void removeServicesExcept(IComponentIdentifier platform);
 	
 	/**
 	 *  Add a service query to the registry.
@@ -58,6 +74,13 @@ public interface IServiceRegistry
 	 */
 	// write
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query);
+	
+	/**
+	 *  Remove a service query from the registry.
+	 *  @param query ServiceQuery.
+	 */
+	// write
+	public void removeQuery(final ServiceQuery<?> query);
 	
 	/**
 	 *  Remove all service queries of a specific component from the registry.
@@ -95,6 +118,14 @@ public interface IServiceRegistry
 	// read
 	//public boolean isIncluded(IComponentIdentifier cid, IServiceIdentifier ser);
 	
+	/** 
+	 *  Returns the service proxy of a local service identified by service ID.
+	 *  
+	 *  @param serviceid The service ID.
+	 *  @return The service proxy.
+	 */
+	public IService getLocalService(IServiceIdentifier serviceid);
+	
 	/**
 	 *  Get all services.
 	 *  @return All services (copy).
@@ -106,4 +137,15 @@ public interface IServiceRegistry
 	 *  @return All queries (copy).
 	 */
 	public Set<ServiceQueryInfo<?>> getAllQueries();
+	
+	/**
+	 *  Returns the lock on the registry.
+	 *  Care must be taken to perform proper unlocking
+	 *  to avoid permanently blocking the registry.
+	 *  Note that the lock is reentrant, so operations
+	 *  can be performed while the lock is held.
+	 *  
+	 *  @return The registry lock.
+	 */
+	public ReadWriteLock getLock();
 }

@@ -3,8 +3,8 @@ package jadex.bridge.service.component.interceptors;
 import java.util.logging.Logger;
 
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.service.ServiceIdentifier;
@@ -13,6 +13,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.ServiceCallEvent;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.commons.DebugException;
 import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
@@ -39,7 +40,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 		Future<Void> fut	= new Future<Void>();
 		
 		final IInternalAccess	caller	= IInternalExecutionFeature.LOCAL.get();
-		final IRequiredServicesFeature	feat	= caller!=null ? caller.getComponentFeature0(IRequiredServicesFeature.class) : null;
+		final IRequiredServicesFeature	feat	= caller!=null ? caller.getFeature0(IRequiredServicesFeature.class) : null;
 		if(feat instanceof IInternalServiceMonitoringFeature && ((IInternalServiceMonitoringFeature)feat).isMonitoring())
 		{
 			if(!ServiceIdentifier.isSystemService(sic.getServiceIdentifier().getServiceType().getType(caller.getClassLoader())))
@@ -53,7 +54,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 		{
 			public void customResultAvailable(Void result)
 			{
-//				if(sic.getMethod().getName().indexOf("Void")!=-1)
+//				if(sic.getMethod().getName().indexOf("getAllKnownNetworks")!=-1)
 //					System.out.println("decouplingret: "+sic.getArguments());
 				
 				final Object	res	= sic.getResult();
@@ -66,13 +67,13 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 						public <T> void scheduleForward(final ICommand<T> com, final T args)
 						{
 							// Don't reschedule if already on correct thread.
-							if(caller==null || caller.getComponentFeature(IExecutionFeature.class).isComponentThread())
+							if(caller==null || caller.getFeature(IExecutionFeature.class).isComponentThread())
 							{
 								com.execute(args);
 							}
-							else if (caller.getComponentDescription().getState().equals(IComponentDescription.STATE_TERMINATED)
+							else if (caller.getDescription().getState().equals(IComponentDescription.STATE_TERMINATED)
 									&& sic.getMethod().getName().equals("destroyComponent")
-									&& sic.getArguments().size()==1 && caller!=null && caller.getComponentIdentifier().equals(sic.getArguments().get(0))) 
+									&& sic.getArguments().size()==1 && caller!=null && caller.getId().equals(sic.getArguments().get(0))) 
 							{
 								// do not try to reschedule if component killed itself and is already terminated to allow passing results to the original caller.
 								com.execute(args);
@@ -81,12 +82,30 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							{
 								try
 								{
-									caller.getComponentFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()
+									final Exception ex	= Future.DEBUG ? new DebugException() : null;									
+									caller.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+//									caller.getFeature(IExecutionFeature.class).scheduleStep(new ImmediateComponentStep<Void>()	// immediate was required for return of monitoring event component disposed. disabled waiting for last monitoring event instead. 
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											com.execute(args);
-											return IFuture.DONE;
+											if(ex!=null)
+											{
+												try
+												{
+													DebugException.ADDITIONAL.set(ex);
+													com.execute(args);
+													return IFuture.DONE;
+												}
+												finally
+												{
+													DebugException.ADDITIONAL.set(null);									
+												}
+											}
+											else
+											{
+												com.execute(args);
+												return IFuture.DONE;
+											}
 										}
 									}).addResultListener(new IResultListener<Void>()
 									{

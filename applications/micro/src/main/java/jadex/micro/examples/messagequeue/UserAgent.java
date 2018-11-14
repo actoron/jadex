@@ -51,7 +51,7 @@ public class UserAgent
 		{
 			public void intermediateResultAvailable(Event event)
 			{
-				System.out.println("Received: "+agent.getComponentIdentifier()+" "+event);
+				System.out.println("Received: "+agent.getId()+" "+event);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -65,10 +65,10 @@ public class UserAgent
 			final int[] cnt = new int[1];
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				mq.publish(topic, new Event("some type", cnt[0]++, agent.getComponentIdentifier()));
+				mq.publish(topic, new Event("some type", cnt[0]++, agent.getId()));
 				if(cnt[0]<10)
 				{
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, this);
+					agent.getFeature(IExecutionFeature.class).waitForDelay(1000, this);
 				}
 				else
 				{
@@ -77,6 +77,6 @@ public class UserAgent
 				return IFuture.DONE;
 			}
 		};
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, step);
 	}
 }

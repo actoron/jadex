@@ -1,0 +1,6 @@
+{
+  "dependencies": { "typescript": "1.8.7", "browserify": "13.1.0"},
+  "scripts": {
+    "build-js": "browserify --debug ./build/ts/Global.js --standalone jadexclasses> ./src/main/java/org/activecomponents/webservice/jadex.js"
+  }
+}

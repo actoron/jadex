@@ -7,7 +7,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerAgent.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.DelegationResultListener;
@@ -24,7 +24,7 @@ import jadex.commons.future.IFuture;
 public class PatrolPlan
 {
 	@PlanCapability
-	protected CleanerBDI capa;
+	protected CleanerAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -67,7 +67,7 @@ public class PatrolPlan
 //			if(loc.getX()==0.1 && loc.getY()==0.1)
 //				System.out.println("patrol to: "+loc);
 			IFuture<AchieveMoveTo> fut = rplan.dispatchSubgoal(capa.new AchieveMoveTo(loc));
-			fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
+			fut.addResultListener(new ExceptionDelegationResultListener<CleanerAgent.AchieveMoveTo, Void>(ret)
 			{
 				public void customResultAvailable(AchieveMoveTo mtg)
 				{

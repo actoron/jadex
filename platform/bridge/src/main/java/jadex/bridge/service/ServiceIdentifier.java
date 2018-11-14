@@ -81,7 +81,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 				superinfos.add(new ClassInfo(sin));
 			}
 		}
-		this.providerid = provider.getComponentIdentifier();
+		this.providerid = provider.getId();
 		this.type	= new ClassInfo(type);
 		this.supertypes = superinfos.toArray(new ClassInfo[superinfos.size()]);
 		this.servicename = servicename;
@@ -195,7 +195,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Set the resource identifier. 
 	 *  @param rid The resource identifier.
 	 */
-	public void setReourceIdentifier(IResourceIdentifier rid)
+	public void setResourceIdentifier(IResourceIdentifier rid)
 	{
 		this.rid = rid;
 	}

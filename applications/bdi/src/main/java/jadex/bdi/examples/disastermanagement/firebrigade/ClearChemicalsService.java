@@ -10,7 +10,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminationCommand;
-import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
  *   Clear chemicals service.
@@ -33,7 +32,7 @@ public class ClearChemicalsService implements IClearChemicalsService
 	 */
 	public ITerminableFuture<Void> clearChemicals(final Object disasterId)
 	{
-		final IBDIXAgentFeature capa = agent.getComponentFeature(IBDIXAgentFeature.class);
+		final IBDIXAgentFeature capa = agent.getFeature(IBDIXAgentFeature.class);
 		
 		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
 		{
@@ -105,6 +104,6 @@ public class ClearChemicalsService implements IClearChemicalsService
 	 */
 	public String toString()
 	{
-		return "ClearChemicalsService, "+agent.getComponentIdentifier();
+		return "ClearChemicalsService, "+agent.getId();
 	}
 }

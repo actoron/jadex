@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>C2_LocalParameters</jadex:modelname>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="RhSLHEmBDfq6lfyZ">
     <semantic:endEvent id="uedpqKBom5xvIjBo">

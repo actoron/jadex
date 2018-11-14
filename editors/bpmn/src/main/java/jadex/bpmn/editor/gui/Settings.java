@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.jar.JarEntry;
 
 import javax.swing.SwingUtilities;
 
@@ -38,6 +37,7 @@ import jadex.bpmn.editor.gui.propertypanels.PropertyPanelFactory;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bridge.ClassInfo;
+import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -1319,50 +1319,6 @@ public class Settings
 			{
 			}
 			return false;
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public static class FileFilter implements IFilter<Object>
-	{
-		/** The filename. */
-		protected String filename;
-		
-		/** The contains flag. */
-		protected boolean contains;
-		
-		/**
-		 * 
-		 */
-		public FileFilter(String filename, boolean contains)
-		{
-			this.filename = filename;
-			this.contains = contains;
-		}
-		
-		/**
-		 * 
-		 */
-		public boolean filter(Object obj)
-		{
-			if(filename==null)
-				return true;
-			
-			String	fn	= "";
-			if(obj instanceof File)
-			{
-				File	f	= (File)obj;
-				fn	= f.getName();
-			}
-			else if(obj instanceof JarEntry)
-			{
-				JarEntry	je	= (JarEntry)obj;
-				fn	= je.getName();
-			}
-			
-			return fn.endsWith(".class") && (contains? fn.indexOf(filename)!=-1: fn.indexOf(filename)==-1);
 		}
 	}
 }

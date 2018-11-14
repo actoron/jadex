@@ -14,7 +14,9 @@ import jadex.bridge.nonfunctional.search.CountThresholdSearchTerminationDecider;
 import jadex.bridge.sensor.unit.MemoryUnit;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -88,7 +90,7 @@ public class ServiceSearchAgent
 //		BasicEvaluatorConstraints cts = new BasicEvaluatorConstraints(null, evaluator, evaluationsize)
 //		SServiceProvider.getServices(agent.getServiceProvider(), ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM, new Basic)
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(SEARCH_DELAY, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(SEARCH_DELAY, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -140,14 +142,14 @@ public class ServiceSearchAgent
 //					}
 //				}); 
 				
-				ITerminableIntermediateFuture<ICoreDependentService> fut = SServiceProvider.getServices(agent, ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				ITerminableIntermediateFuture<ICoreDependentService> fut = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				ITerminableIntermediateFuture<Tuple2<ICoreDependentService, Double>> res = SServiceProvider.rankServicesWithScores(fut, ce, new CountThresholdSearchTerminationDecider<ICoreDependentService>(10));
 				res.addResultListener(new IResultListener<Collection<Tuple2<ICoreDependentService, Double>>>()
 				{
 					public void resultAvailable(Collection<Tuple2<ICoreDependentService, Double>> result)
 					{
 						System.out.println(Arrays.toString(result.toArray()));
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(SEARCH_DELAY, step);
+						agent.getFeature(IExecutionFeature.class).waitForDelay(SEARCH_DELAY, step);
 					}
 	
 					public void exceptionOccurred(Exception exception)

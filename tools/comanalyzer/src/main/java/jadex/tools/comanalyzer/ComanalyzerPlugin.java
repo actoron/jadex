@@ -57,11 +57,10 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.ServiceCallEvent;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IFilter;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -230,7 +229,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			public void customResultAvailable(Void result)
 			{
 				// Todo: use remote access for clock !?
-				SServiceProvider.getService(getJCC().getJCCAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				getJCC().getJCCAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 				{
 					public void customResultAvailable(IClockService result)
@@ -599,7 +598,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 
 //		jcc.addAgentListListener(this);
 		
-//		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+//		getJCC().getExternalAccess().getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class)).addResultListener(new DefaultResultListener()
 //		{
 //			public void resultAvailable(Object result)
 //			{
@@ -1203,7 +1202,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		if(sender == null)
 		{
 			// add to agent tree table
-			sender = new Component(new CMSComponentDescription(sid, "unknown-component-type", false, false, false, false, false, null, null, null, null, -1, null, null, false));
+//			sender = new Component(new CMSComponentDescription(sid, "unknown-component-type", false, false, false, false, false, null, null, null, null, -1, null, false));
+			sender = new Component(new CMSComponentDescription(sid).setType("unknown-component-type"));
 			sender.setState(Component.STATE_DEAD);
 			sender.addMessage(message);
 			sender.applyFilter(agentfilter, true);
@@ -1220,7 +1220,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		Component receiver = componentlist.getAgent(rid);
 		if(receiver == null)
 		{
-			receiver = new Component(new CMSComponentDescription(rid, "unknown-component-type", false, false, false, false, false, null, null, null, null, -1, null, null, false));
+//			receiver = new Component(new CMSComponentDescription(rid, "unknown-component-type", false, false, false, false, false, null, null, null, null, -1, null, false));
+			sender = new Component(new CMSComponentDescription(rid).setType("unknown-component-type"));
 			receiver.setState(Component.STATE_DEAD);
 			receiver.addMessage(message);
 			receiver.applyFilter(agentfilter, true);
@@ -1552,7 +1553,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					message_maps.add(messages[i].getParameters());
 //				}
 
-//				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
+//				jcc.getJCCAccess().getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
 //				{
 //					public void customResultAvailable(Object result)
 //					{
@@ -1663,7 +1664,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					}
 //				}
 				final String sxml = xml;
-//				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
+//				jcc.getJCCAccess().getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
 //				{
 //					public void customResultAvailable(Object result)
 //					{
@@ -1798,88 +1799,81 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */	
 	protected void addMessageListener(final List<Component> added)
 	{
-		SServiceProvider.getService(jcc.getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>()
+		for(int i=0; i<added.size(); i++)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			Component	comp	= (Component)added.get(i);
+			final IComponentIdentifier	cid	= comp.getDescription().getName();
+			jcc.getJCCAccess().getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>()
 			{
-				for(int i=0; i<added.size(); i++)
+				public void customResultAvailable(IExternalAccess ea)
 				{
-					Component	comp	= (Component)added.get(i);
-					final IComponentIdentifier	cid	= comp.getDescription().getName();
-					cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>()
+					// Generic listener
+					IIntermediateResultListener<Object>	lis	= new SwingIntermediateDefaultResultListener<Object>()
 					{
-						public void customResultAvailable(IExternalAccess ea)
+						@Override
+						public void customIntermediateResultAvailable(Object result)
 						{
-							// Generic listener
-							IIntermediateResultListener<Object>	lis	= new SwingIntermediateDefaultResultListener<Object>()
-							{
-								@Override
-								public void customIntermediateResultAvailable(Object result)
-								{
-									addEvent(result);
-								}
-								
-								@Override
-								public void customFinished()
-								{
-									subscriptions.remove(cid);
-								}
-								
-								@Override
-								public void customExceptionOccurred(Exception exception)
-								{
-									subscriptions.remove(cid);
-									super.customExceptionOccurred(exception);
-								}
-							};
-							
-							// Messages
-							ISubscriptionIntermediateFuture<Object>	sub	= (ISubscriptionIntermediateFuture<Object>)
-								ea.scheduleStep(new IComponentStep<Collection<Object>>()
-							{
-								@SuppressWarnings({"rawtypes", "unchecked"})
-								@Override
-								public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
-								{
-									return (ISubscriptionIntermediateFuture)((IInternalMessageFeature)ia.getComponentFeature(IMessageFeature.class))
-										.getMessageEvents();
-								}
-							});
-							subscriptions.put(cid, sub);
-							sub.addResultListener(lis);
-							
-							// Service calls
-							sub	= (ISubscriptionIntermediateFuture<Object>)
-								ea.scheduleStep(new IComponentStep<Collection<Object>>()
-							{
-								@SuppressWarnings({"rawtypes", "unchecked"})
-								@Override
-								public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
-								{
-									final IRequiredServicesFeature	feat	= ia.getComponentFeature0(IRequiredServicesFeature.class);
-									if(feat instanceof IInternalServiceMonitoringFeature)
-									{
-										return (ISubscriptionIntermediateFuture)((IInternalServiceMonitoringFeature)feat).getServiceEvents();
-									}
-									else
-									{
-										@SuppressWarnings("unchecked")
-										SubscriptionIntermediateFuture<Object>	ret	= (SubscriptionIntermediateFuture<Object>)SFuture.getFuture(SubscriptionIntermediateFuture.class);
-										ret.setFinished();
-										return ret;
-									}
-								}
-							});
-							subscriptions.put(cid, sub);
-							sub.addResultListener(lis);
-							
-							// Todo: provided
-						}	
+							addEvent(result);
+						}
+						
+						@Override
+						public void customFinished()
+						{
+							subscriptions.remove(cid);
+						}
+						
+						@Override
+						public void customExceptionOccurred(Exception exception)
+						{
+							subscriptions.remove(cid);
+							super.customExceptionOccurred(exception);
+						}
+					};
+					
+					// Messages
+					ISubscriptionIntermediateFuture<Object>	sub	= (ISubscriptionIntermediateFuture<Object>)
+						ea.scheduleStep(new IComponentStep<Collection<Object>>()
+					{
+						@SuppressWarnings({"rawtypes", "unchecked"})
+						@Override
+						public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
+						{
+							return (ISubscriptionIntermediateFuture)((IInternalMessageFeature)ia.getFeature(IMessageFeature.class))
+								.getMessageEvents();
+						}
 					});
-				}
-			}
-		});
+					subscriptions.put(cid, sub);
+					sub.addResultListener(lis);
+					
+					// Service calls
+					sub	= (ISubscriptionIntermediateFuture<Object>)
+						ea.scheduleStep(new IComponentStep<Collection<Object>>()
+					{
+						@SuppressWarnings({"rawtypes", "unchecked"})
+						@Override
+						public ISubscriptionIntermediateFuture<Object> execute(IInternalAccess ia)
+						{
+							final IRequiredServicesFeature	feat	= ia.getFeature0(IRequiredServicesFeature.class);
+							if(feat instanceof IInternalServiceMonitoringFeature)
+							{
+								return (ISubscriptionIntermediateFuture)((IInternalServiceMonitoringFeature)feat).getServiceEvents();
+							}
+							else
+							{
+								@SuppressWarnings("unchecked")
+								SubscriptionIntermediateFuture<Object>	ret	= (SubscriptionIntermediateFuture<Object>)SFuture.getFuture(SubscriptionIntermediateFuture.class);
+								ret.setFinished();
+								return ret;
+							}
+						}
+					});
+					subscriptions.put(cid, sub);
+					sub.addResultListener(lis);
+					
+					// Todo: provided
+				}	
+			});
+		}
 	}
 
 	/**

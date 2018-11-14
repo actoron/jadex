@@ -3,12 +3,14 @@ package jadex.commons.gui.future;
 
 import javax.swing.SwingUtilities;
 
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IUndoneResultListener;
+import jadex.commons.gui.SGUI;
 
 /**
  *  Delegation result listener that calls customResultAvailable and
@@ -72,45 +74,19 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	 */
 	final public void resultAvailable(final E result)
 	{
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-//		if(SwingUtilities.isEventDispatchThread())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			try
+			public void run()
 			{
-				customResultAvailable(result);
-			}
-			catch(Exception e)
-			{
-				// Could happen that overridden customResultAvailable method
-				// first sets result and then throws exception (listener ex are catched).
-				future.setExceptionIfUndone(e);
-//				if(undone)
-//				{
-//					future.setExceptionIfUndone(e);
-//				}
-//				else
-//				{
-//					future.setException(e);
-//				}
-			}
-		}
-		else
-		{
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
+				try
 				{
-					try
-					{
-						customResultAvailable(result);
-					}
-					catch(Exception e)
-					{
-						// Could happen that overridden customResultAvailable method
-						// first sets result and then throws exception (listener ex are catched).
-						future.setExceptionIfUndone(e);
+					customResultAvailable(result);
+				}
+				catch(Exception e)
+				{
+					// Could happen that overridden customResultAvailable method
+					// first sets result and then throws exception (listener ex are catched).
+					future.setExceptionIfUndone(e);
 //						if(undone)
 //						{
 //							future.setExceptionIfUndone(e);
@@ -119,10 +95,9 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 //						{
 //							future.setException(e);
 //						}
-					}
 				}
-			});
-		}
+			}
+		});
 	}
 	
 	/**
@@ -131,24 +106,13 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	 */
 	final public void exceptionOccurred(final Exception exception)
 	{
-//		exception.printStackTrace();
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-//		if(SwingUtilities.isEventDispatchThread())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			customExceptionOccurred(exception);			
-		}
-		else
-		{
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					customExceptionOccurred(exception);
-				}
-			});
-		}
+				customExceptionOccurred(exception);
+			}
+		});
 	}
 	
 	/**
@@ -197,24 +161,13 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	 */
 	final public void commandAvailable(final Object command)
 	{
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-//		if(SwingUtilities.isEventDispatchThread())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			customCommandAvailable(command);			
-		}
-		else
-		{
-//			Thread.dumpStack();
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					customCommandAvailable(command);
-				}
-			});
-		}
+				customCommandAvailable(command);
+			}
+		});
 	}
 	
 	/**

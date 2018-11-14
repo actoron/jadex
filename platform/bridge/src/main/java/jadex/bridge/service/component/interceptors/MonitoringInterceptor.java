@@ -4,9 +4,8 @@ import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -84,8 +83,9 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(getComponent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
-			&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
+		IMonitoringComponentFeature	feat	= getComponent().getFeature0(IMonitoringComponentFeature.class);
+		
+		if(feat!=null && feat.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 		{
 			// Hack, necessary because getService() is not a service call and the first contained
 			// service call (getChildren) will reset the call context afterwards :-(
@@ -103,17 +103,17 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 			
 	//		if(context.getMethod().getName().indexOf("log")!=-1)
 	//			System.out.println("log");
-			IMonitoringService monser = SServiceProvider.getLocalService0(getComponent(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, false);
+			IMonitoringService monser = ((IInternalRequiredServicesFeature)feat).getRawService(IMonitoringService.class);
 			if(monser!=null)
 			{
 				long start = System.currentTimeMillis();
 				ServiceCall sc = context.getNextServiceCall();
-				Cause cause = sc==null? null: sc.getCause();
+//				Cause cause = sc==null? null: sc.getCause();
 				String info = context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
 //					info += context.getArguments();
 				// Todo: creation time.
-				MonitoringEvent ev = new MonitoringEvent(getComponent().getComponentIdentifier(), 0 /*getComponent().getComponentDescription().getCreationTime()*/,
-					info, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start, PublishEventLevel.MEDIUM);
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getId(), 0 /*getComponent().getComponentDescription().getCreationTime()*/,
+					info, IMonitoringEvent.TYPE_SERVICECALL_START, start, PublishEventLevel.MEDIUM);
 				
 //					if(context.getMethod().getName().indexOf("method")!=-1)
 //						System.out.println("call method: "+ev.getCause().getChainId());
@@ -215,8 +215,9 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 		 */
 		public void customResultAvailable(Void result)
 		{
-			if(getComponent().getComponentFeature(IMonitoringComponentFeature.class)!=null 
-				&& getComponent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
+			IMonitoringComponentFeature	feat	= getComponent().getFeature0(IMonitoringComponentFeature.class);
+			
+			if(feat!=null && feat.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 			{
 				// Hack, necessary because getService() is not a service call and the first contained
 				// service call (getChildren) will reset the call context afterwards :-(
@@ -229,15 +230,15 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 //				sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
 //				CallAccess.setCurrentInvocation(sc); 
 	
-				IMonitoringService monser = SServiceProvider.getLocalService0(getComponent(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM, null, false);
+				IMonitoringService monser = ((IInternalRequiredServicesFeature)feat).getRawService(IMonitoringService.class);
 				if(monser!=null)
 				{
 					long end = System.currentTimeMillis();
 					ServiceCall sc = sic.getNextServiceCall();
-					Cause cause = sc==null? null: sc.getCause();
+//					Cause cause = sc==null? null: sc.getCause();
 					// Todo: creation time.
-					monser.publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), 0 /*getComponent().getComponentDescription().getCreationTime()*/,
-						sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, cause, end, PublishEventLevel.MEDIUM));
+					monser.publishEvent(new MonitoringEvent(getComponent().getId(), 0 /*getComponent().getComponentDescription().getCreationTime()*/,
+						sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, end, PublishEventLevel.MEDIUM));
 				}
 			}
 			ReturnValueResultListener.super.customResultAvailable(null);

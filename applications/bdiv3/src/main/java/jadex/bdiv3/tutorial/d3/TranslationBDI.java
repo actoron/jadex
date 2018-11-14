@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.d3;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalParameter;
@@ -11,8 +12,6 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -26,7 +25,7 @@ import jadex.micro.annotation.Description;
  *  Using goal retry.
  */
 @Description("Translation agent D3. <br>  Using goal retry.")
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Service
 public class TranslationBDI
 {

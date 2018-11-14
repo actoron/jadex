@@ -19,7 +19,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -32,9 +31,9 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Description("This agent offers a helpline for getting information about missing persons.")
 @RequiredServices({
-	@RequiredService(name="clockservice", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_NETWORK, dynamic=true)),
-	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, dynamic=true))
+	@RequiredService(name="clockservice", type=IClockService.class),
+	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_NETWORK),
+	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM)
 })
 @ProvidedServices(@ProvidedService(type=IHelpline.class, implementation=@Implementation(HelplineService.class), scope=RequiredServiceInfo.SCOPE_NETWORK))
 @GuiClass(HelplineViewerPanel.class)
@@ -60,7 +59,7 @@ public class HelplineAgent
 	{
 //		this.infos = new MultiCollection(new HashMap(), TreeSet.class);
 		this.infos = new MultiCollection<String, InformationEntry>();
-		Object ini = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("infos");
+		Object ini = agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("infos");
 		if(ini!=null && SReflect.isIterable(ini))
 		{
 			for(Iterator it=SReflect.getIterator(ini); it.hasNext(); )
@@ -87,8 +86,8 @@ public class HelplineAgent
 	 */
 	public void addInformation(final String name, final String info)
 	{
-//		SServiceProvider.getService(getServiceProvider(), IClockService.class)
-		IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+//		getServiceProvider().searchService( new ServiceQuery<>( IClockService.class))
+		IFuture<IClockService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("clockservice");
 //			.addResultListener(createResultListener(new DefaultResultListener()
 		fut.addResultListener(new DefaultResultListener<IClockService>() // not needed as decoupled service
 		{

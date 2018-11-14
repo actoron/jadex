@@ -8,7 +8,7 @@ dependencies
 										   
 										   // Kernels
 										   ':kernels:base',':kernels:micro',':kernels:bpmn',
-										   ':kernels:application',':kernels:component',':kernels:jadex-applib-bdi',
+										   ':kernels:application',':kernels:component',':applications:applib-bdi',
 										   ':kernels:bdiv3', ':kernels:microservice',
 										   
 										   // Platform

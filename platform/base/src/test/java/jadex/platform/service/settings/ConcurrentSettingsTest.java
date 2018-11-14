@@ -12,7 +12,8 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -31,8 +32,8 @@ public class ConcurrentSettingsTest
 	public void	testMultiplePlatforms() throws Exception
 	{
 		int	number	= 3;	// Number of platforms to create in parallel
-//		long	timeout	= Starter.getScaledLocalDefaultTimeout(null, number);
-		long	timeout	= Starter.getLocalDefaultTimeout(null);
+//		long	timeout	= Starter.getScaledDefaultTimeout(null, number);
+		long	timeout	= Starter.getDefaultTimeout(null);
 		
 		IPlatformConfiguration	conf	= PlatformConfigurationHandler.getMinimal();
 		conf.getExtendedPlatformConfiguration().setSecurity(true);	// enabled to write/read password
@@ -65,7 +66,7 @@ public class ConcurrentSettingsTest
 				@Override
 				public IFuture<String> execute(IInternalAccess ia)
 				{
-					ISettingsService	seser	=	SServiceProvider.getLocalService(ia, ISettingsService.class);
+					ISettingsService	seser	=	ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
 					String	ret	= seser.getProperties("securityservice").get().getStringProperty("platformsecret");
 					return new Future<String>(ret);
 				}

@@ -9,7 +9,7 @@
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
     <jadex:modelname>TestEventprocessStartEvent</jadex:modelname>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="VkKri5cBRYKjzY3x">
     <semantic:subProcess id="BN6NQnDCfnsKNShG" triggeredByEvent="true">
@@ -27,7 +27,7 @@
         <semantic:outgoing>qwHGugR/tHq5msQF</semantic:outgoing>
         <semantic:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;&quot;+$component.getComponentIdentifier()+&quot; after event: &quot;+$event</jadex:parameter>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;&quot;+$component.getId()+&quot; after event: &quot;+$event</jadex:parameter>
         </semantic:extensionElements>
       </semantic:task>
       <semantic:endEvent id="BW619SMSOFSI8dGf">

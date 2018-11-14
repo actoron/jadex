@@ -4,6 +4,7 @@ import java.awt.MouseInfo;
 
 import javax.swing.JOptionPane;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
@@ -17,7 +18,7 @@ import jadex.micro.annotation.AgentCreated;
 /**
  *  A simple BDI agent that likes to have the mouse in the upper left corner.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public class QuickstartBDI
 {
 	/** The belief automatically updates the field to the current mouse location every 100 milliseconds. */
@@ -64,6 +65,6 @@ public class QuickstartBDI
 	@AgentCreated
 	public void start(IInternalAccess self)
 	{
-		self.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new InUpperLeftCorner());
+		self.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new InUpperLeftCorner());
 	}
 }

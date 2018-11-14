@@ -8,7 +8,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -62,7 +63,7 @@ public class HelplineAgent	implements IHelpline
 	public IFuture<Void>	addInformation(String info)
 	{
 		// Create and store information record.
-		InformationEntry	entry	= new InformationEntry(person, info, SServiceProvider.getLocalService(agent, IClockService.class).getTime());
+		InformationEntry	entry	= new InformationEntry(person, info, agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
 		infos.add(entry);
 
 		// forward information to other interested services.
@@ -103,7 +104,7 @@ public class HelplineAgent	implements IHelpline
 			ret.addIntermediateResult(entry);
 		}
 		
-		SServiceProvider.getTaggedServices(agent, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, person).
+		agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags(person)).
 			addResultListener(new IntermediateDefaultResultListener<IHelpline>()
 		{
 			boolean finished	= false;
@@ -175,12 +176,12 @@ public class HelplineAgent	implements IHelpline
 	protected void	postInformation(final InformationEntry entry)
 	{
 		// Todo: use queue for forwarding, if information frequency is high?
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				SServiceProvider.getTaggedServices(ia, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, person).
+				ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags(person)).
 					addResultListener(new IntermediateDefaultResultListener<IHelpline>()
 				{
 					@Override

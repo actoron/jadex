@@ -11,10 +11,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -28,7 +25,7 @@ import jadex.commons.transformation.annotations.Classname;
 public class GetExternalAccessPlan extends Plan
 {
 	boolean	gotexta	= false;
-	Future	done;
+	Future<Void>	done;
 	
 	/**
 	 *  The plan body.
@@ -36,24 +33,21 @@ public class GetExternalAccessPlan extends Plan
 	public void body()
 	{
 		// Sub component will not be initialized before wait future is done.
-		Future	wait	= new Future();
+		Future<Void>	wait	= new Future<>();
 
 		// Create component.
-		IComponentManagementService ces = (IComponentManagementService)SServiceProvider
-			.getLocalService(getAgent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', '.'));
-		Map	args	= new HashMap();
+		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', ':'));
+		Map<String, Object>	args	= new HashMap<>();
 		args.put("future", wait);
-		IFuture init = ces.createComponent(cid.getLocalName(), "jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml",
-			new CreationInfo(null, args, getComponentIdentifier(), false), null);
+		IFuture<IExternalAccess> init = getAgent().createComponent(
+			new CreationInfo(null, args, getComponentIdentifier(), false).setName(cid.getLocalName()).setFilename("jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml"), null);
 		final boolean[]	gotexta	= new boolean[3];	// 0: got exception, 1: got access, 2: got belief value.	
 		
 		// Get and use external access.
-		IResultListener	lis	= new DefaultResultListener()
+		IResultListener<IExternalAccess>	lis	= new DefaultResultListener<IExternalAccess>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IExternalAccess exta)
 			{
-				IExternalAccess exta = (IExternalAccess)result;
 				gotexta[0]	= true;
 //				System.out.println("Got external access: "+exta);
 				
@@ -62,16 +56,17 @@ public class GetExternalAccessPlan extends Plan
 					@Classname("test")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+						IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 						Object fact = bia.getBeliefbase().getBelief("test").getFact();
 						gotexta[1]	= "testfact".equals(fact);
 						return IFuture.DONE;
 					}
-				}).addResultListener(new DelegationResultListener(done));
+				}).addResultListener(new DelegationResultListener<>(done));
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("Got exceptions: "+exception);
 				// Expected on first call.
 			}
 		};
@@ -92,8 +87,8 @@ public class GetExternalAccessPlan extends Plan
 		TestReport	tr	= new TestReport("#2", "External access after init.");
 		wait.setResult(null);
 		init.get();
-		done	= new Future();
-		ces.getExternalAccess(cid).addResultListener(lis);
+		done	= new Future<>();
+		getAgent().getExternalAccess(cid).addResultListener(lis);
 		done.get();
 		if(gotexta[0] && gotexta[1])
 			tr.setSucceeded(true);

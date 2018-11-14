@@ -120,13 +120,13 @@
 //		// System.out.println("platformname: "+cid.getPlatformName());
 //		// if(access==null)
 //		// System.out.println("access: "+access);
-//		// if(access.getComponentIdentifier()==null)
-//		// System.out.println("accesscid"+access.getComponentIdentifier());
-//		// if(access.getComponentIdentifier().getPlatformName()==null)
-//		// System.out.println("accesscidpfname: "+access.getComponentIdentifier().getPlatformName());
+//		// if(access.getId()==null)
+//		// System.out.println("accesscid"+access.getId());
+//		// if(access.getId().getPlatformName()==null)
+//		// System.out.println("accesscidpfname: "+access.getId().getPlatformName());
 //
 //		// For local component use direct listener.
-//		if (cid.getPlatformName().equals(access.getComponentIdentifier().getPlatformName()))
+//		if (cid.getPlatformName().equals(access.getId().getPlatformName()))
 //		{
 //			return installLocalCMSListener(listener);
 //		}
@@ -215,7 +215,7 @@
 //		IFuture<Void> ret = IFuture.DONE;
 //
 //		// For local component use direct listener.
-//		if (cid.getPlatformName().equals(access.getComponentIdentifier().getPlatformName()))
+//		if (cid.getPlatformName().equals(access.getId().getPlatformName()))
 //		{
 //			ret = removeLocalCMSListener(listener);
 //		}
@@ -327,7 +327,7 @@
 //	protected IFuture<Void> installLocalCMSListener(final ICMSComponentListener listener)
 //	{
 //		final Future<Void> ret = new Future<Void>();
-//		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+//		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
 //				new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
@@ -351,7 +351,7 @@
 //	protected IFuture<Void> removeLocalCMSListener(final ICMSComponentListener listener)
 //	{
 //		final Future<Void> ret = new Future<Void>();
-//		SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+//		access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
 //				new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
@@ -374,6 +374,6 @@
 //	 */
 //	protected String buildId(final IComponentIdentifier cid)
 //	{
-//		return "cmslistener_" + hashCode() + "_" + access.getComponentIdentifier().toString() + "_" + cid;
+//		return "cmslistener_" + hashCode() + "_" + access.getId().toString() + "_" + cid;
 //	}
 //}

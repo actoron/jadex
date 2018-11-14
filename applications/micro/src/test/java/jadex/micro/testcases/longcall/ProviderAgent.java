@@ -117,11 +117,15 @@ public class ProviderAgent implements ITestService
 		long to = sc.getTimeout();
 
 //		System.out.println("Timeout is: " + to);
+		
+		boolean realtime = sc.isRemoteCall(agent.getId());
+		
+		System.out.println(agent + " isRemote / Realtime: " + realtime);
 	
 		final long wait = to>0? to*2: 0;
 		final long startwait = System.currentTimeMillis();
 //		System.out.println("waiting: "+wait+", "+System.currentTimeMillis());
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(wait, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -129,6 +133,6 @@ public class ProviderAgent implements ITestService
 				ret.setResultIfUndone(null);
 				return IFuture.DONE;
 			}
-		});
+		}, realtime);
 	}
 }

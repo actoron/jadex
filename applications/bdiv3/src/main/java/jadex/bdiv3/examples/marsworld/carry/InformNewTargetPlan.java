@@ -20,7 +20,7 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 public class InformNewTargetPlan 
 {
 	@PlanCapability
-	protected CarryBDI carry;
+	protected CarryAgent carry;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -38,7 +38,7 @@ public class InformNewTargetPlan
 	{
 		try
 		{
-			IFuture<Collection<ITargetAnnouncementService>> fut = carry.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("targetser");
+			IFuture<Collection<ITargetAnnouncementService>> fut = carry.getAgent().getFeature(IRequiredServicesFeature.class).getServices("targetser");
 			Collection<ITargetAnnouncementService> ansers = fut.get();
 			
 			for(ITargetAnnouncementService anser: ansers)

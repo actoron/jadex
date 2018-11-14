@@ -9,7 +9,7 @@ import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Go;
+import jadex.bdiv3.examples.garbagecollector.GarbageCollectorAgent.Go;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.DelegationResultListener;
@@ -30,7 +30,7 @@ public class GoPlanEnv
 	//-------- attributes --------
 
 	@PlanCapability
-	protected GarbageCollectorBDI collector;
+	protected GarbageCollectorAgent collector;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -85,7 +85,7 @@ public class GoPlanEnv
 			DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put(GoAction.DIRECTION, dir);
-			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(collector.getAgent().getComponentDescription()).getId());
+			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(collector.getAgent().getDescription()).getId());
 			action	= env.performSpaceAction("go", params, lis); 
 			fut.get();
 			action	= -1;

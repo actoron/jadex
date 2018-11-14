@@ -5,17 +5,10 @@ import java.util.Map;
 
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.platform.service.cli.ACliCommand;
@@ -33,7 +26,7 @@ public class DestroyComponentCommand extends ACliCommand
 		public Object convertString(String val, Object context) throws Exception
 		{
 			IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
-			String pfn = comp.getComponentIdentifier().getPlatformName();
+			String pfn = comp.getId().getPlatformName();
 			if(val.indexOf("@")==-1 && !val.equals(pfn))
 			{
 				val += "@"+pfn;
@@ -86,25 +79,7 @@ public class DestroyComponentCommand extends ACliCommand
 		else
 		{
 			final IExternalAccess comp = (IExternalAccess)context.getUserContext();
-			
-			comp.scheduleStep(new IComponentStep<Map<String, Object>>()
-			{
-				public IFuture<Map<String, Object>> execute(IInternalAccess ia)
-				{
-					final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
-			
-					SServiceProvider.getService(comp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
-					{
-						public void customResultAvailable(IComponentManagementService cms)
-						{
-							cms.destroyComponent(cid).addResultListener(new DelegationResultListener<Map<String,Object>>(ret));
-						}
-					});
-					
-					return ret;
-				}
-			}).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+			comp.killComponent(cid).addResultListener(new DelegationResultListener<Map<String,Object>>(ret));
 		}
 		
 		return ret;

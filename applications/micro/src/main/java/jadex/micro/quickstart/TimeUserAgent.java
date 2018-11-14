@@ -1,5 +1,7 @@
 package jadex.micro.quickstart;
 
+import java.util.logging.Level;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
@@ -7,7 +9,7 @@ import jadex.bridge.service.IService;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentServiceQuery;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Simple agent that uses globally available time services.
@@ -18,15 +20,15 @@ public class TimeUserAgent
 	/**
 	 *  The time services are searched and added whenever a new one is found.
 	 */
-	@AgentServiceQuery(scope=Binding.SCOPE_GLOBAL)
+	@AgentServiceQuery(scope=RequiredService.SCOPE_GLOBAL)
 	public void	addTimeService(ITimeService timeservice)
 	{
 		ISubscriptionIntermediateFuture<String>	subscription = timeservice.subscribe();
 		while(subscription.hasNextIntermediateResult())
 		{
 			String time = subscription.getNextIntermediateResult();
-			String platform	= ((IService)timeservice).getServiceIdentifier().getProviderId().getPlatformName();
-			System.out.println("New time received from "+platform+" at "+timeservice.getLocation()+": "+time);
+			String platform	= ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
+			System.out.println("New time received from "+platform+/*" at "+timeservice.getLocation()+*/": "+time);
 		}
 	}
 	
@@ -36,7 +38,9 @@ public class TimeUserAgent
 	public static void main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
+		config.setPlatformName("timeuser_*");
 		config.addComponent(TimeUserAgent.class);
+		config.setLoggingLevel(Level.WARNING);
 		Starter.createPlatform(config, args).get();
 	}
 }

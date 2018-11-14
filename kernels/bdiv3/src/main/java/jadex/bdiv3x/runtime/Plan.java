@@ -42,8 +42,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SReflect;
@@ -122,7 +122,7 @@ public abstract class Plan
 	{
 		checkNotInAtomic();
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(timeout).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(timeout).get();
 	}
 	
 	/**
@@ -132,7 +132,7 @@ public abstract class Plan
 	{
 		checkNotInAtomic();
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForTick().get();
+		agent.getFeature(IExecutionFeature.class).waitForTick().get();
 	}
 	
 	/**
@@ -172,7 +172,7 @@ public abstract class Plan
 		{
 			ret.get(timeout);
 		}
-		catch(BDIFailureException e)
+		catch(GoalFailureException e)
 		{
 			throw e;
 		}
@@ -182,7 +182,7 @@ public abstract class Plan
 		}
 		catch(Exception e)
 		{
-			throw new GoalFailureException(null, e);
+			throw new GoalFailureException(rgoal.toString(), e);
 		}
 	}
 	
@@ -287,7 +287,7 @@ public abstract class Plan
 		
 		final Future<IMessageEvent> ret = new Future<IMessageEvent>();
 
-		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		MMessageEvent mevent = bdif.getBDIModel().getCapability().getResolvedMessageEvent(
 			getRPlan().getModelElement().getCapabilityName(), type);
 		WaitAbstraction wa = new WaitAbstraction();
@@ -365,7 +365,7 @@ public abstract class Plan
 	{
 		checkNotInAtomic();
 		
-		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		MMessageEvent	mreply	= type==null ? null
 			: bdif.getBDIModel().getCapability().getResolvedMessageEvent(getRPlan().getModelElement().getCapabilityName(), type);
 		
@@ -384,12 +384,12 @@ public abstract class Plan
 			rplan.setWaitAbstraction(wa);
 			try
 			{
-				agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent((RMessageEvent)event);
+				agent.getFeature(IInternalBDIXMessageFeature.class).registerMessageEvent((RMessageEvent)event);
 				return ret.get(timeout);
 			}
 			finally
 			{
-				agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent((RMessageEvent)event);
+				agent.getFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent((RMessageEvent)event);
 			}
 		}
 	}
@@ -414,7 +414,7 @@ public abstract class Plan
 		
 		final Future<IInternalEvent> ret = new Future<IInternalEvent>();
 
-		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		MInternalEvent mevent = bdif.getBDIModel().getCapability().getResolvedInternalEvent(rplan.getModelElement().getCapabilityName(), type);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addModelElement(mevent);
@@ -590,13 +590,13 @@ public abstract class Plan
 		RMessageEvent<Object>	rme	= (RMessageEvent<Object>)me;
 		try
 		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent(rme);
+			agent.getFeature(IInternalBDIXMessageFeature.class).registerMessageEvent(rme);
 			IMessageEvent<T>	reply	= replyfut.get(timeout);
 			return reply;
 		}
 		finally
 		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent(rme);
+			agent.getFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent(rme);
 		}
 	}
 
@@ -725,7 +725,7 @@ public abstract class Plan
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		return agent.getComponentIdentifier();
+		return agent.getId();
 	}
 	
 	/**
@@ -734,7 +734,7 @@ public abstract class Plan
 	 */
 	public IComponentDescription getComponentDescription()
 	{
-		return agent.getComponentDescription();
+		return agent.getDescription();
 	}
 
 	/**
@@ -789,7 +789,7 @@ public abstract class Plan
 	 */
 	public IClockService getClock()
 	{
-		return SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 	}
 
 	/**
@@ -950,7 +950,7 @@ public abstract class Plan
 	{
 		checkNotInAtomic();
 		
-		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addChangeEventType(ChangeEvent.FACTCHANGED+"."+belname);
 
@@ -998,7 +998,7 @@ public abstract class Plan
 	{
 		checkNotInAtomic();
 		
-		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addChangeEventType(ChangeEvent.FACTADDED+"."+belname);
 
@@ -1044,7 +1044,7 @@ public abstract class Plan
 	{
 		checkNotInAtomic();
 		
-		IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		WaitAbstraction wa = new WaitAbstraction();
 		wa.addChangeEventType(ChangeEvent.FACTREMOVED+"."+belname);
 
@@ -1104,7 +1104,7 @@ public abstract class Plan
 	{
 		checkNotInAtomic();
 		
-		final IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		final IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		final MCondition mcond = bdif.getCapability().getMCapability().getCondition(name);
 		if(mcond==null)
 			throw new RuntimeException("Unknown condition: "+name);
@@ -1173,7 +1173,7 @@ public abstract class Plan
 		List<EventType> events = new ArrayList<EventType>();
 		BDIAgentFeature.addExpressionEvents(uexp, events, (MParameterElement)rplan.getModelElement());
 		
-		final IInternalBDIAgentFeature bdif = agent.getComponentFeature(IInternalBDIAgentFeature.class);
+		final IInternalBDIAgentFeature bdif = agent.getFeature(IInternalBDIAgentFeature.class);
 		final Future<Void> ret = new Future<Void>();
 		Rule<Void> rule = new Rule<Void>("plan_condition_"+rplan.getId()+"_"+expr, new ICondition()
 		{
@@ -1375,7 +1375,7 @@ public abstract class Plan
 		 */
 		public void addReply(IMessageEvent mevent)
 		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).registerMessageEvent((RMessageEvent)mevent);
+			agent.getFeature(IInternalBDIXMessageFeature.class).registerMessageEvent((RMessageEvent)mevent);
 			getWaitAbstraction().addReply((RMessageEvent)mevent, null);
 		}
 
@@ -1457,7 +1457,7 @@ public abstract class Plan
 		 */
 		public void removeReply(IMessageEvent me)
 		{
-			agent.getComponentFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent((RMessageEvent)me);
+			agent.getFeature(IInternalBDIXMessageFeature.class).deregisterMessageEvent((RMessageEvent)me);
 			getWaitAbstraction().addReply((RMessageEvent)me, null);
 		}
 

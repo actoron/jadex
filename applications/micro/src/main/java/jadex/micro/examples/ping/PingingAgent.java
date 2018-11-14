@@ -61,10 +61,10 @@ public class PingingAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		receiver = (IComponentIdentifier)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("receiver");
-		final int missed_max = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("missed_max")).intValue();
-		final long timeout = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("timeout")).longValue();
-		final Object content = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("content");
+		receiver = (IComponentIdentifier)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("receiver");
+		final int missed_max = ((Number)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("missed_max")).intValue();
+		final long timeout = ((Number)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("timeout")).longValue();
+		final Object content = agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("content");
 		sent = new HashSet<String>();
 		
 		final IComponentStep<Void> step = new IComponentStep<Void>()
@@ -79,7 +79,7 @@ public class PingingAgent
 				}
 				else
 				{
-					String convid = SUtil.createUniqueId(agent.getComponentIdentifier().getName());
+					String convid = SUtil.createUniqueId(agent.getId().getName());
 					Map<String, Object> msg = new HashMap<String, Object>();
 					msg.put(SFipa.CONTENT, content);
 					msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);
@@ -88,8 +88,8 @@ public class PingingAgent
 //					msg.put(SFipa.SENDER, getComponentIdentifier());
 					dif++;
 					sent.add(convid);
-					agent.getComponentFeature(IMessageFeature.class).sendMessage(msg, receiver);
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(timeout, this);
+					agent.getFeature(IMessageFeature.class).sendMessage(msg, receiver);
+					agent.getFeature(IExecutionFeature.class).waitForDelay(timeout, this);
 				}
 				return IFuture.DONE;
 			}
@@ -97,7 +97,7 @@ public class PingingAgent
 		
 		if(receiver==null)
 		{
-			receiver = new BasicComponentIdentifier("Ping", agent.getComponentIdentifier().getParent());
+			receiver = new BasicComponentIdentifier("Ping", agent.getId().getParent());
 		}
 //			createComponentIdentifier("Ping").addResultListener(new DefaultResultListener()
 //			{
@@ -113,7 +113,7 @@ public class PingingAgent
 //			scheduleStep(step);
 //		}
 
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
+		agent.getFeature(IExecutionFeature.class).scheduleStep(step);
 		
 		return ret;
 	}

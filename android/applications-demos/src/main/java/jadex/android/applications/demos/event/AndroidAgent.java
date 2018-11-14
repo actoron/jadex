@@ -14,7 +14,6 @@ import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -29,7 +28,7 @@ import android.util.Log;
  */
 @Description("Sample Android Agent.")
 @RequiredServices({
-		@RequiredService(name="androidcontext", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+		@RequiredService(name="androidcontext", type=IContextService.class)
 })
 @Agent
 public class AndroidAgent
@@ -53,7 +52,7 @@ public class AndroidAgent
 	public IFuture<Void> executeBody()
 	{
 
-		showAndroidMessage("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying hello!");
+		showAndroidMessage("This is Agent <<" + agent.getId().getLocalName() + ">> saying hello!");
 		return new Future<Void>();
 	}
 
@@ -61,7 +60,7 @@ public class AndroidAgent
 	@AgentMessageArrived
 	public void handleMessage(Map<String, Object> msg) {
 		if (msg.get(SFipa.CONTENT).equals("ping")) {
-			showAndroidMessage(agent.getComponentIdentifier().getLocalName()  + ": pong");
+			showAndroidMessage(agent.getId().getLocalName()  + ": pong");
 		}
 	}
 	
@@ -71,7 +70,7 @@ public class AndroidAgent
 	 */
 	public IFuture<Void> agentKilled()
 	{
-		showAndroidMessage("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying goodbye!");
+		showAndroidMessage("This is Agent <<" + agent.getId().getLocalName() + ">> saying goodbye!");
 		return IFuture.DONE;
 	}
 

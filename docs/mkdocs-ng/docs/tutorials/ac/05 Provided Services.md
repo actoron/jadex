@@ -47,7 +47,7 @@ To ensure that the caller of the start method is notified also in case an error 
 ```java
 format = new SimpleDateFormat("hh:mm:ss");
 final Future<Void> ret = new Future<Void>();
-IFuture<IClockService> fut = requiredServicesFeature.getRequiredService("clockservice");
+IFuture<IClockService> fut = requiredServicesFeature.getService("clockservice");
 fut.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 {
 	public void customResultAvailable(IClockService result)
@@ -71,7 +71,7 @@ The first clock service specification can be kept and the second we will name *c
 @ProvidedServices(@ProvidedService(type=IChatService.class, implementation=@Implementation(ChatServiceD1.class)))
 ```
 
--   The code of the agent body should be changed to fetch the chat services using the call ```requiredServicesFeature.getRequiredServices("chatservices")```. As result you will retrieve a *java.util.Collection* of the available chat services (at least the one our agent is offering itself). 
+-   The code of the agent body should be changed to fetch the chat services using the call ```requiredServicesFeature.getServices("chatservices")```. As result you will retrieve a *java.util.Collection* of the available chat services (at least the one our agent is offering itself). 
 Iterate through this collection and invoke the *message* method on each service with your own component name as sender (```agent.getComponentIdentifier().getName()```) and some arbitrary text as message content. 
 
 ## Verify the Component Behavior
@@ -110,7 +110,7 @@ send.addActionListener(new ActionListener()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IFuture<Collection<IChatService>>	chatservices	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
+				IFuture<Collection<IChatService>>	chatservices	= ia.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
 				chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 				{
 					public void resultAvailable(Collection<IChatService> result)
@@ -152,7 +152,7 @@ addWindowListener(new WindowAdapter()
 
 ```java
 final IExternalAccess exta = agent.getExternalAccess();
-IFuture<IClockService>	clockservice	= requiredServicesFeature.getRequiredService("clockservice");
+IFuture<IClockService>	clockservice	= requiredServicesFeature.getService("clockservice");
 clockservice.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 {
 	public void customResultAvailable(IClockService result)
@@ -227,7 +227,7 @@ agent.scheduleStep(new IComponentStep<Void>()
 {
   public IFuture<Void> execute(IInternalAccess ia)
   {
-    IFuture<Collection<IChatService>> chatservices = ia.getServiceContainer().getRequiredServices("chatservices");
+    IFuture<Collection<IChatService>> chatservices = ia.getServiceContainer().getServices("chatservices");
     chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()   
     ...
   }
@@ -292,7 +292,7 @@ Until now we have used chat agents only from one platform. In this lecture we wi
 
 ```java
 
-ia.getServiceContainer().getRequiredServices("chatservices")
+ia.getServiceContainer().getServices("chatservices")
   .addResultListener(new IIntermediateResultListener()...
 
 ```

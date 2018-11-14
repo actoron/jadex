@@ -22,6 +22,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -230,7 +231,7 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							final Future<Void> ret = new Future<Void>();
-							INFMixedPropertyProvider pp = ia.getComponentFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(fsid);
+							INFMixedPropertyProvider pp = ia.getFeature(INFPropertyComponentFeature.class).getRequiredServicePropertyProvider(fsid);
 							if(fmi==null)
 							{
 								pp.removeNFProperty(fname).addResultListener(new DelegationResultListener<Void>(ret));
@@ -245,7 +246,7 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 				}
 				else
 				{
-					IFuture<IService> fut = SServiceProvider.getService(ea, sid);
+					IFuture<IService> fut = ea.searchService( new ServiceQuery<>( (Class<IService>)null).setServiceIdentifier(sid));
 					fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
 					{
 						public void resultAvailable(IService ser) 
@@ -254,13 +255,13 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 							{
 //								((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeMethodNFProperty(mi, propmi.getName())
 //									.addResultListener(new DelegationResultListener<Void>(ret));
-								SNFPropertyProvider.removeMethodNFProperty(ea, ser.getServiceIdentifier(), mi, propmi.getName())
+								ea.removeMethodNFProperty(ser.getServiceId(), mi, propmi.getName())
 									.addResultListener(new DelegationResultListener<Void>(ret));
 							}
 							else
 							{
 //								((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
-								SNFPropertyProvider.removeNFProperty(ea, ser.getServiceIdentifier(), propmi.getName())
+								ea.removeNFProperty(ser.getServiceId(), propmi.getName())
 									.addResultListener(new DelegationResultListener<Void>(ret));
 							}
 						}
@@ -274,7 +275,7 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 			else
 			{
 //				((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
-				SNFPropertyProvider.removeNFProperty(ea, propmi.getName())
+				ea.removeNFProperty(propmi.getName())
 					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		}

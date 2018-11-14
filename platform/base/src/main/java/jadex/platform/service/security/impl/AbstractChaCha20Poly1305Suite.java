@@ -1,13 +1,16 @@
 package jadex.platform.service.security.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.crypto.engines.ChaChaEngine;
 import org.bouncycastle.crypto.generators.Poly1305KeyGenerator;
@@ -16,7 +19,7 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.Pack;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.ByteArrayWrapper;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -24,8 +27,12 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.security.SSecurity;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
+import jadex.platform.service.security.auth.AbstractX509PemSecret;
+import jadex.platform.service.security.auth.AuthToken;
 import jadex.platform.service.security.auth.Blake2bX509AuthenticationSuite;
 import jadex.platform.service.security.auth.IAuthenticationSuite;
+import jadex.platform.service.security.auth.X509AuthToken;
+import jadex.platform.service.security.auth.X509PemStringsSecret;
 import jadex.platform.service.security.handshake.BasicSecurityMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 
@@ -54,7 +61,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	protected int nextstep;
 	
 	/** Hashed network names reverse lookup */
-	protected MultiCollection<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> hashednetworks;
+	//protected MultiCollection<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> hashednetworks;
+	protected Map<ByteArrayWrapper, String> hashednetworknames;
 	
 	// -------------- Operational state -----------------
 	
@@ -118,7 +126,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  
 	 *  @return The security infos for decrypted messages.
 	 */
-	public IMsgSecurityInfos getSecurityInfos()
+	public ISecurityInfo getSecurityInfos()
 	{
 		return secinf;
 	}
@@ -189,7 +197,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
 			nextstep = 2;
 			
-			hashednetworks = getHashedNetworks(agent.getInternalNetworks(), challenge);
+			hashednetworknames = getHashedNetworkNames(agent.getInternalNetworks().keySet(), challenge);
 		}
 		else if (nextstep == 1 && incomingmessage instanceof AckExchangeMessage)
 		{
@@ -201,12 +209,11 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			challenge = new byte[32];
 			dig.doFinal(challenge, 0);
 			
-			hashednetworks = getHashedNetworks(agent.getInternalNetworks(), challenge);
+			hashednetworknames = getHashedNetworkNames(agent.getInternalNetworks().keySet(), challenge);
 			
 			IComponentIdentifier remoteid = ack.getSender().getRoot();
 			
 			KeyExchangeMessage reply = new KeyExchangeMessage(agent.getComponentIdentifier(), ack.getConversationId());
-			reply.setHashedNetworkNames(hashednetworks.keySet());
 			
 			try
 			{
@@ -223,7 +230,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			if (agent.getInternalUsePlatformSecret())
 				reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
-			reply.setNetworkSigs(getNetworkSignatures(pubkey, hashednetworks.keySet()));
+			reply.setNetworkSigs(getNetworkSignatures(pubkey, agent.getInternalNetworks()));
+			
+			reply.setPlatformNameSig(getPlatformNameSignature(pubkey, agent.getInternalPlatformNameCertificate()));
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
 			nextstep = 3;
@@ -244,13 +253,15 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			remotepublickey = kx.getPublicKey();
 			
+			String remotepfname = kx.getSender().getRoot().toString();
+			String authenticatedpfname = null;
+			if (verifyPlatformNameSignature(remotepublickey, kx.getPlatformNameSig(), agent.getInternalNameAuthorities(), remotepfname))
+				authenticatedpfname = remotepfname;
+			
 			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getInternalPlatformSecret());
 			platformauth &= agent.getInternalUsePlatformSecret();
-			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
-			setupSecInfos(remoteid, authnets, platformauth, agent);
-			
-			if (agent.getInternalRefuseUnauth() && !secinf.isAuthenticated())
-				throw new SecurityException("Unauthenticated connection not allowed.");
+			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs(), agent.getInternalNetworks());
+			setupSecInfos(remoteid, authnets, platformauth, authenticatedpfname, agent);
 			
 			ephemeralkey = createEphemeralKey();
 			byte[] pubkey = getPubKey();
@@ -261,7 +272,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			reply.setPublicKey(pubkey);
 			if (agent.getInternalUsePlatformSecret())
 					reply.setPlatformSecretSigs(getPlatformSignatures(pubkey, agent, remoteid));
-			reply.setNetworkSigs(getNetworkSignatures(pubkey, kx.getNetworkSigs().keySet()));
+			reply.setNetworkSigs(getNetworkSignatures(pubkey, agent.getInternalNetworks()));
+			
+			reply.setPlatformNameSig(getPlatformNameSignature(pubkey, agent.getInternalPlatformNameCertificate()));
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
 			nextstep = 4;
@@ -274,12 +287,17 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			
 			remotepublickey = kx.getPublicKey();
 			
+			String remotepfname = kx.getSender().getRoot().toString();
+			String authenticatedpfname = null;
+			if (verifyPlatformNameSignature(remotepublickey, kx.getPlatformNameSig(), agent.getInternalNameAuthorities(), remotepfname))
+				authenticatedpfname = remotepfname;
+			
 			boolean platformauth = verifyPlatformSignatures(remotepublickey, kx.getPlatformSecretSigs(), agent.getInternalPlatformSecret());
 			platformauth &= agent.getInternalUsePlatformSecret();
-			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs());
-			setupSecInfos(remoteid, authnets, platformauth, agent);
+			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs(), agent.getInternalNetworks());
+			setupSecInfos(remoteid, authnets, platformauth, authenticatedpfname, agent);
 			
-			if (agent.getInternalRefuseUnauth() && !secinf.isAuthenticated())
+			if (agent.getInternalRefuseUnauth() && !secinf.hasDefaultAuthorization())
 				throw new SecurityException("Unauthenticated connection not allowed.");
 			
 			nonceprefix = Pack.littleEndianToInt(challenge, 0);
@@ -290,7 +308,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			// Delete handshake state
 			ephemeralkey = null;
 			challenge = null;
-			hashednetworks = null;
+			hashednetworknames = null;
 			remotepublickey = null;
 			authsuite = null;
 			
@@ -310,7 +328,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			ephemeralkey = null;
 			remotepublickey = null;
 			challenge = null;
-			hashednetworks = null;
+			hashednetworknames = null;
 			authsuite = null;
 			
 			ret = false;
@@ -351,20 +369,20 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  
 	 *  @return Tuple of signatures local/remote.
 	 */
-	protected Tuple2<byte[], byte[]> getPlatformSignatures(byte[] pubkey, SecurityAgent agent, IComponentIdentifier remoteid)
+	protected Tuple2<AuthToken, AuthToken> getPlatformSignatures(byte[] pubkey, SecurityAgent agent, IComponentIdentifier remoteid)
 	{
-		byte[] local = null;
+		AuthToken local = null;
 		AbstractAuthenticationSecret ps = agent.getInternalPlatformSecret();
 		if (ps != null && ps.canSign())
 			local = signKey(challenge, pubkey, ps);
 		
-		byte[] remote = null;
+		AuthToken remote = null;
 		ps = agent.getInternalPlatformSecret(remoteid);
 		if (ps != null && ps.canSign())
 			remote = signKey(challenge, pubkey, ps);
 		
 		if (local != null || remote != null)
-			return new Tuple2<byte[], byte[]>(local, remote);
+			return new Tuple2<>(local, remote);
 		
 		return null;
 	}
@@ -376,7 +394,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param networksigs The signatures.
 	 *  @return List of network that authenticated the key.
 	 */
-	protected boolean verifyPlatformSignatures(byte[] key, Tuple2<byte[], byte[]> sigs, AbstractAuthenticationSecret localsecret)
+	protected boolean verifyPlatformSignatures(byte[] key, Tuple2<AuthToken, AuthToken> sigs, AbstractAuthenticationSecret localsecret)
 	{
 		boolean ret = false;
 		if (sigs != null)
@@ -395,6 +413,54 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	}
 	
 	/**
+	 *  Generates a token verifying the platform name.
+	 *  
+	 *  @param key The key.
+	 *  @param secret The name certificate.
+	 *  @return The token.
+	 */
+	public AuthToken getPlatformNameSignature(byte[] key, AbstractX509PemSecret secret)
+	{
+		AuthToken ret = null;
+		if (secret != null)
+		{
+			ret = signKey(challenge, key, secret);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Verifies a token verifying the platform name.
+	 */
+	public boolean verifyPlatformNameSignature(byte[] key, AuthToken platformnamesig, Set<X509CertificateHolder> nameauthorities, String platformname)
+	{
+		boolean ret = false;
+		try
+		{
+			if (platformnamesig instanceof X509AuthToken)
+			{
+				X509AuthToken sig = (X509AuthToken) platformnamesig;
+				for (X509CertificateHolder nameauthority : nameauthorities)
+				{
+//					X509PemStringsSecret nasecret = new X509PemStringsSecret(SSecurity.writeCertificateAsPEM(nameauthority), null, null);
+					X509PemStringsSecret nasecret = new X509PemStringsSecret(SSecurity.writeCertificateAsPEM(nameauthority), null);
+					boolean verified = verifyKey(challenge, key, nasecret, sig);
+					if (verified)
+					{
+						ret = SSecurity.checkEntity(SSecurity.readCertificateFromPEM(sig.getCertificate()), platformname);
+						if (ret)
+							break;
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Signs a key with network secrets.
 	 *  
 	 *  @param key The key (public key).
@@ -402,19 +468,27 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  
 	 *  @return Map hashed network name -> signature.
 	 */
-	protected MultiCollection<ByteArrayWrapper, byte[]> getNetworkSignatures(byte[] key, Set<ByteArrayWrapper> remotehnets)
+	protected MultiCollection<ByteArrayWrapper, AuthToken> getNetworkSignatures(byte[] key, MultiCollection<String, AbstractAuthenticationSecret> networks)
 	{
-		MultiCollection<ByteArrayWrapper, byte[]> networksigs = new MultiCollection<ByteArrayWrapper, byte[]>();
-		if (remotehnets != null && hashednetworks.size() > 0)
+		MultiCollection<ByteArrayWrapper, AuthToken> networksigs = new MultiCollection<>();
+		
+		if (hashednetworknames.size() > 0)
 		{
-			for (ByteArrayWrapper hnwname : remotehnets)
+			for (Map.Entry<ByteArrayWrapper, String> entry : hashednetworknames.entrySet())
 			{
-				Collection<Tuple2<String, AbstractAuthenticationSecret>> tupc = hashednetworks.get(hnwname);
+				Collection<AbstractAuthenticationSecret> secrets = networks.get(entry.getValue());
 				
-				if (tupc != null && tupc.size() > 0)
+				if (secrets != null && secrets.size() > 0)
 				{
-					for (Tuple2<String, AbstractAuthenticationSecret> tup : tupc)
-						networksigs.add(hnwname, signKey(challenge, key, tup.getSecondEntity()));
+					for (AbstractAuthenticationSecret secret : secrets)
+					{
+						if (secret.canSign())
+						{
+							AuthToken sig = signKey(challenge, key, secret);
+							if (sig != null)
+								networksigs.add(entry.getKey(), sig);
+						}
+					}
 				}
 			}
 		}
@@ -428,31 +502,39 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param networksigs The signatures.
 	 *  @return List of network that authenticated the key.
 	 */
-	protected List<String> verifyNetworkSignatures(byte[] key, MultiCollection<ByteArrayWrapper, byte[]> networksigs)
+	protected List<String> verifyNetworkSignatures(byte[] key, MultiCollection<ByteArrayWrapper, AuthToken> networksigs, MultiCollection<String, AbstractAuthenticationSecret> networks)
 	{
 		List<String> ret = new ArrayList<String>();
+		
 		if (networksigs != null)
 		{
-			for (Map.Entry<ByteArrayWrapper, Collection<byte[]>> nwsig : networksigs.entrySet())
+			for (Map.Entry<ByteArrayWrapper, Collection<AuthToken>> nwsig : networksigs.entrySet())
 			{
-				Collection<Tuple2<String, AbstractAuthenticationSecret>> tupc = hashednetworks.get(nwsig.getKey());
-				if (tupc != null && tupc.size() > 0)
+				String networkname = hashednetworknames.get(nwsig.getKey());
+				if (networkname != null)
 				{
-					sigcheck:
-					for (Tuple2<String, AbstractAuthenticationSecret> tup : tupc)
+					Collection<AbstractAuthenticationSecret> secrets = networks.get(networkname);
+					if (secrets != null)
 					{
-						for (byte[] nwsigval : nwsig.getValue())
+						boolean authenticated = false;
+						sigcheck:
+						for (AbstractAuthenticationSecret secret : secrets)
 						{
-							if (verifyKey(challenge, key, tup.getSecondEntity(), nwsigval))
+							for (AuthToken sig : nwsig.getValue())
 							{
-								ret.add(tup.getFirstEntity());
-								break sigcheck;
+								authenticated = verifyKey(challenge, key, secret, sig);
+								if (authenticated)
+									break sigcheck;
 							}
 						}
+						if (!authenticated)
+							throw new SecurityException("Remote platform presented unverifiable network signature for network " + networkname + ", handshake terminated.");
+						ret.add(networkname);
 					}
 				}
 			}
 		}
+		Logger.getLogger("security").fine("Remote networks verified: " + Arrays.toString(ret.toArray()));
 		return ret;
 	}
 	
@@ -464,7 +546,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param secret Secret used for authentication.
 	 *  @return Signature.
 	 */
-	protected byte[] signKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret)
+	protected AuthToken signKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret)
 	{
 		byte[] sigmsg = new byte[key.length + challenge.length];
 		System.arraycopy(key, 0, sigmsg, 0, key.length);
@@ -478,9 +560,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param challenge Nonce / challenge received from remote.
 	 *  @param key The key to verify.
 	 *  @param secret Secret used for authentication.
-	 *  @return Signature.
+	 *  @return True, if authenticated.
 	 */
-	protected boolean verifyKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret, byte[] authtoken)
+	protected boolean verifyKey(byte[] challenge, byte[] key, AbstractAuthenticationSecret secret, AuthToken authtoken)
 	{
 		byte[] sigmsg = new byte[key.length + challenge.length];
 		System.arraycopy(key, 0, sigmsg, 0, key.length);
@@ -503,13 +585,13 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param salt The salt.
 	 *  @return Hashed network name.
 	 */
-	protected static final byte[] hashNetworkName(String nwname, byte[] salt)
+	protected static final ByteArrayWrapper hashNetworkName(String nwname, byte[] salt)
 	{
 		Blake2bDigest dig = new Blake2bDigest(nwname.getBytes(SUtil.UTF8));
 		byte[] hnwname = new byte[dig.getDigestSize()];
 		dig.update(salt, 0, salt.length);
 		dig.doFinal(hnwname, 0);
-		return hnwname;
+		return new ByteArrayWrapper(hnwname);
 	}
 	
 	/**
@@ -519,27 +601,34 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	 *  @param salt Salt to use.
 	 *  @return Reverse look-up map.
 	 */
-	protected static final MultiCollection<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> getHashedNetworks(MultiCollection<String, AbstractAuthenticationSecret> networks, byte[] salt)
+	protected static final Map<ByteArrayWrapper, String> getHashedNetworkNames(Set<String> names, byte[] salt)
 	{
-		MultiCollection<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> ret = new MultiCollection<ByteArrayWrapper, Tuple2<String,AbstractAuthenticationSecret>>();
-		if (networks != null)
-		{
-			for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> nw : networks.entrySet())
-			{
-				if (nw.getValue() != null)
-				{
-					ByteArrayWrapper namehash = new ByteArrayWrapper(hashNetworkName(nw.getKey(), salt));
-					for (AbstractAuthenticationSecret secret : nw.getValue())
-					{
-						Tuple2<String, AbstractAuthenticationSecret> tup;
-						tup = new Tuple2<String, AbstractAuthenticationSecret>(nw.getKey(), secret);
-						ret.add(namehash, tup);
-					}
-				}
-			}
-		}
+		Map<ByteArrayWrapper, String> ret = new HashMap<>();
+		for (String name : names)
+			ret.put(hashNetworkName(name, salt), name);
 		return ret;
 	}
+//	protected static final MultiCollection<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> getHashedNetworks(MultiCollection<String, AbstractAuthenticationSecret> networks, byte[] salt)
+//	{
+//		MultiCollection<ByteArrayWrapper, Tuple2<String, AbstractAuthenticationSecret>> ret = new MultiCollection<ByteArrayWrapper, Tuple2<String,AbstractAuthenticationSecret>>();
+//		if (networks != null)
+//		{
+//			for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> nw : networks.entrySet())
+//			{
+//				if (nw.getValue() != null)
+//				{
+//					ByteArrayWrapper namehash = new ByteArrayWrapper(hashNetworkName(nw.getKey(), salt));
+//					for (AbstractAuthenticationSecret secret : nw.getValue())
+//					{
+//						Tuple2<String, AbstractAuthenticationSecret> tup;
+//						tup = new Tuple2<String, AbstractAuthenticationSecret>(nw.getKey(), secret);
+//						ret.add(namehash, tup);
+//					}
+//				}
+//			}
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 *  Encrypts content using an RFC 7539-like AEAD construction.
@@ -908,14 +997,14 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		/** Public key of the exchange. */
 		protected byte[] publickey;
 		
+		/** Signatures for verifying the platform name. */
+		protected AuthToken platformnamesig;
+		
 		/** Signatures based on the local and remote platform access secrets. */
-		protected Tuple2<byte[], byte[]> platformsecretsigs;
+		protected Tuple2<AuthToken, AuthToken> platformsecretsigs;
 		
 		/** Network signatures of the public key. */
-		protected MultiCollection<ByteArrayWrapper, byte[]> networksigs;
-		
-		/** The available hashed network names */
-		protected Set<ByteArrayWrapper> hashednetworknames;
+		protected MultiCollection<ByteArrayWrapper, AuthToken> networksigs;
 		
 		/** PAKE round 2 data. */
 		protected byte[] pakeround2data;
@@ -956,26 +1045,6 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		}
 		
 		/**
-		 *  Gets the network names.
-		 *
-		 *  @return The network names.
-		 */
-		public Set<ByteArrayWrapper> getHashedNetworkNames()
-		{
-			return hashednetworknames;
-		}
-
-		/**
-		 *  Sets the hashed network names.
-		 *
-		 *  @param hashednetworknames The hashed network names.
-		 */
-		public void setHashedNetworkNames(Set<ByteArrayWrapper> hashednetworknames)
-		{
-			this.hashednetworknames = hashednetworknames;
-		}
-		
-		/**
 		 *  Gets the public key.
 		 *  
 		 *  @return The public key.
@@ -1000,7 +1069,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *  
 		 *  @return The network signatures of the public key.
 		 */
-		public MultiCollection<ByteArrayWrapper, byte[]> getNetworkSigs()
+		public MultiCollection<ByteArrayWrapper, AuthToken> getNetworkSigs()
 		{
 			return networksigs;
 		}
@@ -1010,7 +1079,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *  
 		 *  @param networksigs The network signatures of the public key.
 		 */
-		public void setNetworkSigs(MultiCollection<ByteArrayWrapper, byte[]> networksigs)
+		public void setNetworkSigs(MultiCollection<ByteArrayWrapper, AuthToken> networksigs)
 		{
 			this.networksigs = networksigs;
 		}
@@ -1020,7 +1089,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *
 		 *  @return The platform secret signatures.
 		 */
-		public Tuple2<byte[], byte[]> getPlatformSecretSigs()
+		public Tuple2<AuthToken, AuthToken> getPlatformSecretSigs()
 		{
 			return platformsecretsigs;
 		}
@@ -1030,9 +1099,29 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 *
 		 *  @param platformsecretsigs The platform secret signatures.
 		 */
-		public void setPlatformSecretSigs(Tuple2<byte[], byte[]> platformsecretsigs)
+		public void setPlatformSecretSigs(Tuple2<AuthToken, AuthToken> platformsecretsigs)
 		{
 			this.platformsecretsigs = platformsecretsigs;
+		}
+		
+		/**
+		 *  Gets the platform name signature.
+		 *  
+		 *  @return The signature.
+		 */
+		public AuthToken getPlatformNameSig()
+		{
+			return platformnamesig;
+		}
+		
+		/**
+		 *  Gets the platform name signature.
+		 *  
+		 *  @return The signature.
+		 */
+		public void setPlatformNameSig(AuthToken platformnamesig)
+		{
+			this.platformnamesig = platformnamesig;
 		}
 	}
 	

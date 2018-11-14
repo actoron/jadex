@@ -32,12 +32,12 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSCreatedEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.Future;
@@ -282,13 +282,13 @@ public class HelplinePanel extends JPanel
 				final Future<IHelpline>	ret	= new Future<IHelpline>();
 				try
 				{
-					IHelpline	helpline	= SServiceProvider.getLocalService(ia, IHelpline.class, new BasicComponentIdentifier(person, ia.getComponentIdentifier()));
+					IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class).setProvider(new BasicComponentIdentifier(person, ia.getId())));
 					ret.setResult(helpline);
 				}
 				catch(ServiceNotFoundException snfe)
 				{
-					CreationInfo	ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getComponentIdentifier());
-					SServiceProvider.getLocalService(ia, IComponentManagementService.class).createComponent(ci, person, HelplineAgent.class.getName()+".class")
+					CreationInfo ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getId()).setFilename(HelplineAgent.class.getName()+".class").setName(person);
+					ia.createComponentWithResults(ci)
 						.addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
 					{
 						@Override
@@ -296,7 +296,7 @@ public class HelplinePanel extends JPanel
 						{
 							if(event instanceof CMSCreatedEvent)
 							{
-								IHelpline	helpline	= SServiceProvider.getLocalService(ia, IHelpline.class, event.getComponentIdentifier());
+								IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class).setProvider(event.getComponentIdentifier()));
 								if(helpline==null)
 								{
 									exceptionOccurred(new RuntimeException("No service after creation for "+person));
@@ -364,7 +364,7 @@ public class HelplinePanel extends JPanel
 //					}
 //				});
 				
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

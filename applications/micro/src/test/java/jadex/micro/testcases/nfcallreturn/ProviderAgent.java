@@ -24,7 +24,7 @@ public class ProviderAgent implements ITestService
 	@AgentCreated
 	public void created(IInternalAccess agent)
 	{
-		agent.getLogger().severe("Agent created: "+agent.getComponentDescription());
+		agent.getLogger().severe("Agent created: "+agent.getDescription());
 	}
 
 	/**
@@ -36,7 +36,9 @@ public class ProviderAgent implements ITestService
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		
 		System.out.println("Called method: "+msg+" "+sc.getTimeout()
-			+" "+sc.isRealtime()+" "+sc.getProperties());
+		+" "+sc.getProperties());
+//		System.out.println("Called method: "+msg+" "+sc.getTimeout()
+//			+" "+sc.isRealtime()+" "+sc.getProperties());
 		
 		sc.setProperty("extra", "someotherval");
 		sc.setProperty("new", "new");

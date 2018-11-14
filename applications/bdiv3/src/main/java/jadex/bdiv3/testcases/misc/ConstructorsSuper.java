@@ -3,12 +3,13 @@ package jadex.bdiv3.testcases.misc;
 import java.util.ArrayList;
 import java.util.List;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.micro.annotation.Agent;
 
 /**
  *  Test if constructors are called in correct order.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public abstract class ConstructorsSuper
 {
 	//-------- attributes --------

@@ -9,7 +9,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Public methods for working with BDI agents.
  */
-public interface IBDIAgentFeature
+public interface IBDIAgentFeature extends IExternalBDIAgentFeature
 {
 	/**
 	 *  Get the goals of a given type as pojos.
@@ -31,12 +31,12 @@ public interface IBDIAgentFeature
 	 */
 	public IGoal getGoal(Object goal);
 
-	/**
-	 *  Dispatch a pojo goal wait for its result.
-	 *  @param goal The pojo goal.
-	 *  @return The goal result.
-	 */
-	public <T, E> IFuture<E> dispatchTopLevelGoal(T goal);
+//	/**
+//	 *  Dispatch a pojo goal wait for its result.
+//	 *  @param goal The pojo goal.
+//	 *  @return The goal result.
+//	 */
+//	public <T, E> IFuture<E> dispatchTopLevelGoal(T goal);
 	
 	/**
 	 *  Drop a pojo goal.
@@ -44,20 +44,20 @@ public interface IBDIAgentFeature
 	 */
 	public void dropGoal(Object goal);	
 	
-	/**
-	 *  Dispatch a pojo plan and wait for its result.
-	 *  @param plan The pojo plan or plan name.
-	 *  @return The plan result, i.e. the return value of the plan body method, if any.
-	 */
-	public <T, E> IFuture<E> adoptPlan(T plan);
-	
-	/**
-	 *  Dispatch a goal wait for its result.
-	 *  @param plan The pojo plan or plan name.
-	 *  @param args The plan arguments.
-	 *  @return The plan result, i.e. the return value of the plan body method, if any.
-	 */
-	public <T, E> IFuture<E> adoptPlan(T plan, Object... args);
+//	/**
+//	 *  Dispatch a pojo plan and wait for its result.
+//	 *  @param plan The pojo plan or plan name.
+//	 *  @return The plan result, i.e. the return value of the plan body method, if any.
+//	 */
+//	public <T, E> IFuture<E> adoptPlan(T plan);
+//	
+//	/**
+//	 *  Dispatch a goal wait for its result.
+//	 *  @param plan The pojo plan or plan name.
+//	 *  @param args The plan arguments.
+//	 *  @return The plan result, i.e. the return value of the plan body method, if any.
+//	 */
+//	public <T, E> IFuture<E> adoptPlan(T plan, Object... args);
 	
 	/**
 	 *  Add a belief listener.

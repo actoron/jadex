@@ -91,7 +91,7 @@ public class Executor implements Runnable
 		this.threadpool = threadpool;
 		this.executable = executable;
 		this.shutdownfutures = new ArrayList<Future<Void>>();
-//		System.out.println("create: "+executable);
+//		System.out.println("create: "+executable+" "+threadpool.getClass());
 	}
 		
 	//-------- methods --------
@@ -397,21 +397,7 @@ public class Executor implements Runnable
 				Throwable	t	= throwables.remove(monitor);
 				if(t!=null)
 				{
-					if(t instanceof Error)
-					{
-//						if(t.getClass().getName().indexOf("Step")!=-1)
-//							throw new RuntimeException(t);
-//						else
-							throw (Error)t;
-					}
-					else if(t instanceof RuntimeException)
-					{
-						throw (RuntimeException)t;
-					}
-					else
-					{
-						throw new RuntimeException(t);
-					}
+					SUtil.throwUnchecked(t);
 				}
 			}			
 		}

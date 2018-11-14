@@ -11,7 +11,7 @@
     <jadex:modelname>MessageTest</jadex:modelname>
     <jadex:description>Test if a message can be sent and received by a process.</jadex:description>
     <jadex:package>jadex.bpmn.testcases</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:imports>
       <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
       <jadex:import>jadex.base.test.*</jadex:import>
@@ -95,7 +95,7 @@
       <semantic:messageEventDefinition/>
       <semantic:extensionElements>
         <jadex:property name="mode">&quot;send&quot;</jadex:property>
-        <jadex:property name="message">new FipaMessage(FipaMessage.Performative.INFORM, &quot;content&quot;, $component.getComponentIdentifier())</jadex:property>
+        <jadex:property name="message">new FipaMessage(FipaMessage.Performative.INFORM, &quot;content&quot;, $component.getId())</jadex:property>
       </semantic:extensionElements>
     </semantic:intermediateThrowEvent>
     <semantic:sequenceFlow sourceRef="_eQvvsRJgEd-3Ruc_856dPQ" targetRef="_2dIbMRJgEd-3Ruc_856dPQ" id="_2dIbOhJgEd-3Ruc_856dPQ">

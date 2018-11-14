@@ -32,7 +32,7 @@ public class Gui extends JFrame
 	 */
 	public Gui(final IExternalAccess agent)//, final boolean buy)
 	{
-		super((GuiPanel.isBuyer(agent)? "Buyer: ": "Seller: ")+agent.getComponentIdentifier().getName());
+		super((GuiPanel.isBuyer(agent)? "Buyer: ": "Seller: ")+agent.getId().getName());
 		
 //			System.out.println("booktrading0: "+agent.getComponentIdentifier());
 		GuiPanel gp = new GuiPanel(agent);
@@ -71,7 +71,7 @@ public class Gui extends JFrame
 			{
 //				System.out.println("booktrading2: "+agent.getComponentIdentifier());
 				
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

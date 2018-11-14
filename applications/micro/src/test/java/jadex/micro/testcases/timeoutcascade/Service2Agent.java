@@ -22,7 +22,7 @@ public class Service2Agent implements IService2
 	{
 		// wait longer than default 30 secs
 		// get must set no timeout to avoid being interrupted
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(35000).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(35000).get();
 		return IFuture.DONE;
 	}
 }

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.nonfunctional.annotation.SNameValue;
 import jadex.bridge.service.IService;
 import jadex.commons.MethodInfo;

@@ -1,5 +1,6 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPI;
@@ -34,7 +35,7 @@ import jadex.rules.eca.annotations.Event;
  *  are added to the agent type and conditions to eca rule system 
  *  class is rewritten to announce belief changes (field accesses and annotated methods)
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Imports({"java.util.logging.*"})
 @Properties({@NameValue(name="logging.level", value="Level.INFO")})
 public class HelloWorld2BDI
@@ -117,7 +118,7 @@ public class HelloWorld2BDI
 		{
 			System.out.println("1: "+goal.getText());
 			
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
+			agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

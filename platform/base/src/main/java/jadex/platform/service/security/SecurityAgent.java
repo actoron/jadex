@@ -1,17 +1,33 @@
 package jadex.platform.service.security;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
@@ -23,33 +39,44 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.IUntrustedMessageHandler;
+import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.security.SSecurity;
 import jadex.commons.transformation.traverser.SCloner;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.platform.service.registryv2.SuperpeerClientAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.AbstractX509PemSecret;
 import jadex.platform.service.security.auth.KeySecret;
@@ -63,7 +90,7 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
 /**
  *  Agent that provides the security service.
  */
-@Agent
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, predecessors="jadex.platform.service.clock.ClockAgent"))
 @Arguments(value={
 	@Argument(name="usesecret", clazz=Boolean.class, defaultvalue="null"),
 	@Argument(name="printsecret", clazz=Boolean.class, defaultvalue="null"),
@@ -74,7 +101,7 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
 	@Argument(name="roles", clazz=String.class, defaultvalue="null")
 })
 //@Service // This causes problems because the wrong preprocessor is used (for pojo services instead of remote references)!!!
-@ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
+@ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
 public class SecurityAgent implements ISecurityService, IInternalService
 {
@@ -85,20 +112,67 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected static final String SECURITY_MESSAGE = "__securitymessage__";
 	
 	/** Timeout used for internal expirations */
-	protected static final long TIMEOUT = 60000;
+//	protected static final long TIMEOUT = 60000;
 	
 	/** Component access. */
 	@Agent
 	protected IInternalAccess agent;
 	
+	@AgentFeature
+	protected IExecutionFeature execfeat;
+	
 	/** Flag whether to use the platform secret for authentication. */
+	@AgentArgument
 	protected boolean usesecret = true;
 	
 	/** Flag whether the platform secret should be printed during start. */
+	@AgentArgument
 	protected boolean printsecret = true;
 	
+	/** 
+	 *  Flag whether to grant default authorization
+	 *  (allow basic service calls if name, network or platform is authenticated).
+	 */
+	@AgentArgument
+	protected boolean defaultauthorization = true;
+	
 	/** Flag whether to refuse unauthenticated connections. */
+	@AgentArgument
 	protected boolean refuseunauth = false;
+	
+	/** Flag if connection with platforms without authenticated names are allowed. */
+	@AgentArgument
+	protected boolean allownoauthname = true;
+	
+	/** Flag if connection with platforms without authenticated networks are allowed. */
+	@AgentArgument
+	protected boolean allownonetwork = true;
+	
+	/** Flag whether to use the default Java trust store. */
+	@AgentArgument
+	protected boolean loadjavatruststore = true;
+	
+	/** Flag if the security should create a random default network
+	 *  if no network is set.
+	 */
+	@AgentArgument
+	protected boolean createdefaultnetwork = true;
+	
+	/** Handshake timeout. */
+	@AgentArgument
+	protected long handshaketimeout = -1;
+	
+	/** Handshake timeout scale factor. */
+	@AgentArgument
+	protected double handshaketimeoutscale = 2.0;
+	
+	/** Handshake reset scale factor. */
+	@AgentArgument
+	protected double resettimeoutscale = 0.02;
+	
+	/** Flag enabling debug printouts. */
+	@AgentArgument
+	protected boolean debug = false;
 	
 	/** Local platform authentication secret. */
 	protected AbstractAuthenticationSecret platformsecret;
@@ -107,13 +181,23 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected Map<IComponentIdentifier, AbstractAuthenticationSecret> remoteplatformsecrets = new HashMap<IComponentIdentifier, AbstractAuthenticationSecret>();;
 	
 	/** Flag whether to allow platforms to be associated with roles (clashes, spoofing problem?). */
-	protected boolean allowplatformroles = false;
+//	protected boolean allowplatformroles = false;
 	
 	/** Available virtual networks. */
 //	protected Map<String, AbstractAuthenticationSecret> networks = new HashMap<String, AbstractAuthenticationSecret>();
-	protected MultiCollection<String, AbstractAuthenticationSecret> networks = new MultiCollection<>();
+	protected MultiCollection<String, AbstractAuthenticationSecret> networks = new MultiCollection<>(new HashMap<>(), LinkedHashSet.class);
 	
-	protected Set<AbstractX509PemSecret> nameauthorities = new HashSet<>();
+	/** The platform name certificate if available. */
+	protected AbstractX509PemSecret platformnamecertificate;
+	
+	/** The platform names that are trusted and identified by name. */
+	protected Set<String> trustedplatforms = new HashSet<>();
+	
+	/** Trusted authorities for certifying platform names. */
+	protected Set<X509CertificateHolder> nameauthorities = new HashSet<>();
+	
+	/** Custom (non-Java default) trusted authorities for certifying platform names. */
+	protected Set<X509CertificateHolder> customnameauthorities = new HashSet<>();
 	
 	/** Available crypt suites. */
 	protected Map<String, Class<?>> allowedcryptosuites = new LinkedHashMap<String, Class<?>>();
@@ -122,7 +206,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected Map<String, HandshakeState> initializingcryptosuites = new HashMap<String, HandshakeState>();
 	
 	/** CryptoSuites currently in use. */
-	protected Map<String, ICryptoSuite> currentcryptosuites = Collections.synchronizedMap(new HashMap<String, ICryptoSuite>());
+	protected IRwMap<String, ICryptoSuite> currentcryptosuites = new RwMapWrapper<>(new HashMap<String, ICryptoSuite>());
 	
 	/** CryptoSuites that are expiring with expiration time. */
 	protected MultiCollection<String, Tuple2<ICryptoSuite, Long>> expiringcryptosuites = new MultiCollection<String, Tuple2<ICryptoSuite,Long>>();
@@ -143,215 +227,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Initialization.
 	 */
-	/*@SuppressWarnings("unchecked")
 	@AgentCreated
 	public IFuture<Void> start()
 	{
-		if(!agent.getComponentIdentifier().getLocalName().equals("security"))
-			agent.getLogger().warning("Security agent running as \"" + agent.getComponentIdentifier().getLocalName() +"\" instead of \"security\".");
-		
-		Map<String, Object> activeprops = new HashMap<String, Object>();
-		Map<String, String> networkprops = new HashMap<String, String>();
-		Map<String, String> remotepfprops = new HashMap<String, String>();
-		roles = new HashMap<String, Set<String>>();
-		
-		jadex.commons.Properties settings = getSettingsService().getProperties(PROPERTIES_ID).get();
-		if (settings != null)
-		{
-			Property[] proparr = settings.getProperties();
-			for (Property prop : proparr)
-			{
-				if (prop.getName() == null)
-				{
-					activeprops.put(prop.getType(), prop.getValue());
-				}
-				else
-				{
-					if ("networks".equals(prop.getType()))
-					{
-						networkprops.put(prop.getName(), prop.getValue());
-					}
-					else if ("remoteplatformsecrets".equals(prop.getType()))
-					{
-						remotepfprops.put(prop.getName(), prop.getValue());
-					}
-					else if ("roles".equals(prop.getType()))
-					{
-						Set<String> eroles = roles.get(prop.getName());
-						if (eroles == null)
-						{
-							eroles = new HashSet<String>();
-							roles.put(prop.getName(), eroles);
-						}
-						
-						eroles.add(prop.getValue());
-					}
-					else if(ISecurityService.PROPERTY_PRINTSECRET.equals(prop.getType()) || ISecurityService.PROPERTY_USESECRET.equals(prop.getType()))
-					{
-						activeprops.put(prop.getType(), Boolean.parseBoolean(prop.getValue()));
-					}
-				}
-			}
-		}
-		
-		IArgumentsResultsFeature argfeat = agent.getComponentFeature(IArgumentsResultsFeature.class);
-		Map<String, Object> args = argfeat.getArguments();
-		if (args != null)
-		{
-			Set<String> argexcluded = new HashSet<String>();
-			argexcluded.add(PROPERTY_NETWORK);
-			argexcluded.add(PROPERTY_NETWORKSECRET);
-			argexcluded.add(PROPERTY_REMOTEPLATFORM);
-			argexcluded.add(PROPERTY_REMOTEPLATFORMSECRET);
-			
-			for (Map.Entry<String, Object> arg : args.entrySet())
-			{
-				if (!argexcluded.contains(arg.getKey()))
-					activeprops.put(arg.getKey(), arg.getValue());
-			}
-			
-			Object name = args.get(PROPERTY_NETWORK);
-			Object secret = args.get(PROPERTY_NETWORKSECRET);
-			if (secret == null)
-				secret = args.get(PROPERTY_NETWORKPASS);
-			if (name instanceof String && secret instanceof String)
-			{
-				networkprops.put((String) name, (String) secret);
-			}
-			else if (name instanceof String[] && secret instanceof String[])
-			{
-				String[] aname = (String[]) name;
-				String[] asecret = (String[]) secret;
-				if (aname.length == asecret.length)
-				{
-					for (int i = 0; i < aname.length; ++i)
-					{
-						networkprops.put(aname[i], asecret[i]);
-					}
-				}
-			}
-			
-			name = args.get(PROPERTY_REMOTEPLATFORM);
-			secret = args.get(PROPERTY_REMOTEPLATFORMSECRET);
-			if (name instanceof String && secret instanceof String)
-			{
-				remotepfprops.put((String) name, (String) secret);
-			}
-			else if (name instanceof String[] && secret instanceof String[])
-			{
-				String[] aname = (String[]) name;
-				String[] asecret = (String[]) secret;
-				if (aname.length == asecret.length)
-				{
-					for (int i = 0; i < aname.length; ++i)
-					{
-						remotepfprops.put(aname[i], asecret[i]);
-					}
-				}
-			}
-		}
-		
-		if (!activeprops.containsKey(ISecurityService.PROPERTY_USESECRET))
-			activeprops.put(ISecurityService.PROPERTY_USESECRET, "true");
-		
-		if (!activeprops.containsKey(ISecurityService.PROPERTY_PRINTSECRET))
-			activeprops.put(ISecurityService.PROPERTY_PRINTSECRET, "true");
-		
-		String secretstr = (String)activeprops.get(ISecurityService.PROPERTY_PLATFORMSECRET);
-		printsecret = activeprops.containsKey(ISecurityService.PROPERTY_PRINTSECRET)? (Boolean)activeprops.get(ISecurityService.PROPERTY_PRINTSECRET): true;
-		usesecret = activeprops.containsKey(ISecurityService.PROPERTY_USESECRET)? (Boolean)activeprops.get(ISecurityService.PROPERTY_USESECRET): true;
-		allowunauth = (Boolean) activeprops.get(ISecurityService.PROPERTY_ALLOWUNAUTH);
-		
-		if (usesecret && secretstr == null)
-		{
-			secretstr = KeySecret.createRandomAsString();
-			activeprops.put(ISecurityService.PROPERTY_PLATFORMSECRET, secretstr);
-			System.out.println("Generated new platform access key: "+secretstr.substring(KeySecret.PREFIX.length() + 1));
-		}
-		
-		try
-		{
-			platformsecret = AbstractAuthenticationSecret.fromString(secretstr);
-		}
-		catch (IllegalArgumentException e)
-		{
-			secretstr = PasswordSecret.PREFIX + ":" + secretstr;
-			platformsecret = AbstractAuthenticationSecret.fromString(secretstr);
-			activeprops.put(ISecurityService.PROPERTY_PLATFORMSECRET, secretstr);
-		}
-		
-		networks = new HashMap<String, AbstractAuthenticationSecret>();
-		networknames = (Set<String>)Starter.getPlatformValue(agent.getComponentIdentifier(), Starter.DATA_NETWORKNAMESCACHE);
-		for(Map.Entry<String, String> entry : networkprops.entrySet())
-		{
-			networks.put(entry.getKey(), AbstractAuthenticationSecret.fromString(entry.getValue()));
-			networknames.add(entry.getKey());
-		}
-		
-		remoteplatformsecrets = new HashMap<IComponentIdentifier, AbstractAuthenticationSecret>();
-		for (Map.Entry<String, String> entry : remotepfprops.entrySet())
-			remoteplatformsecrets.put(new ComponentIdentifier(entry.getKey()), AbstractAuthenticationSecret.fromString(entry.getValue()));
-		
-		saveSettings();
-		
-		if (printsecret && platformsecret != null)
-		{
-			secretstr = platformsecret.toString();
-			String pfname = agent.getComponentIdentifier().getPlatformName();
-			
-			if (platformsecret instanceof PasswordSecret)
-				System.out.println("Platform " + pfname + " access password: "+secretstr);
-			else if (platformsecret instanceof KeySecret)
-				System.out.println("Platform " + pfname + " access key: "+secretstr);
-			else if (platformsecret instanceof AbstractX509PemSecret)
-				System.out.println("Platform " + pfname + " access certificates: "+secretstr);
-			else
-				System.out.println("Platform " + pfname + " access secret: "+secretstr);
-		}
-		
-		if (printsecret)
-		{
-			for (Map.Entry<String, AbstractAuthenticationSecret> entry : networks.entrySet())
-				System.out.println("Available network '" + entry.getKey() + "' with secret " + entry.getValue());
-		}
-		
-		initializingcryptosuites = new HashMap<String, HandshakeState>();
-		currentcryptosuites = Collections.synchronizedMap(new HashMap<String, ICryptoSuite>());
-//		expiringcryptosuites = new HashMap<String, Tuple2<ICryptoSuite,Long>>();
-		expiringcryptosuites = new MultiCollection<String, Tuple2<ICryptoSuite,Long>>();
-		
-		String[] cryptsuites = (String[]) argfeat.getArguments().get("cryptosuites");
-		if (cryptsuites == null)
-		{
-			cryptsuites = new String[] { NHCurve448ChaCha20Poly1305Suite.class.getCanonicalName() };
-//			cryptsuites = new String[] { NHCurve448ChaCha20Poly1305Suite.class.getCanonicalName(),
-//										 Curve448ChaCha20Poly1305Suite.class.getCanonicalName(),
-//										 NHChaCha20Poly1305Suite.class.getCanonicalName() };
-		}
-		allowedcryptosuites = new LinkedHashMap<String, Class<?>>();
-		for (String cryptsuite : cryptsuites)
-		{
-			try
-			{
-				Class<?> clazz = Class.forName(cryptsuite, true, agent.getClassLoader());
-				allowedcryptosuites.put(cryptsuite, clazz);
-			}
-			catch (Exception e)
-			{
-				return new Future<Void>(e);
-			}
-		}
-		agent.getComponentFeature(IMessageFeature.class).addMessageHandler(new SecurityMessageHandler());
-		
-		return IFuture.DONE;
-	}*/
-	
-	/**
-	 *  Initialization.
-	 */
-	@AgentCreated
-	public IFuture<Void> start()
-	{
+		if (handshaketimeout < 0)
+			handshaketimeout = (long) (Starter.getDefaultTimeout(agent.getId().getRoot()) * handshaketimeoutscale);
+		if (handshaketimeout <= 0)
+			handshaketimeout = 60000;
 		final Future<Void> ret = new Future<Void>();
 		
 		loadSettings().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
@@ -360,13 +242,158 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			public void customResultAvailable(Map<String, Object> settings)
 			{
 				boolean savesettings = false;
-				Map<String, Object> args = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();
+				Map<String, Object> args = agent.getFeature(IArgumentsResultsFeature.class).getArguments();
 				for (Object val : args.values())
 					savesettings |= val != null;
 				
 				usesecret = getProperty("usesecret", args, settings, usesecret);
 				printsecret = getProperty("printsecret", args, settings, usesecret);
 				refuseunauth = getProperty("refuseunauth", args, settings, refuseunauth);
+				
+				if (args.get("platformnamecertificate") != null)
+					platformnamecertificate = (AbstractX509PemSecret) AbstractAuthenticationSecret.fromString((String) args.get("platformnamecertificate"), true);
+				else
+					platformnamecertificate = getProperty("platformnamecertificate", args, settings, platformnamecertificate);
+				
+				if (args.get("nameauthorities") != null)
+				{
+					nameauthorities = new HashSet<>();
+					String authstr = (String) args.get("nameauthorities");
+					String[] split = authstr.split(",");
+					for (int i = 0; i < split.length; ++i)
+					{
+						if (split[i].length() > 0)
+						{
+							try
+							{
+								X509CertificateHolder cert = SSecurity.readCertificateFromPEM(split[i]);
+								nameauthorities.add(cert);
+							}
+							catch (Exception e)
+							{
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+				else
+				{
+					nameauthorities = getProperty("nameauthorities", args, settings, nameauthorities);
+				}
+				
+				customnameauthorities.addAll(nameauthorities);
+				
+				if (loadjavatruststore)
+				{
+					String tst = System.getProperty("javax.net.ssl.trustStoreType");
+					String tsf = System.getProperty("javax.net.ssl.trustStore");
+					String tsp = System.getProperty("javax.net.ssl.trustStorePassword");
+					
+					if (tsf == null && tst == null)
+					{
+						String javahome = System.getProperty("java.home");
+						Path path = Paths.get(javahome, "lib", "security", "jssecacerts");
+			            if (!path.toFile().exists())
+			            {
+			            	path = Paths.get(javahome, "lib", "security", "cacerts");
+			            }
+						if (path.toFile().exists())
+						{
+							try
+							{
+								tsf = path.toFile().getCanonicalPath();
+							}
+							catch (IOException e)
+							{
+							}
+						}
+					}
+					
+					if (tsp == null)
+						tsp = "changeit";
+					if (tst == null)
+						tst = KeyStore.getDefaultType();
+					
+					if (tst != null && tsf != null)
+					{
+						JcaPEMWriter jpw = null;
+						try
+						{
+							KeyStore ks = KeyStore.getInstance(tst);
+							InputStream is = null;
+							try
+							{
+								is = new FileInputStream(tsf);
+								is = new BufferedInputStream(is);
+								ks.load(is, tsp.toCharArray());
+								SUtil.close(is);
+							}
+							catch (Exception e)
+							{
+							}
+							finally
+							{
+								SUtil.close(is);
+							}
+							
+							Enumeration<String> aliases = ks.aliases();
+							
+							ByteArrayOutputStream baos = new ByteArrayOutputStream();
+							OutputStreamWriter osw = new OutputStreamWriter(baos);
+							jpw = new JcaPEMWriter(osw);
+							while (aliases.hasMoreElements())
+							{
+								try
+								{
+									String alias = aliases.nextElement();
+									Certificate cert = ks.getCertificate(alias);
+									jpw.writeObject(cert);
+//									SUtil.close(jpw);
+//									SUtil.close(baos);
+									jpw.flush();
+									String pem = new String(baos.toByteArray(), SUtil.ASCII);
+									baos.reset();
+									try
+									{
+										nameauthorities.add(SSecurity.readCertificateFromPEM(pem));
+									}
+									catch (Exception e)
+									{
+									}
+								}
+								catch (Exception e)
+								{
+								}
+							}
+//							ts = System.currentTimeMillis() - ts;
+//							System.out.println("READING TOOK " + ts);
+						}
+						catch (Exception e)
+						{
+						}
+						finally
+						{
+							SUtil.close(jpw);
+						}
+					}
+				}
+				
+				if (args.get("trustedplatforms") != null)
+				{
+					String authstr = (String) args.get("trustedplatforms");
+					String[] split = authstr.split(",");
+					for (int i = 0; i < split.length; ++i)
+					{
+						if (split[i].length() > 0)
+						{
+							trustedplatforms.add(split[i]);
+						}
+					}
+				}
+				else
+				{
+					trustedplatforms = getProperty("trustedplatforms", args, settings, trustedplatforms);
+				}
 				
 				if (args.get("platformsecret") != null)
 					platformsecret = AbstractAuthenticationSecret.fromString((String) args.get("platformsecret"), false);
@@ -395,6 +422,48 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					networks = getProperty("networks", args, settings, networks);
 				}
 				
+				File networksfile = new File("networks.cfg");
+				if (networksfile.exists())
+				{
+					InputStream is = null;
+					try
+					{
+						is = new FileInputStream(networksfile);
+						is = new BufferedInputStream(is);
+						java.util.Properties nwfileprops = new java.util.Properties();
+						nwfileprops.load(is);
+						SUtil.close(is);
+						is = null;
+						
+						for (String propname : SUtil.notNull(nwfileprops.stringPropertyNames()))
+						{
+							String secretstr = nwfileprops.getProperty(propname);
+							try
+							{
+								AbstractAuthenticationSecret secret = AbstractAuthenticationSecret.fromString(secretstr, true);
+								networks.add(propname, secret);
+							}
+							catch (Exception e)
+							{
+							}
+						}
+					}
+					catch (Exception e)
+					{
+					}
+					finally
+					{
+						SUtil.close(is);
+					}
+				}
+				
+				if ((networks.isEmpty() || (networks.size() == 1 && networks.containsKey(SuperpeerClientAgent.GLOBAL_NETWORK_NAME))) &&
+					createdefaultnetwork)
+				{
+					networks.add(SUtil.createPlainRandomId("default_network", 6), KeySecret.createRandom());
+					savesettings = true;
+				}
+				
 				remoteplatformsecrets = getProperty("remoteplatformsecrets", args, settings, remoteplatformsecrets);
 				roles = getProperty("roles", args, settings, roles);
 				
@@ -402,7 +471,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				{
 					for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
 					{
-						if (entry.getValue() != null)
+						if (entry.getValue() != null && !SuperpeerClientAgent.GLOBAL_NETWORK_NAME.equals(entry.getKey()))
 						{
 							for (AbstractAuthenticationSecret secret : entry.getValue())
 								System.out.println("Available network '" + entry.getKey() + "' with secret " + secret);
@@ -414,13 +483,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				{
 					platformsecret = KeySecret.createRandom();
 					savesettings = true;
-					System.out.println("Generated new platform access key: "+platformsecret.toString().substring(KeySecret.PREFIX.length() + 1));
+//					System.out.println("Generated new platform access key: "+platformsecret.toString().substring(KeySecret.PREFIX.length() + 1));
 				}
 				
 				if (printsecret && platformsecret != null)
 				{
 					String secretstr = platformsecret.toString();
-					String pfname = agent.getComponentIdentifier().getPlatformName();
+					String pfname = agent.getId().getPlatformName();
 					
 					if (platformsecret instanceof PasswordSecret)
 						System.out.println("Platform " + pfname + " access password: "+secretstr);
@@ -432,8 +501,20 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						System.out.println("Platform " + pfname + " access secret: "+secretstr);
 				}
 				
-				networknames = (Set<String>)Starter.getPlatformValue(agent.getComponentIdentifier(), Starter.DATA_NETWORKNAMESCACHE);
-				networknames.addAll(networks.keySet());
+				networknames = (Set<String>)Starter.getPlatformValue(agent.getId(), Starter.DATA_NETWORKNAMESCACHE);
+//				networknames.addAll(networks.keySet());
+				// Only add network names the platform is a member of (secret can sign).
+				for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
+				{
+					for (AbstractAuthenticationSecret secret : entry.getValue())
+					{
+						if (secret.canSign())
+						{
+							networknames.add(entry.getKey());
+							break;
+						}
+					}
+				}
 				
 				// TODO: Make configurable
 				String[] cryptsuites = new String[] { NHCurve448ChaCha20Poly1305Suite.class.getCanonicalName() };
@@ -455,11 +536,51 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (savesettings)
 					saveSettings();
 				
-				IMessageFeature msgfeat = agent.getComponentFeature(IMessageFeature.class);
+				IMessageFeature msgfeat = agent.getFeature(IMessageFeature.class);
 				msgfeat.addMessageHandler(new SecurityMessageHandler());
 				msgfeat.addMessageHandler(new ReencryptRequestHandler());
 				
 				ret.setResult(null);
+			}
+		});
+		
+		ret.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				// Warn about weak passwords.
+				Map<PasswordSecret, String> pwsecrets = new HashMap<>();
+				if (platformsecret instanceof PasswordSecret)
+					pwsecrets.put((PasswordSecret) platformsecret, "local platform");
+				
+				for (Map.Entry<IComponentIdentifier, AbstractAuthenticationSecret> entry : remoteplatformsecrets.entrySet())
+				{
+					if (entry.getValue() instanceof PasswordSecret)
+						pwsecrets.put((PasswordSecret) entry.getValue(), "for remote platform '" + entry.getKey().toString() + "'");
+				}
+
+				for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> nwentry : networks.entrySet())
+				{
+					for (AbstractAuthenticationSecret secret : nwentry.getValue())
+					{
+						if (secret instanceof PasswordSecret)
+							pwsecrets.put((PasswordSecret) secret, "network '" + nwentry.getKey() + "'");
+					}
+				}
+				
+				for (Map.Entry<PasswordSecret, String> entry : pwsecrets.entrySet())
+				{
+//					System.out.println("CHECKING " + secret + " " + secret.isWeak());
+					if (entry.getKey().isWeak())
+						agent.getLogger().severe(agent.getId().getName() + ": Weak password detected for " + entry.getValue() + ", password '" + entry.getKey().getPassword() + "' is too short, please use at least " + PasswordSecret.MIN_GOOD_PASSWORD_LENGTH + " random characters.");
+				}
+				
+				// Reindex services since networks are now available.
+				ServiceRegistry.getRegistry(agent.getId().getRoot()).updateService(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
 			}
 		});
 		
@@ -484,7 +605,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (cs != null && !isSecurityMessage(header) && !cs.isExpiring())
 			return new Future<byte[]>(cs.encryptAndSign(content));
 		
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<byte[]>()
+		IFuture<byte[]> ret = agent.scheduleStep(new IComponentStep<byte[]>()
 		{
 			public IFuture<byte[]> execute(IInternalAccess ia)
 			{
@@ -502,13 +623,26 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				else
 				{
 					String rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot().toString();
+					
 					ICryptoSuite cs = currentcryptosuites.get(rplat);
 					
 					if (cs != null && cs.isExpiring())
 					{
-						expiringcryptosuites.add(rplat, new Tuple2<ICryptoSuite, Long>(cs, System.currentTimeMillis() + TIMEOUT));
-						currentcryptosuites.remove(rplat);
-						cs = null;
+						currentcryptosuites.writeLock().lock();
+						try
+						{
+							if (cs.equals(currentcryptosuites.get(rplat)))
+							{
+								if (debug)
+									System.out.println("Expiring: "+rplat);
+								expireCryptosuite(rplat);
+								cs = null;
+							}
+						}
+						finally
+						{
+							currentcryptosuites.writeLock().unlock();
+						}
 					}
 					
 					if (cs != null)
@@ -551,6 +685,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				return ret;
 			}
 		});
+		((IInternalExecutionFeature) execfeat).addSimulationBlocker(ret);
+		return ret;
 	}
 	
 	/**
@@ -560,8 +696,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param content The content.
 	 *  @return Decrypted/authenticated message or null on invalid message.
 	 */
-	public IFuture<Tuple2<IMsgSecurityInfos,byte[]>> decryptAndAuth(final IComponentIdentifier sender, final byte[] content)
+	public IFuture<Tuple2<ISecurityInfo,byte[]>> decryptAndAuth(final IComponentIdentifier sender, final byte[] content)
 	{
+//		System.out.println("received: "+sender+" at "+agent.getId());
+		
 		checkCleanup();
 		
 		if (content == null || content.length == 0)
@@ -573,24 +711,24 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			byte[] cleartext = cs.decryptAndAuth(content);
 			if (cleartext != null)
-				return new Future<Tuple2<IMsgSecurityInfos,byte[]>>(new Tuple2<IMsgSecurityInfos, byte[]>(cs.getSecurityInfos(), cleartext));
+				return new Future<Tuple2<ISecurityInfo,byte[]>>(new Tuple2<ISecurityInfo, byte[]>(cs.getSecurityInfos(), cleartext));
 		}
 		
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Tuple2<IMsgSecurityInfos,byte[]>>()
+		return agent.scheduleStep(new IComponentStep<Tuple2<ISecurityInfo,byte[]>>()
 		{
-			public IFuture<Tuple2<IMsgSecurityInfos, byte[]>> execute(IInternalAccess ia)
+			public IFuture<Tuple2<ISecurityInfo, byte[]>> execute(IInternalAccess ia)
 			{
 				doCleanup();
 				
-				final Future<Tuple2<IMsgSecurityInfos, byte[]>> ret = new Future<Tuple2<IMsgSecurityInfos,byte[]>>();
+				final Future<Tuple2<ISecurityInfo, byte[]>> ret = new Future<Tuple2<ISecurityInfo,byte[]>>();
 				
 				if (content.length > 0 && content[0] == -1)
 				{
 					// Security message
 					byte[] newcontent = new byte[content.length - 1];
 					System.arraycopy(content, 1, newcontent, 0, newcontent.length);
-					MsgSecurityInfos secinfos = new MsgSecurityInfos();
-					Tuple2<IMsgSecurityInfos,byte[]> tup = new Tuple2<IMsgSecurityInfos, byte[]>(secinfos, newcontent);
+					SecurityInfo secinfos = new SecurityInfo();
+					Tuple2<ISecurityInfo,byte[]> tup = new Tuple2<ISecurityInfo, byte[]>(secinfos, newcontent);
 					ret.setResult(tup);
 				}
 				else
@@ -630,17 +768,46 @@ public class SecurityAgent implements ISecurityService, IInternalService
 								public void resultAvailable(ICryptoSuite result)
 								{
 									byte[] cleartext = result.decryptAndAuth(fcontent);
-									if (cleartext != null)
+									if(cleartext != null)
 									{
-										ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(result.getSecurityInfos(), cleartext));
+										ret.setResult(new Tuple2<ISecurityInfo, byte[]>(result.getSecurityInfos(), cleartext));
 									}
 									else
 									{
-										cleartext = requestReencryption(splat, content);
-										if (cleartext != null)
-											ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(result.getSecurityInfos(), cleartext));
-										else
-											ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString()));
+										requestReencryption(splat, content).addResultListener(new IResultListener<byte[]>()
+										{
+											public void resultAvailable(byte[] result)
+											{
+												ICryptoSuite cs = currentcryptosuites.get(splat);
+												if (cs != null)
+													ret.setResult(new Tuple2<ISecurityInfo, byte[]>(cs.getSecurityInfos(), result));
+												else
+													ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString() + "  " + content));
+											};
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												ret.setException(exception);
+											}
+										});
+//										Object reply = requestReencryption(splat, content);
+//										if(reply == null)
+//										{
+//											ret.setException(new SecurityException("Could not establish secure communication with (case 1): " + splat.toString()));
+//										}
+//										else if (reply instanceof Exception)
+//										{
+//											ret.setException((Exception) reply);
+//										}
+//										else if (reply instanceof byte[])
+//										{
+//											cleartext = (byte[]) reply;
+//											
+//										}
+//										else
+//										{
+//											ret.setException(new SecurityException("Unrecognized decryption request reply: " + reply));
+//										}
 									}
 								}
 								
@@ -652,17 +819,46 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 						else
 						{
-							cleartext = requestReencryption(splat, content);
-							if (cleartext == null)
-								ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString()));
-							else
-								cs = currentcryptosuites.get(splat);
+							requestReencryption(splat, content).addResultListener(new IResultListener<byte[]>()
+							{
+								public void resultAvailable(byte[] result)
+								{
+									ICryptoSuite cs = currentcryptosuites.get(splat);
+									if (cs != null)
+										ret.setResult(new Tuple2<ISecurityInfo, byte[]>(cs.getSecurityInfos(), result));
+									else
+										ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString() + "  " + content));
+								};
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									ret.setException(exception);
+								}
+							});
+//							Object reply = requestReencryption(splat, content);
+//							if(reply == null)
+//							{
+//								ret.setException(new SecurityException("Could not establish secure communication with (case 2): " + splat.toString() + "  " + content));
+//							}
+//							else if (reply instanceof Exception)
+//							{
+//								ret.setException((Exception) reply);
+//							}
+//							else if (reply instanceof byte[])
+//							{
+//								cleartext = (byte[]) reply;
+//								cs = currentcryptosuites.get(splat);
+//							}
+//							else
+//							{
+//								ret.setException(new SecurityException("Unrecognized decryption request reply: " + reply));
+//							}
 						}
 					}
 					
 					if (cleartext != null)
 					{
-						ret.setResult(new Tuple2<IMsgSecurityInfos, byte[]>(cs.getSecurityInfos(), cleartext));
+						ret.setResult(new Tuple2<ISecurityInfo, byte[]>(cs.getSecurityInfos(), cleartext));
 					}
 				}
 				return ret;
@@ -677,7 +873,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Boolean> isUsePlatformSecret()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Boolean>()
+		return agent.scheduleStep(new IComponentStep<Boolean>()
 		{
 			public IFuture<Boolean> execute(IInternalAccess ia)
 			{
@@ -694,14 +890,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> setUsePlatformSecret(final boolean useplatformsecret)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				usesecret = useplatformsecret;
 				saveSettings();
-				resetCryptoSuites();
-				return IFuture.DONE;
+				return resetCryptoSuites();
 			}
 		});
 	}
@@ -713,7 +908,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Boolean> isPrintPlatformSecret()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Boolean>()
+		return agent.scheduleStep(new IComponentStep<Boolean>()
 		{
 			public IFuture<Boolean> execute(IInternalAccess ia)
 			{
@@ -730,7 +925,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> setPrintPlatformSecret(final boolean printplatformsecret)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -753,7 +948,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (secret == null)
 			return new Future<>(new IllegalArgumentException("Secret is null."));
 		
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -764,15 +959,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					return IFuture.DONE;
 				
 				networks.add(networkname, asecret);
-				networknames.add(networkname);
+				if (asecret.canSign())
+					networknames.add(networkname);
 				
 				saveSettings();
 				
-				resetCryptoSuites();
-				
-				//TODO: RESET keys / sessions?
-				
-				return IFuture.DONE;
+				return resetCryptoSuites();
 			}
 		});
 	}
@@ -786,7 +978,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> removeNetwork(String networkname, String secret)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -804,15 +996,25 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						networks.remove(networkname);
 						networknames.remove(networkname);
 					}
+					else
+					{
+						boolean removename = true;
+						for (AbstractAuthenticationSecret secret : secrets)
+						{
+							if (secret.canSign())
+							{
+								removename = false;
+								break;
+							}
+						}
+						if (removename)
+							networknames.remove(networkname);
+					}
 				}
 				
 				saveSettings();
 				
-				resetCryptoSuites();
-				
-				//TODO: RESET keys / sessions?
-				
-				return IFuture.DONE;
+				return resetCryptoSuites();
 			}
 		});
 	}
@@ -822,9 +1024,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  
 	 *  @return The current networks and secrets.
 	 */
-	public IFuture<MultiCollection<String, String>> getNetworks()
+	public IFuture<MultiCollection<String, String>> getAllKnownNetworks()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<MultiCollection<String, String>>()
+		return agent.scheduleStep(new IComponentStep<MultiCollection<String, String>>()
 		{
 			public IFuture<MultiCollection<String, String>> execute(IInternalAccess ia)
 			{
@@ -844,19 +1046,23 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** 
 	 *  Adds an authority for authenticating platform names.
 	 *  
-	 *  @param secret The secret, only X.509 secrets allowed.
+	 *  @param pemcertificate The pem-encoded certificate.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> addNameAuthority(final String secret)
+	public IFuture<Void> addNameAuthority(String pemcertificate)
 	{
-		final AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
-		if (!(asecret instanceof AbstractX509PemSecret))
-			return new Future<>(new IllegalArgumentException("Only X509 secrets allowed as name authorities"));
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+//		final AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
+//		if (!(asecret instanceof AbstractX509PemSecret))
+//			return new Future<>(new IllegalArgumentException("Only X509 secrets allowed as name authorities"));
+		final X509CertificateHolder cert = SSecurity.readCertificateFromPEM(pemcertificate);
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				nameauthorities.add((AbstractX509PemSecret) asecret);
+				nameauthorities.add(cert);
+				customnameauthorities.add(cert);
+				
+				saveSettings();
 				
 				return IFuture.DONE;
 			}
@@ -869,18 +1075,58 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param secret The secret, only X.509 secrets allowed.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> removeNameAuthority(String secret)
+	public IFuture<Void> removeNameAuthority(String pemcertificate)
 	{
-		final AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
-		if (!(asecret instanceof AbstractX509PemSecret))
-			return new Future<>(new IllegalArgumentException("Only X509 secrets allowed as name authorities"));
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		final X509CertificateHolder cert = SSecurity.readCertificateFromPEM(pemcertificate);
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				nameauthorities.remove((AbstractX509PemSecret) asecret);
+				if (customnameauthorities.remove(cert))
+					nameauthorities.remove(cert);
+				
+				saveSettings();
 				
 				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/** 
+	 *  Adds an authority for authenticating platform names.
+	 *  
+	 *  @param secret The secret, only X.509 secrets allowed.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Set<String>> getNameAuthorities()
+	{
+		return agent.scheduleStep(new IComponentStep<Set<String>>()
+		{
+			public IFuture<Set<String>> execute(IInternalAccess ia)
+			{
+				Set<String> ret = new HashSet<>();
+				for (X509CertificateHolder cert : SUtil.notNull(nameauthorities))
+					ret.add(SSecurity.writeCertificateAsPEM(cert));
+				return new Future<>(ret);
+			}
+		});
+	}
+	
+	/** 
+	 *  Gets all authorities not defined in the Java trust store for authenticating platform names.
+	 *  
+	 *  @return List of name authorities.
+	 */
+	public IFuture<Set<String>> getCustomNameAuthorities()
+	{
+		return agent.scheduleStep(new IComponentStep<Set<String>>()
+		{
+			public IFuture<Set<String>> execute(IInternalAccess ia)
+			{
+				Set<String> ret = new HashSet<>();
+				for (X509CertificateHolder cert : SUtil.notNull(customnameauthorities))
+					ret.add(SSecurity.writeCertificateAsPEM(cert));
+				return new Future<>(ret);
 			}
 		});
 	}
@@ -891,7 +1137,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 //	 */
 //	public IFuture<String[]> getNetworkNames()
 //	{
-//		return agent.getExternalAccess().scheduleStep(new IComponentStep<String[]>()
+//		return agent.scheduleStep(new IComponentStep<String[]>()
 //		{
 //			public IFuture<String[]> execute(IInternalAccess ia)
 //			{
@@ -914,7 +1160,71 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Set<String>> getNetworkNames()
 	{
-		return new Future<Set<String>>(networknames);
+		return agent.scheduleStep(new IComponentStep<Set<String>>()
+		{
+			public IFuture<Set<String>> execute(IInternalAccess ia)
+			{
+				return new Future<Set<String>>(new HashSet<>(networknames));
+			}
+		});
+	}
+	
+	/** 
+	 *  Adds a name of an authenticated platform to allow access.
+	 *  
+	 *  @param name The platform name, name must be authenticated with certificate.
+	 *  @param roles The roles the platform should have, can be null or empty.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addTrustedPlatform(String name)
+	{
+		return agent.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				trustedplatforms.add(name);
+				
+				saveSettings();
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/** 
+	 *  Adds a name of an authenticated platform to allow access.
+	 *  
+	 *  @param name The platform name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeTrustedPlatform(String name)
+	{
+		return agent.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				trustedplatforms.remove(name);
+				
+				saveSettings();
+				
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Gets the trusted platforms that are specified by names. 
+	 *  @return The trusted platforms and their roles.
+	 */
+	public IFuture<Set<String>> getTrustedPlatforms()
+	{
+		return agent.scheduleStep(new IComponentStep<Set<String>>()
+		{
+			public IFuture<Set<String>> execute(IInternalAccess ia)
+			{
+				return new Future<>(new HashSet<>(trustedplatforms));
+			}
+		});
 	}
 	
 	/**
@@ -944,7 +1254,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<String> getPlatformSecret(final IComponentIdentifier cid)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<String>()
+		return agent.scheduleStep(new IComponentStep<String>()
 		{
 			public IFuture<String> execute(IInternalAccess ia)
 			{
@@ -966,14 +1276,14 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> setPlatformSecret(final IComponentIdentifier cid, final String secret)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// TODO: Refresh?
 				if (secret == null)
 				{
-					if (cid == null || agent.getComponentIdentifier().getRoot().equals(cid))
+					if (cid == null || agent.getId().getRoot().equals(cid))
 						platformsecret = null;
 					else
 						remoteplatformsecrets.remove(cid);
@@ -982,7 +1292,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				{
 					AbstractAuthenticationSecret authsec = AbstractAuthenticationSecret.fromString(secret);
 					
-					if (cid == null || agent.getComponentIdentifier().getRoot().equals(cid))
+					if (cid == null || agent.getId().getRoot().equals(cid))
 						platformsecret = authsec;
 					else
 						remoteplatformsecrets.put(cid, authsec);
@@ -991,9 +1301,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				saveSettings();
 				
 				if (usesecret)
-					resetCryptoSuites();
-				
-				return IFuture.DONE;
+					return resetCryptoSuites();
+				else
+					return IFuture.DONE;
 			}
 		});
 	}
@@ -1007,7 +1317,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> addRole(final String entity, final String role)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1022,7 +1332,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				saveSettings();
 				
-				resetCryptoSuites();
+				refreshCryptosuiteRoles();
 				
 				return IFuture.DONE;
 			}
@@ -1038,7 +1348,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> removeRole(final String entity, final String role)
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1052,7 +1362,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				saveSettings();
 				
-				resetCryptoSuites();
+				refreshCryptosuiteRoles();
 				
 				return IFuture.DONE;
 			}
@@ -1066,7 +1376,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Map<String, Set<String>>> getRoleMap()
 	{
-		return agent.getExternalAccess().scheduleStep(new IComponentStep<Map<String, Set<String>>>()
+		return agent.scheduleStep(new IComponentStep<Map<String, Set<String>>>()
 		{
 			@SuppressWarnings("unchecked")
 			public IFuture<Map<String, Set<String>>> execute(IInternalAccess ia)
@@ -1105,20 +1415,36 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public AbstractAuthenticationSecret getInternalPlatformSecret(IComponentIdentifier cid)
 	{
 		cid = cid.getRoot();
-		if (cid.equals(agent.getComponentIdentifier().getRoot()))
+		if (cid.equals(agent.getId().getRoot()))
 			return getInternalPlatformSecret();
 		return remoteplatformsecrets.get(cid.getRoot());
 	}
 	
 	/**
-	 *  Gets the role map.
-	 * 
-	 *  @return The role map.
+	 *  Gets the name authorities.
 	 */
-	public Map<String, Set<String>> getInternalRoles()
+	public Set<X509CertificateHolder> getInternalNameAuthorities()
 	{
-		return roles;
+		return nameauthorities;
 	}
+	
+	/**
+	 *  Gets the trusted platform names.
+	 */
+	public Set<String> getInternalTrustedPlatforms()
+	{
+		return trustedplatforms;
+	}
+	
+	/**
+	 *  Get the platform name certificate.
+	 */
+	public AbstractX509PemSecret getInternalPlatformNameCertificate()
+	{
+		return platformnamecertificate;
+	}
+	
+	
 	
 	/**
 	 *  Checks whether to use platform secret.
@@ -1141,12 +1467,63 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	/**
-	 *  Checks whether to allow platform roles.
+	 *  Checks whether to allow connections without name authentication.
+	 *  
 	 *  @return True, if used.
 	 */
-	public boolean getInternalAllowPlatformRoles()
+	public boolean getInternalAllowNoAuthName()
 	{
-		return allowplatformroles;
+		return allownoauthname;
+	}
+	
+	/**
+	 *  Checks whether to allow connections without network authentication.
+	 *  
+	 *  @return True, if used.
+	 */
+	public boolean getInternalAllowNoNetwork()
+	{
+		return allownonetwork;
+	}
+	
+	/**
+	 *  Checks whether to allow the default authorization.
+	 *  
+	 *  @return True, if used.
+	 */
+	public boolean getInternalDefaultAuthorization()
+	{
+		return defaultauthorization;
+	}
+	
+	/**
+	 *  Sets the roles of a security info object.
+	 *  @param secinf Security info.
+	 */
+	public void setSecInfoRoles(SecurityInfo secinf)
+	{
+		assert agent.isComponentThread();
+		Set<String> siroles = new HashSet<String>();
+		
+		Set<String> platformroles = roles.get(secinf.getAuthenticatedPlatformName());
+		if (platformroles != null)
+			siroles.addAll(platformroles);
+		else
+			siroles.add(secinf.getAuthenticatedPlatformName());
+		
+		
+		if (secinf.getNetworks() != null)
+		{
+			for (String network : secinf.getNetworks())
+			{
+				Set<String> r = roles.get(network);
+				if (r != null)
+					siroles.addAll(r);
+				else
+					siroles.add(network);
+			}
+		}
+		secinf.setRoles(siroles);
 	}
 	
 	/**
@@ -1154,7 +1531,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IComponentIdentifier getComponentIdentifier()
 	{
-		return agent.getComponentIdentifier();
+		return agent.getId();
 	}
 	
 	// -------- Cleanup
@@ -1167,11 +1544,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				if (cleanuptask == null)
 				{
-					cleanuptask = agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+					cleanuptask = agent.scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(TIMEOUT << 1, new IComponentStep<Void>()
+							return ia.getFeature(IExecutionFeature.class).waitForDelay(handshaketimeout << 1, new IComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
@@ -1192,6 +1569,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	protected void doCleanup()
 	{
+		assert agent.getFeature(IExecutionFeature.class).isComponentThread();
 		long time = System.currentTimeMillis();
 		
 		for (Iterator<Map.Entry<String, HandshakeState>> it = initializingcryptosuites.entrySet().iterator(); it.hasNext(); )
@@ -1204,7 +1582,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			}
 		}
 		
-		String[] keys = expiringcryptosuites.keySet().toArray(new String[expiringcryptosuites.size()]);
+		String[] keys = expiringcryptosuites.keySet().toArray(new String[expiringcryptosuites.keySet().size()]);
 		for (String pf : keys)
 		{
 			Collection<Tuple2<ICryptoSuite, Long>> coll = new ArrayList<Tuple2<ICryptoSuite, Long>>(expiringcryptosuites.get(pf));
@@ -1227,42 +1605,44 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Resets the crypto suite in case of security state change (network secret changes etc.).
 	 */
-	protected void resetCryptoSuites()
+	protected IFuture<Void> resetCryptoSuites()
 	{
-		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				if (cryptoreset != null)
+				if (cryptoreset == null)
 				{
-					long resetdelay = TIMEOUT >>> 3;
-					cryptoreset = ia.getComponentFeature(IExecutionFeature.class).waitForDelay(resetdelay, new IComponentStep<Void>()
+					long resetdelay = (long) (handshaketimeout * resettimeoutscale);
+					cryptoreset = ia.getFeature(IExecutionFeature.class).waitForDelay(resetdelay, new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							Map<String, ICryptoSuite> expire = new HashMap<String, ICryptoSuite>(currentcryptosuites);
-							
-							synchronized (currentcryptosuites)
+							List<String> pfnames = new ArrayList<>();
+							currentcryptosuites.writeLock().lock();
+							try
 							{
-								long exptime = System.currentTimeMillis() + TIMEOUT;
-								for (Map.Entry<String, ICryptoSuite> suite : expire.entrySet())
-								{
-									expiringcryptosuites.add(suite.getKey(), new Tuple2<ICryptoSuite, Long>(suite.getValue(), exptime));
-									
-									// Reinitialize handshakes.
-									String rplat = suite.getKey();
-									initializeHandshake(rplat);
-								}
-								currentcryptosuites.clear();
+								pfnames.addAll(currentcryptosuites.keySet());
+								for (String pfname : pfnames)
+									expireCryptosuite(pfname);
 							}
+							finally
+							{
+								currentcryptosuites.writeLock().unlock();
+							}
+							for (String pfname : pfnames)
+								initializeHandshake(pfname);
 							
 							cryptoreset = null;
+							
+							if (debug)
+								System.out.println("Cryptosuites reset.");
 							
 							return IFuture.DONE;
 						}
 					}, true);
 				}
-				return IFuture.DONE;
+				return cryptoreset;
 			}
 		});
 	}
@@ -1271,9 +1651,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  Creates a crypto suite of a particular name.
 	 * 
 	 *  @param name Name of the suite.
+	 *  @param convid Conversation ID of handshake.
 	 *  @return The suite, null if not found.
 	 */
-	protected ICryptoSuite createCryptoSuite(String name)
+	protected ICryptoSuite createCryptoSuite(String name, String convid)
 	{
 		ICryptoSuite ret = null;
 		try
@@ -1282,12 +1663,73 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			if (clazz != null)
 			{
 				ret = (ICryptoSuite) clazz.newInstance();
+				ret.setHandshakeId(convid);
 			}
 		}
 		catch (Exception e)
 		{
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Expires a cryptosuite.
+	 * 
+	 *  @param pfname Platform name.
+	 */
+	protected void expireCryptosuite(String pfname)
+	{
+		assert agent.isComponentThread();
+		currentcryptosuites.writeLock().lock();
+		try
+		{
+			ICryptoSuite cs = currentcryptosuites.get(pfname);
+			if (cs != null)
+			{
+				expiringcryptosuites.add(pfname, new Tuple2<ICryptoSuite, Long>(cs, System.currentTimeMillis() + handshaketimeout));
+				currentcryptosuites.remove(pfname);
+			}
+		}
+		finally
+		{
+			currentcryptosuites.writeLock().unlock();
+		}
+	}
+	
+	/**
+	 *  Refreshed crypto suite roles.
+	 */
+	protected void refreshCryptosuiteRoles()
+	{
+		assert agent.isComponentThread();
+		currentcryptosuites.writeLock().lock();
+		try
+		{
+			for (Map.Entry<String, ICryptoSuite> entry : currentcryptosuites.entrySet())
+			{
+				SecurityInfo secinfo = ((SecurityInfo) entry.getValue().getSecurityInfos());
+				setSecInfoRoles(secinfo);
+			}
+			
+			for (Map.Entry<String, HandshakeState> entry : initializingcryptosuites.entrySet())
+			{
+				HandshakeState state = entry.getValue();
+				if (state != null)
+				{
+					ICryptoSuite suite = state.getCryptoSuite();
+					if (suite != null)
+					{
+						SecurityInfo secinfo = (SecurityInfo) suite.getSecurityInfos();
+						if (secinfo != null)
+							setSecInfoRoles(secinfo);
+					}
+				}
+			}
+		}
+		finally
+		{
+			currentcryptosuites.writeLock().unlock();
+		}
 	}
 	
 	/**
@@ -1304,6 +1746,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			public void exceptionOccurred(Exception exception)
 			{
 //				exception.printStackTrace();
+				if (debug)
+					System.out.println("Failure send message to and removing suite for: "+receiver.getRoot().toString());
+				
 				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
 				if(state != null)
 				{
@@ -1326,16 +1771,16 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	
 	protected void initializeHandshake(String cid)
 	{
-		String convid = SUtil.createUniqueId(agent.getComponentIdentifier().getRoot().toString());
+		String convid = SUtil.createUniqueId(agent.getId().getRoot().toString());
 		HandshakeState hstate = new HandshakeState();
-		hstate.setExpirationTime(System.currentTimeMillis() + TIMEOUT);
+		hstate.setExpirationTime(System.currentTimeMillis() + handshaketimeout);
 		hstate.setConversationId(convid);
 		hstate.setResultFuture(new Future<ICryptoSuite>());
 		
 		initializingcryptosuites.put(cid.toString(), hstate);
 		
 		String[] csuites = allowedcryptosuites.keySet().toArray(new String[allowedcryptosuites.size()]);
-		InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getComponentIdentifier(), convid, csuites);
+		InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getId(), convid, csuites);
 		BasicComponentIdentifier rsec = new BasicComponentIdentifier("security@" + cid);
 		sendSecurityHandshakeMessage(rsec, ihm);
 	}
@@ -1348,7 +1793,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		ISettingsService ret = null;
 		try
 		{
-			ret = SServiceProvider.getLocalService(agent, ISettingsService.class, Binding.SCOPE_PLATFORM);
+			ret = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
 		}
 		catch (Exception e)
 		{
@@ -1397,6 +1842,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			settings.put("remoteplatformsecrets", remoteplatformsecrets);
 		if (roles != null && roles.size() > 0)
 			settings.put("roles", roles);
+		if (platformnamecertificate != null)
+			settings.put("platformnamecertificate", platformnamecertificate);
+		if (customnameauthorities != null && customnameauthorities.size() > 0)
+			settings.put("nameauthorities", customnameauthorities);
+		if (trustedplatforms != null && trustedplatforms.size() > 0)
+			settings.put("trustedplatforms", trustedplatforms);
 		
 		getSettingsService().saveState(PROPERTIES_ID, settings);
 		
@@ -1443,7 +1894,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		Map<String, Object> addheader = new HashMap<String, Object>();
 		addheader.put(SECURITY_MESSAGE, Boolean.TRUE);
 		
-		return agent.getComponentFeature(IMessageFeature.class).sendMessage(message, addheader, receiver);
+		return agent.getFeature(IMessageFeature.class).sendMessage(message, addheader, receiver);
 	}
 	
 	/**
@@ -1462,24 +1913,41 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  
 	 *  @param source Source of the content.
 	 *  @param content The encrypted content.
-	 *  @return Clear decrypted content.
+	 *  @return Reply of decryption request, may be exception.
 	 */
-	protected byte[] requestReencryption(String platformname, byte[] content)
+	protected IFuture<byte[]> requestReencryption(String platformname, byte[] content)
 	{
+		if (debug)
+			System.out.println("reencryption: "+platformname+" "+Arrays.hashCode(content) + " " + currentcryptosuites.get(platformname));
+		expireCryptosuite(platformname);
+		
+//		Thread.dumpStack();
+		
 		ReencryptionRequest req = new ReencryptionRequest();
 		req.setContent(content);
 		
-		byte[] ret = null;
-		try
+		Future<byte[]> ret = new Future<>();
+		BasicComponentIdentifier source = new BasicComponentIdentifier("security@" + platformname);
+		agent.getFeature(IMessageFeature.class).sendMessageAndWait(source, req)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Object>()
 		{
-			BasicComponentIdentifier source = new BasicComponentIdentifier("security@" + platformname);
-			ret = (byte[]) agent.getComponentFeature(IMessageFeature.class).sendMessageAndWait(source, req).get();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+			public void resultAvailable(Object result)
+			{
+				if (result instanceof byte[])
+					ret.setResult((byte[]) result);
+				else if (result instanceof Exception)
+					exceptionOccurred((Exception) result);
+				else
+					ret.setException(new IllegalArgumentException("Received unknown reply: " + result));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		}));
 		
+		((IInternalExecutionFeature) execfeat).addSimulationBlocker(ret);
 		return ret;
 	}
 	
@@ -1495,7 +1963,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		 *  Test if handler should handle a message.
 		 *  @return True if it should handle the message. 
 		 */
-		public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		public boolean isHandling(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			return isSecurityMessage(header);
 		}
@@ -1514,24 +1982,35 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		 *  @param header The header.
 		 *  @param msg The message.
 		 */
-		public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		public void handleMessage(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			if (msg instanceof InitialHandshakeMessage)
 			{
+				if(debug)
+					System.out.println(agent+" initial handshake message: "+msg);
+				
 				final InitialHandshakeMessage imsg = (InitialHandshakeMessage) msg;
 				IComponentIdentifier rplat = imsg.getSender().getRoot();
 				
 				final Future<ICryptoSuite> fut = new Future<ICryptoSuite>();
 				
-				HandshakeState state = initializingcryptosuites.remove(rplat.toString());
+				HandshakeState state = initializingcryptosuites.get(rplat.toString());
 				
 				// Check if handshake is already happening. 
 				if (state != null)
 				{
-					if (getComponentIdentifier().getRoot().toString().compareTo(rplat.toString()) < 0)
-						fut.addResultListener(new DelegationResultListener<ICryptoSuite>(state.getResultFuture()));
+					// Check if duplicate
+					if (!state.getConversationId().equals(imsg.getConversationId()))
+					{
+						if (getComponentIdentifier().getRoot().toString().compareTo(rplat.toString()) < 0)
+							fut.addResultListener(new DelegationResultListener<ICryptoSuite>(state.getResultFuture()));
+						else
+							return;
+					}
 					else
+					{
 						return;
+					}
 				}
 				
 				if (imsg.getCryptoSuites() == null || imsg.getCryptoSuites().length < 1)
@@ -1558,14 +2037,39 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				state = new HandshakeState();
 				state.setResultFuture(fut);
 				state.setConversationId(imsg.getConversationId());
-				state.setExpirationTime(System.currentTimeMillis() + TIMEOUT);
-				initializingcryptosuites.put(rplat.toString(), state);
+				state.setExpirationTime(System.currentTimeMillis() + handshaketimeout);
 				
-				ICryptoSuite oldcs = currentcryptosuites.remove(rplat.toString());
+				ICryptoSuite oldcs = currentcryptosuites.get(rplat.toString());
 				if (oldcs != null)
 				{
-					expiringcryptosuites.add(rplat.toString(), new Tuple2<ICryptoSuite, Long>(oldcs, System.currentTimeMillis() + TIMEOUT));
+					currentcryptosuites.writeLock().lock();
+					try
+					{
+						if (oldcs.equals(currentcryptosuites.get(rplat.toString())))
+						{
+							// Test for duplicate.
+							if (oldcs.getHandshakeId().equals(imsg.getConversationId()))
+								return;
+							
+							if (debug)
+								System.out.println("New handshake, removing existing suite: "+rplat);
+							expireCryptosuite(rplat.toString());
+						}
+					}
+					finally
+					{
+						currentcryptosuites.writeLock().unlock();
+					}
 				}
+				
+				initializingcryptosuites.put(rplat.toString(), state);
+				
+//				ICryptoSuite oldcs = currentcryptosuites_old.remove(rplat.toString());
+//				if (oldcs != null)
+//				{
+//					System.out.println("Removing suite: "+rplat);
+//					expiringcryptosuites.add(rplat.toString(), new Tuple2<ICryptoSuite, Long>(oldcs, System.currentTimeMillis() + timeout));
+//				}
 				
 				InitialHandshakeReplyMessage reply = new InitialHandshakeReplyMessage(getComponentIdentifier(), state.getConversationId(), chosensuite);
 				
@@ -1581,7 +2085,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					String convid = state.getConversationId();
 					if (convid != null && convid.equals(rm.getConversationId()))
 					{
-						ICryptoSuite suite = createCryptoSuite(rm.getChosenCryptoSuite());
+						ICryptoSuite suite = createCryptoSuite(rm.getChosenCryptoSuite(), convid);
 						
 						if (suite == null)
 						{
@@ -1591,7 +2095,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						else
 						{
 							state.setCryptoSuite(suite);
-							InitialHandshakeFinalMessage fm = new InitialHandshakeFinalMessage(agent.getComponentIdentifier(), rm.getConversationId(), rm.getChosenCryptoSuite());
+							InitialHandshakeFinalMessage fm = new InitialHandshakeFinalMessage(agent.getId(), rm.getConversationId(), rm.getChosenCryptoSuite());
 							sendSecurityHandshakeMessage(rm.getSender(), fm);
 						}
 					}
@@ -1607,7 +2111,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					String convid = state.getConversationId();
 					if (convid != null && convid.equals(fm.getConversationId()))
 					{
-						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite());
+						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite(), convid);
 						agent.getLogger().info("Suite: " + (suite != null?suite.getClass().toString():"null"));
 						
 						if (suite == null)
@@ -1620,7 +2124,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							state.setCryptoSuite(suite);
 							if (!suite.handleHandshake(SecurityAgent.this, fm))
 							{
-//								System.out.println(agent.getComponentIdentifier()+" finished handshake: " + fm.getSender());
+								if (debug)
+									System.out.println(agent.getId()+" finished handshake: " + fm.getSender());
 								currentcryptosuites.put(fm.getSender().getRoot().toString(), state.getCryptoSuite());
 								initializingcryptosuites.remove(fm.getSender().getRoot().toString());
 								state.getResultFuture().setResult(state.getCryptoSuite());
@@ -1640,7 +2145,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
 						{
-//							System.out.println(agent.getComponentIdentifier()+" finished handshake: " + secmsg.getSender());
+							if (debug)
+								System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().isTrustedPlatform());
 							currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
 							initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 							state.getResultFuture().setResult(state.getCryptoSuite());
@@ -1648,7 +2154,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					}
 					catch (Exception e)
 					{
-//						e.printStackTrace();
+						e.printStackTrace();
 						state.getResultFuture().setException(e);
 						initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 					}
@@ -1663,7 +2169,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	protected class ReencryptRequestHandler implements IUntrustedMessageHandler
 	{
-		public boolean isHandling(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		public boolean isHandling(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			return msg instanceof ReencryptionRequest;
 		}
@@ -1673,32 +2179,53 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			return false;
 		}
 		
-		public void handleMessage(IMsgSecurityInfos secinfos, IMsgHeader header, Object msg)
+		public void handleMessage(ISecurityInfo secinfos, IMsgHeader header, Object msg)
 		{
 			ReencryptionRequest req = (ReencryptionRequest) msg;
 			String senderpf = ((IComponentIdentifier) header.getProperty(IMsgHeader.SENDER)).getRoot().toString();
 			
-			byte[] deccontent = null;
+			Object ret = null;
 			
 			Collection<Tuple2<ICryptoSuite, Long>> expsuites = expiringcryptosuites.get(senderpf);
-			if (expsuites != null)
+			if (expsuites != null && expsuites.size() > 0)
 			{
+//				String checkresults = "";
 				for (Tuple2<ICryptoSuite, Long> expsuite : expsuites)
 				{
-					IMsgSecurityInfos suiteinfos = expsuite.getFirstEntity().getSecurityInfos();
+					ISecurityInfo suiteinfos = expsuite.getFirstEntity().getSecurityInfos();
 					
-					if (!suiteinfos.isPlatformAuthenticated() || (suiteinfos.isPlatformAuthenticated() == secinfos.isPlatformAuthenticated()))
+//					checkresults += ""+secinfos.isAdminPlatform()+" "+suiteinfos.isAdminPlatform()+" "+secinfos.isAdminPlatform()
+//					+" msgtrust:"+secinfos.isTrustedPlatform()+" suitetrust:"+suiteinfos.isTrustedPlatform()+" "+secinfos.isTrustedPlatform()
+//					+" "+secinfos.getAuthenticatedPlatformName()+" "+suiteinfos.getAuthenticatedPlatformName()
+//					+" "+suiteinfos.getAuthenticatedPlatformName()+" "+secinfos.getAuthenticatedPlatformName()
+//					+" "+Arrays.toString(secinfos.getNetworks().toArray())
+//					+" "+Arrays.toString(suiteinfos.getNetworks().toArray())+"\n";
+					
+					if ((secinfos.isAdminPlatform() || !suiteinfos.isAdminPlatform()) &&
+						(secinfos.isTrustedPlatform() || !suiteinfos.isTrustedPlatform()) && 
+						SUtil.equals(secinfos.getAuthenticatedPlatformName(), suiteinfos.getAuthenticatedPlatformName()) || (suiteinfos.getAuthenticatedPlatformName() == null && secinfos.getAuthenticatedPlatformName() != null))
 					{
-						Set<String> msgnets = new HashSet<String>(Arrays.asList(secinfos.getNetworks()));
-						if (msgnets.containsAll(Arrays.asList(suiteinfos.getNetworks())))
+						Set<String> msgnets = secinfos.getNetworks();
+						if (msgnets.containsAll(suiteinfos.getNetworks()))
 						{
-							deccontent = expsuite.getFirstEntity().decryptAndAuthLocal(req.getContent());
+							ret = expsuite.getFirstEntity().decryptAndAuthLocal(req.getContent());
+							if (ret != null)
+								break;
 						}
 					}
 				}
+				if (ret == null)
+				{
+					ret = new SecurityException("Found expired suites but none match required security criteria.");
+//					ret = new SecurityException("Found " + expsuites.size() + " expired suites but none match required security criteria:\n" + checkresults);
+				}
+			}
+			else
+			{
+				ret = new IllegalStateException("No expired suites found to decrypt message.");
 			}
 			
-			agent.getComponentFeature(IMessageFeature.class).sendReply(header, deccontent);
+			agent.getFeature(IMessageFeature.class).sendReply(header, ret);
 		}
 	}
 	
@@ -1710,7 +2237,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  Get the service identifier.
 	 *  @return The service identifier.
 	 */
-	public IServiceIdentifier getServiceIdentifier()
+	public IServiceIdentifier getServiceId()
 	{
 		return sid;
 	}
@@ -1796,5 +2323,4 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		
 		return ret;
 	}
-
 }

@@ -17,7 +17,7 @@ public class SubService extends BasicService implements ISubService
 	 */
 	public SubService(IInternalAccess comp)
 	{
-		super(comp.getComponentIdentifier(), ISubService.class, null);
+		super(comp.getId(), ISubService.class, null);
 	}
 	
 	//-------- methods --------

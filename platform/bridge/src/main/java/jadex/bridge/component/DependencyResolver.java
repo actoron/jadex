@@ -2,6 +2,7 @@ package jadex.bridge.component;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -9,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.commons.transformation.traverser.SCloner;
-import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  The dependency resolver can be used to find a valid
@@ -60,9 +60,7 @@ public class DependencyResolver<T>
 		// Update nodeps
 		nodeps.remove(a);
 		if(!hasDependencies(b))
-		{
 			nodeps.add(b);
-		}
 	}
 	
 	/**
@@ -81,9 +79,7 @@ public class DependencyResolver<T>
 		
 		// Update nodeps
 		if(!hasDependencies(a))
-		{
 			nodeps.add(a);
-		}
 	}
 	
 	/**
@@ -121,6 +117,43 @@ public class DependencyResolver<T>
 		}
 		
 //		System.out.println("Resolved: "+ret);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Resolve the DAG and deliver a valid order of nodes with sets of nodes for same levels.
+	 *  @return A valid list of set of nodes.
+	 */
+	public List<Set<T>> resolveDependenciesWithLevel()
+	{
+		List<Set<T>> ret = new ArrayList<Set<T>>();
+		
+		while(!nodes.isEmpty())
+		{
+			if(nodeps.size()==0)
+				throw new RuntimeException("Dependency resolution problem.");
+			
+			Iterator<T> it = nodeps.iterator();
+			Set<T> level = new HashSet<T>();
+			while(it.hasNext())
+			{
+				T node = it.next();
+				level.add(node);
+			}
+			ret.add(level);
+			
+			for(T node: level)
+			{
+				NodeInfo<T> nia = getNodeInfo(node);
+				for(T dep: (T[])nia.getOtherDeps().toArray(new Object[0]))
+				{
+					removeDependency(dep, node);
+				}
+				nodeps.remove(node);
+				nodes.remove(node);
+			}
+		}
 		
 		return ret;
 	}

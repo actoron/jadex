@@ -2,15 +2,19 @@ package jadex.micro.testcases.stream;
 
 import java.util.Map;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.future.DelegationResultListener;
@@ -19,7 +23,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -28,16 +32,24 @@ import jadex.micro.testcases.TestAgent;
  *  Agent that provides a service with a stream.
  */
 @Agent
-@RequiredServices(@RequiredService(name="ss", type=IStreamService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)))
+@RequiredServices(@RequiredService(name="ss", type=IStreamService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL))
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class StreamUserAgent extends TestAgent
 {
+	public IPlatformConfiguration getConfig()
+	{
+		IPlatformConfiguration ret = STest.getDefaultTestConfig();
+		ret.getExtendedPlatformConfiguration().setSimul(false);
+		ret.getExtendedPlatformConfiguration().setSimulation(false);
+		return ret;
+	}
+	
 	/**
 	 *  The test count.
 	 */
 	protected int getTestCount()
 	{
-		return 4;
+		return 8;
 	}
 	
 	/**
@@ -47,16 +59,16 @@ public class StreamUserAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		IFuture<IStreamService> fut = agent.getServiceContainer().getRequiredService("ss");
+//		IFuture<IStreamService> fut = agent.getServiceContainer().getService("ss");
 //		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 //		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 
-//		testLocal(1, tc).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-//		{
-//			public void customResultAvailable(Integer testcnt)
-//			{
+		testLocal(1, tc).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+		{
+			public void customResultAvailable(Integer testcnt)
+			{
 //				testRemote(testcnt.intValue(), tc, false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
-				testRemote(1, tc, false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+				testRemote(1, tc, false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
 				{
 					public void customResultAvailable(Integer testcnt)
 					{
@@ -69,8 +81,8 @@ public class StreamUserAgent extends TestAgent
 //						}));
 					}
 				}));
-//			}
-//		}));
+			}
+		}));
 		
 		return ret;
 	}
@@ -80,7 +92,7 @@ public class StreamUserAgent extends TestAgent
 	 */
 	protected IFuture<Integer> testLocal(int testno, Testcase tc)
 	{
-		return performTests(testno, agent.getComponentIdentifier().getRoot(), tc);
+		return performTests(testno, agent.getId().getRoot(), tc);
 	}
 	
 	/**
@@ -90,38 +102,19 @@ public class StreamUserAgent extends TestAgent
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
-		setupRemotePlatform(/*sec ? new String[]{"-ssltcptransport", "true"} : null*/false).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
-			new ExceptionDelegationResultListener<IExternalAccess, Integer>(ret)
-		{
-			public void customResultAvailable(final IExternalAccess platform)
-			{
-//				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Integer>(ret)
-//				{
-//					public void customResultAvailable(ITransportComponentIdentifier result) 
-//					{
-//						if(!sec)
-//						{
-							performTests(testno, platform.getComponentIdentifier(), tc)
-								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
-							{
-								public void customResultAvailable(final Integer result)
-								{
-									platform.killComponent();
-			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-			//						{
-			//							public void customResultAvailable(Map<String, Object> v)
-			//							{
-			//								ret.setResult(result);
-			//							}
-			//						});
-									ret.setResult(result);
-								}
-							}));
-//						}
-//						else
-//						{
-//							performSecureTests(testno, platform.getComponentIdentifier(), tc)
-//								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
+//		setupRemotePlatform(/*sec ? new String[]{"-ssltcptransport", "true"} : null*/false).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
+//			new ExceptionDelegationResultListener<IExternalAccess, Integer>(ret)
+//		{
+//			public void customResultAvailable(final IExternalAccess platform)
+//			{
+////				ComponentIdentifier.getTransportIdentifier(platform).addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, Integer>(ret)
+////				{
+////					public void customResultAvailable(ITransportComponentIdentifier result) 
+////					{
+////						if(!sec)
+////						{
+//							performTests(testno, platform.getId(), tc)
+//								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
 //							{
 //								public void customResultAvailable(final Integer result)
 //								{
@@ -136,9 +129,46 @@ public class StreamUserAgent extends TestAgent
 //									ret.setResult(result);
 //								}
 //							}));
-//						}
-//					}
-//				});
+////						}
+////						else
+////						{
+////							performSecureTests(testno, platform.getComponentIdentifier(), tc)
+////								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
+////							{
+////								public void customResultAvailable(final Integer result)
+////								{
+////									platform.killComponent();
+////			//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+////			//						{
+////			//							public void customResultAvailable(Map<String, Object> v)
+////			//							{
+////			//								ret.setResult(result);
+////			//							}
+////			//						});
+////									ret.setResult(result);
+////								}
+////							}));
+////						}
+////					}
+////				});
+//			}
+//		}));
+		
+		IExternalAccess platform = STest.createPlatform(getConfig());
+		performTests(testno, platform.getId(), tc)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
+		{
+			public void customResultAvailable(final Integer result)
+			{
+				platform.killComponent();
+		//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+		//						{
+		//							public void customResultAvailable(Map<String, Object> v)
+		//							{
+		//								ret.setResult(result);
+		//							}
+		//						});
+				ret.setResult(result);
 			}
 		}));
 		
@@ -159,30 +189,34 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				SServiceProvider.getService(agent, cid, IStreamService.class)
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStreamService.class).setProvider(cid))
 					.addResultListener(new ExceptionDelegationResultListener<IStreamService, Integer>(ret)
 				{
 					public void customResultAvailable(final IStreamService ss)
 					{
-						testGetInputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+						testGetInputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 						{
 							public void customResultAvailable(TestReport result)
 							{
+								System.out.println(result);
 								tc.addReport(result);
-								testGetOutputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+								testGetOutputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 								{
 									public void customResultAvailable(TestReport result)
 									{
+										System.out.println(result);
 										tc.addReport(result);
-										testPassInputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+										testPassInputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 										{
 											public void customResultAvailable(TestReport result)
 											{
+												System.out.println(result);
 												tc.addReport(result);
-												testPassOutputStream(cnt[0]++, ss).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
+												testPassOutputStream(cnt[0]++, ss).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Integer>(ret)
 												{
 													public void customResultAvailable(TestReport result)
 													{
+														System.out.println(result);
 														tc.addReport(result);
 														destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Integer>(ret)
 														{
@@ -222,7 +256,7 @@ public class StreamUserAgent extends TestAgent
 //			public void customResultAvailable(final IComponentIdentifier cid) 
 //			{
 //				System.out.println("created: "+cid+" by "+agent.getComponentIdentifier());
-//				SServiceProvider.getService(agent, cid, IStreamService.class)
+//				agent.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( cid, IStreamService.class))
 //					.addResultListener(new ExceptionDelegationResultListener<IStreamService, Integer>(ret)
 //				{
 //					public void customResultAvailable(final IStreamService ss)

@@ -1,9 +1,11 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,11 +26,11 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.TimeoutException;
+import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -73,6 +75,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			e.printStackTrace();
 		}
 	}
+	
+	/** The reference method cache (method -> boolean[] (is reference)). */
+	public static final Map methodreferences = Collections.synchronizedMap(new LRU(500));
 
 	//-------- attributes --------
 	
@@ -119,10 +124,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		if(required)
 		{
 			IComponentIdentifier	caller	= IComponentIdentifier.LOCAL.get();
-			if(caller!=null && !caller.equals(ea.getComponentIdentifier()))
-			{
-				throw new RuntimeException("Cannot invoke required service of other component '"+ea.getComponentIdentifier()+"' from component '"+caller+"'. Service method: "+sic.getMethod());
-			}
+			if(caller!=null && !caller.equals(ea.getId()))
+				throw new RuntimeException("Cannot invoke required service of other component '"+ea.getId()+"' from component '"+caller+"'. Service method: "+sic.getMethod());
 		}
 		
 		// Fetch marshal service first time.	
@@ -147,7 +150,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //				System.out.println("sdfsdfsdf");
 			
 			Method method = sic.getMethod();
-			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, !copy);
+			boolean[] refs = getReferenceInfo(method, !copy, true);
 			
 			Object[] args = sic.getArgumentArray();
 			List<Object> copyargs = new ArrayList<Object>(); 
@@ -226,7 +229,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //		if(sic.getMethod().getName().indexOf("getChildren")!=-1)
 //			System.out.println("huhuhu");
 		
-		if(ia.getComponentFeature(IExecutionFeature.class).isComponentThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
+		if(ia.getFeature(IExecutionFeature.class).isComponentThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
 		{
 			// Not possible to use if it complains this way
 			// E.g. you have prov service and need to reschedule on the component then first getProviderId(), getExtAccess(), scheduleStep
@@ -247,7 +250,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //			{
 //				if(sic.getObject() instanceof ServiceInfo)
 //				{
-//					IComponentIdentifier	provider	= ((ServiceInfo)sic.getObject()).getManagementService().getServiceIdentifier().getProviderId();
+//					IComponentIdentifier	provider	= ((ServiceInfo)sic.getObject()).getManagementService().getId().getProviderId();
 //					System.out.println("getExternalAccess: "+provider+", "+sic.getArguments());
 //				}
 //			}				
@@ -459,7 +462,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					@Override
 					public void scheduleBackward(final ICommand<Void> code)
 					{
-						if(ia.getComponentFeature(IExecutionFeature.class).isComponentThread())
+						if(ia.getFeature(IExecutionFeature.class).isComponentThread())
 						{
 							code.execute(null);
 						}
@@ -482,13 +485,14 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				// Add timeout handling for local case.
 				if(!((IFuture<?>)res).isDone() && !sic.isRemoteCall())
 				{
-					boolean	realtime = sic.getNextServiceCall().getRealtime();
+//					boolean	realtime = sic.getNextServiceCall().getRealtime();
 					
 					if(timeout>=0)
 					{
 						if(fut instanceof IIntermediateFuture)
 						{
-							TimeoutIntermediateResultListener	tirl	= new TimeoutIntermediateResultListener(timeout, ea, realtime, sic.getMethod(), new IIntermediateFutureCommandResultListener()
+//							TimeoutIntermediateResultListener	tirl	= new TimeoutIntermediateResultListener(timeout, ea, realtime, sic.getMethod(), new IIntermediateFutureCommandResultListener()
+							TimeoutIntermediateResultListener	tirl	= new TimeoutIntermediateResultListener(timeout, ea, false, sic.getMethod(), new IIntermediateFutureCommandResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -532,7 +536,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						else
 						{
 //							SIC.set(sic);
-							fut.addResultListener(new TimeoutResultListener(timeout, ea, realtime, sic.getMethod(), new IFutureCommandResultListener()
+//							fut.addResultListener(new TimeoutResultListener(timeout, ea, realtime, sic.getMethod(), new IFutureCommandResultListener()
+							fut.addResultListener(new TimeoutResultListener(timeout, ea, false, sic.getMethod()+", "+sic.getArguments(), new IFutureCommandResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -638,6 +643,46 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	 */
 	public final ISerializationServices getSerializationServices()
 	{
-		return (ISerializationServices)Starter.getPlatformValue(ia.getComponentIdentifier(), Starter.DATA_SERIALIZATIONSERVICES);
+		return (ISerializationServices)Starter.getPlatformValue(ia.getId(), Starter.DATA_SERIALIZATIONSERVICES);
+	}
+	
+	/**
+	 *  Get the copy info for method parameters.
+	 */
+	public static boolean[] getReferenceInfo(Method method, boolean refdef, boolean local)
+	{
+		boolean[] ret;
+		Object[] tmp = (Object[])methodreferences.get(method);
+		if(tmp!=null)
+		{
+			ret = (boolean[])tmp[local? 0: 1];
+		}
+		else
+		{
+			int params = method.getParameterTypes().length;
+			boolean[] localret = new boolean[params];
+			boolean[] remoteret = new boolean[params];
+			
+			for(int i=0; i<params; i++)
+			{
+				Annotation[][] ann = method.getParameterAnnotations();
+				localret[i] = refdef;
+				remoteret[i] = refdef;
+				for(int j=0; j<ann[i].length; j++)
+				{
+					if(ann[i][j] instanceof Reference)
+					{
+						Reference nc = (Reference)ann[i][j];
+						localret[i] = nc.local();
+						remoteret[i] = nc.remote();
+						break;
+					}
+				}
+			}
+			
+			methodreferences.put(method, new Object[]{localret, remoteret});
+			ret = local? localret: remoteret;
+		}
+		return ret;
 	}
 }

@@ -1,7 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,7 +41,7 @@ public class ValidationInterceptor extends ComponentThreadInterceptor
 			ALWAYSOK.add(Object.class.getMethod("equals", new Class[]{Object.class}));
 			ALWAYSOK.add(Object.class.getMethod("hashCode", new Class[0]));
 			
-//			ALWAYSOK.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
+//			ALWAYSOK.add(IService.class.getMethod("getId", new Class[0]));
 //			ALWAYSOK.add(IService.class.getMethod("isValid", new Class[0]));
 			
 			Method[] ms = IService.class.getDeclaredMethods();

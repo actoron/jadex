@@ -10,10 +10,11 @@ import java.util.Map;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IMessageHandler;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
@@ -29,6 +30,9 @@ public class RelayMessageComponentFeature extends MicroMessageComponentFeature
 	/** Transport cache for the relay, excludes itself. */
 	public Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> relaytransportcache = Collections.synchronizedMap(new LRU<IComponentIdentifier, Tuple2<ITransportService,Integer>>(100));
 	
+	/** Handler for relay messages. */
+	public IMessageHandler relaymessagehandler = null;
+	
 	/**
 	 *  Create the feature.
 	 */
@@ -37,14 +41,22 @@ public class RelayMessageComponentFeature extends MicroMessageComponentFeature
 		super(component, cinfo);
 	}
 	
-	public IFuture<Void> sendToTransports(IMsgHeader header, byte[] encryptedbody)
+	/**
+	 *  Forwards the prepared message to the transport layer.
+	 *  
+	 *  @param header The message header.
+	 *  @param encryptedheader The encrypted header.
+	 *  @param encryptedbody The encrypted message body.
+	 *  @return Null, when done, exception if failed.
+	 */
+	public IFuture<Void> sendToTransports(final IMsgHeader header, final byte[] encryptedheader, final byte[] encryptedbody)
 	{
 //		if (header.getProperty(RelayTransportAgent.FORWARD_DEST) == null)
 //		if (header.getProperty(IMsgHeader.RECEIVER).equals(((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot()))
 //		{
 //			(new RuntimeException("msg to pf component: " + Arrays.toString(((MsgHeader) header).getProperties().keySet().toArray()))).printStackTrace();
 //		}
-		return super.sendToTransports(header, encryptedbody);
+		return super.sendToTransports(header, encryptedheader, encryptedbody);
 	}
 	
 	/**
@@ -58,9 +70,23 @@ public class RelayMessageComponentFeature extends MicroMessageComponentFeature
 	{
 //		System.out.println("RMCF CALLED: " + Arrays.toString(((MsgHeader) header).getProperties().keySet().toArray()));
 		if (header.getProperty(RelayTransportAgent.FORWARD_DEST) != null)
-			messageArrived(null, header, bodydata);
+		{
+			if (relaymessagehandler != null)
+				relaymessagehandler.handleMessage(null, header, bodydata);
+		}
 		else
+		{
 			super.messageArrived(header, bodydata);
+		}
+	}
+	
+	/**
+	 *  Sets the handler for relay messages.
+	 *  @param handler The handler.
+	 */
+	public void setRelayMessageHandler(IMessageHandler handler)
+	{
+		relaymessagehandler = handler;
 	}
 	
 	/**
@@ -82,13 +108,13 @@ public class RelayMessageComponentFeature extends MicroMessageComponentFeature
 	protected Collection<ITransportService> getAllTransports()
 	{
 		List<ITransportService> ret = new ArrayList<ITransportService>();
-		Collection<ITransportService> all = SServiceProvider.getLocalServices(component, ITransportService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
+		Collection<ITransportService> all = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getRawServices(ITransportService.class);
 		if (all != null)
 		{
 			for (Iterator<ITransportService> it = all.iterator(); it.hasNext(); )
 			{
 				IService serv = (IService) it.next();
-				if (!component.getComponentIdentifier().equals(serv.getServiceIdentifier().getProviderId()))
+				if (!component.getId().equals(serv.getServiceId().getProviderId()))
 					ret.add((ITransportService) serv);
 			}
 		}

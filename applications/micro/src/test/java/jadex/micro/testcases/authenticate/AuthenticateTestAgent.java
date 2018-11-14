@@ -16,7 +16,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -25,7 +25,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -37,9 +36,9 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
+	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
 })
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledRemoteDefaultTimeout(null, 4)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class AuthenticateTestAgent extends TestAgent
 {
 	//-------- test settings --------
@@ -78,7 +77,7 @@ public class AuthenticateTestAgent extends TestAgent
 		
 		// Use expected results for def, cus to decide platform settings
 		setupTestPlatform(tests[test][1], tests[test][2])
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			@Override
 			public void customResultAvailable(final IExternalAccess platform) throws Exception
@@ -98,8 +97,7 @@ public class AuthenticateTestAgent extends TestAgent
 							{
 								if(test<tests.length-1)
 								{
-									performTest(tc, tests, test+1)
-										.addResultListener(new DelegationResultListener<Void>(ret));
+									performTest(tc, tests, test+1).addResultListener(new DelegationResultListener<Void>(ret));
 								}
 								else
 								{
@@ -122,6 +120,8 @@ public class AuthenticateTestAgent extends TestAgent
 	 */
 	protected	IFuture<IExternalAccess> setupTestPlatform(boolean def, final boolean cus)
 	{
+		disableLocalSimulationMode().get();
+		
 		IPlatformConfiguration	conf	= STest.getDefaultTestConfig();
 		// use different platform name / key etc.
 		conf.setPlatformName("other_*");
@@ -132,6 +132,7 @@ public class AuthenticateTestAgent extends TestAgent
 		{
 			conf.setNetworkNames((String[]) null);
 			conf.setNetworkSecrets((String[])null);
+			conf.setSupersuperpeer(true);	// Hack!!! -> unrestricted registry service
 		}
 		
 		// Add agents.
@@ -153,12 +154,14 @@ public class AuthenticateTestAgent extends TestAgent
 						// Access with custom roles should work -> add roles to new platform.
 						if(cus)
 						{
-							SServiceProvider.getService(exta, ISecurityService.class)
+							exta.searchService( new ServiceQuery<>( ISecurityService.class))
 								.addResultListener(new ExceptionDelegationResultListener<ISecurityService, IExternalAccess>(ret)
 							{
 								@Override
 								public void customResultAvailable(ISecurityService result) throws Exception
 								{
+//									System.out.println("is compo:"+agent.isComponentThread());
+									
 									result.addRole(STest.testnetwork_name, "custom")
 										.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 									{
@@ -190,7 +193,7 @@ public class AuthenticateTestAgent extends TestAgent
 		final Future<boolean[]>	ret	= new Future<boolean[]>();
 //		System.out.println("invokeServices "+IComponentIdentifier.LOCAL.get());
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(ITestService.class, Binding.SCOPE_GLOBAL)
+		agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class, RequiredService.SCOPE_GLOBAL))
 			.addResultListener(new ExceptionDelegationResultListener<Collection<ITestService>, boolean[]>(ret)
 		{
 			@Override
@@ -334,7 +337,7 @@ public class AuthenticateTestAgent extends TestAgent
 //	{
 //		final Future<TestReport> ret = new Future<TestReport>();
 //		
-//		final ISecurityService	sec	= SServiceProvider.getLocalService(agent, ISecurityService.class);
+//		final ISecurityService	sec	= agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISecurityService.class));
 //		
 //		sec.addRole(agent.getComponentIdentifier().getPlatformPrefix(), "testuser")
 //			.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)

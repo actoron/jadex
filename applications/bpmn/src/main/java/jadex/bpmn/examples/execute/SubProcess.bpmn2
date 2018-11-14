@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>SubProcess</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="_I49DIW1WEd6B3oAuT8wltw">
     <semantic:startEvent id="_I49DI21WEd6B3oAuT8wltw">

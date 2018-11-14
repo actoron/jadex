@@ -9,8 +9,8 @@
 	name="Scenario" package="jadex.bdiv3.examples.moneypainter">
 	
 	<componenttypes>
-		<componenttype name="rich" filename="jadex/bdiv3/examples/moneypainter/RichBDI.class"/>
-		<componenttype name="painter" filename="jadex/bdiv3/examples/moneypainter/PainterBDI.class"/>
+		<componenttype name="rich" filename="jadex/bdiv3/examples/moneypainter/RichAgent.class"/>
+		<componenttype name="painter" filename="jadex/bdiv3/examples/moneypainter/PainterAgent.class"/>
 	</componenttypes>
 	
 	<configurations>

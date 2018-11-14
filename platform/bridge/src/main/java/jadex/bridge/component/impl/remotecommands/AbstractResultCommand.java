@@ -6,7 +6,7 @@ import java.util.PriorityQueue;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.impl.IOrderedConversation;
 import jadex.bridge.component.impl.IRemoteOrderedConversationCommand;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.future.IFuture;
 
 /**
@@ -60,7 +60,7 @@ public abstract class AbstractResultCommand extends AbstractInternalRemoteComman
 	 *  @param conv The active conversation.
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
-	public void	execute(IInternalAccess access, IOrderedConversation conv, IMsgSecurityInfos secinf)
+	public void	execute(IInternalAccess access, IOrderedConversation conv, ISecurityInfo secinf)
 	{
 		PriorityQueue<AbstractResultCommand> dc = conv.getDeferredCommands();
 		dc.offer(this);
@@ -82,5 +82,5 @@ public abstract class AbstractResultCommand extends AbstractInternalRemoteComman
 	 *  @param future Future of the active conversation.
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
-	public abstract void doExecute(IInternalAccess access, IFuture<?> future, IMsgSecurityInfos secinf);
+	public abstract void doExecute(IInternalAccess access, IFuture<?> future, ISecurityInfo secinf);
 }

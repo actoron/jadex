@@ -61,20 +61,20 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	 */
 	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt)
 	{
-		if(event.getCause()==null)
-		{
-			ServiceCall call = CallAccess.getCurrentInvocation();
-			if(call!=null)
-			{
-//				System.out.println("injecting call cause: "+call.getCause());
-				event.setCause(call.getCause());
-			}
-			else if(getComponent().getComponentDescription().getCause()!=null)
-			{
-//				System.out.println("injecting root cause: "+call.getCause());
-				event.setCause(getComponent().getComponentDescription().getCause().createNext());//event.getSourceIdentifier().toString()));
-			}
-		}
+//		if(event.getCause()==null)
+//		{
+//			ServiceCall call = CallAccess.getCurrentInvocation();
+//			if(call!=null)
+//			{
+////				System.out.println("injecting call cause: "+call.getCause());
+//				event.setCause(call.getCause());
+//			}
+//			else if(getComponent().getDescription().getCause()!=null)
+//			{
+////				System.out.println("injecting root cause: "+call.getCause());
+//				event.setCause(getComponent().getDescription().getCause().createNext());//event.getSourceIdentifier().toString()));
+//			}
+//		}
 		
 		// Publish to local subscribers
 		publishLocalEvent(event);
@@ -162,7 +162,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	public ServiceGetter<IMonitoringService> getMonitoringServiceGetter()
 	{
 		if(getter == null)
-			getter = new ServiceGetter<IMonitoringService>(getComponent(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		return getter;
 	}
 
@@ -235,7 +235,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	 */
 	public PublishEventLevel getPublishEmitLevelMonitoring()
 	{
-		return getComponent().getComponentDescription().getMonitoring() != null ? getComponent().getComponentDescription().getMonitoring() : PublishEventLevel.OFF;
+		return getComponent().getDescription().getMonitoring() != null ? getComponent().getDescription().getMonitoring() : PublishEventLevel.OFF;
 		// return emitlevelmon;
 	}
 	
@@ -247,7 +247,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel emitlevel)
 	{
 		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = (SubscriptionIntermediateFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class,
-			getComponent());
+			getInternalAccess());
 
 		ITerminationCommand tcom = new ITerminationCommand()
 		{
@@ -264,7 +264,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 		ret.setTerminationCommand(tcom);
 
 		// Signal that subscription has been done
-		MonitoringEvent subscribed = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(),
+		MonitoringEvent subscribed = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(),
 			PublishEventLevel.COARSE);
 		boolean post = false;
 		try
@@ -335,7 +335,7 @@ public class MonitoringComponentFeature extends AbstractComponentFeature impleme
 	public List<IMonitoringEvent> getCurrentStateEvents()
 	{
 		List<IMonitoringEvent> ret = null;
-		IExecutionFeature exef = getComponent().getComponentFeature0(IExecutionFeature.class);
+		IExecutionFeature exef = getComponent().getFeature0(IExecutionFeature.class);
 		if(exef instanceof ExecutionComponentFeature)
 			ret = ((ExecutionComponentFeature)exef).getCurrentStateEvents();
 		return ret;

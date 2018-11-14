@@ -1,26 +1,25 @@
 package jadex.platform.service.registry;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 /**
  *  Peer registry synchronization agent. 
  */
-@Agent
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="peer"))
 @ProvidedServices(@ProvidedService(type=IPeerRegistrySynchronizationService.class, implementation=@Implementation(PeerRegistrySynchronizationService.class)))
 //@Properties(value=@NameValue(name="system", value="true"))
 public class PeerRegistrySynchronizationAgent
@@ -38,12 +37,11 @@ public class PeerRegistrySynchronizationAgent
 		try
 		{
 			// Kill superpeer agent
-			ISuperpeerRegistrySynchronizationService spser = SServiceProvider.getLocalService(component, ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			ISuperpeerRegistrySynchronizationService spser = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 			
 			if(spser!=null)
 			{
-				IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-				cms.destroyComponent(((IService)spser).getServiceIdentifier().getProviderId());
+				component.killComponent(((IService)spser).getServiceId().getProviderId());
 			}
 		}
 		catch(ServiceNotFoundException e)
@@ -58,7 +56,7 @@ public class PeerRegistrySynchronizationAgent
 //	public void terminate()
 //	{
 //		// Produces problems in platform shutdown
-//		IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 //		cms.createComponent("registrysuperpeer", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null);
 //	}
 }

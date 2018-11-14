@@ -113,7 +113,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			
 			final String iclname = clname.replace(".", "/");
 			
-			ClassVisitor cv = new ClassVisitor(Opcodes.ASM4, cn)
+			ClassVisitor cv = new ClassVisitor(Opcodes.ASM5, cn)
 			{
 				boolean isagentorcapa = false;
 				boolean isgoal = false;
@@ -137,7 +137,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 							}
 						}
 					}
-					if(implbdiagent && name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
+					if(implbdiagent) // hmm needed? && name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
 					{
 						// erase abstract modifier
 //						access = ~Opcodes.ACC_ABSTRACT & access;
@@ -180,7 +180,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			    		public AnnotationVisitor visitAnnotation(String name, String desc)
 			    		{
 //			    			System.out.println("visit: "+name+" "+desc);
-			    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? this: new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
+			    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? super.visitAnnotation(name, desc) : new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
 							{
 			    				public void visit(String name, Object value)
 			    				{
@@ -198,12 +198,12 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			    		
 			    		public AnnotationVisitor visitArray(String name)
 			    		{
-			    			return new AnnotationVisitor(api, super.visitArray(iclname))
+			    			return new AnnotationVisitor(api, super.visitArray(name))
 							{
 			    				public AnnotationVisitor visitAnnotation(String name, String desc)
 					    		{
 //					    			System.out.println("visit: "+name+" "+desc);
-					    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? this: new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
+					    			return !desc.equals("Ljadex/bdiv3/annotation/Goal;")? super.visitAnnotation(name, desc) : new AnnotationVisitor(Opcodes.ASM4, super.visitAnnotation(name, desc))
 									{
 					    				public void visit(String name, Object value)
 					    				{
@@ -444,6 +444,10 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				List<Class<?>> classes = generateBDIClass(icl, model, dummycl, done);//, statics.contains(icl));
 				ret.addAll(classes);
 			}
+		}
+		catch(JadexBDIGenerationException e)
+		{
+			throw e;
 		}
 		catch(Throwable e)
 		{

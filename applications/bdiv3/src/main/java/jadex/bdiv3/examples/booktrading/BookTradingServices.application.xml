@@ -9,21 +9,21 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
 	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
-	name="BookTrading" package="jadex.bdiv3.examples.booktrading"
-	autoshutdown="true">
+	name="BookTrading" package="jadex.bdiv3.examples.booktrading">
 	
 	<imports>
   		<import>jadex.bdiv3.examples.booktrading.common.*</import>
 		<import>java.util.*</import>
 		<import>jadex.bridge.service.types.clock.IClockService</import>
 		<import>jadex.bridge.service.search.*</import>
+		<import>jadex.bridge.service.component.*</import>
 		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.service.*</import>
 	</imports>
 	
 	<componenttypes>
-		<componenttype name="Buyer" filename="jadex/bdiv3/examples/booktrading/buyer/BuyerBDI.class"/>
-		<componenttype name="Seller" filename="jadex/bdiv3/examples/booktrading/seller/SellerBDI.class"/>
+		<componenttype name="Buyer" filename="jadex/bdiv3/examples/booktrading/buyer/BuyerAgent.class"/>
+		<componenttype name="Seller" filename="jadex/bdiv3/examples/booktrading/seller/SellerAgent.class"/>
 	</componenttypes>
 	
 	<configurations>
@@ -34,10 +34,10 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 100, 120, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("All about web services", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 40, 60, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("Harry Potter", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 5, 10, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("Agents in the real world", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 30, 65, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
+								new Order("All about agents", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 100, 120, true, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("All about web services", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 40, 60, true, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("Harry Potter", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 5, 10, true, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("Agents in the real world", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 30, 65, true, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))))
 							}
 						</argument>
 					</arguments>
@@ -47,10 +47,10 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 130, 110, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("All about web services", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 50, 30, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("Harry Potter", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 15, 9, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("Agents in the real world", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 100, 60, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
+								new Order("All about agents", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 130, 110, false, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("All about web services", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 50, 30, false, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("Harry Potter", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 15, 9, false, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("Agents in the real world", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 100, 60, false, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))))
 							}
 						</argument>
 					</arguments>
@@ -64,7 +64,7 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 100, 120, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
+								new Order("All about agents", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 100, 120, true, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))))
 							}
 						</argument>
 					</arguments>
@@ -74,7 +74,7 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 130, 110, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
+								new Order("All about agents", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 130, 110, false, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))))
 							}
 						</argument>
 					</arguments>
@@ -88,10 +88,10 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 100, 120, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("All about web services", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 40, 60, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("Harry Potter", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 5, 10, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("Agents in the real world", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 30, 65, true, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
+								new Order("All about agents", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 100, 120, true, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("All about web services", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 40, 60, true, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("Harry Potter", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 5, 10, true, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("Agents in the real world", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 30, 65, true, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))))
 							}
 						</argument>
 					</arguments>
@@ -101,10 +101,10 @@
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 130, 110, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("All about web services", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 50, 30, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("Harry Potter", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 15, 9, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))),
-								new Order("Agents in the real world", new Date(((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()+60000), 100, 60, false, ((IClockService)SServiceProvider.getLocalService($component.getComponentIdentifier(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))
+								new Order("All about agents", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 130, 110, false, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("All about web services", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 50, 30, false, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("Harry Potter", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 15, 9, false, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)))),
+								new Order("Agents in the real world", new Date(((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()+60000), 100, 60, false, ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))))
 							}
 						</argument>
 					</arguments>

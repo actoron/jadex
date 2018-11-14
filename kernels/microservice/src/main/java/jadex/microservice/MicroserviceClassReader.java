@@ -67,24 +67,15 @@ public class MicroserviceClassReader
 //		System.out.println("read micro: "+cma);
 		
 		String name = SReflect.getUnqualifiedClassName(cma);
-		if(name.endsWith("Microservice"))
-			name = name.substring(0, name.lastIndexOf("Microservice"));
+//		if(name.endsWith("Microservice"))
+//			name = name.substring(0, name.lastIndexOf("Microservice"));
 //		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
 		
 		modelinfo.setName("Minimal");
 		modelinfo.setPackage("jadex.micro");
 		modelinfo.setNameHint(name);
 		
-		// in robolectric testcases, location is null
-		URL srcloc = (cma.getProtectionDomain()!=null 
-			&& cma.getProtectionDomain().getCodeSource().getLocation() != null) 
-			? cma.getProtectionDomain().getCodeSource().getLocation() : null;
-			
-		String src = (srcloc != null) 
-			? SUtil.convertURLToString(srcloc) + File.separator : "/";
-//			: ('/' + cma.getPackage().getName().replace('.', '/') + '/');
-//		modelinfo.setFilename(src+File.separatorChar+model);
-		modelinfo.setFilename(src+SReflect.getClassName(cma).replace('.', cma.getProtectionDomain()!=null? File.separatorChar: '/')+".class");
+		modelinfo.setFilename(SUtil.getClassFileLocation(cma));
 //		System.out.println("mircor: "+src+File.separatorChar+model);
 		modelinfo.setType(MicroserviceFactory.FILETYPE_MICROSERVICE);
 		modelinfo.setStartable(true);
@@ -97,6 +88,10 @@ public class MicroserviceClassReader
 			URL url	= null;
 			try
 			{
+				// in robolectric testcases, location is null
+				URL srcloc = cma.getProtectionDomain()==null ? null 
+					: cma.getProtectionDomain().getCodeSource().getLocation();
+
 				url	= (srcloc != null) 
 					? srcloc 
 					: new URL("file://" + cma.getPackage().getName().replace('.', '/') + '/');
@@ -140,7 +135,7 @@ public class MicroserviceClassReader
 		if(sifs.size()>0)
 		{
 			String firstname = sifs.get(0).getName()+"ms";
-			String exp = "$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\""+firstname+"\")";
+			String exp = "$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\""+firstname+"\")";
 			boolean first = true;
 			for(Class<?> sif: sifs)
 			{

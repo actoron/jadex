@@ -14,7 +14,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.future.DelegationResultListener;
@@ -84,15 +83,15 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 		}
 	}
 	
-	/**
-	 * Sets the Kernels.
-	 * See {@link JadexPlatformManager} constants for available Kernels.
-	 * @param kernels
-	 * @deprecated use getPlatformConfiguration().getRootConfig().setKernels() instead.
-	 */
-	protected void setPlatformKernels(String ... kernels) {
-		this.platformConfiguration.setKernels(kernels);
-	}
+//	/**
+//	 * Sets the Kernels.
+//	 * See {@link JadexPlatformManager} constants for available Kernels.
+//	 * @param kernels
+//	 * @deprecated use getPlatformConfiguration().getRootConfig().setKernels() instead.
+//	 */
+//	protected void setPlatformKernels(String ... kernels) {
+//		this.platformConfiguration.setKernels(kernels);
+//	}
 	
 	/**
 	 * Returns the platform options of newly created platforms.
@@ -162,14 +161,14 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	
 	final protected IFuture<IExternalAccess> startPlatform()
 	{
-		Logger.i("Requested kernels: " + Arrays.toString(platformConfiguration.getKernels()));
+//		Logger.i("Requested kernels: " + Arrays.toString(platformConfiguration.getKernels()));
 		return startJadexPlatform(platformConfiguration);
 	}
 	
-	public IFuture<IComponentManagementService> getCMS()
-	{
-		return getCMS(platformId);
-	}
+//	public IFuture<IComponentManagementService> getCMS()
+//	{
+//		return getCMS(platformId);
+//	}
 	
 	public IExternalAccess getExternalPlatformAccess()
 	{
@@ -233,7 +232,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	@Override
 	protected void onPlatformStarted(IExternalAccess platform)
 	{
-		this.platformId = platform.getComponentIdentifier();
+		this.platformId = platform.getId();
 	}
 	
 
@@ -275,7 +274,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 		return getPlatformAccess().scheduleStep(new IComponentStep<Void>() {
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia) {
-				return ia.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message);
+				return ia.getFeature(IMessageFeature.class).sendMessage(receiver, message);
 			}
 		});
 

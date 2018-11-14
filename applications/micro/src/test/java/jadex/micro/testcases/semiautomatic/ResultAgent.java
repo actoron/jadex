@@ -1,13 +1,13 @@
 package jadex.micro.testcases.semiautomatic;
 
+import java.util.Collection;
+
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -41,52 +41,43 @@ public class ResultAgent
 		
 		if(Math.random()<0.3)
 		{
-			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("result", "last: "+agent.getComponentIdentifier()+": "+Math.random());
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "last: "+agent.getId()+": "+Math.random());
 //			killAgent();
 			ret.setResult(null);
 		}
 		else
 		{
-			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("result", "not last: "+agent.getComponentIdentifier()+": "+Math.random());
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "not last: "+agent.getId()+": "+Math.random());
 			
-//			getServiceContainer().searchService(IComponentManagementService.class)
-			SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+			agent.createComponent(new CreationInfo(agent.getId()).setFilename(ResultAgent.this.getClass().getName()+".class"), 
+				agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Tuple2<String, Object>>>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Collection<Tuple2<String, Object>> result)
 				{
-					IComponentManagementService cms = (IComponentManagementService)result;
-				
-					cms.createComponent(null, ResultAgent.this.getClass().getName()+".class", new CreationInfo(agent.getComponentIdentifier()), agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							System.out.println(agent.getComponentIdentifier()+" got result: "+result);
-							ret.setResult(null);
+					System.out.println(agent.getId()+" got result: "+result);
+					ret.setResult(null);
 //							killAgent();
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							System.out.println("exception occurred: "+exception);
-//							killAgent();
-							ret.setResult(null);
-						}
-					})).addResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							System.out.println("Could not create agent: "+exception);
-//							killAgent();
-							ret.setResult(null);
-						}
-					});
 				}
-			}));
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println("exception occurred: "+exception);
+//							killAgent();
+					ret.setResult(null);
+				}
+			})).addResultListener(new IResultListener<IExternalAccess>()
+			{
+				public void resultAvailable(IExternalAccess result)
+				{
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println("Could not create agent: "+exception);
+//					killAgent();
+					ret.setResult(null);
+				}
+			});
 		}
 		
 		return ret;

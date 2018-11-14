@@ -45,6 +45,6 @@ public class HelplineService implements IHelpline
 	 */
 	public String toString()
 	{
-		return "HelplineService, "+agent.getAgent().getComponentIdentifier();
+		return "HelplineService, "+agent.getAgent().getId();
 	}
 }

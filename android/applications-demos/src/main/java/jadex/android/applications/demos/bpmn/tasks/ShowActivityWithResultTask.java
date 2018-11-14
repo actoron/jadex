@@ -33,7 +33,7 @@ public class ShowActivityWithResultTask implements ITask, Serializable
 	public IFuture<Void> execute(ITaskContext taskContext, IInternalAccess process)
 	{
 		// retrieve service that is set as required in workflow definition
-		IFuture<Object> requiredService = process.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("androidcontext");
+		IFuture<Object> requiredService = process.getFeature(IRequiredServicesFeature.class).getService("androidcontext");
 		IContextService contextService = (IContextService) requiredService.get();
 		// get task attributes
 //		android.content.Context androidContext = (android.content.Context)taskContext.getParameterValue("androidContext");

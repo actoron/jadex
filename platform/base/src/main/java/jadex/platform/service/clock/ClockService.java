@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
+import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -22,11 +24,11 @@ import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.concurrent.JavaThreadPool;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
+import jadex.platform.service.threadpool.ThreadPoolService;
 
 /**
  *  A clock service abstracts away from clock implementations.
@@ -34,6 +36,11 @@ import jadex.commons.future.IResultListener;
  */
 public class ClockService extends BasicService implements IClockService, IPropertiesProvider
 {
+	//-------- static part --------
+	
+	/** Shared clock for bisimulation, if any. */
+	protected static volatile IClock	bisimclock;	
+	
 	//-------- attributes --------
 	
 	/** The clock. */
@@ -72,7 +79,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 	 */
 	public ClockService(ClockCreationInfo cinfo, IInternalAccess component, Map properties, Boolean simulation)
 	{
-		super(component.getComponentIdentifier(), IClockService.class, properties);
+		super(component.getId(), IClockService.class, properties);
 
 		this.cinfo = cinfo;
 		this.component = component;
@@ -316,28 +323,29 @@ public class ClockService extends BasicService implements IClockService, IProper
 		
 		final Future<Void> ret = new Future<Void>();
 
-		threadpool = SServiceProvider.getLocalService(component, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false);
-//		ISettingsService settings = SServiceProvider.getLocalService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		threadpool = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
+//		ISettingsService settings = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 
 //		System.out.println("clock: "+ServiceCall.get);
 		
-//		SServiceProvider.getService(component, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
+//		component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
 //			.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, Void>(ret)
 //		{
 //			public void customResultAvailable(IThreadPoolService result)
 //			{
 //				threadpool = result;
-				clock = createClock(cinfo, threadpool);
+				setClock(cinfo, threadpool);
 				clock.start();
+				
 				ClockService.super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						ISettingsService settings = SServiceProvider.getLocalService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+						ISettingsService settings = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
 						settings.registerPropertiesProvider("clockservice", ClockService.this)
 							.addResultListener(new DelegationResultListener<Void>(ret));
 						
-//						SServiceProvider.getService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//						component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //							.addResultListener(new IResultListener<ISettingsService>()
 //						{
 //							public void resultAvailable(ISettingsService settings)
@@ -350,7 +358,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 //							{
 //								// No settings service: ignore.
 //								ret.setResult(null);
-////								ret.setResult(getServiceIdentifier());
+////								ret.setResult(getId());
 //							}
 //						});
 					}
@@ -381,26 +389,12 @@ public class ClockService extends BasicService implements IClockService, IProper
 		{
 			public void customResultAvailable(Void result)
 			{
-				SServiceProvider.getService(component, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new IResultListener<ISettingsService>()
+				ISettingsService	settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+				settings.deregisterPropertiesProvider("clockservice")
+					.addResultListener(new DelegationResultListener<Void>(ret)
 				{
-					public void resultAvailable(ISettingsService settings)
+					public void customResultAvailable(Void result)
 					{
-						settings.deregisterPropertiesProvider("clockservice")
-							.addResultListener(new DelegationResultListener<Void>(ret)
-						{
-							public void customResultAvailable(Void result)
-							{
-								ClockService.this.component	= null;
-								ClockService.this.clock	= null;
-								ret.setResult(null);
-							}
-						});
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						// No settings service: ignore.
 						ClockService.this.component	= null;
 						ClockService.this.clock	= null;
 						ret.setResult(null);
@@ -424,27 +418,61 @@ public class ClockService extends BasicService implements IClockService, IProper
 	}*/
 	
 	/**
-	 *  Set the clock.
-	 *  @param clock The new clock.
+	 *  Change the clock.
+	 *  @param type The new clock type
 	 */
 	public void setClock(String type, IThreadPool tp)
 	{
-		IClock clock;
+		assert	clock!=null; // Initially created in startService...
+		setClock(new ClockCreationInfo(type, null, clock.getTime(), clock.getDelta(), clock instanceof IContinuousClock ? ((IContinuousClock)clock).getDilation() : 1), tp);
+	}
+	
+	/**
+	 *  Create and set a new clock.
+	 */
+	public void	setClock(ClockCreationInfo cinfo, IThreadPool tp)
+	{
+		IClock old	= clock;
+		boolean	start	= old!=null && IClock.STATE_RUNNING.equals(old.getState());
 		
-		if(IClock.TYPE_CONTINUOUS.equals(type))
-			clock = new ContinuousClock(this.clock, tp);
-		else if(IClock.TYPE_SYSTEM.equals(type))
-			clock = new SystemClock(this.clock, tp);
-		else if(IClock.TYPE_TIME_DRIVEN.equals(type))
-			clock = new SimulationTickClock(this.clock);
-		else if(IClock.TYPE_EVENT_DRIVEN.equals(type))
-			clock = new SimulationEventClock(this.clock);
+		Object	bisimulation	= component.getFeature(IArgumentsResultsFeature.class).getArguments().get("bisimulation");
+		if(Boolean.TRUE.equals(bisimulation))
+		{
+			synchronized(ClockService.class)
+			{
+				if(bisimclock==null)
+				{
+					// HACK!!! first setting wins
+					bisimclock	= createClock(cinfo, new ThreadPoolService(new JavaThreadPool(false), getProviderId()));
+				}
+			}
+			clock	= bisimclock;
+			// Sim flag false to disable auto-adblockers for bisim.
+			Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
+			// Separate bisim flag for platform bootstrap w/o rescue thread
+			Starter.putPlatformValue(component.getId().getRoot(), BISIMULATION_CLOCK_FLAG, Boolean.TRUE);
+		}
 		else
-			throw new RuntimeException("Unknown clock type: "+type);
+		{
+			clock	= createClock(cinfo, tp);
+			
+			if (clock instanceof ISimulationClock)
+				Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.TRUE);
+			else
+				Starter.putPlatformValue(component.getId().getRoot(), SIMULATION_CLOCK_FLAG, Boolean.FALSE);
+		}
 		
-		this.clock.dispose();
+		if(old!=null)
+		{
+			old.stop();
+			((AbstractClock)clock).copyFromClock(old);
+			old.dispose();
+		}
+		if(start)
+		{
+			this.clock.start();
+		}
 		
-		this.clock = clock;
 		for(int i=0; i<listeners.size(); i++)
 		{
 			this.clock.addChangeListener((IChangeListener)listeners.get(i));
@@ -452,12 +480,11 @@ public class ClockService extends BasicService implements IClockService, IProper
 	}
 	
 	/**
-	 *  Create a clock.
+	 *  Create a clock based on creation info.
 	 */
-	public static IClock createClock(ClockCreationInfo cinfo, IThreadPool tp)
+	protected static IClock	createClock(ClockCreationInfo cinfo, IThreadPool tp)
 	{
-		IClock ret;
-		
+		IClock	ret;
 		if(IClock.TYPE_CONTINUOUS.equals(cinfo.getClockType()))
 		{
 			ret = new ContinuousClock(cinfo.getName(), cinfo.getStart(), cinfo.getDilation(), tp);
@@ -478,7 +505,6 @@ public class ClockService extends BasicService implements IClockService, IProper
 		{
 			throw new RuntimeException("Unknown clock type: "+cinfo.getClockType());
 		}
-		
 		return ret;
 	}
 

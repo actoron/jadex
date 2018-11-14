@@ -36,7 +36,7 @@ public class MappingService implements IParallelService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IServicePoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("poolser");
+		IFuture<IServicePoolService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("poolser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 		{
 			public void customResultAvailable(final IServicePoolService sps)
@@ -47,7 +47,7 @@ public class MappingService implements IParallelService
 				{
 					public void customResultAvailable(Void result)
 					{
-						IFuture<ISequentialService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("seqser");
+						IFuture<ISequentialService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("seqser");
 						fut.addResultListener(new ExceptionDelegationResultListener<ISequentialService, Void>(ret)
 						{
 							public void customResultAvailable(ISequentialService result)

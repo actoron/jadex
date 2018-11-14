@@ -1,6 +1,5 @@
 package jadex.commons.security;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,18 +9,13 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.Provider.Service;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Object;
@@ -29,11 +23,17 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.ECPrivateKey;
+import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -42,8 +42,15 @@ import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509ContentVerifierProviderBuilder;
 import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.cert.bc.BcX509v3CertificateBuilder;
+import org.bouncycastle.cert.path.CertPath;
+import org.bouncycastle.cert.path.CertPathValidation;
+import org.bouncycastle.cert.path.CertPathValidationResult;
+import org.bouncycastle.cert.path.validations.BasicConstraintsValidation;
+import org.bouncycastle.cert.path.validations.KeyUsageValidation;
+import org.bouncycastle.cert.path.validations.ParentCertIssuedValidation;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.digests.SHA512Digest;
@@ -67,6 +74,7 @@ import org.bouncycastle.crypto.prng.EntropySourceProvider;
 import org.bouncycastle.crypto.prng.SP800SecureRandomBuilder;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.crypto.util.PrivateKeyInfoFactory;
+import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
@@ -76,6 +84,7 @@ import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
@@ -118,6 +127,14 @@ public class SSecurity
 	/** Enable this to test the seeding fallback, do not change, used by tests only. */
 	protected static boolean TEST_ENTROPY_FALLBACK = false;
 	
+	static
+	{
+		if (SUtil.SECURE_RANDOM != getSecureRandom())
+		{
+			SUtil.SECURE_RANDOM = SECURE_RANDOM;
+		}
+	}
+	
 	/**
 	 *  Gets access to the common secure PRNG.
 	 *  @return Common secure PRNG.
@@ -134,18 +151,6 @@ public class SSecurity
 						SECURE_RANDOM = generateParanoidSecureRandom();
 					else
 						SECURE_RANDOM = generateSecureRandom();
-				}
-				
-				if (Security.getProvider("Jadex") == null)
-				{
-					Security.insertProviderAt(new Provider("Jadex", 1.0, "")
-					{
-						{
-							putService(new Service(this, "SecureRandom", "ChaCha20", "jadex.commons.security.JadexSecureRandomSpi", null, null));
-						}
-						private static final long serialVersionUID = -3208767101511459503L;
-						
-					}, 1);
 				}
 				
 				// Attempt to overwrite UUID secure random.
@@ -199,69 +204,10 @@ public class SSecurity
 				{
 					final IEntropySource basicsource = new IEntropySource()
 					{
-//						protected long bcount = 0;
 						
-						/** Input stream for POSIX-like systems. */
-						protected File urandom = null;
-						
-						{
-							urandom = new File("/dev/urandom");
-							FileInputStream urandomis = null;
-							if (urandom.exists())
-							{
-								try
-								{
-									urandomis = new FileInputStream(urandom);
-								}
-								catch (Exception e)
-								{
-									urandom = null;
-								}
-								finally
-								{
-									if (urandomis != null)
-									{
-										try
-										{
-											urandomis.close();
-										}
-										catch (Exception e)
-										{
-										}
-									}
-								}
-							}
-							
-							if (urandom == null)
-							{
-								urandom = new File("/dev/random");
-								if (urandom.exists())
-								{
-									try
-									{
-										urandomis = new FileInputStream(urandom);
-									}
-									catch (Exception e)
-									{
-										urandom = null;
-									}
-									finally
-									{
-										if (urandomis != null)
-										{
-											try
-											{
-												urandomis.close();
-											}
-											catch (Exception e)
-											{
-											}
-										}
-									}
-								}
-							}
-						}
-						
+						/**
+						 *  Gets low-level entropy, preferably from OS.
+						 */
 						public synchronized void getEntropy(byte[] output)
 						{
 //							bcount += ret.length;
@@ -269,48 +215,35 @@ public class SSecurity
 //							boolean urandomworked = false;
 							byte[] empty = new byte[output.length];
 							byte[] ret = null;
-							if (urandom != null)
+							
+							// For UNIX, use UNIX API to gather entropy data
+							try
 							{
-								FileInputStream urandomis = null;
-								ret = new byte[output.length];
-								try
-								{
-									urandomis = new FileInputStream(urandom);
-									int read = 0;
-									int off = 0;
-									while (read < ret.length)
-									{
-										read = urandomis.read(ret, off, ret.length - read);
-										off += read;
-									}
-								}
-								catch (Exception e)
-								{
-									ret = null;
-								}
-								finally
-								{
-									if (urandomis != null)
-									{
-										try
-										{
-											urandomis.close();
-										}
-										catch (Exception e)
-										{
-										}
-									}
-								}
+								Class<?> unixentropyapi = Class.forName("jadex.commons.security.UnixEntropyApi");
+								Method getEntropy = unixentropyapi.getMethod("getEntropy", int.class);
+								ret = (byte[]) getEntropy.invoke(null, output.length);
 							}
+							catch(Throwable e)
+							{
+								ret = null;
+							}
+							
+							// Try /dev/urandom
+							if (ret == null || Arrays.equals(ret, empty))
+								ret = getEntropyFromFile("/dev/urandom", output.length);
+							
+							// Try /dev/urandom
+							if (ret == null || Arrays.equals(ret, empty))
+								ret = getEntropyFromFile("/dev/random", output.length);
 							
 							if (ret == null || Arrays.equals(ret, empty))
 							{
 								// For Windows, use Windows API to gather entropy data
 								try
 								{
-									Class<?> wincrypt = Class.forName("jadex.commons.security.WinCrypt");
-									Method getrandomfromwindows = wincrypt.getMethod("getRandomFromWindows", int.class);
-									ret = (byte[]) getrandomfromwindows.invoke(null, output.length);
+									Class<?> winentropyapi = Class.forName("jadex.commons.security.WindowsEntropyApi");
+									Method getEntropy = winentropyapi.getMethod("getEntropy", int.class);
+									ret = (byte[]) getEntropy.invoke(null, output.length);
 								}
 								catch(Throwable e)
 								{
@@ -329,13 +262,50 @@ public class SSecurity
 									Logger.getLogger("jadex").warning("Unable to find OS entropy source, using fallback...");
 									ENTROPY_FALLBACK_WARNING_DONE = true;
 								}
-								ret = SecureRandom.getSeed(output.length);
+								ret = SUtil.getJavaDefaultSecureRandom().generateSeed(output.length);
 							}
 							
 							System.arraycopy(ret, 0, output, 0, output.length);
 							
 							if (output == null || Arrays.equals(output, empty))
 								throw new SecurityException("Entropy gathering failed.");
+						}
+						
+						/**
+						 *  Gets entropy from a file.
+						 *  @param path Path of the entropy file.
+						 *  @param numbytes Number of bytes to read.
+						 *  @return Entropy data or null on failure.
+						 */
+						protected byte[] getEntropyFromFile(String path, int numbytes)
+						{
+							File input = new File(path);
+							if (!input.exists())
+								return null;
+							
+							InputStream is = null;
+							try
+							{
+								byte[] ret = new byte[numbytes];
+								is = new FileInputStream(input);
+								int read = 0;
+								int off = 0;
+								while (read < ret.length)
+								{
+									read = is.read(ret, off, ret.length - read);
+									off += read;
+								}
+								return ret;
+								
+							}
+							catch (Exception e)
+							{
+							}
+							finally
+							{
+								SUtil.close(is);
+							}
+							return null;
 						}
 					};
 					
@@ -361,14 +331,7 @@ public class SSecurity
 		try
 		{
 			byte[] certdata = SUtil.readStream(pemcert);
-			pemcert.close();
 			X509CertificateHolder cert = readCertificateFromPEM(new String(certdata, SUtil.UTF8));
-			
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			GZIPOutputStream gos = new GZIPOutputStream(baos);
-			gos.write(certdata);
-			gos.close();
-			certdata = baos.toByteArray();
 			
 			String pemkeystr = new String(SUtil.readStream(pemkey), SUtil.UTF8);
 			pemkey.close();
@@ -380,7 +343,7 @@ public class SSecurity
 			
 			byte[] sig = signer.getSignature();
 			
-			ret = SUtil.mergeData(certdata, sig);
+			ret = sig;
 		}
 		catch (Exception e)
 		{
@@ -388,21 +351,7 @@ public class SSecurity
 		}
 		finally
 		{
-			try
-			{
-				pemcert.close();
-			}
-			catch (Exception e)
-			{
-			}
-			
-			try
-			{
-				pemkey.close();
-			}
-			catch (Exception e)
-			{
-			}
+			SUtil.close(pemcert);
 		}
 		
 		return ret;
@@ -413,76 +362,68 @@ public class SSecurity
 	 * 
 	 *  @param msghash The message hash.
 	 *  @param token The authentication token.
+	 *  @param signingcert The signing certificate.
 	 *  @param trustedpemcert The PEM certificate trust anchor.
 	 *  @return True, if the certificate chain and signature is valid.
 	 */
-	public static final boolean verifyWithPEM(byte[] msghash, byte[] token, InputStream trustedpemcert)
+	public static final boolean verifyWithPEM(byte[] msghash, byte[] token, String signingcert, LinkedHashSet<X509CertificateHolder> trustchain)
 	{
 		try
 		{
 			Date now = new Date();
-			X509CertificateHolder trustedcrtholder = readCertificateFromPEM(new String(SUtil.readStream(trustedpemcert), SUtil.UTF8));
-			trustedpemcert.close();
 			
-			if (!trustedcrtholder.isValidOn(now))
+			List<X509CertificateHolder> certchain = readCertificateChainFromPEM(signingcert);
+//			for (int i = 0; i < certchain.size() - 1; ++i)
+//			{
+//				X509CertificateHolder signedcert = certchain.get(i);
+//				X509CertificateHolder signercert = certchain.get(i + 1);
+//				if (!signedcert.isValidOn(now) || !signercert.isValidOn(now))
+//					return false;
+//				
+//				BasicConstraints bc = BasicConstraints.fromExtensions(signercert.getExtensions());
+//				if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < i))
+//					return false;
+//				
+//				if (!signedcert.isSignatureValid(getVerifierProvider(signercert)))
+//					return false;
+//			}
+//			
+//			// Verify the last chain link is signed by trust anchor.
+//			if (!certchain.get(certchain.size() - 1).isSignatureValid(getVerifierProvider(trustedcrtholder)))
+//				return false;
+//			BasicConstraints bc = BasicConstraints.fromExtensions(trustedcrtholder.getExtensions());
+//			if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < certchain.size() - 1))
+//				return false;
+			
+			// Verify provided certificate chain
+			CertPath certpath = new CertPath(certchain.toArray(new X509CertificateHolder[certchain.size()]));
+			CertPathValidationResult result = certpath.validate(getChainValidationRules());
+			if (!result.isValid())
 				return false;
 			
-			List<byte[]> splitdata = SUtil.splitData(token);
-			if (splitdata.size() != 2)
-				return false;
-			
-			byte[] certdata = splitdata.get(0);
-			ByteArrayInputStream bais = new ByteArrayInputStream(certdata);
-			GZIPInputStream gis = new GZIPInputStream(bais);
-			certdata = SUtil.readStream(gis);
-			byte[] sig = splitdata.get(1);
-			
-			
-			
-			List<X509CertificateHolder> certchain = readCertificateChainFromPEM(new String(certdata, SUtil.UTF8));
-			// Verify certificate chain
-			for (int i = 0; i < certchain.size() - 1; ++i)
+			// Verify if at least one chain certificate is in trusted set.
+			boolean chaintrust = false;
+			for (X509CertificateHolder cert : certchain)
 			{
-				X509CertificateHolder signedcert = certchain.get(i);
-				X509CertificateHolder signercert = certchain.get(i + 1);
-				if (!signedcert.isValidOn(now) || !signercert.isValidOn(now))
-					return false;
-				
-				BasicConstraints bc = BasicConstraints.fromExtensions(signercert.getExtensions());
-				if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < i))
-					return false;
-				
-				if (!signedcert.isSignatureValid(getVerifierProvider(signercert)))
-					return false;
+				if (trustchain.contains(cert))
+				{
+					chaintrust = true;
+					break;
+				}
 			}
-			
-			// Verify the last chain link is signed by trust anchor.
-			if (!certchain.get(certchain.size() - 1).isSignatureValid(getVerifierProvider(trustedcrtholder)))
-				return false;
-			BasicConstraints bc = BasicConstraints.fromExtensions(trustedcrtholder.getExtensions());
-			if (bc == null || !bc.isCA() || (bc.getPathLenConstraint() != null && bc.getPathLenConstraint().longValue() < certchain.size() - 1))
+			if (!chaintrust)
 				return false;
 			
 			// Verify signature
 			ContentVerifier cv = getDefaultVerifier(certchain.get(0));
 			cv.getOutputStream().write(msghash);
 			cv.getOutputStream().close();
-			return cv.verify(sig);
+			return cv.verify(token);
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 			Logger.getLogger("authentication").info("Verification failed: " + e.toString());
-		}
-		finally
-		{
-			try
-			{
-				trustedpemcert.close();
-			}
-			catch (Exception e)
-			{
-			}
 		}
 		return false;
 	}
@@ -580,6 +521,26 @@ public class SSecurity
 		return createCertificateBySpecification(null, null, subject, scheme, schemeconf, hashalg, strength, daysvalid, bcext, kuext);
 	}
 	
+	/** Creates a random CA certificate for testing. */
+	public static final PemKeyPair createTestCACert()
+	{
+		Tuple2<String, String> cacert = createRootCaCertificate("CN=TESTCA", -1, "ECDSA", "NIST P", "SHA256", 256, 1);
+		PemKeyPair ret = new PemKeyPair();
+		ret.setCertificate(cacert.getFirstEntity());
+		ret.setKey(cacert.getSecondEntity());
+		return ret;
+	}
+	
+	/** Creates a random certificate for testing. */
+	public static final PemKeyPair createTestCert(PemKeyPair ca)
+	{
+		Tuple2<String, String> cert = createCertificate(ca.getCertificate(), ca.getKey(), "CN=TEST", "ECDSA", "NIST P", "SHA256", 256, 1);
+		PemKeyPair ret = new PemKeyPair();
+		ret.setCertificate(cert.getFirstEntity());
+		ret.setKey(cert.getSecondEntity());
+		return ret;
+	}
+	
 	/**
 	 *  XORs two byte arrays.
 	 *  
@@ -646,6 +607,85 @@ public class SSecurity
 		}
 		
 		return certchain;
+	}
+	
+	/**
+	 *  Returns the subject ID of a certificate.
+	 *  
+	 *  @param cert The certificate.
+	 *  @return The subject ID.
+	 */
+//	public static final X500Name getSubjectName(X509CertificateHolder cert)
+//	{
+//		return cert.getSubject();
+//	}
+	
+	public static String getCommonName(X500Name name)
+	{
+		String ret = null;
+	    RDN[] rdns = name.getRDNs(BCStyle.CN);
+	    if (rdns != null && rdns.length > 0)
+	    {
+	        RDN rdn = rdns[0];
+	        if (rdn.isMultiValued())
+	        {
+	            for (AttributeTypeAndValue m : rdn.getTypesAndValues())
+	            {
+	                if (m.getType().equals(BCStyle.CN))
+	                {
+	                    ret = IETFUtils.valueToString(m.getValue());
+	                    break;
+	                }
+	            }
+	        }
+	        else
+	        {
+	        	ret = IETFUtils.valueToString(rdn.getFirst().getValue());
+	        }
+	    }
+	    return ret;
+	}
+	
+	/**
+	 *  Check whether a certificate belongs to an entity,
+	 *  either as common name or as alt name.
+	 *  
+	 *  @param cert The certificate.
+	 *  @param entityname The entity name.
+	 *  @return True, if the certificate belongs, false otherwise.
+	 */
+	public static final boolean checkEntity(X509CertificateHolder cert, String entityname)
+	{
+		if (cert == null || entityname == null)
+			return false;
+		
+		String cn = getCommonName(cert.getSubject());
+		if (cn.equals(entityname))
+			return true;
+		
+		//Extension san = cert.getExtension(Extension.subjectAlternativeName);
+		try
+		{
+			GeneralNames gnames = GeneralNames.fromExtensions(cert.getExtensions(), Extension.subjectAlternativeName);
+			if (gnames != null)
+			{
+				GeneralName[] names = gnames.getNames();
+				if (names != null)
+				{
+					for (GeneralName name : names)
+					{
+						String strname = IETFUtils.valueToString(name.getName());
+						if (entityname.equals(strname))
+							return true;
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+		}
+//		String val = IETFUtils.valueToString(san.getParsedValue());
+		return false;
 	}
 	
 	/**
@@ -773,7 +813,17 @@ public class SSecurity
 	public static final String getCertSigAlg(X509CertificateHolder cert)
 	{
 		SubjectPublicKeyInfo spki = cert.getSubjectPublicKeyInfo();
-		
+		return getSigAlg(spki);
+	}
+	
+	/**
+	 *  Gets the signatures algorithm supported by the key.
+	 *  
+	 *  @param spki The subject key info.
+	 *  @return The signature algorithm.
+	 */
+	public static final String getSigAlg(SubjectPublicKeyInfo spki)
+	{
 		String ret = spki.getAlgorithm().getAlgorithm().getId();
 
 		if (X9ObjectIdentifiers.id_ecPublicKey.getId().equals(ret))
@@ -784,6 +834,34 @@ public class SSecurity
 			ret = "DSA";
 		
 		return ret;
+	}
+	
+	/**
+	 *  Gets the certificate chain validation rules.
+	 *  @return The rules.
+	 */
+	protected static final CertPathValidation[] getChainValidationRules()
+	{
+		List<CertPathValidation> ret = new ArrayList<>();
+		
+		ret.add(new BasicConstraintsValidation(true));
+		ret.add(new ParentCertIssuedValidation(new X509ContentVerifierProviderBuilder()
+		{
+
+			public ContentVerifierProvider build(SubjectPublicKeyInfo validatingkeyinfo) throws OperatorCreationException
+			{
+				return getVerifierProvider(validatingkeyinfo);
+			}
+
+			public ContentVerifierProvider build(X509CertificateHolder validatingkeyinfo) throws OperatorCreationException
+			{
+				return getVerifierProvider(validatingkeyinfo);
+			}
+			
+		}));
+		ret.add(new KeyUsageValidation(true));
+		
+		return ret.toArray(new CertPathValidation[ret.size()]);
 	}
 	
 	/**
@@ -849,7 +927,7 @@ public class SSecurity
 		prngs.add(generateSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
-		prngs.add(getDefaultSecureRandom());
+		prngs.add(SUtil.getJavaDefaultSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		final SecureRandom[] randsources = prngs.toArray(new SecureRandom[prngs.size()]);
@@ -1029,14 +1107,23 @@ public class SSecurity
 				else
 					curvname = "brainpoolp256r1";
 			}
+			else if ("NIST K".equals(algconf.toUpperCase()))
+			{
+				if (strength > 384)
+					curvname = "K-571";
+				else if (strength > 256)
+					curvname = "K-409";
+				else
+					curvname = "K-283";
+			}
 			else
 			{
 				if (strength > 384)
-					curvname = "secp521k1";
+					curvname = "P-521";
 				else if (strength > 256)
-					curvname = "secp384k1";
+					curvname = "P-384";
 				else
-					curvname = "secp256k1";
+					curvname = "P-256";
 			}
 			
 			X9ECParameters x9 = CustomNamedCurves.getByName(curvname);
@@ -1150,13 +1237,18 @@ public class SSecurity
 	 *  
 	 *  Gets a verifier provider based on a certificate to identify the algorithm.
 	 *  
-	 *  @param cert The certificate
+	 *  @param keyinfo The certificate or key info.
 	 *  @return The content verifier provider.
 	 */
-	protected static final ContentVerifierProvider getVerifierProvider(X509CertificateHolder cert)
+	protected static final ContentVerifierProvider getVerifierProvider(Object keyinfo)
 	{
-		String sigalg = getCertSigAlg(cert);
-		
+		String sigalg = null;
+		if (keyinfo instanceof X509CertificateHolder)
+			sigalg = getCertSigAlg((X509CertificateHolder) keyinfo);
+		else
+			sigalg = getSigAlg((SubjectPublicKeyInfo) keyinfo);
+			
+			
 		DefaultDigestAlgorithmIdentifierFinder digalgfinder = new DefaultDigestAlgorithmIdentifierFinder();
 		BcContentVerifierProviderBuilder verifierbuilder = null;
 		if ("ECDSA".equals(sigalg))
@@ -1168,7 +1260,10 @@ public class SSecurity
 		
 		try
 		{
-			return verifierbuilder.build(cert);
+			if (keyinfo instanceof X509CertificateHolder)
+				return verifierbuilder.build((X509CertificateHolder) keyinfo);
+			else
+				return verifierbuilder.build(PublicKeyFactory.createKey(((SubjectPublicKeyInfo) keyinfo)));
 		}
 		catch (Exception e)
 		{
@@ -1194,40 +1289,12 @@ public class SSecurity
 		}
 	}
 	
-	/**
-	 *  Creates default algorithm secure random.
-	 */
-	private static final SecureRandom getDefaultSecureRandom()
-	{
-		String alg = "SHA1PRNG";
-		Provider p = Security.getProvider("SUN");
-		if (p != null)
-		{
-			for (Service serv : p.getServices())
-			{
-	            if (serv.getType().equals("SecureRandom"))
-	            {
-	                alg = serv.getAlgorithm();
-	                break;
-	            }
-	        }
-		}
-		try
-		{
-			return SecureRandom.getInstance(alg);
-		}
-		catch (NoSuchAlgorithmException e)
-		{
-			throw SUtil.throwUnchecked(e);
-		}
-	}
-	
-	/**
-	 *  Main for testing.
-	 */
-	public static void main(String[] args)
-	{
-		System.out.println(getSecureRandom().nextInt());
-//		SecureRandom sec = new SecureRandom();
-	}
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+//		System.out.println(getSecureRandom().nextInt());
+////		SecureRandom sec = new SecureRandom();
+//	}
 }

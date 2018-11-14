@@ -22,7 +22,7 @@ public class InformNewTargetPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected ProducerBDI producer;
+	protected ProducerAgent producer;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -40,7 +40,7 @@ public class InformNewTargetPlan
 	{
 		try
 		{
-			IFuture<Collection<ITargetAnnouncementService>> fut = producer.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("targetser");
+			IFuture<Collection<ITargetAnnouncementService>> fut = producer.getAgent().getFeature(IRequiredServicesFeature.class).getServices("targetser");
 			Collection<ITargetAnnouncementService> ansers = fut.get();
 			
 			for(ITargetAnnouncementService anser: ansers)

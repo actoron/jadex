@@ -23,13 +23,12 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSCreatedEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSIntermediateResultEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSIntermediateResultEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -61,9 +60,12 @@ import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Autostart;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.cron.CronAgent;
@@ -74,19 +76,19 @@ import jadex.platform.service.processengine.EventMapper.ModelDetails;
 /**
  *  Agent that implements the bpmn monitoring starter interface.
  */
-@Agent(autoprovide=Boolean3.TRUE)
+@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE))
 @Service
 @RequiredServices(
 {
-	@RequiredService(name="libs", type=ILibraryService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="crons", type=ICronService.class, 
-		binding=@Binding(create=true, creationinfo=@jadex.micro.annotation.CreationInfo(type="cronagent"))),
+	@RequiredService(name="libs", type=ILibraryService.class),
+	@RequiredService(name="crons", type=ICronService.class),
 })
 @ComponentTypes(
 {
 	@ComponentType(name="cronagent", clazz=CronAgent.class)
 })
+@Configurations(@Configuration(name="default", components=@Component(type="cronagent")))
+
 public class ProcessEngineAgent implements IProcessEngineService, IInternalProcessEngineService
 {
 	/** The agent. */
@@ -141,7 +143,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		final Tuple2<String, IResourceIdentifier> key = new Tuple2<String, IResourceIdentifier>(model, urid);
 
 		// find classloader for rid
-		SServiceProvider.getService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new DefaultResultListener<ILibraryService>()
 		{
 			public void resultAvailable(ILibraryService libs)
@@ -155,7 +157,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 						{
 							// load the bpmn model
 							BpmnModelLoader loader = new BpmnModelLoader();
-							final MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getComponentIdentifier().getRoot()});
+							final MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getId().getRoot()});
 							
 							// Find all instance wait activities
 							// register waitqueue events
@@ -511,60 +513,49 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		
 		Tuple2<String, IResourceIdentifier> model = new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid());
 		
-		SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IComponentManagementService>()
+		CreationInfo info = new CreationInfo(agent.getId(), det.getRid());
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
+		info.setArguments(args);
+		info.setFilename(det.getModel());
+		
+		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = agent.createComponentWithResults(info);
+		fut.addResultListener(new ConversionListener(new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid()), det.getFuture())); // Add converion listener for addmodel() future 
+		
+		fut.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 		{
-			public void resultAvailable(IComponentManagementService cms)
+			public void intermediateResultAvailable(CMSStatusEvent result)
 			{
-				CreationInfo info = new CreationInfo(agent.getComponentIdentifier(), det.getRid());
-				Map<String, Object> args = new HashMap<String, Object>();
-				args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
-				info.setArguments(args);
-	
-				ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, null, det.getModel());
-				fut.addResultListener(new ConversionListener(new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid()), det.getFuture())); // Add converion listener for addmodel() future 
-				
-				fut.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				if(result instanceof CMSCreatedEvent)
 				{
-					public void intermediateResultAvailable(CMSStatusEvent result)
-					{
-						if(result instanceof CMSCreatedEvent)
-						{
 //							System.out.println("created: "+result);
-							cont();
-						}
-					}
-					
-					public void resultAvailable(Collection<CMSStatusEvent> result)
-					{
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-						cont();
-					}
-					
-					public void finished()
-					{
-					}
-					
-					protected void cont()
-					{
-						if(creating.remove(ret))
-						{
-							ret.setResult(null);
-//							System.out.println("creating fini");
-						}
-					}
-				});
+					cont();
+				}
+			}
+			
+			public void resultAvailable(Collection<CMSStatusEvent> result)
+			{
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				exception.printStackTrace();
+				cont();
 			}
-		}));
+			
+			public void finished()
+			{
+			}
+			
+			protected void cont()
+			{
+				if(creating.remove(ret))
+				{
+					ret.setResult(null);
+//							System.out.println("creating fini");
+				}
+			}
+		});
 		
 		return ret;
 	}
@@ -587,10 +578,10 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		final Set<Object>	fwq	= wq;
 		final String	ftype	= type;
 		
-		long to = Starter.getLocalDefaultTimeout(agent.getComponentIdentifier());
+		long to = Starter.getDefaultTimeout(agent.getId());
 		if(to>0)
 		{
-			agent.getComponentFeature(IExecutionFeature.class).waitForDelay(to, new IComponentStep<Void>()
+			agent.getFeature(IExecutionFeature.class).waitForDelay(to, new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -705,7 +696,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		}
 		else
 		{
-			IFuture<ICronService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("crons");
+			IFuture<ICronService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("crons");
 			fut.addResultListener(new ExceptionDelegationResultListener<ICronService, Collection<CMSStatusEvent>>(ret2)
 			{
 				public void customResultAvailable(final ICronService crons)

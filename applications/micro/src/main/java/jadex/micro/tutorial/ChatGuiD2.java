@@ -40,7 +40,7 @@ public class ChatGuiD2 extends JFrame
 	 */
 	public ChatGuiD2(final IExternalAccess agent)
 	{
-		super(agent.getComponentIdentifier().getName());
+		super(agent.getId().getName());
 		this.setLayout(new BorderLayout());
 		
 		received = new JTextArea(10, 20);
@@ -63,7 +63,7 @@ public class ChatGuiD2 extends JFrame
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IFuture<Collection<IChatService>>	chatservices	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
+						IFuture<Collection<IChatService>>	chatservices	= ia.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 						chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 						{
 							public void resultAvailable(Collection<IChatService> result)
@@ -71,7 +71,7 @@ public class ChatGuiD2 extends JFrame
 								for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 								{
 									IChatService cs = it.next();
-									cs.message(agent.getComponentIdentifier().getName(), text);
+									cs.message(agent.getId().getName(), text);
 								}
 							}
 						});

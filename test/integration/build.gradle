@@ -13,6 +13,7 @@ dependencies
 										   
 										   // Platform
 										   ':platform:base',
+										   ':transports:tcp',
 										   
 										   // Tools
 										   ':tools:runtimetools-swing',':tools:bdi',':tools:bpmn',
@@ -27,6 +28,7 @@ dependencies
 										   ':platform:webservice-desktop-jetty',
 										   ':platform:webservice-desktop-grizzly',
 
+										   ':transports:intravm',
 										   ':transports:websockettransport',
 										   ':transports:relaytransport',
 										   ])

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -14,10 +13,8 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
 import jadex.commons.Tuple2;
@@ -36,7 +33,6 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
@@ -74,7 +70,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @Service
 @ProvidedServices(@ProvidedService(type=ICronService.class, implementation=@Implementation(expression="$pojoagent")))
-@RequiredServices(@RequiredService(name="clockser", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="clockser", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 @Configurations(
 {
 	@Configuration(name="realtime clock"),
@@ -145,18 +141,18 @@ public class CronAgent implements ICronService
 					long sleep = (min - cur);
 					if(sleep>0)
 					{
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(sleep, this);
+						agent.getFeature(IExecutionFeature.class).waitForDelay(sleep, this);
 					}
 					else
 					{
-						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(this);
+						agent.getFeature(IExecutionFeature.class).scheduleStep(this);
 					}
 					
 					return IFuture.DONE;
 				}
 			};
 			
-			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(check);
+			agent.getFeature(IExecutionFeature.class).scheduleStep(check);
 		}
 	}
 	
@@ -203,7 +199,7 @@ public class CronAgent implements ICronService
 						if(jobs.containsKey(job.getId()))
 						{
 							final IComponentStep<Void> self = this;
-							IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockser");
+							IFuture<IClockService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("clockser");
 							fut.addResultListener(new DefaultResultListener<IClockService>()
 							{
 								public void resultAvailable(IClockService clockser)
@@ -253,11 +249,11 @@ public class CronAgent implements ICronService
 //										System.out.println("waiting for: "+wait);
 										if(wait>0)
 										{
-											agent.getComponentFeature(IExecutionFeature.class).waitForDelay(wait, self);
+											agent.getFeature(IExecutionFeature.class).waitForDelay(wait, self);
 										}
 										else
 										{
-											agent.getComponentFeature(IExecutionFeature.class).scheduleStep(self);
+											agent.getFeature(IExecutionFeature.class).scheduleStep(self);
 										}
 									}
 									catch(Exception e)
@@ -271,7 +267,7 @@ public class CronAgent implements ICronService
 						return IFuture.DONE;
 					}
 				};
-				agent.getComponentFeature(IExecutionFeature.class).scheduleStep(check);
+				agent.getFeature(IExecutionFeature.class).scheduleStep(check);
 			}
 		}
 		
@@ -313,48 +309,36 @@ public class CronAgent implements ICronService
 		
 		if(useworkeragent)
 		{
-			IFuture<IComponentManagementService> fut = SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			CreationInfo ci = new CreationInfo(agent.getId());
+			ci.setFilename("jadex/platform/service/cron/WorkerAgent.class");
+			agent.createComponent(ci, null)
+//					cms.createComponent(null, "jadex/platform/service/cron/WorkerAgent.class", ci, null)
+				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
-				public void customResultAvailable(final IComponentManagementService cms)
+				public void customResultAvailable(IExternalAccess exta) 
 				{
-					CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
-//					cms.createComponent(null, "invocation", ci, null)
-					cms.createComponent(null, "jadex/platform/service/cron/WorkerAgent.class", ci, null)
-						.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+					// Set to finished before executing command to decouple from cron main task
+					ret.setResult(null);
+					
+					exta.scheduleStep(new IComponentStep<Object>()
 					{
-						public void customResultAvailable(IComponentIdentifier cid) 
+						public IFuture<Object> execute(final IInternalAccess ia)
 						{
-							cms.getExternalAccess(cid).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+							doExecuteCommand(jobtup, time).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 							{
-								public void customResultAvailable(IExternalAccess exta) 
+								public void resultAvailable(Void result)
 								{
-									// Set to finished before executing command to decouple from cron main task
-									ret.setResult(null);
-									
-									exta.scheduleStep(new IComponentStep<Object>()
-									{
-										public IFuture<Object> execute(final IInternalAccess ia)
-										{
-											doExecuteCommand(jobtup, time).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
-											{
-												public void resultAvailable(Void result)
-												{
-													ia.killComponent();
-												}
-												public void exceptionOccurred(Exception exception)
-												{
-													exception.printStackTrace();
-												}
-											}));
-											
-											return Future.getEmptyFuture();
-										}
-									});
+									ia.killComponent();
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
 								}
 							}));
+							
+							return Future.getEmptyFuture();
 						}
-					}));
+					});
 				}
 			}));
 		}

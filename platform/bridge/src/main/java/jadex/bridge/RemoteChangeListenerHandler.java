@@ -268,7 +268,7 @@ public abstract class RemoteChangeListenerHandler
 									IInternalAccess	tmp	= instance;	// instance might be set to null concurrently.
 									if(tmp!=null)
 									{
-										fut.addResultListener(tmp.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+										fut.addResultListener(tmp.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{

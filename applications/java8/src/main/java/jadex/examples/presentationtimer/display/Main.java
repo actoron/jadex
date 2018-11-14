@@ -10,9 +10,9 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
 
@@ -79,8 +79,7 @@ public class Main
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
 		fut.addResultListener(access -> {
-			IComponentManagementService cms = getCMS(access).get();
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut2 = cms.createComponent("CDDisplay", CountdownAgent.class.getName() + ".class", null);
+			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut2 = access.createComponent(new CreationInfo().setName("CDDisplay").setFilename(CountdownAgent.class.getName() + ".class"));
 			fut2.addTuple2ResultListener((IComponentIdentifier created) -> {
 				System.out.println("CDDisplay Component created.");
 			}, (Map<String, Object> terminated) -> {
@@ -88,14 +87,5 @@ public class Main
 			});
 		});
 
-	}
-
-	private IFuture<IComponentManagementService> getCMS(IExternalAccess access)
-	{
-		return access.scheduleStep(ia -> SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
-
-		// return access.scheduleStep(ia -> SServiceProvider.getService(ia,
-		// IComponentManagementService.class,
-		// RequiredServiceInfo.SCOPE_PLATFORM));
 	}
 }

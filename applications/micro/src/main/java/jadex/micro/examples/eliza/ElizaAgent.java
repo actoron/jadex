@@ -77,7 +77,7 @@ public class ElizaAgent
 		{
 		}
 		
-		final IComponentIdentifier self = ((IService)chat).getServiceIdentifier().getProviderId();
+		final IComponentIdentifier self = ((IService)chat).getServiceId().getProviderId();
 		chat.subscribeToEvents().addResultListener(new IntermediateDefaultResultListener<ChatEvent>()
 		{
 			public void intermediateResultAvailable(ChatEvent event)
@@ -126,7 +126,7 @@ public class ElizaAgent
 		
 		
 		// Regularly clean up old conversations after 5 minutes of inactivity.
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(60000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(60000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

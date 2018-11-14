@@ -12,7 +12,7 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.component.impl.MessageComponentFeature;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.IFilter;
 
 /**
@@ -42,11 +42,11 @@ public class BpmnMessageComponentFeature extends MessageComponentFeature
 	 *  Called for all messages without matching message handlers.
 	 *  Can be overwritten by specific message feature implementations (e.g. micro or BDI).
 	 */
-	protected void processUnhandledMessage(final IMsgSecurityInfos secinf, final IMsgHeader header, final Object body)
+	protected void processUnhandledMessage(final ISecurityInfo secinf, final IMsgHeader header, final Object body)
 	{
 //		System.out.println("rec msg: "+message);
 		
-		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
+		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getFeature(IBpmnComponentFeature.class);
 
 		// Iterate through process threads and dispatch message to first
 		// waiting and fitting one (filter check).

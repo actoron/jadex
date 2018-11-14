@@ -9,6 +9,8 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.CounterResultListener;
@@ -95,12 +97,12 @@ public class MessagePerformanceAgent
 				current = 1;
 				starttime = result.longValue();
 				
-				final int msgcnt = ((Integer)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("max")).intValue();
-				final int msgsize = ((Integer)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("size")).intValue();
-				boolean auto = ((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("auto")).booleanValue();
-				IComponentIdentifier receiver = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("echo")!=null
-					? (IComponentIdentifier)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("echo") : agent.getComponentIdentifier();
-				final boolean usecodec = ((Boolean)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("codec")).booleanValue();
+				final int msgcnt = ((Integer)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("max")).intValue();
+				final int msgsize = ((Integer)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("size")).intValue();
+				boolean auto = ((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("auto")).booleanValue();
+				IComponentIdentifier receiver = agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("echo")!=null
+					? (IComponentIdentifier)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("echo") : agent.getId();
+				final boolean usecodec = ((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("codec")).booleanValue();
 				
 				final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(msgcnt, true, new IResultListener<Void>()
 				{
@@ -168,7 +170,7 @@ public class MessagePerformanceAgent
 										request.put(SFipa.CONTENT, new BenchmarkMessage(scontent, true));
 									}
 									
-									IFuture<Void>	fut	= agent.getComponentFeature(IMessageFeature.class).sendMessage(receiver, request);
+									IFuture<Void>	fut	= agent.getFeature(IMessageFeature.class).sendMessage(receiver, request);
 									fut.addResultListener(crl);
 									fut.addResultListener(new IResultListener<Void>()
 									{
@@ -195,7 +197,7 @@ public class MessagePerformanceAgent
 								current = i+1;
 								if(current<=msgcnt)
 								{
-									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(0, this);
+									agent.getFeature(IExecutionFeature.class).waitForDelay(0, this);
 								}
 								else
 								{
@@ -228,12 +230,12 @@ public class MessagePerformanceAgent
 		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 //		if(auto)
 //		{
-//			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+//			agent.getFeature(IRequiredServicesFeature.class).searchService(IEchoService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 //				.addResultListener(new IResultListener<IEchoService>()
 //			{
 //				public void resultAvailable(IEchoService result)
 //				{
-//					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
+//					ret.setResult(((IService)result).getId().getProviderId());
 //				}
 //				
 //				public void exceptionOccurred(Exception exception)
@@ -261,7 +263,7 @@ public class MessagePerformanceAgent
 			System.out.println("received first message");
 		}
 		received++;
-		final int msgcnt = ((Integer)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("max")).intValue();
+		final int msgcnt = ((Integer)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("max")).intValue();
 		if(received==msgcnt)
 		{
 			getTime().addResultListener(new DefaultResultListener<Long>()
@@ -270,7 +272,7 @@ public class MessagePerformanceAgent
 				{
 					long dur = result.longValue() - starttime;
 					System.out.println("Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("result", "Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
+					agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
 					
 					future.addResultListener(new IResultListener<Void>()
 					{
@@ -295,6 +297,6 @@ public class MessagePerformanceAgent
 	 */
 	public IFuture<Long> getTime()
 	{
-		return new Future<Long>(new Long(SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime()));
+		return new Future<Long>(new Long(agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()));
 	}
 }

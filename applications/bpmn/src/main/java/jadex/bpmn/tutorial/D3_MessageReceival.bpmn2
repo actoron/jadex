@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>D3_MessageReceival</jadex:modelname>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="X9il1f1dIc+YBBQB">
     <semantic:startEvent id="NxpfTt2yxn/zHny6">

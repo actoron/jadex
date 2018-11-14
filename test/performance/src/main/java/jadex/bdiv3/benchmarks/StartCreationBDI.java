@@ -2,9 +2,7 @@ package jadex.bdiv3.benchmarks;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 
 /**
  * 
@@ -24,7 +22,6 @@ public class StartCreationBDI
 			"-cli", "false",
 //			"-awareness", "false"
 		}).get();
-		IComponentManagementService cms = SServiceProvider.getService(ea, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		cms.createComponent("CreationBDI.class", null).get();
+		ea.createComponent(new CreationInfo().setFilename("CreationBDI.class")).get();
 	}
 }

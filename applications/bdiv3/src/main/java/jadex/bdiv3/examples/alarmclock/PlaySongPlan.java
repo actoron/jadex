@@ -9,7 +9,7 @@ import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.PlaySongGoal;
+import jadex.bdiv3.examples.alarmclock.AlarmclockAgent.PlaySongGoal;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -45,7 +45,7 @@ public class PlaySongPlan
 	public void body(IInternalAccess agent)
 	{
 		final URL song = (URL)goal.getSong();
-		IThreadPoolService tp = (IThreadPoolService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("tpservice").get();
+		IThreadPoolService tp = (IThreadPoolService)agent.getFeature(IRequiredServicesFeature.class).getService("tpservice").get();
 		final ClassLoader cl = agent.getClassLoader();
 		
 		final Future<Void>	fut	= new Future<Void>();

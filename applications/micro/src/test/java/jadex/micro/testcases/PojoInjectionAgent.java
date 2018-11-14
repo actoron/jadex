@@ -47,7 +47,7 @@ public class PojoInjectionAgent extends JunitAgentTest implements IAService
 		{
 			tr.setFailed("Service component not set: "+pojo);
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		
 		return IFuture.DONE;
 	}

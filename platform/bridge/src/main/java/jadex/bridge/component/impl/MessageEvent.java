@@ -1,7 +1,7 @@
 package jadex.bridge.component.impl;
 
 import jadex.bridge.component.IMsgHeader;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 
 /**
  *  Represents the event of a sent or received message for monitoring of communication.
@@ -19,7 +19,7 @@ public class MessageEvent
 	protected Type	type;
 	
 	/** The security infos (only for received). */
-	protected IMsgSecurityInfos	secinfos;
+	protected ISecurityInfo	secinfos;
 	
 	/** The message header. */
 	protected IMsgHeader	header;
@@ -39,7 +39,7 @@ public class MessageEvent
 	/**
 	 *  Instance constructor.
 	 */
-	public MessageEvent(Type type, IMsgSecurityInfos secinfos, IMsgHeader header, Object body)
+	public MessageEvent(Type type, ISecurityInfo secinfos, IMsgHeader header, Object body)
 	{
 		this.type	= type;
 		this.secinfos	= secinfos;
@@ -68,7 +68,7 @@ public class MessageEvent
 	/**
 	 *  Get the security infos.
 	 */
-	public IMsgSecurityInfos getSecinfos()
+	public ISecurityInfo getSecinfos()
 	{
 		return secinfos;
 	}
@@ -76,7 +76,7 @@ public class MessageEvent
 	/**
 	 *  Set the security infos.
 	 */
-	public void setSecinfos(IMsgSecurityInfos secinfos)
+	public void setSecinfos(ISecurityInfo secinfos)
 	{
 		this.secinfos = secinfos;
 	}

@@ -43,7 +43,7 @@ public class ChatGuiD5 extends JFrame
 	 */
 	public ChatGuiD5(IExternalAccess agent)
 	{
-		super(agent.getComponentIdentifier().getName());
+		super(agent.getId().getName());
 		this.agent	= agent;
 		this.setLayout(new BorderLayout());
 		
@@ -67,7 +67,7 @@ public class ChatGuiD5 extends JFrame
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IIntermediateFuture<IChatService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("chatservices");
+						IIntermediateFuture<IChatService>	fut	= ia.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 						fut.addResultListener(new IIntermediateResultListener<IChatService>()
 						{
 							public void resultAvailable(Collection<IChatService> result)
@@ -77,7 +77,7 @@ public class ChatGuiD5 extends JFrame
 									IChatService cs = it.next();
 									try
 									{
-										cs.message(ChatGuiD5.this.agent.getComponentIdentifier().getName(), text);
+										cs.message(ChatGuiD5.this.agent.getId().getName(), text);
 									}
 									catch(Exception e)
 									{
@@ -89,7 +89,7 @@ public class ChatGuiD5 extends JFrame
 							public void intermediateResultAvailable(IChatService cs)
 							{
 								System.out.println("found: "+cs);
-								cs.message(ChatGuiD5.this.agent.getComponentIdentifier().getName(), text);
+								cs.message(ChatGuiD5.this.agent.getId().getName(), text);
 							}
 							
 							public void finished()

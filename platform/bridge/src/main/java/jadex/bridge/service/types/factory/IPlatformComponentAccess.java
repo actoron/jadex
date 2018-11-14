@@ -1,10 +1,14 @@
 package jadex.bridge.service.types.factory;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.PlatformComponent;
 import jadex.commons.future.IFuture;
 
 /**
@@ -41,32 +45,44 @@ public interface IPlatformComponentAccess
 	 *  
 	 *  @return A future to indicate when the initialization is done.
 	 */
-	public IFuture<Void>	init();
+	public IFuture<Void> init();
 	
 	/**
 	 *  Perform the main execution of the component (if any).
 	 *  
 	 *  @return A future to indicate when the body is done.
 	 */
-	public IFuture<Void>	body();
+	public IFuture<Void> body();
 	
 	/**
 	 *  Perform the shutdown of the component (if any).
 	 *  
 	 *  @return A future to indicate when the shutdown is done.
 	 */
-	public IFuture<Void>	shutdown();
+	public IFuture<Void> shutdown();
+	
+	/**
+	 *  Called when a child had an exception and was terminated.
+	 */
+	public IFuture<Void> childTerminated(IComponentDescription desc, Exception exception);
 	
 	/**
 	 *  Get the user view of this platform component.
 	 *  
 	 *  @return An internal access exposing user operations of the component.
 	 */
-	public IInternalAccess	getInternalAccess();
+	public IInternalAccess getInternalAccess();
+	
+	/**
+	 *  Get the platform component.
+	 *  @return The platform component.
+	 */
+	public PlatformComponent getPlatformComponent();
 	
 //	/**
 //	 *  Get the lifecycle state. 
 //	 *  @return The lifecycle state
 //	 */
 //	public ComponentLifecycleState getLifecycleState();
+
 }

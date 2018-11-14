@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -13,6 +14,7 @@ import java.util.logging.Level;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -30,12 +32,14 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.Autostart;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  Agent that provides the settings service.
  */
-@Agent(autoprovide=Boolean3.TRUE)
+@Service
+@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE, predecessors="jadex.platform.service.context.ContextAgent"))
 public class SettingsAgent	implements ISettingsService
 {
 	// -------- constants --------
@@ -83,7 +87,7 @@ public class SettingsAgent	implements ISettingsService
 	{
 		this.providers	= new LinkedHashMap<String, IPropertiesProvider>();
 		this.filename	= "properties.json";
-		settingsdir = new File(SUtil.getAppDir(), "settings_" + access.getComponentIdentifier().getPlatformPrefix());
+		settingsdir = new File(SUtil.getAppDir(), "settings_" + access.getId().getPlatformPrefix());
 		if (settingsdir.exists() && !settingsdir.isDirectory())
 		{
 			access.getLogger().log(Level.WARNING, "Invalid settings directory '" + settingsdir.getName() + "', switching to read-only.");
@@ -94,7 +98,7 @@ public class SettingsAgent	implements ISettingsService
 		//this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
 		
 		final Future<Void>	ret	= new Future<Void>();
-		//contextService = SServiceProvider.getLocalService(access, IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		//contextService = access.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 		loadProperties().addResultListener(new DelegationResultListener<Void>(ret));
 		
 		return ret;
@@ -143,7 +147,7 @@ public class SettingsAgent	implements ISettingsService
 			Properties	sub	= props.getSubproperty(id);
 			if(sub!=null)
 			{
-				provider.setProperties(sub).addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+				provider.setProperties(sub).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 			}
 			else
 			{
@@ -174,7 +178,7 @@ public class SettingsAgent	implements ISettingsService
 			if(saveonexit)
 			{
 //				provider.getProperties().addResultListener(new DelegationResultListener(ret)
-				provider.getProperties().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+				provider.getProperties().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -211,7 +215,7 @@ public class SettingsAgent	implements ISettingsService
 		if(providers.containsKey(id))
 		{
 			((IPropertiesProvider)providers.get(id)).setProperties(props)
-				.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+				.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 		}
 		else
 		{
@@ -247,7 +251,7 @@ public class SettingsAgent	implements ISettingsService
 				props = mprops;
 				
 				final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(providers.size(),
-					access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+					access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 				
 				for(Iterator<String> it=providers.keySet().iterator(); it.hasNext(); )
 				{
@@ -257,7 +261,7 @@ public class SettingsAgent	implements ISettingsService
 					Properties	sub	= props.getSubproperty(id);
 					if(sub!=null)
 					{
-						provider.setProperties(sub).addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(crl));
+						provider.setProperties(sub).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(crl));
 					}
 					else
 					{
@@ -355,7 +359,7 @@ public class SettingsAgent	implements ISettingsService
 					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		};
-		rl	= shutdown ? rl : access.getComponentFeature(IExecutionFeature.class).createResultListener(rl); 
+		rl	= shutdown ? rl : access.getFeature(IExecutionFeature.class).createResultListener(rl); 
 		final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(providers.size(), rl);
 		
 		for(Iterator<String> it=providers.keySet().iterator(); it.hasNext(); )
@@ -371,7 +375,7 @@ public class SettingsAgent	implements ISettingsService
 					crl.resultAvailable(null);
 				}
 			};
-			rl	= shutdown ? rl : access.getComponentFeature(IExecutionFeature.class).createResultListener(rl); 
+			rl	= shutdown ? rl : access.getFeature(IExecutionFeature.class).createResultListener(rl); 
 			provider.getProperties().addResultListener(rlp);
 		}
 		
@@ -465,7 +469,7 @@ public class SettingsAgent	implements ISettingsService
 	{
 		if (!readonly)
 		{
-			FileOutputStream os = null;
+			OutputStream os = null;
 			
 			File file = (new File(settingsdir, id + ".json")).getAbsoluteFile();
 			File tmpfile = null;
@@ -473,15 +477,8 @@ public class SettingsAgent	implements ISettingsService
 			try
 			{
 				tmpfile = File.createTempFile(file.getName(), ".tmp");
-				ArrayList<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>(JsonTraverser.writeprocs.size() + 1);
-				procs.addAll(JsonTraverser.writeprocs);
-				procs.add(procs.size() - 1, new JsonAuthenticationSecretProcessor());
-				String json = JsonTraverser.objectToString(state,
-											 getClass().getClassLoader(),
-											 true, false,
-											 null, null,
-											 procs);
-				json = JsonTraverser.prettifyJson(json);
+				
+				String json = toJson(state);
 				
 				os = new FileOutputStream(tmpfile);
 				os.write(json.getBytes(SUtil.UTF8));
@@ -517,11 +514,8 @@ public class SettingsAgent	implements ISettingsService
 		
 		try
 		{
-			ArrayList<ITraverseProcessor> rprocs = new ArrayList<ITraverseProcessor>(JsonTraverser.readprocs.size() + 1);
-			rprocs.addAll(JsonTraverser.readprocs);
-			rprocs.add(rprocs.size() - 2, new JsonAuthenticationSecretProcessor());
 			String json = new String(SUtil.readFile(file), SUtil.UTF8);
-			Object state = JsonTraverser.objectFromString(json, getClass().getClassLoader(), null, null, rprocs);
+			Object state = fromJson(json);
 			ret.setResult(state);
 		}
 		catch (Exception e)
@@ -529,6 +523,102 @@ public class SettingsAgent	implements ISettingsService
 			ret.setResultIfUndone(null);
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Directly saves a file in the settings directory.
+	 *  
+	 *  @param filename Name of the file.
+	 *  @param content The file content.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> saveFile(String filename, byte[] content)
+	{
+		Future<Void> ret = new Future<>();
+		File file = (new File(settingsdir, filename)).getAbsoluteFile();
+		OutputStream os = null;
+		try
+		{
+			File tmpfile = File.createTempFile(filename, ".tmp");
+			os =  new FileOutputStream(tmpfile);
+			os.write(content);
+			SUtil.close(os);
+			SUtil.moveFile(tmpfile, file);
+			ret.setResult(null);
+		}
+		catch (Exception e)
+		{
+			ret.setException(e);
+		}
+		finally
+		{
+			SUtil.close(os);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Directly loads a file from the settings directory.
+	 *  
+	 *  @param filename Name of the file.
+	 *  @return Content of the file or null if not found.
+	 */
+	public IFuture<byte[]> loadFile(String filename)
+	{
+		Future<byte[]> ret = new Future<>();
+		File file = (new File(settingsdir, filename)).getAbsoluteFile();
+		if (file.exists())
+		{
+			try
+			{
+				byte[] content = SUtil.readFile(file);
+				ret.setResult(content);
+			}
+			catch (Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Converts object to JSON.
+	 * 
+	 *  @param object Object.
+	 *  @return JSON string.
+	 */
+	public static final String toJson(Object object)
+	{
+		ArrayList<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>(JsonTraverser.writeprocs.size() + 1);
+		procs.addAll(JsonTraverser.writeprocs);
+		procs.add(procs.size() - 1, new JsonAuthenticationSecretProcessor());
+		String json = JsonTraverser.objectToString(object,
+									 SettingsAgent.class.getClassLoader(),
+									 true, false,
+									 null, null,
+									 procs);
+		json = JsonTraverser.prettifyJson(json);
+		return json;
+	}
+	
+	/**
+	 *  Converts JSON to object.
+	 * 
+	 *  @param json JSON.
+	 *  @return Object.
+	 */
+	public static final Object fromJson(String json)
+	{
+		ArrayList<ITraverseProcessor> rprocs = new ArrayList<ITraverseProcessor>(JsonTraverser.readprocs.size() + 1);
+		rprocs.addAll(JsonTraverser.readprocs);
+		rprocs.add(rprocs.size() - 2, new JsonAuthenticationSecretProcessor());
+		Object ret = JsonTraverser.objectFromString(json, SettingsAgent.class.getClassLoader(), null, null, rprocs);
 		return ret;
 	}
 }

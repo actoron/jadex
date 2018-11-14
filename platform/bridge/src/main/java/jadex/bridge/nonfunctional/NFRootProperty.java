@@ -2,9 +2,6 @@ package jadex.bridge.nonfunctional;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -54,8 +51,8 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 			this.injected = true;
 			
 			// Add property to root component
-			IComponentManagementService cms = SServiceProvider.getLocalService(comp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			cms.getExternalAccess(comp.getComponentIdentifier().getRoot()).addResultListener(new DefaultResultListener<IExternalAccess>()
+//			IComponentManagementService cms = comp.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
+			comp.getExternalAccess(comp.getId().getRoot()).addResultListener(new DefaultResultListener<IExternalAccess>()
 			{
 				public void resultAvailable(IExternalAccess root)
 				{
@@ -65,7 +62,7 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 //					((INFPropertyProvider)root.getExternalComponentFeature(INFPropertyComponentFeature.class)).addNFProperty(new NFPropertyRef<T, U>((INFPropertyProvider)comp.getExternalAccess().getExternalComponentFeature(INFPropertyComponentFeature.class), root, cmi)).addResultListener(new DelegationResultListener<Void>(ret));
 					
 					NFPropertyRef<T, U> pr = new NFPropertyRef<T, U>(comp.getExternalAccess(), cmi, null, null);
-					SNFPropertyProvider.addNFProperty(root, pr).addResultListener(new DelegationResultListener<Void>(ret));
+					root.addNFProperty(pr).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -87,7 +84,7 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 		if(root!=null && injected)
 		{
 //			((INFPropertyProvider)root.getExternalComponentFeature(INFPropertyComponentFeature.class)).removeNFProperty(getName());//.addResultListener(new DelegationResultListener<Void>(ret));
-			SNFPropertyProvider.removeNFProperty(root, getName()).addResultListener(new IResultListener<Void>()
+			root.removeNFProperty(getName()).addResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{

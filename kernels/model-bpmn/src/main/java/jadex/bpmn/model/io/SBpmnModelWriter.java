@@ -210,29 +210,30 @@ public class SBpmnModelWriter
 		}
 		
 		boolean suspend = Boolean.TRUE.equals(mmodel.getModelInfo().getSuspend(null));
-		boolean master = Boolean.TRUE.equals(mmodel.getModelInfo().getMaster(null));
-		boolean daemon = Boolean.TRUE.equals(mmodel.getModelInfo().getDaemon(null));
-		boolean autoshutdown = Boolean.TRUE.equals(mmodel.getModelInfo().getAutoShutdown(null));
+//		boolean master = Boolean.TRUE.equals(mmodel.getModelInfo().getMaster(null));
+//		boolean daemon = Boolean.TRUE.equals(mmodel.getModelInfo().getDaemon(null));
+//		boolean autoshutdown = Boolean.TRUE.equals(mmodel.getModelInfo().getAutoShutdown(null));
 		boolean synchronous = Boolean.TRUE.equals(mmodel.getModelInfo().getSynchronous(null));
-		boolean persistable = Boolean.TRUE.equals(mmodel.getModelInfo().getPersistable(null));
+//		boolean persistable = Boolean.TRUE.equals(mmodel.getModelInfo().getPersistable(null));
 		String monitoring = mmodel.getModelInfo().getMonitoring(null)!=null ? mmodel.getModelInfo().getMonitoring(null).toString() : null;
 		boolean keepalive = Boolean.TRUE.equals(mmodel.isKeepAlive());
 		
-		if (suspend || master || daemon || autoshutdown || monitoring!=null || synchronous || keepalive)
+		if (suspend || monitoring!=null || synchronous || keepalive)
+//		if (suspend || master || daemon || autoshutdown || monitoring!=null || synchronous || keepalive)
 		{
 			out.print(getIndent(ind));
 			out.print("<jadex:componentflags suspend=\"");
 			out.print(escapeString(String.valueOf(suspend)));
 			out.print("\" master=\"");
-			out.print(escapeString(String.valueOf(master)));
-			out.print("\" daemon=\"");
-			out.print(escapeString(String.valueOf(daemon)));
-			out.print("\" autoshutdown=\"");
-			out.print(escapeString(String.valueOf(autoshutdown)));
+//			out.print(escapeString(String.valueOf(master)));
+//			out.print("\" daemon=\"");
+//			out.print(escapeString(String.valueOf(daemon)));
+//			out.print("\" autoshutdown=\"");
+//			out.print(escapeString(String.valueOf(autoshutdown)));
 			out.print("\" synchronous=\"");
 			out.print(escapeString(String.valueOf(synchronous)));
-			out.print("\" persistable=\"");
-			out.print(escapeString(String.valueOf(persistable)));
+//			out.print("\" persistable=\"");
+//			out.print(escapeString(String.valueOf(persistable)));
 			if(monitoring!=null)
 			{
 				out.print("\" monitoring=\"");
@@ -528,7 +529,7 @@ public class SBpmnModelWriter
 	 */
 	protected static final void writeRequiredServices(PrintStream out, int ind, MBpmnModel mmodel)
 	{
-		RequiredServiceInfo[] rss = mmodel.getModelInfo().getRequiredServices();
+		RequiredServiceInfo[] rss = mmodel.getModelInfo().getServices();
 		if (rss != null && rss.length > 0)
 		{
 			out.print(getIndent(ind));
@@ -563,13 +564,14 @@ public class SBpmnModelWriter
 						out.print(escapeString(scope));
 					}
 					
-					boolean dyn = rs.getDefaultBinding().isDynamic();
-					out.print("\" dynamic=\"");
-					out.print(dyn);
-					
-					boolean create = rs.getDefaultBinding().isCreate();
-					out.print("\" create=\"");
-					out.print(create);
+					// dropped in v4???
+//					boolean dyn = rs.getDefaultBinding().isDynamic();
+//					out.print("\" dynamic=\"");
+//					out.print(dyn);
+//					
+//					boolean create = rs.getDefaultBinding().isCreate();
+//					out.print("\" create=\"");
+//					out.print(create);
 				}
 				
 				out.println("\"/>");
@@ -633,26 +635,26 @@ public class SBpmnModelWriter
 					out.print("\"");
 				}
 				
-				if (conf.getMaster() != null)
-				{
-					out.print(" master=\"");
-					out.print(conf.getMaster().booleanValue());
-					out.print("\"");
-				}
-				
-				if (conf.getDaemon() != null)
-				{
-					out.print(" daemon=\"");
-					out.print(conf.getDaemon().booleanValue());
-					out.print("\"");
-				}
-				
-				if (conf.getAutoShutdown() != null)
-				{
-					out.print(" autoshutdown=\"");
-					out.print(conf.getAutoShutdown().booleanValue());
-					out.print("\"");
-				}
+//				if (conf.getMaster() != null)
+//				{
+//					out.print(" master=\"");
+//					out.print(conf.getMaster().booleanValue());
+//					out.print("\"");
+//				}
+//				
+//				if (conf.getDaemon() != null)
+//				{
+//					out.print(" daemon=\"");
+//					out.print(conf.getDaemon().booleanValue());
+//					out.print("\"");
+//				}
+//				
+//				if (conf.getAutoShutdown() != null)
+//				{
+//					out.print(" autoshutdown=\"");
+//					out.print(conf.getAutoShutdown().booleanValue());
+//					out.print("\"");
+//				}
 
 				if (conf.getSynchronous() != null)
 				{
@@ -661,12 +663,12 @@ public class SBpmnModelWriter
 					out.print("\"");
 				}
 
-				if (conf.getPersistable() != null)
-				{
-					out.print(" persistable=\"");
-					out.print(conf.getPersistable().booleanValue());
-					out.print("\"");
-				}
+//				if (conf.getPersistable() != null)
+//				{
+//					out.print(" persistable=\"");
+//					out.print(conf.getPersistable().booleanValue());
+//					out.print("\"");
+//				}
 
 				out.println(">");
 				++ind;
@@ -820,7 +822,7 @@ public class SBpmnModelWriter
 					out.println("</jadex:providedserviceconfigurations>");
 				}
 				
-				RequiredServiceInfo[] rss = conf.getRequiredServices();
+				RequiredServiceInfo[] rss = conf.getServices();
 				if (rss != null && rss.length > 0)
 				{
 					out.print(getIndent(ind));

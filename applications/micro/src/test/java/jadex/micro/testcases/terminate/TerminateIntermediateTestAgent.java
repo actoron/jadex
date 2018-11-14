@@ -4,9 +4,11 @@ package jadex.micro.testcases.terminate;
 import java.util.Collection;
 
 import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
@@ -16,6 +18,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Properties;
 
 /**
  *  The intermediate invoker agent tests if intermediate futures can be terminated
@@ -24,6 +27,7 @@ import jadex.micro.annotation.Description;
 @Agent
 @Description("The intermediate invoker agent tests if intermediate futures can be terminated " +
 	"in local and remote cases.")
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class TerminateIntermediateTestAgent extends TerminateTestAgent
 {
 	/**
@@ -35,7 +39,7 @@ public class TerminateIntermediateTestAgent extends TerminateTestAgent
 		
 		int	max	= 3;
 		final ITerminableIntermediateFuture<String> fut = service.getResults(delay, max);
-		fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
+		fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<String>()
 		{
 			public void resultAvailable(Collection<String> result)
 			{
@@ -62,7 +66,7 @@ public class TerminateIntermediateTestAgent extends TerminateTestAgent
 			}
 		}));
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay*(max-1)+delay/2, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(delay*(max-1)+delay/2, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -71,7 +75,7 @@ public class TerminateIntermediateTestAgent extends TerminateTestAgent
 			}
 		});
 		
-		final Future<TestReport>	ret	= new Future<TestReport>();
+		final Future<TestReport> ret = new Future<TestReport>();
 		final TestReport tr = new TestReport("#"+testno, "Tests if intermediate future is terminated");
 		tmp.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 		{

@@ -1,12 +1,12 @@
 package jadex.platform.service.parallelizer;
 
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -25,11 +25,12 @@ import jadex.platform.service.servicepool.IServicePoolService;
 		implementation=@Implementation(MappingService.class)))
 @RequiredServices(
 {
-	@RequiredService(name="poolser", type=IServicePoolService.class, binding=@Binding(
-		scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationinfo=@CreationInfo(type="spa"))),
+	@RequiredService(name="poolser", type=IServicePoolService.class),
 	@RequiredService(name="seqser", type=ISequentialService.class)
 })
 @ComponentTypes(@ComponentType(name="spa", filename="jadex.platform.service.servicepool.ServicePoolAgent.class"))
+@Configurations(@Configuration(name="default", components=@Component(type="spa")))
+
 public class ParAgent 
 {
 }

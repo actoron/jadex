@@ -8,7 +8,9 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.SReflect;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
@@ -17,6 +19,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IUndoneIntermediateResultListener;
 import jadex.commons.future.IUndoneResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.SGUI;
 
 /**
  *
@@ -30,6 +33,9 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	
 	/** The undone flag. */
 	protected boolean undone;
+	
+//	/** Future for clock advancement blocking. */
+//	protected Future<Void>	adblock;
 	
 	//-------- constructors --------
 
@@ -94,6 +100,8 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	public SwingIntermediateResultListener(final IIntermediateResultListener<E> listener)
 	{
 		this.listener = listener;
+		
+//		adblock	= SSimulation.block();
 	}
 	
 	//-------- methods --------
@@ -107,23 +115,13 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	 */
 	public void resultAvailable(final Collection<E> result)
 	{
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-//					if(SwingUtilities.isEventDispatchThread())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			customResultAvailable(result);
-		}
-		else
-		{
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					customResultAvailable(result);
-				}
-			});
-		}
+				customResultAvailable(result);
+			}
+		});
 	}
 	
 	/**
@@ -132,25 +130,13 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	 */
 	public void exceptionOccurred(final Exception exception)
 	{
-		// exception.printStackTrace();
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-	//		if(SwingUtilities.isEventDispatchThread())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			customExceptionOccurred(exception);			
-		}
-		else
-		{
-	//			Thread.dumpStack();
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					customExceptionOccurred(exception);
-				}
-			});
-		}
+				customExceptionOccurred(exception);			
+			}
+		});
 	}
 	
 	/**
@@ -159,23 +145,13 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	 */
 	public void intermediateResultAvailable(final E result)
 	{
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-//			if(SwingUtilities.isEventDispatchThread())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			customIntermediateResultAvailable(result);
-		}
-		else
-		{
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					customIntermediateResultAvailable(result);
-				}
-			});
-		}
+				customIntermediateResultAvailable(result);
+			}
+		});
 	}
 	
 	/**
@@ -187,23 +163,13 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
      */
     public void finished()
     {
-    	// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-//    		if(SwingUtilities.isEventDispatchThread())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			customFinished();
-		}
-		else
-		{
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					customFinished();
-				}
-			});
-		}
+				customFinished();
+			}
+		});
     }
 	
     /**
@@ -274,24 +240,13 @@ public class SwingIntermediateResultListener<E> implements IIntermediateFutureCo
 	 */
 	final public void commandAvailable(final Object command)
 	{
-		// Hack!!! When triggered from shutdown hook, swing might be terminated
-		// and invokeLater has no effect (grrr).
-		if(!SReflect.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
-//		if(SwingUtilities.isEventDispatchThread())
+		SGUI.invokeLaterSimBlock(new Runnable()
 		{
-			customCommandAvailable(command);			
-		}
-		else
-		{
-//			Thread.dumpStack();
-			SwingUtilities.invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					customCommandAvailable(command);
-				}
-			});
-		}
+				customCommandAvailable(command);
+			}
+		});
 	}
 	
 	/**

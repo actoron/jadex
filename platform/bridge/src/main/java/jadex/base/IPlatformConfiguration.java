@@ -20,8 +20,8 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
     /** The configuration to use. **/
     public static final String CONFIGURATION_NAME = "configname"; // class: String default: "auto"
     
-    /** Automatically shut down the platform when no user agents are running anymore. **/
-    public static final String AUTOSHUTDOWN = "autoshutdown"; // class: boolean default: false
+//    /** Automatically shut down the platform when no user agents are running anymore. **/
+//    public static final String AUTOSHUTDOWN = "autoshutdown"; // class: boolean default: false
     
     /** Tell the starter to use the default platform component implementation (usually no need to change). **/
     public static final String PLATFORM_COMPONENT = "platformcomponent"; // class: Class default: jadex.platform.service.cms.PlatformComponent.class
@@ -98,14 +98,14 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 //    public static final Set<String> RESERVED = PlatformConfigurationHandler.createReserved();
     
     //-------- Kernel constants. --------
-  	public static final String KERNEL_COMPONENT = "component";
-  	public static final String KERNEL_APPLICATION = "application";
-  	public static final String KERNEL_MICRO = "micro";
-  	public static final String KERNEL_BPMN = "bpmn";
-  	public static final String KERNEL_BDIV3 = "bdiv3";
-  	public static final String KERNEL_BDI = "bdi";
-  	public static final String KERNEL_BDIBPMN = "bdibpmn";
-  	public static final String KERNEL_MULTI = "multi";
+//  	public static final String KERNEL_COMPONENT = "component";
+//  	public static final String KERNEL_APPLICATION = "application";
+//  	public static final String KERNEL_MICRO = "micro";
+//  	public static final String KERNEL_BPMN = "bpmn";
+//  	public static final String KERNEL_BDIV3 = "bdiv3";
+//  	public static final String KERNEL_BDI = "bdi";
+//  	public static final String KERNEL_BDIBPMN = "bdibpmn";
+//  	public static final String KERNEL_MULTI = "multi";
 
   	//-------- Awareness mechanisms. --------
   	/** Uses IPv4 broadcast to announce awareness infos in local networks.
@@ -195,7 +195,7 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
       // false
 
       /** Logging level for platform. **/
-      public static final String	LOGGING_LEVEL		= "logging_level";							// class:
+      public static final String	LOGGING_LEVEL		= "logginglevel";							// class:
       // java.util.logging.Level
       // default:
       // java.util.logging.Level.SEVERE
@@ -220,6 +220,12 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
 
       /** Flag if CIDs may be reused (true for not). **/
       public static final String	UNIQUEIDS			= "uniqueids";								// class:
+      // boolean
+      // default:
+      // true
+      
+      /** Flag if CIDs may be reused (true for not). **/
+      public static final String	PLATFORMPROXIES = "platformproxies";								// class:
       // boolean
       // default:
       // true
@@ -802,20 +808,20 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      */
     public void setSuperpeerClient(boolean value);
     
-//  /**
-//  *  Get the kernel names.
-//  *  @return The kernel names.
-//  */
-//// public IRootComponentConfiguration.KERNEL[] getKernels();
-    public String[] getKernels();
-//
-// /**
-//  *  Set the kernel names.
-//  *  @param value The kernel names.
-//  */
-    public void setKernels(String... value);
-//
-//// public void setKernels(IRootComponentConfiguration.KERNEL... value);
+////  /**
+////  *  Get the kernel names.
+////  *  @return The kernel names.
+////  */
+////// public IRootComponentConfiguration.KERNEL[] getKernels();
+//    public String[] getKernels();
+////
+//// /**
+////  *  Set the kernel names.
+////  *  @param value The kernel names.
+////  */
+//    public void setKernels(String... value);
+////
+////// public void setKernels(IRootComponentConfiguration.KERNEL... value);
 	
 	 /**
      *  Get the network name (used at startup).

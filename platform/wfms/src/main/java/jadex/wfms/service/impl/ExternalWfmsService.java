@@ -81,7 +81,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 	{
 		final Future ret = new Future();
 		final IComponentIdentifier client = ServiceCall.getCurrentInvocation().getCaller();
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().searchService( new ServiceQuery<>( IAAAService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -99,7 +99,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 	{
 		final Future ret = new Future();
 		final IComponentIdentifier client = ServiceCall.getCurrentInvocation().getCaller();
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class)
+		ia.getServiceContainer().searchService( new ServiceQuery<>( IAAAService.class))
 			.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -118,7 +118,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 	{
 		final Future ret = new Future();
 		final IComponentIdentifier client = ServiceCall.getCurrentInvocation().getCaller();
-		SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().searchService( new ServiceQuery<>( IAAAService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -155,7 +155,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IExecutionService.class).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IExecutionService, IComponentIdentifier>(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IExecutionService.class)).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IExecutionService, IComponentIdentifier>(ret)
 				{
 					public void customResultAvailable(IExecutionService result)
 					{
@@ -163,7 +163,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 					}
 				}));
 				//(ia.createResultListener(new ExceptionDelegationResultListener(ret)
-				/*SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				/*ia.getServiceContainer().searchService( new ServiceQuery<>( IModelRepositoryService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -172,7 +172,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 							public void customResultAvailable(Object result)
 							{
 								final String filename = (String) result;
-								SServiceProvider.getService(ia.getServiceContainer(), IExecutionService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								ia.getServiceContainer().searchService( new ServiceQuery<>( IExecutionService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
@@ -202,7 +202,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IModelRepositoryService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -226,7 +226,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IAAAService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -235,7 +235,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 							public void customResultAvailable(Object result)
 							{
 								final String username = (String) result;
-								SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
@@ -266,7 +266,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IAAAService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -275,7 +275,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 							public void customResultAvailable(Object result)
 							{
 								final String username = (String) result;
-								SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
@@ -306,7 +306,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IAAAService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -315,7 +315,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 							public void customResultAvailable(Object result)
 							{
 								final String username = (String) result;
-								SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
@@ -347,7 +347,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IAAAService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -356,7 +356,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 							public void customResultAvailable(Object result)
 							{
 								final String username = (String) result;
-								SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
@@ -386,7 +386,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IAAAService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IAAAService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -395,7 +395,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 							public void customResultAvailable(Object result)
 							{
 								final String username = (String) result;
-								SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+								ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
@@ -426,7 +426,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -453,7 +453,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -480,7 +480,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -507,7 +507,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -533,7 +533,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DefaultResultListener()
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IModelRepositoryService.class)).addResultListener(ia.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -558,7 +558,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DefaultResultListener()
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IModelRepositoryService.class)).addResultListener(ia.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -583,7 +583,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IModelRepositoryService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -610,7 +610,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IModelRepositoryService, IModelInfo>(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IModelRepositoryService.class)).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IModelRepositoryService, IModelInfo>(ret)
 				{
 					public void customResultAvailable(IModelRepositoryService result)
 					{
@@ -638,7 +638,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IModelRepositoryService, IModelInfo>(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IModelRepositoryService.class)).addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IModelRepositoryService, IModelInfo>(ret)
 				{
 					public void customResultAvailable(IModelRepositoryService result)
 					{
@@ -664,7 +664,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IModelRepositoryService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -692,7 +692,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IModelRepositoryService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -720,7 +720,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IModelRepositoryService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IModelRepositoryService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -748,7 +748,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -776,7 +776,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -805,7 +805,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -833,7 +833,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IWorkitemHandlerService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IWorkitemHandlerService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -862,7 +862,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), ILogService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( ILogService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -890,7 +890,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), ILogService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( ILogService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -918,7 +918,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IExecutionService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IExecutionService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -946,7 +946,7 @@ public class ExternalWfmsService implements IExternalWfmsService
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IExecutionService.class).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				ia.getServiceContainer().searchService( new ServiceQuery<>( IExecutionService.class)).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{

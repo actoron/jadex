@@ -1,7 +1,6 @@
 package jadex.bpmn.editor;
 
 import java.awt.EventQueue;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;

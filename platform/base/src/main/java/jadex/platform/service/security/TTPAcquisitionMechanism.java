@@ -116,7 +116,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 //				ITransportComponentIdentifier tttpcid = (ITransportComponentIdentifier)ttpcid;
 //				if(tttpcid.getAddresses()!=null && tttpcid.getAddresses().length>0)
 //				{
-//					SServiceProvider.getService(getSecurityService().getComponent(), ttpcid, ISecurityService.class)
+//					getSecurityService().getComponent().searchService( new ServiceQuery<>( ttpcid, ISecurityService.class))
 //						.addResultListener(new DelegationResultListener<ISecurityService>(ret)
 //					{
 //						public void customResultAvailable(final ISecurityService ss)
@@ -144,7 +144,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 //					
 //					public void intermediateResultAvailable(final ISecurityService ss)
 //					{
-//						if(!found && ((IService)ss).getServiceIdentifier().getProviderId().getPlatformPrefix().equals(ttpcid.getName()))
+//						if(!found && ((IService)ss).getId().getProviderId().getPlatformPrefix().equals(ttpcid.getName()))
 //						{
 //							found = true;
 //							verifyTTP(ss).addResultListener(new ExceptionDelegationResultListener<Void, ISecurityService>(ret)

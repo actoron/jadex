@@ -23,7 +23,7 @@ public class MathAgent
 	public IFuture<Void> agentCreated()
 	{
 		//agent.getComponentFeature(IProvidedServicesFeature.class)
-		agent.getComponentFeature(IProvidedServicesFeature.class).addService("mathservice", IMathService.class, new MathService(agent.getComponentIdentifier()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+		agent.getFeature(IProvidedServicesFeature.class).addService("mathservice", IMathService.class, new MathService(agent.getId()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 		return IFuture.DONE;
 	}
 }

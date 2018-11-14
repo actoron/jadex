@@ -3,6 +3,7 @@ package jadex.bdiv3.testcases.misc;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.commons.Boolean3;
@@ -14,7 +15,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test using injected values in init expressions or constructors.
  */
-@Agent(keepalive=Boolean3.FALSE)
+@Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class InitExpressionsBDI
 {
@@ -28,7 +29,7 @@ public class InitExpressionsBDI
 	protected IInternalAccess	agent;
 	
 	/** The agent name. */
-	protected String	name1	= agent.getComponentIdentifier().getName();
+	protected String	name1	= agent.getId().getName();
 	
 	/** The agent name. */
 	protected String	name2;
@@ -40,7 +41,7 @@ public class InitExpressionsBDI
 	 */
 	public InitExpressionsBDI()
 	{
-		this.name2	= agent.getComponentIdentifier().getName();
+		this.name2	= agent.getId().getName();
 	}
 	 
 	
@@ -53,25 +54,25 @@ public class InitExpressionsBDI
 	public void	body()
 	{
 		TestReport	tr1	= new TestReport("#1", "Test if field expression works.");
-		if(agent.getComponentIdentifier().getName().equals(name1))
+		if(agent.getId().getName().equals(name1))
 		{			
 			tr1.setSucceeded(true);
 		}
 		else
 		{
-			tr1.setReason("Values do not match: "+agent.getComponentIdentifier().getName()+", "+name1);
+			tr1.setReason("Values do not match: "+agent.getId().getName()+", "+name1);
 		}
 		
 		TestReport	tr2	= new TestReport("#2", "Test if field expression works.");
-		if(agent.getComponentIdentifier().getName().equals(name2))
+		if(agent.getId().getName().equals(name2))
 		{			
 			tr2.setSucceeded(true);
 		}
 		else
 		{
-			tr2.setReason("Values do not match: "+agent.getComponentIdentifier().getName()+", "+name2);
+			tr2.setReason("Values do not match: "+agent.getId().getName()+", "+name2);
 		}
 
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 	}
 }

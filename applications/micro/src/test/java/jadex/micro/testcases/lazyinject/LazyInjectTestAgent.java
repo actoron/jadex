@@ -13,10 +13,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.IFunctionalExceptionListener;
 import jadex.commons.future.IFunctionalIntermediateFinishedListener;
@@ -27,10 +26,11 @@ import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -46,14 +46,15 @@ import jadex.micro.annotation.Results;
 })
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class,
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT, create=true, creationinfo=@CreationInfo(type="provider"))),
+	@RequiredService(name="ts", type=ITestService.class),
 })
+@Configurations(@Configuration(name="default", components=@Component(type="provider")))
+
 @Results(@Result(name="testresults", clazz=Testcase.class))
 // Scope global causes search timeouts -> increase test timeout to exceed search timeout
 // Hangs with jadex_deftimeout -1 when incompatible platforms are online, because global search does not return and creation binding never happens :(
 @Properties(
-	@NameValue(name="test.timeout", value="jadex.base.Starter.getScaledLocalDefaultTimeout(null, 1.5)"))
+	@NameValue(name="test.timeout", value="jadex.base.Starter.getScaledDefaultTimeout(null, 1.5)"))
 public class LazyInjectTestAgent extends JunitAgentTest
 {
 	@Agent
@@ -75,7 +76,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 		tuple2FutureTest();
 	}
 
-	private void intermediateFutureTest() {
+	private void intermediateFutureTest() 
+	{
 		IIntermediateFuture<String> fut = ts.getIntermediateResults();
 
 		System.out.println("If test fails after this line, lazy delegation is broken");
@@ -98,26 +100,33 @@ public class LazyInjectTestAgent extends JunitAgentTest
 		final TestReport tr2 = new TestReport("#2", "Test if functional listener works.");
 		reports.add(tr2);
 
-		fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<String>() {
+		fut.addIntermediateResultListener(new IFunctionalIntermediateResultListener<String>() 
+		{
 			@Override
-			public void intermediateResultAvailable(String result) {
-
+			public void intermediateResultAvailable(String result) 
+			{
 				System.out.println("first: " + result);
-				if ("hello".equals(result)) {
+				if ("hello".equals(result)) 
+				{
 					tr2.setSucceeded(true);
-				} else {
+				} 
+				else 
+				{
 					tr2.setFailed("Received wrong results.");
 				}
 				checkFinished();
 			}
-		}, new IFunctionalIntermediateFinishedListener<Void>() {
+		}, new IFunctionalIntermediateFinishedListener<Void>() 
+		{
 			@Override
-			public void finished() {
+			public void finished() 
+			{
 				// should not happen as finish is never called
 				tr2.setFailed(new Exception("finish unexpected"));
 				checkFinished();
 			}
-		}, new IFunctionalExceptionListener() {
+		}, new IFunctionalExceptionListener() 
+		{
 			@Override
 			public void exceptionOccurred(Exception exception) {
 				System.out.println("ex: "+exception);
@@ -128,7 +137,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 
 	}
 
-	private void tuple2FutureTest() {
+	private void tuple2FutureTest() 
+	{
 		ITuple2Future<String, Integer> fut = ts.getFirstTupleResult();
 
 		System.out.println("If test fails after this line, lazy delegation is broken");
@@ -156,7 +166,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			public void firstResultAvailable(String result)
 			{
 				System.out.println("first: "+result);
-				if("hello".equals(result)) {
+				if("hello".equals(result)) 
+				{
 					tr2.setSucceeded(true);
 				}
 				else
@@ -196,16 +207,13 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			finished = finished && report.isFinished();
 		}
 
-
 		if(finished)
 		{
 			tc.setReports(reports.toArray(new TestReport[reports.size()]));
-			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 			agent.killComponent();
 		}
 	}
-
-
 	
 	/**
 	 *  Starter for testing.
@@ -224,7 +232,7 @@ public class LazyInjectTestAgent extends JunitAgentTest
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					SServiceProvider.getLocalService(ia, IComponentManagementService.class).createComponent(LazyInjectTestAgent.class.getCanonicalName() + ".class", null).getSecondResult();
+					ia.createComponent(new CreationInfo().setFilename(LazyInjectTestAgent.class.getCanonicalName() + ".class")).getSecondResult();
 					System.out.println("Step done.");
 					return IFuture.DONE;
 				}

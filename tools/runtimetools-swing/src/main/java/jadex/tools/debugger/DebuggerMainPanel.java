@@ -21,11 +21,9 @@ import javax.swing.SwingUtilities;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
@@ -90,26 +88,25 @@ public class DebuggerMainPanel extends JSplitPane
 		this.setOneTouchExpandable(true);
 		setDividerLocation(0.3);
 				
-		SServiceProvider.getService(jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DebuggerMainPanel.this)
-		{
-			public void customResultAvailable(final IComponentManagementService	cms)
+		// The right panel (step & custom tabs)
+		JPanel	rightpanel	= new JPanel();
+		setRightComponent(rightpanel);
+		rightpanel.setLayout(new GridBagLayout());
+		
+		final JTabbedPane tabs = new JTabbedPane();	
+		
+		jcc.getPlatformAccess().getExternalAccess(desc.getName())
+			.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
+		{			
+			public void resultAvailable(final IExternalAccess exta)
 			{
-				// The right panel (step & custom tabs)
-				JPanel	rightpanel	= new JPanel();
-				setRightComponent(rightpanel);
-				rightpanel.setLayout(new GridBagLayout());
-				
-				final JTabbedPane tabs = new JTabbedPane();	
-				
-				cms.getExternalAccess(desc.getName())
-					.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
+				// The left panel (breakpoints)
+				final BreakpointPanel[] leftpanel = new BreakpointPanel[1];
+				exta.getModelAsync().addResultListener(new SwingResultListener<IModelInfo>(new IResultListener<IModelInfo>()
 				{			
-					public void resultAvailable(final IExternalAccess exta)
+					public void resultAvailable(final IModelInfo model)
 					{
-						// The left panel (breakpoints)
-						final BreakpointPanel[] leftpanel = new BreakpointPanel[1];
-						String[] bps = exta.getModel().getBreakpoints();
+						String[] bps = model.getBreakpoints();
 						if(bps!=null && bps.length>0)
 						{
 							leftpanel[0] = new BreakpointPanel(bps, desc, jcc.getPlatformAccess(), jcc.getCMSHandler());
@@ -137,14 +134,14 @@ public class DebuggerMainPanel extends JSplitPane
 									{
 										public void customResultAvailable(ClassLoader cl)
 										{
-//											final ClassLoader	cl	= (ClassLoader)result;
+		//											final ClassLoader	cl	= (ClassLoader)result;
 											StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
 											while(stok.hasMoreTokens())
 											{
 												String classname	= stok.nextToken();
 												try
 												{
-//													System.out.println("loading panel: "+classname+" "+cl);
+		//													System.out.println("loading panel: "+classname+" "+cl);
 													Class<?> clazz	= SReflect.classForName(classname, cl);
 													IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
 													panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
@@ -169,133 +166,96 @@ public class DebuggerMainPanel extends JSplitPane
 							}
 						});
 					}
+				
 					public void exceptionOccurred(Exception exception)
 					{
 						DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panels.", null, exception);
 					}
 				}));
-				
-				pause = new JButton("Pause");
-				pause.addActionListener(new ActionListener()
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+					DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panels.", null, exception);
+			}
+		}));
+		
+		pause = new JButton("Pause");
+		pause.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				pause.setEnabled(false);
+				DebuggerMainPanel.this.jcc.getPlatformAccess().suspendComponent(DebuggerMainPanel.this.desc.getName());
+			}
+		});
+		
+		step = new JButton("Step");
+		step.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				step.setEnabled(false);
+				run.setEnabled(false);
+				DebuggerMainPanel.this.jcc.getPlatformAccess().getDescription(DebuggerMainPanel.this.desc.getName())
+					.addResultListener(new IResultListener<IComponentDescription>()
 				{
-					public void actionPerformed(ActionEvent e)
+					public void resultAvailable(IComponentDescription result)
 					{
-						pause.setEnabled(false);
-						SServiceProvider.getService(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DebuggerMainPanel.this)
+						updatePanel(result);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						error();
+					}
+				});
+			}
+		});
+		
+		run = new JButton("Run");
+		run.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				step.setEnabled(false);
+				run.setEnabled(false);
+				pause.setEnabled(true);
+				IFuture<Void> ret = DebuggerMainPanel.this.jcc.getPlatformAccess().resumeComponent(DebuggerMainPanel.this.desc.getName()); 
+				ret.addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						DebuggerMainPanel.this.jcc.getPlatformAccess().getDescription(DebuggerMainPanel.this.desc.getName())
+							.addResultListener(new IResultListener<IComponentDescription>()
 						{
-							public void customResultAvailable(IComponentManagementService ces)
+							public void resultAvailable(IComponentDescription result)
 							{
-								ces.suspendComponent(DebuggerMainPanel.this.desc.getName());
+								updatePanel(result);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								error();
 							}
 						});
 					}
-				});
-				
-				step = new JButton("Step");
-				step.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
+					
+					public void exceptionOccurred(Exception exception)
 					{
-						step.setEnabled(false);
-						run.setEnabled(false);
-						SServiceProvider.getService(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DebuggerMainPanel.this)
-						{
-							public void customResultAvailable(final IComponentManagementService cms)
-							{
-								IFuture<Void> ret = cms.stepComponent(DebuggerMainPanel.this.desc.getName(), getStepInfo());
-								ret.addResultListener(new IResultListener<Void>()
-								{
-									public void resultAvailable(Void result)
-									{
-										cms.getComponentDescription(DebuggerMainPanel.this.desc.getName())
-											.addResultListener(new IResultListener<IComponentDescription>()
-										{
-											public void resultAvailable(IComponentDescription result)
-											{
-												updatePanel(result);
-											}
-											
-											public void exceptionOccurred(Exception exception)
-											{
-												error();
-											}
-										});
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										error();
-									}
-								});
-							}
-						});
+						error();
 					}
 				});
-				
-				run = new JButton("Run");
-				run.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						step.setEnabled(false);
-						run.setEnabled(false);
-						pause.setEnabled(true);
-						SServiceProvider.getService(DebuggerMainPanel.this.jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DebuggerMainPanel.this)
-						{
-							public void customResultAvailable(final IComponentManagementService ces)
-							{
-//								IFuture<Void> ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName(), getStepInfo());
-//								ret.addResultListener(new IResultListener<Void>()
-//								{
-//									public void resultAvailable(Void result)
-//									{
-										IFuture<Void> ret = ces.resumeComponent(DebuggerMainPanel.this.desc.getName()); 
-										ret.addResultListener(new IResultListener<Void>()
-										{
-											public void resultAvailable(Void result)
-											{
-												ces.getComponentDescription(DebuggerMainPanel.this.desc.getName())
-													.addResultListener(new IResultListener<IComponentDescription>()
-												{
-													public void resultAvailable(IComponentDescription result)
-													{
-														updatePanel(result);
-													}
-													
-													public void exceptionOccurred(Exception exception)
-													{
-														error();
-													}
-												});
-											}
-											
-											public void exceptionOccurred(Exception exception)
-											{
-												error();
-											}
-										});
-									}
-									
-//									public void exceptionOccurred(Exception exception)
-//									{
-//										error();
-//									}
-//								});
-//							}
-						});
-					}
-				});
-				
-				Dimension msize = pause.getMinimumSize();
-				Dimension psize = pause.getPreferredSize();
-				run.setMinimumSize(msize);
-				run.setPreferredSize(psize);
-				step.setMinimumSize(msize);
-				step.setPreferredSize(psize);
-				
+			}
+		});
+		
+		Dimension msize = pause.getMinimumSize();
+		Dimension psize = pause.getPreferredSize();
+		run.setMinimumSize(msize);
+		run.setPreferredSize(psize);
+		step.setMinimumSize(msize);
+		step.setPreferredSize(psize);
+		
 //				stepmode = new JCheckBox("Step Mode");
 //				stepmode.addActionListener(new ActionListener()
 //				{
@@ -319,48 +279,46 @@ public class DebuggerMainPanel extends JSplitPane
 //						});
 //					}
 //				});
-						
-				int row	= 0;
-				int	col	= 0;
-				rightpanel.add(tabs, new GridBagConstraints(col++, row, GridBagConstraints.REMAINDER, 1,
-					1,1, GridBagConstraints.LINE_END, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
-				row++;
-				col	= 0;
-				rightpanel.add(pause, new GridBagConstraints(col++, row, 1, 1,
-					1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
-				rightpanel.add(step, new GridBagConstraints(col++, row, 1, 1,
-					0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
-				rightpanel.add(run, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
-					0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
-
 				
-				updatePanel((IComponentDescription)desc);
+		int row	= 0;
+		int	col	= 0;
+		rightpanel.add(tabs, new GridBagConstraints(col++, row, GridBagConstraints.REMAINDER, 1,
+			1,1, GridBagConstraints.LINE_END, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
+		row++;
+		col	= 0;
+		rightpanel.add(pause, new GridBagConstraints(col++, row, 1, 1,
+			1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+		rightpanel.add(step, new GridBagConstraints(col++, row, 1, 1,
+			0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+		rightpanel.add(run, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
+			0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
 
-				listener	= jcc.getCMSHandler().addCMSListener(desc.getName().getRoot());
-				listener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
-				{
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-					}
+		
+		updatePanel((IComponentDescription)desc);
 
-					@Override
-					public void resultAvailable(Collection<CMSStatusEvent> result)
-					{
-					}
+		listener	= jcc.getCMSHandler().addCMSListener(desc.getName().getRoot());
+		listener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+			}
 
-					@Override
-					public void intermediateResultAvailable(CMSStatusEvent event)
-					{
-						if(event.getComponentDescription().getName().equals(DebuggerMainPanel.this.desc.getName()))
-							updatePanel(event.getComponentDescription());
-					}
+			@Override
+			public void resultAvailable(Collection<CMSStatusEvent> result)
+			{
+			}
 
-					@Override
-					public void finished()
-					{
-					}
-				});
+			@Override
+			public void intermediateResultAvailable(CMSStatusEvent event)
+			{
+				if(event.getComponentDescription().getName().equals(DebuggerMainPanel.this.desc.getName()))
+					updatePanel(event.getComponentDescription());
+			}
+
+			@Override
+			public void finished()
+			{
 			}
 		});
 	}

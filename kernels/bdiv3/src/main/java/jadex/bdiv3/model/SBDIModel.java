@@ -41,9 +41,9 @@ public class SBDIModel
 				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(capaname+MElement.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getScope(), psi.getPublish(), psi.getProperties(), psi.isSystemService());
 				((ModelInfo)bdimodel.getModelInfo()).addProvidedService(psi2);
 			}
-			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())
+			for(RequiredServiceInfo	rsi: capa.getModelInfo().getServices())
 			{
-				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(capaname+MElement.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding(), rsi.getNFRProperties(), rsi.getTags());
+				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(capaname+MElement.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getDefaultBinding(), rsi.getNFRProperties(), rsi.getTags());
 				((ModelInfo)bdimodel.getModelInfo()).addRequiredService(rsi2);
 			}
 			
@@ -310,7 +310,7 @@ public class SBDIModel
 				bdimodel.getCapability().addConfiguration(outer);
 			}
 			
-			for(MConfigBeliefElement cbel: SUtil.safeList(inner.getInitialBeliefs()))
+			for(MConfigBeliefElement cbel: SUtil.notNull(inner.getInitialBeliefs()))
 			{
 				MConfigBeliefElement	cbel2	= copyConfigBelief(bdimodel, capaname, cbel, outer.getInitialBeliefs());
 				if(cbel2!=null)
@@ -318,7 +318,7 @@ public class SBDIModel
 					outer.addInitialBelief(cbel2);
 				}
 			}
-			for(MConfigBeliefElement cbel: SUtil.safeList(inner.getEndBeliefs()))
+			for(MConfigBeliefElement cbel: SUtil.notNull(inner.getEndBeliefs()))
 			{
 				MConfigBeliefElement	cbel2	= copyConfigBelief(bdimodel, capaname, cbel, outer.getEndBeliefs());
 				if(cbel2!=null)
@@ -327,7 +327,7 @@ public class SBDIModel
 				}
 			}
 			
-			for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialEvents()))
+			for(MConfigParameterElement cpel: SUtil.notNull(inner.getInitialEvents()))
 			{
 				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialEvents());
 				if(cpel2!=null)
@@ -335,7 +335,7 @@ public class SBDIModel
 					outer.addInitialEvent(cpel2);
 				}
 			}
-			for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialGoals()))
+			for(MConfigParameterElement cpel: SUtil.notNull(inner.getInitialGoals()))
 			{
 				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialGoals());
 				if(cpel2!=null)
@@ -343,7 +343,7 @@ public class SBDIModel
 					outer.addInitialGoal(cpel2);
 				}
 			}
-			for(MConfigParameterElement cpel: SUtil.safeList(inner.getInitialPlans()))
+			for(MConfigParameterElement cpel: SUtil.notNull(inner.getInitialPlans()))
 			{
 				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getInitialPlans());
 				if(cpel2!=null)
@@ -352,7 +352,7 @@ public class SBDIModel
 				}
 			}
 			
-			for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndEvents()))
+			for(MConfigParameterElement cpel: SUtil.notNull(inner.getEndEvents()))
 			{
 				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndEvents());
 				if(cpel2!=null)
@@ -360,7 +360,7 @@ public class SBDIModel
 					outer.addEndEvent(cpel2);
 				}
 			}
-			for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndGoals()))
+			for(MConfigParameterElement cpel: SUtil.notNull(inner.getEndGoals()))
 			{
 				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndGoals());
 				if(cpel2!=null)
@@ -368,7 +368,7 @@ public class SBDIModel
 					outer.addEndGoal(cpel2);
 				}
 			}
-			for(MConfigParameterElement cpel: SUtil.safeList(inner.getEndPlans()))
+			for(MConfigParameterElement cpel: SUtil.notNull(inner.getEndPlans()))
 			{
 				MConfigParameterElement	cpel2	= copyConfigParameterElement(bdimodel, capaname, cpel, outer.getEndPlans());
 				if(cpel2!=null)
@@ -389,7 +389,7 @@ public class SBDIModel
 		String	name	= capaname + MElement.CAPABILITY_SEPARATOR + cbel.getName();
 		name	= bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
 		boolean	found	= false;
-		for(MConfigBeliefElement tbel: SUtil.safeList(test))
+		for(MConfigBeliefElement tbel: SUtil.notNull(test))
 		{
 			if(tbel.getName().equals(name))
 			{
@@ -422,7 +422,7 @@ public class SBDIModel
 		cpel2.setName(cpel.getName());
 		if(cpel.getParameters()!=null)
 		{
-			for(Entry<String, List<UnparsedExpression>> param: SUtil.safeSet(cpel.getParameters().entrySet()))
+			for(Entry<String, List<UnparsedExpression>> param: SUtil.notNull(cpel.getParameters().entrySet()))
 			{
 				for(UnparsedExpression value: param.getValue())
 				{
@@ -457,15 +457,15 @@ public class SBDIModel
 		
 		if(param instanceof MPlanParameter)
 		{
-			for(String mapping: SUtil.safeList(((MPlanParameter)param).getGoalMappings()))
+			for(String mapping: SUtil.notNull(((MPlanParameter)param).getGoalMappings()))
 			{
 				((MPlanParameter)param2).addGoalMapping(capaname + MElement.CAPABILITY_SEPARATOR + mapping);
 			}
-			for(String mapping: SUtil.safeList(((MPlanParameter)param).getMessageEventMappings()))
+			for(String mapping: SUtil.notNull(((MPlanParameter)param).getMessageEventMappings()))
 			{
 				((MPlanParameter)param2).addMessageEventMapping(capaname + MElement.CAPABILITY_SEPARATOR + mapping);
 			}
-			for(String mapping: SUtil.safeList(((MPlanParameter)param).getInternalEventMappings()))
+			for(String mapping: SUtil.notNull(((MPlanParameter)param).getInternalEventMappings()))
 			{
 				((MPlanParameter)param2).addInternalEventMapping(capaname + MElement.CAPABILITY_SEPARATOR + mapping);
 			}
@@ -502,13 +502,13 @@ public class SBDIModel
 		for(MGoal goal: bdimodel.getCapability().getGoals())
 		{
 			// Convert parameter events
-			for(MParameter param: SUtil.safeList(goal.getParameters()))
+			for(MParameter param: SUtil.notNull(goal.getParameters()))
 			{
 				param.setEvents(convertEventTypes(null, param.getEvents(), bdimodel));
 			}
 			
 			// Convert goal condition events
-			for(String type: SUtil.safeMap(goal.getConditions()).keySet())
+			for(String type: SUtil.notNull(goal.getConditions()).keySet())
 			{
 				List<MCondition> conds = goal.getConditions(type);
 				for(MCondition cond: conds)
@@ -521,7 +521,7 @@ public class SBDIModel
 		for(MPlan plan: bdimodel.getCapability().getPlans())
 		{
 			// Convert parameter events
-			for(MParameter param: SUtil.safeList(plan.getParameters()))
+			for(MParameter param: SUtil.notNull(plan.getParameters()))
 			{
 				param.setEvents(convertEventTypes(null, param.getEvents(), bdimodel));
 			}

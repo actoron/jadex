@@ -74,7 +74,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4GXcc6Y-EeCQYMYVQDuvlQ" key="1:0" value="in"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4GXcdKY-EeCQYMYVQDuvlQ" key="1:1" value="name"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4GXcdaY-EeCQYMYVQDuvlQ" key="1:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4GXcdqY-EeCQYMYVQDuvlQ" key="1:3" value="$component.getComponentIdentifier().getLocalName().indexOf(&quot;#&quot;)==-1? $component.getComponentIdentifier().getLocalName()+&quot;_#&quot;+(num+1): $component.getComponentIdentifier().getLocalName().substring(0, $component.getComponentIdentifier().getLocalName().indexOf(&quot;#&quot;)+1)+(num+1)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4GXcdqY-EeCQYMYVQDuvlQ" key="1:3" value="$component.getId().getLocalName().indexOf(&quot;#&quot;)==-1? $component.getId().getLocalName()+&quot;_#&quot;+(num+1): $component.getId().getLocalName().substring(0, $component.getId().getLocalName().indexOf(&quot;#&quot;)+1)+(num+1)"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4GYDgKY-EeCQYMYVQDuvlQ" key="2:0" value="in"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4GYDgaY-EeCQYMYVQDuvlQ" key="2:1" value="num"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4GYDgqY-EeCQYMYVQDuvlQ" key="2:2" value="Integer"/>
@@ -154,7 +154,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17iQRPEeCnwcpWvxOwkg" key="1:0" value="inout"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17igRPEeCnwcpWvxOwkg" key="1:1" value="name"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17iwRPEeCnwcpWvxOwkg" key="1:2" value="String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17jARPEeCnwcpWvxOwkg" key="1:3" value="i==1? $component.getComponentIdentifier().getLocalName().substring(0, $component.getComponentIdentifier().getLocalName().indexOf(&quot;#&quot;)-1): $component.getComponentIdentifier().getLocalName().substring(0, $component.getComponentIdentifier().getLocalName().indexOf(&quot;#&quot;)+1)+i"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17jARPEeCnwcpWvxOwkg" key="1:3" value="i==1? $component.getId().getLocalName().substring(0, $component.getId().getLocalName().indexOf(&quot;#&quot;)-1): $component.getId().getLocalName().substring(0, $component.getId().getLocalName().indexOf(&quot;#&quot;)+1)+i"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17jQRPEeCnwcpWvxOwkg" key="2:0" value="inout"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17jgRPEeCnwcpWvxOwkg" key="2:1" value="killstarttime"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ct17jwRPEeCnwcpWvxOwkg" key="2:2" value="long"/>

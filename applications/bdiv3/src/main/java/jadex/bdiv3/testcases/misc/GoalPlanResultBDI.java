@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
@@ -19,7 +20,7 @@ import jadex.micro.annotation.Results;
  *  Agent that has a plan that return a value form the body.
  *  The value is then used as result value of the goal when the goal uses the @GoalResult.
  */
-@Agent(keepalive=Boolean3.FALSE)
+@Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalPlanResultBDI
 {
@@ -66,7 +67,7 @@ public class GoalPlanResultBDI
 	@AgentBody
 	public void body()
 	{
-		String res1 = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AGoal()).get();
+		String res1 = (String)agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AGoal()).get();
 		TestReport	tr1	= new TestReport("#1", "Test if goal result set/get works with field.");
 		if("result".equals(res1))
 		{			
@@ -76,7 +77,7 @@ public class GoalPlanResultBDI
 		{
 			tr1.setReason("Result not received "+res1);
 		}
-		String res2 = (String)agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new BGoal()).get();
+		String res2 = (String)agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new BGoal()).get();
 		
 		
 		TestReport	tr2	= new TestReport("#1", "Test if goal result set/get works with method.");
@@ -90,7 +91,7 @@ public class GoalPlanResultBDI
 		}
 		
 		System.out.println(res1+" "+res2);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
 	}
 	
 	/**

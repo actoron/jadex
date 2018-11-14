@@ -1,7 +1,6 @@
 package jadex.bridge.sensor.service;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +47,7 @@ public class LatencyProperty extends TimedProperty
 		// Necessary for unbound required service property to fetch meta info :-(
 		if(service!=null)
 		{
-			this.sid = service.getServiceIdentifier();
+			this.sid = service.getServiceId();
 		
 			if(ProxyFactory.isProxyClass(service.getClass()))
 			{
@@ -88,7 +87,7 @@ public class LatencyProperty extends TimedProperty
 						}
 					}
 				});
-				comp.getComponentFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
+				comp.getFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getServiceId(), method, listener);
 			}
 			else
 			{
@@ -131,7 +130,7 @@ public class LatencyProperty extends TimedProperty
 	 */
 	public IFuture<Void> dispose()
 	{
-		comp.getComponentFeature(IProvidedServicesFeature.class).removeMethodInvocationListener(sid, method, listener);
+		comp.getFeature(IProvidedServicesFeature.class).removeMethodInvocationListener(sid, method, listener);
 		return super.dispose();
 	}
 }

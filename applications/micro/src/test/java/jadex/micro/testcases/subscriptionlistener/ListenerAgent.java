@@ -15,10 +15,11 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -31,10 +32,10 @@ import jadex.micro.annotation.Results;
  */
 @RequiredServices(
 {
-	@RequiredService(name="test", type=ITestService.class, 
-		binding=@Binding(create=true, creationinfo=@CreationInfo(type="test"))),
+	@RequiredService(name="test", type=ITestService.class),
 })
 @ComponentTypes(@ComponentType(name="test", clazz=ProviderAgent.class))
+@Configurations(@Configuration(name="default", components=@Component(type="test")))
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ListenerAgent
@@ -45,7 +46,7 @@ public class ListenerAgent
 		final Future<Void>	ret	= new Future<Void>();
 		final Collection<TestReport>	reports	= new ArrayList<TestReport>();
 		
-		ITestService ts = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("test").get();
+		ITestService ts = (ITestService)agent.getFeature(IRequiredServicesFeature.class).getService("test").get();
 		ISubscriptionIntermediateFuture<String> fut = ts.test();
 		
 		TestReport	tr	= new TestReport("#1", "Test addition of wrong listener.");
@@ -90,7 +91,7 @@ public class ListenerAgent
 			protected void	proceed()
 			{
 				reports.add(tr2);
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(reports.size(), reports.toArray(new TestReport[reports.size()])));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(reports.size(), reports.toArray(new TestReport[reports.size()])));
 				ret.setResult(null);				
 			}
 		});

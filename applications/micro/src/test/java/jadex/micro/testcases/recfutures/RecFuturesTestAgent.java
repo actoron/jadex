@@ -14,11 +14,9 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -30,10 +28,11 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -59,8 +58,8 @@ import jadex.micro.testcases.RemoteTestBaseAgent;
 @Service
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @ComponentTypes(@ComponentType(name="aagent", clazz=AAgent.class))
-@RequiredServices(@RequiredService(name="aser", type=IAService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_NONE, create=true, creationinfo=@CreationInfo(type="aagent"))))
+@RequiredServices(@RequiredService(name="aser", type=IAService.class))
+@Configurations(@Configuration(name="default", components=@Component(type="aagent")))
 @Ignore
 public class RecFuturesTestAgent extends RemoteTestBaseAgent
 {
@@ -85,21 +84,21 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 		}
 		
 		final Future<TestReport> ret = new Future<TestReport>();
-		ret.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<TestReport>()
+		ret.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<TestReport>()
 		{
 			public void resultAvailable(TestReport result)
 			{
 //				System.out.println("tests finished");
 
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				agent.killComponent();			
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println(agent.getComponentFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getComponentIdentifier());
+				System.out.println(agent.getFeature(IExecutionFeature.class).isComponentThread()+" "+agent.getId());
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				agent.killComponent();	
 			}
 		}));
@@ -120,7 +119,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 //				}
 //			}));
 		
-		testLocal(1, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+		testLocal(1, 100, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
@@ -132,7 +131,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 				}
 				else
 				{
-					testRemote(2, 100, 3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+					testRemote(2, 100, 3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 					{
 						public void customResultAvailable(TestReport result)
 						{
@@ -144,7 +143,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 			}
 		}));
 		
-//		IAService aser = (IAService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("aser").get();
+//		IAService aser = (IAService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("aser").get();
 //		
 //		IFuture<IFuture<String>> futa = aser.methodA();
 //		futa.addResultListener(new DefaultResultListener<IFuture<String>>()
@@ -192,7 +191,7 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 	 */
 	protected IFuture<TestReport> testLocal(int testno, long delay, int max)
 	{
-		return performTest(agent.getComponentIdentifier().getRoot(), testno, delay, max);
+		return performTest(agent.getId().getRoot(), testno, delay, max);
 	}
 	
 	/**
@@ -206,14 +205,16 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 		// Start platform
 		try
 		{
+			disableLocalSimulationMode().get();
+			
 			String url	= SUtil.getOutputDirsExpression("jadex-applications-micro", true);	// Todo: support RID for all loaded models.
 	//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
-				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
+			Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getId().getPlatformPrefix()+"_*",
+				"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
 	//			"-logging_level", "java.util.logging.Level.INFO",
 				"-gui", "false", "-simulation", "false", "-printpass", "false",
 				"-superpeerclient", "false" // TODO: fails on shutdown due to auto restart
-			}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+			}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 				new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 			{
 				public void customResultAvailable(final IExternalAccess platform)
@@ -223,8 +224,8 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 					{
 						public void customResultAvailable(Void result)
 						{
-							performTest(platform.getComponentIdentifier(), testno, delay, max)
-								.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
+							performTest(platform.getId(), testno, delay, max)
+								.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)
 							{
 								public void customResultAvailable(final TestReport result)
 								{
@@ -275,28 +276,23 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 		});
 		
 		// Start service agent
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
-		{
-			public void customResultAvailable(final IComponentManagementService cms)
+		IResourceIdentifier	rid	= new ResourceIdentifier(
+			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//		System.out.println("Using rid: "+rid);
+		final boolean	local	= root.equals(agent.getId().getRoot());
+		jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(local ? agent.getId() : root, rid);
+		agent.createComponent(ci.setFilename(AAgent.class.getName()+".class"), null)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+		{	
+			public void customResultAvailable(final IExternalAccess exta)
 			{
-				IResourceIdentifier	rid	= new ResourceIdentifier(
-					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-//						System.out.println("Using rid: "+rid);
-				final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
-				jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
-				cms.createComponent(null, AAgent.class.getName()+".class", ci, null)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
-				{	
-					public void customResultAvailable(final IComponentIdentifier cid)
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IAService.class).setProvider(exta.getId()))
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IAService, TestReport>(ret)
+				{
+					public void customResultAvailable(IAService service)
 					{
-						SServiceProvider.getService(agent, cid, IAService.class)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IAService, TestReport>(ret)
-						{
-							public void customResultAvailable(IAService service)
-							{
-								System.out.println("found service: "+((IService)service).getServiceIdentifier());
-								
+						System.out.println("found service: "+((IService)service).getServiceId());
+						
 //								IFuture<IFuture<String>> futa = service.methodA();
 //								futa.addResultListener(new DefaultResultListener<IFuture<String>>()
 //								{
@@ -316,35 +312,33 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 //										});
 //									}
 //								});
+						
+						IFuture<IIntermediateFuture<String>> futb = service.methodB();
+						futb.addResultListener(new ExceptionDelegationResultListener<IIntermediateFuture<String>, TestReport>(ret)
+						{
+							public void customResultAvailable(IIntermediateFuture<String> fut2)
+							{
+								System.out.println("received first: "+fut2);
 								
-								IFuture<IIntermediateFuture<String>> futb = service.methodB();
-								futb.addResultListener(new ExceptionDelegationResultListener<IIntermediateFuture<String>, TestReport>(ret)
+								fut2.addResultListener(new IntermediateDefaultResultListener<String>()
 								{
-									public void customResultAvailable(IIntermediateFuture<String> fut2)
+									public void intermediateResultAvailable(String result) 
 									{
-										System.out.println("received first: "+fut2);
-										
-										fut2.addResultListener(new IntermediateDefaultResultListener<String>()
-										{
-											public void intermediateResultAvailable(String result) 
-											{
-												System.out.println("received: "+result);
-											}
-											
-											public void finished() 
-											{
-												System.out.println("fini");
-												TestReport tr = new TestReport("#"+testno, "Tests if rec results work");
-												tr.setSucceeded(true);
-												ret.setResult(tr);
-											}	
-										});
+										System.out.println("received: "+result);
 									}
+									
+									public void finished() 
+									{
+										System.out.println("fini");
+										TestReport tr = new TestReport("#"+testno, "Tests if rec results work");
+										tr.setSucceeded(true);
+										ret.setResult(tr);
+									}	
 								});
 							}
-						}));
+						});
 					}
-				});
+				}));
 			}
 		});
 		

@@ -37,14 +37,12 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI;
 import jadex.bdiv3.examples.cleanerworld.world.Chargingstation;
 import jadex.bdiv3.examples.cleanerworld.world.Cleaner;
 import jadex.bdiv3.examples.cleanerworld.world.Environment;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
-import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -99,7 +97,7 @@ public class EnvironmentGui	extends JFrame
 	 */
 	public EnvironmentGui(final IExternalAccess agent)
 	{
-		super(agent.getComponentIdentifier().getLocalName());
+		super(agent.getId().getLocalName());
 //		System.out.println("EnvGui: "+EnvironmentLocalBDI.class.getClassLoader());
 //		System.out.println(EnvironmentGui.class.getClassLoader()+" "+EnvironmentLocalBDI.class.getClassLoader());
 
@@ -126,7 +124,7 @@ public class EnvironmentGui	extends JFrame
 //					}
 //				});
 				
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
@@ -139,7 +137,7 @@ public class EnvironmentGui	extends JFrame
 				
 //				System.out.println(((IPojoMicroAgent)ia).getPojoAgent().getClass().getClassLoader());
 							
-				final Environment env = ((EnvironmentLocalBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
+				final Environment env = ((EnvironmentLocalAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
 				
 //				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
 				SwingUtilities.invokeLater(new Runnable()
@@ -431,7 +429,7 @@ public class EnvironmentGui	extends JFrame
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 //										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										final Environment env = ((EnvironmentLocalBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
+										final Environment env = ((EnvironmentLocalAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).getEnvironment();
 //										Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
 										
 										Waste[] wastes = env.getWastes();

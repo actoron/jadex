@@ -7,6 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -21,13 +22,12 @@ import jadex.examples.presentationtimer.remotecontrol.ui.ClientFrame;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 
 @Agent
-@RequiredServices({@RequiredService(type = ICountdownService.class, name = "cds", binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL))})
+@RequiredServices({@RequiredService(type = ICountdownService.class, name = "cds", scope = RequiredServiceInfo.SCOPE_GLOBAL)})
 public class ClientAgent
 {
 
@@ -68,13 +68,13 @@ public class ClientAgent
 
 	private ISubscriptionIntermediateFuture<ICountdownService> searchCdServices()
 	{
-		IIntermediateFuture<ICountdownService> searchServices = access.getComponentFeature(IRequiredServicesFeature.class).searchServices(ICountdownService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+		IIntermediateFuture<ICountdownService> searchServices = access.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ICountdownService.class, RequiredServiceInfo.SCOPE_GLOBAL));
 		searchServices.addIntermediateResultListener(cdService -> {
 			subscription.addIntermediateResult(cdService);
 		}, () -> {
 			System.out.println("Search finished. Re-scheduling search.");
 
-			access.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
+			access.getFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
 			{
 
 				@Override

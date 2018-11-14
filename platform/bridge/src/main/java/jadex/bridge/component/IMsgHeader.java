@@ -1,5 +1,7 @@
 package jadex.bridge.component;
 
+import jadex.bridge.IComponentIdentifier;
+
 /**
  *   Interface for message headers with meta information / link-level security.
  *
@@ -18,7 +20,21 @@ public interface IMsgHeader
 	/** Message header key for internal message id (optional).
 	 *  Added automatically when monitoring is active on sender side. */
 	public static final String XID = "x_message_id";
-
+	
+	/**
+	 *  Gets the sender of the message.
+	 * 
+	 *  @return The sender.
+	 */
+	public IComponentIdentifier getSender();
+	
+	/**
+	 *  Gets the receiver of the message.
+	 * 
+	 *  @return The receiver.
+	 */
+	public IComponentIdentifier getReceiver();
+	
 	/**
 	 *  Gets a property stored in the header.
 	 *  

@@ -6,9 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -20,7 +18,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -36,10 +33,8 @@ import jadex.micro.annotation.RequiredServices;
 @ProvidedServices(@ProvidedService(type=IChatService.class, 
 	implementation=@Implementation(value=ChatServiceD5.class)))
 @RequiredServices({
-	@RequiredService(name="clockservice", type=IClockService.class, 
-		binding=@Binding(scope=Binding.SCOPE_PLATFORM)),
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
-		binding=@Binding(dynamic=true, scope=Binding.SCOPE_GLOBAL)),
+	@RequiredService(name="clockservice", type=IClockService.class),
+	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=RequiredService.SCOPE_GLOBAL),
 	@RequiredService(name="regservice", type=IRegistryServiceE3.class)
 })
 @Arguments(@Argument(name="nickname", clazz=String.class, defaultvalue="\"Willi\""))
@@ -62,7 +57,7 @@ public class ChatE3Agent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IRegistryServiceE3>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
+		IFuture<IRegistryServiceE3>	fut	= agent.getFeature(IRequiredServicesFeature.class).getService("regservice");
 		fut.addResultListener(new ExceptionDelegationResultListener<IRegistryServiceE3, Void>(ret)
 		{
 			public void customResultAvailable(final IRegistryServiceE3 rs)
@@ -74,8 +69,8 @@ public class ChatE3Agent
 			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("exception, could not find appreg service: "+exception);
-//				IRegistryServiceE3 reg = SServiceProvider.getLocalService(agent, IRegistryServiceE3.class);
-				IFuture<IRegistryServiceE3>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
+//				IRegistryServiceE3 reg = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IRegistryServiceE3.class));
+				IFuture<IRegistryServiceE3>	fut	= agent.getFeature(IRequiredServicesFeature.class).getService("regservice");
 				super.exceptionOccurred(exception);
 			}
 		});
@@ -89,14 +84,14 @@ public class ChatE3Agent
 	@AgentBody
 	public void executeBody()
 	{
-//		IFuture<IRegistryServiceE3>	regservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
+//		IFuture<IRegistryServiceE3>	regservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getService("regservice");
 //		regservice.addResultListener(new DefaultResultListener<IRegistryServiceE3>()
 //		{
 //			public void resultAvailable(final IRegistryServiceE3 rs)
 //			{
-				regservice.register(agent.getComponentIdentifier(), nickname);
+				regservice.register(agent.getId(), nickname);
 				
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{

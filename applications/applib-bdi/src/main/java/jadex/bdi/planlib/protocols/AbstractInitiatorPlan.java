@@ -77,10 +77,17 @@ public abstract class AbstractInitiatorPlan extends Plan
 		{
 			cancel.getParameter("interaction_state").setValue(getParameter("interaction_state").getValue());
 		}
-//		System.out.println("Initiator aborting: "+this+", "+getComponentIdentifier());
-		dispatchSubgoalAndWait(cancel);
-//		System.out.println("Initiator aborted: "+this+", "+getComponentIdentifier());
-		getLogger().info("Initiator aborted");
+//		System.out.println("Initiator aborting: "+this+", "+getId());
+		try
+		{
+			dispatchSubgoalAndWait(cancel);
+			getLogger().info("Initiator aborted");
+		}
+		catch(Exception e)
+		{
+			getLogger().warning("Initiator could not abort: "+e);			
+		}
+//		System.out.println("Initiator aborted: "+this+", "+getId());
 	}
 	
 	//-------- template methods --------

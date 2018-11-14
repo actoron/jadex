@@ -33,7 +33,7 @@ public class MethodPlanBody extends AbstractPlanBody
 		String	pname	= rplan.getModelElement().getName();
 		String	capaname	= pname.indexOf(MElement.CAPABILITY_SEPARATOR)==-1
 			? null : pname.substring(0, pname.lastIndexOf(MElement.CAPABILITY_SEPARATOR));
-		this.agent	= ((BDIAgentFeature)ia.getComponentFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname);
+		this.agent	= ((BDIAgentFeature)ia.getFeature(IBDIAgentFeature.class)).getCapabilityObject(capaname);
 	}
 	
 	//-------- methods --------

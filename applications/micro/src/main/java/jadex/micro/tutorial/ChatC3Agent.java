@@ -1,31 +1,26 @@
 package jadex.micro.tutorial;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentFeature;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 
 /**
  *  Chat micro agent that uses the clock service. 
  */
 @Description("This agent uses the component management service.")
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
-	binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
 public class ChatC3Agent
 {
-	/** The required services feature. */
-	@AgentFeature
-	protected IRequiredServicesFeature requiredServicesFeature;
+	@Agent
+	protected IInternalAccess agent;
+	
+//	/** The required services feature. */
+//	@AgentFeature
+//	protected IRequiredServicesFeature requiredServicesFeature;
 	
 	/**
 	 *  Execute the functional body of the agent.
@@ -34,23 +29,25 @@ public class ChatC3Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IComponentManagementService>	cms	= requiredServicesFeature.getRequiredService("cms");
-		cms.addResultListener(new DefaultResultListener<IComponentManagementService>()
+//		IFuture<IComponentManagementService>	cms	= requiredServicesFeature.getService("cms");
+//		cms.addResultListener(new DefaultResultListener<IComponentManagementService>()
+//		{
+//			public void resultAvailable(final IComponentManagementService cms)
+//			{
+		SComponentManagementService.getComponentDescriptions(agent)
+//		cms.getComponentDescriptions()
+		.addResultListener(
+			new DefaultResultListener<IComponentDescription[]>()
 		{
-			public void resultAvailable(final IComponentManagementService cms)
+			public void resultAvailable(IComponentDescription[] descs)
 			{
-				cms.getComponentDescriptions().addResultListener(
-					new DefaultResultListener<IComponentDescription[]>()
+				for(int i=0; i<descs.length; i++)
 				{
-					public void resultAvailable(IComponentDescription[] descs)
-					{
-						for(int i=0; i<descs.length; i++)
-						{
-							System.out.println("Found: "+descs[i]);
-						}
-					}
-				});
+					System.out.println("Found: "+descs[i]);
+				}
 			}
 		});
+//			}
+//		});
 	}
 }

@@ -5,16 +5,15 @@ import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -52,12 +51,12 @@ public class EnvironmentService	implements IEnvironmentService
 		for(final IExtensionInfo ei: infos)
 		{
 			ei.createInstance(component.getExternalAccess(), component.getFetcher()).addResultListener(
-				component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExtensionInstance>()
+				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExtensionInstance>()
 			{
 				public void resultAvailable(final IExtensionInstance instance)
 				{
 					spaces.put(ei.getName(), instance);	// Make space known before init, in case initial avatars are created that create agents that want to get their spaces. (hack?)
-					instance.init().addResultListener(component.getComponentFeature(IExecutionFeature.class).createResultListener(lis));
+					instance.init().addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(lis));
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -82,7 +81,7 @@ public class EnvironmentService	implements IEnvironmentService
 		for(final IExtensionInstance instance: spaces.values())
 		{
 			instance.terminate().addResultListener(
-				component.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+				component.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
@@ -115,17 +114,7 @@ public class EnvironmentService	implements IEnvironmentService
 	 */
 	public static IFuture<Object> getSpace(IInternalAccess component, final String name)
 	{
-		final Future<Object>	ret	= new Future<Object>();
-		
-		component.getComponentFeature(IRequiredServicesFeature.class).searchService(IEnvironmentService.class, RequiredServiceInfo.SCOPE_APPLICATION)
-			.addResultListener(new ExceptionDelegationResultListener<IEnvironmentService, Object>(ret)
-		{
-			public void customResultAvailable(IEnvironmentService es)
-			{
-				es.getSpace(name).addResultListener(new DelegationResultListener<Object>(ret));
-			}
-		});
-		
-		return ret;
+		IEnvironmentService es	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IEnvironmentService.class));
+		return es.getSpace(name);
 	}
 }

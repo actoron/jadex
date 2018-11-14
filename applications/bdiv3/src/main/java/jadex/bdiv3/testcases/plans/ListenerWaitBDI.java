@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.plans;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
@@ -12,25 +13,20 @@ import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 /**
  *  Test abort of externally waiting plan with invokeInterruptable
  */
-@Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="extWait")))
 public class ListenerWaitBDI
@@ -49,13 +45,13 @@ public class ListenerWaitBDI
 		
 //		agent.createResultListener(listener)
 		
-		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+		IFuture<ILibraryService> fut = agent.getFeature(IRequiredServicesFeature.class).getService(ILibraryService.class);
 //		agent.createResultListener(listener)
-		fut.addResultListener(new IResultListener<IComponentManagementService>()
+		fut.addResultListener(new IResultListener<ILibraryService>()
 		{
-			public void resultAvailable(IComponentManagementService cms)
+			public void resultAvailable(ILibraryService cms)
 			{
-				System.out.println("after cms: "+cms);
+				System.out.println("after lib: "+cms);
 				ret.setResult(null);
 				tr.setSucceeded(true);
 				agent.killComponent();
@@ -86,6 +82,6 @@ public class ListenerWaitBDI
 	{
 		if(!tr.isFinished())
 			tr.setFailed("Plan not activated");
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

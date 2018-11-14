@@ -338,7 +338,7 @@ public class ClockPanel	extends JPanel
 		// Called from check box -> change state.
 		else
 		{
-			final String	id	= "ClockPanel"+ClockPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getComponentIdentifier();
+			final String	id	= "ClockPanel"+ClockPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getId();
 			final ISimulationService	simservice	= simp.getSimulationService();
 			
 			if(active)

@@ -1,0 +1,36 @@
+package jadex.bpmn;
+
+import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.commons.Boolean3;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Autostart;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.Properties;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+
+/**
+ *  Bpmn kernel.
+ */
+// Hack!!! allows starting bpmn kernel when micro kernel is available, but avoids dependency from bpmn to micro
+// and vice versa.
+@Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\".bpmn\", \".bpmn2\"}")})
+@ProvidedServices({
+	@ProvidedService(type=IComponentFactory.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(
+	expression="new jadex.bpmn.BpmnFactory($component, jadex.commons.SUtil.createHashMap("
+	+		"new String[]"
+	+		"{"
+	+		"	\"debugger.panels\""
+	+		"},"
+	+		"new Object[]"
+	+		"{"
+	+		"	\"jadex.tools.debugger.bpmn.BpmnDebuggerPanel\""
+	+		"})"
+	+	")"))
+})
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="kernel_bpmn"))
+public class KernelBpmnAgent
+{
+}

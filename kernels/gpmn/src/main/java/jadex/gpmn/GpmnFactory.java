@@ -113,7 +113,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 //		final IFuture<Void> sfuture = super.startService();
 		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		(IServiceProvider)ia.getServiceContainer().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -121,7 +121,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 				libservice = (ILibraryService)result;
 //				libservice.addLibraryServiceListener(libservicelistener);
 				
-				SServiceProvider.getService((IServiceProvider)ia.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DefaultResultListener()
+				(IServiceProvider)ia.getServiceContainer().searchService( new ServiceQuery<>( IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(ia.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

@@ -11,6 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -92,12 +93,12 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		
-		SServiceProvider.getService(space.getExternalAccess(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		space.getExternalAccess().searchService( new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new DefaultResultListener<IExecutionService>()
 		{
 			public void resultAvailable(final IExecutionService exeservice)
 			{
-				SServiceProvider.getService(space.getExternalAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new DefaultResultListener<IClockService>()
 				{
 					public void resultAvailable(final IClockService clockservice)
@@ -266,13 +267,13 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 			// Only print warning for sub-components
 			if(task instanceof ExecutionComponentFeature)
 			{
-				IComponentIdentifier	cid	= ((ExecutionComponentFeature)task).getComponent().getComponentIdentifier();
+				IComponentIdentifier	cid	= ((ExecutionComponentFeature)task).getComponent().getId();
 				IComponentIdentifier	test	= cid;
-				while(test!=null && !test.equals(ea.getComponentIdentifier()))
+				while(test!=null && !test.equals(ea.getId()))
 				{
 					test	= test.getParent();
 				}
-				if(test!=null && !cid.equals(ea.getComponentIdentifier()))
+				if(test!=null && !cid.equals(ea.getId()))
 				{
 					System.out.println("Non-idle component at time switch: "+cid);
 				}

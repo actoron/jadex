@@ -36,7 +36,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ConfigureGoal;
+import jadex.bdiv3.examples.blocksworld.BlocksworldAgent.ConfigureGoal;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -85,7 +85,7 @@ public class BlocksworldGui	extends JFrame
 //		{
 //		}
 		
-		setTitle(agent.getComponentIdentifier().getName());
+		setTitle(agent.getId().getName());
 		final JPanel worlds = new JPanel(new GridLayout(1, 2));
 		
 		agent.scheduleStep(new IComponentStep<Void>()
@@ -93,7 +93,7 @@ public class BlocksworldGui	extends JFrame
 			@Classname("start")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				BlocksworldAgent pag = (BlocksworldAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 				final Block[] blocks = (Block[])pag.getBlocks().toArray(new Block[0]);
 				final Table table = pag.getTable();//new Table(pag.getTable());
 				final Object md = pag.getMode();
@@ -187,7 +187,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("clear")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+										BlocksworldAgent pag = (BlocksworldAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 										final Block[] blocks = (Block[])pag.getBlocks().toArray(new Block[0]);
 //										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 //										final Block[]	blocks = (Block[])bia.getBeliefbase().getBeliefSet("blocks").getFacts();
@@ -229,12 +229,12 @@ public class BlocksworldGui	extends JFrame
 									@Classname("configure")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+										BlocksworldAgent pag = (BlocksworldAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 //										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 										
 										Set<Block> bls = SUtil.arrayToSet(newtable.getAllBlocks());
 										ConfigureGoal conf = pag.new ConfigureGoal(newtable, bls);
-										pag.getAgent().getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(conf);
+										pag.getAgent().getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(conf);
 //										IGoal achieve = bia.getGoalbase().createGoal("configure");
 //										achieve.getParameter("configuration").setValue(newtable);
 //										// Hack!!! Blocks must be in state directly.
@@ -297,7 +297,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("createBlock")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+										BlocksworldAgent pag = (BlocksworldAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 										final Block block = new Block(showcol.getBackground(), pag.getTable());
 										pag.getBlocks().add(block);
 										
@@ -359,7 +359,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("deleteBlock")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+										BlocksworldAgent pag = (BlocksworldAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 										pag.getBlocks().remove(block);
 										clear.doClick();
 										return IFuture.DONE;
@@ -370,8 +370,8 @@ public class BlocksworldGui	extends JFrame
 							}
 						});
 						// Execution mode components
-						final JComboBox	mode	= new JComboBox(new BlocksworldBDI.Mode[]
-							{BlocksworldBDI.Mode.NORMAL, BlocksworldBDI.Mode.STEP, BlocksworldBDI.Mode.SLOW});
+						final JComboBox	mode	= new JComboBox(new BlocksworldAgent.Mode[]
+							{BlocksworldAgent.Mode.NORMAL, BlocksworldAgent.Mode.STEP, BlocksworldAgent.Mode.SLOW});
 						
 						mode.setSelectedItem(md);
 //						agent.getBeliefbase().getBeliefFact("mode").addResultListener(new SwingDefaultResultListener(BlocksworldGui.this)
@@ -382,19 +382,19 @@ public class BlocksworldGui	extends JFrame
 //							}
 //						});
 						final JButton	step	= new JButton("step");
-						step.setEnabled(mode.getSelectedItem().equals(BlocksworldBDI.Mode.STEP));
+						step.setEnabled(mode.getSelectedItem().equals(BlocksworldAgent.Mode.STEP));
 						mode.addItemListener(new ItemListener()
 						{
 							public void	itemStateChanged(ItemEvent ie)
 							{
-								step.setEnabled(mode.getSelectedItem().equals(BlocksworldBDI.Mode.STEP));
-								final BlocksworldBDI.Mode sel = (BlocksworldBDI.Mode)mode.getSelectedItem();
+								step.setEnabled(mode.getSelectedItem().equals(BlocksworldAgent.Mode.STEP));
+								final BlocksworldAgent.Mode sel = (BlocksworldAgent.Mode)mode.getSelectedItem();
 								agent.scheduleStep(new IComponentStep<Void>()
 								{
 									@Classname("mode")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+										BlocksworldAgent pag = (BlocksworldAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 										pag.setMode(sel);
 										return IFuture.DONE;
 									}
@@ -411,7 +411,7 @@ public class BlocksworldGui	extends JFrame
 									@Classname("step")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										BlocksworldBDI pag = (BlocksworldBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+										BlocksworldAgent pag = (BlocksworldAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 										
 										pag.steps.addIntermediateResult(null);
 										
@@ -505,7 +505,7 @@ public class BlocksworldGui	extends JFrame
 //										});
 //									}
 //								});
-								ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+								ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 									.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 								{
 									public void intermediateResultAvailable(IMonitoringEvent result)

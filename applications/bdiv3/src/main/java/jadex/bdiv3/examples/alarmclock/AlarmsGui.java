@@ -87,8 +87,8 @@ public class AlarmsGui extends JFrame
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-				IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+//				agent.getServiceProvider().searchService( new ServiceQuery<>( IClockService.class))
+				IFuture<IClockService>	fut	= ia.getFeature(IRequiredServicesFeature.class).getService("clockservice");
 				fut.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 				{
 					public void resultAvailable(final IClockService cs)
@@ -191,7 +191,7 @@ public class AlarmsGui extends JFrame
 									@Classname("alarms")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+										AlarmclockAgent agent = (AlarmclockAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 										final Alarm[] alarms = agent.getAlarms();
 										SwingUtilities.invokeLater(new Runnable()
 										{
@@ -282,7 +282,7 @@ public class AlarmsGui extends JFrame
 			@Classname("addAlarm")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				AlarmclockAgent agent = (AlarmclockAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 				agent.addAlarm(alarm);
 				return IFuture.DONE;
 			}
@@ -309,7 +309,7 @@ public class AlarmsGui extends JFrame
 			@Classname("removeAlarm")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				AlarmclockAgent agent = (AlarmclockAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 				agent.removeAlarm(alarm);
 				return IFuture.DONE;
 			}

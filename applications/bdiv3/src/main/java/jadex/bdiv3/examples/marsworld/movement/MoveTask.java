@@ -3,7 +3,7 @@ package jadex.bdiv3.examples.marsworld.movement;
 import java.util.Iterator;
 import java.util.Set;
 
-import jadex.bdiv3.examples.marsworld.BaseBDI;
+import jadex.bdiv3.examples.marsworld.BaseAgent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -102,7 +102,7 @@ public class MoveTask extends AbstractTask
 				@Classname("add")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					BaseBDI ba = (BaseBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+					BaseAgent ba = (BaseAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 					for(Iterator<ISpaceObject> it=objects.iterator(); it.hasNext(); )
 					{
 						final ISpaceObject so = it.next();

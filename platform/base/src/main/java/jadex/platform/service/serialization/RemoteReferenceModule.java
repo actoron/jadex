@@ -46,8 +46,11 @@ import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.annotation.Uncached;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.component.ServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.types.cms.PlatformComponent;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IChangeListener;
@@ -60,6 +63,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.ImmutableProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -238,7 +242,10 @@ public class RemoteReferenceModule
 		// -> not necessary due to only single threaded access via agent thread
 		
 
-		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
+//		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
+		// todo: repair cache for external access
+		Object tcid = target instanceof IService? target.getClass(): null;
+		
 //		ProxyInfo pi;
 		ProxyReference ret;
 		
@@ -255,11 +262,12 @@ public class RemoteReferenceModule
 				throw new RuntimeException("Proxyable object has no remote interfaces: "+target);
 			
 			// test and create not synchronized due to service invocation (getPropertyMap) in createProxyInfo() potentially leading to deadlock
-			ProxyInfo pi = (ProxyInfo)proxyinfos.get(tcid);
+			ProxyInfo pi = tcid==null? null: (ProxyInfo)proxyinfos.get(tcid);
 			if(pi==null)
 			{
 				pi = createProxyInfo(target, remoteinterfaces, cl, platform);
-				proxyinfos.put(tcid, pi);
+				if(tcid!=null)
+					proxyinfos.put(tcid, pi);
 //				System.out.println("add: "+tcid+" "+pi);
 			}
 			
@@ -289,7 +297,7 @@ public class RemoteReferenceModule
 	/**
 	 *  Create a proxy info for a service. 
 	 */
-	protected static ProxyInfo createProxyInfo(Object target, Class<?>[] remoteinterfaces, ClassLoader cl, IComponentIdentifier platform)
+	public static ProxyInfo createProxyInfo(Object target, Class<?>[] remoteinterfaces, ClassLoader cl, IComponentIdentifier platform)
 	{
 		// todo: dgc, i.e. remember that target is a remote object (for which a proxyinfo is sent away).
 			
@@ -297,94 +305,99 @@ public class RemoteReferenceModule
 		Map<String, Object> properties = null;
 		
 		// Hack! as long as registry is not there
-		String[]	imports	= null;
+		String[] imports = null;
 //		ClassLoader	cl	= null;
-		if(target instanceof IExternalAccess)
-		{
-			imports	= ((IExternalAccess)target).getModel().getAllImports();
-//			cl	= libservice.getClassLoader(((IExternalAccess)target).getModel().getResourceIdentifier());
-			properties = ((IExternalAccess)target).getModel().getProperties();		
-		}
-		else if(target instanceof IService)
-		{
-			properties = ((IService)target).getPropertyMap();
-		}
+		
+		// todo: remove support for properties?! or fix 
+		
+//		if(target instanceof IExternalAccess)
+//		{
+//			imports	= ((IExternalAccess)target).getModel().getAllImports();
+////			cl	= libservice.getClassLoader(((IExternalAccess)target).getModel().getResourceIdentifier());
+//			properties = ((IExternalAccess)target).getModel().getProperties();		
+//		}
+//		else if(target instanceof IService)
+//		{
+//			properties = ((IService)target).getPropertyMap();
+//		}
 		
 		Class<?> targetclass = target.getClass();
 		
 		// Check for excluded and synchronous methods.
-		if(properties!=null)
-		{
-			Object ex = SJavaParser.getProperty(properties, Excluded.class.getName(), imports, null, cl);
-			if(ex!=null)
-			{
-				for(Iterator<Object> it = SReflect.getIterator(ex); it.hasNext(); )
-				{
-					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
-					for(int j=0; j<mis.length; j++)
-					{
-						ret.addExcludedMethod(mis[j]);
-					}
-				}
-			}
-			Object syn = SJavaParser.getProperty(properties, Synchronous.class.getName(), imports, null, cl);
-			if(syn!=null)
-			{
-				for(Iterator<Object> it = SReflect.getIterator(syn); it.hasNext(); )
-				{
-					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
-					for(int j=0; j<mis.length; j++)
-					{
-						ret.addSynchronousMethod(mis[j]);
-					}
-				}
-			}
-			Object un = SJavaParser.getProperty(properties, Uncached.class.getName(), imports, null, cl);
-			if(un!=null)
-			{
-				for(Iterator<Object> it = SReflect.getIterator(un); it.hasNext(); )
-				{
-					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
-					for(int j=0; j<mis.length; j++)
-					{
-						ret.addUncachedMethod(mis[j]);
-					}
-				}
-			}
-			Object mr = SJavaParser.getProperty(properties, Replacement.class.getName(), imports, null, cl);
-			if(mr!=null)
-			{
-				for(Iterator<Object> it = SReflect.getIterator(mr); it.hasNext(); )
-				{
-					Object[] tmp = (Object[])it.next();
-					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
-					for(int j=0; j<mis.length; j++)
-					{
-						ret.addMethodReplacement(mis[j], (IMethodReplacement)tmp[1]);
-					}
-				}
-			}
-			Object to = SJavaParser.getProperty(properties, Timeout.class.getName(), imports, null, cl);
-			if(to!=null)
-			{
-				for(Iterator<Object> it = SReflect.getIterator(to); it.hasNext(); )
-				{
-					Object[] tmp = (Object[])it.next();
-					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
-					for(int j=0; j<mis.length; j++)
-					{
-						ret.addMethodTimeout(mis[j], ((Number)tmp[1]).longValue());
-					}
-				}
-			}
-			Object td = SJavaParser.getProperty(properties, ITargetResolver.TARGETRESOLVER, imports, null, cl);
-			if(td!=null)
-			{
-				@SuppressWarnings("unchecked")
-				Class<ITargetResolver> tmp = (Class<ITargetResolver>)td;
-				ret.setTargetResolverClazz(tmp);
-			}
-		}
+//		if(properties!=null)
+//		{
+//			System.out.println();
+//			
+//			Object ex = SJavaParser.getProperty(properties, Excluded.class.getName(), imports, null, cl);
+//			if(ex!=null)
+//			{
+//				for(Iterator<Object> it = SReflect.getIterator(ex); it.hasNext(); )
+//				{
+//					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+//					for(int j=0; j<mis.length; j++)
+//					{
+//						ret.addExcludedMethod(mis[j]);
+//					}
+//				}
+//			}
+//			Object syn = SJavaParser.getProperty(properties, Synchronous.class.getName(), imports, null, cl);
+//			if(syn!=null)
+//			{
+//				for(Iterator<Object> it = SReflect.getIterator(syn); it.hasNext(); )
+//				{
+//					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+//					for(int j=0; j<mis.length; j++)
+//					{
+//						ret.addSynchronousMethod(mis[j]);
+//					}
+//				}
+//			}
+//			Object un = SJavaParser.getProperty(properties, Uncached.class.getName(), imports, null, cl);
+//			if(un!=null)
+//			{
+//				for(Iterator<Object> it = SReflect.getIterator(un); it.hasNext(); )
+//				{
+//					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+//					for(int j=0; j<mis.length; j++)
+//					{
+//						ret.addUncachedMethod(mis[j]);
+//					}
+//				}
+//			}
+//			Object mr = SJavaParser.getProperty(properties, Replacement.class.getName(), imports, null, cl);
+//			if(mr!=null)
+//			{
+//				for(Iterator<Object> it = SReflect.getIterator(mr); it.hasNext(); )
+//				{
+//					Object[] tmp = (Object[])it.next();
+//					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
+//					for(int j=0; j<mis.length; j++)
+//					{
+//						ret.addMethodReplacement(mis[j], (IMethodReplacement)tmp[1]);
+//					}
+//				}
+//			}
+//			Object to = SJavaParser.getProperty(properties, Timeout.class.getName(), imports, null, cl);
+//			if(to!=null)
+//			{
+//				for(Iterator<Object> it = SReflect.getIterator(to); it.hasNext(); )
+//				{
+//					Object[] tmp = (Object[])it.next();
+//					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
+//					for(int j=0; j<mis.length; j++)
+//					{
+//						ret.addMethodTimeout(mis[j], ((Number)tmp[1]).longValue());
+//					}
+//				}
+//			}
+//			Object td = SJavaParser.getProperty(properties, ITargetResolver.TARGETRESOLVER, imports, null, cl);
+//			if(td!=null)
+//			{
+//				@SuppressWarnings("unchecked")
+//				Class<ITargetResolver> tmp = (Class<ITargetResolver>)td;
+//				ret.setTargetResolverClazz(tmp);
+//			}
+//		}
 		
 		// Add properties from annotations.
 		// Todo: merge with external properties (which precedence?)
@@ -401,7 +414,7 @@ public class RemoteReferenceModule
 //				deftimeout	= new Long(ta.value());
 //			}
 			
-			boolean	allex	= allinterfaces[i].isAnnotationPresent(Excluded.class);
+			boolean	allex = allinterfaces[i].isAnnotationPresent(Excluded.class);
 			
 //			if(allinterfaces[i].isAnnotationPresent(TargetResolver.class))
 //			{
@@ -490,7 +503,7 @@ public class RemoteReferenceModule
 //					System.out.println("hjgff");
 				long to = BasicService.getMethodTimeout(remoteinterfaces, methods[j], true);
 				// Do not save default value (overhead)
-				if(to!=Timeout.UNSET && to!=Starter.getRemoteDefaultTimeout(platform))
+				if(to!=Timeout.UNSET && to!=Starter.getDefaultTimeout(platform))
 					ret.addMethodTimeout(new MethodInfo(methods[j]), to);
 			}
 		}
@@ -545,8 +558,16 @@ public class RemoteReferenceModule
 		// the computer which only uses the proxy.
 		Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
 		if(ret.getMethodReplacement(getclass)==null)
-		{
 			ret.addExcludedMethod(new MethodInfo(getclass));
+		
+		Method getfeat = SReflect.getMethod(IExternalAccess.class, "getExternalFeature", new Class[]{Class.class});
+		if(ret.getMethodReplacement(getfeat)==null)
+		{
+			MethodInfo[] mis = getMethodInfo(getfeat, targetclass, false);
+			for(int i=0; i<mis.length; i++)
+			{
+				ret.addMethodReplacement(mis[i], new GetExternalFeatureMethodReplacement());
+			}
 		}
 		
 		return ret;
@@ -669,59 +690,25 @@ public class RemoteReferenceModule
 	 *  Get a remote reference.
 	 *  @param target The (local) remote object.
 	 */
-	protected RemoteReference getRemoteReference(Object target)
+	protected static RemoteReference getRemoteReference(Object target)
 	{
-		return getRemoteReference(target, target, true);
+		return getRemoteReference(target, target);//, true);
 	}
 	
 	/**
 	 *  Get a remote reference.
 	 *  @param target The (local) remote object.
 	 */
-	protected RemoteReference getRemoteReference(Object target, Object orig, boolean add)
+	public static RemoteReference getRemoteReference(Object target, Object orig)//, boolean add)
 	{
 		RemoteReference ret;// = (RemoteReference)remoterefs.get(target);
 		
 		// Create a remote reference if not yet available.
 //		if(ret==null)
 		{
-			if(ProxyFactory.isProxyClass(target.getClass()))
+			if(target instanceof IService)
 			{
-				Object handler = ProxyFactory.getInvocationHandler(target);
-				if(handler instanceof BasicServiceInvocationHandler)
-				{
-					BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
-					Object ser = bsh.getService();
-					// Has to look into service as could be nested remote handler inside.
-					if(ser instanceof IService)
-					{
-						ret = getRemoteReference(ser, orig, false);
-					}
-					else 
-					{
-						ret = new RemoteReference(bsh.getServiceIdentifier().getProviderId(), bsh.getServiceIdentifier());
-					}
-				}
-				else if(handler instanceof RemoteMethodInvocationHandler)
-				{
-					RemoteMethodInvocationHandler	rmih	= (RemoteMethodInvocationHandler)ProxyFactory.getInvocationHandler(target);
-					ret	= rmih.pr.getRemoteReference();
-				}
-				else
-				{
-					// TODO: can not happen?
-					throw new UnsupportedOperationException("Proxy type not supproetd: "+target);
-//					ret = generateRemoteReference();
-				}
-			}
-			else if(target instanceof IExternalAccess)
-			{
-				ret = new RemoteReference(((IExternalAccess)target).getComponentIdentifier(), ((IExternalAccess)target).getComponentIdentifier());
-//				System.out.println("component ref: "+ret);
-			}
-			else if(target instanceof IService)
-			{
-				ret = new RemoteReference(((IService)target).getServiceIdentifier().getProviderId(), ((IService)target).getServiceIdentifier());
+				ret = new RemoteReference(((IService)target).getServiceId().getProviderId(), ((IService)target).getServiceId());
 //				System.out.println("service ref: "+ret);
 			}
 			else if(target instanceof ServiceInfo)
@@ -729,13 +716,38 @@ public class RemoteReferenceModule
 				ServiceInfo si = (ServiceInfo)target;
 				if(ProxyFactory.isProxyClass(si.getDomainService().getClass()))
 				{
-					ret = getRemoteReference(si.getDomainService(), orig, false);
+					ret = getRemoteReference(si.getDomainService(), orig);//, false);
 				}
 				else
 				{
-					ret = new RemoteReference(((ServiceInfo)target).getManagementService().getServiceIdentifier().getProviderId(), ((ServiceInfo)target).getManagementService().getServiceIdentifier());
+					ret = new RemoteReference(((ServiceInfo)target).getManagementService().getServiceId().getProviderId(), ((ServiceInfo)target).getManagementService().getServiceId());
 	//				System.out.println("service ref: "+ret);
 				}
+			}
+			else if(ProxyFactory.isProxyClass(target.getClass()) && ProxyFactory.getInvocationHandler(target) instanceof BasicServiceInvocationHandler)
+			{
+				Object handler = ProxyFactory.getInvocationHandler(target);
+				BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
+				Object ser = bsh.getService();
+				// Has to look into service as could be nested remote handler inside.
+				if(ser instanceof IService)
+				{
+					ret = getRemoteReference(ser, orig);//, false);
+				}
+				else 
+				{
+					ret = new RemoteReference(bsh.getServiceIdentifier().getProviderId(), bsh.getServiceIdentifier());
+				}
+			}
+			else if(ProxyFactory.isProxyClass(target.getClass()) && ProxyFactory.getInvocationHandler(target) instanceof RemoteMethodInvocationHandler)
+			{
+				RemoteMethodInvocationHandler rmih = (RemoteMethodInvocationHandler)ProxyFactory.getInvocationHandler(target);
+				ret	= rmih.getProxyReference().getRemoteReference();
+			}
+			else if(target instanceof IExternalAccess)
+			{
+				ret = new RemoteReference(((IExternalAccess)target).getId(), ((IExternalAccess)target).getId());
+//				System.out.println("component ref: "+ret);
 			}
 			else
 			{
@@ -830,12 +842,12 @@ public class RemoteReferenceModule
 			{
 				throw new IllegalStateException("Must be run on component that received remote execution message.");
 			}
-			if(!access.getComponentIdentifier().equals(sid.getProviderId()))
+			if(!access.getId().equals(sid.getProviderId()))
 			{
 				throw new IllegalStateException("Must be request for service of component that received remote execution message.");				
 			}
 			
-			ret	= access.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(sid);
+			ret	= access.getFeature(IProvidedServicesFeature.class).getProvidedService(sid);
 		}
 		else if(rr.getTargetIdentifier() instanceof IComponentIdentifier)
 		{
@@ -847,7 +859,7 @@ public class RemoteReferenceModule
 //				public IFuture<IExternalAccess> execute(IInternalAccess ia)
 //				{
 //					final Future<IExternalAccess> ret = new Future<IExternalAccess>();
-//					SServiceProvider.getService(ia, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 //	//						.addResultListener(component.createResultListener(new IResultListener()
 //					{
@@ -868,13 +880,13 @@ public class RemoteReferenceModule
 			{
 				throw new IllegalStateException("Must be run on component that received remote execution message.");
 			}
-			if(!access.getComponentIdentifier().equals(cid))
+			if(!access.getId().equals(cid))
 			{
 				throw new IllegalStateException("Must be request for access of component that received remote execution message.");				
 			}
 			ret	= access.getExternalAccess();
 			
-//			SServiceProvider.getService(access, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 //			{
 //				public void customResultAvailable(IComponentManagementService cms) 
@@ -944,7 +956,9 @@ public class RemoteReferenceModule
 			if(pr.getRemoteReference().getTargetIdentifier() instanceof IServiceIdentifier)
 			{
 				IServiceIdentifier	sid	= (IServiceIdentifier)pr.getRemoteReference().getTargetIdentifier();
-				ret	= SServiceProvider.getLocalService(null, sid, sid.getServiceType().getType(classloader));
+				// Hack???
+				ret	= ServiceRegistry.getRegistry(platform).getLocalService(ServiceRegistry.getRegistry(platform)
+					.searchService(new ServiceQuery<>(sid.getServiceType().getType(classloader)).setProvider(sid.getProviderId()).setNetworkNames((String[]) null)));
 			}
 			else if(pr.getRemoteReference().getTargetIdentifier() instanceof IComponentIdentifier)
 			{
@@ -1657,7 +1671,7 @@ public class RemoteReferenceModule
 	/**
 	 *  Get the proxy interfaces (empty list if none).
 	 */
-	public Class<?>[] getRemoteInterfaces(Object object, ClassLoader cl)
+	public static Class<?>[] getRemoteInterfaces(Object object, ClassLoader cl)
 	{
 		List<Class<?>> ret = new ArrayList<Class<?>>();
 		
@@ -1711,11 +1725,11 @@ public class RemoteReferenceModule
 			{
 				// Hack!!! Should not need class loader at all?
 				// getType0 required, cf. ServiceCallTest (why wrong class loader?)
-				Class<?> serviceinterface = ((IService)object).getServiceIdentifier().getServiceType().getType0();
+				Class<?> serviceinterface = ((IService)object).getServiceId().getServiceType().getType0();
 				if(serviceinterface==null)
 				{
 					// getType(cl) required, cf. RemoteReferenceTest (remote proxy with only typename) -> use ClassInfo in ProxyInfo instead of Class<?>
-					serviceinterface = ((IService)object).getServiceIdentifier().getServiceType().getType(cl);
+					serviceinterface = ((IService)object).getServiceId().getServiceType().getType(cl);
 				}
 				assert serviceinterface!=null;
 				if(!ret.contains(serviceinterface))

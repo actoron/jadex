@@ -19,9 +19,8 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -81,10 +80,10 @@ public class GenerateService implements IGenerateService
 				
 				final AreaData	ad	= (AreaData)task;	// single cutout of area
 				final AreaData	data	= (AreaData)user;	// global area
-				ad.setCalculatorId((IComponentIdentifier)service.getServiceIdentifier().getProviderId());
+				ad.setCalculatorId((IComponentIdentifier)service.getServiceId().getProviderId());
 				
 //				System.out.println("invoke: "+service);
-				agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("displayservice").addResultListener(new DefaultResultListener()
+				agent.getFeature(IRequiredServicesFeature.class).getService("displayservice").addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -148,42 +147,28 @@ public class GenerateService implements IGenerateService
 			public IFuture createService()
 			{
 				final Future	ret	= new Future();
-				agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cmsservice").addResultListener(new DelegationResultListener(ret)
+				Object delay = agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("delay");
+				if(delay==null)
+					delay = Long.valueOf(5000);
+				
+				agent.createComponent(
+					new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
+					agent.getId().getParent()).setFilename("jadex/micro/examples/mandelbrot/CalculateAgent.class"), null)
+					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IExternalAccess>(ret)
 				{
-					public void customResultAvailable(Object result)
+					// Component created, now get the calculation service.
+					public void customResultAvailable(IExternalAccess result)
 					{
-						final IComponentManagementService cms = (IComponentManagementService)result;
-						Object delay = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay");
-						if(delay==null)
-							delay = Long.valueOf(5000);
-						cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 
-							new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
-							agent.getComponentIdentifier().getParent()), null)
-							.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+						result.searchService(new ServiceQuery<>(ICalculateService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY)).addResultListener(
+							agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<ICalculateService>(ret)
 						{
-							// Component created, now get the calculation service.
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(ICalculateService result)
 							{
-								cms.getExternalAccess((IComponentIdentifier)result).addResultListener(
-									agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-								{
-									public void customResultAvailable(Object result)
-									{
-										SServiceProvider.getService((IExternalAccess)result,
-											ICalculateService.class, RequiredServiceInfo.SCOPE_LOCAL).addResultListener(
-											agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-										{
-											public void customResultAvailable(Object result)
-											{
-												ret.setResult(result);
-											}
-										}));
-									}
-								}));
+								ret.setResult(result);
 							}
 						}));
 					}
-				});
+				}));
 				return ret;
 			}
 		}, -1);
@@ -287,7 +272,7 @@ public class GenerateService implements IGenerateService
 		// Assign tasks to service pool.
 		final int number	= areas.size();
 		manager.setMax(data.getParallel());
-		manager.performTasks(areas, true, data).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		manager.performTasks(areas, true, data).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new IIntermediateResultListener<Object>()
 		{
 			int	cnt	= 0;

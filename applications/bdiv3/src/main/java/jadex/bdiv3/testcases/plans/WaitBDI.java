@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
@@ -30,7 +31,7 @@ import jadex.rules.eca.ChangeInfo;
 /**
  *  Agent that tests plan waiting for fact added and removed.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="waitPlan")))
 //@BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="waitqueuePlan")))
@@ -53,21 +54,21 @@ public class WaitBDI
 		tr[0] = new TestReport("#1", "Test waitForFactAdded");
 		tr[1] = new TestReport("#2", "Test waitForFactRemoved");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				System.out.println("Adding");
 				addName("a");
 				
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						System.out.println("Removing");
 						removeName("a");
 						
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+						agent.getFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
@@ -95,7 +96,7 @@ public class WaitBDI
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 	}
 	
 	/**
@@ -127,7 +128,7 @@ public class WaitBDI
 		
 		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, new DelegationResultListener<Void>(ret));
 		
-		rplan.waitForFactAdded("names").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
+		rplan.waitForFactAdded("names").addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
 		{
 			public void customResultAvailable(ChangeInfo<?> result)
 			{
@@ -137,7 +138,7 @@ public class WaitBDI
 			}
 		}));
 		
-		rplan.waitForFactRemoved("names").addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
+		rplan.waitForFactRemoved("names").addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
 		{
 			public void customResultAvailable(ChangeInfo<?> result)
 			{
@@ -212,7 +213,7 @@ public class WaitBDI
 //	/**
 //	 *  Plan that waits with waitqueue for addition of a name.
 //	 */
-//	@Plan(waitqueue=@Trigger(factaddeds="names"))
+//	@Plan(waitqueue=@Trigger(factadded="names"))
 //	protected IFuture<Void> waitqueuePlan(final RPlan rplan)
 //	{
 //		final Future<Void> ret = new Future<Void>();

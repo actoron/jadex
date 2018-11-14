@@ -18,9 +18,10 @@ public class BDIModelLoader extends AbstractModelLoader
 	//-------- constants --------
 	
 	/** The component file extension. */
-	public static final String	FILE_EXTENSION_BDIV3_FIRST = "BDI";
-	public static final String	FILE_EXTENSION_BDIV3_SECOND = ".class";
-	public static final String	FILE_EXTENSION_BDIV3 = FILE_EXTENSION_BDIV3_FIRST + FILE_EXTENSION_BDIV3_SECOND;
+//	public static final String	FILE_EXTENSION_BDIV3_FIRST = "BDI";
+//	public static final String	FILE_EXTENSION_BDIV3_SECOND = ".class";
+//	public static final String	FILE_EXTENSION_BDIV3 = FILE_EXTENSION_BDIV3_FIRST + FILE_EXTENSION_BDIV3_SECOND;
+	public static final String	FILE_EXTENSION_BDIV3 =  ".class";
 	
 	//-------- attributes --------
 	

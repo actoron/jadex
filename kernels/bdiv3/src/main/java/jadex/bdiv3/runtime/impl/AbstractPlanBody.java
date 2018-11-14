@@ -116,7 +116,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 					rplan.setFinishing();
 					
 					// Schedule passed/failed/aborted on separate component step, as it might be triggered inside other plan execution
-					ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Object>()
+					ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Object>()
 					{
 						@Override
 						public IFuture<Object> execute(IInternalAccess ia)
@@ -164,7 +164,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 //				System.out.println("setting ex on: "+rplan);
 				rplan.setException(exception);
 				
-				assert getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+				assert getAgent().getFeature(IExecutionFeature.class).isComponentThread();
 				assert rplan.isFinishing() != (next==2): SUtil.getExceptionStacktrace(exception);	// either finishing (due to abort) or failed.
 				if(next==2)
 				{
@@ -172,7 +172,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 				}
 				
 				// Schedule passed/failed/aborted on separate component step, as it might be triggered inside other plan execution
-				ia.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Object>()
+				ia.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Object>()
 				{
 					@Override
 					public IFuture<Object> execute(IInternalAccess ia)

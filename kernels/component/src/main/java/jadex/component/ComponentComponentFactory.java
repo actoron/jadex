@@ -13,7 +13,10 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.IBootstrapFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -23,7 +26,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.kernelbase.IBootstrapFactory;
 
 /**
  *  Factory for default contexts.
@@ -85,7 +87,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public ComponentComponentFactory(IInternalAccess provider)
 	{
-		super(provider.getComponentIdentifier(), IComponentFactory.class, null);
+		super(provider.getId(), IComponentFactory.class, null);
 		this.provider = provider;
 		this.features	= SComponentFactory.DEFAULT_FEATURES;
 	}
@@ -96,7 +98,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = provider.getComponentIdentifier();
+		this.providerid = provider.getId();
 		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
@@ -188,7 +190,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 					try
 					{
 						ret.setResult(loader.loadComponentModel(model, imports, cl, 
-							new Object[]{rid, getServiceIdentifier().getProviderId().getRoot()}).getModelInfo());
+							new Object[]{rid, getServiceId().getProviderId().getRoot()}).getModelInfo());
 					}
 					catch(Exception e)
 					{
@@ -320,6 +322,6 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	protected ILibraryService getLibraryService()
 	{
-		return internalaccess==null? null: SServiceProvider.getLocalService(internalaccess, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 	}
 }

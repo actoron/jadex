@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -19,7 +20,7 @@ import jadex.micro.annotation.Results;
  *  Agent that has two beliefs. 
  *  num2 belief depends on num1 and a plan depends on changes of num2.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class DynamicBeliefBDI
 {
@@ -41,7 +42,7 @@ public class DynamicBeliefBDI
 	/**
 	 *  Plan that reacts on belief changes of num2.
 	 */
-	@Plan(trigger=@Trigger(factchangeds="num2"))
+	@Plan(trigger=@Trigger(factchanged="num2"))
 	protected void successPlan(int num)
 	{
 		System.out.println("plan activated: num2 changed to "+num);
@@ -57,13 +58,13 @@ public class DynamicBeliefBDI
 	public void body()
 	{
 		num1 = 2;
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!tr.isFinished())
 					tr.setFailed("Plan was not activated due to belief change or incorrect event change.");
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				agent.killComponent();
 				return IFuture.DONE;
 			}

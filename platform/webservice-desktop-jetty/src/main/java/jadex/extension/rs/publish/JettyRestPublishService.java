@@ -23,9 +23,9 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
@@ -34,6 +34,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
 
 /**
  *  Publish service without Jersey directly using Jetty container.
@@ -72,7 +73,26 @@ public class JettyRestPublishService extends AbstractRestPublishService
     @AgentCreated
     public void start()
     {
-    	System.out.println("Jetyy sta");
+    	System.out.println("Jetty started");
+    }
+    
+    @AgentKilled
+    public void stop()
+    {
+    	if (portservers != null)
+    	{
+    		for (Map.Entry<Integer, Server> entry : portservers.entrySet())
+    		{
+    			try
+				{
+					entry.getValue().stop();
+				}
+				catch (Exception e)
+				{
+				}
+    		}
+    	}
+    	System.out.println("Jetty stopped");
     }
     
     /**
@@ -95,7 +115,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
     {
         try
         {
-        	//final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
+        	//final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
         	
             final URI uri = new URI(getCleanPublishId(info.getPublishId()));
             Server server = (Server)getHttpServer(uri, info);
@@ -113,7 +133,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
                     throws IOException, ServletException
                 {
                 	if(service==null)
-                		service = (IService)SServiceProvider.getService(component.getExternalAccess(), serviceid).get();
+                		service = component.getExternalAccess().searchService( new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
                 	
                     // Hack to enable multi-part
                     // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html
@@ -206,7 +226,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
         {
     		String clpid = pid.replace("[", "").replace("]", "");
     		URI uri = new URI(clpid);
-        	//final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
+        	//final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
         	
             Server server = (Server)getHttpServer(uri, null);
             System.out.println("Adding http handler to server: "+uri.getPath());
@@ -242,14 +262,13 @@ public class JettyRestPublishService extends AbstractRestPublishService
     public IFuture<Void> publishResources(final String pid, final String rootpath)
     {
 		final Future<Void>	ret	= new Future<Void>();
-		IComponentManagementService	cms	= SServiceProvider.getLocalService(component, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getComponentIdentifier();
-		cms.getComponentDescription(cid)
+		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getId();
+		component.getDescription(cid)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
 		{
 			public void customResultAvailable(IComponentDescription desc)
 			{
-				ILibraryService	ls	= SServiceProvider.getLocalService(component, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				ILibraryService	ls	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 				ls.getClassLoader(desc.getResourceIdentifier())
 					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{
@@ -257,7 +276,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
 					{
 			    		String clpid = pid.replace("[", "").replace("]", "");
 			    		URI uri = new URI(clpid);
-			        	//final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
+			        	//final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
 			        	
 			            Server server = (Server)getHttpServer(uri, null);
 			            System.out.println("Adding http handler to server: "+uri.getPath());

@@ -7,9 +7,7 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 
 /**
  *  Test remote message sending.
@@ -39,8 +37,7 @@ public class MessagingTest
 		
 		// Start receiver.
 		IExternalAccess	pf_receiver	= Starter.createPlatform(config).get();		
-		IComponentManagementService	cms	= SServiceProvider.getService(pf_receiver, IComponentManagementService.class).get();
-		IComponentIdentifier	cid_receiver	= cms.createComponent(receiver.getName()+".class", null).getFirstResult();
+		IComponentIdentifier cid_receiver = pf_receiver.createComponent(new CreationInfo().setFilename(receiver.getName()+".class")).getFirstResult();
 				
 		// Start sender with receiver CID.
 		IExternalAccess	pf_sender;
@@ -53,8 +50,7 @@ public class MessagingTest
 			// Start second platform
 			pf_sender	= Starter.createPlatform(config).get();
 		}
-		cms	= SServiceProvider.getService(pf_sender, IComponentManagementService.class).get();
-		cms.createComponent(sender.getName()+".class",
-			new CreationInfo(Collections.singletonMap("receiver", (Object)cid_receiver))).get();
+		pf_sender.createComponent(
+			new CreationInfo(Collections.singletonMap("receiver", (Object)cid_receiver)).setFilename(sender.getName()+".class")).get();
 	}
 }

@@ -19,7 +19,6 @@ import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -28,7 +27,7 @@ import jadex.micro.annotation.Results;
 @Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"copy.copy\""))
 @Results(@Result(name="filesize", clazz=long.class))
 @RequiredServices({
-	@RequiredService(name="contextService", type=IContextService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="contextService", type=IContextService.class)
 })
 @Agent
 public class ReceiverAgent
@@ -45,7 +44,7 @@ public class ReceiverAgent
 	@AgentCreated
 	public void created()
 	{
-		agent.getLogger().severe("Agent created: "+agent.getComponentDescription());
+		agent.getLogger().severe("Agent created: "+agent.getDescription());
 	}
 	
 	/**
@@ -73,7 +72,7 @@ public class ReceiverAgent
 			final FileOutputStream fos = new FileOutputStream(f);
 			
 			ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
-			fut.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<byte[]>()
+			fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<byte[]>()
 			{
 				public void resultAvailable(Collection<byte[]> result)
 				{
@@ -109,7 +108,7 @@ public class ReceiverAgent
 					{
 //						System.out.println("finished, size: "+cnt[0]);
 						fos.close();
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("filesize", Long.valueOf(cnt[0]));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("filesize", Long.valueOf(cnt[0]));
 						agent.killComponent();
 					}
 					catch(Exception e)

@@ -112,7 +112,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected String[] SCOPE_TYPES = { RequiredServiceInfo.SCOPE_APPLICATION,
 									   RequiredServiceInfo.SCOPE_COMPONENT,
 									   RequiredServiceInfo.SCOPE_PARENT,
-									   RequiredServiceInfo.SCOPE_LOCAL,
+									   RequiredServiceInfo.SCOPE_COMPONENT_ONLY,
 									   RequiredServiceInfo.SCOPE_PLATFORM,
 									   RequiredServiceInfo.SCOPE_GLOBAL};
 //									   RequiredServiceInfo.SCOPE_UPWARDS };
@@ -274,41 +274,41 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		cbox.setText("Suspend");
 		column.add(cbox);
 		
-		cbox = new JCheckBox();
-		cbox.setSelected(convBool(getModelInfo().getMaster()));
-		cbox.setAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getModelInfo().setMaster(((JCheckBox) e.getSource()).isSelected());
-			}
-		});
-		cbox.setText("Master");
-		column.add(cbox);
-		
-		cbox = new JCheckBox();
-		cbox.setSelected(convBool(getModelInfo().getDaemon()));
-		cbox.setAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getModelInfo().setDaemon(((JCheckBox) e.getSource()).isSelected());
-			}
-		});
-		cbox.setText("Daemon");
-		column.add(cbox);
-		
-		cbox = new JCheckBox();
-		cbox.setSelected(convBool(getModelInfo().getAutoShutdown()));
-		cbox.setAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getModelInfo().setAutoShutdown(((JCheckBox) e.getSource()).isSelected());
-			}
-		});
-		cbox.setText("Autoshutdown");
-		column.add(cbox);
+//		cbox = new JCheckBox();
+//		cbox.setSelected(convBool(getModelInfo().getMaster()));
+//		cbox.setAction(new AbstractAction()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				getModelInfo().setMaster(((JCheckBox) e.getSource()).isSelected());
+//			}
+//		});
+//		cbox.setText("Master");
+//		column.add(cbox);
+//		
+//		cbox = new JCheckBox();
+//		cbox.setSelected(convBool(getModelInfo().getDaemon()));
+//		cbox.setAction(new AbstractAction()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				getModelInfo().setDaemon(((JCheckBox) e.getSource()).isSelected());
+//			}
+//		});
+//		cbox.setText("Daemon");
+//		column.add(cbox);
+//		
+//		cbox = new JCheckBox();
+//		cbox.setSelected(convBool(getModelInfo().getAutoShutdown()));
+//		cbox.setAction(new AbstractAction()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				getModelInfo().setAutoShutdown(((JCheckBox) e.getSource()).isSelected());
+//			}
+//		});
+//		cbox.setText("Autoshutdown");
+//		column.add(cbox);
 		
 		cbox = new JCheckBox();
 		cbox.setSelected(convBool(getModel().isKeepAlive()));
@@ -495,9 +495,9 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				int row = conftable.getRowCount();
 				ConfigurationInfo conf = new ConfigurationInfo(createFreeName("name", new ConfigurationContains(confcache)));
 				conf.setSuspend(getModelInfo().getSuspend());
-				conf.setMaster(getModelInfo().getMaster());
-				conf.setDaemon(getModelInfo().getDaemon());
-				conf.setAutoShutdown(getModelInfo().getAutoShutdown());
+//				conf.setMaster(getModelInfo().getMaster());
+//				conf.setDaemon(getModelInfo().getDaemon());
+//				conf.setAutoShutdown(getModelInfo().getAutoShutdown());
 				confcache.add(conf);
 				getModelInfo().setConfigurations((ConfigurationInfo[]) confcache.toArray(new ConfigurationInfo[confcache.size()]));
 				modelcontainer.setDirty(true);
@@ -1136,12 +1136,12 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 //				if(confname!=null)
 //				{
 //					getModelInfo().getConfiguration(confname).addRequiredService(rs);
-//					row = getModelInfo().getConfiguration(confname).getRequiredServices().length;
+//					row = getModelInfo().getConfiguration(confname).getServices().length;
 //				}
 //				else
 //				{
 					getModelInfo().addRequiredService(rs);
-//					row = getModelInfo().getRequiredServices().length;
+//					row = getModelInfo().getServices().length;
 //				}
 				
 				modelcontainer.setDirty(true);
@@ -1159,7 +1159,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				
 				Arrays.sort(ind);
 				
-				RequiredServiceInfo[] services = getModelInfo().getRequiredServices();
+				RequiredServiceInfo[] services = getModelInfo().getServices();
 				for(int i = ind.length - 1; i >= 0; --i)
 				{
 					getModelInfo().removeRequiredService(services[i]);
@@ -1520,15 +1520,15 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				case 1:
 					ret = convBool(confcache.get(rowIndex).getSuspend());
 					break;
-				case 2:
-					ret = convBool(confcache.get(rowIndex).getMaster());
-					break;
-				case 3:
-					ret = convBool(confcache.get(rowIndex).getDaemon());
-					break;
-				case 4:
-					ret = convBool(confcache.get(rowIndex).getAutoShutdown());
-					break;
+//				case 2:
+//					ret = convBool(confcache.get(rowIndex).getMaster());
+//					break;
+//				case 3:
+//					ret = convBool(confcache.get(rowIndex).getDaemon());
+//					break;
+//				case 4:
+//					ret = convBool(confcache.get(rowIndex).getAutoShutdown());
+//					break;
 			}
 			return ret;
 		}
@@ -1588,15 +1588,15 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				case 1:
 					confcache.get(rowIndex).setSuspend((Boolean) value);
 					break;
-				case 2:
-					confcache.get(rowIndex).setMaster(((Boolean) value));
-					break;
-				case 3:
-					confcache.get(rowIndex).setDaemon(((Boolean) value));
-					break;
-				case 4:
-					confcache.get(rowIndex).setAutoShutdown(((Boolean) value));
-					break;
+//				case 2:
+//					confcache.get(rowIndex).setMaster(((Boolean) value));
+//					break;
+//				case 3:
+//					confcache.get(rowIndex).setDaemon(((Boolean) value));
+//					break;
+//				case 4:
+//					confcache.get(rowIndex).setAutoShutdown(((Boolean) value));
+//					break;
 //				case 1:
 //				
 //					getModel().addPoolLane(confcache.get(rowIndex).getName(), (String) value);
@@ -2334,7 +2334,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public int getRowCount()
 		{
-			return getModelInfo().getRequiredServices().length;
+			return getModelInfo().getServices().length;
 		}
 		
 		/**
@@ -2356,7 +2356,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-			RequiredServiceInfo rs = getModelInfo().getRequiredServices()[rowIndex];
+			RequiredServiceInfo rs = getModelInfo().getServices()[rowIndex];
 			RequiredServiceInfo cs = getReqService(rs.getName(), getModel().getModelInfo().getConfiguration((String)confmodel.getSelectedItem()));
 			switch(columnIndex)
 			{
@@ -2389,7 +2389,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 						rs = cs;
 					if(rs != null && rs.getDefaultBinding() != null && rs.getDefaultBinding().getScope() != null)
 					{
-						ret = rs.getDefaultBinding().isDynamic();
+//						ret = rs.getDefaultBinding().isDynamic();
 					}
 					return ret;
 				}
@@ -2400,7 +2400,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 						rs = cs;
 					if(rs != null && rs.getDefaultBinding() != null && rs.getDefaultBinding().getScope() != null)
 					{
-						ret = rs.getDefaultBinding().isCreate();
+//						ret = rs.getDefaultBinding().isCreate();
 					}
 					return ret;
 				}
@@ -2416,7 +2416,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public void setValueAt(Object value, int rowIndex, int columnIndex)
 		{
-			RequiredServiceInfo rs = getModelInfo().getRequiredServices()[rowIndex];
+			RequiredServiceInfo rs = getModelInfo().getServices()[rowIndex];
 			ConfigurationInfo conf = getModel().getModelInfo().getConfiguration((String) confmodel.getSelectedItem());
 			RequiredServiceInfo cs = getReqService(rs.getName(), conf);
 			if((columnIndex == 3 ||
@@ -2444,7 +2444,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 								itcs.setName(newname);
 						}
 						rs.setName(newname);
-						getModelInfo().setRequiredServices(getModelInfo().getRequiredServices());
+						getModelInfo().setRequiredServices(getModelInfo().getServices());
 					}
 					break;
 				}
@@ -2492,7 +2492,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					if(cs != null)
 					{
 						createBinding(cs);
-						cs.getDefaultBinding().setDynamic((Boolean)value);
+//						cs.getDefaultBinding().setDynamic((Boolean)value);
 						if(compareService(rs, cs))
 						{
 							conf.removeRequiredService(cs);
@@ -2501,7 +2501,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					else
 					{
 						createBinding(rs);
-						rs.getDefaultBinding().setDynamic((Boolean)value);
+//						rs.getDefaultBinding().setDynamic((Boolean)value);
 						for(ConfigurationInfo itconf : getModelInfo().getConfigurations())
 						{
 							cs = getReqService(rs.getName(), itconf);
@@ -2517,7 +2517,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					if(cs != null)
 					{
 						createBinding(cs);
-						cs.getDefaultBinding().setDynamic((Boolean)value);
+//						cs.getDefaultBinding().setDynamic((Boolean)value);
 						if(compareService(rs, cs))
 						{
 							conf.removeRequiredService(cs);
@@ -2526,7 +2526,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					else
 					{
 						createBinding(rs);
-						rs.getDefaultBinding().setCreate((Boolean)value);
+//						rs.getDefaultBinding().setCreate((Boolean)value);
 						for(ConfigurationInfo itconf : getModelInfo().getConfigurations())
 						{
 							cs = getReqService(rs.getName(), itconf);
@@ -2588,7 +2588,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	{
 		public boolean filter(String obj)
 		{
-			RequiredServiceInfo[] rsi = getModelInfo().getRequiredServices();
+			RequiredServiceInfo[] rsi = getModelInfo().getServices();
 			for (int i = 0; i < rsi.length; ++i)
 			{
 				if (obj.equals(rsi[i].getName()))
@@ -2831,7 +2831,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			return null;
 		}
 		
-		RequiredServiceInfo[] services = conf.getRequiredServices();
+		RequiredServiceInfo[] services = conf.getServices();
 		
 		if (services == null)
 		{

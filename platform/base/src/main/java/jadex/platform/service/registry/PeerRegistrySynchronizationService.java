@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
@@ -14,12 +13,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
@@ -36,7 +34,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.micro.annotation.Binding;
 
 /**
  *  Service for normal peers to send local changes to a selected superpeer.
@@ -113,13 +110,14 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				// has results from search?
 				else if(pos<res.size())
 				{
-					ret.setResult(((IService)res.get(pos++)).getServiceIdentifier().getProviderId());
+					ret.setResult(((IService)res.get(pos++)).getServiceId().getProviderId());
 				}
 				// no search running? -> create
 				else if(currentsearch==null)
 				{
 //					System.out.println("created search");
-					currentsearch = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, component.getComponentIdentifier(), null));
+					//TODO
+//					currentsearch = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, component.getComponentIdentifier(), null));
 					final ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> fcurrentsearch = currentsearch;
 					
 					addCall(currentsearch, ret);
@@ -184,15 +182,16 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				if(fini)
 				{
 					// add superpeers as last chance
-					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
-						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
+					//TODO
+//					for(IComponentIdentifier id : ISuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS)
+//						res.add(SServiceProvider.getServiceProxy(component, new BasicComponentIdentifier("registrysuperpeer@" + id.getPlatformName()), ISuperpeerRegistrySynchronizationService.class));
 				}
 				
 				List<Future<IComponentIdentifier>> futs = opencalls.get(call);
 				while(opencalls.size()>0 && pos<res.size() && futs!=null && futs.size()>0)
 				{
 					Future<IComponentIdentifier> fut = futs.remove(0);
-					fut.setResult(((IService)res.get(pos++)).getServiceIdentifier().getProviderId());
+					fut.setResult(((IService)res.get(pos++)).getServiceId().getProviderId());
 				}
 				
 				if(fini)
@@ -300,7 +299,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 										System.out.println("Information about new superpeers, refreshing superpeer");
 										superpeers.clear();
 										for(ISuperpeerRegistrySynchronizationService ser: re.getSuperpeers())
-											superpeers.add(((IService)ser).getServiceIdentifier().getProviderId());
+											superpeers.add(((IService)ser).getServiceId().getProviderId());
 										
 										// Does a new search to refresh superpeer
 										getSuperpeerService(true).addResultListener(searchlis);
@@ -312,7 +311,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 								if(spevent.isUnknown())
 								{
 									spser.updateClientData(lrobs.getCurrentStateEvent(null)).addResultListener(this);
-//									System.out.println("Send full client update to superpeer: "+((IService)spregser).getServiceIdentifier().getProviderId());
+//									System.out.println("Send full client update to superpeer: "+((IService)spregser).getId().getProviderId());
 								}
 							}
 							
@@ -333,7 +332,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 						spser.updateClientData(event).addResultListener(lis);
 //						if(event.size()>0)
 //						{
-//							System.out.println("Send client delta update to superpeer: "+((IService)spser).getServiceIdentifier().getProviderId());
+//							System.out.println("Send client delta update to superpeer: "+((IService)spser).getId().getProviderId());
 //							System.out.println("Event is: "+event);
 //						}
 					}
@@ -372,14 +371,15 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 			{
 				public void customResultAvailable(IComponentIdentifier spcid)
 				{
-					if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
-						throw new RuntimeException("wrooong4");
+//					if(!component.getFeature(IExecutionFeature.class).isComponentThread())
+//						throw new RuntimeException("wrooong4");
 //					spcid = new ComponentIdentifier("registrysuperpeer@"+spcid.getPlatformName());
 //					System.out.println("Found superpeer: "+spcid);
 					ServiceQuery<ISuperpeerRegistrySynchronizationService>	query
-						= new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class, Binding.SCOPE_GLOBAL, spcid, component.getComponentIdentifier(), null);
+						= new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class);
+					query.setProvider(spcid);
 					query.setUnrestricted(true);
-					SServiceProvider.getService(component, query).addResultListener(
+					component.getFeature(IRequiredServicesFeature.class).searchService(query).addResultListener(
 						new DelegationResultListener<ISuperpeerRegistrySynchronizationService>(ret)
 					{
 						public void customResultAvailable(final ISuperpeerRegistrySynchronizationService spser)
@@ -409,7 +409,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 	 */
 	protected IServiceRegistry getRegistry()
 	{
-		return ServiceRegistry.getRegistry(component.getComponentIdentifier());
+		return ServiceRegistry.getRegistry(component.getId());
 	}
 	
 //	/**
@@ -525,7 +525,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 //				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)
 //				{
 ////					System.out.println("found: "+result);
-//					ret.setResult(((IService)result).getServiceIdentifier().getProviderId());
+//					ret.setResult(((IService)result).getId().getProviderId());
 //				}
 //			});
 ////		}
@@ -545,7 +545,8 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 	public static ISuperpeerRegistrySynchronizationService getSuperpeerRegistrySynchronizationService(IInternalAccess component, IComponentIdentifier cid)
 	{
 		IComponentIdentifier sspcid = new ComponentIdentifier("registrysuperpeer@"+cid.getPlatformName());
-		ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, sspcid, ISuperpeerRegistrySynchronizationService.class);
-		return sps;
+		//TODO
+//		ISuperpeerRegistrySynchronizationService sps = SServiceProvider.getServiceProxy(component, sspcid, ISuperpeerRegistrySynchronizationService.class);
+		return null;
 	}
 }

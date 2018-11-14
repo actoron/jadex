@@ -23,12 +23,8 @@ import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Properties;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
@@ -255,27 +251,19 @@ public class StarterPlugin extends AbstractJCCPlugin
 				final Map args = new HashMap();
 				args.put("component", cid);
 				
-				SServiceProvider.getService(getJCC().getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new DefaultResultListener()		
+				CreationInfo ci = new CreationInfo(args);
+				ci.setName(cid.getLocalName());
+				ci.setFilename("jadex/platform/service/remote/ProxyAgent.class");
+				getJCC().getPlatformAccess().createComponent(ci, null).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-						IComponentManagementService cms = (IComponentManagementService)result;
-//								createComponent("jadex/platform/service/remote/ProxyAgent.class", cid.getLocalName(), null, args, false, null, null, null, null);
-						
-						cms.createComponent(cid.getLocalName(), "jadex/platform/service/remote/ProxyAgent.class", 
-							new CreationInfo(args), null).addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-								getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
-							}
-						});
+						getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 					}
 				});
 			}

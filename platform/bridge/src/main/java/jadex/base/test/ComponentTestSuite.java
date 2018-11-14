@@ -34,15 +34,14 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SNonAndroid;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
@@ -259,8 +258,8 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //		
 		IPlatformConfiguration conf = STest.getDefaultTestConfig();
 //		IPlatformConfiguration conf = Starter.processArgs(args);
-//		this.timeout	= Starter.getLocalDefaultTimeout(null);	// Initial timeout for starting platform.
-		this.timeout	= conf.getExtendedPlatformConfiguration().getLocalDefaultTimeout();	// Initial timeout for starting platform.
+//		this.timeout	= Starter.getDefaultTimeout(null);	// Initial timeout for starting platform.
+		this.timeout	= conf.getDefaultTimeout();	// Initial timeout for starting platform.
 		startTimer();
 
 		if (tests != null) 
@@ -275,14 +274,16 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 
 //		System.out.println("start platform");
 		platform	= Starter.createPlatform(conf, args).get();
-//		this.timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
+//		this.timeout	= Starter.getDefaultTimeout(platform.getComponentIdentifier());
 //		System.out.println("end platform");
-		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		ILibraryService libsrv	= SServiceProvider.getService(platform, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+//		ServiceQuery<IComponentManagementService> cmsquery = new ServiceQuery<>(IComponentManagementService.class);
+//		IComponentManagementService cms = platform.searchService(cmsquery).get();
+		ServiceQuery<ILibraryService> lsquery = new ServiceQuery<>(ILibraryService.class);
+		ILibraryService libsrv	= platform.searchService(lsquery).get();
 
 		// Only works with x-rids hack or maven dependency service, because rms cannot use default classloader for decoding application messages.
 //		final IResourceIdentifier	rid	= null;
-		long ctimeout = Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());	// Start with normal timeout for platform startup/shutdown.
+		long ctimeout = Starter.getDefaultTimeout(platform.getId());	// Start with normal timeout for platform startup/shutdown.
 
 		IResourceIdentifier[] rids = new IResourceIdentifier[roots.length];
 		for (int projectIndex=0; projectIndex < roots.length; projectIndex++) {
@@ -322,10 +323,8 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 			{
 				// Scan for test cases.
 				List<String> scanForTestCases = getAllFiles(project[rootIndex]);
-				this.timeout = Starter.getScaledLocalDefaultTimeout(platform.getComponentIdentifier(), 1 + 0.05 * scanForTestCases.size()); // Timeout
+				this.timeout = Starter.getScaledDefaultTimeout(platform.getId(), 1 + 0.05 * scanForTestCases.size()); // Timeout
 																																			// for
-																																			// loading
-																																			// models.
 				startTimer();
 				Logger.getLogger("ComponentTestSuite").info("Scanning for testcases: " + project[rootIndex] + " (scan timeout: " + timeout + ")");
 				for(String abspath : scanForTestCases)
@@ -371,7 +370,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 									System.out.print(".");
 									if(runtests)
 									{
-										ComponentTest test = SAME_PLATFORM ? new ComponentTest(cms, model, this) : new ComponentTest(conf, args, roots, cms, model, this);
+										ComponentTest test = SAME_PLATFORM ? new ComponentTest(platform, model, this) : new ComponentTest(conf, args, roots, platform, model, this);
 										test.setName(abspath);
 										addTest(test);
 										if(ctimeout == Timeout.NONE || test.getTimeout() == Timeout.NONE)
@@ -389,7 +388,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 									System.out.print(".");
 									if(start)
 									{
-										ComponentStartTest test = new ComponentStartTest(cms, model, this);
+										ComponentStartTest test = new ComponentStartTest(platform, model, this);
 										test.setName(abspath);
 										addTest(test);
 										if(ctimeout == Timeout.NONE)
@@ -416,7 +415,12 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 						}
 						catch(final RuntimeException e)
 						{
-							if(load)
+							if(e instanceof TimeoutException)
+							{
+								throw e;
+							}
+							
+							else if(load)
 							{
 								ComponentLoadTest test = new ComponentLoadTest(abspath, new IErrorReport()
 								{

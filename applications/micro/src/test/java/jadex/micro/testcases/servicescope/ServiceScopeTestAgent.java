@@ -11,12 +11,10 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -29,8 +27,7 @@ import jadex.micro.annotation.Results;
 @Agent(keepalive=Boolean3.FALSE)
 @RequiredServices(
 {
-	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="exaser", type=IExampleService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="exaser", type=IExampleService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
 })
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ServiceScopeTestAgent extends JunitAgentTest
@@ -47,16 +44,14 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		final Testcase tc = new Testcase();
 		tc.setTestCount(2);
 		
-		IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
-		
 		// Create user as subcomponent -> should be able to find the service with publication scope application
 		IComponentIdentifier cid = null;
 		TestReport tr = new TestReport("#1", "Test if service with scope application can be found when provider is child of user");
 		try
 		{
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", new CreationInfo(agent.getComponentIdentifier()));
+			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(ProviderAgent.class.getName()+".class"));
 			cid = fut.getFirstResult();
-			IExampleService ser = (IExampleService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("exaser").get();
+			IExampleService ser = (IExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("exaser").get();
 //			System.out.println("Correct: could find service: "+ser.getInfo().get());
 			tr.setSucceeded(true);
 		}
@@ -71,7 +66,7 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 			try
 			{
 				if(cid!=null)
-					cms.destroyComponent(cid).get();
+					agent.killComponent(cid).get();
 			}
 			catch(Exception e)
 			{
@@ -84,9 +79,9 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		tr = new TestReport("#1", "Test if service with scope application can be found when provider is sibling");
 		try
 		{
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(ProviderAgent.class.getName()+".class", new CreationInfo(agent.getModel().getResourceIdentifier()));
+			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getModel().getResourceIdentifier()).setFilename(ProviderAgent.class.getName()+".class"));
 			cid = fut.getFirstResult();
-			IExampleService ser = (IExampleService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("exaser").get();
+			IExampleService ser = (IExampleService)agent.getFeature(IRequiredServicesFeature.class).getService("exaser").get();
 			System.out.println("Problem: could find hidden service: "+ser.getInfo().get());
 			tr.setFailed("Problem: could find hidden service");
 		}
@@ -101,7 +96,7 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 			try
 			{
 				if(cid!=null)
-					cms.destroyComponent(cid).get();
+					agent.killComponent(cid).get();
 			}
 			catch(Exception e)
 			{
@@ -109,6 +104,6 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		}
 		tc.addReport(tr);
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 	}
 }

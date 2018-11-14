@@ -458,8 +458,6 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public void setPackage(String packagename)
 	{
-		if(packagename!=null && packagename.startsWith("package "))
-			System.out.println("dskvby?");
 		this.packagename = packagename;
 	}
 
@@ -629,7 +627,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  Get the required services.
 	 *  @return The required services.
 	 */
-	public RequiredServiceInfo[] getRequiredServices()
+	public RequiredServiceInfo[] getServices()
 	{
 		return requiredservices==null? new RequiredServiceInfo[0]: 
 			requiredservices.values().toArray(new RequiredServiceInfo[requiredservices.size()]);
@@ -665,7 +663,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  Get the required service.
 	 *  @return The required service.
 	 */
-	public RequiredServiceInfo getRequiredService(String name)
+	public RequiredServiceInfo getService(String name)
 	{
 		return requiredservices!=null? requiredservices.get(name): null;
 	}
@@ -735,59 +733,58 @@ public class ModelInfo extends Startable implements IModelInfo
 		}
 	}
 	
-	/**
-	 *  Get the master flag.
-	 *  @param configname The configname.
-	 *  @return The master flag value.
-	 */
-	public Boolean getMaster(String configname)
-	{
-		Boolean ret = null;
-		ConfigurationInfo config = getConfiguration(configname);
-		if(config!=null)
-			ret = config.getMaster();
-		if(ret==null)
-			ret = super.getMaster();
-		return ret;
-		
-//		return master==null? null: (Boolean)master.getValue(configname);
-	}
+//	/**
+//	 *  Get the master flag.
+//	 *  @param configname The configname.
+//	 *  @return The master flag value.
+//	 */
+//	public Boolean getMaster(String configname)
+//	{
+//		Boolean ret = null;
+//		ConfigurationInfo config = getConfiguration(configname);
+//		if(config!=null)
+//			ret = config.getMaster();
+//		if(ret==null)
+//			ret = super.getMaster();
+//		return ret;
+//		
+////		return master==null? null: (Boolean)master.getValue(configname);
+//	}
 	
-	/**
-	 *  Get the daemon flag.
-	 *  @param configname The configname.
-	 *  @return The daemon flag value.
-	 */
-	public Boolean getDaemon(String configname)
-	{
-		Boolean ret = null;
-		ConfigurationInfo config = getConfiguration(configname);
-		if(config!=null)
-			ret = config.getDaemon();
-		if(ret==null)
-			ret = super.getDaemon();
-		return ret;
-		
-//		return daemon==null? null: (Boolean)daemon.getValue(configname);
-	}
+//	/**
+//	 *  Get the daemon flag.
+//	 *  @param configname The configname.
+//	 *  @return The daemon flag value.
+//	 */
+//	public Boolean getDaemon(String configname)
+//	{
+//		Boolean ret = null;
+//		ConfigurationInfo config = getConfiguration(configname);
+//		if(config!=null)
+//			ret = config.getDaemon();
+//		if(ret==null)
+//			ret = super.getDaemon();
+//		return ret;
+//		
+////		return daemon==null? null: (Boolean)daemon.getValue(configname);
+//	}
 	
-	/**
-	 *  Get the autoshutdown flag.
-	 *  @param configname The configname.
-	 *  @return The autoshutdown flag value.
-	 */
-	public Boolean getAutoShutdown(String configname)
-	{
-		Boolean ret = null;
-		ConfigurationInfo config = getConfiguration(configname);
-		if(config!=null)
-			ret = config.getAutoShutdown();
-		if(ret==null)
-			ret = super.getAutoShutdown();
-		return ret;
-		
-//		return autoshutdown==null? null: (Boolean)autoshutdown.getValue(configname);
-	}
+//	/**
+//	 *  Get the autoshutdown flag.
+//	 *  @param configname The configname.
+//	 *  @return The autoshutdown flag value.
+//	 */
+//	public Boolean getAutoShutdown(String configname)
+//	{
+//		Boolean ret = null;
+//		ConfigurationInfo config = getConfiguration(configname);
+//		if(config!=null)
+//			ret = config.getAutoShutdown();
+//		if(ret==null)
+//			ret = super.getAutoShutdown();
+//		return ret;
+////		return autoshutdown==null? null: (Boolean)autoshutdown.getValue(configname);
+//	}
 	
 	/**
 	 *  Get the synchronous flag.
@@ -803,24 +800,23 @@ public class ModelInfo extends Startable implements IModelInfo
 		if(ret==null)
 			ret = super.getSynchronous();
 		return ret;
-		
 	}
 	
-	/**
-	 *  Get the persistable flag.
-	 *  @param persistable The persistable.
-	 *  @return The persistable flag value.
-	 */
-	public Boolean getPersistable(String configname)
-	{
-		Boolean ret = null;
-		ConfigurationInfo config = getConfiguration(configname);
-		if(config!=null)
-			ret = config.getPersistable();
-		if(ret==null)
-			ret = super.getPersistable();
-		return ret;		
-	}
+//	/**
+//	 *  Get the persistable flag.
+//	 *  @param persistable The persistable.
+//	 *  @return The persistable flag value.
+//	 */
+//	public Boolean getPersistable(String configname)
+//	{
+//		Boolean ret = null;
+//		ConfigurationInfo config = getConfiguration(configname);
+//		if(config!=null)
+//			ret = config.getPersistable();
+//		if(ret==null)
+//			ret = super.getPersistable();
+//		return ret;		
+//	}
 
 	/**
 	 *  Get the suspend flag.

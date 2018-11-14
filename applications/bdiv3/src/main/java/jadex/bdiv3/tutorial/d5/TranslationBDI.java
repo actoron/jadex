@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.d5;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalParameter;
@@ -29,7 +30,7 @@ import jadex.micro.annotation.Description;
  *  Using a goal with recur condition.
  */
 @Description("Translation agent D5. <br>  This translation agent using translate goal with recur condition.")
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Service
 public class TranslationBDI
 {

@@ -9,10 +9,8 @@ import jadex.base.test.IAbortableTestSuite;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -67,14 +65,13 @@ public class ComponentStartTestLazyPlatform extends	ComponentTestLazyPlatform
 				{
 //					if(cid.getName().indexOf("ParentProcess")!=-1)
 //						System.out.println("destroying "+cid);
-					IComponentManagementService	mycms	= cms;
-					if(mycms!=null)
+					if(platform!=null)
 					{
 //						if(cid.getName().indexOf("ParentProcess")!=-1)
 //							System.out.println("destroying1 "+cid);
 						try
 						{
-							mycms.destroyComponent(cid).get();
+							platform.killComponent(cid).get();
 						}
 						catch(ComponentTerminatedException e)
 						{
@@ -86,7 +83,8 @@ public class ComponentStartTestLazyPlatform extends	ComponentTestLazyPlatform
 				}
 
 				@Override
-				public void exceptionOccurred(Exception exception) {
+				public void exceptionOccurred(Exception exception) 
+				{
 					System.err.println("COULD NOT STOP COMPONENT!! Exception:");
 					super.exceptionOccurred(exception);
 				}
@@ -101,23 +99,22 @@ public class ComponentStartTestLazyPlatform extends	ComponentTestLazyPlatform
 //				}
 //			};
 			
-			IExternalAccess	ea	= cms.getExternalAccess(cms.getRootIdentifier().get()).get();
-			ea.scheduleStep(new IComponentStep<Void>()
+			platform.scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 //					if(cid.getName().indexOf("ParentProcess")!=-1)
 //						System.out.println("waiting false for "+cid);
-					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, false);
+					return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, false);
 				}
 			}).addResultListener(lis);
-			ea.scheduleStep(new IComponentStep<Void>()
+			platform.scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 //					if(cid.getName().indexOf("ParentProcess")!=-1)
 //						System.out.println("waiting true for "+cid);
-					return ia.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, true);
+					return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, true);
 				}
 			}).addResultListener(lis);
 		}

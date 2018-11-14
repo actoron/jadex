@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalAPI;
@@ -31,7 +32,7 @@ import jadex.micro.annotation.Results;
  *  are added to the agent type and conditions to eca rule system 
  *  class is rewritten to announce belief changes (field accesses and annotated methods)
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Imports({"java.util.logging.*"})
 @Properties({@NameValue(name="logging.level", value="Level.INFO")})
 @Results(@Result(name="testresults", clazz=Testcase.class))
@@ -98,7 +99,7 @@ public class InnerClassChangeBDI
 	@AgentBody
 	public void body()
 	{
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -119,7 +120,7 @@ public class InnerClassChangeBDI
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tr.length, tr));
 	}
 	
 	/**

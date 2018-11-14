@@ -17,16 +17,15 @@ import javax.swing.SwingUtilities;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cli.ICliService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -39,9 +38,8 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -53,7 +51,7 @@ import jadex.micro.annotation.RequiredServices;
  *  
  *  It offers the executeCommand() method via the ICliService.
  */
-@Agent
+@Agent(autostart=@Autostart(Boolean3.TRUE))
 @Service
 @Arguments(
 {
@@ -63,11 +61,11 @@ import jadex.micro.annotation.RequiredServices;
 })
 @ProvidedServices(
 {
-	@ProvidedService(name="cliser", scope=Binding.SCOPE_PLATFORM, type=ICliService.class, implementation=@Implementation(expression="$pojoagent")),
-	@ProvidedService(type=IInternalCliService.class, scope=Binding.SCOPE_PLATFORM, implementation=@Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"cliser\")"))
+	@ProvidedService(name="cliser", scope=RequiredService.SCOPE_PLATFORM, type=ICliService.class, implementation=@Implementation(expression="$pojoagent")),
+	@ProvidedService(type=IInternalCliService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"cliser\")"))
 })
 @RequiredServices(
-	@RequiredService(name="dtp", type=IDaemonThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="dtp", type=IDaemonThreadPoolService.class)
 )
 //@Properties(@NameValue(name="system", value="true"))
 public class CliAgent implements ICliService, IInternalCliService
@@ -160,11 +158,11 @@ public class CliAgent implements ICliService, IInternalCliService
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+						agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								ICliService clis = (ICliService)ia.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(ICliService.class)[0];
+								ICliService clis = (ICliService)ia.getFeature(IProvidedServicesFeature.class).getProvidedServices(ICliService.class)[0];
 								String txt = tf.getText();
 								ta.append(txt+SUtil.LF);
 								tf.setText("");
@@ -202,7 +200,7 @@ public class CliAgent implements ICliService, IInternalCliService
 	 */
 	protected void createConsole()
 	{
-		IFuture<IDaemonThreadPoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("dtp");
+		IFuture<IDaemonThreadPoolService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("dtp");
 		fut.addResultListener(new IResultListener<IDaemonThreadPoolService>()
 		{
 			public void resultAvailable(IDaemonThreadPoolService tp)
@@ -251,7 +249,7 @@ public class CliAgent implements ICliService, IInternalCliService
 										break;
 									}
 									
-									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 									{
 										public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
 										{
@@ -395,7 +393,7 @@ public class CliAgent implements ICliService, IInternalCliService
 		if(tup==null)
 		{
 //			System.out.println("created new shell for session: "+sessionid);
-			shell = new CliShell(agent.getExternalAccess(), agent.getExternalAccess().getComponentIdentifier().getRoot().getName(), sessionid, agent.getClassLoader());
+			shell = new CliShell(agent.getExternalAccess(), agent.getExternalAccess().getId().getRoot().getName(), sessionid, agent.getClassLoader());
 			shell.addAllCommandsFromClassPath(); // agent.getClassLoader()
 			shells.put(sessionid, new Tuple2<ACliShell, Long>(shell, Long.valueOf(System.currentTimeMillis())));
 		}

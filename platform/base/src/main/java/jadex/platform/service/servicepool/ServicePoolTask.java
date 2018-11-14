@@ -30,14 +30,13 @@ import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskProperty;
 import jadex.bpmn.model.task.annotation.TaskPropertyGui;
 import jadex.bridge.ClassInfo;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -83,48 +82,42 @@ public class ServicePoolTask implements ITask
 	{
 		final Future<Void>	ret	= new Future<Void>();
 
-		SServiceProvider.getService(process, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(process.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		CreationInfo ci = new CreationInfo(process.getId()).setFilename(ServicePoolAgent.class.getName()+".class");
+		
+		process.createComponent(ci, null)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess ea) 
 			{
-				CreationInfo ci = new CreationInfo(process.getComponentIdentifier());
-				cms.createComponent(null, ServicePoolAgent.class.getName()+".class", ci, null)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				process.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServicePoolService.class).setProvider(ea.getId()))
+					.addResultListener(process.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier cid) 
+					public void customResultAvailable(IServicePoolService sps)
 					{
-						SServiceProvider.getService(process, cid, IServicePoolService.class)
-							.addResultListener(process.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
+						String[] oldmaps = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_OLD_MAPPINGS);
+						String[] classinfos = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_CLASS_INFOS);
+						String[] fileinfos = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_FILE_INFOS);
+						String[] monitorings = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_MONITORINGS);
+						List<MappingEntry> mappingentries = getMappingEntries(oldmaps, classinfos, fileinfos, monitorings);
+						
+						if(mappingentries.size() > 0)
 						{
-							public void customResultAvailable(IServicePoolService sps)
+							CounterResultListener<Void> lis = new CounterResultListener<Void>(mappingentries.size(), new DelegationResultListener<Void>(ret));
+							for(MappingEntry mentry : mappingentries)
 							{
-								String[] oldmaps = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_OLD_MAPPINGS);
-								String[] classinfos = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_CLASS_INFOS);
-								String[] fileinfos = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_FILE_INFOS);
-								String[] monitorings = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_MONITORINGS);
-								List<MappingEntry> mappingentries = getMappingEntries(oldmaps, classinfos, fileinfos, monitorings);
-								
-								if(mappingentries.size() > 0)
-								{
-									CounterResultListener<Void> lis = new CounterResultListener<Void>(mappingentries.size(), new DelegationResultListener<Void>(ret));
-									for(MappingEntry mentry : mappingentries)
-									{
-										CreationInfo cinfo = new CreationInfo();
-										cinfo.setMonitoring(mentry.getMonitoring());
-										sps.addServiceType(mentry.getClassinfo().getType(process.getClassLoader(), process.getModel().getAllImports()), mentry.getFileinfo()).addResultListener(lis);
-									}
-								}
-								else
-								{
-									ret.setResult(null);
-								}
+								CreationInfo cinfo = new CreationInfo();
+								cinfo.setMonitoring(mentry.getMonitoring());
+								sps.addServiceType(mentry.getClassinfo().getType(process.getClassLoader(), process.getModel().getAllImports()), mentry.getFileinfo()).addResultListener(lis);
 							}
-						}));
+						}
+						else
+						{
+							ret.setResult(null);
+						}
 					}
-				});
+				}));
 			}
-		}));
+		});
 		
 		return ret;
 	}

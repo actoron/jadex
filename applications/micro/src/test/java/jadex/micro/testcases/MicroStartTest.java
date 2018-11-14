@@ -2,6 +2,8 @@ package jadex.micro.testcases;
 
 import java.io.File;
 
+import org.junit.Ignore;
+
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -10,6 +12,7 @@ import junit.framework.Test;
 /**
  *  Test suite for micro agent tests.
  */
+//@Ignore
 public class MicroStartTest extends ComponentTestSuite
 {
 	private static final String NOEXCLUDE = "__noexclude__";
@@ -18,6 +21,9 @@ public class MicroStartTest extends ComponentTestSuite
 	private static final String[]	EXCLUDES = 	
 		new String[]
 	{
+		// For consistency with gradle/eclipse build -> exclude testcases from start tests (not in classpath in gradle, but in eclipse)
+		"testcases",
+		
 //		// Fails on Java 9 (what is this test for anyways?)
 //		"Kill",
 //		
@@ -40,8 +46,8 @@ public class MicroStartTest extends ComponentTestSuite
 		"BrokenInitAgent",
 		"BrokenInit.component.xml",
 //		"CompositeCalculatorAgent",
-//		"blocking/Step",
-//		"blocking\\Step",
+		"blocking/Step",
+		"blocking\\Step",
 //		"CallAllServicesAgent",
 		
 		// Manual tests requiring interaction
@@ -56,6 +62,8 @@ public class MicroStartTest extends ComponentTestSuite
 		"messagequeue\\User",
 		"messagequeue/replicated/User",
 		"messagequeue\\replicated\\User",
+		"pojoservice/User",
+		"pojoservice\\User",
 		"search/User",
 		"search\\User",
 		"nfpropvis/User",
@@ -104,7 +112,7 @@ public class MicroStartTest extends ComponentTestSuite
 			"-df", "true"	// Required for df test, when run in eclipse
 		},
 			new File[][]{SUtil.findOutputDirs("applications"+File.separator+"micro", false)},// tests are already real tests in micro, exclude them here (ignored by eclipse, grrr)
-			null, EXCLUDES, true, true, true);
+			null, EXCLUDES, false, true, true);
 	}
 	
 //	/**

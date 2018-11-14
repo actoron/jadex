@@ -40,6 +40,18 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
     public boolean hasNextIntermediateResult();
 	
     /**
+     *  Check if there are more results for iteration for the given caller.
+     *  If there are currently no unprocessed results and future is not yet finished,
+     *  the caller is blocked until either new results are available and true is returned
+     *  or the future is finished, thus returning false.
+     *  
+	 *  @param timeout The timeout in millis.
+	 *  @param realtime Flag, if wait should be realtime (in constrast to simulation time).
+     *  @return	True, when there are more intermediate results for the caller.
+     */
+    public boolean hasNextIntermediateResult(long timeout, boolean realtime);
+	
+    /**
      *  Iterate over the intermediate results in a blocking fashion.
      *  Manages results independently for different callers, i.e. when called
      *  from different threads, each thread receives all intermediate results.
@@ -52,6 +64,22 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
      *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
      */
     public E getNextIntermediateResult();
+    
+    /**
+     *  Iterate over the intermediate results in a blocking fashion.
+     *  Manages results independently for different callers, i.e. when called
+     *  from different threads, each thread receives all intermediate results.
+     *  
+     *  The operation is guaranteed to be non-blocking, if hasNextIntermediateResult()
+     *  has returned true before for the same caller. Otherwise the caller is blocked
+     *  until a result is available or the future is finished.
+     *  
+	 *  @param timeout The timeout in millis.
+	 *  @param realtime Flag, if wait should be realtime (in constrast to simulation time).
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public E getNextIntermediateResult(long timeout, boolean realtime);
     
 //    /**
 //     *  Iterate over the intermediate results in a blocking fashion.
@@ -95,6 +123,15 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
 	 */
 	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalIntermediateFinishedListener<Void> finishedListener);
     
+	/**
+	 * Add a functional result listener, which called on intermediate results.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param exceptionListener The listener that is called on exceptions. Passing
+	 *        <code>null</code> enables default exception logging.
+	 */
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalExceptionListener exceptionListener);
+
 	/**
 	 * Add a functional result listener, which called on intermediate results.
 	 * 

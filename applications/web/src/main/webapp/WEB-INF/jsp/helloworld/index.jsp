@@ -10,7 +10,7 @@
 </head>
 <body>
 
-The platform name is <%= platform.getComponentIdentifier() %>.
+The platform name is <%=platform.getId()%>.
 
 </body>
 </html>

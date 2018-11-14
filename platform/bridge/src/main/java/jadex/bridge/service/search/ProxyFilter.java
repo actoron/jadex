@@ -1,7 +1,5 @@
 package jadex.bridge.service.search;
 
-import java.lang.reflect.Proxy;
-
 import jadex.bridge.ProxyFactory;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.future.IFuture;

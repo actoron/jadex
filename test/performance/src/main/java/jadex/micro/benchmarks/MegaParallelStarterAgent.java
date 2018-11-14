@@ -10,10 +10,9 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
@@ -61,12 +60,12 @@ public class MegaParallelStarterAgent
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		Map arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();	
+		Map arguments = agent.getFeature(IArgumentsResultsFeature.class).getArguments();	
 		if(arguments==null)
 			arguments = new HashMap();
 		final Map args = arguments;	
 
-		System.out.println("Created starter: "+agent.getComponentIdentifier());
+		System.out.println("Created starter: "+agent.getId());
 		this.subname = "peer";
 		
 		getClock().addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
@@ -78,14 +77,13 @@ public class MegaParallelStarterAgent
 				
 				final int max = ((Integer)args.get("max")).intValue();
 				
-				IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				String model = MegaParallelCreationAgent.class.getName().replaceAll("\\.", "/")+".class";
 				for(int i=1; i<=max; i++)
 				{
 					args.put("num", Integer.valueOf(i));
-//							System.out.println("Created agent: "+i);
-					cms.createComponent(subname+"_#"+i, model, new CreationInfo(new HashMap(args), agent.getComponentIdentifier()), 
-						agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
+//					System.out.println("Created agent: "+i);
+					agent.createComponent(new CreationInfo(new HashMap(args), agent.getId()).setName(subname+"_#"+i).setFilename(model), 
+						agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -109,15 +107,15 @@ public class MegaParallelStarterAgent
 										System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 										System.out.println("Still used memory: "+stillused+"kB.");
 										
-										agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
-										agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
-										agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+										agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+										agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+										agent.getFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
 										agent.killComponent();
 									}
 								});
 							}
 						}
-					})).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+					})).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -167,8 +165,7 @@ public class MegaParallelStarterAgent
 	{
 		final String name = subname+"_#"+cnt;
 //		System.out.println("Destroying peer: "+name);
-		IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getComponentIdentifier());
+		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId());
 		IResultListener lis = new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -185,7 +182,7 @@ public class MegaParallelStarterAgent
 				exception.printStackTrace();
 			}
 		};
-		IFuture ret = cms.destroyComponent(aid);
+		IFuture ret = agent.killComponent(aid);
 		ret.addResultListener(lis);
 	}
 	
@@ -195,7 +192,7 @@ public class MegaParallelStarterAgent
 //		if(cms==null)
 //		{
 //			cms	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class); // Raw service
-////			cms	= getRequiredService("cmsservice");	// Required service proxy
+////			cms	= getService("cmsservice");	// Required service proxy
 //		}
 //		return cms;
 //	}
@@ -206,8 +203,8 @@ public class MegaParallelStarterAgent
 		IFuture<IClockService> clock = null;	// Uncomment for no caching.
 		if(clock==null)
 		{
-			clock	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM); // Raw service
-//			clock	= getRequiredService("clockservice");	// Required service proxy
+			clock	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)); // Raw service
+//			clock	= getService("clockservice");	// Required service proxy
 		}
 		return clock;
 	}

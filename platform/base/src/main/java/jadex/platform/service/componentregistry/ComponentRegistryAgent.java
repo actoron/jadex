@@ -21,17 +21,15 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.Boolean3;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
@@ -39,15 +37,14 @@ import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -56,7 +53,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  The component registry is a component for creating proxy services.
  *  Real services/components are created on demand on service call.
  */
-@Agent
+@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="serviceproxy"))
 @Service
 @Imports("jadex.bridge.service.types.cms.*")
 @Arguments(
@@ -120,7 +117,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 		
         final Future<Void> ret = new Future<Void>();
 
-        CreationInfo[] cis = (CreationInfo[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("componentinfos");
+        CreationInfo[] cis = (CreationInfo[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("componentinfos");
         if(cis!=null)
         {
             CounterResultListener<Void> lis = new CounterResultListener<Void>(cis.length, false, new DelegationResultListener<Void>(ret));
@@ -146,7 +143,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
     {
         final Future<Void> ret = new Future<Void>();
 
-        ILibraryService ls = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+        ILibraryService ls = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
         ls.getClassLoader(info.getResourceIdentifier()).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 		{
         	public void customResultAvailable(ClassLoader cl) throws Exception
@@ -176,7 +173,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        	                    {
 	        	                        public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	        	                        {
-	        	                            assert agent.getComponentFeature(IExecutionFeature.class).isComponentThread();
+	        	                            assert agent.getFeature(IExecutionFeature.class).isComponentThread();
 	
 	//        	                            if(servicetype.getName().indexOf("Settings")!=-1)
 	//        	                            	System.out.println("settings called: "+method.getName());
@@ -188,7 +185,8 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        									{
 	        		                            	public void customResultAvailable(IExternalAccess exta) throws Exception 
 	        		                            	{
-	        		                            		IFuture<IService> fut = (IFuture)SServiceProvider.getService(exta, exta.getComponentIdentifier(), servicetype);
+	        		                            		@SuppressWarnings("unchecked")
+														IFuture<IService> fut = (IFuture<IService>)exta.searchService( new ServiceQuery<>(servicetype).setProvider(exta.getId()));
 	        		                            		fut.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
 	        											{
 	        		                        				public void customResultAvailable(IService service) throws Exception
@@ -202,7 +200,7 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        		                            
 	        		                            return ret;
 	        	                            }
-	        	                            else if(method.getName().equals("getServiceIdentifier"))
+	        	                            else if(method.getName().equals("getId"))
 	        	                            {
 	        	                            	return fsid;
 	        	                            }
@@ -214,13 +212,13 @@ public class ComponentRegistryAgent implements IComponentRegistryService
 	        	                            else
 	        	                            {
 	        	                            	 IExternalAccess exta = getComponent(info).get();
-	        	                            	 IService service = (IService)SServiceProvider.getLocalService(agent, servicetype, exta.getComponentIdentifier());
+	        	                            	 IService service = (IService)agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(servicetype).setProvider(exta.getId()));
 	        	                            	 return method.invoke(service, args);
 	        	                            }
 	        	                        }
 	        	                    });
 	        	                    
-	        	        			agent.getComponentFeature(IProvidedServicesFeature.class).addService(null, servicetype, serviceproxy, null, null).addResultListener(lis);
+	        	        			agent.getFeature(IProvidedServicesFeature.class).addService(null, servicetype, serviceproxy, null, null).addResultListener(lis);
 	        	        			sids.add(fsid);
 	        	                }
 	        	                if(componenttypes==null)
@@ -270,14 +268,14 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         else
         {
         	components.put(info.getFilename(), ret);
-            final IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//          final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
             if(info.getParent()==null)
-            	info.setParent(agent.getComponentIdentifier());
-            cms.createComponent(info.getFilename(), info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+            	info.setParent(agent.getId());
+            agent.createComponent(info).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
             {
                 public void firstResultAvailable(IComponentIdentifier cid)
                 {
-                	cms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
+                	agent.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
                 	{
                 		public void customResultAvailable(IExternalAccess exta)
                 		{
@@ -344,33 +342,37 @@ public class ComponentRegistryAgent implements IComponentRegistryService
     {
     	final Future<Void> ret = new Future<Void>();
     	
-    	IModelInfo model = comp.getModel();
-		
-		ComponentInfo ci = componenttypes.get(model.getFilename());
-		
-		final CounterResultListener<Void> lis = new CounterResultListener<Void>(ci.getSids()!=null? ci.getSids().size()+1: 1, new DelegationResultListener<Void>(ret));
-		
-		if(ci.getSids()!=null)
+    	comp.getModelAsync().addResultListener(new ExceptionDelegationResultListener<IModelInfo, Void>(ret)
 		{
-			for(IServiceIdentifier sid: ci.getSids())
-			{
-				 agent.getComponentFeature(IProvidedServicesFeature.class).removeService(sid).addResultListener(lis);
-			}
-		}
-		
-		((IExternalAccess)comp).killComponent().addResultListener(new IResultListener<Map<String,Object>>()
-		{
-			public void exceptionOccurred(Exception exception)
-			{
-				lis.exceptionOccurred(exception);
-			}
-			
-			public void resultAvailable(Map<String, Object> result)
-			{
-				lis.resultAvailable(null);
-			}
+    		public void customResultAvailable(IModelInfo model) throws Exception
+    		{
+    			ComponentInfo ci = componenttypes.get(model.getFilename());
+    			
+    			final CounterResultListener<Void> lis = new CounterResultListener<Void>(ci.getSids()!=null? ci.getSids().size()+1: 1, new DelegationResultListener<Void>(ret));
+    			
+    			if(ci.getSids()!=null)
+    			{
+    				for(IServiceIdentifier sid: ci.getSids())
+    				{
+    					 agent.getFeature(IProvidedServicesFeature.class).removeService(sid).addResultListener(lis);
+    				}
+    			}
+    			
+    			((IExternalAccess)comp).killComponent().addResultListener(new IResultListener<Map<String,Object>>()
+    			{
+    				public void exceptionOccurred(Exception exception)
+    				{
+    					lis.exceptionOccurred(exception);
+    				}
+    				
+    				public void resultAvailable(Map<String, Object> result)
+    				{
+    					lis.resultAvailable(null);
+    				}
+    			});
+    		}
 		});
-		
+    	
 		return ret;
     }
     

@@ -19,13 +19,11 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -36,7 +34,6 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -47,10 +44,8 @@ import jadex.micro.annotation.Results;
 {
 //	@RequiredService(name="msgservice", type=IMessageService.class, 
 //		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="cms", type=IComponentManagementService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="clock", type=IClockService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+//	@RequiredService(name="cms", type=IComponentManagementService.class),
+	@RequiredService(name="clock", type=IClockService.class)
 })
 //@ComponentTypes(
 //	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/ReceiverAgent.class")
@@ -95,13 +90,13 @@ public abstract class TestAgent
 		final Testcase tc = new Testcase();
 		tc.setTestCount(getTestCount());
 		
-		performTests(tc).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+		performTests(tc).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
 //				System.out.println("tests finished: "+agent.getComponentIdentifier());
 
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				ret.setResult(null);
 //				agent.killAgent();				
 			}
@@ -112,7 +107,7 @@ public abstract class TestAgent
 				
 				exception.printStackTrace();
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 				ret.setResult(null);
 //				agent.killAgent();	
 			}
@@ -128,39 +123,25 @@ public abstract class TestAgent
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		IFuture<IComponentManagementService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		test(agent.getExternalAccess(), true).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public void customResultAvailable(TestReport result)
 			{
-				test(cms, true).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				tc.addReport(result);
+				createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 				{
-					public void customResultAvailable(TestReport result)
+					public void customResultAvailable(final IExternalAccess exta)
 					{
-						tc.addReport(result);
-						createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+						Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 						{
-							public void customResultAvailable(final IExternalAccess exta)
+							public void customResultAvailable(IExternalAccess result)
 							{
-								Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+								test(exta, false).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 								{
-									public void customResultAvailable(IComponentIdentifier result)
+									public void customResultAvailable(TestReport result)
 									{
-										SServiceProvider.getService(exta, IComponentManagementService.class)
-											.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-										{
-											public void customResultAvailable(IComponentManagementService cms2)
-											{
-												test(cms2, false).addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
-												{
-													public void customResultAvailable(TestReport result)
-													{
-														tc.addReport(result);
-														ret.setResult(null);
-													}
-												});
-											}
-										}));
+										tc.addReport(result);
+										ret.setResult(null);
 									}
 								});
 							}
@@ -194,8 +175,8 @@ public abstract class TestAgent
 //		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
 		String[] defargs = new String[]{
 //			"-libpath", url,
-			"-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
+			"-platformname", agent.getId().getPlatformPrefix()+"_*",
+			"-saveonexit", "false", "-welcome", "false", "-awareness", "false",
 //			"-logging", "true",
 //			"-relaytransport", "false",
 //				"-gui", "false", "-usepass", "false", "-simulation", "false"
@@ -227,7 +208,7 @@ public abstract class TestAgent
 
 //		System.out.println("platform args: "+SUtil.arrayToString(defargs));
 		
-		Starter.createPlatform(defargs).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(
+		Starter.createPlatform(defargs).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
 			new DelegationResultListener<IExternalAccess>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
@@ -257,33 +238,26 @@ public abstract class TestAgent
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		IResourceIdentifier	rid	= new ResourceIdentifier(
+		new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
+//		boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
+//		CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
+		CreationInfo ci	= new CreationInfo(root==null? agent.getId(): root, rid);
+		ci.setArguments(args);
+		ci.setConfiguration(config);
+		ci.setFilename(filename);
+		agent.createComponent(ci, reslis)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
-			public void customResultAvailable(final IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				IResourceIdentifier	rid	= new ResourceIdentifier(
-					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
-//				boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
-//				CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
-				CreationInfo ci	= new CreationInfo(root==null? agent.getComponentIdentifier(): root, rid);
-				ci.setArguments(args);
-				ci.setConfiguration(config);
-				cms.createComponent(null, filename, ci, reslis)
-					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
-				{
-					public void customResultAvailable(IComponentIdentifier result)
-					{
-						super.customResultAvailable(result);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-						super.exceptionOccurred(exception);
-					}
-				}
-				);
+				ret.setResult(result.getId());
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+				super.exceptionOccurred(exception);
 			}
 		});
 		
@@ -297,14 +271,7 @@ public abstract class TestAgent
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
-		{
-			public void customResultAvailable(final IComponentManagementService cms)
-			{
-				cms.destroyComponent(cid).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
-			}
-		});
+		agent.killComponent(cid).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 		
 		return ret;
 	}
@@ -314,7 +281,7 @@ public abstract class TestAgent
 	 */
 	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename, IResultListener<Collection<Tuple2<String,Object>>> reslis)
 	{
-		return createComponent(filename, agent.getComponentIdentifier().getRoot(), reslis);
+		return createComponent(filename, agent.getId().getRoot(), reslis);
 	}
 	
 	/**
@@ -330,7 +297,7 @@ public abstract class TestAgent
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 				
-//				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
@@ -356,19 +323,19 @@ public abstract class TestAgent
 //					}
 //				});
 				
-				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				Starter.createProxy(agent.getExternalAccess(), exta).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier result)
+					public void customResultAvailable(IExternalAccess result)
 					{
 						// inverse proxy from remote to local.
 						Starter.createProxy(exta, agent.getExternalAccess())
-							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 						{
-							public void customResultAvailable(IComponentIdentifier result)
+							public void customResultAvailable(IExternalAccess result)
 							{
 								if(filename!=null)
 								{
-									createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
+									createComponent(filename, null, config, exta.getId(), reslis)
 										.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 								}
 								else
@@ -397,15 +364,15 @@ public abstract class TestAgent
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 				Starter.createProxy(agent.getExternalAccess(), exta)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+					.addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 				{
-					public void customResultAvailable(IComponentIdentifier result)
+					public void customResultAvailable(IExternalAccess result)
 					{
 						// inverse proxy from remote to local.
 						Starter.createProxy(exta, agent.getExternalAccess())
-							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IExternalAccess>(ret)
+							.addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 						{
-							public void customResultAvailable(IComponentIdentifier result)
+							public void customResultAvailable(IExternalAccess result)
 							{
 								ret.setResult(exta);
 							}
@@ -432,7 +399,7 @@ public abstract class TestAgent
 				public void customResultAvailable(final IExternalAccess exta)
 				{
 					System.out.println("creating platform: "+cnt);
-					CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(platforms.size()*2, new DelegationResultListener<Void>(ret)
+					CounterResultListener<IExternalAccess> lis = new CounterResultListener<IExternalAccess>(platforms.size()*2, new DelegationResultListener<Void>(ret)
 					{
 						public void customResultAvailable(Void result) 
 						{
@@ -462,7 +429,7 @@ public abstract class TestAgent
 	public <T> IFuture<T>	waitForRealtimeDelay(final long delay, final IComponentStep<T> step)
 	{
 		final Future<T>	ret	= new Future<T>();
-		IFuture<IClockService>	clockfut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clock");
+		IFuture<IClockService>	clockfut	= agent.getFeature(IRequiredServicesFeature.class).getService("clock");
 		clockfut.addResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
 		{
 			public void customResultAvailable(IClockService clock)
@@ -471,7 +438,7 @@ public abstract class TestAgent
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+						agent.getFeature(IExecutionFeature.class).scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
 					}
 				});
 			}
@@ -485,7 +452,7 @@ public abstract class TestAgent
 	 * 	@param local	True when tests runs on local platform. 
 	 *  @return	The test result.
 	 */
-	protected IFuture<TestReport>	test(IComponentManagementService cms, boolean local)
+	protected IFuture<TestReport>	test(IExternalAccess platform, boolean local)
 	{
 		throw new UnsupportedOperationException("Implement test() or performTests()");
 	}

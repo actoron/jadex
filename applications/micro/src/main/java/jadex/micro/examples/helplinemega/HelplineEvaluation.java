@@ -6,8 +6,6 @@ import java.lang.management.ManagementFactory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -17,12 +15,10 @@ import javax.management.ObjectName;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.commons.future.FutureBarrier;
 
@@ -170,7 +166,7 @@ public class HelplineEvaluation
 					try
 					{
 						// search for person 1 (single: only present on second platform, multi: present once on each platform)
-						found	= SServiceProvider.getTaggedServices(firstplatform, IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK, "person1").get();
+						found	= firstplatform.searchServices( new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags("person1")).get();
 					}
 					catch(Exception e)
 					{
@@ -327,18 +323,17 @@ public class HelplineEvaluation
 			// Wait for CPU idle before starting measurement
 			while(getProcessCpuLoad()>0.1)
 				Thread.sleep(500);
-			FutureBarrier<IComponentIdentifier>	fubar	= new FutureBarrier<IComponentIdentifier>();
+			FutureBarrier<IExternalAccess>	fubar	= new FutureBarrier<IExternalAccess>();
 			long start	= System.nanoTime();
 			for(int i=0; i<platforms.length; i++)
 			{
-				IComponentManagementService	cms	= SServiceProvider.getService(platforms[i], IComponentManagementService.class).get();
 				for(int j=0; j<cnt/measurecnt; j++)
 				{
 					int num	= multi
 						? m*cnt/measurecnt + j	// multi: same person numbers used on for all platforms.
 						: numpersons + m*platforms.length + i*cnt/measurecnt + j;	// single: different person numbers for each platform
-					fubar.addFuture(cms.createComponent(null, HelplineAgent.class.getName()+".class",
-						new CreationInfo(Collections.singletonMap("person", (Object)("person"+num))), null));
+					fubar.addFuture(platforms[i].createComponent(
+						new CreationInfo(Collections.singletonMap("person", (Object)("person"+num))).setFilename(HelplineAgent.class.getName()+".class"), null));
 				}
 			}
 			fubar.waitFor().get();

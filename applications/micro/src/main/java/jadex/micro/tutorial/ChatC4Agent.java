@@ -1,13 +1,18 @@
 package jadex.micro.tutorial;
 
+import javax.management.ServiceNotFoundException;
+
 import jadex.bridge.FactoryFilter;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.commons.future.IFuture;
+import jadex.commons.IAsyncFilter;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -25,9 +30,6 @@ public class ChatC4Agent
 	@Agent
 	protected IInternalAccess agent;
 
-	/** The required services feature. */
-	@AgentFeature
-	protected IRequiredServicesFeature requiredServicesFeature;
 	/**
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
@@ -35,11 +37,35 @@ public class ChatC4Agent
 	@AgentBody
 	public void executeBody()
 	{
-//		IFuture<IComponentFactory>	factory	= SServiceProvider.getService(agent.getServiceContainer(), 
-//			new ComponentFactorySelector(MicroAgentFactory.FILETYPE_MICROAGENT));
-		
-		IFuture<IComponentFactory>	factory	= SServiceProvider.getService(agent,
-			IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT));
+		IAsyncFilter<IComponentFactory>	filter	= new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT);
+		Future<IComponentFactory> factory = new Future<>();
+		ITerminableIntermediateFuture<IComponentFactory> search	= agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IComponentFactory.class));
+		search.addResultListener(new IntermediateExceptionDelegationResultListener<IComponentFactory, IComponentFactory>(factory)
+		{
+			@Override
+			public void intermediateResultAvailable(IComponentFactory fac)
+			{
+				System.out.println("factory: "+fac);
+				filter.filter(fac).addResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(factory)
+				{
+					@Override
+					public void customResultAvailable(Boolean result) throws Exception
+					{
+						if(result)
+						{
+							factory.setResultIfUndone(fac);
+							search.terminate();
+						}
+					}
+				});
+			}
+			
+			@Override
+			public void finished()
+			{
+				factory.setExceptionIfUndone(new ServiceNotFoundException());
+			}
+		});
 		
 		//factory.addResultListener(agent.getCompocreateResultListener(new IResultListener<IComponentFactory>()
 		factory.addResultListener(new IResultListener<IComponentFactory>()

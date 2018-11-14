@@ -11,26 +11,26 @@
 	name="CleanerWorld" package="jadex.bdiv3.examples.cleanerworld">
 	
 	<componenttypes>
-		<componenttype name="EnvironmentLocal" filename="jadex/bdiv3/examples/cleanerworld/environment/EnvironmentLocalBDI.class"/>
-		<componenttype name="CleanerLocal" filename="jadex/bdiv3/examples/cleanerworld/cleaner/CleanerBDI.class"/>
+		<componenttype name="EnvironmentLocal" filename="jadex/bdiv3/examples/cleanerworld/environment/EnvironmentLocalAgent.class"/>
+		<componenttype name="CleanerLocal" filename="jadex/bdiv3/examples/cleanerworld/cleaner/CleanerAgent.class"/>
 	</componenttypes>
 	
 	<configurations>
 		<configuration name="Two cleaners local">
 			<components>
-				<component type="EnvironmentLocal" master="true"/>
+				<component type="EnvironmentLocal"/>
 				<component type="CleanerLocal" number="2"/>
 			</components>
 		</configuration>
 		<configuration name="One cleaner local">
 			<components>
-				<component type="EnvironmentLocal" master="true"/>
+				<component type="EnvironmentLocal"/>
 				<component type="CleanerLocal"/>
 			</components>
 		</configuration>
 		<configuration name="Ten cleaners local">
 			<components>
-				<component type="EnvironmentLocal" master="true"/>
+				<component type="EnvironmentLocal"/>
 				<component type="CleanerLocal" number="10"/>
 			</components>
 		</configuration>

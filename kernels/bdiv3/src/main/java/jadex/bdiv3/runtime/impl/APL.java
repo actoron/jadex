@@ -133,7 +133,7 @@ public class APL
 							{
 								if(cand.getClass().isAnnotationPresent(Plan.class))
 								{
-									MCapability	mcapa = (MCapability)ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
+									MCapability	mcapa = (MCapability)ia.getFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
 									MPlan mplan = mcapa.getPlan(cand.getClass().getName());
 									CandidateInfoPojoPlan ci = new CandidateInfoPojoPlan(cand, element, ia);
 									RPlan rplan = RPlan.createRPlan(mplan, ci, element, ia, null, null);
@@ -165,7 +165,7 @@ public class APL
 			if(!done)
 			{
 				// Handle waiting plans
-				Collection<RPlan> rplans = ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getPlans();
+				Collection<RPlan> rplans = ia.getFeature(IInternalBDIAgentFeature.class).getCapability().getPlans();
 				if(rplans!=null)
 				{
 					for(RPlan rplan: rplans)
@@ -279,19 +279,32 @@ public class APL
 	{
 		List<ICandidateInfo> ret = new ArrayList<ICandidateInfo>();
 		
-		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
-		// todo: include a number of retries...
-		int numcandidates = 1;
-		if(mpe.isPostToAll())
-		{
-			numcandidates = Integer.MAX_VALUE;
-		}
+//		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
+//		// todo: include a number of retries...
+//		int numcandidates = 1;
+//		if(mpe.isPostToAll())
+//		{
+//			numcandidates = Integer.MAX_VALUE;
+//		}
+//		
+//		// todo: test if this works with posttoall because getNextCandidate() does not remove a candidate?!
+//		
+//		for(int i=0; i<numcandidates && candidates!=null && candidates.size()>0; i++)
+//		{
+//			ret.add(getNextCandidate(mcapa, ia));
+//		}
 		
-		// todo: test if this works with posttoall because getNextCandidate() does not remove a candidate?!
-		
-		for(int i=0; i<numcandidates && candidates!=null && candidates.size()>0; i++)
+		if(candidates!=null && candidates.size()>0)
 		{
-			ret.add(getNextCandidate(mcapa, ia));
+			MProcessableElement mpe = (MProcessableElement)element.getModelElement();
+			if(mpe.isPostToAll())
+			{
+				ret.addAll(candidates);
+			}
+			else
+			{
+				ret.add(getNextCandidate(mcapa, ia));
+			}
 		}
 		
 		return ret;
@@ -304,7 +317,7 @@ public class APL
 	{
 		final Future<List<ICandidateInfo>> ret = new Future<List<ICandidateInfo>>();
 		
-		IInternalBDIAgentFeature bdif = ia.getComponentFeature(IInternalBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = ia.getFeature(IInternalBDIAgentFeature.class);
 		
 //		MProcessableElement mpe = (MProcessableElement)element.getModelElement();
 		
@@ -1187,7 +1200,7 @@ public class APL
 			this.element = element;
 			this.agent = agent;
 			
-			MCapability	mcapa = (MCapability)agent.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
+			MCapability	mcapa = (MCapability)agent.getFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
 			this.mplan = mcapa.getPlan(pojo.getClass().getName());
 		}
 

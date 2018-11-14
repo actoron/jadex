@@ -11,7 +11,7 @@
     <jadex:modelname>Result</jadex:modelname>
     <jadex:description>&lt;h1&gt;Result Process&lt;/h1&gt; This process collects some arguments and produces a result.&lt;br/&gt; The result can be stored and inspected in the JCC.</jadex:description>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+    <jadex:componentflags suspend="false" monitoring="OFF" synchronous="false" keepalive="false"/>
     <jadex:imports>
       <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
       <jadex:import>jadex.bpmn.model.*</jadex:import>

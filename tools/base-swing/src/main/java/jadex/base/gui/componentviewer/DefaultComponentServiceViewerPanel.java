@@ -10,9 +10,11 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import jadex.base.SRemoteGui;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
@@ -55,19 +57,20 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		IFuture<Void>	fut	= super.init(jcc, component);
 		assert fut.isDone();
 		
-		SServiceProvider.getDeclaredServices(component)
-			.addResultListener(new IResultListener<Collection<IService>>()
-		{
-			public void resultAvailable(Collection<IService> result)
-			{
-				createPanels(component, result).addResultListener(new DelegationResultListener<Void>(ret));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		// TODO: should use SRemoteGui for observing minimal platforms
+//		SServiceProvider.getDeclaredServices(component)
+//			.addResultListener(new IResultListener<Collection<IService>>()
+//		{
+//			public void resultAvailable(Collection<IService> result)
+//			{
+//				createPanels(component, result).addResultListener(new DelegationResultListener<Void>(ret));
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
 		
 		return ret;
 	}
@@ -79,7 +82,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		AbstractJCCPlugin.getClassLoader(exta.getComponentIdentifier(), jcc)
+		AbstractJCCPlugin.getClassLoader(exta.getId(), jcc)
 			.addResultListener(new SwingDefaultResultListener<ClassLoader>()
 		{
 			public void customResultAvailable(final ClassLoader cl)
@@ -111,48 +114,21 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 				});
 				
 				// Component panel.
-				Class<?>[]	classes	= getGuiClasses(exta.getModel().getProperty(PROPERTY_COMPONENTVIEWERCLASS, cl), cl);
-				boolean	found	= false;
-				for(int i=0; !found && i<classes.length; i++)
-				{
-					try
-					{
-						IComponentViewerPanel panel = (IComponentViewerPanel)classes[i].newInstance();
-						found	= true;
-						panels.add(new Object[]{"component", panel});
-						panel.init(jcc, getActiveComponent()).addResultListener(lis);
-					}
-					catch(Exception e)
-					{
-						if(found)
-						{
-							lis.exceptionOccurred(e);
-						}
-					}
-				}
 				
-				if(!found) 
+				exta.getModelAsync().addResultListener(new SwingDefaultResultListener<IModelInfo>()
 				{
-					lis.exceptionOccurred(new RuntimeException("No viewerclass: "+exta.getModel().getProperty(PROPERTY_COMPONENTVIEWERCLASS, cl)));
-				}
-				
-				// Service panels.
-				if(services!=null)
-				{
-					for(IService ser: services)
+					public void customResultAvailable(final IModelInfo model)
 					{
-						classes	= getGuiClasses(ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS), cl);
-						found	= false;
-						for(int j=0; !found && j<classes.length; j++)
+						Class<?>[]	classes	= getGuiClasses(model.getProperty(PROPERTY_COMPONENTVIEWERCLASS, cl), cl);
+						boolean	found	= false;
+						for(int i=0; !found && i<classes.length; i++)
 						{
 							try
 							{
-								IServiceViewerPanel panel = (IServiceViewerPanel)classes[j].newInstance();
+								IComponentViewerPanel panel = (IComponentViewerPanel)classes[i].newInstance();
 								found	= true;
-//								panels.add(new Object[]{SReflect.getInnerClassName(ser.getServiceIdentifier().getServiceType()), panel});
-								panels.add(new Object[]{SReflect.getUnqualifiedTypeName(ser.getServiceIdentifier()
-									.getServiceType().getTypeName()), panel});
-								panel.init(jcc, ser).addResultListener(lis);
+								panels.add(new Object[]{"component", panel});
+								panel.init(jcc, getActiveComponent()).addResultListener(lis);
 							}
 							catch(Exception e)
 							{
@@ -165,10 +141,44 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 						
 						if(!found) 
 						{
-							lis.exceptionOccurred(new RuntimeException("No viewerclass: "+ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)));
+							lis.exceptionOccurred(new RuntimeException("No viewerclass: "+exta.getModelAsync().get().getProperty(PROPERTY_COMPONENTVIEWERCLASS, cl)));
+						}
+						
+						// Service panels.
+						if(services!=null)
+						{
+							for(IService ser: services)
+							{
+								classes	= getGuiClasses(ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS), cl);
+								found	= false;
+								for(int j=0; !found && j<classes.length; j++)
+								{
+									try
+									{
+										IServiceViewerPanel panel = (IServiceViewerPanel)classes[j].newInstance();
+										found	= true;
+		//								panels.add(new Object[]{SReflect.getInnerClassName(ser.getId().getServiceType()), panel});
+										panels.add(new Object[]{SReflect.getUnqualifiedTypeName(ser.getServiceId()
+											.getServiceType().getTypeName()), panel});
+										panel.init(jcc, ser).addResultListener(lis);
+									}
+									catch(Exception e)
+									{
+										if(found)
+										{
+											lis.exceptionOccurred(e);
+										}
+									}
+								}
+								
+								if(!found) 
+								{
+									lis.exceptionOccurred(new RuntimeException("No viewerclass: "+ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)));
+								}
+							}
 						}
 					}
-				}
+				});
 			}
 		});
 		return ret;

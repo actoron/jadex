@@ -4,8 +4,9 @@ import java.util.TimerTask;
 import java.util.logging.Logger;
 
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -199,132 +200,124 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				SServiceProvider.getService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IClockService>()
+				IClockService clock	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+				if(clock!=null)
 				{
-					public void resultAvailable(final IClockService clock)
+					clock.isValid().addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Boolean>()
 					{
-						clock.isValid().addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Boolean>()
+						public void resultAvailable(Boolean valid)
 						{
-							public void resultAvailable(Boolean valid)
+							if(!valid.booleanValue())
 							{
-								if(!valid.booleanValue())
+//										System.out.println("invalid clock");
+								return;
+							}
+							
+							try
+							{
+								final Runnable notify = new Runnable()
 								{
-//									System.out.println("invalid clock");
-									return;
-								}
-								
-								try
-								{
-									final Runnable notify = new Runnable()
+									public void run()
 									{
-										public void run()
+										boolean notify = false;
+										synchronized(TimeoutResultListener.this)
 										{
-											boolean notify = false;
-											synchronized(TimeoutResultListener.this)
+											if(!notified)
 											{
-												if(!notified)
-												{
-													notify = true;
-													notified = true;
-												}
-											}
-											if(notify)
-											{
-												exta.scheduleStep(new IComponentStep<Void>()
-												{
-													public IFuture<Void> execute(IInternalAccess ia)
-													{
-														TimeoutException te	= new TimeoutException("Timeout was: "+timeout+" "+message+(Future.DEBUG ? "" : ". Use PlatformConfiguration.setDebugFutures(true) for timeout cause."), ex);
-														timeoutOccurred(te);
-														return IFuture.DONE;
-													}
-												});
+												notify = true;
+												notified = true;
 											}
 										}
-									};
-									
-			//						synchronized(TimeoutResultListener.this)
-									synchronized(mon)
-									{
-										// Do not create new timer if already notified
-										if(timeout>0 && !notified)
+										if(notify)
 										{
-											cancel();
-											if(realtime)
+											exta.scheduleStep(new IComponentStep<Void>()
 											{
-												// each timer creates a thread!
-												
-//												System.out.println("create timer");
-//												Timer t = new Timer();
-//												TimerTask tt = new TimerTask()
-//												{
-//													public void run()
+												public IFuture<Void> execute(IInternalAccess ia)
+												{
+													TimeoutException te	= new TimeoutException("Timeout was: "+timeout+" "+message+(Future.DEBUG ? "" : ". Use PlatformConfiguration.getExtendedPlatformConfiguration().setDebugFutures(true) for timeout cause."), ex);
+													timeoutOccurred(te);
+													return IFuture.DONE;
+												}
+											});
+										}
+									}
+								};
+								
+		//						synchronized(TimeoutResultListener.this)
+								synchronized(mon)
+								{
+									// Do not create new timer if already notified
+									if(timeout>0 && !notified)
+									{
+										cancel();
+										if(realtime)
+										{
+											// each timer creates a thread!
+											
+//													System.out.println("create timer");
+//													Timer t = new Timer();
+//													TimerTask tt = new TimerTask()
 //													{
-//														notify.run();
-//													}
-//												};
-//												timer = tt;
-//												t.schedule(tt, timeout);
-												
-												timer = clock.createRealtimeTimer(timeout, new ITimedObject()
-												{
-//													Object	timer1	= timer;
-													public void timeEventOccurred(long currenttime)
-													{
-//														if(timer!=timer1)
+//														public void run()
 //														{
-//															System.out.println("wrong timer: "+message);
+//															notify.run();
 //														}
-														notify.run();
-													}
-
-													public String toString()
-													{
-														return super.toString()+": "+message;
-													}
-												});
-//												System.out.println("new real trl: "+message);
-											}
-											else
+//													};
+//													timer = tt;
+//													t.schedule(tt, timeout);
+											
+											timer = clock.createRealtimeTimer(timeout, new ITimedObject()
 											{
-												timer = clock.createTimer(timeout, new ITimedObject()
+//														Object	timer1	= timer;
+												public void timeEventOccurred(long currenttime)
 												{
-//													Object	timer1	= timer;
-													public void timeEventOccurred(long currenttime)
-													{
-//														if(timer!=timer1)
-//														{
-//															System.out.println("wrong timer: "+message);
-//														}
-														notify.run();
-													}
-													
-													public String toString()
-													{
-														return super.toString()+": "+message;
-													}
-												});
-//												System.out.println("new clock trl: "+message);
-											}
+//															if(timer!=timer1)
+//															{
+//																System.out.println("wrong timer: "+message);
+//															}
+													notify.run();
+												}
+
+												public String toString()
+												{
+													return super.toString()+": "+message;
+												}
+											});
+//													System.out.println("new real trl: "+message);
+										}
+										else
+										{
+											timer = clock.createTimer(timeout, new ITimedObject()
+											{
+//														Object	timer1	= timer;
+												public void timeEventOccurred(long currenttime)
+												{
+//															if(timer!=timer1)
+//															{
+//																System.out.println("wrong timer: "+message);
+//															}
+													notify.run();
+												}
+												
+												public String toString()
+												{
+													return super.toString()+": "+message;
+												}
+											});
+//													System.out.println("new clock trl: "+message);
 										}
 									}
 								}
-								catch(IllegalStateException e)
-								{
-//									e.printStackTrace();
-									// todo: should not happen
-									// causes null pointer exception on clock when clock is uninitialized
-								}
 							}
-						}));
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-	//					exception.printStackTrace();
-	//					System.out.println("Could not get clock service.");
-					}
-				}));
+							catch(IllegalStateException e)
+							{
+//										e.printStackTrace();
+								// todo: should not happen
+								// causes null pointer exception on clock when clock is uninitialized
+							}
+						}
+					}));
+				}
 				
 				return IFuture.DONE;
 			}

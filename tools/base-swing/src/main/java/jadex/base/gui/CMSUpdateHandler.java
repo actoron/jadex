@@ -9,9 +9,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
@@ -19,7 +18,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 
 /**
  *  A change handler which receives remote CMS events and delegates to the registered listeners.
@@ -53,7 +51,7 @@ public class CMSUpdateHandler
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
-		for(Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>, Integer> tup: SUtil.safeMap(listeners).values())
+		for(Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>, Integer> tup: SUtil.notNull(listeners).values())
 		{
 			tup.getFirstEntity().terminate();
 		}
@@ -72,10 +70,8 @@ public class CMSUpdateHandler
 		ISubscriptionIntermediateFuture<CMSStatusEvent>	ret;
 		
 		if(listeners==null)
-		{
 			listeners	= new LinkedHashMap<IComponentIdentifier, Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>,Integer>>();
-		}
-		Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>, Integer>	tup	= listeners.get(cid);
+		Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>, Integer> tup = listeners.get(cid);
 		
 		// If exists increase counter.
 		if(tup!=null)
@@ -122,32 +118,16 @@ public class CMSUpdateHandler
 			Integer	cnt	= Integer.valueOf(1);
 			tup	= new Tuple2<ISubscriptionIntermediateFuture<CMSStatusEvent>, Integer>(ret, cnt);
 			listeners.put(cid, tup);
-			SServiceProvider.getService(access, cid, IComponentManagementService.class).
-				addResultListener(new SwingDefaultResultListener<IComponentManagementService>()
+			// cannot invoke method on remote proxy as send message is called then on wrong thread (not component)
+			//cms.listenToAll().addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(fut));
+			access.scheduleStep(new IComponentStep<Void>()
 			{
-				@Override
-				public void customResultAvailable(final IComponentManagementService cms)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					// cannot invoke method on remote proxy as send message is called then on wrong thread (not component)
-					//cms.listenToAll().addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(fut));
-					access.scheduleStep(new IComponentStep<Void>()
-					{
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-							cms.listenToAll().addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(fut));
-							return IFuture.DONE;
-						}
-					});
-				}
-
-				@Override
-				public void customExceptionOccurred(Exception exception)
-				{
-					if(listeners!=null)
-					{
-						listeners.remove(cid);
-					}
-					fut.setException(exception);
+//					cms.listenToAll().addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(fut));
+					SComponentManagementService.listenToAll(ia).addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(fut));
+					
+					return IFuture.DONE;
 				}
 			});
 		}

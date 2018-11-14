@@ -178,7 +178,7 @@ In this exercise we obtain the chat service of the chat component to print a wel
 
 ```java
 
-IChatService chat = SServiceProvider.getService(platform.getServiceProvider(), cid, IChatService.class).get();
+IChatService chat = SServiceProvider.searchService(platform.getServiceProvider(), new ServiceQuery<>( cid, IChatService.class)).get();
 chat.message("Main", "Chat started.");
 
 ```

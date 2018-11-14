@@ -66,7 +66,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public IFuture<Void> init()
 	{
-		return invokeMethod(getComponent(), AgentCreated.class, null);
+		return invokeMethod(getInternalAccess(), AgentCreated.class, null);
 	}
 	
 	/**
@@ -75,10 +75,11 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public IFuture<Void> body()
 	{
+		//System.out.println("body on: "+getComponent().getComponentIdentifier());
 		// Invoke initial service calls.
 		invokeServices();
 		
-		return invokeMethod(getComponent(), AgentBody.class, null);
+		return invokeMethod(getInternalAccess(), AgentBody.class, null);
 	}
 
 	/**
@@ -91,7 +92,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 //			System.out.println("lifecycle feature shutdown start: "+getComponent().getComponentIdentifier());
 			
 		final Future<Void> ret = new Future<Void>();
-		invokeMethod(getComponent(), AgentKilled.class, null).addResultListener(new IResultListener<Void>()
+		invokeMethod(getInternalAccess(), AgentKilled.class, null).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -129,7 +130,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 							val = SJavaParser.evaluateExpression(convback, getComponent().getModel().getAllImports(), fetcher, getComponent().getClassLoader());
 						}
 						
-						getComponent().getComponentFeature(IArgumentsResultsFeature.class).getResults().put(name, val);
+						getComponent().getFeature(IArgumentsResultsFeature.class).getResults().put(name, val);
 					}
 				}
 				catch(Exception e2)
@@ -161,7 +162,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public Object getPojoAgent()
 	{
-		return getComponent().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		return getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
 	}
 	
 	/**
@@ -175,7 +176,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		{
 			for(final ServiceCallInfo call: calls)
 			{
-				IFuture<IService> fut = getComponent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService(call.getRequiredName());
+				IFuture<IService> fut = getComponent().getFeature(IRequiredServicesFeature.class).getService(call.getRequiredName());
 				fut.addResultListener(new IResultListener<IService>()
 				{
 					public void resultAvailable(IService service)
@@ -184,7 +185,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 						Method method = null;
 						if(mi==null)
 						{
-							Class<?> iface = service.getServiceIdentifier().getServiceType().getType(getComponent().getClassLoader());
+							Class<?> iface = service.getServiceId().getServiceType().getType(getComponent().getClassLoader());
 							Method[] methods = iface.getMethods();
 							if(methods!=null)
 							{
@@ -334,7 +335,7 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 				{
 					// It is now allowed to use protected/private agent created, body, terminate methods
 					method.setAccessible(true);
-					Object res = method.invoke(component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent(), iargs);
+					Object res = method.invoke(component.getFeature(IPojoComponentFeature.class).getPojoAgent(), iargs);
 					if(res instanceof IFuture)
 					{
 						ret	= (IFuture<Void>)res;

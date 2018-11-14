@@ -12,9 +12,8 @@ import javax.servlet.http.HttpSession;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.ThreadSuspendable;
 
 /**
@@ -49,8 +48,7 @@ public class JadexDispatcherServlet extends HttpServlet
 		};
 //		ThreadSuspendable	sus	= new ThreadSuspendable();
 		this.platform	= Starter.createPlatform(args).get(30000);
-		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(30000);
-		cms.createComponent("jadex.web.examples.hellobdiv3.SayHelloBDI.class", null).getFirstResult();
+		platform.createComponent(new CreationInfo().setFilename("jadex.web.examples.hellobdiv3.SayHelloBDI.class")).getFirstResult();
 	}
 	
 	/**
@@ -71,7 +69,7 @@ public class JadexDispatcherServlet extends HttpServlet
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 //		ThreadSuspendable	sus	= new ThreadSuspendable();
-		ISayHelloService shs = SServiceProvider.getService(platform, ISayHelloService.class).get(30000);
+		ISayHelloService shs = platform.searchService( new ServiceQuery<>( ISayHelloService.class)).get(30000);
 		String text = shs.sayHello().get(30000);
 		request.setAttribute("text", text);
 		

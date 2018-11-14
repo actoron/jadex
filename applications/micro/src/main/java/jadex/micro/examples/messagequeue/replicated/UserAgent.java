@@ -12,7 +12,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.examples.messagequeue.Event;
@@ -22,7 +21,7 @@ import jadex.micro.examples.messagequeue.Event;
  * 
  */
 @Agent
-@RequiredServices(@RequiredService(name = "mq", type = IMessageQueueReplicableService.class, binding = @Binding(scope = Binding.SCOPE_APPLICATION)))
+@RequiredServices(@RequiredService(name = "mq", type = IMessageQueueReplicableService.class))
 @Arguments(@Argument(name = "topic", clazz = String.class, defaultvalue = "\"default_topic\""))
 public class UserAgent
 {
@@ -54,7 +53,7 @@ public class UserAgent
 			public void intermediateResultAvailable(Event event)
 			{
 				System.out.println("Received: "
-						+ agent.getComponentIdentifier() + " " + event);
+						+ agent.getId() + " " + event);
 			}
 
 			public void exceptionOccurred(Exception exception)
@@ -72,17 +71,17 @@ public class UserAgent
 				if(!(cnt[0] % 2 == 0))
 				{
 					// publish also remote
-					mq.publish(topic, new Event("some type", cnt[0]++, agent.getComponentIdentifier()), true);
+					mq.publish(topic, new Event("some type", cnt[0]++, agent.getId()), true);
 				}
 				else
 				{
 					// just publish local
-					mq.publish(topic,new Event("some type", cnt[0]++, agent.getComponentIdentifier()), false);
+					mq.publish(topic,new Event("some type", cnt[0]++, agent.getId()), false);
 				}
 				
 				if(cnt[0] < 10)
 				{
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, this);
+					agent.getFeature(IExecutionFeature.class).waitForDelay(1000, this);
 				}
 				else
 				{
@@ -91,6 +90,6 @@ public class UserAgent
 				return IFuture.DONE;
 			}
 		};
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, step);
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, step);
 	}
 }

@@ -47,9 +47,9 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
@@ -67,7 +67,7 @@ import jadex.extension.rs.publish.annotation.MethodMapper;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.javaparser.SJavaParser;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
@@ -200,12 +200,11 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		final Future<Void> ret = new Future<Void>();
 		
 		ClassLoader cl = null;
-		ILibraryService ls = SServiceProvider.getLocalService(component, ILibraryService.class, Binding.SCOPE_PLATFORM);
-		if (serviceid.getProviderId().getPlatformName().equals(component.getComponentIdentifier().getPlatformName()))
+		ILibraryService ls = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredService.SCOPE_PLATFORM));
+		if (serviceid.getProviderId().getPlatformName().equals(component.getId().getPlatformName()))
 		{
 			// Local publish, get the component's classloader.
-			IComponentManagementService cms = SServiceProvider.getLocalService(component, IComponentManagementService.class, Binding.SCOPE_PLATFORM);
-			IComponentDescription desc = cms.getComponentDescription(serviceid.getProviderId()).get();
+			IComponentDescription desc = component.getDescription(serviceid.getProviderId()).get();
 			cl = ls.getClassLoader(desc.getResourceIdentifier()).get();
 		}
 		else
@@ -497,7 +496,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		// - only same implclass name + same props => same generated classname
 		
 		StringBuilder builder = new StringBuilder();
-//		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
+//		Class<?> iface = service.getId().getServiceType().getType(classloader);
 		Class<?> nameclazz = baseclass!=null? baseclass: iface;
 		if(nameclazz.getPackage()!=null)
 			builder.append(nameclazz.getPackage().getName());
@@ -1343,7 +1342,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			ret.append("<div class=\"header\">");
 			ret.append("\n");
 			ret.append("<h1>");//Service Info for: ");
-			String ifacename = ((IService)service).getServiceIdentifier().getServiceType().getTypeName();
+			String ifacename = ((IService)service).getServiceId().getServiceType().getTypeName();
 			ret.append(SReflect.getUnqualifiedTypeName(ifacename));
 			ret.append("</h1>");
 			ret.append("\n");

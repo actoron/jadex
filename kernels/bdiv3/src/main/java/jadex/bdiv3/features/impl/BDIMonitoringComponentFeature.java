@@ -48,8 +48,8 @@ public class BDIMonitoringComponentFeature extends MonitoringComponentFeature
 		{
 			for(MBelief mbel: mbels)
 			{
-				BeliefInfo info = BeliefInfo.createBeliefInfo(getComponent(), mbel, getComponent().getClassLoader());
-				MonitoringEvent ev = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
+				BeliefInfo info = BeliefInfo.createBeliefInfo(getInternalAccess(), mbel, getComponent().getClassLoader());
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(mbel.toString());
 				ev.setProperty("details", info);
 				ret.add(ev);
@@ -57,13 +57,13 @@ public class BDIMonitoringComponentFeature extends MonitoringComponentFeature
 		}
 		
 		// Goals of this capability.
-		Collection<RGoal> goals = getComponent().getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getGoals();
+		Collection<RGoal> goals = getComponent().getFeature(IInternalBDIAgentFeature.class).getCapability().getGoals();
 		if(goals!=null)
 		{
 			for(RGoal goal: goals)
 			{
 				GoalInfo info = GoalInfo.createGoalInfo(goal);
-				MonitoringEvent ev = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis(), PublishEventLevel.FINE);
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(goal.toString());
 				ev.setProperty("details", info);
 				ret.add(ev);
@@ -71,13 +71,13 @@ public class BDIMonitoringComponentFeature extends MonitoringComponentFeature
 		}
 		
 		// Plans of this capability.
-		Collection<RPlan> plans	= getComponent().getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getPlans();
+		Collection<RPlan> plans	= getComponent().getFeature(IInternalBDIAgentFeature.class).getCapability().getPlans();
 		if(plans!=null)
 		{
 			for(RPlan plan: plans)
 			{
 				PlanInfo info = PlanInfo.createPlanInfo(plan);
-				MonitoringEvent ev = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis(), PublishEventLevel.FINE);
+				MonitoringEvent ev = new MonitoringEvent(getComponent().getId(), getComponent().getDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(plan.toString());
 				ev.setProperty("details", info);
 				ret.add(ev);

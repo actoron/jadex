@@ -31,6 +31,7 @@ import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -206,8 +207,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //			}
 //		});
 
-		mpanel = new ModelTreePanel(getJCC().getPlatformAccess(), jcc.getJCCAccess(), !getJCC().getJCCAccess().getComponentIdentifier().getPlatformName()
-			.equals(getJCC().getPlatformAccess().getComponentIdentifier().getPlatformName()));
+		mpanel = new ModelTreePanel(getJCC().getPlatformAccess(), jcc.getJCCAccess(), !getJCC().getJCCAccess().getId().getPlatformName()
+			.equals(getJCC().getPlatformAccess().getId().getPlatformName()));
 //		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH,
 //			ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
 
@@ -331,7 +332,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	public IFuture loadPlatformProperties()
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(getJCC().getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		getJCC().getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -379,7 +380,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	public IFuture pushPlatformSettings()
 	{
 		final Future	ret	= new Future();
-		SServiceProvider.getService(getJCC().getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		getJCC().getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -694,7 +695,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		return ModelTreePanel.createResourceIdentifier(jcc.getPlatformAccess(), filepath);
 		
 //		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-//		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//		jcc.getPlatformAccess().getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
 //		{
 //			public void customResultAvailable(ILibraryService ls)

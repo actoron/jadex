@@ -39,11 +39,11 @@ public class ComponentProperties	extends	PropertiesPanel
 		createTextField("State");
 		createTextField("Processing state");
 		
-		createCheckBox("Master");
-		createCheckBox("Daemon");
-		createCheckBox("Auto shutdown");
+//		createCheckBox("Master");
+//		createCheckBox("Daemon");
+//		createCheckBox("Auto shutdown");
 		createCheckBox("Synchronous");
-		createCheckBox("Persistable");
+//		createCheckBox("Persistable");
 	}
 	
 	//-------- methods --------
@@ -64,11 +64,11 @@ public class ComponentProperties	extends	PropertiesPanel
 		getTextField("Resource Identifier").setText(gid==null? "n/a": gid);
 		getTextField("(global / local)").setText(lid==null? "n/a": lid.toString());
 //		getTextField("Processing state").setText(desc.getProcessingState());
-		getCheckBox("Master").setSelected(desc.isMaster());
-		getCheckBox("Daemon").setSelected(desc.isDaemon());
-		getCheckBox("Auto shutdown").setSelected(desc.isAutoShutdown());
+//		getCheckBox("Master").setSelected(desc.isMaster());
+//		getCheckBox("Daemon").setSelected(desc.isDaemon());
+//		getCheckBox("Auto shutdown").setSelected(desc.isAutoShutdown());
 		getCheckBox("Synchronous").setSelected(desc.isSynchronous());
-		getCheckBox("Persistable").setSelected(desc.isPersistable());
+//		getCheckBox("Persistable").setSelected(desc.isPersistable());
 		
 		JTable	list	= (JTable)getComponent("Addresses");
 		String[]	addresses	= desc.getName() instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)desc.getName()).getAddresses() : null;

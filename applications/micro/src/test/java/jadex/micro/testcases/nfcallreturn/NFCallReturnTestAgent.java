@@ -6,18 +6,19 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ProxyFactory;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
@@ -29,7 +30,7 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
+	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
 })
 public class NFCallReturnTestAgent extends TestAgent
 {
@@ -48,19 +49,19 @@ public class NFCallReturnTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
-		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
+		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
 		{
 			public void customResultAvailable(TestReport[] result)
 			{
-				agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
+				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
 				for(TestReport tr: result)
 					tc.addReport(tr);
-				testRemote(3).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
+				testRemote(3).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
 				{
 					public void customResultAvailable(TestReport[] result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
+						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						for(TestReport tr: result)
 							tc.addReport(tr);
 						ret.setResult(null);
@@ -79,8 +80,8 @@ public class NFCallReturnTestAgent extends TestAgent
 	{
 		final Future<TestReport[]> ret = new Future<TestReport[]>();
 		
-		performTests(agent.getComponentIdentifier().getRoot(), testno, true)
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport[]>(ret)));
+		performTests(agent.getId().getRoot(), testno, true)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport[]>(ret)));
 		
 		return ret;
 	}
@@ -96,8 +97,8 @@ public class NFCallReturnTestAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-				performTests(exta.getComponentIdentifier(), testno, false)
-					.addResultListener(agent.getComponentFeature(IExecutionFeature.class)
+				performTests(exta.getId(), testno, false)
+					.addResultListener(agent.getFeature(IExecutionFeature.class)
 						.createResultListener(new DelegationResultListener<TestReport[]>(ret)));
 			}
 		});
@@ -129,13 +130,16 @@ public class NFCallReturnTestAgent extends TestAgent
 		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
 		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut);
 		
-		agent.getLogger().severe("Testagent create provider: "+agent.getComponentDescription());
+		agent.getLogger().severe("Testagent create provider: "+agent.getDescription());
 		createComponent(ProviderAgent.class.getName()+".class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport[]>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				agent.getLogger().severe("Testagent create provider done: "+agent.getComponentDescription());
+				System.out.println("comp thread: "+agent.getFeature(IExecutionFeature.class).isComponentThread());
+				
+				agent.getLogger().severe("Testagent create provider done: "+agent.getDescription());
+				
 				callReqService(cid, testno, 5000).addResultListener(new ExceptionDelegationResultListener<TestReport, TestReport[]>(ret)
 				{
 					public void customResultAvailable(final TestReport result1)
@@ -170,7 +174,7 @@ public class NFCallReturnTestAgent extends TestAgent
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if returning changed nf props works with required proxy");
 		
-		IFuture<ITestService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ITestService.class, cid);
+		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(cid));
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 		{
@@ -190,13 +194,15 @@ public class NFCallReturnTestAgent extends TestAgent
 		final Future<TestReport> ret = new Future<TestReport>();
 		
 		final TestReport tr = new TestReport("#"+testno, "Test if returning changed nf props works with provided proxy");
-		
-		IFuture<ITestService> fut = SServiceProvider.getService(agent, cid, ITestService.class, false);
+		IFuture<ITestService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(cid));
 		
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
 		{
-			public void customResultAvailable(final ITestService ts)
+			public void customResultAvailable(ITestService ts)
 			{
+				// Unwrap required proxy (TODO: easier get without proxy? also for users???)
+				BasicServiceInvocationHandler	bsih	= (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(ts);
+				ts	= (ITestService)bsih.getDomainService();
 				callService(ts, tr).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 		});

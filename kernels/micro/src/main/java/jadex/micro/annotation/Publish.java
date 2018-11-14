@@ -27,7 +27,7 @@ public @interface Publish
 	/**
 	 *  The scope user to find the publish service.
 	 */
-	public String publishscope() default Binding.SCOPE_PLATFORM;
+	public String publishscope() default RequiredService.SCOPE_PLATFORM;
 	
 	/**
 	 *  Flag if the service should be published to multiple locations.

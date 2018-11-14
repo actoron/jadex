@@ -2,13 +2,10 @@ package jadex.bridge.component;
 
 import java.util.Map;
 
-import jadex.commons.Tuple2;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-
 /**
  *  This features provides arguments.
  */
-public interface IArgumentsResultsFeature
+public interface IArgumentsResultsFeature extends IExternalArgumentsResultsFeature
 {
 	/**
 	 *  Get the arguments.
@@ -24,8 +21,8 @@ public interface IArgumentsResultsFeature
 	
 	// todo: allow for setResult() or must use a monitored map to be able to send out intermediate results
 	
-	/**
-	 * Subscribe to receive results.
-	 */
-	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults();
+//	/**
+//	 * Subscribe to receive results.
+//	 */
+//	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults();
 }

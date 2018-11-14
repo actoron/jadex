@@ -5,6 +5,8 @@ import java.util.Collections;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeature;
+import jadex.bridge.service.types.cms.PlatformComponent;
+import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SimpleParameterGuesser;
@@ -44,12 +46,28 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 		this.cinfo	= cinfo;
 	}
 	
+//	/**
+//	 *  Get the component access.
+//	 */
+//	public IInternalAccess getComponent()
+//	{
+//		return component;
+//	}
+	
 	/**
 	 *  Get the component access.
 	 */
-	public IInternalAccess getComponent()
+	public IInternalAccess getInternalAccess()
 	{
 		return component;
+	}
+	
+	/**
+	 *  Get the component access.
+	 */
+	public PlatformComponent getComponent()
+	{
+		return ((IPlatformComponentAccess)component).getPlatformComponent();
 	}
 	
 	//-------- IComponentFeature interface / instance level --------
@@ -58,7 +76,7 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 	 *  Initialize the feature.
 	 *  Empty implementation that can be overridden.
 	 */
-	public IFuture<Void>	init()
+	public IFuture<Void> init()
 	{
 		return IFuture.DONE;
 	}
@@ -66,7 +84,7 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 	/**
 	 *  Execute the main activity of the feature.
 	 */
-	public IFuture<Void>	body()
+	public IFuture<Void> body()
 	{
 		return IFuture.DONE;
 	}
@@ -77,7 +95,7 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 	 *  Non-user-body-features are directly executed for speed.
 	 *  If unsure just return true. ;-)
 	 */
-	public boolean	hasUserBody()
+	public boolean hasUserBody()
 	{
 		// Return true by default so it works if forgotten to override.
 		return true;
@@ -86,7 +104,7 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 	/**
 	 *  Shutdown the feature.
 	 */
-	public IFuture<Void>	shutdown()
+	public IFuture<Void> shutdown()
 	{
 		return IFuture.DONE;
 	}
@@ -121,7 +139,7 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 	 *  by providing an optional value fetcher. The fetch order is the reverse
 	 *  init order, i.e., later features can override values from earlier features.
 	 */
-	public IValueFetcher	getValueFetcher()
+	public IValueFetcher getValueFetcher()
 	{
 		return null;
 	}
@@ -131,12 +149,12 @@ public abstract class AbstractComponentFeature	implements IComponentFeature
 	 *  by providing an optional parameter guesser. The selection order is the reverse
 	 *  init order, i.e., later features can override values from earlier features.
 	 */
-	public IParameterGuesser	getParameterGuesser()
+	public IParameterGuesser getParameterGuesser()
 	{
 		if(guesser==null)
 		{
 			guesser	= new SimpleParameterGuesser(Collections.singleton(this));
 		}
 		return guesser;
-	}
+	}	
 }

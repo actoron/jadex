@@ -15,13 +15,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
 	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
-	name="Shopping" package="jadex.bdiv3.examples.shop"
-	autoshutdown="true">
+	name="Shopping" package="jadex.bdiv3.examples.shop">
 	
 	<componenttypes>
-		<componenttype name="Shop" filename="jadex/bdi/examples/shop/ShopBDI.class"/>
-		<componenttype name="Customer" filename="jadex/bdi/examples/shop/CustomerBDI.class"/>
-		<componenttype name="ShopAndCustomer" filename="jadex/bdi/examples/shop/ShopAndCustomerBDI.class"/>
+		<componenttype name="Shop" filename="jadex/bdiv3/examples/shop/ShopAgent.class"/>
+		<componenttype name="Customer" filename="jadex/bdiv3/examples/shop/CustomerAgent.class"/>
+		<componenttype name="ShopAndCustomer" filename="jadex/bdiv3/examples/shop/ShopAndCustomerAgent.class"/>
 	</componenttypes>
 	
 	<configurations>
@@ -29,7 +28,7 @@
 			<components>
 				<component type="Shop">
 					<arguments>
-						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Ladl, "+$component.getId().getPlatformName()</argument>
 						<argument name="catalog">
 							java.util.Arrays.asList(new ItemInfo[]
 							{
@@ -43,7 +42,7 @@
 				</component>
 				<component type="Shop">
 					<arguments>
-						<argument name="shopname">"Herzie, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Herzie, "+$component.getId().getPlatformName()</argument>
 						<argument name="catalog">
 							java.util.Arrays.asList(new ItemInfo[]
 							{
@@ -62,7 +61,7 @@
 			<components>
 				<component type="Shop">
 					<arguments>
-						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Ladl, "+$component.getId().getPlatformName()</argument>
 						<argument name="catalog">
 							java.util.Arrays.asList(new ItemInfo[]
 							{
@@ -82,7 +81,7 @@
 			<components>
 				<component type="ShopAndCustomer" name="Ladl">
 					<arguments>
-						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Ladl, "+$component.getId().getPlatformName()</argument>
 						<argument name="catalog">
 							java.util.Arrays.asList(new ItemInfo[]
 							{
@@ -96,7 +95,7 @@
 				</component>
 				<component type="ShopAndCustomer" name="Herzie">
 					<arguments>
-						<argument name="shopname">"Herzie, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Herzie, "+$component.getId().getPlatformName()</argument>
 						<argument name="catalog">
 							java.util.Arrays.asList(new ItemInfo[]
 							{

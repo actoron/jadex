@@ -1,10 +1,8 @@
 package jadex.bdiv3.testcases.goals;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalTargetCondition;
@@ -12,8 +10,6 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
-import jadex.bdiv3.runtime.impl.PlanFailureException;
-import jadex.bdiv3.testcases.goals.GoalRebuildBDI.SomeGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -28,7 +24,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that tests rebuild in connection with ExcludeMode.WhenTried.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class StaticGoalWithParameterBDI
 {
@@ -96,14 +92,14 @@ public class StaticGoalWithParameterBDI
 
 		final TestReport tr = new TestReport("#1", "Test if rebuild works with.");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!tr.isFinished())
 				{
 					tr.setFailed("Goal did not return");
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				}
 				
 				ret.setResultIfUndone(null);
@@ -112,9 +108,9 @@ public class StaticGoalWithParameterBDI
 		});
 		
 		SomeGoal sg = new SomeGoal(3);
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(sg).get();
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(sg).get();
 		tr.setSucceeded(true);
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		ret.setResultIfUndone(null);
 		
 		return ret;

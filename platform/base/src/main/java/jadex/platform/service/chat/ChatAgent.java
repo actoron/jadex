@@ -3,10 +3,11 @@ package jadex.platform.service.chat;
 
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
@@ -22,14 +23,13 @@ import jadex.micro.annotation.RequiredServices;
 @Description("This agent offers a chat service.")
 @ProvidedServices({
 	@ProvidedService(name="chat", type=IChatService.class, implementation=@Implementation(ChatService.class)),
-	@ProvidedService(name="chatgui", scope=Binding.SCOPE_PLATFORM, type=IChatGuiService.class, implementation=@Implementation(expression="$component.getComponentFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"chat\")"))
+	@ProvidedService(name="chatgui", scope=RequiredService.SCOPE_PLATFORM, type=IChatGuiService.class, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"chat\")"))
 })
 @RequiredServices(
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
-		binding=@Binding(dynamic=true, scope=Binding.SCOPE_GLOBAL))
+	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=RequiredService.SCOPE_GLOBAL)
 )
 @Arguments(@Argument(name="nosave", clazz=boolean.class, description="Don't save settings."))
-@Agent
+@Agent(autostart=@Autostart(Boolean3.TRUE))
 //@Properties(@NameValue(name="system", value="\"system\".equals($config)"))
 @Configurations({@Configuration(name="system"), @Configuration(name="user")})
 public class ChatAgent

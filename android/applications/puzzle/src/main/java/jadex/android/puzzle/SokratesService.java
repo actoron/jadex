@@ -10,7 +10,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -53,9 +52,10 @@ public class SokratesService extends JadexPlatformService
 	public SokratesService()
 	{
 		setPlatformAutostart(false);
-		setPlatformKernels(IPlatformConfiguration.KERNEL_MICRO, IPlatformConfiguration.KERNEL_COMPONENT, IPlatformConfiguration.KERNEL_BDIV3,
-			IPlatformConfiguration.KERNEL_BDI);
 		setPlatformName("Sokrates");
+		IPlatformConfiguration config = getPlatformConfiguration();
+		config.setValue("kernel_component", "true");
+		config.setValue("kernel_bdiv3", "true");
 		setSharedPlatform(false);
 		handler = new Handler();
 	}
@@ -128,29 +128,20 @@ public class SokratesService extends JadexPlatformService
 				new Thread() {
 					@Override
 					public void run() {
-						getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+						getPlatformAccess().killComponent(sokratesComponent).addResultListener(new DefaultResultListener<Map<String, Object>>()
 						{
 
 							@Override
-							public void resultAvailable(IComponentManagementService cms)
+							public void resultAvailable(Map<String, Object> cmsResult)
 							{
-								cms.destroyComponent(sokratesComponent).addResultListener(new DefaultResultListener<Map<String, Object>>()
-								{
+								result.setResult(null);
+							}
 
-									@Override
-									public void resultAvailable(Map<String, Object> cmsResult)
-									{
-										result.setResult(null);
-									}
-
-									@Override
-									public void exceptionOccurred(Exception exception) {
-										result.setResult(null);
-									}
-								});
+							@Override
+							public void exceptionOccurred(Exception exception) {
+								result.setResult(null);
 							}
 						});
-
 					}
 				}.start();
 			} else {
@@ -165,7 +156,7 @@ public class SokratesService extends JadexPlatformService
 	protected void onPlatformStarted(IExternalAccess platform)
 	{
 		super.onPlatformStarted(platform);
-		this.platformId = platform.getComponentIdentifier();
+		this.platformId = platform.getId();
 		listener.platformStarted();
 	}
 

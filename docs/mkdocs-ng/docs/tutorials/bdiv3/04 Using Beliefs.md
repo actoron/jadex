@@ -53,7 +53,7 @@ public void init() {
 Please note that the added wordpair is automatically passed to the plan method whenever the wordtable changes:
 
 ```java
-@Plan(trigger=@Trigger(factaddeds="wordtable"))
+@Plan(trigger=@Trigger(factadded="wordtable"))
 public void checkWordPairPlan(ChangeEvent event)
 {
     ChangeInfo<String> change = ((ChangeInfo<String>)event.getValue());
@@ -91,7 +91,7 @@ protected boolean alarm = wordtable.containsKey("bugger");
 -   Check whether the value of alarm changes from false to true:
 
 ```java
-@Plan(trigger=@Trigger(factchangeds="alarm"))
+@Plan(trigger=@Trigger(factchanged="alarm"))
 public void checkWordPairPlan(ChangeEvent event)
 {
   ChangeInfo<Boolean> change = (ChangeInfo<Boolean>)event.getValue();
@@ -138,7 +138,7 @@ public void setTime(long time)
 -   Add a method based plan that reacts on fact changes of the time belief. The plan body should just print out the time belief.
 
 ```java
-@Plan(trigger=@Trigger(factchangeds="time"))
+@Plan(trigger=@Trigger(factchanged="time"))
 protected void printTime()
 {
   System.out.println(formatter.format(getTime()));
@@ -186,7 +186,7 @@ protected long time = System.currentTimeMillis();
 
 -   Change the plan so it uses the *time* field directly:
 ```java
-@Plan(trigger=@Trigger(factchangeds="time"))
+@Plan(trigger=@Trigger(factchanged="time"))
 protected void printTime()
 {
     System.out.println(formatter.format(time));

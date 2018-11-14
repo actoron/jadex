@@ -11,6 +11,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.extension.rs.publish.GrizzlyRestServicePublishService;
 
@@ -35,14 +36,14 @@ public class RSHelloTest //extends TestCase
 	{
 		hello = new Hello();
 //		hello.createServiceIdentifier("hello", Hello.class, null, Hello.class, null); // ???
-		sid	= hello.getServiceIdentifier();
+		sid	= hello.getServiceId();
 		
 		pservice = new GrizzlyRestServicePublishService();
 		// Grizzly breaks without trailing '/murks' !?
 		PublishInfo pi = new PublishInfo("http://localhost:9123/murks", "", IRSHelloService.class);
 		pi.addProperty("generate", "false");
 //		
-		IFuture<Void> publishService = pservice.publishService(hello.getServiceIdentifier(), pi);
+		IFuture<Void> publishService = pservice.publishService(hello.getServiceId(), pi);
 //		
 //		ThreadSuspendable sus = new ThreadSuspendable();
 		publishService.get();
@@ -50,7 +51,7 @@ public class RSHelloTest //extends TestCase
 
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
 		config.getExtendedPlatformConfiguration().setTcpTransport(false);
-		config.setKernels(IPlatformConfiguration.KERNEL_COMPONENT, IPlatformConfiguration.KERNEL_MICRO);
+		config.setValue("kernel_component", true);
 		config.addComponent("jadex.webservice.examples.rs.hello.HelloProvider.component.xml");
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 //		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
@@ -111,7 +112,7 @@ public class RSHelloTest //extends TestCase
 		{
 //		ThreadSuspendable sus = new ThreadSuspendable();
 
-		IFuture<IHelloService> fut = SServiceProvider.getService(extAcc, IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<IHelloService> fut = extAcc.searchService( new ServiceQuery<>( IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 
 		IHelloService hs = fut.get();
 

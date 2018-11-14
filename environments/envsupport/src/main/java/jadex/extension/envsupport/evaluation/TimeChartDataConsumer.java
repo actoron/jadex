@@ -72,7 +72,7 @@ public class TimeChartDataConsumer extends AbstractChartDataConsumer
 			try
 			{
 				ClassLoader cl = getSpace().getClassLoader();
-				ResourceInfo rinfo = getResourceInfo(bgimagefn, getSpace().getExternalAccess().getModel().getAllImports(), cl);
+				ResourceInfo rinfo = getResourceInfo(bgimagefn, getSpace().getExternalAccess().getModelAsync().get().getAllImports(), cl);
 				Image image = ImageIO.read(rinfo.getInputStream());
 				rinfo.getInputStream().close();
 				

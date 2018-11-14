@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -20,7 +21,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	//-------- attributes --------
 	
 	/** The intermediate results. */
-	protected Collection<E> results;
+	protected List<E> results;
 	
 	/** Flag indicating that addIntermediateResult()has been called. */
 	protected boolean intermediate;
@@ -144,7 +145,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	}
 	    	else
 	    	{
-	    		addResult(result);
+	    		storeResult(result);
 	    		notify	= true;
 	    		scheduleNotification(new ICommand<IResultListener<Collection<E>>>()
 				{
@@ -173,7 +174,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 *  Add a result.
 	 *  @param result The result.
 	 */
-	protected void addResult(E result)
+	protected void storeResult(E result)
 	{
 //		if(result!=null && result.getClass().getName().indexOf("ChangeEvent")!=-1)
 //			System.out.println("ires: "+this+" "+result);
@@ -200,7 +201,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
        		boolean	ret	= super.doSetResult(result, undone);
        		if(ret)
        		{
-       			this.results	= result;
+       			this.results	= result!=null ? new ArrayList<>(result) : null;
        		}
        		return ret;
 		}
@@ -244,7 +245,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		// because getIntermediateResults() returns empty list when results==null.
     		if(results==null)
     		{
-    			results	= res;
+    			results	= Collections.emptyList();
     		}
 		}
 
@@ -355,7 +356,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 */
 	public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener)
 	{
-		addIntermediateResultListener(intermediateListener, null);
+		addIntermediateResultListener(intermediateListener, null, null);
 	}
 
 	/**
@@ -371,6 +372,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	{
 		addIntermediateResultListener(intermediateListener, finishedListener, null);
 	}
+	
+	/**
+	 * Add a functional result listener, which called on intermediate results.
+	 * 
+	 * @param intermediateListener The intermediate listener.
+	 * @param exceptionListener The listener that is called on exceptions. Passing
+	 *        <code>null</code> enables default exception logging.
+	 */
+    public void addIntermediateResultListener(IFunctionalIntermediateResultListener<E> intermediateListener, IFunctionalExceptionListener exceptionListener)
+    {    	
+		addIntermediateResultListener(intermediateListener, null, exceptionListener);
+    }
 
 	/**
 	 * Add a functional result listener, which called on intermediate results.
@@ -417,6 +430,21 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public boolean hasNextIntermediateResult()
     {
+    	return hasNextIntermediateResult(UNSET, false);
+    }
+    
+    /**
+     *  Check if there are more results for iteration for the given caller.
+     *  If there are currently no unprocessed results and future is not yet finished,
+     *  the caller is blocked until either new results are available and true is returned
+     *  or the future is finished, thus returning false.
+     *  
+	 *  @param timeout The timeout in millis.
+	 *  @param realtime Flag, if wait should be realtime (in constrast to simulation time).
+     *  @return	True, when there are more intermediate results for the caller.
+     */
+    public boolean hasNextIntermediateResult(long timeout, boolean realtime)
+    {
     	boolean	ret;
     	boolean	suspend;
 		ISuspendable caller = ISuspendable.SUSPENDABLE.get();
@@ -454,13 +482,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    	    	   	// todo: realtime as method parameter?!
-    				caller.suspend(this, UNSET, false);
+    				caller.suspend(this, timeout, realtime);
     	    	   	icallers.remove(caller);
     			}
     			// else already resumed.
     		}
-	    	ret	= hasNextIntermediateResult();
+	    	ret	= hasNextIntermediateResult(timeout, realtime);
     	}
     	
     	return ret;
@@ -586,7 +613,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
-    	    		// todo: realtime as method parameter?!
     				caller.suspend(this, timeout, realtime);
     	    	   	icallers.remove(caller);
     			}

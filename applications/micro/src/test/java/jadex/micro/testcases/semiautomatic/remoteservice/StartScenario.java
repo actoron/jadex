@@ -8,10 +8,7 @@ import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
@@ -61,51 +58,44 @@ public class StartScenario
 				{
 					public void resultAvailable(final IExternalAccess rplat)
 					{
-						SServiceProvider.getService(lplat, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new DefaultResultListener<IComponentManagementService>()
-						{
-							public void resultAvailable(final IComponentManagementService lcms)
-							{
-								SServiceProvider.getService(rplat, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new DefaultResultListener<IComponentManagementService>()
+//						rplat.searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//							.addResultListener(new DefaultResultListener<IComponentManagementService>()
+//						{
+//							public void resultAvailable(final IComponentManagementService rcms)
+//							{
+								rplat.createComponent(new CreationInfo().setName("math").setFilename("MathAgent.class"), null)
+									.addResultListener(new DefaultResultListener<IExternalAccess>()
 								{
-									public void resultAvailable(final IComponentManagementService rcms)
+									public void resultAvailable(IExternalAccess result)
 									{
-										rcms.createComponent("math", "MathAgent.class", null, null)
-											.addResultListener(new DefaultResultListener<IComponentIdentifier>()
+//										System.out.println("started remote: "+result);
+										
+										IComponentIdentifier rrms = new ComponentIdentifier("rms@remote", 
+											new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
+										
+										lplat.createComponent(
+											new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{rrms})).setName("proxy").setFilename("jadex.platform.service.remote.ProxyAgent.class"), null)
+											.addResultListener(new DefaultResultListener<IExternalAccess>()
 										{
-											public void resultAvailable(IComponentIdentifier result)
+											public void resultAvailable(IExternalAccess result)
 											{
-	//											System.out.println("started remote: "+result);
-												
-												IComponentIdentifier rrms = new ComponentIdentifier("rms@remote", 
-													new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
-												
-												lcms.createComponent("proxy", "jadex.platform.service.remote.ProxyAgent.class", 
-													new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{rrms})), null)
-													.addResultListener(new DefaultResultListener<IComponentIdentifier>()
+												lplat.createComponent(new CreationInfo().setName("user").setFilename("UserAgent.class"), new DefaultResultListener<Collection<Tuple2<String, Object>>>()
 												{
-													public void resultAvailable(IComponentIdentifier result)
+													public void resultAvailable(Collection<Tuple2<String, Object>> res)
 													{
-														lcms.createComponent("user", "UserAgent.class", null, new DefaultResultListener<Collection<Tuple2<String, Object>>>()
-														{
-															public void resultAvailable(Collection<Tuple2<String, Object>> res)
-															{
-																//System.out.println("killed local user: "+result);
-															
-																ret.setResult(new IExternalAccess[]{lplat, rplat});
-															}
-														});
+														//System.out.println("killed local user: "+result);
+													
+														ret.setResult(new IExternalAccess[]{lplat, rplat});
 													}
 												});
 											}
 										});
 									}
 								});
-							}
-						});			
+							//}
+						//});
 					}
-				});
+				});			
 			}
 		});
 		

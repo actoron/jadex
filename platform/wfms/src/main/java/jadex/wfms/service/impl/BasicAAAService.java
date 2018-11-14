@@ -86,7 +86,7 @@ public class BasicAAAService implements IAAAService
 		final Future ret = new Future<Void>();
 		if (client != null)
 		{
-			ia.getServiceContainer().getRequiredServices("aaa_services").addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<Object>, Boolean>(ret)
+			ia.getServiceContainer().getServices("aaa_services").addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<Object>, Boolean>(ret)
 			{
 				public void customResultAvailable(Collection<Object> result)
 				{
@@ -383,7 +383,7 @@ public class BasicAAAService implements IAAAService
 	
 	protected static void kickClient(IServiceContainer provider, final IComponentIdentifier client)
 	{
-		provider.getRequiredService("aaa_service").addResultListener(new DefaultResultListener()
+		provider.getService("aaa_service").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

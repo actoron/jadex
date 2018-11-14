@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
@@ -23,7 +24,7 @@ import jadex.micro.annotation.Results;
  *  Agent that tests if waiting for a specific index change in a collection works.
  */
 @Results(@Result(name="testresults", clazz=Testcase.class))
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="waitPlan")))
 public abstract class IndexChangeBDI implements IBDIAgent
 {
@@ -75,7 +76,7 @@ public abstract class IndexChangeBDI implements IBDIAgent
 			tr.setReason("Exception occurred: "+e.getMessage());
 		}
 		
-		getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		
 		killComponent();
 		

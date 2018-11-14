@@ -13,9 +13,9 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -297,7 +297,7 @@ public class SimulationSettings extends AServiceSettings {
 			}
 		};
 
-		final String id = "ClockPanel" + SimulationSettings.this.hashCode() + "@" + simService.getClockService().getServiceIdentifier();
+		final String id = "ClockPanel" + SimulationSettings.this.hashCode() + "@" + simService.getClockService().getServiceId();
 
 		getComponentForService().addResultListener(new DefaultResultListener<IExternalAccess>() {
 
@@ -325,20 +325,9 @@ public class SimulationSettings extends AServiceSettings {
 	 * Get the host component of a service.
 	 */
 	public IFuture<IExternalAccess> getComponentForService() {
-		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 
-		SServiceProvider.getService(JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId),
-				IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
-				new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret) {
-					public void customResultAvailable(IComponentManagementService cms) {
-						// IComponentManagementService cms =
-						// (IComponentManagementService)result;
-						cms.getExternalAccess((IComponentIdentifier) ((IService)simService).getServiceIdentifier().getProviderId()).addResultListener(
-								new DelegationResultListener<IExternalAccess>(ret));
-					}
-				});
-
-		return ret;
+		return JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId)
+			.getExternalAccess((IComponentIdentifier) ((IService)simService).getServiceId().getProviderId());
 	}
 
 	/**
@@ -392,7 +381,7 @@ public class SimulationSettings extends AServiceSettings {
 			// Code in component result listener as clock runs on its own
 			// thread.
 			
-			simservice.isExecuting().addResultListener(instance.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Boolean>() {
+			simservice.isExecuting().addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Boolean>() {
 				public void resultAvailable(Boolean result) {
 					try {
 						boolean executing = result.booleanValue();

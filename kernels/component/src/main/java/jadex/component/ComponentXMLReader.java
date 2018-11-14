@@ -318,9 +318,7 @@ public class ComponentXMLReader
 		Set<TypeInfo> types = new HashSet<TypeInfo>();
 		
 //		TypeInfo satype = new TypeInfo(null, new ObjectInfo(MStartable.class),
-//			new MappingInfo(null, new AttributeInfo[]{
-//				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
-//			}, null));
+//			new MappingInfo(null, new AttributeInfo[]{}, null));
 		
 //		Method getname = null; 
 //		Method putprop = null;
@@ -337,7 +335,6 @@ public class ComponentXMLReader
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(ModelInfo.class), 
 			new MappingInfo(null, "description", null,
 				new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 				new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))
 				}, 
 				new SubobjectInfo[]{
@@ -353,8 +350,7 @@ public class ComponentXMLReader
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class), 
 			new MappingInfo(null, "description", null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("type", "typeName")),
-				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},
+				new AttributeInfo(new AccessInfo("type", "typeName"))},
 				new SubobjectInfo[]{
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "component")}), new AccessInfo(new QName(uri, "component"), "componentInstance")),
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
@@ -384,21 +380,17 @@ public class ComponentXMLReader
 			}, null)));
 			
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttypes"), new QName(uri, "componenttype")}), new ObjectInfo(SubcomponentTypeInfo.class),
-			new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
-			}, null), null, new BeanObjectReaderHandler()));		
+			new MappingInfo(null, new AttributeInfo[]{}, null), null, new BeanObjectReaderHandler()));		
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "component")), new ObjectInfo(ComponentInstanceInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
-				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 				new AttributeInfo(new AccessInfo("number"))
 			}, null)));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "creationinfo")), new ObjectInfo(ComponentInstanceInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
-				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 				new AttributeInfo(new AccessInfo("number"))
 			}, null)));
 		

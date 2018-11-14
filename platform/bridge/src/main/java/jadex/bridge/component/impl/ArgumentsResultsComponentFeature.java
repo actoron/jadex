@@ -25,6 +25,7 @@ import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.wrappers.MapWrapper;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -35,7 +36,7 @@ import jadex.javaparser.SJavaParser;
 /**
  *  This feature provides arguments.
  */
-public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	implements IArgumentsResultsFeature, IValueFetcher, IInternalArgumentsResultsFeature, IMapAccess
+public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	implements IArgumentsResultsFeature, IValueFetcher, IInternalArgumentsResultsFeature, IMapAccess
 {
 	//-------- attributes --------
 	
@@ -84,7 +85,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 		}
 		
 		// Get the reverse name (agent1@app1.plat1 -> app1.agent1.<argname>)
-		IComponentIdentifier cid = getComponent().getComponentIdentifier();
+		IComponentIdentifier cid = getComponent().getId();
 		String dotname = cid.getDotName();
 		int idx = dotname.lastIndexOf(".");
 		if(idx!=-1)
@@ -93,7 +94,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 			dotname = getReverseName(dotname);
 		}
 		
-		Map<String, Object>	platformargs = (Map<String, Object>)Starter.getPlatformValue(getComponent().getComponentIdentifier().getRoot(),  IPlatformConfiguration.PLATFORMARGS);
+		Map<String, Object>	platformargs = (Map<String, Object>)Starter.getPlatformValue(getComponent().getId().getRoot(),  IPlatformConfiguration.PLATFORMARGS);
 		if(platformargs!=null)
 		{
 			IArgument[] margs = component.getModel().getArguments();
@@ -165,10 +166,10 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 				postEvent(key, newvalue);
 			}
 		};
-		results.put(IComponentIdentifier.RESULTCID, getComponent().getComponentIdentifier());
+		results.put(IComponentIdentifier.RESULTCID, getComponent().getId());
 		
 		initDefaultResults();
-
+		
 		return IFuture.DONE;
 	}
 	
@@ -305,10 +306,10 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	{
 		if(resfuts!=null)
 		{
-			Exception	ex	= getComponent().getException();
+			Exception ex = getComponent().getException();
 			if(ex!=null)
 			{
-				notified	= true;
+				notified = true;
 				for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resfuts)
 				{
 					fut.setExceptionIfUndone(ex);
@@ -316,6 +317,7 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 			}
 			else
 			{
+//				System.out.println("setFinished "+getComponent().getId());
 				for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resfuts)
 				{
 					fut.setFinishedIfUndone();
@@ -405,6 +407,24 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 	}
 	
 	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public IFuture<Map<String, Object>> getArgumentsAsync()
+	{
+		return new Future<Map<String, Object>>(getArguments());
+	}
+	
+	/**
+	 *  Get the current results.
+	 *  @return The current result values (if any).
+	 */
+	public IFuture<Map<String, Object>> getResultsAsync()
+	{
+		return new Future<Map<String, Object>>(getResults());
+	}
+	
+	/**
 	 * Subscribe to receive results.
 	 */
 	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults()
@@ -417,13 +437,13 @@ public class ArgumentsResultsComponentFeature	extends	AbstractComponentFeature	i
 		{
 			public void terminated(Exception reason)
 			{
-				if(getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread())
+				if(getComponent().getFeature(IExecutionFeature.class).isComponentThread())
 				{
 					resfuts.remove(ret);
 				}
 				else
 				{
-					getComponent().getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+					getComponent().getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{

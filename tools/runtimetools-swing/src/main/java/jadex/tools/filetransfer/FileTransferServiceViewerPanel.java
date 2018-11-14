@@ -98,7 +98,7 @@ public class FileTransferServiceViewerPanel	implements IAbstractViewerPanel
 		
 		panel = new JPanel(new BorderLayout());
 		panel.add(ftp, BorderLayout.CENTER);
-		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), title+" ("+exta.getComponentIdentifier().getPlatformName()+")"));
+		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), title+" ("+exta.getId().getPlatformName()+")"));
 	}
 	
 	/**
@@ -219,7 +219,7 @@ public class FileTransferServiceViewerPanel	implements IAbstractViewerPanel
 //	protected IFuture<IExternalAccess> getJCCAccess(IExternalAccess acc, final IComponentIdentifier cid)
 //	{
 //		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
-//		SServiceProvider.getService(acc, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//		acc.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 //		{
 //			public void customResultAvailable(IComponentManagementService cms)

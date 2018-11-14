@@ -1,7 +1,5 @@
 package jadex.bridge.service.search;
 
-import jadex.bridge.ClassInfo;
-
 /**
  *  Service event used if the service registry is used in event mode.
  *
@@ -9,9 +7,6 @@ import jadex.bridge.ClassInfo;
  */
 public class ServiceEvent<T>
 {
-	/** Class info of the ServiceEvent type. */
-	public static final ClassInfo CLASSINFO = new ClassInfo(ServiceEvent.class);
-	
 	/** Service was added event. */
 	public static final int SERVICE_ADDED = 0;
 	

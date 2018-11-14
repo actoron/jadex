@@ -1,6 +1,7 @@
 package jadex.bdiv3;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,6 +12,7 @@ import java.util.Map;
 /* $if !android $ */
 /* $endif $ */
 
+import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.features.impl.BDIAgentFeature;
 import jadex.bdiv3.features.impl.BDIExecutionComponentFeature;
 import jadex.bdiv3.features.impl.BDILifecycleAgentFeature;
@@ -26,22 +28,27 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.IBootstrapFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
+import jadex.commons.ResourceInfo;
+import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.AnnotationInfo;
+import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.kernelbase.IBootstrapFactory;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgentFactory;
+import jadex.micro.annotation.Agent;
 
 
 /**
@@ -51,8 +58,17 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 {
 	//-------- constants --------
 	
-	/** The bdi agent file type. */
-	public static final String	FILETYPE_BDIAGENT	= "BDIV3 Agent";
+	/** The BDI agent model type name (human readable for display). */
+	public static final String	FILETYPE_BDIAGENT = "BDIV3 Agent";
+	
+	/** The BDI capability model type name (human readable for display). */
+	public static final String	FILETYPE_BDICAPA = "BDIV3 Capability";
+	
+	/** The model type identifier for use in the @Agent annotation. */
+	public static final String	TYPE = "bdi";
+	
+	/** The model type identifier for a capability. */
+	public static final String	CAPA_TYPE = "capability";
 	
 	/** The image icon. */
 	protected static final LazyResource ICON = new LazyResource(BDIAgentFactory.class, "/jadex/bdiv3/images/bdi_agent.png");
@@ -103,7 +119,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public BDIAgentFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getComponentIdentifier(), IComponentFactory.class, properties);
+		super(provider.getId(), IComponentFactory.class, properties);
 
 		this.provider = provider;
 //		this.properties = properties;
@@ -144,7 +160,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = component.getComponentIdentifier();
+		this.providerid = component.getId();
 		setServiceIdentifier(createServiceIdentifier(provider, "Bootstrap Factory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
@@ -154,18 +170,9 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public IFuture<Void> startService()
 	{
-		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				libservice = (ILibraryService)result;
-				libservice.addLibraryServiceListener(libservicelistener);
-				BDIAgentFactory.super.startService().addResultListener(new DelegationResultListener(ret));
-			}
-		});
-		return ret;
+		libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+		libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
+		return BDIAgentFactory.super.startService();
 	}
 	
 	/**
@@ -236,6 +243,10 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 			{
 				ClassLoader cl = getClass().getClassLoader();
 				IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
+				
+				if(model.indexOf("Block")!=-1)
+					System.out.println("model2: "+mi);
+				
 				ret.setResult(mi);
 			}
 			catch(Exception e)
@@ -248,30 +259,171 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 		return ret;
 	}
 		
+//	/**
+//	 *  Test if a model can be loaded by the factory.
+//	 *  @param model The model (e.g. file name).
+//	 *  @param The imports (if any).
+//	 *  @return True, if model can be loaded.
+//	 */
+//	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
+//	{
+////		System.out.println("isLoadable: "+model);
+////		boolean ret = model.toLowerCase().endsWith("bdi.class");
+//		boolean ret = model.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3);
+//		
+////		if(ret)
+////			System.out.println("isLoadable: "+model+" "+ret);
+//		
+////		if(model.toLowerCase().endsWith("Agent.class"))
+////		{
+////			ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
+////			String clname = model.substring(0, model.indexOf(".class"));
+////			Class cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
+////			ret = cma!=null && cma.isAssignableFrom(IMicroAgent.class);
+////			System.out.println(clname+" "+cma+" "+ret);
+////		}
+//		return new Future<Boolean>(ret? Boolean.TRUE: Boolean.FALSE);
+//	}
+	
 	/**
 	 *  Test if a model can be loaded by the factory.
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
+	// todo: reuse code from MicroAgentFactory :-(
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-//		System.out.println("isLoadable: "+model);
-//		boolean ret = model.toLowerCase().endsWith("bdi.class");
-		boolean ret = model.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3);
+		Future<Boolean> ret = new Future<>();
+		loadClassInfo0(model, imports, rid)
+			.addResultListener(new IResultListener<ClassInfo>()
+		{
+			@Override
+			public void resultAvailable(ClassInfo ci)
+			{
+				if(ci!=null)
+				{
+					String	modeltype	= getLoadableType(ci);
+					ret.setResult(modeltype!=null);
+				}
+				else
+				{
+					ret.setResult(false);
+				}
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(false);
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 * 	Get the model type from the class info.
+	 *  @return null, if no BDI model.
+	 */
+	public String getLoadableType(ClassInfo ci)
+	{
+		String	ret	= null;
+		AnnotationInfo ai	= ci.getAnnotation(Agent.class.getName());
+		if(ai!=null)
+		{
+			// Check type in agent annotation
+			Map<String, Object> vals = ai.getValues();
+			String type	= null;
+			if(vals==null)
+			{
+				Method method;
+				try
+				{
+					method = Agent.class.getMethod("type");
+					type = (String)method.getDefaultValue();
+				}
+				catch(Exception e)
+				{
+				}
+			}
+			else
+			{
+				type = (String)vals.get("type");
+			}
+			
+			if(TYPE.equalsIgnoreCase(type))
+			{
+				ret	= TYPE;
+			}
+		}
+		else
+		{
+			ai	= ci.getAnnotation(Capability.class.getName());
+			if(ai!=null)
+			{
+				ret	= CAPA_TYPE;
+			}
+		}
 		
-//		if(ret)
-//			System.out.println("isLoadable: "+model+" "+ret);
+		return ret;
+	}
+	
+	/**
+	 * 	Load the class info for the model.
+	 *  @return null, if it could not be loaded.
+	 */
+	public IFuture<ClassInfo> loadClassInfo0(String model, String[] imports, IResourceIdentifier rid)
+	{
+		Future<ClassInfo> ret = new Future<ClassInfo>();
 		
-//		if(model.toLowerCase().endsWith("Agent.class"))
-//		{
-//			ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
-//			String clname = model.substring(0, model.indexOf(".class"));
-//			Class cma = SReflect.findClass0(clname, null, libservice.getClassLoader());
-//			ret = cma!=null && cma.isAssignableFrom(IMicroAgent.class);
-//			System.out.println(clname+" "+cma+" "+ret);
-//		}
-		return new Future<Boolean>(ret? Boolean.TRUE: Boolean.FALSE);
+		if(model.toLowerCase().endsWith(".class"))
+		{
+			ILibraryService libservice = getLibraryService();
+			if(libservice!=null)
+			{
+				libservice.getClassLoader(rid)
+					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, ClassInfo>(ret)
+				{
+					public void customResultAvailable(ClassLoader cl)
+					{
+						try
+						{
+							ResourceInfo ri = loader.getResourceInfo0(model, imports, cl);
+							if(ri==null)
+							{
+								ret.setResult(null);
+							}
+							else
+							{
+								ret.setResult(SClassReader.getClassInfo(ri.getInputStream()));
+							}
+						}
+						catch(Exception e)
+						{
+							ret.setResult(null);
+						}						
+					}
+				});
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the library service
+	 */
+	protected ILibraryService getLibraryService()
+	{
+		return internalaccess==null? null: internalaccess.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 	}
 	
 	/**
@@ -282,26 +434,28 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public IFuture<Boolean> isStartable(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
-		final Future<Boolean>	ret	= new Future<Boolean>();
-		isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
+		Future<Boolean> ret = new Future<>();
+		loadClassInfo0(model, imports, rid)
+			.addResultListener(new IResultListener<ClassInfo>()
 		{
-			public void customResultAvailable(Boolean result)
+			@Override
+			public void resultAvailable(ClassInfo ci)
 			{
-				if(result.booleanValue())
+				if(ci!=null)
 				{
-					loadModel(model, imports, rid)
-						.addResultListener(new ExceptionDelegationResultListener<IModelInfo, Boolean>(ret)
-					{
-						public void customResultAvailable(IModelInfo result)
-						{
-							ret.setResult(result.isStartable() ? Boolean.TRUE : Boolean.FALSE);
-						}
-					});
+					String	modeltype	= getLoadableType(ci);
+					ret.setResult(TYPE.equals(modeltype) && !ci.isAbstract());
 				}
 				else
 				{
-					super.customResultAvailable(result);
+					ret.setResult(false);
 				}
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(false);
 			}
 		});
 		return ret;
@@ -348,8 +502,33 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
-//		System.out.println("model: "+model+" "+model.toLowerCase().endsWith("bdi.class"));
-		return new Future<String>(model.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3) ? FILETYPE_BDIAGENT: null);
+		Future<String>	ret	= new Future<>();
+		loadClassInfo0(model, imports, rid)
+			.addResultListener(new IResultListener<ClassInfo>()
+		{
+			@Override
+			public void resultAvailable(ClassInfo ci)
+			{
+				if(ci!=null)
+				{
+					String	modeltype	= getLoadableType(ci);
+					ret.setResult(TYPE.equals(modeltype) ? FILETYPE_BDIAGENT
+						: CAPA_TYPE.equals(modeltype) ? FILETYPE_BDIAGENT : null);
+				}
+				else
+				{
+					ret.setResult(null);
+				}
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
 	}
 	
 //	/**
@@ -461,25 +640,25 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 		return new Future(null);
 	}*/
 	
-	/**
-	 *  Get the mirco agent class.
-	 */
-	// todo: make use of cache
-	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
-	{
-		Class<?> ret = SReflect.findClass0(clname, imports, classloader);
-//		System.out.println("getMAC:"+clname+" "+SUtil.arrayToString(imports)+" "+ret);
-		int idx;
-		while(ret==null && (idx=clname.indexOf('.'))!=-1)
-		{
-			clname	= clname.substring(idx+1);
-			ret = SReflect.findClass0(clname, imports, classloader);
-//			System.out.println(clname+" "+cma+" "+ret);
-		}
-		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
-			throw new RuntimeException("No bdi agent file: "+clname+" "+classloader);
-		return ret;
-	}
+//	/**
+//	 *  Get the mirco agent class.
+//	 */
+//	// todo: make use of cache
+//	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
+//	{
+//		Class<?> ret = SReflect.findClass0(clname, imports, classloader);
+////		System.out.println("getMAC:"+clname+" "+SUtil.arrayToString(imports)+" "+ret);
+//		int idx;
+//		while(ret==null && (idx=clname.indexOf('.'))!=-1)
+//		{
+//			clname	= clname.substring(idx+1);
+//			ret = SReflect.findClass0(clname, imports, classloader);
+////			System.out.println(clname+" "+cma+" "+ret);
+//		}
+//		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
+//			throw new RuntimeException("No bdi agent file: "+clname+" "+classloader);
+//		return ret;
+//	}
 	
 	/**
 	 *  Add excluded methods.

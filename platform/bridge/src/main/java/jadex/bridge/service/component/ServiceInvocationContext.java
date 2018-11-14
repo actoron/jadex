@@ -10,15 +10,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import jadex.base.Starter;
-import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.interceptors.CallAccess;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -154,8 +151,8 @@ public class ServiceInvocationContext
 //	/** The flag if local timeouts should be realtime. */
 //	protected boolean realtime;
 	
-	/** The creation (root) cause. */
-	protected Cause cause;
+//	/** The creation (root) cause. */
+//	protected Cause cause;
 	
 	protected IServiceIdentifier sid;
 
@@ -168,7 +165,7 @@ public class ServiceInvocationContext
 	 */
 	public ServiceInvocationContext(Object proxy, Method method, 
 		IServiceInvocationInterceptor[] interceptors, IComponentIdentifier platform, 
-		IServiceIdentifier sid, Cause crcause)
+		IServiceIdentifier sid)//, Cause crcause)
 	{
 //		this.ex = new RuntimeException();
 		this.sid = sid;
@@ -179,7 +176,7 @@ public class ServiceInvocationContext
 		this.method = new ArrayList<Method>();
 		this.arguments = new ArrayList<List<Object>>();
 		this.result = new ArrayList<Object>();
-		this.cause = crcause;
+//		this.cause = crcause;
 		
 		this.used = new ArrayList<Integer>();
 		this.interceptors = interceptors;
@@ -218,11 +215,11 @@ public class ServiceInvocationContext
 					throw new RuntimeException("Dreck: "+this
 						+"\nlocal: "+IComponentIdentifier.LOCAL.get()
 						+"\ncurrentcall: "+currentcall
-						+"\ncause: "+currentcall.getCause()
+//						+"\ncause: "+currentcall.getCause()
 						+"\nmethod: "+method
 						+"\n: lastmod"+currentcall.lastmod, e);
 				}
-				props.remove(ServiceCall.CAUSE); // remove cause as it has to be adapted
+//				props.remove(ServiceCall.CAUSE); // remove cause as it has to be adapted
 			}
 			else
 			{
@@ -249,8 +246,8 @@ public class ServiceInvocationContext
 			}
 			else 
 			{
-				nextcall.setProperty(ServiceCall.DEFTIMEOUT, isRemoteCall()? Starter.getLocalDefaultTimeout(sid.getProviderId())
-					: Starter.getLocalDefaultTimeout(sid.getProviderId()));
+				nextcall.setProperty(ServiceCall.DEFTIMEOUT, isRemoteCall()? Starter.getDefaultTimeout(sid.getProviderId())
+					: Starter.getDefaultTimeout(sid.getProviderId()));
 			}
 		}
 		if(!nextcall.getProperties().containsKey(ServiceCall.REALTIME))
@@ -258,32 +255,32 @@ public class ServiceInvocationContext
 			nextcall.setProperty(ServiceCall.REALTIME, Starter.isRealtimeTimeout(sid.getProviderId())? Boolean.TRUE : Boolean.FALSE);
 		}
 		
-		// Init the cause of the next call based on the last one
-		if(this.nextcall.getCause()==null)
-		{
-//			String target = SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3);
-			String target = sid.toString();
-			if(currentcall!=null && currentcall.getCause()!=null)
-			{
-				this.nextcall.setCause(new Cause(currentcall.getCause(), target));
-//				if(method.getName().indexOf("test")!=-1 && lastcall!=null)
-//					System.out.println("Creating new cause based on: "+lastcall.getCause());
-//				this.call.setCause(new Tuple2<String, String>(cause.getSecondEntity(), SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3)));
-			}
-			else
-			{
-				// Create cause with novel chain id as origin is component itself
-				Cause newc = new Cause(cause);
-//				newc.setChainId(newc.createUniqueId());
-//				newc.setOrigin(cause.getTargetId());
-				// This is on receiver side, i.e. must set the caller as origin
-				newc.setOrigin(caller!=null? caller.getName(): sid.getProviderId().getName());
-				this.nextcall.setCause(new Cause(newc, target));
-				
-//				if(method.getName().indexOf("createCompo")!=-1)
-//					System.out.println("herer: "+cause);
-			}
-		}
+//		// Init the cause of the next call based on the last one
+//		if(this.nextcall.getCause()==null)
+//		{
+////			String target = SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3);
+//			String target = sid.toString();
+//			if(currentcall!=null && currentcall.getCause()!=null)
+//			{
+//				this.nextcall.setCause(new Cause(currentcall.getCause(), target));
+////				if(method.getName().indexOf("test")!=-1 && lastcall!=null)
+////					System.out.println("Creating new cause based on: "+lastcall.getCause());
+////				this.call.setCause(new Tuple2<String, String>(cause.getSecondEntity(), SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3)));
+//			}
+//			else
+//			{
+//				// Create cause with novel chain id as origin is component itself
+//				Cause newc = new Cause(cause);
+////				newc.setChainId(newc.createUniqueId());
+////				newc.setOrigin(cause.getTargetId());
+//				// This is on receiver side, i.e. must set the caller as origin
+//				newc.setOrigin(caller!=null? caller.getName(): sid.getProviderId().getName());
+//				this.nextcall.setCause(new Cause(newc, target));
+//				
+////				if(method.getName().indexOf("createCompo")!=-1)
+////					System.out.println("herer: "+cause);
+//			}
+//		}
 	}
 	
 	/**
@@ -309,7 +306,7 @@ public class ServiceInvocationContext
 		
 		this.caller = context.caller;
 //		this.calleradapter = context.calleradapter;
-		this.cause = context.cause;
+//		this.cause = context.cause;
 	}
 	
 //	/**
@@ -457,8 +454,8 @@ public class ServiceInvocationContext
 		{
 //			if(method.getName().equals("shutdownService") && sid.toString().indexOf("Context")!=-1 && sid.getProviderId().getParent()==null)
 //			if(method.getName().indexOf("performSteps")!=-1)
-//				System.out.println("invoke before: "+method.getName()+" "+interceptor+", "+SServiceProvider.getLocalService(platform, IClockService.class).getTime());
-			IFuture<Void>	fut	= interceptor.execute(this);
+//				System.out.println("invoke before: "+method.getName()+" "+interceptor+", "+platform.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class)).getTime());
+			IFuture<Void> fut = interceptor.execute(this);
 			if(fut.isDone())
 			{
 				pop();
@@ -466,7 +463,7 @@ public class ServiceInvocationContext
 			}
 			else
 			{
-				final Future<Void>	fret	= new Future<Void>();
+				final Future<Void> fret = new Future<Void>();
 				ret	= fret;
 				fut.addResultListener(new IResultListener<Void>()
 				{
@@ -504,7 +501,7 @@ public class ServiceInvocationContext
 		}
 		else
 		{
-			System.out.println("No interceptor: "+method.getName());
+			System.out.println("No interceptor: "+method.getName() + " " + method);
 			ret	= new Future<Void>(new RuntimeException("No interceptor found: "+method.getName()));
 		}
 
@@ -596,6 +593,7 @@ public class ServiceInvocationContext
 			object.remove(object.size()-1);
 			method.remove(method.size()-1);
 			arguments.remove(arguments.size()-1);
+			// result is copied back
 			Object res = this.result.remove(this.result.size()-1);
 			result.set(result.size()-1, res);
 		}
@@ -606,8 +604,7 @@ public class ServiceInvocationContext
 	 */
 	public boolean isRemoteCall()
 	{
-		return caller==null? false: !caller.getRoot().equals(platform) 
-			|| (caller.getLocalName().equals("rms") && caller.getRoot().equals(platform)); // Hack? Shouldn't be caller be set to the remote component?
+		return caller==null? false: !caller.getRoot().equals(platform); // Hack? Shouldn't be caller be set to the remote component?
 	}
 	
 //	/**

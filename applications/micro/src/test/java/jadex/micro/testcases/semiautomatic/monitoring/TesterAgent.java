@@ -5,26 +5,23 @@ import java.util.Collection;
 import java.util.List;
 
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 
 /**
  *  This agent creates call chains to check if monitoring event are created with correct
@@ -35,8 +32,6 @@ import jadex.micro.annotation.RequiredServices;
  *  - the test service method is then recursively called of random component until level is reached 
  */
 @Agent
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 @Configurations({@Configuration(name="default"), @Configuration(name="created")})
 @ProvidedServices(@ProvidedService(type=ITestService.class))
 @Service
@@ -52,17 +47,14 @@ public class TesterAgent implements ITestService
 	@AgentBody
 	public void body()
 	{
-		final IComponentManagementService cms = (IComponentManagementService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms").get();
-
 		if(agent.getConfiguration().equals("created"))
 		{
-			ITestService tsa = SServiceProvider.getService(agent, 
-				agent.getComponentIdentifier().getParent(), ITestService.class).get();
+			ITestService tsa = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ITestService.class).setProvider(agent.getId().getParent())).get();
 			tsa.test(0).get();
 		}
 		else
 		{	
-//			IMonitoringService mons = SServiceProvider.getService(agent.getServiceProvider(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+//			IMonitoringService mons = agent.getServiceProvider().searchService( new ServiceQuery<>( IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
 //			mons.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(new IFilter<IMonitoringEvent>()
 //			{
 //				public boolean filter(IMonitoringEvent obj)
@@ -86,18 +78,32 @@ public class TesterAgent implements ITestService
 						ThreadSuspendable sus = new ThreadSuspendable();
 						
 						CreationInfo ci = new CreationInfo("created", null);
-						ci.setParent(agent.getComponentIdentifier());
+						ci.setParent(agent.getId());
 						ci.setResourceIdentifier(agent.getModel().getResourceIdentifier());
 						final String name =  TesterAgent.class.getName()+".class";
 						
-						IComponentIdentifier ida = cms.createComponent(name, ci).getFirstResult();
-						IComponentIdentifier idb = cms.createComponent(name, ci).getFirstResult();
+						IExternalAccess eaa = agent.createComponent(ci.setFilename(name), null).get();
+						IExternalAccess eab = agent.createComponent(ci.setFilename(name), null).get();
 					
-						IComponentDescription desca = cms.getComponentDescription(ida).get();
-						IComponentDescription descb = cms.getComponentDescription(ida).get();
+						IComponentDescription desca = eaa.scheduleStep(new IComponentStep<IComponentDescription>()
+						{
+							@Override
+							public IFuture<IComponentDescription> execute(IInternalAccess ia)
+							{
+								return new Future<IComponentDescription>(ia.getDescription());
+							}
+						}).get();
+						IComponentDescription descb = eaa.scheduleStep(new IComponentStep<IComponentDescription>()
+						{
+							@Override
+							public IFuture<IComponentDescription> execute(IInternalAccess ia)
+							{
+								return new Future<IComponentDescription>(ia.getDescription());
+							}
+						}).get();
 					
-						System.out.println("chain a: "+ida+" "+desca.getCause().getOrigin());
-						System.out.println("chain b: "+idb+" "+descb.getCause().getOrigin());
+//						System.out.println("chain a: "+eaa+" "+desca.getCause().getOrigin());
+//						System.out.println("chain b: "+eab+" "+descb.getCause().getOrigin());
 					}
 					catch(ComponentTerminatedException e)
 					{
@@ -117,7 +123,7 @@ public class TesterAgent implements ITestService
 //		System.out.println("invoked test on: "+agent.getComponentIdentifier()+" level="+level+" "+ServiceCall.getCurrentInvocation().getCause());
 		if(level<10)
 		{
-			Collection<ITestService> tss = SServiceProvider.getServices(agent, ITestService.class).get();
+			Collection<ITestService> tss = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITestService.class)).get();
 			if(tss.size()>0)
 			{
 				int num = (int)(Math.random()*tss.size());

@@ -166,13 +166,13 @@ public interface IModelInfo
 	 *  Get the required services.
 	 *  @return The required services.
 	 */
-	public RequiredServiceInfo[] getRequiredServices();
+	public RequiredServiceInfo[] getServices();
 
 	/**
 	 *  Get the required service.
 	 *  @return The required service.
 	 */
-	public RequiredServiceInfo getRequiredService(String name);
+	public RequiredServiceInfo getService(String name);
 	
 	/**
 	 *  Get the provided services.
@@ -187,26 +187,26 @@ public interface IModelInfo
 	 */
 	public Boolean getSuspend(String configname);
 	
-	/**
-	 *  Get the master flag.
-	 *  @param configname The configname.
-	 *  @return The master flag value.
-	 */
-	public Boolean getMaster(String configname);
-	
-	/**
-	 *  Get the daemon flag.
-	 *  @param configname The configname.
-	 *  @return The daemon flag value.
-	 */
-	public Boolean getDaemon(String configname);
-	
-	/**
-	 *  Get the autoshutdown flag.
-	 *  @param configname The configname.
-	 *  @return The autoshutdown flag value.
-	 */
-	public Boolean getAutoShutdown(String configname);
+//	/**
+//	 *  Get the master flag.
+//	 *  @param configname The configname.
+//	 *  @return The master flag value.
+//	 */
+//	public Boolean getMaster(String configname);
+//	
+//	/**
+//	 *  Get the daemon flag.
+//	 *  @param configname The configname.
+//	 *  @return The daemon flag value.
+//	 */
+//	public Boolean getDaemon(String configname);
+//	
+//	/**
+//	 *  Get the autoshutdown flag.
+//	 *  @param configname The configname.
+//	 *  @return The autoshutdown flag value.
+//	 */
+//	public Boolean getAutoShutdown(String configname);
 
 	/**
 	 *  Get the synchronous flag.
@@ -215,12 +215,12 @@ public interface IModelInfo
 	 */
 	public Boolean getSynchronous(String configname);
 	
-	/**
-	 *  Get the persistable flag.
-	 *  @param configname The configname.
-	 *  @return The persistable flag value.
-	 */
-	public Boolean getPersistable(String configname);
+//	/**
+//	 *  Get the persistable flag.
+//	 *  @param configname The configname.
+//	 *  @return The persistable flag value.
+//	 */
+//	public Boolean getPersistable(String configname);
 	
 	/**
 	 *  Get the keepalive flag.

@@ -16,4 +16,12 @@ public class ServiceCallService	implements IServiceCallService
 	{
 		return IFuture.DONE;
 	}
+	
+	/**
+	 *  Dummy method for service call benchmark.
+	 */
+	public IFuture<Void> rawcall()
+	{
+		return IFuture.DONE;
+	}
 }

@@ -182,7 +182,7 @@ public class ClockFrame extends JFrame
 					@Classname("settings")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+						AlarmclockAgent agent = (AlarmclockAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 						final Settings sets = agent.getSettings();
 						
 						if(sets.isAutosave())
@@ -349,7 +349,7 @@ public class ClockFrame extends JFrame
 			@Classname("tray")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
@@ -377,9 +377,9 @@ public class ClockFrame extends JFrame
 				@Classname("refresh")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					AlarmclockBDI agent = (AlarmclockBDI)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+					AlarmclockAgent agent = (AlarmclockAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 					final Settings sets = agent.getSettings();
-					IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+					IFuture<IClockService>	fut	= ia.getFeature(IRequiredServicesFeature.class).getService("clockservice");
 					fut.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 					{
 						public void resultAvailable(IClockService cs)

@@ -15,7 +15,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.commons.SUtil;
@@ -85,7 +85,7 @@ public class DownloadFileCommand extends ACliCommand
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				getDeploymentService(ia, p)
-					.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IFileTransferService, String>(ret)
+					.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IFileTransferService, String>(ret)
 //					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IDeploymentService, Collection<Long>>(ret)
 				{
 					public void customResultAvailable(final IFileTransferService ds)
@@ -144,7 +144,7 @@ public class DownloadFileCommand extends ACliCommand
 								}
 							});
 							
-							sic.writeToOutputStream(fos, comp).addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Long>()
+							sic.writeToOutputStream(fos, comp).addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<Long>()
 							{
 								public void intermediateResultAvailable(Long result) 
 								{
@@ -188,13 +188,13 @@ public class DownloadFileCommand extends ACliCommand
 		if(cid!=null)
 		{
 			// global search not a good idea due to long timeout but what to do else?
-			ia.getComponentFeature(IRequiredServicesFeature.class).searchServices(IFileTransferService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IFileTransferService>()
+			ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IFileTransferService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IFileTransferService>()
 			{
 				public void intermediateResultAvailable(IFileTransferService result)
 				{
-//					System.out.println("found: "+((IService)result).getServiceIdentifier().getProviderId().getRoot()+" - "+cid);
-					if(((IService)result).getServiceIdentifier().getProviderId().getRoot().equals(cid))
+//					System.out.println("found: "+((IService)result).getId().getProviderId().getRoot()+" - "+cid);
+					if(((IService)result).getServiceId().getProviderId().getRoot().equals(cid))
 					{
 						ret.setResult(result);
 					}
@@ -221,7 +221,7 @@ public class DownloadFileCommand extends ACliCommand
 			}));
 			
 			// does not work due to cid has no address
-//			SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IDeploymentService>(ret)
 //			{
 //				public void customResultAvailable(final IComponentManagementService cms)
@@ -244,8 +244,8 @@ public class DownloadFileCommand extends ACliCommand
 		}
 		else
 		{
-			SServiceProvider.getService(ia, IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(ia.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IFileTransferService>(ret)));
+			ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IFileTransferService>(ret)));
 		}
 		
 		return ret;

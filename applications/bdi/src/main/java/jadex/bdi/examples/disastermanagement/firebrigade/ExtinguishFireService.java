@@ -10,7 +10,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminationCommand;
-import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
  *  Fire extinguish service.
@@ -32,7 +31,7 @@ public class ExtinguishFireService implements IExtinguishFireService
 	 */
 	public ITerminableFuture<Void> extinguishFire(final Object disasterId)
 	{
-		final IBDIXAgentFeature capa = agent.getComponentFeature(IBDIXAgentFeature.class);
+		final IBDIXAgentFeature capa = agent.getFeature(IBDIXAgentFeature.class);
 
 		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
 		{
@@ -104,6 +103,6 @@ public class ExtinguishFireService implements IExtinguishFireService
 	 */
 	public String toString()
 	{
-		return "ExtinguishFireService, "+agent.getComponentIdentifier();
+		return "ExtinguishFireService, "+agent.getId();
 	}
 }

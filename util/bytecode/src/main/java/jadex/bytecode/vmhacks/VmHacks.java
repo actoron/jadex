@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -127,8 +129,11 @@ public class VmHacks
 		/** setAccessible() override field offset. */
 		private Long setaccessibleoverrideoffset;
 		
+		/** The instrumentation command queue. */
+		private LinkedBlockingQueue<InstrumentationCommand> instrumentationcommandqueue;
+		
 		/** The instrumentation access if available. */
-		private Instrumentation instrumentation;
+//		private Instrumentation instrumentation;
 		
 		/** Classloader class injection map. */
 		private Map<Object[], Class<?>>  injectionclassstore;
@@ -172,7 +177,7 @@ public class VmHacks
 		 */
 		public boolean hasInstrumentation()
 		{
-			return instrumentation != null;
+			return instrumentationcommandqueue != null;
 		}
 		
 		/**
@@ -182,7 +187,7 @@ public class VmHacks
 		 */
 		public boolean hasIndirectRedefinition()
 		{
-			return asm && instrumentation != null;
+			return asm && instrumentationcommandqueue != null;
 		}
 		
 		// --------- Methods providing functionality. -----------------
@@ -314,14 +319,20 @@ public class VmHacks
 		public void redefineClass(final Class<?> clazz, final byte[] bytecode)
 		{
 			ClassDefinition def = new ClassDefinition(clazz, bytecode);
-			try
+			runInstrumentationCommand(new InstrumentationCommand()
 			{
-				instrumentation.redefineClasses(def);
-			}
-			catch (Exception e)
-			{
-				SUtil.throwUnchecked(e);
-			}
+				public void run(Instrumentation instrumentation)
+				{
+					try
+					{
+						instrumentation.redefineClasses(def);
+					}
+					catch (Exception e)
+					{
+						SUtil.throwUnchecked(e);
+					}
+				}
+			});
 		}
 		
 		/**
@@ -347,7 +358,20 @@ public class VmHacks
 			{
 				File file = createTempJar(classname, classcontent, null);
 				JarFile jarfile = new JarFile(file);
-				instrumentation.appendToBootstrapClassLoaderSearch(jarfile);
+				runInstrumentationCommand(new InstrumentationCommand()
+				{
+					public void run(Instrumentation instrumentation)
+					{
+						try
+						{
+							instrumentation.appendToBootstrapClassLoaderSearch(jarfile);
+						}
+						catch (Exception e)
+						{
+							SUtil.throwUnchecked(e);
+						}
+					}
+				});
 			}
 			catch (Exception e)
 			{
@@ -364,7 +388,7 @@ public class VmHacks
 			ret += " asm=" + asm;
 			ret += " native=" + hasNative();
 			ret += " javaunsafe=" + unsafeinstance;
-			ret += " instrumentation=" + instrumentation;
+			ret += " instrumentation=" + instrumentationcommandqueue;
 			return ret;
 		}
 		
@@ -512,17 +536,16 @@ public class VmHacks
 		        boolean hasagent = false;
 		        if (hasNative())
 		        {
-			        try
-					{
-						Class.forName("sun.instrument.InstrumentationImpl");
-//						InstrumentStarter.startAgent(jar.getAbsolutePath());
-						hasagent = nativehelper.startInstrumentationAgent(jar.getAbsolutePath());
-						if (DEBUG && hasagent)
-							System.out.println("Instrumentation agent loaded via internal API call.");
-					}
-					catch (Exception e1)
-					{
-					}
+//			        try
+//					{
+//						Class.forName("sun.instrument.InstrumentationImpl");
+//						hasagent = nativehelper.startInstrumentationAgent(jar.getAbsolutePath());
+//						if (DEBUG && hasagent)
+//							System.out.println("Instrumentation agent loaded via internal API call.");
+//					}
+//					catch (Exception e1)
+//					{
+//					}
 		        }
 		        
 		        if (!hasagent)
@@ -559,7 +582,7 @@ public class VmHacks
 		        }
 		        
 		        if (hasagent)
-		        	instrumentation = ((LinkedBlockingQueue<Instrumentation>) LoggerFilterStore.getStore().get(0)).poll(500, TimeUnit.MILLISECONDS);
+		        	instrumentationcommandqueue = (LinkedBlockingQueue<InstrumentationCommand>) LoggerFilterStore.getStore().get(0);
 		        
 		        if (hasInstrumentation())
 		        	injectionclassstore = (Map<Object[], Class<?>>) LoggerFilterStore.getStore().get(1);
@@ -643,11 +666,6 @@ public class VmHacks
 							
 							try
 							{
-//								Class<?> storeclass = Class.forName(classstoreclassname);
-								
-//								Method x = PrintStream.class.getMethod("exit", System.class);
-//								ret.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(PrintStream.class), x.getName(), Type.getMethodDescriptor(x), false);
-								
 								InsnList nl = new InsnList();
 								SASM.pushImmediate(nl, LoggerFilterStore.ID);
 								nl.accept(ret);
@@ -667,8 +685,6 @@ public class VmHacks
 								Method arrget = ArrayList.class.getMethod("get", int.class);
 								ret.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(ArrayList.class), arrget.getName(), Type.getMethodDescriptor(arrget), false);
 								
-//								ret.visitFieldInsn(Opcodes.GETSTATIC, Type.getInternalName(clinj.getDeclaringClass()), clinj.getName(), Type.getDescriptor(clinj.getType()));
-								
 								ret.visitTypeInsn(Opcodes.CHECKCAST, Type.getDescriptor(Map.class));
 								
 								ret.visitInsn(Opcodes.ICONST_2);
@@ -686,18 +702,6 @@ public class VmHacks
 								Method get = Map.class.getMethod("get", Object.class);
 								ret.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(Map.class), get.getName(), Type.getMethodDescriptor(get), true);
 								
-//								ret.visitVarInsn(Opcodes.ALOAD, 0);
-//								
-//								ret.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(Map.class), get.getName(), Type.getMethodDescriptor(get), true);
-//								
-//								ret.visitInsn(Opcodes.DUP);
-//								ret.visitJumpInsn(Opcodes.IFNULL, cont);
-//								
-//								ret.visitTypeInsn(Opcodes.CHECKCAST, Type.getDescriptor(Map.class));
-//								
-//								ret.visitVarInsn(Opcodes.ALOAD, 1);
-//								ret.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(Map.class), get.getName(), Type.getMethodDescriptor(get), true);
-//								
 								Label cont = new Label();
 								ret.visitInsn(Opcodes.DUP);
 								ret.visitJumpInsn(Opcodes.IFNULL, cont);
@@ -804,6 +808,28 @@ public class VmHacks
 			{
 			}
 			return ret;
+		}
+		
+		/** Run an instrumentation command */
+		protected void runInstrumentationCommand(InstrumentationCommand command)
+		{
+			try
+			{
+				instrumentationcommandqueue.put(command);
+			}
+			catch (Exception e)
+			{
+				SUtil.throwUnchecked(e);
+			}
+			try
+			{
+				command.await(5000);
+			}
+			catch (TimeoutException e)
+			{
+				instrumentationcommandqueue = null;
+				SUtil.throwUnchecked(e);
+			}
 		}
 		
 		/**
@@ -984,5 +1010,61 @@ public class VmHacks
 	protected static final void injectClassIntoStore(Map<Object[], Class<?>> classstore, ClassLoader cl, String classname, Class<?> clazz)
 	{
 		classstore.put(new Object[] { cl, clazz.getName() }, clazz);
+	}
+	
+	/**
+	 *  Instrumentation command issued to the instrumentation agent.
+	 *
+	 */
+	protected static abstract class InstrumentationCommand
+	{
+		/** The semaphore. */
+		protected Semaphore sem = new Semaphore(0);
+		
+		/** Execute the command. */
+		public final void execute(Instrumentation instrumentation)
+		{
+			try
+			{
+				run(instrumentation);
+			}
+			catch (Exception e)
+			{
+			}
+			sem.release();
+		}
+		
+		/** Custom command code. */
+		public abstract void run(Instrumentation instrumentation);
+		
+		/** Wait for command to finish. */
+		public void await()
+		{
+			try
+			{
+				sem.acquire();
+				sem.release();
+			}
+			catch (InterruptedException e)
+			{
+			}
+		}
+		
+		/** Wait for command to finish. */
+		public void await(long timeout) throws TimeoutException
+		{
+			try
+			{
+				boolean acquired = sem.tryAcquire(timeout, TimeUnit.MILLISECONDS);
+				if (acquired)
+					sem.release();
+				else
+					throw new TimeoutException("Instrumentation command did not finish in time.");
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }

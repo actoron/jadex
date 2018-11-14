@@ -10,8 +10,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -48,7 +48,7 @@ public class CapabilityWrapper implements ICapability
 	{
 		this.agent	= agent;
 		this.scope	= scope;
-		this.capa	= agent.getComponentFeature(IBDIXAgentFeature.class);
+		this.capa	= agent.getFeature(IBDIXAgentFeature.class);
 	}
 	
 	//-------- ICapability interface --------
@@ -166,7 +166,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public String getAgentName()
 	{
-		return agent.getComponentIdentifier().getLocalName();
+		return agent.getId().getLocalName();
 	}
 
 	/**
@@ -184,7 +184,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		return agent.getComponentIdentifier();
+		return agent.getId();
 	}
 
 	/**
@@ -193,7 +193,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public IComponentDescription getComponentDescription()
 	{
-		return agent.getComponentDescription();
+		return agent.getDescription();
 	}
 
 //	/**
@@ -220,7 +220,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public long getTime()
 	{
-		return SServiceProvider.getLocalService(agent, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).getTime();
+		return agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class)).getTime();
 	}
 
 	/**
@@ -265,7 +265,7 @@ public class CapabilityWrapper implements ICapability
 //	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm)
 	{
-		return agent.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
+		return agent.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(filter, initial, elm);
 	}
 	
 //	/**
@@ -291,13 +291,13 @@ public class CapabilityWrapper implements ICapability
 //	 *  Get a required service.
 //	 *  @return The service.
 //	 */
-//	public IFuture getRequiredService(final String name);
+//	public IFuture getService(final String name);
 //	
 //	/**
 //	 *  Get a required services.
 //	 *  @return The services.
 //	 */
-//	public IFuture getRequiredServices(final String name);
+//	public IFuture getServices(final String name);
 
 	//-------- helper methods --------
 
@@ -317,9 +317,9 @@ public class CapabilityWrapper implements ICapability
 	{
 		IValueFetcher	ret	= agent.getFetcher();
 		
-		if(scope!=null && agent.getComponentFeature0(IBDIXAgentFeature.class)!=null)	
+		if(scope!=null && agent.getFeature0(IBDIXAgentFeature.class)!=null)	
 		{
-			ICapability	capa	= agent.getComponentFeature(IBDIXAgentFeature.class);
+			ICapability	capa	= agent.getFeature(IBDIXAgentFeature.class);
 			String	prefix	= scope+MElement.CAPABILITY_SEPARATOR;
 			SimpleValueFetcher	fetcher	= new SimpleValueFetcher(ret);
 			fetcher.setValue("$beliefbase", new BeliefbaseWrapper(capa.getBeliefbase(), prefix));

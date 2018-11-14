@@ -33,11 +33,11 @@ import jadex.base.gui.componenttree.ProvidedServiceInfoNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
@@ -342,12 +342,12 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final ProvidedServiceInfoNode node = (ProvidedServiceInfoNode)tmp;
 //						final IService service = node.getService();
 						
-						IFuture<IService> fut = SServiceProvider.getService(getJCC().getJCCAccess(), node.getServiceIdentifier());
+						IFuture<IService> fut = getJCC().getJCCAccess().searchService( new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(node.getServiceIdentifier()));
 						fut.addResultListener(new SwingDefaultResultListener<IService>(comptree)
 						{
 							public void customResultAvailable(final IService service)
 							{
-								SServiceProvider.getService(getJCC().getJCCAccess(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								getJCC().getJCCAccess().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //								AbstractJCCPlugin.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
 									.addResultListener(new SwingDefaultResultListener<ILibraryService>(comptree)
 								{
@@ -417,26 +417,25 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 						final IComponentIdentifier cid = node.getComponentIdentifier();
 						
-						IFuture<IComponentManagementService> fut = SServiceProvider.getService(getJCC().getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-						fut.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(comptree)
+						getJCC().getJCCAccess().getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>(comptree)
 						{
-							public void customResultAvailable(IComponentManagementService cms)
+							public void customResultAvailable(final IExternalAccess exta)
 							{
-								cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>(comptree)
-								{
-									public void customResultAvailable(final IExternalAccess exta)
-									{
-										SServiceProvider.getService(getJCC().getJCCAccess(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								getJCC().getJCCAccess().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //										AbstractJCCPlugin.getClassLoader(cid, getJCC())
-											.addResultListener(new SwingDefaultResultListener<ILibraryService>(comptree)
+									.addResultListener(new SwingDefaultResultListener<ILibraryService>(comptree)
+								{
+									public void customResultAvailable(ILibraryService ls)
+									{
+										ls.getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>(comptree)
 										{
-											public void customResultAvailable(ILibraryService ls)
+											public void customResultAvailable(ClassLoader cl)
 											{
-												ls.getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>(comptree)
+												exta.getModelAsync().addResultListener(new SwingDefaultResultListener<IModelInfo>(comptree)
 												{
-													public void customResultAvailable(ClassLoader cl)
+													public void customResultAvailable(IModelInfo model)
 													{
-														Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+														Object clid = model.getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
 														
 														if(clid instanceof String[]) 
 														{
@@ -498,8 +497,8 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					JComponent comp = panel.getComponent();
 					// todo: help
 					//SHelp.setupHelp(comp, getHelpID());
-					panels.put(exta.getComponentIdentifier(), panel);
-					detail.add(comp, exta.getComponentIdentifier());
+					panels.put(exta.getId(), panel);
+					detail.add(comp, exta.getId());
 					comptree.getModel().fireNodeChanged(node);
 				}
 			});
@@ -569,7 +568,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					viewables.put(sid, fut);
 //					final long start	= System.currentTimeMillis();
 					// Unknown -> start search to find out asynchronously
-					SServiceProvider.getService(getJCC().getJCCAccess(), sid)
+					getJCC().getJCCAccess().searchService( new ServiceQuery<>((Class<Object>)null).setServiceIdentifier(sid))
 						.addResultListener(new SwingExceptionDelegationResultListener<Object, Boolean>(fut)
 					{
 						public void customResultAvailable(Object result)
@@ -610,24 +609,29 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					final Future<Boolean>	fut	= new Future<Boolean>();
 					viewables.put(cid, fut);
 					// Unknown -> start search to find out asynchronously
-					SServiceProvider.getService(getJCC().getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Boolean>(fut)
+					getJCC().getJCCAccess().getExternalAccess(cid).addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, Boolean>(fut)
 					{
-						public void customResultAvailable(final IComponentManagementService cms)
+						public void customResultAvailable(final IExternalAccess exta)
 						{
-							cms.getExternalAccess(cid).addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, Boolean>(fut)
+							exta.getModelAsync().addResultListener(new SwingExceptionDelegationResultListener<IModelInfo, Boolean>(fut)
 							{
-								public void customResultAvailable(final IExternalAccess exta)
+								public void customResultAvailable(final IModelInfo model)
 								{
-									getJCC().getClassLoader(exta.getModel().getResourceIdentifier())
+									getJCC().getClassLoader(model.getResourceIdentifier())
 										.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Boolean>(fut)
 									{
 										public void customResultAvailable(ClassLoader cl)
 										{
-											final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-											fut.setResult(clid==null? Boolean.FALSE: Boolean.TRUE);
-//											System.out.println("isVis first res: "+viewables.get(cid));
-											node.refresh(false);
+											exta.getModelAsync().addResultListener(new SwingExceptionDelegationResultListener<IModelInfo, Boolean>(fut)
+											{
+												public void customResultAvailable(IModelInfo model)
+												{
+													final Object clid = model.getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+													fut.setResult(clid==null? Boolean.FALSE: Boolean.TRUE);
+				//									System.out.println("isVis first res: "+viewables.get(cid));
+													node.refresh(false);
+												}
+											});
 										}
 									});
 								}

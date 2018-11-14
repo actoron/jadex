@@ -12,7 +12,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
@@ -82,13 +82,14 @@ public class ServiceQueryCommand extends ACliCommand
 				final String[] tags = (String[])args.get("-tags");
 				
 				if(owner==null)
-					owner = ia.getComponentIdentifier().getRoot();
+					owner = ia.getId().getRoot();
 				
-				ServiceQuery<IService> q = new ServiceQuery<IService>(type==null? null: new ClassInfo(type), scope, provider, owner, null);
+				ServiceQuery<IService> q = new ServiceQuery<IService>(type==null? null: new ClassInfo(type), scope, owner).setProvider(provider);
 				if(tags!=null)
 					q.setServiceTags(tags);
 				
-				SServiceProvider.getServices(ia, q, false)
+				//SServiceProvider.getServices(ia, q, false);
+				ia.getFeature(IRequiredServicesFeature.class).searchServices(q)
 					.addIntermediateResultListener(new IntermediateDelegationResultListener<IService>(ret));
 				
 				return ret;
@@ -158,7 +159,7 @@ public class ServiceQueryCommand extends ACliCommand
 				{
 					for(IService s: c)
 					{
-						buf.append(s.getServiceIdentifier()).append(SUtil.LF);
+						buf.append(s.getServiceId()).append(SUtil.LF);
 					}
 				}
 				

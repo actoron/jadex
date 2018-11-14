@@ -10,6 +10,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -44,7 +45,7 @@ public class SubscriptionBlockingTestAgent  extends JunitAgentTest
 	@AgentBody
 	public void	execute(final IInternalAccess agent)
 	{
-		IStepService	step	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IStepService.class).get();
+		IStepService	step	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IStepService.class)).get();
 		
 		final IIntermediateFuture<Integer>	fut	=  step.subscribeToSteps(1000);
 
@@ -86,12 +87,12 @@ public class SubscriptionBlockingTestAgent  extends JunitAgentTest
 			&& "[1, 2, 3]".equals(steps2.toString())
 			&& "[1, 1, 2, 2, 3, 3]".equals(stepsall.toString()))
 		{
-			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 				new TestReport[]{new TestReport("#1", "Test subscription blocking.", true, null)}));
 		}
 		else
 		{
-			agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
+			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 				new TestReport[]{new TestReport("#1", "Test subscription blocking.", false, "Wrong steps: "+steps1+", "+steps2+", "+stepsall)}));
 		}
 	}

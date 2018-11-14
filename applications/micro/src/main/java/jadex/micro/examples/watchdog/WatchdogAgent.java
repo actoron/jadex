@@ -18,7 +18,6 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -31,8 +30,7 @@ import jadex.micro.annotation.RequiredServices;
  *  when a watchdog becomes unavailable.
  */
 @ProvidedServices(@ProvidedService(type=IWatchdogService.class, implementation=@Implementation(expression="$pojoagent")))
-@RequiredServices(@RequiredService(name="watchdogs", type=IWatchdogService.class, multiple=true,
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, dynamic=true)))
+@RequiredServices(@RequiredService(name="watchdogs", type=IWatchdogService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL))
 @Arguments(@Argument(clazz=long.class, name="delay", description="Delay between pings.", defaultvalue="3000"))
 @Service
 @Agent
@@ -57,9 +55,9 @@ public class WatchdogAgent	implements IWatchdogService
 		try
 		{
 			this.watchdogs	= new LinkedHashMap();
-			final long	delay	= ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();
+			final long	delay	= ((Number)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();
 			
-			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -70,7 +68,7 @@ public class WatchdogAgent	implements IWatchdogService
 						public void resultAvailable(Object result)
 						{
 							// Pinging finished: Search for new watchdogs.
-							agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServices("watchdogs").addResultListener(new IResultListener()
+							agent.getFeature(IRequiredServicesFeature.class).getServices("watchdogs").addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -87,7 +85,7 @@ public class WatchdogAgent	implements IWatchdogService
 										}
 									}
 									
-									agent.getComponentFeature(IExecutionFeature.class).waitForDelay(delay, step);
+									agent.getFeature(IExecutionFeature.class).waitForDelay(delay, step);
 								}
 								
 								public void exceptionOccurred(Exception exception)
@@ -146,7 +144,7 @@ public class WatchdogAgent	implements IWatchdogService
 	 */
 	public String	getInfo()
 	{
-		return agent.getComponentIdentifier().getName();
+		return agent.getId().getName();
 	}
 	
 	/**

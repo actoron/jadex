@@ -8,7 +8,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.ComposedRemoteFilter;
 import jadex.commons.IAsyncFilter;
 import jadex.commons.MethodInfo;
@@ -183,7 +184,7 @@ public class RHardConstraints
 					{
 						final ConstantValueFilter filter = unboundconstantfilters.get(i);
 						
-						SNFPropertyProvider.getMethodNFPropertyValue(component, ((IService)service).getServiceIdentifier(), method, filter.getValueName())
+						component.getMethodNFPropertyValue(((IService)service).getServiceId(), method, filter.getValueName())
 							.addResultListener(new IResultListener<Object>()
 						{
 							public void resultAvailable(Object result)
@@ -252,37 +253,38 @@ public class RHardConstraints
 		unboundconstantfilters = newunboundconstantfilters;
 	}
 	
-	public static <T> ITerminableIntermediateFuture<T> getServices(final IInternalAccess ea, final Class<T> type, final String scope, final MethodInfo method, final RHardConstraints hardconstraints)
+	public static <T> ITerminableIntermediateFuture<T> getServices(final IInternalAccess ia, final Class<T> type, final String scope, final MethodInfo method, final RHardConstraints hardconstraints)
 	{
 		if(hardconstraints == null)
 		{
-			return SServiceProvider.getServices(ea, type, scope);
+			return ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(type, scope));
 		}
 		else
 		{
 			final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
-			SServiceProvider.getServices(ea, type, scope, (IAsyncFilter<T>) hardconstraints.getRemotableFilter()).addResultListener(new IResultListener<Collection<T>>()
-			{
-				public void resultAvailable(Collection<T> results)
-				{
-//					List<T> filteredresults = new ArrayList<T>();
-					IAsyncFilter<T> filter = (IAsyncFilter<T>) hardconstraints.getLocalFilter();
-					
-//					CollectionResultListener<T> crl = new CollectionResultListener<T>(results.size(), true, new DelegationResultListener<T>(new IResultListener<T>()
+			// dropped for v4???
+//			SServiceProvider.getServices(ea, type, scope, (IAsyncFilter<T>) hardconstraints.getRemotableFilter()).addResultListener(new IResultListener<Collection<T>>()
+//			{
+//				public void resultAvailable(Collection<T> results)
+//				{
+////					List<T> filteredresults = new ArrayList<T>();
+//					IAsyncFilter<T> filter = (IAsyncFilter<T>) hardconstraints.getLocalFilter();
+//					
+////					CollectionResultListener<T> crl = new CollectionResultListener<T>(results.size(), true, new DelegationResultListener<T>(new IResultListener<T>()
+////					{
+////						
+////					}));
+//					
+//					for (T result : results)
 //					{
-//						
-//					}));
-					
-					for (T result : results)
-					{
-					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
-				}
-			});
+//					}
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					ret.setException(exception);
+//				}
+//			});
 		}
 		return null;
 	}

@@ -10,7 +10,6 @@ import java.util.TimerTask;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;

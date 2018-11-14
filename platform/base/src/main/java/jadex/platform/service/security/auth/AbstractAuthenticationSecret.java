@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.commons.security.PemKeyPair;
+import jadex.commons.security.SSecurity;
+
 /**
  *  Class representing a secret used for authentication.
  *
@@ -17,8 +20,8 @@ public abstract class AbstractAuthenticationSecret implements Cloneable
 	{
 		AbstractAuthenticationSecret.SECRET_TYPES.put(PasswordSecret.PREFIX, PasswordSecret.class);
 		AbstractAuthenticationSecret.SECRET_TYPES.put(KeySecret.PREFIX, KeySecret.class);
-		AbstractAuthenticationSecret.SECRET_TYPES.put(X509PemFileSecret.PREFIX, X509PemFileSecret.class);
-		AbstractAuthenticationSecret.SECRET_TYPES.put(X509PemSecret.PREFIX, X509PemSecret.class);
+		AbstractAuthenticationSecret.SECRET_TYPES.put(X509PemStringsSecret.PREFIX, X509PemStringsSecret.class);
+		AbstractAuthenticationSecret.SECRET_TYPES.put(X509PemFilesSecret.PREFIX, X509PemFilesSecret.class);
 	}
 	
 	/**
@@ -52,6 +55,26 @@ public abstract class AbstractAuthenticationSecret implements Cloneable
 	public int hashCode()
 	{
 		return toString().hashCode();
+	}
+	
+	/**
+	 *  Creates an authentication secret based on a pem key pair.
+	 *  
+	 *  @param keypair The key pair.
+	 *  @param ignorekey If true, the secret will not include the key (verify-only).
+	 *  @param chain Rest of the authentication chain.
+	 *  @return The secret.
+	 */
+	public static final AbstractX509PemSecret fromKeyPair(PemKeyPair keypair, boolean ignorekey, PemKeyPair... chain)
+	{
+		String cert = keypair.getCertificate();
+		if (chain != null && chain.length > 0)
+		{
+			for (PemKeyPair pair : chain)
+				cert += pair.getCertificate();
+		}
+		X509PemStringsSecret ret = new X509PemStringsSecret(cert, ignorekey ? null : keypair.getKey());
+		return ret;
 	}
 	
 	/**
@@ -106,5 +129,15 @@ public abstract class AbstractAuthenticationSecret implements Cloneable
 		}
 		
 		return ret;
+	}
+	
+	public static void main(String[] args)
+	{
+		PemKeyPair ca = SSecurity.createTestCACert();
+		PemKeyPair cert = SSecurity.createTestCert(ca);
+		AbstractAuthenticationSecret clientsecret = AbstractAuthenticationSecret.fromKeyPair(ca, true);
+		AbstractAuthenticationSecret serversecret = AbstractAuthenticationSecret.fromKeyPair(cert, false, ca);
+		System.out.println(clientsecret.toString());
+		System.out.println(serversecret.toString());
 	}
 }

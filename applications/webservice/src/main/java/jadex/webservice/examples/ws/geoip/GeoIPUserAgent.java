@@ -29,7 +29,7 @@ public class GeoIPUserAgent extends RestServiceAgent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IGeoIPService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("geoipservice");
+		IFuture<IGeoIPService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("geoipservice");
 		fut.addResultListener(new DefaultResultListener<IGeoIPService>()
 		{
 			public void resultAvailable(IGeoIPService gs)

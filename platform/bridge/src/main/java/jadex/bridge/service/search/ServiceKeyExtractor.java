@@ -96,7 +96,7 @@ public class ServiceKeyExtractor implements IKeyExtractor<IServiceIdentifier>
 	{
 //		if(serv instanceof IService)
 //		{
-//			if(((IService)serv).getServiceIdentifier().getServiceType().getTypeName().indexOf("ITest")!=-1)
+//			if(((IService)serv).getId().getServiceType().getTypeName().indexOf("ITest")!=-1)
 //				System.out.println("sdhgfsdh");
 //		}
 		Set<String> ret = null;

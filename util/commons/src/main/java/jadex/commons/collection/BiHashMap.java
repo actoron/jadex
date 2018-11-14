@@ -204,4 +204,13 @@ public class BiHashMap<K, V> implements Map<K, V>
 		return reverse.keySet();
 	}
 	
+	/**
+	 *  Returns a flipped map, sharing the data with the original map.
+	 * 
+	 *  @return Map with keys and values reversed.
+	 */
+	public BiHashMap<V, K> flip()
+	{
+		return new BiHashMap<>(reverse, forward);
+	}
 }

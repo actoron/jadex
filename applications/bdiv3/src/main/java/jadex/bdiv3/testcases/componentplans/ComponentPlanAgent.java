@@ -7,7 +7,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Parent;
 
 /**
- *  Plan implemented as component.
+ *  Plan implemented as micro agent component.
  */
 @Agent(synchronous=Boolean3.TRUE)
 public class ComponentPlanAgent

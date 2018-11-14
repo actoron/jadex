@@ -6,7 +6,7 @@ public class Faq {
 //        IInternalAccess access = null;
 //        IComponentIdentifier cid = null;
 //
-//        ITransportAddressService tas = SServiceProvider.getLocalService(access, ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//        ITransportAddressService tas = access.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 //        String[] addrs = tas.getPlatformAddresses(cid).get();
 //    }
 }

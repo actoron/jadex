@@ -1,8 +1,7 @@
 package jadex.bridge.component.impl.remotecommands;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.impl.IRemoteConversationCommand;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
 
@@ -36,7 +35,7 @@ public class RemoteForwardCmdCommand extends AbstractResultCommand //implements 
 	 *  @param future Future of the active conversation.
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
-	public void	doExecute(IInternalAccess access, IFuture<?> future, IMsgSecurityInfos secinf)
+	public void	doExecute(IInternalAccess access, IFuture<?> future, ISecurityInfo secinf)
 	{
 		((IForwardCommandFuture)future).sendForwardCommand(command);
 	}

@@ -3,12 +3,6 @@ package jadex.bridge.fipa;
 import java.util.Collection;
 import java.util.Set;
 
-import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.df.IDF;
-import jadex.bridge.service.types.df.IDFComponentDescription;
-import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 
@@ -222,43 +216,43 @@ public class SFipa
 		 return ces.createComponentDescription(id, source.getState(), source.getOwnership(), source.getType());
 	}*/
 	
-	/**
-	 *  Clone the df service description.
-	 *  @param source The source df service description.
-	 *  @param df The df service.
-	 */
-	public static IDFServiceDescription cloneDFServiceDescription(IDFServiceDescription source, IDF df)
-	{
-		IDFServiceDescription clone = df.createDFServiceDescription(source.getName(), source.getType(), source.getOwnership(),
-			source.getLanguages(), source.getOntologies(), source.getProtocols(), source.getProperties());
-		// todo: deep clone properties?
-		return clone;
-	}
+//	/**
+//	 *  Clone the df service description.
+//	 *  @param source The source df service description.
+//	 *  @param df The df service.
+//	 */
+//	public static IDFServiceDescription cloneDFServiceDescription(IDFServiceDescription source, IDF df)
+//	{
+//		IDFServiceDescription clone = df.createDFServiceDescription(source.getName(), source.getType(), source.getOwnership(),
+//			source.getLanguages(), source.getOntologies(), source.getProtocols(), source.getProperties());
+//		// todo: deep clone properties?
+//		return clone;
+//	}
 	
-	/**
-	 *  Clone the df component description.
-	 *  @param source The source df component description.
-	 *  @param df The df service.
-	 */
-	public static IDFComponentDescription cloneDFComponentDescription(IDFComponentDescription source, IComponentManagementService cms, IDF df)
-	{
-		IDFServiceDescription[] sds = source.getServices();
-		IDFServiceDescription[] tds = null;
-		if(sds!=null)
-		{
-			tds = new IDFServiceDescription[sds.length];
-			for(int i=0; i<sds.length; i++)
-			{
-				tds[i] = cloneDFServiceDescription(sds[i], df);
-			}
-		}
-		
-		IComponentIdentifier id = source.getName();
-//		id	= cms.createComponentIdentifier(id.getName(), false, id.getAddresses());
-		id	= id!=null ? new BasicComponentIdentifier(id.getName()) : null;//, id.getAddresses());
-		
-		return df.createDFComponentDescription(id, tds, source.getLanguages(), source.getOntologies(), source.getProtocols(), source.getLeaseTime());
-	}
+//	/**
+//	 *  Clone the df component description.
+//	 *  @param source The source df component description.
+//	 *  @param df The df service.
+//	 */
+//	public static IDFComponentDescription cloneDFComponentDescription(IDFComponentDescription source, IDF df)
+//	{
+//		IDFServiceDescription[] sds = source.getServices();
+//		IDFServiceDescription[] tds = null;
+//		if(sds!=null)
+//		{
+//			tds = new IDFServiceDescription[sds.length];
+//			for(int i=0; i<sds.length; i++)
+//			{
+//				tds[i] = cloneDFServiceDescription(sds[i], df);
+//			}
+//		}
+//		
+//		IComponentIdentifier id = source.getName();
+////		id	= cms.createComponentIdentifier(id.getName(), false, id.getAddresses());
+//		id	= id!=null ? new BasicComponentIdentifier(id.getName()) : null;//, id.getAddresses());
+//		
+//		return df.createDFComponentDescription(id, tds, source.getLanguages(), source.getOntologies(), source.getProtocols(), source.getLeaseTime());
+//	}
 	
 	/**
 	 *  Create a service description.

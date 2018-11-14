@@ -8,10 +8,9 @@ import java.util.Map;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.transformation.IObjectStringConverter;
@@ -19,7 +18,6 @@ import jadex.platform.service.cli.ACliCommand;
 import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
-import jadex.platform.service.security.auth.PasswordSecret;
 
 /**
  *  Command to set a password or network secret.
@@ -80,7 +78,7 @@ public class SetSecretCommand extends ACliCommand
 		{
 			final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 			
-			SServiceProvider.getService(comp, ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			comp.searchService( new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 			{
 				public void customResultAvailable(final ISecurityService ss)

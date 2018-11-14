@@ -6,7 +6,8 @@ import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -24,7 +25,7 @@ public class GetTimeTask	 implements ITask
 	public IFuture<Void> execute(final ITaskContext context, final IInternalAccess process)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IClockService clock = SServiceProvider.getLocalService(process, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IClockService clock = process.getFeature(IRequiredServicesFeature.class).getLocalService(IClockService.class);
 		context.setParameterValue("time", Long.valueOf(clock.getTime()));
 		return ret;
 	}

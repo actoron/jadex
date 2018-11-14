@@ -1,10 +1,8 @@
 package jadex.bdi.examples.disastermanagement.commander;
 
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3x.runtime.IBelief;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.space2d.Space2D;
 
 /**
  *  Handle a disaster by assigning units.
@@ -99,14 +97,14 @@ public class HandleDisasterPlan extends Plan
 //			if(chemicals>chemicalunits.size())
 //			{
 ////				Collection clearchemser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IClearChemicalsService.class).get();
-//				Collection clearchemser = (Collection)getScope().getRequiredServices("clearchemicalsservices").get();
+//				Collection clearchemser = (Collection)getScope().getServices("clearchemicalsservices").get();
 //				if(clearchemser.size()>0)
 //				{
 //					Iterator it=clearchemser.iterator();
 //					while(chemicals>chemicalunits.size() && it.hasNext())
 //					{
 //						final IClearChemicalsService ccs = (IClearChemicalsService)it.next();
-//						final Object provid = ccs.getServiceIdentifier().getProviderId();
+//						final Object provid = ccs.getId().getProviderId();
 //						if(!busy.containsFact(provid))
 //						{
 //							busy.addFact(provid);
@@ -136,14 +134,14 @@ public class HandleDisasterPlan extends Plan
 //			if(fire>fireunits.size())
 //			{
 ////				Collection exfireser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IExtinguishFireService.class).get();
-//				Collection exfireser = (Collection)getScope().getRequiredServices("extinguishfireservices").get();
+//				Collection exfireser = (Collection)getScope().getServices("extinguishfireservices").get();
 //				if(exfireser.size()>0)
 //				{
 //					Iterator it=exfireser.iterator();
 //					while(fire>fireunits.size() && it.hasNext())
 //					{
 //						final IExtinguishFireService fes = (IExtinguishFireService)it.next();
-//						final Object provid = fes.getServiceIdentifier().getProviderId();
+//						final Object provid = fes.getId().getProviderId();
 //						if(!busy.containsFact(provid))
 //						{
 //							busy.addFact(provid);
@@ -174,14 +172,14 @@ public class HandleDisasterPlan extends Plan
 //			if(chemicals==0 && victims>ambulanceunits.size())
 //			{
 ////				Collection treatvicser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), ITreatVictimsService.class).get();
-//				Collection treatvicser = (Collection)getScope().getRequiredServices("treatvictimservices").get();
+//				Collection treatvicser = (Collection)getScope().getServices("treatvictimservices").get();
 //				if(treatvicser.size()>0)
 //				{
 //					Iterator it=treatvicser.iterator();
 //					while(victims>ambulanceunits.size() && it.hasNext())
 //					{
 //						final ITreatVictimsService tvs = (ITreatVictimsService)it.next();
-//						final Object provid = tvs.getServiceIdentifier().getProviderId();
+//						final Object provid = tvs.getId().getProviderId();
 //						if(!busy.containsFact(provid))
 //						{
 //							busy.addFact(provid);

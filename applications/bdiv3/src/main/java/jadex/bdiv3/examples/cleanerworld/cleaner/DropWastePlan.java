@@ -5,9 +5,9 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveDropWaste;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.DropWasteAction;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerAgent.AchieveDropWaste;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerAgent.AchieveMoveTo;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerAgent.DropWasteAction;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
@@ -25,7 +25,7 @@ import jadex.commons.future.IFuture;
 public class DropWastePlan
 {
 	@PlanCapability
-	protected CleanerBDI capa;
+	protected CleanerAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -70,12 +70,12 @@ public class DropWastePlan
 		Location location = wastebin.getLocation();
 		
 		IFuture<AchieveMoveTo> fut = rplan.dispatchSubgoal(capa.new AchieveMoveTo(location));
-		fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchieveMoveTo, Void>(ret)
+		fut.addResultListener(new ExceptionDelegationResultListener<CleanerAgent.AchieveMoveTo, Void>(ret)
 		{
 			public void customResultAvailable(AchieveMoveTo amt)
 			{
 				IFuture<DropWasteAction> fut = rplan.dispatchSubgoal(capa.new DropWasteAction(waste, wastebin));
-				fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.DropWasteAction, Void>(ret)
+				fut.addResultListener(new ExceptionDelegationResultListener<CleanerAgent.DropWasteAction, Void>(ret)
 				{
 					public void customResultAvailable(DropWasteAction result)
 					{

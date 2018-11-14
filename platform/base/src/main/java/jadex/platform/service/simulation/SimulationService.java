@@ -1,32 +1,44 @@
 package jadex.platform.service.simulation;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.bridge.service.types.simulation.ISimulationService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.TimeoutException;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
@@ -65,6 +77,9 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	/** The future (if any) indicating when a step is finished. */
 	protected Future	stepfuture;
 	
+	/** Blockers that prevent the clock from advancing. */
+	protected List<IFuture<?>> advanceblockers = new ArrayList<>();
+	
 	/** The idle future listener. */
 	protected IdleListener	idlelistener;
 	
@@ -93,14 +108,14 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	deregistered	= new Future<Void>();
-		SServiceProvider.getService(access, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		access.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				ISettingsService	settings	= (ISettingsService)result;
 				settings.deregisterPropertiesProvider("simulationservice")
-					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(deregistered)));
+					.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(deregistered)));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -111,7 +126,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		}));
 			
 		final Future	ret	= new Future();
-		deregistered.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+		deregistered.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -125,7 +140,16 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 					stopped	= IFuture.DONE;
 				}
 				
-				stopped.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
+				if(advanceblockers!=null)
+				{
+					for(IFuture<?> fut: advanceblockers)
+					{
+						((Future<?>)fut).setExceptionIfUndone(new RuntimeException("Simulation service shutdowned"));
+					}
+					advanceblockers.clear();
+				}
+				
+				stopped.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
 			}
 		}));
 		
@@ -142,83 +166,25 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		SServiceProvider.getService(access, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener()
+		ISettingsService	settings	= access.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+		settings.registerPropertiesProvider("simulationservice", SimulationService.this)
+			.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
-				ISettingsService	settings	= (ISettingsService)result;
-				settings.registerPropertiesProvider("simulationservice", SimulationService.this)
-					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+				exeservice	= ((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+				clockservice	= ((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+				if(startoninit)
 				{
-					public void customResultAvailable(Object result)
-					{
-						proceed();
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						super.exceptionOccurred(exception);
-					}
-				}));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// No settings service: ignore.
-				proceed();
-			}
-			
-			public void proceed()
-			{
-				final boolean[]	services	= new boolean[2];
-
-				SServiceProvider.getService(access, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
+					startoninit	= false;
+					start().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+				}
+				else
 				{
-					public void customResultAvailable(Object result)
-					{
-						exeservice = (IExecutionService)result;
-						services[0]	= true;
-						if(services[0] && services[1])
-						{
-							if(startoninit)
-							{
-								startoninit	= false;
-								start().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-							}
-							else
-							{
-								ret.setResult(null);
-//										ret.setResult(getServiceIdentifier());
-							}
-						}
-					}
-				}));
-						
-				SServiceProvider.getService(access, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						clockservice = (IClockService)result;
-						services[1]	= true;
-						if(services[0] && services[1])
-						{
-							if(startoninit)
-							{
-								startoninit	= false;
-								start().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(ret)));
-							}
-							else
-							{
-								ret.setResult(null);
-//										ret.setResult(getServiceIdentifier());
-							}
-						}
-					}
-				}));						
+					ret.setResult(null);
+				}
 			}
-		}));				
+		}));
 
 		return ret;
 	}
@@ -383,17 +349,10 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //				System.out.println("Setting clock");
 				final Future	fut	= new Future();
 				ret	= fut;
-				SServiceProvider.getService(access, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM, false)
-					.addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener(fut)
-				{
-					public void customResultAvailable(Object result)
-					{
-						IThreadPoolService	tps	= (IThreadPoolService)result;
-						clockservice.setClock(type, tps);
-						notifyListeners(new ChangeEvent(this, "clock_type", type));
-						fut.setResult(null);
-					}
-				}));
+				IThreadPoolService	tps	= ((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IThreadPoolService.class);
+				clockservice.setClock(type, tps);
+				notifyListeners(new ChangeEvent(this, "clock_type", type));
+				fut.setResult(null);
 			}
 			else
 			{
@@ -471,6 +430,61 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	{
 		return exeservice;
 	}
+	
+	protected static final Map<Future<?>, String>	openfuts	= Collections.synchronizedMap(new LinkedHashMap<>());
+
+	/**
+	 *  Adds a blocker to the clock that prevents the clock from
+	 *  advancing until the future is triggered either by result
+	 *  or exception.
+	 *  
+	 *  @param blocker The blocking future.
+	 *  @return Null, when added.
+	 */
+	public IFuture<Void> addAdvanceBlocker(IFuture<?> blocker)
+	{
+		long rttimeout = Starter.getDefaultTimeout(access.getId().getRoot());
+		if (rttimeout <= 0)
+			rttimeout = 30000;
+		final long frttimeout = rttimeout;
+		
+		Future<?> toblocker = FutureFunctionality.getDelegationFuture(blocker, new FutureFunctionality(access.getLogger())
+		{
+			public boolean isUndone(boolean undone)
+			{
+				return true;
+			}
+		});
+		
+		access.waitForDelay(frttimeout, new ImmediateComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				if (!toblocker.isDone())
+				{
+					String	debug	= openfuts.get(toblocker);
+					access.getLogger().severe("Simulation blocker released after realtime timeout " + frttimeout + (debug!=null?", "+debug:"."));
+					toblocker.setExceptionIfUndone(new TimeoutException("Simulation blocker released after realtime timeout " + frttimeout + "."));
+				}
+				return IFuture.DONE;
+			}
+		}, true);
+		
+		advanceblockers.add(toblocker);
+		
+		// -------- For debugging when simulation hangs due to leftover adblocker.
+		if(SSimulation.DEBUG_BLOCKERS)
+		{
+			openfuts.put(toblocker, ""+ServiceCall.getCurrentInvocation());
+			toblocker.addResultListener(result -> {openfuts.remove(toblocker);}, exception -> {openfuts.remove(toblocker);});
+//			System.out.println("adblocks: "+openfuts);
+//			System.out.println(advanceblockers.size());
+//			System.out.println("addBlocker: "+ServiceCall.getCurrentInvocation()+" "+access);
+		}
+		// -------- End debugging
+		
+		return IFuture.DONE;
+	}
 
 	/**
 	 *  Stop execution.
@@ -495,7 +509,25 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		if(idlelistener!=null)
 			idlelistener.outdated	= true;
 		idlelistener	= new IdleListener();
-		getExecutorService().getNextIdleFuture().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(idlelistener));
+		getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
+//		System.out.println("Wait2");
+//		waitForBlockers().addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+////				System.out.println("Release2");
+//				if(idlelistener!=null)
+//					idlelistener.outdated	= true;
+//				idlelistener	= new IdleListener();
+//				
+//				getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				resultAvailable(null);
+//			}
+//		});
 	}
 	
 	/**
@@ -514,53 +546,68 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 			}
 			else
 			{
-//				System.out.println("Advancing clock");
-				if(getClockService().advanceEvent())
+//				System.out.println(this+" waiting for blockers");
+				waitForBlockers().addResultListener(new IResultListener<Void>()
 				{
-//					System.out.println("Advanced clock");
-					if(idlelistener==null)
-						idlelistener	= new IdleListener();
-					getExecutorService().getNextIdleFuture().addResultListener(access.getComponentFeature(IExecutionFeature.class).createResultListener(idlelistener));
-				}
-				else
-				{
-//					System.out.println("Clock not advanced");
-
-					// Simulation stopped due to no more entries
-					// -> listen on clock until new entries available.
-					if(MODE_NORMAL.equals(mode))
+					public void resultAvailable(Void result)
 					{
-						getClockService().addChangeListener(new IChangeListener()
+//						System.out.println(access+" advancing clock");
+						if(getClockService().advanceEvent())
 						{
-							public void changeOccurred(ChangeEvent event)
+//							System.out.println(access+" advanced clock");
+
+							if(idlelistener==null)
+								idlelistener	= new IdleListener();
+							getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
+								
+						}
+						else
+						{
+//							System.out.println(access+" Clock not advanced");
+		
+							// Simulation stopped due to no more entries
+							// -> listen on clock until new entries available.
+							if(MODE_NORMAL.equals(mode))
 							{
-								if(IClock.EVENT_TYPE_TIMER_ADDED.equals(event.getType()))
+								getClockService().addChangeListener(new IChangeListener()
 								{
-									getClockService().removeChangeListener(this);
-									access.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+									public void changeOccurred(ChangeEvent event)
 									{
-										public IFuture<Void> execute(IInternalAccess ia)
+//										System.out.println(access+" Clock changed after not advanced");
+										if(IClock.EVENT_TYPE_TIMER_ADDED.equals(event.getType()))
 										{
-											// Resume execution if still executing.
-											if(MODE_NORMAL.equals(mode) && executing)
+											getClockService().removeChangeListener(this);
+											access.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 											{
-//												System.out.println("Schedule advancing clock");
-												scheduleAdvanceClock();
-											}
-											return IFuture.DONE;
+												public IFuture<Void> execute(IInternalAccess ia)
+												{
+													// Resume execution if still executing.
+													if(MODE_NORMAL.equals(mode) && executing)
+													{
+//														System.out.println(access+" Schedule advancing clock");
+														scheduleAdvanceClock();
+													}
+													return IFuture.DONE;
+												}
+											});
 										}
-									});
-								}
+									}
+								});
 							}
-						});
+							
+							// Step finished.
+							else
+							{
+								setIdle();
+							}
+						}
 					}
 					
-					// Step finished.
-					else
+					public void exceptionOccurred(Exception exception)
 					{
-						setIdle();
+						resultAvailable(null);
 					}
-				}
+				});
 			}
 		}
 		// else do nothing for continuous clock as it executes itself.
@@ -568,6 +615,45 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 //		{
 //			System.out.println("Not advancing clock");
 //		}
+	}
+	
+	/**
+	 *  Waits for blockers
+	 * @return
+	 */
+	protected IFuture<Void> waitForBlockers()
+	{
+		IFuture<Void> ret = null;
+		if(advanceblockers.size() > 0)
+		{
+			Future<Void> futret = new Future<>();
+			ret = futret;
+			FutureBarrier<Object> bar = new FutureBarrier<>();
+			for(IFuture<?> blocker : advanceblockers)
+			{
+				@SuppressWarnings("unchecked")
+				IFuture<Object>	oblocker = (IFuture<Object>)blocker;
+				bar.addFuture(oblocker);
+			}
+			advanceblockers.clear();
+//			System.out.println("waitForBlockers start");
+			bar.waitForIgnoreFailures(null).addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+//					System.out.println("waitForBlockers end");
+					waitForBlockers().addResultListener(new DelegationResultListener<>(futret));
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			}));
+		}
+		else
+		{
+			ret = IFuture.DONE;
+		}
+		return ret;
 	}
 	
 	//-------- helper classes --------
@@ -602,7 +688,7 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 		 */
 		public void resultAvailable(Object result)
 		{
-//			System.err.println("Executor idle");
+//			System.out.println(SimulationService.this+" Executor idle");
 			if(executing && !outdated)
 			{
 				if(MODE_NORMAL.equals(mode) || MODE_TIME_STEP.equals(mode) || !continued)

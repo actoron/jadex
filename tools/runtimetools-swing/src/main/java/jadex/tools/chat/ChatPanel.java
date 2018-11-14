@@ -96,6 +96,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -289,6 +290,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
 					{
 						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+						
+						// Bug workaround: https://bugs.openjdk.java.net/browse/JDK-8041559
+						if (value == null)
+							return this;
+						
 						ChatUser cu = (ChatUser)value;
 						this.setText(cu.getNick()+" ["+cu.getComponentIdentifier()+"]");
 						if(cu.getComponentIdentifier()==null)
@@ -299,12 +305,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						{
 							System.out.println("service is null");
 						}
-						if(((IService)getService()).getServiceIdentifier()==null)
+						if(((IService)getService()).getServiceId()==null)
 						{
 							System.out.println("service.SID is null");
 						}
 							
-						if(!cu.getComponentIdentifier().equals(((IService)getService()).getServiceIdentifier().getProviderId()))
+						if(!cu.getComponentIdentifier().equals(((IService)getService()).getServiceId().getProviderId()))
 						{
 							this.setToolTipText("Select to send private message.\nRight-click to send file.");
 						}
@@ -505,7 +511,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						{
 							JTable.DropLocation	droploc	= (JTable.DropLocation)support.getDropLocation();
 							ChatUser cu	= (ChatUser)usertable.getModel().getValueAt(droploc.getRow(), 0);
-							if(!cu.getComponentIdentifier().equals(((IService)getService()).getServiceIdentifier().getProviderId()))
+							if(!cu.getComponentIdentifier().equals(((IService)getService()).getServiceId().getProviderId()))
 							{
 								try
 								{
@@ -580,7 +586,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							int row = usertable.rowAtPoint(e.getPoint());
 							usertable.setRowSelectionInterval(row, row);
 							ChatUser cu = (ChatUser)((UserTableModel)usertable.getModel()).getValueAt(row, 0);
-							if(!cu.getComponentIdentifier().equals(((IService)getService()).getServiceIdentifier().getProviderId()))
+							if(!cu.getComponentIdentifier().equals(((IService)getService()).getServiceId().getProviderId()))
 							{
 								createMenu(cu.getComponentIdentifier()).show(e.getComponent(), e.getX(), e.getY());
 							}
@@ -1219,7 +1225,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					public void customIntermediateResultAvailable(IChatService chat)
 					{
-						final IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
+						final IComponentIdentifier cid = ((IService)chat).getServiceId().getProviderId();
 						updateChatUser(cid, chat);
 					}
 					public void customExceptionOccurred(Exception exception)
@@ -1271,7 +1277,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						{
 							public void customIntermediateResultAvailable(final IChatService chat)
 							{
-								final IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
+								final IComponentIdentifier cid = ((IService)chat).getServiceId().getProviderId();
 								updateChatUser(cid, chat);
 							}
 							public void customExceptionOccurred(Exception exception)
@@ -1458,7 +1464,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		{
 			public void customIntermediateResultAvailable(final IChatService chat)
 			{
-				ChatUser	cu	= usermodel.getUser(((IService)chat).getServiceIdentifier().getProviderId());
+				ChatUser	cu	= usermodel.getUser(((IService)chat).getServiceId().getProviderId());
 				if(cu!=null)
 				{
 					sendusers.remove(cu);
@@ -1493,7 +1499,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						cu.removeMessage(id);
 					}
 					usertable.repaint();
-					addMessage(((IService)getService()).getServiceIdentifier().getProviderId(),
+					addMessage(((IService)getService()).getServiceId().getProviderId(),
 						text, nick.substring(0, nick.length()-1), false, true); // Strip last comma.
 				}
 			}
@@ -1539,7 +1545,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public void addMessage(final IComponentIdentifier cid, final String text, final String nick, final boolean privatemessage, final boolean sendfailure)
 	{
-		SServiceProvider.getService(getJCC().getJCCAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		getJCC().getJCCAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 		{
 			public void resultAvailable(final IClockService clock)
@@ -1803,7 +1809,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	protected void	notifyChatEvent(String type, IComponentIdentifier source, Object value, boolean quiet)
 	{
 		// Ignore own messages and own online/offline state changes
-		if(!((IService)getService()).getServiceIdentifier().getProviderId().equals(source)
+		if(!((IService)getService()).getServiceId().getProviderId().equals(source)
 			|| NOTIFICATION_MSG_FAILED.equals(type))
 		{
 			String	text	= null;

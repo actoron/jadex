@@ -14,7 +14,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
@@ -24,12 +25,16 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Autostart;
 
 /**
  *  Implements passive awareness via shared memory.
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE)
+@Agent(autoprovide = Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE,
+	predecessors="jadex.platform.service.address.TransportAddressAgent",
+	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
+)
 public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //extends PassiveAwarenessBaseAgent
 {
 	//-------- constants --------
@@ -57,7 +62,7 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 	@ServiceStart
 	public void	start() throws Exception
 	{
-		IComponentIdentifier pfid = agent.getComponentIdentifier().getRoot();
+		IComponentIdentifier pfid = agent.getId().getRoot();
 		disclock.writeLock().lock();
 //		for(PassiveAwarenessIntraVMAgent otheragent: discoveries.values())
 //			otheragent.announceNewPlatform(pfid);
@@ -72,7 +77,7 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 	public void shutdown()	throws Exception
 	{
 		disclock.writeLock().lock();
-		discoveries.remove(agent.getComponentIdentifier().getRoot());
+		discoveries.remove(agent.getId().getRoot());
 		disclock.writeLock().unlock();
 	}
 	
@@ -93,11 +98,12 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 		
 		if(remote!=null)
 		{
+			
 			return remote.agent.getExternalAccess().scheduleStep(new IComponentStep<List<TransportAddress>>()
 			{
 				public IFuture<List<TransportAddress>> execute(IInternalAccess ia)
 				{
-					ITransportAddressService tas = SServiceProvider.getLocalService(ia, ITransportAddressService.class);
+					ITransportAddressService tas = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class));
 					return tas.getAddresses();
 				}
 			});
@@ -117,7 +123,7 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 		disclock.readLock().lock();
 		HashSet<IComponentIdentifier> result = new HashSet<IComponentIdentifier>(discoveries.keySet());
 		disclock.readLock().unlock();
-		result.remove(agent.getComponentIdentifier().getRoot());
+		result.remove(agent.getId().getRoot());
 		return new IntermediateFuture<IComponentIdentifier>(result);
 	}
 

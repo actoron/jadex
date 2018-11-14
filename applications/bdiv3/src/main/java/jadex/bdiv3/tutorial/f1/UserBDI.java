@@ -9,9 +9,11 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
@@ -26,7 +28,7 @@ import jadex.micro.annotation.Description;
  *  User agent that presents a gui for using the 
  *  translation service of the translation agent.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Description("User agent that presents a gui for using the translation service of the translation agent.")
 public class UserBDI
 {
@@ -67,7 +69,7 @@ public class UserBDI
 					public void actionPerformed(ActionEvent e)
 					{
 						// Search a translation service
-						SServiceProvider.getServices(agent, ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 							.addResultListener(new IntermediateDefaultResultListener<ITranslationService>()
 						{
 							public void intermediateResultAvailable(ITranslationService ts)

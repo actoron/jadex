@@ -9,6 +9,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -31,17 +32,17 @@ public class ScenarioAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-//		ILibraryService ls = SServiceProvider.getLocalService(agent, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		ILibraryService ls = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 //		System.out.println("ls:"+ls);
 		
-		IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<ILibraryService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 //		IFuture<ILibraryService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).searchService(ILibraryService.class);
 		fut.addResultListener(new DefaultResultListener<ILibraryService>()
 		{
 			public void resultAvailable(ILibraryService libservice)
 			{
 //				libservice.getURLStrings().addResultListener(createResultListener(new DefaultResultListener()
-				libservice.getAllResourceIdentifiers().addResultListener(agent.getComponentFeature(IExecutionFeature.class)
+				libservice.getAllResourceIdentifiers().addResultListener(agent.getFeature(IExecutionFeature.class)
 					.createResultListener(new DefaultResultListener<List<IResourceIdentifier>>()
 				{
 					public void resultAvailable(List<IResourceIdentifier> result)
@@ -57,7 +58,7 @@ public class ScenarioAgent
 							}
 						}
 						StartScenario.startScenario(libpaths.toArray(new String[libpaths.size()])).addResultListener(
-							agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess[]>()
+							agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess[]>()
 						{
 							public void resultAvailable(IExternalAccess[] platforms)
 							{

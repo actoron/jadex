@@ -51,6 +51,7 @@ import jadex.base.gui.ParserValidator;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IErrorReport;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -59,9 +60,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.FixedJComboBox;
@@ -136,11 +135,11 @@ public class StarterPanel extends JLayeredPane
 	protected JCheckBox suspend;
 	
 	/** The termination flags. */
-	protected JCheckBox mastercb;
-	protected JCheckBox daemoncb;
-	protected JCheckBox autosdcb;
+//	protected JCheckBox mastercb;
+//	protected JCheckBox daemoncb;
+//	protected JCheckBox autosdcb;
 	protected JCheckBox synccb;
-	protected JCheckBox perscb;
+//	protected JCheckBox perscb;
 	protected JComboBox monicb;
 
 //	/** The application name. */
@@ -328,7 +327,7 @@ public class StarterPanel extends JLayeredPane
 							final String fullname = model.getFullName();//model.getPackage()+"."+model.getName();
 							final IModelInfo mymodel = model;
 							final boolean dokilllis = storeresults!=null && storeresults.isSelected();
-							final String an = genname.isSelected()?  null: model.getName().equals(componentname.getText()) || model.getNameHint().equals(componentname.getText())? null: componentname.getText();
+							final String an = genname.isSelected()?  null: componentname.getText().equals(model.getName()) || componentname.getText().equals(model.getNameHint())? null: componentname.getText();
 							final String configname = (String)config.getModel().getSelectedItem();
 							final int max = ((Integer)numcomponents.getValue()).intValue();
 								
@@ -340,11 +339,11 @@ public class StarterPanel extends JLayeredPane
 									IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
 									createComponent(StarterPanel.this.jcc, modelrid, typename, null, configname, args, 
 										suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+//										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+//										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+//										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										synccb.isSelected()? Boolean.TRUE: Boolean.FALSE,
-										perscb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+//										perscb.isSelected()? Boolean.TRUE: Boolean.FALSE,
 										(PublishEventLevel)monicb.getSelectedItem(),
 										killlistener, StarterPanel.this.parent, StarterPanel.this)
 									.addResultListener(new DelegationResultListener(fut));
@@ -356,11 +355,11 @@ public class StarterPanel extends JLayeredPane
 								IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
 								createComponent(StarterPanel.this.jcc, modelrid, typename, an, configname, args, 
 									suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-									mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-									daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-									autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+//									mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+//									daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+//									autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 									synccb.isSelected()? Boolean.TRUE: Boolean.FALSE,
-									perscb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+//									perscb.isSelected()? Boolean.TRUE: Boolean.FALSE,
 									(PublishEventLevel)monicb.getSelectedItem(),
 									killlistener, StarterPanel.this.parent, StarterPanel.this)
 								.addResultListener(new DelegationResultListener(fut));
@@ -443,29 +442,29 @@ public class StarterPanel extends JLayeredPane
 		JPanel flags = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
 //		Dimension pd = suspend.getPreferredSize();
 //		Dimension md = suspend.getMinimumSize();
-		mastercb = new JCheckBox("Master");
-		mastercb.setToolTipText("If a master component terminates the parent is killed as well");
+//		mastercb = new JCheckBox("Master");
+//		mastercb.setToolTipText("If a master component terminates the parent is killed as well");
 //		mastercb.setPreferredSize(pd);
 //		mastercb.setMinimumSize(md);
-		daemoncb = new JCheckBox("Daemon");
-		daemoncb.setToolTipText("A daemon component does not prevent the parent component to terminate");
+//		daemoncb = new JCheckBox("Daemon");
+//		daemoncb.setToolTipText("A daemon component does not prevent the parent component to terminate");
 //		daemoncb.setPreferredSize(pd);
 //		daemoncb.setMinimumSize(md);
-		autosdcb = new JCheckBox("Auto Shutdown");
-		autosdcb.setToolTipText("Auto shutdown terminates a composite components when all (non daemon) components have terminated");
+//		autosdcb = new JCheckBox("Auto Shutdown");
+//		autosdcb.setToolTipText("Auto shutdown terminates a composite components when all (non daemon) components have terminated");
 //		autosdcb.setPreferredSize(pd);
 //		autosdcb.setMinimumSize(md);
 		monicb = new JComboBox(new Object[]{PublishEventLevel.OFF, PublishEventLevel.COARSE, PublishEventLevel.MEDIUM, PublishEventLevel.FINE});
 		monicb.setToolTipText("Monitor the component. If turned on it will push events to the IMonitoringService of the platform.");
 		synccb = new JCheckBox("Synchronous");
 		synccb.setToolTipText("Run the component synchronously on the thread of its parent.");
-		perscb = new JCheckBox("Persistable");
-		perscb.setToolTipText("Persistable components are subject to auto persistence to free memory.");
+//		perscb = new JCheckBox("Persistable");
+//		perscb.setToolTipText("Persistable components are subject to auto persistence to free memory.");
 		
 		flags.add(suspend);
-		flags.add(mastercb);
-		flags.add(daemoncb);
-		flags.add(autosdcb);
+//		flags.add(mastercb);
+//		flags.add(daemoncb);
+//		flags.add(autosdcb);
 		flags.add(synccb);
 		flags.add(new JLabel("Monitor "));
 		flags.add(monicb);
@@ -753,11 +752,11 @@ public class StarterPanel extends JLayeredPane
 		{
 			// Reset start flags for new model.
 			suspend.setSelected(false);
-			daemoncb.setSelected(false);
-			mastercb.setSelected(false);
-			autosdcb.setSelected(false);
+//			daemoncb.setSelected(false);
+//			mastercb.setSelected(false);
+//			autosdcb.setSelected(false);
 			synccb.setSelected(false);
-			perscb.setSelected(false);
+//			perscb.setSelected(false);
 			monicb.setSelectedItem(PublishEventLevel.OFF);
 			genname.setSelected(false);
 			numcomponents.setValue(Integer.valueOf(1));
@@ -976,16 +975,16 @@ public class StarterPanel extends JLayeredPane
 		{
 			String c = (String)config.getSelectedItem();
 			boolean s = model.getSuspend(c)==null? suspend.isSelected(): model.getSuspend(c).booleanValue();
-			boolean m = model.getMaster(c)==null? mastercb.isSelected(): model.getMaster(c).booleanValue();
-			boolean d = model.getDaemon(c)==null? daemoncb.isSelected(): model.getDaemon(c).booleanValue();
-			boolean a = model.getAutoShutdown(c)==null? autosdcb.isSelected(): model.getAutoShutdown(c).booleanValue();
+//			boolean m = model.getMaster(c)==null? mastercb.isSelected(): model.getMaster(c).booleanValue();
+//			boolean d = model.getDaemon(c)==null? daemoncb.isSelected(): model.getDaemon(c).booleanValue();
+//			boolean a = model.getAutoShutdown(c)==null? autosdcb.isSelected(): model.getAutoShutdown(c).booleanValue();
 			boolean sy = model.getSynchronous(c)==null? synccb.isSelected(): model.getSynchronous(c).booleanValue();
-			boolean pe = model.getPersistable(c)==null? perscb.isSelected(): model.getPersistable(c).booleanValue();
+//			boolean pe = model.getPersistable(c)==null? perscb.isSelected(): model.getPersistable(c).booleanValue();
 			PublishEventLevel mo = model.getMonitoring(c)==null? (PublishEventLevel)monicb.getSelectedItem(): model.getMonitoring(c);
 			suspend.setSelected(s);
-			mastercb.setSelected(m);
-			daemoncb.setSelected(d);
-			autosdcb.setSelected(a); 
+//			mastercb.setSelected(m);
+//			daemoncb.setSelected(d);
+//			autosdcb.setSelected(a); 
 			monicb.setSelectedItem(mo); 
 			synccb.setSelected(sy); 
 //			System.out.println("smda: "+s+" "+m+" "+d+" "+a);
@@ -1465,7 +1464,7 @@ public class StarterPanel extends JLayeredPane
 		
 		if(model!=null)
 		{
-			RequiredServiceInfo[] required = model.getRequiredServices();
+			RequiredServiceInfo[] required = model.getServices();
 			
 			if(required.length>0)
 			{
@@ -1646,37 +1645,70 @@ public class StarterPanel extends JLayeredPane
 		}
 	};
 	
+//	/**
+//	 *  Create a new component on the platform.
+//	 *  Any errors will be displayed in a dialog to the user.
+//	 */
+//	public static IFuture createComponent(final IControlCenter jcc, final IResourceIdentifier rid, final String type, final String name, 
+//		final String configname, final Map arguments, final Boolean suspend, 
+//		final Boolean master, final Boolean daemon, final Boolean autosd, final Boolean sync, final Boolean pers,
+//		final PublishEventLevel moni, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
+//	{
+//		final Future ret = new Future(); 
+//		jcc.getPlatformAccess().searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(panel)
+//		{
+//			public void customResultAvailable(IComponentManagementService cms)
+//			{
+//				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd, sync, pers, moni, null, null, rid), killlistener)
+//					.addResultListener(new IResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						ret.setResult(result);
+//						jcc.setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						ret.setException(exception);
+////						exception.printStackTrace();
+//						jcc.displayError("Problem Starting Component", "Component could not be started.", exception);
+//					}
+//				});
+//			}
+//		});
+//		return ret;
+//	}
+	
 	/**
 	 *  Create a new component on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
-	public static IFuture createComponent(final IControlCenter jcc, final IResourceIdentifier rid, final String type, final String name, 
+	public static IFuture<IComponentIdentifier> createComponent(final IControlCenter jcc, final IResourceIdentifier rid, final String type, final String name, 
 		final String configname, final Map arguments, final Boolean suspend, 
-		final Boolean master, final Boolean daemon, final Boolean autosd, final Boolean sync, final Boolean pers,
+		final Boolean sync, 
 		final PublishEventLevel moni, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
-		final Future ret = new Future(); 
-		SServiceProvider.getService(jcc.getPlatformAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(panel)
+		final Future<IComponentIdentifier> ret = new Future<>(); 
+		
+		CreationInfo ci = new CreationInfo(configname, arguments, parco, suspend, sync, moni, null, null, rid);
+		ci.setName(name);
+		ci.setFilename(type);
+		
+		jcc.getPlatformAccess().createComponent(ci, killlistener).addResultListener(new IResultListener<IExternalAccess>()
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void resultAvailable(IExternalAccess result)
 			{
-				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd, sync, pers, moni, null, null, rid), killlistener)
-					.addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						ret.setResult(result);
-						jcc.setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
-//						exception.printStackTrace();
-						jcc.displayError("Problem Starting Component", "Component could not be started.", exception);
-					}
-				});
+				ret.setResult(result.getId());
+				jcc.setStatusText("Created component: " + result.getId().getLocalName());
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+//				exception.printStackTrace();
+				jcc.displayError("Problem Starting Component", "Component could not be started.", exception);
 			}
 		});
 		return ret;

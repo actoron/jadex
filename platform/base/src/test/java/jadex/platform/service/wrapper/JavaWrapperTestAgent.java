@@ -18,10 +18,11 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -32,10 +33,10 @@ import jadex.micro.annotation.Results;
  */
 @RequiredServices(
 {
-	@RequiredService(name="wrapperservice", type=IJavaWrapperService.class, 
-		binding=@Binding(create=true, creationinfo=@CreationInfo(type="wrapagent")))
+	@RequiredService(name="wrapperservice", type=IJavaWrapperService.class)
 })
 @ComponentTypes(@ComponentType(name="wrapagent", filename="jadex/platform/service/wrapper/JavaWrapperAgent.class"))
+@Configurations(@Configuration(name="default", components=@Component(type="wrapagent")))
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class JavaWrapperTestAgent
@@ -57,7 +58,7 @@ public class JavaWrapperTestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IJavaWrapperService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("wrapperservice");
+		IFuture<IJavaWrapperService>	fut	= agent.getFeature(IRequiredServicesFeature.class).getService("wrapperservice");
 		fut.addResultListener(new ExceptionDelegationResultListener<IJavaWrapperService, Void>(ret)
 		{
 			public void customResultAvailable(IJavaWrapperService result)
@@ -69,7 +70,7 @@ public class JavaWrapperTestAgent
 				{
 					public void customResultAvailable(Collection<TestReport> results)
 					{
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), results.toArray(new TestReport[results.size()])));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), results.toArray(new TestReport[results.size()])));
 						ret.setResult(null);
 					}
 				});
@@ -242,7 +243,7 @@ public class JavaWrapperTestAgent
 			
 			File	url	= new File("../jadex-platform-extension-management/src/test/testapp/testapp-0.0.1.jar").getCanonicalFile();
 			IResourceIdentifier	rid	= new ResourceIdentifier(
-				new LocalResourceIdentifier(agent.getComponentIdentifier().getRoot(), url.toURI().toURL()), null);
+				new LocalResourceIdentifier(agent.getId().getRoot(), url.toURI().toURL()), null);
 			
 			wrapperservice.executeJava(rid, null)
 				.addResultListener(new IResultListener<Void>()
@@ -282,7 +283,7 @@ public class JavaWrapperTestAgent
 			
 			File	url	= new File("../jadex-platform-extension-management/src/test/testapp/testapp-0.0.1.jar").getCanonicalFile();
 			IResourceIdentifier	rid	= new ResourceIdentifier(
-				new LocalResourceIdentifier(agent.getComponentIdentifier().getRoot(), url.toURI().toURL()), null);
+				new LocalResourceIdentifier(agent.getId().getRoot(), url.toURI().toURL()), null);
 			
 			wrapperservice.executeJava(rid, new String[]{"fail"})
 				.addResultListener(new IResultListener<Void>()

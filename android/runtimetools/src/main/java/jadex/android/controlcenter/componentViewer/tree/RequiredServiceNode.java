@@ -35,7 +35,7 @@ public class RequiredServiceNode extends AbstractTreeNode implements IAndroidTre
 		super(parent, model);
 		this.info = info;
 		this.nid = nid;
-		// if(service==null || service.getServiceIdentifier()==null)
+		// if(service==null || service.getId()==null)
 		// System.out.println("service node: "+this);
 		model.registerNode(this);
 	}
@@ -117,9 +117,9 @@ public class RequiredServiceNode extends AbstractTreeNode implements IAndroidTre
 		RequiredServiceBinding bind = info.getDefaultBinding();
 		StringBuffer buf = new StringBuffer();
 		buf.append("scope="+bind.getScope());
-		buf.append(" dynamic="+bind.isDynamic());
-		buf.append(" create="+bind.isCreate());
-		buf.append(" recover="+bind.isRecover());
+//		buf.append(" dynamic="+bind.isDynamic());
+//		buf.append(" create="+bind.isCreate());
+//		buf.append(" recover="+bind.isRecover());
 		if(bind.getComponentName()!=null)
 			buf.append(" component name="+bind.getComponentName());
 		if(bind.getComponentType()!=null)

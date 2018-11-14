@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>SubWorkflowParameter</jadex:modelname>
     <jadex:package>jadex.bpmn.examples.execute</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="_z0QmIVdZEd-gpfWhYqU7MQ">
     <semantic:subProcess id="_X4dNIVdaEd-gpfWhYqU7MQ">

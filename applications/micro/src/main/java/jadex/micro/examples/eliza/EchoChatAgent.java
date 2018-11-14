@@ -6,17 +6,14 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -39,7 +36,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @RequiredServices({
 	@RequiredService(name="chat_intern", type=IChatGuiService.class),
-	@RequiredService(name="chat_extern", type=IChatGuiService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="chat_extern", type=IChatGuiService.class, scope=RequiredService.SCOPE_PLATFORM)
 })
 public class EchoChatAgent
 {
@@ -73,7 +70,7 @@ public class EchoChatAgent
 //		{
 //		}
 		
-		final IComponentIdentifier	self = ((IService)chat).getServiceIdentifier().getProviderId();
+		final IComponentIdentifier	self = ((IService)chat).getServiceId().getProviderId();
 		chat.subscribeToEvents().addResultListener(new IntermediateDefaultResultListener<ChatEvent>()
 		{
 			public void intermediateResultAvailable(ChatEvent event)
@@ -102,18 +99,16 @@ public class EchoChatAgent
 	 */
 	public static void main(String[] args)
 	{
-		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get();
-		IComponentManagementService cms = SServiceProvider.getService(pl, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		
+		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false"}).get();		
 		for(int i=0; i<10000; i++)
 		{
 			System.out.print(".");
 			if(i%100==0)
 				System.out.println("\n "+i+": ");
-			IComponentIdentifier cid = cms.createComponent(EchoChatAgent.class.getName()+".class", null).getFirstResult();
+			IComponentIdentifier cid = pl.createComponent(new CreationInfo().setFilename(EchoChatAgent.class.getName()+".class")).getFirstResult();
 			try
 			{
-				cms.destroyComponent(cid).get();
+				pl.killComponent(cid).get();
 			}
 			catch(Exception e)
 			{

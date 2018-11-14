@@ -12,7 +12,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.bridge.service.types.platform.IJadexPlatformInterface;
@@ -114,15 +113,15 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 		return platformConfiguration;
 	}
 	
-	/**
-	 * Sets the Kernels.
-	 * See {@link jadex.base.IRootComponentConfiguration.KERNELS} Constants for available Kernels.
-	 * @param kernels
-	 * @deprecated use getPlatformConfiguration().getRootConfig().setKernels() instead.
-	 */
-	protected void setPlatformKernels(String ... kernels) {
-		this.platformConfiguration.setKernels(kernels);
-	}
+//	/**
+//	 * Sets the Kernels.
+//	 * See {@link jadex.base.IRootComponentConfiguration.KERNELS} Constants for available Kernels.
+//	 * @param kernels
+//	 * @deprecated use getPlatformConfiguration().getRootConfig().setKernels() instead.
+//	 */
+//	protected void setPlatformKernels(String ... kernels) {
+//		this.platformConfiguration.setKernels(kernels);
+//	}
 //	
 //	/**
 //	 * Sets platform options.
@@ -292,7 +291,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 		return getPlatformAccess().scheduleStep(new IComponentStep<Void>() {
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia) {
-				return ia.getComponentFeature(IMessageFeature.class).sendMessage(receiver, message);
+				return ia.getFeature(IMessageFeature.class).sendMessage(receiver, message);
 			}
 		});
 
@@ -306,15 +305,15 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 		}
 	}
 	
-	/**
-	 * @deprecated use getPlatformService().getSservice() instead.
-	 * @return
-	 */
-	protected IFuture<IComponentManagementService> getCMS()
-	{
-		checkIfJadexIsRunning("getCMS");
-		return platformService.getCMS(platformId);
-	}
+//	/**
+//	 * @deprecated use getPlatformService().getSservice() instead.
+//	 * @return
+//	 */
+//	protected IFuture<IComponentManagementService> getCMS()
+//	{
+//		checkIfJadexIsRunning("getCMS");
+//		return platformService.getCMS(platformId);
+//	}
 
 	public void onServiceConnected(ComponentName name, IBinder service)
 	{
@@ -342,7 +341,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 	 */
 	protected void onPlatformStarted(IExternalAccess result)
 	{
-		this.platformId = result.getComponentIdentifier();
+		this.platformId = result.getId();
 		runOnUiThread(new Runnable()
 		{
 			

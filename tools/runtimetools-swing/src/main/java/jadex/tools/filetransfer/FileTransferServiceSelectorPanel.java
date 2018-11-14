@@ -10,9 +10,6 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.filetransfer.IFileTransferService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -57,24 +54,16 @@ public class FileTransferServiceSelectorPanel extends AbstractServiceSelectorPan
 	{
 		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		
-		SServiceProvider.getService(jcc.getJCCAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		jcc.getJCCAccess().getExternalAccess((IComponentIdentifier)service.getServiceId().getProviderId())
 			.addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Object result) 
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getExternalAccess((IComponentIdentifier)service.getServiceIdentifier().getProviderId())
-					.addResultListener(new SwingDefaultResultListener()
-				{
-					public void customResultAvailable(Object result) 
-					{
-						IExternalAccess component = (IExternalAccess)result; 
-						boolean remote = !jcc.getJCCAccess().getComponentIdentifier().getPlatformName().equals(component.getComponentIdentifier().getPlatformName());
-						FileTransferServiceViewerPanel dp = new FileTransferServiceViewerPanel(component, jcc, remote, (IFileTransferService)service, nodehandler, title);
-						ret.setResult(dp);
-					};
-				});
-			}
+				IExternalAccess component = (IExternalAccess)result; 
+				boolean remote = !jcc.getJCCAccess().getId().getPlatformName().equals(component.getId().getPlatformName());
+				FileTransferServiceViewerPanel dp = new FileTransferServiceViewerPanel(component, jcc, remote, (IFileTransferService)service, nodehandler, title);
+				ret.setResult(dp);
+			};
 		});
 		
 		return ret;

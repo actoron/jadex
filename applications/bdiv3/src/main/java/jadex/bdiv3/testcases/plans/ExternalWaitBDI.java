@@ -1,18 +1,19 @@
 package jadex.bdiv3.testcases.plans;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.micro.annotation.Agent;
 
 /**
  *  Test abort of externally waiting plan with invokeInterruptable.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 //@Results(@Result(name="testresults", clazz=Testcase.class))
 //@BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="extWait")))
 public class ExternalWaitBDI
 {
 	// Todo: implement fully functional plan.scheduleSubstep() that allows step execution to be aborted?
 
-//	@Agent
+//	@Agent(type=BDIAgentFactory.TYPE)
 //	protected IInternalAccess agent;
 //	
 //	protected TestReport tr = new TestReport("#1", "Test if external wait with invokeInterruptable works.");
@@ -59,7 +60,7 @@ public class ExternalWaitBDI
 //	/**
 //	 *  Called when agent is killed.
 //	 */
-//	@AgentKilled
+//	@Agent(type=BDIAgentFactory.TYPE)Killed
 //	public void	destroy(IInternalAccess agent)
 //	{
 //		System.out.println("destroy: "+agent);

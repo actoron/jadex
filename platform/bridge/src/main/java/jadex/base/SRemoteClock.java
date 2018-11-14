@@ -8,8 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.RemoteChangeListenerHandler;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimer;
@@ -38,7 +37,7 @@ public class SRemoteClock
 	public static IFuture<Void>	setDilation(final double dilation, final IExternalAccess exta)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(exta, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		exta.searchService( new ServiceQuery<>(IClockService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(final IClockService cs)
@@ -46,12 +45,12 @@ public class SRemoteClock
 				cs.setDilation(dilation);
 				ret.setResult(null);
 				
-//				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
 //					{
-//						cms.getExternalAccess(((IService)cs).getServiceIdentifier().getProviderId())
+//						cms.getExternalAccess(((IService)cs).getId().getProviderId())
 //							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 //						{
 //							public void customResultAvailable(IExternalAccess csexta)
@@ -82,7 +81,7 @@ public class SRemoteClock
 	public static IFuture<Void>	setDelta(final long delta, final IExternalAccess exta)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(exta, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		exta.searchService( new ServiceQuery<>(IClockService.class))
 			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(final IClockService cs)
@@ -90,12 +89,12 @@ public class SRemoteClock
 				cs.setDelta(delta);
 				ret.setResult(null);
 				
-//				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				exta.getServiceProvider().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
 //					{
-//						cms.getExternalAccess(((IService)cs).getServiceIdentifier().getProviderId())
+//						cms.getExternalAccess(((IService)cs).getId().getProviderId())
 //							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 //						{
 //							public void customResultAvailable(IExternalAccess csexta)
@@ -410,7 +409,7 @@ public class SRemoteClock
 		public void changeOccurred(ChangeEvent event)
 		{
 			// Code in component thread as clock runs on its own thread.
-			instance.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			instance.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -494,7 +493,7 @@ public class SRemoteClock
 		public void changeOccurred(ChangeEvent event)
 		{
 			// Code in component thread as clock runs on its own thread.
-			instance.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			instance.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

@@ -1,8 +1,10 @@
 package jadex.bridge.service.search;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -12,8 +14,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -43,6 +48,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	/** The excluded services cache. */
 	protected Map<IComponentIdentifier, Set<IServiceIdentifier>> excludedservices;
 	
+	/** Read-Write Lock for proxy map. */
+	protected ReadWriteLock proxyrwlock;
+	
+	/** Map for looking up local services using the service identifier. */
+	protected Map<IServiceIdentifier, IService> localserviceproxies;
+	
 	//-------- methods --------
 	
 	/**
@@ -51,8 +62,10 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public ServiceRegistry()
 	{
 		this.rwlock = new ReentrantReadWriteLock(false);
+		this.proxyrwlock = new ReentrantReadWriteLock(false);
 		this.indexer = new Indexer<>(new ServiceKeyExtractor(), false, ServiceKeyExtractor.SERVICE_KEY_TYPES);
 		this.queries = new Indexer<ServiceQueryInfo<?>>(new QueryInfoExtractor(), true, QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
+		this.localserviceproxies = new HashMap<>();
 	}
 	
 	/**
@@ -62,28 +75,31 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	@SuppressWarnings("unchecked")
 	public IServiceIdentifier searchService(final ServiceQuery<?> query)
 	{
+//		if(query.toString().indexOf("IEnvironment")!=-1)
+//			System.out.println("sdgo");
+		
 		IServiceIdentifier ret = null;
 		if(!RequiredServiceInfo.SCOPE_NONE.equals(query.getScope()))
 		{
 			Set<IServiceIdentifier> sers = getServices(query);
 			
-			Set<IServiceIdentifier> ownerservices = null;
-			rwlock.readLock().lock();
-			try
-			{
-				ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
-			}
-			finally
-			{
-				rwlock.readLock().unlock();
-			}
+//			Set<IServiceIdentifier> ownerservices = null;
+//			rwlock.readLock().lock();
+//			try
+//			{
+//				ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+//			}
+//			finally
+//			{
+//				rwlock.readLock().unlock();
+//			}
 			
 			if(sers!=null && !sers.isEmpty())
 			{
 				for(IServiceIdentifier ser : sers)
 				{
-					if(checkScope(query, ser) &&
-					   (ownerservices == null || !ownerservices.contains(ser)))
+					if(checkRestrictions(query, ser))// &&
+//					   (ownerservices == null || !ownerservices.contains(ser)))
 					{
 						ret = ser;
 						break;
@@ -107,30 +123,33 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			ret = getServices(query);
 			
-			Set<IServiceIdentifier> ownerservices = null;
-			rwlock.readLock().lock();
-			try
-			{
-				ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
-			}
-			finally
-			{
-				rwlock.readLock().unlock();
-			}
+//			Set<IServiceIdentifier> ownerservices = null;
+//			rwlock.readLock().lock();
+//			try
+//			{
+//				ownerservices = query.isExcludeOwner()? indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PROVIDER, query.getOwner().toString()) : null;
+//			}
+//			finally
+//			{
+//				rwlock.readLock().unlock();
+//			}
 			
 			if(ret!=null && !ret.isEmpty())
 			{
 				for(Iterator<IServiceIdentifier> it = ret.iterator(); it.hasNext(); )
 				{
 					IServiceIdentifier ser = it.next();
-					if(!checkScope(query, ser) ||
-					   !(ownerservices == null || !ownerservices.contains(ser)))
+					if(!checkRestrictions(query, ser)) // ||
+//					   !(ownerservices == null || !ownerservices.contains(ser)))
 					{
 						it.remove();
 					}
 				}
 			}
 		}
+		
+		if (ret == null)
+			ret = Collections.emptySet();
 		
 		return ret;
 	}
@@ -140,13 +159,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  @param service The service.
 	 */
 	// write
-	public IFuture<Void> addService(IServiceIdentifier service)
+	public void addService(IServiceIdentifier service)
 	{
-		IFuture<Void> ret = null;
 		Lock lock = rwlock.writeLock();
 		lock.lock();
 		try
 		{
+			indexer.removeValue(service);
+			
 			indexer.addValue(service);
 			
 			// If services belongs to excluded component cache them
@@ -165,10 +185,12 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			}
 			else
 			{
-				lock.unlock();
-				lock = null;
+				// Downgrade to read lock.
+				lock = rwlock.readLock();
+				lock.lock();
+				rwlock.writeLock().unlock();
 				
-				ret = checkQueries(service, ServiceEvent.SERVICE_ADDED);
+				checkQueries(service, ServiceEvent.SERVICE_ADDED);
 			}
 		}
 		finally
@@ -176,8 +198,72 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			if(lock != null)
 				lock.unlock();
 		}
+	}
+	
+	/**
+	 *  Add a local service to the registry.
+	 *  @param service The local service.
+	 */
+	// write
+	public void addLocalService(IService service)
+	{
+		// TODO: Optimize write lock acquisition (done twice for local service)
+		proxyrwlock.writeLock().lock();
+		try
+		{
+			localserviceproxies.put(service.getServiceId(), service);
+		}
+		finally
+		{
+			proxyrwlock.writeLock().unlock();
+		}
 		
-		return ret == null ? IFuture.DONE : ret;
+		addService(service.getServiceId());
+	}
+	
+	/**
+	 *  Updates a service if the service meta-information
+	 *  has changes.
+	 *  
+	 *  @param service The service.
+	 */
+	public void updateService(IServiceIdentifier service)
+	{
+		if (service == null)
+		{
+			rwlock.writeLock().lock();
+			Set<IServiceIdentifier> services = indexer.getAllValues();
+			try
+			{
+				for (IServiceIdentifier ser : services)
+				{
+					indexer.removeValue(ser);
+					indexer.addValue(ser);
+				}
+			}
+			finally
+			{
+				rwlock.writeLock().unlock();
+			}
+			
+			for (IServiceIdentifier ser : services)
+				checkQueries(ser, ServiceEvent.SERVICE_CHANGED);
+		}
+		else
+		{
+			rwlock.writeLock().lock();
+			try
+			{
+				indexer.removeValue(service);
+				indexer.addValue(service);
+			}
+			finally
+			{
+				rwlock.writeLock().unlock();
+			}
+			
+			checkQueries(service, ServiceEvent.SERVICE_CHANGED);
+		}
 	}
 	
 	/**
@@ -204,20 +290,35 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 				lock.unlock();
 		}
+		
+		proxyrwlock.writeLock().lock();
+		try
+		{
+			localserviceproxies.remove(service);
+		}
+		finally
+		{
+			proxyrwlock.writeLock().unlock();
+		}
 	}
 	
 	/**
 	 *  Remove services of a platform from the registry.
-	 *  @param platform The platform.
+	 *  @param platform The platform, null for everything.
 	 */
 	// write
 	public void removeServices(IComponentIdentifier platform)
 	{
+		Set<IServiceIdentifier> pservs = null;
+		
 		Lock lock = rwlock.writeLock();
 		lock.lock();
 		try
 		{
-			Set<IServiceIdentifier> pservs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PLATFORM, platform.toString());
+			if (platform == null)
+				pservs = indexer.getAllValues();
+			else
+				pservs = indexer.getValues(ServiceKeyExtractor.KEY_TYPE_PLATFORM, platform.toString());
 			if(pservs != null)
 			{
 				for(IServiceIdentifier serv : pservs)
@@ -241,6 +342,20 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			lock.unlock();
 		}
+		
+		if (pservs != null && pservs.size() > 0)
+		{
+			proxyrwlock.writeLock().lock();
+			try
+			{
+				for (IServiceIdentifier serv : pservs)
+					localserviceproxies.remove(serv);
+			}
+			finally
+			{
+				proxyrwlock.writeLock().unlock();
+			}
+		}
 	}
 	
 	/**
@@ -248,7 +363,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  @param platform The platform.
 	 */
 	// write
-	public void removeServicesExcept(IComponentIdentifier platform)
+	/*public void removeServicesExcept(IComponentIdentifier platform)
 	{
 		Lock lock = rwlock.writeLock();
 		lock.lock();
@@ -284,6 +399,27 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		{
 			lock.unlock();
 		}
+	}*/
+	
+	/** 
+	 *  Returns the service proxy of a local service identified by service ID.
+	 *  
+	 *  @param serviceid The service ID.
+	 *  @return The service proxy.
+	 */
+	public IService getLocalService(IServiceIdentifier serviceid)
+	{
+		IService ret = null;
+		proxyrwlock.readLock().lock();
+		try
+		{
+			ret = localserviceproxies.get(serviceid);
+		}
+		finally
+		{
+			proxyrwlock.readLock().unlock();
+		}
+		return ret;
 	}
 	
 	/**
@@ -321,6 +457,20 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
+	 *  Returns the lock on the registry.
+	 *  Care must be taken to perform proper unlocking
+	 *  to avoid permanently blocking the registry.
+	 *  Note that the lock is reentrant, so operations
+	 *  can be performed while the lock is held.
+	 *  
+	 *  @return The registry lock.
+	 */
+	public ReadWriteLock getLock()
+	{
+		return rwlock;
+	}
+	
+	/**
 	 *  Add a service query to the registry.
 	 *  @param query ServiceQuery.
 	 */
@@ -328,37 +478,46 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(final ServiceQuery<T> query)
 	{
 		final SubscriptionIntermediateFuture<T> fut = new SubscriptionIntermediateFuture<>();
-		ServiceQueryInfo<T> ret = null;
-		
-		fut.setTerminationCommand(new TerminationCommand()
+		if(query.getOwner()==null)
 		{
-			public void terminated(Exception reason)
-			{
-				removeQuery(query);
-			}
-		});
-		
-		rwlock.writeLock().lock();
-		Set<IServiceIdentifier> sers = null;
-		try
+			fut.setException(new IllegalArgumentException("Query owner must not null: "+query));
+		}
+		else
 		{
-			ret = new ServiceQueryInfo<T>((ServiceQuery<T>) query, fut);
-			queries.addValue((ServiceQueryInfo)ret);
+			ServiceQueryInfo<T> ret = null;
 			
-			// We need the write lock during read for consistency
-			// This works because rwlock is reentrant.
-			// deliver currently available services
-			sers = (Set<IServiceIdentifier>)getServices(query);
-		}
-		finally
-		{
-			rwlock.writeLock().unlock();
-		}
-		
-		for (Iterator<IServiceIdentifier> it = sers.iterator(); it.hasNext(); )
-		{
-			IServiceIdentifier ser = it.next();
-			dispatchQueryEvent(ret, ser, ServiceEvent.SERVICE_ADDED);
+			fut.setTerminationCommand(new TerminationCommand()
+			{
+				public void terminated(Exception reason)
+				{
+					removeQuery(query);
+				}
+			});
+			
+			rwlock.writeLock().lock();
+			Set<IServiceIdentifier> sers = null;
+			try
+			{
+				ret = new ServiceQueryInfo<T>((ServiceQuery<T>) query, fut);
+				queries.addValue((ServiceQueryInfo)ret);
+				
+				// We need the write lock during read for consistency
+				// This works because rwlock is reentrant.
+				// deliver currently available services
+				sers = (Set<IServiceIdentifier>)getServices(query);
+			}
+			finally
+			{
+				rwlock.writeLock().unlock();
+			}
+			
+			for (IServiceIdentifier ser : SUtil.notNull(sers))
+			{
+				if (checkRestrictions(query, ser))
+				{
+					dispatchQueryEvent(ret, ser, ServiceEvent.SERVICE_ADDED);
+				}
+			}
 		}
 		
 		return fut;
@@ -369,14 +528,21 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 *  @param query ServiceQuery.
 	 */
 	// write
-	protected void removeQuery(final ServiceQuery<?> query)
+	public void removeQuery(final ServiceQuery<?> query)
 	{
 		
 		rwlock.writeLock().lock();
 		try
 		{
 			Set<ServiceQueryInfo<?>> qi = queries.getValues(QueryInfoExtractor.KEY_TYPE_ID, query.getId());
-			queries.removeValue(qi.iterator().next());
+			if(qi!=null)
+			{
+				queries.removeValue(qi.iterator().next());
+			}
+			else
+			{
+				System.out.println("query not found for removeQuery(): "+query.getId());
+			}
 		}
 		finally
 		{
@@ -493,26 +659,27 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
-	 *  Test if a service is included.
+	 *  Test if a service is visible, i.e. visible after init for all components or visible for subcomponents also during init.
+	 *  @param query The query.
 	 *  @param ser The service.
 	 *  @return True if is included.
 	 */
 	// read
-	protected boolean isIncluded(ServiceQuery<?> query, IServiceIdentifier ser)
+	protected boolean checkLifecycleVisibility(ServiceQuery<?> query, IServiceIdentifier ser)
 	{
-		boolean ret = true;
+		boolean inited;
+		IComponentIdentifier target = ser.getProviderId();
 		rwlock.readLock().lock();
 		try
 		{
-			IComponentIdentifier target = ser.getProviderId();
-			if(target!=null)
-				ret = getDotName(query.getOwner()).endsWith(getDotName(target));
+			inited	= excludedservices == null || !excludedservices.containsKey(target);
 		}
 		finally
 		{
 			rwlock.readLock().unlock();
 		}
-		return ret;
+		
+		return inited || getDotName(query.getOwner()).endsWith(getDotName(target));
 	}
 	
 	/**
@@ -525,14 +692,18 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		Set<ServiceQueryInfo<?>> r1 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, ser.getServiceType().toString());
-		Set<ServiceQueryInfo<?>> r2 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, "null");
-		Set<ServiceQueryInfo<?>> sqis = r1;
-		if(sqis!=null && r2!=null)
-			sqis.addAll(r2);	// safe because indexer returns copy
-		else if(r2!=null)
-			sqis=r2;
+		List<Tuple2<String, String[]>> spec = ((QueryInfoExtractor) queries.getKeyExtractor()).getIndexerSpec(ser);
 		
+		Set<ServiceQueryInfo<?>> sqis = queries.getValuesInverted(spec);
+		
+//		Set<ServiceQueryInfo<?>> r1 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, ser.getServiceType().toString());
+//		Set<ServiceQueryInfo<?>> r2 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, "null");
+//		Set<ServiceQueryInfo<?>> sqis = r1;
+//		if(sqis!=null && r2!=null)
+//			sqis.addAll(r2);	// safe because indexer returns copy
+//		else if(r2!=null)
+//			sqis=r2;
+//		
 		if(sqis!=null)
 		{
 			for (ServiceQueryInfo<?> sqi : sqis)
@@ -540,7 +711,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				ServiceQuery<?> query = sqi.getQuery();
 				
 				//ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()));
-				if (checkScope(query, ser))
+				if (checkRestrictions(query, ser))
 				{
 					dispatchQueryEvent(sqi, ser, eventtype);
 				}
@@ -558,27 +729,29 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	protected void dispatchQueryEvent(ServiceQueryInfo<?> queryinfo, IServiceIdentifier ser, int eventtype)
 	{
 		ServiceQuery<?> query = queryinfo.getQuery();
-		if (ServiceEvent.CLASSINFO.getTypeName().equals(query.getReturnType().getTypeName()))
+		if (query.isEventMode())
 		{
 			ServiceEvent<IServiceIdentifier> event = new ServiceEvent<>(ser, eventtype);
-			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>) queryinfo.getFuture()).addIntermediateResult(event);
+			((TerminableIntermediateFuture<ServiceEvent<IServiceIdentifier>>) queryinfo.getFuture()).addIntermediateResultIfUndone(event);
 		}
 		else if (ServiceEvent.SERVICE_ADDED==eventtype)
 		{
-			((TerminableIntermediateFuture<IServiceIdentifier>) queryinfo.getFuture()).addIntermediateResult(ser);
+			((TerminableIntermediateFuture<IServiceIdentifier>) queryinfo.getFuture()).addIntermediateResultIfUndone(ser);
 		}
 	}
 	
 	/**
-	 *  Check the services according the the scope.
-	 *  @param it The services.
-	 *  @param cid The component id.
-	 *  @param scope The scope.
-	 *  @return The services that fit to the scope.
+	 *  Check the services according additional restrictions like scope.
+	 *  @param query The query.
+	 *  @param ser The service.
+	 *  @return True, if service passes tests.
 	 */
-	protected boolean checkScope(ServiceQuery<?> query, final IServiceIdentifier ser)
+	protected boolean checkRestrictions(ServiceQuery<?> query, final IServiceIdentifier ser)
 	{
-		return checkSearchScope(query, ser) && checkPublicationScope(query, ser);
+		return !(query.isExcludeOwner() && query.getOwner().equals(ser.getProviderId())) 
+			&& checkSearchScope(query, ser)
+			&& checkPublicationScope(query, ser)
+			&& checkLifecycleVisibility(query, ser);
 	}
 	
 	/**
@@ -590,8 +763,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		
 		String scope = query.getScope();
 		
-		if(scope==null)
-			scope = RequiredServiceInfo.SCOPE_APPLICATION;
+//		IComponentIdentifier searchstart	= query.getProvider()!=null ? query.getProvider()
+//			: query.getPlatform()!=null ? query.getPlatform() : query.getOwner();
+		IComponentIdentifier searchstart = query.getSearchStart() != null ? query.getSearchStart() : query.getOwner();
 		
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
@@ -615,29 +789,29 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
 		{
 			// Test if searcher and service are on same platform
-			ret = query.getOwner().getPlatformName().equals(ser.getProviderId().getPlatformName());
+			ret = searchstart.getPlatformName().equals(ser.getProviderId().getPlatformName());
 		}
 		else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getProviderId();
-			ret = sercid.getPlatformName().equals(query.getOwner().getPlatformName())
-				&& getApplicationName(sercid).equals(getApplicationName(query.getOwner()));
+			ret = sercid.getPlatformName().equals(searchstart.getPlatformName())
+				&& getApplicationName(sercid).equals(getApplicationName(searchstart));
 		}
 		else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
 		{
 			IComponentIdentifier sercid = ser.getProviderId();
-			ret = getDotName(sercid).endsWith(getDotName(query.getOwner()));
+			ret = getDotName(sercid).endsWith(getDotName(searchstart));
 		}
-		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
-			ret = ser.getProviderId().equals(query.getOwner());
+			ret = ser.getProviderId().equals(searchstart);
 		}
 		else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
 		{
 			// check if parent of searcher reaches the service
 			IComponentIdentifier sercid = ser.getProviderId();
-			String subname = getSubcomponentName(query.getOwner());
+			String subname = getSubcomponentName(searchstart);
 			ret = sercid.getName().endsWith(subname);
 		}
 		
@@ -651,7 +825,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		boolean ret = false;
 		
-		String scope = ser.getScope()!=null? ser.getScope(): RequiredServiceInfo.SCOPE_GLOBAL;
+		String scope = ser.getScope()!=null? ser.getScope(): RequiredServiceInfo.SCOPE_PLATFORM;
 		
 		if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 		{
@@ -689,7 +863,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			IComponentIdentifier sercid = ser.getProviderId();
 			ret = getDotName(query.getOwner()).endsWith(getDotName(sercid));
 		}
-		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		else if(RequiredServiceInfo.SCOPE_COMPONENT_ONLY.equals(scope))
 		{
 			// only the component itself
 			ret = ser.getProviderId().equals(query.getOwner());
@@ -755,7 +929,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public static IServiceRegistry getRegistry(IInternalAccess ia)
 	{
-		return getRegistry(ia.getComponentIdentifier());
+		return getRegistry(ia.getId());
 	}
 	
 	/**
@@ -768,14 +942,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		String ret = cid.getName();
 		int idx;
 		// If it is a direct subcomponent
-		if((idx = ret.lastIndexOf('.')) != -1)
+		if((idx = ret.lastIndexOf(':')) != -1)
 		{
 			// cut off platform name
 			ret = ret.substring(0, idx);
 			// cut off local name 
 			if((idx = ret.indexOf('@'))!=-1)
 				ret = ret.substring(idx + 1);
-			if((idx = ret.indexOf('.'))!=-1)
+			if((idx = ret.indexOf(':'))!=-1)
 				ret = ret.substring(idx + 1);
 		}
 		else
@@ -804,8 +978,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public static String getDotName(IComponentIdentifier cid)
 	{
-		return cid.getName().replace('@', '.');
-//		return cid.getParent()==null? cid.getName(): cid.getLocalName()+"."+getSubcomponentName(cid);
+		return cid.getName().replace('@', ':');
+//		return cid.getParent()==null? cid.getName(): cid.getLocalName()+":"+getSubcomponentName(cid);
 	}
 
 	/**

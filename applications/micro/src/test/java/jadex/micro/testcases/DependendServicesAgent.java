@@ -14,9 +14,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SUtil;
@@ -71,14 +68,14 @@ public class DependendServicesAgent extends JunitAgentTest
     public IFuture<Void> agentCreated()
     {
         final Future<Void> ret = new Future<Void>();
-        getChildrenAccesses().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Void>(ret)
+        getChildrenAccesses().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Void>(ret)
         {
             public void customResultAvailable(Collection<IExternalAccess> result)
             {
             	IExternalAccess[] childs = (IExternalAccess[])result.toArray(new IExternalAccess[0]);
             	System.out.println("childs: "+SUtil.arrayToString(childs));
                 final CollectionResultListener<Collection<TestReport>> lis = new CollectionResultListener<Collection<TestReport>>(childs.length, true, 
-                	agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Collection<TestReport>>>()
+                	agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Collection<Collection<TestReport>>>()
                 {
                     public void resultAvailable(Collection<Collection<TestReport>> result)
                     {
@@ -90,7 +87,7 @@ public class DependendServicesAgent extends JunitAgentTest
 							Collection<TestReport> tmp = (Collection<TestReport>)it.next();
 							tests.addAll(tmp);
 						}
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(tests.size(), (TestReport[])tests.toArray(new TestReport[tests.size()])));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, (TestReport[])tests.toArray(new TestReport[tests.size()])));
 						
 						agent.killComponent();
                     }
@@ -109,13 +106,13 @@ public class DependendServicesAgent extends JunitAgentTest
 					{
 						public void intermediateResultAvailable(IMonitoringEvent result)
 						{
-							child.getResults().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, Object>>()
+							child.getResultsAsync().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Map<String, Object>>()
                             {
                                 public void resultAvailable(Map<String, Object> res)
                                 {
-                                  System.out.println("del: "+child.getComponentIdentifier()+" "+res);
-//                                    Map res = (Map)result;
-                                    List<TestReport> tests = (List<TestReport>)res.get("testcases");
+                                	System.out.println("del: "+child.getId()+" "+res);
+                                    @SuppressWarnings("unchecked")
+									List<TestReport> tests = (List<TestReport>)res.get("testcases");
                                     lis.resultAvailable(tests);
                                 }
                                 public void exceptionOccurred(Exception exception)
@@ -144,7 +141,7 @@ public class DependendServicesAgent extends JunitAgentTest
 	@AgentBody
     public IFuture<Void> executeBody()
     {
-        getChildrenAccesses().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
+        getChildrenAccesses().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
         {
             public void resultAvailable(Collection<IExternalAccess> result)
             {
@@ -167,25 +164,16 @@ public class DependendServicesAgent extends JunitAgentTest
 	{
 		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
 		
-		SServiceProvider.getService(agent, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
+		agent.getChildren(null, null).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService result)
+			public void customResultAvailable(IComponentIdentifier[] children)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				
-				cms.getChildren(agent.getComponentIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
+				IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
+					new DelegationResultListener<Collection<IExternalAccess>>(ret));
+				for(int i=0; !ret.isDone() && i<children.length; i++)
 				{
-					public void customResultAvailable(IComponentIdentifier[] children)
-					{
-						IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
-							new DelegationResultListener<Collection<IExternalAccess>>(ret));
-						for(int i=0; !ret.isDone() && i<children.length; i++)
-						{
-							cms.getExternalAccess(children[i]).addResultListener(crl);
-						}
-					}
-				});
+					agent.getExternalAccess(children[i]).addResultListener(crl);
+				}
 			}
 		});
 		

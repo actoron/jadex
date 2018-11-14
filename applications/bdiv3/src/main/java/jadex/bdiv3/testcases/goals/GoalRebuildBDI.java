@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -24,7 +25,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that tests rebuild in connection with ExcludeMode.WhenTried.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class GoalRebuildBDI
 {
@@ -84,14 +85,14 @@ public class GoalRebuildBDI
 
 		final TestReport tr = new TestReport("#1", "Test if rebuild works with.");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!tr.isFinished())
 				{
 					tr.setFailed("Goal did return");
-					agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				}
 				
 				ret.setResultIfUndone(null);
@@ -100,7 +101,7 @@ public class GoalRebuildBDI
 		});
 		
 		SomeGoal sg = new SomeGoal();
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(sg).get();
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(sg).get();
 		if(sg.plans.size()==3 && sg.plans.get(0).equals("A") && sg.plans.get(1).equals("B") && sg.plans.get(2).equals("C"))
 		{
 			tr.setSucceeded(true);
@@ -109,7 +110,7 @@ public class GoalRebuildBDI
 		{
 			tr.setFailed("Wrong plans were executed: "+sg.plans);
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		ret.setResultIfUndone(null);
 		
 		return ret;

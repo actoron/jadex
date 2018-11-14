@@ -54,7 +54,7 @@ public class ExecuteProcessThread implements IConditionalComponentStep<Void>
 	 */
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
-		BpmnComponentFeature bcf = (BpmnComponentFeature)thread.getInstance().getComponentFeature(IBpmnComponentFeature.class);
+		BpmnComponentFeature bcf = (BpmnComponentFeature)thread.getInstance().getFeature(IBpmnComponentFeature.class);
 
 		// Update parameters based on edge inscriptions and initial values.
 		thread.updateParametersBeforeStep(thread.getInstance());

@@ -14,7 +14,6 @@ import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -25,10 +24,8 @@ import jadex.micro.annotation.RequiredServices;
 @Capability
 @Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.bdi.examples.shop.CustomerViewerPanel\""))
 @RequiredServices({
-	@RequiredService(name="localshopservices", type=IShopService.class, multiple=true,
-		binding=@Binding(scope=Binding.SCOPE_PLATFORM)),
-	@RequiredService(name="remoteshopservices", type=IShopService.class, multiple=true,
-		binding=@Binding(scope=Binding.SCOPE_GLOBAL)),
+	@RequiredService(name="localshopservices", type=IShopService.class, multiple=true, scope=RequiredService.SCOPE_PLATFORM),
+	@RequiredService(name="remoteshopservices", type=IShopService.class, multiple=true, scope=RequiredService.SCOPE_GLOBAL),
 })
 public class CustomerCapability
 {
@@ -115,11 +112,11 @@ public class CustomerCapability
 			throw new RuntimeException("Not enough money to buy: "+big.name);
 		
 		// Buy the item at the shop (the shop is a service at another agent)
-		System.out.println(capa.getAgent().getComponentIdentifier().getName()+" buying item: "+big.name);
+		System.out.println(capa.getAgent().getId().getName()+" buying item: "+big.name);
 		IFuture<ItemInfo>	future	= big.shop.buyItem(big.name, big.price);
-		System.out.println(capa.getAgent().getComponentIdentifier().getName()+" getting item: "+future);
+		System.out.println(capa.getAgent().getId().getName()+" getting item: "+future);
 		ItemInfo item = (ItemInfo)future.get();
-		System.out.println(capa.getAgent().getComponentIdentifier().getName()+" bought item: "+item);
+		System.out.println(capa.getAgent().getId().getName()+" bought item: "+item);
 		
 		// Update the customer inventory 
 		ItemInfo ii = null;
@@ -146,5 +143,13 @@ public class CustomerCapability
 		
 		// Update the account
 		setMoney(getMoney() - big.price);
+	}
+
+	/**
+	 * @return the capa
+	 */
+	public ICapability getCapability()
+	{
+		return capa;
 	}
 }

@@ -49,13 +49,13 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 import jadex.rules.eca.ChangeInfo;
 
 /**
@@ -260,7 +260,7 @@ public class GuiPanel extends JPanel
 			@Classname("refresh")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				bia.getBeliefbase().getBeliefSet("orders").addBeliefSetListener(new IBeliefListener<Object>()
 				{
 					public void beliefChanged(ChangeInfo<Object> info)
@@ -292,7 +292,7 @@ public class GuiPanel extends JPanel
 			@Classname("refreshDetails")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				bia.getBeliefbase().getBeliefSet("negotiation_reports").addBeliefSetListener(new IBeliefListener<Object>()
 				{
 					public void beliefChanged(ChangeInfo<Object> info)
@@ -356,7 +356,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class))
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -377,7 +377,7 @@ public class GuiPanel extends JPanel
 											@Classname("add")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
-												IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+												IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 												IGoal purchase = bia.getGoalbase().createGoal(goalname);
 												purchase.getParameter("order").setValue(order);
 												bia.getGoalbase().dispatchTopLevelGoal(purchase);
@@ -442,7 +442,7 @@ public class GuiPanel extends JPanel
 						@Classname("remove")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+							IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 							IGoal[] goals = bia.getGoalbase().getGoals(goalname);
 							for(int i=0; i<goals.length; i++)
 							{
@@ -494,7 +494,7 @@ public class GuiPanel extends JPanel
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+						ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class))
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -529,7 +529,7 @@ public class GuiPanel extends JPanel
 												@Classname("drop")
 												public IFuture<Void> execute(IInternalAccess ia)
 												{
-													IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+													IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 													IGoal[] goals = bia.getGoalbase().getGoals(goalname);
 													for(int i=0; i<goals.length; i++)
 													{
@@ -622,7 +622,7 @@ public class GuiPanel extends JPanel
 			@Classname("ref")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				final Object[] aorders = bia.getBeliefbase().getBeliefSet("orders").getFacts();
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -676,7 +676,7 @@ public class GuiPanel extends JPanel
 				@Classname("refD")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+					IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 					IExpression exp = bia.getExpressionbase().getExpression("search_reports");
 					final List res = (List)exp.execute("$order", order);
 					
@@ -757,9 +757,8 @@ public class GuiPanel extends JPanel
 
 			// Add some default entries for easy testing of the gui.
 			// These orders are not added to the agent (see manager.agent.xml).
-			try
+			agent.searchService( new ServiceQuery<>(IClockService.class)).addResultListener(clock ->
 			{
-				IClockService clock	= SServiceProvider.getLocalService(agent.getComponentIdentifier(), IClockService.class, Binding.SCOPE_PLATFORM);
 				if(buy)
 				{
 					orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));
@@ -774,11 +773,7 @@ public class GuiPanel extends JPanel
 					orders.addItem(new Order("Harry Potter", null, 15, 9, buy, clock));
 					orders.addItem(new Order("Agents in the real world", null, 100, 60, buy, clock));
 				}
-			}
-			catch(Exception e)
-			{
-				// happens when killed during startup
-			}
+			});
 			
 			JPanel center = new JPanel(new GridBagLayout());
 			center.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -890,7 +885,7 @@ public class GuiPanel extends JPanel
 	 */
 	public static boolean isBuyer(IExternalAccess agent)
 	{
-		return agent.getModel().getName().indexOf("Buyer")!=-1;
+		return agent.getModelAsync().get().getName().indexOf("Buyer")!=-1;
 	}
 }
 

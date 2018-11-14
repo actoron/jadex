@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jadex.bridge.service.annotation.Timeout;
+import jadex.commons.SUtil;
 import jadex.commons.future.ThreadLocalTransferHelper;
 
 
@@ -24,14 +25,17 @@ public class ServiceCall
 	/** The realtime constant. */
 	public static final String REALTIME = "realtime";
 	
-	/** The cause constant. */
-	public static final String CAUSE = "cause";
+//	/** The cause constant. */
+//	public static final String CAUSE = "cause";
 	
 	/** The monitoring constant. */
 	public static final String MONITORING = "monitoring";
 	
 	/** The inherit constant. */
 	public static final String INHERIT = "inherit";
+	
+	/** The security infos constant. */
+	public static final String SECURITY_INFOS = "secinfos";
 	
 	/** The current service calls mapped to threads. */
 	protected static final ThreadLocal<ServiceCall> CURRENT = new ThreadLocal<ServiceCall>();
@@ -163,12 +167,13 @@ public class ServiceCall
 //				Thread.dumpStack();
 //			}
 			
-//			if(ret!=null && ret.getCause()==null)
+//			if((""+ret.getCaller()).indexOf("ServiceCallAgent")!=-1)
 //			{
-//				System.out.println(Thread.currentThread().hashCode()+": create: "+ret+", "+Thread.currentThread());
+//				System.out.println(ret.hashCode()+": set next: "+ret+", "+IComponentIdentifier.LOCAL.get());
 //			}
 
 			NEXT.set(ret);
+//			ret.setProperty("nextstack1", jadex.commons.SUtil.getExceptionStacktrace(new RuntimeException()));
 			
 //			if(getCurrentInvocation()!=null)
 //			{
@@ -209,7 +214,8 @@ public class ServiceCall
 	 */
 	public long	getTimeout()
 	{
-		return properties.containsKey(TIMEOUT)? ((Long)properties.get(TIMEOUT)).longValue(): ((Long)properties.get(DEFTIMEOUT)).longValue();
+		return properties.containsKey(TIMEOUT)? ((Long)properties.get(TIMEOUT)).longValue():
+			properties.containsKey(DEFTIMEOUT)? ((Long)properties.get(DEFTIMEOUT)).longValue() : SUtil.DEFTIMEOUT;
 	}
 	
 	/**
@@ -238,52 +244,61 @@ public class ServiceCall
 	 *  @return True, if the timeout is a real time (i.e. system time)
 	 *    instead of platform time. 
 	 */
-	public Boolean	getRealtime()
-	{
-		return (Boolean)properties.get(REALTIME);
-	}
+//	public Boolean	getRealtime()
+//	{
+//		return (Boolean)properties.get(REALTIME);
+//	}
 	
 	/**
 	 *  Set the realtime property.
 	 */
-	public void setRealtime(Boolean realtime)
-	{
-		lastmod	= IComponentIdentifier.LOCAL.get();
-		properties.put(REALTIME, realtime);
-	}
+//	public void setRealtime(Boolean realtime)
+//	{
+//		lastmod	= IComponentIdentifier.LOCAL.get();
+//		properties.put(REALTIME, realtime);
+//	}
 	
 	/**
 	 *  Get the realtime flag.
 	 *  @return True, if the timeout is a real time (i.e. system time)
 	 *    instead of platform time. 
 	 */
-	public boolean isRealtime()
-	{
-		return getRealtime().booleanValue();
-	}
+//	public boolean isRealtime()
+//	{
+//		return getRealtime().booleanValue();
+//	}
 	
 	/**
-	 *  Get the cause.
-	 *  @return The cause.
+	 *  Test if a call is remote.
 	 */
-	public Cause getCause()
+	public boolean isRemoteCall(IComponentIdentifier callee)
 	{
-//		if(properties.get(CAUSE)!=null && !(properties.get(CAUSE) instanceof Cause))
-//		{
-//			System.out.println("sdmyb");
-//		}
-		return (Cause)properties.get(CAUSE);
+		IComponentIdentifier platform = callee.getRoot();
+		return caller==null? false: !caller.getRoot().equals(platform);
 	}
 	
-	/**
-	 *  Set the cause.
-	 *  @param cause The cause.
-	 */
-	public void setCause(Cause cause)
-	{
-		lastmod	= IComponentIdentifier.LOCAL.get();
-		properties.put(CAUSE, cause);
-	}
+//	/**
+//	 *  Get the cause.
+//	 *  @return The cause.
+//	 */
+//	public Cause getCause()
+//	{
+////		if(properties.get(CAUSE)!=null && !(properties.get(CAUSE) instanceof Cause))
+////		{
+////			System.out.println("sdmyb");
+////		}
+//		return (Cause)properties.get(CAUSE);
+//	}
+//	
+//	/**
+//	 *  Set the cause.
+//	 *  @param cause The cause.
+//	 */
+//	public void setCause(Cause cause)
+//	{
+//		lastmod	= IComponentIdentifier.LOCAL.get();
+//		properties.put(CAUSE, cause);
+//	}
 	
 	/**
 	 *  Get a property.

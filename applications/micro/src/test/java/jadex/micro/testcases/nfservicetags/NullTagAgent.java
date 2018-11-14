@@ -1,7 +1,6 @@
 package jadex.micro.testcases.nfservicetags;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,7 +43,8 @@ public class NullTagAgent extends JunitAgentTest
 		TestReport tr1 = new TestReport("#1", "Test if tag null.");
 		try
 		{
-			Object tagval = SNFPropertyProvider.getNFPropertyValue(agent.getExternalAccess(), TagProperty.NAME).get();
+//			Object tagval = SNFPropertyProvider.getNFPropertyValue(agent.getExternalAccess(), TagProperty.NAME).get();
+			Object tagval = agent.getNFPropertyValue(TagProperty.NAME).get();
 			if(tagval instanceof Collection && ((Collection)tagval).size()==1 && ((Collection)tagval).iterator().next()==null)
 			{
 				tr1.setSucceeded(true);
@@ -60,7 +60,7 @@ public class NullTagAgent extends JunitAgentTest
 		}
 		results.add(tr1);
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
 		agent.killComponent();
 	}

@@ -191,8 +191,8 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	public AbstractConnectionHandler(IInternalAccess component, Map<String, Object> nonfunc)
 	{
 		// Use timeouts relative to deftimeout
-		this(component, nonfunc, 3, Starter.getScaledRemoteDefaultTimeout(component.getComponentIdentifier(), 1.0/3), 
-			Starter.getScaledRemoteDefaultTimeout(component.getComponentIdentifier(), 1.0/2));
+		this(component, nonfunc, 3, Starter.getScaledDefaultTimeout(component.getId(), 1.0/3), 
+			Starter.getScaledDefaultTimeout(component.getId(), 1.0/2));
 	}
 	
 	/**
@@ -659,7 +659,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 			{
 				if(timer==null)
 				{
-					timer = new java.util.Timer(component.getComponentIdentifier().getName()+".message.timer", true);
+					timer = new java.util.Timer(component.getId().getName()+".message.timer", true);
 				}
 			}
 		}
@@ -886,7 +886,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 */
 	public IMessageFeature getMessageFeature()
 	{
-		return component.getComponentFeature(IMessageFeature.class);
+		return component.getFeature(IMessageFeature.class);
 	}
 	
 	/**
@@ -894,7 +894,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 */
 	public IExecutionFeature getExecutionFeature()
 	{
-		return component.getComponentFeature(IExecutionFeature.class);
+		return component.getFeature(IExecutionFeature.class);
 	}
 	
 //	/**

@@ -58,6 +58,6 @@ public class DefaultActivityHandler implements IActivityHandler
 	 */
 	public static IInternalBpmnComponentFeature getBpmnFeature(IInternalAccess instance)
 	{
-		return (IInternalBpmnComponentFeature)instance.getComponentFeature(IBpmnComponentFeature.class);
+		return (IInternalBpmnComponentFeature)instance.getFeature(IBpmnComponentFeature.class);
 	}
 }

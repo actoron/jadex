@@ -1,5 +1,6 @@
 package jadex.bdiv3.testcases.semiautomatic;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
@@ -21,7 +22,7 @@ import jadex.rules.eca.annotations.Event;
 /**
  *  Simple agent with inline count goal.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @BDIConfigurations(
 	@BDIConfiguration(name="first", initialgoals=@NameValue(name="Count2Goal", clazz=Count2BDI.Count2Goal.class)) // todo: allow simple name
 )
@@ -90,7 +91,7 @@ public class Count2BDI
 	@AgentBody
 	public void body()
 	{
-		IFuture<Count2Goal> fut = agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Count2Goal(5, 10));
+		IFuture<Count2Goal> fut = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Count2Goal(5, 10));
 		fut.addResultListener(new IResultListener<Count2Goal>()
 		{
 			public void resultAvailable(Count2Goal goal)

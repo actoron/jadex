@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.plans;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class PlanPreconditionBDI
 {
@@ -40,7 +41,7 @@ public class PlanPreconditionBDI
 	public void body()
 	{
 		TestReport tr = new TestReport("#1", "Test if plan precondition works.");
-		agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new SomeGoal()).get();
+		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new SomeGoal()).get();
 		if("ABD".equals(res))
 		{
 			tr.setSucceeded(true);
@@ -49,7 +50,7 @@ public class PlanPreconditionBDI
 		{
 			tr.setFailed("Wrong plans executed: "+res);
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killComponent();
 	}
 	

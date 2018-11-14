@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -106,7 +107,16 @@ public abstract class AbstractClock implements IClock
 				}
 				
 				for(int i=0; i<tts.length; i++)
-					tts[i].getTimedObject().timeEventOccurred(currenttime);
+				{
+					try
+					{
+						tts[i].getTimedObject().timeEventOccurred(currenttime);
+					}
+					catch(Exception e)
+					{
+						Logger.getLogger(name).warning("Exception in time event: "+e);
+					}
+				}
 			}
 			
 			public String toString()
@@ -344,7 +354,10 @@ public abstract class AbstractClock implements IClock
 	 */
 	public ITimer[] getTickTimers()
 	{
-		return (ITimer[])ticktimers.toArray(new ITimer[0]);
+		synchronized(this)
+		{
+			return (ITimer[])ticktimers.toArray(new ITimer[0]);
+		}
 	}
 	
 	/**
@@ -356,7 +369,7 @@ public abstract class AbstractClock implements IClock
 		synchronized(this)
 		{
 			timers.add(timer);
-//			System.err.println("Added timer: "+timers);
+//			System.out.println(this+" Added timer: "+timer.getTimedObject());
 		}
 		
 		notifyListeners(new ChangeEvent(this, EVENT_TYPE_TIMER_ADDED));
@@ -373,7 +386,7 @@ public abstract class AbstractClock implements IClock
 			boolean	removed	= timers.remove(timer);
 //			if(!removed)
 //				System.out.println("Could not remove timer: "+timer+" "+timers);
-//			System.err.println("Removed timer: "+timers);
+//			System.out.println(this+" Removed timer: "+removed+", "+timer.getTimedObject());
 		}
 		
 		notifyListeners(new ChangeEvent(this, EVENT_TYPE_TIMER_REMOVED));
@@ -455,7 +468,7 @@ public abstract class AbstractClock implements IClock
 	 */
 	protected void notifyListeners(ChangeEvent ce)
 	{
-//		System.out.println(""+this.getClass()+" "+ce);
+//		System.out.println(this+" "+ce);
 		IChangeListener[]	cls	= (IChangeListener[])listeners.toArray(new IChangeListener[0]);
 		for(int i=0; i<cls.length; i++)
 			cls[i].changeOccurred(ce);

@@ -28,7 +28,7 @@ public class CustomerFrame extends JFrame
 	 */
 	public CustomerFrame(final IExternalAccess agent)
 	{
-		super(agent.getComponentIdentifier().getName());
+		super(agent.getId().getName());
 		
 		add(new CustomerPanel(agent));
 		pack();
@@ -74,7 +74,7 @@ public class CustomerFrame extends JFrame
 //					}
 //				});
 				
-				ia.getComponentFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
+				ia.getFeature(IMonitoringComponentFeature.class).subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

@@ -1,0 +1,7 @@
+description 'Convenience base implementation for transports.'
+
+dependencies
+{
+	api project(':platform:bridge')
+	api project(':kernels:micro')
+}

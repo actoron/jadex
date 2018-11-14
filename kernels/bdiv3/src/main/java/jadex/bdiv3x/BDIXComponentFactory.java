@@ -24,11 +24,10 @@ import jadex.bridge.component.IMonitoringComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.IBootstrapFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -39,7 +38,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.kernelbase.IBootstrapFactory;
 
 
 
@@ -116,7 +114,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 	 */
 	public BDIXComponentFactory(IInternalAccess provider, Map<String, Object> properties)
 	{
-		super(provider.getComponentIdentifier(), IComponentFactory.class, properties);
+		super(provider.getId(), IComponentFactory.class, properties);
 		this.provider = provider;
 		this.features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, BDI_FEATURES));
 	}
@@ -127,7 +125,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
 		this.provider = component;
-		this.providerid = provider.getComponentIdentifier();
+		this.providerid = provider.getId();
 		setServiceIdentifier(createServiceIdentifier(provider, "BootstrapFactory", IComponentFactory.class, IComponentFactory.class, rid, null));
 		return startService();
 	}
@@ -142,7 +140,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 		{
 			public void customResultAvailable(Void result)
 			{
-				libservice	= SServiceProvider.getLocalService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 				loader = new BDIXModelLoader();
 				
 				libservicelistener = new ILibraryServiceListener()
@@ -160,7 +158,7 @@ public class BDIXComponentFactory extends BasicService implements IComponentFact
 					}
 				};
 				
-				libservice.addLibraryServiceListener(libservicelistener);
+				libservice.addLibraryServiceListener(libservicelistener);	// TODO: wait for future?
 						
 				ret.setResult(null);
 			}

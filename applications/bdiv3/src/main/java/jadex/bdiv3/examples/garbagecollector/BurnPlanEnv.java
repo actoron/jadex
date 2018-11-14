@@ -7,7 +7,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.examples.garbagecollector.GarbageBurnerBDI.Pick;
+import jadex.bdiv3.examples.garbagecollector.GarbageBurnerAgent.Pick;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -23,7 +23,7 @@ public class BurnPlanEnv
 	//-------- attributes --------
 
 	@PlanCapability
-	protected GarbageBurnerBDI burner;
+	protected GarbageBurnerAgent burner;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -49,7 +49,7 @@ public class BurnPlanEnv
 		Future<Void> fut = new Future<Void>();
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(ISpaceAction.ACTOR_ID, burner.getAgent().getComponentDescription());
+		params.put(ISpaceAction.ACTOR_ID, burner.getAgent().getDescription());
 		env.performSpaceAction("burn", params, lis);
 		fut.get();
 	}

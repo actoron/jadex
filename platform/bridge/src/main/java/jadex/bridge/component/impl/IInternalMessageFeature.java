@@ -9,7 +9,7 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.streams.InputConnection;
 import jadex.bridge.component.streams.OutputConnection;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -22,10 +22,11 @@ public interface IInternalMessageFeature
 	 *  Forwards the prepared message to the transport layer.
 	 *  
 	 *  @param header The message header.
+	 *  @param encryptedheader The encrypted header.
 	 *  @param encryptedbody The encrypted message body.
 	 *  @return Null, when done, exception if failed.
 	 */
-	public IFuture<Void> sendToTransports(IMsgHeader header, byte[] encryptedbody);
+	public IFuture<Void> sendToTransports(final IMsgHeader header, final byte[] encryptedheader, final byte[] encryptedbody);
 	
 	/**
 	 *  Inform the component that a message has arrived.
@@ -45,7 +46,7 @@ public interface IInternalMessageFeature
 	 *  @param header The message header.
 	 *  @param body The message that arrived.
 	 */
-	public void messageArrived(IMsgSecurityInfos secinfos, IMsgHeader header, Object body);
+	public void messageArrived(ISecurityInfo secinfos, IMsgHeader header, Object body);
 	
 	//-------- streams --------
 	

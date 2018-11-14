@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html ng-app='PuzzleNG'>
+	<head>
+		<script src="https://code.angularjs.org/1.5.2/angular.min.js"></script>
+		<script src="wswebapi/jadex.js"></script>
+		<script src="puzzle_app_jadex.js"></script>
+		<script src="puzzle_app_ng.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body ng-controller="PuzzleBoard">
+		<table class="board">
+			<tr>
+				<td></td>
+				<th ng-repeat="cell in board[0] track by $index">{{columnName($index, true)}}</th>
+				<td></td>
+			</tr>
+			<tr ng-repeat="row in board track by $index">
+				<th>{{rowName($index, true)}}</th>
+				<td class="cell cell{{boardsize}} {{cell}} {{moveable($index, $parent.$index)}}"
+					ng-repeat="cell in row track by $index" ng-click="doMove($index, $parent.$index)">
+					<span>{{cell}}</span>
+				</td>
+				<th>{{rowName($index, false)}}</th>
+			</tr>
+			<tr>
+				<td></td>
+				<th ng-repeat="cell in board[0]  track by $index">{{columnName($index, false)}}</th>
+				<td></td>
+			</tr>
+		</table>
+		<div class="controls">
+			<span class="label">Restart Game</span>		
+			<div class="button" ng-repeat="size in sizes" ng-click="restart(size)">Size {{size}}</div>
+		</div>
+		<div class="controls" ng-hide="moves.length==0">
+			<div class="button" ng-click="takeback()">Take Back</div>	
+			<ol reversed>
+				<li ng-repeat="move in moves.slice().reverse()">{{moveName(move)}}</li>
+			</ol>
+		</div>
+	</body>
+</html>

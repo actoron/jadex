@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Ignore;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
@@ -19,7 +21,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -33,12 +34,13 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that uses a multiplexed service.
  */
-@RequiredServices(@RequiredService(name="ms", type=IExampleService.class, multiple=true, 
-	multiplextype=IMultiplexExampleService.class, binding=@Binding(dynamic=true)))
+@RequiredServices(@RequiredService(name="ms", type=IExampleService.class, multiple=true))
+//	multiplextype=IMultiplexExampleService.class))	// TODO? removed in v4
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent
 @ComponentTypes(@ComponentType(name="provider", filename="ProviderAgent.class"))
 @Configurations(@Configuration(name="def", components=@Component(type="provider", number="5")))
+@Ignore	// Ignore until feature reimplemented?
 public class MultiinvokeTestAgent extends JunitAgentTest
 {
 	@Agent
@@ -52,7 +54,7 @@ public class MultiinvokeTestAgent extends JunitAgentTest
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IMultiplexExampleService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("ms");
+		IFuture<IMultiplexExampleService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("ms");
 		fut.addResultListener(new ExceptionDelegationResultListener<IMultiplexExampleService, Void>(ret)
 		{
 			public void customResultAvailable(IMultiplexExampleService ser)
@@ -68,7 +70,7 @@ public class MultiinvokeTestAgent extends JunitAgentTest
 					{
 //						System.out.println("countlis: "+agent.getComponentFeature(IExecutionFeature.class).isComponentThread());
 						
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(testcnt, reports.toArray(new TestReport[reports.size()])));
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(testcnt, reports.toArray(new TestReport[reports.size()])));
 						ret.setResult(null);
 					}
 

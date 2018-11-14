@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -15,7 +16,6 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -31,10 +31,8 @@ import jadex.micro.annotation.RequiredServices;
 @ProvidedServices(@ProvidedService(type=IChatService.class, 
 	implementation=@Implementation(value=ChatServiceD5.class)))
 @RequiredServices({
-	@RequiredService(name="clockservice", type=IClockService.class, 
-		binding=@Binding(scope=Binding.SCOPE_PLATFORM)),
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
-		binding=@Binding(dynamic=true, scope=Binding.SCOPE_GLOBAL)),
+	@RequiredService(name="clockservice", type=IClockService.class),
+	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=RequiredService.SCOPE_GLOBAL),
 	@RequiredService(name="regservice", type=IRegistryServiceE3.class)
 })
 @Arguments({
@@ -62,14 +60,14 @@ public class ChatE5Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<IRegistryServiceE3>	regservice	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("regservice");
+		IFuture<IRegistryServiceE3>	regservice	= agent.getFeature(IRequiredServicesFeature.class).getService("regservice");
 		regservice.addResultListener(new DefaultResultListener<IRegistryServiceE3>()
 		{
 			public void resultAvailable(final IRegistryServiceE3 rs)
 			{
-				rs.register(agent.getComponentIdentifier(), nickname);
+				rs.register(agent.getId(), nickname);
 				
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).waitForDelay(10000, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -85,13 +83,13 @@ public class ChatE5Agent
 								}
 								else
 								{
-									agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IChatService.class, cid)
+									agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IChatService.class).setProvider(cid))
 										.addResultListener(new DefaultResultListener<IChatService>()
 									{
 										public void resultAvailable(IChatService cs)
 										{
 											System.out.println("is on: "+IComponentIdentifier.LOCAL.get());
-											cs.message(agent.getComponentIdentifier().toString(), "Private hello from: "+nickname);
+											cs.message(agent.getId().toString(), "Private hello from: "+nickname);
 										}
 									});
 								}

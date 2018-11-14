@@ -14,7 +14,8 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -71,7 +72,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
     		inited = true;
     		super.init();
     	
-    		IProvidedServicesFeature psf = component.getComponentFeature(IProvidedServicesFeature.class);
+    		IProvidedServicesFeature psf = component.getFeature(IProvidedServicesFeature.class);
     		return psf.addService("requesthandlerser", IRequestHandlerService.class, this);
     	}
     	else
@@ -176,7 +177,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	{
 	    try
 	    {
-//	    	final IService service = (IService) SServiceProvider.getService(component, serviceid).get();
+//	    	final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
 	    	
 	    	String infopid = info.getPublishId();
 	    	if(infopid.endsWith("/"))
@@ -206,7 +207,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 				public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
 				{
 					if(service == null)
-						service = (IService) SServiceProvider.getService(component, serviceid).get();
+						service = (IService) component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
 					ExternalRestPublishService.this.handleRequest(service, mappings, request, response, null);
 				}
 			};

@@ -3,9 +3,14 @@ package jadex.platform.service.message.websockettransport;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
 
+import com.neovisionaries.ws.client.WebSocketFactory;
+
 import fi.iki.elonen.NanoHTTPD;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IPojoComponentFeature;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.transport.ITransport;
@@ -17,6 +22,8 @@ import jadex.platform.service.transport.ITransportHandler;
  */
 public class WebSocketTransport implements ITransport<IWebSocketConnection>
 {
+	protected static final int PRIORITY = 500;
+	
 	/** Connection handler. */
 	protected WebSocketTransportAgent handler;
 	
@@ -31,6 +38,9 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	public void	init(ITransportHandler<IWebSocketConnection> handler)
 	{
 		this.handler = (WebSocketTransportAgent) handler;
+		this.handler.setWebsocketFactory(new WebSocketFactory());
+		this.handler.getWebSocketFactory().setConnectionTimeout((int) this.handler.getConnectTimeout());
+		this.handler.setThreadPoolService(((IInternalRequiredServicesFeature)this.handler.getAccess().getFeature(IRequiredServicesFeature.class)).getRawService(IDaemonThreadPoolService.class));
 	}
 	
 	/**
@@ -71,7 +81,6 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 			{
 			}
 		}
-		
 	}
 
 	/**
@@ -100,7 +109,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 		{
 			try
 			{
-				WebSocketTransportAgent pojo = (WebSocketTransportAgent) handler.getAccess().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				WebSocketTransportAgent pojo = (WebSocketTransportAgent) handler.getAccess().getFeature(IPojoComponentFeature.class).getPojoAgent();
 		 		int idletimeout = pojo.getIdleTimeout();
 				server = new WebSocketServer(port, handler);
 				server.start(idletimeout, true);
@@ -144,7 +153,7 @@ public class WebSocketTransport implements ITransport<IWebSocketConnection>
 	 *  @param body	The message body.
 	 *  @return	A future indicating success.
 	 */
-	public IFuture<Void> sendMessage(IWebSocketConnection con, byte[] header, byte[] body)
+	public IFuture<Integer> sendMessage(IWebSocketConnection con, byte[] header, byte[] body)
 	{
 //		System.out.println("send: " + Arrays.hashCode(header) + " " + Arrays.hashCode(body));
 		return con.sendMessage(header, body);

@@ -86,7 +86,7 @@ public class AlarmsGui extends JFrame
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IFuture<IClockService>	fut	= ia.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
+				IFuture<IClockService>	fut	= ia.getFeature(IRequiredServicesFeature.class).getService("clockservice");
 				fut.addResultListener(new SwingDefaultResultListener<IClockService>(AlarmsGui.this)
 				{
 					public void customResultAvailable(final IClockService cs)
@@ -189,7 +189,7 @@ public class AlarmsGui extends JFrame
 									@Classname("alarms")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+										IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 										final Alarm[] alarms = (Alarm[])bia.getBeliefbase().getBeliefSet("alarms").getFacts();
 										SwingUtilities.invokeLater(new Runnable()
 										{
@@ -275,7 +275,7 @@ public class AlarmsGui extends JFrame
 			@Classname("addAlarm")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				bia.getBeliefbase().getBeliefSet("alarms").addFact(alarm);
 				return IFuture.DONE;
 			}
@@ -302,7 +302,7 @@ public class AlarmsGui extends JFrame
 			@Classname("removeAlarm")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIXAgentFeature bia = ia.getComponentFeature(IBDIXAgentFeature.class);
+				IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				bia.getBeliefbase().getBeliefSet("alarms").removeFact(alarm);
 				return IFuture.DONE;
 			}

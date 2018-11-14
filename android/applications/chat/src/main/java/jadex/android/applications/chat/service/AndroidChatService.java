@@ -15,6 +15,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -29,7 +30,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.micro.annotation.Binding;
 
 import java.io.File;
 import java.util.Collection;
@@ -101,7 +101,6 @@ public class AndroidChatService extends JadexPlatformService
 		newMessages = new LinkedList<ChatEvent>();
 
 		setPlatformAutostart(true);
-		setPlatformKernels(IPlatformConfiguration.KERNEL_MICRO);
 		IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalComm();
 		config.setLogging(false);
 		config.setNetworkNames("jadexnetwork");
@@ -271,7 +270,7 @@ public class AndroidChatService extends JadexPlatformService
 	private IFuture<Void> subscribe()
 	{
 		final Future<Void> fut = new Future<Void>();
-		SServiceProvider.getService(platform, IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		platform.searchService( new ServiceQuery<>( IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 				.addResultListener(new IResultListener<IChatGuiService>()
 				{
 					public void resultAvailable(IChatGuiService service)
@@ -381,7 +380,7 @@ public class AndroidChatService extends JadexPlatformService
 	private IFuture<Void> sendMessage(final String message)
 	{
 		final Future<Void> fut = new Future<Void>();
-		SServiceProvider.getService(platform, IChatGuiService.class, Binding.SCOPE_PLATFORM).addResultListener(
+		platform.searchService( new ServiceQuery<>( IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(
 				new DefaultResultListener<IChatGuiService>()
 				{
 					public void resultAvailable(IChatGuiService chat)
@@ -437,7 +436,7 @@ public class AndroidChatService extends JadexPlatformService
 					@Override
 					public void resultAvailable(String nickName)
 					{
-						IServiceIdentifier sid = ((IService) chatService).getServiceIdentifier();
+						IServiceIdentifier sid = ((IService) chatService).getServiceId();
 						chatUser.setNickName(nickName);
 						chatUser.setCid(sid.getProviderId());
 						resLis.resultAvailable(null);

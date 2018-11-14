@@ -5,7 +5,7 @@ import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.examples.disastermanagement.IClearChemicalsService;
-import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.SendRescueForce;
+import jadex.bdiv3.examples.disastermanagement.commander.CommanderAgent.SendRescueForce;
 import jadex.commons.future.ITerminableFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 

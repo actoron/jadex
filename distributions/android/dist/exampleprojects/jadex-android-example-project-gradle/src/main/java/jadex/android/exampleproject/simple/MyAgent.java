@@ -53,7 +53,7 @@ public class MyAgent
 		MyEvent myEvent = new MyEvent();
 		myEvent.setMessage(txt);
 		
-		IContextService	cs	= agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+		IContextService	cs	= agent.getFeature(IRequiredServicesFeature.class).searchService(IContextService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		
 		cs.dispatchEvent(myEvent).get();
 	}

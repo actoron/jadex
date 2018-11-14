@@ -7,10 +7,7 @@ import java.util.Set;
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.TimeoutException;
 
 /**
@@ -26,10 +23,9 @@ public class EndStateAbortPlan extends Plan
 	public void body()
 	{
 		// Create worker agent.
-		IComponentManagementService	cms	= getAgent().getComponentFeature(IRequiredServicesFeature.class)
-			.searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IComponentIdentifier	worker	= cms.createComponent("/jadex/bdi/testcases/misc/EndStateAbortWorker.agent.xml",
-			new CreationInfo(getComponentIdentifier())).getFirstResult();
+		IComponentIdentifier	worker	= getAgent()
+			.createComponent(
+			new CreationInfo(getComponentIdentifier()).setFilename("/jadex/bdi/testcases/misc/EndStateAbortWorker.agent.xml")).getFirstResult();
 		
 		// Wait to allow worker to start plan
 		waitFor(100);
@@ -39,7 +35,7 @@ public class EndStateAbortPlan extends Plan
 		try
 		{
 //			System.out.println("destroying worker: "+worker);
-			cms.destroyComponent(worker).get();
+			agent.killComponent(worker).get();
 //			System.out.println("destroyed worker: "+worker);
 			report.setFailed("Worker agent terminated without timeout.");
 		}

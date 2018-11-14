@@ -22,7 +22,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.Properties;
@@ -38,8 +37,7 @@ import jadex.micro.testcases.LoggerAgent.TestLogHandler;
 @Imports({"java.util.logging.*"})
 @Description("Tests the logger.")
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
-@RequiredServices({@RequiredService(name="clockservice", type=IClockService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))})
+@RequiredServices({@RequiredService(name="clockservice", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)})
 @Properties({
 	@NameValue(name="logging.level", value="Level.FINEST"),
 //	@NameValue(name="logging.useParentHandlers", value="true"),
@@ -62,7 +60,7 @@ public class LoggerAgent extends JunitAgentTest
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		agent.getFeature(IRequiredServicesFeature.class).getService("clockservice").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -120,7 +118,7 @@ public class LoggerAgent extends JunitAgentTest
 					tr2.setReason("TestLogHandler was not found: "+SUtil.arrayToString(handlers));
 				reports.add(tr2);
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
 				ret.setResult(null);
 			}
 		});

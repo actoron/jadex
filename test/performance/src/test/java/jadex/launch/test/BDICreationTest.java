@@ -7,14 +7,10 @@ import java.util.Map;
 import org.junit.Test;
 
 import jadex.base.Starter;
+import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -31,27 +27,30 @@ public class BDICreationTest //extends TestCase
 	@Test
 	public void	testBDICreation()
 	{
-		long timeout	= -1;//BasicService.getLocalDefaultTimeout();
-		String projectroot = new String("jadex-integration-performance-test");
+		long timeout	= -1;//BasicService.getDefaultTimeout();
+//		String projectroot = new String("jadex-integration-performance-test");
 //		System.out.println(resdir);
-		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
-//			"-kernels", "\"micro\"",
+		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(STest.getDefaultTestConfig(),
+			new String[]{
+//				"-platformname", "benchmarks_*", 
+////			"-kernels", "\"micro\"",
 //			"-logging", "true",
-			"-libpath", SUtil.getOutputDirsExpression(projectroot, true),
-			"-awareness", "false",	// otherwise influences performance measure
-			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
-//			"-componentfactory", "jadex.component.ComponentComponentFactory",
-//			"-conf", "jadex.standalone.Platform.component.xml",
-			"-printpass", "false"}).get(timeout);
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
+//			"-libpath", SUtil.getOutputDirsExpression(projectroot, true),
+//			"-awareness", "false",	// otherwise influences performance measure
+//			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true",
+////			"-componentfactory", "jadex.component.ComponentComponentFactory",
+////			"-conf", "jadex.standalone.Platform.component.xml",
+//			"-printpass", "false"
+			}
+			).get(timeout);
 		
 		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", Integer.valueOf(1000));
-		cms.createComponent(null, "jadex.bdi.benchmarks.AgentCreation.agent.xml", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<Tuple2<String, Object>>>(fut)
+		platform.createComponent(new CreationInfo(args).setFilename("jadex.bdi.benchmarks.AgentCreation.agent.xml"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void customResultAvailable(IExternalAccess result)
 			{
 				// Agent created. Kill listener waits for result.
 			}
@@ -101,7 +100,6 @@ public class BDICreationTest //extends TestCase
 		}
 		
 		platform	= null;
-		cms	= null;
 		fut	= null;
 		
 //		try

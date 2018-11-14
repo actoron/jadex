@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.beliefs;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -17,7 +18,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test beliefs with update rate.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class UpdaterateGetterSetterBDI
 {
@@ -41,7 +42,7 @@ public class UpdaterateGetterSetterBDI
 	@AgentBody
 	public void	body(IInternalAccess agent)
 	{
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000).get();
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000).get();
 		tr.setFailed("Plan was not triggered.");
 		agent.killComponent();
 	}
@@ -63,7 +64,7 @@ public class UpdaterateGetterSetterBDI
 	@AgentKilled
 	public void	destroy(IInternalAccess agent)
 	{
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	//-------- plans --------
@@ -71,7 +72,7 @@ public class UpdaterateGetterSetterBDI
 	/**
 	 *  Plan that is triggered when fact changes.
 	 */
-	@Plan(trigger=@Trigger(factchangeds={"cntBel"}))
+	@Plan(trigger=@Trigger(factchanged={"cntBel"}))
 	public void	beliefChanged(int cntevt)
 	{
 		if(cnt==5 && cntevt==5)

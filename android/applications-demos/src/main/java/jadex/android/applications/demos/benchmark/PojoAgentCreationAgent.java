@@ -8,10 +8,10 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -107,20 +107,20 @@ public class PojoAgentCreationAgent
 		
 		if(num<max)
 		{
-			getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-			{
-				public void resultAvailable(IComponentManagementService cms)
-				{
+//			getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+//			{
+//				public void resultAvailable(IComponentManagementService cms)
+//				{
 					Map<String, Object>	args	= new HashMap<String, Object>();
 					args.put("max", Integer.valueOf(max));
 					args.put("num", Integer.valueOf(num));
 					args.put("starttime", Long.valueOf(starttime));
 					args.put("startmem", Long.valueOf(startmem));
-					cms.createComponent(createPeerName(num+1, agent.getComponentIdentifier()),
-						PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
-						new CreationInfo(null, args, agent.getComponentDescription().getResourceIdentifier()), null);
-				}
-			});
+					agent.createComponent(
+						new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
+							.setName(createPeerName(num+1, agent.getId())).setFilename(PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"), null);
+//				}
+//			});
 		}
 		else
 		{
@@ -149,13 +149,13 @@ public class PojoAgentCreationAgent
 					System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 				
 					// Use initial component to kill others
-					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-					{
-						public void resultAvailable(IComponentManagementService cms)
-						{
-							String	initial	= createPeerName(1, agent.getComponentIdentifier());
-							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
-							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+//					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+//					{
+//						public void resultAvailable(IComponentManagementService cms)
+//						{
+							String	initial	= createPeerName(1, agent.getId());
+							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
+							agent.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess exta)
 								{
@@ -165,12 +165,12 @@ public class PojoAgentCreationAgent
 										public IFuture<Void> execute(final IInternalAccess ia)
 										{
 											final Future<Void> ret = new Future<Void>();
-											ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class))
 												.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 											{
 												public void customResultAvailable(IClockService result)
 												{
-													((PojoAgentCreationAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent())
+													((PojoAgentCreationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent())
 														.deletePeers(max, result.getTime(), dur, pera, omem, upera);
 													ret.setResult(null);
 												}
@@ -180,8 +180,8 @@ public class PojoAgentCreationAgent
 									});
 								}
 							});
-						}
-					});
+//						}
+//					});
 				}
 			});
 		}
@@ -212,13 +212,13 @@ public class PojoAgentCreationAgent
 	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera,
 		final long omem, final double upera)
 	{
-		final String name = createPeerName(cnt, agent.getComponentIdentifier());
-		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
-		{
-			public void resultAvailable(IComponentManagementService cms)
-			{
-				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
-				cms.destroyComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
+		final String name = createPeerName(cnt, agent.getId());
+//		getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+//		{
+//			public void resultAvailable(IComponentManagementService cms)
+//			{
+				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
+				agent.killComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
 				{
 					public void resultAvailable(Map<String, Object> result)
 					{
@@ -234,8 +234,8 @@ public class PojoAgentCreationAgent
 						}
 					}
 				});
-			}
-		});
+//			}
+//		});
 	}
 	
 	/**
@@ -267,22 +267,22 @@ public class PojoAgentCreationAgent
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				System.out.println("Still used memory: "+stillused+"kB.");
 				
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microcreationtime", new Tuple(""+pera, "s"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("microkillingtime", new Tuple(""+killpera, "s"));
+				agent.getFeature(IArgumentsResultsFeature.class).getResults().put("micromem", new Tuple(""+upera, "kb"));
 				agent.killComponent();
 			}
 		});
 	}
 	
-	protected IFuture<IComponentManagementService>	getCMS()
-	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-	}
+//	protected IFuture<IComponentManagementService>	getCMS()
+//	{
+//		return agent.getFeature(IRequiredServicesFeature.class).getService(IComponentManagementService.class);
+//	}
 	
 	
 	protected IFuture<IClockService> getClock()
 	{
-		return agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return agent.getFeature(IRequiredServicesFeature.class).getService(IClockService.class);
 	}
 }

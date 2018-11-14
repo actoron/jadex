@@ -32,7 +32,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 /**
- *  The security settings panel.
+ *  The monitoring settings panel.
  */
 public class MonitoringPanel	implements IServiceViewerPanel
 {
@@ -64,97 +64,97 @@ public class MonitoringPanel	implements IServiceViewerPanel
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		ToolTipManager.sharedInstance().registerComponent(tree);
 		
-		monservice.subscribeToEvents(null).addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateResultListener<IMonitoringEvent>()
-		{
-			public void intermediateResultAvailable(IMonitoringEvent event)
-			{
-//				if(event.getType().indexOf(IMonitoringEvent.SOURCE_CATEGORY_SERVICE)==-1)
-//					return;
-				
-				String origin = event.getCause().getOrigin();
-				
-//				System.out.println("received callid: "+callid);
-				
-				IdTreeNode<List<IMonitoringEvent>> call = tm.getNode(origin);
-//				String name = event.getCause().getSourceId().equals(origin)? event.getCause().getSourceName()+" ("+origin+")": origin;
-				String name = event.getCause().getSourceId().equals(origin)? event.getCause().getSourceId()+" ("+origin+")": origin;
-				if(call==null)
-				{
-					call = new IdTreeNode<List<IMonitoringEvent>>(origin, name, tm, null, null, null, null);
-					root.add(call);
-				}
-				else if(origin.equals(call.getName()) && event.getCause().getSourceId().equals(origin))
-				{
-					call.setName(name);
-				}
-				
-				String srcid = event.getCause().getSourceId();
-				String trgid = event.getCause().getTargetId();
-				
-				IdTreeNode<List<IMonitoringEvent>> parent = tm.getNode(srcid);
-				IdTreeNode<List<IMonitoringEvent>> child = tm.getNode(trgid);
-				
-//				System.out.println("event : "+srcid+" "+(parent!=null)+" "+trgid+" "+(child!=null));
-				
-				// Create child
-				if(child==null)
-				{
-					// Parent not found, create parent and add parent on call level
-//					child = new MyIdTreeNode<List<IMonitoringEvent>>(trgid, event.getCause().getTargetName()+" "+trgid, tm, null, null, null, new ArrayList<IMonitoringEvent>()); 
-					String desc = event.getSourceIdentifier().toString();
-					if(event.getSourceDescription()!=null)
-						desc += event.getSourceDescription();
-					child = new MyIdTreeNode<List<IMonitoringEvent>>(trgid, desc, tm, null, null, null, new ArrayList<IMonitoringEvent>()); 
-				}
-				else
-				{
-					// If child exists check whether it has been added to top-level call -> remove, now has correct parent
-					if(child.getParent().equals(call))
-					{
-						call.remove(child);
-					}
-				}
-
-				// Create parent
-				if(parent==null)
-				{
-					// Parent not found, create parent and add parent on call level
-//					String srcname = event.getCause().getSourceName()!=null? event.getCause().getSourceName(): "unknown";
-					parent = new MyIdTreeNode<List<IMonitoringEvent>>(srcid, null, tm, null, null, null, new ArrayList<IMonitoringEvent>()); 
-					call.add(parent);
-				}
-
-				// Add event on child
-				List<IMonitoringEvent> evs = child.getObject();
-//				if(evs==null)
-//					System.out.println("huch");
-				evs.add(event);
-				
-				// Add child on parent
-//				System.out.println("parent "+parent.getId()+" "+parent.getChildCount());
-				parent.add(child);
-//				else if(parent.hashCode()!=child.getParent().hashCode())
+//		monservice.subscribeToEvents(null).addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateResultListener<IMonitoringEvent>()
+//		{
+//			public void intermediateResultAvailable(IMonitoringEvent event)
+//			{
+////				if(event.getType().indexOf(IMonitoringEvent.SOURCE_CATEGORY_SERVICE)==-1)
+////					return;
+//				
+//				String origin = event.getCause().getOrigin();
+//				
+////				System.out.println("received callid: "+callid);
+//				
+//				IdTreeNode<List<IMonitoringEvent>> call = tm.getNode(origin);
+////				String name = event.getCause().getSourceId().equals(origin)? event.getCause().getSourceName()+" ("+origin+")": origin;
+//				String name = event.getCause().getSourceId().equals(origin)? event.getCause().getSourceId()+" ("+origin+")": origin;
+//				if(call==null)
 //				{
-//					throw new RuntimeException("Wrong parent");
+//					call = new IdTreeNode<List<IMonitoringEvent>>(origin, name, tm, null, null, null, null);
+//					root.add(call);
 //				}
-			}
-			
-			public void resultAvailable(Collection<IMonitoringEvent> result)
-			{
-				System.out.println("ra");
-			}
-			
-			public void finished()
-			{
-				System.out.println("finfi");
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-		}));
-		
+//				else if(origin.equals(call.getName()) && event.getCause().getSourceId().equals(origin))
+//				{
+//					call.setName(name);
+//				}
+//				
+//				String srcid = event.getCause().getSourceId();
+//				String trgid = event.getCause().getTargetId();
+//				
+//				IdTreeNode<List<IMonitoringEvent>> parent = tm.getNode(srcid);
+//				IdTreeNode<List<IMonitoringEvent>> child = tm.getNode(trgid);
+//				
+////				System.out.println("event : "+srcid+" "+(parent!=null)+" "+trgid+" "+(child!=null));
+//				
+//				// Create child
+//				if(child==null)
+//				{
+//					// Parent not found, create parent and add parent on call level
+////					child = new MyIdTreeNode<List<IMonitoringEvent>>(trgid, event.getCause().getTargetName()+" "+trgid, tm, null, null, null, new ArrayList<IMonitoringEvent>()); 
+//					String desc = event.getSourceIdentifier().toString();
+//					if(event.getSourceDescription()!=null)
+//						desc += event.getSourceDescription();
+//					child = new MyIdTreeNode<List<IMonitoringEvent>>(trgid, desc, tm, null, null, null, new ArrayList<IMonitoringEvent>()); 
+//				}
+//				else
+//				{
+//					// If child exists check whether it has been added to top-level call -> remove, now has correct parent
+//					if(child.getParent().equals(call))
+//					{
+//						call.remove(child);
+//					}
+//				}
+//
+//				// Create parent
+//				if(parent==null)
+//				{
+//					// Parent not found, create parent and add parent on call level
+////					String srcname = event.getCause().getSourceName()!=null? event.getCause().getSourceName(): "unknown";
+//					parent = new MyIdTreeNode<List<IMonitoringEvent>>(srcid, null, tm, null, null, null, new ArrayList<IMonitoringEvent>()); 
+//					call.add(parent);
+//				}
+//
+//				// Add event on child
+//				List<IMonitoringEvent> evs = child.getObject();
+////				if(evs==null)
+////					System.out.println("huch");
+//				evs.add(event);
+//				
+//				// Add child on parent
+////				System.out.println("parent "+parent.getId()+" "+parent.getChildCount());
+//				parent.add(child);
+////				else if(parent.hashCode()!=child.getParent().hashCode())
+////				{
+////					throw new RuntimeException("Wrong parent");
+////				}
+//			}
+//			
+//			public void resultAvailable(Collection<IMonitoringEvent> result)
+//			{
+//				System.out.println("ra");
+//			}
+//			
+//			public void finished()
+//			{
+//				System.out.println("finfi");
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				exception.printStackTrace();
+//			}
+//		}));
+//		
 		JButton clear = new JButton("Clear");
 		clear.addActionListener(new ActionListener()
 		{
@@ -265,7 +265,7 @@ class MyIdTreeNode<T> extends IdTreeNode<T>
 //				}
 				
 //				buf.append(ev.getSourceIdentifier()+" "+ev.getType());
-				buf.append(ev.getCause().getOrigin()+" "+ev.getSourceIdentifier()+" "+ev.getType()+" "+ev.getCause().getSourceId()+" "+ev.getCause().getTargetId());
+//				buf.append(ev.getCause().getOrigin()+" "+ev.getSourceIdentifier()+" "+ev.getType()+" "+ev.getCause().getSourceId()+" "+ev.getCause().getTargetId());
 				buf.append("<br>");
 			}
 		}

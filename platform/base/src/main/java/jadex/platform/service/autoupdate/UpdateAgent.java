@@ -24,7 +24,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.daemon.StartOptions;
 import jadex.bridge.service.types.email.Email;
@@ -43,13 +42,13 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.xml.bean.JavaWriter;
@@ -63,11 +62,10 @@ import jadex.xml.writer.XMLWriterFactory;
 @Agent
 @RequiredServices(
 {	
-	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="chatser", type=IChatGuiService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="emailser", type=IEmailService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationinfo=@CreationInfo(type="emailagent"))),
-	@RequiredService(name="depser", type=IDependencyService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="daeser", type=IDaemonService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, creationinfo=@CreationInfo(type="daemon")))
+	@RequiredService(name="chatser", type=IChatGuiService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="emailser", type=IEmailService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="depser", type=IDependencyService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="daeser", type=IDaemonService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
 })
 @Arguments(
 {
@@ -84,6 +82,11 @@ import jadex.xml.writer.XMLWriterFactory;
 	@ComponentType(name="emailagent", filename="jadex/platform/service/email/EmailAgent.class"),
 	@ComponentType(name="daemon", filename="jadex/platform/service/daemon/DaemonAgent.class")
 })
+@Configurations(@Configuration(name="default", components=
+{
+	@Component(type="emailagent"),
+	@Component(type="daemon")
+}))
 public class UpdateAgent implements IUpdateService
 {
 	//-------- attributes --------
@@ -101,8 +104,8 @@ public class UpdateAgent implements IUpdateService
 	protected IInternalAccess agent;
 	
 	/** The cms. */
-	@AgentServiceSearch
-	protected IComponentManagementService cms;
+//	@AgentServiceSearch
+//	protected IComponentManagementService cms;
 	
 //	/** The new cid (need to be acknowledge by create and via call ack). */
 //	protected IComponentIdentifier newcomp;
@@ -138,7 +141,7 @@ public class UpdateAgent implements IUpdateService
 	@AgentBody
 	public void body()
 	{
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -162,7 +165,7 @@ public class UpdateAgent implements IUpdateService
 										
 										public void resultAvailable(String newversion)
 										{
-											String text	= "Shutting down old platform "+agent.getComponentIdentifier().getRoot()
+											String text	= "Shutting down old platform "+agent.getId().getRoot()
 													+" ("+getLocalVersionInfo()+") for new platform "+newcid+" ("+newversion+")";
 											
 											notifyUpdateResult(text)
@@ -171,7 +174,7 @@ public class UpdateAgent implements IUpdateService
 												public void resultAvailable(Void result) 
 												{
 													// Kill platform.
-													cms.destroyComponent(agent.getComponentIdentifier().getRoot());	
+													agent.killComponent(agent.getId().getRoot());	
 												}
 												
 												public void exceptionOccurred(Exception exception) 
@@ -185,7 +188,7 @@ public class UpdateAgent implements IUpdateService
 								
 								public void exceptionOccurred(Exception exception)
 								{
-									String text	= "Update of platform "+agent.getComponentIdentifier().getRoot()
+									String text	= "Update of platform "+agent.getId().getRoot()
 											+" ("+getLocalVersionInfo()+") failed due to "+exception;
 									
 									notifyUpdateResult(text)
@@ -193,7 +196,7 @@ public class UpdateAgent implements IUpdateService
 									{
 										public void resultAvailable(Void result) 
 										{
-											agent.getComponentFeature(IExecutionFeature.class).waitForDelay(interval, self);
+											agent.getFeature(IExecutionFeature.class).waitForDelay(interval, self);
 										}
 										
 										public void exceptionOccurred(Exception exception) 
@@ -206,13 +209,13 @@ public class UpdateAgent implements IUpdateService
 						}
 						else
 						{
-							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(interval, self);
+							agent.getFeature(IExecutionFeature.class).waitForDelay(interval, self);
 						}
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(interval, self);
+						agent.getFeature(IExecutionFeature.class).waitForDelay(interval, self);
 					}
 				});
 				return IFuture.DONE;
@@ -291,26 +294,19 @@ public class UpdateAgent implements IUpdateService
 	{
 		// Todo: version service!?
 		final Future<String>	ret	= new Future<String>();
-		IFuture<IComponentManagementService>	cms	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
-		cms.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String>(ret)
+		agent.getExternalAccess(newcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess exta)
 			{
-				cms.getExternalAccess(newcid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
+				exta.scheduleStep(new IComponentStep<String>()
 				{
-					public void customResultAvailable(IExternalAccess exta)
+					@Classname("getVersionInfo")
+					
+					public IFuture<String> execute(IInternalAccess ia)
 					{
-						exta.scheduleStep(new IComponentStep<String>()
-						{
-							@Classname("getVersionInfo")
-							
-							public IFuture<String> execute(IInternalAccess ia)
-							{
-								return new Future<String>(getLocalVersionInfo());
-							}
-						}).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<String>(ret)));
+						return new Future<String>(getLocalVersionInfo());
 					}
-				});
+				}).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<String>(ret)));
 			}
 		});
 		
@@ -338,13 +334,13 @@ public class UpdateAgent implements IUpdateService
 		// notify via chat
 		final Future<Void> firstret = new Future<Void>(); 
 		firstret.addResultListener(lis);
-		IFuture<IChatGuiService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("chatser");
+		IFuture<IChatGuiService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("chatser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IChatGuiService, Void>(firstret)
 		{
 			public void customResultAvailable(IChatGuiService chatser)
 			{
 				// Only wait 2 secs for sending status before continuing.
-				chatser.message(agent.getComponentIdentifier().getName()+": "+text, null, true)
+				chatser.message(agent.getId().getName()+": "+text, null, true)
 					.addResultListener(new TimeoutResultListener<Collection<IChatService>>(2000, agent.getExternalAccess(),
 					new IResultListener<Collection<IChatService>>()
 				{
@@ -368,7 +364,7 @@ public class UpdateAgent implements IUpdateService
 		if(receivers!=null && receivers.length>0)
 		{
 //			System.out.println("update send email");
-			IFuture<IEmailService> efut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("emailser");
+			IFuture<IEmailService> efut = agent.getFeature(IRequiredServicesFeature.class).getService("emailser");
 			efut.addResultListener(new IResultListener<IEmailService>()
 			{
 				public void resultAvailable(IEmailService emailser)
@@ -435,8 +431,8 @@ public class UpdateAgent implements IUpdateService
 		
 		// todo: create new classpath for new version 
 		
-		Map<String, Object> args = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();//new HashMap<String, Object>();
-		args.put("creator", agent.getComponentIdentifier());
+		Map<String, Object> args = agent.getFeature(IArgumentsResultsFeature.class).getArguments();//new HashMap<String, Object>();
+		args.put("creator", agent.getId());
 		String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), args, null, JavaWriter.getObjectHandler());
 //		String argsstr = JavaWriter.objectToXML(args, null);
 		argsstr = argsstr.replaceAll("\"", "\\\\\"");
@@ -456,11 +452,11 @@ public class UpdateAgent implements IUpdateService
 //		Starter.createPlatform(new String[]{"-component", "jadex.platform.service.autoupdate.UpdateAgent.class(:"+deser+")"})
 //		Starter.createPlatform(new String[]{"-deftimeout", "-1", "-component", "jadex.platform.service.autoupdate.UpdateAgent.class(:"+deser+")"})
 		Starter.createPlatform(new String[]{"-maven_dependencies", "false", "-component", "jadex.platform.service.autoupdate.UpdateAgent.class(:"+deser+")"})
-			.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				IComponentIdentifier cid = result.getComponentIdentifier();
+				IComponentIdentifier cid = result.getId();
 				ret.setResult(cid);
 //				acknowledgeUpdate(cid.getRoot());
 			}
@@ -478,7 +474,7 @@ public class UpdateAgent implements IUpdateService
 		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		IFuture<IDaemonService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("daeser");
+		IFuture<IDaemonService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("daeser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IDaemonService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IDaemonService daeser)
@@ -533,62 +529,55 @@ public class UpdateAgent implements IUpdateService
 		
 //		String cmd = System.getProperty("sun.java.command");
 		
-		IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, StartOptions>(ret)
+		agent.getExternalAccess(agent.getId().getRoot())
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, StartOptions>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IExternalAccess plat)
 			{
-				cms.getExternalAccess(agent.getComponentIdentifier().getRoot())
-					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, StartOptions>(ret)
+				plat.getArgumentsAsync().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, StartOptions>(ret)
 				{
-					public void customResultAvailable(IExternalAccess plat)
+					public void customResultAvailable(Map<String, Object> args)
 					{
-						plat.getArguments().addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, StartOptions>(ret)
+						// Set program args according to the original ones
+						// Will change the argument with the update agent to have the creator cid
+						
+						String[] oldargs = (String[])args.get(IPlatformConfiguration.PROGRAM_ARGUMENTS);
+						List<String> newargs = new ArrayList<String>();
+						
+						if(oldargs!=null)
 						{
-							public void customResultAvailable(Map<String, Object> args)
+							for(int i=0; i<oldargs.length; i++)
 							{
-								// Set program args according to the original ones
-								// Will change the argument with the update agent to have the creator cid
-								
-								String[] oldargs = (String[])args.get(IPlatformConfiguration.PROGRAM_ARGUMENTS);
-								List<String> newargs = new ArrayList<String>();
-								
-								if(oldargs!=null)
-								{
-									for(int i=0; i<oldargs.length; i++)
-									{
 //										if("-component".equals(oldargs[i]) && oldargs[i+1].indexOf("jadex.platform.service.autoupdate.FileUpdateAgent")!=-1)
-										if("-component".equals(oldargs[i]) && (oldargs[i+1].indexOf("UpdateAgent")!=-1
-											// Hack!!! Shouldn't know about daemon responder!?
-											|| oldargs[i+1].indexOf("DaemonResponderAgent")!=-1))
-										{
-											i++;
-										}
-										else
-										{
-											newargs.add("\""+SUtil.escapeString(oldargs[i])+"\"");
-										}
-									}
+								if("-component".equals(oldargs[i]) && (oldargs[i+1].indexOf("UpdateAgent")!=-1
+									// Hack!!! Shouldn't know about daemon responder!?
+									|| oldargs[i+1].indexOf("DaemonResponderAgent")!=-1))
+								{
+									i++;
 								}
-								
-								// Add -component jadex.platform.service.autoupdate.FileUpdateAgent.class with fresh argument
-								Map<String, Object> uaargs = getUpdateArguments();
-								String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), uaargs, null, JavaWriter.getObjectHandler());
-//								System.out.println("pre: "+argsstr);
-								argsstr	= SUtil.escapeString(argsstr);	// First: escape string
-								argsstr = argsstr.replace("\"", "\\\\\""); // then escape quotes again for argument parser
-//								System.out.println("post: "+argsstr);
-								String deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\",null)";
-								newargs.add("-component");
-								newargs.add("\""+agent.getModel().getFullName().replace(".", "/")+"Agent.class(:"+deser+")\"");
-
-								so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(newargs), " "));
-								
-								ret.setResult(so);
+								else
+								{
+									newargs.add("\""+SUtil.escapeString(oldargs[i])+"\"");
+								}
 							}
-						}));
+						}
+						
+						// Add -component jadex.platform.service.autoupdate.FileUpdateAgent.class with fresh argument
+						Map<String, Object> uaargs = getUpdateArguments();
+						String argsstr = AWriter.objectToXML(XMLWriterFactory.getInstance().createWriter(true, false, false), uaargs, null, JavaWriter.getObjectHandler());
+//								System.out.println("pre: "+argsstr);
+						argsstr	= SUtil.escapeString(argsstr);	// First: escape string
+						argsstr = argsstr.replace("\"", "\\\\\""); // then escape quotes again for argument parser
+//								System.out.println("post: "+argsstr);
+						String deser = "jadex.xml.bean.JavaReader.objectFromXML(\\\""+argsstr+"\\\",null)";
+						newargs.add("-component");
+						newargs.add("\""+agent.getModel().getFullName().replace(".", "/")+"Agent.class(:"+deser+")\"");
+
+						so.setProgramArguments(flattenStrings((Iterator)SReflect.getIterator(newargs), " "));
+						
+						ret.setResult(so);
 					}
-				});
+				}));
 			}
 		});
 		
@@ -626,7 +615,7 @@ public class UpdateAgent implements IUpdateService
 	protected Map<String, Object>	getUpdateArguments()
 	{
 		Map<String, Object>	ret	= new HashMap<String, Object>();
-		ret.putAll(agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments());
+		ret.putAll(agent.getFeature(IArgumentsResultsFeature.class).getArguments());
 		return ret;
 	}
 }

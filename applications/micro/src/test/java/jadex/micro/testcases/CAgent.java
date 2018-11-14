@@ -14,7 +14,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -23,7 +23,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -36,7 +35,7 @@ import jadex.micro.annotation.Results;
  *  Simple test agent with one service for testing parameter and result copying.
  */
 @ProvidedServices(@ProvidedService(type=ICService.class, implementation=@Implementation(expression="$pojoagent")))
-@RequiredServices(@RequiredService(name="cservice", type=ICService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL)))
+@RequiredServices(@RequiredService(name="cservice", type=ICService.class, scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Service(ICService.class)
 @Agent
@@ -56,7 +55,7 @@ public class CAgent extends JunitAgentTest implements ICService
 		final List<TestReport> testcases = new ArrayList<TestReport>();
 		
 		// Test with required service proxy.
-		IFuture<ICService>	fut	= agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cservice");
+		IFuture<ICService>	fut	= agent.getFeature(IRequiredServicesFeature.class).getService("cservice");
 		fut.addResultListener(new DefaultResultListener<ICService>()
 		{
 			public void resultAvailable(ICService result)
@@ -67,7 +66,7 @@ public class CAgent extends JunitAgentTest implements ICService
 					public void resultAvailable(Void result)
 					{
 						// Test with provided service proxy.
-						SServiceProvider.getService(agent, ICService.class)
+						agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICService.class))
 							.addResultListener(new DefaultResultListener<ICService>()
 						{
 							public void resultAvailable(ICService result)
@@ -77,7 +76,7 @@ public class CAgent extends JunitAgentTest implements ICService
 								{
 									public void resultAvailable(Void result)
 									{										
-										agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(testcases.size(),
+										agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(testcases.size(),
 											(TestReport[])testcases.toArray(new TestReport[testcases.size()])));
 //										killAgent();
 										ret.setResult(null);

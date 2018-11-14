@@ -102,7 +102,7 @@ public class ConversationPanel extends JSplitPane
 		
 		// Right side starts with initial send panel only.
 		FipaMessage	msg	= new FipaMessage();
-		msg.setSender(agent.getComponentIdentifier());
+		msg.setSender(agent.getId());
 		sendpanel = new FipaMessagePanel(msg, agent, jccaccess, cmshandler, iconcache, comptree);
 
 		JButton send = new JButton("Send");
@@ -426,7 +426,7 @@ public class ConversationPanel extends JSplitPane
 			public void run() 
 			{
 				FipaMessage	msg	= new FipaMessage();
-				msg.setSender(agent.getComponentIdentifier());
+				msg.setSender(agent.getId());
 				sendpanel.setMessage(msg);
 			}
 		});				
@@ -505,7 +505,7 @@ public class ConversationPanel extends JSplitPane
 			{
 				final FipaMessage	message	= (FipaMessage)decodeMessage(msg);
 				// Update sender.
-				message.setSender(agent.getComponentIdentifier());
+				message.setSender(agent.getId());
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -527,7 +527,7 @@ public class ConversationPanel extends JSplitPane
 				final boolean last = i == sents.length-1;
 				FipaMessage	message	= (FipaMessage)decodeMessage(sents[i].getValue());
 				// Update sender.
-				message.setSender(agent.getComponentIdentifier());
+				message.setSender(agent.getId());
 				sentmsgs.add(0, message);	// Re-revert order
 				
 				if(last)
@@ -605,7 +605,7 @@ public class ConversationPanel extends JSplitPane
 			@Classname("sendM")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				return ia.getComponentFeature(IMessageFeature.class).sendMessage(message, receiver);
+				return ia.getFeature(IMessageFeature.class).sendMessage(message, receiver);
 			}
 		}).addResultListener(new SwingDefaultResultListener<Void>(this)
 		{

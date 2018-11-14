@@ -22,11 +22,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSCreatedEvent;
+import jadex.bridge.service.types.cms.CMSStatusEvent.CMSTerminatedEvent;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -101,7 +101,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 			}
 		});
 		
-		cmslistener	= cmshandler.addCMSListener(access.getComponentIdentifier().getRoot());
+		cmslistener	= cmshandler.addCMSListener(access.getId().getRoot());
 		cmslistener.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 		{
 			@Override
@@ -149,7 +149,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 							// Hack for speed
 							if(desc.getModelName().equals("jadex.platform.service.remote.Proxy"))
 							{
-								SServiceProvider.getService(access, desc.getName(), IProxyAgentService.class)
+								access.searchService( new ServiceQuery<>(IProxyAgentService.class).setProvider(desc.getName()))
 									.addResultListener(new IResultListener<IProxyAgentService>()
 								{
 									public void resultAvailable(IProxyAgentService ser)
@@ -179,11 +179,11 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 			{
 				((DefaultListModel)pllist.getModel()).removeAllElements();
 				
-				IComponentIdentifier self = access.getComponentIdentifier().getRoot();
+				IComponentIdentifier self = access.getId().getRoot();
 				valmap.put(null, self);
 				((DefaultListModel)pllist.getModel()).add(0, self);
 				
-				SServiceProvider.getServices(access, IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				access.searchServices( new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()
 				{
 					public void intermediateResultAvailable(final IProxyAgentService ser)
@@ -231,7 +231,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 		{
 			public void resultAvailable(IComponentIdentifier cid)
 			{
-				IComponentIdentifier key = ((IService)ser).getServiceIdentifier().getProviderId();
+				IComponentIdentifier key = ((IService)ser).getServiceId().getProviderId();
 				if(!valmap.containsKey(key))
 				{
 					valmap.put(key, cid);

@@ -88,7 +88,7 @@ This lecture will show how services of components can be directly connected. In 
 
 ```java
 
-agent.getServiceContainer().getRequiredService("regservice")
+agent.getServiceContainer().getService("regservice")
   .addResultListener(new DefaultResultListener()
 {
   public void resultAvailable(Object result)

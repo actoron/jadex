@@ -2,6 +2,8 @@ package jadex.commons.security.random;
 
 import java.security.SecureRandom;
 
+import jadex.commons.security.SSecurity;
+
 /**
  *  Wrapper for quick multi-threaded PRNG access using multiple PRNGs.
  *
@@ -163,6 +165,16 @@ public class SecureThreadedRandom extends SecureRandom
 		{
 			return r.nextLong();
 		}
+	}
+	
+	/**
+	 *  Generates a seed value from OS source.
+	 */
+	public byte[] generateSeed(int numbytes)
+	{
+		byte[] ret = new byte[numbytes];
+		SSecurity.getEntropySource().getEntropy(ret);
+		return ret;
 	}
 	
 	/**

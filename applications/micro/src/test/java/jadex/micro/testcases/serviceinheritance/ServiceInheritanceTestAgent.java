@@ -63,7 +63,7 @@ public class ServiceInheritanceTestAgent extends JunitAgentTest
 					public void customResultAvailable(TestReport tr)
 					{
 						tc.addReport(tr);
-						agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+						agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 						ret.setResult(null);
 					}
 				});
@@ -81,7 +81,7 @@ public class ServiceInheritanceTestAgent extends JunitAgentTest
 		final Future<TestReport> ret = new Future<TestReport>();
 		final TestReport tr = new TestReport();
 		
-		IFuture<IBasicService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("basicser");
+		IFuture<IBasicService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("basicser");
 		fut.addResultListener(new IResultListener<IBasicService>()
 		{
 			public void resultAvailable(IBasicService service)
@@ -123,7 +123,7 @@ public class ServiceInheritanceTestAgent extends JunitAgentTest
 		final Future<TestReport> ret = new Future<TestReport>();
 		final TestReport tr = new TestReport();
 		
-		IFuture<IExtendedService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("extser");
+		IFuture<IExtendedService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("extser");
 		fut.addResultListener(new IResultListener<IExtendedService>()
 		{
 			public void resultAvailable(IExtendedService service)

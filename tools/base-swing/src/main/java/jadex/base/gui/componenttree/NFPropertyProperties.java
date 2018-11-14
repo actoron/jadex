@@ -18,6 +18,7 @@ import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
@@ -99,7 +100,7 @@ public class NFPropertyProperties extends PropertiesPanel
 					
 					if(sid!=null)
 					{
-						IFuture<IService> fut = SServiceProvider.getService(ea, sid);
+						IFuture<IService> fut = ea.searchService( new ServiceQuery<>( (Class<IService>)null).setServiceIdentifier(sid));
 						fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
 						{
 							public void resultAvailable(IService ser) 
@@ -107,12 +108,12 @@ public class NFPropertyProperties extends PropertiesPanel
 								if(mi!=null)
 								{
 //									((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getMethodNFPropertyValue(mi, propmi.getName(), u).addResultListener(lis);
-									SNFPropertyProvider.getMethodNFPropertyValue(ea, ser.getServiceIdentifier(), mi, propmi.getName()).addResultListener(lis);
+									ea.getMethodNFPropertyValue(ser.getServiceId(), mi, propmi.getName()).addResultListener(lis);
 								}
 								else
 								{
 //									((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyValue(propmi.getName(), u).addResultListener(lis);
-									SNFPropertyProvider.getNFPropertyValue(ea, ser.getServiceIdentifier(), propmi.getName()).addResultListener(lis);
+									ea.getNFPropertyValue(ser.getServiceId(), propmi.getName()).addResultListener(lis);
 								}
 							}
 							
@@ -125,7 +126,7 @@ public class NFPropertyProperties extends PropertiesPanel
 					{
 //						IFuture<Object> fut = ((INFPropertyProvider)ea.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyValue(propmi.getName(), u);
 //						fut.addResultListener(lis);
-						SNFPropertyProvider.getNFPropertyValue(ea, propmi.getName(), u).addResultListener(lis);
+						ea.getNFPropertyValue(propmi.getName(), u).addResultListener(lis);
 					}
 				}
 			}

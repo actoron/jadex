@@ -86,7 +86,7 @@ public abstract class AbstractModelLoader
 	 *  @param imports	The imports, if any.
 	 *  @return The resource info identifying the file or null.
 	 */
-	protected ResourceInfo getResourceInfo0(String name, String[] imports, ClassLoader classloader)
+	public ResourceInfo getResourceInfo0(String name, String[] imports, ClassLoader classloader)
 	{
 		// Try to find directly as absolute path.
 		ResourceInfo ret = SUtil.getResourceInfo0(name, classloader);

@@ -10,7 +10,7 @@
   <semantic:extension>
     <jadex:modelname>B1_simple</jadex:modelname>
     <jadex:package>jadex.bpmn.tutorial</jadex:package>
-    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
+    <jadex:componentflags suspend="false" synchronous="false" persistable="false" monitoring="OFF" keepalive="false"/>
     <jadex:configurations>
       <jadex:configuration name="name">
       </jadex:configuration>

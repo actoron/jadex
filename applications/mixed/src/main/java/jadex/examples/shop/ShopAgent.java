@@ -41,9 +41,9 @@ public class ShopAgent //extends MicroAgent
 	 */
 	public IFuture<Void>	agentCreated()
 	{
-		agent.getComponentFeature(IProvidedServicesFeature.class)
+		agent.getFeature(IProvidedServicesFeature.class)
 			.addService("shopservice", IShopService.class, new ShopService(agent.getExternalAccess(), 
-			(String)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("name")));
+			(String)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("name")));
 		return IFuture.DONE;
 	}
 	
@@ -99,7 +99,7 @@ public class ShopAgent //extends MicroAgent
 	 */
 	public ItemInfo[] getCatalog()
 	{
-		ItemInfo[] catalog = (ItemInfo[])agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("catalog");
+		ItemInfo[] catalog = (ItemInfo[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("catalog");
 		return catalog!=null? catalog: new ItemInfo[0];
 	}
 	

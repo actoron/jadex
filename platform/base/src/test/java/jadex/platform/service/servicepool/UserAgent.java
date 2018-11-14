@@ -7,10 +7,9 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
@@ -22,10 +21,11 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -39,13 +39,13 @@ import jadex.micro.annotation.Results;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="poolser", type=IServicePoolService.class, binding=@Binding(
-		scope=RequiredServiceInfo.SCOPE_COMPONENT, create=true, 
-		creationinfo=@CreationInfo(type="spa"))),
+	@RequiredService(name="poolser", type=IServicePoolService.class),
 	@RequiredService(name="aser", type=IAService.class),
 	@RequiredService(name="bser", type=IBService.class)
 })
 @ComponentTypes(@ComponentType(name="spa", filename="jadex.platform.service.servicepool.ServicePoolAgent.class"))
+@Configurations(@Configuration(name="default", components=@Component(type="spa")))
+
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class UserAgent
 {
@@ -88,12 +88,12 @@ public class UserAgent
 	public IFuture<Void> registerServices()
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IServicePoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("poolser");
+		IFuture<IServicePoolService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("poolser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 		{
 			public void customResultAvailable(final IServicePoolService sps)
 			{
-//				if(!agent.getComponentIdentifier().equals(((IService)sps).getServiceIdentifier().getProviderId().getParent()))
+//				if(!agent.getComponentIdentifier().equals(((IService)sps).getId().getProviderId().getParent()))
 //					System.out.println("gasjjjjjjjashjfha");
 				
 				sps.addServiceType(IAService.class, new DefaultPoolStrategy(5, 35000, 10), "jadex.platform.service.servicepool.example.AAgent.class")
@@ -118,12 +118,12 @@ public class UserAgent
 	{
 		final Future<Tuple2<IAService, IBService>> ret = new Future<Tuple2<IAService, IBService>>();
 		
-		IFuture<IAService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("aser");
+		IFuture<IAService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("aser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IAService, Tuple2<IAService, IBService>>(ret)
 		{
 			public void customResultAvailable(final IAService aser)
 			{				
-				IFuture<IBService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("bser");
+				IFuture<IBService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("bser");
 				fut.addResultListener(new ExceptionDelegationResultListener<IBService, Tuple2<IAService, IBService>>(ret)
 				{
 					public void customResultAvailable(final IBService bser)
@@ -164,7 +164,7 @@ public class UserAgent
 						
 						final TestReport rep3 = new TestReport("#3", "Test if no A services besides proxy can be found");
 						// Ensure that only 
-						SServiceProvider.getServices(agent, IAService.class)
+						agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IAService.class))
 							.addResultListener(new ExceptionDelegationResultListener<Collection<IAService>, Void>(ret)
 						{
 							public void customResultAvailable(Collection<IAService> result)
@@ -197,7 +197,7 @@ public class UserAgent
 											public void resultAvailable(TestReport rep5)
 											{
 //												System.err.println("FFFFFFFFFFFINI: "+agent.getComponentIdentifier());
-												agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
+												agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
 												ret.setResult(null);
 											}
 											
@@ -205,7 +205,7 @@ public class UserAgent
 											{
 												TestReport rep5 = new TestReport("#5", "Test non-func props");
 												rep5.setFailed(exception);
-												agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
+												agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
 												ret.setResult(null);
 											}
 										});

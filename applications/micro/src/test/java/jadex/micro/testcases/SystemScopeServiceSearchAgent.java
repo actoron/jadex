@@ -6,8 +6,8 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -24,14 +24,14 @@ import jadex.micro.annotation.Results;
  */
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
-@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
+@RequiredServices(@RequiredService(name="cms", type=ILibraryService.class))
 public class SystemScopeServiceSearchAgent extends JunitAgentTest
 {
 	@Agent
 	protected IInternalAccess agent;
 	
 	@AgentServiceSearch
-	protected IComponentManagementService cms;
+	protected ILibraryService cms;
 	
 	@AgentBody
 	public void body()
@@ -39,7 +39,7 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 		TestReport tr1 = new TestReport("#1", "Test if system service can be found without scope with SServiceProvider");
 		try
 		{
-			IComponentManagementService cms = SServiceProvider.getLocalService(agent, IComponentManagementService.class);
+			ILibraryService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
 			System.out.println("Found: "+cms);
 			tr1.setSucceeded(true);
 		}
@@ -52,7 +52,7 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 		TestReport tr2 = new TestReport("#2", "Test if system service can be found without scope with required service def");
 		try
 		{
-			IFuture<IComponentManagementService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("cms");
+			IFuture<ILibraryService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("cms");
 			System.out.println("Found: "+fut.get());
 			tr2.setSucceeded(true);
 		}
@@ -71,7 +71,7 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 			tr3.setFailed("Not injected");
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, 
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(3, 
 			new TestReport[]{tr1, tr2, tr3}));
 		
 		agent.killComponent();

@@ -26,7 +26,7 @@ import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Properties;
@@ -40,6 +40,7 @@ import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 
 /**
@@ -101,8 +102,8 @@ public class StarterPluginPanel extends JPanel
 		lsplit.setResizeWeight(0.7);
 
 		mpanel = new ModelTreePanel(jcc.getPlatformAccess(), jcc.getJCCAccess(), 
-			!SUtil.equals(jcc.getPlatformAccess().getComponentIdentifier().getPlatformName(), 
-			jcc.getJCCAccess().getComponentIdentifier().getPlatformName()))
+			!SUtil.equals(jcc.getPlatformAccess().getId().getPlatformName(), 
+			jcc.getJCCAccess().getId().getPlatformName()))
 		{
 			public void removeTopLevelNode(ISwingTreeNode node)
 			{
@@ -244,7 +245,7 @@ public class StarterPluginPanel extends JPanel
 											public void customResultAvailable(Object result)
 											{
 												if(((Boolean)result).booleanValue())
-													StarterPanel.createComponent(jcc, rid, filename, null, null, null, null, false, null, null, null, null, null, null, null, StarterPluginPanel.this);
+													StarterPanel.createComponent(jcc, rid, filename, null, null, null, null, false, null, null, null, StarterPluginPanel.this);
 												mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 											}
 										});
@@ -569,30 +570,28 @@ public class StarterPluginPanel extends JPanel
 	/**
 	 *  Load and apply the platform properties.
 	 */
-	public IFuture loadPlatformProperties()
+	public IFuture<Void> loadPlatformProperties()
 	{
-		final Future	ret	= new Future();
-		SServiceProvider.getService(jcc.getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDelegationResultListener(ret)
+		final Future<Void>	ret	= new Future<>();
+		jcc.getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			.addResultListener(new SwingExceptionDelegationResultListener<ISettingsService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(ISettingsService settings)
 			{
-				ISettingsService	settings	= (ISettingsService)result;
 				settings.getProperties("StarterServicePanel")
-					.addResultListener(new SwingDelegationResultListener(ret)
+					.addResultListener(new SwingExceptionDelegationResultListener<Properties, Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Properties props)
 					{
-						if(result!=null)
+						if(props!=null)
 						{
-							final Properties	props	= (Properties)result;
 							mpanel.setProperties(props.getSubproperty("mpanel"))
-								.addResultListener(new SwingDelegationResultListener(ret)
+								.addResultListener(new SwingDelegationResultListener<Void>(ret)
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(Void result)
 								{
 									spanel.setProperties(props.getSubproperty("spanel"))
-										.addResultListener(new DelegationResultListener(ret));
+										.addResultListener(new DelegationResultListener<Void>(ret));
 								}
 							});
 						}
@@ -621,32 +620,39 @@ public class StarterPluginPanel extends JPanel
 	{
 		final Future	ret	= new Future();
 //		System.out.println("fetching settings service");
-		SServiceProvider.getService(jcc.getPlatformAccess(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		jcc.getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
 //				System.out.println("fetching mpanel properties");
 				final ISettingsService	settings	= (ISettingsService)result;
-				mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+				try
 				{
-					public void customResultAvailable(Object result)
+					mpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 					{
-//						System.out.println("fetched mpanel properties");
-						final Properties	props	= new Properties();
-						props.addSubproperties("mpanel", (Properties)result);
-						spanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+						public void customResultAvailable(Object result)
 						{
-							public void customResultAvailable(Object result)
+//							System.out.println("fetched mpanel properties");
+							final Properties	props	= new Properties();
+							props.addSubproperties("mpanel", (Properties)result);
+							spanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 							{
-//								System.out.println("fetched spanel properties");
-								props.addSubproperties("spanel", (Properties)result);
-								settings.setProperties("StarterServicePanel", props)
-									.addResultListener(new SwingDelegationResultListener(ret));
-							}
-						});
-					}
-				});
+								public void customResultAvailable(Object result)
+								{
+	//								System.out.println("fetched spanel properties");
+									props.addSubproperties("spanel", (Properties)result);
+									settings.setProperties("StarterServicePanel", props)
+										.addResultListener(new SwingDelegationResultListener(ret));
+								}
+							});
+						}
+					});
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 			
 			public void customExceptionOccurred(Exception exception)

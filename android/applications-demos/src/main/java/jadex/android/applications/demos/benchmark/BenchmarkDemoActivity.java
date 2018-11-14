@@ -10,9 +10,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
@@ -58,7 +58,6 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 		super();
 		IPlatformConfiguration config = getPlatformConfiguration();
 		config.setPlatformName("benchmarkDemoPlatform");
-		config.setKernels(IPlatformConfiguration.KERNEL_MICRO);
 		setPlatformAutostart(true);
 	}
 	
@@ -178,21 +177,21 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 			public IFuture<Collection<Tuple2<String, Object>>> execute(IInternalAccess ia)
 			{
 				final Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
-				ia.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<Tuple2<String, Object>>>(fut)
-				{
-					public void customResultAvailable(IComponentManagementService cms)
-					{
-						cms.createComponent(null, agent, new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<Tuple2<String, Object>>>(fut)
+//				ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class))
+//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<Tuple2<String, Object>>>(fut)
+//				{
+//					public void customResultAvailable(IComponentManagementService cms)
+//					{
+						ia.createComponent(new CreationInfo(args).setName(agent), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
 						{
-							public void customResultAvailable(IComponentIdentifier result)
+							public void customResultAvailable(IExternalAccess result)
 							{
 								// ignore (wait for agent termination)
 							}
 						});
-					}
-				});
+//					}
+//				});
 				
 				return fut;
 			}

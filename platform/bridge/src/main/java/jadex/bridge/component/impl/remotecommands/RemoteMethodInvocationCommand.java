@@ -10,7 +10,9 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -50,6 +52,9 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		this.method	= new MethodInfo(method);
 		this.args	= args;
 //		System.out.println("created rmi command: "+target+" "+method.getName());
+		
+//		if(method.toString().toLowerCase().indexOf("getdesc")!=-1)
+//			System.out.println("Creating command for: "+method);
 	}
 	
 	/**
@@ -104,21 +109,21 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	 *  Execute the method.
 	 */
 	@Override
-	public IFuture<T>	execute(IInternalAccess access, IMsgSecurityInfos secinf)
+	public IFuture<T> execute(IInternalAccess access, ISecurityInfo secinf)
 	{
-//		if(method.toString().toLowerCase().indexOf("transport")==-1)
-//			System.out.println("Executing requested remote method invocation: "+access.getComponentIdentifier()+", "+method);
+//		if(method.toString().toLowerCase().indexOf("getdesc")!=-1)
+//			System.out.println("Executing requested remote method invocation: "+access.getId()+", "+method);
 		
 		Object	ret	= null;
 		if(target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
-			if(sid.getProviderId().equals(access.getComponentIdentifier()))
+			if(sid.getProviderId().equals(access.getId()))
 			{
 				try
 				{
 					Method	m	= method.getMethod(access.getClassLoader());
-					Object	service	= access.getComponentFeature(IProvidedServicesFeature.class).getProvidedService(sid);
+					Object	service	= access.getFeature(IProvidedServicesFeature.class).getProvidedService(sid);
 					if(service==null)
 					{
 						ret = new Future<Object>(new ServiceNotFoundException(sid.getServiceType()+" on component: "+access));
@@ -139,18 +144,35 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			}
 			else
 			{
-				ret	= new Future<Object>(new IllegalArgumentException("Can not invoke service of other component: "+access.getComponentIdentifier()+", "+sid));
+				ret	= new Future<Object>(new IllegalArgumentException("Can not invoke service of other component: "+access.getId()+", "+sid));
 			}
 		}
 		else if(target instanceof IComponentIdentifier)
 		{
 			IComponentIdentifier	cid	= (IComponentIdentifier)target;
-			if(cid.equals(access.getComponentIdentifier()))
+			if(cid.equals(access.getId()))
 			{
 				try
 				{
 					Method	m	= method.getMethod(access.getClassLoader());
 					ret	= m.invoke(access.getExternalAccess(), args);
+					
+//					System.out.println("adding lis: "+Arrays.toString(args));
+//					if(method.toString().toLowerCase().indexOf("getdesc")!=-1)
+//					{
+//						((IFuture)ret).addResultListener(new IResultListener()
+//						{
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								System.out.println("ex: "+exception+" "+Arrays.toString(args));
+//							}
+//							
+//							public void resultAvailable(Object result)
+//							{
+//								System.out.println("res is: "+result+" "+Arrays.toString(args));
+//							}
+//						});
+//					}
 				}
 				catch(Exception e)
 				{
@@ -159,13 +181,26 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			}
 			else
 			{
-				ret	= new Future<Object>(new IllegalArgumentException("Can not access other component: "+access.getComponentIdentifier()+", "+cid));
+				ret	= new Future<Object>(new IllegalArgumentException("Can not access other component: "+access.getId()+", "+cid));
 			}			
 		}
 		
 		@SuppressWarnings("unchecked")
 		IFuture<T>	fret	= ret instanceof IFuture<?> ? (IFuture<T>)ret : new Future<T>((T)ret);
 		return fret;
+	}
+	
+	protected static final Method	SEARCHMETHOD;
+	static
+	{
+		try
+		{
+			SEARCHMETHOD	= IRemoteRegistryService.class.getMethod("searchServices", ServiceQuery.class);
+		}
+		catch(NoSuchMethodException e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
 	}
 	
 	/**
@@ -178,11 +213,17 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		Security	level	= null;
 		Method	m0	= method.getMethod(access.getClassLoader());
 		
+//		// Special case for service search -> use security settings of service type, if any (hack???) -> changed IRemoteRegistryService to unrestricted instead
+//		if(SEARCHMETHOD.equals(m0) && ((ServiceQuery<?>)args[0]).getServiceType()!=null)
+//		{
+//			level	=  ((ServiceQuery<?>)args[0]).getServiceType().getType(access.getClassLoader()).getAnnotation(Security.class);
+//		}
+		
 		// For service call -> look for annotation in impl class hierarchy
-		if(target instanceof IServiceIdentifier)
+		if(level==null && target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
-			Object	impl	= access.getComponentFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
+			Object	impl	= access.getFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(sid);
 			Class<?>	implclass	= impl!=null ? impl.getClass() : null;
 			
 			// Precedence: hierarchy before specificity (e.g. class annotation in subclass wins over method annotation in superclass)
@@ -220,7 +261,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		}
 		
 		// Default: use method annotation, if any.
-		else
+		else if(level==null)
 		{
 			level	= m0.getAnnotation(Security.class);
 		}

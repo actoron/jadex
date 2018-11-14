@@ -1,6 +1,5 @@
 package jadex.platform.service.security.impl;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -10,8 +9,8 @@ import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.platform.service.security.ICryptoSuite;
-import jadex.platform.service.security.MsgSecurityInfos;
 import jadex.platform.service.security.SecurityAgent;
+import jadex.platform.service.security.SecurityInfo;
 
 /**
  *  Abstract crypto suite class for handling message IDs / replays.
@@ -35,7 +34,10 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	protected Set<Long> missingids = new LinkedHashSet<Long>();
 	
 	/** The message security info used after key exchange and authentication. */
-	protected MsgSecurityInfos secinf;
+	protected SecurityInfo secinf;
+	
+	/** The handshake ID. */
+	protected String handshakeid;
 	
 	/** Checks if a message ID is valid */
 	protected synchronized boolean isValid(long msgid)
@@ -84,37 +86,58 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	 *  @param platformauth Flag if the platform name itself was authenticated
 	 *  @param agent The security agent.
 	 */
-	protected void setupSecInfos(IComponentIdentifier remoteid, List<String> authnets, boolean platformauth, SecurityAgent agent)
+	protected void setupSecInfos(IComponentIdentifier remoteid, List<String> authnets, boolean platformauth, String authenticatedplatformname, SecurityAgent agent)
 	{
-		secinf = new MsgSecurityInfos();
-		secinf.setPlatformAuthenticated(platformauth);
-		if (platformauth)
+		secinf = new SecurityInfo();
+//		secinf.setPlatformAuthenticated(platformauth);
+		if (authenticatedplatformname == null && platformauth)
 			secinf.setAuthenticatedPlatformName(remoteid.toString());
-		secinf.setTrustedPlatform(false);
-		secinf.setNetworks(authnets.toArray(new String[authnets.size()]));
+		else
+			secinf.setAuthenticatedPlatformName(authenticatedplatformname);
+		secinf.setAdminPlatform(platformauth);
+		secinf.setNetworks(new HashSet<>(authnets));
 		
-		Map<String, Set<String>> rolemap = agent.getInternalRoles();
-		Set<String> roles = new HashSet<String>();
+		Set<String> sharednets = new HashSet<>(authnets);
+		sharednets.retainAll(agent.getInternalNetworks().keySet());
+		secinf.setSharedNetworks(sharednets);
 		
-		if (agent.getInternalAllowPlatformRoles())
-		{
-			Set<String> r = rolemap.get(secinf.getAuthenticatedPlatformName());
-			if (r != null)
-				roles.addAll(r);
-		}
+		if (authenticatedplatformname != null && agent.getInternalTrustedPlatforms().contains(authenticatedplatformname))
+			secinf.setTrustedPlatform(true);
 		
-		if (secinf.getNetworks() != null)
-		{
-			for (String network : secinf.getNetworks())
-			{
-				Set<String> r = rolemap.get(network);
-				if (r != null)
-					roles.addAll(r);
-				else
-					roles.add(network);
-			}
-		}
+		secinf.setAllowDefaultAuthorization(agent.getInternalDefaultAuthorization());
 		
-		secinf.setRoles(roles);
+		agent.setSecInfoRoles(secinf);
+		
+		if (!agent.getInternalAllowNoAuthName() && secinf.getAuthenticatedPlatformName() == null)
+			throw new SecurityException("Connections to platforms with unauthenticated platform names are not allowed: " + remoteid);
+		
+		if (!agent.getInternalAllowNoNetwork() && secinf.getNetworks().isEmpty())
+			throw new SecurityException("Connections to platforms with no authenticated networks are not allowed: " + remoteid);
+		
+		if (agent.getInternalRefuseUnauth() && 
+			(secinf.getAuthenticatedPlatformName() == null &&
+			 secinf.getNetworks().isEmpty() &&
+			 !secinf.isAdminPlatform()))
+			throw new SecurityException("Unauthenticated connection not allowed: " + remoteid);
+	}
+	
+	/**
+	 *  Gets the ID used to identify the handshake of the suite.
+	 *  
+	 *  @return Handshake ID.
+	 */
+	public String getHandshakeId()
+	{
+		return handshakeid;
+	}
+	
+	/**
+	 *  Sets the ID used to identify the handshake of the suite.
+	 *  
+	 *  @param id Handshake ID.
+	 */
+	public void setHandshakeId(String id)
+	{
+		handshakeid = id;
 	}
 }

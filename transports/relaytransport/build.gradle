@@ -2,5 +2,7 @@ description 'Message transport implementing relay routing.'
 
 dependencies
 {
-	api project(':platform:base')
+	api project(':platform:bridge')
+	api project(':kernels:micro')
+	api project(':transports:base')	
 }

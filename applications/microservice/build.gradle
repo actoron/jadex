@@ -1,0 +1,10 @@
+description 'The Jadex microservice applications package contains several example applications, benchmarks and testcases using micro services.'
+
+dependencies 
+{
+	api project(':util:commons')
+	api project(':util:gui')
+	api project(':platform:bridge')
+	api project(':tools:base-swing')
+	api project(':kernels:microservice')	
+}

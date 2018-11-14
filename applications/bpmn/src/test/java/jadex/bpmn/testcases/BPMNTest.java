@@ -3,6 +3,7 @@ package jadex.bpmn.testcases;
 import java.io.File;
 
 import jadex.base.test.ComponentTestSuite;
+import jadex.commons.SUtil;
 import junit.framework.Test;
 
 /**

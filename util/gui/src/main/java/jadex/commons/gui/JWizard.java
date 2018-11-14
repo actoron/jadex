@@ -29,11 +29,14 @@ import jadex.commons.ICommand;
 import jadex.commons.collection.IdentityHashSet;
 
 /**
- *  
+ *  GUI class for creating wizard dialogs.
  *
  */
 public class JWizard extends JPanel
 {
+	/** Serial */
+	private static final long serialVersionUID = 4992471651678269871L;
+
 	/** ID for finish events. */
 	public static final int FINISH_ID = 0;
 	
@@ -260,6 +263,8 @@ public class JWizard extends JPanel
 		
 		JButton backbutton = new JButton(new AbstractAction("< Back")
 		{
+			private static final long serialVersionUID = 8555507317815950243L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				try
@@ -275,24 +280,32 @@ public class JWizard extends JPanel
 		
 		backbutton.setEnabled(!current.getParentNodeStack().isEmpty());
 		
-		AbstractAction nextaction = new AbstractAction("Next >")
+		AbstractAction nextaction = null;
+		if (current.getChildren().size() != 0)
 		{
-			public void actionPerformed(ActionEvent e)
+			nextaction = new AbstractAction("Next >")
 			{
-				try
+				private static final long serialVersionUID = -4975918469003714414L;
+
+				public void actionPerformed(ActionEvent e)
 				{
-					current.onNext();
-					next();
+					try
+					{
+						current.onNext();
+						next();
+					}
+					catch (Exception e1)
+					{
+					}
 				}
-				catch (Exception e1)
-				{
-				}
-			}
-		};
-		if (current.getChildren().size() == 0)
+			};
+		}
+		else
 		{
 			nextaction = new AbstractAction("Finish")
 			{
+				private static final long serialVersionUID = 4923957179445964525L;
+
 				public void actionPerformed(ActionEvent e)
 				{
 					try
@@ -302,6 +315,7 @@ public class JWizard extends JPanel
 					}
 					catch (Exception e1)
 					{
+						e1.printStackTrace();
 					}
 				}
 			};
@@ -310,6 +324,8 @@ public class JWizard extends JPanel
 		
 		JButton cancelbutton = new JButton(new AbstractAction("Cancel")
 		{
+			private static final long serialVersionUID = 2198620502764979156L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				try
@@ -356,6 +372,8 @@ public class JWizard extends JPanel
 		frame.setLocation(SGUI.calculateMiddlePosition(frame));
 		wizard.addTerminationListener(new AbstractAction()
 		{
+			private static final long serialVersionUID = 9133682067352852751L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				frame.dispose();
@@ -370,6 +388,8 @@ public class JWizard extends JPanel
 	 */
 	protected static class WizardNode extends JPanel
 	{
+		private static final long serialVersionUID = 7657673980110325857L;
+
 		/** The parent node stack. */
 		protected LinkedList<WizardNode> parents = new LinkedList<WizardNode>();
 		
@@ -510,6 +530,7 @@ public class JWizard extends JPanel
 	 */
 	public static class ChoiceNode extends WizardNode
 	{
+		private static final long serialVersionUID = 1634355685705747180L;
 		protected ButtonGroup bgroup;
 		
 		/**

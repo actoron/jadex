@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.c2;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -17,7 +18,7 @@ import jadex.rules.eca.ChangeInfo;
  *  Dynamic belief.
  */
 @Description("The clock agent C2. <br>  This translation agent uses a belief with update rate.")
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Service
 public class TranslationBDI
 {
@@ -45,7 +46,7 @@ public class TranslationBDI
 	/**
 	 *  Initiate an alarm.
 	 */
-	@Plan(trigger=@Trigger(factchangeds="alarm"))
+	@Plan(trigger=@Trigger(factchanged="alarm"))
 	public void checkWordPairPlan(ChangeEvent<ChangeInfo<Boolean>> event)
 	{
 		ChangeInfo<Boolean>	change	= event.getValue();

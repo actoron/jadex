@@ -13,11 +13,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IPojoComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SNonAndroid;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -38,26 +34,25 @@ public class JCCTest //extends TestCase
 //		System.err.println("starting platform");
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
 		config.setGui(true);
+		config.setValue("superpeerclient", true);
 		config.setValue("settings.readonly", true);
+//		config.setLogging(true);
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(config);
 		
-		long timeout = Starter.getLocalDefaultTimeout(null);
+		long timeout = Starter.getDefaultTimeout(null);
 //		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		IExternalAccess	platform	= fut.get(timeout);
-		timeout	= Starter.getLocalDefaultTimeout(platform.getComponentIdentifier());
+		timeout	= Starter.getDefaultTimeout(platform.getId());
 		
-		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
-			.getService(platform, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(timeout);
-
-		IExternalAccess	jcc	= (IExternalAccess)cms.getExternalAccess(
-			new BasicComponentIdentifier("jcc", platform.getComponentIdentifier())).get(timeout);
+		IExternalAccess	jcc	= (IExternalAccess)platform.getExternalAccess(
+			new BasicComponentIdentifier("jcc", platform.getId())).get(timeout);
 		
 		jcc.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				final JCCAgent	jcca	= (JCCAgent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+				final JCCAgent	jcca	= (JCCAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
 				final ControlCenter	cc	= jcca.getControlCenter();
 				
 				final Future<Void>	ret	= new Future<Void>();
@@ -79,7 +74,6 @@ public class JCCTest //extends TestCase
 		fut	= null;
 		platform	= null;
 		jcc	= null;
-		cms	= null;
 		
 		SNonAndroid.clearAWT();
 		

@@ -1,5 +1,9 @@
 package jadex.tools.jcc;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.base.gui.componentviewer.ComponentViewerPlugin;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IComponentIdentifier;
@@ -12,12 +16,18 @@ import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.Boolean3;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.micro.annotation.Agent;
@@ -26,16 +36,15 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Properties;
-import jadex.tools.awareness.AwarenessServicePlugin;
 import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
-import jadex.tools.registry.RegistryComponentPlugin;
+import jadex.tools.libtool.LibraryServicePlugin;
 import jadex.tools.security.SecurityServicePlugin;
 import jadex.tools.simcenter.SimulationServicePlugin;
 import jadex.tools.starter.StarterPlugin;
-import jadex.tools.testcenter.TestCenterPlugin;
 
 /**
  *  Micro component for opening the JCC gui.
@@ -46,9 +55,9 @@ import jadex.tools.testcenter.TestCenterPlugin;
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true", description="Save settings on exit?"),
 	@Argument(name="platforms", clazz=String.class, defaultvalue="null", description="Show JCC for platforms matching this name.")
 })
-@Agent
+@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="jcc", predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
 @Properties(@NameValue(name="system", value="true"))
-public class JCCAgent	implements IComponentStep<Void>
+public class JCCAgent implements IComponentStep<Void>
 {
 	//-------- constants --------
 	
@@ -60,22 +69,26 @@ public class JCCAgent	implements IComponentStep<Void>
 	
 	//-------- attributes --------
 	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
+	
 	/** The saveonexit argument. */
 	@AgentArgument
-	protected boolean	saveonexit;
+	protected boolean saveonexit;
 	
 	/** The platforms argument. */
 	@AgentArgument
-	protected String	platforms;
+	protected String platforms;
 	
 	/** The control center. */
 	protected ControlCenter	cc;
 	
 	/** Number of tries, when connecting initially to remote platforms. */
-	protected int	tries;
+	protected int tries;
 	
 	/** True when initially connected to a remote platform.. */
-	protected boolean	connected;
+	protected boolean connected;
 	
 	//-------- micro agent methods --------
 	
@@ -129,17 +142,17 @@ public class JCCAgent	implements IComponentStep<Void>
 			{
 				agent.getLogger().info("Searching for platforms matching '"+platforms+"'.");
 				
-				agent.getComponentFeature(IRequiredServicesFeature.class).searchServices(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-					.addResultListener(new TimeoutIntermediateResultListener<IComponentManagementService>(RETRY_DELAY, agent.getExternalAccess(),
-						new IntermediateExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+					.addResultListener(new TimeoutIntermediateResultListener<ILibraryService>(RETRY_DELAY, agent.getExternalAccess(),
+						new IntermediateExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{
-					public void intermediateResultAvailable(IComponentManagementService cms)
+					public void intermediateResultAvailable(ILibraryService cms)
 					{
-						IComponentIdentifier	cid	= ((IService)cms).getServiceIdentifier().getProviderId().getRoot();
+						IComponentIdentifier cid = ((IService)cms).getServiceId().getProviderId().getRoot();
 						if(cid.getName().startsWith(platforms))
 						{
-							connected	= true;
-							cms.getExternalAccess(cid)
+							connected = true;
+							agent.getExternalAccess(cid)
 								.addResultListener(new IResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess platform)
@@ -172,7 +185,7 @@ public class JCCAgent	implements IComponentStep<Void>
 						// If no platform found, search again after 1 second.
 						if(!connected)
 						{
-							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(RETRY_DELAY, JCCAgent.this, true)
+							agent.getFeature(IExecutionFeature.class).waitForDelay(RETRY_DELAY, JCCAgent.this, true)
 								.addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					}
@@ -182,7 +195,7 @@ public class JCCAgent	implements IComponentStep<Void>
 						// If no platform found, search again after 1 second.
 						if(!connected)
 						{
-							agent.getComponentFeature(IExecutionFeature.class).waitForDelay(exception instanceof TimeoutException ? 0 : RETRY_DELAY, JCCAgent.this, true)
+							agent.getFeature(IExecutionFeature.class).waitForDelay(exception instanceof TimeoutException ? 0 : RETRY_DELAY, JCCAgent.this, true)
 								.addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					}
@@ -197,20 +210,20 @@ public class JCCAgent	implements IComponentStep<Void>
 	 *  Close the gui on agent shutdown.
 	 */
 	@AgentKilled
-	public IFuture<Void>	agentKilled(IInternalAccess agent)
+	public IFuture<Void> agentKilled(IInternalAccess agent)
 	{
 //		System.out.println("JCC agent killed");
 		Future<Void>	ret	= new Future<Void>();
 		if(cc!=null)
 		{
 			cc.shutdown()
-				.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 		}
 		else
 		{
 			ret.setResult(null);
 		}
-
+		
 		return ret;
 	}
 	
@@ -218,7 +231,7 @@ public class JCCAgent	implements IComponentStep<Void>
 	 *  Get the control center.
 	 */
 	// Used for test case.
-	public ControlCenter	getControlCenter()
+	public ControlCenter getControlCenter()
 	{
 		return cc;
 	}
@@ -243,20 +256,20 @@ public class JCCAgent	implements IComponentStep<Void>
 	//				DFServicePlugin.class.getName(),
 	//				ConversationPlugin.class.getName(),
 	//				"jadex.tools.comanalyzer.ComanalyzerPlugin",
-					TestCenterPlugin.class.getName(),
+//					TestCenterPlugin.class.getName(),
 	//				JadexdocPlugin.class.getName(),
 					SimulationServicePlugin.class.getName(),
 					DebuggerPlugin.class.getName(),
 	//				RuleProfilerPlugin.class.getName(),
-	//				LibraryServicePlugin.class.getName(),
+					LibraryServicePlugin.class.getName(),
 //					AwarenessComponentPlugin.class.getName(),
-					AwarenessServicePlugin.class.getName(),
+//					AwarenessServicePlugin.class.getName(),
 					ComponentViewerPlugin.class.getName(),
 					SecurityServicePlugin.class.getName(),
-					RegistryComponentPlugin.class.getName()
+//					RegistryComponentPlugin.class.getName()
 	//				DeployerPlugin.class.getName()
 				},
-			saveonexit).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+			saveonexit).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
 		}
 		else
 		{

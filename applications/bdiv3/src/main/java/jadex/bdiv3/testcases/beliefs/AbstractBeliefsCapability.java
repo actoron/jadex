@@ -108,7 +108,7 @@ public class AbstractBeliefsCapability
 		results.put("array", new TestReport("#10", "Test abstract array belief."));
 		
 		// todo: agentCreated
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -123,7 +123,7 @@ public class AbstractBeliefsCapability
 				setString("hello");
 				setArray(new String[]{"hello", "world"});
 				
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(300, new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).waitForDelay(300, new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -146,7 +146,7 @@ public class AbstractBeliefsCapability
 	
 	//-------- plans --------
 	
-	@Plan(trigger=@Trigger(factchangeds={"byte", "short", "int", "long", "float", "double", "char", "boolean", "string", "array"}))
+	@Plan(trigger=@Trigger(factchanged={"byte", "short", "int", "long", "float", "double", "char", "boolean", "string", "array"}))
 	public void	beliefChanged(ChangeEvent event)
 	{
 		TestReport	tr	= results.get(event.getSource());

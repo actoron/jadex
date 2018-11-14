@@ -2,14 +2,12 @@ package jadex.micro.testcases.autoterminate;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
@@ -23,10 +21,8 @@ import jadex.micro.annotation.RequiredServices;
 	@Configuration(name="self"),
 	@Configuration(name="platform")})
 @RequiredServices({
-	@RequiredService(name="sub", type=IAutoTerminateService.class,
-		binding=@Binding(scope=Binding.SCOPE_GLOBAL)),
-	@RequiredService(name="cms", type=IComponentManagementService.class,
-		binding=@Binding(scope=Binding.SCOPE_PLATFORM))})
+	@RequiredService(name="sub", type=IAutoTerminateService.class, scope=RequiredService.SCOPE_GLOBAL),
+})
 public class SubscriberAgent
 {
 	//-------- attributes --------
@@ -39,10 +35,6 @@ public class SubscriberAgent
 //	@AgentService
 //	protected IAutoTerminateService	sub;
 
-	/** The cms. */
-	@AgentServiceSearch
-	protected IComponentManagementService	cms;
-	
 	//-------- methods --------
 	
 	/**
@@ -53,7 +45,7 @@ public class SubscriberAgent
 	{
 //		agent.getLogger().severe("subscribe "+agent.getComponentIdentifier()+", "+agent.getConfiguration());
 		
-		SServiceProvider.getService(agent, IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL))
 			.addResultListener(new IResultListener<IAutoTerminateService>()
 		{
 			public void exceptionOccurred(Exception exception)
@@ -72,7 +64,7 @@ public class SubscriberAgent
 						if("platform".equals(agent.getConfiguration()))
 						{
 //							agent.getLogger().severe("destroy platform: "+agent.getComponentIdentifier().getRoot());
-							cms.destroyComponent(agent.getComponentIdentifier().getRoot());
+							agent.killComponent(agent.getId().getRoot());
 						}
 						else
 						{

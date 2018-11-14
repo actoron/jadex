@@ -190,8 +190,8 @@ public class ProcessThread	implements ITaskContext
 //		else
 //			System.out.println("activity to null: "+getId());
 		
-		if(getInstance().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-			getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
+		if(getInstance().getFeature0(IMonitoringComponentFeature.class)!=null && getInstance().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			getInstance().getFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
 	}
 	
 	/**
@@ -266,8 +266,8 @@ public class ProcessThread	implements ITaskContext
 	{
 //		System.out.println("Set waiting thread: "+getId()+" "+waiting);
 		this.waiting = waiting;
-		if(getInstance().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-			getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
+		if(getInstance().getFeature0(IMonitoringComponentFeature.class)!=null && getInstance().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			getInstance().getFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
 	}
 	
 	/**
@@ -285,8 +285,8 @@ public class ProcessThread	implements ITaskContext
 //		this.waitinfo = null;
 		this.cancelinfo = null;
 		this.waitfilter = null;
-		if(getInstance().getComponentFeature0(IMonitoringComponentFeature.class)!=null && getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-			getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
+		if(getInstance().getFeature0(IMonitoringComponentFeature.class)!=null && getInstance().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			getInstance().getFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, this), PublishTarget.TOALL);
 
 //		if(waswaiting)
 //			scheduleExecution();
@@ -299,7 +299,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	protected void scheduleExecution()
 	{
-		getInstance().getComponentFeature(IExecutionFeature.class).scheduleStep(new ExecuteProcessThread(this)).addResultListener(new IResultListener<Void>()
+		getInstance().getFeature(IExecutionFeature.class).scheduleStep(new ExecuteProcessThread(this)).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -1061,7 +1061,7 @@ public class ProcessThread	implements ITaskContext
 				else if (de.getSource() == null)
 				{
 					// Argument data edge
-					passedparams.put(de.getTargetParameter(), instance.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get(de.getSourceParameter()));
+					passedparams.put(de.getTargetParameter(), instance.getFeature(IArgumentsResultsFeature.class).getArguments().get(de.getSourceParameter()));
 					missedparams.remove(de.getTargetParameter());
 				}
 				else
@@ -1167,7 +1167,7 @@ public class ProcessThread	implements ITaskContext
 					if(de.getTarget() == null)
 					{
 						// Result data edge
-						instance.getComponentFeature(IArgumentsResultsFeature.class).getResults().put(de.getTargetParameter(), value);
+						instance.getFeature(IArgumentsResultsFeature.class).getResults().put(de.getTargetParameter(), value);
 					}
 					else
 					{
@@ -1344,9 +1344,9 @@ public class ProcessThread	implements ITaskContext
 			{
 //				System.out.println("remove1: "+thread);
 //				BpmnInterpreter in = thread.getInstance();
-				if(getInstance().getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+				if(getInstance().getFeature0(IMonitoringComponentFeature.class)!=null && thread.getInstance().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 				{	
-					thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(thread.getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
+					thread.getInstance().getFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(thread.getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
 				}
 			}
 		}
@@ -1368,9 +1368,9 @@ public class ProcessThread	implements ITaskContext
 			subthreads	= new ArrayList<ProcessThread>();
 		
 		subthreads.add(thread);
-		if(getInstance().getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(getInstance().getFeature0(IMonitoringComponentFeature.class)!=null && thread.getInstance().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{	
-			thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(thread.getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
+			thread.getInstance().getFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(thread.getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
 		}
 //		System.out.println("add: "+thread);
 	}
@@ -1397,9 +1397,9 @@ public class ProcessThread	implements ITaskContext
 ////			threads.putAll(oldthreads);
 //		}
 		
-		if(getInstance().getComponentFeature0(IMonitoringComponentFeature.class)!=null && thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(getInstance().getFeature0(IMonitoringComponentFeature.class)!=null && thread.getInstance().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{	
-			thread.getInstance().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(thread.getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
+			thread.getInstance().getFeature(IMonitoringComponentFeature.class).publishEvent(getBpmnFeature(thread.getInstance()).createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
 		}
 //		System.out.println("add: "+thread);
 	}
@@ -1593,7 +1593,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	protected IInternalBpmnComponentFeature getBpmnFeature(IInternalAccess ia)
 	{
-		return (IInternalBpmnComponentFeature)ia.getComponentFeature(IBpmnComponentFeature.class);
+		return (IInternalBpmnComponentFeature)ia.getFeature(IBpmnComponentFeature.class);
 	}
 	
 	/**

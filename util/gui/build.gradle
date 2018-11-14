@@ -2,6 +2,7 @@ description 'Common GUI support classes.'
 
 dependencies
 {
+	api project(':platform:bridge')
 	api project(':util:commons')
 	api project(':util:concurrent')
 }

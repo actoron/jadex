@@ -56,7 +56,7 @@ public class AAgent implements IAService
 				{
 //					System.out.println("ma2 called "+cnt[0]+" "+agent.getComponentIdentifier().getLocalName());
 					ret.addIntermediateResult(Integer.valueOf(cnt[0]++));
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(10, this, false);
+					agent.getFeature(IExecutionFeature.class).waitForDelay(10, this, false);
 				}
 				else
 				{
@@ -65,7 +65,7 @@ public class AAgent implements IAService
 				return IFuture.DONE;
 			}
 		};
-		agent.getComponentFeature(IExecutionFeature.class).scheduleStep(step);
+		agent.getFeature(IExecutionFeature.class).scheduleStep(step);
 		return ret;
 	}
 	

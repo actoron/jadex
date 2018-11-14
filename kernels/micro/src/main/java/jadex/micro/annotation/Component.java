@@ -20,20 +20,20 @@ public @interface Component
 	 */
 	public Boolean3 suspend() default Boolean3.NULL;
 	
-	/**
-	 *  The master flag.
-	 */
-	public Boolean3 master() default Boolean3.NULL;
-	
-	/**
-	 *  The daemon flag.
-	 */
-	public Boolean3 daemon() default Boolean3.NULL;
-	
-	/**
-	 *  The autoshutdown flag.
-	 */
-	public Boolean3 autoshutdown() default Boolean3.NULL;
+//	/**
+//	 *  The master flag.
+//	 */
+//	public Boolean3 master() default Boolean3.NULL;
+//	
+//	/**
+//	 *  The daemon flag.
+//	 */
+//	public Boolean3 daemon() default Boolean3.NULL;
+//	
+//	/**
+//	 *  The autoshutdown flag.
+//	 */
+//	public Boolean3 autoshutdown() default Boolean3.NULL;
 
 	/**
 	 *  The synchronous flag.
@@ -70,8 +70,8 @@ public @interface Component
 	 */
 	public NameValue[] arguments() default {};
 	
-	/**
-	 *  The argument values.
-	 */
-	public Binding[] bindings() default {};
+//	/**
+//	 *  The argument values.
+//	 */
+//	public Binding[] bindings() default {};
 }

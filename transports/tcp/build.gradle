@@ -1,0 +1,8 @@
+description 'Message transport based on direct TCP connections.'
+
+dependencies
+{
+	api project(':platform:bridge')
+	api project(':kernels:micro')
+	api project(':transports:base')
+}

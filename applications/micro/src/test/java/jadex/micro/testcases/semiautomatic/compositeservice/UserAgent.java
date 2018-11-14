@@ -8,7 +8,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -17,7 +16,7 @@ import jadex.micro.annotation.RequiredServices;
  *  The user agent uses services for testing them.
  */
 @Description("This agent uses an add service.")
-@RequiredServices(@RequiredService(name="addservice", type=IAddService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="addservice", type=IAddService.class, scope=RequiredService.SCOPE_PLATFORM))
 @Agent
 public class UserAgent
 {
@@ -31,7 +30,7 @@ public class UserAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("addservice").addResultListener(new DefaultResultListener()
+		agent.getFeature(IRequiredServicesFeature.class).getService("addservice").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -40,7 +39,7 @@ public class UserAgent
 				{
 					public void resultAvailable(Object result)
 					{
-						System.out.println("add service result: "+result+" "+agent.getComponentIdentifier().getLocalName());
+						System.out.println("add service result: "+result+" "+agent.getId().getLocalName());
 					}
 					
 					public void exceptionOccurred(Exception exception)

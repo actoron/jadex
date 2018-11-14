@@ -34,11 +34,11 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 	 */
 	public void intermediateResultAvailable(final E result)
 	{
-		if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+		if(!component.getFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{
-				component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -84,11 +84,11 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
      */
     public void finished()
     {
-    	if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+    	if(!component.getFeature(IExecutionFeature.class).isComponentThread())
 		{
 			try
 			{
-				component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+				component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -111,7 +111,7 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(component.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(component.getId(), new Runnable()
 				{
 					public void run()
 					{

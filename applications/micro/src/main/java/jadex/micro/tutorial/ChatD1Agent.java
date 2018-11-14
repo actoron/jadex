@@ -11,7 +11,6 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentFeature;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -27,10 +26,8 @@ import jadex.micro.annotation.RequiredServices;
 @ProvidedServices(@ProvidedService(type=IChatService.class, 
 	implementation=@Implementation(ChatServiceD1.class)))
 @RequiredServices({
-	@RequiredService(name="clockservice", type=IClockService.class, 
-		binding=@Binding(scope=Binding.SCOPE_PLATFORM)),
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
-		binding=@Binding(dynamic=true, scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="clockservice", type=IClockService.class),
+	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=RequiredService.SCOPE_PLATFORM)
 })
 public class ChatD1Agent
 {
@@ -49,7 +46,7 @@ public class ChatD1Agent
 	@AgentBody
 	public void executeBody()
 	{
-		IFuture<Collection<IChatService>>	chatservices	= requiredServicesFeature.getRequiredServices("chatservices");
+		IFuture<Collection<IChatService>>	chatservices	= requiredServicesFeature.getServices("chatservices");
 		chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 		{
 			public void resultAvailable(Collection<IChatService> result)
@@ -57,7 +54,7 @@ public class ChatD1Agent
 				for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 				{
 					IChatService cs = it.next();
-					cs.message(agent.getComponentIdentifier().getName(), "Hello");
+					cs.message(agent.getId().getName(), "Hello");
 				}
 			}
 		});

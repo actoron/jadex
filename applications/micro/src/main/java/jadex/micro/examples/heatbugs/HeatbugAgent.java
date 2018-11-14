@@ -62,7 +62,7 @@ public class HeatbugAgent
 			public void customResultAvailable(Object result)
 			{
 				final Grid2D grid = (Grid2D)result;
-				ISpaceObject avatar = grid.getAvatar(agent.getComponentDescription());
+				ISpaceObject avatar = grid.getAvatar(agent.getDescription());
 				
 //						unhappiness = Math.abs(ideal_temp - temp);
 				randomchance = ((Number)avatar.getProperty("random_move_chance")).doubleValue();
@@ -73,7 +73,7 @@ public class HeatbugAgent
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ISpaceObject avatar = grid.getAvatar(agent.getComponentDescription());
+						ISpaceObject avatar = grid.getAvatar(agent.getDescription());
 						IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 						Collection coll	= grid.getSpaceObjectsByGridPosition(mypos, "patch");
 						if(coll!=null)
@@ -145,7 +145,7 @@ public class HeatbugAgent
 							}
 						}
 						
-						agent.getComponentFeature(IExecutionFeature.class).waitForTick(this);
+						agent.getFeature(IExecutionFeature.class).waitForTick(this);
 						return IFuture.DONE;
 					}
 					
@@ -155,7 +155,7 @@ public class HeatbugAgent
 					}
 				};
 				
-				agent.getComponentFeature(IExecutionFeature.class).waitForTick(com);
+				agent.getFeature(IExecutionFeature.class).waitForTick(com);
 			}
 		});
 		

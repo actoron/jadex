@@ -11,7 +11,6 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.SNFPropertyProvider;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.DefaultPoolStrategy;
@@ -22,10 +21,11 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -39,13 +39,11 @@ import jadex.platform.service.servicepool.IServicePoolService;
 @Service
 @RequiredServices(
 {
-	@RequiredService(name="poolser", type=IServicePoolService.class, binding=@Binding(
-		scope=RequiredServiceInfo.SCOPE_COMPONENT, create=true, 
-		creationinfo=@CreationInfo(type="spa"))),
-	@RequiredService(name="testser", type=ITestService.class, 
-		binding=@Binding(create=true, creationinfo=@CreationInfo(type="provider")))
+	@RequiredService(name="poolser", type=IServicePoolService.class),
+	@RequiredService(name="testser", type=ITestService.class)
 })
 @ComponentTypes(@ComponentType(name="spa", filename="jadex.platform.service.servicepool.ServicePoolAgent.class"))
+@Configurations(@Configuration(name="default", components=@Component(type="spa")))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
 public class UserAgent
 {
@@ -61,7 +59,7 @@ public class UserAgent
 //	{
 //		registerServices().get();
 //		
-//		ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser").get();
+//		ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getService("testser").get();
 //		
 //		for(int i=0; i<100; i++)
 //		{
@@ -79,7 +77,7 @@ public class UserAgent
 	{
 		registerServices().get();
 		
-		ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser").get();
+		ITestService ser = (ITestService)agent.getFeature(IRequiredServicesFeature.class).getService("testser").get();
 		
 		final List<TestReport> results = new ArrayList<TestReport>();
 		final long wa = 500;
@@ -98,7 +96,7 @@ public class UserAgent
 			Method ma = ser.getClass().getMethod("methodA", new Class[]{long.class});
 			
 //			INFMixedPropertyProvider prov = ((INFMixedPropertyProvider)((IService)ser).getExternalComponentFeature(INFPropertyComponentFeature.class));
-			double w = ((Long)SNFPropertyProvider.getMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ser).getServiceIdentifier(), new MethodInfo(ma), ExecutionTimeProperty.NAME).get()).doubleValue();
+			double w = ((Long)agent.getMethodNFPropertyValue(((IService)ser).getServiceId(), new MethodInfo(ma), ExecutionTimeProperty.NAME).get()).doubleValue();
 //			double w = ((Long)((IService)ser).getMethodNFPropertyValue(new MethodInfo(ma), ExecutionTimeProperty.NAME).get()).doubleValue();
 			double d = Math.abs(w-wa)/wa;
 			if(d<0.15)
@@ -114,7 +112,7 @@ public class UserAgent
 			results.add(tr2);
 			Method mb = ser.getClass().getMethod("methodB", new Class[]{long.class});
 //			prov = ((INFMixedPropertyProvider)((IService)ser).getExternalComponentFeature(INFPropertyComponentFeature.class));
-			w = ((Long)SNFPropertyProvider.getMethodNFPropertyValue(agent.getExternalAccess(), ((IService)ser).getServiceIdentifier(), new MethodInfo(mb), ExecutionTimeProperty.NAME).get()).doubleValue();
+			w = ((Long)agent.getMethodNFPropertyValue(((IService)ser).getServiceId(), new MethodInfo(mb), ExecutionTimeProperty.NAME).get()).doubleValue();
 //			w = ((Long)((IService)ser).getMethodNFPropertyValue(new MethodInfo(mb), ExecutionTimeProperty.NAME).get()).doubleValue();
 			d = Math.abs(w-wb)/wb;
 			if(d<0.15)
@@ -129,7 +127,7 @@ public class UserAgent
 			TestReport tr3 = new TestReport("#3", "Test if wait time of service is ok");
 			results.add(tr3);
 //			prov = ((INFMixedPropertyProvider)((IService)ser).getExternalComponentFeature(INFPropertyComponentFeature.class));
-			w = ((Long)SNFPropertyProvider.getNFPropertyValue(agent.getExternalAccess(), ((IService)ser).getServiceIdentifier(), ExecutionTimeProperty.NAME).get()).doubleValue();
+			w = ((Long)agent.getNFPropertyValue(((IService)ser).getServiceId(), ExecutionTimeProperty.NAME).get()).doubleValue();
 //			w = ((Long)((IService)ser).getNFPropertyValue(ExecutionTimeProperty.NAME).get()).doubleValue();
 			long wab = (wa+wb)/2;
 			d = Math.abs(w-wab)/wab;
@@ -147,7 +145,7 @@ public class UserAgent
 			e.printStackTrace();
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
 		agent.killComponent();
 	}
@@ -158,7 +156,7 @@ public class UserAgent
 	public IFuture<Void> registerServices()
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IServicePoolService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("poolser");
+		IFuture<IServicePoolService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("poolser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
 		{
 			public void customResultAvailable(final IServicePoolService sps)

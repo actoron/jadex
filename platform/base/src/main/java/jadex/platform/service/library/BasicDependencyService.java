@@ -57,7 +57,7 @@ public class BasicDependencyService implements IDependencyService
 	@ServiceStart
 	public IFuture<Void> startService()
 	{
-		this.cid	= component.getComponentIdentifier().getRoot();
+		this.cid	= component.getId().getRoot();
 		this.logger	= component.getLogger();
 		return IFuture.DONE;
 	}

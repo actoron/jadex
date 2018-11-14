@@ -4,22 +4,25 @@ import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -29,7 +32,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -40,12 +42,13 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 
-import jadex.commons.FileWatcher;
+import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.gui.ModulateComposite;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
+import jadex.commons.security.PemKeyPair;
 import jadex.commons.security.SCertStore;
 import jadex.commons.security.SSecurity;
 
@@ -165,7 +168,7 @@ public class CertTree extends JTree implements TreeModel
 	}
 	
 	/** The loaded certificates used as model. */
-	Map<String, Tuple2<String, String>> certmodel;
+	Map<String, PemKeyPair> certmodel = new HashMap<>();
 	
 	/** Lookup helper for finding tree nodes. */
 	Map<String, CertTreeNode> nodelookup;
@@ -177,21 +180,23 @@ public class CertTree extends JTree implements TreeModel
 	protected List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
 	
 	/** Path to certificate store. */
-	protected String storepath;
+	protected String storrepath;
+	
+	/** Store save command. */
+	protected ICommand<byte[]> storesavecommand;
 	
 	/** File watcher for the store. */
-	protected FileWatcher storewatch;
+//	protected FileWatcher storewatch;
 	
 	/**
 	 *  Creates the tree.
 	 *  
 	 *  @param certstorepath Certificate store path.
 	 */
-	public CertTree(String certstorepath)
+	public CertTree()
 	{
 		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		
-		storepath = certstorepath;
 		root = createRootNode();
 		setEditable(false);
 		setShowsRootHandles(true);
@@ -199,7 +204,6 @@ public class CertTree extends JTree implements TreeModel
 		setRootVisible(true);
 //		setBorder(BorderFactory.createTitledBorder("Certificates"));
 		
-		certmodel = new HashMap<String, Tuple2<String,String>>();		
 //		try
 //		{
 //			certmodel = SCertStore.convertToSubjectMap(SCertStore.loadCertStore(storepath));
@@ -214,6 +218,8 @@ public class CertTree extends JTree implements TreeModel
 		
 		setCellRenderer(new DefaultTreeCellRenderer()
 		{
+			private static final long serialVersionUID = 8920125694443497650L;
+
 			public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus)
 			{
 				super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
@@ -250,6 +256,8 @@ public class CertTree extends JTree implements TreeModel
 					
 					JMenuItem addcert = new JMenuItem(new AbstractAction("Add Certificate...")
 					{
+						private static final long serialVersionUID = 991210496232594322L;
+
 						public void actionPerformed(ActionEvent e)
 						{
 //							final JDialog createdia = new JDialog(JOptionPane.getRootFrame(), "Add Certificate", false);
@@ -260,14 +268,16 @@ public class CertTree extends JTree implements TreeModel
 							
 							final AddCertPanel certpanel = new AddCertPanel(getSelectedCert(), new AbstractAction()
 							{
+								private static final long serialVersionUID = 6728859103551025243L;
+
 								public void actionPerformed(ActionEvent e)
 								{
 									if (e.getID() == ActionEvent.ACTION_PERFORMED)
 									{
 										AddCertPanel pan = (AddCertPanel) e.getSource();
-										Tuple2<String, String> cert = pan.getCertificate();
+										PemKeyPair cert = pan.getCertificate();
 										
-										String subjectid = SSecurity.readCertificateFromPEM(cert.getFirstEntity()).getSubject().toString();
+										String subjectid = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert.getCertificate()).getSubject());
 										
 										CertTree.this.certmodel.put(subjectid, cert);
 										
@@ -289,13 +299,15 @@ public class CertTree extends JTree implements TreeModel
 					
 					JMenuItem delkey = new JMenuItem(new AbstractAction("Delete Key")
 					{
+						private static final long serialVersionUID = -7584770925534751334L;
+
 						public void actionPerformed(ActionEvent e)
 						{
-							Tuple2<String, String> cert = getSelectedCert();
+							PemKeyPair cert = getSelectedCert();
+							
 							if (cert == null)
 								return;
-							String name = SSecurity.readCertificateFromPEM(cert.getFirstEntity()).getSubject().toString();
-							certmodel.put(name, new Tuple2<String, String>(cert.getFirstEntity(), null));
+							cert.setKey(null);
 							
 							updateAndSave();
 						}
@@ -303,20 +315,29 @@ public class CertTree extends JTree implements TreeModel
 					
 					JMenuItem delcert = new JMenuItem(new AbstractAction("Delete Certificate")
 					{
+						private static final long serialVersionUID = 3920965217865964794L;
+
 						public void actionPerformed(ActionEvent e)
 						{
-							Tuple2<String, String> cert = getSelectedCert();
-							if (cert == null)
+							Object onode = getSelectionModel().getSelectionPath().getLastPathComponent();
+							if (onode == root)
 								return;
-							String name = SSecurity.readCertificateFromPEM(cert.getFirstEntity()).getSubject().toString();
-							certmodel.remove(name);
+							CertTreeNode node = (CertTreeNode) onode;
+							
+							deleteCertNode(node, certmodel);
+							
+//							PemKeyPair cert = getSelectedCert();
+//							if (cert == null)
+//								return;
+//							String name = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert.getCertificate()).getSubject());
+//							certmodel.remove(name);
 							
 							updateAndSave();
 						}
 					});
 					
 					menu.add(addcert);
-					if (getSelectedCert() != null && getSelectedCert().getSecondEntity() != null)
+					if (getSelectedCert() != null && getSelectedCert().getKey() != null)
 						menu.add(delkey);
 					menu.add(delcert);
 					
@@ -336,7 +357,7 @@ public class CertTree extends JTree implements TreeModel
 		
 //		setRootVisible(false);
 		
-		addHierarchyListener(new HierarchyListener()
+		/*addHierarchyListener(new HierarchyListener()
 		{
 			public void hierarchyChanged(HierarchyEvent e)
 			{
@@ -352,27 +373,8 @@ public class CertTree extends JTree implements TreeModel
 					visible &= p.isDisplayable();
 					p = p.getParent();
 				}
-				
-				if (visible)
-				{
-					if (storewatch == null)
-					{
-//						System.out.println("Shown " + e.getComponent());
-						loadAndUpdate();
-						createStoreWatch();
-					}
-				}
-				else
-				{
-					if (storewatch != null)
-					{
-//						System.out.println("Hidden: " + e.getComponent());
-						storewatch.stop();
-						storewatch = null;
-					}
-				}
 			}
-		});
+		});*/
 		
 //		loadAndUpdate();
 	}
@@ -443,11 +445,12 @@ public class CertTree extends JTree implements TreeModel
 	/**
 	 *  Loads and updates the model.
 	 */
-	public void loadAndUpdate()
+	public void load(byte[] storedata)
 	{
 		try
 		{
-			certmodel = SCertStore.convertToSubjectMap(SCertStore.loadCertStore(storepath));
+//			certmodel = SCertStore.convertToSubjectMap(SCertStore.loadCertStore(storedata));
+			certmodel = SCertStore.loadCertStore(storedata);
 		}
 		catch (Exception e)
 		{
@@ -458,24 +461,24 @@ public class CertTree extends JTree implements TreeModel
 	/**
 	 *  Creates a store watch.
 	 */
-	protected void createStoreWatch()
-	{
-		if (storewatch != null)
-			storewatch.stop();
-		storewatch = new FileWatcher(storepath, new Runnable()
-		{
-			public void run()
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						loadAndUpdate();
-					}
-				});
-			}
-		}, true);
-	}
+//	protected void createStoreWatch()
+//	{
+//		if (storewatch != null)
+//			storewatch.stop();
+//		storewatch = new FileWatcher(storepath, new Runnable()
+//		{
+//			public void run()
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						loadAndUpdate();
+//					}
+//				});
+//			}
+//		}, true);
+//	}
 	
 	/**
 	 *  Updates the model.
@@ -486,37 +489,89 @@ public class CertTree extends JTree implements TreeModel
 		nodelookup.clear();
 		clearToggledPaths();
 		
+//		for (Map.Entry<String, PemKeyPair> entry : certmodel.entrySet())
+//		{
+//			List<X509CertificateHolder> certchain = SSecurity.readCertificateChainFromPEM(entry.getValue().getCertificate());
+//			for (int i = 0; i < certchain.size(); ++i)
+//			{
+//				X509CertificateHolder cert = certchain.get(i);
+//				String cn = SSecurity.getCommonName(cert.getSubject());
+//				if (!certmodel.containsKey(cn))
+//				{
+//					PemKeyPair kp = new PemKeyPair();
+//					kp.setCertificate(SSecurity.writeCertificateAsPEM(cert));
+//					certmodel.put(cn, kp);
+//				}
+//			}
+//		}
+		
+		Map<String, PemKeyPair> model = null;
 		synchronized(certmodel)
 		{
-			for (Map.Entry<String, Tuple2<String, String>> entry : certmodel.entrySet())
+			model = new HashMap<>(certmodel);
+		}
+		
+		boolean done = false;
+		while(!model.isEmpty() || done)
+		{
+			boolean hasremoved = false;
+			for (Iterator<Map.Entry<String, PemKeyPair>> it = model.entrySet().iterator(); it.hasNext(); )
 			{
-				List<X509CertificateHolder> certchain = SSecurity.readCertificateChainFromPEM(entry.getValue().getFirstEntity());
-				Collections.reverse(certchain);
+				Map.Entry<String, PemKeyPair> entry = it.next();
+				X509CertificateHolder cert = SSecurity.readCertificateFromPEM(entry.getValue().getCertificate());
+				String issuer = SSecurity.getCommonName(cert.getIssuer());
 				
-				for (int i = 0; i < certchain.size(); ++i)
+				if (SSecurity.getCommonName(cert.getSubject()).equals(issuer) ||
+					nodelookup.get(issuer) != null)
 				{
-					X509CertificateHolder cert = certchain.get(i);
+					it.remove();
+					hasremoved = true;
+					String sub = SSecurity.getCommonName(cert.getSubject());
+					CertTreeNode node = new CertTreeNode(sub);
+					nodelookup.put(SSecurity.getCommonName(cert.getSubject()), node);
 					
-					if (!nodelookup.containsKey(cert.getSubject().toString()))
+					CertTreeNode issuernode = nodelookup.get(SSecurity.getCommonName(cert.getIssuer()).toString());
+					
+					if (cert.getIssuer().equals(cert.getSubject()) || issuernode == null)
 					{
-						String sub = cert.getSubject().toString();
-						CertTreeNode node = new CertTreeNode(sub);
-						nodelookup.put(cert.getSubject().toString(), node);
-						
-						if (cert.getIssuer().equals(cert.getSubject()))
-						{
-							root.addChild(node);
-						}
-						else
-						{
-							CertTreeNode issuernode = nodelookup.get(cert.getIssuer().toString());
-							issuernode.addChild(node);
-						}
+						root.addChild(node);
+					}
+					else
+					{
+						issuernode.addChild(node);
 					}
 				}
-				
 			}
+			done = !hasremoved;
+			
+//				List<X509CertificateHolder> certchain = SSecurity.readCertificateChainFromPEM(entry.getValue().getCertificate());
+//				Collections.reverse(certchain);
+			
+//				for (int i = 0; i < certchain.size(); ++i)
+//				{
+//					X509CertificateHolder cert = certchain.get(i);
+//					
+//					if (!nodelookup.containsKey(SSecurity.getCommonName(cert.getSubject())))
+//					{
+//						String sub = SSecurity.getCommonName(cert.getSubject());
+//						CertTreeNode node = new CertTreeNode(sub);
+//						nodelookup.put(SSecurity.getCommonName(cert.getSubject()), node);
+//						
+//						CertTreeNode issuernode = nodelookup.get(SSecurity.getCommonName(cert.getIssuer()).toString());
+//						
+//						if (cert.getIssuer().equals(cert.getSubject()) || issuernode == null)
+//						{
+//							root.addChild(node);
+//						}
+//						else
+//						{
+//							issuernode.addChild(node);
+//						}
+//					}
+//				}
+			
 		}
+		
 		int numchildren = root.getChildren().size();
 		int[] indices = new int[numchildren];
 		for (int i = 0; i < numchildren; ++i)
@@ -563,19 +618,39 @@ public class CertTree extends JTree implements TreeModel
 	/**
 	 *  Updates and saves model.
 	 */
+	protected byte[] save()
+	{
+		update();
+//		SCertStore.saveCertStore(storepath, certmodel.values());
+		return SCertStore.saveCertStore(certmodel.values());
+	}
+	
+	/**
+	 *  Updates and saves model.
+	 */
 	protected void updateAndSave()
 	{
 		update();
-		SCertStore.saveCertStore(storepath, certmodel.values());
+		if (storesavecommand != null)
+			storesavecommand.execute(save());
+	}
+	
+	/**
+	 *  Sets the store save command.
+	 *  @param command The command.
+	 */
+	protected void setSaveCommand(ICommand<byte[]> command)
+	{
+		storesavecommand = command;
 	}
 	
 	/**
 	 *  Gets the selected certificate.
 	 *  @return The selected certificate.
 	 */
-	protected Tuple2<String, String> getSelectedCert()
+	protected PemKeyPair getSelectedCert()
 	{
-		Tuple2<String, String> ret = null;
+		PemKeyPair ret = null;
 		
 		if (getSelectionCount() > 0)
 		{
@@ -587,6 +662,68 @@ public class CertTree extends JTree implements TreeModel
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Gets the selected certificate.
+	 *  @return The selected certificate.
+	 */
+	protected PemKeyPair getSelectedCertChainPair()
+	{
+		PemKeyPair ret = null;
+		
+		if (getSelectionCount() > 0)
+		{
+			Object onode = getSelectionModel().getSelectionPath().getLastPathComponent();
+			if (onode == root)
+				return null;
+			CertTreeNode node = (CertTreeNode) onode;
+			String[] certchainarr = getSelectedCertChain();
+			String cert = "";
+			for (String certchaincomp : certchainarr)
+				cert += certchaincomp;
+			ret = new PemKeyPair();
+			ret.setCertificate(cert);
+			ret.setKey(certmodel.get(node.getSubjectId()).getKey());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Gets the selected certificate chain.
+	 *  @return The selected certificate chain.
+	 */
+	protected String[] getSelectedCertChain()
+	{
+		List<String> certs = new ArrayList<>();
+		
+		if (getSelectionCount() > 0)
+		{
+			Object onode = getSelectionModel().getSelectionPath().getLastPathComponent();
+			if (onode == root)
+				return null;
+			CertTreeNode node = (CertTreeNode) onode;
+			String certstr = certmodel.get(node.getSubjectId()).getCertificate();
+			X509CertificateHolder cert = SSecurity.readCertificateFromPEM(certstr);
+			certs.add(SSecurity.writeCertificateAsPEM(cert));
+			node = nodelookup.get(SSecurity.getCommonName(cert.getIssuer()).toString());
+			while (node != null)
+			{
+				certstr = certmodel.get(node.getSubjectId()).getCertificate();
+				cert = SSecurity.readCertificateFromPEM(certstr);
+				certs.add(certstr);
+				if (SSecurity.getCommonName(cert.getIssuer()).equals(SSecurity.getCommonName(cert.getSubject())))
+					node = null;
+				else
+					node = nodelookup.get(SSecurity.getCommonName(cert.getIssuer()).toString());
+			}
+		}
+		
+//		String ret = null;
+//		for (String cert : SUtil.notNull(certs))
+//			ret = ret == null ? cert : ret + cert;
+		return certs.size() == 0 ? null : certs.toArray(new String[certs.size()]);
 	}
 	
 	/**
@@ -609,7 +746,17 @@ public class CertTree extends JTree implements TreeModel
 	}
 	
 	/**
-	 *  Tests of a node represents a CA certficate.
+	 *  Deletes a cert node.
+	 */
+	protected void deleteCertNode(CertTreeNode node, Map<String, PemKeyPair> certmodel)
+	{
+		for (CertTreeNode cnode : SUtil.notNull(node.getChildren()))
+			deleteCertNode(cnode, certmodel);
+		certmodel.remove(node.getSubjectId());
+	}
+	
+	/**
+	 *  Tests of a node represents a CA certificate.
 	 *  
 	 *  @param node The node.
 	 *  @return True, if CA.
@@ -617,9 +764,9 @@ public class CertTree extends JTree implements TreeModel
 	protected boolean isCaNode(CertTreeNode node)
 	{
 		boolean ret = false;
-		Tuple2<String, String> cert = certmodel.get(node.getSubjectId());
+		PemKeyPair cert = certmodel.get(node.getSubjectId());
 		if (cert != null)
-			ret = SSecurity.isCaCertificate(cert.getFirstEntity());
+			ret = SSecurity.isCaCertificate(cert.getCertificate());
 		return ret;
 	}
 	
@@ -632,9 +779,140 @@ public class CertTree extends JTree implements TreeModel
 	protected boolean hasKey(CertTreeNode node)
 	{
 		boolean ret = false;
-		Tuple2<String, String> cert = certmodel.get(node.getSubjectId());
+		PemKeyPair cert = certmodel.get(node.getSubjectId());
 		if (cert != null)
-			ret = cert.getSecondEntity() != null;
+			ret = cert.getKey() != null;
+		return ret;
+	}
+	
+	public static final List<Tuple2<String, String>> loadCertStore(String path)
+	{
+		File file = new File(path);
+		List<Tuple2<String, String>> ret = null;
+		
+		if (file.exists())
+		{
+			ZipInputStream zis = null;
+			try
+			{
+				zis = new ZipInputStream(new FileInputStream(file));
+				Map<String, String[]> map = new HashMap<String, String[]>();
+				ret = new ArrayList<Tuple2<String,String>>();
+				
+				ZipEntry entry = null;
+				while((entry = zis.getNextEntry()) != null)
+				{
+					if (entry.getName().endsWith(".crt") || entry.getName().endsWith(".key"))
+					{
+						String basename = entry.getName().substring(0, entry.getName().length() - 4);
+						String[] tup = map.get(basename);
+						if (tup == null)
+						{
+							tup = new String[2];
+							map.put(basename, tup);
+						}
+						
+						if (entry.getName().endsWith(".crt"))
+						{
+							String crt = new String(SUtil.readStream(zis), SUtil.UTF8);
+							tup[0] = crt;
+						}
+						else if (entry.getName().endsWith(".key"))
+						{
+							String key = new String(SUtil.readStream(zis), SUtil.UTF8);
+							tup[1] = key;
+						}
+					}
+				}
+				
+				for (String[] val : map.values())
+				{
+					if (val[0] != null)
+						ret.add(new Tuple2<String, String>(val[0], val[1]));
+				}
+				
+				zis.close();
+				zis = null;
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				ret = null;
+			}
+			finally
+			{
+				try
+				{
+					if (zis != null)
+						zis.close();
+				}
+				catch(Exception e)
+				{
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	public static void saveCertStore(String path, Collection<Tuple2<String, String>> certs)
+	{
+		ZipOutputStream zos = null;
+		try
+		{
+			File tmpfile = File.createTempFile("certstore", ".zip");
+			
+			zos = new ZipOutputStream(new FileOutputStream(tmpfile));
+			
+			for (Tuple2<String, String> cert : certs)
+			{
+				String name = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert.getFirstEntity()).getSubject());
+				
+				ZipEntry entry = new ZipEntry(name + ".crt");
+				zos.putNextEntry(entry);
+				zos.write(cert.getFirstEntity().getBytes(SUtil.UTF8));
+				zos.closeEntry();
+				
+				if (cert.getSecondEntity() != null)
+				{
+					entry = new ZipEntry(name + ".key");
+					zos.putNextEntry(entry);
+					zos.write(cert.getSecondEntity().getBytes(SUtil.UTF8));
+					zos.closeEntry();
+				}
+			}
+			
+			zos.close();
+			zos = null;
+			
+			File file = new File(path);
+			SUtil.moveFile(tmpfile, file);
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+		finally
+		{
+			try
+			{
+				if (zos != null)
+					zos.close();
+			}
+			catch(Exception e)
+			{
+			}
+		}
+	}
+	
+	public static final Map<String, Tuple2<String, String>> convertToSubjectMap(Collection<Tuple2<String, String>> certs)
+	{
+		Map<String, Tuple2<String, String>> ret = new HashMap<String, Tuple2<String,String>>();
+		for (Tuple2<String, String> cert : certs)
+		{
+			String key = SSecurity.readCertificateFromPEM(cert.getFirstEntity()).getSubject().toString();
+			ret.put(key, cert);
+		}
 		return ret;
 	}
 	
@@ -709,9 +987,11 @@ public class CertTree extends JTree implements TreeModel
 		
 		public String toString()
 		{
-			Tuple2<String, String> tup = certmodel.get(subjectid);
+			PemKeyPair keypair = certmodel.get(subjectid);
 			
-			String name = subjectid + " (" + SSecurity.getCertSigAlg(tup.getFirstEntity()) + ")";
+			String name = "Unknown";
+			if (keypair != null)
+				name = subjectid + " (" + SSecurity.getCertSigAlg(keypair.getCertificate()) + ")";
 			
 			return name;
 		}

@@ -2,6 +2,7 @@ package jadex.commons;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
@@ -14,7 +15,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.collection.SCollection;
 import jadex.commons.collection.WeakValueMap;
 
@@ -469,7 +471,7 @@ public class SReflect
 	 *  Also beautifies names of arrays (eg 'String[]' instead of '[LString;').
 	 *  @return The unqualified (without package) name of a class.
 	 */
-	public static String	getUnqualifiedClassName(Class clazz)
+	public static String getUnqualifiedClassName(Class clazz)
 	{
 		String	classname	= getClassName(clazz);
 		return getUnqualifiedTypeName(classname);
@@ -574,7 +576,7 @@ public class SReflect
 	 *	Get inner class name.
 	 *  @return The inner class's name (without declaring class).
 	 */
-	public static String	getInnerClassName(Class clazz)
+	public static String getInnerClassName(Class<?> clazz)
 	{
 		String	classname	= (String)innerclassnamecache.get(clazz);
 		if(classname==null)
@@ -594,7 +596,7 @@ public class SReflect
 	 *	Get the package of a class.
 	 *  @return The name of the package.
 	 */
-	public static String	getPackageName(Class clazz)
+	public static String getPackageName(Class<?> clazz)
 	{
 		String	classname	= clazz.getName();
 		StringTokenizer	stok	= new StringTokenizer(classname,".");
@@ -814,13 +816,13 @@ public class SReflect
 	 *  @param types	The parameter types.
 	 *  @return	The method (or null if not found).
 	 */
-	public static Method	getMethod(Class clazz, String name, Class[] types)
+	public static Method	getMethod(Class<?> clazz, String name, Class<?>[] types)
 	{
 		Method	meth	= null;
 		Method[]	ms	= getMethods(clazz, name);
 		for(int i=0; i<ms.length; i++)
 		{
-			Class[]	ptypes	= ms[i].getParameterTypes();
+			Class<?>[]	ptypes	= ms[i].getParameterTypes();
 			boolean	match	= ptypes.length==types.length;
 			for(int j=0; match && j<ptypes.length; j++)
 			{
@@ -1715,7 +1717,7 @@ public class SReflect
 	/**
 	 *  Scan for files in a given list of urls.
 	 */
-	public static String[] scanForFiles(URL[] urls, IFilter filter)
+	public static String[] scanForFiles(URL[] urls, IFilter<Object> filter)
 	{
 		Set<String>	ret	= new HashSet<String>();
 		for(int i=0; i<urls.length; i++)
@@ -1733,7 +1735,7 @@ public class SReflect
 						jar	= new JarFile(f);
 						for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
 						{
-							JarEntry	je	= e.nextElement();
+							JarEntry je	= e.nextElement();
 							if(filter.filter(je))	
 							{
 								ret.add(je.getName());
@@ -1769,10 +1771,147 @@ public class SReflect
 		return ret.toArray(new String[ret.size()]);
 	}
 	
+	protected static Map<Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>, Set<ClassInfo>> CICACHE	= Collections.synchronizedMap(new LinkedHashMap<>());
+	
+	/**
+	 *  Scan for component classes in the classpath.
+	 */
+	public static Set<ClassInfo> scanForClassInfos(URL[] urls, IFilter<Object> filefilter, IFilter<ClassInfo> classfilter)
+	{
+		Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>	key
+			= new Tuple3<>(new HashSet<>(Arrays.asList(urls)), filefilter, classfilter);
+		
+		Set<ClassInfo> ret = CICACHE.get(key);
+		if(ret==null)
+		{
+			ret	= new LinkedHashSet<>();
+			
+			if(filefilter==null)
+				filefilter = new jadex.commons.FileFilter("$", false, ".class");
+			Map<String, Set<String>> files = SReflect.scanForFiles2(urls, filefilter);
+			
+			//int cnt = 0;
+			for(Map.Entry<String, Set<String>> entry: files.entrySet())
+			{
+				String jarname = entry.getKey();
+				if(jarname!=null)
+				{
+					try(JarFile jar	= new JarFile(jarname))
+					{
+						for(String jename: entry.getValue())
+						{
+							JarEntry je = jar.getJarEntry(jename);
+							InputStream is = jar.getInputStream(je);
+							ClassInfo ci = SClassReader.getClassInfo(jarname+jename, is);
+							if(classfilter.filter(ci))
+							{
+								ret.add(ci);
+							}
+						}
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				else
+				{
+					for(String filename: entry.getValue())
+					{
+						try(FileInputStream is = new FileInputStream(filename))
+						{
+							ClassInfo ci = SClassReader.getClassInfo(filename, is);
+							if(classfilter.filter(ci))
+							{
+								ret.add(ci);
+							}
+	//						System.out.println(cnt++);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+			CICACHE.put(key, ret);
+//			System.out.println("scanned class infos cache size: "+CICACHE.size());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Scan for files in a given list of urls.
+	 */
+	public static Map<String, Set<String>> scanForFiles2(URL[] urls, IFilter<Object> filter)
+	{
+		Map<String, Set<String>> ret = new HashMap<>();
+		Set<String>	topset = new HashSet<String>();
+		
+		for(int i=0; i<urls.length; i++)
+		{
+//			System.out.println("Scanning: "+entry);
+			try
+			{
+//				System.out.println("url: "+urls[i].toURI());
+				File f = new File(urls[i].toURI());
+				if(f.getName().endsWith(".jar"))
+				{
+					JarFile	jar = null;
+					try
+					{
+						jar	= new JarFile(f);
+						Set<String>	set	= new HashSet<String>();
+						
+						for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
+						{
+							JarEntry je	= e.nextElement();
+							if(filter.filter(je))	
+							{
+								set.add(je.getName());
+							}
+						}
+						jar.close();
+					
+						if(set.size()>0)
+							ret.put(f.getAbsolutePath(), set);
+					}
+					catch(Exception e)
+					{
+//						System.out.println("Error opening jar: "+urls[i]+" "+e.getMessage());
+					}
+					finally
+					{
+						if(jar!=null)
+						{
+							jar.close();
+						}
+					}
+				}
+				else if(f.isDirectory())
+				{
+					scanDir2(urls, f, filter, topset, new ArrayList<String>());
+//					throw new UnsupportedOperationException("Currently only jar files supported: "+f);
+				}
+			}
+			catch(Exception e)
+			{
+				System.out.println("scan problem with: "+urls[i]);
+//				e.printStackTrace();
+			}
+		}
+		
+		if(topset.size()>0)
+			ret.put(null, topset);
+		
+		return ret;
+	}
+	
 	/**
 	 *  Scan directories.
 	 */
-	public static void scanDir(URL[] urls, File file, IFilter filter, Collection<String> results, List<String> donedirs)
+	public static void scanDir(URL[] urls, File file, IFilter<Object> filter, Collection<String> results, List<String> donedirs)
 	{
 		File[] files = file.listFiles(new FileFilter()
 		{
@@ -1807,6 +1946,49 @@ public class SReflect
 				if(!donedirs.contains(dir.getAbsolutePath()))
 				{
 					scanDir(urls, dir, filter, results, donedirs);
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Scan directories.
+	 */
+	public static void scanDir2(URL[] urls, File file, IFilter<Object> filter, Collection<String> results, List<String> donedirs)
+	{
+		File[] files = file.listFiles(new FileFilter()
+		{
+			public boolean accept(File f)
+			{
+				return !f.isDirectory();
+			}
+		});
+		for(File fi: files)
+		{
+			if(filter.filter(fi))
+			{
+				//String fn = SUtil.convertPathToPackage(fi.getAbsolutePath(), urls);
+//				System.out.println("fn: "+fi.getName());
+				results.add(fi.getAbsolutePath());
+			}
+		}
+		
+		if(file.isDirectory())
+		{
+			donedirs.add(file.getAbsolutePath());
+			File[] sudirs = file.listFiles(new FileFilter()
+			{
+				public boolean accept(File f)
+				{
+					return f.isDirectory();
+				}
+			});
+			
+			for(File dir: sudirs)
+			{
+				if(!donedirs.contains(dir.getAbsolutePath()))
+				{
+					scanDir2(urls, dir, filter, results, donedirs);
 				}
 			}
 		}

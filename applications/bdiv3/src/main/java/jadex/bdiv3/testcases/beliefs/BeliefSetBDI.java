@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
@@ -24,7 +25,7 @@ import jadex.micro.annotation.Results;
 /**
  * 
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class BeliefSetBDI
 {
@@ -49,7 +50,7 @@ public class BeliefSetBDI
 		names.add("a");
 		names.remove("a");
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(3000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -70,18 +71,18 @@ public class BeliefSetBDI
 			if(!ter.isFinished())
 				ter.setFailed("Plan not activated");
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, tr));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, tr));
 	}
 	
 	// todo: plan creation condition?!
-	@Plan(trigger=@Trigger(factaddeds="names"))
+	@Plan(trigger=@Trigger(factadded="names"))
 	protected void printAddedFact(ChangeEvent event, RPlan rplan)
 	{
 		System.out.println("fact added: "+event.getValue()+" "+event.getSource()+" "+rplan);
 		tr[0].setSucceeded(true);
 	}
 	
-	@Plan(trigger=@Trigger(factremoveds="names"))
+	@Plan(trigger=@Trigger(factremoved="names"))
 	protected void printRemFact(ChangeEvent event, RPlan rplan)
 	{
 		System.out.println("fact removed: "+event.getValue()+" "+event.getSource()+" "+rplan);

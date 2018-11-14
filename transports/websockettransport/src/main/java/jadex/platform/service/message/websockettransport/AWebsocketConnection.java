@@ -36,7 +36,7 @@ public abstract class AWebsocketConnection implements IWebSocketConnection
 	public AWebsocketConnection(ITransportHandler<IWebSocketConnection> handler)
 	{
 		this.handler = handler;
-		pojoagent = (WebSocketTransportAgent) handler.getAccess().getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+		pojoagent = (WebSocketTransportAgent) handler.getAccess().getFeature(IPojoComponentFeature.class).getPojoAgent();
 		maxmsgsize = pojoagent.getMaximumMessageSize();
 	}
 	

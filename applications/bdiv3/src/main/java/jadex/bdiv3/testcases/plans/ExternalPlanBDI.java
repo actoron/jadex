@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.plans;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test if an external plan can define a trigger.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Plans(@Plan(body=@Body(ExternalPlan.class)))
 public class ExternalPlanBDI
@@ -38,7 +39,7 @@ public class ExternalPlanBDI
 	{
 		try
 		{
-			agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MyGoal()).get();
+			agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new MyGoal()).get();
 			tr.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -54,6 +55,6 @@ public class ExternalPlanBDI
 	@AgentKilled
 	public void	destroy(IInternalAccess agent)
 	{
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

@@ -2,6 +2,7 @@ package jadex.bdiv3.testcases.plans;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
@@ -27,7 +28,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test abort of externally waiting plan with manual "interruptable" step.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="extWait", clazz=ExtWait.class)))
 public class ExternalWait2BDI
@@ -49,12 +50,12 @@ public class ExternalWait2BDI
 			
 			System.out.println("before waiting");
 			
-			agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+			agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess args)
 				{
 					System.out.println("start waiting...");
-					agent.getComponentFeature(IExecutionFeature.class).waitForDelay(3000)
+					agent.getFeature(IExecutionFeature.class).waitForDelay(3000)
 						.addResultListener(new DelegationResultListener<Void>(fut, true));
 					return fut;
 				}
@@ -100,6 +101,6 @@ public class ExternalWait2BDI
 		
 		if(!tr.isFinished())
 				tr.setFailed("Plan not activated");
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

@@ -15,8 +15,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
 	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
-	name="Shopping" package="jadex.bdi.examples.shop"
-	autoshutdown="true">
+	name="Shopping" package="jadex.bdi.examples.shop">
 	
 	<imports>
 		<import>jadex.bridge.service.clock.IClockService</import>
@@ -35,7 +34,7 @@
 			<components>
 				<component type="Shop">
 					<arguments>
-						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Ladl, "+$component.getId().getPlatformName()</argument>
 						<argument name="catalog">
 							new ItemInfo[]
 							{
@@ -49,7 +48,7 @@
 				</component>
 				<component type="Shop">
 					<arguments>
-						<argument name="shopname">"Herzie, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Herzie, "+$component.getId().getPlatformName()</argument>
 						<argument name="catalog">
 							new ItemInfo[]
 							{
@@ -68,7 +67,7 @@
 			<components>
 				<component type="Shop">
 					<arguments>
-						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Ladl, "+$component.getId().getPlatformName()</argument>
 						<argument name="catalog">
 							new ItemInfo[]
 							{
@@ -88,7 +87,7 @@
 			<components>
 				<component type="ShopAndCustomer" name="Ladl">
 					<arguments>
-						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Ladl, "+$component.getId().getPlatformName()</argument>
 						<argument name="catalog">
 							new ItemInfo[]
 							{
@@ -102,7 +101,7 @@
 				</component>
 				<component type="ShopAndCustomer" name="Herzie">
 					<arguments>
-						<argument name="shopname">"Herzie, "+$component.getComponentIdentifier().getPlatformName()</argument>
+						<argument name="shopname">"Herzie, "+$component.getId().getPlatformName()</argument>
 						<argument name="catalog">
 							new ItemInfo[]
 							{

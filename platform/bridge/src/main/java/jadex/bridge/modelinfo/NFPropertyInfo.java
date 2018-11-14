@@ -1,7 +1,6 @@
 package jadex.bridge.modelinfo;
 
 import java.util.List;
-import java.util.Map;
 
 import jadex.bridge.ClassInfo;
 

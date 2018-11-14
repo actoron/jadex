@@ -5,6 +5,7 @@ import java.util.SortedSet;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.web.examples.puzzle.Board;
 import jadex.web.examples.puzzle.HighscoreEntry;
@@ -31,7 +32,7 @@ public class Main
 		int	timeout	= 300000;
 		ThreadSuspendable	sus	= new ThreadSuspendable();
 		IExternalAccess	platform	= Starter.createPlatform(args).get(timeout);
-		IPuzzleService	puzzle	= SServiceProvider.getService(platform, IPuzzleService.class).get(timeout);
+		IPuzzleService	puzzle	= platform.searchService( new ServiceQuery<>( IPuzzleService.class)).get(timeout);
 		
 		Board	board	= new Board(11);
 		int	hints	= 0;
@@ -45,7 +46,7 @@ public class Main
 		
 		try
 		{
-			puzzle.addHighscore(new HighscoreEntry(platform.getComponentIdentifier().getLocalName(), board.getSize(), hints)).get(timeout);
+			puzzle.addHighscore(new HighscoreEntry(platform.getId().getLocalName(), board.getSize(), hints)).get(timeout);
 			System.out.println("New highscore entry!");
 		}
 		catch(RuntimeException e)

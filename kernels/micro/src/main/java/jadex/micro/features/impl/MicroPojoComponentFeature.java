@@ -23,8 +23,7 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 	//-------- constants --------
 	
 	/** The factory. */
-	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IPojoComponentFeature.class, MicroPojoComponentFeature.class,
-		null, null);
+	public static final IComponentFeatureFactory FACTORY = new ComponentFeatureFactory(IPojoComponentFeature.class, MicroPojoComponentFeature.class, null, null);
 	
 	//-------- attributes --------
 	
@@ -47,7 +46,10 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 		{
 			// Create the pojo agent
 			MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
-			this.pojoagent = model.getPojoClass().getType(model.getClassloader()).newInstance();
+			if(cinfo.getArguments()!=null && cinfo.getArguments().get("__pojo")!=null)
+				this.pojoagent = cinfo.getArguments().get("__pojo");
+			else
+				this.pojoagent = model.getPojoClass().getType(model.getClassloader()).newInstance();
 		}
 		catch(Exception e)
 		{
@@ -106,11 +108,11 @@ public class MicroPojoComponentFeature extends	AbstractComponentFeature implemen
 		else if(name!=null && name.startsWith(IPlatformConfiguration.PLATFORMARGS))
 		{
 			String valname = name.length()>13? name.substring(14): null;
-			return valname==null? Starter.getPlatformValue(getComponent().getComponentIdentifier(), IPlatformConfiguration.PLATFORMARGS): Starter.getPlatformValue(getComponent().getComponentIdentifier(), valname);
+			return valname==null? Starter.getPlatformValue(getComponent().getId(), IPlatformConfiguration.PLATFORMARGS): Starter.getPlatformValue(getComponent().getId(), valname);
 		}
-		else if(Starter.hasPlatformValue(getComponent().getComponentIdentifier(), name))
+		else if(Starter.hasPlatformValue(getComponent().getId(), name))
 		{
-			return Starter.getPlatformValue(getComponent().getComponentIdentifier(), name);
+			return Starter.getPlatformValue(getComponent().getId(), name);
 		}
 		else
 		{

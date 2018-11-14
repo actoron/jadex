@@ -24,9 +24,6 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple3;
 import jadex.commons.future.IFuture;
 
@@ -55,14 +52,14 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 	 */
 	public IFuture<Void> body()
 	{
-		assert getComponent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert getComponent().getFeature(IExecutionFeature.class).isComponentThread();
 		
-		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
+		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getFeature(IBpmnComponentFeature.class);
 		
 		// Check if triggered by external event
 		// eventtype, mactid, event
         Tuple3<String, String, Object> trigger = (Tuple3<String, String, Object>)getComponent()
-        	.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get(MBpmnModel.TRIGGER);
+        	.getFeature(IArgumentsResultsFeature.class).getArguments().get(MBpmnModel.TRIGGER);
         MSubProcess triggersubproc = null;
         MActivity triggeractivity = null;
         
@@ -133,15 +130,15 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
             {
             	if(triggersubproc != null)
             	{
-            		ProcessThread thread = new ProcessThread(triggersubproc, bcf.getTopLevelThread(), getComponent(), true);
+            		ProcessThread thread = new ProcessThread(triggersubproc, bcf.getTopLevelThread(), getInternalAccess(), true);
             		bcf.getTopLevelThread().addThread(thread);
-					ProcessThread subthread = new ProcessThread(triggeractivity, thread, getComponent());
+					ProcessThread subthread = new ProcessThread(triggeractivity, thread, getInternalAccess());
 					thread.addThread(subthread);
 					subthread.setOrCreateParameterValue("$event", trigger.getThirdEntity());
             	}
             	else
             	{
-                    ProcessThread thread = new ProcessThread(mact, bcf.getTopLevelThread(), getComponent());
+                    ProcessThread thread = new ProcessThread(mact, bcf.getTopLevelThread(), getInternalAccess());
                     thread.setOrCreateParameterValue("$event", trigger.getThirdEntity());
                     bcf.getTopLevelThread().addThread(thread);
             	}
@@ -152,7 +149,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
             	&& !MBpmnModel.EVENT_START_SIGNAL.equals(mact.getActivityType())
             	&& !MBpmnModel.EVENT_START_TIMER.equals(mact.getActivityType()))
             {
-                ProcessThread thread = new ProcessThread(mact, bcf.getTopLevelThread(), getComponent());
+                ProcessThread thread = new ProcessThread(mact, bcf.getTopLevelThread(), getInternalAccess());
                 bcf.getTopLevelThread().addThread(thread);
             }
         } 
@@ -168,7 +165,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 	@Override
 	public IFuture<Void> shutdown()
 	{
-		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
+		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getFeature(IBpmnComponentFeature.class);
 		bcf.getTopLevelThread().removeSubcontext();
 		return super.shutdown();
 	}
@@ -220,7 +217,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 		if(!started)
 			return false;
 		
-		BpmnComponentFeature bcf = (BpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
+		BpmnComponentFeature bcf = (BpmnComponentFeature)getComponent().getFeature(IBpmnComponentFeature.class);
 
 //		if(!bcf.isFinished() && bcf.isReady())
 //		{
@@ -254,8 +251,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 			finishing = true;
 //				((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
 			
-			IComponentManagementService cms = SServiceProvider.getLocalService(getComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			cms.destroyComponent(getComponent().getComponentIdentifier()); // todo: listener?
+			getComponent().killComponent(getComponent().getId()); // todo: listener?
 		}
 		
 //			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
@@ -425,7 +421,7 @@ public class BpmnExecutionFeature extends ExecutionComponentFeature
 		boolean	isatbreakpoint	= false;
 		Set<String>	bps	= new HashSet<String>(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
 		
-		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getComponentFeature(IBpmnComponentFeature.class);
+		IInternalBpmnComponentFeature bcf = (IInternalBpmnComponentFeature)getComponent().getFeature(IBpmnComponentFeature.class);
 
 		for(Iterator<ProcessThread> it = bcf.getTopLevelThread().getAllThreads().iterator(); !isatbreakpoint && it.hasNext(); )
 		{

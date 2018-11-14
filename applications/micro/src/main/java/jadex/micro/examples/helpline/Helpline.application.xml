@@ -6,11 +6,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-application 
 	                    http://www.activecomponents.org/jadex-application-${jadex_build_version}.xsd"
-	name="Helpline" package="jadex.micro.examples.helpline"
-	autoshutdown="true">
+	name="Helpline" package="jadex.micro.examples.helpline">
 	
 	<imports>
 		<import>jadex.bridge.service.*</import>
+		<import>jadex.bridge.service.component.*</import>
 		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.bridge.service.types.clock.IClockService</import>
 		<import>jadex.commons.future.*</import>
@@ -22,8 +22,8 @@
 	
 	<!--<properties>
 		<property name="clock" class="IFuture">
-			 SServiceProvider.getService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM) 
-			SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			 $component.getFeature(jadex.bridge.service.component.IRequiredServicesFeature.class).searchService( new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)) 
+			$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 		</property>
 	</properties>-->
 	
@@ -35,9 +35,9 @@
 						<argument name="infos">
 							new InformationEntry[]
 							{
-								new InformationEntry("Lennie Lost", "First aid given at Hummel square.", ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()-2*60*60*1000),
-								new InformationEntry("Lennie Lost", "Brought to collection point.", ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime()-1*60*60*1000),
-								new InformationEntry("Lennie Lost", "Savely reached Mainville Hospital.", ((IClockService)SServiceProvider.getLocalService($component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).getTime())
+								new InformationEntry("Lennie Lost", "First aid given at Hummel square.", ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()-2*60*60*1000),
+								new InformationEntry("Lennie Lost", "Brought to collection point.", ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime()-1*60*60*1000),
+								new InformationEntry("Lennie Lost", "Savely reached Mainville Hospital.", ((IClockService)$component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))).getTime())
 							}
 						</argument>
 					</arguments>

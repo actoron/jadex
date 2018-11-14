@@ -3,7 +3,6 @@ package jadex.bridge.nonfunctional;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.sensor.unit.IConvertableUnit;
-import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -45,11 +44,11 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 				protected void cont()
 				{
 					setValue(measureValue());
-					comp.getComponentFeature(IExecutionFeature.class).waitForDelay(mi.getUpdateRate(), mi.isRealtime()).addResultListener(this);
+					comp.getFeature(IExecutionFeature.class).waitForDelay(mi.getUpdateRate(), mi.isRealtime()).addResultListener(this);
 				}
 			};
 			
-			comp.getComponentFeature(IExecutionFeature.class).waitForDelay(mi.getUpdateRate(), mi.isRealtime()).addResultListener(res);
+			comp.getFeature(IExecutionFeature.class).waitForDelay(mi.getUpdateRate(), mi.isRealtime()).addResultListener(res);
 		}
 		else
 		{

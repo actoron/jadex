@@ -31,7 +31,7 @@ public class BreakpointAgent
 	{
 //		step	= "hop";	// first step
 		
-		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 		{			
 			@Breakpoint("hop")
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -40,7 +40,7 @@ public class BreakpointAgent
 				
 //				step	= "step";	// second step
 
-				agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+				agent.getFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 				{		
 					@Breakpoint("step")
 					public IFuture<Void> execute(IInternalAccess ia)
@@ -49,7 +49,7 @@ public class BreakpointAgent
 
 //						step	= "jump";	// third step
 						
-						agent.getComponentFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
+						agent.getFeature(IExecutionFeature.class).waitForDelay(1000, new IComponentStep<Void>()
 						{			
 							@Breakpoint("jump")
 							public IFuture<Void> execute(IInternalAccess ia)

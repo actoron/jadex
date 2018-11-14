@@ -89,7 +89,7 @@ public class JsonPropertiesProcessor implements ITraverseProcessor
 				 props.setProperties((Property[]) traverser.doTraverse(obj.get("properties"), Property[].class, conversionprocessors, processors, mode, targetcl, context));
 			
 			if(obj.get("subproperties")!=null)
-				 props.setSubproperties((Properties[]) traverser.doTraverse(obj.get("properties"), Properties[].class, conversionprocessors, processors, mode, targetcl, context));
+				 props.setSubproperties((Properties[]) traverser.doTraverse(obj.get("subproperties"), Properties[].class, conversionprocessors, processors, mode, targetcl, context));
 			
 			ret = props;
 			

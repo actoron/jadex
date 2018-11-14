@@ -43,6 +43,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
@@ -263,7 +264,7 @@ public class ComponentSelectorDialog
 					if(selected!=null)
 					{
 						final IComponentIdentifier fselected = selected;
-						SServiceProvider.getService(access, selected, IProxyAgentService.class)
+						access.searchService( new ServiceQuery<>(IProxyAgentService.class).setProvider(selected))
 							.addResultListener(new SwingResultListener<IProxyAgentService>(new IResultListener<IProxyAgentService>()
 						{
 							public void resultAvailable(IProxyAgentService ps)
@@ -373,7 +374,7 @@ public class ComponentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				addSelectedAgent(new BasicComponentIdentifier("@"+access.getComponentIdentifier().getPlatformName()), list);
+				addSelectedAgent(new BasicComponentIdentifier("@"+access.getId().getPlatformName()), list);
 			}
 		});
 		remove.addActionListener(new ActionListener()

@@ -145,7 +145,7 @@ class CleanerPanel extends JPanel
 			g.fillOval(p.x-w, p.y-h, w*2, h*2);
 			g.setColor(Color.black);	// Agent
 			g.fillOval(p.x-3, p.y-3, 7, 7);
-			g.drawString(agent.getComponentIdentifier().getLocalName(),
+			g.drawString(agent.getId().getLocalName(),
 				p.x+5, p.y-5);
 			g.drawString("battery: " + (int)(drawdata.my_chargestate*100.0) + "%",
 				p.x+5, p.y+5);
@@ -214,7 +214,7 @@ class CleanerPanel extends JPanel
 	{
 		public IFuture<DrawData> execute(IInternalAccess ia)
 		{
-			IBDIXAgentFeature bdif = ia.getComponentFeature(IBDIXAgentFeature.class);
+			IBDIXAgentFeature bdif = ia.getFeature(IBDIXAgentFeature.class);
 			
 			DrawData	drawdata	= new DrawData();
 			drawdata.daytime = ((Boolean)bdif.getBeliefbase().getBelief("daytime").getFact()).booleanValue();

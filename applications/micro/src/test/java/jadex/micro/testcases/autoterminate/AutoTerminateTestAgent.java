@@ -2,6 +2,7 @@ package jadex.micro.testcases.autoterminate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
@@ -13,15 +14,17 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -37,7 +40,7 @@ import jadex.micro.testcases.TestAgent;
 @Service
 @Agent
 @ProvidedServices(@ProvidedService(type=IAutoTerminateService.class))
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledRemoteDefaultTimeout(null, 4)")}) // cannot use $component.getComponentIdentifier() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateService
 {
 	//-------- attributes --------
@@ -110,9 +113,9 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			: "Test remote offline automatic subscription termination: "+ServiceCall.getCurrentInvocation().getCaller());
 		reports.add(report);
 		
-//		agent.getLogger().severe("test: "+report.getDescription()+", "+Starter.getLocalDefaultTimeout(agent.getComponentIdentifier()));
+//		agent.getLogger().severe("test: "+report.getDescription()+", "+Starter.getDefaultTimeout(agent.getComponentIdentifier()));
 		
-		waitForRealtimeDelay(Starter.getScaledRemoteDefaultTimeout(agent.getComponentIdentifier(), 1.25),
+		waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.25),
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -181,6 +184,42 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 	}
 	
 	/**
+	 *  Setup a local test.
+	 */
+	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename,  IResultListener<Map<String,Object>> reslis)
+	{
+		return createComponent(filename, agent.getId().getRoot(), reslis);
+	}
+	
+	/**
+	 *  Setup a remote test.
+	 */
+	protected IFuture<IComponentIdentifier>	setupRemoteTest(final String filename, final String config,
+		final  IResultListener<Map<String,Object>> reslis, final boolean remove)
+	{
+		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
+		
+		setupRemotePlatform(remove)
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+		{
+			public void customResultAvailable(final IExternalAccess exta)
+			{
+//				ComponentIdentifier.getTransportIdentifier(exta)
+//					.addResultListener(new ExceptionDelegationResultListener<ITransportComponentIdentifier, IComponentIdentifier>(ret)
+//                {
+//                    public void customResultAvailable(ITransportComponentIdentifier cid)
+//                    {
+						createComponent(filename, null, config, exta.getId(), reslis)
+							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+//                    }
+//                });
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
 	 *  Starter for testing.
 	 */
 	public static void main(String[] args) throws Exception
@@ -199,7 +238,7 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					SServiceProvider.getLocalService(ia, IComponentManagementService.class).createComponent(AutoTerminateTestAgent.class.getCanonicalName() + ".class", null).getSecondResult();
+					ia.createComponent(new CreationInfo().setFilename(AutoTerminateTestAgent.class.getCanonicalName() + ".class")).getSecondResult();
 					System.out.println("Step done.");
 					return IFuture.DONE;
 				}

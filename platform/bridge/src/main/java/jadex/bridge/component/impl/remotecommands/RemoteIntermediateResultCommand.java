@@ -1,11 +1,9 @@
 package jadex.bridge.component.impl.remotecommands;
 
-import java.util.Collection;
 import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.impl.IRemoteConversationCommand;
-import jadex.bridge.service.types.security.IMsgSecurityInfos;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IntermediateFuture;
 
@@ -40,7 +38,7 @@ public class RemoteIntermediateResultCommand<T>	extends AbstractResultCommand
 	 *  @param secinf The established security level to decide if the command is allowed.
 	 */
 	@SuppressWarnings("unchecked")
-	public void	doExecute(IInternalAccess access, IFuture<?> future, IMsgSecurityInfos secinf)
+	public void	doExecute(IInternalAccess access, IFuture<?> future, ISecurityInfo secinf)
 	{
 		((IntermediateFuture<T>)future).addIntermediateResult(result);
 	}

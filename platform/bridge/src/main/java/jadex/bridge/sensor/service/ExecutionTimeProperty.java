@@ -1,7 +1,6 @@
 package jadex.bridge.sensor.service;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,10 +9,10 @@ import jadex.bridge.ProxyFactory;
 import jadex.bridge.sensor.time.TimedProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
@@ -48,9 +47,9 @@ public class ExecutionTimeProperty extends TimedProperty
 		
 		if(service!=null)
 		{
-			this.sid = service.getServiceIdentifier();
+			this.sid = service.getServiceId();
 		
-			clock = SServiceProvider.getLocalService(comp, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			clock = comp.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 		
 			if(ProxyFactory.isProxyClass(service.getClass()))
 			{
@@ -79,7 +78,7 @@ public class ExecutionTimeProperty extends TimedProperty
 					}
 				});
 	//			System.out.println("installing lis: "+comp.getComponentIdentifier().getName());
-				comp.getComponentFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
+				comp.getFeature(IProvidedServicesFeature.class).addMethodInvocationListener(service.getServiceId(), method, listener);
 			}
 			else
 			{
@@ -124,7 +123,7 @@ public class ExecutionTimeProperty extends TimedProperty
 	 */
 	public IFuture<Void> dispose()
 	{
-		comp.getComponentFeature(IProvidedServicesFeature.class).removeMethodInvocationListener(sid, method, listener);
+		comp.getFeature(IProvidedServicesFeature.class).removeMethodInvocationListener(sid, method, listener);
 		return IFuture.DONE;
 	}
 }

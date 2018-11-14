@@ -12,7 +12,6 @@ import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -29,8 +28,8 @@ import jadex.micro.annotation.Results;
 @ProvidedServices(@ProvidedService(type=IBlockService.class))
 @RequiredServices(
 {
-	@RequiredService(name="myser", type=IBlockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL)),
-	@RequiredService(name="stepser", type=IStepService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
+	@RequiredService(name="myser", type=IBlockService.class, scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY),
+	@RequiredService(name="stepser", type=IStepService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL)
 })
 public class ReqServiceBlockAgent  extends JunitAgentTest implements IBlockService
 {
@@ -45,7 +44,7 @@ public class ReqServiceBlockAgent  extends JunitAgentTest implements IBlockServi
 		trs[0] = new TestReport("#1", "Test if required service can be fetched with get()");
 		try
 		{
-			IBlockService bs = (IBlockService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("myser").get(1000);
+			IBlockService bs = (IBlockService)agent.getFeature(IRequiredServicesFeature.class).getService("myser").get(1000);
 			trs[0].setSucceeded(true);
 		}
 		catch(Exception e)
@@ -57,7 +56,7 @@ public class ReqServiceBlockAgent  extends JunitAgentTest implements IBlockServi
 		trs[1] = new TestReport("#2", "Test if not available required service can be fetched with get()");
 		try
 		{
-			IStepService ss = (IStepService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("stepser").get(10);
+			IStepService ss = (IStepService)agent.getFeature(IRequiredServicesFeature.class).getService("stepser").get(10);
 			trs[1].setFailed("Non-available service found: "+ss.toString());
 		}
 		catch(Exception e)
@@ -66,7 +65,7 @@ public class ReqServiceBlockAgent  extends JunitAgentTest implements IBlockServi
 //			e.printStackTrace();
 		}
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, trs));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(2, trs));
 	}
 	
 	/**

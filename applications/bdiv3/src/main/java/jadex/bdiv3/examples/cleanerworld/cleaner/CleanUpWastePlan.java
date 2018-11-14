@@ -5,10 +5,10 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveCleanup;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveDropWaste;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchievePickupWaste;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.QueryWastebin;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerAgent.AchieveCleanup;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerAgent.AchieveDropWaste;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerAgent.AchievePickupWaste;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerAgent.QueryWastebin;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.DelegationResultListener;
@@ -25,7 +25,7 @@ import jadex.commons.future.IResultListener;
 public class CleanUpWastePlan
 {
 	@PlanCapability
-	protected CleanerBDI capa;
+	protected CleanerAgent capa;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -74,7 +74,7 @@ public class CleanUpWastePlan
 			Waste waste = goal.getWaste();
 			
 			IFuture<AchievePickupWaste> fut = rplan.dispatchSubgoal(capa.new AchievePickupWaste(waste));
-			fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.AchievePickupWaste, Void>(ret)
+			fut.addResultListener(new ExceptionDelegationResultListener<CleanerAgent.AchievePickupWaste, Void>(ret)
 			{
 				public void customResultAvailable(AchievePickupWaste apw)
 				{
@@ -100,14 +100,14 @@ public class CleanUpWastePlan
 		final Future<Void> ret = new Future<Void>();
 		
 		IFuture<QueryWastebin> fut = rplan.dispatchSubgoal(capa.new QueryWastebin());
-		fut.addResultListener(new ExceptionDelegationResultListener<CleanerBDI.QueryWastebin, Void>(ret)
+		fut.addResultListener(new ExceptionDelegationResultListener<CleanerAgent.QueryWastebin, Void>(ret)
 		{
 			public void customResultAvailable(QueryWastebin qw)
 			{
 //				System.out.println("found wastebin: "+qw.getWastebin());
 				
 				IFuture<AchieveDropWaste> fut = rplan.dispatchSubgoal(capa.new AchieveDropWaste(qw.getWastebin()));
-				fut.addResultListener(new IResultListener<CleanerBDI.AchieveDropWaste>()
+				fut.addResultListener(new IResultListener<CleanerAgent.AchieveDropWaste>()
 				{
 					public void resultAvailable(AchieveDropWaste result)
 					{

@@ -26,10 +26,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -139,7 +138,7 @@ public class ObserverCenter implements IObserverCenter
 			selecteddataviewname = (String)spaceviews.keySet().iterator().next();
 		activeplugin = null;
 		
-		SServiceProvider.getService(space.getExternalAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new DefaultResultListener<IClockService>()
 		{
 			public void resultAvailable(IClockService result)
@@ -835,7 +834,7 @@ public class ObserverCenter implements IObserverCenter
 		{
 			if(delay==-1)
 			{
-				SServiceProvider.getService(space.getExternalAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -855,7 +854,7 @@ public class ObserverCenter implements IObserverCenter
 			}
 			else if(delay==0)
 			{
-				SServiceProvider.getService(space.getExternalAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -875,7 +874,7 @@ public class ObserverCenter implements IObserverCenter
 			}
 			else
 			{
-				SServiceProvider.getService(space.getExternalAccess(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				space.getExternalAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -913,15 +912,7 @@ public class ObserverCenter implements IObserverCenter
 			dispose();
 			if(killonexit)
 			{
-				SServiceProvider.getService(space.getExternalAccess(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new SwingDefaultResultListener(mainwindow)
-				{
-					public void customResultAvailable(Object result)
-					{
-						IComponentManagementService	cms = (IComponentManagementService)result;
-						cms.destroyComponent(space.getExternalAccess().getComponentIdentifier());
-					}
-				});
+				space.getExternalAccess().killComponent(space.getExternalAccess().getId());
 			}
 		}
 		
@@ -970,7 +961,7 @@ public class ObserverCenter implements IObserverCenter
 		if(clocklistener!=null)
 		{
 			clock.removeChangeListener(clocklistener);
-//			SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			space.getExternalAccess().getServiceProvider().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //				.addResultListener(new SwingDefaultResultListener(mainwindow)
 //			{
 //				public void customResultAvailable(Object result)

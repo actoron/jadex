@@ -1,13 +1,13 @@
 package jadex.base.test.impl;
 
-import org.junit.Test;
+import java.util.Map;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
+import jadex.commons.future.IResultListener;
 
 /**
  * Junit compatible test class to be extended either by agents that provide test results
@@ -15,7 +15,6 @@ import jadex.bridge.IExternalAccess;
  */
 public abstract class JunitAgentTest extends ComponentTestLazyPlatform 
 {
-
     private IPlatformConfiguration config;
 
     /**
@@ -23,7 +22,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
      */
     public JunitAgentTest() 
     {
-//        Logger.getLogger("ComponentTest").log(Level.INFO, "Trying to guess TestAgent name...");
+//      Logger.getLogger("ComponentTest").log(Level.INFO, "Trying to guess TestAgent name...");
         String className = this.getClass().getName();
         this.comp = extendWithClassIfNeeded(className);
         this.config = STest.getDefaultTestConfig();
@@ -55,8 +54,6 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
      */
     public void setConfig(IPlatformConfiguration config) 
     {
-        if (cms == null) 
-            throw new IllegalStateException("Platform already started.");
         this.config = config;
     }
 
@@ -73,10 +70,23 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
     public void runBare() 
     {
         IExternalAccess platform = STest.createPlatform(getConfig());
-        cms = STest.getCMS(platform);
-        setPlatform(platform, cms);
+        setPlatform(platform);
         super.runBare();
         platform.killComponent();
+//        .addResultListener(new IResultListener<Map<String,Object>>()
+//		{
+//			@Override
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("exor: "+exception);
+//			}
+//			
+//			@Override
+//			public void resultAvailable(Map<String, Object> result)
+//			{
+//				System.out.println("resa");
+//			}
+//		});
     }
 
     @Test

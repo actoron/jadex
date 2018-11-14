@@ -17,10 +17,11 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -32,10 +33,10 @@ import jadex.micro.annotation.Results;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="paser", type=IParallelService.class, binding=@Binding(
-		create=true, creationinfo=@CreationInfo(type="pa"))),
+	@RequiredService(name="paser", type=IParallelService.class),
 })
 @ComponentTypes(@ComponentType(name="pa", filename="jadex.platform.service.parallelizer.Par2Agent.class"))
+@Configurations(@Configuration(name="default", components=@Component(type="pa")))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class UserAgent
 {
@@ -54,7 +55,7 @@ public class UserAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IParallelService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("paser");
+		IFuture<IParallelService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("paser");
 		fut.addResultListener(new ExceptionDelegationResultListener<IParallelService, Void>(ret)
 		{
 			public void customResultAvailable(IParallelService paser)
@@ -107,7 +108,7 @@ public class UserAgent
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults()
+				agent.getFeature(IArgumentsResultsFeature.class).getResults()
 					.put("testresults", new Testcase(1, new TestReport[]{
 						new TestReport("#1", "Test paralellizer", exception)
 					}));
@@ -116,7 +117,7 @@ public class UserAgent
 			@Override
 			public void resultAvailable(Void result)
 			{
-				agent.getComponentFeature(IArgumentsResultsFeature.class).getResults()
+				agent.getFeature(IArgumentsResultsFeature.class).getResults()
 				.put("testresults", new Testcase(1, new TestReport[]{
 					new TestReport("#1", "Test paralellizer", true, null)
 				}));

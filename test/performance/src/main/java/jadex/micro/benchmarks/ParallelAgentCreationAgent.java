@@ -11,9 +11,9 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -49,150 +49,144 @@ public class ParallelAgentCreationAgent
 	@AgentBody
 	public IFuture<Void> executeBody()
 	{
-		Map arguments = agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments();			
+		Map arguments = agent.getFeature(IArgumentsResultsFeature.class).getArguments();			
 		final int num	= ((Integer)arguments.get("num")).intValue();
 		if(num>0)
 		{
-			agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+			agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-					final IComponentManagementService	cms	= (IComponentManagementService)result;
-					agent.getComponentFeature(IRequiredServicesFeature.class).searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+					final IClockService	clock	= (IClockService)result;
+					final long	startmem	= Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+					final long	starttime	= clock.getTime();
+					final long[]	omem	= new long[1];
+					final double[]	dur	= new double[1];
+					final long[]	killstarttime	= new long[1];
+					
+					IResultListener	creationlis	= new CounterResultListener(num, new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
-							final IClockService	clock	= (IClockService)result;
-							final long	startmem	= Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-							final long	starttime	= clock.getTime();
-							final long[]	omem	= new long[1];
-							final double[]	dur	= new double[1];
-							final long[]	killstarttime	= new long[1];
-							
-							IResultListener	creationlis	= new CounterResultListener(num, new IResultListener()
+							agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 							{
-								public void resultAvailable(Object result)
+								@Classname("destroy1")
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("destroy1")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-											omem[0] = (used-startmem)/1024;
-											double upera = ((long)(1000*omem[0]/num))/1000.0;
-											System.out.println("Overall memory usage: "+omem[0]+"kB. Per agent: "+upera+" kB.");
-											long end = clock.getTime();
-											System.out.println("Last peer created. "+num+" agents started.");
-											dur[0] = ((double)end-starttime)/1000.0;
-											double pera = dur[0]/num;
-											System.out.println("Needed: "+dur[0]+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-											
-											killstarttime[0]	= clock.getTime();
-											for(int i=num; i>0; i--)
-											{
-												String name = createPeerName(i);
-//												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
-												final IComponentIdentifier cid = new BasicComponentIdentifier(name, agent.getComponentIdentifier().getRoot());
-												cms.destroyComponent(cid).addResultListener(new IResultListener<Map<String, Object>>()
-												{
-													public void resultAvailable(Map<String, Object> result)
-													{
-														System.out.println("Successfully destroyed peer: "+cid);
-													}
-													
-													public void exceptionOccurred(Exception exception)
-													{
-														// Ignore: Kill listener already added on create.	
-													};
-												});
-											}		
-											return IFuture.DONE;
-										}
-									});
-								}
-								
-								public void exceptionOccurred(final Exception exception)
-								{
-									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("destroy2")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											if(exception instanceof RuntimeException)
-												throw (RuntimeException)exception;
-											else
-												throw new RuntimeException(exception);
-										}
-									});
-								}
-							})
-							{
-								public void intermediateResultAvailable(Object result)
-								{
-									System.out.println("Created peer: "+getCnt());
-								}
-							};
-							
-							
-							IResultListener	killlis	= new CounterResultListener(num, new IResultListener()
-							{
-								public void resultAvailable(Object result)
-								{
-									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-									{
-										@Classname("last")
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											long killend = clock.getTime();
-											System.out.println("Last peer destroyed. "+num+" agents killed.");
-											double killdur = ((double)killend-killstarttime[0])/1000.0;
-											double killpera = killdur/num;
-											
-											Runtime.getRuntime().gc();
-											long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
-											double pera = dur[0]/num;
-											double upera = ((long)(1000*omem[0]/num))/1000.0;
-
-											System.out.println("\nCumulated results:");
-											System.out.println("Creation needed: "+dur[0]+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-											System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
-											System.out.println("Overall memory usage: "+omem[0]+"kB. Per agent: "+upera+" kB.");
-											System.out.println("Still used memory: "+stillused+"kB.");
+									long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+									omem[0] = (used-startmem)/1024;
+									double upera = ((long)(1000*omem[0]/num))/1000.0;
+									System.out.println("Overall memory usage: "+omem[0]+"kB. Per agent: "+upera+" kB.");
+									long end = clock.getTime();
+									System.out.println("Last peer created. "+num+" agents started.");
+									dur[0] = ((double)end-starttime)/1000.0;
+									double pera = dur[0]/num;
+									System.out.println("Needed: "+dur[0]+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 									
-											agent.killComponent();
-											
-											return IFuture.DONE;
-										}
-									});
-								}
-								
-								public void exceptionOccurred(final Exception exception)
-								{
-									agent.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+									killstarttime[0]	= clock.getTime();
+									for(int i=num; i>0; i--)
 									{
-										@Classname("destroyMe")
-										public IFuture<Void> execute(IInternalAccess ia)
+										String name = createPeerName(i);
+//												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
+										final IComponentIdentifier cid = new BasicComponentIdentifier(name, agent.getId().getRoot());
+										agent.killComponent(cid).addResultListener(new IResultListener<Map<String, Object>>()
 										{
-											if(exception instanceof RuntimeException)
-												throw (RuntimeException)exception;
-											else
-												throw new RuntimeException(exception);
-										}
-									});
+											public void resultAvailable(Map<String, Object> result)
+											{
+												System.out.println("Successfully destroyed peer: "+cid);
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												// Ignore: Kill listener already added on create.	
+											};
+										});
+									}		
+									return IFuture.DONE;
 								}
 							});
-							
-							Map	args	= new HashMap();
-							args.put("num", Integer.valueOf(0));
-							CreationInfo	cinfo	= new CreationInfo(null, args, agent.getComponentDescription().getResourceIdentifier());
-							for(int i=1; i<=num; i++)
+						}
+						
+						public void exceptionOccurred(final Exception exception)
+						{
+							agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 							{
-								cms.createComponent(createPeerName(i), ParallelAgentCreationAgent.this.getClass().getName()+".class", cinfo, killlis)
-									.addResultListener(creationlis);
-							}
+								@Classname("destroy2")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									if(exception instanceof RuntimeException)
+										throw (RuntimeException)exception;
+									else
+										throw new RuntimeException(exception);
+								}
+							});
+						}
+					})
+					{
+						public void intermediateResultAvailable(Object result)
+						{
+							System.out.println("Created peer: "+getCnt());
+						}
+					};
+					
+					
+					IResultListener	killlis	= new CounterResultListener(num, new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("last")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									long killend = clock.getTime();
+									System.out.println("Last peer destroyed. "+num+" agents killed.");
+									double killdur = ((double)killend-killstarttime[0])/1000.0;
+									double killpera = killdur/num;
+									
+									Runtime.getRuntime().gc();
+									long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+									double pera = dur[0]/num;
+									double upera = ((long)(1000*omem[0]/num))/1000.0;
+
+									System.out.println("\nCumulated results:");
+									System.out.println("Creation needed: "+dur[0]+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+									System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+									System.out.println("Overall memory usage: "+omem[0]+"kB. Per agent: "+upera+" kB.");
+									System.out.println("Still used memory: "+stillused+"kB.");
+							
+									agent.killComponent();
+									
+									return IFuture.DONE;
+								}
+							});
+						}
+						
+						public void exceptionOccurred(final Exception exception)
+						{
+							agent.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+							{
+								@Classname("destroyMe")
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									if(exception instanceof RuntimeException)
+										throw (RuntimeException)exception;
+									else
+										throw new RuntimeException(exception);
+								}
+							});
 						}
 					});
+					
+					Map	args	= new HashMap();
+					args.put("num", Integer.valueOf(0));
+					for(int i=1; i<=num; i++)
+					{
+						CreationInfo cinfo = new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()).setName(createPeerName(i)).setFilename(ParallelAgentCreationAgent.this.getClass().getName()+".class");
+						
+						agent.createComponent(cinfo, killlis)
+							.addResultListener(creationlis);
+					}
 				}
 			});
 		}
@@ -205,7 +199,7 @@ public class ParallelAgentCreationAgent
 	 */
 	protected String createPeerName(int num)
 	{
-		return agent.getComponentIdentifier().getLocalName() + "Peer_#" + num;
+		return agent.getId().getLocalName() + "Peer_#" + num;
 	}
 	
 //	/**

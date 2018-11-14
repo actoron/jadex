@@ -44,7 +44,7 @@ public class AppProviderService implements IAppProviderService<IMandelbrotServic
 	 */
 	public IFuture<IMandelbrotService> getApplication()
 	{
-		IMandelbrotService ms = (IMandelbrotService)agent.getComponentFeature(IProvidedServicesFeature.class).getProvidedServices(IMandelbrotService.class)[0];
+		IMandelbrotService ms = (IMandelbrotService)agent.getFeature(IProvidedServicesFeature.class).getProvidedServices(IMandelbrotService.class)[0];
 		return new Future<IMandelbrotService>(ms);
 	}
 }

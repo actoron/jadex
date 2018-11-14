@@ -2,7 +2,6 @@ package jadex.micro.testcases.stream;
 
 import java.util.Map;
 
-import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -41,20 +40,21 @@ public class Initiator2Agent extends TestAgent
 	 */
 	protected IFuture<Void> performTests(final Testcase tc)
 	{
+		disableLocalSimulationMode().get();
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getComponentDescription());
-		testLocal(1).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test remote: "+agent.getComponentDescription());
+				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
 				tc.addReport(result);
-				testRemote(2).addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getComponentDescription());
+						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -70,7 +70,7 @@ public class Initiator2Agent extends TestAgent
 	 */
 	protected IFuture<TestReport> testLocal(int testno)
 	{
-		return performTest(agent.getComponentIdentifier().getRoot(), testno);
+		return performTest(agent.getId().getRoot(), testno);
 	}
 	
 	/**
@@ -84,8 +84,8 @@ public class Initiator2Agent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
-               	performTest(exta.getComponentIdentifier(), testno)
-               		.addResultListener(agent.getComponentFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
+               	performTest(exta.getId(), testno)
+               		.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		});
 		
@@ -116,15 +116,15 @@ public class Initiator2Agent extends TestAgent
 		final Future<Map<String, Object>> resfut = new Future<Map<String, Object>>();
 		IResultListener<Map<String, Object>> reslis = new DelegationResultListener<Map<String,Object>>(resfut);
 		
-		agent.getLogger().severe("Testagent create receiver: "+agent.getComponentDescription());
+		agent.getLogger().severe("Testagent create receiver: "+agent.getDescription());
 		createComponent("jadex/micro/testcases/stream/Receiver2Agent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				agent.getLogger().severe("Testagent create receiver done: "+agent.getComponentDescription());
-				IMessageFeature mf = agent.getComponentFeature(IMessageFeature.class);
-				mf.createInputConnection(agent.getComponentIdentifier(), cid, null)
+				agent.getLogger().severe("Testagent create receiver done: "+agent.getDescription());
+				IMessageFeature mf = agent.getFeature(IMessageFeature.class);
+				mf.createInputConnection(agent.getId(), cid, null)
 					.addResultListener(new ExceptionDelegationResultListener<IInputConnection, TestReport>(ret)
 				{
 					public void customResultAvailable(final IInputConnection icon) 
@@ -137,6 +137,7 @@ public class Initiator2Agent extends TestAgent
 								{
 									public void customResultAvailable(Map<String,Object> result) 
 									{
+										System.out.println("Test result: "+tr);
 										ret.setResult(tr);
 									}
 								});

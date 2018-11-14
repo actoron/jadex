@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.c4;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.Description;
  *  Argument mapped to a field.
  */
 @Description("The clock agent C4. <br>  This translation agent uses an argument.")
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Service
 @Arguments(@Argument(name="wordpair", clazz=String[].class, 
 	defaultvalue="new String[]{\"bugger\", \"Flegel\"}"))

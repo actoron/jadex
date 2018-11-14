@@ -186,7 +186,7 @@ public class TimerPanel	extends JPanel
 		// Called from check box -> change state.
 		else
 		{
-			String	id	= "TimerPanel"+TimerPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getComponentIdentifier();
+			String	id	= "TimerPanel"+TimerPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getId();
 			ISimulationService	simservice	= simp.getSimulationService();
 			
 			if(active)

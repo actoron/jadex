@@ -71,13 +71,11 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
-		if(element.toString().indexOf("cnp_make_proposal")!=-1)
-			System.out.println("select candidates: "+element);
+//		if(element.toString().indexOf("cnp_make_proposal")!=-1)
+//			System.out.println("select candidates: "+element);
 		
-		Future<Void> ret = new Future<Void>();
-
 //		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-		MCapability	mcapa = (MCapability)ia.getComponentFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
+		MCapability	mcapa = (MCapability)ia.getFeature(IInternalBDIAgentFeature.class).getCapability().getModelElement();
 
 		List<ICandidateInfo> cands = element.getApplicablePlanList().selectCandidates(mcapa, ia);
 		
@@ -174,7 +172,6 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 							}
 						});
 					}
-					ret.setResult(null);
 				}
 				// direct subgoal for goal
 				else if(cand instanceof MGoalInfo)
@@ -198,8 +195,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 						if(allcands.size()==1)
 						{
 							element.planFinished(ia, null);
-							ret.setResult(null);
-							return ret;
+							return IFuture.DONE;
 						}
 						
 						for(ICandidateInfo c: allcands)
@@ -261,7 +257,6 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 					});
 					
 					RGoal.adoptGoal(rgoal, ia);
-					ret.setResult(null);
 				}
 				else if(cand.getClass().isAnnotationPresent(Plan.class))
 				{
@@ -269,7 +264,6 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 //					MPlan mplan = mcapa.getPlan(cand.getClass().getName());
 //					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia, null, null);
 					RPlan.executePlan(rplan, ia);
-					ret.setResult(null);
 				}
 				else if(cand instanceof RPlan)
 				{
@@ -288,13 +282,11 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 //						System.out.println("rplan resume command: "+rplan);
 						rplan.getResumeCommand().execute(new ResumeCommandArgs(null, Boolean.FALSE, null));
 					}
-					ret.setResult(null);
 				}
 				else if(cand instanceof Waitqueue)
 				{
 					// dispatch to waitqueue
 					((Waitqueue)cand).addElement(element);
-					ret.setResult(null);
 				}
 //				// Unwrap candidate info coming from meta-level reasoning
 //				else if(cand instanceof ICandidateInfo)
@@ -312,7 +304,7 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 			element.planFinished(ia, null);
 		}
 		
-		return ret;
+		return IFuture.DONE;
 	}
 	
 	public String toString()

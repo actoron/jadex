@@ -11,7 +11,6 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
@@ -40,7 +39,7 @@ public class PojoServiceImplAgent extends JunitAgentTest implements IAService
 	@AgentBody
 	public void body()
 	{
-		IProvidedServicesFeature psf = agent.getComponentFeature(IProvidedServicesFeature.class);
+		IProvidedServicesFeature psf = agent.getFeature(IProvidedServicesFeature.class);
 		Object serimpl = psf.getProvidedServiceRawImpl(IAService.class);
 		TestReport	tr	= new TestReport("#1", "Test if impl is pojo object.");
 		if(serimpl==this)
@@ -51,7 +50,7 @@ public class PojoServiceImplAgent extends JunitAgentTest implements IAService
 		{
 			tr.setFailed("Wrong service impl object: "+serimpl);
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killComponent();
 	}
 	

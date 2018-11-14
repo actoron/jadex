@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
@@ -15,10 +16,10 @@ import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 public class ArrayListBDI 
 {
-    @Agent
+    @Agent(type=BDIAgentFactory.TYPE)
     IInternalAccess agent;
 
     @Belief
@@ -28,7 +29,7 @@ public class ArrayListBDI
     public void body()
     {
         System.out.println("BDI Agent started");
-        agent.getComponentFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal());
+        agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new TestGoal());
     }
 
     @Goal

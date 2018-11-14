@@ -17,12 +17,12 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MProcessableElement.ExcludeMode;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -34,7 +34,7 @@ import jadex.micro.annotation.RequiredServices;
 	@Plan(trigger=@Trigger(goals={MovementCapability.Move.class, MovementCapability.Missionend.class}), body=@Body(MoveToLocationPlan.class)),
 	@Plan(trigger=@Trigger(goals=MovementCapability.WalkAround.class), body=@Body(RandomWalkPlan.class))
 })
-@RequiredServices(@RequiredService(name="clockser", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="clockser", type=IClockService.class))
 public class MovementCapability
 {
 	//-------- attributes --------
@@ -50,7 +50,7 @@ public class MovementCapability
 	protected AbstractEnvironmentSpace env = (AbstractEnvironmentSpace)EnvironmentService.getSpace(capa.getAgent(), "myspace").get();
 	
 	/** The environment. */
-	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getComponentDescription(), capa.getAgent().getModel().getFullName());
+	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getDescription(), capa.getAgent().getModel().getFullName());
 
 	/** The mission end. */
 //	@Belief(dynamic=true, updaterate=1000) 
@@ -165,9 +165,9 @@ public class MovementCapability
 	 */
 	protected long getTime()
 	{
-		IClockService cs = SServiceProvider.getLocalService(capa.getAgent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		// todo: capa.getAgent().getComponentFeature().getRequiredService() does not work in init expressions only from plans :-(
-//		IClockService cs =  (IClockService)capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockser").get();
+		IClockService cs = capa.getAgent().getFeature(IRequiredServicesFeature.class).getLocalService(IClockService.class);
+		// todo: capa.getAgent().getComponentFeature().getService() does not work in init expressions only from plans :-(
+//		IClockService cs =  (IClockService)capa.getAgent().getComponentFeature(IRequiredServicesFeature.class).getService("clockser").get();
 		return cs.getTime();
 	}
 	

@@ -56,7 +56,7 @@ public class ServiceIdFilter implements IAsyncFilter
 	 */
 	public IFuture<Boolean> filter(Object obj)
 	{
-		return obj instanceof IService && ((IService)obj).getServiceIdentifier().equals(sid) ? IFuture.TRUE : IFuture.FALSE;
+		return obj instanceof IService && ((IService)obj).getServiceId().equals(sid) ? IFuture.TRUE : IFuture.FALSE;
 	}
 	
 	/**
@@ -72,6 +72,6 @@ public class ServiceIdFilter implements IAsyncFilter
 	 */
 	public boolean equals(Object obj)
 	{
-		return obj instanceof IService && ((IService)obj).getServiceIdentifier().equals(sid);
+		return obj instanceof IService && ((IService)obj).getServiceId().equals(sid);
 	}
 }

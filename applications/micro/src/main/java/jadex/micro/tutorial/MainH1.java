@@ -21,6 +21,6 @@ public class MainH1
 		
 		// Wait until the platform has started and retrieve the platform access.
 		IExternalAccess	platform	= platfut.get();
-		System.out.println("Started platform: "+platform.getComponentIdentifier());
+		System.out.println("Started platform: "+platform.getId());
 	}
 }

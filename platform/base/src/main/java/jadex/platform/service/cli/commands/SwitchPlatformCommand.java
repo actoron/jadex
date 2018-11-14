@@ -8,8 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -82,32 +81,25 @@ public class SwitchPlatformCommand extends ACliCommand
 		{
 			final IComponentIdentifier cid = new BasicComponentIdentifier((String)args.get(null));
 			
-			SServiceProvider.getServices(comp, IInternalCliService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+			comp.searchServices( new ServiceQuery<>(IInternalCliService.class, RequiredServiceInfo.SCOPE_GLOBAL))
 				.addResultListener(new IIntermediateResultListener<IInternalCliService>()
 			{
 				boolean found = false;
 				public void intermediateResultAvailable(final IInternalCliService cliser)
 				{
-					final IComponentIdentifier plat = ((IService)cliser).getServiceIdentifier().getProviderId().getRoot();
+					final IComponentIdentifier plat = ((IService)cliser).getServiceId().getProviderId().getRoot();
 					if(plat.equals(cid) && !ret.isDone())
 					{
 						found = true;
-						SServiceProvider.getService(comp, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IInternalCliService>(ret)
+						comp.getExternalAccess(plat).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IInternalCliService>(ret)
 						{
-							public void customResultAvailable(IComponentManagementService cms)
+							public void customResultAvailable(IExternalAccess exta)
 							{
-								cms.getExternalAccess(plat).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IInternalCliService>(ret)
-								{
-									public void customResultAvailable(IExternalAccess exta)
-									{
-										Tuple2<String, Integer> osid = context.getShell().getSessionId();
-										Tuple2<String, Integer> nsid = new Tuple2<String, Integer>(osid.getFirstEntity(), Integer.valueOf(osid.getSecondEntity().intValue()+1)); 
-										context.getShell().addSubshell(new RemoteCliShell(cliser, nsid));
+								Tuple2<String, Integer> osid = context.getShell().getSessionId();
+								Tuple2<String, Integer> nsid = new Tuple2<String, Integer>(osid.getFirstEntity(), Integer.valueOf(osid.getSecondEntity().intValue()+1)); 
+								context.getShell().addSubshell(new RemoteCliShell(cliser, nsid));
 //										ret.setResult(cliser);
-										ret.setResult(null);
-									}
-								});
+								ret.setResult(null);
 							}
 						});
 					}
@@ -158,7 +150,7 @@ public class SwitchPlatformCommand extends ACliCommand
 		{
 			public String convertObject(Object val, Object context)
 			{
-				return val!=null? ((IService)val).getServiceIdentifier().getProviderId().getRoot().getName(): "";
+				return val!=null? ((IService)val).getServiceId().getProviderId().getRoot().getName(): "";
 			}
 		});
 	}

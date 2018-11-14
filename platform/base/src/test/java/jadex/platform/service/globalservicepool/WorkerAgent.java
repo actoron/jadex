@@ -24,7 +24,7 @@ public class WorkerAgent implements ITestService
 	 */
 	public IFuture<Void> methodA(int cnt)
 	{
-		System.out.println(cnt+" called methodA on: "+agent.getComponentIdentifier());
+		System.out.println(cnt+" called methodA on: "+agent.getId());
 		return IFuture.DONE;
 	}
 }

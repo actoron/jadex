@@ -6,12 +6,12 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
@@ -22,9 +22,9 @@ import jadex.micro.annotation.Results;
 /**
  *  Test if binding of required service info can be overridden in configuration.
  */
-@RequiredServices(@RequiredService(name="as", type=IAService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="as", type=IAService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 @Configurations({
-	@Configuration(name="a", requiredservices=@RequiredService(name="as", type=IAService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL))),
+	@Configuration(name="a", requiredservices=@RequiredService(name="as", type=IAService.class, scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY)),
 	@Configuration(name="b")
 })
 @Results(@Result(name="testresults", clazz=Testcase.class)) 
@@ -41,10 +41,10 @@ public class RequiredServiceConfigurationsAgent extends JunitAgentTest
 	public IFuture<Void> agentCreated()
 	{
 //		BasicServiceContainer con = (BasicServiceContainer)agent.getServiceContainer();
-		RequiredServiceInfo rsi = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredServiceInfo("as");
+		RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getServiceInfo("as");
 //		System.out.println(rsi.getDefaultBinding().getScope());
 		TestReport tr = new TestReport("#1", "Test required service overriding.");
-		if(rsi.getDefaultBinding().getScope().equals(RequiredServiceInfo.SCOPE_LOCAL))
+		if(rsi.getDefaultBinding().getScope().equals(RequiredServiceInfo.SCOPE_COMPONENT_ONLY))
 		{
 			tr.setSucceeded(true);
 		}
@@ -52,7 +52,7 @@ public class RequiredServiceConfigurationsAgent extends JunitAgentTest
 		{
 			tr.setFailed("Wrong service implementation: "+rsi.getDefaultBinding().getScope());
 		}
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		return IFuture.DONE;
 	}	
 }

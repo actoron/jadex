@@ -1,8 +1,5 @@
 package jadex.micro.testcases.nfservicetags;
 
-import org.junit.Ignore;
-
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,22 +9,18 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.nonfunctional.SNFPropertyProvider;
-import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.sensor.service.TagProperty;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.MethodInfo;
-import jadex.commons.SReflect;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -39,13 +32,13 @@ import jadex.micro.annotation.Results;
 @Agent
 @Service
 @RequiredServices({
-	@RequiredService(name="testser1", type=ITestService.class, 
-		binding=@Binding(create=true, creationinfo=@CreationInfo(type="provider"))),
+	@RequiredService(name="testser1", type=ITestService.class),
 	@RequiredService(name="testser2", type=ITestService.class, tags=TagProperty.PLATFORM_NAME),
 	@RequiredService(name="testser3", type=ITestService.class, tags="blatag")
 })
 
 @ComponentTypes(@ComponentType(name="provider", filename="jadex.micro.testcases.nfservicetags.ProviderAgent.class"))
+@Configurations(@Configuration(name="default", components=@Component(type="provider")))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
 public class NFServiceTagsTestAgent extends JunitAgentTest
 {
@@ -64,7 +57,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr1 = new TestReport("#1", "Test if can find service withouts tags.");
 		try
 		{
-			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser1").get();
+			agent.getFeature(IRequiredServicesFeature.class).getService("testser1").get();
 			tr1.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -76,7 +69,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr2 = new TestReport("#2", "Test if can find service with tags in required service defition.");
 		try
 		{
-			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser2").get();
+			agent.getFeature(IRequiredServicesFeature.class).getService("testser2").get();
 			tr2.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -88,7 +81,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr3 = new TestReport("#3", "Test if can find service with tags in required service defition that are not defined on service.");
 		try
 		{
-			ITestService ser = (ITestService)agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("testser3").get();
+			agent.getFeature(IRequiredServicesFeature.class).getService("testser3").get();
 			tr3.setReason("Found service that does not have the tag");
 		}
 		catch(Exception e)
@@ -100,8 +93,15 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr4 = new TestReport("#4", "Test if can find service via SServiceProvider.getServices()");
 		try
 		{
-			Collection<ITestService> sers = SServiceProvider.getTaggedServices(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, TagProperty.PLATFORM_NAME).get(); 
-			tr4.setSucceeded(true);
+			Collection<ITestService> sers = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(new String[]{TagProperty.PLATFORM_NAME}, agent.getExternalAccess()));
+			if(sers.isEmpty())
+			{
+				tr4.setFailed("No service found");
+			}
+			else
+			{
+				tr4.setSucceeded(true);
+			}
 		}
 		catch(Exception e)
 		{
@@ -112,7 +112,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr5 = new TestReport("#5", "Test if can find service via SServiceProvider.getService()");
 		try
 		{
-			ITestService ser = SServiceProvider.getTaggedService(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, TagProperty.PLATFORM_NAME).get(); 
+			agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(new String[]{TagProperty.PLATFORM_NAME}, agent.getExternalAccess())); 
 			tr5.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -124,7 +124,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		TestReport tr6 = new TestReport("#6", "Test if can find null tagged service service via SServiceProvider.getService()");
 		try
 		{
-			ITestService ser = SServiceProvider.getTaggedService(agent, ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM, new String[]{null}).get(); 
+			agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_PLATFORM).setServiceTags(new String[]{null})); 
 			tr6.setSucceeded(true);
 		}
 		catch(Exception e)
@@ -133,7 +133,7 @@ public class NFServiceTagsTestAgent extends JunitAgentTest
 		}
 		results.add(tr6);
 		
-		agent.getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
+		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
 		agent.killComponent();
 	}

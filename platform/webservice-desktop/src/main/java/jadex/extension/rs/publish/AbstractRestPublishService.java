@@ -191,8 +191,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		converters.add(MediaType.TEXT_PLAIN, tostrc);
 		converters.add("*/*", tostrc);
     	
-    	final Long to = (Long)Starter.getPlatformValue(component.getComponentIdentifier(), Starter.DATA_DEFAULT_REMOTE_TIMEOUT);
-		System.out.println("Using default client timeout: "+to);
+    	final Long to = (Long)Starter.getPlatformValue(component.getId(), Starter.DATA_DEFAULT_TIMEOUT);
+		component.getLogger().info("Using default client timeout: "+to);
     	
     	requestspercall = new MultiCollection<String, AsyncContext>()
         {
@@ -253,9 +253,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      */
     public void handleRequest(IService service, MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
     {
-    	if(!component.getComponentFeature(IExecutionFeature.class).isComponentThread())
+    	if(!component.getFeature(IExecutionFeature.class).isComponentThread())
     	{
-    		component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+    		component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
     			@Override
     			public IFuture<Void> execute(IInternalAccess ia)
@@ -400,7 +400,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //                    	System.out.println("added context: "+fcallid+" "+ctx);
                     	
                     	((IIntermediateFuture<Object>)ret).addIntermediateResultListener(
-                    		component.getComponentFeature(IExecutionFeature.class).createResultListener(
+                    		component.getFeature(IExecutionFeature.class).createResultListener(
                     		new IIntermediateFutureCommandResultListener<Object>()
 						{
                     		public void resultAvailable(Collection<Object> result)
@@ -486,7 +486,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //				        				System.out.println("checking "+result);
 				        				// if timeout -> cancel future.
 				        				// TODO: which timeout? (client vs server).
-				        				if(System.currentTimeMillis() - rinfo.getTimestamp()>Starter.getRemoteDefaultTimeout(component.getComponentIdentifier()))
+				        				if(System.currentTimeMillis() - rinfo.getTimestamp()>Starter.getDefaultTimeout(component.getId()))
 				        				{
 //				        					System.out.println("terminating "+result);
 				        					rinfo.setTerminated();
@@ -527,7 +527,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     	// todo: use timeout listener
                     	// TODO: allow also longcalls (requires intermediate command responses -> use only when requested by browser?)
                     	((IFuture)ret).addResultListener(
-                    		component.getComponentFeature(IExecutionFeature.class).createResultListener(
+                    		component.getFeature(IExecutionFeature.class).createResultListener(
                     		new IResultListener<Object>()
 						{
                     		public void resultAvailable(Object ret)
@@ -545,7 +545,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //                    			ctx.complete();
                     		}
 						}));
-//                        ret = ((IFuture<?>)ret).get(Starter.getLocalDefaultTimeout(null));
+//                        ret = ((IFuture<?>)ret).get(Starter.getDefaultTimeout(null));
                     }
                     else
                     {
@@ -1411,7 +1411,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			ret.append("<div class=\"header\">");
 			ret.append("\n");
 			ret.append("<h1>");//Service Info for: ");
-			String ifacename = ((IService)service).getServiceIdentifier().getServiceType().getTypeName();
+			String ifacename = ((IService)service).getServiceId().getServiceType().getTypeName();
 			ret.append(SReflect.getUnqualifiedTypeName(ifacename));
 			ret.append("</h1>");
 			ret.append("\n");

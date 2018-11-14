@@ -51,11 +51,11 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.commons.IResultCommand;
@@ -139,41 +139,31 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			{
 				buswitchpeer.setEnabled(false);
 				
-				SServiceProvider.getService(getActiveComponent(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new IResultListener<IComponentManagementService>()
+				getActiveComponent().searchService( new ServiceQuery<>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+					.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 				{
-					public void resultAvailable(final IComponentManagementService cms)
+					public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
 					{
-						SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
-						{
-							public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
-							{
-								cms.destroyComponent(((IService)sps).getServiceIdentifier().getProviderId());
-								cms.createComponent("registrypeer", PeerRegistrySynchronizationAgent.class.getName()+".class", null);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								SServiceProvider.getService(getActiveComponent(), IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new IResultListener<IPeerRegistrySynchronizationService>()
-								{
-									public void resultAvailable(IPeerRegistrySynchronizationService ps)
-									{
-										cms.destroyComponent(((IService)ps).getServiceIdentifier().getProviderId());
-										cms.createComponent("registrysuperpeer", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null);
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-									}
-								});
-							}
-						});
+						getActiveComponent().killComponent(((IService)sps).getServiceId().getProviderId());
+						
+						getActiveComponent().createComponent(new CreationInfo().setFilename(PeerRegistrySynchronizationAgent.class.getName()+".class").setName("registrypeer"));
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						getActiveComponent().searchService( new ServiceQuery<>( IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+							.addResultListener(new IResultListener<IPeerRegistrySynchronizationService>()
+						{
+							public void resultAvailable(IPeerRegistrySynchronizationService ps)
+							{
+								getActiveComponent().killComponent(((IService)ps).getServiceId().getProviderId());
+								getActiveComponent().createComponent(new CreationInfo().setFilename(SuperpeerRegistrySynchronizationAgent.class.getName()+".class").setName("registrysuperpeer"));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+							}
+						});
 					}
 				});
 			}
@@ -216,7 +206,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		pserinfos.add(BorderLayout.CENTER, new JScrollPane(jtservices));
 		jtservices.setDefaultRenderer(Date.class, new DateTimeRenderer());
 		jtservices.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtservices.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
+		jtservices.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getId().getRoot()));
 		jtservices.setDefaultRenderer(ClassInfo.class, new ClassInfoRenderer());
 		jtservices.setDefaultRenderer(IServiceIdentifier.class, new ServiceIdentifierRenderer());
 		jtservices.setDefaultRenderer(Set.class, new DefaultTableCellRenderer());
@@ -243,7 +233,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		pqueryinfos.add(BorderLayout.CENTER, new JScrollPane(jtqueries));
 		jtqueries.setDefaultRenderer(Date.class, new DateTimeRenderer());
 		jtqueries.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtqueries.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
+		jtqueries.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getId().getRoot()));
 		jtqueries.setDefaultRenderer(ClassInfo.class, new ClassInfoRenderer());
 		jtqueries.setDefaultRenderer(IServiceIdentifier.class, new ServiceIdentifierRenderer());
 		jtqueries.setDefaultRenderer(String[].class, new DefaultTableCellRenderer()
@@ -272,7 +262,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		jtpartners.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		ppartners.add(BorderLayout.CENTER, new JScrollPane(jtpartners));
 		jtpartners.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtpartners.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
+		jtpartners.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getId().getRoot()));
 		
 		// create panel with partner table
 		JPanel pclients = new JPanel(new BorderLayout());
@@ -285,7 +275,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 		jtclients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		pclients.add(BorderLayout.CENTER, new JScrollPane(jtclients));
 		jtclients.setDefaultRenderer(ComponentIdentifier.class, new ComponentIdentifierRenderer(null));
-		jtclients.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getComponentIdentifier().getRoot()));
+		jtclients.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer(getActiveComponent().getId().getRoot()));
 		
 		tpane.addTab("Services", pserinfos);
 		tpane.addTab("Queries", pqueryinfos);
@@ -441,7 +431,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 //		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
 		
 //		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
-//		SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//		getActiveComponent().searchService( new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 //			.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 //		{
 //			public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
@@ -493,7 +483,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 	 */
 	protected void fetchSuperpeer()
 	{
-		SServiceProvider.getService(getActiveComponent(), IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		getActiveComponent().searchService( new ServiceQuery<>( IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<IPeerRegistrySynchronizationService>()
 		{
 			public void exceptionOccurred(Exception exception)
@@ -540,7 +530,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 //		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
 		
 //		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
-		SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		getActiveComponent().searchService( new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 		{
 			public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
@@ -582,7 +572,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 //		ISuperpeerRegistrySynchronizationService sps = getRegistry().searchServiceSync(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, null, null, null, null));
 		
 //		final IComponentIdentifier fplat = getActiveComponent().getComponentIdentifier().getRoot();
-		SServiceProvider.getService(getActiveComponent(), ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		getActiveComponent().searchService( new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM))
 			.addResultListener(new IResultListener<ISuperpeerRegistrySynchronizationService>()
 		{
 			public void resultAvailable(ISuperpeerRegistrySynchronizationService sps)
@@ -629,7 +619,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 				IFuture<Object> ret = null;
 				try
 				{
-					IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getComponentIdentifier());
+					IServiceRegistry reg = ServiceRegistry.getRegistry(ia.getId());
 					Object res = cmd.execute(reg);
 					if(res instanceof IFuture)
 						ret = (IFuture<Object>)res;
@@ -718,34 +708,34 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			}
 			else if(column == 1)
 			{
-				value = ser.getServiceIdentifier().getServiceType();
+				value = ser.getServiceId().getServiceType();
 			}
 			else if(column == 2)
 			{
-				value = ser.getServiceIdentifier().getProviderId();
+				value = ser.getServiceId().getProviderId();
 			}
 			else if(column == 3)
 			{
-				value = ser.getServiceIdentifier().getProviderId().getRoot();
+				value = ser.getServiceId().getProviderId().getRoot();
 			}
 			else if(column == 4)
 			{
-				value = ser.getServiceIdentifier();
+				value = ser.getServiceId();
 			}
 			else if(column == 5)
 			{
 //				Map<String, Object> sprops = ser.getPropertyMap();
 //				if(sprops != null)
 //					value = (Set<String>)sprops.get(TagProperty.SERVICE_PROPERTY_NAME);
-				value = ser.getServiceIdentifier().getTags();
+				value = ser.getServiceId().getTags();
 			}
 			else if(column == 6)
 			{
-				value = ser.getServiceIdentifier().getNetworkNames();
+				value = ser.getServiceId().getNetworkNames();
 			}
 			else if(column == 7)
 			{
-				value = ser.getServiceIdentifier().isUnrestricted();
+				value = ser.getServiceId().isUnrestricted();
 			}
 			return value;
 		}
@@ -799,7 +789,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			{
 				IComponentIdentifier cid = (IComponentIdentifier)getValueAt(row, 3);
 				
-				if(!cid.getRoot().equals(getActiveComponent().getComponentIdentifier()))
+				if(!cid.getRoot().equals(getActiveComponent().getId()))
 				{
 					int cc = SUtil.diffuseStringHash(cid.toString());
 					float cc2 = ((float)cc)/Integer.MAX_VALUE;
@@ -866,7 +856,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 				case 2:
 					return "Owner";
 				case 3:
-					return "Provider";
+					return "Search Start";
 				case 4:
 					return "Platform";
 				case 5:
@@ -903,7 +893,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			}
 			else if(column == 3)
 			{
-				value = query.getQuery().getProvider();
+				value = query.getQuery().getSearchStart();
 			}
 			else if(column == 4)
 			{
@@ -973,7 +963,7 @@ public class RegistryPanel extends AbstractComponentViewerPanel
 			{
 				IComponentIdentifier cid = (IComponentIdentifier)getValueAt(row, 2);
 				
-				if(cid!=null && !cid.getRoot().equals(getActiveComponent().getComponentIdentifier()))
+				if(cid!=null && !cid.getRoot().equals(getActiveComponent().getId()))
 				{
 					int cc = SUtil.diffuseStringHash(cid.toString());
 					float cc2 = ((float)cc)/Integer.MAX_VALUE;

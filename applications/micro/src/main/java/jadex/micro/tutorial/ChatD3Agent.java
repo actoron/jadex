@@ -2,7 +2,6 @@ package jadex.micro.tutorial;
 
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -18,10 +17,8 @@ import jadex.micro.annotation.RequiredServices;
 @ProvidedServices(@ProvidedService(type=IExtendedChatService.class, 
 	implementation=@Implementation(ChatServiceD3.class)))
 @RequiredServices({
-	@RequiredService(name="clockservice", type=IClockService.class, 
-		binding=@Binding(scope=Binding.SCOPE_PLATFORM)),
-	@RequiredService(name="chatservices", type=IExtendedChatService.class, multiple=true,
-		binding=@Binding(dynamic=true, scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="clockservice", type=IClockService.class),
+	@RequiredService(name="chatservices", type=IExtendedChatService.class, multiple=true, scope=RequiredService.SCOPE_PLATFORM)
 })
 public class ChatD3Agent
 {

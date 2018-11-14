@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
@@ -37,7 +38,8 @@ public class SFuture
 	public static void avoidCallTimeouts(final Future<?> ret, IInternalAccess ia)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
-		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
+//		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
+		boolean	realtime = sc != null ? sc.isRemoteCall(ia.getId()) : false;
 		avoidCallTimeouts(ret, ia, realtime);
 	}
 	
@@ -53,7 +55,7 @@ public class SFuture
 	public static void avoidCallTimeouts(final Future<?> ret, IInternalAccess ia, boolean realtime)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
-		long to = sc!=null? sc.getTimeout(): Starter.getLocalDefaultTimeout(ia.getComponentIdentifier()); // Hack!!! find out in which cases service call can null
+		long to = sc!=null? sc.getTimeout(): Starter.getDefaultTimeout(ia.getId()); // Hack!!! find out in which cases service call can null
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
 	//	to = 5000;
@@ -71,8 +73,9 @@ public class SFuture
 	public static void avoidCallTimeouts(final Future<?> ret, IExternalAccess ea)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
-		long to = sc!=null? sc.getTimeout(): Starter.getLocalDefaultTimeout(ea.getComponentIdentifier()); // Hack!!! find out in which cases service call can null
-		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
+		long to = sc!=null? sc.getTimeout(): Starter.getDefaultTimeout(ea.getId()); // Hack!!! find out in which cases service call can null
+//		boolean	realtime	= sc!=null ? sc.getRealtime()!=null ? sc.getRealtime().booleanValue() : false : false;
+		boolean	realtime = sc != null ? sc.isRemoteCall(ea.getId()) : false;
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
 	//	to = 5000;
@@ -129,12 +132,18 @@ public class SFuture
 					if(!ret.isDone())
 					{
 						ret.sendForwardCommand(IForwardCommandFuture.Type.UPDATETIMER);
-						ia.getComponentFeature(IExecutionFeature.class).waitForDelay(w, this, realtime);
+						ia.getFeature(IExecutionFeature.class).waitForDelay(w, this, realtime);
 					}
 					return IFuture.DONE;
 				}
 			};
-			ia.getComponentFeature(IExecutionFeature.class).waitForDelay(w, step, realtime);
+//			ia.getFeature(IExecutionFeature.class).waitForDelay(w, step, realtime);
+			
+			// Send the first update immediately since the avoid is set up at
+			// the receiver and some time may have already passed until the receiver
+			// gets the call. Otherwise the call only has 0.2*timeout to get to the
+			// receiver in the first place.
+			ia.scheduleStep(step);
 		}
 	}
 	
@@ -312,6 +321,20 @@ public class SFuture
 			}
 		}
 		
+		return ret;
+	}
+
+	/**
+	 *  Blocking wait for first result.
+	 *  Future is terminated after first result is received.
+	 *  Uses realtime timeout (hack?)
+	 *  @param fut	The future.
+	 *  @return The first result.
+	 */
+	public static <T> T getFirstResultAndTerminate(ITerminableIntermediateFuture<T> fut)
+	{
+		T	ret	= fut.getNextIntermediateResult(Timeout.UNSET, true);
+		fut.terminate();
 		return ret;
 	}
 	

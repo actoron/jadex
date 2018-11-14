@@ -23,16 +23,19 @@ public class ProviderAgent
 	@AgentCreated
 	public void created(IInternalAccess agent)
 	{
-		agent.getLogger().severe("Agent created: "+agent.getComponentDescription());
+		agent.getLogger().severe("Agent created: " + agent.getDescription());
+		argResults.getResults().put("exampleresult", "value");
 	}
 
 	@AgentBody
-	private void body() {
-		argResults.getResults().put("exampleresult", "value");
+	private void body()
+	{
+		// cannot work because this agent is terminated from outside
+//		argResults.getResults().put("exampleresult", "value");
 	}
+
 	/**
-	 *  Call a method that must use a secure
-	 *  transport under the hood.
+	 * Call a method that must use a secure transport under the hood.
 	 */
 	public IFuture<Void> method(String msg)
 	{

@@ -7,9 +7,7 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 
 /**
  *  Test remote message sending.
@@ -51,7 +49,6 @@ public class RemoteMessagingTest
 //		config2.setNetworkName("remotemessagetest");
 //		config2.setNetworkPass(key);
 		IExternalAccess	access2	= Starter.createPlatform(config2).get();
-		IComponentManagementService	cms	= SServiceProvider.getService(access2, IComponentManagementService.class).get();
 
 		// Add addresses of first platform to second
 //		TransportAddressBook	tab2	= TransportAddressBook.getAddressBook(access2.getComponentIdentifier());
@@ -64,8 +61,8 @@ public class RemoteMessagingTest
 		
 		// Start sender with receiver CID on remote platform.
 //		cms.createComponent(SenderAgent.class.getName()+".class",
-		cms.createComponent(BenchmarkAgent.class.getName()+".class",
+		access2.createComponent(
 			new CreationInfo(Collections.singletonMap("receiver",
-				(Object)new BasicComponentIdentifier("Receiver", access1.getComponentIdentifier())))).get();
+				(Object)new BasicComponentIdentifier("Receiver", access1.getId()))).setFilename(BenchmarkAgent.class.getName()+".class")).get();
 	}
 }

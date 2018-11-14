@@ -8,7 +8,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
@@ -29,7 +28,7 @@ import jadex.micro.annotation.Results;
 @Description("Base description")
 @Imports({"b1", "b2"})
 @Properties({@NameValue(name="a", value="\"ba\""), @NameValue(name="b", value="\"bb\"")})
-@RequiredServices(@RequiredService(name="clock", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@RequiredServices(@RequiredService(name="clock", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
 @ProvidedServices(@ProvidedService(name="myservice", type=IAService.class, implementation=@Implementation(Object.class)))
 @Arguments(@Argument(name="arg1", defaultvalue="\"bval\"", clazz=String.class))
 @Results(@Result(name="res1", defaultvalue="\"bres\"", clazz=String.class))

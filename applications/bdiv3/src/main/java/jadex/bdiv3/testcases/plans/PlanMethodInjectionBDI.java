@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
@@ -23,7 +24,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that tests if injection of change event works for plan method.
  */
-@Agent
+@Agent(type=BDIAgentFactory.TYPE)
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public abstract class PlanMethodInjectionBDI implements IBDIAgent
 {
@@ -36,19 +37,19 @@ public abstract class PlanMethodInjectionBDI implements IBDIAgent
 	public void body()
 	{
 		items.add(2);
-		getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
+		getFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				tr.setReason("Plan not triggered.");
-				getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+				getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 				killComponent();
 				return IFuture.DONE;
 			}
 		});
 	}
 	
-	@Plan(trigger=@Trigger(factaddeds="items"))
+	@Plan(trigger=@Trigger(factadded="items"))
 	public void	somePlan(ChangeEvent event, Integer value, int v2) 
 	{
 		System.out.println("plan invoked " + PlanMethodInjectionBDI.this + " for reason " + event+", "+value);
@@ -60,7 +61,7 @@ public abstract class PlanMethodInjectionBDI implements IBDIAgent
 		{
 			tr.setFailed("Expected event vs. "+event+" and 2 vs. "+value);
 		}
-		getComponentFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
+		getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 		killComponent();
 	}
 }

@@ -13,8 +13,12 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
@@ -47,19 +51,30 @@ public class ChatServiceD5 implements IChatService
 	@ServiceStart
 	public IFuture<Void> startService()
 	{
-		final Future<Void> ret = new Future<Void>();
+		final Future<Void> fut = new Future<Void>();
+		IFuture<Void> ret = fut;
 		
 		this.format = new SimpleDateFormat("hh:mm:ss");
-		IFuture<IClockService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("clockservice");
-		fut.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
+		IFuture<IClockService> csfut = agent.getFeature(IRequiredServicesFeature.class).getService("clockservice");
+		csfut.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(fut)
 		{
 			public void customResultAvailable(IClockService result)
 			{
 				clock = result;
 				gui = createGui(agent.getExternalAccess());
-				ret.setResult(null);
+				fut.setResult(null);
 			}
 		});
+		
+//		ISimulationService	simserv	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISimulationService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+//		if(simserv!=null)
+//		{
+//			FutureBarrier<Void>	fubar	= new FutureBarrier<>();
+//			fubar.addFuture(ret);
+//			fubar.addFuture(simserv.addAdvanceBlocker(ret));
+//			ret	= fubar.waitFor();
+//		}
+
 		return ret;
 	}
 	
@@ -86,7 +101,7 @@ public class ChatServiceD5 implements IChatService
 	 */
 	public void message(final String sender, final String text)
 	{
-		gui.addMessage(agent.getComponentIdentifier().getLocalName()+" received at "
+		gui.addMessage(agent.getId().getLocalName()+" received at "
 			+format.format(new Date(clock.getTime()))+" from: "+sender+" message: "+text);
 	}
 	

@@ -37,7 +37,11 @@ import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.Provider.Service;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -128,22 +132,22 @@ public class SUtil
 	public static final Random FAST_RANDOM = new FastThreadedRandom();
 	
 	/** Access to secure random source. */
-	public static final SecureRandom SECURE_RANDOM;
+	public static volatile SecureRandom SECURE_RANDOM = null;
+	
 	static
 	{
-		SecureRandom secrand = null;
-		try
+		getSecureRandom();
+		if (Security.getProvider("Jadex") == null)
 		{
-			Class<?> ssecurity = Class.forName("jadex.commons.security.SSecurity");
-			Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
-			secrand = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
+			Security.insertProviderAt(new Provider("Jadex", 1.0, "")
+			{
+				{
+					putService(new Service(this, "SecureRandom", "ChaCha20", "jadex.commons.JadexSecureRandomSpi", null, null));
+				}
+				private static final long serialVersionUID = -3208767101511459503L;
+				
+			}, 1);
 		}
-		catch (Exception e)
-		{
-			secrand = new SecureRandom();
-		}
-		SECURE_RANDOM = secrand;
-		
 	}
 	
 	/** The mime types. */
@@ -421,6 +425,68 @@ public class SUtil
 			}
 		});
 		RESOURCEINFO_MAPPERS	= mappers.toArray(new IResultCommand[mappers.size()]);
+	}
+	
+	/** Default timeout e.g. from environment. */
+	public static final long DEFTIMEOUT;
+	static
+	{
+		// Set deftimeout from environment, if set.
+	    String	dtoprop	= System.getProperty("jadex.deftimeout", System.getenv("jadex.deftimeout"));
+	    if(dtoprop==null)
+	    	dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
+	    if(dtoprop==null)
+	    	dtoprop	= System.getProperty("jadex_timeout", System.getenv("jadex_timeout"));
+//	    if(dtoprop!=null)
+//	    {
+//	        System.out.println("Property jadex.deftimeout is deprecated. Use jadex_deftimeout instead.");
+//	    }
+//	    else
+//	    {
+//	        dtoprop	= System.getProperty("jadex_deftimeout", System.getenv("jadex_deftimeout"));
+//	    }
+	    if(dtoprop!=null)
+	    {
+//	        DEFAULT_REMOTE_TIMEOUT = (Long.parseLong(dtoprop));
+//	        DEFAULT_LOCAL_TIMEOUT = (Long.parseLong(dtoprop));
+	        System.out.println("Setting jadex_timeout: "+dtoprop);
+	    }
+		
+		Long ret = dtoprop!=null? Long.parseLong(dtoprop): null;
+		if(ret==null)
+			ret = SReflect.isAndroid() ? 60000L : 30000;
+		DEFTIMEOUT	= ret;
+	}
+
+	
+	/**
+	 *  Gets the global secure random.
+	 *  
+	 *  @return The secure random.
+	 */
+	public static final SecureRandom getSecureRandom()
+	{
+		if (SECURE_RANDOM == null)
+		{
+			synchronized(SUtil.class)
+			{
+				if (SECURE_RANDOM == null)
+				{
+					try
+					{
+						Class<?> ssecurity = Class.forName("jadex.commons.security.SSecurity");
+						Method getSecureRandom = ssecurity.getDeclaredMethod("getSecureRandom", new Class[0]);
+						SECURE_RANDOM = (SecureRandom) getSecureRandom.invoke(null, (Object[]) null);
+					}
+					catch (Throwable t)
+					{
+						SECURE_RANDOM = getJavaDefaultSecureRandom();
+					}
+				}
+			}
+		}
+		
+		return SECURE_RANDOM;
 	}
 
 	/**
@@ -1080,92 +1146,6 @@ public class SUtil
 	}
 
 	/**
-	 * Extract the values out of an sl message.
-	 * 
-	 * @param message The sl message.
-	 * @return The extracted properties. / // obsolete ??? public static
-	 *         Properties parseSLToPropertiesFast(String message) { Properties
-	 *         props = new Properties(); int index = message.indexOf(':');
-	 *         while(index!=-1) { // Hack !!! Assume space separated slots. int
-	 *         index2 = message.indexOf(' ', index); String name =
-	 *         message.substring(index+1, index2); index = message.indexOf('"',
-	 *         index2); index2 = message.indexOf('"', index+1); String value =
-	 *         message.substring(index+1, index2); props.setProperty(name,
-	 *         value); index = message.indexOf(':', index2); } return props; }
-	 */
-	/**
-	 * Extract the value(s) out of an sl message.
-	 * 
-	 * @param message The sl message.
-	 * @return The extracted value(s) as string, index map or array list.
-	 * @see #toSLString(Object) / public static Object fromSLString(String
-	 *      message) { Object ret; // Parse map. if(message.startsWith("(Map ")
-	 *      && message.endsWith(")")) { message = message.substring(5,
-	 *      message.length()-1); ExpressionTokenizer exto = new
-	 *      ExpressionTokenizer(message, " \t\r\n", new String[]{"\"\"", "()"});
-	 *      Map map = new IndexMap().getAsMap(); // Hack???
-	 *      while(exto.hasMoreTokens()) { // Check for ":" as start of slot
-	 *      name. String slot = exto.nextToken(); if(!slot.startsWith(":") ||
-	 *      !exto.hasMoreTokens()) throw new
-	 *      RuntimeException("Invalid SL: "+message); slot = slot.substring(1);
-	 *      //if(slot.equals("2")) // System.out.println("Da1!"); map.put(slot,
-	 *      fromSLString(exto.nextToken())); } ret = map; } // Parse sequence to
-	 *      collection object. else if(message.startsWith("(sequence ") &&
-	 *      message.endsWith(")")) { message = message.substring(10,
-	 *      message.length()-1); ExpressionTokenizer exto2 = new
-	 *      ExpressionTokenizer(message, " \t\r\n", new String[]{"\"\"", "()"});
-	 *      List list = new ArrayList(); while(exto2.hasMoreTokens()) {
-	 *      list.add(fromSLString(exto2.nextToken())); } ret = list; } // Simple
-	 *      slot message. else { // Remove quotes from message.
-	 *      if(message.startsWith("\"") && message.endsWith("\"")) message =
-	 *      message.substring(1, message.length()-1); // Replace escaped quotes.
-	 *      message = SUtil.replace(message, "\\\"", "\""); ret = message; }
-	 *      return ret; }
-	 */
-
-	/**
-	 * Convert an object to an SL string. When the value is of type
-	 * java.util.Map the key value pairs are extracted as slots. Keys must be
-	 * valid slot names. Values of type java.util.Collection are stored as
-	 * sequence.
-	 * 
-	 * @return A string representation in SL. / public static String
-	 *         toSLString(Object o) { StringBuffer sbuf = new StringBuffer();
-	 *         toSLString(o, sbuf); return sbuf.toString(); }
-	 */
-
-	/**
-	 * Convert an object to an SL string. When the value is of type
-	 * java.util.Map the key value pairs are extracted as slots. Keys must be
-	 * valid slot names. Values of type java.util.Collection are stored as
-	 * sequence.
-	 * 
-	 * @param o The object to convert to SL.
-	 * @param sbuf The buffer to convert into. / public static void
-	 *        toSLString(Object o, StringBuffer sbuf) { // Get mapo from
-	 *        encodable object. /*if(o instanceof IEncodable) { o =
-	 *        ((IEncodable)o).getEncodableRepresentation(); }* / // Write
-	 *        contents as slot value pairs. if(o instanceof Map) { Map contents
-	 *        = (Map)o; sbuf.append("(Map "); for(Iterator
-	 *        i=contents.keySet().iterator(); i.hasNext();) { Object key =
-	 *        i.next(); Object val = contents.get(key); if(val!=null &&
-	 *        !"null".equals(val)) // Hack ??? { // Check if key is valid slot
-	 *        identifier. String keyval = key.toString();
-	 *        if(keyval.indexOf(' ')!=-1 || keyval.indexOf('\t')!=-1 ||
-	 *        keyval.indexOf('\r')!=-1 || keyval.indexOf('\n')!=-1) { throw new
-	 *        RuntimeException("Encoding error: Invalid slot name "+keyval); }
-	 *        sbuf.append(" :"); sbuf.append(keyval); sbuf.append(" ");
-	 *        toSLString(val, sbuf); } } sbuf.append(")"); } // Write collection
-	 *        value as sequence. else if(o instanceof Collection) { Collection
-	 *        coll = (Collection)o; sbuf.append(" (sequence "); for(Iterator
-	 *        j=coll.iterator(); j.hasNext(); ) { sbuf.append(" ");
-	 *        toSLString(j.next(), sbuf); } sbuf.append(")"); } // Write normal
-	 *        slot value as string. else { sbuf.append("\""); // Escape quotes
-	 *        (directly writes to string buffer). SUtil.replace(""+o, sbuf,
-	 *        "\"", "\\\""); sbuf.append("\""); } }
-	 */
-
-	/**
 	 * Parse a source string replacing occurrences and storing the result in the
 	 * given string buffer. This is a fast alternative to String.replaceAll(),
 	 * because it does not use regular expressions.
@@ -1348,6 +1328,15 @@ public class SUtil
 		if(ret == null)
 		{
 			URL url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
+			
+			if(url==null && name.endsWith(".class") && name.indexOf("/")==-1)
+			{
+				name = name.substring(0, name.length()-6).replace('.', '/')+".class";
+				url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
+			}
+			
+			//System.out.println("url: "+url);
+			
 			// System.out.println("Classloader: "+classloader+" "+name+" "+url+" "+classloader.getParent());
 			// if(classloader instanceof URLClassLoader)
 			// System.out.println("URLs: "+SUtil.arrayToString(((URLClassLoader)classloader).getURLs()));
@@ -2106,7 +2095,7 @@ public class SUtil
 		chars[o++] = '_';
 		
 		byte[] precached = new byte[32];
-		SECURE_RANDOM.nextBytes(precached);
+		getSecureRandom().nextBytes(precached);
 		
 		long rndlong = SUtil.bytesToLong(precached, 0);
 		for (int i = 0; i < 11; ++i)
@@ -2588,16 +2577,21 @@ public class SUtil
 				{
 					port = Integer.parseInt(transporturi.substring(portdiv+1));
 				}
-				try {
-					ret =  new URI(scheme, null, hostname, port, null, null, null);
-//					System.out.println("silently converted wrongly formatted URI: " + transporturi);
-				} catch (URISyntaxException e1) {
-					e1.printStackTrace();
+					try 
+					{
+						ret =  new URI(scheme, null, hostname, port, null, null, null);
+//						System.out.println("silently converted wrongly formatted URI: " + transporturi);
+					} 
+					catch (URISyntaxException e1) 
+					{
+						e1.printStackTrace();
+						rethrowAsUnchecked(e);
+					}
+				} 
+				else 
+				{
 					rethrowAsUnchecked(e);
 				}
-			} else {
-				rethrowAsUnchecked(e);
-			}
 		}
 		return ret;
 	}
@@ -2648,33 +2642,6 @@ public class SUtil
 		throw convertToRuntimeException(e);
 	}
 
-	/**
-	 * Main method for testing. / public static void main(String[] args) {
-	 * String res1 = getRelativePath("c:/a/b/c", "c:/a/d"); String res2 =
-	 * getRelativePath("c:/a/b/c", "c:/a/b/c"); //String res2 =
-	 * getRelativePath("c:/a/b/c", "d:/a/d"); String res3 =
-	 * getRelativePath("c:/a/b/c", "c:/a/b/c/d/e"); //String tst =
-	 * "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
-	 * ; //System.out.println(tst); //System.out.println(SUtil.wrapText(tst));
-	 * /*String[] a = new String[]{"a1", "a2", "a3"}; Integer[] b = new
-	 * Integer[]{Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3)};
-	 * System.out.println(arrayToString(joinArbitraryArrays(new Object[]{a,
-	 * b})));
-	 */
-
-	/*
-	 * try { URL target = new URL("file:///C:/projects/jadex/lib/examples.jar");
-	 * DynamicURLClassLoader loader = new DynamicURLClassLoader(new URL[0]); try
-	 * { Class clazz = loader.loadClass("jadex.examples.ping.PingPlan");
-	 * System.out.println("Loaded class: "+clazz); }
-	 * catch(ClassNotFoundException e){System.out.println(e);}
-	 * loader.addURL(target); try { Class clazz =
-	 * loader.loadClass("jadex.examples.ping.PingPlan");
-	 * System.out.println("Loaded class: "+clazz); }
-	 * catch(ClassNotFoundException e){System.out.println(e);} } catch(Exception
-	 * e) { System.out.println(e); } }
-	 */
-	
 	public static void main(String[] args)
 	{
 //		String res = SUtil.makeConform("uniique-dialogservice.de/ues4/rc?f=https://plus.google.com/+targobank?koop_id=mar_vermoegen18");
@@ -3024,6 +2991,38 @@ public class SUtil
 //		return ret;
 	}
 
+	/**
+	 *  Get the file location for a class (either filename or jar url).
+	 */
+	public static String	getClassFileLocation(Class<?> clazz)
+	{
+		String	ret;
+
+		URL sourceloc = clazz.getProtectionDomain()==null || clazz.getProtectionDomain().getCodeSource()==null
+			? null 
+			: clazz.getProtectionDomain().getCodeSource().getLocation();
+			
+		// in robolectric testcases, location is null
+		if(sourceloc==null)
+		{
+			// Hack: pseudo class location?
+			ret	= "/"+SReflect.getClassName(clazz).replace('.', '/')+".class";
+		}
+		
+		// Jar url
+		else if(sourceloc.getPath().endsWith(".jar"))
+		{
+			ret	= "jar:file:"+sourceloc.getPath()+"!/"+SReflect.getClassName(clazz).replace('.', '/')+".class";
+		}
+		
+		// default case
+		else
+		{
+			ret	= SUtil.convertURLToString(sourceloc) + File.separator + SReflect.getClassName(clazz).replace('.', File.separatorChar)+".class";
+		}
+		
+		return ret;
+	}
 
 	/**
 	 *  Convert an URL to a local file name.
@@ -4179,6 +4178,34 @@ public class SUtil
 			ret[i] = (byte) val;
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Escapes all line breaks similar to Java string literals.
+	 *  
+	 *  @param unescapedstring Unescaped input string.
+	 *  @return Escaped string.
+	 */
+	public static String escapeLineBreaks(String unescapedstring)
+	{
+		if (unescapedstring == null)
+			return null;
+		
+		return unescapedstring.replace("\\", "\\\\").replace("\n", "\\n").replace("\r", "\\r");
+	}
+	
+	/**
+	 *  Unescapes all line breaks from strings similar to Java string literals.
+	 *  
+	 *  @param escapedstring Escaped input string.
+	 *  @return Unescaped string.
+	 */
+	public static String unescapeLineBreaks(String escapedstring)
+	{
+		if (escapedstring == null)
+			return null;
+		
+		return escapedstring.replace("\\r", "\r").replace("\\n", "\n").replace("\\\\", "\\");
 	}
 	
 	/**
@@ -5604,7 +5631,7 @@ public class SUtil
 	/**
 	 *  Helper method to allow iterating over possibly null lists.
 	 */
-	public static <T> List<T>	safeList(List<T> list)
+	public static <T> List<T>	notNull(List<T> list)
 	{
 		if(list!=null)
 		{
@@ -5619,7 +5646,7 @@ public class SUtil
 	/**
 	 *  Helper method to allow iterating over possibly null collections.
 	 */
-	public static <T> Collection<T>	safeCollection(Collection<T> coll)
+	public static <T> Collection<T>	notNull(Collection<T> coll)
 	{
 		if(coll!=null)
 		{
@@ -5634,7 +5661,7 @@ public class SUtil
 	/**
 	 *  Helper method to allow iterating over possibly null sets.
 	 */
-	public static <T> Set<T>	safeSet(Set<T> set)
+	public static <T> Set<T>	notNull(Set<T> set)
 	{
 		if(set!=null)
 		{
@@ -5649,7 +5676,7 @@ public class SUtil
 	/**
 	 *  Helper method to allow iterating over possibly null maps.
 	 */
-	public static <K, E> Map<K, E>	safeMap(Map<K, E> map)
+	public static <K, E> Map<K, E>	notNull(Map<K, E> map)
 	{
 		if(map!=null)
 		{
@@ -5658,6 +5685,21 @@ public class SUtil
 		else
 		{
 			return Collections.emptyMap();
+		}
+	}
+	
+	/**
+	 *  Helper method to allow iterating over possibly null array.
+	 */
+	public static <T> T[] notNull(T[] array)
+	{
+		if(array!=null)
+		{
+			return array;
+		}
+		else
+		{
+			return (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
 		}
 	}
 	
@@ -5732,7 +5774,7 @@ public class SUtil
 	
 	/**
 	 *  Try to find the correct classpath root directories for current build tool chain.
-	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
+	 *  Tries bin and bin/main (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
 	 *  and uses the directory with the newest file.
 	 */
 	public static File[]	findOutputDirs(String projectroot, boolean includeTestClasses)
@@ -5741,18 +5783,32 @@ public class SUtil
 		
 		List<List<File>>	candidates	= new ArrayList<List<File>>();
 		
-		// eclipse
-		candidates.add(new ArrayList<File>(Arrays.asList(
-			new File(projectDir, "bin"))));
-		
+		// eclipse old
+		if(!new File(new File(projectDir, "bin"), "main").exists())
+		{
+			candidates.add(new ArrayList<File>(Arrays.asList(
+				new File(projectDir, "bin"))));
+		}
+		else
+		{
+			// eclipse new
+			candidates.add(new ArrayList<File>(Arrays.asList(
+				new File(new File(projectDir, "bin"), "main"))));
+			if (includeTestClasses) {
+				candidates.get(candidates.size()-1).add(
+					new File(new File(projectDir, "bin"), "test"));
+			}
+		}
+			
 		// gradle
 		candidates.add(new ArrayList<File>(Arrays.asList(
 			new File(new File(new File(new File(projectDir, "build"), "classes"),"java"),  "main"),
 			new File(new File(new File(projectDir, "build"), "resources"),  "main"))));
 		if (includeTestClasses) {
-			candidates.add(new ArrayList<File>(Arrays.asList(
-				new File(new File(new File(new File(projectDir, "build"), "classes"),"java"),  "test"),
-				new File(new File(new File(projectDir, "build"), "resources"),  "test"))));
+			candidates.get(candidates.size()-1).add(
+				new File(new File(new File(new File(projectDir, "build"), "classes"),"java"),  "test"));
+			candidates.get(candidates.size()-1).add(
+				new File(new File(new File(projectDir, "build"), "resources"),  "test"));
 		}
 
 		// maven
@@ -5760,9 +5816,10 @@ public class SUtil
 			new File(new File(projectDir, "target"), "classes"),
 			new File(new File(projectDir, "target"), "resources"))));
 		if (includeTestClasses) {
-			candidates.add(new ArrayList<File>(Arrays.asList(
-					new File(new File(projectDir, "target"), "test-classes"),
-					new File(new File(projectDir, "target"), "test-resources"))));
+			candidates.get(candidates.size()-1).add(
+				new File(new File(projectDir, "target"), "test-classes"));
+			candidates.get(candidates.size()-1).add(
+				new File(new File(projectDir, "target"), "test-resources"));
 		}
 		
 		// Choose newest list of files based on first entry
@@ -5773,7 +5830,7 @@ public class SUtil
 			if(cand.get(0).exists())
 			{
 				long	mod	= SUtil.getLastModified(cand.get(0));
-				if(mod>retmod)
+				if(mod>=retmod)
 				{
 					found	= cand;
 					retmod	= mod;
@@ -5849,6 +5906,64 @@ public class SUtil
 	}
 	
 	/**
+	 *  Find index of last upper case letter.
+	 *  @param str The string.
+	 *  @return The index (or -1).
+	 */
+	public static int inndexOfLastUpperCaseCharacter(String str) 
+	{        
+	    for(int i=str.length()-1; i>=0; i--) 
+	    {
+	        if(Character.isUpperCase(str.charAt(i))) 
+	        {
+	            return i;
+	        }
+	    }
+	    return -1;
+	}
+	
+	/** The Java default secure random. */
+	protected static volatile SecureRandom JAVA_DEFAULT_SECURE_RANDOM;
+	
+	/**
+	 *  Creates Java default algorithm secure random.
+	 */
+	public static final SecureRandom getJavaDefaultSecureRandom()
+	{
+		if (JAVA_DEFAULT_SECURE_RANDOM == null)
+		{
+			synchronized(SUtil.class)
+			{
+				if (JAVA_DEFAULT_SECURE_RANDOM == null)
+				{
+					String alg = "SHA1PRNG";
+					Provider p = Security.getProvider("SUN");
+					if (p != null)
+					{
+						for (Service serv : p.getServices())
+						{
+				            if (serv.getType().equals("SecureRandom"))
+				            {
+				                alg = serv.getAlgorithm();
+				                break;
+				            }
+				        }
+					}
+					try
+					{
+						JAVA_DEFAULT_SECURE_RANDOM = SecureRandom.getInstance(alg);
+					}
+					catch (NoSuchAlgorithmException e)
+					{
+						throw SUtil.throwUnchecked(e);
+					}
+				}
+			}
+		}
+		return JAVA_DEFAULT_SECURE_RANDOM;
+	}
+	
+	/**
 	 *  Tests if the OS is Windows.
 	 *  @return True, if Windows.
 	 */
@@ -5856,6 +5971,26 @@ public class SUtil
 	{
 		String osname = System.getProperty("os.name");
 		return osname != null && osname.startsWith("Windows");
+	}
+	
+	/**
+	 *  Replace the last occurrence of a substring.
+	 *  @param string The string
+	 *  @param toreplace The substring to replace.
+	 *  @param replacement The new substring
+	 *  @return The new string.
+	 */
+	public static String replaceLast(String string, String toreplace, String replacement) 
+	{
+	    int pos = string.lastIndexOf(toreplace);
+	    if(pos > -1) 
+	    {
+	    	return string.substring(0, pos) + replacement + string.substring(pos + toreplace.length(), string.length());
+	    } 
+	    else 
+	    {
+	        return string;
+	    }
 	}
 	
 	/**

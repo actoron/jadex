@@ -28,12 +28,12 @@ import com.mxgraph.swing.mxGraphComponent;
 
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.Settings.BpmnClassFilter;
-import jadex.bpmn.editor.gui.Settings.FileFilter;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MTask;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
+import jadex.commons.FileFilter;
 import jadex.commons.IdGenerator;
 
 /**

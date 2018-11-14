@@ -8,6 +8,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -106,8 +107,8 @@ public class SecuritySettings extends AServiceSettings
 		case OPTIONS_ADD_REMOTE_PW:
 
 			final AlertDialog.Builder builder = new AlertDialog.Builder(platformPasswordsCat.getContext());
-			SServiceProvider.getService(JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId),
-					IAwarenessManagementService.class).addResultListener(new DefaultResultListener<IAwarenessManagementService>()
+			JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId).searchService(
+				new ServiceQuery<>(IAwarenessManagementService.class)).addResultListener(new DefaultResultListener<IAwarenessManagementService>()
 			{
 				public void resultAvailable(IAwarenessManagementService result)
 				{

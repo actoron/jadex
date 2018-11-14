@@ -1,15 +1,18 @@
 package jadex.platform.service.security.auth;
 
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.crypto.agreement.jpake.JPAKERound1Payload;
 import org.bouncycastle.crypto.agreement.jpake.JPAKERound2Payload;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
@@ -378,9 +381,9 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	 *  @param secret The secret used for authentication.
 	 *  @return Authentication token.
 	 */
-	public byte[] createAuthenticationToken(byte[] msg, AbstractAuthenticationSecret secret)
+	public AuthToken createAuthenticationToken(byte[] msg, AbstractAuthenticationSecret secret)
 	{
-		byte[] ret = null;
+		AuthToken ret = null;
 		
 		// Generate random salt.
 		byte[] salt = new byte[SALT_SIZE];
@@ -402,7 +405,8 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 				if (jpake != null)
 					dk = jpake.getDerivedKey();
 				else
-					throw new SecurityException("J-PAKE key not found for password " + secret);
+					return null;
+					//throw new SecurityException("J-PAKE key not found for password " + secret);
 			}
 			else
 			{
@@ -414,11 +418,13 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 			
 			// Generate MAC used for authentication.
 			Blake2bDigest blake2b = new Blake2bDigest(dk);
-			ret = new byte[SALT_SIZE + MAC_SIZE + 4];
-			Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
-			System.arraycopy(salt, 0, ret, 4, salt.length);
+			byte[] mac = new byte[SALT_SIZE + MAC_SIZE + 4];
+			Pack.intToLittleEndian(AUTH_SUITE_ID, mac, 0);
+			System.arraycopy(salt, 0, mac, 4, salt.length);
 			blake2b.update(msghash, 0, msghash.length);
-			blake2b.doFinal(ret, salt.length + 4);
+			blake2b.doFinal(mac, salt.length + 4);
+			ret = new AuthToken();
+			ret.setAuthData(mac);
 			
 			/*if (ssecret instanceof PasswordSecret)
 			{
@@ -494,15 +500,32 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 		}
 		else if (secret instanceof AbstractX509PemSecret)
 		{
-			AbstractX509PemSecret aps = (AbstractX509PemSecret) secret;
-			if (!aps.canSign())
-				throw new IllegalArgumentException("Secret cannot be used to sign: " + aps);
-			
-			byte[] sig = SSecurity.signWithPEM(msghash, aps.openCertificate(), aps.openPrivateKey());
-			ret = new byte[sig.length + SALT_SIZE + 4];
-			Pack.intToLittleEndian(AUTH_SUITE_ID, ret, 0);
-			System.arraycopy(salt, 0, ret, 4, salt.length);
-			System.arraycopy(sig, 0, ret, 4 + salt.length, sig.length);
+			InputStream is = null;
+			try
+			{
+				AbstractX509PemSecret aps = (AbstractX509PemSecret) secret;
+				if (!aps.canSign())
+					throw new IllegalArgumentException("Secret cannot be used to sign: " + aps);
+				
+				byte[] sig = SSecurity.signWithPEM(msghash, aps.openCertificate(), aps.openPrivateKey());
+				is = aps.openCertificate();
+				String cert = new String(SUtil.readStream(is), SUtil.UTF8);
+				byte[] authdata = new byte[sig.length + SALT_SIZE + 4];
+				Pack.intToLittleEndian(AUTH_SUITE_ID, authdata, 0);
+				System.arraycopy(salt, 0, authdata, 4, salt.length);
+				System.arraycopy(sig, 0, authdata, 4 + salt.length, sig.length);
+				ret = new X509AuthToken();
+				((X509AuthToken) ret).setCertificate(cert);
+				ret.setAuthData(authdata);
+			}
+			catch (Exception e)
+			{
+				ret = null;
+			}
+			finally
+			{
+				SUtil.close(is);
+			}
 		}
 		else
 		{
@@ -522,29 +545,29 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 	 *  @param authtoken Authentication token.
 	 *  @return True if authenticated, false otherwise.
 	 */
-	public boolean verifyAuthenticationToken(byte[] msg, AbstractAuthenticationSecret secret, byte[] authtoken)
+	public boolean verifyAuthenticationToken(byte[] msg, AbstractAuthenticationSecret secret, AuthToken authtoken)
 	{
 		boolean ret = false;
 		try
 		{
-			if (Pack.littleEndianToInt(authtoken, 0) != AUTH_SUITE_ID)
+			if (Pack.littleEndianToInt(authtoken.getAuthData(), 0) != AUTH_SUITE_ID)
 				return false;
 			
 			if (secret instanceof SharedSecret)
 			{
 				SharedSecret ssecret = (SharedSecret) secret;
 				
-				if (authtoken.length != SALT_SIZE + MAC_SIZE + 4)
+				if (authtoken.getAuthData().length != SALT_SIZE + MAC_SIZE + 4)
 					return false;
 				
 				// Decode token.
 				byte[] salt = new byte[SALT_SIZE];
-				System.arraycopy(authtoken, 4, salt, 0, salt.length);
+				System.arraycopy(authtoken.getAuthData(), 4, salt, 0, salt.length);
 				
 				byte[] msghash = getMessageHash(msg, salt);
 				
 				byte[] mac = new byte[MAC_SIZE];
-				System.arraycopy(authtoken, SALT_SIZE + 4, mac, 0, mac.length);
+				System.arraycopy(authtoken.getAuthData(), SALT_SIZE + 4, mac, 0, mac.length);
 				
 				// Derive the  key.
 				byte[] dk = null;
@@ -674,19 +697,22 @@ public class Blake2bX509AuthenticationSuite implements IAuthenticationSuite
 					ret = Arrays.equals(gmac, mac);
 				}*/
 			}
-			else if (secret instanceof AbstractX509PemSecret)
+			else if (secret instanceof AbstractX509PemSecret && authtoken instanceof X509AuthToken)
 			{
 				// Decode token.
 				byte[] salt = new byte[SALT_SIZE];
-				System.arraycopy(authtoken, 4, salt, 0, salt.length);
+				System.arraycopy(authtoken.getAuthData(), 4, salt, 0, salt.length);
 				
 				byte[] msghash = getMessageHash(msg, salt);
 				
 				AbstractX509PemSecret aps = (AbstractX509PemSecret) secret;
-				byte[] sig = new byte[authtoken.length - 4 - salt.length];
-				System.arraycopy(authtoken, 4 + salt.length, sig, 0, sig.length);
+				byte[] sig = new byte[authtoken.getAuthData().length - 4 - salt.length];
+				System.arraycopy(authtoken.getAuthData(), 4 + salt.length, sig, 0, sig.length);
 				
-				SSecurity.verifyWithPEM(msghash, sig, aps.openTrustAnchorCert());
+				String apscert = new String(SUtil.readStream(aps.openCertificate()), SUtil.UTF8);
+				LinkedHashSet<X509CertificateHolder> apscertchain = new LinkedHashSet<>(SSecurity.readCertificateChainFromPEM(apscert));
+				
+				ret = SSecurity.verifyWithPEM(msghash, sig, ((X509AuthToken) authtoken).getCertificate(), apscertchain);
 			}
 			else
 			{

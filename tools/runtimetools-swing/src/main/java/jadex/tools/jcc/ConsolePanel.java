@@ -34,7 +34,6 @@ import javax.swing.text.StyledDocument;
 import jadex.base.SRemoteGui;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.RemoteChangeListenerHandler;
-import jadex.bridge.service.annotation.Security;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SUtil;
@@ -255,7 +254,7 @@ public class ConsolePanel extends JPanel
 	 */
 	public void setConsoleEnabled(boolean enable)
 	{
-		final String id = jccaccess.getComponentIdentifier().getPlatformName()+"#console@"+hashCode();
+		final String id = jccaccess.getId().getPlatformName()+"#console@"+hashCode();
 		if(!enable)
 		{
 //			in.setEnabled(false);

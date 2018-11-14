@@ -1,7 +1,6 @@
 package jadex.bridge.sensor.service;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
@@ -39,7 +38,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 	{
 		super(comp, new NFPropertyMetaInfo(NAME, int.class, Void.class, true, -1, true, null));
 		this.method = method;
-		this.sid = service.getServiceIdentifier();
+		this.sid = service.getServiceId();
 		
 		if(ProxyFactory.isProxyClass(service.getClass()))
 		{
@@ -61,7 +60,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 					setValue(Integer.valueOf(cnt));
 				}
 			});
-			comp.getComponentFeature(IProvidedServicesFeature.class).addMethodInvocationListener(sid, method, listener);
+			comp.getFeature(IProvidedServicesFeature.class).addMethodInvocationListener(sid, method, listener);
 		}
 		else
 		{
@@ -83,7 +82,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 	 */
 	public IFuture<Void> dispose()
 	{
-		comp.getComponentFeature(IProvidedServicesFeature.class).removeMethodInvocationListener(sid, method, listener);
+		comp.getFeature(IProvidedServicesFeature.class).removeMethodInvocationListener(sid, method, listener);
 		return IFuture.DONE;
 	}
 }

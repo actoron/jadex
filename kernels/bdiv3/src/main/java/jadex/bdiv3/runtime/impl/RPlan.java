@@ -35,9 +35,9 @@ import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentSuspendable;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -302,19 +302,19 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			List<EventType> events = new ArrayList<EventType>();
 			
-			for(String belname: SUtil.safeList(wqtr.getFactAddeds()))
+			for(String belname: SUtil.notNull(wqtr.getFactAddeds()))
 			{
 				events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
 			}
-			for(String belname: SUtil.safeList(wqtr.getFactRemoveds()))
+			for(String belname: SUtil.notNull(wqtr.getFactRemoveds()))
 			{
 				events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
 			}
-			for(String belname: SUtil.safeList(wqtr.getFactChangeds()))
+			for(String belname: SUtil.notNull(wqtr.getFactChangeds()))
 			{
 				events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}));
 			}			
-			for(MGoal goal: SUtil.safeList(wqtr.getGoalFinisheds()))
+			for(MGoal goal: SUtil.notNull(wqtr.getGoalFinisheds()))
 			{
 				events.add(new EventType(new String[]{ChangeEvent.GOALDROPPED, goal.getName()}));
 			}
@@ -338,12 +338,12 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 				rplan.internalSetupEventsRule(events);
 			}
 			
-			for(MInternalEvent mevent: SUtil.safeList(wqtr.getInternalEvents()))
+			for(MInternalEvent mevent: SUtil.notNull(wqtr.getInternalEvents()))
 			{
 				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
 				wa.addModelElement(mevent);
 			}
-			for(MMessageEvent mevent: SUtil.safeList(wqtr.getMessageEvents()))
+			for(MMessageEvent mevent: SUtil.notNull(wqtr.getMessageEvents()))
 			{
 				WaitAbstraction wa = rplan.getOrCreateWaitqueueWaitAbstraction();
 				wa.addModelElement(mevent);
@@ -410,7 +410,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		
 //		executePlan(rplan, ia, null);
 		IConditionalComponentStep<Void> action = new ExecutePlanStepAction(rplan);
-		ia.getComponentFeature(IExecutionFeature.class).scheduleStep(action);
+		ia.getFeature(IExecutionFeature.class).scheduleStep(action);
 		
 		rplan.addListener(new DelegationResultListener<Object>(ret));
 		
@@ -846,7 +846,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public void setFinishing()
 	{
 		assert finished==null;
-		assert getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+		assert getAgent().getFeature(IExecutionFeature.class).isComponentThread();
 		finished	= new Future<Void>();
 	}
 	
@@ -894,7 +894,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public IFuture<Void>	abort()
 	{
-//		System.out.println("aborting: "+this);
+//		System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get());
 		
 		if(!isFinishing())
 		{
@@ -1097,7 +1097,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //		setResumeCommand(rescom);
 		addResumeCommand(rescom);
 
-		getAgent().getComponentFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
+		getAgent().getFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -1139,7 +1139,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 
 		final Future<E> ret = new BDIFuture<E>();
 		
-		IBDIModel bdim = getAgent().getComponentFeature(IInternalBDIAgentFeature.class).getBDIModel();
+		IBDIModel bdim = getAgent().getFeature(IInternalBDIAgentFeature.class).getBDIModel();
 		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
@@ -1517,7 +1517,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		final Future<ITimer> ret = new Future<ITimer>();
 		if(timeout>-1)
 		{
-			IClockService cs = SServiceProvider.getLocalService(ia, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			IClockService	cs	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 			ITimedObject to	= new ITimedObject()
 			{
 				public void timeEventOccurred(long currenttime)
@@ -1581,7 +1581,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //	{
 //		final Future<ITimer> ret = new Future<ITimer>();
 //		
-//		IClockService cs = SServiceProvider.getLocalService(getComponent(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		IClockService cs = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
 //		ITimedObject	to	=  	new ITimedObject()
 //		{
 //			public void timeEventOccurred(long currenttime)
@@ -1797,7 +1797,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		 */
 		public void execute(ResumeCommandArgs args)
 		{
-			assert getAgent().getComponentFeature(IExecutionFeature.class).isComponentThread();
+			assert getAgent().getFeature(IExecutionFeature.class).isComponentThread();
 
 //			System.out.println("exe: "+this+" "+RPlan.this.getId()+" "+this);
 
@@ -1971,12 +1971,12 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public void publishToolPlanEvent(String evtype)
 	{
-		if(getAgent().getComponentFeature0(IMonitoringComponentFeature.class)!=null 
-			&& getAgent().getComponentFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
+		if(getAgent().getFeature0(IMonitoringComponentFeature.class)!=null 
+			&& getAgent().getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
-			mev.setSourceIdentifier(getAgent().getComponentIdentifier());
+			mev.setSourceIdentifier(getAgent().getId());
 			mev.setTime(time);
 			
 			PlanInfo info = PlanInfo.createPlanInfo(this);
@@ -1986,7 +1986,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			mev.setProperty("details", info);
 			mev.setLevel(PublishEventLevel.FINE);
 			
-			getAgent().getComponentFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
+			getAgent().getFeature(IMonitoringComponentFeature.class).publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
 	}
 	
@@ -2022,7 +2022,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 			}
 		});
 		rule.setEvents(events);
-		getAgent().getComponentFeature(IInternalBDIAgentFeature.class).getRuleSystem().getRulebase().updateRule(rule);
+		getAgent().getFeature(IInternalBDIAgentFeature.class).getRuleSystem().getRulebase().updateRule(rule);
 	}
 	
 //	/**
@@ -2038,6 +2038,18 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	public boolean	isSucceeded()
 	{
 		return isPassed();
+	}
+	
+	/**
+	 *  Check if the element is currently part of the agent's reasoning.
+	 *  E.g. the bases are always adopted and all of their contents such as goals, plans and beliefs.
+	 */
+	public boolean	isAdopted()
+	{
+		return true;
+//	 	// Hack!!! Subgoals removed to late, TODO: fix hierarchic goal plan lifecycle management
+//		System.out.println(this + " isAdopted(): "+(!(getReason() instanceof RParameterElement) || ((RParameterElement) getReason()).isAdopted()));
+//		return !(getReason() instanceof RParameterElement) || ((RParameterElement) getReason()).isAdopted();
 	}
 	
 //	/**

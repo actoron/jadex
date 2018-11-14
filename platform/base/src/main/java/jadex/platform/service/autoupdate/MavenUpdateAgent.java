@@ -75,7 +75,7 @@ public class MavenUpdateAgent extends UpdateAgent
 //	protected IFuture<IResourceIdentifier> getVersion(final IResourceIdentifier rid)
 //	{
 //		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-//		IFuture<IDependencyService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getRequiredService("depser");
+//		IFuture<IDependencyService> fut = agent.getComponentFeature(IRequiredServicesFeature.class).getService("depser");
 //		fut.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 //		{
 //			public void customResultAvailable(IDependencyService depser)

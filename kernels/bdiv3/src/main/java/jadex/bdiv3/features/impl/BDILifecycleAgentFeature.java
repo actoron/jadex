@@ -32,6 +32,7 @@ import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MParameter.EvaluationMode;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
+import jadex.bdiv3.runtime.BDIFailureException;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.EasyDeliberationStrategy;
 import jadex.bdiv3.runtime.IDeliberationStrategy;
@@ -63,11 +64,10 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.commons.ICommand;
@@ -124,7 +124,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 	 */
 	public IFuture<Void> body()
 	{
-		IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
+		IInternalBDIAgentFeature bdif = component.getFeature(IInternalBDIAgentFeature.class);
 		createStartBehavior().startBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability());
 		return super.body();
 	}
@@ -153,7 +153,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		setShutdown(true);
 		
 		final Future<Void>	ret	= new Future<Void>();
-		final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
+		final IInternalBDIAgentFeature bdif = component.getFeature(IInternalBDIAgentFeature.class);
 
 		createEndBehavior().startEndBehavior(bdif.getBDIModel(), bdif.getRuleSystem(), bdif.getCapability())
 			.addResultListener(new IResultListener<Void>()
@@ -328,7 +328,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		 */
 		public Object getCapabilityObject(String name)
 		{
-			IBDIAgentFeature bdif = component.getComponentFeature(IBDIAgentFeature.class);
+			IBDIAgentFeature bdif = component.getFeature(IBDIAgentFeature.class);
 			return ((BDIAgentFeature)bdif).getCapabilityObject(name);
 		}
 		
@@ -337,7 +337,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		 */
 		public IFuture<Object> dispatchTopLevelGoal(Object goal)
 		{
-			IBDIAgentFeature bdif = component.getComponentFeature(IBDIAgentFeature.class);
+			IBDIAgentFeature bdif = component.getFeature(IBDIAgentFeature.class);
 			return bdif.dispatchTopLevelGoal(goal);
 		}
 		
@@ -346,7 +346,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		 */
 		public IFuture<Void> sendMessageEvent(IMessageEvent message)
 		{
-			IMessageFeature mf = component.getComponentFeature(IMessageFeature.class);
+			IMessageFeature mf = component.getFeature(IMessageFeature.class);
 			return mf.sendMessage(message.getMessage());
 		}
 		
@@ -399,7 +399,14 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					@Override
 					public void execute(Exception e)
 					{
-						component.getLogger().severe("Failure during config plan execution: "+SUtil.getExceptionStacktrace(e));
+						if(e instanceof BDIFailureException)
+						{
+							component.getLogger().info("Failure during config plan execution: "+SUtil.getExceptionStacktrace(e));
+						}
+						else
+						{
+							component.getLogger().severe("Failure during config plan execution: "+SUtil.getExceptionStacktrace(e));
+						}
 					}
 				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}
@@ -498,7 +505,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					{
 						try
 						{
-							Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+							Object agent = component.getFeature(IPojoComponentFeature.class).getPojoAgent();
 							Class<?> agcl = agent.getClass();
 							Constructor<?>[] cons = gcl.getDeclaredConstructors();
 							for(Constructor<?> c: cons)
@@ -593,12 +600,12 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			Future<Void> ret = new Future<Void>();
 			FutureBarrier<Void> barrier = new FutureBarrier<Void>();
 			
-			IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
+			IInternalBDIAgentFeature bdif = component.getFeature(IInternalBDIAgentFeature.class);
 			MCapability mcapa = (MCapability)bdif.getCapability().getModelElement();
 			
 			// Send initial messages
 			// Throw initial internal events
-			for(MConfigParameterElement cpe: SUtil.safeList(cevents))
+			for(MConfigParameterElement cpe: SUtil.notNull(cevents))
 			{
 				MInternalEvent mievent = mcapa.getInternalEvent(cpe.getRef());
 				if(mievent!=null)
@@ -731,7 +738,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				
 				String name = null;
 				Object capa = null;
-				if(component.getComponentFeature0(IPojoComponentFeature.class)!=null)
+				if(component.getFeature0(IPojoComponentFeature.class)!=null)
 				{
 					int	i	= mbel.getName().indexOf(MElement.CAPABILITY_SEPARATOR);
 					if(i!=-1)
@@ -741,7 +748,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					}
 					else
 					{
-						Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+						Object agent = component.getFeature(IPojoComponentFeature.class).getPojoAgent();
 						capa	= agent;
 						name	= mbel.getName();
 					}
@@ -799,7 +806,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 				
 				if(mbel.getUpdaterateValue(component)>0)
 				{
-					final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					IClockService	cs	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 //					cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
 					ITimedObject to = new ITimedObject()
 					{
@@ -811,7 +818,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 //							System.out.println("belief update "+component+", "+mbel);
 							try
 							{
-								component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+								component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
@@ -860,7 +867,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 						@Override
 						public String toString()
 						{
-							return "updateBelief("+mbel.getName()+"@"+component.getComponentIdentifier()+")";
+							return "updateBelief("+mbel.getName()+"@"+component.getId()+")";
 						}
 						
 //						public void exceptionOccurred(Exception exception)
@@ -903,7 +910,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 //										System.out.println("parameter update: "+event);
 										
 										RCapability capa = BDIAgentFeature.getCapability(component);
-										for(RGoal goal: SUtil.safeCollection(capa.getGoals(mgoal)))
+										for(RGoal goal: SUtil.notNull(capa.getGoals(mgoal)))
 										{
 											if(!mparam.isMulti(component.getClassLoader()))
 											{
@@ -925,7 +932,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 							
 							if(mparam.getUpdaterateValue(component)>0)
 							{
-								final IClockService cs = SServiceProvider.getLocalService(component, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+								IClockService	cs	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class));
 								ITimedObject to = new ITimedObject()
 								{
 									ITimedObject self = this;
@@ -935,7 +942,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 									{
 										try
 										{
-											component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+											component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 											{
 												public IFuture<Void> execute(IInternalAccess ia)
 												{
@@ -944,7 +951,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 														System.out.println("parameter updaterate: "+mparam.getUpdaterateValue(component));
 														
 														RCapability capa = BDIAgentFeature.getCapability(component);
-														for(RGoal goal: SUtil.safeCollection(capa.getGoals(mgoal)))
+														for(RGoal goal: SUtil.notNull(capa.getGoals(mgoal)))
 														{
 															if(!mparam.isMulti(component.getClassLoader()))
 															{
@@ -1020,7 +1027,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										
 										for(int i=0; i<ptypes.length; i++)
 										{
-											Object agent = component.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
+											Object agent = component.getFeature(IPojoComponentFeature.class).getPojoAgent();
 											Object	o	= event.getContent();
 											if(o!=null && SReflect.isSupertype(ptypes[i], o.getClass()))
 											{
@@ -1051,6 +1058,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 										
 										if(ok)
 										{
+											c.setAccessible(true);
 											pojogoal = c.newInstance(pvals);
 										}
 									}
@@ -1949,7 +1957,16 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						RGoal goal = (RGoal)event.getContent();
-						return delstr.goalIsOption(goal);
+						
+						// For subgoals, check if parent still adopted (hack!!!) TODO: fix connected goal/plan lifecycles!!!
+//						if(goal.isAdopted())
+						{
+							return delstr.goalIsOption(goal);							
+						}
+//						else
+//						{
+//							return IFuture.DONE;
+//						}
 					}
 				});
 //				rule.addEvent(new EventType(new String[]{ChangeEvent.GOALNOTINHIBITED, EventType.MATCHALL}));
@@ -1961,7 +1978,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 			
 			// Init must be set to true before init writes to ensure that new events
 			// are executed and not processed as init writes
-			IInternalBDILifecycleFeature bdil = (IInternalBDILifecycleFeature)component.getComponentFeature(ILifecycleComponentFeature.class);
+			IInternalBDILifecycleFeature bdil = (IInternalBDILifecycleFeature)component.getFeature(ILifecycleComponentFeature.class);
 			bdil.setInited(true);
 			
 			// After init rule execution mode to direct
@@ -2014,7 +2031,7 @@ public class BDILifecycleAgentFeature extends MicroLifecycleComponentFeature imp
 		public IFuture<Void> startEndBehavior(final IBDIModel bdimodel, final RuleSystem rulesystem, final RCapability rcapa)
 		{
 			final Future<Void>	ret	= new Future<Void>();
-			final IInternalBDIAgentFeature bdif = component.getComponentFeature(IInternalBDIAgentFeature.class);
+			final IInternalBDIAgentFeature bdif = component.getFeature(IInternalBDIAgentFeature.class);
 			
 			// Barrier to wait for all body processing.
 			FutureBarrier<Void>	bodyend	= new FutureBarrier<Void>();
