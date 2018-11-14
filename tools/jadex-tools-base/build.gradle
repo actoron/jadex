@@ -1,0 +1,7 @@
+description 'Reusable classes for starting Jadex, running test cases and building JCC plugins. No GUI classes included.'
+
+dependencies
+{
+	api project(':platform:jadex-bridge')
+}
+

@@ -1,0 +1,8 @@
+description 'Small Java annotation-based event-condition-action rule engine.'
+
+dependencies
+{
+	api project(':util:jadex-commons')
+	api project(':util:jadex-concurrent')
+	api project(':util:jadex-javaparser')
+}

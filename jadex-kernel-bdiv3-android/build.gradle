@@ -1,7 +1,0 @@
-description 'BDIV3 kernel for Jadex-Android.'
-
-dependencies
-{
-    api project(':jadex-kernel-bdiv3')
-    api project(':jadex-android-commons')
-}

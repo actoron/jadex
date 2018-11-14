@@ -1,0 +1,10 @@
+description 'Jadex webservices publication addon.'
+
+dependencies
+{
+	api project(':applications:jadex-applications-webservice')
+	api project(':platform:jadex-platform-extension-webservice')
+	api project(':platform:jadex-platform-extension-webservice-desktop')
+	api project(':platform:jadex-platform-extension-webservice-desktop-grizzly')
+	api project(':platform:jadex-platform-extension-webservice-desktop-jetty')
+}

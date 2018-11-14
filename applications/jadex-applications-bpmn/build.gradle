@@ -1,0 +1,10 @@
+description 'The Jadex bpmn applications package contains several example applications, benchmarks and testcases using bpmn workflows.'
+
+dependencies
+{
+	api project(':kernels:jadex-kernel-bpmn')
+
+	testImplementation project(':platform:jadex-platform')
+	testImplementation project(':transports:jadex-platform-extension-websockettransport')
+	testImplementation project(':transports:jadex-platform-extension-relaytransport')
+}
