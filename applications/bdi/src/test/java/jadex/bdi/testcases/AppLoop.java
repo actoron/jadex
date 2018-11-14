@@ -21,7 +21,7 @@ public class AppLoop
 	 */
 	public static void main(String[] args)
 	{
-		IPlatformConfiguration config = STest.getDefaultTestConfig(AppLoop.class);
+		IPlatformConfiguration config = STest.getLocalTestConfig(AppLoop.class);
 		config.getExtendedPlatformConfiguration().setDf(true);
 		IExternalAccess	platform = Starter.createPlatform(config, args).get();
 		for(int i=0; ; i++)

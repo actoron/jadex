@@ -71,7 +71,6 @@ public class MultiPlatformsTest //extends TestCase
 			}
 			
 			IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
-			config.setPlatformName("testcases_"+i+"*");
 			futures.add(Starter.createPlatform(config,
 				new String[]{
 //				"-gui", "false", "-printpass", "false", "-cli", "false",

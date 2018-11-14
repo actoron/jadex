@@ -28,14 +28,15 @@ public class STest
 	static AtomicInteger	platno	= new AtomicInteger(0);
 
     /**
-     *  Get the test configuration using a unique platform name derived from the test class.
-     *  @param test	The test class.
+     *  Get local (no communication) test configuration using a unique platform name derived from the test name.
+     *  Attention: The name is unique and the config can not be reused for multiple platforms!
+     *  @param test	The test name.
      *  @return The default configuration with a unique platform name.
      */
-    public static IPlatformConfiguration getLocalTestConfig(Class<?> test)
+    public static IPlatformConfiguration getLocalTestConfig(String test)
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-		config.setPlatformName(test.getName()+"-"+platno.getAndIncrement());
+		config.setPlatformName(test+"-"+platno.getAndIncrement());
 
         // Do not use multi factory as it is much too slow now :(
 //		config.setValue("kernel_multi", true);
@@ -60,11 +61,24 @@ public class STest
     }
     
     /**
-     *  Get the test configuration using a unique platform name derived from the test class.
+     *  Get a local (no communication) test configuration using a unique platform name derived from the test name.
+     *  Attention: The name is unique and the config can not be reused for multiple platforms!
      *  @param test	The test class.
      *  @return The default configuration with a unique platform name.
      */
-    public static IPlatformConfiguration getDefaultTestConfig(Class<?> test)
+    public static IPlatformConfiguration getLocalTestConfig(Class<?> test)
+    {
+    	return getLocalTestConfig(test.getName());
+    }
+
+    
+    /**
+     *  Get the test configuration using a unique platform name derived from the test name.
+     *  Attention: The name is unique and the config can not be reused for multiple platforms!
+     *  @param test	The test name.
+     *  @return The default configuration with a unique platform name.
+     */
+    public static IPlatformConfiguration getDefaultTestConfig(String test)
     {
     	IPlatformConfiguration config = getLocalTestConfig(test);
     	
@@ -77,6 +91,17 @@ public class STest
 		config.setNetworkSecrets(new String[] { testnetwork_pass });
 		
         return config;
+    }
+    
+    /**
+     *  Get the test configuration using a unique platform name derived from the test class.
+     *  Attention: The name is unique and the config can not be reused for multiple platforms!
+     *  @param test	The test class.
+     *  @return The default configuration with a unique platform name.
+     */
+    public static IPlatformConfiguration getDefaultTestConfig(Class<?> test)
+    {
+    	return getDefaultTestConfig(test.getName());
     }
     
     public static void terminatePlatform(IExternalAccess platform) 

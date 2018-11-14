@@ -44,7 +44,7 @@ public abstract class GenericTestSuite extends TestSuite implements IAbortableTe
 	public GenericTestSuite(boolean justStartComponents, String... components)
 	{
 		this.components = components;
-		this.config = STest.getDefaultTestConfig(getClass());
+		this.config = STest.getLocalTestConfig(getClass());
 		for(String component : components)
 		{
 			if(!component.endsWith(".class"))

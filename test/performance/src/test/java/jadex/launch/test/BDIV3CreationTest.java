@@ -28,7 +28,7 @@ public class BDIV3CreationTest //extends TestCase
 	public void	testBDICreation()
 	{
 //		ISuspendable	sus	= 	new ThreadSuspendable();
-		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(STest.getDefaultTestConfig(getClass()),
+		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(STest.getLocalTestConfig(getClass()),
 			new String[]{
 //				"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
