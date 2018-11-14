@@ -177,7 +177,7 @@ subprojects
 		// strip "-debug" from .aar and .apks to include them in dist
 		onVariantOutput(project, com.android.builder.core.BuilderConstants.RELEASE) {output ->
 			def fileName = output.outputFile.getName()
-			output.outputFile = new File(output.outputFile.parent, "$archivesBaseName-${version}${fileName.substring(fileName.lastIndexOf("."))}")
+			output.outputFile = new File(output.outputFile.parent, "$archivesBaseName${fileName.substring(fileName.lastIndexOf("."))}")
 		}
 
     	android {
@@ -189,6 +189,7 @@ subprojects
                 targetSdkVersion android_targetSdkVersion
                 versionCode 1
 				versionName jadex_build_version
+				setProperty("archivesBaseName", "$project.name-$project.version")
             }
 
             sourceSets {
