@@ -263,6 +263,11 @@ publishing {
                     from components.web
                 } else if (!isAndroidProject(project)) {
                     from components.java
+                } else if (isAndroidLibraryProject(project)) {
+                    File outputFile = bundleRelease.archivePath // bundleRelease.archivePath is not renamed at this point
+                    def fileName = outputFile.getName()
+                    def artifactFile = new File(outputFile.parent, "$archivesBaseName-${version}${fileName.substring(fileName.lastIndexOf("."))}")
+                    artifact artifactFile
                 }
 
                 // somehow artifacts are lost when publishing with maven-publish, re-add all jars:
@@ -297,13 +302,13 @@ publishing {
     //                println "sign: " + it
                     if (it instanceof Artifact) {
                         artifact(it) {
-                            def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
+                            def matcher = it.file =~ /-(sources|javadoc)\.(jar|aar)\.asc$/
                             if (matcher.find()) {
                                 classifier = matcher.group(1)
                             } else {
                                 classifier = null
                             }
-                            extension = 'jar.asc'
+                            extension = matcher.group(2) + '.asc'
                         }
                     }
                 }
