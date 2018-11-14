@@ -161,7 +161,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	 */
 	protected IFuture<IExternalAccess> createPlatform(final String[] args)
 	{
-		return createPlatform(STest.getDefaultTestConfig(), args);
+		return createPlatform(STest.getDefaultTestConfig(getClass()), args);
 	}
 	
 	/**
@@ -278,7 +278,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		disableLocalSimulationMode().get();
 		
 //		agent.getLogger().severe("Testagent setup remote platform: "+agent.getComponentDescription());
-		IPlatformConfiguration conf = STest.getDefaultTestConfig();
+		IPlatformConfiguration conf = STest.getDefaultTestConfig(getClass());
 		conf.getExtendedPlatformConfiguration().setSimul(false);
 		conf.getExtendedPlatformConfiguration().setSimulation(false);
 		createPlatform(conf, null).addResultListener(new DelegationResultListener<IExternalAccess>(ret)

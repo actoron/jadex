@@ -76,6 +76,9 @@ public class MicroStartTest extends ComponentTestSuite
 		"TimeUserAgent",
 		"SubscriberAgent",
 		"lottery/PlayerAgent",
+		"lottery/HumanPlayerAgent",
+		"lottery\\PlayerAgent",
+		"lottery\\HumanPlayerAgent",
 		
 		// Todo: fix race condition between shutdown and autocreate
 		"mandelbrot",

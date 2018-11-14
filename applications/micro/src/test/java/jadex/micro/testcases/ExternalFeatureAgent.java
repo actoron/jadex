@@ -48,7 +48,7 @@ public class ExternalFeatureAgent extends JunitAgentTest
 		
 		TestReport tr2 = new TestReport("#1", "Test if an external feature from remote platform can be used.");
 		
-		IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig()).get();
+		IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
 		
 		feat = plat.getExternalFeature(IExternalArgumentsResultsFeature.class);
 		args = feat.getArgumentsAsync().get();

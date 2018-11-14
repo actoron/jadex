@@ -3,6 +3,8 @@ package jadex.micro.testcases.servicecall;
 import java.io.IOException;
 import java.util.Map;
 
+import org.bouncycastle.asn1.cmc.GetCert;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
@@ -315,7 +317,7 @@ public class ServiceCallTestAgent extends TestAgent
 	public static void main(String[] args) throws Exception
 	{
 		// Start platform with agent.
-		IPlatformConfiguration	config1	= STest.getDefaultTestConfig();
+		IPlatformConfiguration	config1	= STest.getDefaultTestConfig(ServiceCallTestAgent.class);
 //		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
 		config1.addComponent(ServiceCallTestAgent.class);

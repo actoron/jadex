@@ -631,7 +631,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		ISearchQueryManagerService sqms = isRemote(query) ? searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE)) : null;
 		if(isRemote(query) && sqms==null)
 		{
-			return new TerminableIntermediateFuture<>(new IllegalStateException("No ISearchQueryManagerService found for remote query: "+query));
+			getComponent().getLogger().warning("No ISearchQueryManagerService found for remote search: "+query);
+//			return new TerminableIntermediateFuture<>(new IllegalStateException("No ISearchQueryManagerService found for remote search: "+query));
 		}
 		
 		// Local only -> create future, fill results, and set to finished.

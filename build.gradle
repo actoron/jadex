@@ -181,6 +181,14 @@ subprojects
 			}
 		}
 
+		repositories {
+			mavenCentral()
+			maven
+			{
+				url "https://maven.google.com"
+			}
+		}
+
 		// Disable Android lint nonsense.
 		tasks.whenTaskAdded {task ->
 		    if(task.name.contains("lint")) {
@@ -216,7 +224,7 @@ subprojects
                 versionCode 1
 				versionName jadex_build_version
 				multiDexEnabled true
-			}
+            }
 
             sourceSets {
                 main {
@@ -341,6 +349,9 @@ subprojects
 //		}
 
     }
+	addJavaDocJarTask(project)
+	addSourcesJarTask(project)
+
 	// needs to be applied after android + java plugins:
 	apply from: "$rootDir/src/main/buildutils/publishing.gradle"
 
@@ -350,8 +361,6 @@ subprojects
 		addSchemaTasks(project)
 	}
 
-	addJavaDocJarTask(project)
-	addSourcesJarTask(project)
 
     sourceCompatibility = 1.8
     

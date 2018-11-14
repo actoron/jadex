@@ -160,7 +160,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 			
 			disableLocalSimulationMode().get();
 			
-			IPlatformConfiguration	config	= STest.getDefaultTestConfig();
+			IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
 			config.getExtendedPlatformConfiguration().setSimulation(false);	// No simulaton, because we need to measure in real time
 			Starter.createPlatform(config)
 				.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(

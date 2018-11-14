@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import jadex.commons.ICommand;
+import jadex.commons.SUtil;
 import jadex.commons.functional.Function;
 
 /**
@@ -584,13 +585,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     			{
     				throw new NoSuchElementException("No more intermediate results.");
     			}
-    			else if(exception instanceof RuntimeException)
-    			{
-    				throw (RuntimeException)exception;
-    			}
     			else
     			{
-    				throw new RuntimeException(exception);
+    				SUtil.throwUnchecked(exception);
     			}
     		}
     		else

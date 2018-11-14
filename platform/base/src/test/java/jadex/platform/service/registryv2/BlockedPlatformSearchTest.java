@@ -41,7 +41,7 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 
 	static
 	{
-		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
+		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(BlockedPlatformSearchTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*2));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);

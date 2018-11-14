@@ -174,7 +174,7 @@ public class ComponentStartTest extends ComponentTest
 	 */
 	public static void main(String[] args) throws IOException
 	{
-		IExternalAccess platform = Starter.createPlatform(STest.getDefaultTestConfig()).get();
+		IExternalAccess platform = Starter.createPlatform(STest.getLocalTestConfig(ComponentStartTest.class)).get();
 //		IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
 
 		String filename = null;

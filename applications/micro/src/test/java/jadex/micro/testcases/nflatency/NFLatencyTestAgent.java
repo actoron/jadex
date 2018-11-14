@@ -107,7 +107,7 @@ public class NFLatencyTestAgent extends TestAgent
 		disableLocalSimulationMode().get();
 		
 //		createPlatform(null)
-		IPlatformConfiguration config = STest.getDefaultTestConfig();
+		IPlatformConfiguration config = STest.getDefaultTestConfig(getClass());
 		config.getExtendedPlatformConfiguration().setSimul(false);
 		config.getExtendedPlatformConfiguration().setSimulation(false);
 		createPlatform(config, null).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
