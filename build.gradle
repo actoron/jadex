@@ -142,20 +142,12 @@ subprojects
 		buildscript {
 			dependencies {
 				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
-						version: "$project.version.major.$project.version.minor.+"
+						version: "$project.version.major.$project.version.minor.98"
 //				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
 //						version: "3.0-DEVELOPMENT"
 			}
 		}
 		
-		repositories {
-			mavenCentral()
-			maven
-			{
-				url "https://maven.google.com"
-			}
-		}
-
 		repositories {
 			mavenCentral()
 			maven
