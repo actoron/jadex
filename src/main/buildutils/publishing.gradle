@@ -163,6 +163,8 @@ def configurePom(pom) {
                     dependencyNode.appendNode('version', it.version)
                 }
             }
+        } else if (!root.get('packaging').isEmpty()) {
+            root.remove(root.get('packaging'))
         }
         root.children().last() + PomConfig.common
         root.children().last() + PomConfig.gpl
