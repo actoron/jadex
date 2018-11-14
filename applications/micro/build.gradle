@@ -1,0 +1,36 @@
+description 'The Jadex micro applications package contains several example applications, benchmarks and testcases using micro agents.'
+
+sourceSets
+{
+    main
+    {
+        java
+        {
+        	srcDir 'src/main/java'
+            exclude 'jadex/micro/examples/dungeonkeeper/**'
+        }
+    }
+	test {
+		java.srcDir 'src/test/java'
+	}
+}
+
+
+dependencies 
+{
+	api project(':util:commons')
+	api project(':util:gui')
+	api project(':serialization:xml')
+	api project(':platform:bridge')
+	api project(':tools:base-swing')
+	api project(':kernels:micro')
+	runtime project(':kernels:component') // Todo: move component tests in own project. -<scope>runtime</scope>
+	api project(':kernels:application')
+	api project(':environments:envsupport')
+	testImplementation project(':platform:base')
+	testImplementation project(':transports:websockettransport')
+	testImplementation project(':transports:relaytransport')
+	
+	api 'com.github.sarxos:webcam-capture:0.3.9'
+	api 'org.jcodec:jcodec:0.1.5'
+}

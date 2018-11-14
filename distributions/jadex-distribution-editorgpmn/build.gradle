@@ -1,6 +1,0 @@
-description 'Jadex GPMN editor.'
-
-dependencies
-{
-	api project(':editors:jadex-editor-gpmn')
-}

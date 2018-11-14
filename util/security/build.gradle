@@ -1,0 +1,11 @@
+description 'Common security support classes.'
+
+dependencies
+{
+	api project(':util:commons')
+	api 'org.bouncycastle:bcprov-jdk15on:1.59'
+	api 'org.bouncycastle:bcpkix-jdk15on:1.59'
+	apiNoAndroidRuntime 'net.java.dev.jna:jna:4.5.1'
+	apiNoAndroidRuntime 'net.java.dev.jna:jna-platform:4.5.1'
+//	api 'org.bouncycastle:bcprov-debug-jdk15on:1.57'
+}

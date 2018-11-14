@@ -1,8 +1,0 @@
-description 'The Jadex base kernel provides basic support for all kinds of active components.'
-
-dependencies
-{
-	api project(':util:jadex-commons')
-	api project(':util:jadex-javaparser')
-	api project(':platform:jadex-bridge')
-}

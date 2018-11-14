@@ -1,0 +1,21 @@
+description 'Jadex API Javadoc as addon.'
+
+dependencies
+{
+	api project(':applications:bdi')
+	api project(':platform:bridge')
+	api project(':util:commons')
+	api project(':util:gui')
+	api project(':util:security')
+	api project(':util:concurrent')
+	api project(':util:bytecode')
+	api project(':util:javaparser')
+	api project(':kernels:bdiv3')
+	api project(':kernels:bpmn')
+	api project(':environments:agr')
+	api project(':environments:envsupport')
+	api project(':kernels:micro')
+	api project(':kernels:microservice')
+	api project(':platform:webservice')
+	api project(':serialization:xml')
+}

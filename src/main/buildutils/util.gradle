@@ -86,6 +86,15 @@ def getReleaseVariant(project) {
 }
 
 /**
+ *  Gets the project depth in the hierarchy.
+ */
+def getProjectDepth(proj) {
+	if (proj.path.equals(':'))
+		return 0;
+	return proj.path.split(':').length - 1
+}
+
+/**
  * Recursively check for dependencies with apiNoAndroidRuntime scope and exclude them from the project
  * @param project
  * @param dep
@@ -323,6 +332,7 @@ def addJavaDocJarTask(Project p) {
         }
 
         p.tasks.create('androidjavadocsJar', Jar) {
+        	baseName = getArtifactName(p)
             classifier = 'javadoc'
             dependsOn javadocsTask
             from javadocsTask.destinationDir
@@ -330,6 +340,7 @@ def addJavaDocJarTask(Project p) {
 
     } else {
         def javadocJar = p.tasks.create('javadocJar', Jar) {
+        	baseName = getArtifactName(p)
             classifier = 'javadoc'
             from p.javadoc
         }
@@ -346,12 +357,14 @@ def addJavaDocJarTask(Project p) {
 def addSourcesJarTask(Project p) {
     if (isAndroidProject(p)) {
         p.tasks.create('androidsourcesJar', Jar) {
+        	baseName = getArtifactName(p)
             classifier = 'sources'
             from p.android.sourceSets.main.java.srcDirs
         }
 
     } else {
         def sourcesJar = p.tasks.create('sourcesJar', Jar) {
+        	baseName = getArtifactName(p)
             classifier = 'sources'
             from p.sourceSets.main.allSource
         }
@@ -425,6 +438,25 @@ def getVar(String key, Project p) {
     return value
 }
 
+def singularize(name) {
+	if (name.endsWith('s') && !project.ext.keepplural.contains(name))
+		name = name.substring(0, name.length() - 1)
+	return name;
+}
+
+def getArtifactName(project) {
+	def ret = 'jadex'
+    def pathcomps = project.getPath().split(':')
+    for (int i = 1; i < pathcomps.length; ++i) {
+    	def comp = pathcomps[i]
+    	if (i == 1)
+    		comp = singularize(comp)
+    	ret += '-' + comp
+    }
+    return ret
+}
+
+
 // make functions externally visible
 
 ext {
@@ -434,6 +466,7 @@ ext {
     isAndroidProject = this.&isAndroidProject
     isAndroidLibraryProject = this.&isAndroidLibraryProject
     isWebApplicationProject = this.&isWebApplicationProject
+    getProjectDepth = this.&getProjectDepth
     isTestParallel = this.&isTestParallel
     androidSdkExists = this.&androidSdkExists
     onVariant = this.&onVariant
@@ -447,4 +480,6 @@ ext {
     addSourcesJarTask = this.&addSourcesJarTask
     addEclipseWorkarounds = this.&addEclipseWorkarounds
     getVar = this.&getVar
+    singularize = this.&singularize
+    getArtifactName = this.&getArtifactName
 }

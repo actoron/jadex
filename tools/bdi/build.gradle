@@ -1,0 +1,13 @@
+description 'The Jadex tools bdi package contains JCC plugins for Jadex BDI agents.'
+
+dependencies
+{
+	api project(':rules:base')
+	api project(':serialization:xml')
+	api project(':util:commons')
+	api project(':platform:bridge')
+	//api project(':kernels:bdi')
+	api project(':tools:runtimetools-swing')
+	api project(':rules:tools')
+	api project(':kernels:bdiv3')
+}

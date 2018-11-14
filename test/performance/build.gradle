@@ -1,0 +1,9 @@
+description 'Performance tests'
+
+dependencies
+{
+	api project(':test:integration')
+	api project(':applications:micro')
+}
+
+task performanceTest(dependsOn:test)

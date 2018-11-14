@@ -1,7 +1,6 @@
 build
 target
 bin
-gen
 .settings
 .classpath
 .project
@@ -47,3 +46,5 @@ jadex-platform-standalone-launch/highscore.dmp
 /reports
 /public
 /testreport
+/platform/jadex-platform/testfile.txt
+/platform/base/testfile.txt

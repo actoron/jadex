@@ -1,0 +1,46 @@
+description 'Integration Tests'
+
+dependencies
+{
+	def launcharts = new HashSet<String> ([
+										   // Core API
+										   ':util:commons',':platform:bridge',':util:javaparser',':serialization:xml',
+										   
+										   // Kernels
+										   ':kernels:base',':kernels:micro',':kernels:bpmn',
+										   ':kernels:application',':kernels:component',':applications:applib-bdi',
+										   ':kernels:bdiv3',
+										   
+										   // Platform
+										   ':platform:base',
+										   
+										   // Tools
+										   ':tools:runtimetools-swing',':tools:bdi',':tools:bpmn',
+										   ':tools:comanalyzer',':tools:rules',
+										   
+										   // Extensions
+										   ':environments:agr',':environments:envsupport',
+										   ':environments:envsupport-opengl',
+//										   ':platform:jadex-platform-extension-maven',
+										   ':environments:envsupport-jmonkey',':platform:webservice',
+										   ':platform:webservice-desktop',
+										   ':platform:webservice-desktop-jetty',
+										   ':platform:webservice-desktop-grizzly',
+
+										   ':transports:websockettransport',
+										   ':transports:relaytransport',
+										   ])
+	
+	launcharts.retainAll(gradle.ext.includeartifacts)
+	
+	launcharts.each { art ->
+		api project(art)
+	}
+	api project(':applications:micro')
+
+//	test {
+//		testLogging {
+//			showStandardStreams = true
+//		}
+//	}
+}

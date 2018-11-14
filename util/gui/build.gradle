@@ -1,0 +1,7 @@
+description 'Common GUI support classes.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':util:concurrent')
+}

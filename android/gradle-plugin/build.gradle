@@ -1,0 +1,145 @@
+description 'Gradle plugin for generating BDIV3 runtime code from agent annotations at api time. Needed by Jadex-Android, because runtime code generation is not supported on Jadex-Android.'
+
+//ext.props = new Properties()
+//props.load(new FileReader(file("../gradle.properties")))
+
+apply plugin: 'groovy'
+
+buildscript {
+    repositories {
+        maven
+        {
+            url "https://maven.google.com"
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven
+    {
+        url "https://maven.google.com"
+    }
+}
+
+def androidToolsVersion = android_gradlePluginVersion;
+dependencies {
+    testImplementation gradleTestKit()
+
+    api gradleApi()
+    api localGroovy()
+
+    api project(':kernels:bdiv3')
+    api "com.android.tools.build:gradle:$androidToolsVersion"
+    api 'commons-io:commons-io:2.6'
+
+
+    testImplementation 'org.assertj:assertj-core:1.7.0'
+    testImplementation "com.android.tools.build:gradle:$androidToolsVersion"
+    testImplementation 'com.neenbedankt.gradle.plugins:android-apt:1.7'
+}
+
+test.testLogging.showStandardStreams = true
+test.enabled = false;
+
+// Write the plugin's classpath to a file to share with the tests
+task createClasspathManifest {
+    def outputDir = file("$buildDir/$name")
+
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+    }
+}
+
+// Add the classpath file to the test runtime classpath
+dependencies {
+    testRuntime files(createClasspathManifest)
+}
+
+
+
+//configurations {
+//    gradlePluginArchives
+//}
+
+artifacts {
+    archives jar
+}
+
+// upload task for gradle plugin and its dependencies
+//uploadGradlePluginArchives {
+//    repositories {
+//        repositories.mavenDeployer {
+//            beforeDeployment
+//                    {
+//                        MavenDeployment deployment -> signing.signPom(deployment)
+//                    }
+//
+//            snapshotRepository(url: reposnapshoturl)
+//                    {
+//                        authentication(userName: repouser, password: repopassword)
+//                    }
+//            repository(url: "http://oss.sonatype.org/service/local/staging/deploy/maven2/")
+//                    {
+//                        authentication(userName: repouser, password: repopassword)
+//                    }
+//        }
+//    }
+//}
+
+//uploadGradlePluginArchives.dependsOn += uploadArchives
+
+//task installGradlePluginArchives(dependsOn:'install') {
+//
+//}
+
+//afterEvaluate {
+//    def deps = getTransitiveJadexDependencies(getConfigurations().getByName('compile'), project.group)
+//// add dependencies -> install them when installGradlePluginArchives executes
+//    addTaskDependencies(installGradlePluginArchives, deps, "install")
+//    // add dependencies -> upload them when uploadgradlePluginArchives executes
+//    addTaskDependencies(uploadGradlePluginArchives, deps, "uploadArchives")
+//}
+
+/**
+ * Add depTaskName tasks of given depProjects as dependency to given task.
+ *
+ * @param task
+ * @param depProjectList
+ * @param depTaskName
+ * @return
+ */
+def addTaskDependencies(Task task, depProjects, String depTaskName) {
+    depProjects.each {dep ->
+//        println "adding: ${dep.name}.${depTaskName} to task ${task}"
+        task.dependsOn.add project(":${dep.name}")."${depTaskName}"
+    }
+}
+
+/**
+ * Get all transitive dependencies of 'conf' that have given 'jadexGroup'.
+ * Returns a Collection with items: [group, name, version]
+ * @param conf
+ * @param jadexGroup
+ * @return
+ */
+def Collection<Dependency> getTransitiveJadexDependencies(Configuration conf, String jadexGroup) {
+    def firstLevelDeps = conf.resolvedConfiguration.firstLevelModuleDependencies.findAll({it.moduleGroup == jadexGroup})
+    def result = []
+    getTransitiveJadexDependencies_recursive(firstLevelDeps, result, jadexGroup)
+    return result.unique()
+}
+
+def getTransitiveJadexDependencies_recursive(Collection<ResolvedDependency> deps, result, String jadexGroup) {
+    deps.each {dep ->
+        if (dep.moduleGroup == jadexGroup) {
+            result.add([group: dep.moduleGroup, name: dep.moduleName, version: dep.moduleVersion])
+            getTransitiveJadexDependencies_recursive(dep.getChildren(), result, jadexGroup)
+        }
+    }
+}

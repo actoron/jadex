@@ -1,0 +1,15 @@
+description 'The Jadex applications Java 8 package contains several example applications using Java 8 language features.'
+
+dependencies
+{
+	api project(':util:commons')
+	api project(':platform:bridge')
+	api project(':tools:base-swing')
+	api project(':kernels:micro')
+	api project(':kernels:component')
+	api project(':kernels:application')
+	api project(':platform:base')
+	api project(':environments:envsupport')
+}
+
+sourceCompatibility = 1.8
