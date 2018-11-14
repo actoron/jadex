@@ -64,7 +64,7 @@ public class ServiceCallTestNFClearTest
 
 //		String pid = SUtil.createPlainRandomId(name.getMethodName(), 3) + "-*";
 
-		IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
+//		IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
 //		config.getExtendedPlatformConfiguration().setDebugFutures(true);
 //		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
 ////		config.setLogging(true);
@@ -78,9 +78,9 @@ public class ServiceCallTestNFClearTest
 //		config.setAwareness(false);
 //		config.getExtendedPlatformConfiguration().setTcpTransport(true);
 
-		platform1 = Starter.createPlatform(config).get(timeout);
+		platform1 = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get(timeout);
 
-		platform2 = Starter.createPlatform(config).get(timeout);
+		platform2 = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get(timeout);
 
 //		createProxies(platform1, platform2);
 
