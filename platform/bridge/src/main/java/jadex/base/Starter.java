@@ -511,6 +511,13 @@ public class Starter
 				if(IComponentIdentifier.LOCAL.get()==null)
 					IComponentIdentifier.LOCAL.set(cid);
 				
+				// Check if platform with same name exists in VM
+				if(getPlatformValue(cid, DATA_PLATFORMACCESS)!=null)
+				{
+					ret.setException(new IllegalArgumentException("Platform already exists: "+cid));
+					return ret;
+				}
+				
 //				Class<?> pcclass = pc instanceof Class ? (Class<?>)pc : SReflect.classForName(pc.toString(), cl);
 //				final IPlatformComponentAccess component = (IPlatformComponentAccess)pcclass.newInstance();
 				final IPlatformComponentAccess component = SComponentManagementService.createPlatformComponent(cl);
