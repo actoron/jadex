@@ -95,13 +95,14 @@ class PomConfig {
 // -------------------------------------
 
 def canPublishToNexus = isCommercial(project) && repo_commercial || !isCommercial(project) && repo_noncommercial
+def canSign = project.hasProperty('signing.secretKeyRingFile')
 
 // Selects the projects to publish, add a better heuristic here if available
 def includedproject = getProjectDepth(project) > 1
 // Empty project
 includedproject &= !project.path.equals(':android:applications')
 
-if (project.hasProperty('signing.secretKeyRingFile')) {
+if (canSign) {
     signing {
         sign configurations.archives
         if (isAndroidProject(project)) { // add manually because somehow, those tasks do not end up in configurations.archives??
@@ -241,35 +242,35 @@ publishing {
 
     publications {
 
-        if (!isAndroidProject(project) || isAndroidLibraryProject(project)) {  // dont publish apks
+        if (canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project))) {  // dont publish apks
             // Publish signatures separately because gradle 4.8 maven-publish DOES NOT SUPPORT IT BY DEFAULT
             signatures (MavenPublication) {
                 groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
-            artifactId getArtifactName(project)
-            version project.version
-
-            // give signature files to rtifact method
-            getSignatureFiles().each {signature ->
-                artifact (signature.archive) {
-                    classifier = signature.classifier
-                    extension  = signature.extension
+                artifactId getArtifactName(project)
+                version project.version
+    
+                // give signature files to rtifact method
+                getSignatureFiles().each {signature ->
+                    artifact (signature.archive) {
+                        classifier = signature.classifier
+                        extension  = signature.extension
+                    }
+                }
+                // copy + pasted from below's publication in order to not upload a wrong pom after the correct was uploaded
+                // (and no, one can not exclude pom uploading to avoid this...)
+                configurePom(pom)
+                pom.withXml() {
+                    // remove once on gradle 4.8:
+                    // signing workaround for gradle 4.7:
+                    def pomFile = file("${project.buildDir}/generated-pom.xml")
+                    writeTo(pomFile)
+                    def pomAscFile = signing.sign(pomFile).signatureFiles[0]
+                    artifact(pomAscFile) {
+                        classifier = null
+                        extension = 'pom.asc'
+                    }
                 }
             }
-            // copy + pasted from below's publication in order to not upload a wrong pom after the correct was uploaded
-            // (and no, one can not exclude pom uploading to avoid this...)
-            configurePom(pom)
-            pom.withXml() {
-                // remove once on gradle 4.8:
-                // signing workaround for gradle 4.7:
-                def pomFile = file("${project.buildDir}/generated-pom.xml")
-                writeTo(pomFile)
-                def pomAscFile = signing.sign(pomFile).signatureFiles[0]
-                artifact(pomAscFile) {
-                    classifier = null
-                    extension = 'pom.asc'
-                }
-            }
-        }
 
             MyPublication(MavenPublication) {
                 if (isWebApplicationProject(project)) {
@@ -291,9 +292,9 @@ publishing {
 
                 //groupId group
                 groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
-            //artifactId project.name
-            artifactId getArtifactName(project)
-			//println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
+                //artifactId project.name
+                artifactId getArtifactName(project)
+                //println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
                 version project.version
                 configurePom(pom)
                 pom.withXml() {
