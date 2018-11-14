@@ -283,8 +283,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			{
 				if(manager.superpeer!=null)
 				{
-					if(query.toString().indexOf("ITestService")!=-1)
-						System.out.println(agent+" searchServices() at superpeer: "+manager.superpeer);
+//					if(query.toString().indexOf("ITestService")!=-1)
+//						System.out.println(agent+" searchServices() at superpeer: "+manager.superpeer);
 					
 					foundsuperpeer	= true;
 					// Todo: remember searches for termination? -> more efficient to just let searches run out an ignore result?
@@ -295,8 +295,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						@Override
 						public void exceptionOccurred(Exception exception)
 						{
-							if(query.toString().indexOf("ITestService")!=-1)
-								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" failed: "+exception);
+//							if(query.toString().indexOf("ITestService")!=-1)
+//								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" failed: "+exception);
 
 							if(track.decrementAndGet()==0)
 							{
@@ -307,8 +307,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						@Override
 						public void resultAvailable(Set<IServiceIdentifier> result)
 						{
-							if(query.toString().indexOf("ITestService")!=-1)
-								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" succeeded: "+result);
+//							if(query.toString().indexOf("ITestService")!=-1)
+//								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" succeeded: "+result);
 
 							
 							if(!ret.isDone())
@@ -675,7 +675,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									stopSuperpeerSearch();
 									superpeer	= sp;
 									connection	= regfut;
-									System.out.println(agent+" accepted super peer connection for network "+networkname+" from super peer: "+sp);
+//									System.out.println(agent+" accepted super peer connection for network "+networkname+" from super peer: "+sp);
 									
 									// Activate waiting queries if any.
 									for(QueryManager<?> qmanager: waitingqueries)
@@ -731,8 +731,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 													{
 														try
 														{
-															if(event.toString().indexOf("ITestService")!=-1)
-																System.out.println(agent+ " sending service event to superpeer "+sp+": "+event);
+//															if(event.toString().indexOf("ITestService")!=-1)
+//																System.out.println(agent+ " sending service event to superpeer "+sp+": "+event);
 															regfut.sendBackwardCommand(event);
 														}
 														catch (Exception e)
@@ -784,7 +784,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							 */
 							protected void	checkConnectionRetry(Exception reason)
 							{
-								System.out.println(agent+" super peer disconnected: "+sp+", ex="+reason);
+//								System.out.println(agent+" super peer disconnected: "+sp+", ex="+reason);
 								
 								// Connection still current but ended?
 								if(running && superpeer==sp)

@@ -11,7 +11,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -28,11 +27,11 @@ public class ProviderAgent implements ITestService
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentCreated
-	public void created()
-	{
-		agent.getLogger().severe("Agent created: "+agent.getDescription());
-	}
+//	@AgentCreated
+//	public void created()
+//	{
+//		agent.getLogger().severe("Agent created: "+agent.getDescription());
+//	}
 
 	/**
 	 *  Call a method that must use a secure

@@ -23,7 +23,7 @@ public class ProviderAgent
 	@AgentCreated
 	public void created(IInternalAccess agent)
 	{
-		agent.getLogger().severe("Agent created: " + agent.getDescription());
+//		agent.getLogger().severe("Agent created: " + agent.getDescription());
 		argResults.getResults().put("exampleresult", "value");
 	}
 
