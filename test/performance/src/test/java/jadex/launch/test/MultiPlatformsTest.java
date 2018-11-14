@@ -70,7 +70,7 @@ public class MultiPlatformsTest //extends TestCase
 				System.out.println("Starting platform "+i);
 			}
 			
-			IPlatformConfiguration	config	= STest.getDefaultTestConfig();
+			IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
 			config.setPlatformName("testcases_"+i+"*");
 			futures.add(Starter.createPlatform(config,
 				new String[]{

@@ -4,7 +4,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
-import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
@@ -14,18 +13,6 @@ import jadex.commons.SUtil;
  */
 public class STest 
 {
-
-    public static IExternalAccess createPlatform() 
-    {
-        return createPlatform(getDefaultTestConfig());
-    }
-
-    public static IExternalAccess createPlatform(IPlatformConfiguration config) 
-    {
-        IExternalAccess access = Starter.createPlatform(config).get();
-        return access;
-    }
-
     // one time network pass for this vm.
     public static final String	testnetwork_name	= "test";
     //public static final String	testnetwork_pass	= SUtil.createUniqueId();
@@ -41,29 +28,14 @@ public class STest
 	static AtomicInteger	platno	= new AtomicInteger(0);
 
     /**
-     *  Get the test configuration using a unique platform name derived from the caller class.
+     *  Get the test configuration using a unique platform name derived from the test class.
+     *  @param test	The test class.
+     *  @return The default configuration with a unique platform name.
      */
-    public static IPlatformConfiguration getLocalTestConfig()
+    public static IPlatformConfiguration getLocalTestConfig(Class<?> test)
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-        
-        // Set platform name based on caller class / code line
-        boolean	found	= false;
-    	for(StackTraceElement stack: Thread.currentThread().getStackTrace())
-    	{
-    		// If STest -> skip and set found to true
-    		if(stack.getClassName().equals(STest.class.getName()))
-    		{
-    			found	= true;
-    		}
-    		
-    		// If found previously but not in current stack element(!) -> use stack element as name (i.e. class that called some STest method)
-    		else if(found)
-    		{
-    			config.setPlatformName(stack.getClassName()+":"+stack.getLineNumber()+"-"+platno.getAndIncrement());
-    			break;
-    		}
-    	}
+		config.setPlatformName(test.getName()+"-"+platno.getAndIncrement());
 
         // Do not use multi factory as it is much too slow now :(
 //		config.setValue("kernel_multi", true);
@@ -88,13 +60,13 @@ public class STest
     }
     
     /**
-     *  Get the test configuration using a unique platform name derived from the test objects class.
-     *  @param test	The test instance.
-     *  @return	The configuration.
+     *  Get the test configuration using a unique platform name derived from the test class.
+     *  @param test	The test class.
+     *  @return The default configuration with a unique platform name.
      */
-    public static IPlatformConfiguration getDefaultTestConfig()
+    public static IPlatformConfiguration getDefaultTestConfig(Class<?> test)
     {
-    	IPlatformConfiguration config = getLocalTestConfig();
+    	IPlatformConfiguration config = getLocalTestConfig(test);
     	
 		// Enable intravm awareness, transport and security
 		config.setSuperpeerClient(true);

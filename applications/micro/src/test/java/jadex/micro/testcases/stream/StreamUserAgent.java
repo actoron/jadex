@@ -3,6 +3,7 @@ package jadex.micro.testcases.stream;
 import java.util.Map;
 
 import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.util.STest;
@@ -38,7 +39,7 @@ public class StreamUserAgent extends TestAgent
 {
 	public IPlatformConfiguration getConfig()
 	{
-		IPlatformConfiguration ret = STest.getDefaultTestConfig();
+		IPlatformConfiguration ret = STest.getDefaultTestConfig(getClass());
 		ret.getExtendedPlatformConfiguration().setSimul(false);
 		ret.getExtendedPlatformConfiguration().setSimulation(false);
 		return ret;
@@ -154,7 +155,7 @@ public class StreamUserAgent extends TestAgent
 //			}
 //		}));
 		
-		IExternalAccess platform = STest.createPlatform(getConfig());
+		IExternalAccess platform = Starter.createPlatform(getConfig()).get();
 		performTests(testno, platform.getId(), tc)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
 		{

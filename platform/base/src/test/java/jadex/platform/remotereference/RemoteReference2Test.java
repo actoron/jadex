@@ -24,11 +24,11 @@ public class RemoteReference2Test //extends TestCase
 		long timeout	= Starter.getDefaultTimeout(null);
 		
 		// Start platform1 used for remote access.
-		final IExternalAccess	platform1	= Starter.createPlatform(STest.getDefaultTestConfig()).get(timeout);
+		final IExternalAccess	platform1	= Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get(timeout);
 		timeout	= Starter.getDefaultTimeout(platform1.getId());
 		
 		// Start platform2 with services.
-		IPlatformConfiguration	config2	= STest.getDefaultTestConfig();
+		IPlatformConfiguration	config2	= STest.getDefaultTestConfig(getClass());
 		config2.addComponent(SearchServiceProviderAgent.class);		
 		config2.addComponent(LocalServiceProviderAgent.class);		
 		IExternalAccess	platform2	= Starter.createPlatform(config2).get(timeout);

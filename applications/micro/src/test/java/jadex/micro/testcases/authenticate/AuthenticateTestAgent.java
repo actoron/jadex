@@ -122,10 +122,7 @@ public class AuthenticateTestAgent extends TestAgent
 	{
 		disableLocalSimulationMode().get();
 		
-		IPlatformConfiguration	conf	= STest.getDefaultTestConfig();
-		// use different platform name / key etc.
-		conf.setPlatformName("other_*");
-		conf.setValue("settings.readonly", Boolean.TRUE);	// Do not save settings (hack!!! security isn't read from config, when settings file exists)
+		IPlatformConfiguration	conf	= STest.getDefaultTestConfig(getClass());
 		
 		// Not default visibility means test unrestricted access -> don't use test network.
 		if(!def)

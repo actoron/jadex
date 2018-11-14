@@ -27,7 +27,7 @@ public class BisimulationTest
 	@Test
 	public void test()
 	{
-		IPlatformConfiguration	config	= STest.getDefaultTestConfig();
+		IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
 		config.setValue("bisimulation", true);
 		config.setValue("tcp", false);
 //		config.setLogging(true);

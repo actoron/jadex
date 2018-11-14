@@ -19,7 +19,7 @@ public class BPMNStartElementsTest //extends TestCase
 	public void testStartActivities()
 	{
 //		System.err.println("starting platform");
-		IPlatformConfiguration	config	= STest.getDefaultTestConfig();
+		IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
 //		config.setGui(true);
 //		config.setDefaultTimeout(-1);
 //		config.setValue("kernel_multi", false);

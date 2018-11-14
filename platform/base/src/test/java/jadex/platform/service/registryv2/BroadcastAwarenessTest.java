@@ -36,7 +36,7 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 
 	static
 	{
-		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
+		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(BroadcastAwarenessTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenessbroadcast", true);

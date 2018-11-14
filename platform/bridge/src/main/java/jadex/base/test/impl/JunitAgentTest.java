@@ -1,13 +1,11 @@
 package jadex.base.test.impl;
 
-import java.util.Map;
-
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.future.IResultListener;
 
 /**
  * Junit compatible test class to be extended either by agents that provide test results
@@ -25,7 +23,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
 //      Logger.getLogger("ComponentTest").log(Level.INFO, "Trying to guess TestAgent name...");
         String className = this.getClass().getName();
         this.comp = extendWithClassIfNeeded(className);
-        this.config = STest.getDefaultTestConfig();
+        this.config = STest.getDefaultTestConfig(getClass());
     }
 
     /**
@@ -44,7 +42,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
     public JunitAgentTest(String component) 
     {
         super(extendWithClassIfNeeded(component), null);
-        this.config = STest.getDefaultTestConfig();
+        this.config = STest.getDefaultTestConfig(getClass());
     }
 
 
@@ -69,7 +67,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
     @Override
     public void runBare() 
     {
-        IExternalAccess platform = STest.createPlatform(getConfig());
+        IExternalAccess platform = Starter.createPlatform(getConfig()).get();
         setPlatform(platform);
         super.runBare();
         platform.killComponent();

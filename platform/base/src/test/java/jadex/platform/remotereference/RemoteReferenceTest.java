@@ -26,7 +26,7 @@ public class RemoteReferenceTest //extends TestCase
 		long timeout = Starter.getDefaultTimeout(null);
 		
 		// Start platform1 with local service.
-		IPlatformConfiguration	config1	= STest.getDefaultTestConfig();
+		IPlatformConfiguration	config1	= STest.getDefaultTestConfig(getClass());
 //		config1.setLogging(true);
 		config1.addComponent(LocalServiceProviderAgent.class);
 		final IExternalAccess	platform1	= Starter.createPlatform(config1).get(timeout);
@@ -36,7 +36,7 @@ public class RemoteReferenceTest //extends TestCase
 		ILocalService	service1	= platform1.searchService( new ServiceQuery<>(ILocalService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get(timeout);
 		
 		// Start platform2 with (remote) search service.
-		IPlatformConfiguration	config2	= STest.getDefaultTestConfig();
+		IPlatformConfiguration	config2	= STest.getDefaultTestConfig(getClass());
 		config2.addComponent(SearchServiceProviderAgent.class);
 		IExternalAccess	platform2	= Starter.createPlatform(config2).get(timeout);
 		

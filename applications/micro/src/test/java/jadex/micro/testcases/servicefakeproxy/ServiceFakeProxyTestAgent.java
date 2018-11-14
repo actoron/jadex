@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.util.STest;
@@ -81,7 +82,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 			
 			disableLocalSimulationMode().get();
 			
-			IExternalAccess plat = STest.createPlatform();
+			IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
 			
 			createProxies(plat).get();
 			// awareness is disabled in testsuite
