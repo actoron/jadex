@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +21,6 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITargetResolver;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.component.impl.remotecommands.IMethodReplacement;
@@ -50,7 +48,6 @@ import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.cms.PlatformComponent;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IChangeListener;
@@ -63,12 +60,10 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.ImmutableProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
-import jadex.javaparser.SJavaParser;
 
 /**
  *  This class implements the rmi handling. It mainly supports:
@@ -859,7 +854,7 @@ public class RemoteReferenceModule
 //				public IFuture<IExternalAccess> execute(IInternalAccess ia)
 //				{
 //					final Future<IExternalAccess> ret = new Future<IExternalAccess>();
-//					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//					ia.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 //	//						.addResultListener(component.createResultListener(new IResultListener()
 //					{
@@ -886,7 +881,7 @@ public class RemoteReferenceModule
 			}
 			ret	= access.getExternalAccess();
 			
-//			access.searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			access.searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 //			{
 //				public void customResultAvailable(IComponentManagementService cms) 

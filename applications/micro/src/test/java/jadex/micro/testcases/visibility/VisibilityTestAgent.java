@@ -3,6 +3,7 @@ package jadex.micro.testcases.visibility;
 import java.util.HashMap;
 import java.util.Map;
 
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
@@ -46,7 +47,7 @@ public class VisibilityTestAgent extends JunitAgentTest
 //		final IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig()).get();
 //		Starter.createProxy(agent.getExternalAccess(), plat).get();
 //		Starter.createProxy(plat, agent.getExternalAccess()).get();
-		final IExternalAccess plat = STest.createPlatform();
+		final IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig(getClass())).get();
 		TestAgent.createComponent(agent, FirstAgent.class.getName()+".class", null, null, plat.getId(), null).get();
 		TestAgent.createComponent(agent, SecondAgent.class.getName()+".class", null, null, plat.getId(), null).get();
 		

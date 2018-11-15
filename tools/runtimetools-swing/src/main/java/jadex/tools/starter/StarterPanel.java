@@ -1655,7 +1655,7 @@ public class StarterPanel extends JLayeredPane
 //		final PublishEventLevel moni, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 //	{
 //		final Future ret = new Future(); 
-//		jcc.getPlatformAccess().searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//		jcc.getPlatformAccess().searchService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(panel)
 //		{
 //			public void customResultAvailable(IComponentManagementService cms)

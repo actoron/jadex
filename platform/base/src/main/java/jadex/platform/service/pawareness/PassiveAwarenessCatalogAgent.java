@@ -2,6 +2,7 @@ package jadex.platform.service.pawareness;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -122,10 +123,7 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 	 */
 	public IIntermediateFuture<IComponentIdentifier> searchPlatforms()
 	{
-		IntermediateFuture<IComponentIdentifier> ret = new IntermediateFuture<>();
-		for (IComponentIdentifier id : catalog.keySet())
-			ret.addIntermediateResult(id);
-		return ret;
+		return new IntermediateFuture<>(new LinkedHashSet<>(catalog.keySet()));
 	}
 	
 	/**

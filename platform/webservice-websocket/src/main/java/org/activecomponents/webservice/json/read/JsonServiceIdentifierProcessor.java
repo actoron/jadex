@@ -1,20 +1,16 @@
 package org.activecomponents.webservice.json.read;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -54,7 +50,7 @@ public class JsonServiceIdentifierProcessor implements ITraverseProcessor
 		
 		// todo: supertypes, networknames, unrestricted???
 //		public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)
-		ServiceIdentifier sid = new ServiceIdentifier(pid, new ClassInfo(obj.get("type").asString()), null, obj.get("name").asString(), rid, obj.get("scope").asString(), null, false);
+		ServiceIdentifier sid = new ServiceIdentifier(pid, new ClassInfo(obj.get("type").asString()), null, obj.get("name").asString(), rid, ServiceScope.valueOf(obj.get("scope").asString()), null, false);
 		return sid;
 	}
 }

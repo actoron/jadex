@@ -6,6 +6,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -25,7 +26,7 @@ import jadex.micro.annotation.Results;
  */
 @Agent
 @RequiredServices(@RequiredService(name = "ser1", type=IService1.class, 
-	scope = RequiredService.SCOPE_PLATFORM))
+	scope = ServiceScope.PLATFORM))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @ComponentTypes(
 {

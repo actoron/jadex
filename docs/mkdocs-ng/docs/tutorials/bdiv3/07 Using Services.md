@@ -93,7 +93,7 @@ bt.addActionListener(new ActionListener()
 {
     public void actionPerformed(ActionEvent e)
     {
-        SServiceProvider.getServices(agent, ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+        SServiceProvider.getServices(agent, ITranslationService.class, ServiceScope.PLATFORM)
             .addResultListener(new IntermediateDefaultResultListener<ITranslationService>()
         {
             public void intermediateResultAvailable(ITranslationService ts)
@@ -280,7 +280,7 @@ protected IBDIAgentFeature bdiFeature;
 
 ```java
 @RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, 
-  binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+  binding=@Binding(scope=ServiceScope.PLATFORM)))
 @Goals(@Goal(clazz=TranslationGoal.class))
 @Plans(@Plan(trigger=@Trigger(goals=TranslationGoal.class), body=@Body(service=@ServicePlan(name="transser"))))
 ```

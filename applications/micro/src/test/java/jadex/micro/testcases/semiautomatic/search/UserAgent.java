@@ -7,7 +7,7 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.Future;
@@ -19,7 +19,7 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 @Agent
-@RequiredServices({@RequiredService(name = "testService", type = ITestService.class, multiple = true, scope=RequiredServiceInfo.SCOPE_PLATFORM)})
+@RequiredServices({@RequiredService(name = "testService", type = ITestService.class, multiple = true, scope=ServiceScope.PLATFORM)})
 public class UserAgent
 {
     @Agent

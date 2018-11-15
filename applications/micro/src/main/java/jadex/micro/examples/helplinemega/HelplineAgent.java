@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClockService;
@@ -27,7 +27,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Helpline component for a single person of interest. 
  */
 @Description("This agent provides a helpline service for managing information about a missing person.")
-@ProvidedServices(@ProvidedService(type=IHelpline.class, scope=RequiredServiceInfo.SCOPE_NETWORK))
+@ProvidedServices(@ProvidedService(type=IHelpline.class, scope=ServiceScope.NETWORK))
 @Agent
 public class HelplineAgent	implements IHelpline
 {
@@ -104,7 +104,7 @@ public class HelplineAgent	implements IHelpline
 			ret.addIntermediateResult(entry);
 		}
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags(person)).
+		agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, ServiceScope.NETWORK).setServiceTags(person)).
 			addResultListener(new IntermediateDefaultResultListener<IHelpline>()
 		{
 			boolean finished	= false;
@@ -181,7 +181,7 @@ public class HelplineAgent	implements IHelpline
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags(person)).
+				ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IHelpline.class, ServiceScope.NETWORK).setServiceTags(person)).
 					addResultListener(new IntermediateDefaultResultListener<IHelpline>()
 				{
 					@Override

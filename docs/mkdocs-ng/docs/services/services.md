@@ -107,7 +107,7 @@ To use a service, it has to be declared as Required Service inside the using com
 ```java
 @RequiredServices({
     @RequiredService(name="sumService", type=ISumService.class, 
-    binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL))
+    binding=@Binding(scope=ServiceScope.GLOBAL))
 })
 @Agent
 public class UsingAgent {...
@@ -163,7 +163,7 @@ public void setSumService(ISumService sum) { ...
 
 <!--
 TODO: document inline-requiredservice:
-@AgentService(lazy=false, requiredservice=@RequiredService(name="", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@AgentService(lazy=false, requiredservice=@RequiredService(name="", type=IComponentManagementService.class, binding=@Binding(scope=ServiceScope.PLATFORM)))
 -->
 
 Instead of injecting the service instance, you can directly inject values of the service:

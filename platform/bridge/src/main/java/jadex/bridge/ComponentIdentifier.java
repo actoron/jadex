@@ -132,7 +132,7 @@ public class ComponentIdentifier extends BasicComponentIdentifier implements ITr
 //	public static IFuture<ITransportComponentIdentifier> getTransportIdentifier(final IExternalAccess exta)
 //	{
 //		final Future<ITransportComponentIdentifier> ret = new Future<ITransportComponentIdentifier>();
-//		exta.searchService( new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//		exta.searchService( new ServiceQuery<>( ITransportAddressService.class, ServiceScope.PLATFORM))
 //			.addResultListener(new ExceptionDelegationResultListener<ITransportAddressService, ITransportComponentIdentifier>(ret)
 //		{
 //			public void customResultAvailable(ITransportAddressService tas)

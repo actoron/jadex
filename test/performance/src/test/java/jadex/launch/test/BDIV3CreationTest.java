@@ -1,6 +1,5 @@
 package jadex.launch.test;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +10,6 @@ import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -28,7 +26,7 @@ public class BDIV3CreationTest //extends TestCase
 	public void	testBDICreation()
 	{
 //		ISuspendable	sus	= 	new ThreadSuspendable();
-		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(STest.getDefaultTestConfig(),
+		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(STest.getLocalTestConfig(getClass()),
 			new String[]{
 //				"-platformname", "benchmarks_*",
 //			"-kernels", "\"micro\"",
@@ -42,22 +40,22 @@ public class BDIV3CreationTest //extends TestCase
 			}
 			).get();
 		
-		Future<Map<String, Object>> fut = new Future<Map<String, Object>>();
-		Future<Map<String, Object>> ffut = fut;
-		Map<String, Object>	args = new HashMap<String, Object>();
+		final Future<Map<String, Object>> fut = new Future<Map<String, Object>>();
+		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", Integer.valueOf(10000));
 		platform.createComponent(new CreationInfo(args).setFilename("jadex.bdiv3.benchmarks.CreationBDI.class"))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, Object>>(fut)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				result.waitForTermination().addResultListener(new DelegationResultListener<Map<String, Object>>(ffut));
 				// Agent created. Kill listener waits for result.
+				result.waitForTermination().addResultListener(new DelegationResultListener<>(fut));
 			}
 		});
 		
 		// timeout should do on all build servers. if test fails, check if platform has become slower ;-)
-		Map<String, Object> results = fut.get();
+//		Collection<Tuple2<String, Object>>	results	= 
+			fut.get();
 		
 //		// Write values to property files for hudson plot plugin.
 //		Collection<Tuple2<String, Object>>	results	= fut.get(sus, timeout);
@@ -101,7 +99,7 @@ public class BDIV3CreationTest //extends TestCase
 		
 //		sus	= null;
 		platform	= null;
-		fut	= null;
+//		fut	= null;
 		
 //		try
 //		{

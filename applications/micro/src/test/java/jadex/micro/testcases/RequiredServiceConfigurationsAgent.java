@@ -6,6 +6,7 @@ import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.Boolean3;
@@ -22,9 +23,9 @@ import jadex.micro.annotation.Results;
 /**
  *  Test if binding of required service info can be overridden in configuration.
  */
-@RequiredServices(@RequiredService(name="as", type=IAService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="as", type=IAService.class, scope=ServiceScope.PLATFORM))
 @Configurations({
-	@Configuration(name="a", requiredservices=@RequiredService(name="as", type=IAService.class, scope=RequiredServiceInfo.SCOPE_COMPONENT_ONLY)),
+	@Configuration(name="a", requiredservices=@RequiredService(name="as", type=IAService.class, scope=ServiceScope.COMPONENT_ONLY)),
 	@Configuration(name="b")
 })
 @Results(@Result(name="testresults", clazz=Testcase.class)) 
@@ -44,7 +45,7 @@ public class RequiredServiceConfigurationsAgent extends JunitAgentTest
 		RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getServiceInfo("as");
 //		System.out.println(rsi.getDefaultBinding().getScope());
 		TestReport tr = new TestReport("#1", "Test required service overriding.");
-		if(rsi.getDefaultBinding().getScope().equals(RequiredServiceInfo.SCOPE_COMPONENT_ONLY))
+		if(rsi.getDefaultBinding().getScope().equals(ServiceScope.COMPONENT_ONLY))
 		{
 			tr.setSucceeded(true);
 		}

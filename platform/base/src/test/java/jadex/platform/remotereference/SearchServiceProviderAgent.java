@@ -1,7 +1,7 @@
 package jadex.platform.remotereference;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.future.IFuture;
@@ -18,7 +18,7 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Agent
 @Imports("jadex.micro.*")
-@RequiredServices(@RequiredService(name="local", type=ILocalService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL))
+@RequiredServices(@RequiredService(name="local", type=ILocalService.class, scope=ServiceScope.GLOBAL))
 @ProvidedServices(@ProvidedService(type=ISearchService.class, implementation=@Implementation(expression="$pojoagent")))
 @Service
 public class SearchServiceProviderAgent implements ISearchService

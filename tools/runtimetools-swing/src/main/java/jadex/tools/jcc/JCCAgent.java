@@ -10,7 +10,7 @@ import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -133,7 +133,7 @@ public class JCCAgent implements IComponentStep<Void>
 			{
 				agent.getLogger().info("Searching for platforms matching '"+platforms+"'.");
 				
-				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ILibraryService.class, ServiceScope.GLOBAL))
 					.addResultListener(new TimeoutIntermediateResultListener<ILibraryService>(RETRY_DELAY, agent.getExternalAccess(),
 						new IntermediateExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{

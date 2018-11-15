@@ -31,7 +31,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -386,7 +386,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 		{
 			public void customResultAvailable(IComponentDescription desc)
 			{
-				ILibraryService	ls	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+				ILibraryService	ls	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
 				ls.getClassLoader(desc.getResourceIdentifier())
 					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{

@@ -16,7 +16,7 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.registry.RegistryEvent;
@@ -166,7 +166,7 @@ public class HelplineEvaluation
 					try
 					{
 						// search for person 1 (single: only present on second platform, multi: present once on each platform)
-						found	= firstplatform.searchServices( new ServiceQuery<>(IHelpline.class, RequiredServiceInfo.SCOPE_NETWORK).setServiceTags("person1")).get();
+						found	= firstplatform.searchServices( new ServiceQuery<>(IHelpline.class, ServiceScope.NETWORK).setServiceTags("person1")).get();
 					}
 					catch(Exception e)
 					{

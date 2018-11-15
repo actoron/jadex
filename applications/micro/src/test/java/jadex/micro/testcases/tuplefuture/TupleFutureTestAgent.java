@@ -34,7 +34,7 @@ import jadex.micro.annotation.Results;
 {
 	@RequiredService(name="ts", type=ITestService.class)
 		// Hangs with global search during micro tests?
-//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, create=true, creationinfo=@CreationInfo(type="ta"))),
+//		binding=@Binding(scope=ServiceScope.GLOBAL, create=true, creationinfo=@CreationInfo(type="ta"))),
 })
 @Configurations(@Configuration(name="default", components=@Component(type="ta")))
 @Results(@Result(name="testresults", clazz=Testcase.class))

@@ -256,7 +256,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 //			args = newargs;
 //		}
 //		
-		IPlatformConfiguration conf = STest.getDefaultTestConfig();
+		IPlatformConfiguration conf = STest.getLocalTestConfig(getName());	// Avoid dependencies to created platforms
 //		IPlatformConfiguration conf = Starter.processArgs(args);
 //		this.timeout	= Starter.getDefaultTimeout(null);	// Initial timeout for starting platform.
 		this.timeout	= conf.getDefaultTimeout();	// Initial timeout for starting platform.
@@ -370,7 +370,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 									System.out.print(".");
 									if(runtests)
 									{
-										ComponentTest test = SAME_PLATFORM ? new ComponentTest(platform, model, this) : new ComponentTest(conf, args, roots, platform, model, this);
+										ComponentTest test = SAME_PLATFORM ? new ComponentTest(platform, model, this) : new ComponentTest(STest.getLocalTestConfig(abspath), args, roots, platform, model, this);
 										test.setName(abspath);
 										addTest(test);
 										if(ctimeout == Timeout.NONE || test.getTimeout() == Timeout.NONE)

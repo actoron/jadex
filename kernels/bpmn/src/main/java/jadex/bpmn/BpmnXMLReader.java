@@ -50,6 +50,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
@@ -1514,7 +1515,7 @@ public class BpmnXMLReader
 							// todo: interceptors, proxytype
 							
 							RequiredServiceBinding binding = new RequiredServiceBinding(null, compname, comptype, 
-									scope, null, proxytype==null || proxytype.length()==0? 
+									ServiceScope.valueOf(scope), null, proxytype==null || proxytype.length()==0? 
 										BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED: proxytype);
 							bindings.put(name, binding);
 						}

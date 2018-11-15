@@ -9,6 +9,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -19,7 +20,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
-import jadex.micro.annotation.RequiredService;
 import jadex.platform.TestAgent;
 
 /**
@@ -61,7 +61,7 @@ public class ServiceCallbackTestAgent extends TestAgent	implements ICalledServic
 			IFuture<IExternalAccess> fut = platform.createComponent(ci);	// Start as subcomponent in local case
 			IComponentIdentifier provider = fut.get().getId();
 			ICallerService	service	= local ? agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class)).get()
-				: agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class, RequiredService.SCOPE_GLOBAL)).get(); // Search globally in remote case.
+				: agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICallerService.class, ServiceScope.GLOBAL)).get(); // Search globally in remote case.
 			service.doCall(this).get();
 			platform.getExternalAccess(provider).killComponent().get();
 			ret.get().setSucceeded(true);

@@ -10,7 +10,7 @@ The goal plan tree is an *AND/OR* decomposition of the problem.
 To achieve a goal, *only one* of the available plans needs to work (*OR* decomposition, e.g. "throw pancake" *or* "flip with spatula").
 For a plan to complete, *all* subgoals of the plan need to be successful (*AND* decomposition, e.g. "pancake mix ready" *and* "pancake flipped").
 
-![](example-goalplantree.png)
+![](example-goalplantree.svg)
 
 *Figure C.1: Example Goal Plan Tree (inspired by a [paper of Broekens et al.](https://link.springer.com/chapter/10.1007%2F978-3-642-16178-0_5))*
  
@@ -35,7 +35,7 @@ because we try to fetch a charging station object from an empty set:
 WARNING: Plan 'loadBattery' threw exception: java.util.NoSuchElementException
 	at java.util.LinkedHashMap$LinkedHashIterator.nextNode(LinkedHashMap.java:721)
 	at java.util.LinkedHashMap$LinkedKeyIterator.next(LinkedHashMap.java:742)
-	at jadex.quickstart.cleanerworld.single.CleanerBDIAgent.loadBattery(CleanerBDIAgent.java:170)
+	at quickstart.cleanerworld.single.CleanerBDIAgent.loadBattery(CleanerBDIAgent.java:170)
 ```
 
 We now want to make sure that we always know some charging station by using a subgoal
@@ -161,7 +161,7 @@ We also have to alter our load battery plan to use this new goal:
 Execute the program and check what happens. Again, an error occurs, but a different one:
 
 ```
-WARNING: Plan 'loadBattery' threw exception: jadex.bdiv3.runtime.impl.GoalFailureException: No more candidates: jadex.quickstart.cleanerworld.single.CleanerBDIAgent$QueryChargingStation...
+WARNING: Plan 'loadBattery' threw exception: jadex.bdiv3.runtime.impl.GoalFailureException: No more candidates: quickstart.cleanerworld.single.CleanerBDIAgent$QueryChargingStation...
 ```
 
 Now the agent has the goal to find a charging station, but there are no plans for this goal.
@@ -179,7 +179,7 @@ extend other classes or implement interfaces etc.
 With regard to Jadex features, this goal only uses features that we already encountered: The target condition
 as implemented in the method `isStationKnown()` depends on our new `stations` belief, so it will be re-checked,
 whenever our sensor adds a charging station to this belief set. When the set is not empty, we remember the first station.
-Once we remembered a station, the method will return true and the goal will be completed.
+Once we remembered a station, the method will return `true` and the goal will be completed.
 
 
 ### The `IPlan` Parameter and the `dispatchSubgoal()` Method

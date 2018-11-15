@@ -9,8 +9,7 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.extension.rs.publish.GrizzlyRestServicePublishService;
@@ -112,7 +111,7 @@ public class RSHelloTest //extends TestCase
 		{
 //		ThreadSuspendable sus = new ThreadSuspendable();
 
-		IFuture<IHelloService> fut = extAcc.searchService( new ServiceQuery<>( IHelloService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+		IFuture<IHelloService> fut = extAcc.searchService( new ServiceQuery<>( IHelloService.class, ServiceScope.PLATFORM));
 
 		IHelloService hs = fut.get();
 

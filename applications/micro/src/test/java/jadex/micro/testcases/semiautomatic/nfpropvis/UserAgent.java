@@ -35,7 +35,7 @@ import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.sensor.service.AverageEvaluator;
 import jadex.bridge.sensor.service.WaitqueueEvaluator;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.SServiceProvider;
@@ -55,7 +55,7 @@ import jadex.micro.annotation.RequiredServices;
 /**
  *  Ranking of a requires services via an waitqueue ranker.
  */
-@RequiredServices(@RequiredService(name="aser", type=ICryptoService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM))
+@RequiredServices(@RequiredService(name="aser", type=ICryptoService.class, multiple=true, scope=ServiceScope.PLATFORM))
 //ranker="new AverageEvaluator(new WaitqueueEvaluator(new MethodInfo(ICryttoService.class.getMethod(\"encrypt\", new Class[]{String.class}))))"
 
 @Agent
@@ -63,7 +63,7 @@ import jadex.micro.annotation.RequiredServices;
 @Configurations({@Configuration(name="default"), @Configuration(name="with gui")})
 
 //@RequiredServices(@RequiredService(name="cryptoser", type=ICryptoService.class, multiple=true, 
-//	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, dynamic=true),
+//	binding=@Binding(scope=ServiceScope.PLATFORM, dynamic=true),
 //	nfreqs=@NFRequirement(description="select service with smallest call waitqueue", 
 //	value=WaitqueueProperty.class, methodname="encrypt", ranker=WaitqueueEvaluator.class)))
 public class UserAgent

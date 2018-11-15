@@ -21,7 +21,7 @@ import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CMSStatusEvent.CMSCreatedEvent;
@@ -183,7 +183,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 				valmap.put(null, self);
 				((DefaultListModel)pllist.getModel()).add(0, self);
 				
-				access.searchServices( new ServiceQuery<>(IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				access.searchServices( new ServiceQuery<>(IProxyAgentService.class, ServiceScope.PLATFORM))
 					.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()
 				{
 					public void intermediateResultAvailable(final IProxyAgentService ser)

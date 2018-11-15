@@ -1581,7 +1581,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 //	{
 //		final Future<ITimer> ret = new Future<ITimer>();
 //		
-//		IClockService cs = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		IClockService cs = getComponent().getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 //		ITimedObject	to	=  	new ITimedObject()
 //		{
 //			public void timeEventOccurred(long currenttime)

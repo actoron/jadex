@@ -13,7 +13,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -159,7 +159,7 @@ public class GenerateService implements IGenerateService
 					// Component created, now get the calculation service.
 					public void customResultAvailable(IExternalAccess result)
 					{
-						result.searchService(new ServiceQuery<>(ICalculateService.class, RequiredServiceInfo.SCOPE_COMPONENT_ONLY)).addResultListener(
+						result.searchService(new ServiceQuery<>(ICalculateService.class, ServiceScope.COMPONENT_ONLY)).addResultListener(
 							agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<ICalculateService>(ret)
 						{
 							public void customResultAvailable(ICalculateService result)

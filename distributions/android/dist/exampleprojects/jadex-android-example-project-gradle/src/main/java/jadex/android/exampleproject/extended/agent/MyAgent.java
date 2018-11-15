@@ -26,7 +26,7 @@ import jadex.micro.annotation.RequiredServices;
 	@ProvidedService(name="agentinterface", type=IAgentInterface.class)
 })
 @RequiredServices({
-	@RequiredService(name="context", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+	@RequiredService(name="context", type=IContextService.class, binding=@Binding(scope=ServiceScope.PLATFORM))
 })
 @Service
 @Agent

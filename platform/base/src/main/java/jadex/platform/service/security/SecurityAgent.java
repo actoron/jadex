@@ -34,6 +34,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -43,6 +44,7 @@ import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -51,6 +53,7 @@ import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -74,7 +77,6 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 import jadex.platform.service.registryv2.SuperpeerClientAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.AbstractX509PemSecret;
@@ -101,7 +103,7 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
 	@Argument(name="roles", clazz=String.class, defaultvalue="null")
 })
 //@Service // This causes problems because the wrong preprocessor is used (for pojo services instead of remote references)!!!
-@ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=RequiredService.SCOPE_PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
+@ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
 public class SecurityAgent implements ISecurityService, IInternalService
 {
@@ -605,7 +607,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (cs != null && !isSecurityMessage(header) && !cs.isExpiring())
 			return new Future<byte[]>(cs.encryptAndSign(content));
 		
-		IFuture<byte[]> ret = agent.scheduleStep(new IComponentStep<byte[]>()
+		return agent.scheduleStep(new IComponentStep<byte[]>()
 		{
 			public IFuture<byte[]> execute(IInternalAccess ia)
 			{
@@ -647,14 +649,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					
 					if (cs != null)
 					{
-						try
-						{
-							ret.setResult(cs.encryptAndSign(content));
-						}
-						catch (Exception e)
-						{
-							ret.setException(e);
-						}
+						ret.setResult(cs.encryptAndSign(content));
 					}
 					else
 					{
@@ -665,18 +660,23 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							hstate = initializingcryptosuites.get(rplat);
 						}
 						
-						hstate.getResultFuture().addResultListener(new ExceptionDelegationResultListener<ICryptoSuite, byte[]>(ret)
+						// Add sim blocker and print error msg when handshake doesn't work
+						SSimulation.addBlocker(ret);
+						ia.waitForDelay(Starter.getScaledDefaultTimeout(ia.getId(), 0.5), true)
+							.addResultListener(v ->
+						{
+							if(!ret.isDone())
+							{
+								System.out.println("Security handshake timeout from "+agent+" to "+rplat);
+								ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
+							}
+						});
+							
+						hstate.getResultFuture().addResultListener(new ExceptionDelegationResultListener<ICryptoSuite, byte[]>(ret, true)
 						{
 							public void customResultAvailable(ICryptoSuite result) throws Exception
 							{
-								try
-								{
-									ret.setResult(result.encryptAndSign(content));
-								}
-								catch (Exception e)
-								{
-									ret.setException(e);
-								}
+								ret.setResultIfUndone(result.encryptAndSign(content));
 							}
 						});
 					}
@@ -685,8 +685,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				return ret;
 			}
 		});
-		((IInternalExecutionFeature) execfeat).addSimulationBlocker(ret);
-		return ret;
 	}
 	
 	/**

@@ -14,7 +14,7 @@ import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.MethodInfo;
@@ -43,8 +43,8 @@ import jadex.micro.testcases.TestAgent;
 @Agent
 @RequiredServices(
 {
-	@RequiredService(name="ts", type=ITestService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL),
-	@RequiredService(name="aser", type=ITestService.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL,
+	@RequiredService(name="ts", type=ITestService.class, scope=ServiceScope.GLOBAL),
+	@RequiredService(name="aser", type=ITestService.class, multiple=true, scope=ServiceScope.GLOBAL,
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))
 })
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
@@ -57,18 +57,18 @@ public class NFLatencyTestAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+//		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
 		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
-				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
+//				agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
 				tc.addReport(result);
 				testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
-						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
+//						agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 						tc.addReport(result);
 						ret.setResult(null);
 					}
@@ -108,7 +108,7 @@ public class NFLatencyTestAgent extends TestAgent
 		disableLocalSimulationMode().get();
 		
 //		createPlatform(null)
-		IPlatformConfiguration config = STest.getDefaultTestConfig();
+		IPlatformConfiguration config = STest.getDefaultTestConfig(getClass());
 		config.getExtendedPlatformConfiguration().setSimul(false);
 		config.getExtendedPlatformConfiguration().setSimulation(false);
 		createPlatform(config, null).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(
@@ -205,7 +205,7 @@ public class NFLatencyTestAgent extends TestAgent
 //		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
 		
 		// Add awarenessinfo for remote platform
-//		IAwarenessManagementService awa = agent.getServiceProvider().searchService( new ServiceQuery<>( IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+//		IAwarenessManagementService awa = agent.getServiceProvider().searchService( new ServiceQuery<>( IAwarenessManagementService.class, ServiceScope.PLATFORM)).get();
 //		AwarenessInfo info = new AwarenessInfo(cid.getRoot(), AwarenessInfo.STATE_ONLINE, -1, 
 //			null, null, null, SReflect.getInnerClassName(this.getClass()));
 //		awa.addAwarenessInfo(info).get();

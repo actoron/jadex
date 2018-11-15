@@ -38,7 +38,7 @@ public class PojoHelloWorldAgent
 	{
 //		System.out.println(agent.getComponentFeature(IArgumentsFeature.class).getArgument("welcome text"));
 		
-//		IClockService cl = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		IClockService cl = agent.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 //		System.out.println("clockservice: "+cl);
 		
 //		agent.getComponentFeature(IExecutionFeature.class).waitForDelay(2000, new IComponentStep<Void>()

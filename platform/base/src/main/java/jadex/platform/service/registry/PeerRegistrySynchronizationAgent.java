@@ -2,7 +2,7 @@ package jadex.platform.service.registry;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -36,7 +36,7 @@ public class PeerRegistrySynchronizationAgent
 		try
 		{
 			// Kill superpeer agent
-			ISuperpeerRegistrySynchronizationService spser = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+			ISuperpeerRegistrySynchronizationService spser = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ISuperpeerRegistrySynchronizationService.class, ServiceScope.PLATFORM));
 			
 			if(spser!=null)
 			{
@@ -55,7 +55,7 @@ public class PeerRegistrySynchronizationAgent
 //	public void terminate()
 //	{
 //		// Produces problems in platform shutdown
-//		IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		IComponentManagementService cms = component.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 //		cms.createComponent("registrysuperpeer", SuperpeerRegistrySynchronizationAgent.class.getName()+".class", null);
 //	}
 }

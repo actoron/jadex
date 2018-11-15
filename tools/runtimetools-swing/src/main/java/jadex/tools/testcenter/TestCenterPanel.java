@@ -299,7 +299,7 @@ public class TestCenterPanel extends JSplitPanel
 					, "Save")==JFileChooser.APPROVE_OPTION)
 				{
 //					SServiceProvider.getService(plugin.getJCC().getJCCAccess().getServiceProvider(),
-//						ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
+//						ILibraryService.class, ServiceScope.PLATFORM).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 //					{
 //						public void customResultAvailable(Object result)
 					plugin.getJCC().getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>(TestCenterPanel.this)

@@ -1,8 +1,9 @@
 package jadex.base.test.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
-import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
@@ -12,18 +13,6 @@ import jadex.commons.SUtil;
  */
 public class STest 
 {
-
-    public static IExternalAccess createPlatform() 
-    {
-        return createPlatform(getDefaultTestConfig());
-    }
-
-    public static IExternalAccess createPlatform(IPlatformConfiguration config) 
-    {
-        IExternalAccess access = Starter.createPlatform(config).get();
-        return access;
-    }
-
     // one time network pass for this vm.
     public static final String	testnetwork_name	= "test";
     //public static final String	testnetwork_pass	= SUtil.createUniqueId();
@@ -35,9 +24,20 @@ public class STest
     	testnetwork_pass = "key:" + new String(Base64.encodeNoPadding(key), SUtil.UTF8);
     }
     
-    public static IPlatformConfiguration getDefaultTestConfig() 
+    /** Counter for unique platform numbers. */
+	static AtomicInteger	platno	= new AtomicInteger(0);
+
+    /**
+     *  Get local (no communication) test configuration using a unique platform name derived from the test name.
+     *  Attention: The name is unique and the config can not be reused for multiple platforms!
+     *  @param test	The test name.
+     *  @return The default configuration with a unique platform name.
+     */
+    public static IPlatformConfiguration getLocalTestConfig(String test)
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
+		config.setPlatformName(test+"-"+platno.getAndIncrement());
+
         // Do not use multi factory as it is much too slow now :(
 //		config.setValue("kernel_multi", true);
 //		config.setValue("kernel_micro", false);
@@ -47,14 +47,6 @@ public class STest
 		config.setValue("kernel_bdix", true);
 		config.setValue("kernel_bdi", true);
 		
-		// Enable intravm awareness, transport and security
-		config.setSuperpeerClient(true);
-		config.setValue("passiveawarenessintravm", true);
-        config.setValue("intravm", true);
-        config.getExtendedPlatformConfiguration().setSecurity(true);
-		config.setNetworkNames(new String[] { testnetwork_name });
-		config.setNetworkSecrets(new String[] { testnetwork_pass });
-
         config.getExtendedPlatformConfiguration().setSimul(true); // start simulation component
         config.getExtendedPlatformConfiguration().setSimulation(true);
 //        config.setValue("bisimulation", true);
@@ -65,7 +57,51 @@ public class STest
 //        config.getExtendedPlatformConfiguration().setDebugFutures(true);
 //		config.setWelcome(true);
 		
+		return config;
+    }
+    
+    /**
+     *  Get a local (no communication) test configuration using a unique platform name derived from the test name.
+     *  Attention: The name is unique and the config can not be reused for multiple platforms!
+     *  @param test	The test class.
+     *  @return The default configuration with a unique platform name.
+     */
+    public static IPlatformConfiguration getLocalTestConfig(Class<?> test)
+    {
+    	return getLocalTestConfig(test.getName());
+    }
+
+    
+    /**
+     *  Get the test configuration using a unique platform name derived from the test name.
+     *  Attention: The name is unique and the config can not be reused for multiple platforms!
+     *  @param test	The test name.
+     *  @return The default configuration with a unique platform name.
+     */
+    public static IPlatformConfiguration getDefaultTestConfig(String test)
+    {
+    	IPlatformConfiguration config = getLocalTestConfig(test);
+    	
+		// Enable intravm awareness, transport and security
+		config.setSuperpeerClient(true);
+		config.setValue("passiveawarenessintravm", true);
+        config.setValue("intravm", true);
+        config.getExtendedPlatformConfiguration().setSecurity(true);
+		config.setNetworkNames(new String[] { testnetwork_name });
+		config.setNetworkSecrets(new String[] { testnetwork_pass });
+		
         return config;
+    }
+    
+    /**
+     *  Get the test configuration using a unique platform name derived from the test class.
+     *  Attention: The name is unique and the config can not be reused for multiple platforms!
+     *  @param test	The test class.
+     *  @return The default configuration with a unique platform name.
+     */
+    public static IPlatformConfiguration getDefaultTestConfig(Class<?> test)
+    {
+    	return getDefaultTestConfig(test.getName());
     }
     
     public static void terminatePlatform(IExternalAccess platform) 

@@ -9,6 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -33,8 +34,8 @@ import jadex.micro.annotation.RequiredServices;
 @ProvidedServices(@ProvidedService(type=IJavaWrapperService.class,
 	implementation=@Implementation(expression="$pojoagent")))
 @RequiredServices({
-	@RequiredService(name="tpservice", type=IThreadPoolService.class, scope=RequiredService.SCOPE_PLATFORM),
-	@RequiredService(name="libservice", type=ILibraryService.class, scope=RequiredService.SCOPE_PLATFORM)
+	@RequiredService(name="tpservice", type=IThreadPoolService.class, scope=ServiceScope.PLATFORM),
+	@RequiredService(name="libservice", type=ILibraryService.class, scope=ServiceScope.PLATFORM)
 })
 @Service
 public class JavaWrapperAgent	implements	IJavaWrapperService

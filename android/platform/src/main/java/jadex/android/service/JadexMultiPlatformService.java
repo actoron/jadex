@@ -19,6 +19,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.platform.IJadexMultiPlatformBinder;
 import jadex.commons.future.DefaultResultListener;
@@ -137,10 +138,10 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 
 	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz)
 	{
-		return getService(platformId, serviceClazz, RequiredServiceInfo.SCOPE_PLATFORM);
+		return getService(platformId, serviceClazz, ServiceScope.PLATFORM);
 	}
 
-	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz, String scope)
+	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz, ServiceScope scope)
 	{
 		return jadexPlatformManager.getService(platformId, serviceClazz, scope);
 	}

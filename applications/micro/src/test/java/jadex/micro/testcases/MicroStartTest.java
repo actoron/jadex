@@ -2,8 +2,6 @@ package jadex.micro.testcases;
 
 import java.io.File;
 
-import org.junit.Ignore;
-
 import jadex.base.test.ComponentTestSuite;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -78,6 +76,9 @@ public class MicroStartTest extends ComponentTestSuite
 		"TimeUserAgent",
 		"SubscriberAgent",
 		"lottery/PlayerAgent",
+		"lottery/HumanPlayerAgent",
+		"lottery\\PlayerAgent",
+		"lottery\\HumanPlayerAgent",
 		
 		// Todo: fix race condition between shutdown and autocreate
 		"mandelbrot",

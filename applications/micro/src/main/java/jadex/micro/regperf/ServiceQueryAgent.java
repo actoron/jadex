@@ -9,7 +9,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
@@ -39,7 +39,7 @@ public class ServiceQueryAgent
 			{
 				final long start = System.currentTimeMillis();
 				
-				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IExampleService.class, RequiredServiceInfo.SCOPE_NETWORK))
+				agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IExampleService.class, ServiceScope.NETWORK))
 					.addIntermediateResultListener(new IIntermediateResultListener<IExampleService>()
 				{
 					Set<IComponentIdentifier> plats = new HashSet<IComponentIdentifier>();

@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.publish.IPublishService;
 
 /**
@@ -29,7 +29,7 @@ public @interface ProvidedService
 	/** 
 	 *  The visibility scope.
 	 */
-	public String scope() default RequiredServiceInfo.SCOPE_GLOBAL;
+	public ServiceScope scope() default ServiceScope.GLOBAL;
 	
 	/**
 	 *  The service implementation.

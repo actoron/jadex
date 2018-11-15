@@ -39,34 +39,34 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		AbstractAuthenticationSecret clientsecret = AbstractAuthenticationSecret.fromKeyPair(ca, true);
 		AbstractAuthenticationSecret serversecret = AbstractAuthenticationSecret.fromKeyPair(cert, false, ca);
 		
-		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig();
+		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(GlobalSuperpeerTest.class);
 		baseconf.setValue("superpeerclient.awaonly", false);
-		baseconf.setValue("superpeerclient.pollingrate", WAITFACTOR/2); 	// -> 1500 millis.
-		baseconf.setValue("superpeerclient.contimeout", WAITFACTOR/2); 	// -> 1500 millis.
+		baseconf.setValue("superpeerclient.contimeout", WAITFACTOR*2);
 		baseconf.setValue("passiveawarenessintravm", false);
 		baseconf.setValue("passiveawarenesscatalog", true);
 		baseconf.setValue("rt", true);
-		baseconf.setValue("platformurls", "intravm://ssp@localhost:"+sspport);
+		baseconf.setValue("platformurls", "intravm://GlobalSuperpeerTestSSP@localhost:"+sspport);
 		baseconf.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
 		baseconf.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass);
 		// Remote only -> no simulation please
 		baseconf.getExtendedPlatformConfiguration().setSimul(false);
 		baseconf.getExtendedPlatformConfiguration().setSimulation(false);
 //		baseconf.setValue("security.debug", true);
+		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 			
 		CLIENTCONF	= baseconf.clone();
-		CLIENTCONF.setPlatformName("client_*");
+		CLIENTCONF.setPlatformName("GlobalSuperpeerTestClient_*");
 //		CLIENTCONF.setLogging(true);
 //		CLIENTCONF.setValue("rt.debug", true);
 		
 		PROCONF	= baseconf.clone();
 		PROCONF.addComponent(NetworkProviderAgent.class);
 		PROCONF.addComponent(LocalProviderAgent.class);
-		PROCONF.setPlatformName("provider_*");
+		PROCONF.setPlatformName("GlobalSuperpeerTestProvider_*");
 		
 		SPCONF	= baseconf.clone();
 		SPCONF.setValue("superpeer", true);
-		SPCONF.setPlatformName("SP_*");
+		SPCONF.setPlatformName("GlobalSuperpeerTestSP_*");
 //		SPCONF.setValue("rt.debug", true);
 //		SPCONF.setLogging(true);
 		
@@ -75,7 +75,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		RELAYCONF.setValue("supersuperpeer", true);
 		RELAYCONF.setValue("rt.forwarding", true);
 		RELAYCONF.setValue("intravm.port", sspport);
-		RELAYCONF.setPlatformName("ssp");
+		RELAYCONF.setPlatformName("GlobalSuperpeerTestSSP");
 		RELAYCONF.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME);
 		RELAYCONF.setNetworkSecrets(serversecret.toString());
 //		RELAYCONF.setLogging(true);

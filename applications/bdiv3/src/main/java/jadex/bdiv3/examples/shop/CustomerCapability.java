@@ -12,6 +12,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
@@ -24,8 +25,8 @@ import jadex.micro.annotation.RequiredServices;
 @Capability
 @Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.bdi.examples.shop.CustomerViewerPanel\""))
 @RequiredServices({
-	@RequiredService(name="localshopservices", type=IShopService.class, multiple=true, scope=RequiredService.SCOPE_PLATFORM),
-	@RequiredService(name="remoteshopservices", type=IShopService.class, multiple=true, scope=RequiredService.SCOPE_GLOBAL),
+	@RequiredService(name="localshopservices", type=IShopService.class, multiple=true, scope=ServiceScope.PLATFORM),
+	@RequiredService(name="remoteshopservices", type=IShopService.class, multiple=true, scope=ServiceScope.GLOBAL),
 })
 public class CustomerCapability
 {

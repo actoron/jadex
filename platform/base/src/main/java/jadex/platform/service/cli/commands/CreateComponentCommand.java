@@ -8,7 +8,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -73,7 +73,7 @@ public class CreateComponentCommand extends ACliCommand
 //			{
 //				final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 //				
-//				ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//				ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 //				{
 //					public void customResultAvailable(final IComponentManagementService cms)
@@ -87,7 +87,7 @@ public class CreateComponentCommand extends ACliCommand
 //						
 //						IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
 //				
-//						comp.searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//						comp.searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 //							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
 //						{
 //							public void customResultAvailable(ILibraryService  libs)
@@ -166,7 +166,7 @@ public class CreateComponentCommand extends ACliCommand
 				
 				IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
 		
-				comp.searchService( new ServiceQuery<>(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				comp.searchService( new ServiceQuery<>(ILibraryService.class, ServiceScope.PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
 				{
 					public void customResultAvailable(ILibraryService  libs)

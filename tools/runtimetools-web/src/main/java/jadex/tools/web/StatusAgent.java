@@ -14,7 +14,7 @@ import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.IServiceRegistry;
 import jadex.bridge.service.search.ServiceEvent;
@@ -44,14 +44,13 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Publish;
-import jadex.micro.annotation.RequiredService;
 
 /**
  *  An agent to provide a platform status view in the web.
  */
 @ProvidedServices(
 	@ProvidedService(name="status", type=IStatusService.class,
-		scope=RequiredService.SCOPE_PLATFORM,
+		scope=ServiceScope.PLATFORM,
 		implementation=@Implementation(expression="$pojoagent"),
 		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="[http://localhost:8081/]status"
 //		properties={
@@ -230,7 +229,7 @@ public class StatusAgent implements IStatusService
 			.setEventMode()
 			.setOwner(agent.getId())
 			.setNetworkNames((String[])null)
-			.setScope(RequiredServiceInfo.SCOPE_GLOBAL));
+			.setScope(ServiceScope.GLOBAL));
 	}
 	
 	/**
@@ -239,7 +238,7 @@ public class StatusAgent implements IStatusService
 	// No intermediate for easier REST?
 	public IFuture<Collection<Map<String, Object>>>	getMemInfo()
 	{
-		Collection<IMemstatService>	stats	= agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IMemstatService.class, RequiredService.SCOPE_PLATFORM));
+		Collection<IMemstatService>	stats	= agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IMemstatService.class, ServiceScope.PLATFORM));
 		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();
 		for(IMemstatService stat: stats)
 		{

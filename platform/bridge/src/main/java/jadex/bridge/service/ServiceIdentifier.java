@@ -40,7 +40,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	protected IResourceIdentifier rid;
 	
 	/** The scope. */
-	protected String scope;
+	protected ServiceScope scope;
 	
 	/** The network names (shared object with security service). */
 	protected Set<String> networknames;
@@ -66,7 +66,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(IInternalAccess provider, Class<?> type, String servicename, IResourceIdentifier rid, String scope)
+	public ServiceIdentifier(IInternalAccess provider, Class<?> type, String servicename, IResourceIdentifier rid, ServiceScope scope)
 	{
 //		if(!type.isInterface())
 //		{
@@ -86,26 +86,27 @@ public class ServiceIdentifier implements IServiceIdentifier
 		this.supertypes = superinfos.toArray(new ClassInfo[superinfos.size()]);
 		this.servicename = servicename;
 		this.rid = rid;
-		this.scope = scope;
-		@SuppressWarnings("unused")
+		@SuppressWarnings({"unchecked"})
 		Set<String>	networknames = (Set<String>)Starter.getPlatformValue(providerid, Starter.DATA_NETWORKNAMESCACHE);
 		this.networknames	= networknames;
 		this.unrestricted = isUnrestricted(provider, type);
+		
+		setScope(scope);
 	}
 	
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)
+	public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, ServiceScope scope, Set<String> networknames, boolean unrestricted)
 	{
 		this.providerid = providerid;
 		this.type	= type;
 		this.supertypes = supertypes;
 		this.servicename = servicename;
 		this.rid = rid;
-		this.scope = scope;
 		this.networknames = networknames;
 		this.unrestricted = unrestricted;
+		setScope(scope);
 	}
 	
 	//-------- methods --------
@@ -204,9 +205,9 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public String getScope()
+	public ServiceScope getScope()
 	{
-//		return scope==null? RequiredServiceInfo.SCOPE_GLOBAL: scope;
+//		return scope==null? ServiceScope.GLOBAL: scope;
 		return scope;
 	}
 
@@ -214,9 +215,10 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Set the scope.
 	 *  @param scope The scope to set.
 	 */
-	public void setScope(String scope)
+	public void setScope(ServiceScope scope)
 	{
-		this.scope = scope;
+		// default publication scope is platform
+		this.scope = scope!=null ? scope : ServiceScope.PLATFORM;
 	}
 	
 	/**

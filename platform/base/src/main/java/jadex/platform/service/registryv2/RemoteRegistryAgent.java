@@ -7,8 +7,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
@@ -29,7 +29,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Service
 @Agent(name=IRemoteRegistryService.REMOTE_REGISTRY_NAME, autostart=Boolean3.TRUE)
-@ProvidedServices(@ProvidedService(type=IRemoteRegistryService.class, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME, scope=RequiredServiceInfo.SCOPE_NETWORK))
+@ProvidedServices(@ProvidedService(type=IRemoteRegistryService.class, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME, scope=ServiceScope.NETWORK))
 public class RemoteRegistryAgent implements IRemoteRegistryService
 {
 	

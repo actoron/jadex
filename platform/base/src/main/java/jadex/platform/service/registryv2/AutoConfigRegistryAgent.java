@@ -23,7 +23,7 @@ import jadex.bridge.sensor.time.ComponentUptimeProperty;
 import jadex.bridge.sensor.unit.MemoryUnit;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -117,7 +117,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		
 		// todo: use normal searchServices() - internally should find out that it has to use addAll
 		//ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> search = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(
-		//	ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, agent.getComponentIdentifier(), null));
+		//	ISuperpeerRegistrySynchronizationService.class, ServiceScope.GLOBAL, null, agent.getComponentIdentifier(), null));
 		
 		searchConfigurableSuperpeers().addResultListener(new IResultListener<Collection<ISuperpeerService>>()
 		{
@@ -409,7 +409,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	protected IFuture<Void> makeSuperpeer(IComponentIdentifier cid)
 	{
 		final Future<Void> ret = new Future<Void>();
-		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<>(IAutoConfigRegistryService.class, ServiceScope.PLATFORM);
 		q.setPlatform(cid.getRoot());
 		agent.getFeature(IRequiredServicesFeature.class).searchService(q).addResultListener(new ExceptionDelegationResultListener<IAutoConfigRegistryService, Void>(ret)
 		{
@@ -428,7 +428,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	protected IFuture<Void> makeClient(IComponentIdentifier cid)
 	{
 		final Future<Void> ret = new Future<Void>();
-		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		ServiceQuery<IAutoConfigRegistryService> q = new ServiceQuery<IAutoConfigRegistryService>(IAutoConfigRegistryService.class, ServiceScope.PLATFORM);
 		q.setPlatform(cid.getRoot());
 		agent.getFeature(IRequiredServicesFeature.class).searchService(q).addResultListener(new ExceptionDelegationResultListener<IAutoConfigRegistryService, Void>(ret)
 		{
@@ -585,7 +585,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		ISuperpeerService spser=null;
 		try
 		{
-			spser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+			spser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class, ServiceScope.PLATFORM));
 		}
 		catch(ServiceNotFoundException e)
 		{
@@ -656,7 +656,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 //		IPeerRegistrySynchronizationService pser = null;
 //		try
 //		{
-//			pser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//			pser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IPeerRegistrySynchronizationService.class, ServiceScope.PLATFORM));
 //		}
 //		catch(Exception e)
 //		{
@@ -701,7 +701,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		boolean ret = false;
 		try
 		{
-			ISuperpeerService spser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+			ISuperpeerService spser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class, ServiceScope.PLATFORM));
 			ret = spser!=null;
 		}
 		catch(ServiceNotFoundException e)
@@ -719,7 +719,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 //		boolean ret = false;
 //		try
 //		{
-//			IPeerRegistrySynchronizationService pser = SServiceProvider.getLocalService(agent, IPeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//			IPeerRegistrySynchronizationService pser = SServiceProvider.getLocalService(agent, IPeerRegistrySynchronizationService.class, ServiceScope.PLATFORM);
 //			ret = pser!=null;
 //		}
 //		catch(ServiceNotFoundException e)
@@ -735,7 +735,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	{
 		Future<Collection<ISuperpeerService>> ret = new Future<>();
 		
-		ITerminableIntermediateFuture<ISuperpeerService> search = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ISuperpeerService.class, RequiredServiceInfo.SCOPE_GLOBAL));
+		ITerminableIntermediateFuture<ISuperpeerService> search = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ISuperpeerService.class, ServiceScope.GLOBAL));
 		
 		search.addResultListener(new IResultListener<Collection<ISuperpeerService>>()
 		{
@@ -751,7 +751,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 					for (ISuperpeerService sp : sps)
 						spsmap.put(((IService) sp).getServiceId().getProviderId().getRoot(), sp);
 					
-					ITerminableIntermediateFuture<IAutoConfigRegistryService> search = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_GLOBAL));
+					ITerminableIntermediateFuture<IAutoConfigRegistryService> search = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IAutoConfigRegistryService.class, ServiceScope.GLOBAL));
 					search.addResultListener(new IResultListener<Collection<IAutoConfigRegistryService>>()
 					{
 						public void resultAvailable(Collection<IAutoConfigRegistryService> acs)
@@ -787,7 +787,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	{
 		Future<Collection<IAutoConfigRegistryService>> ret = new Future<>();
 		
-		ITerminableIntermediateFuture<IAutoConfigRegistryService> search = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IAutoConfigRegistryService.class, RequiredServiceInfo.SCOPE_GLOBAL));
+		ITerminableIntermediateFuture<IAutoConfigRegistryService> search = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IAutoConfigRegistryService.class, ServiceScope.GLOBAL));
 		
 		search.addResultListener(new IResultListener<Collection<IAutoConfigRegistryService>>()
 		{
@@ -803,7 +803,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 					for (IAutoConfigRegistryService ac : acs)
 						acsmap.put(((IService) ac).getServiceId().getProviderId().getRoot(), ac);
 					
-					ITerminableIntermediateFuture<ISuperpeerService> search	= agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ISuperpeerService.class, RequiredServiceInfo.SCOPE_GLOBAL));
+					ITerminableIntermediateFuture<ISuperpeerService> search	= agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(ISuperpeerService.class, ServiceScope.GLOBAL));
 
 					search.addResultListener(new IResultListener<Collection<ISuperpeerService>>()
 					{

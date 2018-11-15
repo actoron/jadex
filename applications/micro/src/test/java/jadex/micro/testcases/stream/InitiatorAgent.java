@@ -40,7 +40,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
+//		agent.getLogger().severe("Testagent test local: "+agent.getDescription());
 		testLocal(1).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
@@ -53,12 +53,12 @@ public class InitiatorAgent extends TestAgent
 				} 
 				else 
 				{
-					agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
+//					agent.getLogger().severe("Testagent test remote: "+agent.getDescription());
 					testRemote(2).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 					{
 						public void customResultAvailable(TestReport result)
 						{
-							agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
+//							agent.getLogger().severe("Testagent tests finished: "+agent.getDescription());
 							tc.addReport(result);
 							for(TestReport tr: tc.getReports())
 								System.out.println(tr.isSucceeded());
@@ -126,24 +126,24 @@ public class InitiatorAgent extends TestAgent
 			@Override
 			public void customResultAvailable(Map<String, Object> result)
 			{
-				agent.getLogger().severe("Testagent receiver finished: "+agent.getDescription());
+//				agent.getLogger().severe("Testagent receiver finished: "+agent.getDescription());
 				super.customResultAvailable(result);
 			}
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				agent.getLogger().severe("Testagent receiver failed: "+agent.getDescription()+", "+exception);
+//				agent.getLogger().severe("Testagent receiver failed: "+agent.getDescription()+", "+exception);
 				super.exceptionOccurred(exception);
 			}
 		};
 		
-		agent.getLogger().severe("Testagent setup receiver: "+agent.getDescription());
+//		agent.getLogger().severe("Testagent setup receiver: "+agent.getDescription());
 		createComponent("jadex/micro/testcases/stream/ReceiverAgent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				agent.getLogger().severe("Testagent setup receiver done: "+agent.getDescription());
+//				agent.getLogger().severe("Testagent setup receiver done: "+agent.getDescription());
 				IMessageFeature mf = agent.getFeature(IMessageFeature.class);
 				mf.createOutputConnection(agent.getId(), cid, null)
 					.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, TestReport>(ret)

@@ -13,7 +13,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.filetransfer.IFileTransferService;
@@ -173,7 +173,7 @@ public class UploadFileCommand extends ACliCommand
 		if(cid!=null)
 		{
 			// global search not a good idea due to long timeout but what to do else?
-			ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IFileTransferService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+			ia.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IFileTransferService.class, ServiceScope.GLOBAL))
 				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<IFileTransferService>()
 			{
 				public void intermediateResultAvailable(IFileTransferService result)
@@ -206,7 +206,7 @@ public class UploadFileCommand extends ACliCommand
 			}));
 			
 			// does not work due to cid has no address
-//			ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//			ia.getServiceContainer().searchService( new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //				.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IDeploymentService>(ret)
 //			{
 //				public void customResultAvailable(final IComponentManagementService cms)
@@ -219,7 +219,7 @@ public class UploadFileCommand extends ACliCommand
 //							{
 //								public IFuture<IDeploymentService> execute(IInternalAccess ia)
 //								{
-//									return ia.getServiceContainer().searchService(IDeploymentService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//									return ia.getServiceContainer().searchService(IDeploymentService.class, ServiceScope.PLATFORM);
 //								}
 //							}).addResultListener(new DelegationResultListener<IDeploymentService>(ret));
 //						}
@@ -229,7 +229,7 @@ public class UploadFileCommand extends ACliCommand
 		}
 		else
 		{
-			ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IFileTransferService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+			ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IFileTransferService.class, ServiceScope.PLATFORM))
 				.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IFileTransferService>(ret)));
 		}
 		

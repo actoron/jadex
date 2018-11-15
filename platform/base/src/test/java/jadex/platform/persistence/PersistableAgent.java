@@ -5,7 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.modelinfo.IPersistInfo;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.persistence.IPersistenceService;
@@ -42,7 +42,7 @@ public class PersistableAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IPersistenceService.class, ServiceScope.PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IPersistenceService, Void>(ret)
 		{
 			public void customResultAvailable(IPersistenceService result)

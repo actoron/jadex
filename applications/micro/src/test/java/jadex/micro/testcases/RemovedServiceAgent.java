@@ -12,6 +12,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.ServiceInvalidException;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -25,7 +26,6 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.servicecall.DecoupledServiceAgent;
@@ -118,7 +118,7 @@ public class RemovedServiceAgent extends JunitAgentTest
 			public void customResultAvailable(final IExternalAccess exta)
 			{
 				// Get service reference of created agent.
-				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, RequiredService.SCOPE_PLATFORM))
+				agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, ServiceScope.PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<IServiceCallService, Collection<TestReport>>(testfut)
 				{
 					public void customResultAvailable(final IServiceCallService scs)
@@ -138,7 +138,7 @@ public class RemovedServiceAgent extends JunitAgentTest
 									{
 										final TestReport	tr2	= new TestReport("#"+(++cnt), "Test if service of destroyed "+agentname+" can be found.");
 										testfut.addIntermediateResult(tr2);
-										agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, RequiredService.SCOPE_PLATFORM))
+										agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IServiceCallService.class, ServiceScope.PLATFORM))
 											.addResultListener(new IResultListener<IServiceCallService>()
 										{
 											public void resultAvailable(IServiceCallService result)

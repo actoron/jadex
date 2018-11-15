@@ -57,7 +57,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
@@ -505,7 +505,7 @@ public class ComponentTreePanel extends JSplitPane
 					final IComponentIdentifier	cid	= pctn.getComponentIdentifier();
 					if(cid!=null)
 					{
-						access.searchService( new ServiceQuery<>( ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+						access.searchService( new ServiceQuery<>( ISecurityService.class, ServiceScope.PLATFORM))
 							.addResultListener(new SwingDefaultResultListener<ISecurityService>(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(final ISecurityService sec)

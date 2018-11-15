@@ -22,7 +22,7 @@ import jadex.bridge.component.impl.MsgHeader;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -60,7 +60,6 @@ import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 import jadex.platform.service.transport.AbstractTransportAgent;
 
 /**
@@ -76,7 +75,7 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 //	@Argument(name="addresses", clazz=String.class, defaultvalue="\"ws://ssp1@ngrelay1.actoron.com:80\""),	// TODO: wss, TODO: set in PlatformAgent???
 })
 @ProvidedServices({
-		@ProvidedService(type=ITransportService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
+		@ProvidedService(type=ITransportService.class, scope=ServiceScope.PLATFORM)
 })
 @Features(additional=true, replace=true, value=@Feature(type=IMessageFeature.class, clazz=RelayMessageComponentFeature.class))
 @Service
@@ -199,7 +198,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		directconns = new PassiveLeaseTimeSet<IComponentIdentifier>(keepaliveinterval << 2);
 		
 		ServiceQuery<IRoutingService> query = new ServiceQuery<>(IRoutingService.class);
-		query.setScope(RequiredServiceInfo.SCOPE_GLOBAL).setExcludeOwner(true);//.setServiceTags("forwarding=true");
+		query.setScope(ServiceScope.GLOBAL).setExcludeOwner(true);//.setServiceTags("forwarding=true");
 		agent.getFeature(IRequiredServicesFeature.class).addQuery(query).addResultListener(new IIntermediateResultListener<IRoutingService>()
 		{
 			public void intermediateResultAvailable(IRoutingService result)
@@ -747,7 +746,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 //						try
 //						{
 ////							Collection<IRoutingService> addrs = SServiceProvider.getServices(agent, IRoutingService.class, Binding.SCOPE_GLOBAL).get(MAX_ROUTING_SERVICE_DELAY, true);
-//							Collection<IRoutingService> addrs = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IRoutingService.class, RequiredService.SCOPE_GLOBAL).setServiceTags(new String[]{"forwarding=true"})).get(MAX_ROUTING_SERVICE_DELAY, true);
+//							Collection<IRoutingService> addrs = agent.getFeature(IRequiredServicesFeature.class).searchServices(new ServiceQuery<>(IRoutingService.class, ServiceScope.GLOBAL).setServiceTags(new String[]{"forwarding=true"})).get(MAX_ROUTING_SERVICE_DELAY, true);
 //							for (IRoutingService rs : addrs)
 //							{
 //								IComponentIdentifier rsprov = ((IService) rs).getId().getProviderId();
@@ -822,7 +821,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	{
 		System.out.println("Relay transport in forwarding mode.");
 		
-		agent.getFeature(IProvidedServicesFeature.class).addService("routing", IRoutingService.class, RelayTransportAgent.this, null, RequiredServiceInfo.SCOPE_GLOBAL);
+		agent.getFeature(IProvidedServicesFeature.class).addService("routing", IRoutingService.class, RelayTransportAgent.this, null, ServiceScope.GLOBAL);
 		
 		IUntrustedMessageHandler handler = new IUntrustedMessageHandler()
 		{
@@ -984,7 +983,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		if (ret == null)
 		{
 			IComponentIdentifier relay = getRtComponent(relayplatform);
-			IServiceIdentifier si = BasicService.createServiceIdentifier(relay, new ClassInfo(IRoutingService.class), null, "routing", null, RequiredService.SCOPE_GLOBAL, null, true);
+			IServiceIdentifier si = BasicService.createServiceIdentifier(relay, new ClassInfo(IRoutingService.class), null, "routing", null, ServiceScope.GLOBAL, null, true);
 			ret = (IRoutingService)RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, si);
 			routingservicecache.put(relayplatform, ret);
 		}

@@ -753,7 +753,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					});
 				}
 			}
-//			component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM, false))
+//			component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IExecutionService.class, ServiceScope.PLATFORM, false))
 //				.addResultListener(new IResultListener<IExecutionService>()
 //			{
 //				public void resultAvailable(IExecutionService exe)

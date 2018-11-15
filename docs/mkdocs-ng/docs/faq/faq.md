@@ -15,7 +15,7 @@ Usually, Jadex abstracts from physical adresses to allow transparent remote comp
 But if you still need the adresses Jadex uses to contact a given component (or more exactly, it's platform), you can use the ```ITransportAddressService``` (check the [API documentation](${URLJavaDoc/jadex/bridge/service/types/address/ITransportAddressService.html})). 
 Either add it to your required services or use ```SServiceProvider```:
 ```java
-ITransportAddressService tas = access.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+ITransportAddressService tas = access.getComponentFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ITransportAddressService.class, ServiceScope.PLATFORM));
 String[] addrs = tas.getPlatformAddresses(cid).get();
 ```
 

@@ -13,6 +13,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
@@ -190,7 +191,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 		return getService(platformId, serviceClazz);
 	}
 
-	public <S> IFuture<S> getService(Class<S> serviceClazz, String scope)
+	public <S> IFuture<S> getService(Class<S> serviceClazz, ServiceScope scope)
 	{
 		return getService(platformId, serviceClazz, scope);
 	}

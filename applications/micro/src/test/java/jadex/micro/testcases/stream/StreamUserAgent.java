@@ -3,6 +3,7 @@ package jadex.micro.testcases.stream;
 import java.util.Map;
 
 import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.util.STest;
@@ -12,7 +13,7 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
@@ -32,13 +33,13 @@ import jadex.micro.testcases.TestAgent;
  *  Agent that provides a service with a stream.
  */
 @Agent
-@RequiredServices(@RequiredService(name="ss", type=IStreamService.class, scope=RequiredServiceInfo.SCOPE_GLOBAL))
+@RequiredServices(@RequiredService(name="ss", type=IStreamService.class, scope=ServiceScope.GLOBAL))
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class StreamUserAgent extends TestAgent
 {
 	public IPlatformConfiguration getConfig()
 	{
-		IPlatformConfiguration ret = STest.getDefaultTestConfig();
+		IPlatformConfiguration ret = STest.getDefaultTestConfig(getClass());
 		ret.getExtendedPlatformConfiguration().setSimul(false);
 		ret.getExtendedPlatformConfiguration().setSimulation(false);
 		return ret;
@@ -154,7 +155,7 @@ public class StreamUserAgent extends TestAgent
 //			}
 //		}));
 		
-		IExternalAccess platform = STest.createPlatform(getConfig());
+		IExternalAccess platform = Starter.createPlatform(getConfig()).get();
 		performTests(testno, platform.getId(), tc)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Integer>(ret)
 		{

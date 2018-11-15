@@ -11,7 +11,6 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IntermediateComponentResultListener;
-import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -117,7 +116,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 				{
 //					System.out.println("created search");
 					//TODO
-//					currentsearch = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, component.getComponentIdentifier(), null));
+//					currentsearch = ((ServiceRegistry)getRegistry()).searchServicesAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, ServiceScope.GLOBAL, null, component.getComponentIdentifier(), null));
 					final ISubscriptionIntermediateFuture<ISuperpeerRegistrySynchronizationService> fcurrentsearch = currentsearch;
 					
 					addCall(currentsearch, ret);
@@ -519,7 +518,7 @@ public class PeerRegistrySynchronizationService implements IPeerRegistrySynchron
 //			
 //		}
 //		
-//			((ServiceRegistry)getRegistry()).searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, RequiredServiceInfo.SCOPE_GLOBAL, null, component.getComponentIdentifier(), null))
+//			((ServiceRegistry)getRegistry()).searchServiceAsyncByAskAll(new ServiceQuery<ISuperpeerRegistrySynchronizationService>(ISuperpeerRegistrySynchronizationService.class, ServiceScope.GLOBAL, null, component.getComponentIdentifier(), null))
 //				.addResultListener(new ExceptionDelegationResultListener<ISuperpeerRegistrySynchronizationService, IComponentIdentifier>(ret)
 //			{
 //				public void customResultAvailable(ISuperpeerRegistrySynchronizationService result)

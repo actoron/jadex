@@ -14,7 +14,7 @@ Create a Java class called *ChatC1Agent.java* and use the following:
 
 -   Add the *@Agent* annotation to state that this java file is an agent
 -   Add a *@Description* annotation with an illustrative example explanation such as @Description("This agent uses the clock service.")
--   Add a required service description that defines the name of the service as *clockservice*, its type as *IClockService* and its scope as *RequiredServiceInfo.SCOPE_PLATFORM*. 
+-   Add a required service description that defines the name of the service as *clockservice*, its type as *IClockService* and its scope as *ServiceScope.PLATFORM*. 
 
 The resulting definition should look like the following:
 
@@ -24,7 +24,7 @@ package tutorial;
 @Description("This agent declares a required clock service.")
 @Agent
 @RequiredServices(@RequiredService(name="clockservice", type=IClockService.class,
-  binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+  binding=@Binding(scope=ServiceScope.PLATFORM)))
 public class ChatC1Agent
 {
 }
@@ -119,7 +119,7 @@ So what we need is a possibility to further restrict the search results. This ca
 
 ```java
 IFuture<IComponentFactory>	factory	= SServiceProvider.getService(agent, 
-    IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM, new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT));
+    IComponentFactory.class, ServiceScope.PLATFORM, new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT));
 
 factory.addResultListener(new DefaultResultListener<IComponentFactory>()
 {

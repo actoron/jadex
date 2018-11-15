@@ -18,7 +18,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.settings.ISettingsService;
@@ -83,7 +83,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		
 		// Load plugins.
 		final Future<Void>	ret	= new Future<Void>();
-		controlcenter.getJCCAccess().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		controlcenter.getJCCAccess().searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM))
 			.addResultListener(new SwingExceptionDelegationResultListener<ILibraryService, Void>(ret)
 		{
 			public void customResultAvailable(ILibraryService result)
@@ -435,7 +435,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			public void customResultAvailable(Void result)
 			{
 //				System.out.println("Pushed platform settings");
-				getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				getPlatformAccess().searchService( new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM))
 					.addResultListener(new SwingExceptionDelegationResultListener<ISettingsService, Void>(ret)
 				{
 					public void customResultAvailable(ISettingsService settings)

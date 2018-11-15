@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.NullOutputStream;
@@ -62,7 +62,7 @@ public class ExecuteFileCommand extends ACliCommand
 		final String dir = (String)args.get(null);
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
-		comp.searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		comp.searchService( new ServiceQuery<>( IDaemonThreadPoolService.class, ServiceScope.PLATFORM))
 			.addResultListener(new ExceptionDelegationResultListener<IDaemonThreadPoolService, String>(ret)
 		{
 			public void customResultAvailable(IDaemonThreadPoolService tp)

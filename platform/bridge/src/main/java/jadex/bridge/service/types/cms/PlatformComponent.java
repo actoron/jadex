@@ -761,7 +761,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		// Only remember first exception.
 		if(exception==null && e!=null)
 			this.exception	= e;
-//		IComponentManagementService cms = this.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		IComponentManagementService cms = this.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 		IFuture<Map<String, Object>> ret = this.killComponent(getId());
 		return ret;
 //		if(getComponentIdentifier().getParent()==null)

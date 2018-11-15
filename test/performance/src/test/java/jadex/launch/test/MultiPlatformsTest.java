@@ -70,8 +70,7 @@ public class MultiPlatformsTest //extends TestCase
 				System.out.println("Starting platform "+i);
 			}
 			
-			IPlatformConfiguration	config	= STest.getDefaultTestConfig();
-			config.setPlatformName("testcases_"+i+"*");
+			IPlatformConfiguration	config	= STest.getDefaultTestConfig(getClass());
 			futures.add(Starter.createPlatform(config,
 				new String[]{
 //				"-gui", "false", "-printpass", "false", "-cli", "false",

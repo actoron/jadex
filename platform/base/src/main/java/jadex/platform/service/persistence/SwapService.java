@@ -69,7 +69,7 @@ public class SwapService	//implements ISwapService, IIdleHook
 //		final Future<Void>	ret	= new Future<Void>();
 //		final boolean[]	found	= new boolean[2];
 //		
-//		comp.getServiceContainer().searchService(IPersistenceService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//		comp.getServiceContainer().searchService(IPersistenceService.class, ServiceScope.PLATFORM)
 //			.addResultListener(new ExceptionDelegationResultListener<IPersistenceService, Void>(ret, true)
 //		{
 //			public void customResultAvailable(IPersistenceService result)
@@ -91,7 +91,7 @@ public class SwapService	//implements ISwapService, IIdleHook
 //			}
 //		});
 //		
-//		comp.getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//		comp.getServiceContainer().searchService(IClockService.class, ServiceScope.PLATFORM)
 //			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret, true)
 //		{
 //			public void customResultAvailable(IClockService result)

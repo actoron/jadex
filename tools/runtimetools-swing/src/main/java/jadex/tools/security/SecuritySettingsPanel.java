@@ -39,7 +39,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -57,9 +57,6 @@ import jadex.commons.gui.jtable.StringArrayTableModel;
 import jadex.commons.security.PemKeyPair;
 import jadex.commons.security.SSecurity;
 import jadex.platform.service.registryv2.SuperpeerClientAgent;
-import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
-import jadex.platform.service.security.auth.AbstractX509PemSecret;
-import jadex.platform.service.security.auth.X509PemStringsSecret;
 
 /**
  *  Settings for security service.
@@ -128,8 +125,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IComponentIdentifier targetpf = sid.getProviderId().getRoot();
-				secservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISecurityService.class).setScope(RequiredServiceInfo.SCOPE_PLATFORM).setSearchStart(targetpf)).get();
-				settingsservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class).setScope(RequiredServiceInfo.SCOPE_PLATFORM).setSearchStart(targetpf)).get();
+				secservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISecurityService.class).setScope(ServiceScope.PLATFORM).setSearchStart(targetpf)).get();
+				settingsservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class).setScope(ServiceScope.PLATFORM).setSearchStart(targetpf)).get();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{

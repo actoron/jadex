@@ -13,6 +13,7 @@ import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -22,7 +23,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
 
 /**
  *  The time provider periodically sends out time values to all subscribers.
@@ -30,7 +30,7 @@ import jadex.micro.annotation.RequiredService;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITimeService.class, scope=RequiredService.SCOPE_GLOBAL))
+@ProvidedServices(@ProvidedService(type=ITimeService.class, scope=ServiceScope.GLOBAL))
 public class TimeProviderAgent	implements ITimeService
 {
 	//-------- attributes --------

@@ -13,6 +13,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -206,7 +207,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	}
 	
 	/**
-	 * Looks up a service using RequiredServiceInfo.SCOPE_PLATFORM as scope.
+	 * Looks up a service using ServiceScope.PLATFORM as scope.
 	 * 
 	 * @see getsService
 	 * 
@@ -215,7 +216,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	 * @return Future of the service.
 	 */
 	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz) {
-		IFuture<S> service = getService(platformId, serviceClazz, RequiredServiceInfo.SCOPE_PLATFORM);
+		IFuture<S> service = getService(platformId, serviceClazz, ServiceScope.PLATFORM);
 		return service;
 	}
 	
@@ -229,7 +230,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	 * @param scope Search scope. See {@link RequiredServiceInfo} constants.
 	 * @return Future of the service.
 	 */
-	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz, final String scope) {
+	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz, final ServiceScope scope) {
 		return getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<S>() {
 			@Classname("create-component")
 			public IFuture<S> execute(IInternalAccess ia) {

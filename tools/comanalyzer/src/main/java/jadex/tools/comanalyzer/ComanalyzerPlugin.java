@@ -53,7 +53,7 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
 import jadex.bridge.component.impl.MessageEvent;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IInternalServiceMonitoringFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.ServiceCallEvent;
@@ -229,7 +229,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			public void customResultAvailable(Void result)
 			{
 				// Todo: use remote access for clock !?
-				getJCC().getJCCAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+				getJCC().getJCCAccess().searchService( new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM))
 					.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 				{
 					public void customResultAvailable(IClockService result)
@@ -1553,7 +1553,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					message_maps.add(messages[i].getParameters());
 //				}
 
-//				jcc.getJCCAccess().getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
+//				jcc.getJCCAccess().getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
 //				{
 //					public void customResultAvailable(Object result)
 //					{
@@ -1664,7 +1664,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					}
 //				}
 				final String sxml = xml;
-//				jcc.getJCCAccess().getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
+//				jcc.getJCCAccess().getServiceProvider().searchService( new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM)).addResultListener(new SwingDefaultResultListener(comptree)
 //				{
 //					public void customResultAvailable(Object result)
 //					{

@@ -95,15 +95,20 @@ class PomConfig {
 // -------------------------------------
 
 def canPublishToNexus = isCommercial(project) && repo_commercial || !isCommercial(project) && repo_noncommercial
+def canSign = project.hasProperty('signing.secretKeyRingFile')
 
 // Selects the projects to publish, add a better heuristic here if available
 def includedproject = getProjectDepth(project) > 1
 // Empty project
 includedproject &= !project.path.equals(':android:applications')
 
-if (project.hasProperty('signing.secretKeyRingFile')) {
+if (canSign) {
     signing {
         sign configurations.archives
+        if (isAndroidProject(project)) { // add manually because somehow, those tasks do not end up in configurations.archives??
+            sign project.tasks.androidsourcesJar
+            sign project.tasks.androidjavadocsJar
+        }
 // uncomment with gradle 4.8
 // signing poms with maven-publish is supported with gradle 4.8, however, 4.8 seems to be incompatible with bintray 1.8 :/
 //            sign publishing.publications.MyPublication
@@ -113,40 +118,63 @@ if (project.hasProperty('signing.secretKeyRingFile')) {
     // remove once on gradle 4.8:
     // generate pom so it can be signed with gradle < 4.8
     // see https://medium.com/@nmauti/sign-and-publish-on-maven-central-a-project-with-the-new-maven-publish-gradle-plugin-22a72a4bfd4b
-    model {
-        tasks.generatePomFileForMyPublicationPublication {
-            destination = file("$buildDir/generated-pom.xml")
-            //enabled = includedproject // pom must be built even if not used :(
-        }
-        tasks.publishMyPublicationPublicationToMavenLocal {
-            dependsOn project.tasks.signArchives
-            enabled = includedproject
-        }
-        if (canPublishToNexus) {
-            tasks.publishMyPublicationPublicationToMavenRepository {
+    if (!isAndroidProject(project) || isAndroidLibraryProject(project)) { // dont publish apks
+        model {
+            tasks.generatePomFileForMyPublicationPublication {
+                destination = file("$buildDir/generated-pom.xml")
+                //enabled = includedproject // pom must be built even if not used :(
+            }
+            tasks.publishMyPublicationPublicationToMavenLocal {
+                dependsOn project.tasks.signArchives
+                enabled = includedproject
+            }
+            if (canPublishToNexus) {
+                tasks.publishMyPublicationPublicationToMavenRepository {
+                    dependsOn project.tasks.signArchives
+                    enabled = includedproject
+                }
+                tasks.publishSignaturesPublicationToMavenRepository {
+                    dependsOn project.tasks.signArchives
+                    enabled = includedproject
+                }
+            }
+            tasks.bintrayUpload {
                 dependsOn project.tasks.signArchives
                 enabled = includedproject
             }
         }
-        tasks.bintrayUpload {
-            dependsOn project.tasks.signArchives
-            enabled = includedproject
-        }
     }
+}
 
-    // remove once on gradle 4.8:
-    project.tasks.signArchives.signatureFiles.each {
-        if (it instanceof Artifact) {
-            artifact(it) {
-                def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
-                if (matcher.find()) {
-                    classifier = matcher.group(1)
-                } else {
-                    classifier = null
+def configurePom(pom) {
+    pom.withXml {
+        def root = asNode()
+        root.appendNode('description', project.description)
+        root.appendNode('name', project.name)
+        if (isAndroidProject(project)) {
+            root.get('packaging').get(0).setValue('aar')
+            def dependenciesNode = asNode().appendNode('dependencies')
+            project.configurations.implementation.allDependencies.each {
+                // Ensure dependencies such as fileTree are not included.
+                if (it.name != 'unspecified') {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
                 }
-                extension = 'jar.asc'
             }
+        } else if (!root.get('packaging').isEmpty()) {
+            root.remove(root.get('packaging'))
         }
+        root.children().last() + PomConfig.common
+        root.children().last() + PomConfig.gpl
+
+        // workaround for compile-time scope in POMs: (remove with gradle 4.7 or something)
+        asNode().dependencies.'*'.findAll() {
+        it.scope.text() == 'runtime' && project.configurations.compile.allDependencies.find { dep ->
+            dep.name == it.artifactId.text()
+        }
+        }.each { it.scope*.value = 'compile' }
     }
 }
 
@@ -172,59 +200,131 @@ publishing {
         }
     }
 
-    publications {
-        MyPublication(MavenPublication) {
-            if (isWebApplicationProject(project)) {
-                from components.web
-            } else if (!isAndroidProject(project)) {
-                from components.java
+    // This is also a hack that maybe can be removed with gradle 4.8:
+    // extract signature file and give them proper name
+    def getSignatureFiles = {
+        def allFiles = project.tasks.signArchives.signatureFiles.collect { it }
+        if (isAndroidProject(project)) {
+            allFiles += project.tasks.signAndroidsourcesJar.signatureFiles.collect { it }
+            allFiles +=  project.tasks.signAndroidjavadocsJar.signatureFiles.collect { it }
+        }
+        def signedSources = allFiles.find { it.name.contains('-sources') }
+        def signedJavadoc = allFiles.find { it.name.contains('-javadoc') }
+        def signedWar = allFiles.find {it.name.endsWith('war.asc')}
+        def signedAar = allFiles.find {it.name.endsWith('aar.asc')}
+        def signedApk = allFiles.find {it.name.endsWith('apk.asc')} // dont need apk signature as apk is not published
+        def signedJar = (allFiles - [signedSources, signedJavadoc, signedWar, signedAar, signedApk])[0]
+        def sigFiles = []
+        if (signedWar != null) {
+            sigFiles += [archive: signedWar,     classifier: null,      extension: 'war.asc']
+        }
+        if (signedJar != null) {
+            sigFiles += [archive: signedJar,     classifier: null,      extension: 'jar.asc']
+        }
+        if (signedAar != null) {
+            // the aar name is modified in build.gradle to strip out the "-release" part. Do the same for it's sig:
+            if (signedAar.name.contains("release")) {
+                String baseName = signedAar.name.replaceAll(signedAar.getParent(), "")
+                signedAar = file("${signedAar.getParent()}${File.separator}${project.name}-${project.version}.aar.asc")
             }
+            sigFiles += [archive: signedAar,     classifier: null,      extension: 'aar.asc']
+        }
 
-            // somehow artifacts are lost when publishing with maven-publish, re-add all jars:
-            project.tasks.withType(Jar) {
-                def matcher = (it.name =~ /.*(javadoc|sources).*/)
-                if (matcher.matches()) {
-//                println "adding artifact: $it , classifier: ${matcher[0][1]}"
-                    artifact(it) {
-                        classifier matcher[0][1]
+        if (signedSources != null) {
+            sigFiles += [archive: signedSources, classifier: 'sources', extension: 'jar.asc']
+        }
+
+        if (signedJavadoc != null) {
+            sigFiles +=  [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc']
+        }
+
+        return sigFiles
+    }
+
+
+    publications {
+
+        if (canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project))) {  // dont publish apks
+            // Publish signatures separately because gradle 4.8 maven-publish DOES NOT SUPPORT IT BY DEFAULT
+            signatures (MavenPublication) {
+                groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
+                artifactId getArtifactName(project)
+                version project.version
+    
+                // give signature files to rtifact method
+                getSignatureFiles().each {signature ->
+                    artifact (signature.archive) {
+                        classifier = signature.classifier
+                        extension  = signature.extension
+                    }
+                }
+                // copy + pasted from below's publication in order to not upload a wrong pom after the correct was uploaded
+                // (and no, one can not exclude pom uploading to avoid this...)
+                configurePom(pom)
+                pom.withXml() {
+                    // remove once on gradle 4.8:
+                    // signing workaround for gradle 4.7:
+                    def pomFile = file("${project.buildDir}/generated-pom.xml")
+                    writeTo(pomFile)
+                    def pomAscFile = signing.sign(pomFile).signatureFiles[0]
+                    artifact(pomAscFile) {
+                        classifier = null
+                        extension = 'pom.asc'
                     }
                 }
             }
 
-            //groupId group
-            groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
-            //artifactId project.name
-            artifactId getArtifactName(project)
-			//println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
-            version project.version
-            pom.withXml {
-                def root = asNode()
-                root.appendNode('description', project.description)
-                root.appendNode('name', project.name)
-                if (isAndroidProject(project)) {
-                    root.get('packaging').get(0).setValue('aar')
-                    def dependenciesNode = asNode().appendNode('dependencies')
-                    project.configurations.implementation.allDependencies.each {
-                        // Ensure dependencies such as fileTree are not included.
-                        if (it.name != 'unspecified') {
-                            def dependencyNode = dependenciesNode.appendNode('dependency')
-                            dependencyNode.appendNode('groupId', it.group)
-                            dependencyNode.appendNode('artifactId', it.name)
-                            dependencyNode.appendNode('version', it.version)
+            MyPublication(MavenPublication) {
+                if (isWebApplicationProject(project)) {
+                    from components.web
+                } else if (!isAndroidProject(project)) {
+                    from components.java
+                }
+
+                // somehow artifacts are lost when publishing with maven-publish, re-add all jars:
+                project.tasks.withType(Jar) {
+                    def matcher = (it.name =~ /.*(javadoc|sources).*/)
+                    if (matcher.matches()) {
+    //                println "adding artifact: $it , classifier: ${matcher[0][1]}"
+                        artifact(it) {
+                            classifier matcher[0][1]
                         }
                     }
                 }
-                root.children().last() + PomConfig.common
-                root.children().last() + PomConfig.gpl
+
+                //groupId group
+                groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
+                //artifactId project.name
+                artifactId getArtifactName(project)
+                //println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
+                version project.version
+                configurePom(pom)
+                pom.withXml() {
+                    // remove once on gradle 4.8:
+                    // signing workaround for gradle 4.7:
+                    def pomFile = file("${project.buildDir}/generated-pom.xml")
+                    writeTo(pomFile)
+                    def pomAscFile = signing.sign(pomFile).signatureFiles[0]
+                    artifact(pomAscFile) {
+                        classifier = null
+                        extension = 'pom.asc'
+                    }
+                }
 
                 // remove once on gradle 4.8:
-                // signing workaround for gradle 4.7:
-                def pomFile = file("${project.buildDir}/generated-pom.xml")
-                writeTo(pomFile)
-                def pomAscFile = signing.sign(pomFile).signatureFiles[0]
-                artifact(pomAscFile) {
-                    classifier = null
-                    extension = 'pom.asc'
+                project.tasks.signArchives.signatureFiles.each {
+    //                println "sign: " + it
+                    if (it instanceof Artifact) {
+                        artifact(it) {
+                            def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
+                            if (matcher.find()) {
+                                classifier = matcher.group(1)
+                            } else {
+                                classifier = null
+                            }
+                            extension = 'jar.asc'
+                        }
+                    }
                 }
             }
         }
@@ -236,7 +336,7 @@ if (!isCommercial(project)) {
         user = getVar('BINTRAY_USER', project)
         key = getVar('BINTRAY_KEY', project)
         configurations = ['archives']
-        publish = false
+        publish = true
         publications = ['MyPublication']
         pkg {
             repo = 'jadex'

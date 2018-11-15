@@ -57,7 +57,7 @@ public class StartScenario
 				{
 					public void resultAvailable(final IExternalAccess rplat)
 					{
-//						rplat.searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+//						rplat.searchService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM))
 //							.addResultListener(new DefaultResultListener<IComponentManagementService>()
 //						{
 //							public void resultAvailable(final IComponentManagementService rcms)

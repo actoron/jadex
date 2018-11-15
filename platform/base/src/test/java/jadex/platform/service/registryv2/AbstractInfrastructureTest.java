@@ -15,7 +15,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.registryv2.ISuperpeerStatusService;
 import jadex.commons.future.IFuture;
@@ -120,11 +120,12 @@ public abstract class AbstractInfrastructureTest
 	
 	/**
 	 *  Wait until all clients have connected to super peer.
-	 *  @param platforms The super peer (first value) and other platforms that need to connect.
+	 *  @param sp	The super peer.
+	 *  @param clients Platforms that need to connect.
 	 */
 	protected void	waitForSuperpeerConnections(IExternalAccess sp, IExternalAccess... clients)
 	{
-		ISuperpeerStatusService	status	= sp.searchService(new ServiceQuery<>(ISuperpeerStatusService.class, RequiredServiceInfo.SCOPE_PLATFORM)).get();
+		ISuperpeerStatusService	status	= sp.searchService(new ServiceQuery<>(ISuperpeerStatusService.class, ServiceScope.PLATFORM)).get();
 		ISubscriptionIntermediateFuture<IComponentIdentifier>	connected	= status.getRegisteredClients();
 		Set<IComponentIdentifier>	platformids	= new LinkedHashSet<>();
 		for(IExternalAccess ea: clients)

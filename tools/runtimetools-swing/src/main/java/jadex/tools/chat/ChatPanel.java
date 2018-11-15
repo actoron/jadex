@@ -94,8 +94,7 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
@@ -1545,7 +1544,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public void addMessage(final IComponentIdentifier cid, final String text, final String nick, final boolean privatemessage, final boolean sendfailure)
 	{
-		getJCC().getJCCAccess().searchService( new ServiceQuery<>( IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM))
+		getJCC().getJCCAccess().searchService( new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM))
 			.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 		{
 			public void resultAvailable(final IClockService clock)

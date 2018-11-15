@@ -32,7 +32,7 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 	public MonitoringInterceptor(IInternalAccess component)
 	{
 		super(component);
-//		this.getter = new ServiceGetter<IMonitoringService>(component, IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		this.getter = new ServiceGetter<IMonitoringService>(component, IMonitoringService.class, ServiceScope.PLATFORM);
 	}
 	
 	/**

@@ -1,7 +1,7 @@
 package jadex.micro.testcases.autoterminate;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IResultListener;
@@ -21,7 +21,7 @@ import jadex.micro.annotation.RequiredServices;
 	@Configuration(name="self"),
 	@Configuration(name="platform")})
 @RequiredServices({
-	@RequiredService(name="sub", type=IAutoTerminateService.class, scope=RequiredService.SCOPE_GLOBAL),
+	@RequiredService(name="sub", type=IAutoTerminateService.class, scope=ServiceScope.GLOBAL),
 })
 public class SubscriberAgent
 {
@@ -45,7 +45,7 @@ public class SubscriberAgent
 	{
 //		agent.getLogger().severe("subscribe "+agent.getComponentIdentifier()+", "+agent.getConfiguration());
 		
-		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IAutoTerminateService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+		agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IAutoTerminateService.class, ServiceScope.GLOBAL))
 			.addResultListener(new IResultListener<IAutoTerminateService>()
 		{
 			public void exceptionOccurred(Exception exception)

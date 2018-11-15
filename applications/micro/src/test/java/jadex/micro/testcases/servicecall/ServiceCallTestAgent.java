@@ -3,6 +3,8 @@ package jadex.micro.testcases.servicecall;
 import java.io.IOException;
 import java.util.Map;
 
+import org.bouncycastle.asn1.cmc.GetCert;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
@@ -12,13 +14,13 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
@@ -32,9 +34,9 @@ import jadex.micro.testcases.TestAgent;
  *  Agent providing a direct service.
  */
 @RequiredServices({
-	@RequiredService(name="raw", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_RAW, scope=RequiredService.SCOPE_GLOBAL),
-	@RequiredService(name="direct", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_DIRECT, scope=RequiredService.SCOPE_GLOBAL),
-	@RequiredService(name="decoupled", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_DECOUPLED, scope=RequiredService.SCOPE_GLOBAL),
+	@RequiredService(name="raw", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_RAW, scope=ServiceScope.GLOBAL),
+	@RequiredService(name="direct", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_DIRECT, scope=ServiceScope.GLOBAL),
+	@RequiredService(name="decoupled", type=IServiceCallService.class, proxytype=RequiredService.PROXYTYPE_DECOUPLED, scope=ServiceScope.GLOBAL),
 })
 @Agent
 //@Arguments(replace=false, value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
@@ -315,7 +317,7 @@ public class ServiceCallTestAgent extends TestAgent
 	public static void main(String[] args) throws Exception
 	{
 		// Start platform with agent.
-		IPlatformConfiguration	config1	= STest.getDefaultTestConfig();
+		IPlatformConfiguration	config1	= STest.getDefaultTestConfig(ServiceCallTestAgent.class);
 //		config1.setLogging(true);
 //		config1.setDefaultTimeout(-1);
 		config1.addComponent(ServiceCallTestAgent.class);

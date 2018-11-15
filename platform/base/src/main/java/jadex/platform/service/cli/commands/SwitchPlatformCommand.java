@@ -7,7 +7,7 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -81,7 +81,7 @@ public class SwitchPlatformCommand extends ACliCommand
 		{
 			final IComponentIdentifier cid = new BasicComponentIdentifier((String)args.get(null));
 			
-			comp.searchServices( new ServiceQuery<>(IInternalCliService.class, RequiredServiceInfo.SCOPE_GLOBAL))
+			comp.searchServices( new ServiceQuery<>(IInternalCliService.class, ServiceScope.GLOBAL))
 				.addResultListener(new IIntermediateResultListener<IInternalCliService>()
 			{
 				boolean found = false;

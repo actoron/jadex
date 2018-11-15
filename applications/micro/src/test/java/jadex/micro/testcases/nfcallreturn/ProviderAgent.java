@@ -24,7 +24,7 @@ public class ProviderAgent implements ITestService
 	@AgentCreated
 	public void created(IInternalAccess agent)
 	{
-		agent.getLogger().severe("Agent created: "+agent.getDescription());
+//		agent.getLogger().severe("Agent created: "+agent.getDescription());
 	}
 
 	/**

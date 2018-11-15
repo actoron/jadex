@@ -11,6 +11,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.platform.IJadexPlatformBinder;
@@ -187,7 +188,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection,
 		return platformService.getService(serviceClazz);
 	}
 
-	public <S> IFuture<S> getService(Class<S> serviceClazz, String scope)
+	public <S> IFuture<S> getService(Class<S> serviceClazz, ServiceScope scope)
 	{
 		checkIfJadexIsRunning("getService()");
 		return platformService.getService(serviceClazz, scope);

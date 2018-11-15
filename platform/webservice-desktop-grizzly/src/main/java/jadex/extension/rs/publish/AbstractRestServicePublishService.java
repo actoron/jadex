@@ -45,6 +45,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -67,7 +68,6 @@ import jadex.extension.rs.publish.annotation.MethodMapper;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.javaparser.SJavaParser;
-import jadex.micro.annotation.RequiredService;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
@@ -200,7 +200,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		final Future<Void> ret = new Future<Void>();
 		
 		ClassLoader cl = null;
-		ILibraryService ls = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, RequiredService.SCOPE_PLATFORM));
+		ILibraryService ls = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
 		if (serviceid.getProviderId().getPlatformName().equals(component.getId().getPlatformName()))
 		{
 			// Local publish, get the component's classloader.

@@ -108,7 +108,7 @@ public class RestServiceWrapperInvocationHandlerAndroid implements InvocationHan
 		final Future<Object> ret = new Future<Object>();
 			
 //		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getService("cms");
-//		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM));
+//		IFuture<IComponentManagementService> fut = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 //		fut.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 //		{
 //			public void customResultAvailable(final IComponentManagementService cms)

@@ -49,6 +49,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Service;
@@ -700,7 +701,7 @@ public class MicroClassReader
 //							configinfo.setPersistable(config.persistable().toBoolean());
 						if(configinfo.getSuspend()==null)
 							configinfo.setSuspend(config.suspend().toBoolean());
-						if(configinfo.getScope()==null && !RequiredServiceInfo.SCOPE_GLOBAL.equals(config.scope()))
+						if(configinfo.getScope()==null && !ServiceScope.GLOBAL.equals(config.scope()))
 							configinfo.setScope(config.scope());
 							
 						NameValue[] argvals = config.arguments();
@@ -1737,7 +1738,7 @@ public class MicroClassReader
 	public static RequiredServiceBinding createBinding(RequiredService rq)
 	{
 		return new RequiredServiceBinding(null, null, null,
-			rq.scope().length()==0? null: rq.scope(), createUnparsedExpressions(rq.interceptors()),
+			rq.scope(), createUnparsedExpressions(rq.interceptors()),
 			rq.proxytype());
 	}
 	
