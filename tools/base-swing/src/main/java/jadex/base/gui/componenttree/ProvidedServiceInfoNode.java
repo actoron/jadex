@@ -147,7 +147,8 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 			public void resultAvailable(final IService ser)
 			{
 //				((INFMixedPropertyProvider)ser.getExternalComponentFeature(INFPropertyComponentFeature.class)).getNFPropertyMetaInfos()
-				ea.getNFPropertyMetaInfos(ser.getServiceId())
+				IServiceIdentifier sid = ser.getServiceId();
+				ea.getNFPropertyMetaInfos(sid)
 					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 //					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 				{

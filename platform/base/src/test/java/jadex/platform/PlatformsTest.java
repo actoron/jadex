@@ -48,6 +48,8 @@ public class PlatformsTest //extends TestCase
 		"-welcome", "false",
 		"-printpass", "false",
 		"-superpeerclient", "false", // TODO: fails on shutdown due to auto restart
+		"-passiveawarenessmulticast", "false", // avoid interference with other tests
+		"-passiveawarenessbroadcast", "false", // avoid interference with other tests
 //		"-deftimeout", ""+TIMEOUT
 	};
 	

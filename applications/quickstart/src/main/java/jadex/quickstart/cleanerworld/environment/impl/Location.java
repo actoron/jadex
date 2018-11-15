@@ -35,6 +35,10 @@ public class Location implements ILocation, Cloneable
 	 */
 	public Location(double x, double y)
 	{
+		if(Double.isNaN(x))
+			throw new IllegalArgumentException("x is not a number: "+x);
+		if(Double.isNaN(y))
+			throw new IllegalArgumentException("y is not a number: "+y);
 		setX(x);
 		setY(y);
 	}

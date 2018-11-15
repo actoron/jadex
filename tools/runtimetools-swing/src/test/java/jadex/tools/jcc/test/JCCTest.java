@@ -34,7 +34,9 @@ public class JCCTest //extends TestCase
 //		System.err.println("starting platform");
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimal();
 		config.setGui(true);
+		config.setValue("superpeerclient", true);
 		config.setValue("settings.readonly", true);
+//		config.setLogging(true);
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(config);
 		
 		long timeout = Starter.getDefaultTimeout(null);

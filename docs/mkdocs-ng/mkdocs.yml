@@ -31,7 +31,11 @@ pages:
 - BDI Quickstart Tutorial:
     - 'tutorials/quickstart-bdi/01 Introduction.md'
     - 'tutorials/quickstart-bdi/02 Goals and Plans.md'
-    - 'tutorials/quickstart-bdi/0x Summary.md'
+    - 'tutorials/quickstart-bdi/03 Beliefs and Goal Conditions.md'
+    - 'tutorials/quickstart-bdi/04 Plans with Subgoals.md'
+    - 'tutorials/quickstart-bdi/05 Goals with Multiple Instances.md'
+    - 'tutorials/quickstart-bdi/06 Advanced Exercises.md'
+    - 'tutorials/quickstart-bdi/07 Summary.md'
 - Active Components Tutorial:
     - 'tutorials/ac/01 Introduction.md'
     - 'tutorials/ac/03 Active Components.md'

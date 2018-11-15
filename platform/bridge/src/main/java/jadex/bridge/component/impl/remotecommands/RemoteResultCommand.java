@@ -52,10 +52,13 @@ public class RemoteResultCommand<T>	extends AbstractResultCommand
 	@SuppressWarnings("unchecked")
 	public void	doExecute(IInternalAccess access, IFuture<?> future, ISecurityInfo secinf)
 	{
+//		if(result!=null)// && result.toString().indexOf("rt")!=-1)
+//			System.out.println("exe result: "+result.getClass()+" "+result+" "+access.getId());
+		
 		if(exception!=null)
-			((Future<T>) future).setException(exception);
+			((Future<T>)future).setException(exception);
 		else
-			((Future<T>) future).setResult(result);
+			((Future<T>)future).setResult(result);
 	}
 	
 	/**

@@ -65,6 +65,7 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.SBDIModel;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -585,12 +586,11 @@ public class BDIClassReader extends MicroClassReader
 		
 		Class<?>[] gs = trigger.goals();
 		Class<?>[] gfs = trigger.goalfinisheds();
-		String[] fas = trigger.factaddeds();
-		String[] frs = trigger.factremoveds();
-		String[] fcs = trigger.factchangeds();
 		ServiceTrigger st = trigger.service();
 		
-		if(gs.length>0 || gfs.length>0 || fas.length>0 || frs.length>0 || fcs.length>0 
+		if(gs.length>0 || gfs.length>0
+			|| trigger.factadded().length>0 || trigger.factremoved().length>0 || trigger.factchanged().length>0 
+			|| trigger.factaddeds().length>0 || trigger.factremoveds().length>0 || trigger.factchangeds().length>0 
 			|| st.name().length()>0 || !Object.class.equals(st.type()))
 		{
 			tr = new MTrigger();
@@ -617,19 +617,31 @@ public class BDIClassReader extends MicroClassReader
 				tr.addGoalFinished(mgoal);
 			}
 			
-			for(int j=0; j<fas.length; j++)
+			for(String bel: trigger.factadded())
 			{
-				tr.addFactAdded(fas[j]);
+				tr.addFactAdded(bel);
+			}
+			for(String bel: trigger.factaddeds())
+			{
+				tr.addFactAdded(bel);
 			}
 			
-			for(int j=0; j<frs.length; j++)
+			for(String bel: trigger.factremoved())
 			{
-				tr.addFactRemoved(frs[j]);
+				tr.addFactRemoved(bel);
+			}
+			for(String bel: trigger.factremoveds())
+			{
+				tr.addFactRemoved(bel);
 			}
 			
-			for(int j=0; j<fcs.length; j++)
+			for(String bel: trigger.factchanged())
 			{
-				tr.addFactChanged(fcs[j]);
+				tr.addFactChanged(bel);
+			}
+			for(String bel: trigger.factchangeds())
+			{
+				tr.addFactChanged(bel);
 			}
 			
 			MServiceCall sc = getServiceCall(bdimodel, st);
@@ -992,6 +1004,18 @@ public class BDIClassReader extends MicroClassReader
 				for(String pev: paramevs)
 				{
 					BDIAgentFeature.addParameterEvents(mgoal, model.getCapability(), events, pev, cl);
+				}
+				for(String bel: gc.factadded())
+				{
+					events.add(BDIAgentFeature.createBeliefEvent(model.getCapability(), bel, ChangeEvent.FACTADDED));
+				}
+				for(String bel: gc.factremoved())
+				{
+					events.add(BDIAgentFeature.createBeliefEvent(model.getCapability(), bel, ChangeEvent.FACTREMOVED));
+				}
+				for(String bel: gc.factchanged())
+				{
+					events.add(BDIAgentFeature.createBeliefEvent(model.getCapability(), bel, ChangeEvent.FACTCHANGED));
 				}
 				MCondition cond = new MCondition("creation_"+c.toString(), events);
 				cond.setConstructorTarget(new ConstructorInfo(c));

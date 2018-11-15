@@ -152,6 +152,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	@AgentArgument
 	protected boolean loadjavatruststore = true;
 	
+	/** Flag if the security should create a random default network
+	 *  if no network is set.
+	 */
+	@AgentArgument
+	protected boolean createdefaultnetwork = true;
+	
 	/** Handshake timeout. */
 	@AgentArgument
 	protected long handshaketimeout = -1;
@@ -449,6 +455,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						SUtil.close(is);
 					}
+				}
+				
+				if ((networks.isEmpty() || (networks.size() == 1 && networks.containsKey(SuperpeerClientAgent.GLOBAL_NETWORK_NAME))) &&
+					createdefaultnetwork)
+				{
+					networks.add(SUtil.createPlainRandomId("default_network", 6), KeySecret.createRandom());
+					savesettings = true;
 				}
 				
 				remoteplatformsecrets = getProperty("remoteplatformsecrets", args, settings, remoteplatformsecrets);

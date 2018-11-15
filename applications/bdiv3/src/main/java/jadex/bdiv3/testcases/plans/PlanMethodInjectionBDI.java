@@ -49,7 +49,7 @@ public abstract class PlanMethodInjectionBDI implements IBDIAgent
 		});
 	}
 	
-	@Plan(trigger=@Trigger(factaddeds="items"))
+	@Plan(trigger=@Trigger(factadded="items"))
 	public void	somePlan(ChangeEvent event, Integer value, int v2) 
 	{
 		System.out.println("plan invoked " + PlanMethodInjectionBDI.this + " for reason " + event+", "+value);

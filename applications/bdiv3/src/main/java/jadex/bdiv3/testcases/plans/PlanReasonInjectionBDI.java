@@ -52,7 +52,7 @@ public abstract class PlanReasonInjectionBDI implements IBDIAgent
 		});
 	}
 	
-	@Plan(trigger=@Trigger(factaddeds="items"))
+	@Plan(trigger=@Trigger(factadded="items"))
 	public class SomePlan 
 	{
 		@PlanAPI

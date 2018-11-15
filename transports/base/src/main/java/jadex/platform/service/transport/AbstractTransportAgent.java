@@ -663,8 +663,16 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 					// Then decode header and deliver to receiver agent.
 					final IMsgHeader header = (IMsgHeader)serser.decode(null, agent, tup.getSecondEntity());
 					final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
-					
-//					System.out.println("rec msg: "+header);
+
+//					try
+//					{
+//						if(rec.getLocalName().equals("rt"))
+//							System.out.println("rec msg: "+rec+", "+header);
+//					}
+//					catch(Throwable t)
+//					{
+//						t.printStackTrace();
+//					}
 					
 					// Cannot use agent/cms.getExternalAccess(cid) because when remote call
 					// is in init the call will be delayed after init has finished (deadlock)
@@ -673,6 +681,15 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 						@Override
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
+//							try
+//							{
+//								if(rec.getLocalName().equals("rt"))
+//									System.out.println("rec msg scheduled: "+rec+", "+header);
+//							}
+//							catch(Throwable t)
+//							{
+//								t.printStackTrace();
+//							}
 							IMessageFeature mf = ia.getFeature0(IMessageFeature.class);
 							if(mf instanceof IInternalMessageFeature)
 							{

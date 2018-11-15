@@ -46,9 +46,9 @@ import jadex.tools.starter.StarterPlugin;
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true", description="Save settings on exit?"),
 	@Argument(name="platforms", clazz=String.class, defaultvalue="null", description="Show JCC for platforms matching this name.")
 })
-@Agent(name="jcc", autostart=Boolean3.TRUE)
+@Agent(name="jcc", autostart=Boolean3.TRUE, predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent")
 @Properties(@NameValue(name="system", value="true"))
-public class JCCAgent	implements IComponentStep<Void>
+public class JCCAgent implements IComponentStep<Void>
 {
 	//-------- constants --------
 	
@@ -60,22 +60,26 @@ public class JCCAgent	implements IComponentStep<Void>
 	
 	//-------- attributes --------
 	
+	/** The agent. */
+	@Agent
+	protected IInternalAccess agent;
+	
 	/** The saveonexit argument. */
 	@AgentArgument
-	protected boolean	saveonexit;
+	protected boolean saveonexit;
 	
 	/** The platforms argument. */
 	@AgentArgument
-	protected String	platforms;
+	protected String platforms;
 	
 	/** The control center. */
 	protected ControlCenter	cc;
 	
 	/** Number of tries, when connecting initially to remote platforms. */
-	protected int	tries;
+	protected int tries;
 	
 	/** True when initially connected to a remote platform.. */
-	protected boolean	connected;
+	protected boolean connected;
 	
 	//-------- micro agent methods --------
 	
@@ -197,7 +201,7 @@ public class JCCAgent	implements IComponentStep<Void>
 	 *  Close the gui on agent shutdown.
 	 */
 	@AgentKilled
-	public IFuture<Void>	agentKilled(IInternalAccess agent)
+	public IFuture<Void> agentKilled(IInternalAccess agent)
 	{
 //		System.out.println("JCC agent killed");
 		Future<Void>	ret	= new Future<Void>();
@@ -210,7 +214,7 @@ public class JCCAgent	implements IComponentStep<Void>
 		{
 			ret.setResult(null);
 		}
-
+		
 		return ret;
 	}
 	
@@ -218,7 +222,7 @@ public class JCCAgent	implements IComponentStep<Void>
 	 *  Get the control center.
 	 */
 	// Used for test case.
-	public ControlCenter	getControlCenter()
+	public ControlCenter getControlCenter()
 	{
 		return cc;
 	}

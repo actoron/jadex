@@ -213,7 +213,7 @@ public class WaitBDI
 //	/**
 //	 *  Plan that waits with waitqueue for addition of a name.
 //	 */
-//	@Plan(waitqueue=@Trigger(factaddeds="names"))
+//	@Plan(waitqueue=@Trigger(factadded="names"))
 //	protected IFuture<Void> waitqueuePlan(final RPlan rplan)
 //	{
 //		final Future<Void> ret = new Future<Void>();

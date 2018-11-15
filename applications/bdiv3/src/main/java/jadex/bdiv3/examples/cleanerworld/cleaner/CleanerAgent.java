@@ -640,7 +640,7 @@ public class CleanerAgent
 	{
 	}
 	
-	@Plan(trigger=@Trigger(factchangeds={"environment", "my_location"}))
+	@Plan(trigger=@Trigger(factchanged={"environment", "my_location"}))
 	protected IFuture<Void> updateVision(IPlan rplan)
 	{
 		final Future<Void> ret = new Future<Void>();

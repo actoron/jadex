@@ -52,6 +52,9 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		this.method	= new MethodInfo(method);
 		this.args	= args;
 //		System.out.println("created rmi command: "+target+" "+method.getName());
+		
+//		if(method.toString().toLowerCase().indexOf("getdesc")!=-1)
+//			System.out.println("Creating command for: "+method);
 	}
 	
 	/**
@@ -108,8 +111,8 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	@Override
 	public IFuture<T> execute(IInternalAccess access, ISecurityInfo secinf)
 	{
-//		if(method.toString().toLowerCase().indexOf("transport")==-1)
-//		System.out.println("Executing requested remote method invocation: "+access.getId()+", "+method);
+//		if(method.toString().toLowerCase().indexOf("getdesc")!=-1)
+//			System.out.println("Executing requested remote method invocation: "+access.getId()+", "+method);
 		
 		Object	ret	= null;
 		if(target instanceof IServiceIdentifier)
@@ -153,6 +156,23 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 				{
 					Method	m	= method.getMethod(access.getClassLoader());
 					ret	= m.invoke(access.getExternalAccess(), args);
+					
+//					System.out.println("adding lis: "+Arrays.toString(args));
+//					if(method.toString().toLowerCase().indexOf("getdesc")!=-1)
+//					{
+//						((IFuture)ret).addResultListener(new IResultListener()
+//						{
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								System.out.println("ex: "+exception+" "+Arrays.toString(args));
+//							}
+//							
+//							public void resultAvailable(Object result)
+//							{
+//								System.out.println("res is: "+result+" "+Arrays.toString(args));
+//							}
+//						});
+//					}
 				}
 				catch(Exception e)
 				{

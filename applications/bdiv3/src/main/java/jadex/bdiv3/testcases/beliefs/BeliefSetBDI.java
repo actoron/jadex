@@ -75,14 +75,14 @@ public class BeliefSetBDI
 	}
 	
 	// todo: plan creation condition?!
-	@Plan(trigger=@Trigger(factaddeds="names"))
+	@Plan(trigger=@Trigger(factadded="names"))
 	protected void printAddedFact(ChangeEvent event, RPlan rplan)
 	{
 		System.out.println("fact added: "+event.getValue()+" "+event.getSource()+" "+rplan);
 		tr[0].setSucceeded(true);
 	}
 	
-	@Plan(trigger=@Trigger(factremoveds="names"))
+	@Plan(trigger=@Trigger(factremoved="names"))
 	protected void printRemFact(ChangeEvent event, RPlan rplan)
 	{
 		System.out.println("fact removed: "+event.getValue()+" "+event.getSource()+" "+rplan);

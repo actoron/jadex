@@ -66,7 +66,7 @@ public class UpdaterateBDI
 	/**
 	 *  Plan that is triggered when fact changes.
 	 */
-	@Plan(trigger=@Trigger(factchangeds={"cntbel"}))
+	@Plan(trigger=@Trigger(factchanged={"cntbel"}))
 	public void	beliefChanged(int cntevt)
 	{
 		if(cntbel==5 && cntevt==5)

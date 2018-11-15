@@ -539,7 +539,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 								}
 								public void exceptionOccurred(Exception exception)
 								{
-									exception.printStackTrace();
+									if (debug)
+										exception.printStackTrace();
 									finished();
 								}
 								public void resultAvailable(Collection<Integer> result)

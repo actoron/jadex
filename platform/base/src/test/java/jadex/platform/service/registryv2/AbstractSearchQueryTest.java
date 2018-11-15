@@ -19,7 +19,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  Test basic search and query managing functionality with a client and some providers.
- *  Abstract base implementation to be overriden for testing different infrastructure scenarios.
+ *  Abstract base implementation to be overridden for testing different infrastructure scenarios.
  */
 public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 {
@@ -240,8 +240,8 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("5) start SP, wait for connection from provider platforms and client platform, search for service");
 			IExternalAccess	sp	= createPlatform(spconf);
 			waitForSuperpeerConnections(sp, client, pro2);
-//			waitALittle(client);
-			waitLonger(client);	// Hack for timeout in CI Pipeline!?
+			waitALittle(client);
+//			waitLonger(client);	// Hack for timeout in CI Pipeline!?
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, RequiredServiceInfo.SCOPE_GLOBAL)).get();
 			Assert.assertEquals(""+result, 1, result.size());
 			

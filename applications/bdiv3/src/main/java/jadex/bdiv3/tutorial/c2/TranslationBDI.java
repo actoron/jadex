@@ -46,7 +46,7 @@ public class TranslationBDI
 	/**
 	 *  Initiate an alarm.
 	 */
-	@Plan(trigger=@Trigger(factchangeds="alarm"))
+	@Plan(trigger=@Trigger(factchanged="alarm"))
 	public void checkWordPairPlan(ChangeEvent<ChangeInfo<Boolean>> event)
 	{
 		ChangeInfo<Boolean>	change	= event.getValue();

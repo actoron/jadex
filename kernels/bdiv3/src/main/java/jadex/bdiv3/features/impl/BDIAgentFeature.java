@@ -481,8 +481,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				throw new RuntimeException(e);
+				SUtil.throwUnchecked(e);
 			}
 		}
 	}
@@ -1024,6 +1023,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			{
 				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, IBDIClassGenerator.AGENT_FIELD_NAME);
 //				System.out.println("res: "+res);
+				res.getFirstEntity().setAccessible(true);
 				agent = (IInternalAccess)res.getFirstEntity().get(res.getSecondEntity());
 				if(agent==null) 
 				{
@@ -1054,19 +1054,15 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 					catch(Exception e)
 					{
 						e.printStackTrace();
-						throw new RuntimeException(e);
+						SUtil.throwUnchecked(e);
 					}					
 					
 					return;
 				}
 			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
 			catch(Exception e)
 			{
-				throw new RuntimeException(e);
+				SUtil.throwUnchecked(e);
 			}
 		}
 
@@ -2446,6 +2442,20 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
 			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
 		}
+	}
+	
+	/**
+	 *  Create belief event from a belief name.
+	 *  Checks if belief exists and creates event type.
+	 */
+	public static EventType	createBeliefEvent(MCapability mcapa, String belname, String eventname)
+	{
+		belname = belname.replace(".", "/");
+		MBelief mbel = mcapa.getBelief(belname);
+		if(mbel==null)
+			throw new RuntimeException("No such belief: "+belname);
+		
+		return new EventType(new String[]{eventname, belname});
 	}
 	
 	/**
