@@ -26,8 +26,10 @@ public class SSimulation
 	 *  Simulation blocking means the clock will not advance until the future is done.
 	 *  This allows synchronizing external threads (e.g. swing) with the simulation execution.
 	 */
-	public static void	addBlocker(IFuture<?> adblock)
+	public static boolean	addBlocker(IFuture<?> adblock)
 	{
+		boolean	blocked	= false;
+		
 		IInternalAccess	ia	= ExecutionComponentFeature.LOCAL.get();
 		if(isSimulating(ia))
 		{
@@ -41,6 +43,7 @@ public class SSimulation
 			{
 				// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
 			}
+			blocked	= true;
 		}
 		else if(isBisimulating(ia))
 		{
@@ -57,12 +60,15 @@ public class SSimulation
 				{
 					// happens after successful get() wakeup in notifications caused by component died (endagenda.setResult()), grrr -> ignore so blocker gets removed.
 				}
+				blocked	= true;
 			}
 			catch(Exception e)
 			{
 				e.printStackTrace();
 			}
 		}
+		
+		return blocked;
 	}
 
 	/**

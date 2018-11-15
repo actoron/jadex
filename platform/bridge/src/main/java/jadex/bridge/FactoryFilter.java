@@ -128,4 +128,9 @@ public class FactoryFilter implements IAsyncFilter<IComponentFactory>
 		return ret;		
 	}
 
+	@Override
+	public String toString()
+	{
+		return getClass().getSimpleName()+"("+model+")";
+	}
 }
