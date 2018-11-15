@@ -55,7 +55,7 @@ public class DebugException extends RuntimeException
 	{
 		Throwable throwable = super.fillInStackTrace();
 		// when getStackTrace() is called, super saves the stacktrace elements, so we don't have to.
-		StackTraceElement[] stackTrace = getStackTrace();
+		getStackTrace();
 		return throwable;
 	}
 }

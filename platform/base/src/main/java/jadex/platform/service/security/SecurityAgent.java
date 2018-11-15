@@ -34,7 +34,6 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -77,7 +76,6 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.platform.service.registryv2.SuperpeerClientAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.AbstractX509PemSecret;
 import jadex.platform.service.security.auth.KeySecret;
@@ -112,6 +110,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	
 	/** Header property for security messages. */
 	protected static final String SECURITY_MESSAGE = "__securitymessage__";
+	
+	/** Name of the global network. */
+	public static final String GLOBAL_NETWORK_NAME = "___GLOBAL___";
+	
+	/** Default root certificate for global network. */
+	public static final String DEFAULT_GLOBAL_ROOT_CERTIFICATE = "pem:-----BEGIN CERTIFICATE-----|MIICszCCAhWgAwIBAgIVAP5jQirZLKNnSHf1FES8qkWMJyvKMAoGCCqGSM49BAME|MDYxHTAbBgNVBAMMFEphZGV4IEdsb2JhbCBSb290IFgxMRUwEwYDVQQKDAxBY3Rv|cm9uIEdtYkgwHhcNMTgwODAxMDkxNjA5WhcNMjgwNzI5MDkxNjA5WjA2MR0wGwYD|VQQDDBRKYWRleCBHbG9iYWwgUm9vdCBYMTEVMBMGA1UECgwMQWN0b3JvbiBHbWJI|MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQA6K9sA0U88s0/6nLTwZhXwzBesBr/|MpNAqpZtCBe2sD+3sjppYtnug3RUbRFYNZsYPMMHBqOWyo0BR7N5DxeSJ8AB/T/z|zTC9PqjDUcIazUDCf0XsSSx08a3UqBPZ5EzKRtOvf3cx/qCp/0/fND3iKWfrNhng|LxYMS0d/BMlNRE3vQl6jgbwwgbkwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8E|BAMCAoQwSQYDVR0OBEIEQLAcDiIifZpM0BihTvohWfxP5bHk3iHeA/O5vLaTp7o5|Lw+2E2CcyIXfNcMRhQ5lAymDVYBwJjr0ZjgzvXOsJhIwSwYDVR0jBEQwQoBAsBwO|IiJ9mkzQGKFO+iFZ/E/lseTeId4D87m8tpOnujkvD7YTYJzIhd81wxGFDmUDKYNV|gHAmOvRmODO9c6wmEjAKBggqhkjOPQQDBAOBiwAwgYcCQgGYPCBbcI/ai9nAqzuU|1oXIn4KFguj/95xbVm4HBb9wsNrB0K8LtdXsvB4BR2HeRCB0cWqyCKZimBbaJIoD|BTcs2gJBTXfqb/KlKCwrO6KXLOtah5sgASt+QZ3uD6AXBNrBfBjC5nUBWkx/zJd+|sllyYoekCGy/UAvwNIB4aFkTHnQGyS4=|-----END CERTIFICATE-----|";
 	
 	/** Timeout used for internal expirations */
 //	protected static final long TIMEOUT = 60000;
@@ -153,6 +157,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** Flag whether to use the default Java trust store. */
 	@AgentArgument
 	protected boolean loadjavatruststore = true;
+	
+	/** Flag if the security should add a global network
+	 *  if no global network is set.
+	 */
+	@AgentArgument
+	protected boolean addglobalnetwork = true;
 	
 	/** Flag if the security should create a random default network
 	 *  if no network is set.
@@ -459,7 +469,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					}
 				}
 				
-				if ((networks.isEmpty() || (networks.size() == 1 && networks.containsKey(SuperpeerClientAgent.GLOBAL_NETWORK_NAME))) &&
+				if (addglobalnetwork && !networks.containsKey(GLOBAL_NETWORK_NAME))
+					networks.add(GLOBAL_NETWORK_NAME, AbstractAuthenticationSecret.fromString(DEFAULT_GLOBAL_ROOT_CERTIFICATE, true));
+				
+				if ((networks.isEmpty() || (networks.size() == 1 && networks.containsKey(GLOBAL_NETWORK_NAME))) &&
 					createdefaultnetwork)
 				{
 					networks.add(SUtil.createPlainRandomId("default_network", 6), KeySecret.createRandom());
@@ -473,7 +486,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				{
 					for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
 					{
-						if (entry.getValue() != null && !SuperpeerClientAgent.GLOBAL_NETWORK_NAME.equals(entry.getKey()))
+						if (entry.getValue() != null && !GLOBAL_NETWORK_NAME.equals(entry.getKey()))
 						{
 							for (AbstractAuthenticationSecret secret : entry.getValue())
 								System.out.println("Available network '" + entry.getKey() + "' with secret " + secret);
@@ -661,16 +674,19 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 						
 						// Add sim blocker and print error msg when handshake doesn't work
-						SSimulation.addBlocker(ret);
-						ia.waitForDelay(Starter.getScaledDefaultTimeout(ia.getId(), 0.5), true)
-							.addResultListener(v ->
+						if(SSimulation.addBlocker(ret))
 						{
-							if(!ret.isDone())
+							ia.waitForDelay(Starter.getScaledDefaultTimeout(ia.getId(), 0.5), true)
+								.addResultListener(v ->
 							{
-								System.out.println("Security handshake timeout from "+agent+" to "+rplat);
-								ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
-							}
-						});
+								if(!ret.isDone())
+								{
+									System.out.println("Security handshake timeout from "+agent+" to "+rplat);
+									checkCleanup();
+									ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
+								}
+							});
+						}
 							
 						hstate.getResultFuture().addResultListener(new ExceptionDelegationResultListener<ICryptoSuite, byte[]>(ret, true)
 						{

@@ -60,6 +60,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
+import jadex.platform.service.security.SecurityAgent;
 
 /**
  *  The super peer client agent is responsible for managing connections to super peers for each network.
@@ -69,12 +70,6 @@ import jadex.micro.annotation.AgentKilled;
 public class SuperpeerClientAgent implements ISearchQueryManagerService
 {
 	//-------- constants --------
-	
-	/** Name of the global network. */
-	public static final String GLOBAL_NETWORK_NAME = "___GLOBAL___";
-	
-	/** Default root certificate for global network. */
-	public static final String DEFAULT_GLOBAL_ROOT_CERTIFICATE = "pem:-----BEGIN CERTIFICATE-----|MIICszCCAhWgAwIBAgIVAP5jQirZLKNnSHf1FES8qkWMJyvKMAoGCCqGSM49BAME|MDYxHTAbBgNVBAMMFEphZGV4IEdsb2JhbCBSb290IFgxMRUwEwYDVQQKDAxBY3Rv|cm9uIEdtYkgwHhcNMTgwODAxMDkxNjA5WhcNMjgwNzI5MDkxNjA5WjA2MR0wGwYD|VQQDDBRKYWRleCBHbG9iYWwgUm9vdCBYMTEVMBMGA1UECgwMQWN0b3JvbiBHbWJI|MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQA6K9sA0U88s0/6nLTwZhXwzBesBr/|MpNAqpZtCBe2sD+3sjppYtnug3RUbRFYNZsYPMMHBqOWyo0BR7N5DxeSJ8AB/T/z|zTC9PqjDUcIazUDCf0XsSSx08a3UqBPZ5EzKRtOvf3cx/qCp/0/fND3iKWfrNhng|LxYMS0d/BMlNRE3vQl6jgbwwgbkwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8E|BAMCAoQwSQYDVR0OBEIEQLAcDiIifZpM0BihTvohWfxP5bHk3iHeA/O5vLaTp7o5|Lw+2E2CcyIXfNcMRhQ5lAymDVYBwJjr0ZjgzvXOsJhIwSwYDVR0jBEQwQoBAsBwO|IiJ9mkzQGKFO+iFZ/E/lseTeId4D87m8tpOnujkvD7YTYJzIhd81wxGFDmUDKYNV|gHAmOvRmODO9c6wmEjAKBggqhkjOPQQDBAOBiwAwgYcCQgGYPCBbcI/ai9nAqzuU|1oXIn4KFguj/95xbVm4HBb9wsNrB0K8LtdXsvB4BR2HeRCB0cWqyCKZimBbaJIoD|BTcs2gJBTXfqb/KlKCwrO6KXLOtah5sgASt+QZ3uD6AXBNrBfBjC5nUBWkx/zJd+|sllyYoekCGy/UAvwNIB4aFkTHnQGyS4=|-----END CERTIFICATE-----|";
 	
 	/** The fallback polling search rate as factor of the default remote timeout. */
 	public static final double	POLLING_RATE	= 0.33333333;	// 30*0.333.. secs  -> 10 secs.
@@ -131,12 +126,6 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						assert agent.getFeature(IExecutionFeature.class).isComponentThread();
 						
 						Set<String> networknames = new HashSet<>(networks.keySet());
-						
-						if (!networknames.contains(GLOBAL_NETWORK_NAME))
-						{
-							secser.setNetwork(GLOBAL_NETWORK_NAME, DEFAULT_GLOBAL_ROOT_CERTIFICATE);
-							networknames.add(GLOBAL_NETWORK_NAME);
-						}
 						
 						for(String network: networknames)
 						{
@@ -524,7 +513,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				ServiceScope.APPLICATION_GLOBAL.equals(query.getScope()))
 			{
 				Set<String> retset = new LinkedHashSet<>(Arrays.asList(ret));
-				retset.add(GLOBAL_NETWORK_NAME);
+				retset.add(SecurityAgent.GLOBAL_NETWORK_NAME);
 				ret	= retset.toArray(new String[retset.size()]);
 			}
 		}
@@ -533,13 +522,13 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		else
 		{
 			Set<String> retset;
-			if(connections.containsKey(GLOBAL_NETWORK_NAME)
+			if(connections.containsKey(SecurityAgent.GLOBAL_NETWORK_NAME)
 				&& !ServiceScope.GLOBAL.equals(query.getScope())
 				&& !ServiceScope.APPLICATION_GLOBAL.equals(query.getScope()))
 			{
 				// use all connections but exclude global
 				retset = new LinkedHashSet<>(connections.keySet());
-				retset.remove(GLOBAL_NETWORK_NAME);
+				retset.remove(SecurityAgent.GLOBAL_NETWORK_NAME);
 			}
 			else
 			{
@@ -593,7 +582,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		protected NetworkManager(String networkname)
 		{
 			this.networkname	= networkname;
-			this.global	= GLOBAL_NETWORK_NAME.equals(networkname);
+			this.global	= SecurityAgent.GLOBAL_NETWORK_NAME.equals(networkname);
 		}
 		
 		//------- helper methods ---------
