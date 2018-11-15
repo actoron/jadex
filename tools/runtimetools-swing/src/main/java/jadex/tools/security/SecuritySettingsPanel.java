@@ -56,7 +56,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.jtable.StringArrayTableModel;
 import jadex.commons.security.PemKeyPair;
 import jadex.commons.security.SSecurity;
-import jadex.platform.service.registryv2.SuperpeerClientAgent;
+import jadex.platform.service.security.SecurityAgent;
 
 /**
  *  Settings for security service.
@@ -1058,7 +1058,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 							
 							for (Map.Entry<String, Collection<String>> entry : nws.entrySet())
 							{
-								if (entry.getValue() != null && entry.getValue().size() > 0 && !SuperpeerClientAgent.GLOBAL_NETWORK_NAME.equals(entry.getKey()))
+								if (entry.getValue() != null && entry.getValue().size() > 0 && !SecurityAgent.GLOBAL_NETWORK_NAME.equals(entry.getKey()))
 								{
 									for (String secret : entry.getValue())
 									{
