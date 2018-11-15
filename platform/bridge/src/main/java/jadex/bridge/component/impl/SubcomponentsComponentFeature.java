@@ -57,7 +57,7 @@ import jadex.javaparser.SimpleValueFetcher;
 /**
  *  This feature provides subcomponents.
  */
-public class SubcomponentsComponentFeature	extends	AbstractComponentFeature implements ISubcomponentsFeature, IInternalSubcomponentsFeature
+public class SubcomponentsComponentFeature extends AbstractComponentFeature implements ISubcomponentsFeature, IInternalSubcomponentsFeature
 {
 //	/** The number of children. */
 //	protected int childcount;
@@ -314,7 +314,7 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 			modelbar.addFuture(fut);
 		}
 		
-		final IntermediateFuture<IExternalAccess> ret = new IntermediateFuture<>();
+		final IntermediateFuture<Map<String, Object>> ret = new IntermediateFuture<>();
 		
 		modelbar.waitFor().addResultListener(new IResultListener<Void>()
 		{
@@ -326,10 +326,10 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 			public void resultAvailable(Void result)
 			{
 				DependencyResolver<String> dr = new DependencyResolver<>();
-				final MultiCollection<String, CreationInfo> instances = new MultiCollection<>();
+				final MultiCollection<String, IComponentIdentifier> instances = new MultiCollection<>();
 				
-				for (Map.Entry<Integer, IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>>> entry : modelmap.entrySet())
-					addComponentToLevels(dr, infos[entry.getKey()], entry.getValue().get().getFirstEntity(), instances);
+				for (Map.Entry<Integer, IFuture<IModelInfo>> entry : modelmap.entrySet())
+					addComponentToLevels(dr, cids[entry.getKey()], entry.getValue().get(), instances);
 				
 				final List<Set<String>> levels = dr.resolveDependenciesWithLevel();
 				
@@ -348,28 +348,28 @@ public class SubcomponentsComponentFeature	extends	AbstractComponentFeature impl
 						++levelnum[0];
 						if (levelnum[0] < levels.size())
 						{
-							FutureBarrier<IExternalAccess> levelbar = new FutureBarrier<>();
+							FutureBarrier<Map<String, Object>> levelbar = new FutureBarrier<>();
 							Set<String> level = levels.get(levelnum[0]);
 							for (String mname : level)
 							{
-								Collection<CreationInfo> insts = instances.get(mname);
-								for (CreationInfo inst : insts)
+								Collection<IComponentIdentifier> insts = instances.get(mname);
+								for (IComponentIdentifier inst : insts)
 								{
-									IFuture<IExternalAccess> createfut = createComponent(inst);
-									levelbar.addFuture(createfut);
-									createfut.addResultListener(new IResultListener<IExternalAccess>()
+									IFuture<Map<String, Object>> killfut = SComponentManagementService.getExternalAccess(inst, component).killComponent();
+									levelbar.addFuture(killfut);
+									killfut.addResultListener(new IResultListener<Map<String, Object>>()
 									{
 										public void exceptionOccurred(Exception exception)
 										{
 											ret.setExceptionIfUndone(exception);
 										}
 										
-										public void resultAvailable(IExternalAccess result)
+										public void resultAvailable(Map<String, Object> result)
 										{
 											ret.addIntermediateResultIfUndone(result);
 										};
 									});
-									levelbar.addFuture(createfut);
+									levelbar.addFuture(killfut);
 								}
 							}
 							levelbar.waitFor().addResultListener(this);
