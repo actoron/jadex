@@ -54,7 +54,6 @@ import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.Boolean3;
-import jadex.commons.DebugException;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IRwMap;
@@ -78,7 +77,6 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.platform.service.registryv2.SuperpeerClientAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 import jadex.platform.service.security.auth.AbstractX509PemSecret;
 import jadex.platform.service.security.auth.KeySecret;
@@ -471,11 +469,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					}
 				}
 				
-				if (addglobalnetwork && !networknames.contains(GLOBAL_NETWORK_NAME))
-				{
+				if (addglobalnetwork && !networks.containsKey(GLOBAL_NETWORK_NAME))
 					networks.add(GLOBAL_NETWORK_NAME, AbstractAuthenticationSecret.fromString(DEFAULT_GLOBAL_ROOT_CERTIFICATE, true));
-					networknames.add(GLOBAL_NETWORK_NAME);
-				}
 				
 				if ((networks.isEmpty() || (networks.size() == 1 && networks.containsKey(GLOBAL_NETWORK_NAME))) &&
 					createdefaultnetwork)
