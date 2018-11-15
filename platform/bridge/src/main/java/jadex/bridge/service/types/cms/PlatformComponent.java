@@ -1279,7 +1279,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 			@Override
 			public void resultAvailable(IComponentIdentifier result)
 			{
-				System.out.println("created: "+result);
+//				System.out.println("created: "+result);
 				SComponentManagementService.getExternalAccess(result, getInternalAccess()).addResultListener(new DelegationResultListener<>(ret));
 			}
 		}, getExternalAccess()));
