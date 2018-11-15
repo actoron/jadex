@@ -1483,6 +1483,10 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				return cid;
 //					return getId();
 			}
+			else if("getExternalAccess".equals(method.getName()))
+			{
+				return getExternalAccess((IComponentIdentifier) args[0]);
+			}
 			else if("toString".equals(method.getName()))
 			{
 				return tostring;

@@ -9,8 +9,8 @@ import jadex.platform.service.transport.ITransport;
  *  Agent that implements TCP message transport.
  */
 @Agent(name="intravm",
-	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	autostart=Boolean3.FALSE)
+	autostart=Boolean3.FALSE,
+	predecessors="jadex.platform.service.address.TransportAddressAgent")
 public class IntravmTransportAgent extends AbstractTransportAgent2<IntravmTransport.HandlerHolder>
 {
 	//-------- abstract methods to be provided by concrete transport --------

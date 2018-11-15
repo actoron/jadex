@@ -1,10 +1,13 @@
 package jadex.bridge.modelinfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
@@ -496,11 +499,43 @@ public class ModelInfo extends Startable implements IModelInfo
 	}
 	
 	/**
+	 *  Adds required predecessors (dependencies).
+	 */
+	public void addPredecessors(String[] predecessors)
+	{
+		if (this.predecessors != null && this.predecessors.length > 0)
+		{
+			Set<String> tmp = new HashSet<>();
+			tmp.addAll(Arrays.asList(this.predecessors));
+			tmp.addAll(Arrays.asList(predecessors));
+			predecessors = tmp.toArray(new String[tmp.size()]);
+		}
+		this.predecessors = predecessors;
+	}
+	
+	/**
 	 *  Set required predecessors (dependencies).
 	 */
 	public void setPredecessors(String[] predecessors)
 	{
+		if (name.contains("Intravm"))
+			System.out.println("Got INAIAIA");
 		this.predecessors = predecessors;
+	}
+	
+	/**
+	 *  Adds required predecessors (dependencies).
+	 */
+	public void addSuccessors(String[] successors)
+	{
+		if (this.successors != null && this.successors.length > 0)
+		{
+			Set<String> tmp = new HashSet<>();
+			tmp.addAll(Arrays.asList(this.successors));
+			tmp.addAll(Arrays.asList(successors));
+			successors = tmp.toArray(new String[tmp.size()]);
+		}
+		this.successors = successors;
 	}
 	
 	/**

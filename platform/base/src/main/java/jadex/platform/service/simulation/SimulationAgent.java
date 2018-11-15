@@ -16,7 +16,8 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Agent that provides the simulation service.
  */
-@Agent(autostart=Boolean3.TRUE)
+@Agent(autostart=Boolean3.TRUE,
+	predecessors="jadex.platform.service.security.SecurityAgent")
 @Arguments(@Argument(name="bisimulation", clazz=boolean.class))
 @ProvidedServices(@ProvidedService(type=ISimulationService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="SimulationAgent.create($args.bisimulation)")))
 //@Properties(value=@NameValue(name="system", value="true"))

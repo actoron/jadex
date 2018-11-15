@@ -20,7 +20,9 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="new jadex.application.ApplicationComponentFactory($component)"))
 })
-@Agent(name="kernel_application", autostart=Boolean3.FALSE)
+@Agent(name="kernel_application",
+	autostart=Boolean3.FALSE,
+	predecessors="jadex.platform.service.security.SecurityAgent")
 public class KernelApplicationAgent
 {
 }

@@ -18,7 +18,9 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices({@ProvidedService(type=IComponentFactory.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(
 	expression="new MicroAgentFactory($component, SUtil.createHashMap(new String[]{\"debugger.panels\"},new Object[]{\"jadex.tools.debugger.micro.MicroDebuggerPanel\"}))"))
 })
-@Agent(name="kernel_micro", autostart=Boolean3.FALSE)
+@Agent(name="kernel_micro",
+	autostart=Boolean3.FALSE,
+	predecessors="jadex.platform.service.security.SecurityAgent")
 @Properties({@NameValue(name="system", value="true"), @NameValue(name="kernel.types", value="new String[]{\".class\"}")})
 public class KernelMicroAgent
 {

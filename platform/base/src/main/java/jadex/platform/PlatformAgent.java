@@ -22,6 +22,7 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.DependencyResolver;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
@@ -125,10 +126,16 @@ public class PlatformAgent
 			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
 			if(ai!=null)
 			{
-				AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
-				if(aai!=null)
+//				AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
+//				if(aai!=null)
+//				{
+//					EnumInfo ei = (EnumInfo)aai.getValue("value");
+//					String val = ei.getValue();
+//					ret = val==null? false: "true".equals(val.toLowerCase()) || "false".equals(val.toLowerCase()); // include all which define the value (false can be overridden from args)
+//				}
+				EnumInfo ei = (EnumInfo)ai.getValue("autostart");
+				if(ei!=null)
 				{
-					EnumInfo ei = (EnumInfo)aai.getValue("value");
 					String val = ei.getValue();
 					ret = val==null? false: "true".equals(val.toLowerCase()) || "false".equals(val.toLowerCase()); // include all which define the value (false can be overridden from args)
 				}
@@ -162,46 +169,137 @@ public class PlatformAgent
 				
 		// Class name -> instance name
 		Map<String, String> names = new HashMap<String, String>();
-		DependencyResolver<String> dr = new DependencyResolver<String>();
 
 		URL[] urls = new URL[0];
 		ClassLoader classloader = PlatformAgent.class.getClassLoader();
 		if(classloader instanceof URLClassLoader)
 			urls = ((URLClassLoader)classloader).getURLs();
-//		System.out.println("urls: "+urls.length);
 		
 		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
-		Set<String>	comps	= new LinkedHashSet<>();
-		
-		for(ClassInfo ci: cis)
+		List<CreationInfo> infos = new ArrayList<>();
+		for (ClassInfo ci : cis)
 		{
-//			System.out.println("Found: "+ci.getClassname());
-//			Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
-//			if(clazz==null)
-//				agent.getLogger().warning("Could not load agent class: "+ci.getClassname());
-//			else
-				addComponentToLevels(dr, ci, names, comps);
+			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
+			EnumInfo ei = (EnumInfo)ai.getValue("autostart");
+			String val = ei.getValue();
+			boolean ok = "true".equals(val.toLowerCase());
+			String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
+			if(name!=null)
+			{
+				Boolean agentstart = getAgentStart(name);
+				if(agentstart!=null)
+					ok = agentstart.booleanValue();
+			}
+			else
+			{
+				// check classname as parameter
+//				name = SReflect.getInnerClassName(cl);
+				name = SReflect.getUnqualifiedTypeName(ci.getClassName());
+				
+				if(getAgentStart(name.toLowerCase())!=null)
+				{	
+					ok = getAgentStart(name.toLowerCase());
+				}
+				else
+				{
+					// check classname - suffix (BDI/Agent etc) in lowercase
+					int suf = SUtil.inndexOfLastUpperCaseCharacter(name);
+					if(suf>0)
+					{
+						name = name.substring(0, suf).toLowerCase();
+						if(getAgentStart(name)!=null)
+						{	
+							ok = getAgentStart(name);
+						}
+					}
+				}
+			}
+			
+			if (ok)
+			{
+				CreationInfo info = new CreationInfo();
+				info.setName(name);
+				info.setFilename(ci.getClassName()+".class");
+				
+				infos.add(info);
+			}
 		}
 		
-//		System.out.println("cls: "+files.size()+" "+components.size());
-//		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
-		
-		Collection<Set<String>> levels = dr.resolveDependenciesWithLevel();
-//		System.out.println("levels: "+levels);
-//		System.out.println("names: "+names);
-		
-		startComponents(levels.iterator(), names, comps).addResultListener(new DelegationResultListener<Void>(ret)
+		agent.getFeature(ISubcomponentsFeature.class).createComponents(infos.toArray(new CreationInfo[infos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
 		{
-			@Override
-			public void customResultAvailable(Void result)
+			public void resultAvailable(Collection<IExternalAccess> result)
 			{
 				if(platformproxies)
 					addQueryForPlatformProxies();
-				super.customResultAvailable(result);
+				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
 			}
 		});
+		
+//		startComponents(levels.iterator(), names, comps).addResultListener(new DelegationResultListener<Void>(ret)
+//		{
+//			@Override
+//			public void customResultAvailable(Void result)
+//			{
+//				if(platformproxies)
+//					addQueryForPlatformProxies();
+//				super.customResultAvailable(result);
+//			}
+//		});
 		return ret;
 	}
+//	public IFuture<Void> init()
+//	{
+//		Future<Void> ret = new Future<>();
+////		System.out.println("Start scanning...");
+//		long start = System.currentTimeMillis();
+//				
+//		// Class name -> instance name
+//		Map<String, String> names = new HashMap<String, String>();
+//		DependencyResolver<String> dr = new DependencyResolver<String>();
+//
+//		URL[] urls = new URL[0];
+//		ClassLoader classloader = PlatformAgent.class.getClassLoader();
+//		if(classloader instanceof URLClassLoader)
+//			urls = ((URLClassLoader)classloader).getURLs();
+////		System.out.println("urls: "+urls.length);
+//		
+//		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
+//		Set<String>	comps	= new LinkedHashSet<>();
+//		
+//		for(ClassInfo ci: cis)
+//		{
+////			System.out.println("Found: "+ci.getClassname());
+////			Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
+////			if(clazz==null)
+////				agent.getLogger().warning("Could not load agent class: "+ci.getClassname());
+////			else
+//				addComponentToLevels(dr, ci, names, comps);
+//		}
+//		
+////		System.out.println("cls: "+files.size()+" "+components.size());
+////		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
+//		
+//		Collection<Set<String>> levels = dr.resolveDependenciesWithLevel();
+////		System.out.println("levels: "+levels);
+////		System.out.println("names: "+names);
+//		
+//		startComponents(levels.iterator(), names, comps).addResultListener(new DelegationResultListener<Void>(ret)
+//		{
+//			@Override
+//			public void customResultAvailable(Void result)
+//			{
+//				if(platformproxies)
+//					addQueryForPlatformProxies();
+//				super.customResultAvailable(result);
+//			}
+//		});
+//		return ret;
+//	}
 	
 	/**
 	 *  Add query for creating platform proxies.
@@ -270,14 +368,12 @@ public class PlatformAgent
 //			if(autostart.value().toBoolean()!=null)
 //			{		
 				AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
-				AnnotationInfo autostart = (AnnotationInfo)ai.getValue("autostart");
 				
-				String name = autostart.getValue("name")==null || ((String)autostart.getValue("name")).length()==0? null: (String)autostart.getValue("name");
+				String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
 //				String name = autostart.name().length()==0? null: autostart.name();
 				
-				AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
+				EnumInfo ei = (EnumInfo)ai.getValue("autostart");
 				
-				EnumInfo ei = (EnumInfo)aai.getValue("value");
 				String val = ei.getValue();
 				boolean ok = "true".equals(val.toLowerCase()); 
 				if(name!=null)
@@ -323,7 +419,7 @@ public class PlatformAgent
 					comps.add(cname);
 					dr.addNode(cname);
 					
-					Object[] pres = (Object[])autostart.getValue("predecessors");
+					Object[] pres = (Object[])ai.getValue("predecessors");
 					if(pres!=null)
 					{
 						for(Object pre: pres)
@@ -334,7 +430,7 @@ public class PlatformAgent
 						}
 					}
 					
-					Object[] sucs = (Object[])autostart.getValue("successors");
+					Object[] sucs = (Object[])ai.getValue("successors");
 					if(sucs!=null)
 					{
 						for(Object suc: sucs)

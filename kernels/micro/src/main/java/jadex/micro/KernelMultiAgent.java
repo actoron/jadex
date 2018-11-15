@@ -32,7 +32,9 @@ import jadex.micro.annotation.ProvidedServices;
 		@Component(name="kernel_micro", type="KernelMicro")
 	})
 })
-@Agent(name="kernel_multi", autostart=Boolean3.TRUE)
+@Agent(name="kernel_multi",
+	autostart=Boolean3.TRUE,
+	predecessors="jadex.platform.service.security.SecurityAgent")
 @Properties(@NameValue(name="system", value="true"))
 public class KernelMultiAgent
 {

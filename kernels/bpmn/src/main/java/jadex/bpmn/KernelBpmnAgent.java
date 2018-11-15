@@ -29,7 +29,9 @@ import jadex.micro.annotation.ProvidedServices;
 	+		"})"
 	+	")"))
 })
-@Agent(name="kernel_bpmn", autostart=Boolean3.FALSE)
+@Agent(name="kernel_bpmn",
+	autostart=Boolean3.FALSE,
+	predecessors="jadex.platform.service.security.SecurityAgent")
 public class KernelBpmnAgent
 {
 }

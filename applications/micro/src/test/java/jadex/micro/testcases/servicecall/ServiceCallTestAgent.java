@@ -139,6 +139,7 @@ public class ServiceCallTestAgent extends TestAgent
 					
 					public void resultAvailable(Void result)
 					{
+						System.out.println(platform.getExternalAccess(exta.getId()));
 						platform.getExternalAccess(exta.getId()).killComponent().addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
 						{
 							public void customResultAvailable(Map<String, Object> result)

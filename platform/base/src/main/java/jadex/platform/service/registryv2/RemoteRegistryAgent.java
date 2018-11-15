@@ -28,7 +28,9 @@ import jadex.micro.annotation.ProvidedServices;
  *  See SuperpeerRegistryAgent for extended implementation supporting also persistent queries.
  */
 @Service
-@Agent(name=IRemoteRegistryService.REMOTE_REGISTRY_NAME, autostart=Boolean3.TRUE)
+@Agent(name=IRemoteRegistryService.REMOTE_REGISTRY_NAME,
+	autostart=Boolean3.TRUE,
+	predecessors="jadex.platform.service.security.SecurityAgent")
 @ProvidedServices(@ProvidedService(type=IRemoteRegistryService.class, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME, scope=ServiceScope.NETWORK))
 public class RemoteRegistryAgent implements IRemoteRegistryService
 {

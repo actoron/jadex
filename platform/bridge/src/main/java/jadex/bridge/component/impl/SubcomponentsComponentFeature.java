@@ -1,6 +1,7 @@
 package jadex.bridge.component.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -257,24 +258,34 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 							Set<String> level = levels.get(levelnum[0]);
 							for (String mname : level)
 							{
+								System.out.println("MNAME: " + mname);
+//								for (String naame : instances.keySet())
+//									System.out.println("instnn: " + naame);
 								Collection<CreationInfo> insts = instances.get(mname);
-								for (CreationInfo inst : insts)
+								if (insts != null)
 								{
-									IFuture<IExternalAccess> createfut = createComponent(inst);
-									levelbar.addFuture(createfut);
-									createfut.addResultListener(new IResultListener<IExternalAccess>()
+									for (CreationInfo inst : insts)
 									{
-										public void exceptionOccurred(Exception exception)
+										IFuture<IExternalAccess> createfut = createComponent(inst);
+										levelbar.addFuture(createfut);
+										createfut.addResultListener(new IResultListener<IExternalAccess>()
 										{
-											ret.setExceptionIfUndone(exception);
-										}
-										
-										public void resultAvailable(IExternalAccess result)
-										{
-											ret.addIntermediateResultIfUndone(result);
-										};
-									});
-									levelbar.addFuture(createfut);
+											public void exceptionOccurred(Exception exception)
+											{
+												ret.setExceptionIfUndone(exception);
+											}
+											
+											public void resultAvailable(IExternalAccess result)
+											{
+												ret.addIntermediateResultIfUndone(result);
+											};
+										});
+										levelbar.addFuture(createfut);
+									}
+								}
+								else
+								{
+									System.out.println("Skipping unresolvable dep: " + mname);
 								}
 							}
 							levelbar.waitFor().addResultListener(this);
@@ -435,16 +446,23 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		{
 			public void customResultAvailable(Void result)
 			{
-				createComponents(cinfos.toArray(new CreationInfo[cinfos.size()])).addResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, List<IComponentIdentifier>>(ret)
+				if (cinfos != null && !cinfos.isEmpty())
 				{
-					public void customResultAvailable(Collection<IExternalAccess> result)
+					createComponents(cinfos.toArray(new CreationInfo[cinfos.size()])).addResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, List<IComponentIdentifier>>(ret)
 					{
-						List<IComponentIdentifier> cids = new ArrayList<>();
-						for (IExternalAccess exta : SUtil.notNull(result))
-							cids.add(exta.getId());
-						ret.setResult(cids);
-					}
-				});
+						public void customResultAvailable(Collection<IExternalAccess> result)
+						{
+							List<IComponentIdentifier> cids = new ArrayList<>();
+							for (IExternalAccess exta : SUtil.notNull(result))
+								cids.add(exta.getId());
+							ret.setResult(cids);
+						}
+					});
+				}
+				else
+				{
+					ret.setResult(null);
+				}
 				
 			}
 		});
@@ -810,9 +828,10 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 */
 	protected <T> void addComponentToLevels(DependencyResolver<String> dr, T instanceinfo, IModelInfo minfo, MultiCollection<String, T> instances)
 	{
+//		System.out.println("addcomptolevel: " + minfo.getFullName());
 		try
 		{
-			String cname = minfo.getFilename();
+			String cname = minfo.getFullName();
 			
 			dr.addNode(cname);
 			String[] pres = minfo.getPredecessors();
@@ -831,8 +850,11 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		
 			// if no predecessors are defined add SecurityAgent
 			if(pres==null || pres.length==0)
-				System.err.println("NO DEPS: " + cname);
+			{
+				System.err.println("NO DEPS: " + cname + " " + Arrays.toString(SUtil.notNull(pres)));
+				dr.addDependency(cname, Object.class.getName());
 //				dr.addDependency(cname, SecurityAgent.class.getName());
+			}
 			
 			instances.add(cname, instanceinfo);
 		}

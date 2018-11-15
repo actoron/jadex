@@ -50,7 +50,8 @@ import jadex.micro.annotation.RequiredServices;
  *  
  *  It offers the executeCommand() method via the ICliService.
  */
-@Agent(autostart=Boolean3.TRUE)
+@Agent(autostart=Boolean3.TRUE,
+	predecessors="jadex.platform.service.security.SecurityAgent")
 @Service
 @Arguments(
 {
