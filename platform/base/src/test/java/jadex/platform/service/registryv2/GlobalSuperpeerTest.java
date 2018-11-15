@@ -7,6 +7,7 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.security.PemKeyPair;
 import jadex.commons.security.SSecurity;
+import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.auth.AbstractAuthenticationSecret;
 
 /**
@@ -46,7 +47,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		baseconf.setValue("passiveawarenesscatalog", true);
 		baseconf.setValue("rt", true);
 		baseconf.setValue("platformurls", "intravm://GlobalSuperpeerTestSSP@localhost:"+sspport);
-		baseconf.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
+		baseconf.setNetworkNames(SecurityAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);
 		baseconf.setNetworkSecrets(clientsecret.toString(), STest.testnetwork_pass);
 		// Remote only -> no simulation please
 		baseconf.getExtendedPlatformConfiguration().setSimul(false);
@@ -76,7 +77,7 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		RELAYCONF.setValue("rt.forwarding", true);
 		RELAYCONF.setValue("intravm.port", sspport);
 		RELAYCONF.setPlatformName("GlobalSuperpeerTestSSP");
-		RELAYCONF.setNetworkNames(SuperpeerClientAgent.GLOBAL_NETWORK_NAME);
+		RELAYCONF.setNetworkNames(SecurityAgent.GLOBAL_NETWORK_NAME);
 		RELAYCONF.setNetworkSecrets(serversecret.toString());
 //		RELAYCONF.setLogging(true);
 //		RELAYCONF.setValue("rt.debug", true);

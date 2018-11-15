@@ -50,6 +50,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Autostart;
+import jadex.platform.service.security.SecurityAgent;
 
 /**
  *  Agent that observes the environment and decides to
@@ -128,7 +129,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 				{
 					ISuperpeerService sp = it.next();
 					Set<String> networks = ((IService) sp).getServiceId().getNetworkNames();
-					if (networks == null || (networks.size() == 1 && networks.contains(SuperpeerClientAgent.GLOBAL_NETWORK_NAME)))
+					if (networks == null || (networks.size() == 1 && networks.contains(SecurityAgent.GLOBAL_NETWORK_NAME)))
 						it.remove();
 				}
 				
