@@ -34,7 +34,6 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -55,6 +54,7 @@ import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.Boolean3;
+import jadex.commons.DebugException;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IRwMap;
@@ -679,16 +679,19 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 						
 						// Add sim blocker and print error msg when handshake doesn't work
-						SSimulation.addBlocker(ret);
-						ia.waitForDelay(Starter.getScaledDefaultTimeout(ia.getId(), 0.5), true)
-							.addResultListener(v ->
+						if(SSimulation.addBlocker(ret))
 						{
-							if(!ret.isDone())
+							ia.waitForDelay(Starter.getScaledDefaultTimeout(ia.getId(), 0.5), true)
+								.addResultListener(v ->
 							{
-								System.out.println("Security handshake timeout from "+agent+" to "+rplat);
-								ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
-							}
-						});
+								if(!ret.isDone())
+								{
+									System.out.println("Security handshake timeout from "+agent+" to "+rplat);
+									checkCleanup();
+									ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
+								}
+							});
+						}
 							
 						hstate.getResultFuture().addResultListener(new ExceptionDelegationResultListener<ICryptoSuite, byte[]>(ret, true)
 						{
