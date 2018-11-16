@@ -1,5 +1,6 @@
 package jadex.base;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -176,8 +177,15 @@ public class Starter
 	// keytool -import -trustcacerts -alias startcom.ca -file ca.crt
 	// // wget http://www.startssl.com/certs/sub.class1.server.ca.crt
 	// // keytool -import -alias startcom.ca.sub -file sub.class1.server.ca.crt
-//	static
-//	{
+	static
+	{
+		File f = new File("/dev/urandom");
+		if(f.exists()) 
+		{ 
+		    // set secure random to non-blocking entropy source
+			 System.getProperties().setProperty("securerandom.source", "/dev/urandom");  
+		}
+		
 //		try
 //		{
 //			Class<?> cl = SReflect.findClass0("jadex.platform.service.security.SSecurity", null, null);
@@ -192,7 +200,7 @@ public class Starter
 //		{
 //			System.out.println("Error adding startssl certificate to truststore: "+e.getMessage());
 //		}
-//	}
+	}
 	
 	/**
 	 *  Unescape a string.
