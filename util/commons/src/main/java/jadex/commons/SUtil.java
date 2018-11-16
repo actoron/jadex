@@ -134,22 +134,6 @@ public class SUtil
 	/** Access to secure random source. */
 	public static volatile SecureRandom SECURE_RANDOM = null;
 	
-	static
-	{
-		getSecureRandom();
-		if (Security.getProvider("Jadex") == null)
-		{
-			Security.insertProviderAt(new Provider("Jadex", 1.0, "")
-			{
-				{
-					putService(new Service(this, "SecureRandom", "ChaCha20", "jadex.commons.JadexSecureRandomSpi", null, null));
-				}
-				private static final long serialVersionUID = -3208767101511459503L;
-				
-			}, 1);
-		}
-	}
-	
 	/** The mime types. */
 	protected volatile static Map<String, String> MIMETYPES;
 
@@ -480,7 +464,7 @@ public class SUtil
 					}
 					catch (Throwable t)
 					{
-						SECURE_RANDOM = getJavaDefaultSecureRandom();
+						SECURE_RANDOM = new SecureRandom();
 					}
 				}
 			}
@@ -5922,47 +5906,6 @@ public class SUtil
 	    return -1;
 	}
 	
-	/** The Java default secure random. */
-	protected static volatile SecureRandom JAVA_DEFAULT_SECURE_RANDOM;
-	
-	/**
-	 *  Creates Java default algorithm secure random.
-	 */
-	public static final SecureRandom getJavaDefaultSecureRandom()
-	{
-		if (JAVA_DEFAULT_SECURE_RANDOM == null)
-		{
-			synchronized(SUtil.class)
-			{
-				if (JAVA_DEFAULT_SECURE_RANDOM == null)
-				{
-					String alg = "SHA1PRNG";
-					Provider p = Security.getProvider("SUN");
-					if (p != null)
-					{
-						for (Service serv : p.getServices())
-						{
-				            if (serv.getType().equals("SecureRandom"))
-				            {
-				                alg = serv.getAlgorithm();
-				                break;
-				            }
-				        }
-					}
-					try
-					{
-						JAVA_DEFAULT_SECURE_RANDOM = SecureRandom.getInstance(alg);
-					}
-					catch (NoSuchAlgorithmException e)
-					{
-						throw SUtil.throwUnchecked(e);
-					}
-				}
-			}
-		}
-		return JAVA_DEFAULT_SECURE_RANDOM;
-	}
-	
 	/**
 	 *  Tests if the OS is Windows.
 	 *  @return True, if Windows.
@@ -5991,6 +5934,29 @@ public class SUtil
 	    {
 	        return string;
 	    }
+	}
+	
+	/**
+	 *  Ensures SecureRandom use is nonblocking in all cases.
+	 *  Must be called before first new SecureRandom() use.
+	 *  Safe to call multiple times.
+	 *  
+	 *  Note: On certain systems like Linux, SecureRandom ends up
+	 *  using /dev/random as a entropy source for initialization.
+	 *  This has the severe disadvantage of blocking indefinitely
+	 *  once the entropy pool "runs out of entropy" (whatever that
+	 *  means). Calling this method prevents this undesirable behavior.
+	 */
+	public static void ensureNonblockingSecureRandom()
+	{
+		Provider p = Security.getProvider("SUN");
+		if (p != null)
+		{
+			Object nonblocking = p.get("SecureRandom.NativePRNGNonBlocking");
+			Object defnative = p.get("SecureRandom.NativePRNG");
+			if (nonblocking != defnative && nonblocking != null && defnative != null)
+				p.put("SecureRandom.NativePRNG", nonblocking);
+		}
 	}
 	
 	/**
