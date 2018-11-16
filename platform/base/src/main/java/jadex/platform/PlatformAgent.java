@@ -176,7 +176,8 @@ public class PlatformAgent
 			urls = ((URLClassLoader)classloader).getURLs();
 		
 		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
-		List<CreationInfo> infos = new ArrayList<>();
+		List<CreationInfo> sysinfos = new ArrayList<>();
+		List<CreationInfo> userinfos = new ArrayList<>();
 		for (ClassInfo ci : cis)
 		{
 			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
