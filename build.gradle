@@ -142,7 +142,7 @@ subprojects
 		buildscript {
 			dependencies {
 				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
-						version: "$project.version.major.$project.version.minor.98"
+						version: "$project.version.major.$project.version.minor.+"
 //				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
 //						version: "3.0-DEVELOPMENT"
 			}
