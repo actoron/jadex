@@ -277,6 +277,14 @@ publishing {
             MyPublication(MavenPublication) {
                 if (isWebApplicationProject(project)) {
                     from components.web
+                    // publish jar for web projects, too
+                    // (somebody generates signatures, sources,javadoc for them which are uploaded,
+                    // so we need the main jar artifact, too
+                    project.tasks.withType(Jar) {
+                        if (it.name.endsWith('jar') && !it.name.contains('sources') && !it.name.contains('javadoc')) {
+                            artifact(it)
+                        }
+                    }
                 } else if (!isAndroidProject(project)) {
                     from components.java
                 }
