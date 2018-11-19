@@ -2069,7 +2069,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public IExternalAccess getExternalAccess(IComponentIdentifier cid)
 	{
-		return getComponent().getExternalAccess();
+		if (cid == null || component.getId().equals(cid))
+			return getComponent().getExternalAccess();
+		return SComponentManagementService.getExternalAccess(cid, component);
 	}
 	
 	/**

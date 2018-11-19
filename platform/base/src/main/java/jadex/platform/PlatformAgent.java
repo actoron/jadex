@@ -4,12 +4,17 @@ import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
 import static jadex.base.IPlatformConfiguration.PLATFORMPROXIES;
 import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -25,6 +30,7 @@ import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -118,7 +124,7 @@ public class PlatformAgent
 	//-------- static part --------
 	
 	/** Filter for finding agents to be auto-started. */
-	protected static IFilter<SClassReader.ClassInfo>	filter	= new IFilter<SClassReader.ClassInfo>()
+	protected static IFilter<SClassReader.ClassInfo> filter = new IFilter<SClassReader.ClassInfo>()
 	{
 		public boolean filter(ClassInfo ci)
 		{
@@ -175,11 +181,16 @@ public class PlatformAgent
 		if(classloader instanceof URLClassLoader)
 			urls = ((URLClassLoader)classloader).getURLs();
 		
+		// Remove JVM jars
+		urls = SUtil.removeSystemUrls(urls);
+		
 		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
+//		List<CreationInfo> infos = new ArrayList<>();
 		List<CreationInfo> sysinfos = new ArrayList<>();
 		List<CreationInfo> userinfos = new ArrayList<>();
 		for (ClassInfo ci : cis)
 		{
+			isSystemComponent(ci, classloader);
 			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
 			EnumInfo ei = (EnumInfo)ai.getValue("autostart");
 			String val = ei.getValue();
@@ -222,17 +233,40 @@ public class PlatformAgent
 				info.setName(name);
 				info.setFilename(ci.getClassName()+".class");
 				
-				infos.add(info);
+				if (isSystemComponent(ci, classloader))
+					sysinfos.add(info);
+				else
+					userinfos.add(info);
 			}
 		}
 		
-		agent.getFeature(ISubcomponentsFeature.class).createComponents(infos.toArray(new CreationInfo[infos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
+		agent.getFeature(ISubcomponentsFeature.class).createComponents(sysinfos.toArray(new CreationInfo[sysinfos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
 		{
 			public void resultAvailable(Collection<IExternalAccess> result)
 			{
 				if(platformproxies)
 					addQueryForPlatformProxies();
-				ret.setResult(null);
+				if (userinfos.size() > 0)
+				{
+					agent.getFeature(ISubcomponentsFeature.class).createComponents(userinfos.toArray(new CreationInfo[userinfos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
+					{
+						public void resultAvailable(java.util.Collection<IExternalAccess> result)
+						{
+							ret.setResult(null);
+						};
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// Ignore failures for user startup, but do complain.
+							exception.printStackTrace();
+							ret.setResult(null);
+						};
+					});
+				}
+				else
+				{
+					ret.setResult(null);
+				}
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -583,6 +617,99 @@ public class PlatformAgent
 			}
 			return ret;
 		}
+	}
+	
+	protected static final boolean isSystemComponent(ClassInfo ci, ClassLoader cl)
+	{
+		AnnotationInfo provservsinfo = ci.getAnnotation(ProvidedServices.class.getName());
+		if (provservsinfo != null)
+		{
+			Object[] provservs = (Object[]) provservsinfo.getValue("value");
+			for (Object provserv : SUtil.notNull(provservs))
+			{
+				AnnotationInfo provservinfo = (AnnotationInfo) provserv;
+				String ifacename = ((ClassInfo) provservinfo.getValue("type")).getClassName();
+				if (isSystemInterface(ifacename, cl))
+				{
+//					System.out.println("System because of provided service declaration: " + ci);
+					return true;
+				}
+			}
+		}
+		
+		boolean autoprovide = false;
+		ClassInfo curci = ci;
+		while (curci != null)
+		{
+			AnnotationInfo agentinfo = curci.getAnnotation(Agent.class.getName());
+			if (agentinfo != null)
+			{
+				EnumInfo ap = (EnumInfo) agentinfo.getValue("autoprovide");
+				if (ap != null && !"NULL".equals(ap.getValue()))
+				{
+					autoprovide = "TRUE".equals(ap.getValue()) ? true : false;
+					break;
+				}
+				
+			}
+			String scn = curci.getSuperClassName();
+			if (scn != null)
+				curci = SClassReader.getClassInfo(scn, cl);
+			else
+				curci = null;
+		}
+		
+		if (autoprovide)
+		{
+			curci = ci;
+			while (curci != null)
+			{
+				List<String> ifaces = curci.getInterfaceNames();
+				for (String ifacename : SUtil.notNull(ifaces))
+				{
+					if (isSystemInterface(ifacename, cl))
+					{
+//						System.out.println("System because of autoprovide: " + ci);
+						return true;
+					}
+				}
+				String scn = curci.getSuperClassName();
+				if (scn != null)
+					curci = SClassReader.getClassInfo(scn, cl);
+				else
+					curci = null;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 *  Checks if an interface or any superinterface has the system property.
+	 *  
+	 *  @param ifacename Interface name.
+	 *  @param cl Class loader.
+	 *  @return True, if system.
+	 */
+	protected static final boolean isSystemInterface(String ifacename, ClassLoader cl)
+	{
+		ClassInfo iface = SClassReader.getClassInfo(ifacename, cl);
+		AnnotationInfo sinfo = iface.getAnnotation(Service.class.getName());
+		if (sinfo != null)
+		{
+			Boolean sys = (Boolean) sinfo.getValue("system");
+			if (Boolean.TRUE.equals(sys))
+				return true;
+		}
+		
+		List<String> superifaces = iface.getInterfaceNames();
+		for (String superiface : SUtil.notNull(superifaces))
+		{
+			if (isSystemInterface(superiface, cl))
+				return true;
+		}
+		
+		return false;
 	}
 
 	/**

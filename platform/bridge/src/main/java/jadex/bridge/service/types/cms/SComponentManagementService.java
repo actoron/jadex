@@ -375,7 +375,7 @@ public class SComponentManagementService
 	 *  Notify the cms listeners of an addition.
 	 */
 	public static void notifyListenersAdded(IComponentDescription desc)
-	{
+	{System.out.println("Comp added: " + desc);
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	slis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(desc.getName())));
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	alis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(null)));
 		slis.addAll(alis);
@@ -739,7 +739,8 @@ public class SComponentManagementService
 	 */
 	protected static IExternalAccess getRemotePlatform(IInternalAccess agent, final IComponentIdentifier cid)
 	{
-		return SServiceProvider.getExternalAccessProxy(agent, cid);
+		return getExternalAccess(cid, agent);
+//		return SServiceProvider.getExternalAccessProxy(agent, cid);
 	}
 	
 	
@@ -1236,7 +1237,7 @@ public class SComponentManagementService
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
 			)
 		{
-			IExternalAccess ea = getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), true, agent);
+			IExternalAccess ea = getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), agent);
 			ea.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, IResourceIdentifier>(ret)
 			{
 				public void customResultAvailable(IModelInfo model)
@@ -1283,7 +1284,7 @@ public class SComponentManagementService
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
-	public static IExternalAccess getExternalAccess(final IComponentIdentifier cid, boolean internal, IInternalAccess agent)
+	public static IExternalAccess getExternalAccess(final IComponentIdentifier cid, IInternalAccess agent)
 	{
 		IExternalAccess ret = null;
 		
@@ -1542,10 +1543,10 @@ public class SComponentManagementService
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
-	public static IExternalAccess getExternalAccess(final IComponentIdentifier cid, IInternalAccess agent)
-	{
-		return getExternalAccess(cid, false, agent);
-	}
+//	public static IExternalAccess getExternalAccess(final IComponentIdentifier cid, IInternalAccess agent)
+//	{
+//		return getExternalAccess(cid, false, agent);
+//	}
 	
 	/**
 	 *  Set breakpoints for a component.

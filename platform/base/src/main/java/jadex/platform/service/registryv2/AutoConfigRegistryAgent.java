@@ -492,7 +492,8 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		final Number[] res = new Number[valcnt];
 		final int[] cnt = new int[valcnt];
 		
-		IExternalAccess ea = SServiceProvider.getExternalAccessProxy(agent, sid.getProviderId().getRoot());
+//		IExternalAccess ea = SServiceProvider.getExternalAccessProxy(agent, sid.getProviderId().getRoot());
+		IExternalAccess ea = agent.getExternalAccess(sid.getProviderId().getRoot());
 		
 		final Runnable run = new Runnable()
 		{

@@ -2597,6 +2597,48 @@ public class SUtil
 	}
 	
 	/**
+	 *  Converts a file URL to a File,
+	 *  returns null if invalid.
+	 *  
+	 *  @param url The URL.
+	 *  @return File or null if invalid.
+	 */
+	public static final File toFile(URL url)
+	{
+		File ret = null;
+		URI uri = toURI0(url);
+		if (uri != null)
+		{
+			ret = new File(uri);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Converts a file URL to a File,
+	 *  returns null if invalid.
+	 *  
+	 *  @param url The URL.
+	 *  @return File or null if invalid.
+	 */
+	public static final File toFile0(URL url)
+	{
+		File ret = null;
+		URI uri = toURI0(url);
+		if (uri != null)
+		{
+			try
+			{
+				ret = new File(uri);
+			}
+			catch (RuntimeException e)
+			{
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Sleep the current thread, ignore exceptions.
 	 *  @param  millis Time to sleep in milliseconds
 	 */
@@ -3120,6 +3162,51 @@ public class SUtil
 			}
 		}
 		return file;
+	}
+	
+	/**
+	 *  Removes the (.jar) URLs contained in directories associated
+	 *  with the JVM.
+	 *  
+	 *  @param urls The input URLs.
+	 *  
+	 *  @return URLs without the system path URLs.
+	 */
+	public static final URL[] removeSystemUrls(URL[] urls)
+	{
+		Set<String> bootpaths = new HashSet<>();
+		
+		// Java 8 or lower boot cp with rt.jar etc.
+		String cp = System.getProperty("sun.boot.class.path");
+		if (cp != null && cp.length() > 0)
+			bootpaths.addAll(Arrays.asList(cp.split(":")));
+		
+		// ext libraries
+		cp = System.getProperty("java.ext.dirs");
+		if (cp != null && cp.length() > 0)
+			bootpaths.addAll(Arrays.asList(cp.split(":")));
+		
+		Set<File> javalibdirs = new HashSet<>();
+		
+		for (String bp : bootpaths)
+		{
+			File bpf = new File(bp);
+			if (bpf.isDirectory())
+				javalibdirs.add(bpf);
+			else
+				javalibdirs.add(bpf.getParentFile());
+		}
+		
+		ArrayList<URL> tmpurl = new ArrayList<>();
+		for (URL url : SUtil.notNull(urls))
+		{
+			File urlfile = SUtil.getFile(url);
+			if (urlfile == null || !javalibdirs.contains(urlfile.getParentFile()))
+				tmpurl.add(url);
+//			else
+//				System.out.println("Excluded: " + url);
+		}
+		return tmpurl.toArray(new URL[tmpurl.size()]);
 	}
 	
 	/**

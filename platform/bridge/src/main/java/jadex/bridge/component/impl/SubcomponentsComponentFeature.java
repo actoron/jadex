@@ -158,9 +158,13 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	public IFuture<IExternalAccess> createComponent(CreationInfo info)
 	{
 		if (info.getParent() == null || component.getId().equals(info.getParent()))
+		{
 			return getComponent().createComponent(info, null);
+		}
 		else
-			return component.getExternalAccessAsync(info.getParent()).get().createComponent(info);
+		{
+			return component.getExternalAccess(info.getParent()).createComponent(info);
+		}
 	}
 	
 	/**
@@ -258,9 +262,6 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 							Set<String> level = levels.get(levelnum[0]);
 							for (String mname : level)
 							{
-								System.out.println("MNAME: " + mname);
-//								for (String naame : instances.keySet())
-//									System.out.println("instnn: " + naame);
 								Collection<CreationInfo> insts = instances.get(mname);
 								if (insts != null)
 								{

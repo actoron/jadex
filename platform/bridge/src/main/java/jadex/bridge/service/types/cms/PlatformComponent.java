@@ -1124,14 +1124,16 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	{
 		if(parent!=null && !getId().equals(parent))
 		{
-			return SServiceProvider.getExternalAccessProxy(getInternalAccess(), parent).scheduleStep(new IComponentStep<IComponentIdentifier[]>()
-			{
-				@Classname("getChildren")
-				public IFuture<IComponentIdentifier[]> execute(IInternalAccess ia)
-				{
-					return ia.getChildren(type, null);
-				}
-			});
+			return getExternalAccess().getExternalAccess(parent).getChildren(type, parent);
+//			System.out.println(SServiceProvider.getExternalAccessProxy(getInternalAccess(), parent));
+//			return SServiceProvider.getExternalAccessProxy(getInternalAccess(), parent).scheduleStep(new IComponentStep<IComponentIdentifier[]>()
+//			{
+//				@Classname("getChildren")
+//				public IFuture<IComponentIdentifier[]> execute(IInternalAccess ia)
+//				{
+//					return ia.getChildren(type, null);
+//				}
+//			});
 		}
 		
 		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
