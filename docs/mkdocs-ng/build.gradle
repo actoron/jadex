@@ -282,7 +282,7 @@ class DockerTask extends DefaultTask {
     String dockerImageName
 
     protected String docker = "which docker".execute().text.trim()
-    private final static String DOCKERCONTAINERNAME = 'jadextempdocker'
+    private final String DOCKERCONTAINERNAME = 'jadextempdocker-'+dockerImageName
 
     def boolean forceDocker = project.hasProperty('forceDocker') ? project.property('forceDocker') : false
 
