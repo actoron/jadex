@@ -282,7 +282,6 @@ class DockerTask extends DefaultTask {
     String dockerImageName
 
     protected String docker = "which docker".execute().text.trim()
-    protected String DOCKERCONTAINERNAME = 'jadextempdocker-'+dockerImageName
 
     def boolean forceDocker = project.hasProperty('forceDocker') ? project.property('forceDocker') : false
 
@@ -292,7 +291,8 @@ class DockerTask extends DefaultTask {
         if (builder.command().first().contains("docker")) {
             Runtime.runtime.addShutdownHook {
                 println "shutting down - please be patient"
-                def stopProcess = "$docker stop $DOCKERCONTAINERNAME".execute()
+				def dockerContainerName = dockerImageName.replace("/", "-")+"-container"
+                def stopProcess = "$docker stop $dockerContainerName".execute()
                 stopProcess.waitFor();
                 println stopProcess.text
                 if (stopProcess.exitValue() == 0) {
@@ -325,7 +325,8 @@ class DockerTask extends DefaultTask {
                 pullDockerImage(dockerImageName);
             }
 
-            allArgs = [docker, 'run', '--name=' + DOCKERCONTAINERNAME]
+			def dockerContainerName = dockerImageName.replace("/", "-")+"-container"
+            allArgs = [docker, 'run', '--name=' + dockerContainerName]
             allArgs.addAll(dockerArgs)
             allArgs.add(dockerImageName)
         } else {
