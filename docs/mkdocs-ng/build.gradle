@@ -62,19 +62,18 @@ task processDocs(type: Copy) {
     }
     into project.buildDir.getCanonicalPath() + "${File.separator}mkdocs"
 //    outputs.upToDateWhen {false}
-    from('docs') { // everything but md source
-        include '**/*'
-        exclude '*.md'
-        into 'docs'
-
-    }
     from('theme') {
         include '**/*'
         into 'theme'
         filter(ExpandProperties, project: ant.project)
     }
+    from('docs') { // everything but md source
+        include '**/*'
+        exclude '*.md'
+        into 'docs'
+    }
     from ('.') { // preprocess md source
-        include '**/*.md'
+        include 'docs/**/*.md'
         include 'mkdocs.yml'
         filter(ExpandProperties, project: ant.project)
     }
