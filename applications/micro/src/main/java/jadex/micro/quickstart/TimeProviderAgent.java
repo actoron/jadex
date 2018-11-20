@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
@@ -162,6 +164,15 @@ public class TimeProviderAgent	implements ITimeService
 				ret.setResultIfUndone("unknown");
 			}			
 		}).start();
+		
+		new Timer().schedule(new TimerTask()
+		{
+			@Override
+			public void run()
+			{
+				ret.setResultIfUndone("unknown");
+			}
+		}, 15000L);
 		
 		return ret.get();
 	}
