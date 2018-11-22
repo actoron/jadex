@@ -91,7 +91,7 @@
 
   // correct javadoc links
   // var docsHome = $(searchHeader).find('a.icon-home').attr('href');
-  var docsHome = $('ul.wy-breadcrumbs > li > a')
+  var docsHome = $('ul.wy-breadcrumbs > li > a').attr('href')
 //  console.log(docsHome);
 
   var lengthOf = "$RELJAVADOCPATH".length;
