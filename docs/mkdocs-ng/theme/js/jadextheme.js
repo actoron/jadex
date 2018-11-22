@@ -90,7 +90,8 @@
   });
 
   // correct javadoc links
-  var docsHome = $(searchHeader).find('a.icon-home').attr('href');
+  // var docsHome = $(searchHeader).find('a.icon-home').attr('href');
+  var docsHome = $('ul.wy-breadcrumbs > li > a')
 //  console.log(docsHome);
 
   var lengthOf = "$RELJAVADOCPATH".length;
@@ -99,6 +100,7 @@
 //  	window.location.pathname.indexof
 	var originalHref = element.getAttribute('href')
 	var url = docsHome + "/../" + "javadoc" +  originalHref.substring(originalHref.indexOf('$RELJAVADOCPATH') + lengthOf);
-	console.log("replacing with: " + url);
+
+	// console.log("replacing with: " + url);
 	element.setAttribute('href', url);
   });
