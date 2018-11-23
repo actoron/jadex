@@ -3,10 +3,14 @@ pipeline {
   agent any
   stages {
 	stage('Prepare') {
-	  script {
-        def versionprops = readProperties  file: 'src/main/buildutils/jadexversion.properties'
-        def version = sh 'git describe --match "${versionprops.major}.${versionprops.minor}.*" --abbrev=0'
-        currentBuild.displayName = version
+	  steps {
+	    script {
+	      def versionprops = readProperties  file: 'src/main/buildutils/jadexversion.properties'
+	      echo versionprops
+          def version = sh 'git describe --match "${versionprops.jadexversion_major}.${versionprops.jadexversion_minor}.*" --abbrev=0'
+          echo version
+          currentBuild.displayName = version
+	    }
 	  }
 	}
 	stage('Build and Test') {
