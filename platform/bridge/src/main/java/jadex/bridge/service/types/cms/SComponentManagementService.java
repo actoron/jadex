@@ -1995,6 +1995,10 @@ public class SComponentManagementService
 		if(!contains)
 			SComponentManagementService.getCleanupFutures(agent.getId()).put(cid, tmp);
 		
+		// Is the component inited, i.e. init info already remved or init failed with exception and waiting for removal.
+		boolean inited	= SComponentManagementService.getInitInfo(cid)==null
+			|| SComponentManagementService.getInitInfo(cid).getInitFuture().isDone();
+		
 		// Is the component locked?
 		LockEntry kt = SComponentManagementService.getLockEntries(agent.getId()).get(cid);
 		if(kt!=null && kt.getLockerCount()>0)
@@ -2007,7 +2011,7 @@ public class SComponentManagementService
 		
 		releaseWriteLock(agent.getId());
 		
-		if(!contains && !locked)
+		if(!contains && !locked && inited)
 			destroyComponent(cid, ret, agent);
 
 		return ret;
@@ -2733,13 +2737,6 @@ public class SComponentManagementService
 								public void run()
 								{
 									IPlatformComponentAccess comp = getComponent(cid);
-//									IPlatformComponentAccess comp = SComponentManagementService.getComponents(agent.getId()).get(cid);
-//									if(comp==null)
-//									{
-//										InitInfo	ii	= getInitInfo(cid);
-//										assert ii!=null: "Should be either in 'components' or 'initinfos'.";
-//										comp	= ii.getComponent();
-//									}
 									
 									comp.getInternalAccess().getExternalAccess().killComponent(exception)
 										.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, IComponentIdentifier>(inited)
