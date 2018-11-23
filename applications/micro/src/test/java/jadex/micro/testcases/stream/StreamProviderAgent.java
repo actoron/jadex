@@ -3,6 +3,7 @@ package jadex.micro.testcases.stream;
 import java.util.Collection;
 import java.util.List;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
@@ -190,7 +191,8 @@ public class StreamProviderAgent implements IStreamService
 				size[0]++;
 				if(cnt[0]++<50)
 				{
-					agent.getFeature(IExecutionFeature.class).waitForDelay(50, this);
+					agent.getFeature(IExecutionFeature.class)
+						.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 5.0/3000), this);
 				}
 				else
 				{
@@ -200,7 +202,8 @@ public class StreamProviderAgent implements IStreamService
 				return IFuture.DONE;
 			}
 		};
-		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, step);
+		agent.getFeature(IExecutionFeature.class)
+			.waitForDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), step);
 		
 		return ret;
 	}
