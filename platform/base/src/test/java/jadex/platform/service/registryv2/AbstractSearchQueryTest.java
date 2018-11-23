@@ -240,8 +240,8 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("5) start SP, wait for connection from provider platforms and client platform, search for service");
 			IExternalAccess	sp	= createPlatform(spconf);
 			waitForSuperpeerConnections(sp, client, pro2);
-			waitALittle(client);
-//			waitLonger(client);	// Hack for timeout in CI Pipeline!?
+//			waitALittle(client);
+			waitLonger(client);	// Hack for timeout in CI Pipeline!?
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(client.toString()+": "+result, 1, result.size());
 			
