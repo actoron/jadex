@@ -27,10 +27,8 @@ public class BPMNStartElementsTest //extends TestCase
 //		config.setValue("kernel_bpmn", true);
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(config);
 		
-		long timeout = Starter.getDefaultTimeout(null);
-		
-		IExternalAccess	platform	= fut.get(timeout);
-		timeout	= Starter.getDefaultTimeout(platform.getId());
+		// Use larger timeout so we can reduce default timeout on build slave
+		IExternalAccess	platform	= fut.get(Starter.getScaledDefaultTimeout(null, 5));
 		
 		CreationInfo ci = new CreationInfo();
 		ci.setConfiguration("Case A");
