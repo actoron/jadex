@@ -39,7 +39,8 @@ public class JCCTest //extends TestCase
 //		config.setLogging(true);
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(config);
 		
-		long timeout = Starter.getDefaultTimeout(null);
+		// Use larger timeout so we can reduce default timeout on build slave
+		long timeout = Starter.getScaledDefaultTimeout(null, 3);
 //		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		IExternalAccess	platform	= fut.get(timeout);
