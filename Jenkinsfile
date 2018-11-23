@@ -1,5 +1,6 @@
 pipeline {
   //agent { label 'jadex-jenkins-agent' }
+  agent any
   stages {
 	stage('Prepare') {
 	  steps {
