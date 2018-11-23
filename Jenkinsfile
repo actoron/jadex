@@ -3,7 +3,7 @@ pipeline {
   agent any
   stages {
 	stage('Prepare') {
-	  steps {
+	  script {
         def versionprops = readProperties  file: 'src/main/buildutils/jadexversion.properties'
         def version = sh 'git describe --match "${versionprops.major}.${versionprops.minor}.*" --abbrev=0'
         currentBuild.displayName = version
