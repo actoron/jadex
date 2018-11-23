@@ -39,7 +39,7 @@ import jadex.micro.testcases.TestAgent;
 @Service
 @Agent
 @ProvidedServices(@ProvidedService(type=IAutoTerminateService.class))
-@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 10)")}) // cannot use $component.getId() because is extracted from test suite :-(
+@Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(
 public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateService
 {
 	//-------- attributes --------
@@ -146,14 +146,14 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			}
 		});
 		
-		// sending ping every second
-		waitForRealtimeDelay(1000, new IComponentStep<Void>()
+		// sending ping every second (by default)
+		waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(ret.addIntermediateResultIfUndone("ping"))
 				{
-					waitForRealtimeDelay(1000, this);
+					waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), this);
 				}
 				
 				return IFuture.DONE;
