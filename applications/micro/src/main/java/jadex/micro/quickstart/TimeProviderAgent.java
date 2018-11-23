@@ -172,7 +172,7 @@ public class TimeProviderAgent	implements ITimeService
 			{
 				ret.setResultIfUndone("unknown");
 			}
-		}, 15000L);
+		}, Starter.getScaledDefaultTimeout(null, 0.5));
 		
 		return ret.get();
 	}
