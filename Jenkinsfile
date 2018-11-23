@@ -7,7 +7,12 @@ pipeline {
 	    script {
 	      def versionprops = readProperties  file: 'src/main/buildutils/jadexversion.properties'
 	      echo "Defined Jadex version is ${versionprops.jadexversion_major}.${versionprops.jadexversion_minor}"
-          def version = sh 'git describe --match "${versionprops.jadexversion_major}.${versionprops.jadexversion_minor}.*" --abbrev=0'
+	      def gitcmd = "git describe --match \"${versionprops.jadexversion_major}.${versionprops.jadexversion_minor}.*\" --abbrev=0"
+	      echo gitcmd
+          def version = sh (
+          	script: gitcmd,
+          	returnStdout: true
+          )
           echo "Tagged Jadex version is ${version}"
           currentBuild.displayName = version
 	    }
