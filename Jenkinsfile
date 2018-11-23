@@ -1,6 +1,13 @@
 pipeline {
-  agent { label 'jadex-jenkins-agent' }
+  //agent { label 'jadex-jenkins-agent' }
   stages {
+	stage('Prepare') {
+	  steps {
+        def versionprops = readProperties  file: 'src/main/buildutils/jadexversion.properties'
+        def version = sh 'git describe --match "${versionprops.major}.${versionprops.minor}.*" --abbrev=0'
+        currentBuild.displayName = version
+	  }
+	}
 	stage('Build and Test') {
 	  steps {
 		wrap([$class: 'Xvfb']) {
