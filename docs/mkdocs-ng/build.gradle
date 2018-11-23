@@ -239,7 +239,7 @@ class BuildPandocImageTask extends DockerTask {
 //            println "Removing old pandoc docker image..."
 //            println "$docker rmi $dockerImageName".execute().text
             println "Building pandoc docker image..."
-            def p = "$docker build -t $dockerImageName .".execute()
+            def p = ("$docker build -t $dockerImageName "+project.file('.')).execute()
             p.inputStream.eachLine{println it}
             p.waitFor()
         }
@@ -267,7 +267,9 @@ class MkDocsTask extends DockerTask {
             command.add("site")
         }
 
-        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$workDir:/docs/"];
+        def String[] dockerArgs = System.getenv("DOCKER_MKDOCS_USER")!=null
+			? ["--rm", "-u", System.getenv("DOCKER_MKDOCS_USER"), "-p", "8000:8000", "-v", "$workDir:/docs/"]
+			: ["--rm", "-p", "8000:8000", "-v", "$workDir:/docs/"];
         def builder =  getProcessBuilderForCommand("mkdocs", null, dockerArgs, true)
         builder.command.addAll(command)
         builder.directory(new File(workDir)) // only works without docker?
