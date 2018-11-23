@@ -60,7 +60,8 @@ public class ServiceCallTestNFClearTest
 	@Before
 	public void setUp()
 	{
-		timeout = Starter.getDefaultTimeout(null);
+		// Use larger timeout so we can reduce default timeout on build slave
+		timeout = Starter.getScaledDefaultTimeout(null, 5);
 
 //		String pid = SUtil.createPlainRandomId(name.getMethodName(), 3) + "-*";
 
