@@ -20,11 +20,12 @@ pipeline {
 	// Build and check if all tests pass before doing anything else 
 	stage('Build and Test') {
 	  steps {
-	    sh 'gradlew -Pdist=addongradleplugin clean :android:gradle-plugin:test publishToMavenLocal -x javadoc -x processSchemas'
+	    // not required?
+	    //sh './gradlew -Pdist=addongradleplugin clean :android:gradle-plugin:test publishToMavenLocal -x javadoc -x processSchemas'
 		wrap([$class: 'Xvfb']) {
 		  // todo: why build hangs with distzip and javadoc?
-		  // No 'clean' as already done for android-gradle-plugin
-		  sh './gradlew -Pdist=publishdists :applications:micro:test :platform:base:test test -x javadoc -x processSchemas --continue'
+		  // No 'clean' when already done for android-gradle-plugin
+		  sh './gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc -x processSchemas --continue'
 		}
 	  }
 	}
