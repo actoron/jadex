@@ -3,37 +3,27 @@ Object fetchNextBuildNameFromGitTag()
 	// Fetch major.minor version from properties
 	def versionprops = readProperties  file: 'src/main/buildutils/jadexversion.properties'
 	def version = versionprops.jadexversion_major + "." + versionprops.jadexversion_minor
-	def patch = 0;
+	def patch = getLatestPatchVersion(version);
 	def branchpatch = 1; // Start branch subnumbers at 1, because jadex-1.2.3-branch-0 is ugly(?)
 	def buildname	= null;
 
-	// Fetch latest major.minor.patch tag from git
-	def suffix = getLatestTagSuffix(version+".")
-	if(suffix!=null)
+	// Fetch latest major.minor.patch[-branchname-branchpatch] tag from git for non-master/stable branches
+	if(includeBranchName(env.BRANCH_NAME))
 	{
-		// Strip branch, if any
-		if(suffix.indexOf("-")!=-1)
-			suffix = suffix.substring(0, suffix.indexOf("-"));
-		patch = suffix as Integer
-		
-		// Fetch latest major.minor.patch[-branchname-branchpatch] tag from git for non-master/stable branches
-		if(includeBranchName(env.BRANCH_NAME))
-		{
-			suffix = getLatestTagSuffix(version+"."+patch+"-"+env.BRANCH_NAME+"-")
-			if(suffix!=null)
-				branchpatch =  suffix as Integer;
-		}		
+		def suffix = getLatestTagSuffix(version+"."+patch+"-"+env.BRANCH_NAME+"-")
+		if(suffix!=null)
+			branchpatch =  suffix as Integer;
+	}		
 
-		// If there are commits since last tag -> increment (branch) patch number
-		buildname = createBuildname(version, patch, branchpatch, false)
-		if(suffix!=null && !isHead(buildname.full))
-		{
-			if(includeBranchName(env.BRANCH_NAME))
-				branchpatch++
-			else
-				patch++
-			buildname = createBuildname(version, patch, branchpatch, true)
-		}
+	// If there are commits since last tag -> increment (branch) patch number
+	buildname = createBuildname(version, patch, branchpatch, false)
+	if(!isHead(buildname.full))
+	{
+		if(includeBranchName(env.BRANCH_NAME))
+			branchpatch++
+		else
+			patch++
+		buildname = createBuildname(version, patch, branchpatch, true)
 	}
 	
 	return buildname!=null ? buildname : createBuildname(version, patch, branchpatch, false);
@@ -61,13 +51,50 @@ Object	createBuildname(version, patch, branchpatch, isnew)
 }
 
 /**
+ *  Fetch all tags matching the given major.minor version and 
+ *  return the latest patch version.
+ *  @return The found patch version or 0 if not found.
+ */
+int getLatestPatchVersion(version)
+{
+	def	patch	= 0;
+	def status = sh (returnStatus: true,
+		script: "git log --tags=\"${version}.*\" --no-walk --format=%D >tags.txt")
+	if(status==0)
+	{
+		for(String tag: readFile('tags.txt').split("\\n"))
+		{
+			if(tag.startsWith("tag: "+version+"."))
+			{
+				tag	= tag.substring(("tag: "+version+".").length())
+				if(tag.indexOf("-")!=-1)	// Strip version branch names in tag
+					tag	= tag.substring(0, tag.indexOf("-"));
+				if(tag.indexOf(",")!=-1)	// Strip git branch names after tag
+					tag	= tag.substring(0, tag.indexOf(","));
+				
+				if(tag.matches("\\d+"))	// Skip tags not conforming to <major>.<minor>.<patch> or <major>.<minor>.<patch>-<branch>-<branchpatch>
+				{
+				 	patch = Math.max(patch, tag as Integer)
+				}
+				else
+				{
+					echo "ignored ${tag}"
+				}
+			}
+		}
+	}
+	return patch
+}
+
+/**
  *  Fetch the latest tag matching the given prefix and return the suffix.
- *  @return The suffix or null, when no matching tag is found. 
+ *  @return The suffix or null, when no matching tag is found.
  */
 String getLatestTagSuffix(prefix)
 {
 	def status = sh (returnStatus: true,
 		script: "git describe --match \"${prefix}*\" --abbrev=0 > tag.txt")
+	//git log --tags="4.0.*" --no-walk --format=%D >tags.txt
 	if(status==0)
 	{
 		return readFile('tag.txt').trim().substring(prefix.length())
