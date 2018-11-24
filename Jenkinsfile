@@ -1,6 +1,5 @@
 pipeline {
   agent { label 'jadex-jenkins-agent' }
-  agent any
   stages {
   
     // Determine version to build
