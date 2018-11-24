@@ -7,31 +7,13 @@ pipeline {
 	stage('Prepare') {
 	  steps {
 	    script {
-	      sh 'printenv'
+	      //sh 'printenv'
 	      
-	      // Read major.minor version from properties file
-	      def versionprops = readProperties  file: 'src/main/buildutils/jadexversion.properties'
-	      def version = versionprops.jadexversion_major + "." + versionprops.jadexversion_minor
-	      def patch = "0";	// Default for new major/minor version
-	      
-	      // Fetch latest major.minor.patch tag from git
-	      def status = sh (
-	        returnStatus: true,
-	        script: "git describe --match \"${version}.*\" --abbrev=0 > tagversion.txt"
-	      )
-		  if(status==0) {
-		    patch = readFile('tagversion.txt').trim()
-		    echo "pre strip ${patch}"
-		    patch = patch.substring(patch.lastIndexOf(".")+1)
-		    echo "post strip1 ${patch}"
-		    if(patch.lastIndexOf("-")!=-1) {
-		        patch = patch.substring(patch.lastIndexOf("-")+1);
-		    }
-		    echo "post strip2 ${patch}"
-		  }
-	      // Todo: Fetch latest major.minor.patch[-branchname-branchpatch] tag from git for non-master/stable branches
-          currentBuild.displayName = version + "." + patch
-          env.BUILD_VERSION_SUFFIX = patch
+	      // Determine build number
+		  def build_util = load "src/main/buildutils/jenkinsutil.groovy"
+	      def buildname = build_util.fetchNextBuildNameFromGitTag()
+          currentBuild.displayName = buildname.full
+          env.BUILD_VERSION_SUFFIX = buildname.suffix
 	    }
 	  }
 	}
