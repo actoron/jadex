@@ -4,7 +4,7 @@ Object fetchNextBuildNameFromGitTag()
 	def versionprops = readProperties  file: 'src/main/buildutils/jadexversion.properties'
 	def version = versionprops.jadexversion_major + "." + versionprops.jadexversion_minor
 	def patch = 0;
-	def branchpatch;
+	def branchpatch = 1; // Start branch subnumbers at 1, because jadex-1.2.3-branch-0 is ugly(?)
 	def buildname	= null;
 
 	// Fetch latest major.minor.patch tag from git
@@ -20,7 +20,8 @@ Object fetchNextBuildNameFromGitTag()
 		if(includeBranchName(env.BRANCH_NAME))
 		{
 			suffix = getLatestTagSuffix(version+"."+patch+"-"+env.BRANCH_NAME+"-")
-			branchpatch = suffix!=null ? suffix as Integer : 1; // Start branch subnumbers at 1, because jadex-1.2.3-branch-0 is ugly(?)
+			if(suffix!=null)
+				branchpatch =  suffix as Integer;
 		}		
 
 		// If there are commits since last tag -> increment (branch) patch number
