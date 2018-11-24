@@ -211,7 +211,6 @@ publishing {
         if (signedAar != null) {
             // the aar name is modified in build.gradle to strip out the "-release" part. Do the same for it's sig:
             if (signedAar.name.contains("release")) {
-                String baseName = signedAar.name.replaceAll(signedAar.getParent(), "")
                 signedAar = file("${signedAar.getParent()}${File.separator}${project.name}-${project.version}.aar.asc")
             }
             sigFiles += [archive: signedAar,     classifier: null,      extension: 'aar.asc']
