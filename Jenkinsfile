@@ -19,7 +19,7 @@ pipeline {
 	        returnStatus: true,
 	        script: "git describe --match \"${version}.*\" --abbrev=0 > tagversion.txt"
 	      )
-		  if(status!=0) {
+		  if(status==0) {
 		    patch = readFile('tagversion.txt').trim().substring(version.lastIndexOf("."))
 		    echo "pre strip " patch
 		    if(patch.lastIndexOf("-")!=-1) {
