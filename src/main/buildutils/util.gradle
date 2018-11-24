@@ -167,29 +167,37 @@ def addSchemaTasks(Project project) {
     }
     project.assemble.dependsOn += project.schemadocs
     project.tasks.create('processSchemas').doLast {
-        ant.copy todir: file("$project.buildDir/tmp/schemas"),
-                {
-                    resources
-                            {
-                                fileset dir: 'src/main/schema', includes: project.rootProject.ext.filterfiles, erroronmissingdir: false
-                            }
-
-                    filterset begintoken: '${', endtoken: '}',
-                            {
-                                filter token: 'jadex_build_version', value: jadex_build_version
-                            }
-                }
-        copy {
-            // rename filtered file to x-3.0-SNAPSHOT
-            from file("$project.buildDir/tmp/schemas")
-            into file("$project.buildDir/schemas")
-            rename '(.+)\\.(.+)', "\$1-$jadex_build_version.\$2"
+		// rename and filter files to x-3.0-SNAPSHOT
+        ant.copy(todir: file("$project.buildDir/schemas"))
+        {
+            fileset(
+				dir: 'src/main/schema',
+				includes: project.rootProject.ext.filterfiles,
+				erroronmissingdir: false
+			)
+            filterset(begintoken: '${', endtoken: '}')
+            {
+                filter(token: 'jadex_build_version', value: jadex_build_version)
+            }
+			mapper(
+				type: 'regexp',
+				from: '(.+)\\.(.+)',
+				to:	"\\1-$jadex_build_version.\\2"
+			)
         }
-        copy {
-            // copy original unfiltered file and rename to -${jadex_build_version}
-            from file("$project.projectDir/src/main/schema/")
-            into file("$project.buildDir/devschemas")
-            rename '(.+)\\.(.+)', '\$1-\\${jadex_build_version}.\$2'
+		// copy original unfiltered file and rename to -${jadex_build_version}
+        ant.copy(todir: file("$project.buildDir/devschemas"))
+        {
+            fileset(
+				dir: 'src/main/schema',
+				includes: project.rootProject.ext.filterfiles,
+				erroronmissingdir: false
+			)
+			mapper(
+				type: 'regexp',
+				from: '(.+)\\.(.+)',
+				to:	'\\1-${jadex_build_version}.\\2'
+			)
         }
     }
     project.processSchemas.dependsOn += project.schemadocs
