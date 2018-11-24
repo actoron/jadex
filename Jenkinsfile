@@ -21,11 +21,11 @@ pipeline {
 	      )
 		  if(status==0) {
 		    patch = readFile('tagversion.txt').trim().substring(version.lastIndexOf("."))
-		    echo "pre strip " patch
+		    echo "pre strip ${patch}"
 		    if(patch.lastIndexOf("-")!=-1) {
 		        patch = patch.substring(patch.lastIndexOf("-"));
 		    }
-		    echo "post strip " patch
+		    echo "post strip ${patch}"
 		  }
 	      // Todo: Fetch latest major.minor.patch[-branchname-branchpatch] tag from git for non-master/stable branches
           currentBuild.displayName = version + "." + patch
