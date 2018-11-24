@@ -20,12 +20,12 @@ pipeline {
 	        script: "git describe --match \"${version}.*\" --abbrev=0 > tagversion.txt"
 	      )
 		  if(status==0) {
-		    patch = readFile('tagversion.txt').trim().substring(version.lastIndexOf("."))
+		    patch = readFile('tagversion.txt').trim().substring(patch.lastIndexOf(".")+1)
 		    echo "pre strip ${patch}"
 		    if(patch.lastIndexOf("-")!=-1) {
-		        patch = patch.substring(patch.lastIndexOf("-"));
+		        patch = patch.substring(patch.lastIndexOf("-")+1);
+    		    echo "post strip ${patch}"
 		    }
-		    echo "post strip ${patch}"
 		  }
 	      // Todo: Fetch latest major.minor.patch[-branchname-branchpatch] tag from git for non-master/stable branches
           currentBuild.displayName = version + "." + patch
