@@ -2,20 +2,39 @@ pipeline {
   //agent { label 'jadex-jenkins-agent' }
   agent any
   stages {
+  
+    // Determine version to build
 	stage('Prepare') {
 	  steps {
 	    script {
+	      sh 'printenv'
+	      
+	      // Read major.minor version from properties file
 	      def versionprops = readProperties  file: 'src/main/buildutils/jadexversion.properties'
-	      echo "Defined Jadex version is ${versionprops.jadexversion_major}.${versionprops.jadexversion_minor}"
-          def version = sh (
-          	script: "git describe --match \"${versionprops.jadexversion_major}.${versionprops.jadexversion_minor}.*\" --abbrev=0",
-          	returnStdout: true
-          )
-          echo "Tagged Jadex version is ${version}"
-          currentBuild.displayName = version
+	      def version = versionprops.jadexversion_major + "." + versionprops.jadexversion_minor
+	      def patch = 0;	// Default for new major/minor version
+	      
+	      // Fetch latest major.minor.patch tag from git
+	      def status = sh (
+	        returnStatus: true,
+	        script: "git describe --match \"${version}.*\" --abbrev=0 > tagversion.txt"
+	      )
+		  if(status!=0) {
+		    patch = readFile('tagversion.txt').trim().substring(version.lastIndexOf("."))
+		    echo "pre strip " patch
+		    if(patch.lastIndexOf("-")!=-1) {
+		        patch = patch.substring(patch.lastIndexOf("-"));
+		    }
+		    echo "post strip " patch
+		  }
+	      // Todo: Fetch latest major.minor.patch[-branchname-branchpatch] tag from git for non-master/stable branches
+          currentBuild.displayName = version + "." + patch
+          env.BUILD_VERSION_SUFFIX = patch
 	    }
 	  }
 	}
+	
+	// Build and check if all tests pass before doing anything else 
 	stage('Build and Test') {
 	  steps {
 		wrap([$class: 'Xvfb']) {
@@ -24,6 +43,8 @@ pipeline {
 		}
 	  }
 	}
+	
+	// Build all kinds of docs/dist files as parallel as possible
 	stage('Dist and Docs') {
 	  parallel {
 		stage('Dist') {
@@ -43,6 +64,7 @@ pipeline {
 		}
 	  }
 	}
+	
   }
   post {
     always {
