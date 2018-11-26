@@ -768,6 +768,21 @@ public class SUtil
 		// Should try comparable first, for consistency???
 		return val1 == val2 || val1 != null && val1.equals(val2);
 	}
+	
+	/**
+	 * Test if two arrays are content equal or both null.
+	 * 
+	 * @param array1 The first array.
+	 * @param array2 The second array.
+	 * @return True when the arrays are content equal.
+	 */
+	public static final boolean arrayEmptyOrNull(Object array)
+	{
+		if (array != null)
+			return Array.getLength(array) == 0;
+			
+		return true;
+	}
 
 	/**
 	 * Test if two arrays are content equal or both null.

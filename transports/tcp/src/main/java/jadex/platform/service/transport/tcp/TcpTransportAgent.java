@@ -12,7 +12,8 @@ import jadex.platform.service.transport.ITransport;
  */
 @Agent(name="tcp",
 	autostart=Boolean3.TRUE,
-	predecessors="jadex.platform.service.address.TransportAddressAgent")
+	predecessors="jadex.platform.service.address.TransportAddressAgent",
+	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
 public class TcpTransportAgent extends AbstractTransportAgent2<SocketChannel>
 {
 	//-------- abstract methods to be provided by concrete transport --------

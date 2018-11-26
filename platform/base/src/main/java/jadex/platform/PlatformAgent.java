@@ -185,9 +185,9 @@ public class PlatformAgent
 		urls = SUtil.removeSystemUrls(urls);
 		
 		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
-//		List<CreationInfo> infos = new ArrayList<>();
-		List<CreationInfo> sysinfos = new ArrayList<>();
-		List<CreationInfo> userinfos = new ArrayList<>();
+		List<CreationInfo> infos = new ArrayList<>();
+//		List<CreationInfo> sysinfos = new ArrayList<>();
+//		List<CreationInfo> userinfos = new ArrayList<>();
 		for (ClassInfo ci : cis)
 		{
 			isSystemComponent(ci, classloader);
@@ -233,40 +233,22 @@ public class PlatformAgent
 				info.setName(name);
 				info.setFilename(ci.getClassName()+".class");
 				
-				if (isSystemComponent(ci, classloader))
-					sysinfos.add(info);
-				else
-					userinfos.add(info);
+//				if (isSystemComponent(ci, classloader))
+//					sysinfos.add(info);
+//				else
+//					userinfos.add(info);
+				infos.add(info);
 			}
 		}
 		
-		agent.getFeature(ISubcomponentsFeature.class).createComponents(sysinfos.toArray(new CreationInfo[sysinfos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
+		agent.getFeature(ISubcomponentsFeature.class).createComponents(infos.toArray(new CreationInfo[infos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
 		{
 			public void resultAvailable(Collection<IExternalAccess> result)
 			{
 				if(platformproxies)
 					addQueryForPlatformProxies();
-				if (userinfos.size() > 0)
-				{
-					agent.getFeature(ISubcomponentsFeature.class).createComponents(userinfos.toArray(new CreationInfo[userinfos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
-					{
-						public void resultAvailable(java.util.Collection<IExternalAccess> result)
-						{
-							ret.setResult(null);
-						};
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							// Ignore failures for user startup, but do complain.
-							exception.printStackTrace();
-							ret.setResult(null);
-						};
-					});
-				}
-				else
-				{
-					ret.setResult(null);
-				}
+				
+				ret.setResult(null);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -274,6 +256,41 @@ public class PlatformAgent
 				ret.setException(exception);
 			}
 		});
+		
+//		agent.getFeature(ISubcomponentsFeature.class).createComponents(sysinfos.toArray(new CreationInfo[sysinfos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
+//		{
+//			public void resultAvailable(Collection<IExternalAccess> result)
+//			{
+//				if(platformproxies)
+//					addQueryForPlatformProxies();
+//				if (userinfos.size() > 0)
+//				{
+//					agent.getFeature(ISubcomponentsFeature.class).createComponents(userinfos.toArray(new CreationInfo[userinfos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
+//					{
+//						public void resultAvailable(java.util.Collection<IExternalAccess> result)
+//						{
+//							ret.setResult(null);
+//						};
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							// Ignore failures for user startup, but do complain.
+//							exception.printStackTrace();
+//							ret.setResult(null);
+//						};
+//					});
+//				}
+//				else
+//				{
+//					ret.setResult(null);
+//				}
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
 		
 //		startComponents(levels.iterator(), names, comps).addResultListener(new DelegationResultListener<Void>(ret)
 //		{

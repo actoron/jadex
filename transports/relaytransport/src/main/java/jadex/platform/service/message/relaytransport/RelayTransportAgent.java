@@ -68,7 +68,8 @@ import jadex.platform.service.transport.AbstractTransportAgent;
 //@Agent(autoprovide=Boolean3.TRUE)
 @Agent(name="rt",
 	autostart=Boolean3.TRUE,
-	predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent")
+	predecessors="jadex.platform.service.address.TransportAddressAgent",
+	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
 @Arguments({
 	// todo: see SuperpeerRegistrySynchronizationAgent
 //	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),

@@ -45,7 +45,9 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Super peer collects services from client and answers search requests and queries.
  */
-@Agent(name="superpeer", autostart=Boolean3.FALSE)
+@Agent(name="superpeer",
+	autostart=Boolean3.FALSE,
+	predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent")
 @Service
 @ProvidedServices(replace=true,
 	value={@ProvidedService(type=ISuperpeerService.class, scope=ServiceScope.GLOBAL),

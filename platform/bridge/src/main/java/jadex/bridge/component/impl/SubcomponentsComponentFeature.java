@@ -3,6 +3,7 @@ package jadex.bridge.component.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -39,6 +41,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.CollectionResultListener;
@@ -48,8 +51,11 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
@@ -63,12 +69,16 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 //	/** The number of children. */
 //	protected int childcount;
 	
+	/** Debug flag. */
+	protected boolean debug = false;
+	
 	/**
 	 *  Create the feature.
 	 */
 	public SubcomponentsComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
+		debug = Boolean.TRUE.equals(component.getArgument("debug"));
 	}
 	
 	/**
@@ -215,12 +225,12 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		
 		FutureBarrier<Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>> modelbar = new FutureBarrier<>();
 		
-		final Map<Integer, IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>>> modelmap = new HashMap<>();
+		final Map<Integer, IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>>> tmpmodelmap = new HashMap<>();
 		for (int i = 0; i < infos.length; ++i)
 		{
 			IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>> fut = 
 				SComponentManagementService.loadModel(infos[i].getFilename(), infos[i], component);
-			modelmap.put(i, fut);
+			tmpmodelmap.put(i, fut);
 			modelbar.addFuture(fut);
 		}
 		
@@ -235,70 +245,66 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			
 			public void resultAvailable(Void result)
 			{
-				DependencyResolver<String> dr = new DependencyResolver<>();
-				final MultiCollection<String, CreationInfo> instances = new MultiCollection<>();
+				List<Tuple2<CreationInfo, IModelInfo>> sysinfos = null;
+				List<Tuple2<CreationInfo, IModelInfo>> userinfos = new ArrayList<>();
 				
-				for (Map.Entry<Integer, IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>>> entry : modelmap.entrySet())
-					addComponentToLevels(dr, infos[entry.getKey()], entry.getValue().get().getFirstEntity(), instances);
-				
-				final List<Set<String>> levels = dr.resolveDependenciesWithLevel();
-				
-				int[] levelnum = new int[1];
-				levelnum[0] = -1;
-				
-				IResultListener<Void> levelrl = new IResultListener<Void>()
+				for (int i = 0; i < infos.length; ++i)
 				{
-					public void exceptionOccurred(Exception exception)
+					IModelInfo model = tmpmodelmap.get(i).get().getFirstEntity();
+					
+					if (isSystemComponent(model))
 					{
-						ret.setExceptionIfUndone(exception);
+						if (sysinfos == null)
+							sysinfos = new ArrayList<>();
+						sysinfos.add(new Tuple2<CreationInfo, IModelInfo>(infos[i], model));
+						continue;
 					}
 					
-					public void resultAvailable(Void result)
+					userinfos.add(new Tuple2<CreationInfo, IModelInfo>(infos[i], model));
+				}
+				
+				if (debug)
+				{
+					System.out.println(component + " starting system subcomponents: " + (sysinfos == null ? "[]" : Arrays.toString(sysinfos.toArray())));
+					System.out.println(component + " starting user subcomponents: " + Arrays.toString(userinfos.toArray()));
+				}
+				
+				if (sysinfos != null)
+				{
+					if (!isSystemComponent(component.getModel()))
 					{
-						++levelnum[0];
-						if (levelnum[0] < levels.size())
+						ret.setException(new IllegalArgumentException(component.toString() + " attempted to start system component without being a system component."));
+						return;
+					}
+					
+					doCreateComponents(sysinfos).addResultListener(new IntermediateDefaultResultListener<IExternalAccess>()
+					{
+						public void intermediateResultAvailable(IExternalAccess result)
 						{
-							FutureBarrier<IExternalAccess> levelbar = new FutureBarrier<>();
-							Set<String> level = levels.get(levelnum[0]);
-							for (String mname : level)
-							{
-								Collection<CreationInfo> insts = instances.get(mname);
-								if (insts != null)
-								{
-									for (CreationInfo inst : insts)
-									{
-										IFuture<IExternalAccess> createfut = createComponent(inst);
-										levelbar.addFuture(createfut);
-										createfut.addResultListener(new IResultListener<IExternalAccess>()
-										{
-											public void exceptionOccurred(Exception exception)
-											{
-												ret.setExceptionIfUndone(exception);
-											}
-											
-											public void resultAvailable(IExternalAccess result)
-											{
-												ret.addIntermediateResultIfUndone(result);
-											};
-										});
-										levelbar.addFuture(createfut);
-									}
-								}
-								else
-								{
-									System.out.println("Skipping unresolvable dep: " + mname);
-								}
-							}
-							levelbar.waitFor().addResultListener(this);
-						}
-						else
+							ret.addIntermediateResult(result);
+						};
+						
+						public void finished()
 						{
-							if (!ret.isDone())
+							if (userinfos.size() > 0)
+								doCreateComponents(userinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
+							else
 								ret.setFinished();
 						}
-					}
-				};
-				levelrl.resultAvailable(null);
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+				else
+				{
+					if (userinfos.size() > 0)
+						doCreateComponents(userinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
+					else
+						ret.setFinished();
+				}
 			}
 		});
 		return ret;
@@ -312,90 +318,67 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 */
 	public IIntermediateFuture<Map<String, Object>> killComponents(IComponentIdentifier... cids)
 	{
-		if (cids == null || cids.length == 0)
-			return new IntermediateFuture<>(new IllegalArgumentException("Creation infos must not be null or empty."));
-		
-		FutureBarrier<IModelInfo> modelbar = new FutureBarrier<>();
-		
-		final Map<Integer, IFuture<IModelInfo>> modelmap = new HashMap<>();
-		for (int i = 0; i < cids.length; ++i)
-		{
-			IExternalAccess exta = component.getExternalAccess(cids[i]);
-			IFuture<IModelInfo> fut = exta.getModelAsync();
-			modelmap.put(i, fut);
-			modelbar.addFuture(fut);
-		}
-		
+		System.out.println("KILL order received by " + component + ": " + Arrays.toString(cids));
 		final IntermediateFuture<Map<String, Object>> ret = new IntermediateFuture<>();
-		
-		modelbar.waitFor().addResultListener(new IResultListener<Void>()
+		ret.addResultListener(new IResultListener<Collection<Map<String,Object>>>()
 		{
+			public void resultAvailable(Collection<Map<String, Object>> result)
+			{
+				System.out.println("FINISHED KILL ORDER OF COMPONENT " + component);
+			}
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
-			}
-			
-			public void resultAvailable(Void result)
-			{
-				DependencyResolver<String> dr = new DependencyResolver<>();
-				final MultiCollection<String, IComponentIdentifier> instances = new MultiCollection<>();
-				
-				for (Map.Entry<Integer, IFuture<IModelInfo>> entry : modelmap.entrySet())
-					addComponentToLevels(dr, cids[entry.getKey()], entry.getValue().get(), instances);
-				
-				final List<Set<String>> levels = dr.resolveDependenciesWithLevel();
-				
-				int[] levelnum = new int[1];
-				levelnum[0] = -1;
-				
-				IResultListener<Void> levelrl = new IResultListener<Void>()
-				{
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setExceptionIfUndone(exception);
-					}
-					
-					public void resultAvailable(Void result)
-					{
-						++levelnum[0];
-						if (levelnum[0] < levels.size())
-						{
-							FutureBarrier<Map<String, Object>> levelbar = new FutureBarrier<>();
-							Set<String> level = levels.get(levelnum[0]);
-							for (String mname : level)
-							{
-								Collection<IComponentIdentifier> insts = instances.get(mname);
-								for (IComponentIdentifier inst : insts)
-								{
-									IFuture<Map<String, Object>> killfut = SComponentManagementService.getExternalAccess(inst, component).killComponent();
-									levelbar.addFuture(killfut);
-									killfut.addResultListener(new IResultListener<Map<String, Object>>()
-									{
-										public void exceptionOccurred(Exception exception)
-										{
-											ret.setExceptionIfUndone(exception);
-										}
-										
-										public void resultAvailable(Map<String, Object> result)
-										{
-											ret.addIntermediateResultIfUndone(result);
-										};
-									});
-									levelbar.addFuture(killfut);
-								}
-							}
-							levelbar.waitFor().addResultListener(this);
-						}
-						else
-						{
-							if (!ret.isDone())
-								ret.setFinished();
-						}
-					}
-				};
-				levelrl.resultAvailable(null);
+				exception.printStackTrace();
 			}
 		});
+		
+		final List<IComponentIdentifier> sysinfos = new ArrayList<>();
+		final List<IComponentIdentifier> userinfos = new ArrayList<>();
+		
+		for (int i = 0; i < cids.length; ++i)
+		{
+			if (SComponentManagementService.getDescription(cids[i]).isSystemComponent())
+			{
+				sysinfos.add(cids[i]);
+			}
+			else
+			{
+				userinfos.add(cids[i]);
+			}
+		}
+		
+		if (userinfos.size() > 0)
+		{
+			doKillComponents(userinfos).addResultListener(new IntermediateDefaultResultListener<Map<String, Object>>()
+			{
+				public void intermediateResultAvailable(Map<String, Object> result)
+				{
+					ret.addIntermediateResult(result);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
+				}
+				
+				public void finished()
+				{
+					System.out.println("User kill done, killing sysagents..." + sysinfos.size());
+					if (sysinfos.size() > 0)
+						doKillComponents(sysinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
+					else
+						ret.setFinished();
+				}
+			});
+		}
+		else
+		{
+			if (sysinfos.size() > 0)
+				doKillComponents(sysinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
+			else
+				ret.setFinished();
+		}
+		
 		return ret;
 	}
 	
@@ -413,6 +396,242 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 //		info.setParent(component.getId());
 //		return component.createComponent(info, null);
 //	}
+	
+	protected IIntermediateFuture<IExternalAccess> doCreateComponents(List<Tuple2<CreationInfo, IModelInfo>> infos)
+	{
+		final IntermediateFuture<IExternalAccess> ret = new IntermediateFuture<>();
+		
+		DependencyResolver<String> dr = new DependencyResolver<>();
+		final MultiCollection<String, CreationInfo> instances = new MultiCollection<>();
+		
+		boolean lineardeps = true;
+		for (Tuple2<CreationInfo, IModelInfo> tup : infos)
+		{
+			IModelInfo model = tup.getSecondEntity();
+			if (!SUtil.arrayEmptyOrNull(model.getPredecessors()) ||
+				!SUtil.arrayEmptyOrNull(model.getSuccessors()))
+			{
+				lineardeps = false;
+				break;
+			}
+		}
+		
+		if (debug)
+			System.out.println("Starting subcomponent set for " + component + " uses linear dependencies: " + lineardeps);
+		
+//		for (Map.Entry<Integer, IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>>> entry : modelmap.entrySet())
+		for (int i = 0; i < infos.size(); ++i)
+		{
+			String[] prevdep = lineardeps && i > 0 ? new String[] { infos.get(i - 1).getSecondEntity().getFullName() } : null;
+			addComponentToLevels(dr, infos.get(i).getFirstEntity(), infos.get(i).getSecondEntity(), instances, prevdep);
+		}
+		
+		final List<Set<String>> levels = dr.resolveDependenciesWithLevel();
+		
+		int[] levelnum = new int[1];
+		levelnum[0] = -1;
+		
+		IResultListener<Void> levelrl = new IResultListener<Void>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setExceptionIfUndone(exception);
+			}
+			
+			public void resultAvailable(Void result)
+			{
+				++levelnum[0];
+				if (levelnum[0] < levels.size())
+				{
+					FutureBarrier<IExternalAccess> levelbar = new FutureBarrier<>();
+					Set<String> level = levels.get(levelnum[0]);
+					for (String mname : level)
+					{
+						Collection<CreationInfo> insts = instances.get(mname);
+						if (insts != null)
+						{
+							for (CreationInfo inst : insts)
+							{
+								IFuture<IExternalAccess> createfut = createComponent(inst);
+								levelbar.addFuture(createfut);
+								createfut.addResultListener(new IResultListener<IExternalAccess>()
+								{
+									public void exceptionOccurred(Exception exception)
+									{
+										ret.setExceptionIfUndone(exception);
+									}
+									
+									public void resultAvailable(IExternalAccess result)
+									{
+										if (debug)
+											System.out.println("Started: " + result);
+										ret.addIntermediateResultIfUndone(result);
+									};
+								});
+								levelbar.addFuture(createfut);
+							}
+						}
+						else if (debug)
+						{
+							System.out.println("Skipping unresolvable dependency: " + mname);
+						}
+					}
+					levelbar.waitFor().addResultListener(this);
+				}
+				else
+				{
+					if (!ret.isDone())
+						ret.setFinished();
+				}
+			}
+		};
+		levelrl.resultAvailable(null);
+		
+		return ret;
+	}
+	
+	protected IIntermediateFuture<Map<String, Object>> doKillComponents(List<IComponentIdentifier> cids)
+	{
+		System.out.println("doKillComponents " + Arrays.toString(cids.toArray()));
+		final IntermediateFuture<Map<String, Object>> ret = new IntermediateFuture<>();
+		
+		final MultiCollection<String, IComponentIdentifier> instances = new MultiCollection<>();
+		
+		getShutdownLevels(instances, cids).addResultListener(new IResultListener<List<Set<String>>>()
+		{
+			public void resultAvailable(List<Set<String>> levels)
+			{
+				int[] levelnum = new int[1];
+				levelnum[0] = -1;
+				
+				IResultListener<Void> levelrl = new IResultListener<Void>()
+				{
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setExceptionIfUndone(exception);
+					}
+					
+					public void resultAvailable(Void result)
+					{
+						++levelnum[0];
+//						System.out.println("LEVEL " + levelnum[0] + " " + levels.size() + " " + component);
+						if (levelnum[0] < levels.size())
+						{
+							FutureBarrier<Map<String, Object>> levelbar = new FutureBarrier<>();
+							Set<String> level = levels.get(levelnum[0]);
+							for (String mname : level)
+							{
+								
+								Collection<IComponentIdentifier> insts = instances.get(mname);
+								if (insts != null)
+								{
+									for (IComponentIdentifier inst : insts)
+									{
+										IFuture<Map<String, Object>> killfut = SComponentManagementService.getExternalAccess(inst, component).killComponent();
+										System.out.println("Agent " + component + " killing " + inst);
+										levelbar.addFuture(killfut);
+										killfut.addResultListener(new IResultListener<Map<String, Object>>()
+										{
+											public void exceptionOccurred(Exception exception)
+											{
+												ret.setExceptionIfUndone(exception);
+											}
+											
+											public void resultAvailable(Map<String, Object> result)
+											{
+												ret.addIntermediateResultIfUndone(result);
+											};
+										});
+										levelbar.addFuture(killfut);
+									}
+								}
+							}
+							levelbar.waitFor().addResultListener(this);
+						}
+						else
+						{
+							if (!ret.isDone())
+							{
+								ret.setFinished();
+							}
+						}
+					}
+				};
+				levelrl.resultAvailable(null);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Gets the ordered shutdown levels for a number of components.
+	 *  
+	 *  @param instances Empty lookup map type->instance (will be filled by the method.
+	 *  @param cids The component identifiers.
+	 *  @return Levels containing types defining shutdown order.
+	 */
+	protected IFuture<List<Set<String>>> getShutdownLevels(final MultiCollection<String, IComponentIdentifier> instances, List<IComponentIdentifier> cids)
+	{
+		
+		if (cids == null || cids.size() == 0)
+			return new Future<List<Set<String>>>(new IllegalArgumentException("Component identifiers must not be null or empty."));
+		
+		final Future<List<Set<String>>> ret = new Future<>();
+		
+		FutureBarrier<IModelInfo> modelbar = new FutureBarrier<>();
+		
+		final Map<Integer, IFuture<IModelInfo>> modelmap = new HashMap<>();
+		for (int i = 0; i < cids.size(); ++i)
+		{
+			IExternalAccess exta = component.getExternalAccess(cids.get(i));
+			IFuture<IModelInfo> fut = exta.getModelAsync();
+			modelmap.put(i, fut);
+			modelbar.addFuture(fut);
+		}
+		
+		modelbar.waitFor().addResultListener(new IResultListener<Void>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+			
+			public void resultAvailable(Void result)
+			{
+				boolean lineardeps = true;
+				for (Map.Entry<Integer, IFuture<IModelInfo>> entry : modelmap.entrySet())
+				{
+					IModelInfo model = entry.getValue().get();
+					if (!SUtil.arrayEmptyOrNull(model.getPredecessors()) ||
+						!SUtil.arrayEmptyOrNull(model.getSuccessors()))
+					{
+						lineardeps = false;
+						break;
+					}
+				}
+				
+				DependencyResolver<String> dr = new DependencyResolver<>();
+				
+				IModelInfo prev = null;
+				for (Map.Entry<Integer, IFuture<IModelInfo>> entry : modelmap.entrySet())
+				{
+					String[] prevdep = lineardeps && prev != null ? new String[] { prev.getFullName() } : null;
+					addComponentToLevels(dr, cids.get(entry.getKey()), entry.getValue().get(), instances, prevdep);
+					prev = entry.getValue().get();
+				}
+				
+				List<Set<String>> levels = dr.resolveDependenciesWithLevel();
+				Collections.reverse(levels);
+				ret.setResult(levels);
+			}
+		});
+		return ret;
+	}
 	
 	/**
 	 *  Create the initial subcomponents.
@@ -761,6 +980,23 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	}
 	
 	/**
+	 *  Tests if the component model belongs to a system component.
+	 * 
+	 *  @param model The model.
+	 *  @return True, if system component.
+	 */
+	protected boolean isSystemComponent(IModelInfo model)
+	{
+		ProvidedServiceInfo[] provs = model.getProvidedServices();
+		for (ProvidedServiceInfo prov : SUtil.notNull(provs))
+		{
+			if (prov.isSystemService())
+				return true;
+		}
+		return false;
+	}
+	
+	/**
 	 *  Test if the current thread is an external thread.
 	 */
 	protected boolean isExternalThread()
@@ -827,7 +1063,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 *  Add a components to the dependency resolver to build start levels.
 	 *  Components of the same level can be started in parallel.
 	 */
-	protected <T> void addComponentToLevels(DependencyResolver<String> dr, T instanceinfo, IModelInfo minfo, MultiCollection<String, T> instances)
+	protected <T> void addComponentToLevels(DependencyResolver<String> dr, T instanceinfo, IModelInfo minfo, MultiCollection<String, T> instances, String... addpredecessors)
 	{
 //		System.out.println("addcomptolevel: " + minfo.getFullName());
 		try
@@ -842,6 +1078,12 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 					dr.addDependency(cname, (String)pre);
 			}
 			
+			if (addpredecessors != null)
+			{
+				for (String addpredecessor : addpredecessors)
+					dr.addDependency(cname, addpredecessor);
+			}
+			
 			Object[] sucs = minfo.getSuccessors();
 			if(sucs!=null)
 			{
@@ -849,13 +1091,9 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 					dr.addDependency((String)suc, cname);
 			}
 		
-			// if no predecessors are defined add SecurityAgent
-			if(pres==null || pres.length==0)
-			{
-				System.err.println("NO DEPS: " + cname + " " + Arrays.toString(SUtil.notNull(pres)));
-				dr.addDependency(cname, Object.class.getName());
-//				dr.addDependency(cname, SecurityAgent.class.getName());
-			}
+			// no predecessors
+			if(debug && (pres==null || pres.length==0))
+				System.err.println("NO PREDECESSORS: " + cname + " " + Arrays.toString(SUtil.notNull(pres)));
 			
 			instances.add(cname, instanceinfo);
 		}

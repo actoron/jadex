@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
@@ -50,7 +51,6 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.IServiceRegistry;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
@@ -71,12 +71,14 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -375,7 +377,7 @@ public class SComponentManagementService
 	 *  Notify the cms listeners of an addition.
 	 */
 	public static void notifyListenersAdded(IComponentDescription desc)
-	{System.out.println("Comp added: " + desc);
+	{
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	slis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(desc.getName())));
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	alis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(null)));
 		slis.addAll(alis);
@@ -1923,6 +1925,7 @@ public class SComponentManagementService
 //					ret.setException(exception);
 				}
 			}));
+			
 		}
 		else
 		{
@@ -2013,19 +2016,15 @@ public class SComponentManagementService
 //				else
 //					System.out.println("no children: "+cid);
 				
-				destroyComponentLoop(cid, achildren, achildren.length-1, agent).addResultListener(createResultListener(agent, new IResultListener<List<Exception>>()
+//				System.out.println("Killing: " + agent + " " + Arrays.toString(achildren));
+//				resumeComponent(cid, false, agent);
+//				System.out.println("Resumed: " + agent);
+				
+				Runnable finishkill = new Runnable()
 				{
-					public void resultAvailable(List<Exception> result)
+					public void run()
 					{
-//						if(achildren.length>0)
-//							System.out.println("kill childs end: "+cid);
-//						
-//						if(cid.toString().toLowerCase().indexOf("super")!=-1)
-//							System.out.println("Terminated component structure: "+cid.getName());
-						
-						agent.getLogger().info("Terminated component structure: "+cid.getName());
-						
-						// Fetch comp again as component may be already killed (e.g. when autoshutdown).
+//						System.out.println("DONE killing: " + agent);
 						InitInfo infos	= getInitInfo(cid);
 						IPlatformComponentAccess comp = infos!=null ? infos.getComponent() : SComponentManagementService.getComponents(agent.getId()).get(cid);
 						if(comp!=null)
@@ -2038,6 +2037,7 @@ public class SComponentManagementService
 							{
 								public void resultAvailable(Void result)
 								{
+									System.out.println("Killed: " + cid);
 									cleanup(cid, null);
 								}
 								
@@ -2049,17 +2049,102 @@ public class SComponentManagementService
 							IResultListener<Void> lis = cid.getParent()==null? cc: createResultListener(agent, cc);
 							comp.shutdown().addResultListener(lis);
 						}
-						
-						// Resume component to be killed in case it is currently suspended.
-						resumeComponent(cid, false, agent);
 					}
-					
-					public void exceptionOccurred(Exception exception)
+				};
+				
+				if (achildren != null && achildren.length > 0)
+				{
+					agent.getFeature(ISubcomponentsFeature.class).killComponents(achildren).addResultListener(new IResultListener<Collection<Map<String,Object>>>()
 					{
-//						System.out.println("ex: "+exception);
-						SComponentManagementService.exitDestroy(cid, desc, exception, null);
-					}
-				}));
+						public void resultAvailable(Collection<Map<String, Object>> result)
+						{
+							System.err.println("SUBS KILLED: " + agent);
+							finishkill.run();
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+							exception.printStackTrace();
+							SComponentManagementService.exitDestroy(cid, desc, exception, null);
+						}
+					});
+				}
+				else
+				{
+					finishkill.run();
+				}
+				
+//				final MultiCollection<String, IComponentIdentifier> instances = new MultiCollection<>();
+//				System.out.println("Fwr lvlw");
+//				((IInternalSubcomponentsFeature) agent.getFeature(ISubcomponentsFeature.class)).getShutdownLevels(instances, achildren).addResultListener(new IResultListener<List<Set<String>>>()
+//				{
+//					public void resultAvailable(List<Set<String>> levels)
+//					{
+//						List<IComponentIdentifier> orderedchildren = new ArrayList<>();
+//						for (Set<String> level : levels)
+//						{
+//							for (String comptype : level)
+//							{
+//								Collection<IComponentIdentifier> comps = instances.get(comptype);
+//								orderedchildren.addAll(comps);
+//							}
+//						}
+//						System.out.println("Fwr lvlw2");
+//						IComponentIdentifier[] oachildren = orderedchildren.toArray(new IComponentIdentifier[orderedchildren.size()]);
+//						System.out.println("Orig: " + Arrays.toString(achildren) + " reordered: " + Arrays.toString(oachildren));
+//						
+//						destroyComponentLoop(cid, oachildren, oachildren.length-1, agent).addResultListener(createResultListener(agent, new IResultListener<List<Exception>>()
+//						{
+//							public void resultAvailable(List<Exception> result)
+//							{
+////								if(achildren.length>0)
+////									System.out.println("kill childs end: "+cid);
+////								
+////								if(cid.toString().toLowerCase().indexOf("super")!=-1)
+////									System.out.println("Terminated component structure: "+cid.getName());
+//								
+//								agent.getLogger().info("Terminated component structure: "+cid.getName());
+//								
+//								// Fetch comp again as component may be already killed (e.g. when autoshutdown).
+//								InitInfo infos	= getInitInfo(cid);
+//								IPlatformComponentAccess comp = infos!=null ? infos.getComponent() : SComponentManagementService.getComponents(agent.getId()).get(cid);
+//								if(comp!=null)
+//								{
+////									// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+////									// todo: killcomponent should only be called once for each component?
+//									
+//									agent.getLogger().info("Terminating component: "+cid.getName());
+//									IResultListener<Void> cc = new IResultListener<Void>()
+//									{
+//										public void resultAvailable(Void result)
+//										{
+//											cleanup(cid, null);
+//										}
+//										
+//										public void exceptionOccurred(Exception exception)
+//										{
+//											cleanup(cid, exception);
+//										}
+//									};
+//									IResultListener<Void> lis = cid.getParent()==null? cc: createResultListener(agent, cc);
+//									comp.shutdown().addResultListener(lis);
+//								}
+//								
+//								// Resume component to be killed in case it is currently suspended.
+//								resumeComponent(cid, false, agent);
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+////								System.out.println("ex: "+exception);
+//								SComponentManagementService.exitDestroy(cid, desc, exception, null);
+//							}
+//						}));
+//					}
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						exception.printStackTrace();
+//					}
+//				});
 			}			
 			else
 			{
