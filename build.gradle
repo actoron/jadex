@@ -355,12 +355,11 @@ subprojects
 	// needs to be applied after android + java plugins:
 	apply from: "$rootDir/src/main/buildutils/publishing.gradle"
 
-
+	
 	// process schemas and generate schemadocs
 	if (project.projectDir.toPath().resolve('src/main/schema').toFile().exists()) {
 		addSchemaTasks(project)
 	}
-
 
     sourceCompatibility = 1.8
     
@@ -524,6 +523,79 @@ task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
 	}
 }
 
+task checkDist(dependsOn: [distZip]) {
+	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
+
+	doLast {
+		checkDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
+	}
+}
+
+task checkDists(dependsOn: [distZips])  {
+	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
+
+	doLast {
+		gradle.ext.selecteddists.parallelStream().forEach {selecteddist ->
+			if(!selecteddist.startsWith('addon'))	// Exclude addons for now. TODO: fix addon dists!
+			{
+				def arts = gradle.ext.distartmap.get(selecteddist)
+				checkDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
+			}
+		}
+	}
+}
+
+def checkDistZip(distname, arts, isaddon)
+{
+	def commercial = false
+	arts.each { artname ->
+		commercial |= isCommercial(project.ext.subprojectmap.get(artname))
+	}	
+	def preprocessdirfile = new File(project.distsDir, 'tmp/'+distname)
+	def rebuilddirfile = new File(project.distsDir, 'rebuild/'+distname);
+	rebuilddirfile.mkdirs()
+	def srczip	= new File(preprocessdirfile, isaddon ? 'sources-'+distname+'.zip' : 'sources.zip');
+
+	// Extract and build sources.zip
+	ant.unzip(src: srczip, dest: rebuilddirfile)
+//	// Hack!!! extract minimal zip also, as addons do not build on their own 
+//	if(isaddon)
+//		ant.unzip(src: new File(project.distsDir, 'tmp/minimal/sources.zip'), dest: rebuilddirfile)
+	// https://stackoverflow.com/questions/26459067/how-to-run-gradle-script-from-gradle
+	def artefactBuild = project.tasks.create([name: "tmpCheckDist$distname", type: GradleBuild])
+	artefactBuild.buildFile = project.file(new File(rebuilddirfile, "sources/build.gradle"))
+	artefactBuild.tasks = ["distZip"]
+	artefactBuild.startParameter.excludedTaskNames	= ["test", "javadoc"]
+	artefactBuild.startParameter.projectProperties << ["dist": distname]
+	artefactBuild.execute()
+	
+	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
+	def entries	= new HashSet();
+	def distzip = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+	new java.util.zip.ZipFile(distzip).stream()
+		.forEach {e -> entries.add(e.getName())}
+	def distzip2 = new File(rebuilddirfile, 'sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip')
+	new java.util.zip.ZipFile(distzip2).stream()
+		.forEach {e ->
+			if(!entries.remove(e.getName()))
+				throw new RuntimeException("New entry in rebuilt dist: "+e);
+		}
+	if(!entries.isEmpty())
+		throw new RuntimeException("Missing entries in rebuilt dist: "+entries);
+		
+	// Check original and rebuilt sources.zip for equality based on zip contents with name/crc/size
+	new java.util.zip.ZipFile(srczip).stream()
+		.forEach {e -> entries.add(e.getName()+':'+e.getCrc()+':'+e.getSize())}
+	distzip2 = new File(rebuilddirfile, 'sources/build/distributions/sources/jadex-'  + distname  + '-' + jadex_build_version + '-sources.zip')
+	new java.util.zip.ZipFile(distzip2).stream()
+		.forEach {e ->
+			if(!entries.remove(e.getName()+':'+e.getCrc()+':'+e.getSize()))
+				throw new RuntimeException("New or changed entry in rebuilt sources.zip: "+e);
+		}
+	if(!entries.isEmpty())
+		throw new RuntimeException("Missing entries in rebuilt sources.zip: "+entries);
+}
+
 def createDistZip(distname, arts, isaddon)
 {
 	def commercial = false
@@ -532,7 +604,7 @@ def createDistZip(distname, arts, isaddon)
 	}
 	println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
 
-	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/tmp/'+distname)
+	def preprocessdirfile = new File(project.distsDir, 'tmp/'+distname)
 	preprocessdirfile.mkdirs()
 	def preprocessdir = preprocessdirfile.getCanonicalPath()
 	def foldername = 'jadex-'  + jadex_build_version
