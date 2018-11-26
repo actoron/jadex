@@ -50,7 +50,7 @@ In addition to configurations a component can be customized at startup by using 
 
 -   After selecting the component model in the JCC you should see an input field for the argument value in the Starter panel as shown below in the screenshot. Try out starting without and with entering a number in the argument input field. You should check that the started composite component has as many components as you entered. Be sure to have started the component in the new configuration.
 
-![AC Tutorial.06 Composition@arguments.png](06%20Composition-arguments.png)
+![AC Tutorial.06 Composition@arguments.png](06Composition-arguments.png)
 
 # Exercise E3 - Static component binding
 

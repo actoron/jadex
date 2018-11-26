@@ -24,7 +24,7 @@ Please have a look at the puzzle example (SokratesBDI) to see how it can be used
 
 # Example Projects
 To learn more about Jadex BDIV3, please take a look at the application projects contained in the Jadex distribution.   
-You can start them by loading the *jadex-application-bdiv3.jar* into the [JCC](../../tools/01 Introduction/#from-jadex-distribution).
+You can start them by loading the *jadex-application-bdiv3.jar* into the [JCC](../../../tools/01 Introduction/#from-jadex-distribution)).
 
 The content of the new jar will be added as new node to the model tree on the left hand side.  
 Next, you can expand the model tree by double clicking on the corresponding top-level node, which represents the jar-file. 

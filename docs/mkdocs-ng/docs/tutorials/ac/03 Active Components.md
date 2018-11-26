@@ -9,10 +9,10 @@ Active components build on SCA and extend it in the direction of software agents
 ![03 Active Components@ac.png](ac.png)  
 *Active Component Structure*
 
-You can read more about this in the [Active Components User Guide](../../guides/ac/02 Active Components).
+You can read more about this in the [Active Components User Guide](../../../guides/ac/02 Active Components)).
 
 # Exercise B1 - Java Component Definition
-There are various Jadex active component types such as applications, BPMN workflows, micro and BDI agents (learn more about [component types](../../component-types/component-types/)).
+There are various Jadex active component types such as applications, BPMN workflows, micro and BDI agents (learn more about [component types](../../../component-types/component-types/))).
 Micro (and BDIV3) agents are defined using plain Java objects that are enhanced by annotations:
 
 ```java
@@ -31,7 +31,7 @@ public class ChatB1Agent
 *Basic chat micro agent definition*
 
 Use your IDE to create a Java class called *ChatB1Agent.java* and add the annotations as shown in the figure above. 
-In this case the component only posses a description that will be displayed in the [JCC](../../tools/01 Introduction) (if used) and the marker annotation *@Agent*. 
+In this case the component only posses a description that will be displayed in the [JCC](../../../tools/01 Introduction) (if used)) and the marker annotation *@Agent*. 
 
 Please further note that it is also required to follow a **naming convention** which requires that all micro agent files end with *Agent.java*. 
 
@@ -52,4 +52,4 @@ public class Main {
 As you component does not do anything for now, there will be no useful output.
 If you want to use the JCC, use ```PlatformConfiguration.getDefault()``` as configuration instead.
 
-More about starting your components/applications can be found in the [Getting Started](../../getting-started/getting-started/#starting-your-applications) section.
+More about starting your components/applications can be found in the [Getting Started](../../../getting-started/getting-started/#starting-your-applications)) section.
