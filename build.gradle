@@ -450,11 +450,11 @@ task exampleZips {
 	String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
 	outputs.dir outputdir
 	doLast {
-		def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filteredexampleprojects')
+		def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/tmp')
 		def preprocessdir = preprocessdirfile.getCanonicalPath()
 		//String outputdir = project.distsDir.getCanonicalPath() + '/exampleprojects/'
 		String buildExcludes = 'build/**, classes/**, target/**, bin/**, .gradle/**, .idea/**, *.iml'
-		gradle.ext.maindistartifacts.each { artname ->
+		gradle.ext.maindistartifacts.parallelStream().forEach { artname ->
 			Project sp = project.ext.subprojectmap.get(artname)
 			File exdir = new File(sp.projectDir.getCanonicalPath() + '/dist/exampleprojects')
 			if (exdir.exists() && exdir.isDirectory()) {
@@ -482,7 +482,7 @@ task exampleZips {
 							}
 						}
 						ant.zip(destfile: outputdir + ex.getName() + '.zip', basedir: preprocessdir, includes: ex.getName() + '/**')
-						ant.delete dir: preprocessdir
+						//ant.delete dir: preprocessdir
 					}
 				}
 			}
@@ -498,7 +498,7 @@ task srcZip(dependsOn: createVersionInfo) {
 
 task srcZips(dependsOn: createVersionInfo) {
 	doLast {
-		gradle.ext.selecteddists.each { selecteddist ->
+		gradle.ext.selecteddists.parallelStream().forEach { selecteddist ->
 			def arts = gradle.ext.distartmap.get(selecteddist)
 			createSrcZip(selecteddist, arts, selecteddist.startsWith('addon'))
 		}
@@ -517,7 +517,7 @@ task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
 	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
 
 	doLast {
-		gradle.ext.selecteddists.each { selecteddist ->
+		gradle.ext.selecteddists.parallelStream().forEach {selecteddist ->
 			def arts = gradle.ext.distartmap.get(selecteddist)
 			createDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
 		}
@@ -532,7 +532,7 @@ def createDistZip(distname, arts, isaddon)
 	}
 	println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
 
-	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/filtereddistfiles')
+	def preprocessdirfile = new File(project.distsDir.getCanonicalPath() + '/tmp/'+distname)
 	preprocessdirfile.mkdirs()
 	def preprocessdir = preprocessdirfile.getCanonicalPath()
 	def foldername = 'jadex-'  + jadex_build_version
@@ -622,7 +622,7 @@ def createDistZip(distname, arts, isaddon)
 			zipfileset dir: preprocessdir, prefix: foldername + '/', excludes: project.ext.execfiles, erroronmissingdir: false
 			zipfileset dir: preprocessdir, prefix: foldername + '/', includes: project.ext.execfiles, filemode: 755, erroronmissingdir: false
 		}
-		ant.delete dir: preprocessdir
+		//ant.delete dir: preprocessdir
 	}
 }
 
