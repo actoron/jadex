@@ -8,7 +8,7 @@ The security lecvel of services and their methods can be adjusted by the *@Secur
 
 ## Starting two different Platforms
 
-Currently, your chat service has the default security level *PASSWORD* and therefore cannot be accessed from other platforms. To verify this behavior, start two platforms with different names. E.g. in eclipse, duplicate your launch configuration (cf. [Installation](./02 Installation) ) and add the following in the programm arguments section: *-platformname platform2_*.
+Currently, your chat service has the default security level *PASSWORD* and therefore cannot be accessed from other platforms. To verify this behavior, start two platforms with different names. E.g. in eclipse, duplicate your launch configuration and add the following in the programm arguments section: *-platformname platform2_*.
 Start the chat component on each platform (e.g. *ChatD2*) and check that chat messages are not sent between the platforms.
 
 ## Changing the security level of the service
@@ -50,4 +50,4 @@ In the following an alternative setup for allowing restricted access is describe
 
 Now open the security panel in the first platforms JCC, which is identified by a lock symbol. In the text fields at the bottom, enter a network name of your choice and click 'Add'. Add the same network name in the second platform. Instead of having separate passwords for each platform, the security network settings allow establishing a group of platforms that allow access to each other. While not strictly necessary, you can also add a password for the network. You can also add multiple networks for platforms that should be present in more than one group. As long as two platforms share a at least one network name with the same password (or no password for both), they will allow restricted communication.
 
-Start a chat component on each platform and verify if it works. Further details about security issues and settings can be found in the [security settings chapter in the tool guide](../AC%20Tool%20Guide/05%20Security%20Settings%20) .
+Start a chat component on each platform and verify if it works. Further details about security issues and settings can be found in the [security settings chapter in the tool guide](../../../tools/05%20Security%20Settings)) .

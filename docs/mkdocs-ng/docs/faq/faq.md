@@ -3,10 +3,10 @@
 # General Questions
 
 ### How to create new components from within a component?
-Just add the IComponentManagementService to the [required services](../services/services/#using-services) of your component, inject it into a field and call [**createComponent()**](../components/components/#starting-the-component) to create a new component..
+Just add the IComponentManagementService to the [required services](../../services/services/#using-services) of your component, inject it into a field and call [**createComponent()**](../../components/components/#starting-the-component) to create a new component..
 
 ### How to retrieve the Provider of a Required Service?
-To get the Service ID or the ComponentIdentifier of the component providing a given service, you can always [cast the service to IService](../services/services/#the-iservice-interface).
+To get the Service ID or the ComponentIdentifier of the component providing a given service, you can always [cast the service to IService](../../services/services/#the-iservice-interface).
 
 ### How to get the (IP) Adresses of a Remote Component?
 Usually, Jadex abstracts from physical adresses to allow transparent remote components access.
@@ -18,7 +18,7 @@ String[] addrs = tas.getPlatformAddresses(cid).get();
 ```
 
 ### Parameters do not get passed in service calls, instead, they are null
-If you pass an instance of a custom class in a service call, it may happen that the target service implementation receives ```null``` instead of the correct value. When that happens, check if your class follows the JavaBean specification or uses annotations as described in [Remote Communication - Serialization](../remote/remote/#serialization).
+If you pass an instance of a custom class in a service call, it may happen that the target service implementation receives ```null``` instead of the correct value. When that happens, check if your class follows the JavaBean specification or uses annotations as described in [Remote Communication - Serialization](../../remote/remote/#serialization).
 
 ### How can the environment of a Jadex MAS be programmed?
 If distribution is needed we used the approach of a separate environment. The environment holds the global state permits tasks, actions and processes being executed. See the environment user guide for details.
@@ -28,7 +28,7 @@ Jadex relies on the Java class loading mechanism. This means that normally Java 
 
 ### How can I parametrize a component and set parameter values before starting?
 All Jadex components support the use of arguments. For BDI agents , beliefs can be marked as arguments. The JCC gui automatically creates input fields for these arguments. Programmatically, the arguments can e.g. be directly referenced via their associated beliefs.
-Take a look at [Component Arguments](../components/components/#component-arguments) for an example how to pass arguments.
+Take a look at [Component Arguments](../../components/components/#component-arguments) for an example how to pass arguments.
 
 ### I get a NullPointerException on a method called access$000
 When scheduling a component step on a remote platform, a NullPointerException is thrown in a method called ```...access$000```.
@@ -63,4 +63,4 @@ If you want to be notified when an agent dies you can use an agent listener.
 In the current version Jadex does not provide a ready-to-use persistence mechanism for the beliefs of an agent. We have successfully used normal object-relational mapping frameworks such as Hibernate in combination with Jadex. Nonetheless, the task of persisting data cannot be fully automated and needs to be done in plans. This topic should be an issue of further research and improvement.
 
 ### Can capabilities be used for group communication, i.e. are they some kind of tuple space, where one agent puts in data and other can read it?
-No, this seems to be a common misunderstanding of the concept. A capability is comparable to a module. Each agent that includes a capability get a separate instance of that module. For details have a look at [Capabilities](../guides/bdiv3/05 Capabilities/).
+No, this seems to be a common misunderstanding of the concept. A capability is comparable to a module. Each agent that includes a capability get a separate instance of that module. For details have a look at [Capabilities](../../guides/bdiv3/05 Capabilities/).

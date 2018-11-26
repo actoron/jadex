@@ -1,10 +1,10 @@
 # Using Services
 
 So far we have explored how BDI can be used to define the internal behaviour of an agent. 
-In this part we move on towards multi-agent scenarios and show how a BDI agents can be designed to interact with each other. The typical way for realizing interactions with active components is using [services](../../services/services/).
+In this part we move on towards multi-agent scenarios and show how a BDI agents can be designed to interact with each other. The typical way for realizing interactions with active components is using [services](../../../services/services/)).
  
 A service is defined by an interface that determines the available methods and a service implementation that can be either a separate class of just part of the agent itself.  
-For further details please have a look at the  [services section](../../services/services/).
+For further details please have a look at the  [services section](../../../services/services/)).
 
 # F1 - Creating a Service
 
@@ -13,7 +13,7 @@ We will additionally create a user agent that opens a small user interface.
 The user interface allows for entering English words that will be translated on request. 
 Internally, the user agent searches for a translation service and delegates the request to it. 
 
--   First create a new Java interface called *ITranslationService*. Add a method called *translateEnglishGerman* to it. The method should take a String parameter called *eword* and return a [futurized](../../futures/futures/) String (```IFuture<String>```):
+-   First create a new Java interface called *ITranslationService*. Add a method called *translateEnglishGerman* to it. The method should take a String parameter called *eword* and return a [futurized](../../../futures/futures/) String (```IFuture<String>```)):
 
 ```java
 public interface ITranslationService
@@ -118,7 +118,7 @@ bt.addActionListener(new ActionListener()
 });
 ```
 
-For more information about service invocation, visit the [Services](../../services/services/#using-services) chapter.
+For more information about service invocation, visit the [Services](../../../services/services/#using-services)) chapter.
 
 ** Starting and testing the agents **
 
@@ -287,7 +287,7 @@ protected IBDIAgentFeature bdiFeature;
 
 The code in the action listener of the translate button has to be changed to create a translation goal instead of a service call:
 
--  As we need to dispatch a goal on the agent thread (and not on the Swing thread which is active when the button is pressed) first a thread switch has to be applied. This is done using a component step which [is executed on the agent](../../components/components/#scheduling-steps). 
+-  As we need to dispatch a goal on the agent thread (and not on the Swing thread which is active when the button is pressed) first a thread switch has to be applied. This is done using a component step which [is executed on the agent](../../../components/components/#scheduling-steps)). 
 
 -  Inside the component step, just create and dispatch the goal and use ```get()``` to wait for the result of the future.  
 

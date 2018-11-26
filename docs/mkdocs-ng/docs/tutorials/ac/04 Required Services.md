@@ -34,7 +34,7 @@ public class ChatC1Agent
 
 To understand the code it is necessary to explain the underlying concepts of the component service container. Each active component (regardless of its type) contains a service container that basically fulfills three aspects. 
 It allows for *fetching required services*, *searching services*, and *providing services*.  
-If you're using the JCC, you can [see the service container below your running component](../../tools/03 Starter/#running-components). 
+If you're using the JCC, you can [see the service container below your running component](../../../tools/03 Starter/#running-components)). 
 
 # Exercise C2 - Invoking a Predefined Service
 
@@ -45,10 +45,10 @@ In this lecture we will use the clock service to print out the current platform 
 -   Create a Java class called *ChatC2Agent.java* by copying the agent file from the last lecture.
 
 -   Insert a field of type ```IRequiredServicesFeature``` and name it *requiredServicesFeature*. Add an ```@AgentFeature``` annotation above the field declaration. Jadex will notice the annotation and automatically inject the corresponding micro agent feature object to the agent.
- In this case, the injected feature provides access to the declared Required Services. Read more about Component Features [here](../../components/components/#component-features).
+ In this case, the injected feature provides access to the declared Required Services. Read more about Component Features [here](../../../components/components/#component-features)).
  
 -   Declare a public void method called *executeBody()* and add a ```@AgentBody``` annotation above the method. 
-This annotation is one of three [lifecycle annotations](../../components/components/#component-lifecycle) of a micro agents which will contain the functional agent code. It is called once after the agent is born. 
+This annotation is one of three [lifecycle annotations](../../../components/components/#component-lifecycle)) of a micro agents which will contain the functional agent code. It is called once after the agent is born. 
 
 -   What is still missing is the usage of the declared required service. This will be done in the *executeBody()* method with the following code:
 

@@ -39,7 +39,9 @@ The BPMN process debugger comprises three views:
 Micro Agent Debugger
 =================================
 
-![12 Debugger@microdebugger.png](Breakpoint()* annotation. Additionally, a method has to be implemented that checks if a specific breakpoint has been reached. When implementing a pojo micro agent the @AgentBreakpoint annotation can be used, otherwise the method should override 
+![12 Debugger@microdebugger.png](microdebugger.png)
+
+()* annotation. Additionally, a method has to be implemented that checks if a specific breakpoint has been reached. When implementing a pojo micro agent the @AgentBreakpoint annotation can be used, otherwise the method should override 
 ```java
 public boolean isAtBreakpoint(String[] breakpoints)
 ```

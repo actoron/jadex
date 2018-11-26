@@ -20,7 +20,7 @@ IComponentManagementService cms = SServiceProvider.getService(platform, ICompone
 ```
 
 ### Creating Agent and Service
-With the ComponentManagementService, the agents can now be created. As you are trying to create them with Java, you usually want to set values to them. This is done by an Service, which is defined in a separate Service Definition as pure Java Interface (see [Chapter 5: Provided Services](05 Provided Services):
+With the ComponentManagementService, the agents can now be created. As you are trying to create them with Java, you usually want to set values to them. This is done by an Service, which is defined in a separate Service Definition as pure Java Interface (see [Provided Services](../../../services/services#providing-services)):
 
 ```java
 public interface IInitialisationService {
@@ -63,7 +63,7 @@ serviceSQ.setMyColor(Math.abs(random.nextInt() % 254));
 Afterwards, the agent behaviour needs to be started. As the service call can only be executed with an agent who has finished his ```@AgentBody```, the start of the agent behaviour can not be done by in the body. Instead, the ```IInitialisationService``` has the ```start()```-method which should now trigger the normal agent behaviour.
 
 ## Exercise 2 - Creating Space and Space Objects from Java
-In order to get both a spatial representation of the agents and a graphical interface at once with minimal effort, the Jadex Environment Space was created. A detailed description can be found in [Chapter 1](01 Introduction).
+In order to get both a spatial representation of the agents and a graphical interface at once with minimal effort, the Jadex Environment Space was created. A detailed description can be found in [Chapter 1](../01 Introduction).
 
 In order to use the space with standalone started components, the space needs to be created manually. For describing the space, a separate .application.xml should be created. It should define at least the objects in space and the mapping between the agents and their avatars in the space.
 

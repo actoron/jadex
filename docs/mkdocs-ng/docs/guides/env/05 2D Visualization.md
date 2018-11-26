@@ -1,6 +1,6 @@
 # Visualization
 
-In this section the visualization concepts between components and space objects are described. The presented elements are part of the space environment type xml part as introduced in section [03 Domain Model](03 Domain Model). For convenience the relevant cutout of the xml schema is shown again below.
+In this section the visualization concepts between components and space objects are described. The presented elements are part of the space environment type xml part as introduced in section [03 Domain Model](../03 Domain Model). For convenience the relevant cutout of the xml schema is shown again below.
 
 
 ![](visualization.png)

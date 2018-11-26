@@ -21,7 +21,7 @@ The engine will automatically inject the plan API when a plan instance is create
 
 When using a method as plan this is not possible. Hence, the signature of the plan method can be used to retrieve the plan API just by adding a parameter of type [```IPlan```](${URLJavaDoc}/jadex/bdiv3/runtime/IPlan.html). 
 <x-hint title="parameters">
-Please note that in Jadex methods that are invoked by the framework can have any signature. The engine will do its best to [automatically determine](../../components/components/#parameter-guesser) which values are expected and set them as parameter values. If the engine does not find a suitable value of a given type the value will be null.
+Please note that in Jadex methods that are invoked by the framework can have any signature. The engine will do its best to [automatically determine](../../../components/components/#parameter-guesser)) which values are expected and set them as parameter values. If the engine does not find a suitable value of a given type the value will be null.
 </x-hint>
 
 <!--# Exercise B1 - A Plan as Normal Java Class-->
@@ -78,7 +78,7 @@ Letting *eword* and *gword* being the English and German words respectively.
 @Plans(@Plan(body=@Body(TranslationPlan.class)))
 ```
 -   Add a field called *bdiFeature* to the agent class and annotate it with ```@AgentFeature```. The field should be of type ```IBDIAgentFeature```. This will let the engine automatically inject the BDI agent feature to the POJO agent class. 
-Read more about features [here](../../components/components/#component-features).
+Read more about features [here](../../../components/components/#component-features)).
 
 ```java
 @AgentFeature 
@@ -134,7 +134,7 @@ Once again, in this lecture the same functionality will be created. But this tim
 Again, copy the agent file from the last lecture and do the following:
 
 -   Copy the word table field from the inner to the agent class
--   Copy the init code for the word table to a newly created init method of the agent, annotated with ```@AgentCreated```. Read more about component lifecycles [here](../../components/components/#component-lifecycle).
+-   Copy the init code for the word table to a newly created init method of the agent, annotated with ```@AgentCreated```. Read more about component lifecycles [here](../../../components/components/#component-lifecycle)).
 
 ```java
 @AgentCreated
@@ -194,7 +194,7 @@ This time, we need a translation agent with an inner plan class to be able to ad
 ## Changing the agent
 
 -   Add a try-catch-block to the ```adoptPlan()``` call and wait for the plan to be finished using get() at the end of the invocation. The get() turns the future based asynchronous call into a synchronous one.  
-For more information about asynchronous programming with futures in Jadex please refer to the [AC User Guide](../../guides/ac/03 Asynchronous Programming).  
+For more information about asynchronous programming with futures in Jadex please refer to the [AC User Guide](../../../guides/ac/03 Asynchronous Programming)).  
 The agent body method should look like this:
 
 

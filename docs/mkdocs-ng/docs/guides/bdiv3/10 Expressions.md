@@ -10,7 +10,7 @@ The expression language follows a Java-like syntax. In general, all of the *oper
 
 
 
-In addition to the Java-like syntax, the language has some extensions: Parameters give access to specific elements depending on the context of the expression. OQL-like select statements allow to create complex queries, e.g., for querying the beliefbase. To simplify the Java statements in the expressions, imports can be declared in the ADF (see [Imports](04 Imports)) that allow to use unqualified class names. The imports are defined once, and can be used for all expressions throughout the ADF.
+In addition to the Java-like syntax, the language has some extensions: Parameters give access to specific elements depending on the context of the expression. OQL-like select statements allow to create complex queries, e.g., for querying the beliefbase. To simplify the Java statements in the expressions, imports can be declared in the ADF (see [Imports](../04 Imports)) that allow to use unqualified class names. The imports are defined once, and can be used for all expressions throughout the ADF.
   
 
 ## Expression Properties

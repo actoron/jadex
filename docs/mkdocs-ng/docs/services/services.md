@@ -4,7 +4,7 @@ A Jadex Service is generally represented by an arbitrary Java Interface and has 
 The service interface can be implemented as a Java class.
  Inside the component, access to services is then granted via Component Features or Injections.
 
-For services provided for general use by the Jadex Active Components Platform, please refer to [Platform Services](../platform/platform/#platform-services).
+For services provided for general use by the Jadex Active Components Platform, please refer to [Platform Services](../../platform/platform/#platform-services).
 
 # Implementation
 
@@ -19,7 +19,7 @@ public interface ISumService {
 ```
 
 <x-hint title="Futures">
-Again, using the *futurized* return type allows you to perform work asynchronously while a service call is executing. You can refer to the chapter [Futures](../futures/futures) for more information.
+Again, using the *futurized* return type allows you to perform work asynchronously while a service call is executing. You can refer to the chapter [Futures](../../futures/futures) for more information.
 </x-hint>
 
 ## Java Implementation
@@ -186,7 +186,7 @@ private IRequiredServiceFeature reqFeat;
 }
 ```
 
-Note that the name specified must match the required service declaration (as seen [above](services#using-services)).
+Note that the name specified must match the required service declaration (as seen [above](#using-services)).
 By using the ```IProvidedServiceFeature```, you can also get access to services *provided* by your component.
 
 ## The IService interface
@@ -217,7 +217,7 @@ private IInternalAccess agentAccess;
 private MyAgent agent;
 ```
 
-This annotation will also inject Agent Capabilities (see [BDI Capabilities](../tutorials/bdiv3/06 Using Capabilities/)) and other instances that can be guessed by the [Parameter Guesser](../components/components/#parameter-guesser).
+This annotation will also inject Agent Capabilities (see [BDI Capabilities](../../tutorials/bdiv3/06 Using Capabilities/)) and other instances that can be guessed by the [Parameter Guesser](../../components/components/#parameter-guesser).
 
 # Service Lifecycle
 
