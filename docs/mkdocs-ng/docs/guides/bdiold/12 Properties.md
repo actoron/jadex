@@ -32,7 +32,7 @@ The "debugging" property influences the execution mode of the agent. When settin
 
 
 The logging properties can be used to adjust the logging behavior according to the [Java Logging API](http://java.sun.com/j2se/1.4/docs/guide/util/logging/overview.html) . The level influences the amount of logging information produced by the agent (logging information below the level will be completely ignored). Setting "useParentHandlers" to "true" will forward logging information to the parent handler, which by Java default causes logging output up to the INFO level to be displayed on the console. If you want to direct more detailed logging output to the console use the "addConsoleHandler" property, which creates a custom logging handler for console ouput with the specified logging level.    
-More about logging settings can be found in [Jadex Active Components Tools](../../tools/01 Introduction).
+More about logging settings can be found in [Jadex Active Components Tools](../../../tools/01 Introduction)).
 
 
 The "logging.level.exceptions" property can be used to specify the logging level for uncatched exceptions occurring in plan bodies. Using the default settings for logging (non-BDI specific) exceptions are printed out as SEVERE log messages to the console. You can adjust the level settings to suppress exception log messages from plans that you expect to throw exceptions. 

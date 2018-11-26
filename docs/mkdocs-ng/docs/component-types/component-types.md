@@ -1,7 +1,7 @@
 ${SorryOutdatedv3}
 
 # Component Types
-While the most basic component type is a *Micro Agent*, Jadex supports much more advanced concepts. This is an overview of the supported component types and their [Features](../components/components/#component-features).
+While the most basic component type is a *Micro Agent*, Jadex supports much more advanced concepts. This is an overview of the supported component types and their [Features](../../components/components/#component-features).
 
 <!--TODO: List IComponentFeatures of each type-->
 ## Micro Agents
@@ -11,10 +11,10 @@ Micro agents are pojo (plain old java object) based Java classes that support th
  
 | Feature Name | Description |
 |--------------|-------------|
-|[IPojoComponentFeature](${URLJavaDoc}/jadex/bridge/component/IPojoComponentFeature)| This feature allows to access the Component POJO object (e.g. from inside a service as in [Accessing the Component](../services/services/#accessing-the-component)). |
+|[IPojoComponentFeature](${URLJavaDoc}/jadex/bridge/component/IPojoComponentFeature)| This feature allows to access the Component POJO object (e.g. from inside a service as in [Accessing the Component](../../services/services/#accessing-the-component)). |
 |IMicroInjectionFeature| This feature implements the injections of agent object, arguments, results and features. *No user methods available.* |
-|IMicroServiceInjectionFeature| Injects required services into [annotated field values](../services/services/#using-injection). *No user methods available.*|
-|ILifecycleComponentFeature| Implements the Component's [Lifecycle](../components/components/#component-lifecycle). *No user methods available.*|
+|IMicroServiceInjectionFeature| Injects required services into [annotated field values](../../services/services/#using-injection). *No user methods available.*|
+|ILifecycleComponentFeature| Implements the Component's [Lifecycle](../../components/components/#component-lifecycle). *No user methods available.*|
 
  
 ## BDI Agents

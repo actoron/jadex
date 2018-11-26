@@ -11,13 +11,13 @@ Decomposing the software into Active Components allows the developer to migrate 
 
 Most of the content of this guide assumes you are already familiar with Jadex and only discusses Android specifics and additions.
 
--   [Chapter 2 - Installation](02%20Installation)  describes how to install the required tools and libaries and start development of Jadex Android applications.
--   [Chapter 3 - Using Jadex on Android](03%20Using%20Jadex%20on%20Android) gives an overview of available API functions
+-   [Chapter 2 - Installation](#installation)  describes how to install the required tools and libaries and start development of Jadex Android applications.
+-   [Chapter 3 - Using Jadex on Android](#using-jadex-on-android) gives an overview of available API functions
 
 ## General Notes on Jadex Android
 
 Most of the Jadex features are available on Android, too.
-The probably most important difference is that there is no JCC and Android Apps are initialized very differently - you can read more about that in [Chapter 3](03 Using Jadex on Android/#differences-to-the-desktop-version-of-jadex).
+The probably most important difference is that there is no JCC and Android Apps are initialized very differently - you can read more about that [here](#differences-to-the-desktop-version-of-jadex).
 
 You can follow the release notes below to get an impression of the ongoing development, the latest distribution can be found on the [download page](https://www.activecomponents.org/bin/view/Download/Distributions).
 
@@ -185,12 +185,12 @@ We try to list some of the differences here to avoid confusion.
 
 -   **UI as entry point:** In the Desktop variant of Jadex, you have Active Components that create their own UI. On Android, the entry point of an application IS the UI (e.g. an Activity). Because of this, components can never create the UI on Android.
 
--   **The Jadex Platform runs inside an Application:** In consequence, instead of running the Jadex Platform and then starting applications, on Android, you will first start your application which then can launch a Jadex Platform. The Platform is also not shared across applications. This is very similar to the Jadex [application integration](../AC Tutorial/09 Application Integration/), so most things written down there also apply for Jadex Android.
+-   **The Jadex Platform runs inside an Application:** In consequence, instead of running the Jadex Platform and then starting applications, on Android, you will first start your application which then can launch a Jadex Platform. The Platform is also not shared across applications. This is very similar to the Jadex [application integration](../../tutorials/ac/09 Application Integration/), so most things written down there also apply for Jadex Android.
 
 -   **UI can be paused any time:** Because an Android UI Component can be paused or destroyed at any time, it is recommended to let the Jadex Platform run in an Android Service.
 
 -  **BDIV3 compile time generation:** If you want to use BDIV3 components on Android, you need to include a gradle plugin that handles the code generation that is required. As opposed to desktop variants, in Jadex Android, the required code is generated at compile time to save performance.
- This is described in detail in [Chapter 04](04 Using BDIv3/).
+ This is described in detail [below](#using-bdiv3-on-android).
 
 ## Required Libraries
 To use Jadex for Android, first open your project's build.gradle. 

@@ -58,7 +58,7 @@ public class TimeUserAgent
 
 Start the Jadex platform and the agent with the provided *main()* method. In case there are any time services online, you should see their time printed to the console in periodic updates. In the next chapter you will learn how to start a local time provider.
 
-The details of the time user agent are explained in the following subsections. Furthermore, you can see [Platform.Starting a Platform](../../platform/platform/#starting-a-platform) for details on platform configurations and [Tools.JCC Overview](../../tools/02 JCC Overview/) for details on the Jadex control center window (JCC).
+The details of the time user agent are explained in the following subsections. Furthermore, you can see [Platform.Starting a Platform](../../../platform/platform/#starting-a-platform) for details on platform configurations and [Tools.JCC Overview](../../../tools/02 JCC Overview/) for details on the Jadex control center window (JCC)).
 
 ## Class Name and @Agent Annotation
 
@@ -74,7 +74,7 @@ The ```@AgentService``` annotation to the ```addTimeService()``` method states t
 
 # The Agent Behavior
 
-The *addTimeService()* method is called for each found service. In this method, the agent subscribes to the found time service and receives the client side of the subscription future as described in the [last section](02 Time Service Interface/#the-subscribe-method). In the while loop, *hasNextIntermediateResult()* blocks until the next time notification becomes available and can be fetched by *getNextIntermediateResult()*.
+The *addTimeService()* method is called for each found service. In this method, the agent subscribes to the found time service and receives the client side of the subscription future as described in the [last section](../02 Time Service Interface/#the-subscribe-method). In the while loop, *hasNextIntermediateResult()* blocks until the next time notification becomes available and can be fetched by *getNextIntermediateResult()*.
 
 [//]: # (*todo: describe IService and service identifier?*)
 

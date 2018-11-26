@@ -16,7 +16,7 @@ The timer event represents some passing of time. As time is outside the control 
 
 Create a process as shown in the figure below. This example represents a reminder process, e.g. when some order is late. First, an initial reminder is sent. If nothing happens after some delay, a second reminder is sent. 
 
-![05 Events and Messages@1.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-1.png)
+![05 Events and Messages@1.png](../05%20Events%20and%20Messages/05%20Events%20and%20Messages-1.png)
 
 
 
@@ -39,7 +39,7 @@ Thus, exception events can be attached to subprocess elements. When an exception
 
 Consider the following process. It starts with one activity: 'Credit Check'. If the credit check is successful the process proceeds to the 'Credit Approved' task. If some problem occurs during the credit check, the exception exit is triggered and the process moves on to the 'Credit Denied' task.
 
-![05 Events and Messages@2.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-2.png)
+![05 Events and Messages@2.png](../05%20Events%20and%20Messages/05%20Events%20and%20Messages-2.png)
 
 
 
@@ -58,7 +58,7 @@ Using messages, processes can communicate with the outside world. The outside wo
 
 Draw a process as shown below. The process has a preparatory task (e.g. print out a message to the console), then waits for a message being received and finally prints out the content of the received message.
 
-![05 Events and Messages@3.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-3.png)
+![05 Events and Messages@3.png](../05%20Events%20and%20Messages/05%20Events%20and%20Messages-3.png)
 
 
 
@@ -66,9 +66,9 @@ Per default, the message intermediate event reacts to any received message, so y
 
 ### Using the Conversation Center
 
-To send the process a message, you can use the conversation center. Choose the conversation center from the toolbar in the JCC. It is represented by the envelope icon (![05 Events and Messages@newconversation.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-newconversation.png)).
+To send the process a message, you can use the conversation center. Choose the conversation center from the toolbar in the JCC. It is represented by the envelope icon (![05 Events and Messages@newconversation.png](../05%20Events%20and%20Messages/05%20Events%20and%20Messages-newconversation.png)).
 
-![05 Events and Messages@4.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-4.png)
+![05 Events and Messages@4.png](../05%20Events%20and%20Messages/05%20Events%20and%20Messages-4.png)
 
 
 
@@ -109,7 +109,7 @@ Sometimes a process should not react to just any message, but only to messages t
 
 Edit the properties of the message intermediate event in the diagram. Add a parameter 'performative' with the value '"request"'. Use quotes for the value, because the value should be a string in this case.
 
-![05 Events and Messages@eclipsemessagereceivalparameter.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-eclipsemessagereceivalparameter.png)
+![05 Events and Messages@eclipsemessagereceivalparameter.png](../05%20Events%20and%20Messages/05%20Events%20and%20Messages-eclipsemessagereceivalparameter.png)
 
 
 
@@ -130,11 +130,11 @@ If the message is not received within the time specified in the time event, the 
 
 The above mentioned timeout pattern is shown in the following process description. The process combines the elements from exercises D1 and D3.
 
-![05 Events and Messages@eclipsetimeout.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-eclipsetimeout.png)
+![05 Events and Messages@eclipsetimeout.png](../05%20Events%20and%20Messages/05%20Events%20and%20Messages-eclipsetimeout.png)
 
 
 
-Note the use of the multiple event (![05 Events and Messages@bpmnmultipleevent.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-bpmnmultipleevent.png)). In eclipse, it is available from the *Intermediary Events* section of the palette and is called *Multiple intermediate event*. Set a conveniently long timeout like e.g. 5000 milliseconds in the time event, because you need to send the process a message manually for testing.
+Note the use of the multiple event (![05 Events and Messages@bpmnmultipleevent.png](../05%20Events%20and%20Messages/05%20Events%20and%20Messages-bpmnmultipleevent.png)). In eclipse, it is available from the *Intermediary Events* section of the palette and is called *Multiple intermediate event*. Set a conveniently long timeout like e.g. 5000 milliseconds in the time event, because you need to send the process a message manually for testing.
 
 ### Testing the Timeout Process
 
@@ -156,7 +156,7 @@ Additionally, a component identifier may hold a number of transport addresses, w
 
 For sending a message, add a message intermediate event as shown below. As mentioned earlier, BPMN distinguishes between *catching*- and *throwing*-events. The events we have used so far, were all catching-events which are represented by white icons within the BPMN event symbol. In contrast, throwing events are represented by black icons (see below). While catching a message is an analogy to receiving, throwing is an analogy to sending a message. Because of this, the event's mode has to be changed by right-clicking on the symbol and choosing "Set as a throwing shape". Add message parameters as required.
 <!-- TODO: update screenshot-->
-![05 Events and Messages@eclipsemessagesending.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-eclipsemessagesending.png)
+![05 Events and Messages@eclipsemessagesending.png](../05%20Events%20and%20Messages/05%20Events%20and%20Messages-eclipsemessagesending.png)
 
 We want to send a message to the process from Exercise D3. Thus, set the performative to request as expected by the D3 process and and enter an appropriate content for the message. Finally, we need to specify the recipient of the message.
 You can use the helper method *createComponentIdentifier()* to create a local component identifier. The method is defined in the BMPN interpreter object, which is available from the reserved variable '$interpreter'. Supply the local name of the process without the platform name, e.g., 'MessageReceival'.
@@ -170,9 +170,9 @@ If it does not work as expected, make sure that the name of the D3 process insta
 
 ### Observing Messages using the Communication Analyzer
 
-The JCC includes a tool to monitor the messages that are exchanged between processes: the communication analyzer (![05 Events and Messages@newcomanalyzer.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-newcomanalyzer.png)). Open the tool by selecting its icon from the upper right tool bar in the JCC. The window is divided in two main areas. On the left, there is a tree of the currently running agents. On the right you can see the observed messages in four different views: as a table, as a sequence diagram, as a 2D graph, and as a bar or pie chart. Furthermore, details of a selected message can be shown at the bottom.
+The JCC includes a tool to monitor the messages that are exchanged between processes: the communication analyzer (![05 Events and Messages@newcomanalyzer.png](../05%20Events%20and%20Messages/05%20Events%20and%20Messages-newcomanalyzer.png)). Open the tool by selecting its icon from the upper right tool bar in the JCC. The window is divided in two main areas. On the left, there is a tree of the currently running agents. On the right you can see the observed messages in four different views: as a table, as a sequence diagram, as a 2D graph, and as a bar or pie chart. Furthermore, details of a selected message can be shown at the bottom.
 
-![05 Events and Messages@jadexcomanalyzer.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-jadexcomanalyzer.png)
+![05 Events and Messages@jadexcomanalyzer.png](../05%20Events%20and%20Messages/05%20Events%20and%20Messages-jadexcomanalyzer.png)
 
 To observe the message between D3 and D5 perform the following steps. Start D3 (using the starter tool). Switch to the communication analyzer and double click on the D3 process. You will see that the icon is enriched with a small looking glass. This means that the communication analyzer now observes this process and therefore notices any message that this process may send or receive. Now start the D5 process. The message will be exchanged and both processes will terminate.
 The tree in the communication analyzer will now show both processes with a small ghost icon, meaning that these processes are no longer alive.
