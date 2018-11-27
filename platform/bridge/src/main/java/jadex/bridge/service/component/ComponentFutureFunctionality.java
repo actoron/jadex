@@ -9,7 +9,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.commons.DebugException;
 import jadex.commons.ICommand;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
@@ -43,10 +45,13 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	{
 		if(!access.getFeature(IExecutionFeature.class).isComponentThread())
 		{
+			Exception ex	= Future.DEBUG ? new DebugException() : null;
 			access.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
+					if(Future.DEBUG)
+						DebugException.ADDITIONAL.set(ex);
 					command.execute(args);
 					return IFuture.DONE;
 				}
