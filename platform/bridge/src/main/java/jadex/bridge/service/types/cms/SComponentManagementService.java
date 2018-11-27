@@ -412,7 +412,7 @@ public class SComponentManagementService
 	/**
 	 *  Notify the cms listeners of a removal.
 	 */
-	public static void notifyListenersRemoved(IComponentDescription desc, Map<String, Object> results)
+	public static void notifyListenersRemoved(IComponentDescription desc, Exception ex, Map<String, Object> results)
 	{
 		// listeners are copied to be threadsafe
 		
@@ -422,7 +422,7 @@ public class SComponentManagementService
 		
 		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slis)
 		{
-			sub.addIntermediateResultIfUndone(new CMSTerminatedEvent(desc, results));
+			sub.addIntermediateResultIfUndone(new CMSTerminatedEvent(desc, results, ex));
 		}
 		
 		// remove the listeners of the terminated component
@@ -3107,12 +3107,13 @@ public class SComponentManagementService
 			
 			public void finished()
 			{
-				ret.addIntermediateResultIfUndone(new CMSTerminatedEvent(SComponentManagementService.getDescription(mycid[0]), results));
+				ret.addIntermediateResultIfUndone(new CMSTerminatedEvent(SComponentManagementService.getDescription(mycid[0]), results, null));
 				ret.setFinishedIfUndone();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				ret.addIntermediateResultIfUndone(new CMSTerminatedEvent(SComponentManagementService.getDescription(mycid[0]), results, exception));
 				ret.setExceptionIfUndone(exception);
 			}
 		}, agent).addResultListener(new IResultListener<IComponentIdentifier>()
@@ -3307,7 +3308,7 @@ public class SComponentManagementService
 		
 		SComponentManagementService.exitDestroy(cid, desc, ex, results);
 
-		SComponentManagementService.notifyListenersRemoved(desc, results);
+		SComponentManagementService.notifyListenersRemoved(desc, ex, results);
 		
 		if(ex!=null && !(ex instanceof StepAbortedException))
 		{

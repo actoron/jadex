@@ -99,7 +99,7 @@ public class ComponentStartTestLazyPlatform extends	ComponentTestLazyPlatform
 //					super.resultAvailable(result);
 //				}
 //			};
-			
+			System.out.println("KILLWAITTT!!!! " + cid);
 			platform.scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)

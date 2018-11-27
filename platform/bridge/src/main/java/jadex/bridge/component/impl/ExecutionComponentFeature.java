@@ -641,7 +641,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				if (result instanceof CMSStatusEvent.CMSTerminatedEvent)
 				{
-					ret.setResult(((CMSStatusEvent.CMSTerminatedEvent) result).getResults());
+					CMSStatusEvent.CMSTerminatedEvent termev = (CMSStatusEvent.CMSTerminatedEvent) result;
+					if (termev.getException() != null)
+						ret.setException(termev.getException());
+					else
+						ret.setResult(termev.getResults());
 				}
 			}
 		});

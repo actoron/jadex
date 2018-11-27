@@ -40,6 +40,7 @@ import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -352,10 +353,13 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				public void finished()
 				{
 //					System.out.println("User kill done, killing sysagents..." + sysinfos.size());
-					if (sysinfos.size() > 0)
-						doKillComponents(sysinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
-					else
-						ret.setFinished();
+					if (!ret.isDone())
+					{
+						if (sysinfos.size() > 0)
+							doKillComponents(sysinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
+						else
+							ret.setFinished();
+					}
 				}
 			});
 		}
@@ -548,7 +552,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				ret.setExceptionIfUndone(exception);
 			}
 		});
 		
@@ -581,11 +585,17 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			modelbar.addFuture(fut);
 		}
 		
-		modelbar.waitFor().addResultListener(new IResultListener<Void>()
+		modelbar.waitForIgnoreFailures(new ICommand<Exception>()
+		{
+			public void execute(Exception exception)
+			{
+				ret.setExceptionIfUndone(exception);
+			}
+		}).addResultListener(new IResultListener<Void>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+//				ret.setException(exception);
 			}
 			
 			public void resultAvailable(Void result)
@@ -608,7 +618,15 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				for (Map.Entry<Integer, IFuture<IModelInfo>> entry : modelmap.entrySet())
 				{
 					String[] prevdep = lineardeps && prev != null ? new String[] { prev.getFullName() } : null;
-					addComponentToLevels(dr, cids.get(entry.getKey()), entry.getValue().get(), instances, prevdep);
+					try
+					{
+						addComponentToLevels(dr, cids.get(entry.getKey()), entry.getValue().get(), instances, prevdep);
+					}
+					catch (Exception e)
+					{
+						ret.setExceptionIfUndone(e);
+						return;
+					}
 					prev = entry.getValue().get();
 				}
 				
