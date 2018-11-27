@@ -461,7 +461,6 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 										ret.addIntermediateResultIfUndone(result);
 									};
 								});
-								levelbar.addFuture(createfut);
 							}
 						}
 						else if (debug)
@@ -533,7 +532,6 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 												ret.addIntermediateResultIfUndone(result);
 											};
 										});
-										levelbar.addFuture(killfut);
 									}
 								}
 							}
@@ -585,32 +583,27 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			modelbar.addFuture(fut);
 		}
 		
-		modelbar.waitForIgnoreFailures(new ICommand<Exception>()
-		{
-			public void execute(Exception exception)
-			{
-				ret.setExceptionIfUndone(exception);
-			}
-		}).addResultListener(new IResultListener<Void>()
+		modelbar.waitFor().addResultListener(new IResultListener<Void>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-//				ret.setException(exception);
+				ret.setException(exception);
 			}
 			
 			public void resultAvailable(Void result)
 			{
-				boolean lineardeps = true;
-				for (Map.Entry<Integer, IFuture<IModelInfo>> entry : modelmap.entrySet())
-				{
-					IModelInfo model = entry.getValue().get();
-					if (!SUtil.arrayEmptyOrNull(model.getPredecessors()) ||
-						!SUtil.arrayEmptyOrNull(model.getSuccessors()))
-					{
-						lineardeps = false;
-						break;
-					}
-				}
+//				boolean lineardeps = true;
+//				for (Map.Entry<Integer, IFuture<IModelInfo>> entry : modelmap.entrySet())
+//				{
+//					IModelInfo model = entry.getValue().get();
+//					if (!SUtil.arrayEmptyOrNull(model.getPredecessors()) ||
+//						!SUtil.arrayEmptyOrNull(model.getSuccessors()))
+//					{
+//						lineardeps = false;
+//						break;
+//					}
+//				}
+				boolean lineardeps = false;
 				
 				DependencyResolver<String> dr = new DependencyResolver<>();
 				
@@ -1070,7 +1063,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 */
 	protected <T> void addComponentToLevels(DependencyResolver<String> dr, T instanceinfo, IModelInfo minfo, MultiCollection<String, T> instances, String... addpredecessors)
 	{
-//		System.out.println("addcomptolevel: " + minfo.getFullName());
+		System.out.println("addcomptolevel: " + minfo.getFullName());
 		try
 		{
 			String cname = minfo.getFullName();
