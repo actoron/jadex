@@ -465,7 +465,7 @@ public class RestMethodInfo
 					{
 						try
 						{
-							Object val = m.invoke(an, null);
+							Object val = m.invoke(an);
 							vals.put(m.getName(), val);
 						}
 						catch(Exception e)
