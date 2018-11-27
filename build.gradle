@@ -301,6 +301,8 @@ subprojects
 				archives jar
 			}
 			war.baseName = getArtifactName(project)
+			war.reproducibleFileOrder	= true
+			war.preserveFileTimestamps	= false
 		}
 		jar.baseName = getArtifactName(project)
 		jar.reproducibleFileOrder	= true
