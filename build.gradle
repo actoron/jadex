@@ -704,6 +704,17 @@ def createDistZip(distname, arts, isaddon)
 
 def createSrcZip(distname, arts, isaddon)
 {
+//	project.tasks.create([name: "srcZip"+distname.substring(0,1).toUpperCase()+distname.substring(1), type: Zip]) {
+//		destinationDir new File(project.distsDir, "sources")
+//		archiveName 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
+//		reproducibleFileOrder	true
+//		preserveFileTimestamps	false
+//		
+//		from('distributions/minimal') {
+//			into 'sources/distributions/minimal'
+//		}
+//	}.execute()
+	
 	def mainzipdir = 'sources/'
 	String maindir = project.projectDir.getCanonicalPath()
 	String zipfilename = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
