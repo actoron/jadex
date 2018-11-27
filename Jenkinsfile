@@ -24,7 +24,7 @@ pipeline {
 		wrap([$class: 'Xvfb']) {
 		  // todo: why build hangs with distzip and javadoc?
 		  // No 'clean' when already done for android-gradle-plugin
-		  sh './gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc -x androidjavadocs --continue'
+		  sh './gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue'
 		}
 	  }
 	}
@@ -34,7 +34,7 @@ pipeline {
 	  parallel {
 		stage('Dist') {
 		  steps {
-			sh './gradlew -Pdist=publishdists distZips checkDists -x test -x javadoc -x androidjavadocs'
+			sh './gradlew -Pdist=publishdists distZips checkDists -x test -x javadoc'
 		  }
 		}
 		stage('HTML/PDF Docs') {
