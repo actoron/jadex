@@ -9,6 +9,7 @@ import jadex.base.test.IAbortableTestSuite;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.CounterResultListener;
@@ -52,11 +53,11 @@ public class ComponentStartTestLazyPlatform extends	ComponentTestLazyPlatform
 	 *  Called when a component has been started.
 	 *  @param cid	The cid, set as soon as known.
 	 */
-	protected void componentStarted(ITuple2Future<IComponentIdentifier, Map<String, Object>> fut)
+	protected void componentStarted(IFuture<IExternalAccess> fut)
 	{
 		try
 		{
-			final IComponentIdentifier	cid	= fut.getFirstResult();
+			final IComponentIdentifier	cid	= fut.get().getId();
 			
 			// Wait some time (simulation and real time) and kill the component afterwards.
 			final IResultListener<Void>	lis	= new CounterResultListener<Void>(1, new DefaultResultListener<Void>()

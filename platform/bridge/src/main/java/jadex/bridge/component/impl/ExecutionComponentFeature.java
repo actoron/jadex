@@ -80,6 +80,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ISuspendable;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.ThreadLocalTransferHelper;
@@ -633,18 +634,35 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public IFuture<Map<String, Object>> waitForTermination()
 	{
+		System.out.println("WAITFORTERM");
 		final Future<Map<String, Object>> ret = new Future<>();
-		SComponentManagementService.linkResults(new IResultListener<Collection<Tuple2<String,Object>>>()
+//		SComponentManagementService.linkResults(new IResultListener<Collection<Tuple2<String,Object>>>()
+//		{
+//			public void resultAvailable(Collection<Tuple2<String, Object>> result)
+//			{
+//				ret.setResult(new HashMap<>(getComponent().getFeature(IArgumentsResultsFeature.class).getResults()));
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		}, getComponent(), component);
+		SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
 		{
-			public void resultAvailable(Collection<Tuple2<String, Object>> result)
+			public void intermediateResultAvailable(CMSStatusEvent result)
 			{
-				ret.setResult(new HashMap<>(getComponent().getFeature(IArgumentsResultsFeature.class).getResults()));
+				System.out.println("RRRR " + result);
+				if (result instanceof CMSStatusEvent.CMSTerminatedEvent)
+				{
+					ret.setResult(((CMSStatusEvent.CMSTerminatedEvent) result).getResults());
+				}
 			}
-			public void exceptionOccurred(Exception exception)
+			public void finished()
 			{
-				ret.setException(exception);
+				System.out.println("FINIS");
 			}
-		}, getComponent(), component);
+		});
+		System.out.println("WAITFORTERM2");
 		return ret;
 	}
 	
@@ -2041,6 +2059,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public IFuture<Map<String, Object>> killComponent()
 	{
+		System.out.println("ExecFeat: killComponent(): " + component);
 		return getComponent().killComponent();
 	}
 	

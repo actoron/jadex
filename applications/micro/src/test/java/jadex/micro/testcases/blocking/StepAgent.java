@@ -20,7 +20,7 @@ import jadex.micro.annotation.RequiredServices;
 /**
  *  An agent that provides the stepped service.
  */
-@Agent
+@Agent(predecessors="jadex.micro.testcases.blocking.BlockAgent")
 @Service
 @ProvidedServices(@ProvidedService(type=IStepService.class,
 	implementation=@Implementation(expression="$pojoagent")))

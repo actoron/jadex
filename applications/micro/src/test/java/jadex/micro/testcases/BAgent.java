@@ -30,7 +30,7 @@ import jadex.micro.annotation.Results;
 //@Results(@Result(name="exception", typename="Exception"))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IBService.class)
-@Agent
+@Agent(predecessors="jadex.micro.testcases.AAgent")
 public class BAgent implements IBService
 {
 	@ServiceComponent

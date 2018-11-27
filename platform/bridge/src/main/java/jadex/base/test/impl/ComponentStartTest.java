@@ -66,11 +66,11 @@ public class ComponentStartTest extends ComponentTest
 	 * 
 	 * @param cid The cid, set as soon as known.
 	 */
-	protected void componentStarted(ITuple2Future<IComponentIdentifier, Map<String, Object>> fut)
+	protected void componentStarted(IFuture<IExternalAccess> fut)
 	{
 		try
 		{
-			final IComponentIdentifier cid = fut.getFirstResult();
+			final IComponentIdentifier cid = fut.get().getId();
 
 			// Wait some time (simulation and real time) and kill the component
 			// afterwards.

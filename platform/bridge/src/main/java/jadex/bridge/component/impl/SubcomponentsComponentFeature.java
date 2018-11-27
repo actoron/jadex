@@ -404,17 +404,18 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		DependencyResolver<String> dr = new DependencyResolver<>();
 		final MultiCollection<String, CreationInfo> instances = new MultiCollection<>();
 		
-		boolean lineardeps = true;
-		for (Tuple2<CreationInfo, IModelInfo> tup : infos)
-		{
-			IModelInfo model = tup.getSecondEntity();
-			if (!SUtil.arrayEmptyOrNull(model.getPredecessors()) ||
-				!SUtil.arrayEmptyOrNull(model.getSuccessors()))
-			{
-				lineardeps = false;
-				break;
-			}
-		}
+//		boolean lineardeps = true;
+//		for (Tuple2<CreationInfo, IModelInfo> tup : infos)
+//		{
+//			IModelInfo model = tup.getSecondEntity();
+//			if (!SUtil.arrayEmptyOrNull(model.getPredecessors()) ||
+//				!SUtil.arrayEmptyOrNull(model.getSuccessors()))
+//			{
+//				lineardeps = false;
+//				break;
+//			}
+//		}
+		boolean lineardeps = false;
 		
 		if (debug)
 			System.out.println("Starting subcomponent set for " + component + " uses linear dependencies: " + lineardeps);
