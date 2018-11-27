@@ -413,7 +413,7 @@ public class ServiceRegistry implements IServiceRegistry, IRegistryDataProvider 
 	{
 		if(queries!=null)
 		{
-			for(Map.Entry<ClassInfo, Set<ServiceQueryInfo<?>>> entry: queries.entrySet())
+			for(Map.Entry<ClassInfo, Set<ServiceQueryInfo<?>>> entry: new HashSet<Map.Entry<ClassInfo, Set<ServiceQueryInfo<?>>>>(queries.entrySet()))
 			{
 				for(ServiceQueryInfo<?> query: entry.getValue().toArray(new ServiceQueryInfo<?>[entry.getValue().size()]))
 				{
