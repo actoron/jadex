@@ -318,19 +318,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 */
 	public IIntermediateFuture<Map<String, Object>> killComponents(IComponentIdentifier... cids)
 	{
-		System.out.println("KILL order received by " + component + ": " + Arrays.toString(cids));
 		final IntermediateFuture<Map<String, Object>> ret = new IntermediateFuture<>();
-		ret.addResultListener(new IResultListener<Collection<Map<String,Object>>>()
-		{
-			public void resultAvailable(Collection<Map<String, Object>> result)
-			{
-				System.out.println("FINISHED KILL ORDER OF COMPONENT " + component);
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-		});
 		
 		final List<IComponentIdentifier> sysinfos = new ArrayList<>();
 		final List<IComponentIdentifier> userinfos = new ArrayList<>();
@@ -363,7 +351,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				
 				public void finished()
 				{
-					System.out.println("User kill done, killing sysagents..." + sysinfos.size());
+//					System.out.println("User kill done, killing sysagents..." + sysinfos.size());
 					if (sysinfos.size() > 0)
 						doKillComponents(sysinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
 					else
@@ -493,7 +481,6 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	
 	protected IIntermediateFuture<Map<String, Object>> doKillComponents(List<IComponentIdentifier> cids)
 	{
-		System.out.println("doKillComponents " + Arrays.toString(cids.toArray()));
 		final IntermediateFuture<Map<String, Object>> ret = new IntermediateFuture<>();
 		
 		final MultiCollection<String, IComponentIdentifier> instances = new MultiCollection<>();
@@ -529,7 +516,6 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 									for (IComponentIdentifier inst : insts)
 									{
 										IFuture<Map<String, Object>> killfut = SComponentManagementService.getExternalAccess(inst, component).killComponent();
-										System.out.println("Agent " + component + " killing " + inst);
 										levelbar.addFuture(killfut);
 										killfut.addResultListener(new IResultListener<Map<String, Object>>()
 										{

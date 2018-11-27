@@ -2037,7 +2037,7 @@ public class SComponentManagementService
 							{
 								public void resultAvailable(Void result)
 								{
-									System.out.println("Killed: " + cid);
+//									System.out.println("Killed: " + cid);
 									cleanup(cid, null);
 								}
 								
@@ -2058,12 +2058,11 @@ public class SComponentManagementService
 					{
 						public void resultAvailable(Collection<Map<String, Object>> result)
 						{
-							System.err.println("SUBS KILLED: " + agent);
 							finishkill.run();
 						}
 						public void exceptionOccurred(Exception exception)
 						{
-							exception.printStackTrace();
+//							exception.printStackTrace();
 							SComponentManagementService.exitDestroy(cid, desc, exception, null);
 						}
 					});

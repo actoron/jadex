@@ -634,35 +634,17 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public IFuture<Map<String, Object>> waitForTermination()
 	{
-		System.out.println("WAITFORTERM");
 		final Future<Map<String, Object>> ret = new Future<>();
-//		SComponentManagementService.linkResults(new IResultListener<Collection<Tuple2<String,Object>>>()
-//		{
-//			public void resultAvailable(Collection<Tuple2<String, Object>> result)
-//			{
-//				ret.setResult(new HashMap<>(getComponent().getFeature(IArgumentsResultsFeature.class).getResults()));
-//			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				ret.setException(exception);
-//			}
-//		}, getComponent(), component);
 		SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
 		{
 			public void intermediateResultAvailable(CMSStatusEvent result)
 			{
-				System.out.println("RRRR " + result);
 				if (result instanceof CMSStatusEvent.CMSTerminatedEvent)
 				{
 					ret.setResult(((CMSStatusEvent.CMSTerminatedEvent) result).getResults());
 				}
 			}
-			public void finished()
-			{
-				System.out.println("FINIS");
-			}
 		});
-		System.out.println("WAITFORTERM2");
 		return ret;
 	}
 	
@@ -2059,7 +2041,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public IFuture<Map<String, Object>> killComponent()
 	{
-		System.out.println("ExecFeat: killComponent(): " + component);
 		return getComponent().killComponent();
 	}
 	
