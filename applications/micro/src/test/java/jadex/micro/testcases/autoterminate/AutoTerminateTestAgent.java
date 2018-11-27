@@ -146,14 +146,14 @@ public class AutoTerminateTestAgent extends	TestAgent	implements IAutoTerminateS
 			}
 		});
 		
-		// sending ping every second
-		waitForRealtimeDelay(1000, new IComponentStep<Void>()
+		// sending ping every second (by default)
+		waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(ret.addIntermediateResultIfUndone("ping"))
 				{
-					waitForRealtimeDelay(1000, this);
+					waitForRealtimeDelay(Starter.getScaledDefaultTimeout(agent.getId(), 1.0/30), this);
 				}
 				
 				return IFuture.DONE;

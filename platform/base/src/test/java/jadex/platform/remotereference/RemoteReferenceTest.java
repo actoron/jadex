@@ -23,7 +23,8 @@ public class RemoteReferenceTest //extends TestCase
 	@Test
 	public void	testRemoteReference()
 	{
-		long timeout = Starter.getDefaultTimeout(null);
+		// Use larger timeout so we can reduce default timeout on build slave
+		long timeout = Starter.getScaledDefaultTimeout(null, 5);
 		
 		// Start platform1 with local service.
 		IPlatformConfiguration	config1	= STest.getDefaultTestConfig(getClass());

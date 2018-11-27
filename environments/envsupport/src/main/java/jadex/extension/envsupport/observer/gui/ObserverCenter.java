@@ -29,6 +29,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
@@ -380,73 +381,56 @@ public class ObserverCenter implements IObserverCenter
 	public IFuture<Void>	addPerspective(final String name, final IPerspective perspective)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		
 		if(SwingUtilities.isEventDispatchThread())
 		{
-			Exception e	= null;
-			synchronized(perspectives)
-			{
-				try
-				{
-					perspective.setObserverCenter(this);
-					perspective.setName(name);
-					perspectives.put(name, perspective);
-					if(perspectives.size() == 1)
-					{
-						setSelectedPerspective(name);
-					}
-				}
-				catch(Exception ex)
-				{
-					e	= ex;
-				}
-			}
-			if(e!=null)
-			{
-				ret.setException(e);
-			}
-			else
-			{
-				ret.setResult(null);
-			}
+			addPerspective(name, perspective, ret);
 		}
 		else
-		{
-			SwingUtilities.invokeLater(new Runnable()
+		{			
+			SSimulation.addBlocker(ret);
+			SwingUtilities.invokeLater(() ->
 			{
-				public void run() 
-				{
-					Exception e	= null;
-					synchronized(perspectives)
-					{
-						try
-						{
-							perspective.setObserverCenter(ObserverCenter.this);
-							perspective.setName(name);
-							perspectives.put(name, perspective);
-							if(perspectives.size() == 1)
-							{
-								setSelectedPerspective(name);
-							}
-						}
-						catch(Exception ex)
-						{
-							e	= ex;
-						}
-					}
-					if(e!=null)
-					{
-						ret.setException(e);
-					}
-					else
-					{
-						ret.setResult(null);
-					}
-				}
+				addPerspective(name, perspective, ret);
 			});
 		}
-		
 		return ret;
+	}
+	
+	/**
+	 * Adds a perspective.
+	 * Internal method only to be called on swing thread.
+	 * @param name name of the perspective
+	 * @param perspective the perspective
+	 */
+	protected void	addPerspective(final String name, final IPerspective perspective, final Future<Void> ret)
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		synchronized(perspectives)
+		{
+			try
+			{
+				perspective.setObserverCenter(this);
+				perspective.setName(name);
+				perspectives.put(name, perspective);
+				if(perspectives.size() == 1)
+				{
+					setSelectedPerspective(name);
+				}
+				space.getExternalAccess().scheduleStep(ia ->
+				{
+					ret.setResult(null);
+					return IFuture.DONE;
+				});
+			}
+			catch(Exception ex)
+			{
+				space.getExternalAccess().scheduleStep(ia ->
+				{
+					ret.setException(ex);
+					return IFuture.DONE;
+				});
+			}
+		}
 	}
 	
 	/**

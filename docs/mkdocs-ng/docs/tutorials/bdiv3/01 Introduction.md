@@ -5,18 +5,18 @@ The Jadex BDI V3 kernel is a Belief-Desire-Intention reasoning engine for intell
 
 This tutorial is a good starting point for agent developers that want to learn programming Jadex BDI agents in small hands-on exercises. 
 Each lesson of this tutorial covers one important concept and tries to illustrate why and especially how the concept can be used in Jadex. 
-Nonetheless, the tutorial cannot illustrate all available concepts and the reader is encouraged to also have a look at the example source contained in the distribution or take a look into the [BDIV3 User Guide](../../guides/bdiv3/01 Introduction/).
+Nonetheless, the tutorial cannot illustrate all available concepts and the reader is encouraged to also have a look at the example source contained in the distribution or take a look into the [BDIV3 User Guide](../../../guides/bdiv3/01 Introduction/)).
 
 Contents of this tutorial:
 
--   [Chapter 2, Your first BDI Agent](02 Your first BDI Agent)  describes how to setup the Jadex environment properly and how to start a simple agent.
--   [Chapter 3, Using Plans](03 Using Plans)  explains step by step the usage of plans.
--   [Chapter 4, Using Beliefs](04 Using Beliefs)  introduces beliefs as agent knowledge form.
--   [Chapter 5, Using Goals](05 Using Goals)  shows how goals can be used to capture the agent objectives in an intuitive way.
--   [Chapter 6, Using Capabilities](06 Using Capabilities)  explains how beliefs, goals and plans can be composed into reusable agent modules.
--   [Chapter 7, Using Services](07 Using Services)  covers aspects about BDI service integration including goal delegation to other agents.
--   [Chapter 8, External Processes](08 External Processes)  explains exemplarily the integration of Jadex agents with external processes.
--   [Chapter 9, Conclusion](09 Conclusion)  finally concludes the lessons.
+-   [Chapter 2, Your first BDI Agent](../02 Your first BDI Agent)  describes how to setup the Jadex environment properly and how to start a simple agent.
+-   [Chapter 3, Using Plans](../03 Using Plans)  explains step by step the usage of plans.
+-   [Chapter 4, Using Beliefs](../04 Using Beliefs)  introduces beliefs as agent knowledge form.
+-   [Chapter 5, Using Goals](../05 Using Goals)  shows how goals can be used to capture the agent objectives in an intuitive way.
+-   [Chapter 6, Using Capabilities](../06 Using Capabilities)  explains how beliefs, goals and plans can be composed into reusable agent modules.
+-   [Chapter 7, Using Services](../07 Using Services)  covers aspects about BDI service integration including goal delegation to other agents.
+-   [Chapter 8, External Processes](../08 External Processes)  explains exemplarily the integration of Jadex agents with external processes.
+-   [Chapter 9, Conclusion](../09 Conclusion)  finally concludes the lessons.
 
 ##Application Context
 

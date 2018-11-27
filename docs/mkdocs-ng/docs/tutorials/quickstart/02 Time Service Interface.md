@@ -4,7 +4,7 @@ This chapter sketches the Java project setup and explains how to define a Jadex 
 
 # Prerequisites
 
-This quickstart tutorial assumes that you are familiar with Java and your favourite IDE. Therefore, you should know how to set up a project to start developing Java applications, which use Jadex. If you need additional guidance for this, please have a look at the [getting started guide](../../getting-started/getting-started/#ide-setup).
+This quickstart tutorial assumes that you are familiar with Java and your favourite IDE. Therefore, you should know how to set up a project to start developing Java applications, which use Jadex. If you need additional guidance for this, please have a look at the [getting started guide](../../../getting-started/getting-started/#ide-setup)).
 
 For your Java project please make sure **not** to include the jadex-application-xyz jars as they already contain the quickstart tutorial classes. If you include these, Java might ignore your own classes and only use the ones from the jar. If you set up your project using the maven-based Jadex example project, the appropriate jars will be automatically included and excluded as needed.
 
@@ -59,9 +59,9 @@ In Jadex, the fully qualified name of a service interface is used for service di
 
 ## The *subscribe()* Method
 
-Service methods are potentially remote calls. Therefore service methods should use [future types](../../futures/futures/) as return values. Futures avoid that the caller is blocked during the service processing and add further support e.g. for dealing with timeouts. 
+Service methods are potentially remote calls. Therefore service methods should use [future types](../../../futures/futures/)) as return values. Futures avoid that the caller is blocked during the service processing and add further support e.g. for dealing with timeouts. 
 
-The subscribe() method signature captures most of the interaction between time provider and time user. It uses the [subscription intermediate future](../../futures/futures/) as a return type, which denotes a subscription semantics for the interaction as shown in the diagram below.
+The subscribe() method signature captures most of the interaction between time provider and time user. It uses the [subscription intermediate future](../../../futures/futures/)) as a return type, which denotes a subscription semantics for the interaction as shown in the diagram below.
 
 ![02 Time Service Interface@subscription.png](subscription.png)  
 *Figure 2: Interaction diagram of a subscription future*
@@ -76,6 +76,6 @@ One notable exception to the use of future return types is when service operatio
 
 # Security Issues
 
-Jadex platforms can potentially detect any other Jadex platforms on the internet using several [awareness mechanisms](../../remote/remote/#awareness). This means that a time service hosted on your platform may be found and invoked by some other Jadex platform that you are not aware of. To avoid security issues due to being visible and accessible to other platforms, in Jadex all services are restricted by default. This would mean that only components on your platform can invoke your time service. This behavior is advantageous for getting used to Jadex, because you can just start and implement your own services without having to consider security issues. All your services are available for local testing but shielded from outside platforms.
+Jadex platforms can potentially detect any other Jadex platforms on the internet using several [awareness mechanisms](../../../remote/remote/#awareness)). This means that a time service hosted on your platform may be found and invoked by some other Jadex platform that you are not aware of. To avoid security issues due to being visible and accessible to other platforms, in Jadex all services are restricted by default. This would mean that only components on your platform can invoke your time service. This behavior is advantageous for getting used to Jadex, because you can just start and implement your own services without having to consider security issues. All your services are available for local testing but shielded from outside platforms.
 
-For our time service example, we consider that the service does not pose any security threats, because the service does not change the local system and provides no sensitive information. Therefore, we want the service to be accessible to outside platforms as well. For example you should be able to test your user agent with one of our time provider components hosted in our infrastructure. To enable unrestricted access to the service, the ```@Security``` annotation is specified. More information about security and restricted and unrestricted services can be found in the [user guide](../../guides/ac/08 Security/).
+For our time service example, we consider that the service does not pose any security threats, because the service does not change the local system and provides no sensitive information. Therefore, we want the service to be accessible to outside platforms as well. For example you should be able to test your user agent with one of our time provider components hosted in our infrastructure. To enable unrestricted access to the service, the ```@Security``` annotation is specified. More information about security and restricted and unrestricted services can be found in the [user guide](../../../guides/ac/08 Security/)).

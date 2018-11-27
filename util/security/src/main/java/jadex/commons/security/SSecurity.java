@@ -9,7 +9,9 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.security.Provider;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -129,10 +131,8 @@ public class SSecurity
 	
 	static
 	{
-		if (SUtil.SECURE_RANDOM != getSecureRandom())
-		{
-			SUtil.SECURE_RANDOM = SECURE_RANDOM;
-		}
+		SUtil.ensureNonblockingSecureRandom();
+		getSecureRandom();
 	}
 	
 	/**
@@ -262,7 +262,7 @@ public class SSecurity
 									Logger.getLogger("jadex").warning("Unable to find OS entropy source, using fallback...");
 									ENTROPY_FALLBACK_WARNING_DONE = true;
 								}
-								ret = SUtil.getJavaDefaultSecureRandom().generateSeed(output.length);
+								ret = SecureRandom.getSeed(output.length);
 							}
 							
 							System.arraycopy(ret, 0, output, 0, output.length);
@@ -927,7 +927,7 @@ public class SSecurity
 		prngs.add(generateSecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
-		prngs.add(SUtil.getJavaDefaultSecureRandom());
+		prngs.add(new SecureRandom());
 //		System.out.println(prngs.get(prngs.size() - 1));
 		
 		final SecureRandom[] randsources = prngs.toArray(new SecureRandom[prngs.size()]);

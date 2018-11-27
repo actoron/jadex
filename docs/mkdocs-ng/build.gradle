@@ -62,19 +62,18 @@ task processDocs(type: Copy) {
     }
     into project.buildDir.getCanonicalPath() + "${File.separator}mkdocs"
 //    outputs.upToDateWhen {false}
-    from('docs') { // everything but md source
-        include '**/*'
-        exclude '*.md'
-        into 'docs'
-
-    }
     from('theme') {
         include '**/*'
         into 'theme'
         filter(ExpandProperties, project: ant.project)
     }
+    from('docs') { // everything but md source
+        include '**/*'
+        exclude '*.md'
+        into 'docs'
+    }
     from ('.') { // preprocess md source
-        include '**/*.md'
+        include 'docs/**/*.md'
         include 'mkdocs.yml'
         filter(ExpandProperties, project: ant.project)
     }
@@ -240,7 +239,7 @@ class BuildPandocImageTask extends DockerTask {
 //            println "Removing old pandoc docker image..."
 //            println "$docker rmi $dockerImageName".execute().text
             println "Building pandoc docker image..."
-            def p = "$docker build -t $dockerImageName .".execute()
+            def p = ("$docker build -t $dockerImageName "+project.file('.')).execute()
             p.inputStream.eachLine{println it}
             p.waitFor()
         }
@@ -268,7 +267,9 @@ class MkDocsTask extends DockerTask {
             command.add("site")
         }
 
-        def String[] dockerArgs = ["--rm", "-p", "8000:8000", "-v", "$workDir:/docs/"];
+        def String[] dockerArgs = System.getenv("DOCKER_MKDOCS_USER")!=null
+			? ["--rm", "-u", System.getenv("DOCKER_MKDOCS_USER"), "-p", "8000:8000", "-v", "$workDir:/docs/"]
+			: ["--rm", "-p", "8000:8000", "-v", "$workDir:/docs/"];
         def builder =  getProcessBuilderForCommand("mkdocs", null, dockerArgs, true)
         builder.command.addAll(command)
         builder.directory(new File(workDir)) // only works without docker?
@@ -283,7 +284,6 @@ class DockerTask extends DefaultTask {
     String dockerImageName
 
     protected String docker = "which docker".execute().text.trim()
-    private final static String DOCKERCONTAINERNAME = 'jadextempdocker'
 
     def boolean forceDocker = project.hasProperty('forceDocker') ? project.property('forceDocker') : false
 
@@ -293,7 +293,8 @@ class DockerTask extends DefaultTask {
         if (builder.command().first().contains("docker")) {
             Runtime.runtime.addShutdownHook {
                 println "shutting down - please be patient"
-                def stopProcess = "$docker stop $DOCKERCONTAINERNAME".execute()
+				def dockerContainerName = dockerImageName.replace("/", "-")+"-container"
+                def stopProcess = "$docker stop $dockerContainerName".execute()
                 stopProcess.waitFor();
                 println stopProcess.text
                 if (stopProcess.exitValue() == 0) {
@@ -326,7 +327,8 @@ class DockerTask extends DefaultTask {
                 pullDockerImage(dockerImageName);
             }
 
-            allArgs = [docker, 'run', '--name=' + DOCKERCONTAINERNAME]
+			def dockerContainerName = dockerImageName.replace("/", "-")+"-container"
+            allArgs = [docker, 'run', '--name=' + dockerContainerName]
             allArgs.addAll(dockerArgs)
             allArgs.add(dockerImageName)
         } else {

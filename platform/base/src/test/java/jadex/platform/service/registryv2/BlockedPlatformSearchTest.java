@@ -43,7 +43,7 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 	{
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(BlockedPlatformSearchTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
-		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*2));
+		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*4));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 
 		// Remote only -> no simulation please
@@ -80,12 +80,12 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("Blocking registry");
+				System.out.println("Blocking registry "+System.currentTimeMillis());
 				ISuspendable	sus	= ISuspendable.SUSPENDABLE.get();
 				ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
 				block.get(Timeout.NONE);
 				ISuspendable.SUSPENDABLE.set(sus);
-				System.out.println("Registry unblocked");
+				System.out.println("Registry unblocked "+System.currentTimeMillis());
 				return IFuture.DONE;
 			}
 		});

@@ -1,8 +1,13 @@
 package jadex.base;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.Provider;
+import java.security.Provider.Service;
+import java.security.Security;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,8 +19,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 import jadex.bridge.BasicComponentIdentifier;
-import jadex.bridge.Cause;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -48,7 +51,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
-import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
@@ -60,7 +62,6 @@ import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.future.CallSequentializer;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -176,8 +177,11 @@ public class Starter
 	// keytool -import -trustcacerts -alias startcom.ca -file ca.crt
 	// // wget http://www.startssl.com/certs/sub.class1.server.ca.crt
 	// // keytool -import -alias startcom.ca.sub -file sub.class1.server.ca.crt
-//	static
-//	{
+	static
+	{
+		// set secure random to non-blocking entropy source
+		SUtil.ensureNonblockingSecureRandom();
+		
 //		try
 //		{
 //			Class<?> cl = SReflect.findClass0("jadex.platform.service.security.SSecurity", null, null);
@@ -192,7 +196,7 @@ public class Starter
 //		{
 //			System.out.println("Error adding startssl certificate to truststore: "+e.getMessage());
 //		}
-//	}
+	}
 	
 	/**
 	 *  Unescape a string.

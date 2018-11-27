@@ -17,7 +17,7 @@ The options are:
 - Add a result listener (```addResultListener```) and continue (right)
 
 Futures make it possible to perform asynchronous communication with local and/or remote components and services and are used throughout in Jadex Active Components.
-For more information and motivation, please refer to [Asynchronous Programming](../guides/ac/03 Asynchronous Programming/).
+For more information and motivation, please refer to [Asynchronous Programming](../../guides/ac/03 Asynchronous Programming/).
 
 # Working with Futures
 
@@ -153,7 +153,7 @@ There are also variants of *apply* and *accept*: *applyToEither* and *acceptEith
 For a complete documentation of these methods, please visit the [IFuture API documentation](${URLJavaDoc}/jadex/commons/future/IFuture.html).
 
 # Future Types
-The following is a short list of commonly used future types. For a more complete guide, visit [Asynchronous Programming](../guides/ac/03 Asynchronous Programming/#programming-futures-and-listeners).
+The following is a short list of commonly used future types. For a more complete guide, visit [Asynchronous Programming](../../guides/ac/03 Asynchronous Programming/#programming-futures-and-listeners).
 
 ## Tuple2 Futures
 The Tuple2 Future can be used if exactly two result values should be returned. 
@@ -294,7 +294,7 @@ This section discusses problems frequently encountered in the Jadex Active Compo
 
 ## No Stack Trace, just a one-liner
 Because exceptions are generally passed through a chain of result listeners, sometimes you may forget to print stack traces and only get a one-line warning message.  
-Enabling future debugging as [configuration example](../platform/platform/#configuration-examples) suggests will always print useful stack traces when exceptions occur (if some kind of  ```DefaultResultListener``` is attached!).  
+Enabling future debugging as [configuration example](../../platform/platform/#configuration-examples) suggests will always print useful stack traces when exceptions occur (if some kind of  ```DefaultResultListener``` is attached!).  
 Note that enabling this feature will seriously **decrease performance**, as debug information is remembered throughout the application!
  
 ## No error message, calls silently fail

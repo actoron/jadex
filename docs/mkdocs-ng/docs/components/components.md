@@ -4,9 +4,9 @@ ${SorryOutdatedv3}
 
 With Jadex, the behaviour of a software is defined by the interaction between components, each of them providing a clearly defined functionality.
  
-When you create a new component, you have to choose between different component types. For now, we will focus on *Micro Agents*, the most basic type of component. For other component types, please refer to [Component Types](../component-types/component-types).
+When you create a new component, you have to choose between different component types. For now, we will focus on *Micro Agents*, the most basic type of component. For other component types, please refer to [Component Types](../../component-types/component-types/).
 
-For a more complete guide into Active Components, take a look at the [AC User Guide](../guides/ac/01 Introduction).
+For a more complete guide into Active Components, take a look at the [AC User Guide](../../guides/ac/01 Introduction).
 
 # Implementation
 Micro Agents are defined by plain java classes. In order for a java class to represent a Micro Agent, two requirements have to be met:
@@ -14,7 +14,7 @@ Micro Agents are defined by plain java classes. In order for a java class to rep
  - The name of the class has to end with "Agent" (e.g. ```MyAgent```, ```ChatAgent```, ...)
  - The class has to be annotated with the ```@Agent``` Annotation
   
-Optionally, it can provide a description using the ```@Description``` Annotation. The value is then shown inside the [JCC](../tools/02 JCC Overview).
+Optionally, it can provide a description using the ```@Description``` Annotation. The value is then shown inside the [JCC](../../tools/02 JCC Overview).
 
 This leads to the following code for a basic micro agent:
 
@@ -83,10 +83,10 @@ System.out.println("Started component: " + cid);
 
 <x-hint title="Future types">
 Notice how you get a different Future object this time?
-A ```Tuple2Future``` represents a promise that two different results are going to be available. In this case, the first is the ```ComponentIdentifier```, which is used to identify the instantiated component. The second result is a Map that can be filled with results by the component and is only returned upon termination of the component. You can use ```fut.getSecondResult()``` to block until the component is terminated and receive the results. Take a look at [Futures](../futures/futures/#future-types) for different future types.
+A ```Tuple2Future``` represents a promise that two different results are going to be available. In this case, the first is the ```ComponentIdentifier```, which is used to identify the instantiated component. The second result is a Map that can be filled with results by the component and is only returned upon termination of the component. You can use ```fut.getSecondResult()``` to block until the component is terminated and receive the results. Take a look at [Futures](../../futures/futures/#future-types) for different future types.
 </x-hint>
 
-Now that you know how to start your own components, you can read more about [Services](../services/services), as they provide a way for components to interact with each other.
+Now that you know how to start your own components, you can read more about [Services](../../services/services), as they provide a way for components to interact with each other.
 
 ## Destroying the component
 
@@ -142,7 +142,7 @@ IExecutionFeature exeFeat;
 <!--final long delay = ((Number)agent.getComponentFeature(IArgumentsResultsFeature.class).getArguments().get("delay")).longValue();-->
 
 Below is a list of important features commonly available for all components.
-For features specific to a component-type, take a look at [component types](../component-types/component-types).
+For features specific to a component-type, take a look at [component types](/../component-types/component-types).
 
 | Feature Name | Description |
 |--------------|-------------|
@@ -150,8 +150,8 @@ For features specific to a component-type, take a look at [component types](../c
 |IExecutionFeature| Provides access to the execution model to schedule component steps and provide wait functions. |
 |IMessageFeature| Handles sending and reception of messages between components. |
 |IMonitoringComponentFeature| Components can publish monitoring events with this feature. |
-|IRequiredServicesFeature | See [Services](../services/services#accessing-services) |
-|IProvidedServicesFeature | See [Services](../services/services#accessing-services) |
+|IRequiredServicesFeature | See [Services](/services/services#accessing-services) |
+|IProvidedServicesFeature | See [Services](/services/services#accessing-services) |
 
 <!-- TODO: describe all default features -->
 <!--PropertiesComponentFeature-->
@@ -197,7 +197,7 @@ public class ParentAgent { …
 ```
 
 Any services provided by subcomponents using the scope [ServiceScope.COMPONENT](${URLJavaDoc}/jadex/bridge/service/RequiredServiceInfo.html) can then be accessed using the same scope in the parent component or any other subcomponents.
-Please refer to the [AC Tutorial](../tutorials/ac/06 Composition/) for a more complete example.
+Please refer to the [AC Tutorial](../../tutorials/ac/06 Composition/) for a more complete example.
 
 ## More Annotations
 The most important annotations common to all components were already discussed.
@@ -232,7 +232,7 @@ When using one of these annotations on methods or fields, fields and method para
 <!-- TODO: for which annotations does the parameter guesser work? -->
 
 ## Scheduling steps
-The [concurrency model](../guides/ac/05 Services/#concurrency) of Jadex Active Components is based on single-threaded components.
+The [concurrency model](../../guides/ac/05 Services/#concurrency) of Jadex Active Components is based on single-threaded components.
 If you want to execute your code on a component's thread from outside, you can call [scheduleStep](${URLJavaDoc}/jadex/bridge/IExternalAccess.html#scheduleStep-jadex.bridge.IComponentStep-) on the IExternalAccess of a component:
 ```java
 extAcc.scheduleStep(iAccess -> {

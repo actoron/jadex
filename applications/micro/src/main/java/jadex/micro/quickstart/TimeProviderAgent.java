@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
@@ -15,6 +17,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -121,45 +124,57 @@ public class TimeProviderAgent	implements ITimeService
 	 */
 	protected static String	determineLocation()
 	{
-		String	ret;
-		try
+		Future<String>	ret	= new Future<>();
+		new Thread(()->
 		{
-			// These free-to-try geoip services have (almost) the same result format.
-//			Scanner scanner	= new Scanner(new URL("http://ipinfo.io/json").openStream(), "UTF-8");
-//			Scanner scanner	= new Scanner(new URL("http://api.petabyet.com/geoip/").openStream(), "UTF-8");
-			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/json/").openStream(), "UTF-8");	// use "country_name"
-//			Scanner scanner	= new Scanner(new URL("http://ip-api.com/json").openStream(), "UTF-8");
-			
-			// Very simple JSON parsing, matches ..."key": "value"... parts to find country and city.
-			String	country	= null;
-			String	city	= null;
-			scanner.useDelimiter(",");
-			while(scanner.findWithinHorizon("\"([^\"]*)\"[^:]*:[^\"]*\"([^\"]*)\"", 0)!=null)
+			try
 			{
-				String	key	= scanner.match().group(1);
-				String	val	= scanner.match().group(2);
-//				if("country".equals(key))
-				if("country_name".equals(key))
+				// These free-to-try geoip services have (almost) the same result format.
+//				Scanner scanner	= new Scanner(new URL("http://ipinfo.io/json").openStream(), "UTF-8");
+//				Scanner scanner	= new Scanner(new URL("http://api.petabyet.com/geoip/").openStream(), "UTF-8");
+				Scanner scanner	= new Scanner(new URL("http://freegeoip.net/json/").openStream(), "UTF-8");	// use "country_name"
+//				Scanner scanner	= new Scanner(new URL("http://ip-api.com/json").openStream(), "UTF-8");
+				
+				// Very simple JSON parsing, matches ..."key": "value"... parts to find country and city.
+				String	country	= null;
+				String	city	= null;
+				scanner.useDelimiter(",");
+				while(scanner.findWithinHorizon("\"([^\"]*)\"[^:]*:[^\"]*\"([^\"]*)\"", 0)!=null)
 				{
-					country	= val;
+					String	key	= scanner.match().group(1);
+					String	val	= scanner.match().group(2);
+//					if("country".equals(key))
+					if("country_name".equals(key))
+					{
+						country	= val;
+					}
+					else if("city".equals(key))
+					{
+						city	= val;
+					}
 				}
-				else if("city".equals(key))
-				{
-					city	= val;
-				}
+				scanner.close();
+				
+				ret.setResultIfUndone(city!=null ? country!=null ? city+", "+country : city
+					: country!=null ? country : "unknown");
 			}
-			scanner.close();
-			
-			ret	= city!=null ? country!=null ? city+", "+country : city
-				: country!=null ? country : "unknown";
-		}
-		catch(Exception e)
-		{
-			// ignore
-			ret	= "unknown";
-		}
+			catch(Exception e)
+			{
+				// ignore
+				ret.setResultIfUndone("unknown");
+			}			
+		}).start();
 		
-		return ret;
+		new Timer().schedule(new TimerTask()
+		{
+			@Override
+			public void run()
+			{
+				ret.setResultIfUndone("unknown");
+			}
+		}, Starter.getScaledDefaultTimeout(null, 0.5));
+		
+		return ret.get();
 	}
 	
 

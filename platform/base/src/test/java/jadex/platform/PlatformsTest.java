@@ -90,7 +90,8 @@ public class PlatformsTest //extends TestCase
 	@Test
 	public void	testPlatforms()
 	{
-		long timeout = Starter.getDefaultTimeout(null);
+		// Use larger timeout so we can reduce default timeout on build slave
+		long timeout = Starter.getScaledDefaultTimeout(null, 5);
 		long[] starttimes = new long[PLATFORMS.length/2+1];
 		long[] shutdowntimes = new long[PLATFORMS.length/2+1];
 		IModelInfo	defmodel	= null;	// Model of default platform to compare others to.

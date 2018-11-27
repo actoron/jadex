@@ -59,7 +59,7 @@ public class ServiceCallTestAgent extends TestAgent
 	
 	/** The invocation count. */
 	@AgentArgument
-	protected int max	= 500;
+	protected int max	= 100;
 	
 	//-------- methods --------
 	
@@ -72,15 +72,15 @@ public class ServiceCallTestAgent extends TestAgent
 		
 //		System.out.println("Service call test on: "+agent.getComponentIdentifier());
 		
-		performTests(platform, RawServiceAgent.class.getName()+".class", local ? 20000 : 1, local ? 6 : 1, local ? 6 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+		performTests(platform, RawServiceAgent.class.getName()+".class", local ? 5000 : 1, local ? 6 : 1, local ? 6 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
-				performTests(platform, DirectServiceAgent.class.getName()+".class", local ? 10 : 1, local ? 6 : 1, local ? 4 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+				performTests(platform, DirectServiceAgent.class.getName()+".class", local ? 20 : 1, local ? 10 : 1, local ? 5 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						performTests(platform, DecoupledServiceAgent.class.getName()+".class", local ? 2 : 1, local ? 4 : 1, local ? 2 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+						performTests(platform, DecoupledServiceAgent.class.getName()+".class", local ? 5 : 1, local ? 5 : 1, local ? 5 : 1).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 						{
 							public void customResultAvailable(Void result)
 							{
@@ -281,7 +281,7 @@ public class ServiceCallTestAgent extends TestAgent
 			{
 				long end = System.nanoTime();
 				
-				System.out.println(servicename+" service "+call.toString()+" on "+tag+" service took "+((end-start)/10/((long)max*factor))/100.0+" microseconds per call ("+(max*factor)+" calls in "+(end-start)+" nanos).");
+				System.out.println(servicename+" service "+call.toString()+" on "+tag+" service took "+((end-start)/10/((long)max*factor))/100.0+" microseconds per call ("+(max*factor)+" calls in "+(end-start)/1000000000.0+" seconds).");
 				// To stop profiling after finished.
 				if(WAIT && "decoupled".equals(tag) && "decoupled".equals(servicename))
 				{
