@@ -7,7 +7,8 @@ apply plugin: 'java-library' // needed for distsDir on root project level
 apply from: "$rootDir/src/main/buildutils/versioning.gradle"
 
 def date = new Date()
-def timestamp = date.format('yyyyMMdd.HHmmss')
+def timestamp = gradle.startParameter.projectProperties.timestamp
+timestamp = timestamp!=null ? timestamp : date.format('yyyyMMdd.HHmmss')
 
 def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
@@ -302,6 +303,8 @@ subprojects
 			war.baseName = getArtifactName(project)
 		}
 		jar.baseName = getArtifactName(project)
+		jar.reproducibleFileOrder	= true
+		jar.preserveFileTimestamps	= false
 //			test {
 //				reports.html.enabled = false
 //			}
@@ -480,9 +483,17 @@ task exampleZips {
 								fileset dir: ex.getCanonicalPath(), excludes: project.ext.filterfiles + ', ' + buildExcludes, erroronmissingdir: false
 							}
 						}
-						ant.zip(destfile: outputdir + ex.getName() + '.zip', basedir: preprocessdir, includes: ex.getName() + '/**')
+//						ant.zip(destfile: outputdir + ex.getName() + '.zip', basedir: preprocessdir, includes: ex.getName() + '/**')
 						//ant.delete dir: preprocessdir
 					}
+					def zipExample = project.tasks.create([name: "zipExample"+ex.getName(), type: Zip])
+					zipExample.destinationDir = file(outputdir)
+					zipExample.archiveName = ex.getName() + '.zip'
+					zipExample.from(preprocessdir)
+					zipExample.reproducibleFileOrder	= true
+					zipExample.preserveFileTimestamps	= false
+					zipExample.include(ex.getName() + '/**')
+					zipExample.execute()
 				}
 			}
 		}
@@ -562,38 +573,31 @@ def checkDistZip(distname, arts, isaddon)
 //	if(isaddon)
 //		ant.unzip(src: new File(project.distsDir, 'tmp/minimal/sources.zip'), dest: rebuilddirfile)
 	// https://stackoverflow.com/questions/26459067/how-to-run-gradle-script-from-gradle
-	def artefactBuild = project.tasks.create([name: "tmpCheckDist$distname", type: GradleBuild])
+	def artefactBuild = project.tasks.create([name: "checkDist"+distname.substring(0,1).toUpperCase()+distname.substring(1), type: GradleBuild])
 	artefactBuild.buildFile = project.file(new File(rebuilddirfile, "sources/build.gradle"))
 	artefactBuild.tasks = ["distZip"]
 	artefactBuild.startParameter.excludedTaskNames	= ["test", "javadoc"]
-	artefactBuild.startParameter.projectProperties << ["dist": distname]
+	artefactBuild.startParameter.projectProperties << ["dist": distname, "timestamp": timestamp]
 	artefactBuild.execute()
 	
 	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-	def entries	= new HashSet();
+	def entries	= new HashMap();
+	def diff	= "";
 	def distzip = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 	new java.util.zip.ZipFile(distzip).stream()
-		.forEach {e -> entries.add(e.getName())}
+		.forEach {e -> entries.put(e.getName(), e.getCrc()+':'+e.getSize())}
 	def distzip2 = new File(rebuilddirfile, 'sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip')
 	new java.util.zip.ZipFile(distzip2).stream()
 		.forEach {e ->
-			if(!entries.remove(e.getName()))
-				throw new RuntimeException("New entry in rebuilt dist: "+e);
+			def e2	= entries.remove(e.getName());
+			if(e2==null)
+				diff	+= "\nUnexpected entry: "+e;
+			else if(!e2.equals(e.getCrc()+':'+e.getSize()))
+				diff	+= "\nChanged entry (crc:size): "+e+", old="+e2+" new="+e.getCrc()+':'+e.getSize();
 		}
-	if(!entries.isEmpty())
-		throw new RuntimeException("Missing entries in rebuilt dist: "+entries);
-		
-	// Check original and rebuilt sources.zip for equality based on zip contents with name/crc/size
-	new java.util.zip.ZipFile(srczip).stream()
-		.forEach {e -> entries.add(e.getName()+':'+e.getCrc()+':'+e.getSize())}
-	distzip2 = new File(rebuilddirfile, 'sources/build/distributions/sources/jadex-'  + distname  + '-' + jadex_build_version + '-sources.zip')
-	new java.util.zip.ZipFile(distzip2).stream()
-		.forEach {e ->
-			if(!entries.remove(e.getName()+':'+e.getCrc()+':'+e.getSize()))
-				throw new RuntimeException("New or changed entry in rebuilt sources.zip: "+e);
-		}
-	if(!entries.isEmpty())
-		throw new RuntimeException("Missing entries in rebuilt sources.zip: "+entries);
+	entries.keySet().stream().forEach {diff+="\nMissing entry: "+e}
+	if(diff.length()!=0)
+		throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);		
 }
 
 def createDistZip(distname, arts, isaddon)

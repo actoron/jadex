@@ -8,7 +8,6 @@ pipeline {
 	    script {
 	      //sh 'printenv'
 	      
-	      // Determine build number
 		  def build_util = load "src/main/buildutils/jenkinsutil.groovy"
 	      def buildname = build_util.fetchNextBuildNameFromGitTag()
           currentBuild.displayName = buildname.full
@@ -25,9 +24,7 @@ pipeline {
 		wrap([$class: 'Xvfb']) {
 		  // todo: why build hangs with distzip and javadoc?
 		  // No 'clean' when already done for android-gradle-plugin
-		  // Try with processSchemas for finding bug
 		  sh './gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue'
-		  //sh './gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc -x processSchemas --continue'
 		}
 	  }
 	}
