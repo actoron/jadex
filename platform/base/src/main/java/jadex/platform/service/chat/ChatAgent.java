@@ -29,8 +29,7 @@ import jadex.micro.annotation.RequiredServices;
 	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=ServiceScope.GLOBAL)
 )
 @Arguments(@Argument(name="nosave", clazz=boolean.class, description="Don't save settings."))
-@Agent(autostart=Boolean3.TRUE,
-	predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent")
+@Agent
 //@Properties(@NameValue(name="system", value="\"system\".equals($config)"))
 @Configurations({@Configuration(name="system"), @Configuration(name="user")})
 public class ChatAgent

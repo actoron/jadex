@@ -79,7 +79,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	public SubcomponentsComponentFeature(IInternalAccess component, ComponentCreationInfo cinfo)
 	{
 		super(component, cinfo);
-		debug = Boolean.TRUE.equals(component.getArgument("debug"));
+//		debug = Boolean.TRUE.equals(component.getArgument("debug"));
 	}
 	
 	/**
@@ -1063,7 +1063,8 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 */
 	protected <T> void addComponentToLevels(DependencyResolver<String> dr, T instanceinfo, IModelInfo minfo, MultiCollection<String, T> instances, String... addpredecessors)
 	{
-		System.out.println("addcomptolevel: " + minfo.getFullName());
+		if (debug)
+			System.out.println("addcomptolevel: " + minfo.getFullName());
 		try
 		{
 			String cname = minfo.getFullName();
