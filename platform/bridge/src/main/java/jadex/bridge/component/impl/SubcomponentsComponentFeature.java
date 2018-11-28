@@ -40,7 +40,6 @@ import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -52,7 +51,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -583,14 +581,9 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			modelbar.addFuture(fut);
 		}
 		
-		modelbar.waitFor().addResultListener(new IResultListener<Void>()
+		modelbar.waitFor().addResultListener(new ExceptionDelegationResultListener<Void, List<Set<String>>>(ret)
 		{
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-			
-			public void resultAvailable(Void result)
+			public void customResultAvailable(Void result)
 			{
 //				boolean lineardeps = true;
 //				for (Map.Entry<Integer, IFuture<IModelInfo>> entry : modelmap.entrySet())
@@ -617,7 +610,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 					}
 					catch (Exception e)
 					{
-						ret.setExceptionIfUndone(e);
+						ret.setException(e);
 						return;
 					}
 					prev = entry.getValue().get();
