@@ -1536,6 +1536,12 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						return new Future<>(ia.getException());
 					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
 				}
+				if("getModelAsync".equals(method.getName()))
+				{
+					if(shutdown)
+						return new Future<>(info.getModel());
+					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+				}
 				
 				if("waitForTermination".equals(method.getName()))
 				{
