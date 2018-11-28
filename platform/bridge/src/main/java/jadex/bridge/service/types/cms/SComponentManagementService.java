@@ -1980,6 +1980,8 @@ public class SComponentManagementService
 		}
 		else
 		{
+			if (cid.toString().contains("Scenario"))
+				System.out.println("ITSIST");
 			InitInfo infos = getInitInfo(cid);
 			IPlatformComponentAccess comp = infos!=null ? infos.getComponent() : SComponentManagementService.getComponents(agent.getId()).get(cid);
 			
@@ -2063,6 +2065,7 @@ public class SComponentManagementService
 						public void exceptionOccurred(Exception exception)
 						{
 //							exception.printStackTrace();
+							finishkill.run();
 							SComponentManagementService.exitDestroy(cid, desc, exception, null);
 						}
 					});
