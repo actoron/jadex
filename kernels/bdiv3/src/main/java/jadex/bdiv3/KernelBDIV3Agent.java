@@ -22,7 +22,9 @@ import jadex.micro.annotation.ProvidedServices;
 //	expression="new jadex.bdiv3.BDIAgentFactory($component)"))
 	expression="new jadex.bdiv3.BDIAgentFactory($component, jadex.commons.SUtil.createHashMap(new String[]{\"debugger.panels\"},new Object[]{\"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel\"}))"))
 })
-@Agent(name="kernel_bdi", autostart=Boolean3.FALSE)
+@Agent(name="kernel_bdi",
+	autostart=Boolean3.FALSE,
+	predecessors="jadex.platform.service.security.SecurityAgent")
 public class KernelBDIV3Agent 
 {
 }

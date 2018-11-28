@@ -13,7 +13,9 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Component kernel for XML BDI agents.
  */
-@Agent(name="kernel_bdix", autostart=Boolean3.FALSE)
+@Agent(name="kernel_bdix",
+	autostart=Boolean3.FALSE,
+	predecessors="jadex.platform.service.security.SecurityAgent")
 @Properties({
 	@NameValue(name="kernel.types", value="new String[]{\"agent.xml\", \"capability.xml\"}")
 })
