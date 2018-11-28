@@ -582,22 +582,24 @@ def checkDistZip(distname, arts, isaddon)
 	artefactBuild.startParameter.projectProperties << ["dist": distname, "timestamp": timestamp]
 	artefactBuild.execute()
 	
+	// For debugging bluetooth aar
+	if(subprojectmap.get(":android:bluetooth")!=null) {
+		def zip1	= new File(project.projectDir, 'android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
+		def zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
+		def diff	= diffZips(zip1, zip2)
+		if(diff.length()!=0)
+			throw new RuntimeException("Rebuilt bluetooth classes.jar does not match original: "+diff);		
+		zip1	= new File(project.projectDir, 'android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
+		zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
+		diff	= diffZips(zip1, zip2)
+		if(diff.length()!=0)
+			throw new RuntimeException("Rebuilt bluetooth-" + jadex_build_version + ".aar does not match original: "+diff);		
+	}
+	
 	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-	def entries	= new HashMap();
-	def diff	= "";
 	def distzip = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-	new java.util.zip.ZipFile(distzip).stream()
-		.forEach {e -> entries.put(e.getName(), e.getCrc()+':'+e.getSize())}
 	def distzip2 = new File(rebuilddirfile, 'sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip')
-	new java.util.zip.ZipFile(distzip2).stream()
-		.forEach {e ->
-			def e2	= entries.remove(e.getName());
-			if(e2==null)
-				diff	+= "\nUnexpected entry: "+e;
-			else if(!e2.equals(e.getCrc()+':'+e.getSize()))
-				diff	+= "\nChanged entry (crc:size): "+e+", old="+e2+" new="+e.getCrc()+':'+e.getSize();
-		}
-	entries.keySet().stream().forEach {e -> diff+="\nMissing entry: "+e}
+	def diff	= diffZips(distzip, distzip2)
 	if(diff.length()!=0)
 		throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);		
 }
@@ -737,64 +739,52 @@ def createSrcZip(distname, arts, isaddon)
 		}
 	}.execute()
 	
-//	//-------- old ant zip for reference --------
-//	def mainzipdir = 'sources/'
-//	String maindir = project.projectDir.getCanonicalPath()
-//	String zipfilename = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sourcesOld.zip'
-//	def ant = new groovy.util.AntBuilder()
-//	ant.sequential {
-//		zip destfile: zipfilename,
-//		{
-//			Set<String> toplevels = new HashSet();
-//			arts.each { artname ->
-//				Project sp = subprojectmap.get(artname)
-//				if (getProjectDepth(sp) == 2)
-//					toplevels.add(sp.projectDir.getCanonicalFile().getParentFile().getCanonicalPath())
-//				
-//				// each project: sources + resources
-//				String prefix = (mainzipdir + Paths.get(maindir).relativize(sp.projectDir.toPath()).toString()).replace(File.separator, "/") // handle nested paths correctly
-//				zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + srcdir, prefix: prefix +'/' + srcdir,  erroronmissingdir: false
-//				// each project: dist directory
-//				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist', prefix: prefix + '/dist',  erroronmissingdir: false, excludes: '**/build/**'
-//				// each project: build script files
-//				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: prefix, includes: '*.gradle, *.properties, lib/**',  erroronmissingdir: false
-//			}
-//			
-//			for (String topdir : toplevels)
-//			{
-//				String prefix = (mainzipdir + Paths.get(maindir).relativize(Paths.get(topdir)).toString()).replace(File.separator, "/")
-//				zipfileset dir: topdir, prefix: prefix, includes: '*.gradle, *.properties, lib/**',  erroronmissingdir: false
-//			}
-//			
-//			// top-level build script files
-//			if (!isaddon) {
-//				zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle, gradle.properties, gradle/wrapper/*', excludes: '.gradle'
-//				zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat', filemode: 755
-//				zipfileset dir: maindir, prefix: mainzipdir, includes: 'src/main/buildutils/**/*', excludes: 'src/main/buildutils/jadexversion.properties'
-//				zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
-//				zipfileset dir: project.buildDir.getCanonicalPath(), prefix: mainzipdir + 'src/main/buildutils/', includes: 'jadexversion.properties'
-//			}
-//		}
-//	}
-//	
-//	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-//	def entries	= new HashMap();
-//	def diff	= "";
-//	def distzip = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sourcesOld.zip'
-//	new java.util.zip.ZipFile(distzip).stream()
-//		.forEach {e -> entries.put(e.getName(), e.getCrc()+':'+e.getSize())}
-//	def distzip2 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
-//	new java.util.zip.ZipFile(distzip2).stream()
-//		.forEach {e ->
-//			def e2	= entries.remove(e.getName());
-//			if(e2==null)
-//				diff	+= "\nUnexpected entry: "+e;
-//			else if(!e2.equals(e.getCrc()+':'+e.getSize()))
-//				diff	+= "\nChanged entry (crc:size): "+e+", old="+e2+" new="+e.getCrc()+':'+e.getSize();
-//		}
-//	entries.keySet().stream().forEach {e -> diff+="\nMissing entry: "+e}
-//	if(diff.length()!=0)
-//		throw new RuntimeException("New jadex-" + distname + "-" + jadex_build_version + "-sources.zip does not match original: "+diff);
+	//-------- old ant zip for reference --------
+	def mainzipdir = 'sources/'
+	String maindir = project.projectDir.getCanonicalPath()
+	String zipfilename = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sourcesOld.zip'
+	def ant = new groovy.util.AntBuilder()
+	ant.sequential {
+		zip destfile: zipfilename,
+		{
+			Set<String> toplevels = new HashSet();
+			arts.each { artname ->
+				Project sp = subprojectmap.get(artname)
+				if (getProjectDepth(sp) == 2)
+					toplevels.add(sp.projectDir.getCanonicalFile().getParentFile().getCanonicalPath())
+				
+				// each project: sources + resources
+				String prefix = (mainzipdir + Paths.get(maindir).relativize(sp.projectDir.toPath()).toString()).replace(File.separator, "/") // handle nested paths correctly
+				zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + srcdir, prefix: prefix +'/' + srcdir,  erroronmissingdir: false
+				// each project: dist directory
+				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist', prefix: prefix + '/dist',  erroronmissingdir: false, excludes: '**/build/**'
+				// each project: build script files
+				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: prefix, includes: '*.gradle, *.properties, lib/**',  erroronmissingdir: false
+			}
+			
+			for (String topdir : toplevels)
+			{
+				String prefix = (mainzipdir + Paths.get(maindir).relativize(Paths.get(topdir)).toString()).replace(File.separator, "/")
+				zipfileset dir: topdir, prefix: prefix, includes: '*.gradle, *.properties, lib/**',  erroronmissingdir: false
+			}
+			
+			// top-level build script files
+			if (!isaddon) {
+				zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle, gradle.properties, gradle/wrapper/*', excludes: '.gradle'
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat', filemode: 755
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'src/main/buildutils/**/*', excludes: 'src/main/buildutils/jadexversion.properties'
+				zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
+				zipfileset dir: project.buildDir.getCanonicalPath(), prefix: mainzipdir + 'src/main/buildutils/', includes: 'jadexversion.properties'
+			}
+		}
+	}
+	
+	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
+	def zip1 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sourcesOld.zip'
+	def zip2 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
+	def diff	= diffZips(zip1, zip2)
+	if(diff.length()!=0)
+		throw new RuntimeException("New jadex-" + distname + "-" + jadex_build_version + "-sources.zip does not match original: "+diff);
 }
 
 task performanceTest() {
