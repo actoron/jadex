@@ -263,6 +263,18 @@ subprojects
 			def build = variant.buildType.name
 			if(build.equals(com.android.builder.core.BuilderConstants.DEBUG)) {
 				variant.setIgnore(true);
+			}		
+		}
+
+		if(isAndroidLibraryProject(project)) {
+			android.libraryVariants.all { variant -> 
+				variant.outputs.each { output ->
+					output.getPackageLibrary().reproducibleFileOrder	= true
+					output.getPackageLibrary().preserveFileTimestamps	= false
+					output.getPackageLibrary().doLast {
+						println 'Executed AAR task for ' + output.getPackageLibrary().archiveName + ' ' + output.getPackageLibrary().reproducibleFileOrder + ' ' + output.getPackageLibrary().preserveFileTimestamps
+					}
+				}
 			}
 		}
 
