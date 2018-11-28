@@ -70,7 +70,7 @@ public class ComponentStartTest extends ComponentTest
 	{
 		try
 		{
-			final IComponentIdentifier cid = fut.get().getId();
+			final IExternalAccess exta = fut.get();
 
 			// Wait some time (simulation and real time) and kill the component
 			// afterwards.
@@ -86,7 +86,7 @@ public class ComponentStartTest extends ComponentTest
 						// System.out.println("destroying1 "+cid);
 						try
 						{
-							platform.getExternalAccess(cid).killComponent().get();
+							exta.killComponent().get();
 						}
 						catch(ComponentTerminatedException e)
 						{
