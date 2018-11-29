@@ -516,13 +516,44 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 								{
 									for (IComponentIdentifier inst : insts)
 									{
-										IFuture<Map<String, Object>> killfut = SComponentManagementService.getExternalAccess(inst, component).killComponent();
+										IFuture<Map<String, Object>> killfut = null;
+										IExternalAccess tmpexta = null;
+										try
+										{
+											tmpexta = SComponentManagementService.getExternalAccess(inst, component);
+										}
+										catch (Exception e)
+										{
+											Map<String, Object> res = new HashMap<>();
+											res.put("exception", e);
+											killfut = new Future<>(res);
+										}
+										final IExternalAccess exta = tmpexta;
+										if (exta != null)
+											killfut = exta.killComponent();
+										
 										levelbar.addFuture(killfut);
 										killfut.addResultListener(new IResultListener<Map<String, Object>>()
 										{
-											public void exceptionOccurred(Exception exception)
+											public void exceptionOccurred(final Exception exception)
 											{
-												ret.setExceptionIfUndone(exception);
+//												ret.setExceptionIfUndone(exception);
+												exta.getResultsAsync().addResultListener(new IResultListener<Map<String,Object>>()
+												{
+													public void resultAvailable(Map<String, Object> result)
+													{
+														Map<String, Object> res = new HashMap<>(result);
+														res.put("exception", exception);
+														ret.addIntermediateResultIfUndone(res);
+													}
+
+													public void exceptionOccurred(Exception e)
+													{
+														Map<String, Object> res = new HashMap<>();
+														res.put("exception", exception);
+														ret.addIntermediateResultIfUndone(res);
+													}
+												});
 											}
 											
 											public void resultAvailable(Map<String, Object> result)
