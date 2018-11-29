@@ -8,10 +8,10 @@ import jadex.bridge.ISearchConstraints;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITuple2Future;
 
 /**
  *  External perspective of the subcomponents feature.
@@ -67,7 +67,7 @@ public interface IExternalSubcomponentsFeature extends IExternalComponentFeature
 	 *  @param infos Start information.
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public IIntermediateFuture<Map<String, Object>> killComponents(IComponentIdentifier... cids);
+	public IIntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> killComponents(IComponentIdentifier... cids);
 	
 	/**
 	 * Search for subcomponents matching the given description.

@@ -1934,9 +1934,9 @@ public class SComponentManagementService
 				
 				if (achildren != null && achildren.length > 0)
 				{
-					agent.getFeature(ISubcomponentsFeature.class).killComponents(achildren).addResultListener(new IResultListener<Collection<Map<String,Object>>>()
+					agent.getFeature(ISubcomponentsFeature.class).killComponents(achildren).addResultListener(new IResultListener<Collection<Tuple2<IComponentIdentifier, Map<String,Object>>>>()
 					{
-						public void resultAvailable(Collection<Map<String, Object>> result)
+						public void resultAvailable(Collection<Tuple2<IComponentIdentifier, Map<String, Object>>> result)
 						{
 							finishkill.run();
 						}

@@ -315,9 +315,9 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 *  @param cids The component identifiers.
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public IIntermediateFuture<Map<String, Object>> killComponents(IComponentIdentifier... cids)
+	public IIntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> killComponents(IComponentIdentifier... cids)
 	{
-		final IntermediateFuture<Map<String, Object>> ret = new IntermediateFuture<>();
+		final IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> ret = new IntermediateFuture<>();
 		
 		final List<IComponentIdentifier> sysinfos = new ArrayList<>();
 		final List<IComponentIdentifier> userinfos = new ArrayList<>();
@@ -336,9 +336,9 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		
 		if (userinfos.size() > 0)
 		{
-			doKillComponents(userinfos).addResultListener(new IntermediateDefaultResultListener<Map<String, Object>>()
+			doKillComponents(userinfos).addResultListener(new IntermediateDefaultResultListener<Tuple2<IComponentIdentifier, Map<String, Object>>>()
 			{
-				public void intermediateResultAvailable(Map<String, Object> result)
+				public void intermediateResultAvailable(Tuple2<IComponentIdentifier, Map<String, Object>> result)
 				{
 					ret.addIntermediateResult(result);
 				}
@@ -480,9 +480,9 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		return ret;
 	}
 	
-	protected IIntermediateFuture<Map<String, Object>> doKillComponents(List<IComponentIdentifier> cids)
+	protected IIntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> doKillComponents(List<IComponentIdentifier> cids)
 	{
-		final IntermediateFuture<Map<String, Object>> ret = new IntermediateFuture<>();
+		final IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> ret = new IntermediateFuture<>();
 		
 		final MultiCollection<String, IComponentIdentifier> instances = new MultiCollection<>();
 		
@@ -544,21 +544,21 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 													{
 														Map<String, Object> res = new HashMap<>(result);
 														res.put("exception", exception);
-														ret.addIntermediateResultIfUndone(res);
+														ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, res));
 													}
 
 													public void exceptionOccurred(Exception e)
 													{
 														Map<String, Object> res = new HashMap<>();
 														res.put("exception", exception);
-														ret.addIntermediateResultIfUndone(res);
+														ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, res));
 													}
 												});
 											}
 											
 											public void resultAvailable(Map<String, Object> result)
 											{
-												ret.addIntermediateResultIfUndone(result);
+												ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, result));
 											};
 										});
 									}
