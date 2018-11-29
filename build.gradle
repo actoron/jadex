@@ -271,16 +271,16 @@ subprojects
 		if(isAndroidLibraryProject(project)) {
 			project.afterEvaluate {
 				project.tasks.matching {
-					it.name.startsWith('transformResourcesWithMergeJavaRes')
-				}.each {task -> task.doLast {
-					def outputdir	= task.getStreamOutputFolder()
-					outputdir.listFiles({File file -> file.getName().endsWith(".jar")} as FileFilter).each{ file ->
-						// Intercept jar-building task and rebuild jar afterwards LOL :(
-						def rebuilddir	= new File(outputdir, "rebuild")
+//					it.name.startsWith('transformResourcesWithMergeJavaRes')
+					it.name.startsWith('transformClassesAndResourcesWithSyncLibJars')
+				}.each {task -> task.doFirst {
+					// Intercept jar input to rebuild jar beforehands LOL :(
+					task.getInputs().getFiles().filter({it.getName().endsWith(".jar")}).getFiles().each {file ->
+						def rebuilddir	= new File(file.getParentFile(), "rebuild")
 						rebuilddir.mkdirs()
 						ant.unzip(src: file, dest: rebuilddir)
 						project.tasks.create([name: "rebuildJar", type: Zip]) {
-							destinationDir outputdir
+							destinationDir file.getParentFile()
 							archiveName file.getName()
 							reproducibleFileOrder	true
 							preserveFileTimestamps	false							
@@ -288,24 +288,10 @@ subprojects
 								includes = ['*/**']
 							}
 						}.execute()
-						println 'Rebuilt generated jar ' + file.getCanonicalPath() + ' ' + file.exists()
+//						println 'Rebuilt generated jar ' + file.getCanonicalPath() + ' ' + file.exists()
 					}
 				}}
 			}
-//			android.libraryVariants.all { variant ->
-//				variant.outputs.each { output ->
-//					// Set anyway but doesn't work, cf. https://android.googlesource.com/platform/tools/base/+/studio-master-dev/build-system/gradle-core/src/main/java/com/android/build/gradle/tasks/BundleAar.kt
-////					output.getPackageLibrary().reproducibleFileOrder	= true
-////					output.getPackageLibrary().preserveFileTimestamps	= false
-//					
-//					output.getPackageLibrary().doFirst {
-//						println 'Executing AAR task for ' + output.getPackageLibrary().getClass() + ', ' + output.getPackageLibrary().archiveName+', '+output.getPackageLibrary().reproducibleFileOrder+', '+output.getPackageLibrary().preserveFileTimestamps
-//						def classesjar	= new File(project.projectDir, 'build/intermediates/packaged-classes/release/classes.jar')
-//						if(classesjar.exists())
-//							classesjar.setLastModified(0) 
-//					}
-//				}
-//			}
 		}
 
         // include all resources that are placed inside src dirs
@@ -347,8 +333,8 @@ subprojects
 			war.preserveFileTimestamps	= false
 		}
 		jar.baseName = getArtifactName(project)
-//		jar.reproducibleFileOrder	= true
-//		jar.preserveFileTimestamps	= false
+		jar.reproducibleFileOrder	= true
+		jar.preserveFileTimestamps	= false
 //			test {
 //				reports.html.enabled = false
 //			}
