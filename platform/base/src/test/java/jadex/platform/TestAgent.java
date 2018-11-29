@@ -241,11 +241,11 @@ public abstract class TestAgent
 		new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //		boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
 //		CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
-		CreationInfo ci	= new CreationInfo(root==null? agent.getId(): root, rid);
+		CreationInfo ci	= new CreationInfo(rid);
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		agent.createComponent(ci)
+		agent.getExternalAccess(root==null? agent.getId(): root).createComponent(ci)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)

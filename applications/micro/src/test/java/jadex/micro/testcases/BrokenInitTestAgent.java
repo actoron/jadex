@@ -111,7 +111,7 @@ public class BrokenInitTestAgent extends JunitAgentTest
 	protected IFuture<Void> testBrokenComponent(final String model)
 	{
 		final Future<Void>	fut1	= new Future<Void>();
-		agent.createComponent(new CreationInfo(agent.getId()).setFilename(model))
+		agent.createComponent(new CreationInfo().setFilename(model))
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(IExternalAccess result)

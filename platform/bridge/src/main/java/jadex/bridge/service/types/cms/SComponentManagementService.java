@@ -443,6 +443,7 @@ public class SComponentManagementService
 		final IInternalAccess pad = getParentComponent(cinfo, agent);
 //		final IExternalAccess parent = pad.getExternalAccess();
 		
+		IComponentIdentifier parent = agent.getId();
 		IModelInfo model = pad.getModel();
 //		parent.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, ClassLoader>>(ret)
 //		{
@@ -459,7 +460,8 @@ public class SComponentManagementService
 							
 							String filename = modelname;
 							
-							if(cinfo.getParent()!=null)
+//							if(cinfo.getParent()!=null) // FIXME
+							if(parent!=null)
 							{
 								// Try to find file for local type.
 								String localtype = modelname!=null ? modelname : cinfo.getLocalType();
@@ -519,7 +521,8 @@ public class SComponentManagementService
 					// Hack for platform init
 					String	filename	= modelname;
 					
-					if(cinfo.getParent()!=null)
+//					if(cinfo.getParent()!=null) //FIXME
+					if(parent!=null)
 					{
 						// Try to find file for local type.
 						String	localtype = modelname!=null ? modelname : cinfo.getLocalType();
@@ -1243,7 +1246,8 @@ public class SComponentManagementService
 	 */
 	public static IComponentIdentifier getParentIdentifier(CreationInfo ci, IInternalAccess agent)
 	{
-		IComponentIdentifier ret = ci!=null && ci.getParent()!=null ? ci.getParent() : agent.getId().getRoot(); 
+//		IComponentIdentifier ret = ci!=null && ci.getParent()!=null ? ci.getParent() : agent.getId().getRoot(); //FIXME 
+		IComponentIdentifier ret = agent.getId();
 //		System.out.println("parent id: "+ret);
 		return ret;
 	}
@@ -1267,12 +1271,13 @@ public class SComponentManagementService
 		// Local parent //(but not platform -> platform now has valid rid).
 		else if(ci!=null 
 //			&& !ci.getParent().equals(root.getComponentIdentifier())
-			&& (ci.getParent()==null || !isRemoteComponent(ci.getParent(), agent))
+//			&& (ci.getParent()==null || !isRemoteComponent(ci.getParent(), agent)) //FIXME: PARENT
 //			&& !initinfos.containsKey(ci.getParent())	// does not work during init as external access is not available!?
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
 			)
 		{
-			IExternalAccess ea = getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), agent);
+			//IExternalAccess ea = getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), agent); //FIXME: PARENT
+			IExternalAccess ea = getExternalAccess(agent.getId(), agent);
 			ea.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, IResourceIdentifier>(ret)
 			{
 				public void customResultAvailable(IModelInfo model)
@@ -2206,7 +2211,7 @@ public class SComponentManagementService
 	{
 		final Future<IComponentIdentifier> ret = new Future<>();
 		
-		agent.getExternalAccessAsync(cinfo.getParent().getRoot()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+		agent.getExternalAccessAsync(agent.getId().getRoot()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret) //FIXME: PARENT
 		{
 			@Override
 			public void customResultAvailable(IExternalAccess platform) throws Exception
@@ -2431,40 +2436,41 @@ public class SComponentManagementService
 	 */
 	protected static void addParentLocking(CreationInfo cinfo, IInternalAccess agent, Future<IComponentIdentifier> inited)
 	{
+		IComponentIdentifier parent = agent.getId(); //FIXME: PARENT
 		// Lock the parent while creating child
 		final String lockkey = SUtil.createUniqueId("lock");
-		LockEntry kt = SComponentManagementService.getLockEntries(agent.getId()).get(cinfo.getParent());
+		LockEntry kt = SComponentManagementService.getLockEntries(agent.getId()).get(parent);
 		if(kt==null)
 		{
-			kt = new LockEntry(cinfo.getParent());
-			SComponentManagementService.getLockEntries(agent.getId()).put(cinfo.getParent(), kt);
+			kt = new LockEntry(parent);
+			SComponentManagementService.getLockEntries(agent.getId()).put(parent, kt);
 		}
 		kt.addLocker(lockkey);
 		inited.addResultListener(createResultListener(agent, new IResultListener<IComponentIdentifier>()
 		{
 			public void resultAvailable(IComponentIdentifier result)
 			{
-				LockEntry kt = SComponentManagementService.getLockEntries(agent.getId()).get(cinfo.getParent());
+				LockEntry kt = SComponentManagementService.getLockEntries(agent.getId()).get(parent);
 				if(kt!=null)
 				{
 					if(kt.removeLocker(lockkey))
 						destroyComponent(kt.getLocked(), kt.getKillFuture(), agent);
 					if(kt.getLockerCount()==0)
 					{
-						SComponentManagementService.getLockEntries(agent.getId()).remove(cinfo.getParent());
+						SComponentManagementService.getLockEntries(agent.getId()).remove(parent);
 					}
 				}
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				LockEntry kt = SComponentManagementService.getLockEntries(agent.getId()).get(cinfo.getParent());
+				LockEntry kt = SComponentManagementService.getLockEntries(agent.getId()).get(parent);
 				if(kt!=null)
 				{
 					if(kt.removeLocker(lockkey))
 						destroyComponent(kt.getLocked(), kt.getKillFuture(), agent);
 					if(kt.getLockerCount()==0)
 					{
-						SComponentManagementService.getLockEntries(agent.getId()).remove(cinfo.getParent());
+						SComponentManagementService.getLockEntries(agent.getId()).remove(parent);
 					}
 				}
 			}
@@ -2591,7 +2597,8 @@ public class SComponentManagementService
 	// rw: cleanup futures, (loadModel), lock entries, init infos, components
 	public static IFuture<IComponentIdentifier> createComponent(final String oname, final String modelname, CreationInfo info, 
 		final IResultListener<Collection<Tuple2<String, Object>>> resultlistener, IInternalAccess agent)
-	{			
+	{
+		IComponentIdentifier ciparent = agent.getId(); // FIXME: PARENT
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Error creating component: " + oname + " : Modelname must not be null."));
 
@@ -2607,14 +2614,14 @@ public class SComponentManagementService
 		
 		final CreationInfo cinfo = new CreationInfo(info);	// Dummy default info, if null. Must be cloned as localtype is set on info later.
 		
-		if(cinfo.getParent()!=null)
+		if(ciparent!=null)
 		{
 			// Check if parent is killing itself -> no new child component, exception
-			if(SComponentManagementService.getCleanupFutures(agent.getId()).containsKey(cinfo.getParent()))
-				return new Future<IComponentIdentifier>(new ComponentTerminatedException(cinfo.getParent() ,"Parent is killing itself. Child component creation no allowed."));
+			if(SComponentManagementService.getCleanupFutures(agent.getId()).containsKey(ciparent))
+				return new Future<IComponentIdentifier>(new ComponentTerminatedException(ciparent ,"Parent is killing itself. Child component creation no allowed."));
 		}
 		
-		if(cinfo.getParent()!=null && isRemoteComponent(cinfo.getParent(), agent))
+		if(ciparent!=null && isRemoteComponent(ciparent, agent))
 		{				
 			handleRemoteCreation(oname, modelname, cinfo, resultlistener, agent).addResultListener(new DelegationResultListener<>(inited));
 		}
@@ -2674,9 +2681,9 @@ public class SComponentManagementService
 	//					Boolean persistable = cinfo.getPersistable()!=null? cinfo.getPersistable(): lmodel.getPersistable(cinfo.getConfiguration());
 						PublishEventLevel moni = cinfo.getMonitoring()!=null? cinfo.getMonitoring(): tmplmodel.getMonitoring(cinfo.getConfiguration());
 						// Inherit monitoring from parent if null
-						if(moni==null && cinfo.getParent()!=null)
+						if(moni==null && ciparent!=null)
 						{
-							CMSComponentDescription desc = (CMSComponentDescription)SComponentManagementService.getDescription(cinfo.getParent());
+							CMSComponentDescription desc = (CMSComponentDescription)SComponentManagementService.getDescription(ciparent);
 							moni = desc.getMonitoring();
 						}
 						
@@ -2724,7 +2731,7 @@ public class SComponentManagementService
 						// Start regular execution of inited component
 						// when this component is the outermost component, i.e. with no parent
 						// or the parent is already running
-						tmpdoinit = cinfo.getParent()==null || getInitInfo(cinfo.getParent())==null;
+						tmpdoinit = ciparent==null || getInitInfo(ciparent)==null;
 						
 						agent.getLogger().info("Starting component: "+cid.getName());
 		//				System.err.println("Pre-Init: "+cid);
@@ -3291,20 +3298,26 @@ public class SComponentManagementService
 	protected static IPlatformComponentAccess getComponent(IComponentIdentifier cid)
 	{
 		IPlatformComponentAccess ret = null;
-		setReadLock(cid);
 		try
 		{
-			ret = SComponentManagementService.getComponents(cid).get(cid);
-			if(ret==null)
+			setReadLock(cid);
+			try
 			{
-				InitInfo ii = getInitInfo(cid);
-				if(ii!=null)
-					ret	= ii.getComponent();
+				ret = SComponentManagementService.getComponents(cid).get(cid);
+				if(ret==null)
+				{
+					InitInfo ii = getInitInfo(cid);
+					if(ii!=null)
+						ret	= ii.getComponent();
+				}
+			}
+			finally
+			{
+				releaseReadLock(cid);
 			}
 		}
 		finally
 		{
-			releaseReadLock(cid);
 		}
 		
 		return ret;

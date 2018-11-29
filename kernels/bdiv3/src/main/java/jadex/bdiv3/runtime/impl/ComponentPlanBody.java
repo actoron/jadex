@@ -77,7 +77,7 @@ public class ComponentPlanBody extends AbstractPlanBody
 	public Object invokeBody(Object[] params) throws BodyAborted
 	{
 		Future<Void>	ret	= new Future<>();
-		ia.createComponent(new CreationInfo(ia.getId()).setFilename(component)).addResultListener(new IResultListener<IExternalAccess>()
+		ia.createComponent(new CreationInfo().setFilename(component)).addResultListener(new IResultListener<IExternalAccess>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{

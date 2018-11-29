@@ -116,12 +116,13 @@ public class ServiceQueriesTestAgent extends TestAgent
 			});
 
 			// The creation info is important to be able to resolve the class/model
-			CreationInfo ci = platform.getId().getPlatformName().equals(agent.getId().getPlatformName())
-				? new CreationInfo(agent.getId(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+			CreationInfo ci = new CreationInfo(agent.getModel().getResourceIdentifier());
 
+			IExternalAccess creator = platform.getId().getPlatformName().equals(agent.getId().getPlatformName()) ? agent : platform;
 			for(int i=0; i<cnt; i++)
 			{
-				IFuture<IExternalAccess> fut = platform.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
+				
+				IFuture<IExternalAccess> fut = creator.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
 				cids[i] = fut.get(Starter.getDefaultTimeout(agent.getId()), true).getId();
 			}
 			

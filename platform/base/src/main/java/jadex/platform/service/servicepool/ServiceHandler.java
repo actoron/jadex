@@ -172,7 +172,7 @@ public class ServiceHandler implements InvocationHandler
 		final Future<IService> ret = new Future<IService>();
 		
 		CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
-		ci.setParent(component.getId());
+//		ci.setParent(component.getId());
 		ci.setImports(component.getModel().getAllImports());
 		// Worker services are exposed with scope parent only to hinder others finding directly the worker services
 		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null)});

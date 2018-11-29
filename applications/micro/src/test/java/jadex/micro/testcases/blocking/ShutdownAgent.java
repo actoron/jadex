@@ -44,7 +44,7 @@ public class ShutdownAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		agent.createComponent(new CreationInfo(agent.getId()).setFilename(BlockAgent.class.getName()+".class"))
+		agent.createComponent(new CreationInfo().setFilename(BlockAgent.class.getName()+".class"))
 			.addResultListener(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(final IExternalAccess exta)

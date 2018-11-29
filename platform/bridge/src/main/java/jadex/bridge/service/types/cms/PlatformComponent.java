@@ -1480,6 +1480,15 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				rettype = m.getReturnType();
 			}
 			
+//			if("createComponent".equals(method.getName()))
+//			{
+//				if (!ia.getId().equals(ia.getId().getRoot()))
+//				{
+//					System.out.println("Created on non-platform: " +ia.getModel().getFilename());
+//					new RuntimeException().printStackTrace();
+//				}
+//			}
+			
 			if("getId".equals(method.getName()))
 			{
 				return cid;

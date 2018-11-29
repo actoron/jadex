@@ -76,7 +76,7 @@ public class BPMNRecoveryTestAgent
 		
 //		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, ServiceScope.PLATFORM)).get();
 		IPersistenceService	ps	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPersistenceService.class, ServiceScope.PLATFORM)).get();
-		CreationInfo ci = new CreationInfo(agent.getId());
+		CreationInfo ci = new CreationInfo();
 		ci.setFilename(model);
 		
 		IFuture<IExternalAccess> fut = agent.createComponent(ci);

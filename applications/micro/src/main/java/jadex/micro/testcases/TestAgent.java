@@ -203,11 +203,11 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 //		IResourceIdentifier	rid	= new ResourceIdentifier(
 //			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		boolean	local = root.equals(agent.getId().getRoot());
-		CreationInfo ci	= new CreationInfo(local? agent.getId(): root, agent.getModel().getResourceIdentifier());
+		CreationInfo ci	= new CreationInfo(agent.getModel().getResourceIdentifier());
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		IFuture<IExternalAccess> cmsfut = agent.createComponent(ci);
+		IFuture<IExternalAccess> cmsfut = agent.getExternalAccess(local? agent.getId(): root).createComponent(ci);
 		cmsfut.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
@@ -235,11 +235,11 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 
 		boolean	local = root.equals(agent.getId().getRoot());
-		CreationInfo ci	= new CreationInfo(local? agent.getId(): root, agent.getModel().getResourceIdentifier());
+		CreationInfo ci	= new CreationInfo(agent.getModel().getResourceIdentifier());
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		IFuture<IExternalAccess> cmsfut = agent.createComponent(ci);
+		IFuture<IExternalAccess> cmsfut = agent.getExternalAccess(local? agent.getId(): root).createComponent(ci);
 		cmsfut.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)

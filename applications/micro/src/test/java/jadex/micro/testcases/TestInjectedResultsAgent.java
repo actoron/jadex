@@ -44,7 +44,7 @@ public class TestInjectedResultsAgent extends JunitAgentTest
 		final TestReport tr	= new TestReport("#1", "Test if injected results work.");
 		
 		IFuture<IExternalAccess> fut = agent
-			.createComponent(new CreationInfo(agent.getId()).setFilename(InjectedResultsAgent.class.getName()+".class"));
+			.createComponent(new CreationInfo().setFilename(InjectedResultsAgent.class.getName()+".class"));
 		fut.addResultListener(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(IExternalAccess result)

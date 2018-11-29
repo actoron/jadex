@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +53,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -166,14 +169,15 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 */
 	public IFuture<IExternalAccess> createComponent(CreationInfo info)
 	{
-		if (info.getParent() == null || component.getId().equals(info.getParent()))
-		{
-			return getComponent().createComponent(info, null);
-		}
-		else
-		{
-			return component.getExternalAccess(info.getParent()).createComponent(info);
-		}
+		return getComponent().createComponent(info, null);
+//		if (info.getParent() == null || component.getId().equals(info.getParent()))
+//		{
+//			return getComponent().createComponent(info, null);
+//		}
+//		else
+//		{
+//			return component.getExternalAccess(info.getParent()).createComponent(info);
+//		}
 	}
 	
 	/**
@@ -221,8 +225,10 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	{
 		if (infos == null || infos.length == 0)
 			return new IntermediateFuture<>(new IllegalArgumentException("Creation infos must not be null or empty."));
-		
 		FutureBarrier<Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>> modelbar = new FutureBarrier<>();
+		
+		if (debug)
+			System.out.println("createComponents: " + component + " " + Arrays.toString(infos));
 		
 		final Map<Integer, IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>>> tmpmodelmap = new HashMap<>();
 		for (int i = 0; i < infos.length; ++i)
@@ -317,57 +323,155 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 */
 	public IIntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> killComponents(IComponentIdentifier... cids)
 	{
-		final IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> ret = new IntermediateFuture<>();
+		if (cids == null || cids.length == 0)
+			return new IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>>(new IllegalArgumentException("Component identifiers must not be null or empty."));
 		
-		final List<IComponentIdentifier> sysinfos = new ArrayList<>();
-		final List<IComponentIdentifier> userinfos = new ArrayList<>();
+//		boolean subsonly = true;
+//		for (IComponentIdentifier cid : cids)
+//		{
+//			if (!component.getId().equals(cid.getParent()))
+//				subsonly = false;
+//		}
+//		if (subsonly)
+//			return killLocalComponents(cids);
 		
-		for (int i = 0; i < cids.length; ++i)
+		final IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> ret = new IntermediateFuture<>(); 
+		
+		boolean suicide = false;
+		Set<IComponentIdentifier> killset = new HashSet<>(Arrays.asList(cids));
+		Map<IComponentIdentifier, Set<IComponentIdentifier>> killparents = new HashMap<>();
+		idloop:
+		for (IComponentIdentifier cid : cids)
 		{
-			if (SComponentManagementService.getDescription(cids[i]).isSystemComponent())
+			IComponentIdentifier parent = cid.getParent();
+			while (parent != null)
 			{
-				sysinfos.add(cids[i]);
+				if (killset.contains(parent))
+					continue idloop;
+				parent = parent.getParent();
 			}
-			else
+			
+			if (component.getId().equals(cid))
 			{
-				userinfos.add(cids[i]);
+				suicide = true;
+				continue;
+			}
+			
+			IComponentIdentifier kp = cid.getParent();
+			if (kp == null)
+				kp = cid;
+			Set<IComponentIdentifier> kpset = killparents.get(kp);
+			if (kpset == null)
+			{
+				kpset = new LinkedHashSet<>();
+				killparents.put(kp, kpset);
+			}
+			kpset.add(cid);
+		}
+		
+		Set<IComponentIdentifier> locals = killparents.remove(component.getId());
+		if (suicide)
+			locals = null;
+		
+		FutureBarrier<Void> compkillbar = new FutureBarrier<>();
+		for (Map.Entry<IComponentIdentifier, Set<IComponentIdentifier>> entry : killparents.entrySet())
+		{
+			final Set<IComponentIdentifier> kills = entry.getValue();
+			if (kills != null && kills.size() > 0)
+			{
+				IExternalAccess exta = component.getExternalAccess(entry.getKey());
+				Future<Void> donefut = new Future<>();
+				compkillbar.addFuture(donefut);
+				exta.killComponents(kills.toArray(new IComponentIdentifier[kills.size()])).addResultListener(new IntermediateDefaultResultListener<Tuple2<IComponentIdentifier, Map<String, Object>>>()
+				{
+					public void exceptionOccurred(Exception exception)
+					{
+						HashMap<String, Object> res = new HashMap<>();
+						res.put("exception", exception);
+						for (IComponentIdentifier kill : kills)
+						{
+							ret.addIntermediateResult(new Tuple2<IComponentIdentifier, Map<String,Object>>(kill, res));
+						}
+						donefut.setResult(null);
+					}
+					
+					public void intermediateResultAvailable(Tuple2<IComponentIdentifier, Map<String, Object>> result)
+					{
+						kills.remove(result.getFirstEntity());
+						ret.addIntermediateResult(result);
+					}
+					
+					public void finished()
+					{
+						donefut.setResult(null);
+					}
+				});
 			}
 		}
 		
-		if (userinfos.size() > 0)
+		if (locals != null)
 		{
-			doKillComponents(userinfos).addResultListener(new IntermediateDefaultResultListener<Tuple2<IComponentIdentifier, Map<String, Object>>>()
+			Future<Void> donefut = new Future<>();
+			compkillbar.addFuture(donefut);
+			final Set<IComponentIdentifier> flocals = locals;
+			killLocalComponents(locals.toArray(new IComponentIdentifier[locals.size()])).addResultListener(new IntermediateDefaultResultListener<Tuple2<IComponentIdentifier, Map<String, Object>>>()
 			{
-				public void intermediateResultAvailable(Tuple2<IComponentIdentifier, Map<String, Object>> result)
-				{
-					ret.addIntermediateResult(result);
-				}
-				
 				public void exceptionOccurred(Exception exception)
 				{
-					ret.setException(exception);
+					HashMap<String, Object> res = new HashMap<>();
+					res.put("exception", exception);
+					for (IComponentIdentifier kill : flocals)
+					{
+						ret.addIntermediateResult(new Tuple2<IComponentIdentifier, Map<String,Object>>(kill, res));
+					}
+					donefut.setResult(null);
+				}
+				
+				public void intermediateResultAvailable(Tuple2<IComponentIdentifier, Map<String, Object>> result)
+				{
+					flocals.remove(result.getFirstEntity());
+					ret.addIntermediateResult(result);
 				}
 				
 				public void finished()
 				{
-//					System.out.println("User kill done, killing sysagents..." + sysinfos.size());
-					if (!ret.isDone())
-					{
-						if (sysinfos.size() > 0)
-							doKillComponents(sysinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
-						else
-							ret.setFinished();
-					}
+					donefut.setResult(null);
 				}
 			});
 		}
-		else
+		
+		if (suicide)
 		{
-			if (sysinfos.size() > 0)
-				doKillComponents(sysinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
-			else
-				ret.setFinished();
+			Future<Void> donefut = new Future<>();
+			compkillbar.addFuture(donefut);
+			component.killComponent().addResultListener(new IResultListener<Map<String,Object>>()
+			{
+				public void resultAvailable(Map<String, Object> result)
+				{
+					ret.addIntermediateResult(new Tuple2<IComponentIdentifier, Map<String,Object>>(component.getId(), result));
+					donefut.setResult(null);
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					HashMap<String, Object> res = new HashMap<>();
+					res.put("exception", exception);
+					ret.addIntermediateResult(new Tuple2<IComponentIdentifier, Map<String,Object>>(component.getId(), res));
+					donefut.setResult(null);
+				}
+			});
 		}
+		
+		compkillbar.waitFor().addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				ret.setFinished();
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
 		
 		return ret;
 	}
@@ -476,6 +580,72 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			}
 		};
 		levelrl.resultAvailable(null);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Stops a set of components, in order of dependencies.
+	 *  
+	 *  @param cids The component identifiers.
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	protected IIntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> killLocalComponents(IComponentIdentifier... cids)
+	{
+		if (cids == null || cids.length == 0)
+			return new IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>>(new IllegalArgumentException("Component identifiers must not be null or empty."));
+		
+		final IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> ret = new IntermediateFuture<>(); 
+		
+		final List<IComponentIdentifier> sysinfos = new ArrayList<>();
+		final List<IComponentIdentifier> userinfos = new ArrayList<>();
+		
+		for (int i = 0; i < cids.length; ++i)
+		{
+			if (SComponentManagementService.getDescription(cids[i]).isSystemComponent())
+			{
+				sysinfos.add(cids[i]);
+			}
+			else
+			{
+				userinfos.add(cids[i]);
+			}
+		}
+		
+		if (userinfos.size() > 0)
+		{
+			doKillComponents(userinfos).addResultListener(new IntermediateDefaultResultListener<Tuple2<IComponentIdentifier, Map<String, Object>>>()
+			{
+				public void intermediateResultAvailable(Tuple2<IComponentIdentifier, Map<String, Object>> result)
+				{
+					ret.addIntermediateResult(result);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
+				}
+				
+				public void finished()
+				{
+//					System.out.println("User kill done, killing sysagents..." + sysinfos.size());
+					if (!ret.isDone())
+					{
+						if (sysinfos.size() > 0)
+							doKillComponents(sysinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
+						else
+							ret.setFinished();
+					}
+				}
+			});
+		}
+		else
+		{
+			if (sysinfos.size() > 0)
+				doKillComponents(sysinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
+			else
+				ret.setFinished();
+		}
 		
 		return ret;
 	}

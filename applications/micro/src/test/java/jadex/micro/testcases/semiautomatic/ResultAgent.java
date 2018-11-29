@@ -50,7 +50,7 @@ public class ResultAgent
 		{
 			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("result", "not last: "+agent.getId()+": "+Math.random());
 			
-			agent.createComponent(new CreationInfo(agent.getId()).setFilename(ResultAgent.this.getClass().getName()+".class")).addResultListener(new IResultListener<IExternalAccess>()
+			agent.createComponent(new CreationInfo().setFilename(ResultAgent.this.getClass().getName()+".class")).addResultListener(new IResultListener<IExternalAccess>()
 			{
 				public void resultAvailable(IExternalAccess result)
 				{

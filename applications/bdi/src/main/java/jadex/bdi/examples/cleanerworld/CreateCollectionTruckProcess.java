@@ -84,7 +84,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
 				IFuture<IExternalAccess> ret = space.getExternalAccess().createComponent(
-					new CreationInfo().setArguments(params).setParent(space.getExternalAccess().getId()).setImports(space.getExternalAccess().getModelAsync().get().getAllImports()).setName("Truck"));
+					new CreationInfo().setArguments(params).setImports(space.getExternalAccess().getModelAsync().get().getAllImports()).setName("Truck"));
 				
 				IResultListener<IExternalAccess> lis = new IResultListener<IExternalAccess>()
 				{

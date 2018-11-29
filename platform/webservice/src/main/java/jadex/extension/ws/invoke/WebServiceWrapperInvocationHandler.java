@@ -62,7 +62,7 @@ class WebServiceWrapperInvocationHandler implements InvocationHandler
 	{
 		final Future<Object> ret = new Future<Object>();
 			
-		CreationInfo ci = new CreationInfo(agent.getId());
+		CreationInfo ci = new CreationInfo();
 		ci.setFilename("jadex/extension/ws/invoke/WebServiceInvocationAgent.class");
 		agent.createComponent(ci)
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)

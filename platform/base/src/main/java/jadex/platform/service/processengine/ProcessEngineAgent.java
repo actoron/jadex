@@ -512,7 +512,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		
 		Tuple2<String, IResourceIdentifier> model = new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid());
 		
-		CreationInfo info = new CreationInfo(agent.getId(), det.getRid());
+		CreationInfo info = new CreationInfo(det.getRid());
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
 		info.setArguments(args);

@@ -395,7 +395,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{	
 				kernels.put(f.getFirstEntity(), null);
 				
-				CreationInfo ci = new CreationInfo(agent.getId());
+				CreationInfo ci = new CreationInfo();
 				ci.setFilename(f.getFirstEntity()+".class");
 				
 //				System.out.println("create compo start: "+f.getFirstEntity());

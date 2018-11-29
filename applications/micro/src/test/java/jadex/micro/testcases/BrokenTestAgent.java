@@ -141,7 +141,7 @@ public class BrokenTestAgent extends JunitAgentTest
 			}
 		};
 		
-		agent.createComponent(new CreationInfo(agent.getId()).setFilename(model))
+		agent.createComponent(new CreationInfo().setFilename(model))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)

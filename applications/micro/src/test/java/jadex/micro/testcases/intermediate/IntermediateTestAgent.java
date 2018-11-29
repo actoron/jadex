@@ -222,8 +222,8 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //				System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
-		CreationInfo	ci	= new CreationInfo(local ? agent.getId() : root, rid);
-		agent.createComponent(ci.setFilename("jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class"))
+		CreationInfo	ci	= new CreationInfo(rid);
+		agent.getExternalAccess(local ? agent.getId() : root).createComponent(ci.setFilename("jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class"))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)

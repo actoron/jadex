@@ -266,8 +266,8 @@ public class ComponentRegistryAgent implements IComponentRegistryService
         {
         	components.put(info.getFilename(), ret);
 //          final IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-            if(info.getParent()==null)
-            	info.setParent(agent.getId());
+//            if(info.getParent()==null)
+//            	info.setParent(agent.getId());
             agent.createComponent(info).addResultListener(new IResultListener<IExternalAccess>()
 			{
             	public void resultAvailable(IExternalAccess exta)

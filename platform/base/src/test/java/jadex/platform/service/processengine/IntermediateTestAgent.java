@@ -263,7 +263,7 @@ public class IntermediateTestAgent
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
-		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
+		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(model));
 		
 		try
 		{
@@ -300,7 +300,7 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		CreationInfo ci = new CreationInfo(agent.getId()).setFilename(model);
+		CreationInfo ci = new CreationInfo().setFilename(model);
 		IFuture<IExternalAccess> fut = agent.createComponent(ci);
 		fut.get();
 		
@@ -358,7 +358,7 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
+		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(model));
 		fut.get();
 
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
@@ -402,7 +402,7 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
+		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(model));
 		fut.get();
 
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
@@ -449,7 +449,7 @@ public class IntermediateTestAgent
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 
-		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
+		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(model));
 		
 		try
 		{

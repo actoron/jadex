@@ -280,8 +280,8 @@ public class RecFuturesTestAgent extends RemoteTestBaseAgent
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //		System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
-		jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(local ? agent.getId() : root, rid);
-		agent.createComponent(ci.setFilename(AAgent.class.getName()+".class"))
+		jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(rid);
+		agent.getExternalAccess(local ? agent.getId() : root).createComponent(ci.setFilename(AAgent.class.getName()+".class"))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)

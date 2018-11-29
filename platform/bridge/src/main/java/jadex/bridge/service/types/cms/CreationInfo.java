@@ -32,7 +32,7 @@ public class CreationInfo
 	protected Map<String, Object> args;
 	
 	/** The parent component. */
-	protected IComponentIdentifier parent;
+//	protected IComponentIdentifier parent;
 	
 	/** The resource identifier. */
 	protected IResourceIdentifier rid;
@@ -98,7 +98,7 @@ public class CreationInfo
 			this.filename = info.getFilename();
 			this.config	= info.getConfiguration();
 			this.args	= info.getArguments();
-			this.parent	= info.getParent();
+//			this.parent	= info.getParent();
 			this.suspend	= info.getSuspend(); 
 //			this.master = info.getMaster();
 //			this.daemon = info.getDaemon();
@@ -116,12 +116,11 @@ public class CreationInfo
 
 	/**
 	 *  Create a new creation info.
-	 *  @param parent	The parent of the component to be created.
 	 */
-	public CreationInfo(IComponentIdentifier parent)
-	{
-		this(null, parent);
-	}
+//	public CreationInfo(IComponentIdentifier parent)
+//	{
+//		this(null, parent);
+//	}
 	
 	/**
 	 *  Create a new creation info.
@@ -145,10 +144,10 @@ public class CreationInfo
 	 *  Create a new creation info.
 	 *  @param parent	The parent of the component to be created.
 	 */
-	public CreationInfo(IComponentIdentifier parent, IResourceIdentifier rid)
-	{
-		this(null, null, parent, null, null, null, null, null, rid);
-	}
+//	public CreationInfo(IComponentIdentifier parent, IResourceIdentifier rid)
+//	{
+//		this(null, null, parent, null, null, null, null, null, rid);
+//	}
 	
 	/**
 	 *  Create a new creation info.
@@ -248,7 +247,7 @@ public class CreationInfo
 	{
 		this.config	= config;
 		this.args	= args;
-		this.parent	= parent;
+//		this.parent	= parent;
 		this.suspend	= suspend;
 //		this.master = master;
 //		this.daemon = daemon;
@@ -339,20 +338,24 @@ public class CreationInfo
 	 *  Get the parent.
 	 *  @return the parent
 	 */
-	public IComponentIdentifier getParent()
-	{
-		return parent;
-	}
+//	public IComponentIdentifier getParent()
+//	{
+//		return parent;
+//	}
+//	public IComponentIdentifier getParent()
+//	{
+//		return null;
+//	}
 
 	/**
 	 *  Set the parent.
 	 *  @param parent the parent to set
 	 */
-	public CreationInfo setParent(IComponentIdentifier parent)
-	{
-		this.parent = parent;
-		return this;
-	}
+//	public CreationInfo setParent(IComponentIdentifier parent)
+//	{
+//		this.parent = parent;
+//		return this;
+//	}
 
 	/**
 	 *  Get the resource identifier for loading the component model.

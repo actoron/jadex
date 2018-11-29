@@ -50,7 +50,7 @@ public class ParameterGuesserTestAgent extends JunitAgentTest
 		TestReport tr = new TestReport(""+no, " Test if the parameter guesser works correctly when using injection annotations.");
 		try
 		{
-			IComponentIdentifier cid = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model)).get().getId();
+			IComponentIdentifier cid = agent.createComponent(new CreationInfo().setFilename(model)).get().getId();
 
 			IInjectionTestService ser = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IInjectionTestService.class).setProvider(cid)).get();
 

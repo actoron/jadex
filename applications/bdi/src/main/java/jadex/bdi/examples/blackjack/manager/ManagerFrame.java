@@ -419,7 +419,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				final IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				
 				ia.createComponent(
-					new CreationInfo(ia.getId().getParent()).setName("BlackjackDealer").setFilename("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml"))
+					new CreationInfo().setName("BlackjackDealer").setFilename("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml"))
 				.addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess dealer)
