@@ -182,6 +182,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		Future<Void>	ret	= new Future<>();
 		if (keepaliveinterval < 0)
 			keepaliveinterval = Starter.getDefaultTimeout(agent.getId().getRoot());
 		if (keepaliveinterval < 0)
@@ -217,6 +218,10 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 
 			public void exceptionOccurred(Exception exception)
 			{
+				if(!ret.setExceptionIfUndone(exception))
+				{
+					agent.killComponent(exception);
+				}
 			}
 
 			public void finished()
@@ -229,7 +234,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		else
 			setupClient();
 		
-		return IFuture.DONE;
+		ret.setResultIfUndone(null);
+		return ret;
 	}
 	
 	/**
