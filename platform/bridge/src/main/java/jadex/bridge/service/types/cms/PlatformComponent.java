@@ -8,10 +8,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -51,7 +54,6 @@ import jadex.bridge.service.component.ComponentFutureFunctionality;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -68,7 +70,6 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
-import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -83,7 +84,6 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
-import jadex.commons.transformation.annotations.Classname;
 
 /**
  *  Standalone platform component implementation.
@@ -94,6 +94,21 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	
 	/** Property name for timeout after which component long running cleanup is forcefully aborted. */
 	public static final String	PROPERTY_TERMINATION_TIMEOUT	= "termination_timeout";
+	
+	/** External access method exempt from component suspension. */
+	public static final Set<String> SUSPEND_METHOD_EXPEMPTIONS;
+	static
+	{
+		Set<String> tmp = new HashSet<>();
+		tmp.add("resumeComponent");
+		tmp.add("createComponent");
+		tmp.add("createComponents");
+		tmp.add("createComponentWithEvents");
+		tmp.add("killComponent");
+		tmp.add("killComponents");
+		tmp.add("stepComponent");
+		SUSPEND_METHOD_EXPEMPTIONS = Collections.unmodifiableSet(tmp);
+	}
 	
 	//-------- attributes --------
 	
@@ -1480,14 +1495,14 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				rettype = m.getReturnType();
 			}
 			
-			if("createComponent".equals(method.getName()))
-			{
-				if (!ia.getId().equals(ia.getId().getRoot()))
-				{
-					System.out.println("Created on non-platform: " +ia.getModel().getFilename());
-					new RuntimeException().printStackTrace();
-				}
-			}
+//			if("createComponent".equals(method.getName()))
+//			{
+//				if (!ia.getId().equals(ia.getId().getRoot()))
+//				{
+//					System.out.println("Created on non-platform: " +ia.getModel().getFilename());
+//					new RuntimeException().printStackTrace();
+//				}
+//			}
 			
 			if("getId".equals(method.getName()))
 			{
@@ -1527,42 +1542,51 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				int prio = IExecutionFeature.STEP_PRIORITY_NORMAL;
 				
 				// Allow getting arguments and results from dead components.
-				if("getResultsAsync".equals(method.getName()))
+				switch (method.getName())
 				{
-					if(shutdown)
-						return new Future<>(getFeature(IArgumentsResultsFeature.class).getResults());
-					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
-				}
-				if("getArgumentsAsync".equals(method.getName()))
-				{
-					if(shutdown)
-						return new Future<>(getFeature(IArgumentsResultsFeature.class).getArguments());
-					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
-				}
-				if("getExceptionAsync".equals(method.getName()))
-				{
-					if(shutdown)
-						return new Future<>(ia.getException());
-					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
-				}
-				if("getModelAsync".equals(method.getName()))
-				{
-					if(shutdown)
-						return new Future<>(info.getModel());
-					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
-				}
-				if("waitForTermination".equals(method.getName()))
-				{
-					if(shutdown)
-						return new Future<>(getFeature(IArgumentsResultsFeature.class).getResults());
-					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
-				}
+					case "getResultsAsync":
+					{
+						if(shutdown)
+							return new Future<>(getFeature(IArgumentsResultsFeature.class).getResults());
+						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+						break;
+					}
+					case "getArgumentsAsync":
+					{
+						if(shutdown)
+							return new Future<>(getFeature(IArgumentsResultsFeature.class).getArguments());
+						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+						break;
+					}
+					case "getExceptionAsync":
+					{
+						if(shutdown)
+							return new Future<>(ia.getException());
+						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+						break;
+					}
+					case "getModelAsync":
+					{
+						if(shutdown)
+							return new Future<>(info.getModel());
+						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+						break;
+					}
+					case "waitForTermination":
+					{
+						if(shutdown)
+							return new Future<>(getFeature(IArgumentsResultsFeature.class).getResults());
+						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+						break;
+					}
+					default:
+				};
 				
-				if("resumeComponent".equals(method.getName()) ||
-				   "killComponent".equals(method.getName()) ||
-				   "stepComponent".equals(method.getName()))
+				if(SUSPEND_METHOD_EXPEMPTIONS.contains(method.getName()))
 				{
-					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+					// Only when running?
+					if (!shutdown)
+						prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
 				}
 				
 				if(!getFeature(IExecutionFeature.class).isComponentThread())
