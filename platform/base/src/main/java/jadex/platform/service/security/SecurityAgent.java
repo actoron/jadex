@@ -643,7 +643,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					
 					if (cs != null && cs.isExpiring())
 					{
-						currentcryptosuites.writeLock().lock();
+						currentcryptosuites.getWriteLock().lock();
 						try
 						{
 							if (cs.equals(currentcryptosuites.get(rplat)))
@@ -656,7 +656,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 						finally
 						{
-							currentcryptosuites.writeLock().unlock();
+							currentcryptosuites.getWriteLock().unlock();
 						}
 					}
 					
@@ -1633,7 +1633,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							List<String> pfnames = new ArrayList<>();
-							currentcryptosuites.writeLock().lock();
+							currentcryptosuites.getWriteLock().lock();
 							try
 							{
 								pfnames.addAll(currentcryptosuites.keySet());
@@ -1642,7 +1642,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							}
 							finally
 							{
-								currentcryptosuites.writeLock().unlock();
+								currentcryptosuites.getWriteLock().unlock();
 							}
 							for (String pfname : pfnames)
 								initializeHandshake(pfname);
@@ -1694,7 +1694,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected void expireCryptosuite(String pfname)
 	{
 		assert agent.isComponentThread();
-		currentcryptosuites.writeLock().lock();
+		currentcryptosuites.getWriteLock().lock();
 		try
 		{
 			ICryptoSuite cs = currentcryptosuites.get(pfname);
@@ -1706,7 +1706,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		finally
 		{
-			currentcryptosuites.writeLock().unlock();
+			currentcryptosuites.getWriteLock().unlock();
 		}
 	}
 	
@@ -1716,7 +1716,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected void refreshCryptosuiteRoles()
 	{
 		assert agent.isComponentThread();
-		currentcryptosuites.writeLock().lock();
+		currentcryptosuites.getWriteLock().lock();
 		try
 		{
 			for (Map.Entry<String, ICryptoSuite> entry : currentcryptosuites.entrySet())
@@ -1742,7 +1742,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		finally
 		{
-			currentcryptosuites.writeLock().unlock();
+			currentcryptosuites.getWriteLock().unlock();
 		}
 	}
 	
@@ -2056,7 +2056,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				ICryptoSuite oldcs = currentcryptosuites.get(rplat.toString());
 				if (oldcs != null)
 				{
-					currentcryptosuites.writeLock().lock();
+					currentcryptosuites.getWriteLock().lock();
 					try
 					{
 						if (oldcs.equals(currentcryptosuites.get(rplat.toString())))
@@ -2072,7 +2072,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					}
 					finally
 					{
-						currentcryptosuites.writeLock().unlock();
+						currentcryptosuites.getWriteLock().unlock();
 					}
 				}
 				

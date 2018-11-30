@@ -1162,14 +1162,14 @@ public class Starter
 		IRwMap<String, Object> mem = platformmem.get(platform.getRoot());
 		if(mem == null)
 		{
-			platformmem.writeLock().lock();
+			platformmem.getWriteLock().lock();
 			mem = platformmem.get(platform.getRoot());
 			if (mem == null)
 			{
 				mem = new RwMapWrapper<String, Object>(new HashMap<String, Object>());
 				platformmem.put(platform, mem);
 			}
-			platformmem.writeLock().unlock();
+			platformmem.getWriteLock().unlock();
 		}
 		mem.put(key, value);
 	}

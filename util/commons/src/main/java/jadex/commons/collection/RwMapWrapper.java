@@ -1,5 +1,7 @@
 package jadex.commons.collection;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +16,12 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 {
 	/** The lock. */
 	protected ReadWriteLock rwlock;
+	
+	/** The resource read unlock. */
+	protected IAutoLock readunlock;
+	
+	/** The resource write unlock. */
+	protected IAutoLock writeunlock;
 	
 	/** The wrapped map. */
 	protected Map<K, V> map;
@@ -37,6 +45,30 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	{
 		this.rwlock = lock;
 		this.map = map;
+		this.readunlock = new IAutoLock()
+		{
+			public void close()
+			{
+				release();
+			}
+
+			public void release()
+			{
+				rwlock.readLock().unlock();
+			}
+		};
+		this.writeunlock = new IAutoLock()
+		{
+			public void close()
+			{
+				release();
+			}
+			
+			public void release()
+			{
+				rwlock.writeLock().unlock();
+			}
+		};
 	}
 	
 	/**
@@ -47,8 +79,7 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	 */
 	public RwMapWrapper(Map<K, V> map, boolean fair)
 	{
-		rwlock = new ReentrantReadWriteLock(fair);
-		this.map = map;
+		this(map, new ReentrantReadWriteLock(fair));
 	}
 
 	/**
@@ -176,9 +207,27 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	}
 	
 	/**
+	 *  Locks the read lock for resource-based locking.
+	 */
+	public IAutoLock readLock()
+	{
+		rwlock.readLock().lock();
+		return readunlock;
+	}
+	
+	/**
+	 *  Locks the write lock for resource-based locking.
+	 */
+	public IAutoLock writeLock()
+	{
+		rwlock.writeLock().lock();
+		return writeunlock;
+	}
+	
+	/**
 	 *  Gets the read lock for manual locking.
 	 */
-	public Lock readLock()
+	public Lock getReadLock()
 	{
 		return rwlock.readLock();
 	}
@@ -186,7 +235,7 @@ public class RwMapWrapper<K, V> implements IRwMap<K, V>
 	/**
 	 *  Gets the write lock for manual locking.
 	 */
-	public Lock writeLock()
+	public Lock getWriteLock()
 	{
 		return rwlock.writeLock();
 	}

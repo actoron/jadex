@@ -216,7 +216,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		List<Con> cons = new ArrayList<>();
 		try
 		{
-			establishedconnections.writeLock().lock();
+			establishedconnections.getWriteLock().lock();
 			for (Con con : establishedconnections.values())
 			{
 				if (con != null)
@@ -229,7 +229,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		}
 		finally
 		{
-			establishedconnections.writeLock().unlock();
+			establishedconnections.getWriteLock().unlock();
 		}
 		
 		for (Con con : cons)
@@ -342,7 +342,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 								boolean notconnected = false;
 								if (canDecide(remotepf))
 								{
-									establishedconnections.writeLock().lock();
+									establishedconnections.getWriteLock().lock();
 									try
 									{
 										notconnected = !establishedconnections.containsKey(remotepf);
@@ -351,7 +351,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 									}
 									finally
 									{
-										establishedconnections.writeLock().unlock();
+										establishedconnections.getWriteLock().unlock();
 									}
 								}
 								else
@@ -566,13 +566,13 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 				Map<Con, IComponentIdentifier> hscons = null;
 				try
 				{
-					establishedconnections.readLock().lock();
+					establishedconnections.getReadLock().lock();
 					cons = new HashMap<>(establishedconnections);
 					hscons = new HashMap<>(handshakingconnections);
 				}
 				finally
 				{
-					establishedconnections.readLock().unlock();
+					establishedconnections.getReadLock().unlock();
 				}
 				
 				meminf.put("cons", cons);
@@ -616,14 +616,14 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 									boolean notconnected = false;
 									try
 									{
-										establishedconnections.writeLock().lock();
+										establishedconnections.getWriteLock().lock();
 										notconnected = !establishedconnections.containsKey(remotepf);
 										if (notconnected)
 											establishedconnections.put(remotepf, null);
 									}
 									finally
 									{
-										establishedconnections.writeLock().unlock();
+										establishedconnections.getWriteLock().unlock();
 									}
 									
 									if (notconnected)
@@ -764,13 +764,13 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 //		Map<Con, IComponentIdentifier> hscons = null;
 		try
 		{
-			establishedconnections.readLock().lock();
+			establishedconnections.getReadLock().lock();
 			cons = new HashMap<>(establishedconnections);
 //			hscons = new HashMap<>(handshakingconnections);
 		}
 		finally
 		{
-			establishedconnections.readLock().unlock();
+			establishedconnections.getReadLock().unlock();
 		}
 		
 //		for(Map.Entry<Con, IComponentIdentifier> entry : hscons.entrySet())

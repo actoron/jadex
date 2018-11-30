@@ -1,16 +1,14 @@
 package jadex.bridge.service.types.cms;
 
+import java.io.Closeable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.base.Starter;
 import jadex.bridge.BasicComponentIdentifier;
@@ -70,8 +68,8 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
+import jadex.commons.collection.IAutoLock;
 import jadex.commons.collection.IRwMap;
-import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -87,7 +85,6 @@ import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.future.Tuple2Future;
-import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -655,10 +652,10 @@ public class SComponentManagementService
 	protected static IInternalAccess getParentComponent(CreationInfo cinfo, IInternalAccess agent)
 	{
 		// access to both maps could fail if not in a transaction
-		setReadLock(agent.getId());
+		
 		
 		IPlatformComponentAccess component = null;
-		try
+		try(IAutoLock lock = setReadLock(agent.getId()))
 		{
 			IComponentIdentifier paid = getParentIdentifier(cinfo, agent);
 			component = SComponentManagementService.getComponents(agent.getId()).get(paid);
@@ -676,10 +673,6 @@ public class SComponentManagementService
 		catch (Exception e)
 		{
 			SUtil.throwUnchecked(e);
-		}
-		finally
-		{
-			releaseReadLock(agent.getId());
 		}
 		
 		return component.getInternalAccess();
@@ -813,9 +806,8 @@ public class SComponentManagementService
 		// checks components and init infos
 		
 		BasicComponentIdentifier ret = null;
-		setReadLock(agent.getId());
 		
-		try
+		try(IAutoLock lock = setReadLock(agent.getId()))
 		{
 			if(platformname==null)
 				platformname = agent.getId().getName();
@@ -841,10 +833,6 @@ public class SComponentManagementService
 				}
 				while(SComponentManagementService.getComponents(agent.getId()).containsKey(ret) || getInitInfo(ret)!=null || SComponentManagementService.getCleanupFutures(agent.getId()).containsKey(ret));
 			}
-		}
-		finally
-		{
-			releaseReadLock(agent.getId());
 		}
 		
 		return ret;
@@ -880,9 +868,7 @@ public class SComponentManagementService
 		// Otherwise search for matching descriptions.
 		else
 		{
-			setReadLock(agent.getId());
-			
-			try
+			try(IAutoLock lock = setReadLock(agent.getId()))
 			{
 				for(Iterator<IPlatformComponentAccess> it=SComponentManagementService.getComponents(agent.getId()).values().iterator(); it.hasNext(); )
 				{
@@ -899,85 +885,10 @@ public class SComponentManagementService
 					}
 				}
 			}
-			finally
-			{
-				releaseReadLock(agent.getId());
-			}
 		}
+		
+		fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
 
-		//System.out.println("searched: "+ret);
-		
-//		System.out.println("Started search: "+ret);
-//		open.add(fut);
-		
-		boolean remote = false;
-		if(remote)
-		{
-//			IFuture<Collection<IComponentManagementService>> futi = agent.getFeature(IRequiredServicesFeature.class).searchServices((new ServiceQuery<>(IComponentManagementService.class).setScope(ServiceScope.GLOBAL)));
-//			futi.addResultListener(createResultListener(agent, new IResultListener<Collection<IComponentManagementService>>()
-//			{
-//				public void resultAvailable(Collection<IComponentManagementService> result)
-//				{
-////					System.out.println("cms: "+coll);
-//					// Ignore search failures of remote dfs
-//					IResultListener<IComponentDescription[]> lis = createResultListener(agent, new CollectionResultListener<IComponentDescription[]>(result.size(), true, 
-//						new IResultListener<Collection<IComponentDescription[]>>()
-//					{
-//						public void resultAvailable(Collection<IComponentDescription[]> result)
-//						{
-//							// Add all services of all remote dfs
-//							for(Iterator<IComponentDescription[]> it=result.iterator(); it.hasNext(); )
-//							{
-//								IComponentDescription[] res = it.next();
-//								if(res!=null)
-//								{
-//									for(int i=0; i<res.length; i++)
-//									{
-//										ret.add(res[i]);
-//									}
-//								}
-//							}
-////							open.remove(fut);
-////							System.out.println("Federated search: "+ret);//+" "+open);
-//							fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
-//						}
-//						
-//						public void exceptionOccurred(Exception exception)
-//						{
-////							open.remove(fut);
-//							fut.setException(exception);
-////							fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
-//						}
-//					}));
-////					for(Iterator<IComponentManagementService> it=result.iterator(); it.hasNext(); )
-////					{
-////						IComponentManagementService remotecms = it.next();
-//////						if(remotecms!=ComponentManagementService.this)
-////						if(!((IService)remotecms).getId().equals(sid))
-////						{
-////							remotecms.searchComponents(adesc, con, false).addResultListener(lis);
-////						}
-////						else
-////						{
-////							lis.resultAvailable(null);
-////						}
-////					}
-//				}
-//				
-//				public void exceptionOccurred(Exception exception)
-//				{
-////					open.remove(fut);
-//					fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
-//				}
-//			}));
-		}
-		else
-		{
-//			open.remove(fut);
-//			System.out.println("Local search: "+ret+" "+open);
-			fut.setResult((CMSComponentDescription[])ret.toArray(new CMSComponentDescription[ret.size()]));
-		}
-		
 		return fut;
 	}
 	
@@ -1006,8 +917,7 @@ public class SComponentManagementService
 		
 		IComponentDescription[] ret = null;
 		
-		setReadLock(agent.getId());
-		try
+		try(IAutoLock lock = setReadLock(agent.getId()))
 		{
 			ret = new IComponentDescription[SComponentManagementService.getComponents(agent.getId()).size()];
 			int i=0;
@@ -1015,10 +925,6 @@ public class SComponentManagementService
 			{
 				ret[i] = (IComponentDescription)((CMSComponentDescription)it.next().getInternalAccess().getDescription()).clone();
 			}
-		}
-		finally
-		{
-			releaseReadLock(agent.getId());
 		}
 		
 		fut.setResult(ret);
@@ -1068,9 +974,7 @@ public class SComponentManagementService
 	{
 		final Future<IComponentDescription[]>	ret	= new Future<IComponentDescription[]>();
 		
-		setReadLock(agent.getId());
-		
-		try
+		try(IAutoLock lock = setReadLock(agent.getId()))
 		{
 			CMSComponentDescription desc = (CMSComponentDescription)SComponentManagementService.getDescription(cid);
 			IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
@@ -1082,10 +986,6 @@ public class SComponentManagementService
 				assert descs[i]!=null;
 			}
 			ret.setResult(descs);
-		}
-		finally
-		{
-			releaseReadLock(agent.getId());
 		}
 		
 		return ret;
@@ -1102,19 +1002,13 @@ public class SComponentManagementService
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
-		setReadLock(agent.getId());
-		
-		try
+		try(IAutoLock lock = setReadLock(agent.getId()))
 		{
 			CMSComponentDescription desc = (CMSComponentDescription)SComponentManagementService.getDescription(cid);
 			IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
 				IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
 			
 			ret.setResult(tmp.length);
-		}
-		finally
-		{
-			releaseReadLock(agent.getId());
 		}
 		
 		return ret;
@@ -1184,31 +1078,7 @@ public class SComponentManagementService
 					ret.setResult(model.getResourceIdentifier());
 				}
 			}));
-//			getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), true, agent)
-//				.addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IExternalAccess, IResourceIdentifier>(ret)
-//			{
-//				public void customResultAvailable(IExternalAccess ea)
-//				{
-////					System.err.println("Model class loader: "+ea.getModel().getName()+", "+ea.getModel().getClassLoader());
-////						classloadercache.put(ci.getParent(), ea.getModel().getClassLoader());
-//					ea.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, IResourceIdentifier>(ret)
-//					{
-//						public void customResultAvailable(IModelInfo model)
-//						{
-//							ret.setResult(model.getResourceIdentifier());
-//						}
-//					}));
-//				}
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					// External access of parent not found, because already terminated (hack!!! fix creation/destroy structure lock)
-//					if(ci.getParent()!=null)
-//						exception 	= new ComponentTerminatedException(ci.getParent());
-//					super.exceptionOccurred(exception);
-//				}
-//			}));
 		}
-		
 		// Remote or no parent or platform as parent
 		else
 		{
@@ -1283,9 +1153,7 @@ public class SComponentManagementService
 		}
 		else
 		{
-			setReadLock(agent.getId());
-			
-			try
+			try(IAutoLock lock = setReadLock(agent.getId()))
 			{
 	//			System.out.println("getExternalAccess: local");
 				IPlatformComponentAccess component = null;
@@ -1307,10 +1175,6 @@ public class SComponentManagementService
 				{
 					throw new ComponentNotFoundException("No local component found for component identifier: "+cid);
 				}
-			}
-			finally
-			{
-				releaseReadLock(agent.getId());
 			}
 		}
 		
@@ -1424,8 +1288,7 @@ public class SComponentManagementService
 							// Not killed during init.
 							if(!SComponentManagementService.getCleanupFutures(agent.getId()).containsKey(cid))
 							{
-								setWriteLock(agent.getId());
-								try
+								try(IAutoLock lock = setWriteLockk(agent.getId()))
 								{
 									InitInfo ii = removeInitInfo(cid);
 		//							System.out.println("removed: "+cid+" "+ii);
@@ -1441,12 +1304,8 @@ public class SComponentManagementService
 										}
 									}
 								}
-								finally
-								{
-									// release before outbound call body()
-									releaseWriteLock(agent.getId());
-								}
 								
+								// release before outbound call body()
 								adapter.body().addResultListener(adapter.getInternalAccess().getFeature(IExecutionFeature.class).createResultListener(new IResultListener<Void>()
 								{
 									public void resultAvailable(Void result)
@@ -1472,17 +1331,12 @@ public class SComponentManagementService
 							// Killed after init but before init resume -> execute queued destroy.
 							else if(getInitInfo(cid)!=null)
 							{
-								setWriteLock(agent.getId());
-								try
+								try(IAutoLock lock = setWriteLockk(agent.getId()))
 								{
 									removeInitInfo(cid);
 									
 									System.out.println("init resume remove cleanup future: "+cid);
 									SComponentManagementService.getCleanupFutures(agent.getId()).remove(cid);
-								}
-								finally
-								{
-									releaseWriteLock(agent.getId());
 								}
 							}
 						}
@@ -1531,11 +1385,9 @@ public class SComponentManagementService
 	{
 		IFuture<Void>	ret;
 		
-		setWriteLock(agent.getId());
-		
 		CMSComponentDescription desc = null;
 		boolean notifylisteners = false;
-		try
+		try(IAutoLock lock = setWriteLockk(agent.getId()))
 		{
 			final IPlatformComponentAccess comp = SComponentManagementService.getComponents(agent.getId()).get(cid);
 			if(comp!=null)
@@ -1568,10 +1420,7 @@ public class SComponentManagementService
 				ret	= new Future<Void>(new ComponentNotFoundException("Component identifier not registered: "+cid));
 			}
 		}
-		finally
-		{
-			releaseWriteLock(agent.getId());
-		}
+		
 		if (notifylisteners)
 			SComponentManagementService.notifyListenersChanged(desc);
 		
@@ -1760,8 +1609,7 @@ public class SComponentManagementService
 		boolean inited = false;
 		Future<Map<String, Object>> tmp;
 		
-		setWriteLock(agent.getId());
-		try
+		try(IAutoLock lock = setWriteLockk(agent.getId()))
 		{
 			contains = SComponentManagementService.getCleanupFutures(agent.getId()).containsKey(cid);
 			tmp = contains? (Future<Map<String, Object>>)SComponentManagementService.getCleanupFutures(agent.getId()).get(cid): new Future<Map<String, Object>>();
@@ -1783,10 +1631,6 @@ public class SComponentManagementService
 				kt.setKillFuture(tmp);
 				locked = true;
 			}
-		}
-		finally
-		{
-			releaseWriteLock(agent.getId());
 		}
 		
 		final Future<Map<String, Object>> ret = tmp;
@@ -2152,8 +1996,7 @@ public class SComponentManagementService
 					IInternalAccess tmppad = null;
 					IModelInfo tmplmodel = null;
 					
-					setWriteLock(agent.getId());
-					try
+					try(IAutoLock lock = setWriteLockk(agent.getId()))
 					{
 						tmplmodel = t.getFirstEntity();
 						ClassLoader cl = t.getSecondEntity();
@@ -2213,10 +2056,6 @@ public class SComponentManagementService
 						
 						cci = new ComponentCreationInfo(tmplmodel, config, cinfo.getArguments(), tmpad, cinfo.getProvidedServiceInfos(), cinfo.getRequiredServiceBindings());
 					}
-					finally
-					{
-						releaseWriteLock(agent.getId());
-					}
 					
 					final CMSComponentDescription ad = tmpad;
 					final IInternalAccess pad = tmppad;
@@ -2227,8 +2066,7 @@ public class SComponentManagementService
 					component.create(cci, features);
 					
 					boolean tmpdoinit = false;
-					setWriteLock(agent.getId());
-					try
+					try(IAutoLock lock = setWriteLockk(agent.getId()))
 					{
 						linkResults(resultlistener, component, agent);
 						
@@ -2243,19 +2081,13 @@ public class SComponentManagementService
 		//				System.err.println("Pre-Init: "+cid);
 						
 					}
-					finally
-					{
-						releaseWriteLock(agent.getId());
-					}
 					final boolean doinit = tmpdoinit;
 					
 					resfut.addResultListener(createResultListener(agent, new IResultListener<Void>()
 					{
 						public void resultAvailable(Void result)
 						{
-							setWriteLock(agent.getId());
-							
-							try
+							try(IAutoLock lock = setWriteLockk(agent.getId()))
 							{
 								agent.getLogger().info("Started component: "+cid.getName());
 		
@@ -2268,10 +2100,6 @@ public class SComponentManagementService
 								// not set to suspend to allow other initing sibling components invoking services
 								
 								SComponentManagementService.getComponents(agent.getId()).put(cid, info.getComponent());
-							}
-							finally
-							{
-								releaseWriteLock(agent.getId());
 							}
 							
 							// Register component at parent.
@@ -2292,9 +2120,7 @@ public class SComponentManagementService
 									killfut	= (Future<Map<String, Object>>)SComponentManagementService.getCleanupFutures(agent.getId()).get(cid);
 									if(killfut!=null)
 									{
-										setWriteLock(agent.getId());
-										
-										try
+										try(IAutoLock lock = setWriteLockk(agent.getId()))
 										{
 											// Remove init infos otherwise done in resume()
 											List<IComponentIdentifier>	cids = new ArrayList<IComponentIdentifier>();
@@ -2312,10 +2138,6 @@ public class SComponentManagementService
 													}
 												}
 											}
-										}
-										finally
-										{
-											releaseWriteLock(agent.getId());
 										}
 										
 										// Kill component if destroy called during init.
@@ -2668,9 +2490,7 @@ public class SComponentManagementService
 		CMSComponentDescription desc;
 		Map<String, Object> results = null;
 		
-		setWriteLock(cid);
-		
-		try
+		try(IAutoLock lock = setWriteLockk(cid))
 		{
 	//		System.out.println("doCleanup: "+cid);
 	//		logger.info("Terminated component: "+cid.getName());
@@ -2764,11 +2584,8 @@ public class SComponentManagementService
 			
 	//		System.out.println("CleanupCommand end.");
 		}
-		finally
-		{
-			// Release before outbound call destroyComponent()
-			releaseWriteLock(cid);
-		}
+		
+		// Release before outbound call destroyComponent()
 		
 		if (notifylis)
 			SComponentManagementService.notifyListenersRemoved(desc, ex, results);
@@ -2806,8 +2623,7 @@ public class SComponentManagementService
 		IPlatformComponentAccess ret = null;
 		try
 		{
-			setReadLock(cid);
-			try
+			try(IAutoLock lock = setReadLock(cid))
 			{
 				ret = SComponentManagementService.getComponents(cid).get(cid);
 				if(ret==null)
@@ -2816,10 +2632,6 @@ public class SComponentManagementService
 					if(ii!=null)
 						ret	= ii.getComponent();
 				}
-			}
-			finally
-			{
-				releaseReadLock(cid);
 			}
 		}
 		finally
@@ -2857,13 +2669,13 @@ public class SComponentManagementService
 	 * Set the read lock.
 	 * @param agent The agent
 	 */
-	protected static void setReadLock(IComponentIdentifier cid)
+	protected static IAutoLock setReadLock(IComponentIdentifier cid)
 	{
 //		System.out.println(cid + " setReadLock: " + rlcounter.incrementAndGet());
 		IRwMap<IComponentIdentifier, IPlatformComponentAccess> comps = SComponentManagementService.getComponents(cid);
 		if (comps == null)
 			throw new ComponentTerminatedException(cid);
-		comps.readLock().lock();
+		return comps.readLock();
 //		System.out.println("setReadLock");
 	}
 	
@@ -2871,34 +2683,34 @@ public class SComponentManagementService
 	 * Release the read lock.
 	 * @param agent The agent
 	 */
-	protected static void releaseReadLock(IComponentIdentifier cid)
-	{
-//		System.out.println(cid + " releaseReadLock: "+rlcounter.decrementAndGet());
-		SComponentManagementService.getComponents(cid).readLock().unlock();
-//		System.out.println("releaseReadLock");
-	}
+//	protected static void releaseReadLock(IComponentIdentifier cid)
+//	{
+////		System.out.println(cid + " releaseReadLock: "+rlcounter.decrementAndGet());
+//		SComponentManagementService.getComponents(cid).getReadLock().unlock();
+////		System.out.println("releaseReadLock");
+//	}
 //	static AtomicInteger wlcounter = new AtomicInteger(0);
 	/**
 	 * Set the write lock.
 	 * @param agent The agent
 	 */
-	protected static void setWriteLock(IComponentIdentifier cid)
+	protected static IAutoLock setWriteLockk(IComponentIdentifier cid)
 	{
 //		System.out.println(cid + " setWriteLock: " + wlcounter.incrementAndGet());
 //		System.out.println("setWriteLock");
-		SComponentManagementService.getComponents(cid).writeLock().lock();
+		return SComponentManagementService.getComponents(cid).writeLock();
 	}
 	
 	/**
 	 * Release the write lock.
 	 * @param agent The agent
 	 */
-	protected static void releaseWriteLock(IComponentIdentifier cid)
-	{
-//		System.out.println(cid + " releaseWriteLock " + wlcounter.decrementAndGet());
-//		System.out.println("releaseWriteLock");
-		SComponentManagementService.getComponents(cid).writeLock().unlock();
-	}
+//	protected static void releaseWriteLock(IComponentIdentifier cid)
+//	{
+////		System.out.println(cid + " releaseWriteLock " + wlcounter.decrementAndGet());
+////		System.out.println("releaseWriteLock");
+//		SComponentManagementService.getComponents(cid).getWriteLock().unlock();
+//	}
 	
 	/**
 	 *  Schedule a step without getting external access.

@@ -520,13 +520,13 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 									Tuple2<IComponentIdentifier, Integer> tup = routecache.get(destination);
 									if (tup == null || tup.getSecondEntity() >= result)
 									{
-										routecache.writeLock().lock();
+										routecache.getWriteLock().lock();
 										tup = routecache.get(destination);
 										if (tup == null || tup.getSecondEntity() >= result)
 										{
 											routecache.put(destination, new Tuple2<IComponentIdentifier, Integer>(relplat, result));
 										}
-										routecache.writeLock().unlock();
+										routecache.getWriteLock().unlock();
 									}
 									ret.addIntermediateResult(result);
 								}
