@@ -110,9 +110,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		
 		// Add CMS listener for platform node.
 		if(desc.getName().getParent()==null)
-		{
 			addCMSListener(desc.getName());
-		}
 	}
 	
 	//-------- AbstractComponentTreeNode methods --------
