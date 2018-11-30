@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import fi.iki.elonen.NanoHTTPD;
+import fi.iki.elonen.NanoHTTPD.Response.IStatus;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
@@ -42,8 +43,100 @@ import jadex.micro.annotation.AgentKilled;
  *  
  */
 @Service
-public class NanoRestPublishService //extends AbstractRestPublishService
+public class NanoRestPublishService extends ExternalRestPublishService
 {
+	public class Server extends NanoHTTPD 
+	{
+		public Server(int port) 
+		{
+			super(port);
+		}
+		
+		@Override 
+		public Response serve(IHTTPSession session) 
+		{
+			System.out.println("serve called: "+session.getUri());
+			
+//			HttpServletRequest req = null;
+//			HttpServletResponse resp = null;
+//			
+//			handleRequest(req, resp, null).get();
+////			resp.get
+//			
+//			newFixedLengthResponse(IStatus);
+			
+			return null;
+		}
+	}
+	
+	/** The servers per port. */
+	protected Map<Integer, PathHandler> portservers2;
+	
+	@AgentCreated
+	public void start()
+	{
+		System.out.println("Nano started");
+	}
+  
+//	@AgentKilled
+//	public void stop()
+//	{
+//		if(portservers != null)
+//		{
+//			for(Map.Entry<Integer, Server> entry : portservers.entrySet())
+//			{
+//				try
+//				{
+//					entry.getValue().stop();
+//				}
+//				catch (Exception e)
+//				{
+//				}
+//			}
+//		}
+//		System.out.println("Nano stopped");
+//	}
+	
+	
+	/**
+	 *  Get or start an api to the http server.
+	 */
+	public Object getHttpServer(URI uri, PublishInfo info)
+	{
+//		Object ps = super.getHttpServer(uri, info);
+//		
+//		 Server server = null;
+//		 
+//         try
+//         {
+//             server = portservers2==null? null: portservers2.get(uri.getPort());
+// 
+//             if(server==null)
+//             {
+//                 System.out.println("Starting new server: "+uri.getPort());
+//                 server = new Server(uri.getPort());
+// 
+//                 server.start();
+// 
+//                 if(portservers==null)
+//                     portservers = new HashMap<Integer, Server>();
+//                 portservers.put(uri.getPort(), server);
+//             }
+//         }
+//         catch(RuntimeException e)
+//         {
+//             throw e;
+//         }
+//         catch(Exception e)
+//         {
+//             throw new RuntimeException(e);
+//         }
+// 
+//         return server;
+		
+		return null;
+	}
+	
 //	// Jetty requires 1.8
 ////	static
 ////	{
