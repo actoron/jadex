@@ -2045,6 +2045,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public IFuture<Map<String, Object>> killComponent()
 	{
+		if (IComponentDescription.STATE_SUSPENDED.equals(getComponent().getDescription().getState()))
+			getComponent().resumeComponent(component.getId());
 		return getComponent().killComponent();
 	}
 	
@@ -2054,6 +2056,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public IFuture<Map<String, Object>> killComponent(Exception e)
 	{
+		if (IComponentDescription.STATE_SUSPENDED.equals(getComponent().getDescription().getState()))
+			getComponent().resumeComponent(component.getId());
 		return getComponent().killComponent(e);
 	}
 	

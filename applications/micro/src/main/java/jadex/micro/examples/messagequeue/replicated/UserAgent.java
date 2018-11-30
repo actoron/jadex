@@ -90,6 +90,6 @@ public class UserAgent
 				return IFuture.DONE;
 			}
 		};
-		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, step);
+		agent.waitForDelay(1000, step);
 	}
 }

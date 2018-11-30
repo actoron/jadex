@@ -1480,14 +1480,14 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				rettype = m.getReturnType();
 			}
 			
-//			if("createComponent".equals(method.getName()))
-//			{
-//				if (!ia.getId().equals(ia.getId().getRoot()))
-//				{
-//					System.out.println("Created on non-platform: " +ia.getModel().getFilename());
-//					new RuntimeException().printStackTrace();
-//				}
-//			}
+			if("createComponent".equals(method.getName()))
+			{
+				if (!ia.getId().equals(ia.getId().getRoot()))
+				{
+					System.out.println("Created on non-platform: " +ia.getModel().getFilename());
+					new RuntimeException().printStackTrace();
+				}
+			}
 			
 			if("getId".equals(method.getName()))
 			{
@@ -1551,11 +1551,17 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 						return new Future<>(info.getModel());
 					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
 				}
-				
 				if("waitForTermination".equals(method.getName()))
 				{
 					if(shutdown)
 						return new Future<>(getFeature(IArgumentsResultsFeature.class).getResults());
+					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
+				}
+				
+				if("resumeComponent".equals(method.getName()) ||
+				   "killComponent".equals(method.getName()) ||
+				   "stepComponent".equals(method.getName()))
+				{
 					prio = IExecutionFeature.STEP_PRIORITY_IMMEDIATE;
 				}
 				
