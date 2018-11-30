@@ -476,6 +476,8 @@ def diffZips(zip1, zip2) {
 				diff	+= "\nUnexpected entry: "+e;
 			else if(!e2.equals(e.getCrc()+':'+e.getSize()))
 				diff	+= "\nChanged entry (crc:size): "+e+", old="+e2+" new="+e.getCrc()+':'+e.getSize();
+//			else
+//				println 'Matched entry '+zip1.getName()+ '/' +e.getName() + '(' + e2 + ')'
 		}
 	entries.keySet().stream().forEach {e -> diff+="\nMissing entry: "+e}
 	return diff;
