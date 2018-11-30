@@ -2,16 +2,10 @@ package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 
 /**
  *  Test start/termination flags work. 
@@ -36,8 +30,6 @@ public class FlagPlan extends Plan
 		{
 			tr.setReason("Component not suspended: "+desc);
 		}
-//		SComponentManagementService.resumeComponent(ea.getId(), false, agent).get();
-		ea.resumeComponent().get();	// Hack!!! TODO: auto-resume on kill
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 
 		
@@ -53,8 +45,6 @@ public class FlagPlan extends Plan
 		{
 			tr.setReason("Component not suspended: "+desc);
 		}
-//		SComponentManagementService.resumeComponent(ea.getId(), false, agent).get();
-		ea.resumeComponent().get();	// Hack!!! TODO: auto-resume on kill
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 	}
 	
