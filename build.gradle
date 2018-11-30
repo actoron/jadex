@@ -63,7 +63,6 @@ buildscript
 //apply plugin: 'eclipse'
 //eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 
-
 allprojects
 {
 	version = rootProject.version
@@ -114,6 +113,14 @@ allprojects
 		tasks.withType(Javadoc) {
         	options.addStringOption('Xdoclint:none', '-quiet')
         }
+	}
+
+	// Make builds reproducible, cf. https://dzone.com/articles/reproducible-builds-in-java
+	project.afterEvaluate {
+		tasks.withType(AbstractArchiveTask) {
+			preserveFileTimestamps = false
+			reproducibleFileOrder = true
+		}
 	}
 }
 
@@ -282,8 +289,6 @@ subprojects
 						project.tasks.create([name: "rebuildJar", type: Zip]) {
 							destinationDir file.getParentFile()
 							archiveName file.getName()
-							reproducibleFileOrder	true
-							preserveFileTimestamps	false							
 							from(rebuilddir) {
 								includes = ['*/**']
 							}
@@ -329,12 +334,8 @@ subprojects
 				archives jar
 			}
 			war.baseName = getArtifactName(project)
-			war.reproducibleFileOrder	= true
-			war.preserveFileTimestamps	= false
 		}
 		jar.baseName = getArtifactName(project)
-		jar.reproducibleFileOrder	= true
-		jar.preserveFileTimestamps	= false
 //			test {
 //				reports.html.enabled = false
 //			}
@@ -520,8 +521,6 @@ task exampleZips {
 					zipExample.destinationDir = file(outputdir)
 					zipExample.archiveName = ex.getName() + '.zip'
 					zipExample.from(preprocessdir)
-					zipExample.reproducibleFileOrder	= true
-					zipExample.preserveFileTimestamps	= false
 					zipExample.include(ex.getName() + '/**')
 					zipExample.execute()
 				}
@@ -741,8 +740,6 @@ def createSrcZip(distname, arts, isaddon)
 	project.tasks.create([name: "srcZip"+distname.substring(0,1).toUpperCase()+distname.substring(1), type: Zip]) {
 		destinationDir new File(project.distsDir, "sources")
 		archiveName 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
-		reproducibleFileOrder	true
-		preserveFileTimestamps	false
 		
 		// Add all included artifact projects and their parents (but exclude root project for addons)
 		def projs = new HashSet();	// keep track of added projects to avoid duplicates
