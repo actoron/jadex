@@ -325,9 +325,9 @@ public class SimulationSettings extends AServiceSettings {
 	 * Get the host component of a service.
 	 */
 	public IFuture<IExternalAccess> getComponentForService() {
-
-		return JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId)
-			.getExternalAccess((IComponentIdentifier) ((IService)simService).getServiceId().getProviderId());
+		// For backwards compatibility. Future actually no longer required.
+		return new Future(JadexPlatformManager.getInstance().getExternalPlatformAccess(platformId)
+			.getExternalAccess((IComponentIdentifier) ((IService)simService).getServiceId().getProviderId()));
 	}
 
 	/**

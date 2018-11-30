@@ -464,6 +464,25 @@ def getArtifactName(project) {
     return ret
 }
 
+def diffZips(zip1, zip2) {
+	def diff	= "";
+	def entries	= new HashMap();
+	new java.util.zip.ZipFile(zip1).stream()
+		.forEach {e -> entries.put(e.getName(), e.getCrc()+':'+e.getSize())}
+	new java.util.zip.ZipFile(zip2).stream()
+		.forEach {e ->
+			def e2	= entries.remove(e.getName());
+			if(e2==null)
+				diff	+= "\nUnexpected entry: "+e;
+			else if(!e2.equals(e.getCrc()+':'+e.getSize()))
+				diff	+= "\nChanged entry (crc:size): "+e+", old="+e2+" new="+e.getCrc()+':'+e.getSize();
+//			else
+//				println 'Matched entry '+zip1.getName()+ '/' +e.getName() + '(' + e2 + ')'
+		}
+	entries.keySet().stream().forEach {e -> diff+="\nMissing entry: "+e}
+	return diff;
+}
+
 
 // make functions externally visible
 
@@ -490,4 +509,5 @@ ext {
     getVar = this.&getVar
     singularize = this.&singularize
     getArtifactName = this.&getArtifactName
+    diffZips = this.&diffZips
 }

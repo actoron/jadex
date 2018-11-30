@@ -5,14 +5,12 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
-import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -1304,7 +1302,7 @@ public abstract class Test extends TestCase
 			Object booleanOptional = ofMethod.invoke(optionalClass, true);
 			doWriteAndRead(booleanOptional);
 
-			Object nullOptional = emptyMethod.invoke(optionalClass, null);
+			Object nullOptional = emptyMethod.invoke(optionalClass);
 			doWriteAndRead(nullOptional);
 		}
 	}

@@ -10,7 +10,8 @@
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
 	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
 	name="Production"
-	package="jadex.bdi.examples.marsworld_classic.producer">
+	package="jadex.bdi.examples.marsworld_classic.producer"
+	predecessors="jadex.bdi.examples.marsworld_classic.environment.Environment">
 
 	<imports>
 		<import>jadex.bdi.examples.marsworld_classic.movement.*</import>

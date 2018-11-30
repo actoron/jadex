@@ -289,10 +289,11 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 					{
 						for (IComponentIdentifier cid : result)
 						{
-							extAcc.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
-							{
-								public void resultAvailable(final IExternalAccess acc)
-								{
+							final IExternalAccess acc	= extAcc.getExternalAccess(cid);
+//								.addResultListener(new DefaultResultListener<IExternalAccess>()
+//							{
+//								public void resultAvailable(final IExternalAccess acc)
+//								{
 									Object clid = acc.getModelAsync().get().getProperty(ViewableFilter.COMPONENTVIEWER_VIEWERCLASS,
 											getClassLoader());
 
@@ -313,8 +314,8 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 											}
 										});
 									}
-								}
-							});
+//								}
+//							});
 						}
 					}
 				});

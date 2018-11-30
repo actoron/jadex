@@ -36,6 +36,8 @@ public class FlagPlan extends Plan
 		{
 			tr.setReason("Component not suspended: "+desc);
 		}
+		SComponentManagementService.resumeComponent(ea.getId(), false, agent).get();
+//		ea.resumeComponent().get();	// Hack!!! TODO: auto-resume on kill
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 
 		
@@ -51,8 +53,9 @@ public class FlagPlan extends Plan
 		{
 			tr.setReason("Component not suspended: "+desc);
 		}
+		SComponentManagementService.resumeComponent(ea.getId(), false, agent).get();
+//		ea.resumeComponent().get();	// Hack!!! TODO: auto-resume on kill
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
-		
 	}
 	
 	/**

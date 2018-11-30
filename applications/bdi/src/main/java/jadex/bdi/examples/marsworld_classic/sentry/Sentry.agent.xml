@@ -11,7 +11,8 @@
 	xsi:schemaLocation="http://www.activecomponents.org/jadex-bdi
 	                    http://www.activecomponents.org/jadex-bdi-${jadex_build_version}.xsd"
 	name="Sentry"
-	package="jadex.bdi.examples.marsworld_classic.sentry">
+	package="jadex.bdi.examples.marsworld_classic.sentry"
+	predecessors="jadex.bdi.examples.marsworld_classic.environment.Environment">
 
 	<imports>
 		<import>jadex.bdi.examples.marsworld_classic.*</import>

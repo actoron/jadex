@@ -128,7 +128,7 @@ public class SokratesService extends JadexPlatformService
 				new Thread() {
 					@Override
 					public void run() {
-						getPlatformAccess().killComponent(sokratesComponent).addResultListener(new DefaultResultListener<Map<String, Object>>()
+						getPlatformAccess().getExternalAccess(sokratesComponent).killComponent().addResultListener(new DefaultResultListener<Map<String, Object>>()
 						{
 
 							@Override
