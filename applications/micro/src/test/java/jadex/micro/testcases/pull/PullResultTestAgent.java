@@ -20,8 +20,6 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -241,9 +239,6 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		
 		// Start service agent
 		// Hack!!! TODO: use some internal/external access for fetching service???
-		@SuppressWarnings("unchecked")
-		IClockService clock	= (IClockService)ServiceRegistry.getRegistry(root)
-			.getLocalService(ServiceRegistry.getRegistry(root).searchService(new ServiceQuery<>(IClockService.class).setNetworkNames(null)));
 		IResourceIdentifier	rid	= new ResourceIdentifier(
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //		System.out.println("Using rid: "+rid);

@@ -119,7 +119,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
         	
             final URI uri = new URI(getCleanPublishId(info.getPublishId()));
             Server server = (Server)getHttpServer(uri, info);
-            System.out.println("Adding http handler to server: "+uri.getPath());
+            System.out.println("Adding http handler to server (jetty): "+uri.getPath());
 
             ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
 
@@ -229,7 +229,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
         	//final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
         	
             Server server = (Server)getHttpServer(uri, null);
-            System.out.println("Adding http handler to server: "+uri.getPath());
+            System.out.println("Adding http handler to server (jetty): "+uri.getPath());
 
             ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
 
@@ -279,7 +279,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
 			        	//final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
 			        	
 			            Server server = (Server)getHttpServer(uri, null);
-			            System.out.println("Adding http handler to server: "+uri.getPath());
+			            System.out.println("Adding http handler to server (jetty): "+uri.getPath());
 
 			            ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
 			            

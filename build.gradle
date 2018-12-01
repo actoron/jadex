@@ -72,7 +72,6 @@ buildscript
 //apply plugin: 'eclipse'
 //eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 
-
 allprojects
 {
 	version = rootProject.version
@@ -123,6 +122,14 @@ allprojects
 		tasks.withType(Javadoc) {
         	options.addStringOption('Xdoclint:none', '-quiet')
         }
+	}
+
+	// Make builds reproducible, cf. https://dzone.com/articles/reproducible-builds-in-java
+	project.afterEvaluate {
+		tasks.withType(AbstractArchiveTask) {
+			preserveFileTimestamps = false
+			reproducibleFileOrder = true
+		}
 	}
 }
 
@@ -272,6 +279,32 @@ subprojects
 			def build = variant.buildType.name
 			if(build.equals(com.android.builder.core.BuilderConstants.DEBUG)) {
 				variant.setIgnore(true);
+			}		
+		}
+
+		// Android zips are not produced by gradle zip task -> no reproducibleFileOrder=true setting possible, grrr
+		// cf. https://issuetracker.google.com/issues/67597902
+		if(isAndroidLibraryProject(project)) {
+			project.afterEvaluate {
+				project.tasks.matching {
+//					it.name.startsWith('transformResourcesWithMergeJavaRes')
+					it.name.startsWith('transformClassesAndResourcesWithSyncLibJars')
+				}.each {task -> task.doFirst {
+					// Intercept jar input to rebuild jar beforehands LOL :(
+					task.getInputs().getFiles().filter({it.getName().endsWith(".jar")}).getFiles().each {file ->
+						def rebuilddir	= new File(file.getParentFile(), "rebuild")
+						rebuilddir.mkdirs()
+						ant.unzip(src: file, dest: rebuilddir)
+						project.tasks.create([name: "rebuildJar", type: Zip]) {
+							destinationDir file.getParentFile()
+							archiveName file.getName()
+							from(rebuilddir) {
+								includes = ['*/**']
+							}
+						}.execute()
+//						println 'Rebuilt generated jar ' + file.getCanonicalPath() + ' ' + file.exists()
+					}
+				}}
 			}
 		}
 
@@ -312,8 +345,6 @@ subprojects
 			war.baseName = getArtifactName(project)
 		}
 		jar.baseName = getArtifactName(project)
-		jar.reproducibleFileOrder	= true
-		jar.preserveFileTimestamps	= false
 //			test {
 //				reports.html.enabled = false
 //			}
@@ -499,8 +530,6 @@ task exampleZips {
 					zipExample.destinationDir = file(outputdir)
 					zipExample.archiveName = ex.getName() + '.zip'
 					zipExample.from(preprocessdir)
-					zipExample.reproducibleFileOrder	= true
-					zipExample.preserveFileTimestamps	= false
 					zipExample.include(ex.getName() + '/**')
 					zipExample.execute()
 				}
@@ -589,22 +618,24 @@ def checkDistZip(distname, arts, isaddon)
 	artefactBuild.startParameter.projectProperties << ["dist": distname, "timestamp": timestamp]
 	artefactBuild.execute()
 	
+	// For debugging bluetooth aar
+	if(subprojectmap.get(":android:bluetooth")!=null) {
+		def zip1	= new File(project.projectDir, 'android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
+		def zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
+		def diff	= diffZips(zip1, zip2)
+		if(diff.length()!=0)
+			throw new RuntimeException("Rebuilt bluetooth classes.jar does not match original: "+diff);		
+		zip1	= new File(project.projectDir, 'android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
+		zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
+		diff	= diffZips(zip1, zip2)
+		if(diff.length()!=0)
+			throw new RuntimeException("Rebuilt bluetooth-" + jadex_build_version + ".aar does not match original: "+diff);		
+	}
+	
 	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-	def entries	= new HashMap();
-	def diff	= "";
 	def distzip = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-	new java.util.zip.ZipFile(distzip).stream()
-		.forEach {e -> entries.put(e.getName(), e.getCrc()+':'+e.getSize())}
 	def distzip2 = new File(rebuilddirfile, 'sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip')
-	new java.util.zip.ZipFile(distzip2).stream()
-		.forEach {e ->
-			def e2	= entries.remove(e.getName());
-			if(e2==null)
-				diff	+= "\nUnexpected entry: "+e;
-			else if(!e2.equals(e.getCrc()+':'+e.getSize()))
-				diff	+= "\nChanged entry (crc:size): "+e+", old="+e2+" new="+e.getCrc()+':'+e.getSize();
-		}
-	entries.keySet().stream().forEach {e -> diff+="\nMissing entry: "+e}
+	def diff	= diffZips(distzip, distzip2)
 	if(diff.length()!=0)
 		throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);		
 }
@@ -718,8 +749,6 @@ def createSrcZip(distname, arts, isaddon)
 	project.tasks.create([name: "srcZip"+distname.substring(0,1).toUpperCase()+distname.substring(1), type: Zip]) {
 		destinationDir new File(project.distsDir, "sources")
 		archiveName 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
-		reproducibleFileOrder	true
-		preserveFileTimestamps	false
 		
 		// Add all included artifact projects and their parents (but exclude root project for addons)
 		def projs = new HashSet();	// keep track of added projects to avoid duplicates
@@ -755,7 +784,7 @@ def createSrcZip(distname, arts, isaddon)
 //			Set<String> toplevels = new HashSet();
 //			arts.each { artname ->
 //				Project sp = subprojectmap.get(artname)
-//				if (getProjectDepth(sp) == 2)
+//				if (getProjectDepth(sp) > 1)
 //					toplevels.add(sp.projectDir.getCanonicalFile().getParentFile().getCanonicalPath())
 //				
 //				// each project: sources + resources
@@ -785,21 +814,9 @@ def createSrcZip(distname, arts, isaddon)
 //	}
 //	
 //	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-//	def entries	= new HashMap();
-//	def diff	= "";
-//	def distzip = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sourcesOld.zip'
-//	new java.util.zip.ZipFile(distzip).stream()
-//		.forEach {e -> entries.put(e.getName(), e.getCrc()+':'+e.getSize())}
-//	def distzip2 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
-//	new java.util.zip.ZipFile(distzip2).stream()
-//		.forEach {e ->
-//			def e2	= entries.remove(e.getName());
-//			if(e2==null)
-//				diff	+= "\nUnexpected entry: "+e;
-//			else if(!e2.equals(e.getCrc()+':'+e.getSize()))
-//				diff	+= "\nChanged entry (crc:size): "+e+", old="+e2+" new="+e.getCrc()+':'+e.getSize();
-//		}
-//	entries.keySet().stream().forEach {e -> diff+="\nMissing entry: "+e}
+//	def zip1 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sourcesOld.zip'
+//	def zip2 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
+//	def diff	= diffZips(zip1, zip2)
 //	if(diff.length()!=0)
 //		throw new RuntimeException("New jadex-" + distname + "-" + jadex_build_version + "-sources.zip does not match original: "+diff);
 }

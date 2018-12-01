@@ -13,11 +13,13 @@ Object fetchNextBuildNameFromGitTag()
 		def suffix = getLatestTagSuffix(version+"."+patch+"-"+env.BRANCH_NAME+"-")
 		if(suffix!=null)
 			branchpatch =  suffix as Integer;
-	}		
-
-	// If there are commits since last tag -> increment (branch) patch number
+	}
+	
+	// Create the build name based on version path and branch info.		
 	buildname = createBuildname(version, patch, branchpatch, false)
-	if(!isHead(buildname.full))
+	
+	// If tag for buildname exists, but is not head -> there are commits since last tag -> increment (branch) patch number.
+	if(getLatestTagSuffix(buildname.full)!=null && !isHead(buildname.full))
 	{
 		if(includeBranchName(env.BRANCH_NAME))
 			branchpatch++

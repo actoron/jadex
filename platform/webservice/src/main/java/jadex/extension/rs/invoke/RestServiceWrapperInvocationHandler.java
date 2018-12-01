@@ -233,7 +233,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 								MultivaluedMap<String, String> ps = (MultivaluedMap<String, String>)targetparams;
 								for(String key: ps.keySet())
 								{
-									wt = wt.queryParam(key, ps.get(key).toArray(new String[0]));
+									wt = wt.queryParam(key, (Object[])ps.get(key).toArray(new String[0]));
 								}
 							}
 							
