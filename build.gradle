@@ -1,23 +1,11 @@
 import java.nio.file.Paths
+import java.util.concurrent.Callable
 import java.util.regex.Matcher
 import org.gradle.api.artifacts.ProjectDependency
 
 apply plugin: 'java-library' // needed for distsDir on root project level
 
 apply from: "$rootDir/src/main/buildutils/versioning.gradle"
-
-// Get timestamp from env or previous (not-cleaned) build or generate new timestamp
-def timestamp = gradle.startParameter.projectProperties.timestamp
-if(timestamp==null)
-{
-	def props = new Properties()
-	def propFile = new File(project.buildDir, "jadexversion.properties")
-	if (propFile.exists()) {
-		props.load(new FileReader(propFile))
-	}
-	timestamp = props.getProperty("jadextimestamp", new Date().format('yyyyMMdd.HHmmss'))
-}
-println 'timestamp: '+timestamp
 
 def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
@@ -41,7 +29,23 @@ project.ext.keepplural.add('rules')
 project.ext.keepplural.add('tools')
 project.ext.keepplural.add('applications')
 
-project.ext.timestamp=timestamp
+
+project.ext.timestamp	= null
+// Get timestamp from sources if defined (i.e. build from dist sources)
+def propFile = new File(project.projectDir, "src/main/buildutils/jadexversion.properties")
+if (propFile.exists()) {
+	def props = new Properties()
+	props.load(new FileReader(propFile))
+	def	propstamp	= props.getProperty("jadextimestamp")
+	project.ext.timestamp = propstamp.equals('${SRCDIST_TIMESTAMP}') ? null : propstamp
+}
+//println 'timestamp: ' + project.ext.timestamp
+// Generate new timestamp (i.e. build from git sources)
+if(timestamp==null) {
+	project.ext.timestamp	= new Date().format('yyyyMMdd.HHmmss')
+//	println 'timestamp: '+project.ext.timestamp
+}
+
 
 def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
 
@@ -371,9 +375,10 @@ subprojects
 			filesMatching('**/version.properties')
 			{
 				filter{String line -> line.replace('${jadex_build_version}', project.version.toString())}
-				filter{String line -> line.replace('${timestamp}', rootProject.timestamp)}
+				filter{String line -> line.replace('${timestamp}', rootProject.ext.timestamp)}
 			}
 		}
+		processResources.dependsOn(":createVersionInfo")
 
         afterEvaluate {
         	// Set correct bootclasspath for each project, depending on sourceCompatibility
@@ -446,14 +451,45 @@ task copyJavaDocSources(type: Copy) {
 	}
 }
 
+
+//def readVersionInfo() {
+//	def timestamp = "nix"
+//	println 'timestamp: ' + timestamp
+//	// Get timestamp from sources if defined (i.e. build from dist sources)
+//	def propFile = new File(project.projectDir, "util/commons/src/main/java/jadex/bridge/version.properties")
+//	if (propFile.exists()) {
+//		def props = new Properties()
+//		props.load(new FileReader(propFile))
+//		def	propstamp	= props.getProperty("jadex_build_timestamp")
+//		timestamp = propstamp.equals('${timestamp}') ? null : propstamp
+//	}
+//	println 'timestamp: ' + timestamp
+//	// Get timestamp from previous (not-cleaned) build or generate new timestamp (i.e. build from git sources)
+//	if(timestamp==null) {
+//		def props = new Properties()
+//		propFile = new File(project.buildDir, "jadexversion.properties")
+//		println 'propsfile: ' +propFile.getCanonicalPath()
+//		if (propFile.exists()) {
+//			props.load(new FileReader(propFile))
+//		}
+//		timestamp = props.getProperty("jadextimestamp")
+//		println 'timestamp: '+timestamp
+//		timestamp	= timestamp!=null ? timestamp : new Date().format('yyyyMMdd.HHmmss')
+//		println 'timestamp: '+timestamp
+//	}
+//	return timestamp
+//}
+
+// Create version.properties with new timestamp (i.e. after clean)
 task createVersionInfo(type: Copy) {
 	into project.buildDir.getCanonicalPath()
-	outputs.upToDateWhen {false}
 	from('src/main/buildutils') {
 		include 'jadexversion.properties'
-		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: timestamp)
+		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: project.ext.timestamp)
 	}
 }
+createVersionInfo.mustRunAfter clean
+
 
 task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	def sourcedir = project.distsDir.getCanonicalPath() + '/javadocworkdir'
@@ -615,22 +651,22 @@ def checkDistZip(distname, arts, isaddon)
 	artefactBuild.buildFile = project.file(new File(rebuilddirfile, "sources/build.gradle"))
 	artefactBuild.tasks = ["distZip"]
 	artefactBuild.startParameter.excludedTaskNames	= ["test", "javadoc"]
-	artefactBuild.startParameter.projectProperties << ["dist": distname, "timestamp": timestamp]
+	artefactBuild.startParameter.projectProperties << ["dist": distname]
 	artefactBuild.execute()
 	
-	// For debugging bluetooth aar
-	if(subprojectmap.get(":android:bluetooth")!=null) {
-		def zip1	= new File(project.projectDir, 'android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
-		def zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
-		def diff	= diffZips(zip1, zip2)
-		if(diff.length()!=0)
-			throw new RuntimeException("Rebuilt bluetooth classes.jar does not match original: "+diff);		
-		zip1	= new File(project.projectDir, 'android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
-		zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
-		diff	= diffZips(zip1, zip2)
-		if(diff.length()!=0)
-			throw new RuntimeException("Rebuilt bluetooth-" + jadex_build_version + ".aar does not match original: "+diff);		
-	}
+//	// For debugging bluetooth aar
+//	if(subprojectmap.get(":android:bluetooth")!=null) {
+//		def zip1	= new File(project.projectDir, 'android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
+//		def zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
+//		def diff	= diffZips(zip1, zip2)
+//		if(diff.length()!=0)
+//			throw new RuntimeException("Rebuilt bluetooth classes.jar does not match original: "+diff);		
+//		zip1	= new File(project.projectDir, 'android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
+//		zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
+//		diff	= diffZips(zip1, zip2)
+//		if(diff.length()!=0)
+//			throw new RuntimeException("Rebuilt bluetooth-" + jadex_build_version + ".aar does not match original: "+diff);		
+//	}
 	
 	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
 	def distzip = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
