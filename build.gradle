@@ -6,9 +6,18 @@ apply plugin: 'java-library' // needed for distsDir on root project level
 
 apply from: "$rootDir/src/main/buildutils/versioning.gradle"
 
-def date = new Date()
+// Get timestamp from env or previous (not-cleaned) build or generate new timestamp
 def timestamp = gradle.startParameter.projectProperties.timestamp
-timestamp = timestamp!=null ? timestamp : date.format('yyyyMMdd.HHmmss')
+if(timestamp==null)
+{
+	def props = new Properties()
+	def propFile = new File(project.buildDir, "jadexversion.properties")
+	if (propFile.exists()) {
+		props.load(new FileReader(propFile))
+	}
+	timestamp = props.getProperty("jadextimestamp", new Date().format('yyyyMMdd.HHmmss'))
+}
+println 'timestamp: '+timestamp
 
 def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
@@ -411,7 +420,7 @@ task createVersionInfo(type: Copy) {
 	outputs.upToDateWhen {false}
 	from('src/main/buildutils') {
 		include 'jadexversion.properties'
-		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '')
+		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: timestamp)
 	}
 }
 
