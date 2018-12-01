@@ -29,7 +29,7 @@ project.ext.keepplural.add('rules')
 project.ext.keepplural.add('tools')
 project.ext.keepplural.add('applications')
 
-
+// unix timestamp from git: git log -1 --pretty=format:%ct
 project.ext.timestamp	= null
 // Get timestamp from sources if defined (i.e. build from dist sources)
 def propFile = new File(project.projectDir, "src/main/buildutils/jadexversion.properties")
