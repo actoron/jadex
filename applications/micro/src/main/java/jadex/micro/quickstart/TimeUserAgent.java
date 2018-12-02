@@ -18,17 +18,18 @@ import jadex.micro.annotation.AgentServiceQuery;
 public class TimeUserAgent
 {
 	/**
-	 *  The time services are searched and added whenever a new one is found.
+	 *  Subscribe to any newly found time service and print the results when they arrive.
 	 */
 	@AgentServiceQuery(scope=ServiceScope.GLOBAL)
 	public void	addTimeService(ITimeService timeservice)
 	{
+		String	location	= timeservice.getLocation().get();
 		ISubscriptionIntermediateFuture<String>	subscription = timeservice.subscribe();
 		while(subscription.hasNextIntermediateResult())
 		{
 			String time = subscription.getNextIntermediateResult();
 			String platform	= ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
-			System.out.println("New time received from "+platform+/*" at "+timeservice.getLocation()+*/": "+time);
+			System.out.println("New time received from "+platform+" at "+location+": "+time);
 		}
 	}
 	

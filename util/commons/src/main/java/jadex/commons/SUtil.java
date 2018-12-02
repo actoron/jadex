@@ -37,9 +37,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
-import java.security.Provider.Service;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.text.DateFormat;
@@ -5935,6 +5933,52 @@ public class SUtil
 	        return string;
 	    }
 	}
+	
+	/**
+	 *  Determine the location of the local computer
+	 *  using some GeoIP web service.
+	 *  @return The location as [<city>][, ][<country>] depending on what's available.
+	 */
+	public static String	getGeoIPLocation()
+	{
+		try
+		{
+			// These free-to-try geoip services have (almost) the same result format.
+//			Scanner scanner	= new Scanner(new URL("http://ipinfo.io/json").openStream(), "UTF-8");
+//			Scanner scanner	= new Scanner(new URL("http://api.petabyet.com/geoip/").openStream(), "UTF-8");
+			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/json/").openStream(), "UTF-8");	// use "country_name"
+//			Scanner scanner	= new Scanner(new URL("http://ip-api.com/json").openStream(), "UTF-8");
+			
+			// Very simple JSON parsing, matches ..."key": "value"... parts to find country and city.
+			String	country	= null;
+			String	city	= null;
+			scanner.useDelimiter(",");
+			while(scanner.findWithinHorizon("\"([^\"]*)\"[^:]*:[^\"]*\"([^\"]*)\"", 0)!=null)
+			{
+				String	key	= scanner.match().group(1);
+				String	val	= scanner.match().group(2);
+//				if("country".equals(key))
+				if("country_name".equals(key))
+				{
+					country	= val;
+				}
+				else if("city".equals(key))
+				{
+					city	= val;
+				}
+			}
+			scanner.close();
+			
+			return city!=null
+				? country!=null ? city+", "+country : city
+				: country!=null ? country : "unknown";
+		}
+		catch(Exception e)
+		{
+			return "unknown";
+		}
+	}
+
 	
 	/**
 	 *  Ensures SecureRandom use is nonblocking in all cases.

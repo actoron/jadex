@@ -5,6 +5,7 @@ import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
@@ -18,26 +19,30 @@ import jadex.micro.annotation.AgentServiceQuery;
 public class NonblockingTimeUserAgent
 {
 	/**
-	 *  The time services are searched and added whenever a new one is found.
+	 *  Subscribe to any newly found time service and print the results when they arrive.
 	 */
 	@AgentServiceQuery(scope=ServiceScope.GLOBAL)
 	public void	addTimeService(final ITimeService timeservice)
 	{
-		ISubscriptionIntermediateFuture<String> subscription	= timeservice.subscribe();
-		subscription.addResultListener(new IntermediateDefaultResultListener<String>()
+		timeservice.getLocation().addResultListener(new DefaultResultListener<String>()
 		{
-			/**
-			 *  This method gets called for each received time submission.
-			 */
-			public void intermediateResultAvailable(String time)
+			@Override
+			public void resultAvailable(String location)
 			{
-				String	platform	= ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
-				System.out.println("New time received from "+platform+/*" at "+timeservice.getLocation()+*/": "+time);
-
-//				String	platform	= ((IService)timeservice).getId().getProviderId().getPlatformName();
-//				System.out.println("New time received from "+platform+/*" at "+timeservice.getLocation()+*/": "+time);
+				ISubscriptionIntermediateFuture<String> subscription	= timeservice.subscribe();
+				subscription.addResultListener(new IntermediateDefaultResultListener<String>()
+				{
+					/**
+					 *  This method gets called for each received time submission.
+					 */
+					public void intermediateResultAvailable(String time)
+					{
+						String	platform	= ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
+						System.out.println("New time received from "+platform+" at "+location+": "+time);
+					}
+				});				
 			}
-		});				
+		});
 	}	
 	
 	/**
