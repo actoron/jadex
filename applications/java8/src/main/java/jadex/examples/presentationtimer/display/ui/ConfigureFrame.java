@@ -37,14 +37,14 @@ public class ConfigureFrame extends JFrame {
 			}
 		});
 
-		contentPane.add(new JLabel("Zeit für gelbe Ansicht (mm:ss): "));
+		contentPane.add(new JLabel("Zeit fuer gelbe Ansicht (mm:ss): "));
 		contentPane.add(new JTextField("01:00") {
 			{
 				infoTimeTF = this;
 			}
 		});
 
-		contentPane.add(new JLabel("Zeit für rote Ansicht (mm:ss): "));
+		contentPane.add(new JLabel("Zeit fuer rote Ansicht (mm:ss): "));
 		contentPane.add(new JTextField("00:15") {
 			{
 				warningTimeTF = this;
@@ -103,7 +103,7 @@ public class ConfigureFrame extends JFrame {
 					
 					
 				} else {
-					fehlerLabel.setText("info und warnzeit müssen größer als Gesamtzeit sein!");
+					fehlerLabel.setText("info und warnzeit muessen groesser als Gesamtzeit sein!");
 				}
 				
 				
