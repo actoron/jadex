@@ -404,6 +404,7 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, final Map<String, Object> args)
 	{
+//		System.out.println("Java Version: " + System.getProperty("java.version"));
 		final IPlatformConfiguration config = pconfig!=null? pconfig: PlatformConfigurationHandler.getDefault();
 		
 //		if(!Boolean.TRUE.equals(config.getValues().get("bisimulation")))
