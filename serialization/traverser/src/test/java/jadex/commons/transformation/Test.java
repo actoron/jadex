@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -135,6 +136,7 @@ public abstract class Test extends TestCase
 				testClass();
 				testClassInfo();
 				testDate();
+				testDateFormat();
 				testUUID();
 				testInnerClass();
 				testURL();
@@ -201,7 +203,7 @@ public abstract class Test extends TestCase
 		//(new RuntimeException()).printStackTrace();
 		Object written = doWrite(wo);
 		
-//		System.out.println("written is:"+new String((byte[])written));
+//		System.out.println("written is:"+new String((byte[])written, "UTF-8"));
 		
 		Object ro = doRead(written);
 		
@@ -812,6 +814,24 @@ public abstract class Test extends TestCase
 	public void testDate() throws Exception
 	{
 		doWriteAndRead(new java.util.Date());
+	}
+	
+	/**
+	 *  Test if date format transfer works.
+	 */
+	public void testDateFormat() throws Exception
+	{
+		doWriteAndRead(DateFormat.getDateTimeInstance(),
+			new Comparator<DateFormat>()
+		{
+			@Override
+			public int compare(DateFormat df1, DateFormat df2)
+			{
+				// Hack!!! Currently date formats are not unmarshalled as equal, but output should be the same.
+				Date	d	= new Date();
+				return  df1.format(d).compareTo(df2.format(d));
+			}
+		});
 	}
 	
 	/**

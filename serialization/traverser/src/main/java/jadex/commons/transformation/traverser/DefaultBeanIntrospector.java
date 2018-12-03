@@ -126,22 +126,26 @@ public class DefaultBeanIntrospector implements IBeanIntrospector
 					List<Method> setters = new ArrayList<Method>();
 					for(int i=0; i<ms.length; i++)
 					{
-						String method_name = ms[i].getName();
-						if(ms[i].getParameterTypes().length==0)
+						// Only consider non-static methods
+						if((ms[i].getModifiers()&Modifier.STATIC)==0)
 						{
-							if(method_name.startsWith("is"))
+							String method_name = ms[i].getName();
+							if(ms[i].getParameterTypes().length==0)
 							{
-								getters.put(method_name.substring(2), ms[i]);
+								if(method_name.startsWith("is"))
+								{
+									getters.put(method_name.substring(2), ms[i]);
+								}
+								else if(method_name.startsWith("get"))
+								{
+									getters.put(method_name.substring(3), ms[i]);
+								}
 							}
-							else if(method_name.startsWith("get"))
+							else if(method_name.startsWith("set")
+								&& ms[i].getParameterTypes().length == 1)
 							{
-								getters.put(method_name.substring(3), ms[i]);
+								setters.add(ms[i]);
 							}
-						}
-						else if(method_name.startsWith("set")
-							&& ms[i].getParameterTypes().length == 1)
-						{
-							setters.add(ms[i]);
 						}
 					}
 					
@@ -152,6 +156,10 @@ public class DefaultBeanIntrospector implements IBeanIntrospector
 						if(getter!=null && getter.getReturnType().equals(setter.getParameterTypes()[0]))
 						{
 							propname = Character.toLowerCase(propname.charAt(0)) + propname.substring(1);
+							if(!Character.isJavaIdentifierStart(propname.charAt(0)))
+							{
+								propname = "_" + propname;	// e.g. DateFormat.get2DigitYearStart() -> _2DigitYearStart
+							}
 							beanprops.put(propname, createBeanProperty(propname, getter.getReturnType(), getter, setter, setter.getParameterTypes()[0], getter.getGenericReturnType()));
 						}
 					}

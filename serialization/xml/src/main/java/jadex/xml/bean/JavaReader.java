@@ -9,10 +9,12 @@ import java.net.URI;
 import java.net.URL;
 import java.security.cert.CertificateFactory;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Currency;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -96,6 +98,8 @@ public class JavaReader
 	 *  - Array
 	 *  - java.util.Color
 	 *  - java.util.Date
+	 *  - java.util.Calendar
+	 *  - java.util.Currency
 	 *  - java.lang.Class
 	 *  - java.net.URL
 	 *  - java.logging.Level
@@ -302,9 +306,35 @@ public class JavaReader
 					new AttributeInfo(new AccessInfo("classname", null, AccessInfo.IGNORE_READWRITE))
 				}
 			));
-//				new ObjectInfo(Date.class), new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("time", null))}));
 			typeinfos.add(ti_calendar);	
+
+			// java.util.Currency
+			TypeInfo ti_currency = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Currency")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
+					{
+						return Currency.getInstance((String)rawattributes.get("currencyCode"));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("currencyCode", null, AccessInfo.IGNORE_READWRITE))
+				}
+			));
+			typeinfos.add(ti_currency);
 			
+			// java.text.SimpleDateFormat
+			// Pattern managed with applyPattern(String) and String toPattern() grrrr.
+			TypeInfo ti_simpledateformat = new TypeInfo(new XMLInfo(new QName(SXML.PROTOCOL_TYPEINFO+"java.text", "SimpleDateFormat")),
+				new ObjectInfo(SimpleDateFormat.class), 
+				new MappingInfo(null, null, null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("pattern", null, null, null,
+					new BeanAccessInfo(SimpleDateFormat.class.getMethod("applyPattern", String.class),
+						SimpleDateFormat.class.getMethod("toPattern"))))},
+				null, true, null, null	// Include methods for DateFormat properties
+			));
+			typeinfos.add(ti_simpledateformat);
+
 			TypeInfo ti_biginteger = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.math", "BigInteger")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{

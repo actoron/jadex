@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import jadex.commons.SUtil;
+
 
 /**
  *  Implementation of the subscription intermediate future.
@@ -223,7 +225,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 				ownresults.put(Thread.currentThread(), ownres);
 			}
 			
-    		ret	= !ownres.isEmpty();
+    		ret	= !ownres.isEmpty() || isDone() && getException()!=null;
     		suspend	= !ret && !isDone();
     		if(suspend)
     		{
@@ -301,7 +303,10 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     		}
     		else if(isDone())
     		{
-    			throw new NoSuchElementException("No more intermediate results.");
+    			if(getException()!=null)
+    				throw SUtil.throwUnchecked(getException());
+    			else
+    				throw new NoSuchElementException("No more intermediate results.");
     		}
     		else
     		{
