@@ -423,14 +423,17 @@ public class PlatformAgent
 		if (provservsinfo != null)
 		{
 			Object[] provservs = (Object[]) provservsinfo.getValue("value");
-			for (Object provserv : SUtil.notNull(provservs))
+			if (provservs != null)
 			{
-				AnnotationInfo provservinfo = (AnnotationInfo) provserv;
-				String ifacename = ((ClassInfo) provservinfo.getValue("type")).getClassName();
-				if (isSystemInterface(ifacename, cl))
+				for (Object provserv : provservs)
 				{
-//					System.out.println("System because of provided service declaration: " + ci);
-					return true;
+					AnnotationInfo provservinfo = (AnnotationInfo) provserv;
+					String ifacename = ((ClassInfo) provservinfo.getValue("type")).getClassName();
+					if (isSystemInterface(ifacename, cl))
+					{
+	//					System.out.println("System because of provided service declaration: " + ci);
+						return true;
+					}
 				}
 			}
 		}

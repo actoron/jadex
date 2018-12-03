@@ -3195,13 +3195,16 @@ public class SUtil
 		}
 		
 		ArrayList<URL> tmpurl = new ArrayList<>();
-		for (URL url : SUtil.notNull(urls))
+		if (urls != null)
 		{
-			File urlfile = SUtil.getFile(url);
-			if (urlfile == null || !javalibdirs.contains(urlfile.getParentFile()))
-				tmpurl.add(url);
-//			else
-//				System.out.println("Excluded: " + url);
+			for (URL url : urls)
+			{
+				File urlfile = SUtil.getFile(url);
+				if (urlfile == null || !javalibdirs.contains(urlfile.getParentFile()))
+					tmpurl.add(url);
+	//			else
+	//				System.out.println("Excluded: " + url);
+			}
 		}
 		return tmpurl.toArray(new URL[tmpurl.size()]);
 	}
@@ -5769,21 +5772,6 @@ public class SUtil
 		else
 		{
 			return Collections.emptyMap();
-		}
-	}
-	
-	/**
-	 *  Helper method to allow iterating over possibly null array.
-	 */
-	public static <T> T[] notNull(T[] array)
-	{
-		if(array!=null)
-		{
-			return array;
-		}
-		else
-		{
-			return (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
 		}
 	}
 	

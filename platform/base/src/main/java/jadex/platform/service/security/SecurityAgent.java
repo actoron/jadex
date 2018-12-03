@@ -91,15 +91,6 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
  */
 @Agent(autostart=Boolean3.TRUE,
 	predecessors="jadex.platform.service.clock.ClockAgent")
-@Arguments(value={
-	@Argument(name="usesecret", clazz=Boolean.class, defaultvalue="null"),
-	@Argument(name="printsecret", clazz=Boolean.class, defaultvalue="null"),
-	@Argument(name="refuseunauth", clazz=Boolean.class, defaultvalue="null"),
-	@Argument(name="platformsecret", clazz=String[].class, defaultvalue="null"),
-	@Argument(name="networknames", clazz=String[].class, defaultvalue="null"),
-	@Argument(name="networksecrets", clazz=String[].class, defaultvalue="null"),
-	@Argument(name="roles", clazz=String.class, defaultvalue="null")
-})
 //@Service // This causes problems because the wrong preprocessor is used (for pojo services instead of remote references)!!!
 @ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
