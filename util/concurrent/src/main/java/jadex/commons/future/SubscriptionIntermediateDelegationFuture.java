@@ -212,7 +212,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 				ownresults.put(Thread.currentThread(), ownres);
 			}
 			
-    		ret	= !ownres.isEmpty();
+    		ret	= !ownres.isEmpty() || isDone() && getException()!=null;
     		suspend	= !ret && !isDone();
     		if(suspend)
     		{
@@ -290,8 +290,10 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     		}
     		else if(isDone())
     		{
-    			throw new NoSuchElementException("No more intermediate results"
-    				+ (getException()==null ? "." : ": exception="+SUtil.getExceptionStacktrace(getException())));
+    			if(getException()!=null)
+    				throw SUtil.throwUnchecked(getException());
+    			else
+    				throw new NoSuchElementException("No more intermediate results.");
     		}
     		else
     		{
