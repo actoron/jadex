@@ -2,6 +2,7 @@ package jadex.micro.quickstart;
 
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 
@@ -15,13 +16,11 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 @Service
 public interface ITimeService
 {
-//	/**
-//	 *  Get the location of the platform, where the time service runs.
-//	 *  The location is a constant value for each service, therefore it can be cached
-//	 *  and no future is needed.
-//	 */
+	/**
+	 *  Get the location of the platform, where the time service runs.
+	 */
 	// TODO: support for cached methods, yes or no? -> otherwise forbid or support sync?
-//	public String	getLocation();
+	public IFuture<String>	getLocation();
 	
 	/**
 	 *  Subscribe to the time service.
