@@ -57,13 +57,13 @@ public class NanoRestPublishService extends ExternalRestPublishService
 		{
 			System.out.println("serve called: "+session.getUri());
 			
-//			HttpServletRequest req = null;
-//			HttpServletResponse resp = null;
-//			
-//			handleRequest(req, resp, null).get();
-////			resp.get
-//			
-//			newFixedLengthResponse(IStatus);
+			HttpServletRequestWrapper req = new HttpServletRequestWrapper(session);
+			HttpServletResponseWrapper resp = new HttpServletResponseWrapper(session);
+			
+			handleRequest(req, resp, null).get();
+			
+			
+//			newFixedLengthResponse();
 			
 			return null;
 		}
