@@ -1,5 +1,7 @@
 package jadex.micro.quickstart;
 
+import java.text.DateFormat;
+
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
@@ -27,5 +29,5 @@ public interface ITimeService
 	 *  Every couple of seconds, a string with the current time will be
 	 *  sent to the subscriber.
 	 */
-	public ISubscriptionIntermediateFuture<String>	subscribe();
+	public ISubscriptionIntermediateFuture<String>	subscribe(DateFormat format);
 }

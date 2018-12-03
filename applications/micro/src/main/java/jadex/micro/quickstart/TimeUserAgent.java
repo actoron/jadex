@@ -1,5 +1,6 @@
 package jadex.micro.quickstart;
 
+import java.text.DateFormat;
 import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
@@ -24,7 +25,8 @@ public class TimeUserAgent
 	public void	addTimeService(ITimeService timeservice)
 	{
 		String	location	= timeservice.getLocation().get();
-		ISubscriptionIntermediateFuture<String>	subscription = timeservice.subscribe();
+		DateFormat	format	= DateFormat.getDateTimeInstance();
+		ISubscriptionIntermediateFuture<String>	subscription = timeservice.subscribe(format);
 		while(subscription.hasNextIntermediateResult())
 		{
 			String time = subscription.getNextIntermediateResult();
