@@ -54,7 +54,7 @@ public class JsonTest extends jadex.commons.transformation.Test
 		exs.add("b");
 		ex.put(A.class, exs);
 		String ret = JsonTraverser.objectToString(a, null, false, ex);
-		System.out.println("ret: " + ret);
+//		System.out.println("ret: " + ret);
 		
 		assertTrue(ret.contains("\"s\""));
 		assertTrue(!ret.contains("\"b\":"));

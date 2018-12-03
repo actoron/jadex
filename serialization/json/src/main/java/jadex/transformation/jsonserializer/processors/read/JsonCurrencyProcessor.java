@@ -1,22 +1,23 @@
-package jadex.transformation.jsonserializer.processors.write;
+package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Type;
+import java.util.Currency;
 import java.util.List;
+
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
- * 
+ *  Read java.util.Currency objects.
  */
-public class JsonThrowableProcessor extends JsonBeanProcessor
+public class JsonCurrencyProcessor implements ITraverseProcessor
 {
-	// TODO: reduce LRU size?
-//	/** Bean introspector for inspecting beans. */
-//	protected IBeanIntrospector intro = BeanIntrospectorFactory.getInstance().getBeanIntrospector(500);
-	
 	/**
 	 *  Test if the processor is applicable.
 	 *  @param object The object.
@@ -27,7 +28,7 @@ public class JsonThrowableProcessor extends JsonBeanProcessor
 	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
-		return SReflect.isSupertype(Throwable.class, clazz);
+		return object instanceof JsonObject && SReflect.isSupertype(Currency.class, clazz);
 	}
 	
 	/**
@@ -39,44 +40,15 @@ public class JsonThrowableProcessor extends JsonBeanProcessor
 	 */
 	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
-		JsonWriteContext wr = (JsonWriteContext)context;
-		wr.addObject(wr.getCurrentInputObject());
+		JsonObject obj = (JsonObject)object;
+		String	code = obj.getString("currencyCode", null);
+		Currency	ret	= Currency.getInstance(code);
 		
-		Throwable t = (Throwable)object;
+		JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
+		if(idx!=null)
+			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 		
-		wr.write("{");
-		
-		boolean first = true;
-		if(wr.isWriteClass())
-		{
-			wr.writeClass(object.getClass());
-			first = false;
-		}
-		
-		if(t.getMessage()!=null)
-		{
-			if(!first)
-				wr.write(",");
-			wr.write("\"msg\":");
-			traverser.doTraverse(t.getMessage(), String.class, conversionprocessors, processors, mode, targetcl, context);
-			first = false;
-		}
-		if(t.getCause()!=null)
-		{
-			if(!first)
-				wr.write(",");
-			wr.write("\"cause\":");
-			Object val = t.getCause();
-			traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, conversionprocessors, processors, mode, targetcl, context);
-			first = false;
-		}
-		
-		traverseProperties(object, conversionprocessors, processors, mode, traverser, targetcl, context, intro, first);
-		
-		wr.write("}");
-		
-		return object;
+		return ret;
+
 	}
 }
-
-
