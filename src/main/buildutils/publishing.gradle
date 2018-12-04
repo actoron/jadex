@@ -233,7 +233,36 @@ publishing {
                 artifactId getArtifactName(project)
                 //println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
                 version project.version
-                configurePom(pom)
+//                configurePom(pom)
+				pom.withXml {
+					def root = asNode()
+					root.appendNode('description', project.description)
+					root.appendNode('name', project.name)
+					if (isAndroidProject(project)) {
+						root.get('packaging').get(0).setValue('aar')
+						def dependenciesNode = asNode().appendNode('dependencies')
+						project.configurations.implementation.allDependencies.each {
+							// Ensure dependencies such as fileTree are not included.
+							if (it.name != 'unspecified') {
+								def dependencyNode = dependenciesNode.appendNode('dependency')
+								dependencyNode.appendNode('groupId', it.group)
+								dependencyNode.appendNode('artifactId', it.name)
+								dependencyNode.appendNode('version', it.version)
+							}
+						}
+					} else if (!root.get('packaging').isEmpty()) {
+						root.remove(root.get('packaging'))
+					}
+					root.children().last() + PomConfig.common
+					root.children().last() + PomConfig.gpl
+			
+					// workaround for compile-time scope in POMs: (remove with gradle 4.7 or something)
+					asNode().dependencies.'*'.findAll() {
+					it.scope.text() == 'runtime' && project.configurations.compile.allDependencies.find { dep ->
+						dep.name == it.artifactId.text()
+					}
+					}.each { it.scope*.value = 'compile' }
+				}
 //                pom.withXml() {
 //                    // remove once on gradle 4.8:
 //                    // signing workaround for gradle 4.7:
