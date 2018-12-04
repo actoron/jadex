@@ -390,12 +390,22 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				}
 				
 				ClassLoader found = null;
-				for(ClassLoader tmpcl: pas)
+				if (ClassLoader.getSystemClassLoader().getResource(fname)!=null)
 				{
-					if(tmpcl.getResource(fname)!=null)
+					// If the system classloader has the class, it MUST be enahnced there
+					// because all classloaders use it as parent even if setParent(null) was
+					// called on them.
+					found = ClassLoader.getSystemClassLoader();
+				}
+				else
+				{
+					for(ClassLoader tmpcl: pas)
 					{
-						found = tmpcl;
-						break;
+						if(tmpcl.getResource(fname)!=null)
+						{
+							found = tmpcl;
+							break;
+						}
 					}
 				}
 				
