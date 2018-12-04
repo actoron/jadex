@@ -401,7 +401,13 @@ subprojects
 	addSourcesJarTask(project)
 
 	// needs to be applied after android + java plugins:
-	apply from: "$rootDir/src/main/buildutils/publishing.gradle"
+	if(project.getChildProjects().isEmpty()) {
+//		println 'publishing leaf project ' + project
+		apply from: "$rootDir/src/main/buildutils/publishing.gradle"
+	}
+//	else {
+//		println 'not publishing grouping project ' + project
+//	}
 
 	
 	// process schemas and generate schemadocs
