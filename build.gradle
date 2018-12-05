@@ -450,6 +450,7 @@ subprojects
 		project.parent!=null && project.parent.name.equals("addons")
 			? 'addon'+project.name : null
 	if(distname!=null) {
+//		println 'dist: ' + distname + ', ' +isAddon([distname])
 		def arts = gradle.ext.distartmap.get(distname)
 		def prefixsize	= rootProject.projectDir.canonicalPath.length()
 		project.tasks.create([name: "srcZip", type: Zip, dependsOn: rootProject.createVersionInfo]) {
@@ -460,7 +461,7 @@ subprojects
 			def projs = new HashSet();	// keep track of added projects to avoid duplicates
 			arts.each { artname ->
 				Project sp = subprojectmap.get(artname)
-				while((isAddon(distname)?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
+				while((isAddon([distname])?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
 					projs.add(sp);
 					from(sp.projectDir) {
 						into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
@@ -470,7 +471,7 @@ subprojects
 					sp	= sp.parent;
 				}
 			}
-			if(!isAddon(distname)) {
+			if(!isAddon([distname])) {
 				// Add preprocessed version properties
 				from(rootProject.buildDir.getCanonicalPath()) {
 					into 'sources/src/main/buildutils'

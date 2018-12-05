@@ -63,6 +63,7 @@ gradle.ext.distartmap.put('everything', allprojects)
 /* Add metapackages */
 allprojects.each { proj ->
 	if (proj.startsWith(':' + metaprefix)) {
+		// For distributions: add project and all transitive project dependencies
 		def metaname = proj.substring(1 + metaprefix.length())
 		HashSet set = new HashSet<String>();
 		addDependency(proj, projdeps, set);
@@ -71,9 +72,11 @@ allprojects.each { proj ->
 		gradle.ext.distartmap.put(metaname, set);
 	}
 	else if (proj.startsWith(':' + addonprefix)) {
+		// For addons: add project and direct dependencies only
 		def metaname = 'addon' + proj.substring(1 + addonprefix.length())
 		HashSet set = new HashSet<String>();
-		addDependency(proj, projdeps, set);
+		set.add(proj)
+		set.addAll(projdeps.get(proj))
 		List<String> extraarts = getExtraArtifacts(proj)
 		set.addAll(extraarts);
 		gradle.ext.distartmap.put(metaname, set);
