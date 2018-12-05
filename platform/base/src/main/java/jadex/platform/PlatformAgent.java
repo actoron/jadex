@@ -169,15 +169,36 @@ public class PlatformAgent
 		// Class name -> instance name
 		Map<String, String> names = new HashMap<String, String>();
 
-		URL[] urls = new URL[0];
+		Set<URL> urlset = new HashSet<>();
+		String[] cpaths = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
+		if (cpaths != null)
+		{
+			for (String cpath : cpaths)
+			{
+				try
+				{
+					File file = new File(cpath);
+					if (file.exists())
+					{
+						URL url = file.toURI().toURL();
+						urlset.add(url);
+					}
+				}
+				catch(Exception e)
+				{
+				}
+			}
+		}
 		ClassLoader classloader = PlatformAgent.class.getClassLoader();
 		if(classloader instanceof URLClassLoader)
-			urls = ((URLClassLoader)classloader).getURLs();
+			urlset.addAll(Arrays.asList(((URLClassLoader)classloader).getURLs()));
+		URL[] urls = urlset.toArray(new URL[urlset.size()]);
 		
 		// Remove JVM jars
 		urls = SUtil.removeSystemUrls(urls);
 		
 		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
+		
 		List<CreationInfo> infos = new ArrayList<>();
 		for (ClassInfo ci : cis)
 		{
@@ -423,14 +444,17 @@ public class PlatformAgent
 		if (provservsinfo != null)
 		{
 			Object[] provservs = (Object[]) provservsinfo.getValue("value");
-			for (Object provserv : SUtil.notNull(provservs))
+			if (provservs != null)
 			{
-				AnnotationInfo provservinfo = (AnnotationInfo) provserv;
-				String ifacename = ((ClassInfo) provservinfo.getValue("type")).getClassName();
-				if (isSystemInterface(ifacename, cl))
+				for (Object provserv : provservs)
 				{
-//					System.out.println("System because of provided service declaration: " + ci);
-					return true;
+					AnnotationInfo provservinfo = (AnnotationInfo) provserv;
+					String ifacename = ((ClassInfo) provservinfo.getValue("type")).getClassName();
+					if (isSystemInterface(ifacename, cl))
+					{
+	//					System.out.println("System because of provided service declaration: " + ci);
+						return true;
+					}
 				}
 			}
 		}

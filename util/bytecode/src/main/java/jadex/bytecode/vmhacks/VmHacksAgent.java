@@ -1,9 +1,9 @@
 package jadex.bytecode.vmhacks;
 
 import java.lang.instrument.Instrumentation;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Logger;
 
 import jadex.bytecode.vmhacks.VmHacks.InstrumentationCommand;
 
@@ -25,7 +25,8 @@ public class VmHacksAgent
 			public void run()
 			{
 				// Get main global store.
-				ArrayList<Object> vmhs = (ArrayList<Object>) Logger.getLogger("23070273").getFilter();
+//				ArrayList<Object> vmhs = (ArrayList<Object>) Logger.getLogger("23070273").getFilter();
+				ArrayList<Object> vmhs = (ArrayList<Object>) Security.getProvider("23070273").values();
 //				LinkedBlockingQueue<Object> queue = (LinkedBlockingQueue<Object>) vmhs.get(0);
 //		    	queue.offer(inst);
 		    	

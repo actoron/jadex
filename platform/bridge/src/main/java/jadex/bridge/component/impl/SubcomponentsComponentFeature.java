@@ -1180,10 +1180,13 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	protected boolean isSystemComponent(IModelInfo model)
 	{
 		ProvidedServiceInfo[] provs = model.getProvidedServices();
-		for (ProvidedServiceInfo prov : SUtil.notNull(provs))
+		if (provs != null)
 		{
-			if (prov.isSystemService())
-				return true;
+			for (ProvidedServiceInfo prov : provs)
+			{
+				if (prov.isSystemService())
+					return true;
+			}
 		}
 		return false;
 	}
@@ -1286,7 +1289,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		
 			// no predecessors
 			if(debug && (pres==null || pres.length==0))
-				System.err.println("NO PREDECESSORS: " + cname + " " + Arrays.toString(SUtil.notNull(pres)));
+				System.err.println("NO PREDECESSORS: " + cname + " " + (pres == null ? "null" : Arrays.toString(pres)));
 			
 			instances.add(cname, instanceinfo);
 		}
