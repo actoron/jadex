@@ -72,8 +72,9 @@ allprojects.each { proj ->
 	}
 	else if (proj.startsWith(':' + addonprefix)) {
 		def metaname = 'addon' + proj.substring(1 + addonprefix.length())
+		HashSet set = new HashSet<String>();
+		addDependency(proj, projdeps, set);
 		List<String> extraarts = getExtraArtifacts(proj)
-		HashSet set = new HashSet<String>(projdeps.get(proj));
 		set.addAll(extraarts);
 		gradle.ext.distartmap.put(metaname, set);
 	}
@@ -190,7 +191,7 @@ def addProjectDir(projects, dir, blacklist, prefix)
 		{
 			if (prefix != null){
 				projects.add(prefix + dir.getName())
-				//println 'added !!!!! ' + prefix + dir.getName()
+//				println 'added !!!!! ' + prefix + dir.getName()
 			}
 			isgradle = true
 		}

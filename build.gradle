@@ -137,6 +137,18 @@ allprojects
 	}
 }
 
+
+// Create version.properties with new timestamp (i.e. after clean)
+task createVersionInfo(type: Copy) {
+	into project.buildDir.getCanonicalPath()
+	from('src/main/buildutils') {
+		include 'jadexversion.properties'
+		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: project.ext.timestamp)
+	}
+}
+createVersionInfo.mustRunAfter clean
+
+
 subprojects
 {
     def mainSrcDir  = 'src/main/java'
@@ -430,6 +442,43 @@ subprojects
     {
 		task allDeps(type: DependencyReportTask) {}
 	}*/
+	
+	// Add srcZip<Dist> tasks for project, if it is a dist project
+	def	distname	=
+		project.parent!=null && project.parent.name.equals("distributions")
+			? project.name :
+		project.parent!=null && project.parent.name.equals("addons")
+			? 'addon'+project.name : null
+	if(distname!=null) {
+		def arts = gradle.ext.distartmap.get(distname)
+		def prefixsize	= rootProject.projectDir.canonicalPath.length()
+		project.tasks.create([name: "srcZip", type: Zip, dependsOn: rootProject.createVersionInfo]) {
+			destinationDir new File(rootProject.distsDir, "sources")
+			archiveName 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
+			
+			// Add all included artifact projects and their parents (but exclude root project for addons)
+			def projs = new HashSet();	// keep track of added projects to avoid duplicates
+			arts.each { artname ->
+				Project sp = subprojectmap.get(artname)
+				while((isAddon(distname)?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
+					projs.add(sp);
+					from(sp.projectDir) {
+						into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
+						includes = ['*.properties', '*.gradle', 'src/**', 'dist/**', 'lib/**', 'gradle/**', 'gradlew*']
+						excludes = ['secret.properties', '**/.gradle', 'src/main/config', 'src/main/buildutils/jadexversion.properties']
+					}
+					sp	= sp.parent;
+				}
+			}
+			if(!isAddon(distname)) {
+				// Add preprocessed version properties
+				from(rootProject.buildDir.getCanonicalPath()) {
+					into 'sources/src/main/buildutils'
+					includes = ['jadexversion.properties']
+				}
+			}
+		}
+	}
 }
 
 task copyJavaDocSources(type: Copy) {
@@ -460,44 +509,6 @@ task copyJavaDocSources(type: Copy) {
 	}
 }
 
-
-//def readVersionInfo() {
-//	def timestamp = "nix"
-//	println 'timestamp: ' + timestamp
-//	// Get timestamp from sources if defined (i.e. build from dist sources)
-//	def propFile = new File(project.projectDir, "util/commons/src/main/java/jadex/bridge/version.properties")
-//	if (propFile.exists()) {
-//		def props = new Properties()
-//		props.load(new FileReader(propFile))
-//		def	propstamp	= props.getProperty("jadex_build_timestamp")
-//		timestamp = propstamp.equals('${timestamp}') ? null : propstamp
-//	}
-//	println 'timestamp: ' + timestamp
-//	// Get timestamp from previous (not-cleaned) build or generate new timestamp (i.e. build from git sources)
-//	if(timestamp==null) {
-//		def props = new Properties()
-//		propFile = new File(project.buildDir, "jadexversion.properties")
-//		println 'propsfile: ' +propFile.getCanonicalPath()
-//		if (propFile.exists()) {
-//			props.load(new FileReader(propFile))
-//		}
-//		timestamp = props.getProperty("jadextimestamp")
-//		println 'timestamp: '+timestamp
-//		timestamp	= timestamp!=null ? timestamp : new Date().format('yyyyMMdd.HHmmss')
-//		println 'timestamp: '+timestamp
-//	}
-//	return timestamp
-//}
-
-// Create version.properties with new timestamp (i.e. after clean)
-task createVersionInfo(type: Copy) {
-	into project.buildDir.getCanonicalPath()
-	from('src/main/buildutils') {
-		include 'jadexversion.properties'
-		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: project.ext.timestamp)
-	}
-}
-createVersionInfo.mustRunAfter clean
 
 
 task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
@@ -583,34 +594,17 @@ task exampleZips {
 	}
 }
 
-task srcZip(dependsOn: createVersionInfo) {
-	inputs.files(gradle.ext.maindistartifacts)
-	outputs.dir('sources')
-	doLast {
-		createSrcZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
-	}
-}
-
-task srcZips(dependsOn: createVersionInfo) {
-	gradle.ext.selecteddists.parallelStream().forEach { selecteddist ->
-		def arts = gradle.ext.distartmap.get(selecteddist)
-		inputs.files(arts)
-		outputs.dir('sources')
-		doLast {
-			createSrcZip(selecteddist, arts, selecteddist.startsWith('addon'))
-		}
-	}
-}
-
-task distZip(dependsOn: [subprojects.build, srcZip, exampleZips]) {
+task distZip(dependsOn: [subprojects.build, exampleZips]) {
 	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
 
+	inputs.files(gradle.ext.maindistartifacts)
+	outputs.dir('sources')
 	doLast {
 		createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
 	}
 }
 
-task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
+task distZips(dependsOn: [subprojects.build, exampleZips])  {
 	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
 
 	doLast {
@@ -791,84 +785,6 @@ def createDistZip(distname, arts, isaddon)
 	}
 }
 
-def createSrcZip(distname, arts, isaddon)
-{
-	//-------- new gradle zip for reproducibility support --------
-	def prefixsize	= project.projectDir.canonicalPath.length()
-	project.tasks.create([name: "srcZip"+distname.substring(0,1).toUpperCase()+distname.substring(1), type: Zip]) {
-		destinationDir new File(project.distsDir, "sources")
-		archiveName 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
-		
-		// Add all included artifact projects and their parents (but exclude root project for addons)
-		def projs = new HashSet();	// keep track of added projects to avoid duplicates
-		arts.each { artname ->
-			Project sp = subprojectmap.get(artname)
-			while((isaddon?sp!=project:sp!=null) && !projs.contains(sp)) {
-				projs.add(sp);				
-				from(sp.projectDir) {
-					into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
-					includes = ['*.properties', '*.gradle', 'src/**', 'dist/**', 'lib/**', 'gradle/**', 'gradlew*']
-					excludes = ['secret.properties', '**/.gradle', 'src/main/config', 'src/main/buildutils/jadexversion.properties']
-				}
-				sp	= sp.parent;
-			}
-		}
-		if(!isaddon) {
-			// Add preprocessed version properties
-			from(project.buildDir.getCanonicalPath()) {
-				into 'sources/src/main/buildutils'
-				includes = ['jadexversion.properties']
-			}
-		}
-	}.execute()
-	
-//	//-------- old ant zip for reference --------
-//	def mainzipdir = 'sources/'
-//	String maindir = project.projectDir.getCanonicalPath()
-//	String zipfilename = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sourcesOld.zip'
-//	def ant = new groovy.util.AntBuilder()
-//	ant.sequential {
-//		zip destfile: zipfilename,
-//		{
-//			Set<String> toplevels = new HashSet();
-//			arts.each { artname ->
-//				Project sp = subprojectmap.get(artname)
-//				if (getProjectDepth(sp) > 1)
-//					toplevels.add(sp.projectDir.getCanonicalFile().getParentFile().getCanonicalPath())
-//				
-//				// each project: sources + resources
-//				String prefix = (mainzipdir + Paths.get(maindir).relativize(sp.projectDir.toPath()).toString()).replace(File.separator, "/") // handle nested paths correctly
-//				zipfileset dir: sp.projectDir.getCanonicalPath() + '/' + srcdir, prefix: prefix +'/' + srcdir,  erroronmissingdir: false
-//				// each project: dist directory
-//				zipfileset dir: sp.projectDir.getCanonicalPath() + '/dist', prefix: prefix + '/dist',  erroronmissingdir: false, excludes: '**/build/**'
-//				// each project: build script files
-//				zipfileset dir: sp.projectDir.getCanonicalPath(), prefix: prefix, includes: '*.gradle, *.properties, lib/**',  erroronmissingdir: false
-//			}
-//			
-//			for (String topdir : toplevels)
-//			{
-//				String prefix = (mainzipdir + Paths.get(maindir).relativize(Paths.get(topdir)).toString()).replace(File.separator, "/")
-//				zipfileset dir: topdir, prefix: prefix, includes: '*.gradle, *.properties, lib/**',  erroronmissingdir: false
-//			}
-//			
-//			// top-level build script files
-//			if (!isaddon) {
-//				zipfileset dir: maindir, prefix: mainzipdir, includes: '*.gradle, gradle.properties, gradle/wrapper/*', excludes: '.gradle'
-//				zipfileset dir: maindir, prefix: mainzipdir, includes: 'gradlew, gradlew.bat', filemode: 755
-//				zipfileset dir: maindir, prefix: mainzipdir, includes: 'src/main/buildutils/**/*', excludes: 'src/main/buildutils/jadexversion.properties'
-//				zipfileset dir: maindir, prefix: mainzipdir, includes: 'dependencies.conf'
-//				zipfileset dir: project.buildDir.getCanonicalPath(), prefix: mainzipdir + 'src/main/buildutils/', includes: 'jadexversion.properties'
-//			}
-//		}
-//	}
-//	
-//	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-//	def zip1 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sourcesOld.zip'
-//	def zip2 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
-//	def diff	= diffZips(zip1, zip2)
-//	if(diff.length()!=0)
-//		throw new RuntimeException("New jadex-" + distname + "-" + jadex_build_version + "-sources.zip does not match original: "+diff);
-}
 
 task performanceTest() {
 	description="Execute performance tests. Be sure to call this with a dist that includes some performance tests, such as 'everything'."
