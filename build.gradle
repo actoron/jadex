@@ -468,6 +468,11 @@ subprojects
 						includes = ['*.properties', '*.gradle', 'src/**', 'dist/**', 'lib/**', 'gradle/**', 'gradlew*']
 						excludes = ['secret.properties', '**/.gradle', 'src/main/config', 'src/main/buildutils/jadexversion.properties']
 					}
+					// Allow special files being included in source tree (e.g. readmes for building)
+					from(new File(sp.projectDir, '/dist/sources')) {
+						into 'sources'
+						includes = ['*/**']
+					}
 					sp	= sp.parent;
 				}
 			}
