@@ -540,15 +540,15 @@ subprojects
 						else if(fsp.getChildProjects().isEmpty()) {
 							if (isApp(fsp)) {
 								// Fetch war or if no war, fetch jar if any.
-								tasks	= fsp.tasks.matching {
+								def mytasks	= fsp.tasks.matching {
 									it.name.equals('war')
 								}
-								if(tasks.isEmpty()) {
-									tasks	= fsp.tasks.matching {
+								if(mytasks.isEmpty()) {
+									mytasks	= fsp.tasks.matching {
 										it.name.equals('jar')
 									}
 								}
-								tasks.each {task ->
+								mytasks.each {task ->
 									from(task.outputs) {
 										into 'jadex-'  + jadex_build_version + '/apps'
 									}

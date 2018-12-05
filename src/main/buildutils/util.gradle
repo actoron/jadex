@@ -477,6 +477,10 @@ def getArtifactName(project) {
 }
 
 def diffZips(zip1, zip2) {
+	if(!new File(zip1).exists())
+		return zip1 + " does not exist";
+	if(!new File(zip2).exists())
+		return zip2 + " does not exist";
 	def diff	= "";
 	def entries	= new HashMap();
 	new java.util.zip.ZipFile(zip1).stream()
