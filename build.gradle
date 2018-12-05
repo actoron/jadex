@@ -488,7 +488,7 @@ subprojects
 		}
 
 		// Create distZip task
-		project.tasks.create([name: "distZip", type: Zip, dependsOn: project.srcZip]) {
+		project.tasks.create([name: "distZip", type: Zip]) {
 			def commercial = false
 			archiveName 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 			
@@ -567,6 +567,13 @@ subprojects
 					sp	= sp.parent;
 				}
 			}
+			
+			// Copy generated srcZip
+			from(project.srcZip.outputs) {
+				into 'jadex-'  + jadex_build_version
+				rename {name -> isaddon ? 'sources-' + distname + '.zip' : 'sources.zip'}
+			}
+	
 			println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
 			destinationDir new File(rootProject.distsDir, commercial? 'commercial' : 'noncommercial')
 		}
