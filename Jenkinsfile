@@ -34,8 +34,8 @@ pipeline {
 	  parallel {
 		stage('Dist') {
 		  steps {
-//			sh './gradlew -Pdist=publishdists distZips -x test -x javadoc'
-			sh './gradlew -Pdist=publishdists distZips checkDists -x test -x javadoc'
+			sh './gradlew -Pdist=publishdists distZips -x test -x javadoc'
+//			sh './gradlew -Pdist=publishdists distZips checkDists -x test -x javadoc'
 		  }
 		}
 		stage('HTML/PDF Docs') {
@@ -46,6 +46,18 @@ pipeline {
 		stage('Javadocs') {
 		  steps {
 			sh './gradlew -Pdist=addonjavadoc javadocZip'
+		  }
+		}
+	  }
+	}
+	
+	// Upload to all kinds of targets
+	stage('Publish and Deploy') {
+	  parallel {
+		stage('Publish') {
+		  steps {
+		  	// TODO: move credentials to environment
+			sh './gradlew -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax'
 		  }
 		}
 	  }
