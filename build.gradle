@@ -523,14 +523,12 @@ subprojects
 				commercial |= isCommercial(sp)
 				while((isaddon?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
 					projs.add(sp);
-					
-					def spbdir = sp.buildDir.getCanonicalPath()
-	
-					if (isAndroidProject(sp)) {
-						// apps as debug version, because unsigned releases do not run on android
-						def variant	= isAndroidLibraryProject(sp) ? com.android.builder.core.BuilderConstants.RELEASE : com.android.builder.core.BuilderConstants.DEBUG;
-						def fsp	= sp	// android property only available after evaluate -> need to copy sp var to final fsp
-						sp.afterEvaluate {
+					def fsp	= sp	// project details may be configured later :( -> need to copy sp var to final fsp
+					// TODO: use correct include ordering for subprojects based on dependencies???
+					sp.afterEvaluate {
+						if (isAndroidProject(fsp)) {
+							// apps as debug version, because unsigned releases do not run on android
+							def variant	= isAndroidLibraryProject(fsp) ? com.android.builder.core.BuilderConstants.RELEASE : com.android.builder.core.BuilderConstants.DEBUG;
 							onVariantOutput(fsp, variant) {output ->
 								from(output.outputFile.getParent()) {
 									into 'jadex-'  + jadex_build_version + (isAndroidLibraryProject(fsp) ? '/lib' : '/apps')
@@ -538,37 +536,37 @@ subprojects
 								}
 							}
 						}
-					} else {
-						if (isApp(sp)) {
-							// Fetch war or if no war, fetch jar if any.
-							tasks	= sp.tasks.matching {
-								it.name.equals('war')
+						// Only collect artifacts from leaf projects
+						else if(fsp.getChildProjects().isEmpty()) {
+							if (isApp(fsp)) {
+								// Fetch war or if no war, fetch jar if any.
+								tasks	= fsp.tasks.matching {
+									it.name.equals('war')
+								}
+								if(tasks.isEmpty()) {
+									tasks	= fsp.tasks.matching {
+										it.name.equals('jar')
+									}
+								}
+								tasks.each {task ->
+									from(task.outputs) {
+										into 'jadex-'  + jadex_build_version + '/apps'
+									}
+								}
 							}
-							if(tasks.isEmpty()) {
-								tasks	= sp.tasks.matching {
+							else  {
+								// Fetch jar if any.
+								fsp.tasks.matching {
 									it.name.equals('jar')
+								}.each {task ->
+//									println 'outputs: ' + task.outputs.files.files
+									from(task.outputs) {
+										into 'jadex-'  + jadex_build_version + '/lib'
+									}
 								}
-							}
-							tasks.each {task ->
-								from(task.outputs) {
-									into 'jadex-'  + jadex_build_version + '/apps'
-								}
-							}
-						}
-						else {
-							// Fetch jar if any.
-							sp.tasks.matching {
-								it.name.equals('jar')
-							}.each {task ->
-								from(task.outputs) {
-									into 'jadex-'  + jadex_build_version + '/lib'
-								}
-							}
-	
-							// copy all runtime deps:
-							def fsp	= sp	// configurations only available after evaluate -> need to copy sp var to final fsp
-							if(sp.parent!=null) {
-								sp.afterEvaluate {
+		
+								// copy all runtime deps:
+								if(fsp.parent!=null) {
 									// 'runtimeElements' instead of 'runtime'!? cf. https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
 									def runtimeConfig = distname.contains('android') ? fsp.configurations.runtimeAndroid :fsp.configurations.runtimeElements
 									def detached = getDetachedConfiguration(fsp, runtimeConfig)
@@ -586,13 +584,6 @@ subprojects
 						}
 					}
 	
-//					def exdir = new File(sp.projectDir.getCanonicalPath() + File.separator + 'dist/exampleprojects')
-//					if (exdir.exists() && exdir.isDirectory()) {
-//						exdir.listFiles().each { ex ->
-//							zipfileset dir: project.distsDir.getCanonicalPath() + '/exampleprojects/', prefix: foldername + '/', includes: ex.getName() + '.zip'
-//						}
-//					}
-//		
 					// Files to be included from dist/files directories
 					// 1) plain files w/o filtering or executable flag
 					from(new File(sp.projectDir, '/dist/files')) {
@@ -784,7 +775,15 @@ def checkDistZip(distname, arts, isaddon)
 	def commercial = false
 	arts.each { artname ->
 		commercial |= isCommercial(project.ext.subprojectmap.get(artname))
-	}	
+	}
+	
+	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
+	def distzip11 = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '_old.zip'
+	def distzip22 = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+	def difff	= diffZips(distzip11, distzip22)
+	if(difff.length()!=0)
+		throw new RuntimeException("Gradle based jadex-" + distname + "-" + jadex_build_version + ".zip does not match old ant based: "+difff);
+	
 	def preprocessdirfile = new File(project.distsDir, 'tmp/'+distname)
 	def rebuilddirfile = new File(project.distsDir, 'rebuild/'+distname);
 	rebuilddirfile.mkdirs()
