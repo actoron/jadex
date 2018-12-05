@@ -2,6 +2,7 @@ import java.nio.file.Paths
 import java.util.concurrent.Callable
 import java.util.regex.Matcher
 import org.gradle.api.artifacts.ProjectDependency
+import org.apache.tools.ant.filters.*
 
 apply plugin: 'java-library' // needed for distsDir on root project level
 
@@ -555,8 +556,14 @@ subprojects
 					from(new File(sp.projectDir, '/dist/files')) {
 						into 'jadex-'  + jadex_build_version
 						includes	= ['*/**']
-//						excludes	= rootProject.ext.filterfiles
+						excludes	= Arrays.asList(rootProject.ext.filterfiles.split("\\s*,\\s*"))
 					}
+					from(new File(sp.projectDir, '/dist/files')) {
+						into 'jadex-'  + jadex_build_version
+						includes	= Arrays.asList(rootProject.ext.filterfiles.split("\\s*,\\s*"))
+						filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: jadex_build_version])
+					}
+		
 					sp	= sp.parent;
 				}
 			}
