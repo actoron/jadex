@@ -19,6 +19,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
 import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
@@ -36,11 +38,12 @@ import javax.servlet.http.Part;
 
 import fi.iki.elonen.NanoHTTPD.CookieHandler;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
+import fi.iki.elonen.NanoHTTPD.ResponseException;
 
 /**
  *  Wrapper of HttpServletRequest for nano.
  */
-public class HttpServletRequestWrapper implements HttpServletRequest
+public class NanoHttpServletRequestWrapper implements HttpServletRequest
 {
 	private static final String CHARSET_REGEX = "[ |\t]*(charset)[ |\t]*=[ |\t]*['|\"]?([^\"^'^;^,]*)['|\"]?";
     private static final Pattern CHARSET_PATTERN = Pattern.compile(CHARSET_REGEX, Pattern.CASE_INSENSITIVE);
@@ -60,6 +63,10 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	/** The request attributes. */
 	protected Map<String, Object> attributes;
 	
+	/** The async context. */
+	protected NanoAsyncContext context;
+	
+	
 	private String getDetailFromContentHeader(String contentTypeHeader, Pattern pattern, String defaultValue, int group) 
 	{
 		Matcher matcher = pattern.matcher(contentTypeHeader);
@@ -69,7 +76,7 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	/**
 	 *  Create a new wrapper.
 	 */
-	public HttpServletRequestWrapper(IHTTPSession session)
+	public NanoHttpServletRequestWrapper(IHTTPSession session)
 	{
 		this.session = session;
 	}
@@ -272,7 +279,33 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	
 	public int getLocalPort()
 	{
-		throw new UnsupportedOperationException();
+		// todo: 443 for https
+		int ret = 80;
+		
+		String host = session.getHeaders().get("host");
+		if(host!=null)
+		{
+			int idx = host.indexOf(":");
+			if(idx!=-1)
+			{
+				String rest = host.substring(idx+1);
+				idx = rest.indexOf("/");
+				if(idx!=-1)
+				{
+					rest = rest.substring(0, idx);
+				}
+				
+				try
+				{
+					ret = Integer.parseInt(rest);
+				}
+				catch(Exception e)
+				{
+					// nop
+				}
+			}
+		}
+		return ret;
 	}
 	
 	public ServletContext getServletContext()
@@ -282,23 +315,29 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	
 	public AsyncContext startAsync() throws IllegalStateException
 	{
-		throw new UnsupportedOperationException();
+		if(context==null)
+			context = new NanoAsyncContext(null, null);
+		
+		return context;
 	}
+	
 	 
-	public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) 
+	public AsyncContext startAsync(ServletRequest request, ServletResponse response) 
 		throws IllegalStateException
 	{
-		throw new UnsupportedOperationException();
+		if(context==null)
+			context = new NanoAsyncContext(request, response);
+		return context;
 	}
 	   
 	public boolean isAsyncStarted()
 	{
-		throw new UnsupportedOperationException();
+		return context!=null? context.isStarted(): false;
 	}
 	
 	public boolean isAsyncSupported()
 	{
-		return false;
+		return true;
 	}
 	
 	public AsyncContext getAsyncContext()
@@ -379,14 +418,10 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 		throw new UnsupportedOperationException();
 	}
 
-	public String getPathTranslated()
-	{
-		throw new UnsupportedOperationException();
-	}
-
 	public String getContextPath()
 	{
-		throw new UnsupportedOperationException();
+		// todo: how to implment?!
+		return "";
 	}
 	    
 	public String getQueryString()
@@ -468,7 +503,7 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	    
 	public boolean isRequestedSessionIdFromUrl()
 	{
-		// todo
+		// todoServletRequest request, ServletResponse response
 		throw new UnsupportedOperationException();
 	}
 
@@ -604,5 +639,130 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	    {
 	    	return formatter[0].format(new Date(date));
 	    }
+	}
+	
+	public static class NanoAsyncContext implements AsyncContext
+	{
+		protected boolean started;
+		protected List<AsyncListener> listeners = new ArrayList<>();
+		protected ServletRequest request;
+		protected ServletResponse response;
+		
+		public NanoAsyncContext(ServletRequest request, ServletResponse response)
+		{
+			this.request = request;
+			this.response = response;
+		}
+		
+		@Override
+		public void start(Runnable run) 
+		{
+			for(AsyncListener lis: listeners)
+			{
+				try
+				{
+					lis.onStartAsync(new AsyncEvent(this));
+				}
+				catch(Exception e)
+				{
+					// nop
+				}
+			}
+		}
+		
+		@Override
+		public void setTimeout(long timeout) 
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public boolean hasOriginalRequestAndResponse() 
+		{
+			return request!=null && response!=null;
+		}
+		
+		@Override
+		public long getTimeout() 
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public ServletResponse getResponse() 
+		{
+			return response;
+		}
+		
+		@Override
+		public ServletRequest getRequest() 
+		
+		{
+			return request;
+		}
+		
+		@Override
+		public void dispatch(ServletContext context, String path) 
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void dispatch(String path) 
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void dispatch() 
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public <T extends AsyncListener> T createListener(Class<T> clazz) throws ServletException 
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void complete() 
+		{
+			for(AsyncListener lis: listeners)
+			{
+				try
+				{
+					lis.onComplete(new AsyncEvent(this));
+				}
+				catch(Exception e)
+				{
+					// nop
+				}
+			}
+		}
+		
+		@Override
+		public void addListener(AsyncListener listener, ServletRequest servletRequest, ServletResponse servletResponse) 
+		{
+			// todo: request response
+			listeners.add(listener);
+		}
+		
+		@Override
+		public void addListener(AsyncListener listener) 
+		{
+			listeners.add(listener);
+		}
+
+		public boolean isStarted() 
+		{
+			return started;
+		}
+	}
+
+	@Override
+	public String getPathTranslated() 
+	{
+		throw new UnsupportedOperationException();
 	}
 }

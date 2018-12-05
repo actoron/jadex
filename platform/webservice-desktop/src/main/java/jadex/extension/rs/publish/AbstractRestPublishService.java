@@ -329,7 +329,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         // request info manages an ongoing conversation
         if(requestinfos.containsKey(callid))
         {
-        	RequestInfo	rinfo	= requestinfos.get(callid);
+        	RequestInfo	rinfo = requestinfos.get(callid);
         	
         	// Result already available?
         	if(rinfo.checkForResult())

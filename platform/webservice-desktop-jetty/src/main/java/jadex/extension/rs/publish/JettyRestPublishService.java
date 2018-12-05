@@ -23,6 +23,8 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -70,16 +72,16 @@ public class JettyRestPublishService extends AbstractRestPublishService
     /** Infos for unpublishing. */
     protected Map<IServiceIdentifier, Tuple2<Server, ContextHandler>> unpublishinfos = new HashMap<IServiceIdentifier, Tuple2<Server,ContextHandler>>();
     
-    @AgentCreated
+    @ServiceStart
     public void start()
     {
     	System.out.println("Jetty started");
     }
     
-    @AgentKilled
+    @ServiceShutdown
     public void stop()
     {
-    	if (portservers != null)
+    	if(portservers != null)
     	{
     		for (Map.Entry<Integer, Server> entry : portservers.entrySet())
     		{
