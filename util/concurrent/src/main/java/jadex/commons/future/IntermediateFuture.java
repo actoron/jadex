@@ -462,7 +462,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     			index	= Integer.valueOf(0);
     		}
     		
-    		ret	= results!=null && results.size()>index.intValue();
+    		ret	= (results!=null && results.size()>index.intValue()) || isDone() && getException()!=null;
     		suspend	= !ret && !isDone();
     		if(suspend)
     		{
@@ -581,14 +581,10 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		}
     		else if(isDone())
     		{
-    			if(exception==null)
-    			{
-    				throw new NoSuchElementException("No more intermediate results.");
-    			}
+    			if(getException()!=null)
+    				throw SUtil.throwUnchecked(getException());
     			else
-    			{
-    				SUtil.throwUnchecked(exception);
-    			}
+    				throw new NoSuchElementException("No more intermediate results.");
     		}
     		else
     		{

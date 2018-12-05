@@ -1,5 +1,6 @@
 package jadex.micro.quickstart;
 
+import java.text.DateFormat;
 import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
@@ -18,17 +19,19 @@ import jadex.micro.annotation.AgentServiceQuery;
 public class TimeUserAgent
 {
 	/**
-	 *  The time services are searched and added whenever a new one is found.
+	 *  Subscribe to any newly found time service and print the results when they arrive.
 	 */
 	@AgentServiceQuery(scope=ServiceScope.GLOBAL)
 	public void	addTimeService(ITimeService timeservice)
 	{
-		ISubscriptionIntermediateFuture<String>	subscription = timeservice.subscribe();
+		String	location	= timeservice.getLocation().get();
+		DateFormat	format	= DateFormat.getDateTimeInstance();
+		ISubscriptionIntermediateFuture<String>	subscription = timeservice.subscribe(format);
 		while(subscription.hasNextIntermediateResult())
 		{
 			String time = subscription.getNextIntermediateResult();
 			String platform	= ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
-			System.out.println("New time received from "+platform+/*" at "+timeservice.getLocation()+*/": "+time);
+			System.out.println("New time received from "+platform+" at "+location+": "+time);
 		}
 	}
 	

@@ -1,0 +1,11 @@
+description 'Provides webservice support via Jetty.'
+
+//def jersey_version	= 2.11
+
+dependencies 
+{
+	api project(':platform:webservice-desktop')
+	
+	// NanoHTTPd server
+	api 'org.nanohttpd:nanohttpd:2.3.1'
+}

@@ -26,6 +26,7 @@ import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
+import jadex.xml.stax.ILocation;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.XMLReporter;
 import jadex.xml.stax.XmlUtil;
@@ -57,7 +58,13 @@ public abstract class AReader
 
 	public AReader(boolean bulklink, XMLReporter reporter) {
 		this.bulklink = bulklink;
-		this.reporter = reporter;
+		this.reporter = reporter!=null ? reporter : new XMLReporter()
+		{
+			public void report(String message, String errorType, Object relatedInformation, ILocation location)	throws Exception
+			{
+				throw new RuntimeException(message);
+			}
+		};
 	}
 
 	/**
@@ -165,7 +172,7 @@ public abstract class AReader
 		{
 //			t.printStackTrace();
 //			System.out.println("problem: "+new String(val));
-			throw new RuntimeException(e);
+			throw SUtil.throwUnchecked(e);
 		}
 		finally
 		{

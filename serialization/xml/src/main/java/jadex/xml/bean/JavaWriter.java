@@ -8,7 +8,9 @@ import java.net.URI;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Currency;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -93,6 +95,7 @@ public class JavaWriter
 	 *  - java.util.Color
 	 *  - java.util.Date
 	 *  - java.util.Calendar
+	 *  - java.util.Currency
 	 *  - java.lang.Class
 	 *  - java.net.URL
 	 *  - java.logging.Level
@@ -260,9 +263,28 @@ public class JavaWriter
 //				new AttributeInfo(new AccessInfo("date", null, AccessInfo.IGNORE_READWRITE))},
 				null
 			));
-			
 			typeinfos.add(ti_calendar);
-			
+
+			// java.util.Currency
+			// Ignores several redundant bean attributes for performance reasons.
+			TypeInfo ti_currency = new TypeInfo(new XMLInfo(new QName("typeinfo:java.util", "Currency")), new ObjectInfo(Currency.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("currencyCode", null))},
+				null
+			));
+			typeinfos.add(ti_currency);
+
+			// java.text.SimpleDateFormat
+			// Pattern managed with applyPattern(String) and String toPattern() grrrr.
+			TypeInfo ti_simpledateformat = new TypeInfo(new XMLInfo(new QName("typeinfo:java.text", "SimpleDateFormat")), new ObjectInfo(SimpleDateFormat.class), 
+				new MappingInfo(null, null, null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("pattern", null, null, null,
+					new BeanAccessInfo(SimpleDateFormat.class.getMethod("applyPattern", String.class),
+						SimpleDateFormat.class.getMethod("toPattern"))))},
+				null, true, null, null	// Include methods for DateFormat properties
+			));
+			typeinfos.add(ti_simpledateformat);
+
 			// java.sql.Timestamp
 			// Ignores several redundant bean attributes for performance reasons.
 			TypeInfo ti_timestamp = new TypeInfo(null, new ObjectInfo(Timestamp.class), 
