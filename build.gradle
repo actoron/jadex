@@ -241,6 +241,9 @@ subprojects
 		    if(task.name.contains("androidjavadocs")) {
 		        task.enabled = false
 		    }
+		    if(task.name.contains("signAndroidjavadocsJar")) {
+		        task.enabled = false
+		    }
 		}
 
 	 	if (isAndroidLibraryProject(project))
@@ -311,6 +314,9 @@ subprojects
 				variant.setIgnore(true);
 			}		
 		}
+		
+//		if(project.parent!=null && project.parent.parent!=null && project.parent.parent.parent!=null)
+//			println 'Deep android project: '+project
 
 		// Android zips are not produced by gradle zip task -> no reproducibleFileOrder=true setting possible, grrr
 		// cf. https://issuetracker.google.com/issues/67597902
@@ -540,26 +546,29 @@ subprojects
 					sp.afterEvaluate {
 						if (isAndroidProject(fsp)) {
 							// apps as debug version, because unsigned releases do not run on android
-							def variant	= isAndroidLibraryProject(fsp) ? com.android.builder.core.BuilderConstants.RELEASE : com.android.builder.core.BuilderConstants.DEBUG;
-							onVariantOutput(fsp, variant) {output ->
-								from(output.outputFile.getParent()) {
+							def assembletask	= fsp.tasks.find {/*isAndroidLibraryProject(fsp) ? */it.name.equals('bundleReleaseAar')/* : it.name.equals('packageRelease')*/} // apk debug???
+							if(assembletask!=null) {
+								from(assembletask.outputs) {
 									into 'jadex-'  + jadex_build_version + (isAndroidLibraryProject(fsp) ? '/lib' : '/apps')
-									includes = [output.outputFile.getName()]
 								}
 							}
+							else {
+								println 'No output task found for project: ' + fsp
+//								fsp.tasks.each { task ->
+//									println 'Task ' + task + ': ' + task.outputs.files.files
+//								}
+							}								
 						}
-						// Only collect artifacts from leaf projects and exclude dist project itself (legacy mode, todo: include? or exclude all dist/no-content projects)
-						else if(fsp.getChildProjects().isEmpty() && (fsp!=project||isaddon) ) {
+						// Only collect artifacts from leaf projects
+						else if(fsp.getChildProjects().isEmpty()) {
 							if (isApp(fsp)) {
-								// Fetch war or if no war, fetch jar if any.
+								// Legacy mode: include war and jar in apps!?
 								def mytasks	= fsp.tasks.matching {
-									it.name.equals('war')
+									it.name.equals('war') || it.name.equals('jar')
 								}
-								if(mytasks.isEmpty()) {
-									mytasks	= fsp.tasks.matching {
-										it.name.equals('jar')
-									}
-								}
+								// Fetch jar only if no war.
+//								if(mytasks.isEmpty())
+//									mytasks	= fsp.tasks.matching {it.name.equals('jar')}
 								mytasks.each {task ->
 									from(task.outputs) {
 										into 'jadex-'  + jadex_build_version + '/apps'
@@ -569,7 +578,7 @@ subprojects
 							else  {
 								// Fetch jar if any.
 								fsp.tasks.matching {
-									it.name.equals('jar')
+									it.name.equals('jar') && !fsp.getPath().contains(':distributions:')	// Legacy(?) hack: do not include distribution projects, todo: include? or exclude all dist/no-content projects
 								}.each {task ->
 //									println 'outputs: ' + task.outputs.files.files
 									from(task.outputs) {
@@ -766,7 +775,6 @@ task distZips(dependsOn: [subprojects.build, srcZips, exampleZips])  {
 			createDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
 		}
 	}
-	println 'distziptasks: ' + subprojects.collect({p -> p.tasks.matching{it.name.equals('distZip')}}).flatten()
 	dependsOn subprojects.collect({p -> p.tasks.matching{it.name.equals('distZip')}}).flatten()
 }
 
