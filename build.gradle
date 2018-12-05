@@ -584,15 +584,19 @@ task exampleZips {
 }
 
 task srcZip(dependsOn: createVersionInfo) {
+	inputs.files(gradle.ext.maindistartifacts)
+	outputs.dir('sources')
 	doLast {
 		createSrcZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
 	}
 }
 
 task srcZips(dependsOn: createVersionInfo) {
-	doLast {
-		gradle.ext.selecteddists.parallelStream().forEach { selecteddist ->
-			def arts = gradle.ext.distartmap.get(selecteddist)
+	gradle.ext.selecteddists.parallelStream().forEach { selecteddist ->
+		def arts = gradle.ext.distartmap.get(selecteddist)
+		inputs.files(arts)
+		outputs.dir('sources')
+		doLast {
 			createSrcZip(selecteddist, arts, selecteddist.startsWith('addon'))
 		}
 	}
