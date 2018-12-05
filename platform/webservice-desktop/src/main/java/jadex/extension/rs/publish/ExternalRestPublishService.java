@@ -196,7 +196,10 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	    	
 	        component.getLogger().info("Adding http handler to server: "+uri.getPath());
 	        
-	        PathHandler ph = (PathHandler)getHttpServer(uri, info);
+	        // is overridden by nano to return nano server :-( cast then does not work
+//	        PathHandler ph = (PathHandler)getHttpServer(uri, info);
+	        getHttpServer(uri, info);
+	        PathHandler ph = portservers.get(uri.getPort());
 	        
 	        final MultiCollection<String, MappingInfo> mappings = evaluateMapping(serviceid, info);
 	
