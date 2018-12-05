@@ -453,6 +453,7 @@ subprojects
 //		println 'dist: ' + distname + ', ' +isAddon([distname])
 		def arts = gradle.ext.distartmap.get(distname)
 		def prefixsize	= rootProject.projectDir.canonicalPath.length()
+		def	isaddon	= isAddon([distname])
 		project.tasks.create([name: "srcZip", type: Zip, dependsOn: rootProject.createVersionInfo]) {
 			destinationDir new File(rootProject.distsDir, "sources")
 			archiveName 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
@@ -461,7 +462,7 @@ subprojects
 			def projs = new HashSet();	// keep track of added projects to avoid duplicates
 			arts.each { artname ->
 				Project sp = subprojectmap.get(artname)
-				while((isAddon([distname])?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
+				while((isaddon?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
 					projs.add(sp);
 					from(sp.projectDir) {
 						into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
@@ -476,13 +477,91 @@ subprojects
 					sp	= sp.parent;
 				}
 			}
-			if(!isAddon([distname])) {
+			if(!isaddon) {
 				// Add preprocessed version properties
 				from(rootProject.buildDir.getCanonicalPath()) {
 					into 'sources/src/main/buildutils'
 					includes = ['jadexversion.properties']
 				}
 			}
+		}
+
+		// Create distZip task
+		project.tasks.create([name: "distZip", type: Zip, dependsOn: project.srcZip]) {
+			def commercial = false
+			archiveName 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+			
+			// Add all included artifact projects and their parents (but exclude root project for addons)
+			def projs = new HashSet();	// keep track of added projects to avoid duplicates
+			arts.each { artname ->
+				Project sp = subprojectmap.get(artname)
+				commercial |= isCommercial(sp)
+				while((isaddon?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
+					projs.add(sp);
+					
+					def spbdir = sp.buildDir.getCanonicalPath()
+	
+					if (isAndroidProject(sp)) {
+						// apps as debug version, because unsigned releases do not run on android
+						def variant	= isAndroidLibraryProject(sp) ? com.android.builder.core.BuilderConstants.RELEASE : com.android.builder.core.BuilderConstants.DEBUG;
+						def fsp	= sp	// android property only available after evaluate -> need to copy sp var to final fsp
+						sp.afterEvaluate {
+							onVariantOutput(fsp, variant) {output ->
+								from(output.outputFile.getParent()) {
+									into 'jadex-'  + jadex_build_version + (isAndroidLibraryProject(fsp) ? '/lib' : '/apps')
+									includes = [output.outputFile.getName()]
+								}
+							}
+						}
+					} else {
+						if (isApp(sp)) {
+							from(new File(sp.buildDir, 'libs')) {
+								into 'jadex-'  + jadex_build_version + '/apps'
+								includes	= ['*.jar', '*.war']
+								excludes	= ['*-sources.jar', '*-javadoc.jar', 'jadex-distribution-*.jar', '*-test.jar']
+							}
+						}
+						else {
+							from(new File(sp.buildDir, 'libs')) {
+								into 'jadex-'  + jadex_build_version + '/lib'
+								includes	= ['*.jar']
+								excludes	= ['*-sources.jar', '*-javadoc.jar', 'jadex-distribution-*.jar', '*-test.jar']
+							}
+	
+//							// copy all runtime deps:
+//							def runtimeConfig = sp.configurations.runtimeElements	// 'runtimeElements' instead of 'runtime'!? cf. https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
+//							if (distname.contains('android')) {
+//								runtimeConfig = sp.configurations.runtimeAndroid
+//							}
+//	
+//							def detached = getDetachedConfiguration(sp, runtimeConfig)
+//							detached.each { file ->
+//								if (!extdists.contains(file)) {
+//									zipfileset file: file, prefix: foldername + '/lib/'
+//									extdists.add(file)
+//								}
+//							}
+						}
+					}
+	
+//					def exdir = new File(sp.projectDir.getCanonicalPath() + File.separator + 'dist/exampleprojects')
+//					if (exdir.exists() && exdir.isDirectory()) {
+//						exdir.listFiles().each { ex ->
+//							zipfileset dir: project.distsDir.getCanonicalPath() + '/exampleprojects/', prefix: foldername + '/', includes: ex.getName() + '.zip'
+//						}
+//					}
+					
+					// Allow special files being included in dist tree (e.g. readmes for starting)
+					from(new File(sp.projectDir, '/dist/files')) {
+						into 'jadex-'  + jadex_build_version
+						includes	= ['*/**']
+//						excludes	= rootProject.ext.filterfiles
+					}
+					sp	= sp.parent;
+				}
+			}
+			println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
+			destinationDir new File(rootProject.distsDir, commercial? 'commercial' : 'noncommercial')
 		}
 	}
 }
@@ -600,16 +679,6 @@ task exampleZips {
 	}
 }
 
-task distZip(dependsOn: [subprojects.build, exampleZips]) {
-	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
-
-	inputs.files(gradle.ext.maindistartifacts)
-	outputs.dir('sources')
-	doLast {
-		createDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
-	}
-}
-
 task distZips(dependsOn: [subprojects.build, exampleZips])  {
 	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
 
@@ -618,14 +687,6 @@ task distZips(dependsOn: [subprojects.build, exampleZips])  {
 			def arts = gradle.ext.distartmap.get(selecteddist)
 			createDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
 		}
-	}
-}
-
-task checkDist(dependsOn: [distZip]) {
-	description	= "Build a single zip containing modules of all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
-
-	doLast {
-		checkDistZip(maindistsuffix.substring(1), gradle.ext.maindistartifacts, isAddon(gradle.ext.selecteddists))
 	}
 }
 
