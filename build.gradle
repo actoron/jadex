@@ -486,6 +486,29 @@ subprojects
 				}
 			}
 		}
+		
+		// Create examplesZip task(s), if any
+		def dir	= new File(project.projectDir, 'dist/exampleprojects')
+		if(dir.exists() && dir.isDirectory())
+		{
+			def examples	= dir.listFiles().findAll { it.isDirectory() }
+			examples.each { example ->
+				def task	= project.tasks.create([name: examples.size()==1 ? "exampleZip" : "exampleZip-" + example.getName(), type: Zip]) {
+					destinationDir new File(rootProject.distsDir, 'exampleprojects')
+					archiveName example.getName() + '.zip'
+					from (example) {
+						into example.getName()
+						include '**/*'
+						exclude rootProject.ext.filterfiles.split("\\s*,\\s*")
+					}
+					from (example) {
+						into example.getName()
+						include rootProject.ext.filterfiles.split("\\s*,\\s*")
+						filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: jadex_build_version])
+					}
+				}
+			}
+		}
 
 		// Create distZip task
 		project.tasks.create([name: "distZip", type: Zip]) {
@@ -494,6 +517,7 @@ subprojects
 			
 			// Add all included artifact projects and their parents (but exclude root project for addons)
 			def projs = new HashSet();	// keep track of added projects to avoid duplicates
+			def extdists = new HashSet()	// keep track of added extra artifacts to avoid duplicates
 			arts.each { artname ->
 				Project sp = subprojectmap.get(artname)
 				commercial |= isCommercial(sp)
@@ -529,19 +553,24 @@ subprojects
 								excludes	= ['*-sources.jar', '*-javadoc.jar', 'jadex-distribution-*.jar', '*-test.jar']
 							}
 	
-//							// copy all runtime deps:
-//							def runtimeConfig = sp.configurations.runtimeElements	// 'runtimeElements' instead of 'runtime'!? cf. https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
-//							if (distname.contains('android')) {
-//								runtimeConfig = sp.configurations.runtimeAndroid
-//							}
-//	
-//							def detached = getDetachedConfiguration(sp, runtimeConfig)
-//							detached.each { file ->
-//								if (!extdists.contains(file)) {
-//									zipfileset file: file, prefix: foldername + '/lib/'
-//									extdists.add(file)
-//								}
-//							}
+							// copy all runtime deps:
+							def fsp	= sp	// configurations only available after evaluate -> need to copy sp var to final fsp
+							if(sp.parent!=null) {
+								sp.afterEvaluate {
+									// 'runtimeElements' instead of 'runtime'!? cf. https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
+									def runtimeConfig = distname.contains('android') ? fsp.configurations.runtimeAndroid :fsp.configurations.runtimeElements
+									def detached = getDetachedConfiguration(fsp, runtimeConfig)
+									detached.each { file ->
+										if (!extdists.contains(file)) {
+											from (file.getParent()) {
+												into 'jadex-'  + jadex_build_version + '/lib'
+												includes = [file.getName()]
+											}
+											extdists.add(file)
+										}
+									}
+								}
+							}
 						}
 					}
 	
@@ -551,19 +580,39 @@ subprojects
 //							zipfileset dir: project.distsDir.getCanonicalPath() + '/exampleprojects/', prefix: foldername + '/', includes: ex.getName() + '.zip'
 //						}
 //					}
-					
-					// Allow special files being included in dist tree (e.g. readmes for starting)
+//		
+					// Files to be included from dist/files directories
+					// 1) plain files w/o filtering or executable flag
 					from(new File(sp.projectDir, '/dist/files')) {
 						into 'jadex-'  + jadex_build_version
-						includes	= ['*/**']
-						excludes	= Arrays.asList(rootProject.ext.filterfiles.split("\\s*,\\s*"))
+						include	'*/**'
+						exclude rootProject.ext.filterfiles.split("\\s*,\\s*")
+						exclude rootProject.ext.execfiles.split("\\s*,\\s*")
 					}
+					// 2) files with filtering but not executable
 					from(new File(sp.projectDir, '/dist/files')) {
 						into 'jadex-'  + jadex_build_version
-						includes	= Arrays.asList(rootProject.ext.filterfiles.split("\\s*,\\s*"))
+						include	rootProject.ext.filterfiles.split("\\s*,\\s*")
+						exclude	rootProject.ext.execfiles.split("\\s*,\\s*")
 						filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: jadex_build_version])
 					}
-		
+					// 3) executable files with new permissions (always filtered)
+					from(new File(sp.projectDir, '/dist/files')) {
+						into 'jadex-'  + jadex_build_version
+						include	rootProject.ext.execfiles.split("\\s*,\\s*")
+						filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: jadex_build_version])
+						fileMode 0755	// Does not work with 755!?
+					}
+					
+					// Copy generated example zips, if any
+					sp.tasks.matching {
+						it.name.startsWith('exampleZip')
+					}.each { task ->
+						from(task.outputs) {
+							into 'jadex-'  + jadex_build_version
+						}
+					}
+
 					sp	= sp.parent;
 				}
 			}
@@ -776,7 +825,7 @@ def createDistZip(distname, arts, isaddon)
 	preprocessdirfile.mkdirs()
 	def preprocessdir = preprocessdirfile.getCanonicalPath()
 	def foldername = 'jadex-'  + jadex_build_version
-	def zipfilename = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+	def zipfilename = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '_old.zip'
 	def distdir = project.distsDir.getCanonicalPath()
 	def ant = new groovy.util.AntBuilder()
 	def extdists = new HashSet()
