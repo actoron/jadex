@@ -34,8 +34,8 @@ pipeline {
 	  parallel {
 		stage('Dist') {
 		  steps {
-			sh './gradlew -Pdist=publishdists distZips -x test -x javadoc'
-//			sh './gradlew -Pdist=publishdists distZips checkDists -x test -x javadoc'
+//			sh './gradlew -Pdist=publishdists distZips -x test -x javadoc'
+			sh './gradlew -Pdist=publishdists distZips checkDists -x test -x javadoc'
 		  }
 		}
 		stage('HTML/PDF Docs') {
