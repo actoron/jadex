@@ -526,79 +526,45 @@ subprojects
 		task distZip(type: Zip) {
 			def commercial = false
 			archiveName 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-			
-			// Add all included artifact projects and their parents (but exclude root project for addons)
-			def projs = new HashSet();	// keep track of added projects to avoid duplicates
-			def extdists = new HashSet()	// keep track of added extra artifacts to avoid duplicates
-			arts.each { artname ->
-				Project sp = subprojectmap.get(artname)
-//				println 'artifact: ' +sp
-				commercial |= isCommercial(sp)
-				while((isaddon?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
-					projs.add(sp);
-					def fsp	= sp	// project details may be configured later :( -> need to copy sp var to final fsp
-					// TODO: use correct include ordering for subprojects based on dependencies???
+			gradle.projectsEvaluated() {
+				// Add all included artifact projects and their parents (but exclude root project for addons)
+				def projs = new HashSet();	// keep track of added projects to avoid duplicates
+				def projs_orig = new HashSet();	// compare hierarchy vs arts only
+				def extdists = new HashSet()	// keep track of added extra artifacts to avoid duplicates
+				arts.each { artname ->
+					Project sp = subprojectmap.get(artname)
+					projs_orig.add(sp)
+//					println 'artifact: ' +sp
+					commercial |= isCommercial(sp)
+					while((isaddon?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
+						projs.add(sp);
 
-//					sp.tasks.all {
-//						if (it.name.equals('packageRelease')) {
-//							it.outputs.all {
-//								println "!!!!!!!!!!!!!!!!!!! packageRelease mit output: ${it} ${it.files.files}"
-//
-//							}
-//						}
-//					}
-					sp.afterEvaluate {
-						if (isAndroidProject(fsp)) {
+						if (isAndroidProject(sp)) {
 							// apps as debug version, because unsigned releases do not run on android
-//							fsp.tasks.all {
-//								if (it.name.equals('packageRelease')) {
-//									println "!!!!!!!!!!!!!!!!!!! packageRelease gefunden für: ${it} ${it.outputs.files.files}"
-//								}
-//							}
-							def assembletask	= fsp.tasks.find {/*isAndroidLibraryProject(fsp) ? */it.name.equals('bundleReleaseAar')/* : it.name.equals('packageRelease')*/} // apk debug???
-							if (!isAndroidLibraryProject(fsp)) {
-								fsp.afterEvaluate {
-									onVariant(fsp, "release") {
-										println it.getAssemble().outputs.files.files
-									}
-								}
-								
-								onVariant(fsp, "release") {
-									println "Variantoutput: $it ${it.getClass()}"
-									println it.outputs
-									println it.outputs.getClass()
-									println it.outputs.each {
-//										println it.getClass()
-//										println it.getAssemble()
-//										println it.getAssemble().outputs
-//										println it.getAssemble().outputs.getClass()
-										
-										println it.getAssemble().outputs.files.files
-									}
-								}
-							}
+							def assembletask	= sp.tasks.find {isAndroidLibraryProject(sp) ? it.name.equals('bundleReleaseAar') : it.name.equals('packageRelease')} // apk debug???
 							if(assembletask!=null) {
 								from(assembletask.outputs) {
-									into 'jadex-'  + jadex_build_version + (isAndroidLibraryProject(fsp) ? '/lib' : '/apps')
+									into 'jadex-'  + jadex_build_version + (isAndroidLibraryProject(sp) ? '/lib' : '/apps')
+									exclude '/tmp/**', '/release/**', 'output.json'
 								}
 							}
 							else {
-//								println 'No output task found for project: ' + fsp
-//								fsp.tasks.each { task ->
+								println 'No output task found for project: ' + sp
+//								sp.tasks.each { task ->
 //									println 'Task ' + task + ': ' + task.outputs.files.files
 //								}
 							}
 						}
 						// Only collect artifacts from leaf projects
-						else if(fsp.getChildProjects().isEmpty()) {
-							if (isApp(fsp)) {
+						else if(sp.getChildProjects().isEmpty()) {
+							if (isApp(sp)) {
 								// Legacy mode: include war and jar in apps!?
-								def mytasks	= fsp.tasks.matching {
+								def mytasks	= sp.tasks.matching {
 									it.name.equals('war') || it.name.equals('jar')
 								}
 								// Fetch jar only if no war.
 //								if(mytasks.isEmpty())
-//									mytasks	= fsp.tasks.matching {it.name.equals('jar')}
+//									mytasks	= sp.tasks.matching {it.name.equals('jar')}
 								mytasks.each {task ->
 									from(task.outputs) {
 										into 'jadex-'  + jadex_build_version + '/apps'
@@ -607,21 +573,21 @@ subprojects
 							}
 							else  {
 								// Fetch jar if any.
-								fsp.tasks.matching {
+								sp.tasks.matching {
 									it.name.equals('jar')
 								}.each {task ->
 //									println 'outputs: ' + task + ', ' + task.outputs.files.files
-									//&& !fsp.getPath().contains(':distributions:')	// Legacy(?) hack: do not include distribution projects, todo: include? or exclude all dist/no-content projects
+									//&& !sp.getPath().contains(':distributions:')	// Legacy(?) hack: do not include distribution projects, todo: include? or exclude all dist/no-content projects
 									from(task.outputs) {
 										into 'jadex-'  + jadex_build_version + '/lib'
 									}
 								}
 		
 								// copy all runtime deps:
-								if(fsp.parent!=null) {
+								if(sp.parent!=null) {
 									// 'runtimeElements' instead of 'runtime'!? cf. https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
-									def runtimeConfig = distname.contains('android') ? fsp.configurations.runtimeAndroid :fsp.configurations.runtimeElements
-									def detached = getDetachedConfiguration(fsp, runtimeConfig)
+									def runtimeConfig = distname.contains('android') ? sp.configurations.runtimeAndroid :sp.configurations.runtimeElements
+									def detached = getDetachedConfiguration(sp, runtimeConfig)
 									detached.each { file ->
 										if (!extdists.contains(file)) {
 											from (file.getParent()) {
@@ -634,42 +600,44 @@ subprojects
 								}
 							}
 						}
-					}
 	
-					// Files to be included from dist/files directories
-					// 1) plain files w/o filtering or executable flag
-					from(new File(sp.projectDir, '/dist/files')) {
-						into 'jadex-'  + jadex_build_version
-						include	'*/**'
-						exclude rootProject.ext.filterfiles.split("\\s*,\\s*")
-						exclude rootProject.ext.execfiles.split("\\s*,\\s*")
-					}
-					// 2) files with filtering but not executable
-					from(new File(sp.projectDir, '/dist/files')) {
-						into 'jadex-'  + jadex_build_version
-						include	rootProject.ext.filterfiles.split("\\s*,\\s*")
-						exclude	rootProject.ext.execfiles.split("\\s*,\\s*")
-						filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: jadex_build_version])
-					}
-					// 3) executable files with new permissions (always filtered)
-					from(new File(sp.projectDir, '/dist/files')) {
-						into 'jadex-'  + jadex_build_version
-						include	rootProject.ext.execfiles.split("\\s*,\\s*")
-						filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: jadex_build_version])
-						fileMode 0755	// Does not work with 755!?
-					}
-					
-					// Copy generated example zips, if any
-					sp.tasks.matching {
-						it.name.startsWith('exampleZip')
-					}.each { task ->
-						from(task.outputs) {
+						// Files to be included from dist/files directories
+						// 1) plain files w/o filtering or executable flag
+						from(new File(sp.projectDir, '/dist/files')) {
 							into 'jadex-'  + jadex_build_version
+							include	'*/**'
+							exclude rootProject.ext.filterfiles.split("\\s*,\\s*")
+							exclude rootProject.ext.execfiles.split("\\s*,\\s*")
 						}
+						// 2) files with filtering but not executable
+						from(new File(sp.projectDir, '/dist/files')) {
+							into 'jadex-'  + jadex_build_version
+							include	rootProject.ext.filterfiles.split("\\s*,\\s*")
+							exclude	rootProject.ext.execfiles.split("\\s*,\\s*")
+							filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: jadex_build_version])
+						}
+						// 3) executable files with new permissions (always filtered)
+						from(new File(sp.projectDir, '/dist/files')) {
+							into 'jadex-'  + jadex_build_version
+							include	rootProject.ext.execfiles.split("\\s*,\\s*")
+							filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: jadex_build_version])
+							fileMode 0755	// Does not work with 755!?
+						}
+						
+						// Copy generated example zips, if any
+						sp.tasks.matching {
+							it.name.startsWith('exampleZip')
+						}.each { task ->
+							from(task.outputs) {
+								into 'jadex-'  + jadex_build_version
+							}
+						}
+	
+						sp	= sp.parent;
 					}
-
-					sp	= sp.parent;
 				}
+			
+				println 'projs diff: ' + projs.removeAll(projs_orig)
 			}
 			
 			// Copy generated srcZip
