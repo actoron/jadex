@@ -411,17 +411,23 @@ public class SComponentManagementService
 	{
 		// listeners are copied to be threadsafe
 		
-		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	slis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(desc.getName())));
+		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	slis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).remove(desc.getName())));
 		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	alis = new ArrayList<>(SUtil.notNull(getListeners(desc.getName()).get(null)));
-		slis.addAll(alis);
+//		slis.addAll(alis);
 		
-		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slis)
+		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: alis)
 		{
 			sub.addIntermediateResultIfUndone(new CMSTerminatedEvent(desc, results, ex));
 		}
 		
+		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: slis)
+		{
+			sub.addIntermediateResultIfUndone(new CMSTerminatedEvent(desc, results, ex));
+			sub.setFinished();
+		}
+		
 		// remove the listeners of the terminated component
-		getListeners(desc.getName()).remove(desc.getName());	// remove(!) subscriptions for termination event
+//		getListeners(desc.getName()).remove(desc.getName());	// remove(!) subscriptions for termination event
 	}
 	
 	// r: components, local component types
