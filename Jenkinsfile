@@ -56,7 +56,7 @@ pipeline {
 		stage('Publish') {
 		  steps {
 		  	// TODO: move credentials to environment
-			sh './gradlew --max-workers 128 -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax'
+			sh './gradlew -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax'
 		  }
 		}
 	  }
