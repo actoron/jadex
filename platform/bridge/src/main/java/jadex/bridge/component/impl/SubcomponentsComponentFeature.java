@@ -694,7 +694,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 										catch (Exception e)
 										{
 											exceptions.add(e);
-											killfut = new Future<>(null);
+											continue;
 										}
 										final IExternalAccess exta = tmpexta;
 										if (exta != null)
@@ -710,8 +710,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 											
 											public void resultAvailable(Map<String, Object> result)
 											{
-												if (result != null)
-													ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, result));
+												ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, result));
 											};
 										});
 									}
