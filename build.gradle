@@ -538,20 +538,55 @@ subprojects
 					projs.add(sp);
 					def fsp	= sp	// project details may be configured later :( -> need to copy sp var to final fsp
 					// TODO: use correct include ordering for subprojects based on dependencies???
+
+//					sp.tasks.all {
+//						if (it.name.equals('packageRelease')) {
+//							it.outputs.all {
+//								println "!!!!!!!!!!!!!!!!!!! packageRelease mit output: ${it} ${it.files.files}"
+//
+//							}
+//						}
+//					}
 					sp.afterEvaluate {
 						if (isAndroidProject(fsp)) {
 							// apps as debug version, because unsigned releases do not run on android
+//							fsp.tasks.all {
+//								if (it.name.equals('packageRelease')) {
+//									println "!!!!!!!!!!!!!!!!!!! packageRelease gefunden für: ${it} ${it.outputs.files.files}"
+//								}
+//							}
 							def assembletask	= fsp.tasks.find {/*isAndroidLibraryProject(fsp) ? */it.name.equals('bundleReleaseAar')/* : it.name.equals('packageRelease')*/} // apk debug???
+							if (!isAndroidLibraryProject(fsp)) {
+								fsp.afterEvaluate {
+									onVariant(fsp, "release") {
+										println it.getAssemble().outputs.files.files
+									}
+								}
+								
+								onVariant(fsp, "release") {
+									println "Variantoutput: $it ${it.getClass()}"
+									println it.outputs
+									println it.outputs.getClass()
+									println it.outputs.each {
+//										println it.getClass()
+//										println it.getAssemble()
+//										println it.getAssemble().outputs
+//										println it.getAssemble().outputs.getClass()
+										
+										println it.getAssemble().outputs.files.files
+									}
+								}
+							}
 							if(assembletask!=null) {
 								from(assembletask.outputs) {
 									into 'jadex-'  + jadex_build_version + (isAndroidLibraryProject(fsp) ? '/lib' : '/apps')
 								}
 							}
 							else {
-								println 'No output task found for project: ' + fsp
-								fsp.tasks.each { task ->
-									println 'Task ' + task + ': ' + task.outputs.files.files
-								}
+//								println 'No output task found for project: ' + fsp
+//								fsp.tasks.each { task ->
+//									println 'Task ' + task + ': ' + task.outputs.files.files
+//								}
 							}
 						}
 						// Only collect artifacts from leaf projects
