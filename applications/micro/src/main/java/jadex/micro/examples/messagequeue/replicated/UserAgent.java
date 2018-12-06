@@ -28,7 +28,7 @@ public class UserAgent
 	// -------- attributes --------
 
 	/** The agent. */
-//	@Agent
+	@Agent
 	protected IInternalAccess					agent;
 
 	/** The message queue. */
