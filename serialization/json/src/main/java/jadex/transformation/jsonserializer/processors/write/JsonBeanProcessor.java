@@ -83,7 +83,7 @@ public class JsonBeanProcessor implements ITraverseProcessor
 	/**
 	 *  Clone all properties of an object.
 	 */
-	protected static void traverseProperties(Object object, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, 
+	protected void traverseProperties(Object object, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, 
 		ClassLoader targetcl, Object context, IBeanIntrospector intro, boolean first)
 	{
 		Class<?> clazz = object.getClass();

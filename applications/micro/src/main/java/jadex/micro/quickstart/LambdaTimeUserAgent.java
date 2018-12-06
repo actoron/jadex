@@ -1,5 +1,7 @@
 package jadex.micro.quickstart;
 
+import java.text.DateFormat;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
@@ -24,7 +26,7 @@ public class LambdaTimeUserAgent
 		// Wait for location result before continuing.
 		timeservice.getLocation().addResultListener(location ->
 		// For every time result do a println.
-		timeservice.subscribe().addIntermediateResultListener(time ->
+		timeservice.subscribe(DateFormat.getDateTimeInstance()).addIntermediateResultListener(time ->
 			System.out.println("New time received from "
 				+ ((IService)timeservice).getServiceId().getProviderId().getPlatformName()
 				+ " at "+location+": "+time)

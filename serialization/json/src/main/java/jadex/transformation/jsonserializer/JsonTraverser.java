@@ -67,6 +67,8 @@ public class JsonTraverser extends Traverser
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonStackTraceElementProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonThrowableProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonCalendarProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonCurrencyProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonSimpleDateFormatProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonCollectionProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor());
 		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLRUProcessor());
@@ -96,6 +98,8 @@ public class JsonTraverser extends Traverser
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonStackTraceElementProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonThrowableProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCalendarProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCurrencyProcessor());
+		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonSimpleDateFormatProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCollectionProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonURIProcessor());
 		readprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonURLProcessor());

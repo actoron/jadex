@@ -1,5 +1,7 @@
 package jadex.micro.quickstart;
 
+import java.text.DateFormat;
+
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
@@ -29,7 +31,8 @@ public class NonblockingTimeUserAgent
 			@Override
 			public void resultAvailable(String location)
 			{
-				ISubscriptionIntermediateFuture<String> subscription	= timeservice.subscribe();
+				DateFormat	format	= DateFormat.getDateTimeInstance();
+				ISubscriptionIntermediateFuture<String> subscription	= timeservice.subscribe(format);
 				subscription.addResultListener(new IntermediateDefaultResultListener<String>()
 				{
 					/**

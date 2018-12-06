@@ -124,12 +124,12 @@ public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDLis
 		{
 			// Schriftfarbe
 			// UIManager.getColor("List.selectionForeground") gibt die
-			// Standard Schriftfarbe für ein markiertes Listen Element zurück
+			// Standard Schriftfarbe fuer ein markiertes Listen Element zurueck
 			this.setForeground(UIManager.getColor("List.selectionForeground"));
 			// Hintergrund
 			// UIManager.getColor("List.selectionBackground") gibt die
-			// Standard Hintergrundfarbe für ein markiertes Listen Element
-			// zurück
+			// Standard Hintergrundfarbe fuer ein markiertes Listen Element
+			// zurueck
 			this.setBackground(UIManager.getColor("List.selectionBackground"));
 		}
 		// Element aus der Liste ist nicht markiert

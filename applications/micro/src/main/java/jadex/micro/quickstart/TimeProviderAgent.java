@@ -1,8 +1,9 @@
 package jadex.micro.quickstart;
 
+import java.text.DateFormat;
 import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
@@ -36,8 +37,7 @@ public class TimeProviderAgent	implements ITimeService
 	//-------- attributes --------
 		
 	/** The subscriptions to be informed about the time. */
-	protected Set<SubscriptionIntermediateFuture<String>>	subscriptions
-		= new LinkedHashSet<SubscriptionIntermediateFuture<String>>();
+	protected Map<SubscriptionIntermediateFuture<String>, DateFormat>	subscriptions	= new LinkedHashMap<>();
 	
 	//-------- ITimeService interface --------
 	
@@ -57,11 +57,11 @@ public class TimeProviderAgent	implements ITimeService
 	 *  Every couple of seconds, a string with the current time will be
 	 *  sent to the subscriber.
 	 */
-	public ISubscriptionIntermediateFuture<String>	subscribe()
+	public ISubscriptionIntermediateFuture<String>	subscribe(DateFormat format)
 	{
 		// Add a subscription to the set of subscriptions.
 		final SubscriptionIntermediateFuture<String>	ret	= new SubscriptionIntermediateFuture<String>();
-		subscriptions.add(ret);
+		subscriptions.put(ret, format);
 		
 		ret.setTerminationCommand(new TerminationCommand()
 		{
@@ -99,12 +99,15 @@ public class TimeProviderAgent	implements ITimeService
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// Notify all subscribers
-				for(SubscriptionIntermediateFuture<String> subscriber: subscriptions)
+				for(SubscriptionIntermediateFuture<String> subscriber: subscriptions.keySet())
 				{
+					DateFormat	df	= subscriptions.get(subscriber);
+					String	time	= df.format(new Date());
+					
 					// Add the current time as intermediate result.
 					// The if-undone part is used to ignore errors,
 					// when subscription was cancelled in the mean time.
-					subscriber.addIntermediateResultIfUndone(new Date().toString());
+					subscriber.addIntermediateResultIfUndone(time+"; "+new Date().toString());
 				}
 				
 				return IFuture.DONE;
