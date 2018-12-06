@@ -461,7 +461,8 @@ subprojects
 		def arts = gradle.ext.distartmap.get(distname)
 		def prefixsize	= rootProject.projectDir.canonicalPath.length()
 		def	isaddon	= isAddon([distname])
-		project.tasks.create([name: "srcZip", type: Zip, dependsOn: rootProject.createVersionInfo]) {
+
+		task srcZip(type: Zip, dependsOn: rootProject.createVersionInfo) {
 			destinationDir new File(rootProject.distsDir, "sources")
 			archiveName 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
 			
@@ -473,8 +474,13 @@ subprojects
 					projs.add(sp);
 					from(sp.projectDir) {
 						into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
-						includes = ['*.properties', '*.gradle', 'src/**', 'dist/**', 'lib/**', 'gradle/**', 'gradlew*']
+						includes = ['*.properties', '*.gradle', 'src/**', 'dist/**', 'lib/**', 'gradle/**', 'gradlew.bat']
 						excludes = ['secret.properties', '**/.gradle', 'src/main/config', 'src/main/buildutils/jadexversion.properties']
+					}
+					from(sp.projectDir) {
+						into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
+						include	'gradlew'
+						fileMode 0755
 					}
 //					// Allow special files being included in source tree (e.g. readmes for building)
 //					from(new File(sp.projectDir, '/dist/sources')) {
@@ -517,7 +523,7 @@ subprojects
 		}
 
 		// Create distZip task
-		project.tasks.create([name: "distZip", type: Zip]) {
+		task distZip(type: Zip) {
 			def commercial = false
 			archiveName 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 			
@@ -543,9 +549,9 @@ subprojects
 							}
 							else {
 								println 'No output task found for project: ' + fsp
-//								fsp.tasks.each { task ->
-//									println 'Task ' + task + ': ' + task.outputs.files.files
-//								}
+								fsp.tasks.each { task ->
+									println 'Task ' + task + ': ' + task.outputs.files.files
+								}
 							}
 						}
 						// Only collect artifacts from leaf projects
