@@ -637,7 +637,8 @@ subprojects
 					}
 				}
 			
-				println 'projs diff: ' + projs.removeAll(projs_orig)
+				println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
+				destinationDir new File(rootProject.distsDir, commercial? 'commercial' : 'noncommercial')
 			}
 			
 			// Copy generated srcZip
@@ -645,9 +646,6 @@ subprojects
 				into 'jadex-'  + jadex_build_version
 				rename {name -> isaddon ? 'sources-' + distname + '.zip' : 'sources.zip'}
 			}
-	
-			println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
-			destinationDir new File(rootProject.distsDir, commercial? 'commercial' : 'noncommercial')
 		}
 	}
 }
