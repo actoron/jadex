@@ -42,6 +42,7 @@ import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.MultiException;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -337,6 +338,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		
 		final IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> ret = new IntermediateFuture<>(); 
 		
+		final List<Throwable> exceptions = new ArrayList<>();
 		boolean suicide = false;
 		Set<IComponentIdentifier> killset = new HashSet<>(Arrays.asList(cids));
 		Map<IComponentIdentifier, Set<IComponentIdentifier>> killparents = new HashMap<>();
@@ -376,28 +378,24 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		FutureBarrier<Void> compkillbar = new FutureBarrier<>();
 		for (Map.Entry<IComponentIdentifier, Set<IComponentIdentifier>> entry : killparents.entrySet())
 		{
-			final Set<IComponentIdentifier> kills = entry.getValue();
-			if (kills != null && kills.size() > 0)
+			if (entry.getValue().size() > 0)
 			{
 				IExternalAccess exta = component.getExternalAccess(entry.getKey());
 				Future<Void> donefut = new Future<>();
 				compkillbar.addFuture(donefut);
-				exta.killComponents(kills.toArray(new IComponentIdentifier[kills.size()])).addResultListener(new IntermediateDefaultResultListener<Tuple2<IComponentIdentifier, Map<String, Object>>>()
+				exta.killComponents(entry.getValue().toArray(new IComponentIdentifier[entry.getValue().size()])).addResultListener(new IntermediateDefaultResultListener<Tuple2<IComponentIdentifier, Map<String, Object>>>()
 				{
 					public void exceptionOccurred(Exception exception)
 					{
-						HashMap<String, Object> res = new HashMap<>();
-						res.put("exception", exception);
-						for (IComponentIdentifier kill : kills)
-						{
-							ret.addIntermediateResult(new Tuple2<IComponentIdentifier, Map<String,Object>>(kill, res));
-						}
+						if (exception instanceof MultiException)
+							exceptions.addAll(Arrays.asList(((MultiException)exception).getCauses()));
+						else
+							exceptions.add(exception);
 						donefut.setResult(null);
 					}
 					
 					public void intermediateResultAvailable(Tuple2<IComponentIdentifier, Map<String, Object>> result)
 					{
-						kills.remove(result.getFirstEntity());
 						ret.addIntermediateResult(result);
 					}
 					
@@ -413,23 +411,19 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		{
 			Future<Void> donefut = new Future<>();
 			compkillbar.addFuture(donefut);
-			final Set<IComponentIdentifier> flocals = locals;
 			killLocalComponents(locals.toArray(new IComponentIdentifier[locals.size()])).addResultListener(new IntermediateDefaultResultListener<Tuple2<IComponentIdentifier, Map<String, Object>>>()
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					HashMap<String, Object> res = new HashMap<>();
-					res.put("exception", exception);
-					for (IComponentIdentifier kill : flocals)
-					{
-						ret.addIntermediateResult(new Tuple2<IComponentIdentifier, Map<String,Object>>(kill, res));
-					}
+					if (exception instanceof MultiException)
+						exceptions.addAll(Arrays.asList(((MultiException)exception).getCauses()));
+					else
+						exceptions.add(exception);
 					donefut.setResult(null);
 				}
 				
 				public void intermediateResultAvailable(Tuple2<IComponentIdentifier, Map<String, Object>> result)
 				{
-					flocals.remove(result.getFirstEntity());
 					ret.addIntermediateResult(result);
 				}
 				
@@ -453,9 +447,10 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					HashMap<String, Object> res = new HashMap<>();
-					res.put("exception", exception);
-					ret.addIntermediateResult(new Tuple2<IComponentIdentifier, Map<String,Object>>(component.getId(), res));
+					if (exception instanceof MultiException)
+						exceptions.addAll(Arrays.asList(((MultiException)exception).getCauses()));
+					else
+						exceptions.add(exception);
 					donefut.setResult(null);
 				}
 			});
@@ -465,7 +460,10 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		{
 			public void resultAvailable(Void result)
 			{
-				ret.setFinished();
+				if (exceptions.size() > 0)
+					ret.setException(new MultiException(exceptions));
+				else
+					ret.setFinished();
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -674,6 +672,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 					{
 						++levelnum[0];
 //						System.out.println("LEVEL " + levelnum[0] + " " + levels.size() + " " + component);
+						final List<Throwable> exceptions = new ArrayList<>();
 						if (levelnum[0] < levels.size())
 						{
 							FutureBarrier<Map<String, Object>> levelbar = new FutureBarrier<>();
@@ -694,9 +693,8 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 										}
 										catch (Exception e)
 										{
-											Map<String, Object> res = new HashMap<>();
-											res.put("exception", e);
-											killfut = new Future<>(res);
+											exceptions.add(e);
+											killfut = new Future<>(null);
 										}
 										final IExternalAccess exta = tmpexta;
 										if (exta != null)
@@ -705,30 +703,15 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 										levelbar.addFuture(killfut);
 										killfut.addResultListener(new IResultListener<Map<String, Object>>()
 										{
-											public void exceptionOccurred(final Exception exception)
+											public void exceptionOccurred(Exception exception)
 											{
-//												ret.setExceptionIfUndone(exception);
-												exta.getResultsAsync().addResultListener(new IResultListener<Map<String,Object>>()
-												{
-													public void resultAvailable(Map<String, Object> result)
-													{
-														Map<String, Object> res = new HashMap<>(result);
-														res.put("exception", exception);
-														ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, res));
-													}
-
-													public void exceptionOccurred(Exception e)
-													{
-														Map<String, Object> res = new HashMap<>();
-														res.put("exception", exception);
-														ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, res));
-													}
-												});
+												exceptions.add(exception);
 											}
 											
 											public void resultAvailable(Map<String, Object> result)
 											{
-												ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, result));
+												if (result != null)
+													ret.addIntermediateResultIfUndone(new Tuple2<IComponentIdentifier, Map<String,Object>>(inst, result));
 											};
 										});
 									}
@@ -740,7 +723,10 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 						{
 							if (!ret.isDone())
 							{
-								ret.setFinished();
+								if (exceptions.size() > 0)
+									ret.setException(new MultiException(exceptions));
+								else
+									ret.setFinished();
 							}
 						}
 					}
