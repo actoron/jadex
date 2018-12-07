@@ -378,7 +378,6 @@ public class SComponentManagementService
 	    		col = new ArrayList<SubscriptionIntermediateFuture<CMSStatusEvent>>();
 	    		compstate.setCmsListeners(col);
 	    	}
-	    	System.out.println("lis " + ret + " added to " +cid);
 	    	col.add(ret);
     	}
     	
