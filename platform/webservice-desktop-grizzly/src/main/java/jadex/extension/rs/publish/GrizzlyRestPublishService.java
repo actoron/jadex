@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpHandler;
@@ -31,8 +33,12 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo;
 import jadex.javaparser.SJavaParser;
 
 /**
@@ -68,84 +74,94 @@ public class GrizzlyRestPublishService extends AbstractRestPublishService
      */
     public IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info)
     {
-        try
-        {
-        	final IService service = component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null, ServiceScope.PLATFORM).setServiceIdentifier(serviceid)).get();
-        	
-            final URI uri = new URI(getCleanPublishId(info.getPublishId()));
-            HttpServer server = (HttpServer)getHttpServer(uri, info);
-            System.out.println("Adding http handler to server: "+uri.getPath());
-
-            final MultiCollection<String, MappingInfo> mappings = evaluateMapping(service.getServiceId(), info);
-
-        	HttpHandler handler = new HttpHandler()
-			{
-				public void service(Request request, Response response) throws Exception
-				{
-					// Hack to enable multi-part
-                    // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html
-//                    if(request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) 
-//                    	baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
-                	
-					HttpServletResponseImpl res = HttpServletResponseImpl.create();
-					HttpServletRequestImpl req = HttpServletRequestImpl.create();
-					req.initialize(request, res, new WebappContext(uri.getPath(), uri.getPath())); 
-					res.initialize(response, req);
-					
-					MappingData data = request.obtainMappingData();
-					
-					String pi = request.getPathInfo();
-					
-					if(pi==null)
-					{
-						String ctx = request.getContextPath();
-						String full = request.getRequestURL().toString();
-						if(ctx!=null && full!=null)
-						{
-							int start = full.indexOf(ctx)+ctx.length();
-							int end = full.indexOf("?");
-							if(start>0 && full.length()>start)
-							{
-								pi = full.substring(start, end>0? end: full.length());
-							}
-						}
-						if("/".equals(pi))
-							pi = null;
-					}
-					if(pi!=null)
-					{
-						req.setServletPath(data.wrapperPath.toString());
-						Method m = req.getClass().getDeclaredMethod("setPathInfo", new Class[]{String.class});
-						m.setAccessible(true);
-						m.invoke(req, new Object[]{pi});
-					}
-					
-				    Method m = req.getClass().getDeclaredMethod("setContextPath", new Class[]{String.class});
-				    m.setAccessible(true);
-				    m.invoke(req, new Object[]{data.contextPath.toString()});
-			            
-//			        request.setNote(SERVLET_REQUEST_NOTE, servletRequest);
-//			        request.setNote(SERVLET_RESPONSE_NOTE, servletResponse);
-
-                	handleRequest(service, mappings, req, res, null);
-                	
-//                  System.out.println("handler is: "+uri.getPath());
-				}
-			};
-
-			ServerConfiguration sc = server.getServerConfiguration();
-			sc.addHttpHandler(handler, uri.getPath());
-
-            if(sidservers==null)
-                sidservers = new HashMap<IServiceIdentifier, HttpServer>();
-            sidservers.put(service.getServiceId(), server);
-        }
-        catch(Exception e)
-        {
-            throw new RuntimeException(e);
-        }
+    	Future<Void> ret = new Future<>();
+		
+        IFuture<MultiCollection<String, MappingInfo>> fut = evaluateMapping(serviceid, info);
         
-        return IFuture.DONE;
+        fut.addResultListener(new ExceptionDelegationResultListener<MultiCollection<String, MappingInfo>, Void>(ret)
+		{
+        	@Override
+        	public void customResultAvailable(MultiCollection<String, MappingInfo> mappings)
+        	{
+        		try
+    	        {
+    	        	final IService service = component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null, ServiceScope.PLATFORM).setServiceIdentifier(serviceid)).get();
+    	        	
+    	            final URI uri = new URI(getCleanPublishId(info.getPublishId()));
+    	            HttpServer server = (HttpServer)getHttpServer(uri, info);
+    	            System.out.println("Adding http handler to server: "+uri.getPath());
+
+    	        	HttpHandler handler = new HttpHandler()
+    				{
+    					public void service(Request request, Response response) throws Exception
+    					{
+    						// Hack to enable multi-part
+    	                    // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html
+//        	                    if(request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) 
+//        	                    	baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+    	                	
+    						HttpServletResponseImpl res = HttpServletResponseImpl.create();
+    						HttpServletRequestImpl req = HttpServletRequestImpl.create();
+    						req.initialize(request, res, new WebappContext(uri.getPath(), uri.getPath())); 
+    						res.initialize(response, req);
+    						
+    						MappingData data = request.obtainMappingData();
+    						
+    						String pi = request.getPathInfo();
+    						
+    						if(pi==null)
+    						{
+    							String ctx = request.getContextPath();
+    							String full = request.getRequestURL().toString();
+    							if(ctx!=null && full!=null)
+    							{
+    								int start = full.indexOf(ctx)+ctx.length();
+    								int end = full.indexOf("?");
+    								if(start>0 && full.length()>start)
+    								{
+    									pi = full.substring(start, end>0? end: full.length());
+    								}
+    							}
+    							if("/".equals(pi))
+    								pi = null;
+    						}
+    						if(pi!=null)
+    						{
+    							req.setServletPath(data.wrapperPath.toString());
+    							Method m = req.getClass().getDeclaredMethod("setPathInfo", new Class[]{String.class});
+    							m.setAccessible(true);
+    							m.invoke(req, new Object[]{pi});
+    						}
+    						
+    					    Method m = req.getClass().getDeclaredMethod("setContextPath", new Class[]{String.class});
+    					    m.setAccessible(true);
+    					    m.invoke(req, new Object[]{data.contextPath.toString()});
+    				            
+//        				        request.setNote(SERVLET_REQUEST_NOTE, servletRequest);
+//        				        request.setNote(SERVLET_RESPONSE_NOTE, servletResponse);
+
+    	                	handleRequest(service, mappings, req, res, null);
+    	                	
+//        	                  System.out.println("handler is: "+uri.getPath());
+    					}
+    				};
+
+    				ServerConfiguration sc = server.getServerConfiguration();
+    				sc.addHttpHandler(handler, uri.getPath());
+
+    	            if(sidservers==null)
+    	                sidservers = new HashMap<IServiceIdentifier, HttpServer>();
+    	            sidservers.put(service.getServiceId(), server);
+    	            ret.setResult(null);
+    	        }
+    	        catch(Exception e)
+    	        {
+    	        	ret.setException(e);
+    	        }
+        	}
+		});
+        
+        return ret;
     }
 
     /**

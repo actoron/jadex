@@ -45,7 +45,9 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
@@ -66,6 +68,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.ILeaseTimeSet;
 import jadex.commons.collection.LeaseTimeSet;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -1249,90 +1252,105 @@ public abstract class AbstractRestPublishService implements IWebPublishService
      *  Return a multicollection in which for each path name the possible
      *  methods are contained (can be more than one due to different parameters).
      */
-    public MultiCollection<String, MappingInfo> evaluateMapping(IServiceIdentifier sid, PublishInfo pi)
+    public IFuture<MultiCollection<String, MappingInfo>> evaluateMapping(IServiceIdentifier sid, PublishInfo pi)
     {
-        Class<?> mapcl = pi.getMapping()==null? null: pi.getMapping().getType(component.getClassLoader());
-        if(mapcl==null)
-            mapcl = sid.getServiceType().getType(component.getClassLoader());
+    	Future<MultiCollection<String, MappingInfo>> ret = new Future<>();
+    	
+    	IComponentIdentifier cid = sid.getProviderId();
+    	
+    	IExternalAccess ea = component.getExternalAccess(cid);
+    	
+    	ea.scheduleStep(new IComponentStep<MultiCollection<String, MappingInfo>>()
+		{
+    		@Override
+    		public IFuture<MultiCollection<String, MappingInfo>> execute(IInternalAccess ia)
+    		{
+    			Class<?> mapcl = pi.getMapping()==null? null: pi.getMapping().getType(ia.getClassLoader());
+		        if(mapcl==null)
+		            mapcl = sid.getServiceType().getType(ia.getClassLoader());
 
-        MultiCollection<String, MappingInfo> ret = new MultiCollection<String, MappingInfo>();
-        MultiCollection<String, MappingInfo> natret = new MultiCollection<String, MappingInfo>();
+		        MultiCollection<String, MappingInfo> ret = new MultiCollection<String, MappingInfo>();
+		        MultiCollection<String, MappingInfo> natret = new MultiCollection<String, MappingInfo>();
 
-        for(Method m: SReflect.getAllMethods(mapcl))
-        {
-            MappingInfo mi = new MappingInfo();
-            if(m.isAnnotationPresent(GET.class))
-            {
-                mi.setHttpMethod(HttpMethod.GET);
-            }
-            else if(m.isAnnotationPresent(POST.class))
-            {
-                mi.setHttpMethod(HttpMethod.POST);
-            }
-            else if(m.isAnnotationPresent(PUT.class))
-            {
-                mi.setHttpMethod(HttpMethod.PUT);
-            }
-            else if(m.isAnnotationPresent(DELETE.class))
-            {
-                mi.setHttpMethod(HttpMethod.DELETE);
-            }
-            else if(m.isAnnotationPresent(OPTIONS.class))
-            {
-                mi.setHttpMethod(HttpMethod.OPTIONS);
-            }
-            else if(m.isAnnotationPresent(HEAD.class))
-            {
-                mi.setHttpMethod(HttpMethod.HEAD);
-            }
+		        for(Method m: SReflect.getAllMethods(mapcl))
+		        {
+		            MappingInfo mi = new MappingInfo();
+		            if(m.isAnnotationPresent(GET.class))
+		            {
+		                mi.setHttpMethod(HttpMethod.GET);
+		            }
+		            else if(m.isAnnotationPresent(POST.class))
+		            {
+		                mi.setHttpMethod(HttpMethod.POST);
+		            }
+		            else if(m.isAnnotationPresent(PUT.class))
+		            {
+		                mi.setHttpMethod(HttpMethod.PUT);
+		            }
+		            else if(m.isAnnotationPresent(DELETE.class))
+		            {
+		                mi.setHttpMethod(HttpMethod.DELETE);
+		            }
+		            else if(m.isAnnotationPresent(OPTIONS.class))
+		            {
+		                mi.setHttpMethod(HttpMethod.OPTIONS);
+		            }
+		            else if(m.isAnnotationPresent(HEAD.class))
+		            {
+		                mi.setHttpMethod(HttpMethod.HEAD);
+		            }
 
-            if(m.isAnnotationPresent(Path.class))
-            {
-                Path path = m.getAnnotation(Path.class);
-                mi.setPath(path.value());
-            }
-            else if(!mi.isEmpty())
-            {
-                mi.setPath(m.getName());
-            }
+		            if(m.isAnnotationPresent(Path.class))
+		            {
+		                Path path = m.getAnnotation(Path.class);
+		                mi.setPath(path.value());
+		            }
+		            else if(!mi.isEmpty())
+		            {
+		                mi.setPath(m.getName());
+		            }
 
-            if(!mi.isEmpty())
-            {
-                if(m.isAnnotationPresent(Consumes.class))
-                {
-                    Consumes con = (Consumes)m.getAnnotation(Consumes.class);
-                    String[] types = con.value();
-                    for(String type: types)
-                    {
-                        mi.addConsumedMediaType(type);
-                    }
-                }
+		            if(!mi.isEmpty())
+		            {
+		                if(m.isAnnotationPresent(Consumes.class))
+		                {
+		                    Consumes con = (Consumes)m.getAnnotation(Consumes.class);
+		                    String[] types = con.value();
+		                    for(String type: types)
+		                    {
+		                        mi.addConsumedMediaType(type);
+		                    }
+		                }
 
-                if(m.isAnnotationPresent(Produces.class))
-                {
-                    Produces prod = (Produces)m.getAnnotation(Produces.class);
-                    String[] types = prod.value();
-                    for(String type: types)
-                    {
-                        mi.addProducedMediaType(type);
-                    }
-                }
+		                if(m.isAnnotationPresent(Produces.class))
+		                {
+		                    Produces prod = (Produces)m.getAnnotation(Produces.class);
+		                    String[] types = prod.value();
+		                    for(String type: types)
+		                    {
+		                        mi.addProducedMediaType(type);
+		                    }
+		                }
 
-//                // Jadex specific annotations
-//                if(m.isAnnotationPresent(ResultMapper.class))
-//                {
-//
-//                }
+//    		                // Jadex specific annotations
+//    		                if(m.isAnnotationPresent(ResultMapper.class))
+//    		                {
+		//
+//    		                }
 
-                mi.setMethod(m);
-                ret.add(mi.getPath(), mi);
-            }
+		                mi.setMethod(m);
+		                ret.add(mi.getPath(), mi);
+		            }
 
-            // Natural mapping using simply all declared methods
-            natret.add(m.getName(), new MappingInfo(null, m, m.getName()));
-        }
+		            // Natural mapping using simply all declared methods
+		            natret.add(m.getName(), new MappingInfo(null, m, m.getName()));
+		        }
 
-        return ret.size()>0? ret: natret;
+		        return new Future<MultiCollection<String, MappingInfo>>(ret.size()>0? ret: natret);
+    		}
+		}).addResultListener(new DelegationResultListener<>(ret));
+    	
+    	return ret;
     }
 
     /**
