@@ -786,6 +786,13 @@ task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 //	dependsOn subprojects.collect({p -> p.tasks.matching{it.name.equals('distZip')}}).flatten()
 //}
 
+// for shared stable/master jenkinsfile in buildscripts
+task distZips()  {
+	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
+	dependsOn subprojects.collect({p -> p.tasks.matching{it.name.equals('distZip')}}).flatten()
+}
+
+
 task checkDists()  {
 	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
 
