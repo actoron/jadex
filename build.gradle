@@ -228,12 +228,6 @@ subprojects
 		    if(task.name.contains("lint")) {
 		        task.enabled = false
 		    }
-		    if(task.name.contains("androidjavadocs")) {
-		        task.enabled = false
-		    }
-		    if(task.name.contains("signAndroidjavadocsJar")) {
-		        task.enabled = false
-		    }
 		}
 
 	 	if (isAndroidLibraryProject(project))
