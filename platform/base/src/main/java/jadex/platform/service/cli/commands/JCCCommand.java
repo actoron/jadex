@@ -87,7 +87,7 @@ public class JCCCommand extends CreateComponentCommand
 							CounterResultListener<Map<String, Object>> lis = new CounterResultListener<Map<String, Object>>(descs.length, new DelegationResultListener<Void>(ret));
 							for(IComponentDescription desc: descs)
 							{
-								ia.killComponent(desc.getName()).addResultListener(lis);
+								ia.getExternalAccess(desc.getName()).killComponent().addResultListener(lis);
 							}
 						}
 					});

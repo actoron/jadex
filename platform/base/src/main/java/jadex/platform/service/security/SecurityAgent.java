@@ -72,7 +72,6 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -90,16 +89,17 @@ import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
 /**
  *  Agent that provides the security service.
  */
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, predecessors="jadex.platform.service.clock.ClockAgent"))
+@Agent(autostart=Boolean3.TRUE,
+	predecessors="jadex.platform.service.clock.ClockAgent")
 @Arguments(value={
-	@Argument(name="usesecret", clazz=Boolean.class, defaultvalue="null"),
-	@Argument(name="printsecret", clazz=Boolean.class, defaultvalue="null"),
-	@Argument(name="refuseunauth", clazz=Boolean.class, defaultvalue="null"),
-	@Argument(name="platformsecret", clazz=String[].class, defaultvalue="null"),
-	@Argument(name="networknames", clazz=String[].class, defaultvalue="null"),
-	@Argument(name="networksecrets", clazz=String[].class, defaultvalue="null"),
-	@Argument(name="roles", clazz=String.class, defaultvalue="null")
-})
+		@Argument(name="usesecret", clazz=Boolean.class, defaultvalue="null"),
+		@Argument(name="printsecret", clazz=Boolean.class, defaultvalue="null"),
+		@Argument(name="refuseunauth", clazz=Boolean.class, defaultvalue="null"),
+		@Argument(name="platformsecret", clazz=String[].class, defaultvalue="null"),
+		@Argument(name="networknames", clazz=String[].class, defaultvalue="null"),
+		@Argument(name="networksecrets", clazz=String[].class, defaultvalue="null"),
+		@Argument(name="roles", clazz=String.class, defaultvalue="null")
+	})
 //@Service // This causes problems because the wrong preprocessor is used (for pojo services instead of remote references)!!!
 @ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
@@ -643,7 +643,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					
 					if (cs != null && cs.isExpiring())
 					{
-						currentcryptosuites.writeLock().lock();
+						currentcryptosuites.getWriteLock().lock();
 						try
 						{
 							if (cs.equals(currentcryptosuites.get(rplat)))
@@ -656,7 +656,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						}
 						finally
 						{
-							currentcryptosuites.writeLock().unlock();
+							currentcryptosuites.getWriteLock().unlock();
 						}
 					}
 					
@@ -1633,7 +1633,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							List<String> pfnames = new ArrayList<>();
-							currentcryptosuites.writeLock().lock();
+							currentcryptosuites.getWriteLock().lock();
 							try
 							{
 								pfnames.addAll(currentcryptosuites.keySet());
@@ -1642,7 +1642,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							}
 							finally
 							{
-								currentcryptosuites.writeLock().unlock();
+								currentcryptosuites.getWriteLock().unlock();
 							}
 							for (String pfname : pfnames)
 								initializeHandshake(pfname);
@@ -1694,7 +1694,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected void expireCryptosuite(String pfname)
 	{
 		assert agent.isComponentThread();
-		currentcryptosuites.writeLock().lock();
+		currentcryptosuites.getWriteLock().lock();
 		try
 		{
 			ICryptoSuite cs = currentcryptosuites.get(pfname);
@@ -1706,7 +1706,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		finally
 		{
-			currentcryptosuites.writeLock().unlock();
+			currentcryptosuites.getWriteLock().unlock();
 		}
 	}
 	
@@ -1716,7 +1716,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected void refreshCryptosuiteRoles()
 	{
 		assert agent.isComponentThread();
-		currentcryptosuites.writeLock().lock();
+		currentcryptosuites.getWriteLock().lock();
 		try
 		{
 			for (Map.Entry<String, ICryptoSuite> entry : currentcryptosuites.entrySet())
@@ -1742,7 +1742,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		finally
 		{
-			currentcryptosuites.writeLock().unlock();
+			currentcryptosuites.getWriteLock().unlock();
 		}
 	}
 	
@@ -2056,7 +2056,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				ICryptoSuite oldcs = currentcryptosuites.get(rplat.toString());
 				if (oldcs != null)
 				{
-					currentcryptosuites.writeLock().lock();
+					currentcryptosuites.getWriteLock().lock();
 					try
 					{
 						if (oldcs.equals(currentcryptosuites.get(rplat.toString())))
@@ -2072,7 +2072,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					}
 					finally
 					{
-						currentcryptosuites.writeLock().unlock();
+						currentcryptosuites.getWriteLock().unlock();
 					}
 				}
 				

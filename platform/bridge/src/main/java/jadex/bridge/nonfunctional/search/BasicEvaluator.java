@@ -141,7 +141,7 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 		}
 		else
 		{
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{

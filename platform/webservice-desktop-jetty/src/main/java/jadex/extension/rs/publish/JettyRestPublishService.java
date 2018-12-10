@@ -23,6 +23,8 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -33,6 +35,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 
@@ -70,16 +73,16 @@ public class JettyRestPublishService extends AbstractRestPublishService
     /** Infos for unpublishing. */
     protected Map<IServiceIdentifier, Tuple2<Server, ContextHandler>> unpublishinfos = new HashMap<IServiceIdentifier, Tuple2<Server,ContextHandler>>();
     
-    @AgentCreated
+    @ServiceStart
     public void start()
     {
     	System.out.println("Jetty started");
     }
     
-    @AgentKilled
+    @ServiceShutdown
     public void stop()
     {
-    	if (portservers != null)
+    	if(portservers != null)
     	{
     		for (Map.Entry<Integer, Server> entry : portservers.entrySet())
     		{
@@ -113,54 +116,64 @@ public class JettyRestPublishService extends AbstractRestPublishService
      */
     public IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info)
     {
-        try
-        {
-        	//final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
-        	
-            final URI uri = new URI(getCleanPublishId(info.getPublishId()));
-            Server server = (Server)getHttpServer(uri, info);
-            System.out.println("Adding http handler to server (jetty): "+uri.getPath());
-
-            ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
-
-            final MultiCollection<String, MappingInfo> mappings = evaluateMapping(serviceid, info);
-
-            ContextHandler ch = new ContextHandler()
-            {
-            	protected IService service = null;
-            	
-                public void doHandle(String target, Request baseRequest, final HttpServletRequest request, final HttpServletResponse response)
-                    throws IOException, ServletException
-                {
-                	if(service==null)
-                		service = component.getExternalAccess().searchService( new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
-                	
-                    // Hack to enable multi-part
-                    // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html
-                    if(request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) 
-                    	baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
-                	
-                	handleRequest(service, mappings, request, response, new Object[]{target, baseRequest});
-                	
-//                  System.out.println("handler is: "+uri.getPath());
-                    baseRequest.setHandled(true);
-                }
-            };
-            ch.setContextPath(uri.getPath());
-            collhandler.addHandler(ch);
-            unpublishinfos.put(serviceid, new Tuple2<Server,ContextHandler>(server, ch));
-            ch.start(); // must be started explicitly :-(((
-
-            if(sidservers==null)
-                sidservers = new HashMap<IServiceIdentifier, Server>();
-            sidservers.put(serviceid, server);
-        }
-        catch(Exception e)
-        {
-            throw new RuntimeException(e);
-        }
+    	Future<Void> ret = new Future<>();
+		
+        IFuture<MultiCollection<String, MappingInfo>> fut = evaluateMapping(serviceid, info);
         
-        return IFuture.DONE;
+        fut.addResultListener(new ExceptionDelegationResultListener<MultiCollection<String, MappingInfo>, Void>(ret)
+		{
+        	@Override
+        	public void customResultAvailable(MultiCollection<String, MappingInfo> mappings)
+        	{
+        		try
+                {
+                	//final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
+                	
+                    final URI uri = new URI(getCleanPublishId(info.getPublishId()));
+                    Server server = (Server)getHttpServer(uri, info);
+                    System.out.println("Adding http handler to server (jetty): "+uri.getPath());
+
+                    ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
+
+                    ContextHandler ch = new ContextHandler()
+                    {
+                    	protected IService service = null;
+                    	
+                        public void doHandle(String target, Request baseRequest, final HttpServletRequest request, final HttpServletResponse response)
+                            throws IOException, ServletException
+                        {
+                        	if(service==null)
+                        		service = component.getExternalAccess().searchService( new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
+                        	
+                            // Hack to enable multi-part
+                            // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html
+                            if(request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) 
+                            	baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+                        	
+                        	handleRequest(service, mappings, request, response, new Object[]{target, baseRequest});
+                        	
+//                          System.out.println("handler is: "+uri.getPath());
+                            baseRequest.setHandled(true);
+                        }
+                    };
+                    ch.setContextPath(uri.getPath());
+                    collhandler.addHandler(ch);
+                    unpublishinfos.put(serviceid, new Tuple2<Server,ContextHandler>(server, ch));
+                    ch.start(); // must be started explicitly :-(((
+
+                    if(sidservers==null)
+                        sidservers = new HashMap<IServiceIdentifier, Server>();
+                    sidservers.put(serviceid, server);
+                    ret.setResult(null);
+                }
+                catch(Exception e)
+                {
+                	ret.setException(e);
+                }
+        	}
+		});
+        
+        return ret;
     }
 
     /**

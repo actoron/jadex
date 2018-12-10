@@ -896,7 +896,7 @@ public class ObserverCenter implements IObserverCenter
 			dispose();
 			if(killonexit)
 			{
-				space.getExternalAccess().killComponent(space.getExternalAccess().getId());
+				space.getExternalAccess().getExternalAccess(space.getExternalAccess().getId()).killComponent();
 			}
 		}
 		

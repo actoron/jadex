@@ -60,7 +60,7 @@ public class SubscriptionListenerTestAgent extends TestAgent
 							tr.setFailed("Wrong vals: "+vals1+", "+vals2);
 						}
 						
-						platform.killComponent(provider)
+						platform.getExternalAccess(provider).killComponent()
 							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
 						{
 							public void customResultAvailable(Map<String, Object> map)

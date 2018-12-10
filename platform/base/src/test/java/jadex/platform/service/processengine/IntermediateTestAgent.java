@@ -9,6 +9,7 @@ import java.util.Map;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
@@ -262,7 +263,7 @@ public class IntermediateTestAgent
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
+		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(model));
 		
 		try
 		{
@@ -274,7 +275,7 @@ public class IntermediateTestAgent
 			tr.setFailed("Timeout exception.");
 			try
 			{
-				agent.killComponent(fut.getFirstResult());
+				fut.get().killComponent();
 			}
 			catch(Exception ex)
 			{
@@ -299,9 +300,9 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		CreationInfo ci = new CreationInfo(agent.getId()).setFilename(model);
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(ci);
-		fut.getFirstResult();
+		CreationInfo ci = new CreationInfo().setFilename(model);
+		IFuture<IExternalAccess> fut = agent.createComponent(ci);
+		fut.get();
 		
 //		// For debugging to receive error messages, when thread hangs before fut.get().
 //		fut.addResultListener(new IResultListener<Collection<TupleResult>>()
@@ -332,7 +333,7 @@ public class IntermediateTestAgent
 			tr.setFailed("Timeout exception.");
 			try
 			{
-				agent.killComponent(fut.getFirstResult());
+				fut.get().killComponent();
 			}
 			catch(Exception ex)
 			{
@@ -357,8 +358,8 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
-		fut.getFirstResult();
+		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(model));
+		fut.get();
 
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
@@ -376,7 +377,7 @@ public class IntermediateTestAgent
 			tr.setSucceeded(true);
 			try
 			{
-				agent.killComponent(fut.getFirstResult());
+				fut.get().killComponent();
 			}
 			catch(Exception ex)
 			{
@@ -401,8 +402,8 @@ public class IntermediateTestAgent
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
-		fut.getFirstResult();
+		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(model));
+		fut.get();
 
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 		
@@ -420,7 +421,7 @@ public class IntermediateTestAgent
 			tr.setSucceeded(true);
 			try
 			{
-				agent.killComponent(fut.getFirstResult());
+				fut.get().killComponent();
 			}
 			catch(Exception ex)
 			{
@@ -448,7 +449,7 @@ public class IntermediateTestAgent
 		
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();
 
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(new CreationInfo(agent.getId()).setFilename(model));
+		IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(model));
 		
 		try
 		{
@@ -460,7 +461,7 @@ public class IntermediateTestAgent
 			tr.setSucceeded(true);
 			try
 			{
-				agent.killComponent(fut.getFirstResult());
+				fut.get().killComponent();
 			}
 			catch(Exception ex)
 			{

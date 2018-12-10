@@ -154,8 +154,11 @@ public class CMSStatusEvent
 	 */
 	public static class CMSTerminatedEvent extends CMSStatusEvent
 	{
-		/** The cid. */
+		/** The component results. */
 		protected Map<String, Object> results;
+		
+		/** Component exception if component failed */
+		protected Exception exception;
 
 		/**
 		 *  Create a new CMSCreatedEvent. 
@@ -167,10 +170,11 @@ public class CMSStatusEvent
 		/**
 		 *  Create a new CMSCreatedEvent. 
 		 */
-		public CMSTerminatedEvent(IComponentDescription desc, Map<String, Object> results)
+		public CMSTerminatedEvent(IComponentDescription desc, Map<String, Object> results, Exception exception)
 		{
 			super(desc);
 			this.results = results;
+			this.exception = exception;
 		}
 
 		/**
@@ -189,6 +193,24 @@ public class CMSStatusEvent
 		public void setResults(Map<String, Object> results)
 		{
 			this.results = results;
+		}
+		
+		/**
+		 *  Get the component exception if error occurred.
+		 *  @return The exception or null if no error.
+		 */
+		public Exception getException()
+		{
+			return exception;
+		}
+		
+		/**
+		 *  Set the component exception if error occurred.
+		 *  @param exception The exception or null if no error.
+		 */
+		public void setException(Exception exception)
+		{
+			this.exception = exception;
 		}
 	}
 }

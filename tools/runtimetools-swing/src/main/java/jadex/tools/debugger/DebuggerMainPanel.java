@@ -95,7 +95,7 @@ public class DebuggerMainPanel extends JSplitPane
 		
 		final JTabbedPane tabs = new JTabbedPane();	
 		
-		jcc.getPlatformAccess().getExternalAccess(desc.getName())
+		jcc.getPlatformAccess().getExternalAccessAsync(desc.getName())
 			.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 		{			
 			public void resultAvailable(final IExternalAccess exta)
@@ -186,7 +186,7 @@ public class DebuggerMainPanel extends JSplitPane
 			public void actionPerformed(ActionEvent e)
 			{
 				pause.setEnabled(false);
-				DebuggerMainPanel.this.jcc.getPlatformAccess().suspendComponent(DebuggerMainPanel.this.desc.getName());
+				DebuggerMainPanel.this.jcc.getPlatformAccess().getExternalAccess(DebuggerMainPanel.this.desc.getName()).suspendComponent();
 			}
 		});
 		
@@ -221,7 +221,7 @@ public class DebuggerMainPanel extends JSplitPane
 				step.setEnabled(false);
 				run.setEnabled(false);
 				pause.setEnabled(true);
-				IFuture<Void> ret = DebuggerMainPanel.this.jcc.getPlatformAccess().resumeComponent(DebuggerMainPanel.this.desc.getName()); 
+				IFuture<Void> ret = DebuggerMainPanel.this.jcc.getPlatformAccess().getExternalAccess(DebuggerMainPanel.this.desc.getName()).resumeComponent(); 
 				ret.addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)

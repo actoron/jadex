@@ -16,7 +16,6 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -27,7 +26,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Kill peer agent if present.
  *  Starts peer agent on terminate.
  */
-@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="oldsuperpeer"))
+@Agent(name="oldsuperpeer", autostart=Boolean3.FALSE)
 @ProvidedServices(@ProvidedService(type=ISuperpeerRegistrySynchronizationService.class, 
 	implementation=@Implementation(expression="new SuperpeerRegistrySynchronizationService(SuperpeerRegistrySynchronizationService.DEFAULT_SUPERSUPERPEERS, $args.supersuperpeer? 0: 1)")))
 // TODO: publication scope.
@@ -60,7 +59,7 @@ public class SuperpeerRegistrySynchronizationAgent
 			
 			if(pser!=null)
 			{
-				component.killComponent(((IService)pser).getServiceId().getProviderId());
+				component.getExternalAccess(((IService)pser).getServiceId().getProviderId()).killComponent();
 			}
 		}
 		catch(ServiceNotFoundException e)

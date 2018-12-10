@@ -395,27 +395,29 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{	
 				kernels.put(f.getFirstEntity(), null);
 				
-				CreationInfo ci = new CreationInfo(agent.getId());
+				CreationInfo ci = new CreationInfo();
 				ci.setFilename(f.getFirstEntity()+".class");
 				
 //				System.out.println("create compo start: "+f.getFirstEntity());
-				agent.createComponent(ci, new IResultListener<Collection<Tuple2<String, Object>>>()
-				{
-					public void resultAvailable(Collection<Tuple2<String, Object>> result)
-					{
-//						System.out.println("Killed kernel: " + f);
-						kernels.remove(f.getFirstEntity());
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-//						System.out.println("Killed kernel: " + f+", "+exception);
-						kernels.remove(f.getFirstEntity());
-					}
-				}).addResultListener(new IResultListener<IExternalAccess>()
+				agent.createComponent(ci).addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)
 					{
+						exta.waitForTermination().addResultListener(new IResultListener<Map<String, Object>>()
+						{
+							public void resultAvailable(Map<String, Object> result)
+							{
+		//						System.out.println("Killed kernel: " + f);
+								kernels.remove(f.getFirstEntity());
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+		//						System.out.println("Killed kernel: " + f+", "+exception);
+								kernels.remove(f.getFirstEntity());
+							}
+						});
+						
 //						System.out.println("Started factory: "+exta);
 						kernels.put(f.getFirstEntity(), exta.getId());
 						

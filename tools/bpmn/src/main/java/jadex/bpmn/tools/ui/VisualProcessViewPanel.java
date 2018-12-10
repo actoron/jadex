@@ -1066,7 +1066,7 @@ public class VisualProcessViewPanel extends JPanel
 	 */
 	protected void doStep()
 	{
-		IFuture<Void> ret = access.stepComponent(access.getId(), getStepInfo());
+		IFuture<Void> ret = access.stepComponent(getStepInfo());
 		ret.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
@@ -1107,7 +1107,7 @@ public class VisualProcessViewPanel extends JPanel
 						abps.add(bp);
 					}
 					
-					access.setComponentBreakpoints(access.getId(), (String[])abps.toArray(new String[abps.size()]))
+					access.setComponentBreakpoints((String[])abps.toArray(new String[abps.size()]))
 						.addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});

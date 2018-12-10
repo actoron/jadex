@@ -333,7 +333,7 @@ public class HelplineEvaluation
 						? m*cnt/measurecnt + j	// multi: same person numbers used on for all platforms.
 						: numpersons + m*platforms.length + i*cnt/measurecnt + j;	// single: different person numbers for each platform
 					fubar.addFuture(platforms[i].createComponent(
-						new CreationInfo(Collections.singletonMap("person", (Object)("person"+num))).setFilename(HelplineAgent.class.getName()+".class"), null));
+						new CreationInfo(Collections.singletonMap("person", (Object)("person"+num))).setFilename(HelplineAgent.class.getName()+".class")));
 				}
 			}
 			fubar.waitFor().get();

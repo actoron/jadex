@@ -417,7 +417,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 						final IComponentIdentifier cid = node.getComponentIdentifier();
 						
-						getJCC().getJCCAccess().getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>(comptree)
+						getJCC().getJCCAccess().getExternalAccessAsync(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>(comptree)
 						{
 							public void customResultAvailable(final IExternalAccess exta)
 							{
@@ -609,7 +609,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					final Future<Boolean>	fut	= new Future<Boolean>();
 					viewables.put(cid, fut);
 					// Unknown -> start search to find out asynchronously
-					getJCC().getJCCAccess().getExternalAccess(cid).addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, Boolean>(fut)
+					getJCC().getJCCAccess().getExternalAccessAsync(cid).addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, Boolean>(fut)
 					{
 						public void customResultAvailable(final IExternalAccess exta)
 						{

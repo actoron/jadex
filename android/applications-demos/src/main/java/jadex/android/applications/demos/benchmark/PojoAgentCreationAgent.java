@@ -118,7 +118,7 @@ public class PojoAgentCreationAgent
 					args.put("startmem", Long.valueOf(startmem));
 					agent.createComponent(
 						new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
-							.setName(createPeerName(num+1, agent.getId())).setFilename(PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"), null);
+							.setName(createPeerName(num+1, agent.getId())).setFilename(PojoAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"));
 //				}
 //			});
 		}
@@ -155,10 +155,11 @@ public class PojoAgentCreationAgent
 //						{
 							String	initial	= createPeerName(1, agent.getId());
 							IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
-							agent.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
-							{
-								public void resultAvailable(IExternalAccess exta)
-								{
+							IExternalAccess exta	= agent.getExternalAccess(cid);
+//								.addResultListener(new DefaultResultListener<IExternalAccess>()
+//							{
+//								public void resultAvailable(IExternalAccess exta)
+//								{
 									exta.scheduleStep(new IComponentStep<Void>()
 									{
 										@Classname("deletePeers")
@@ -178,8 +179,8 @@ public class PojoAgentCreationAgent
 											return ret;
 										}
 									});
-								}
-							});
+//								}
+//							});
 //						}
 //					});
 				}
@@ -218,7 +219,7 @@ public class PojoAgentCreationAgent
 //			public void resultAvailable(IComponentManagementService cms)
 //			{
 				IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
-				agent.killComponent(aid).addResultListener(new DefaultResultListener<Map<String, Object>>()
+				agent.getExternalAccess(aid).killComponent().addResultListener(new DefaultResultListener<Map<String, Object>>()
 				{
 					public void resultAvailable(Map<String, Object> result)
 					{

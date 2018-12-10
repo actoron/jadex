@@ -39,14 +39,15 @@ import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 /**
  *  Super peer collects services from client and answers search requests and queries.
  */
-@Agent(autostart=@Autostart(name="superpeer", value=Boolean3.FALSE))
+@Agent(name="superpeer",
+	autostart=Boolean3.FALSE,
+	predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent")
 @Service
 @ProvidedServices(replace=true,
 	value={@ProvidedService(type=ISuperpeerService.class, scope=ServiceScope.GLOBAL),

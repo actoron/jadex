@@ -55,7 +55,7 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 		
 		for(IComponentIdentifier proxy: proxies)
 		{
-			IFuture<Map<String, Object>> kill = agent.killComponent(proxy);
+			IFuture<Map<String, Object>> kill = agent.getExternalAccess(proxy).killComponent();
 			fubar.addFuture(kill);
 		}
 		proxies	= null;

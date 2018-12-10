@@ -42,7 +42,7 @@ public class ExternalAccessInvokerAgent
 				final IComponentIdentifier cid = agentselector.selectAgent(null);
 				if(cid!=null)
 				{
-					agent.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+					agent.getExternalAccessAsync(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 					{
 						public void resultAvailable(IExternalAccess ea)
 						{

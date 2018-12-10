@@ -350,7 +350,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@Classname("close")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.killComponent(agent.getId().getParent());
+						ia.getExternalAccess(agent.getId().getParent()).killComponent();
 
 						return IFuture.DONE;
 					}
@@ -419,24 +419,17 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				final IBDIXAgentFeature bia = ia.getFeature(IBDIXAgentFeature.class);
 				
 				ia.createComponent(
-					new CreationInfo(ia.getId().getParent()).setName("BlackjackDealer").setFilename("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml"))
-				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+					new CreationInfo().setName("BlackjackDealer").setFilename("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml"))
+				.addResultListener(new IResultListener<IExternalAccess>()
 				{
-					@Override
-					public void firstResultAvailable(IComponentIdentifier dealer)
+					public void resultAvailable(IExternalAccess dealer)
 					{
 						bia.getLogger().info("local DealerAgent started: "+dealer);
 						//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
-						bia.getBeliefbase().getBelief("localDealerAID").setFact(dealer);
+						bia.getBeliefbase().getBelief("localDealerAID").setFact(dealer.getId());
 						ret.setResult(null);
 					}
 					
-					@Override
-					public void secondResultAvailable(Map<String, Object> result)
-					{
-					}
-					
-					@Override
 					public void exceptionOccurred(Exception exception)
 					{
 						ret.setExceptionIfUndone(exception);
@@ -468,7 +461,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				IComponentIdentifier dealer = (IComponentIdentifier)bia.getBeliefbase().getBelief("localDealerAID").getFact();
 				if(dealer!=null)
 				{
-					ia.killComponent(dealer);
+					ia.getExternalAccess(dealer).killComponent();
 					bia.getBeliefbase().getBelief("localDealerAID").setFact(null);
 				}
 				return IFuture.DONE;
@@ -629,21 +622,14 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						args.put("dealer", dealeraid);
 						
 						ia.createComponent(new CreationInfo(args, ia.getId().getParent()).setName(player.getName()).setFilename("jadex/bdi/examples/blackjack/player/Player.agent.xml"))
-							.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+							.addResultListener(new IResultListener<IExternalAccess>()
 						{
-							@Override
-							public void firstResultAvailable(IComponentIdentifier playerid)
+							public void resultAvailable(IExternalAccess playerexta)
 							{
-								player.setAgentID(playerid);
+								player.setAgentID(playerexta.getId());
 								ret.setResult(null);
 							}
 							
-							@Override
-							public void secondResultAvailable(Map<String, Object> result)
-							{
-							}
-							
-							@Override
 							public void exceptionOccurred(Exception exception)
 							{
 								ret.setExceptionIfUndone(exception);
@@ -669,7 +655,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				@Classname("stop")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.killComponent(player.getAgentID());
+					ia.getExternalAccess(player.getAgentID()).killComponent();
 					return IFuture.DONE;
 				}
 			});

@@ -54,7 +54,7 @@ public class SingleTest extends	ComponentTestSuite
 		SingleTest test = null;
 //		test = new SingleTest("jadex.bdi.examples.puzzle.Benchmark");
 //		test = new SingleTest("jadex.bdiv3.testcases.semiautomatic");
-//		test = new SingleTest("jadex.bdi.testcases.goals.GoalRecur");
+		test = new SingleTest("jadex.bdi.testcases.misc.Flag");
 //				"jadex.micro.testcases.servicequeries.User",
 //				"jadex.micro.testcases.threading.Initiator",
 //				"jadex.micro.servicecall.ServiceCall");

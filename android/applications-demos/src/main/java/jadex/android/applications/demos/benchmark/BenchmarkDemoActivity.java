@@ -138,9 +138,9 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 //					new String[]{SRelay.ADDRESS_SCHEME+"grisougarfield.dyndns.org:52339/relay/"}));
 			}
 			
-			runBenchmark(agent, args).addResultListener(new IResultListener<Collection<Tuple2<String, Object>>>()
+			runBenchmark(agent, args).addResultListener(new IResultListener<Map<String, Object>>()
 			{
-				public void resultAvailable(final Collection<Tuple2<String, Object>> result)
+				public void resultAvailable(final Map<String, Object> result)
 				{
 					System.out.println(result);
 				}
@@ -169,24 +169,26 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 	/**
 	 *  Run a benchmark and return the results.
 	 */
-	protected IFuture<Collection<Tuple2<String, Object>>>	runBenchmark(final String agent, final Map<String, Object> args)
+	protected IFuture<Map<String, Object>>	runBenchmark(final String agent, final Map<String, Object> args)
 	{
-		return getPlatformAccess().scheduleStep(new IComponentStep<Collection<Tuple2<String, Object>>>()
+		return getPlatformAccess().scheduleStep(new IComponentStep<Map<String, Object>>()
 		{
 			@Classname("create-component")
-			public IFuture<Collection<Tuple2<String, Object>>> execute(IInternalAccess ia)
+			public IFuture<Map<String, Object>> execute(IInternalAccess ia)
 			{
-				final Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
+				final Future<Map<String, Object>>	fut	= new Future<>();
 //				ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class))
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<Tuple2<String, Object>>>(fut)
 //				{
 //					public void customResultAvailable(IComponentManagementService cms)
 //					{
-						ia.createComponent(new CreationInfo(args).setName(agent), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
+						ia.createComponent(new CreationInfo(args).setName(agent))
+//						, new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, Object>>(fut)
 						{
 							public void customResultAvailable(IExternalAccess result)
 							{
+								result.waitForTermination().addResultListener(new DelegationResultListener<>(fut));
 								// ignore (wait for agent termination)
 							}
 						});

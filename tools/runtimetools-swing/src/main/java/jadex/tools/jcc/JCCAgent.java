@@ -28,7 +28,6 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Properties;
 import jadex.tools.chat.ChatPlugin;
@@ -47,7 +46,7 @@ import jadex.tools.starter.StarterPlugin;
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true", description="Save settings on exit?"),
 	@Argument(name="platforms", clazz=String.class, defaultvalue="null", description="Show JCC for platforms matching this name.")
 })
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="jcc", predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
+@Agent(name="jcc", autostart=Boolean3.TRUE, predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent")
 @Properties(@NameValue(name="system", value="true"))
 public class JCCAgent implements IComponentStep<Void>
 {
@@ -144,7 +143,7 @@ public class JCCAgent implements IComponentStep<Void>
 						if(cid.getName().startsWith(platforms))
 						{
 							connected = true;
-							agent.getExternalAccess(cid)
+							agent.getExternalAccessAsync(cid)
 								.addResultListener(new IResultListener<IExternalAccess>()
 							{
 								public void resultAvailable(IExternalAccess platform)

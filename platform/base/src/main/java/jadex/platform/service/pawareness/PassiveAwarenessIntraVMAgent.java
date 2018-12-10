@@ -25,15 +25,15 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Autostart;
 
 /**
  *  Implements passive awareness via shared memory.
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE,
+@Agent(autoprovide = Boolean3.TRUE,
 	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
+	successors="jadex.platform.service.registryv2.SuperpeerClientAgent",
+	autostart=Boolean3.FALSE
 )
 public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //extends PassiveAwarenessBaseAgent
 {

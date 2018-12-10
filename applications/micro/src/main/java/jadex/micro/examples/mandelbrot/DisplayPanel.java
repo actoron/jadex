@@ -399,7 +399,7 @@ public class DisplayPanel extends JComponent
 												final ProgressData	progress	= (ProgressData)pds[i];
 												if(!progress.isFinished())
 												{
-													ia.getExternalAccess(progress.getProviderId())
+													ia.getExternalAccessAsync(progress.getProviderId())
 														.addResultListener(new SwingResultListener<IExternalAccess>(new IResultListener<IExternalAccess>()
 													{
 														public void resultAvailable(IExternalAccess	ea)

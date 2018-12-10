@@ -479,7 +479,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		{
 			final Future<String[]> ret = new Future<String[]>();
 
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -512,7 +512,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<String[]> ret = new Future<String[]>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -554,7 +554,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, INFPropertyMetaInfo>>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, INFPropertyMetaInfo>>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -596,7 +596,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -630,7 +630,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<T> ret = new Future<T>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -665,7 +665,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<T> ret = new Future<T>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -697,7 +697,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<Void> ret = new Future<Void>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -729,7 +729,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<Void> ret = new Future<Void>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -760,7 +760,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<Void> ret = new Future<Void>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -795,7 +795,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		{
 			final Future<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>> ret = new Future<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>();
 
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -828,7 +828,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<String[]> ret = new Future<String[]>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -861,7 +861,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<String[]> ret = new Future<String[]>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String[]>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -893,7 +893,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, INFPropertyMetaInfo>>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, INFPropertyMetaInfo>>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -927,7 +927,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, INFPropertyMetaInfo>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -962,7 +962,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<T> ret = new Future<T>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -1012,7 +1012,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<T> ret = new Future<T>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -1045,7 +1045,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<Void> ret = new Future<Void>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{
@@ -1078,7 +1078,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		else
 		{
 			final Future<Void> ret = new Future<Void>();
-			component.getExternalAccess(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
 				{

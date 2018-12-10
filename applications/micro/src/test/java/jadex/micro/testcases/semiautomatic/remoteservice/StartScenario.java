@@ -1,6 +1,6 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
-import java.util.Collection;
+import java.util.Map;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
@@ -10,7 +10,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -63,7 +62,7 @@ public class StartScenario
 //						{
 //							public void resultAvailable(final IComponentManagementService rcms)
 //							{
-								rplat.createComponent(new CreationInfo().setName("math").setFilename("MathAgent.class"), null)
+								rplat.createComponent(new CreationInfo().setName("math").setFilename("MathAgent.class"))
 									.addResultListener(new DefaultResultListener<IExternalAccess>()
 								{
 									public void resultAvailable(IExternalAccess result)
@@ -74,18 +73,24 @@ public class StartScenario
 											new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 										
 										lplat.createComponent(
-											new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{rrms})).setName("proxy").setFilename("jadex.platform.service.remote.ProxyAgent.class"), null)
+											new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{rrms})).setName("proxy").setFilename("jadex.platform.service.remote.ProxyAgent.class"))
 											.addResultListener(new DefaultResultListener<IExternalAccess>()
 										{
 											public void resultAvailable(IExternalAccess result)
 											{
-												lplat.createComponent(new CreationInfo().setName("user").setFilename("UserAgent.class"), new DefaultResultListener<Collection<Tuple2<String, Object>>>()
+												lplat.createComponent(new CreationInfo().setName("user").setFilename("UserAgent.class")).addResultListener(new DefaultResultListener<IExternalAccess>()
 												{
-													public void resultAvailable(Collection<Tuple2<String, Object>> res)
+													public void resultAvailable(IExternalAccess result)
 													{
-														//System.out.println("killed local user: "+result);
-													
-														ret.setResult(new IExternalAccess[]{lplat, rplat});
+														result.waitForTermination().addResultListener(new DefaultResultListener<Map<String, Object>>()
+														{
+															public void resultAvailable(Map<String, Object> res)
+															{
+																//System.out.println("killed local user: "+result);
+															
+																ret.setResult(new IExternalAccess[]{lplat, rplat});
+															}
+														});
 													}
 												});
 											}

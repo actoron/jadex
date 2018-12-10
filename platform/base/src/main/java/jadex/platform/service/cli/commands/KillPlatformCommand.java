@@ -57,7 +57,7 @@ public class KillPlatformCommand extends ACliCommand
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		
-		comp.killComponent(comp.getId().getRoot())
+		comp.getExternalAccess(comp.getId().getRoot()).killComponent()
 			.addResultListener(new DelegationResultListener<Map<String,Object>>(ret));
 
 		return ret;

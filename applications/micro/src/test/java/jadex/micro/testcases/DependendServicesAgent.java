@@ -172,7 +172,7 @@ public class DependendServicesAgent extends JunitAgentTest
 					new DelegationResultListener<Collection<IExternalAccess>>(ret));
 				for(int i=0; !ret.isDone() && i<children.length; i++)
 				{
-					agent.getExternalAccess(children[i]).addResultListener(crl);
+					agent.getExternalAccessAsync(children[i]).addResultListener(crl);
 				}
 			}
 		});

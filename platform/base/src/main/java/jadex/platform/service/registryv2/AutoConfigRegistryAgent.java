@@ -38,7 +38,6 @@ import jadex.bridge.service.types.registryv2.ISuperpeerService;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -49,7 +48,6 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Autostart;
 import jadex.platform.service.security.SecurityAgent;
 
 /**
@@ -57,8 +55,10 @@ import jadex.platform.service.security.SecurityAgent;
  *  a) make this platform to a SP registry (upgrade)
  *  b) make this platform from a SP registry to a normal client (downgrade) 
  */
-@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE, name="spautoconf", 
-predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
+@Agent(name="spautoconf",
+	autoprovide=Boolean3.TRUE,
+	predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent", 
+	autostart=Boolean3.FALSE)
 @Service
 public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 {
@@ -492,7 +492,8 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		final Number[] res = new Number[valcnt];
 		final int[] cnt = new int[valcnt];
 		
-		IExternalAccess ea = SServiceProvider.getExternalAccessProxy(agent, sid.getProviderId().getRoot());
+//		IExternalAccess ea = SServiceProvider.getExternalAccessProxy(agent, sid.getProviderId().getRoot());
+		IExternalAccess ea = agent.getExternalAccess(sid.getProviderId().getRoot());
 		
 		final Runnable run = new Runnable()
 		{
@@ -597,16 +598,11 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 //			IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
 			CreationInfo ci = new CreationInfo().setName("spreg").setFilename(SuperpeerRegistryAgent.class.getName()+".class");
 			
-			agent.createComponent(ci)
-				.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+			agent.createComponent(ci).addResultListener(new IResultListener<IExternalAccess>()
 			{
-				public void firstResultAvailable(IComponentIdentifier result)
+				public void resultAvailable(IExternalAccess result)
 				{
 					ret.setResult(null);
-				}
-				
-				public void secondResultAvailable(Map<String, Object> result)
-				{
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -634,7 +630,7 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 		ISuperpeerService sps = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISuperpeerService.class).setMultiplicity(0));
 		if (sps != null)
 		{
-			agent.killComponent(((IService)sps).getServiceId().getProviderId()).addResultListener(new IResultListener<Map<String,Object>>()
+			agent.getExternalAccess(((IService)sps).getServiceId().getProviderId()).killComponent().addResultListener(new IResultListener<Map<String,Object>>()
 			{
 				public void resultAvailable(Map<String, Object> result)
 				{

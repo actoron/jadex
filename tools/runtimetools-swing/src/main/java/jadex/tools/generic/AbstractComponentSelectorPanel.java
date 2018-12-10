@@ -104,7 +104,7 @@ public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPan
 		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		
 		// Get external access using local CMS (speedup in case remote component found by remote platform is actually local).
-		jccaccess.getExternalAccess((IComponentIdentifier)cid)
+		jccaccess.getExternalAccessAsync((IComponentIdentifier)cid)
 			.addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, IAbstractViewerPanel>(ret)
 		{
 			public void customResultAvailable(IExternalAccess exta)

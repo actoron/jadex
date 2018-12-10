@@ -222,8 +222,8 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //				System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
-		CreationInfo	ci	= new CreationInfo(local ? agent.getId() : root, rid);
-		agent.createComponent(ci.setFilename("jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class"), null)
+		CreationInfo	ci	= new CreationInfo(rid);
+		agent.getExternalAccess(local ? agent.getId() : root).createComponent(ci.setFilename("jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class"))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
@@ -265,7 +265,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 								{
 									tr.setReason("Results did arrive too fast (in bunch at the end (needed/expected): ("+needed+" / "+expected);
 								}
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 							public void resultAvailable(Collection<String> result)
@@ -273,7 +273,7 @@ public class IntermediateTestAgent extends RemoteTestBaseAgent
 //										System.out.println("resultAvailable: "+result);
 								TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
 								tr.setReason("resultAvailable was called");
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 							public void exceptionOccurred(Exception exception)

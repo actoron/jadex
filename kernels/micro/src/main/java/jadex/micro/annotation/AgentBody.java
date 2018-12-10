@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Marker for agent body method.
+ *  A method marked with this annotation will be called after creation of the agent is complete.
+ *  At this point, all fields and required services are available and can be used.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

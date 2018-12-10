@@ -14,7 +14,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
  *  send files and user status.
  */
 @Security(roles=Security.UNRESTRICTED)
-@Service(system=true)
+@Service
 public interface IChatService
 {
 	//-------- constants --------

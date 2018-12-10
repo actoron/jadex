@@ -15,6 +15,8 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
+import java.security.Provider;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -27,7 +29,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
-import java.util.logging.Logger;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -138,8 +139,11 @@ public class VmHacks
 		/** Classloader class injection map. */
 		private Map<Object[], Class<?>>  injectionclassstore;
 		
+		/** Classloaders that have been enhanced with injections. */
+		private Map<ClassLoader, IByteCodeClassLoader> enhancedloaders = new WeakHashMap<ClassLoader, IByteCodeClassLoader>();
+		
 		/** Classloader classes that have been enhanced with injections. */
-		private Map<Class<?>, Unsafe> enhancedloaders = new WeakHashMap<Class<?>, Unsafe>();
+		private Map<Class<?>, Unsafe> enhancedloaderclasses = new WeakHashMap<Class<?>, Unsafe>();
 		
 		/**
 		 *  Creates the Unsafe.
@@ -300,12 +304,17 @@ public class VmHacks
 			try
 			{
 				enhanceClassLoader(cl);
-				IByteCodeClassLoader bcl = SASM.createByteCodeClassLoader(cl);
+				IByteCodeClassLoader bcl = enhancedloaders.get(cl);
+//				IByteCodeClassLoader bcl = SASM.createByteCodeClassLoader(cl);
 				ret = bcl.doDefineClass(bytecode);
 				injectClassIntoStore(injectionclassstore, cl, clazz.getName(), ret);
+				if (DEBUG)
+					System.out.println("Class " + clazz + " redefined to " + ret + " indirectly via " + bcl);
 			}
 			catch (Exception e)
 			{
+				if (DEBUG)
+					e.printStackTrace();
 			}
 			return ret;
 		}
@@ -451,7 +460,7 @@ public class VmHacks
 		{
 			asm = !SReflect.isAndroid();
 			
-			LoggerFilterStore.inject();
+			SecurityProviderStore.inject();
 			
 			try
 			{
@@ -536,16 +545,16 @@ public class VmHacks
 		        boolean hasagent = false;
 		        if (hasNative())
 		        {
-//			        try
-//					{
-//						Class.forName("sun.instrument.InstrumentationImpl");
-//						hasagent = nativehelper.startInstrumentationAgent(jar.getAbsolutePath());
-//						if (DEBUG && hasagent)
-//							System.out.println("Instrumentation agent loaded via internal API call.");
-//					}
-//					catch (Exception e1)
-//					{
-//					}
+			        try
+					{
+						Class.forName("sun.instrument.InstrumentationImpl");
+						hasagent = nativehelper.startInstrumentationAgent(jar.getAbsolutePath());
+						if (DEBUG && hasagent)
+							System.out.println("Instrumentation agent loaded via internal API call.");
+					}
+					catch (Exception e1)
+					{
+					}
 		        }
 		        
 		        if (!hasagent)
@@ -582,10 +591,10 @@ public class VmHacks
 		        }
 		        
 		        if (hasagent)
-		        	instrumentationcommandqueue = (LinkedBlockingQueue<InstrumentationCommand>) LoggerFilterStore.getStore().get(0);
+		        	instrumentationcommandqueue = (LinkedBlockingQueue<InstrumentationCommand>) SecurityProviderStore.getStore().get(0);
 		        
 		        if (hasInstrumentation())
-		        	injectionclassstore = (Map<Object[], Class<?>>) LoggerFilterStore.getStore().get(1);
+		        	injectionclassstore = (Map<Object[], Class<?>>) SecurityProviderStore.getStore().get(1);
 		        else if (DEBUG)
 		        	System.out.println("Instrumentation is unavailable.");
 		        
@@ -602,9 +611,12 @@ public class VmHacks
 		 */
 		private void enhanceClassLoader(ClassLoader cl)
 		{
-			synchronized(enhancedloaders)
+			synchronized(enhancedloaderclasses)
 			{
-				if (enhancedloaders.containsKey(cl.getClass()))
+				if (!enhancedloaders.containsKey(cl))
+					enhancedloaders.put(cl, SASM.createByteCodeClassLoader(cl));
+				
+				if (enhancedloaderclasses.containsKey(cl.getClass()))
 					return;
 				
 				Class<?> clclazz = cl.getClass();
@@ -623,9 +635,9 @@ public class VmHacks
 					}
 				}
 				
-				if (enhancedloaders.containsKey(clclazz))
+				if (enhancedloaderclasses.containsKey(clclazz))
 				{
-					enhancedloaders.put(clclazz, Unsafe.this);
+					enhancedloaderclasses.put(clclazz, Unsafe.this);
 					return;
 				}
 				
@@ -667,17 +679,23 @@ public class VmHacks
 							try
 							{
 								InsnList nl = new InsnList();
-								SASM.pushImmediate(nl, LoggerFilterStore.ID);
+								SASM.pushImmediate(nl, SecurityProviderStore.ID);
 								nl.accept(ret);
 								
 								Method valueof = String.class.getMethod("valueOf", int.class);
 								ret.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(String.class), valueof.getName(), Type.getMethodDescriptor(valueof), false);
 								
-								Method getlogger = Logger.class.getMethod("getLogger", String.class);
-								ret.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(Logger.class), getlogger.getName(), Type.getMethodDescriptor(getlogger), false);
+//								Method getlogger = Logger.class.getMethod("getLogger", String.class);
+//								ret.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(Logger.class), getlogger.getName(), Type.getMethodDescriptor(getlogger), false);
+//								
+//								Method getfilter = Logger.class.getMethod("getFilter");
+//								ret.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(Logger.class), getfilter.getName(), Type.getMethodDescriptor(getfilter), false);
 								
-								Method getfilter = Logger.class.getMethod("getFilter");
-								ret.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(Logger.class), getfilter.getName(), Type.getMethodDescriptor(getfilter), false);
+								Method getprovider = Security.class.getMethod("getProvider", String.class);
+								ret.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(Security.class), getprovider.getName(), Type.getMethodDescriptor(getprovider), false);
+//								
+								Method values = Provider.class.getMethod("values");
+								ret.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(Provider.class), values.getName(), Type.getMethodDescriptor(values), false);
 								
 								ret.visitTypeInsn(Opcodes.CHECKCAST, Type.getDescriptor(ArrayList.class));
 								
@@ -728,7 +746,7 @@ public class VmHacks
 				byte[] newcl = cw.toByteArray();
 				
 				redefineClass(clclazz, newcl);
-				enhancedloaders.put(clclazz, Unsafe.this);
+				enhancedloaderclasses.put(clclazz, Unsafe.this);
 			}
 		}
 		

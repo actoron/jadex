@@ -102,14 +102,14 @@ public class ServiceCallTestAgent extends TestAgent
 	protected IFuture<Void>	performTests(final IExternalAccess platform, final String agentname, final int rawfactor, final int directfactor, final int decoupledfactor)
 	{
 		final Future<Void> ret	= new Future<Void>();
-		CreationInfo ci = platform.getId().getPlatformName().equals(agent.getId().getPlatformName())
-			? new CreationInfo(agent.getId(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+		CreationInfo ci = new CreationInfo(agent.getModel().getResourceIdentifier());
 		
 		String an = agentname.toLowerCase();
 		final String tag = an.indexOf("raw")!=-1? "raw": an.indexOf("direct")!=-1? "direct": an.indexOf("decoupled")!=-1? "decoupled": null;	
 //		System.out.println("Tag is: "+tag+" "+agentname);	
 		
-		platform.createComponent(ci.setFilename(agentname), null)
+		IExternalAccess creator = platform.getId().getPlatformName().equals(agent.getId().getPlatformName()) ? agent : platform;
+		creator.createComponent(ci.setFilename(agentname))
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)
@@ -133,13 +133,14 @@ public class ServiceCallTestAgent extends TestAgent
 				{
 					public void exceptionOccurred(Exception exception)
 					{
-						platform.killComponent(exta.getId());
+						platform.getExternalAccess(exta.getId()).killComponent();
 						ret.setException(exception);
 					}
 					
 					public void resultAvailable(Void result)
 					{
-						platform.killComponent(exta.getId()).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+						System.out.println(platform.getExternalAccess(exta.getId()));
+						platform.getExternalAccess(exta.getId()).killComponent().addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
 						{
 							public void customResultAvailable(Map<String, Object> result)
 							{

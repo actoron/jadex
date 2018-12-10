@@ -50,7 +50,7 @@ public class DestroyComponentTask implements ITask
 				cid = new BasicComponentIdentifier(name, instance.getId().getParent());
 		}
 		
-		IFuture<Map<String, Object>> tmp = instance.killComponent(cid);
+		IFuture<Map<String, Object>> tmp = instance.getExternalAccess(cid).killComponent();
 		if(wait || resultlistener!=null)
 		{
 			tmp.addResultListener(new IResultListener<Map<String, Object>>()

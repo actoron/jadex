@@ -20,7 +20,6 @@ import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -29,7 +28,9 @@ import jadex.micro.annotation.ProvidedServices;
  *  See SuperpeerRegistryAgent for extended implementation supporting also persistent queries.
  */
 @Service
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME))
+@Agent(name=IRemoteRegistryService.REMOTE_REGISTRY_NAME,
+	autostart=Boolean3.TRUE,
+	predecessors="jadex.platform.service.security.SecurityAgent")
 @ProvidedServices(@ProvidedService(type=IRemoteRegistryService.class, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME, scope=ServiceScope.NETWORK))
 public class RemoteRegistryAgent implements IRemoteRegistryService
 {

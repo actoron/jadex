@@ -56,7 +56,6 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.ProvidedService;
@@ -67,8 +66,10 @@ import jadex.platform.service.transport.AbstractTransportAgent;
  *  Agent implementing relay routing.
  */
 //@Agent(autoprovide=Boolean3.TRUE)
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, name="rt",
-	predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent"))
+@Agent(name="rt",
+	autostart=Boolean3.TRUE,
+	predecessors={"jadex.platform.service.address.TransportAddressAgent",
+		"jadex.platform.service.registryv2.SuperpeerClientAgent"})
 @Arguments({
 	// todo: see SuperpeerRegistrySynchronizationAgent
 //	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),
@@ -181,6 +182,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		Future<Void>	ret	= new Future<>();
 		if (keepaliveinterval < 0)
 			keepaliveinterval = Starter.getDefaultTimeout(agent.getId().getRoot());
 		if (keepaliveinterval < 0)
@@ -216,6 +218,10 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 
 			public void exceptionOccurred(Exception exception)
 			{
+				if(!ret.setExceptionIfUndone(exception))
+				{
+					agent.killComponent(exception);
+				}
 			}
 
 			public void finished()
@@ -228,7 +234,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		else
 			setupClient();
 		
-		return IFuture.DONE;
+		ret.setResultIfUndone(null);
+		return ret;
 	}
 	
 	/**
@@ -519,13 +526,13 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 									Tuple2<IComponentIdentifier, Integer> tup = routecache.get(destination);
 									if (tup == null || tup.getSecondEntity() >= result)
 									{
-										routecache.writeLock().lock();
+										routecache.getWriteLock().lock();
 										tup = routecache.get(destination);
 										if (tup == null || tup.getSecondEntity() >= result)
 										{
 											routecache.put(destination, new Tuple2<IComponentIdentifier, Integer>(relplat, result));
 										}
-										routecache.writeLock().unlock();
+										routecache.getWriteLock().unlock();
 									}
 									ret.addIntermediateResult(result);
 								}

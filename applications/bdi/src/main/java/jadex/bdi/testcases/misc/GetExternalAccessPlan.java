@@ -40,7 +40,7 @@ public class GetExternalAccessPlan extends Plan
 		Map<String, Object>	args	= new HashMap<>();
 		args.put("future", wait);
 		IFuture<IExternalAccess> init = getAgent().createComponent(
-			new CreationInfo(null, args, getComponentIdentifier(), false).setName(cid.getLocalName()).setFilename("jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml"), null);
+			new CreationInfo(null, args, getComponentIdentifier(), false).setName(cid.getLocalName()).setFilename("jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml"));
 		final boolean[]	gotexta	= new boolean[3];	// 0: got exception, 1: got access, 2: got belief value.	
 		
 		// Get and use external access.
@@ -88,7 +88,7 @@ public class GetExternalAccessPlan extends Plan
 		wait.setResult(null);
 		init.get();
 		done	= new Future<>();
-		getAgent().getExternalAccess(cid).addResultListener(lis);
+		getAgent().getExternalAccessAsync(cid).addResultListener(lis);
 		done.get();
 		if(gotexta[0] && gotexta[1])
 			tr.setSucceeded(true);

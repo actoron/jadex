@@ -10,9 +10,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.RequiredService;
@@ -45,9 +45,9 @@ public class UserAgent
 		final int[] cnt = new int[1];
 		for(int i=0; i<max; i++)
 		{
-			plat.createComponent(new CreationInfo().setFilename(ProviderAgent.class.getName()+".class")).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+			plat.createComponent(new CreationInfo().setFilename(ProviderAgent.class.getName()+".class")).addResultListener(new IResultListener<IExternalAccess>()
 			{
-				public void firstResultAvailable(IComponentIdentifier result)
+				public void resultAvailable(IExternalAccess result)
 				{
 					cnt[0]++;
 //					System.out.println("created: "+result+" "+cnt[0]);
@@ -55,10 +55,6 @@ public class UserAgent
 					{
 						fut.setResult(null);
 					}
-				}
-				
-				public void secondResultAvailable(Map<String, Object> result)
-				{
 				}
 				
 				public void exceptionOccurred(Exception exception)

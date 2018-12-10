@@ -4,12 +4,17 @@ import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
 import static jadex.base.IPlatformConfiguration.PLATFORMPROXIES;
 import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -22,8 +27,10 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.DependencyResolver;
+import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -117,7 +124,7 @@ public class PlatformAgent
 	//-------- static part --------
 	
 	/** Filter for finding agents to be auto-started. */
-	protected static IFilter<SClassReader.ClassInfo>	filter	= new IFilter<SClassReader.ClassInfo>()
+	protected static IFilter<SClassReader.ClassInfo> filter = new IFilter<SClassReader.ClassInfo>()
 	{
 		public boolean filter(ClassInfo ci)
 		{
@@ -125,10 +132,9 @@ public class PlatformAgent
 			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
 			if(ai!=null)
 			{
-				AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
-				if(aai!=null)
+				EnumInfo ei = (EnumInfo)ai.getValue("autostart");
+				if(ei!=null)
 				{
-					EnumInfo ei = (EnumInfo)aai.getValue("value");
 					String val = ei.getValue();
 					ret = val==null? false: "true".equals(val.toLowerCase()) || "false".equals(val.toLowerCase()); // include all which define the value (false can be overridden from args)
 				}
@@ -162,44 +168,101 @@ public class PlatformAgent
 				
 		// Class name -> instance name
 		Map<String, String> names = new HashMap<String, String>();
-		DependencyResolver<String> dr = new DependencyResolver<String>();
 
-		URL[] urls = new URL[0];
+		Set<URL> urlset = new HashSet<>();
+		String[] cpaths = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
+		if (cpaths != null)
+		{
+			for (String cpath : cpaths)
+			{
+				try
+				{
+					File file = new File(cpath);
+					if (file.exists())
+					{
+						URL url = file.toURI().toURL();
+						urlset.add(url);
+					}
+				}
+				catch(Exception e)
+				{
+				}
+			}
+		}
 		ClassLoader classloader = PlatformAgent.class.getClassLoader();
 		if(classloader instanceof URLClassLoader)
-			urls = ((URLClassLoader)classloader).getURLs();
-//		System.out.println("urls: "+urls.length);
+			urlset.addAll(Arrays.asList(((URLClassLoader)classloader).getURLs()));
+		URL[] urls = urlset.toArray(new URL[urlset.size()]);
+		
+		// Remove JVM jars
+		urls = SUtil.removeSystemUrls(urls);
 		
 		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
-		Set<String>	comps	= new LinkedHashSet<>();
 		
-		for(ClassInfo ci: cis)
+		List<CreationInfo> infos = new ArrayList<>();
+		for (ClassInfo ci : cis)
 		{
-//			System.out.println("Found: "+ci.getClassname());
-//			Class<?> clazz = SReflect.findClass0(ci.getClassname(), null, classloader);
-//			if(clazz==null)
-//				agent.getLogger().warning("Could not load agent class: "+ci.getClassname());
-//			else
-				addComponentToLevels(dr, ci, names, comps);
+			isSystemComponent(ci, classloader);
+			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
+			EnumInfo ei = (EnumInfo)ai.getValue("autostart");
+			String val = ei.getValue();
+			boolean ok = "true".equals(val.toLowerCase());
+			String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
+			if(name!=null)
+			{
+				Boolean agentstart = getAgentStart(name);
+				if(agentstart!=null)
+					ok = agentstart.booleanValue();
+			}
+			else
+			{
+				name = SReflect.getUnqualifiedTypeName(ci.getClassName());
+				
+				if(getAgentStart(name.toLowerCase())!=null)
+				{	
+					ok = getAgentStart(name.toLowerCase());
+				}
+				else
+				{
+					// check classname - suffix (BDI/Agent etc) in lowercase
+					int suf = SUtil.inndexOfLastUpperCaseCharacter(name);
+					if(suf>0)
+					{
+						name = name.substring(0, suf).toLowerCase();
+						if(getAgentStart(name)!=null)
+						{	
+							ok = getAgentStart(name);
+						}
+					}
+				}
+			}
+			
+			if (ok)
+			{
+				CreationInfo info = new CreationInfo();
+				info.setName(name);
+				info.setFilename(ci.getClassName()+".class");
+				
+				infos.add(info);
+			}
 		}
 		
-//		System.out.println("cls: "+files.size()+" "+components.size());
-//		System.out.println("Scanning files needed: "+(System.currentTimeMillis()-start)/1000);
-		
-		Collection<Set<String>> levels = dr.resolveDependenciesWithLevel();
-//		System.out.println("levels: "+levels);
-//		System.out.println("names: "+names);
-		
-		startComponents(levels.iterator(), names, comps).addResultListener(new DelegationResultListener<Void>(ret)
+		agent.getFeature(ISubcomponentsFeature.class).createComponents(infos.toArray(new CreationInfo[infos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
 		{
-			@Override
-			public void customResultAvailable(Void result)
+			public void resultAvailable(Collection<IExternalAccess> result)
 			{
 				if(platformproxies)
 					addQueryForPlatformProxies();
-				super.customResultAvailable(result);
+				
+				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
 			}
 		});
+		
 		return ret;
 	}
 	
@@ -270,14 +333,12 @@ public class PlatformAgent
 //			if(autostart.value().toBoolean()!=null)
 //			{		
 				AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
-				AnnotationInfo autostart = (AnnotationInfo)ai.getValue("autostart");
 				
-				String name = autostart.getValue("name")==null || ((String)autostart.getValue("name")).length()==0? null: (String)autostart.getValue("name");
+				String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
 //				String name = autostart.name().length()==0? null: autostart.name();
 				
-				AnnotationInfo aai = (AnnotationInfo)ai.getValue("autostart");
+				EnumInfo ei = (EnumInfo)ai.getValue("autostart");
 				
-				EnumInfo ei = (EnumInfo)aai.getValue("value");
 				String val = ei.getValue();
 				boolean ok = "true".equals(val.toLowerCase()); 
 				if(name!=null)
@@ -323,7 +384,7 @@ public class PlatformAgent
 					comps.add(cname);
 					dr.addNode(cname);
 					
-					Object[] pres = (Object[])autostart.getValue("predecessors");
+					Object[] pres = (Object[])ai.getValue("predecessors");
 					if(pres!=null)
 					{
 						for(Object pre: pres)
@@ -334,7 +395,7 @@ public class PlatformAgent
 						}
 					}
 					
-					Object[] sucs = (Object[])autostart.getValue("successors");
+					Object[] sucs = (Object[])ai.getValue("successors");
 					if(sucs!=null)
 					{
 						for(Object suc: sucs)
@@ -363,147 +424,113 @@ public class PlatformAgent
 	 *  Get the config/argument value of an agent name.
 	 */
 	protected Boolean getAgentStart(String name)
-	{		
-//		Boolean ret = null;
-//		IPlatformConfiguration config = (IPlatformConfiguration)Starter.getPlatformValue(agent.getId().getRoot(), IPlatformConfiguration.PLATFORMCONFIG);
-//		if(config.getValue(name, agent.getModel())!=null)
-//			ret = (boolean)config.getValue(name, agent.getModel());
-//		
-//		if(name.indexOf("jcc")!=-1)
-//			System.out.println("getAgentStart: "+name+" "+ret);
-//		
-//		return ret;
-		
+	{
 		Map<String, Object> argsmap = (Map<String, Object>)Starter.getPlatformValue(agent.getId(), IPlatformConfiguration.PLATFORMARGS);
 		if(argsmap.containsKey(name))
 			return (Boolean)argsmap.get(name);
 		return null;
 	}
-		
+	
 	/**
-	 *  Start components in levels.
+	 *  Statically checks a class if it is a system component.
+	 *  
+	 *  @param ci The class info from SClassReader
+	 *  @param cl The class loader.
+	 *  @return True, if the component is a system component.
 	 */
-	protected IFuture<Void> startComponents(Iterator<Set<String>> levels, Map<String, String> names, Set<String> comps)
+	protected static final boolean isSystemComponent(ClassInfo ci, ClassLoader cl)
 	{
-		if(STARTUP_MONKEY)
-			return startComponentsDebug(levels, null, names, comps);
-		
-		final Future<Void> ret = new Future<>();
-		
-		if(levels.hasNext())
+		AnnotationInfo provservsinfo = ci.getAnnotation(ProvidedServices.class.getName());
+		if (provservsinfo != null)
 		{
-//			System.out.println("---------- LEVEL --------------");
-			Set<String> level = levels.next();
-			CounterResultListener<Void> lis = new CounterResultListener<>(level.size(), new IResultListener<Void>()
+			Object[] provservs = (Object[]) provservsinfo.getValue("value");
+			if (provservs != null)
 			{
-				public void resultAvailable(Void result)
+				for (Object provserv : provservs)
 				{
-					startComponents(levels, names, comps).addResultListener(new DelegationResultListener<>(ret));
+					AnnotationInfo provservinfo = (AnnotationInfo) provserv;
+					String ifacename = ((ClassInfo) provservinfo.getValue("type")).getClassName();
+					if (isSystemInterface(ifacename, cl))
+					{
+	//					System.out.println("System because of provided service declaration: " + ci);
+						return true;
+					}
 				}
-
-				public void exceptionOccurred(Exception exception)
-				{
-					agent.getLogger().warning(SUtil.getExceptionStacktrace(exception));
-					startComponents(levels, names, comps).addResultListener(new DelegationResultListener<>(ret));
-				}
-			});
-			
-			for(String c: level)
+			}
+		}
+		
+		boolean autoprovide = false;
+		ClassInfo curci = ci;
+		while (curci != null)
+		{
+			AnnotationInfo agentinfo = curci.getAnnotation(Agent.class.getName());
+			if (agentinfo != null)
 			{
-				if(comps.contains(c))
+				EnumInfo ap = (EnumInfo) agentinfo.getValue("autoprovide");
+				if (ap != null && !"NULL".equals(ap.getValue()))
 				{
-					//ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(names.get(c), c.getName()+".class", (CreationInfo)null);
-					//fut.addTuple2ResultListener(res -> {lis.resultAvailable(null);}, res -> {});
-					
-					CreationInfo ci = new CreationInfo();
-					ci.setName(names.get(c));
-					ci.setFilename(c+".class");
-					IFuture<IExternalAccess> fut = agent.createComponent(ci, null);
-					fut.addResultListener(
-						res -> {
-//							System.out.println("Auto started: "+c+", "+names.get(c));
-							lis.resultAvailable(null);
-						},
-						exception -> {
-//							System.out.println("Auto start failed: "+c+", "+names.get(c)+", "+exception);
-							lis.exceptionOccurred(new RuntimeException("Cannot autostart "+c+".class", exception));
-						});
-					
-//					System.out.println("Auto starting: "+c+", "+names.get(c));
+					autoprovide = "TRUE".equals(ap.getValue()) ? true : false;
+					break;
 				}
+				
+			}
+			String scn = curci.getSuperClassName();
+			if (scn != null)
+				curci = SClassReader.getClassInfo(scn, cl);
+			else
+				curci = null;
+		}
+		
+		if (autoprovide)
+		{
+			curci = ci;
+			while (curci != null)
+			{
+				List<String> ifaces = curci.getInterfaceNames();
+				for (String ifacename : SUtil.notNull(ifaces))
+				{
+					if (isSystemInterface(ifacename, cl))
+					{
+//						System.out.println("System because of autoprovide: " + ci);
+						return true;
+					}
+				}
+				String scn = curci.getSuperClassName();
+				if (scn != null)
+					curci = SClassReader.getClassInfo(scn, cl);
 				else
-				{
-					lis.resultAvailable(null);					
-				}
+					curci = null;
 			}
 		}
-		else
-		{
-			ret.setResult(null);
-		}
 		
-		return ret;
+		return false;
 	}
-
+	
 	/**
-	 *  Start components synchronized using random order to find implicit dependencies. 
+	 *  Checks if an interface or any superinterface has the system property.
+	 *  
+	 *  @param ifacename Interface name.
+	 *  @param cl Class loader.
+	 *  @return True, if system.
 	 */
-	protected IFuture<Void> startComponentsDebug(Iterator<Set<String>> levels, Iterator<String> level, Map<String, String> names, Set<String> comps)
+	protected static final boolean isSystemInterface(String ifacename, ClassLoader cl)
 	{
-		// Initial level or finished with last level -> start next level
-		if(level==null || !level.hasNext())
+		ClassInfo iface = SClassReader.getClassInfo(ifacename, cl);
+		AnnotationInfo sinfo = iface.getAnnotation(Service.class.getName());
+		if (sinfo != null)
 		{
-			if(levels.hasNext())
-			{
-				//			System.out.println("---------- LEVEL --------------");
-				// Chaos monkey -> randomize list of components to find implicit dependencies
-				List<String>	list	= new ArrayList<>(levels.next());
-				Collections.shuffle(list, SSecurity.getSecureRandom());
-				return startComponentsDebug(levels, list.iterator(), names, comps);
-			}
-			else
-			{
-				return IFuture.DONE;
-			}
+			Boolean sys = (Boolean) sinfo.getValue("system");
+			if (Boolean.TRUE.equals(sys))
+				return true;
 		}
 		
-		// level!=null && level.hasNext() -> Start next component in level
-		else
+		List<String> superifaces = iface.getInterfaceNames();
+		for (String superiface : SUtil.notNull(superifaces))
 		{
-			Future<Void>	ret	= new Future<>();
-			
-			String	c	= level.next();
-			if(comps.contains(c))
-			{
-				IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setName(names.get(c)).setFilename(c+".class"), null);
-				fut.addResultListener(
-					res -> startComponentsDebug(levels, level, names, comps).addResultListener(new DelegationResultListener<>(ret)),
-					exception -> ret.setException(new RuntimeException("Cannot autostart "+c+".class", exception)));
-			}
-			else
-			{
-				startComponentsDebug(levels, level, names, comps).addResultListener(new DelegationResultListener<>(ret));
-			}
-			return ret;
+			if (isSystemInterface(superiface, cl))
+				return true;
 		}
+		
+		return false;
 	}
-
-	/**
-	 *  Called when platform startup finished.
-	 */
-	// BUG: currently not called because CMS calls it and platform is not created via cms
-//	@AgentBody
-//	public void body()
-//	{
-//		System.out.println("Start scanning...");
-//	}
-
-	// todo?! remove platform proxy query on termination 
-	// BUG: currently not called
-//	@AgentTerminated
-//	public void terminated()
-//	{
-//		if(query!=null)
-//			query.terminate();
-//	}
 }

@@ -32,7 +32,7 @@ public class SJCC
 	public static IFuture<IExternalAccess>	getRootAccess(final IExternalAccess access)
 	{
 		final Future<IExternalAccess>	ret	= new Future<IExternalAccess>();
-		access.getExternalAccess((IComponentIdentifier)access.getId().getRoot())
+		access.getExternalAccessAsync((IComponentIdentifier)access.getId().getRoot())
 			.addResultListener(new SwingDelegationResultListener<IExternalAccess>(ret));
 		return ret;
 	}	

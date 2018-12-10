@@ -224,7 +224,7 @@ public abstract class TestAgent
 	 * 
 	 */
 	protected IFuture<IComponentIdentifier> createComponent(final String filename,
-		final IComponentIdentifier root, final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+		final IComponentIdentifier root, final IResultListener<Map<String,Object>> reslis)
 	{
 		return createComponent(filename, null, null, root, reslis);
 	}
@@ -233,7 +233,7 @@ public abstract class TestAgent
 	 * 
 	 */
 	protected IFuture<IComponentIdentifier> createComponent(final String filename, final Map<String, Object> args, 
-		final String config, final IComponentIdentifier root, final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+		final String config, final IComponentIdentifier root, final IResultListener<Map<String,Object>> reslis)
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
@@ -241,15 +241,16 @@ public abstract class TestAgent
 		new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //		boolean	local = root.equals(agent.getComponentIdentifier().getRoot());
 //		CreationInfo ci	= new CreationInfo(local? agent.getComponentIdentifier(): root, rid);
-		CreationInfo ci	= new CreationInfo(root==null? agent.getId(): root, rid);
+		CreationInfo ci	= new CreationInfo(rid);
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		agent.createComponent(ci, reslis)
+		agent.getExternalAccess(root==null? agent.getId(): root).createComponent(ci)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
+				result.waitForTermination().addResultListener(reslis);
 				ret.setResult(result.getId());
 			}
 			
@@ -270,7 +271,7 @@ public abstract class TestAgent
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		agent.killComponent(cid).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+		agent.getExternalAccess(cid).killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 		
 		return ret;
 	}
@@ -278,7 +279,7 @@ public abstract class TestAgent
 	/**
 	 *  Setup a local test.
 	 */
-	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename, IResultListener<Collection<Tuple2<String,Object>>> reslis)
+	protected IFuture<IComponentIdentifier>	setupLocalTest(String filename, IResultListener<Map<String,Object>> reslis)
 	{
 		return createComponent(filename, agent.getId().getRoot(), reslis);
 	}
@@ -287,7 +288,7 @@ public abstract class TestAgent
 	 *  Setup a remote test.
 	 */
 	protected IFuture<IComponentIdentifier>	setupRemoteTest(final String filename, final String config,
-		final IResultListener<Collection<Tuple2<String,Object>>> reslis)
+		final IResultListener<Map<String,Object>> reslis)
 	{
 		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 		

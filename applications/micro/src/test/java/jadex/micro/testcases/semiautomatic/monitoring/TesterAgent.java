@@ -78,12 +78,12 @@ public class TesterAgent implements ITestService
 						ThreadSuspendable sus = new ThreadSuspendable();
 						
 						CreationInfo ci = new CreationInfo("created", null);
-						ci.setParent(agent.getId());
+//						ci.setParent(agent.getId());
 						ci.setResourceIdentifier(agent.getModel().getResourceIdentifier());
 						final String name =  TesterAgent.class.getName()+".class";
 						
-						IExternalAccess eaa = agent.createComponent(ci.setFilename(name), null).get();
-						IExternalAccess eab = agent.createComponent(ci.setFilename(name), null).get();
+						IExternalAccess eaa = agent.createComponent(ci.setFilename(name)).get();
+						IExternalAccess eab = agent.createComponent(ci.setFilename(name)).get();
 					
 						IComponentDescription desca = eaa.scheduleStep(new IComponentStep<IComponentDescription>()
 						{

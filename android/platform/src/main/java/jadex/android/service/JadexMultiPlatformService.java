@@ -269,15 +269,15 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 //		{
 //			public void customResultAvailable(final IComponentManagementService cms)
 //			{
-				ITuple2Future<IComponentIdentifier,Map<String,Object>> fut = jadexPlatformManager.getExternalPlatformAccess(platformId)
+				IFuture<IExternalAccess> fut = jadexPlatformManager.getExternalPlatformAccess(platformId)
 					.createComponent(creationInfo);
 				
-				fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String,Object>>() {
+				fut.addResultListener(new IResultListener<IExternalAccess>() {
 
 					IComponentIdentifier cid;
 					@Override
-					public void firstResultAvailable(final IComponentIdentifier cid) {
-						this.cid = cid;
+					public void resultAvailable(final IExternalAccess ea) {
+						this.cid = ea.getId();
 						// schedule to component to allow suspending
 //						cms.getExternalAccess(cid).addResultListener(new  DefaultResultListener<IExternalAccess>()
 //						{
@@ -307,10 +307,10 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 //						}).start();
 
 						ret.setResult(cid);
-					}
-
-					@Override
-					public void secondResultAvailable(final Map<String, Object> result) {
+//					}
+//
+//					@Override
+//					public void secondResultAvailable(final Map<String, Object> result) {
 						// occurs when execution is terminated.
 //						new Thread(new Runnable() {
 //							@Override
@@ -340,7 +340,8 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 //							}
 //						});
 						if (terminationListener != null) {
-							terminationListener.resultAvailable(result);
+							ea.waitForTermination().addResultListener(terminationListener);
+//							terminationListener.resultAvailable(result);
 						}
 					}
 

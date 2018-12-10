@@ -35,7 +35,7 @@
 			<fact>new Counter()</fact>
 		</belief>
 		<belief name="starttime" class="Long" exported="true">
-			<fact>new Long($scope.getTime())</fact>
+			<fact>System.currentTimeMillis()</fact>
 		</belief>
 		<belief name="startmem" class="Long" exported="true">
 			<fact>new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())</fact>

@@ -75,7 +75,7 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 		Future<Void>	block	= new Future<>();
 		IComponentIdentifier	registry	= ((IService)provider.searchService(
 			new ServiceQuery<>(IRemoteRegistryService.class)).get()).getServiceId().getProviderId();
-		provider.getExternalAccess(registry).get().scheduleStep(new IComponentStep<Void>()
+		provider.getExternalAccess(registry).scheduleStep(new IComponentStep<Void>()
 		{
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)

@@ -77,6 +77,13 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	// TimerWrapper
 	public IFuture<Void> waitForTick();
 	
+	/**
+	 *  Waits for the components to finish.
+	 * 
+	 *  @return Component results.
+	 */
+	public IFuture<Map<String, Object>> waitForTermination();
+	
 	// todo:?
 //	/**
 //	 *  Wait for some time and execute a component step afterwards.
@@ -118,20 +125,20 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	 *  The listener is registered for component changes.
 	 *  @param cid	The component to be listened.
 	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent(IComponentIdentifier cid);
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent();
 	
-	/**
-	 * Search for components matching the given description.
-	 * @return An array of matching component descriptions.
-	 */
-	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con);
+//	/**
+//	 * Search for components matching the given description.
+//	 * @return An array of matching component descriptions.
+//	 */
+//	public IFuture<IComponentDescription[]> searchComponents(IComponentDescription adesc, ISearchConstraints con);
 	
 	/**
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
 	 *  @param listener Called when the step is finished (result will be the component description).
 	 */
-	public IFuture<Void> stepComponent(IComponentIdentifier componentid, String stepinfo);
+	public IFuture<Void> stepComponent(String stepinfo);
 	
 	/**
 	 *  Set breakpoints for a component.
@@ -140,32 +147,32 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	 *  @param componentid The component identifier.
 	 *  @param breakpoints The new breakpoints (if any).
 	 */
-	public IFuture<Void> setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints);
+	public IFuture<Void> setComponentBreakpoints(String[] breakpoints);
 	
 	/**
 	 *  Suspend the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture<Void> suspendComponent(IComponentIdentifier componentid);
+	public IFuture<Void> suspendComponent();
 	
 	/**
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture<Void> resumeComponent(IComponentIdentifier componentid);
+	public IFuture<Void> resumeComponent();
 	
 	/**
 	 *  Add a new component as subcomponent of this component.
 	 *  @param component The model or pojo of the component.
 	 */
-	public IFuture<IExternalAccess> createComponent(CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener);
+//	public IFuture<IExternalAccess> createComponent(CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener);
 //	public IFuture<IExternalAccess> createComponent(Object component, CreationInfo info, IResultListener<Collection<Tuple2<String, Object>>> resultlistener);
 	
 	/**
 	 *  Add a new component as subcomponent of this component.
 	 *  @param component The model or pojo of the component.
 	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(CreationInfo info);
+//	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(CreationInfo info);
 //	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponentWithResults(Object component, CreationInfo info);
 	
 	/**
@@ -175,7 +182,7 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	 *  @param info Additional start information such as parent component or arguments (optional).
 	 *  @return The id of the component and the results after the component has been killed.
 	 */
-	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(CreationInfo info);
+//	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(CreationInfo info);
 //	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(Object component, CreationInfo info);
 	
 	/**
@@ -193,14 +200,21 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	 *  Kill the component.
 	 *  @param e The failure reason, if any.
 	 */
-	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid);
+//	public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid);
 	
 	/**
 	 *  Get the external access for a component id.
 	 *  @param cid The component id.
 	 *  @return The external access.
 	 */
-	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid);
+	public IExternalAccess getExternalAccess(IComponentIdentifier cid);
+	
+	/**
+	 *  Get the external access for a component id.
+	 *  @param cid The component id.
+	 *  @return The external access.
+	 */
+	public IFuture<IExternalAccess> getExternalAccessAsync(IComponentIdentifier cid);
 	
 	/**
 	 *  Get the component description.

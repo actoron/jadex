@@ -25,7 +25,7 @@ public class ArgumentsPlan extends Plan
 			Map<String, Object> args = SCollection.createHashMap();
 			args.put("creator", getComponentIdentifier());
 			getAgent().createComponent(
-				new CreationInfo(args, getComponentIdentifier()).setFilename("/jadex/bdi/testcases/misc/ArgumentsWorker.agent.xml")).getFirstResult();
+				new CreationInfo(args, getComponentIdentifier()).setFilename("/jadex/bdi/testcases/misc/ArgumentsWorker.agent.xml")).get();
 
 			waitForMessageEvent("inform_created", 1000);
 			tr.setSucceeded(true);

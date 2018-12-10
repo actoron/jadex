@@ -203,16 +203,17 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 //		IResourceIdentifier	rid	= new ResourceIdentifier(
 //			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		boolean	local = root.equals(agent.getId().getRoot());
-		CreationInfo ci	= new CreationInfo(local? agent.getId(): root, agent.getModel().getResourceIdentifier());
+		CreationInfo ci	= new CreationInfo(agent.getModel().getResourceIdentifier());
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		ITuple2Future<IComponentIdentifier,Map<String,Object>> cmsfut = agent.createComponent(ci);
-		cmsfut.addTuple2ResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+		IFuture<IExternalAccess> cmsfut = agent.getExternalAccess(local? agent.getId(): root).createComponent(ci);
+		cmsfut.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				super.customResultAvailable(result);
+				ret.setResult(result.getId());
+				result.waitForTermination().addResultListener(reslis);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -220,7 +221,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 				exception.printStackTrace();
 				super.exceptionOccurred(exception);
 			}
-		}, reslis);
+		});
 		
 		return ret;
 	}
@@ -234,24 +235,25 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 
 		boolean	local = root.equals(agent.getId().getRoot());
-		CreationInfo ci	= new CreationInfo(local? agent.getId(): root, agent.getModel().getResourceIdentifier());
+		CreationInfo ci	= new CreationInfo(agent.getModel().getResourceIdentifier());
 		ci.setArguments(args);
 		ci.setConfiguration(config);
 		ci.setFilename(filename);
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> cmsfut = agent.createComponent(ci);
-		cmsfut.addTuple2ResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+		IFuture<IExternalAccess> cmsfut = agent.getExternalAccess(local? agent.getId(): root).createComponent(ci);
+		cmsfut.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
-			public void customResultAvailable(IComponentIdentifier result)
+			public void customResultAvailable(IExternalAccess result)
 			{
-				super.customResultAvailable(result);
+				ret.setResult(result.getId());
+				result.waitForTermination().addResultListener(reslis);
 			}
-
+			
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
 				super.exceptionOccurred(exception);
 			}
-		}, reslis);
+		});
 
 		return ret;
 	}
@@ -263,7 +265,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		agent.killComponent(cid).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+		agent.getExternalAccess(cid).killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 		
 		return ret;
 	}

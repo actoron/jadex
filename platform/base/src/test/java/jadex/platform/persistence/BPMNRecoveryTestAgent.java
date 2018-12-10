@@ -76,11 +76,11 @@ public class BPMNRecoveryTestAgent
 		
 //		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IComponentManagementService.class, ServiceScope.PLATFORM)).get();
 		IPersistenceService	ps	= agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IPersistenceService.class, ServiceScope.PLATFORM)).get();
-		CreationInfo ci = new CreationInfo(agent.getId());
+		CreationInfo ci = new CreationInfo();
 		ci.setFilename(model);
 		
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = agent.createComponent(ci);
-		IExternalAccess	exta = agent.getExternalAccess(fut.getFirstResult()).get();
+		IFuture<IExternalAccess> fut = agent.createComponent(ci);
+		IExternalAccess	exta = fut.get();
 		ISubscriptionIntermediateFuture<Tuple2<String, Object>>	res	= exta.subscribeToResults();
 		if(!exta.getResultsAsync().get().containsKey("running"))
 		{
@@ -93,19 +93,19 @@ public class BPMNRecoveryTestAgent
 			System.out.println("Already running.");
 		}
 
-		IPersistInfo	info	= ps.snapshot(fut.getFirstResult()).get();
+		IPersistInfo	info	= ps.snapshot(fut.get().getId()).get();
 		exta.killComponent().get();
 
 		ps.restore(info).get();
 		
 		Future<Collection<Tuple2<String,Object>>>	cres	= new Future<Collection<Tuple2<String,Object>>>();
-		IExternalAccess	exta2	= agent.getExternalAccess(fut.getFirstResult()).get();
+		IExternalAccess	exta2	= fut.get();
 		exta2.subscribeToResults().addResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres));
 //		cms.addComponentResultListener(new DelegationResultListener<Collection<Tuple2<String,Object>>>(cres), fut.getFirstResult()).get();
 		
 		Map<String, Object>	msg	= new HashMap<String, Object>();
 //		msg.put(SFipa.RECEIVERS, fut.getFirstResult());
-		agent.getFeature(IMessageFeature.class).sendMessage(msg, fut.getFirstResult()).get();
+		agent.getFeature(IMessageFeature.class).sendMessage(msg, fut.get().getId()).get();
 		
 		cres.get();
 		

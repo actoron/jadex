@@ -159,7 +159,7 @@ public class TerminateTestAgent extends TestAgent
 		IResourceIdentifier	rid	= new ResourceIdentifier(
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		
-		agent.createComponent(new CreationInfo(root, rid).setFilename("jadex/micro/testcases/terminate/TerminableProviderAgent.class"), null)
+		agent.getExternalAccess(root).createComponent(new CreationInfo(rid).setFilename("jadex/micro/testcases/terminate/TerminableProviderAgent.class"))
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
@@ -168,11 +168,11 @@ public class TerminateTestAgent extends TestAgent
 				{
 					public void resultAvailable(Collection<TestReport> result)
 					{
-						agent.killComponent(exta.getId());
+						agent.getExternalAccess(exta.getId()).killComponent();
 					}
 					public void exceptionOccurred(Exception exception)
 					{
-						agent.killComponent(exta.getId());
+						agent.getExternalAccess(exta.getId()).killComponent();
 					}
 				});
 				

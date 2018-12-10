@@ -93,12 +93,12 @@ public class ComponentResultTest2Agent extends JunitAgentTest
 	protected IFuture<Void> testComponentResult(final String config, final String expected)
 	{
 		final Future<Void>	fut	= new Future<Void>();
-		agent.createComponent(new CreationInfo(config, null, agent.getId()).setFilename("jadex/micro/testcases/Result.component.xml"), null)
+		agent.createComponent(new CreationInfo(config, null, agent.getId()).setFilename("jadex/micro/testcases/Result.component.xml"))
 			.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(fut)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
-				agent.killComponent(result.getId())
+				agent.getExternalAccess(result.getId()).killComponent()
 					.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(fut)
 				{
 					public void customResultAvailable(Map<String, Object> results)

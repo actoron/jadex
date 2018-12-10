@@ -263,7 +263,7 @@ public class RestWebSocket extends Endpoint
 					if(cid!=null)
 					{
 //						IComponentManagementService cms = platform.searchService(new ServiceQuery<>(IComponentManagementService.class)).get();
-						platform.killComponent(cid);
+						platform.getExternalAccess(cid).killComponent();
 						System.out.println("Killing session component: "+((IService)val).getServiceId().getProviderId());
 					}
 				}
@@ -1235,29 +1235,39 @@ public class RestWebSocket extends Endpoint
 					{
 						session.getUserProperties().put(key, ret);
 
-						platform.createComponent(new CreationInfo().setFilename(filename)).addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+						platform.createComponent(new CreationInfo().setFilename(filename)).addResultListener(new IResultListener<IExternalAccess>()
 						{
-							public void firstResultAvailable(IComponentIdentifier cid)
+							public void resultAvailable(IExternalAccess exta)
 							{
-								platform.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
-							}
-
-							public void secondResultAvailable(Map<String, Object> result)
-							{
-								try
+								exta.waitForTermination().addResultListener(new IResultListener<Map<String,Object>>()
 								{
-									session.getUserProperties().remove(key);
-								}
-								catch(IllegalStateException e)
-								{
-									// nop when session is already closed
-								}
-								catch(Exception e)
-								{
-//										System.out.println("Could not remove component from session: "+key);
-									System.out.println("Could not remove component from session: "+key);
-									e.printStackTrace();
-								}
+									public void resultAvailable(java.util.Map<String,Object> result)
+									{
+										try
+										{
+											session.getUserProperties().remove(key);
+										}
+										catch(IllegalStateException e)
+										{
+											// nop when session is already closed
+										}
+										catch(Exception e)
+										{
+//												System.out.println("Could not remove component from session: "+key);
+											System.out.println("Could not remove component from session: "+key);
+											e.printStackTrace();
+										}
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										if(!ret.setExceptionIfUndone(exception))
+										{
+											System.out.println("Exception in session component");
+											exception.printStackTrace();
+										}
+									}
+								});
+								ret.setResult(exta);
 							}
 
 							public void exceptionOccurred(Exception exception)

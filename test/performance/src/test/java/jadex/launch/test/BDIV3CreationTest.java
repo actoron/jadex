@@ -1,6 +1,5 @@
 package jadex.launch.test;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +10,6 @@ import jadex.base.test.util.STest;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -19,6 +17,7 @@ import jadex.commons.future.Future;
 /**
  *  Test if the bdi v3 creation test works.
  */
+//@Ignore
 public class BDIV3CreationTest //extends TestCase
 {
 	/**
@@ -42,15 +41,16 @@ public class BDIV3CreationTest //extends TestCase
 			}
 			).get();
 		
-		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
+		final Future<Map<String, Object>> fut = new Future<Map<String, Object>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
-		args.put("max", Integer.valueOf(10000));
-		platform.createComponent(new CreationInfo(args).setFilename("jadex.bdiv3.benchmarks.CreationBDI.class"), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
-			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Collection<Tuple2<String, Object>>>(fut)
+		args.put("max", Integer.valueOf(2000));
+		platform.createComponent(new CreationInfo(args).setFilename("jadex.bdiv3.benchmarks.CreationBDI.class"))
+			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, Object>>(fut)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
 				// Agent created. Kill listener waits for result.
+				result.waitForTermination().addResultListener(new DelegationResultListener<>(fut));
 			}
 		});
 		
@@ -100,7 +100,7 @@ public class BDIV3CreationTest //extends TestCase
 		
 //		sus	= null;
 		platform	= null;
-		fut	= null;
+//		fut	= null;
 		
 //		try
 //		{

@@ -11,15 +11,14 @@ import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 
 /**
  *  Implements passive awareness via multicast.
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE, autostart=@Autostart(value=Boolean3.TRUE,
+@Agent(autoprovide = Boolean3.TRUE, autostart=Boolean3.TRUE,
 	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
+	successors="jadex.platform.service.registryv2.SuperpeerClientAgent"
 )
 @Arguments({
 	@Argument(name="address", clazz=String.class, defaultvalue="\"232.0.9.1\""),

@@ -243,8 +243,8 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 //		System.out.println("Using rid: "+rid);
 		final boolean	local	= root.equals(agent.getId().getRoot());
-		CreationInfo ci	= new CreationInfo(local ? agent.getId() : root, rid).setFilename(PullResultProviderAgent.class.getName()+".class");
-		agent.createComponent(ci, null)
+		CreationInfo ci	= new CreationInfo(rid).setFilename(PullResultProviderAgent.class.getName()+".class");
+		agent.getExternalAccess(local ? agent.getId() : root).createComponent(ci)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
@@ -342,9 +342,9 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 		IResourceIdentifier	rid	= new ResourceIdentifier(
 			new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUri()), null);
 		final boolean	local	= root.equals(agent.getId().getRoot());
-		CreationInfo	ci	= new CreationInfo(local ? agent.getId() : root, rid).setFilename(PullResultProviderAgent.class.getName()+".class");
-		System.out.println("create: "+ci.getParent()+", "+rid);
-		agent.createComponent(ci, null)
+		CreationInfo	ci	= new CreationInfo(rid).setFilename(PullResultProviderAgent.class.getName()+".class");
+		System.out.println("create: "+rid);
+		agent.getExternalAccess(local ? agent.getId() : root).createComponent(ci)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{	
 			public void customResultAvailable(final IExternalAccess exta)
@@ -373,7 +373,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 								System.out.println("finished: ");
 								TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
 								tr.setReason("Exception did not occur");
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 							public void resultAvailable(Collection<String> result)
@@ -381,7 +381,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 								System.out.println("resultAvailable: "+result);
 								TestReport tr = new TestReport("#"+testno, "Tests if pull results work");
 								tr.setReason("Exception did not occur");
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 							public void exceptionOccurred(Exception exception)
@@ -397,7 +397,7 @@ public class PullResultTestAgent extends RemoteTestBaseAgent
 								{
 									tr.setReason("Other exception: ("+exception);
 								}
-								agent.killComponent(exta.getId());
+								agent.getExternalAccess(exta.getId()).killComponent();
 								ret.setResult(tr);
 							}
 						}));

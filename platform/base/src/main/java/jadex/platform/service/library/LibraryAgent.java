@@ -9,7 +9,6 @@ import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -17,7 +16,7 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Agent that provides the library service.
  */
-@Agent(autostart=@Autostart(value=Boolean3.TRUE, predecessors="java.lang.Object"))
+@Agent(autostart=Boolean3.TRUE)
 @Arguments({
 	@Argument(name="libpath", clazz=String.class),
 	@Argument(name="baseclassloader", clazz=ClassLoader.class),

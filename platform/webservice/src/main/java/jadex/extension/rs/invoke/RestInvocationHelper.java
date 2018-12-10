@@ -30,8 +30,8 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
-import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFunctionalResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
@@ -114,29 +114,35 @@ public class RestInvocationHelper
 			CreationInfo info = new CreationInfo();
 			info.addArgument("restargs", restargs);
 			info.setFilename("jadex.extension.rs.invoke.RestInvocationAgent.class");
-			component.createComponent(info, new IResultListener<Collection<Tuple2<String,Object>>>()
+			component.createComponent(info).addResultListener(new IFunctionalResultListener<IExternalAccess>()
 			{
-				public void resultAvailable(Collection<Tuple2<String, Object>> result)
+				public void resultAvailable(IExternalAccess result)
 				{
-					String json = null;
-					Exception exception = null;
-					for (Iterator<Tuple2<String, Object>> it = result.iterator(); it.hasNext(); )
+					result.waitForTermination().addResultListener(new IResultListener<Map<String,Object>>()
 					{
-						Tuple2<String, Object> res = it.next();
-						if (res.getSecondEntity() instanceof String)
-							json = (String) res.getSecondEntity();
-						else if (res.getSecondEntity() instanceof Exception)
-							exception = (Exception) res.getSecondEntity();
-					}
-					if (exception != null)
-						ret.setException(exception);
-					else
-						ret.setResult(json);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
+						public void resultAvailable(Map<String, Object> result)
+						{
+							String json = null;
+							Exception exception = null;
+							for (Iterator<Map.Entry<String, Object>> it = result.entrySet().iterator(); it.hasNext(); )
+							{
+								Map.Entry<String, Object> res = it.next();
+								if (res.getValue() instanceof String)
+									json = (String) res.getValue();
+								else if (res.getValue() instanceof Exception)
+									exception = (Exception) res.getValue();
+							}
+							if (exception != null)
+								ret.setException(exception);
+							else
+								ret.setResult(json);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
 				}
 			});
 		}

@@ -200,11 +200,14 @@ public class DelegationURLClassLoader extends URLClassLoader
 		for(URL url: myurls)
 			ret.add(url);
 		
-		DelegationURLClassLoader[] cls = SUtil.notNull(getDelegateClassLoaders());
+		DelegationURLClassLoader[] cls = getDelegateClassLoaders();
 		
-		for(DelegationURLClassLoader cl: cls)
+		if (cls != null)
 		{
-			ret.addAll(cl.getALLURLs());
+			for(DelegationURLClassLoader cl: cls)
+			{
+				ret.addAll(cl.getALLURLs());
+			}
 		}
 		
 		return ret;

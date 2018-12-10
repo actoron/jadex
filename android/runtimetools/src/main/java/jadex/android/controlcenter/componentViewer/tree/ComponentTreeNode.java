@@ -318,11 +318,11 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 //				{
 //					public void resultAvailable(final IExternalAccess rootea)
 //					{
-						access.getExternalAccess(cid)
-							.addResultListener(new IResultListener<IExternalAccess>()
-						{
-							public void resultAvailable(final IExternalAccess ea)
-							{
+						final IExternalAccess ea	= access.getExternalAccess(cid);
+//							.addResultListener(new IResultListener<IExternalAccess>()
+//						{
+//							public void resultAvailable(final IExternalAccess ea)
+//							{
 	//							System.out.println("search childs: "+ea);
 								
 								SRemoteGui.getServiceInfos(ea)
@@ -425,17 +425,17 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 										}
 									}
 								});
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								ready[1]	= true;
-								if(ready[0] &&  ready[1])
-								{
-									ret.setExceptionIfUndone(exception);
-								}
-							}
-						});
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								ready[1]	= true;
+//								if(ready[0] &&  ready[1])
+//								{
+//									ret.setExceptionIfUndone(exception);
+//								}
+//							}
+//						});
 //					}
 //					public void exceptionOccurred(Exception exception)
 //					{

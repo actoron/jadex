@@ -82,9 +82,9 @@ public class ServicePoolTask implements ITask
 	{
 		final Future<Void>	ret	= new Future<Void>();
 
-		CreationInfo ci = new CreationInfo(process.getId()).setFilename(ServicePoolAgent.class.getName()+".class");
+		CreationInfo ci = new CreationInfo().setFilename(ServicePoolAgent.class.getName()+".class");
 		
-		process.createComponent(ci, null)
+		process.createComponent(ci)
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{
 			public void customResultAvailable(IExternalAccess ea) 

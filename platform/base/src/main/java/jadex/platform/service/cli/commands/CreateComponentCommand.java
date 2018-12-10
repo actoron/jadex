@@ -165,6 +165,7 @@ public class CreateComponentCommand extends ACliCommand
 				final Integer count = (Integer)args.get("-cnt");
 				
 				IExternalAccess comp = (IExternalAccess)((CliContext)context).getUserContext();
+				IExternalAccess parentcomp = parent != null ? comp.getExternalAccess(parent) : comp.getExternalAccess(comp.getId().getRoot());
 		
 				comp.searchService( new ServiceQuery<>(ILibraryService.class, ServiceScope.PLATFORM))
 					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IComponentIdentifier>(ret)
@@ -196,8 +197,8 @@ public class CreateComponentCommand extends ACliCommand
 								}
 								
 								CreationInfo info = new CreationInfo();
-								if(parent!=null)
-									info.setParent(parent);
+//								if(parent!=null)
+//									info.setParent(parent);
 								if(config!=null)
 									info.setConfiguration(config);
 								if(found!=null)
@@ -209,7 +210,7 @@ public class CreateComponentCommand extends ACliCommand
 								
 								for(int i=0; i<(count==null? 1: count.intValue()); i++)
 								{
-									comp.createComponent(info, null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+									parentcomp.createComponent(info).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 									{
 										public void customResultAvailable(IExternalAccess result) throws Exception
 										{

@@ -47,9 +47,9 @@ public class PlatformsTest //extends TestCase
 		"-saveonexit", "false",
 		"-welcome", "false",
 		"-printpass", "false",
-		"-superpeerclient", "false", // TODO: fails on shutdown due to auto restart
 		"-passiveawarenessmulticast", "false", // avoid interference with other tests
 		"-passiveawarenessbroadcast", "false", // avoid interference with other tests
+		"-passiveawarenesscatalog", "false", // avoid interference outside world
 //		"-deftimeout", ""+TIMEOUT
 	};
 	
@@ -125,7 +125,7 @@ public class PlatformsTest //extends TestCase
 			
 			final Future<Void>	fut	= new Future<Void>();
 			
-			platform.listenToComponent(platform.getId()).addIntermediateResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+			platform.listenToComponent().addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 			{
 				@Override
 				public void exceptionOccurred(Exception exception)

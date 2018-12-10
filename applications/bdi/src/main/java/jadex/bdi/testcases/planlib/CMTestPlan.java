@@ -31,7 +31,7 @@ public class CMTestPlan extends Plan
 	{
 		// Create receiver agent.
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
-		IComponentIdentifier receiver = getAgent().createComponent(new CreationInfo(getComponentIdentifier()).setFilename(agenttype)).getFirstResult();
+		IComponentIdentifier receiver = getAgent().createComponent(new CreationInfo().setFilename(agenttype)).get().getId();
 		
 		// Dispatch request goal.
 		IGoal	request	= createGoal("procap.rp_initiate");
@@ -62,7 +62,7 @@ public class CMTestPlan extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 		
 		// Destroy receiver agent.
-		getAgent().killComponent(receiver).get();
+		getAgent().getExternalAccess(receiver).killComponent().get();
 	}
 	
 	/**
@@ -72,7 +72,7 @@ public class CMTestPlan extends Plan
 	{
 		// Create receiver agent.
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
-		IComponentIdentifier receiver = getAgent().createComponent(new CreationInfo(getComponentIdentifier()).setFilename(agenttype)).getFirstResult();
+		IComponentIdentifier receiver = getAgent().createComponent(new CreationInfo().setFilename(agenttype)).get().getId();
 		
 		// Dispatch request goal.
 		IGoal	request	= createGoal("procap.rp_initiate");
@@ -82,7 +82,7 @@ public class CMTestPlan extends Plan
 		
 		// Wait a sec. and then kill the receiver agent (should abort interaction in its end state).
 		waitFor(1000);
-		getAgent().killComponent(receiver).get();
+		getAgent().getExternalAccess(receiver).killComponent().get();
 		
 		// Check if goal finishes. (todo: check result).
 		TestReport	report	= new TestReport("test_abort", "Test if interaction can be aborted on receiver side.");

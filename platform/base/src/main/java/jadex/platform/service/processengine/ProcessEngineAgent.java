@@ -60,7 +60,6 @@ import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -76,7 +75,7 @@ import jadex.platform.service.processengine.EventMapper.ModelDetails;
 /**
  *  Agent that implements the bpmn monitoring starter interface.
  */
-@Agent(autoprovide=Boolean3.TRUE, autostart=@Autostart(value=Boolean3.FALSE))
+@Agent(autoprovide=Boolean3.TRUE, autostart=Boolean3.FALSE)
 @Service
 @RequiredServices(
 {
@@ -513,13 +512,13 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		
 		Tuple2<String, IResourceIdentifier> model = new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid());
 		
-		CreationInfo info = new CreationInfo(agent.getId(), det.getRid());
+		CreationInfo info = new CreationInfo(det.getRid());
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
 		info.setArguments(args);
 		info.setFilename(det.getModel());
 		
-		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = agent.createComponentWithResults(info);
+		ISubscriptionIntermediateFuture<CMSStatusEvent> fut = agent.createComponentWithEvents(info);
 		fut.addResultListener(new ConversionListener(new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid()), det.getFuture())); // Add converion listener for addmodel() future 
 		
 		fut.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()

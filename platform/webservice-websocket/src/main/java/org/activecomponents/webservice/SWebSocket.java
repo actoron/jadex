@@ -154,18 +154,14 @@ public class SWebSocket
 		{
 			@Override
 			public void customResultAvailable(IExternalAccess platform) throws Exception
-			{				
-				platform.createComponent(new CreationInfo().setFilename(model)).addTuple2ResultListener(new IFunctionalResultListener<IComponentIdentifier>()
+			{
+				platform.createComponent(new CreationInfo().setFilename(model)).addResultListener(new IResultListener<IExternalAccess>()
 				{
-					@Override
-					public void resultAvailable(IComponentIdentifier cid)
+					public void resultAvailable(IExternalAccess result)
 					{
-						ret.setResult(cid);
-						System.out.println("Created component: "+cid);
+						ret.setResult(result.getId());
+						System.out.println("Created component: "+result.getId());
 					}
-				}, null, new IFunctionalExceptionListener()
-				{
-					@Override
 					public void exceptionOccurred(Exception exception)
 					{
 						ret.setExceptionIfUndone(exception);

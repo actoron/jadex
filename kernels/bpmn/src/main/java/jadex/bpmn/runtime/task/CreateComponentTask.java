@@ -222,12 +222,15 @@ public class CreateComponentTask implements ITask
 			instance.getModel().getResourceIdentifier());
 		ci.setFilename(model);
 		ci.setName(name);
-		instance.createComponent(ci, lis)
+		ci.setSuspend(true);
+		instance.createComponent(ci)
 			.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(creationfuture)
 		{
 			@Override
 			public void customResultAvailable(IExternalAccess result) throws Exception
 			{
+				result.subscribeToResults().addResultListener(lis);
+				result.resumeComponent();
 				creationfuture.setResult(result.getId());
 			}
 		}));
@@ -262,7 +265,7 @@ public class CreateComponentTask implements ITask
 		{
 			public void resultAvailable(final IComponentIdentifier cid)
 			{
-				IFuture<Map<String, Object>> fut = instance.killComponent(cid);
+				IFuture<Map<String, Object>> fut = instance.getExternalAccess(cid).killComponent();
 				fut.addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 				{
 					public void customResultAvailable(Map<String, Object> result)

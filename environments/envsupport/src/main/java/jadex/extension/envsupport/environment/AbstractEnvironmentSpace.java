@@ -640,8 +640,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						ia.getClassLoader(), killonexit!=null ? killonexit.booleanValue() : true);
 					observercenters.add(oc);
 					
-					getExternalAccess().listenToComponent(getExternalAccess().getId())
-						.addIntermediateResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+					getExternalAccess().listenToComponent()
+						.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 					{
 						@Override
 						public void exceptionOccurred(Exception exception)
@@ -1713,8 +1713,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									desc.setLocalType(compotype);
 									setOwner(ret.getId(), desc);
 //									System.out.println("env create: "+cid);
-									IFuture	future	= exta.createComponent(
-										new CreationInfo(null, null, getExternalAccess().getId(), false, model.getAllImports()).setFilename(filename).setName(cid.getLocalName()), null);
+									IFuture<IExternalAccess> future = exta.createComponent(
+										new CreationInfo(null, null, getExternalAccess().getId(), false, model.getAllImports()).setFilename(filename).setName(cid.getLocalName()));
 									future.addResultListener(new IResultListener()
 									{
 										public void resultAvailable(Object result)
@@ -1860,7 +1860,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
 				if(mapping.isKillComponent())
 				{
-					getExternalAccess().killComponent(desc.getName());
+					getExternalAccess().getExternalAccess(desc.getName()).killComponent();
 				}
 			}
 		}
@@ -2593,7 +2593,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	protected IFuture getComponentType(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
-		getExternalAccess().getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+		getExternalAccess().getExternalAccessAsync(cid).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{

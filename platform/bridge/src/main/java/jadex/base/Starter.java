@@ -404,6 +404,7 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, final Map<String, Object> args)
 	{
+//		System.out.println("Java Version: " + System.getProperty("java.version"));
 		final IPlatformConfiguration config = pconfig!=null? pconfig: PlatformConfigurationHandler.getDefault();
 		
 //		if(!Boolean.TRUE.equals(config.getValues().get("bisimulation")))
@@ -883,7 +884,7 @@ public class Starter
 			ci.setName(name);
 			ci.setFilename(comp);
 			
-			instance.createComponent(ci, null)
+			instance.createComponent(ci)
 				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
 				public void customResultAvailable(IExternalAccess result)
@@ -1063,7 +1064,7 @@ public class Starter
 										Map<String, Object>	args = new HashMap<String, Object>();
 										args.put("component", remote.getId().getRoot());
 										CreationInfo ci = new CreationInfo(args);
-										local.createComponent(ci.setFilename("\"jadex/platform/service/remote/ProxyAgent.class\""), null).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+										local.createComponent(ci.setFilename("\"jadex/platform/service/remote/ProxyAgent.class\"")).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 										
 //										local.searchService( new ServiceQuery<>(IComponentManagementService.class))
 //											.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
@@ -1162,14 +1163,14 @@ public class Starter
 		IRwMap<String, Object> mem = platformmem.get(platform.getRoot());
 		if(mem == null)
 		{
-			platformmem.writeLock().lock();
+			platformmem.getWriteLock().lock();
 			mem = platformmem.get(platform.getRoot());
 			if (mem == null)
 			{
 				mem = new RwMapWrapper<String, Object>(new HashMap<String, Object>());
 				platformmem.put(platform, mem);
 			}
-			platformmem.writeLock().unlock();
+			platformmem.getWriteLock().unlock();
 		}
 		mem.put(key, value);
 	}

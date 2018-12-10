@@ -20,7 +20,7 @@ import jadex.micro.examples.messagequeue.Event;
 /**
  * 
  */
-@Agent
+@Agent(predecessors="jadex.micro.examples.messagequeue.replicated.ReplicatedMessageQueueAgent")
 @RequiredServices(@RequiredService(name = "mq", type = IMessageQueueReplicableService.class))
 @Arguments(@Argument(name = "topic", clazz = String.class, defaultvalue = "\"default_topic\""))
 public class UserAgent
@@ -90,6 +90,6 @@ public class UserAgent
 				return IFuture.DONE;
 			}
 		};
-		agent.getFeature(IExecutionFeature.class).waitForDelay(1000, step);
+		agent.waitForDelay(1000, step);
 	}
 }

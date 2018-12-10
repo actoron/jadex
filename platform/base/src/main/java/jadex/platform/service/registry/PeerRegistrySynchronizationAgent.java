@@ -11,7 +11,6 @@ import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationServ
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Autostart;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -19,7 +18,7 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Peer registry synchronization agent. 
  */
-@Agent(autostart=@Autostart(value=Boolean3.FALSE, name="peer"))
+@Agent(name="peer", autostart=Boolean3.FALSE)
 @ProvidedServices(@ProvidedService(type=IPeerRegistrySynchronizationService.class, implementation=@Implementation(PeerRegistrySynchronizationService.class)))
 //@Properties(value=@NameValue(name="system", value="true"))
 public class PeerRegistrySynchronizationAgent
@@ -41,7 +40,7 @@ public class PeerRegistrySynchronizationAgent
 			
 			if(spser!=null)
 			{
-				component.killComponent(((IService)spser).getServiceId().getProviderId());
+				component.getExternalAccess(((IService)spser).getServiceId().getProviderId()).killComponent();
 			}
 		}
 		catch(ServiceNotFoundException e)

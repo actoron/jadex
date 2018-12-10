@@ -1,10 +1,13 @@
 package jadex.bridge.modelinfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
@@ -28,8 +31,17 @@ public class ModelInfo extends Startable implements IModelInfo
 	/** The name. */
 	protected String name;
 	
+	/** Default instance name. */
+	protected String instancename;
+	
 	/** The package. */
 	protected String packagename;
+	
+	/** The predecessors. */
+	protected String[] predecessors;
+	
+	/** The predecessors. */
+	protected String[] successors;
 	
 	/** The imports. */
 	protected List<String> imports;
@@ -153,6 +165,31 @@ public class ModelInfo extends Startable implements IModelInfo
 	public String getName()
 	{
 		return name;
+	}
+	
+	/**
+	 *  Get the default instance name.
+	 *  @return The instance name.
+	 */
+	public String getInstanceName()
+	{
+		return instancename;
+	}
+	
+	/**
+	 *  Get required predecessors (dependencies).
+	 */
+	public String[] getPredecessors()
+	{
+		return predecessors;
+	}
+	
+	/**
+	 *  Get declared successors (dependencies).
+	 */
+	public String[] getSuccessors()
+	{
+		return successors;
 	}
 	
 	/**
@@ -450,6 +487,63 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+	
+	/**
+	 *  Set the default instance name.
+	 *  @param instancename The instance name.
+	 */
+	public void setInstanceName(String instancename)
+	{
+		this.instancename = instancename;
+	}
+	
+	/**
+	 *  Adds required predecessors (dependencies).
+	 */
+	public void addPredecessors(String[] predecessors)
+	{
+		if (this.predecessors != null && this.predecessors.length > 0)
+		{
+			Set<String> tmp = new HashSet<>();
+			tmp.addAll(Arrays.asList(this.predecessors));
+			tmp.addAll(Arrays.asList(predecessors));
+			predecessors = tmp.toArray(new String[tmp.size()]);
+		}
+		this.predecessors = predecessors;
+	}
+	
+	/**
+	 *  Set required predecessors (dependencies).
+	 */
+	public void setPredecessors(String[] predecessors)
+	{
+		if (name.contains("Intravm"))
+			System.out.println("Got INAIAIA");
+		this.predecessors = predecessors;
+	}
+	
+	/**
+	 *  Adds required predecessors (dependencies).
+	 */
+	public void addSuccessors(String[] successors)
+	{
+		if (this.successors != null && this.successors.length > 0)
+		{
+			Set<String> tmp = new HashSet<>();
+			tmp.addAll(Arrays.asList(this.successors));
+			tmp.addAll(Arrays.asList(successors));
+			successors = tmp.toArray(new String[tmp.size()]);
+		}
+		this.successors = successors;
+	}
+	
+	/**
+	 *  Set declared successors (dependencies).
+	 */
+	public void setSuccessors(String[] successors)
+	{
+		this.successors = successors;
 	}
 
 	/**

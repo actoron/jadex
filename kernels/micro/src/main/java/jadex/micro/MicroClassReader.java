@@ -300,6 +300,10 @@ public class MicroClassReader
 //				Boolean	persist	= val.persistable().toBoolean();
 				Boolean	keep	= val.keepalive().toBoolean();
 				
+				modelinfo.setInstanceName(!"".equals(val.name()) ? val.name() : null);
+				modelinfo.addPredecessors(val.predecessors());
+				modelinfo.addSuccessors(val.successors());
+				
 				// Use most specific autoprovide setting.
 				autoprovide	= autoprovide != Boolean3.NULL ? autoprovide : val.autoprovide();
 

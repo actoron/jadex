@@ -23,6 +23,8 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.TupleResult;
@@ -169,7 +171,7 @@ public class ComponentTestLazyPlatform extends TestCase
 					boolean b = finished.setExceptionIfUndone(new TimeoutException(ComponentTestLazyPlatform.this + " did not finish in " + timeout + " ms."));
 					if(b && cid[0] != null && platform != null)
 					{
-						platform.killComponent(cid[0]);
+						platform.getExternalAccess(cid[0]).killComponent();
 					}
 				}
 			}, timeout);
@@ -179,30 +181,53 @@ public class ComponentTestLazyPlatform extends TestCase
 		// (hack???)
 		ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
 
-		ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = platform.createComponent(new CreationInfo(rid).setFilename(filename));
+		IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo(rid).setFilename(filename));
 		componentStarted(fut);
-		fut.addResultListener(new IntermediateDefaultResultListener<TupleResult>()
+		fut.addResultListener(new IResultListener<IExternalAccess>()
 		{
-			@SuppressWarnings("unchecked")
-			public void intermediateResultAvailable(TupleResult result)
-			{
-				if(result.getNum() == 0)
-				{
-					cid[0] = (IComponentIdentifier)result.getResult();
-				}
-				else
-				{
-					// if(filename.toString().indexOf("Feature")!=-1)
-					// Thread.dumpStack();
-					finished.setResultIfUndone((Map<String, Object>)result.getResult());
-				}
-			}
-
 			public void exceptionOccurred(Exception exception)
 			{
 				finished.setExceptionIfUndone(exception);
 			}
+			
+			public void resultAvailable(IExternalAccess result)
+			{
+				cid[0] = result.getId();
+				result.waitForTermination().addResultListener(new IResultListener<Map<String,Object>>()
+				{
+					public void exceptionOccurred(Exception exception)
+					{
+						finished.setExceptionIfUndone(exception);
+					}
+					public void resultAvailable(Map<String, Object> result)
+					{
+						finished.setResultIfUndone(result);
+					}
+				});
+			}
 		});
+//		fut.addResultListener(new IntermediateDefaultResultListener<TupleResult>()
+//		{
+//			@SuppressWarnings("unchecked")
+//			public void intermediateResultAvailable(TupleResult result)
+//			{
+//				if(result.getNum() == 0)
+//				{
+//					cid[0] = (IComponentIdentifier)result.getResult();
+//				}
+//				else
+//				{
+//					// if(filename.toString().indexOf("Feature")!=-1)
+//					// Thread.dumpStack();
+//					finished.setResultIfUndone((Map<String, Object>)result.getResult());
+//				}
+//			}
+//
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				finished.setExceptionIfUndone(exception);
+//			}
+//		});
 		Map<String, Object> res = null;
 		try
 		{
@@ -226,7 +251,7 @@ public class ComponentTestLazyPlatform extends TestCase
 
 		// cleanup platform?
 		if(conf != null)
-			platform.killComponent(platform.getId().getRoot()).get(timeout, true);
+			platform.killComponent().get(timeout, true);
 
 		// Remove references to Jadex resources to aid GC cleanup.
 		suite = null;
@@ -237,7 +262,7 @@ public class ComponentTestLazyPlatform extends TestCase
 	/**
 	 * Called when a component has been started.
 	 */
-	protected void componentStarted(ITuple2Future<IComponentIdentifier, Map<String, Object>> fut)
+	protected void componentStarted(IFuture<IExternalAccess> fut)
 	{
 	}
 

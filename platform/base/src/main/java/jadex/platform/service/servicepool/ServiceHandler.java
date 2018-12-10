@@ -172,13 +172,13 @@ public class ServiceHandler implements InvocationHandler
 		final Future<IService> ret = new Future<IService>();
 		
 		CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
-		ci.setParent(component.getId());
+//		ci.setParent(component.getId());
 		ci.setImports(component.getModel().getAllImports());
 		// Worker services are exposed with scope parent only to hinder others finding directly the worker services
 		ci.setProvidedServiceInfos(new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, servicetype, null, ServiceScope.PARENT, null, null)});
 		ci.setFilename(componentname);
 		
-		component.createComponent(ci, null)
+		component.createComponent(ci)
 			.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IService>(ret)
 		{
 			public void customResultAvailable(IExternalAccess ea)
@@ -485,7 +485,7 @@ public class ServiceHandler implements InvocationHandler
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		component.killComponent(workercid).addResultListener(
+		component.getExternalAccess(workercid).killComponent().addResultListener(
 			inta.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{
 			public void customResultAvailable(Map<String, Object> result) 

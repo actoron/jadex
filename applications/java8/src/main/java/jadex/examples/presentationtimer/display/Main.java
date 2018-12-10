@@ -8,13 +8,9 @@ import java.util.Map;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ITuple2Future;
 
 
 public class Main
@@ -79,11 +75,12 @@ public class Main
 		IFuture<IExternalAccess> fut = Starter.createPlatform(config);
 
 		fut.addResultListener(access -> {
-			ITuple2Future<IComponentIdentifier, Map<String, Object>> fut2 = access.createComponent(new CreationInfo().setName("CDDisplay").setFilename(CountdownAgent.class.getName() + ".class"));
-			fut2.addTuple2ResultListener((IComponentIdentifier created) -> {
+			IFuture<IExternalAccess> fut2 = access.createComponent(new CreationInfo().setName("CDDisplay").setFilename(CountdownAgent.class.getName() + ".class"));
+			fut2.addResultListener((IExternalAccess created) -> {
 				System.out.println("CDDisplay Component created.");
-			}, (Map<String, Object> terminated) -> {
-				System.out.println("CDDisplay Component terminated!");
+				created.waitForTermination().addResultListener((Map<String, Object> terminated) -> {
+					System.out.println("CDDisplay Component terminated!");
+				});
 			});
 		});
 

@@ -25,7 +25,7 @@ public class EndStateAbortPlan extends Plan
 		// Create worker agent.
 		IComponentIdentifier	worker	= getAgent()
 			.createComponent(
-			new CreationInfo(getComponentIdentifier()).setFilename("/jadex/bdi/testcases/misc/EndStateAbortWorker.agent.xml")).getFirstResult();
+			new CreationInfo().setFilename("/jadex/bdi/testcases/misc/EndStateAbortWorker.agent.xml")).get().getId();
 		
 		// Wait to allow worker to start plan
 		waitFor(100);
@@ -35,7 +35,7 @@ public class EndStateAbortPlan extends Plan
 		try
 		{
 //			System.out.println("destroying worker: "+worker);
-			agent.killComponent(worker).get();
+			agent.getExternalAccess(worker).killComponent().get();
 //			System.out.println("destroyed worker: "+worker);
 			report.setFailed("Worker agent terminated without timeout.");
 		}

@@ -142,64 +142,58 @@ public class MicroInjectionComponentFeature extends	AbstractComponentFeature	imp
 			if(pis.length>0)
 			{
 //				IComponentManagementService cms = getComponent().getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IComponentManagementService.class));
-				getComponent().getExternalAccess(getComponent().getId().getParent())
-					.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				IExternalAccess exta = getComponent().getExternalAccess(getComponent().getId().getParent());
+				final CounterResultListener<Void> lis = new CounterResultListener<Void>(pis.length, new DelegationResultListener<Void>(ret));
+				
+				for(int i=0; i<pis.length; i++)
 				{
-					public void customResultAvailable(IExternalAccess exta)
+					final Field	f	= pis[i].getField(getComponent().getClassLoader());
+					if(IExternalAccess.class.equals(f.getType()))
 					{
-						final CounterResultListener<Void> lis = new CounterResultListener<Void>(pis.length, new DelegationResultListener<Void>(ret));
-						
-						for(int i=0; i<pis.length; i++)
+						try
 						{
-							final Field	f	= pis[i].getField(getComponent().getClassLoader());
-							if(IExternalAccess.class.equals(f.getType()))
-							{
-								try
-								{
-									f.setAccessible(true);
-									f.set(agent, exta);
-									lis.resultAvailable(null);
-								}
-								catch(Exception e)
-								{
-									exceptionOccurred(e);
-								}
-							}
-							else if(getComponent().getDescription().isSynchronous())
-							{
-								exta.scheduleStep(new IComponentStep<Void>()
-								{
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										Object pagent = ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
-										if(SReflect.isSupertype(f.getType(), pagent.getClass()))
-										{
-											try
-											{
-												f.setAccessible(true);
-												f.set(agent, pagent);
-												lis.resultAvailable(null);
-											}
-											catch(Exception e)
-											{
-												exceptionOccurred(e);
-											}
-										}
-										else
-										{
-											throw new RuntimeException("Incompatible types for parent injection: "+pagent+", "+f);													
-										}
-										return IFuture.DONE;
-									}
-								});
-							}
-							else
-							{
-								exceptionOccurred(new RuntimeException("Non-external parent injection for non-synchronous subcomponent not allowed: "+f));
-							}
+							f.setAccessible(true);
+							f.set(agent, exta);
+							lis.resultAvailable(null);
+						}
+						catch(Exception e)
+						{
+							ret.setException(e);
 						}
 					}
-				});
+					else if(getComponent().getDescription().isSynchronous())
+					{
+						exta.scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								Object pagent = ia.getFeature(IPojoComponentFeature.class).getPojoAgent();
+								if(SReflect.isSupertype(f.getType(), pagent.getClass()))
+								{
+									try
+									{
+										f.setAccessible(true);
+										f.set(agent, pagent);
+										lis.resultAvailable(null);
+									}
+									catch(Exception e)
+									{
+										ret.setException(e);
+									}
+								}
+								else
+								{
+									throw new RuntimeException("Incompatible types for parent injection: "+pagent+", "+f);													
+								}
+								return IFuture.DONE;
+							}
+						});
+					}
+					else
+					{
+						ret.setException(new RuntimeException("Non-external parent injection for non-synchronous subcomponent not allowed: "+f));
+					}
+				}
 			}
 			else
 			{

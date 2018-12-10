@@ -18,6 +18,7 @@ import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
@@ -207,8 +208,9 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			IComponentIdentifier	parent	= thread.hasPropertyValue("parent")
 				? (IComponentIdentifier)thread.getPropertyValue("parent")
 				: instance.getId();
-			if(info.getParent()==null && parent!=null)
-				info.setParent(parent);
+//			if(info.getParent()==null && parent!=null)
+//				info.setParent(parent);
+			IExternalAccess creator = parent == null ? instance.getExternalAccess() : instance.getExternalAccess(parent);
 			
 			String[] imps = instance.getModel().getAllImports();
 			if(info.getImports()==null && imps!=null)
@@ -216,7 +218,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			info.setFilename(file);	
 //					System.out.println("parent is: "+parent.getAddresses());	
 
-			instance.createComponentWithResults(info)
+			creator.createComponentWithEvents(info)
 				.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateResultListener<CMSStatusEvent>()
 			{
 				protected SubprocessResultHandler handler = new SubprocessResultHandler(thread, activity);	

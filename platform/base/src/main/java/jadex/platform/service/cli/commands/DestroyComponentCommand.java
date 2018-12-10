@@ -79,7 +79,7 @@ public class DestroyComponentCommand extends ACliCommand
 		else
 		{
 			final IExternalAccess comp = (IExternalAccess)context.getUserContext();
-			comp.killComponent(cid).addResultListener(new DelegationResultListener<Map<String,Object>>(ret));
+			comp.getExternalAccess(cid).killComponent().addResultListener(new DelegationResultListener<Map<String,Object>>(ret));
 		}
 		
 		return ret;

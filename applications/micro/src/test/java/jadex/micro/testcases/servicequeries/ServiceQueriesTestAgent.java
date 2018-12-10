@@ -116,13 +116,14 @@ public class ServiceQueriesTestAgent extends TestAgent
 			});
 
 			// The creation info is important to be able to resolve the class/model
-			CreationInfo ci = platform.getId().getPlatformName().equals(agent.getId().getPlatformName())
-				? new CreationInfo(agent.getId(), agent.getModel().getResourceIdentifier()) : new CreationInfo(agent.getModel().getResourceIdentifier());
+			CreationInfo ci = new CreationInfo(agent.getModel().getResourceIdentifier());
 
+			IExternalAccess creator = platform.getId().getPlatformName().equals(agent.getId().getPlatformName()) ? agent : platform;
 			for(int i=0; i<cnt; i++)
 			{
-				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = platform.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
-				cids[i] = fut.getFirstResult(Starter.getDefaultTimeout(agent.getId()), true);
+				
+				IFuture<IExternalAccess> fut = creator.createComponent(ci.setFilename(ProviderAgent.class.getName()+".class"));
+				cids[i] = fut.get(Starter.getDefaultTimeout(agent.getId()), true).getId();
 			}
 			
 			// Wait some time and then terminate query
@@ -147,7 +148,7 @@ public class ServiceQueriesTestAgent extends TestAgent
 			{
 				for(int i=0; i<cids.length; i++)
 				{
-					platform.killComponent(cids[i]).get();
+					platform.getExternalAccess(cids[i]).killComponent().get();
 				}
 			}
 			catch(Exception e)
