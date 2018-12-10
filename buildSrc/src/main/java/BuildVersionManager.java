@@ -159,7 +159,7 @@ public class BuildVersionManager
 		            try (RevWalk walk = new RevWalk(repository))
 		            {
 		                RevCommit commit = walk.parseCommit(head);
-		                timestamp	= TIMESTAMP_FORMAT.format(new Date(1000L*commit.getCommitTime());	// Unix timestamp w/o milliseconds
+		                timestamp	= TIMESTAMP_FORMAT.format(new Date(1000L*commit.getCommitTime()));	// Unix timestamp w/o milliseconds
 		                walk.dispose();
 		            }
 				}
