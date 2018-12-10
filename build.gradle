@@ -148,7 +148,7 @@ task createVersionInfo(type: Copy) {
 	into project.buildDir.getCanonicalPath()
 	from('src/main/buildutils') {
 		include 'jadexversion.properties'
-		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: project.ext.timestamp)
+		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: project.ext.timestamp, SRCDIST_COMMIT: '', SRCDIST_BRANCH: '')
 	}
 }
 createVersionInfo.mustRunAfter clean
@@ -492,6 +492,14 @@ subprojects
 				from(rootProject.buildDir.getCanonicalPath()) {
 					into 'sources/src/main/buildutils'
 					includes = ['jadexversion.properties']
+				}
+				
+				// Add build helper project
+				def helpdir	= new File(rootProject.projectDir, "buildsrc")
+				from(helpdir) {
+					into 'sources' + helpdir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
+					includes = ['*.properties', '*.gradle', 'src/**', 'dist/**', 'lib/**', 'gradle/**', 'gradlew.bat']
+					excludes = ['secret.properties', '**/.gradle', 'src/main/config', 'src/main/buildutils/jadexversion.properties']
 				}
 			}			
 		}

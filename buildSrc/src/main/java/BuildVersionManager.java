@@ -2,9 +2,19 @@
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.api.Project;
 import org.gradle.tooling.BuildException;
 
@@ -56,7 +66,19 @@ public class BuildVersionManager
 		catch(NumberFormatException e)
 		{
 			// Patch not included -> try to read local git repo.
-			ret	= fetchVersionInfoFromProps(project, major, minor, 0, props);
+			try(Repository repository = new FileRepositoryBuilder()
+				.setGitDir(new File(project.getProjectDir(), ".git"))
+				.readEnvironment() // scan environment GIT_* variables
+				.build())
+			{
+				ret	= fetchVersionInfoFromRepo(project, major, minor, repository);
+			}
+			catch(Exception e2)
+			{
+				// Not in git repo -> use major.minor.9999-SNAPSHOT and current time. (branch is unknown)
+				e2.printStackTrace();
+				ret	= new BuildVersionInfo(major, minor, 9999, null, new SimpleDateFormat("yyyyMMddhhmmss").format(new Date()), true);
+			}
 		}
 		
 		return ret;
@@ -79,6 +101,60 @@ public class BuildVersionManager
 		{
 			patch++;
 		}
+		
+		return new BuildVersionInfo(major, minor, patch, branch, timestamp, dirty);
+	}
+
+	/**
+	 *  Fetch version info for build from git repo.
+	 *  @throws IOException in case of errors. 
+	 */
+	protected static BuildVersionInfo fetchVersionInfoFromRepo(Project project, int major, int minor, Repository repository) throws Exception
+	{
+//		String	tags	= git.describe().setMatch(major+"."+minor+".*").abbrev(0).call();	// --abbrev=0 not supported :(, cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=537883
+		String	prefix	= "refs/tags/"+major+"."+minor+".";
+		int	patch	= 0;
+		ObjectId	latest	= null;
+		for(Ref ref: repository.getRefDatabase().getRefsByPrefix(prefix))
+		{
+			String	spatch	= ref.getName().substring(prefix.length());
+			try
+			{
+				int	tagpatch	= Integer.parseInt(spatch);
+				if(tagpatch>=patch)
+				{
+					latest	= ref.getObjectId();
+					patch	= tagpatch;
+				}
+			}
+			catch(NumberFormatException nfe)
+			{
+				System.out.println("Ignoring tag: "+spatch);
+			}
+		}
+		
+		// Check if tag points at head -> else increment patch and add timestamp of head
+		String	timestamp	= null;
+		if(latest!=null)
+		{
+			ObjectId head = repository.resolve("HEAD");
+			System.out.println("Latest is: "+latest);
+			System.out.println("Head is: "+head);
+			if(!latest.equals(head))
+			{
+				patch++;
+				latest	= head;
+	            try (RevWalk walk = new RevWalk(repository))
+	            {
+	                RevCommit commit = walk.parseCommit(head);
+	                timestamp	= ""+commit.getCommitTime();
+	                walk.dispose();
+	            }
+			}
+		}
+		
+		String branch	= repository.getBranch();
+		boolean dirty	= !Git.wrap(repository).status().call().isClean();
 		
 		return new BuildVersionInfo(major, minor, patch, branch, timestamp, dirty);
 	}
