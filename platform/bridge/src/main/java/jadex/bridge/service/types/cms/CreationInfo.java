@@ -137,7 +137,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(IResourceIdentifier rid)
 	{
-		this(null, null, null, null, null, null, null, null, rid);
+		this(null, null, rid);
 	}
 	
 	/**
@@ -156,7 +156,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args)
 	{
-		this(config, args, (IComponentIdentifier)null);
+		this(config, args, null);
 	}
 	
 	/**
@@ -164,118 +164,9 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IResourceIdentifier rid)
 	{
-		this(config, args, null, null, null, null, null, null, rid);
-	}
-	
-
-	/**
-	 *  Create a new creation info.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 */
-	public CreationInfo(Map<String, Object> args, IComponentIdentifier parent)
-	{
-		this(null, args, parent);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent)
-	{
-		this(config, args, parent, null, (String[])null);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 *  @param suspend	The suspend flag.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend)
-	{
-		this(config, args, parent, suspend, (String[])null);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 *  @param suspend	The suspend flag.
-	 *  @param imports	The imports.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, String[] imports)
-	{
-		this(config, args, parent, suspend, null, null, imports, null, null);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 *  @param suspend	The suspend flag.
-	 *  @param master	The master flag.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, 
-		//Boolean master, Boolean daemon, Boolean autoshutdown, 
-		Boolean synchronous, //Boolean persistable, 
-		PublishEventLevel monitoring)
-	{
-		this(config, args, parent, suspend, synchronous, monitoring, null, null, null);
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param config	The configuration.
-	 *  @param args	The arguments.
-	 *  @param parent	The parent of the component to be created.
-	 *  @param suspend	The suspend flag.
-	 *  @param master	The master flag.
-	 *  @param imports	The imports.
-	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, 
-		Boolean suspend, //Boolean master, Boolean daemon, Boolean autoshutdown, 
-		Boolean synchronous, //Boolean persistable, 
-		PublishEventLevel monitoring,
-		String[] imports, RequiredServiceBinding[] bindings, IResourceIdentifier rid)
-	{
-		this.config	= config;
-		this.args	= args;
-//		this.parent	= parent;
-		this.suspend	= suspend;
-//		this.master = master;
-//		this.daemon = daemon;
-//		this.autoshutdown = autoshutdown;
-		this.monitoring = monitoring;
-		this.imports	= imports;
-		this.bindings = bindings;
-		this.rid = rid;
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param filename The filename.
-	 */
-	public CreationInfo(String filename)
-	{
-		this.filename = filename;
-	}
-	
-	/**
-	 *  Create a new creation info.
-	 *  @param filename The filename.
-	 */
-	public CreationInfo(String filename, String config, Map<String, Object> args)
-	{
-		this.filename = filename;
 		this.config = config;
 		this.args = args;
+		this.rid = rid;
 	}
 	
 	//-------- methods --------

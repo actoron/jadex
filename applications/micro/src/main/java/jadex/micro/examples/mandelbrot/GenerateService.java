@@ -151,9 +151,8 @@ public class GenerateService implements IGenerateService
 				if(delay==null)
 					delay = Long.valueOf(5000);
 				
-				agent.createComponent(
-					new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
-					agent.getId().getParent()).setFilename("jadex/micro/examples/mandelbrot/CalculateAgent.class"))
+				agent.getExternalAccess(agent.getId().getParent()).createComponent(
+					new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay})).setFilename("jadex/micro/examples/mandelbrot/CalculateAgent.class"))
 					.addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<IExternalAccess>(ret)
 				{
 					// Component created, now get the calculation service.
