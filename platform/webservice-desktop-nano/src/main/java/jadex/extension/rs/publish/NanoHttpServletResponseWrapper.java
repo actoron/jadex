@@ -192,8 +192,6 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
 				{
     				buf.append(arg0);
 				}
-    			
-    			
 				
 				@Override
 				public void setWriteListener(WriteListener writeListener) 
@@ -204,7 +202,8 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
 				@Override
 				public boolean isReady() 
 				{
-					throw new UnsupportedOperationException();
+					return true;
+//					throw new UnsupportedOperationException();
 //					return false;
 				}
 			};

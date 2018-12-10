@@ -1,20 +1,38 @@
 package jadex.extension.rs.publish;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipEntry;
 
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.IStatus;
+import jadex.base.JarAsDirectory;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.SUtil;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Publish service using Nano.
@@ -161,6 +179,14 @@ public class NanoRestPublishService extends ExternalRestPublishService
          return server;
 	}
 	
+	/**
+	 *  Get or start an api to the http server.
+	 */
+	public PathHandler getPathHandler(URI uri, PublishInfo info)
+	{
+		return (PathHandler)super.getHttpServer(uri, info);
+	}
+	
 //    /**
 //     *  Publish a static page (without ressources).
 //     */
@@ -200,60 +226,133 @@ public class NanoRestPublishService extends ExternalRestPublishService
 //        return IFuture.DONE;
 //    }
 //
-//    /**
-//     *  Publish file resources from the classpath.
-//     */
-//    public IFuture<Void> publishResources(final String pid, final String rootpath)
-//    {
-//		final Future<Void>	ret	= new Future<Void>();
-//		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getId();
-//		component.getDescription(cid)
-//			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
-//		{
-//			public void customResultAvailable(IComponentDescription desc)
-//			{
-//				ILibraryService	ls	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
-//				ls.getClassLoader(desc.getResourceIdentifier())
-//					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
-//				{
-//					public void customResultAvailable(ClassLoader cl) throws Exception 
-//					{
-//			    		String clpid = pid.replace("[", "").replace("]", "");
-//			    		URI uri = new URI(clpid);
-//			        	//final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
-//			        	
-//			            Server server = (Server)getHttpServer(uri, null);
-//			            System.out.println("Adding http handler to server: "+uri.getPath());
-//
-//			            ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
-//			            
-//			            ResourceHandler	rh	= new ResourceHandler();
-//			            ContextHandler	ch	= new ContextHandler()
-//			            {
-//			            	@Override
-//			            	public void doHandle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
-//			            	{
-//			            		// TODO Auto-generated method stub
-//			            		super.doHandle(target, baseRequest, request, response);
-//			            	}
-//			            };
-////			            ch.setBaseResource(Resource.newClassPathResource(rootpath));
-//			            ch.setBaseResource(new UniversalClasspathResource(rootpath));
-//			            ch.setHandler(rh);
-//			            ch.setContextPath(uri.getPath());
-//			            collhandler.addHandler(ch);
-//			            ch.start(); // must be started explicitly :-(((
-//						
-//						System.out.println("Resource published at: "+uri.getPath());
-//						ret.setResult(null);
-//					}
-//				});
-//			}
-//		});
-//		
-//		return ret;
-//    }
-//	
+    /**
+     *  Publish file resources from the classpath.
+     */
+	// "[http://localhost:8081/]", "META-INF/resources";
+    public IFuture<Void> publishResources(final String pid, final String rootpath)
+    {
+		final Future<Void>	ret	= new Future<Void>();
+		
+		IComponentIdentifier cid = ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null? ServiceCall.getLastInvocation().getCaller() : component.getId();
+		component.getDescription(cid)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
+		{
+			public void customResultAvailable(IComponentDescription desc)
+			{
+				ILibraryService	ls	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
+				ls.getClassLoader(desc.getResourceIdentifier())
+					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+				{
+					public void customResultAvailable(ClassLoader cl) throws Exception 
+					{
+						try
+					    {
+							URI uri = null;
+							String mpid = pid;
+														
+							if(mpid.startsWith("["))
+							{
+								mpid = mpid.substring(1);
+								mpid = mpid.replace("]", "");
+							}
+							
+							if(mpid.endsWith("/"))
+								mpid = mpid.substring(0, mpid.length()-1);
+							
+							uri = new URI(mpid);
+							
+//					    	if(mpid.startsWith("["))
+//					    	{
+//					    		mpid = mpid.substring(mpid.indexOf("]")+1);
+//					    		uri = new URI(DEFAULT_COMPLETECONTEXT+mpid);
+////						    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
+//					    	}
+//					    	else
+//					    	{
+//					    		uri = new URI(mpid);
+//					    	}
+					    	
+					        component.getLogger().info("Adding http handler to server: "+uri.getPath());
+					        
+					        // cannot use DEFAULT_COMPLETECONTEXT because here it needs to start a server
+					        getHttpServer(uri, null);
+					        PathHandler ph = getPathHandler(uri, null);
+					        
+					        IRequestHandler rh = new IRequestHandler()
+							{
+								public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
+								{
+									String url = request.getRequestURL().toString();
+
+									if(url.equals("/") || url.length()==0)
+										url = "/index.html";
+									
+//									int idx = url.indexOf("/");
+//									idx = url.indexOf("/", idx+1);
+//									idx = url.indexOf("/", idx+1);
+//									String path = url.substring(idx+1);
+
+									String fp = rootpath+url;
+									
+									System.out.println("serve path: "+fp);
+									
+									File f = getFile(cl, fp);
+									 
+									OutputStream os = response.getOutputStream();
+									SUtil.copyStream(new FileInputStream(f), os);
+								}
+							};
+							if(ph.containsSubhandlerForExactUri(null, uri.getPath()))
+							{
+								component.getLogger().info("The URL "+uri.getPath() + " is already published, unpublishing...");
+								ph.removeSubhandler(null, uri.getPath());
+							}
+							
+							ph.addSubhandler(null, uri.getPath(), rh);
+							
+							ret.setResult(null);
+					    }
+					    catch(Exception e)
+					    {
+					    	ret.setException(e);
+					    }
+					}
+				});
+			}
+		});
+			
+		
+	    
+	    return ret;
+    }
+    
+    public static File getFile(ClassLoader cl, String path) throws IOException
+	{
+		if("file".equals(getURL(cl, path).getProtocol()))
+		{
+			return SUtil.getFile(getURL(cl, path));
+		}
+		else if("jar".equals(getURL(cl, path).getProtocol()))
+		{
+			String jar = getURL(cl, path).getPath();
+			String entry = null;
+			if(jar.contains("!/"))
+			{
+				entry = jar.substring(jar.indexOf("!/")+2);
+				jar	= jar.substring(0, jar.indexOf("!/"));
+			}
+			return new JarAsDirectory(new URL(jar).getPath(), new ZipEntry(entry));
+		}
+		
+		throw new UnsupportedOperationException();
+	}
+    
+    public static URL getURL(ClassLoader cl, String path)
+	{
+		return cl.getResource(path);
+	}
+
 //	public IFuture<Void> mirrorHttpServer(URI sourceserveruri, URI targetserveruri, PublishInfo info)
 //	{
 //        throw new UnsupportedOperationException();

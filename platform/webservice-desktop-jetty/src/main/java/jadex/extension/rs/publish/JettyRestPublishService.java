@@ -275,18 +275,20 @@ public class JettyRestPublishService extends AbstractRestPublishService
     public IFuture<Void> publishResources(final String pid, final String rootpath)
     {
 		final Future<Void>	ret	= new Future<Void>();
-		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getId();
-		component.getDescription(cid)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
+		try
 		{
-			public void customResultAvailable(IComponentDescription desc)
-			{
-				ILibraryService	ls	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
-				ls.getClassLoader(desc.getResourceIdentifier())
-					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
-				{
-					public void customResultAvailable(ClassLoader cl) throws Exception 
-					{
+//		IComponentIdentifier	cid	= ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null ? ServiceCall.getLastInvocation().getCaller() : component.getId();
+//		component.getDescription(cid)
+//			.addResultListener(new ExceptionDelegationResultListener<IComponentDescription, Void>(ret)
+//		{
+//			public void customResultAvailable(IComponentDescription desc)
+//			{
+//				ILibraryService	ls	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( ILibraryService.class, ServiceScope.PLATFORM));
+//				ls.getClassLoader(desc.getResourceIdentifier())
+//					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+//				{
+//					public void customResultAvailable(ClassLoader cl1) throws Exception 
+//					{
 			    		String clpid = pid.replace("[", "").replace("]", "");
 			    		URI uri = new URI(clpid);
 			        	//final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
@@ -302,7 +304,6 @@ public class JettyRestPublishService extends AbstractRestPublishService
 			            	@Override
 			            	public void doHandle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
 			            	{
-			            		// TODO Auto-generated method stub
 			            		super.doHandle(target, baseRequest, request, response);
 			            	}
 			            };
@@ -315,10 +316,15 @@ public class JettyRestPublishService extends AbstractRestPublishService
 						
 						System.out.println("Resource published at: "+uri.getPath());
 						ret.setResult(null);
-					}
-				});
-			}
-		});
+//					}
+//				});
+//			}
+//		});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		
 		return ret;
     }

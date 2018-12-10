@@ -4399,7 +4399,7 @@ public class SUtil
 	{
 		assert url.getProtocol().equals("file");
 		
-		File	file;
+		File file;
 		try
 		{
 			file = new File(URLDecoder.decode(url.getFile(), "UTF-8"));

@@ -315,7 +315,9 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	    	
 	        component.getLogger().info("Adding http handler to server: "+uri.getPath());
 	        
-	        PathHandler ph = (PathHandler)getHttpServer(uri, null);
+//	        PathHandler ph = (PathHandler)getHttpServer(uri, null);
+	        getHttpServer(uri, null);
+	        PathHandler ph = portservers.get(uri.getPort());
 	        
 	        IRequestHandler rh = new IRequestHandler()
 			{
