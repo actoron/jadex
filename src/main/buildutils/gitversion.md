@@ -17,7 +17,7 @@
 
 ## Assumptions
   
-1. Jadex versions take the form `<#major>.<#minor>.<#patch>[-[<branchname>-](<#timestamp>|SNAPSHOT)]`.
+1. Jadex versions take the form `<#major>.<#minor>.<#patch>[[-<branchname>]-(<#timestamp>|SNAPSHOT)]`.
    This is roughly line with [Semantic Versioning](https://semver.org/), but
    uses branch and timestamp/SNAPSHOT as part of a single identifier called
    [pre-release version](https://semver.org/#spec-item-9).
