@@ -65,7 +65,7 @@ public class JadexGatewayServlet extends HttpServlet
 	    ServletCallAccess.purgeServiceCalls();
 	    
 //		cms.createComponent(ExternalRSPublishAgent.class.getName()+".class", null).getFirstResult();
-		this.handler = platform.searchService( new ServiceQuery<>( IRequestHandlerService.class, ServiceScope.PLATFORM)).get();
+		this.handler = platform.searchService(new ServiceQuery<>(IRequestHandlerService.class, ServiceScope.PLATFORM)).get();
 
 		// create components
 		Enumeration<String> pnames = config.getInitParameterNames();
