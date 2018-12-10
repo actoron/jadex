@@ -12,10 +12,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IPojoComponentFeature;
-import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
@@ -63,7 +59,6 @@ public class AgentCreationAgent
 		
 		if(args.get("num")==null)
 		{
-			IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 			System.gc();
 			try
 			{
@@ -72,7 +67,7 @@ public class AgentCreationAgent
 			catch(InterruptedException e){}
 			
 			Long startmem = Long.valueOf(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
-			Long starttime = Long.valueOf(clock.getTime());
+			Long starttime = Long.valueOf(System.currentTimeMillis());
 			args.put("num", Integer.valueOf(1));
 			args.put("startmem", startmem);
 			args.put("starttime", starttime);
@@ -103,14 +98,13 @@ public class AgentCreationAgent
 			args.put("num", Integer.valueOf(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-			agent.createComponent(
+			agent.getExternalAccess(agent.getId().getParent()).createComponent(
 				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, agent.getDescription().getResourceIdentifier())
 				.setName(createPeerName(num+1, agent.getId())).setFilename(AgentCreationAgent.this.getClass().getName()+".class"));
 		}
 		else
 		{
-			IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
-			final long end = clock.getTime();
+			final long end = System.currentTimeMillis();
 			
 			System.gc();
 			try
@@ -151,8 +145,7 @@ public class AgentCreationAgent
 							@Classname("deletePeers")
 							public IFuture<Void> execute(final IInternalAccess ia)
 							{
-								IClockService clock = ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
-								((AgentCreationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
+								((AgentCreationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).deletePeers(max, System.currentTimeMillis(), dur, pera, omem, upera, max, nested);
 								return IFuture.DONE;
 							}
 						});
@@ -215,8 +208,7 @@ public class AgentCreationAgent
 	protected void killLastPeer(final int max, final long killstarttime, final double dur, final double pera, 
 		final long omem, final double upera)
 	{
-		IClockService cs = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
-		long killend = cs.getTime();
+		long killend = System.currentTimeMillis();
 		System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 		double killdur = ((double)killend-killstarttime)/1000.0;
 		final double killpera = killdur/(max-1);

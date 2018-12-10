@@ -3,7 +3,6 @@ package jadex.launch.test;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import jadex.base.Starter;
