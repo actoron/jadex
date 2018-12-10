@@ -34,6 +34,9 @@ public class BuildVersionManager
 	/** Prefix of properties for major, minor, patch etc. */
 	public static String	PROPS_PREFIX	= "jadexversion_";
 	
+	/** The date formatter for time stamps. */
+	public static SimpleDateFormat TIMESTAMP_FORMAT	= new SimpleDateFormat("yyyyMMddhhmmss");
+	
 	//-------- methods --------
 	
 	/**
@@ -111,6 +114,9 @@ public class BuildVersionManager
 	 */
 	protected static BuildVersionInfo fetchVersionInfoFromRepo(Project project, int major, int minor, Repository repository) throws Exception
 	{
+		boolean dirty	= !Git.wrap(repository).status().call().isClean();
+		String branch	= repository.getBranch();
+		
 //		String	tags	= git.describe().setMatch(major+"."+minor+".*").abbrev(0).call();	// --abbrev=0 not supported :(, cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=537883
 		String	prefix	= "refs/tags/"+major+"."+minor+".";
 		int	patch	= 0;
@@ -129,32 +135,36 @@ public class BuildVersionManager
 			}
 			catch(NumberFormatException nfe)
 			{
-				System.out.println("Ignoring tag: "+spatch);
+//				System.out.println("Ignoring tag: "+spatch);
 			}
 		}
 		
-		// Check if tag points at head -> else increment patch and add timestamp of head
+		// Increment patch when dirty or latest tag not at head
 		String	timestamp	= null;
 		if(latest!=null)
 		{
-			ObjectId head = repository.resolve("HEAD");
-			System.out.println("Latest is: "+latest);
-			System.out.println("Head is: "+head);
-			if(!latest.equals(head))
+			if(dirty)
 			{
 				patch++;
-				latest	= head;
-	            try (RevWalk walk = new RevWalk(repository))
-	            {
-	                RevCommit commit = walk.parseCommit(head);
-	                timestamp	= ""+commit.getCommitTime();
-	                walk.dispose();
-	            }
+                timestamp	= TIMESTAMP_FORMAT.format(new Date());	// Timestamp for reference in version properties, not part of version string.
+			}
+			else
+			{
+				// Clean workdir -> when not at head then increment patch and add timestamp from latest commit
+				ObjectId head = repository.resolve("HEAD");
+				if(!latest.equals(head))
+				{
+					patch++;
+					latest	= head;
+		            try (RevWalk walk = new RevWalk(repository))
+		            {
+		                RevCommit commit = walk.parseCommit(head);
+		                timestamp	= TIMESTAMP_FORMAT.format(new Date(commit.getCommitTime()));
+		                walk.dispose();
+		            }
+				}
 			}
 		}
-		
-		String branch	= repository.getBranch();
-		boolean dirty	= !Git.wrap(repository).status().call().isClean();
 		
 		return new BuildVersionInfo(major, minor, patch, branch, timestamp, dirty);
 	}
