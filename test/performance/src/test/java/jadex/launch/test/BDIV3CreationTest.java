@@ -3,6 +3,7 @@ package jadex.launch.test;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import jadex.base.Starter;
@@ -17,6 +18,7 @@ import jadex.commons.future.Future;
 /**
  *  Test if the bdi v3 creation test works.
  */
+//@Ignore
 public class BDIV3CreationTest //extends TestCase
 {
 	/**
@@ -42,7 +44,7 @@ public class BDIV3CreationTest //extends TestCase
 		
 		final Future<Map<String, Object>> fut = new Future<Map<String, Object>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
-		args.put("max", Integer.valueOf(10000));
+		args.put("max", Integer.valueOf(2000));
 		platform.createComponent(new CreationInfo(args).setFilename("jadex.bdiv3.benchmarks.CreationBDI.class"))
 			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Map<String, Object>>(fut)
 		{

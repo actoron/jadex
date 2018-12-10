@@ -8,10 +8,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
@@ -67,7 +63,6 @@ public class BlockingAgentCreationAgent
 	{
 		if(num==0)
 		{
-			IClockService	clock	= getClock(agent);
 			System.gc();
 			try
 			{
@@ -76,7 +71,7 @@ public class BlockingAgentCreationAgent
 			catch(InterruptedException e){}
 			
 			startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-			starttime = clock.getTime();
+			starttime = System.currentTimeMillis();
 		}
 		
 		num++;
@@ -89,14 +84,13 @@ public class BlockingAgentCreationAgent
 			args.put("num", Integer.valueOf(num));
 			args.put("starttime", Long.valueOf(starttime));
 			args.put("startmem", Long.valueOf(startmem));
-			agent.createComponent(
+			agent.getExternalAccess(agent.getId().getParent()).createComponent(
 				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
 				.setName(createPeerName(num+1, agent.getId())).setFilename(BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class"));
 		}
 		else
 		{
-			IClockService	clock	= getClock(agent);
-			long	end	= clock.getTime();
+			long	end	= System.currentTimeMillis();
 			
 			System.gc();
 			try
@@ -124,8 +118,7 @@ public class BlockingAgentCreationAgent
 				@Classname("deletePeers")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					IClockService	clock	= getClock(ia);
-					long	killstarttime	= clock.getTime();
+					long	killstarttime	= System.currentTimeMillis();
 //					IComponentManagementService	cms	= getCMS(ia);
 					for(int i=max; i>1; i--)
 					{
@@ -135,7 +128,7 @@ public class BlockingAgentCreationAgent
 						System.out.println("Successfully destroyed peer: "+name);
 					}
 					
-					long killend = clock.getTime();
+					long killend = System.currentTimeMillis();
 					System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 					double killdur = ((double)killend-killstarttime)/1000.0;
 					final double killpera = killdur/(max-1);
@@ -183,10 +176,5 @@ public class BlockingAgentCreationAgent
 			name	+= "Peer_#"+num;
 		}
 		return name;
-	}
-	
-	protected static IClockService getClock(IInternalAccess ia)
-	{
-		return ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(IClockService.class, ServiceScope.PLATFORM)).get();
 	}
 }
