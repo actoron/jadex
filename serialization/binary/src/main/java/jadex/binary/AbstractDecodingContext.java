@@ -263,9 +263,18 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 		String ret = null;
 		if (strid >= pool.size())
 		{
-			int length = (int) readVarInt();
-			ret = new String(read(length), SUtil.UTF8);
-			pool.add(ret);
+			long rawlen = readVarInt();
+			if (rawlen <= Integer.MAX_VALUE)
+			{
+				int length = (int) rawlen;
+				ret = new String(read(length), SUtil.UTF8);
+				pool.add(ret);
+			}
+			else
+			{
+				ret = null;
+				pool.add(ret);
+			}
 		}
 		else
 		{

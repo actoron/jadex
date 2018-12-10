@@ -294,10 +294,17 @@ public class EncodingContext extends AbstractEncodingContext
 			sid = pool.size();
 			pool.put(string, sid);
 			writeVarInt(sid);
-			byte[] encodedString = string.getBytes(SUtil.UTF8);
-			
-			writeVarInt(encodedString.length);
-			write(encodedString);
+			if (string != null)
+			{
+				byte[] encodedString = string.getBytes(SUtil.UTF8);
+				
+				writeVarInt(encodedString.length);
+				write(encodedString);
+			}
+			else
+			{
+				writeVarInt(Integer.MAX_VALUE + 1L);
+			}
 		}
 		else
 		{
