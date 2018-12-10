@@ -1,7 +1,10 @@
 package jadex.extension.rs.publish;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
+import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -10,16 +13,17 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
-import jadex.extension.rs.publish.HttpServletRequestWrapper.DateHandler;
+import jadex.extension.rs.publish.NanoHttpServletRequestWrapper.DateHandler;
 
 /**
  *  Wrapper of HttpServletResponse for nano.
  */
-public class HttpServletResponseWrapper implements HttpServletResponse
+public class NanoHttpServletResponseWrapper implements HttpServletResponse
 {
 	/** The nano session. */
 	protected IHTTPSession session;
@@ -30,8 +34,13 @@ public class HttpServletResponseWrapper implements HttpServletResponse
 	protected String contenttype;
 	protected int status;
 	protected long length;
+//	protected String content;
+	protected String charencoding;
+	protected ServletOutputStream out;
+	protected StringBuffer outbuf = new StringBuffer();
+	protected PrintWriter writer;
 	
-	public HttpServletResponseWrapper(IHTTPSession session)
+	public NanoHttpServletResponseWrapper(IHTTPSession session)
 	{
 		this.session = session;
 	}
@@ -68,12 +77,17 @@ public class HttpServletResponseWrapper implements HttpServletResponse
 
     public void sendError(int sc, String msg) throws IOException
     {
-    	throw new UnsupportedOperationException();
+    	this.status = sc;
+    	this.contenttype = "text/html";
+    	outbuf.append("<html><head></head><body><h1>Error</h1>");
+    	if(msg!=null)
+    		outbuf.append(msg);
+    	outbuf.append("</body></html>");
     }
 
     public void sendError(int sc) throws IOException
     {
-    	throw new UnsupportedOperationException();
+    	sendError(sc, null);
     }
 
     public void sendRedirect(String location) throws IOException
@@ -152,12 +166,12 @@ public class HttpServletResponseWrapper implements HttpServletResponse
     
     public void setCharacterEncoding(String charset)
     {
-    	throw new UnsupportedOperationException();
+    	this.charencoding = charset;
     }
     
     public String getCharacterEncoding()
     {
-    	throw new UnsupportedOperationException();
+    	return charencoding;
     }
     
     public String getContentType()
@@ -167,13 +181,46 @@ public class HttpServletResponseWrapper implements HttpServletResponse
     
     public ServletOutputStream getOutputStream() throws IOException
     {
-    	throw new UnsupportedOperationException();
+    	if(out==null)
+    	{
+    		StringBuffer buf = new StringBuffer();
+    		
+    		out = new ServletOutputStream() 
+    		{
+    			@Override
+				public void write(int arg0) throws IOException 
+				{
+    				buf.append(arg0);
+				}
+    			
+    			
+				
+				@Override
+				public void setWriteListener(WriteListener writeListener) 
+				{
+					throw new UnsupportedOperationException();
+				}
+				
+				@Override
+				public boolean isReady() 
+				{
+					throw new UnsupportedOperationException();
+//					return false;
+				}
+			};
+    	}
+    	return out;
     }
     
     public PrintWriter getWriter() throws IOException
     {
-    	throw new UnsupportedOperationException();
+    	if(writer==null)
+    		writer = new BufPrintWriter(outbuf);
+    	
+    	return writer;
     }
+    
+    
     
     public void setContentLength(int len)
     {
@@ -238,4 +285,9 @@ public class HttpServletResponseWrapper implements HttpServletResponse
     		val = oval+","+val;
     	hs.put(name, val);
     }
+
+	public StringBuffer getOutbuf() 
+	{
+		return outbuf;
+	}
 }

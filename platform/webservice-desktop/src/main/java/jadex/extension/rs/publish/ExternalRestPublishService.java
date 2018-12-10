@@ -19,6 +19,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -175,60 +176,73 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	 */
 	public IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info)
 	{
-	    try
-	    {
-//	    	final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
-	    	
-	    	String infopid = info.getPublishId();
-	    	if(infopid.endsWith("/"))
-	    		infopid = infopid.substring(0, infopid.length()-1);
-	    	
-	    	// If tolerant url notation cut off first part till real publish part
-	    	URI uri = new URI(infopid.replace("[", "").replace("]", ""));
-	    	
-	    	String pid = infopid;
-	    	if(pid.startsWith("["))
-	    	{
-	    		pid = pid.substring(pid.indexOf("]")+1);
-	    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
-//	    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
-	    	}
-	    	
-	        component.getLogger().info("Adding http handler to server: "+uri.getPath());
-	        
-	        PathHandler ph = (PathHandler)getHttpServer(uri, info);
-	        
-	        final MultiCollection<String, MappingInfo> mappings = evaluateMapping(serviceid, info);
-	
-	        IRequestHandler rh = new IRequestHandler()
-			{
-	        	protected IService service = null;
-	        	
-				public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
-				{
-					if(service == null)
-						service = (IService) component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
-					ExternalRestPublishService.this.handleRequest(service, mappings, request, response, null);
-				}
-			};
-			if(ph.containsSubhandlerForExactUri(null, uri.getPath()))
-			{
-//				System.out.println("The URL "+uri.getPath() + " is already published, unpublishing...");
-				component.getLogger().info("The URL "+uri.getPath() + " is already published, unpublishing...");
-				ph.removeSubhandler(null, uri.getPath());
-			}
-			ph.addSubhandler(null, uri.getPath(), rh);
-	        
-	        if(sidservers==null)
-	            sidservers = new HashMap<IServiceIdentifier, Tuple2<PathHandler, URI>>();
-	        sidservers.put(serviceid, new Tuple2<PathHandler, URI>(ph, uri));
-	    }
-	    catch(Exception e)
-	    {
-	        throw new RuntimeException(e);
-	    }
-	    
-	    return IFuture.DONE;
+		Future<Void> ret = new Future<>();
+		
+        IFuture<MultiCollection<String, MappingInfo>> fut = evaluateMapping(serviceid, info);
+        
+        fut.addResultListener(new ExceptionDelegationResultListener<MultiCollection<String, MappingInfo>, Void>(ret)
+		{
+        	@Override
+        	public void customResultAvailable(MultiCollection<String, MappingInfo> mappings)
+        	{
+        		try
+        		{
+//	        		final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
+    		    	
+    		    	String infopid = info.getPublishId();
+    		    	if(infopid.endsWith("/"))
+    		    		infopid = infopid.substring(0, infopid.length()-1);
+    		    	
+    		    	// If tolerant url notation cut off first part till real publish part
+    		    	URI uri = new URI(infopid.replace("[", "").replace("]", ""));
+    		    	
+    		    	String pid = infopid;
+    		    	if(pid.startsWith("["))
+    		    	{
+    		    		pid = pid.substring(pid.indexOf("]")+1);
+    		    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
+//	        		    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
+    		    	}
+    		    	
+    		        component.getLogger().info("Adding http handler to server: "+uri.getPath());
+    		        
+    		        // is overridden by nano to return nano server :-( cast then does not work
+//	        		        PathHandler ph = (PathHandler)getHttpServer(uri, info);
+    		        getHttpServer(uri, info);
+    		        PathHandler ph = portservers.get(uri.getPort());
+	        		
+	        		IRequestHandler rh = new IRequestHandler()
+	     			{
+	     	        	protected IService service = null;
+	     	        	
+	     				public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
+	     				{
+	     					if(service == null)
+	     						service = (IService) component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
+	     					ExternalRestPublishService.this.handleRequest(service, mappings, request, response, null);
+	     				}
+	     			};
+	     			if(ph.containsSubhandlerForExactUri(null, uri.getPath()))
+	     			{
+//	     				System.out.println("The URL "+uri.getPath() + " is already published, unpublishing...");
+	     				component.getLogger().info("The URL "+uri.getPath() + " is already published, unpublishing...");
+	     				ph.removeSubhandler(null, uri.getPath());
+	     			}
+	     			ph.addSubhandler(null, uri.getPath(), rh);
+	     	        
+	     	        if(sidservers==null)
+	     	            sidservers = new HashMap<IServiceIdentifier, Tuple2<PathHandler, URI>>();
+	     	        sidservers.put(serviceid, new Tuple2<PathHandler, URI>(ph, uri));
+	     	        ret.setResult(null);
+        		}
+        	    catch(Exception e)
+        	    {
+        	        ret.setException(e);
+        	    }
+        	}
+		});
+        
+        return ret;
 	}
 	
 	/**

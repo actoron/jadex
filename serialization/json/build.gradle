@@ -1,4 +1,4 @@
-description 'JSON support for Jadex.'
+description 'Support for reading/writing Java object to/from JSON.'
 
 //apply plugin: 'maven-publish'
 

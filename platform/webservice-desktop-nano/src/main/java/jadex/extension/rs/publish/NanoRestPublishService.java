@@ -2,45 +2,22 @@ package jadex.extension.rs.publish;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.IStatus;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ServiceCall;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
-import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.library.ILibraryService;
-import jadex.bridge.service.types.publish.IPublishService;
-import jadex.commons.Tuple2;
-import jadex.commons.collection.MultiCollection;
-import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
 
 /**
- *  Publish service without Jersey directly using Jetty container.
- *  
- *  todo: make abstract base class without Jetty deps
- *  
- *  note: Jetty releases are Java 1.8 only.
- *  
+ *  Publish service using Nano.
  */
 @Service
 public class NanoRestPublishService extends ExternalRestPublishService
@@ -57,286 +34,133 @@ public class NanoRestPublishService extends ExternalRestPublishService
 		{
 			System.out.println("serve called: "+session.getUri());
 			
-			HttpServletRequestWrapper req = new HttpServletRequestWrapper(session);
-			HttpServletResponseWrapper resp = new HttpServletResponseWrapper(session);
+			Response[] ret = new Response[1];
 			
+			NanoHttpServletRequestWrapper req = new NanoHttpServletRequestWrapper(session);
+			NanoHttpServletResponseWrapper resp = new NanoHttpServletResponseWrapper(session);
+			
+			// todo: make handle request use async context return 
 			handleRequest(req, resp, null).get();
 			
+			Future<Void> wait = new Future<>();
 			
-//			newFixedLengthResponse();
+			Runnable run = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					IStatus status = Response.Status.lookup(resp.getStatus());
+					String mimetype = resp.getContentType();
+					String txt = resp.getOutbuf().toString();
+					ret[0] = newFixedLengthResponse(status, mimetype, txt);
+				}
+			};
 			
-			return null;
+			if(req.isAsyncStarted())
+			{
+				req.getAsyncContext().addListener(new AsyncListener()
+				{
+					@Override
+					public void onTimeout(AsyncEvent event) throws IOException
+					{
+					}
+					
+					@Override
+					public void onStartAsync(AsyncEvent event) throws IOException
+					{
+					}
+					
+					@Override
+					public void onError(AsyncEvent event) throws IOException
+					{
+					}
+					
+					@Override
+					public void onComplete(AsyncEvent event) throws IOException
+					{
+						run.run();
+						wait.setResult(null);
+					}
+				});
+			}
+			else
+			{
+				run.run();
+			}
+			
+			wait.get();
+			
+			return ret[0];
 		}
 	}
 	
 	/** The servers per port. */
-	protected Map<Integer, PathHandler> portservers2;
+	protected Map<Integer, Server> portservers2;
 	
-	@AgentCreated
+	@ServiceStart
 	public void start()
 	{
+		super.init();
+		
 		System.out.println("Nano started");
 	}
   
-//	@AgentKilled
-//	public void stop()
-//	{
-//		if(portservers != null)
-//		{
-//			for(Map.Entry<Integer, Server> entry : portservers.entrySet())
-//			{
-//				try
-//				{
-//					entry.getValue().stop();
-//				}
-//				catch (Exception e)
-//				{
-//				}
-//			}
-//		}
-//		System.out.println("Nano stopped");
-//	}
-	
+	@ServiceShutdown
+	public void stop()
+	{
+		if(portservers2 != null)
+		{
+			for(Map.Entry<Integer, Server> entry : portservers2.entrySet())
+			{
+				try
+				{
+					entry.getValue().stop();
+				}
+				catch (Exception e)
+				{
+				}
+			}
+		}
+		System.out.println("Nano stopped");
+	}
 	
 	/**
 	 *  Get or start an api to the http server.
 	 */
 	public Object getHttpServer(URI uri, PublishInfo info)
 	{
-//		Object ps = super.getHttpServer(uri, info);
-//		
-//		 Server server = null;
-//		 
-//         try
-//         {
-//             server = portservers2==null? null: portservers2.get(uri.getPort());
-// 
-//             if(server==null)
-//             {
-//                 System.out.println("Starting new server: "+uri.getPort());
-//                 server = new Server(uri.getPort());
-// 
-//                 server.start();
-// 
-//                 if(portservers==null)
-//                     portservers = new HashMap<Integer, Server>();
-//                 portservers.put(uri.getPort(), server);
-//             }
-//         }
-//         catch(RuntimeException e)
-//         {
-//             throw e;
-//         }
-//         catch(Exception e)
-//         {
-//             throw new RuntimeException(e);
-//         }
-// 
-//         return server;
+		Object ps = super.getHttpServer(uri, info);
 		
-		return null;
+		Server server = null;
+		 
+        try
+        {
+        	server = portservers2==null? null: portservers2.get(uri.getPort());
+ 
+        	if(server==null)
+            {
+        		System.out.println("Starting new server: "+uri.getPort());
+                server = new Server(uri.getPort());
+ 
+                server.start();
+ 
+                if(portservers2==null)
+                	portservers2 = new HashMap<Integer, Server>();
+                portservers2.put(uri.getPort(), server);
+             }
+         }
+         catch(RuntimeException e)
+         {
+             throw e;
+         }
+         catch(Exception e)
+         {
+             throw new RuntimeException(e);
+         }
+ 
+         return server;
 	}
 	
-//	// Jetty requires 1.8
-////	static
-////	{
-////		String ver = System.getProperty("java.version");
-////		
-////		if(Float.parseFloat(ver.substring(0,3)) < 1.8f)
-////		{
-////			System.out.println("WARNING: Jetty requires Java 1.8");
-////		}
-////	}
-//	
-//	public static class Server extends NanoHTTPD 
-//	{
-//		protected List<ContextHandler> handlers = new ArrayList<ContextHandler>();
-//		
-//		public Server(int port) 
-//		{
-//			super(port);
-//		}
-//		
-//		@Override 
-//		public Response serve(IHTTPSession session) 
-//		{
-//			System.out.println("serve called: "+session.getUri());
-//		}
-//
-//		/**
-//		 *  Get the handlers.
-//		 *  @return The handlers
-//		 */
-//		public List<ContextHandler> getHandlers()
-//		{
-//			return handlers;
-//		}
-//	}
-//	
-//	public static class ContextHandler
-//	{
-//		
-//	}
-//	
-//	// Hack constant for enabling multi-part :-(
-//	private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
-//
-//    /** The servers per service id. */
-//    protected Map<IServiceIdentifier, Server> sidservers;
-//
-//    /** The servers per port. */
-//    protected Map<Integer, Server> portservers;
-//    
-//    /** Infos for unpublishing. */
-//    protected Map<IServiceIdentifier, Tuple2<Server, ContextHandler>> unpublishinfos = new HashMap<IServiceIdentifier, Tuple2<Server,ContextHandler>>();
-//    
-//    @AgentCreated
-//    public void start()
-//    {
-//    	System.out.println("Jetty started");
-//    }
-//    
-//    @AgentKilled
-//    public void stop()
-//    {
-//    	if(portservers != null)
-//    	{
-//    		for (Map.Entry<Integer, Server> entry : portservers.entrySet())
-//    		{
-//    			try
-//				{
-//					entry.getValue().stop();
-//				}
-//				catch (Exception e)
-//				{
-//				}
-//    		}
-//    	}
-//    	System.out.println("Jetty stopped");
-//    }
-//    
-//    /**
-//     *  Test if publishing a specific type is supported (e.g. web service).
-//     *  @param publishtype The type to test.
-//     *  @return True, if can be published.
-//     */
-//    public IFuture<Boolean> isSupported(String publishtype)
-//    {
-//        return IPublishService.PUBLISH_RS.equals(publishtype) ? IFuture.TRUE : IFuture.FALSE;
-//    }
-//
-//    /**
-//     *  Publish a service.
-//     *  @param cl The classloader.
-//     *  @param service The original service.
-//     *  @param pid The publish id (e.g. url or name).
-//     */
-//    public IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info)
-//    {
-//        try
-//        {
-//        	//final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
-//        	
-//            final URI uri = new URI(getCleanPublishId(info.getPublishId()));
-//            Server server = (Server)getHttpServer(uri, info);
-//            System.out.println("Adding http handler to server: "+uri.getPath());
-//
-//            ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
-//
-//            final MultiCollection<String, MappingInfo> mappings = evaluateMapping(serviceid, info);
-//
-//            ContextHandler ch = new ContextHandler()
-//            {
-//            	protected IService service = null;
-//            	
-//                public void doHandle(String target, Request baseRequest, final HttpServletRequest request, final HttpServletResponse response)
-//                    throws IOException, ServletException
-//                {
-//                	if(service==null)
-//                		service = component.getExternalAccess().searchService( new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
-//                	
-//                    // Hack to enable multi-part
-//                    // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03294.html
-//                    if(request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) 
-//                    	baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
-//                	
-//                	handleRequest(service, mappings, request, response, new Object[]{target, baseRequest});
-//                	
-////                  System.out.println("handler is: "+uri.getPath());
-//                    baseRequest.setHandled(true);
-//                }
-//            };
-//            
-//            ch.setContextPath(uri.getPath());
-//            collhandler.addHandler(ch);
-//            unpublishinfos.put(serviceid, new Tuple2<Server,ContextHandler>(server, ch));
-//            ch.start(); // must be started explicitly :-(((
-//
-//            if(sidservers==null)
-//                sidservers = new HashMap<IServiceIdentifier, Server>();
-//            sidservers.put(serviceid, server);
-//        }
-//        catch(Exception e)
-//        {
-//            throw new RuntimeException(e);
-//        }
-//        
-//        return IFuture.DONE;
-//    }
-//
-//    /**
-//     *  Get or start an api to the http server.
-//     */
-//    public Object getHttpServer(URI uri, PublishInfo info)
-//    {
-//        Server server = null;
-//
-//        try
-//        {
-////            URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
-//            server = portservers==null? null: portservers.get(uri.getPort());
-//
-//            if(server==null)
-//            {
-//                System.out.println("Starting new server: "+uri.getPort());
-//                server = new Server(uri.getPort());
-//
-////                ContextHandlerCollection collhandler = new ContextHandlerCollection();
-////                server.setHandler(collhandler);
-//
-//                server.start();
-////              server.join();
-//
-//                if(portservers==null)
-//                    portservers = new HashMap<Integer, Server>();
-//                portservers.put(uri.getPort(), server);
-//            }
-//        }
-//        catch(RuntimeException e)
-//        {
-//            throw e;
-//        }
-//        catch(Exception e)
-//        {
-//            throw new RuntimeException(e);
-//        }
-//
-//        return server;
-//    }
-//
-//    /**
-//     *  Unpublish a service.
-//     *  @param sid The service identifier.
-//     */
-//    public IFuture<Void> unpublishService(IServiceIdentifier sid)
-//    {
-//    	Tuple2<Server,ContextHandler> unpublish = unpublishinfos.remove(sid);
-//    	if(unpublish != null)
-//    		((ContextHandlerCollection)unpublish.getFirstEntity().getHandler()).removeHandler(unpublish.getSecondEntity());
-////        throw new UnsupportedOperationException();
-//    	return IFuture.DONE;
-//    }
-//
 //    /**
 //     *  Publish a static page (without ressources).
 //     */
@@ -429,19 +253,6 @@ public class NanoRestPublishService extends ExternalRestPublishService
 //		
 //		return ret;
 //    }
-//
-//	
-//	public IFuture<Void> publishRedirect(URI uri, String html)
-//	{
-//        throw new UnsupportedOperationException();
-//	}
-//
-//
-//	public IFuture<Void> unpublish(String vhost, URI uri)
-//	{
-//        throw new UnsupportedOperationException();
-//	}
-//
 //	
 //	public IFuture<Void> mirrorHttpServer(URI sourceserveruri, URI targetserveruri, PublishInfo info)
 //	{

@@ -14,44 +14,29 @@ import jadex.commons.SReflect;
  */
 public class RequiredServiceInfo
 {
-//	//-------- constants --------
-//	
-//	/** None component scope (nothing will be searched, forces required service creation). */
-//	public static final String SCOPE_NONE = "none";
-//
-//	/** Parent scope. */
-//	public static final String SCOPE_PARENT = "parent";
-//	
-//	// todo: rename (COMPONENT_LOCAL)
-//	/** Local component scope (component only). */
-//	public static final String SCOPE_COMPONENT_ONLY = "component_only";
-//	
-//	/** Component scope (component and subcomponents). */
-//	public static final String SCOPE_COMPONENT = "component";
-//	
-//	// todo: rename (APPLICATION_PLATFORM) or remove
-//	/** Application scope (local application, i.e. second level component plus all subcomponents). */
-//	public static final String SCOPE_APPLICATION = "application";
-//
-//	/** Platform scope (all components on the local platform). */
-//	public static final String SCOPE_PLATFORM = "platform";
-//
-//	
-//	/** Application network scope (any platform with which a secret is shared and application tag must be shared). */
-//	public static final String SCOPE_APPLICATION_NETWORK = "application_network";
-////	public static final String SCOPE_APPLICATION_CLOUD = "application_cloud";
-//	
-//	/** Network scope (any platform with which a secret is shared). */
-//	public static final String SCOPE_NETWORK = "network";
-////	public static final String SCOPE_CLOUD = "cloud";
-//		
-//	// needed?!
-//	/** Global application scope. */
-//	public static final String SCOPE_APPLICATION_GLOBAL = "application_global";
-//	
-//	/** Global scope (any reachable platform including those with unrestricted services). */
-//	public static final String SCOPE_GLOBAL = "global";
-//	
+	//-------- legacy constants --------
+	
+	/** @deprecated Use {@link ServiceScope} instead */
+	public static final ServiceScope SCOPE_NONE = ServiceScope.NONE;
+	/** @deprecated Use {@link ServiceScope} instead */
+	public static final ServiceScope SCOPE_PARENT = ServiceScope.PARENT;
+	/** @deprecated Use {@link ServiceScope} instead */
+	public static final ServiceScope SCOPE_COMPONENT_ONLY = ServiceScope.COMPONENT_ONLY;
+	/** @deprecated Use {@link ServiceScope} instead */
+	public static final ServiceScope SCOPE_COMPONENT = ServiceScope.COMPONENT;
+	/** @deprecated Use {@link ServiceScope} instead */
+	public static final ServiceScope SCOPE_APPLICATION = ServiceScope.APPLICATION;
+	/** @deprecated Use {@link ServiceScope} instead */
+	public static final ServiceScope SCOPE_PLATFORM = ServiceScope.PLATFORM;	
+	/** @deprecated Use {@link ServiceScope} instead */
+	public static final ServiceScope SCOPE_APPLICATION_NETWORK = ServiceScope.APPLICATION_NETWORK;
+	/** @deprecated Use {@link ServiceScope} instead */
+	public static final ServiceScope SCOPE_NETWORK = ServiceScope.NETWORK;
+	/** @deprecated Use {@link ServiceScope} instead */
+	public static final ServiceScope SCOPE_APPLICATION_GLOBAL = ServiceScope.APPLICATION_GLOBAL;
+	/** @deprecated Use {@link ServiceScope} instead */
+	public static final ServiceScope SCOPE_GLOBAL = ServiceScope.GLOBAL;
+	
 //	/** The scopes local to a platform. */
 //	public static final Set<String> LOCAL_SCOPES;
 //	static

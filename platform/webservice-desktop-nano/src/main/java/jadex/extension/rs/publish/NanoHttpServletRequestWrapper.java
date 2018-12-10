@@ -14,11 +14,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
 import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
@@ -40,7 +44,7 @@ import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 /**
  *  Wrapper of HttpServletRequest for nano.
  */
-public class HttpServletRequestWrapper implements HttpServletRequest
+public class NanoHttpServletRequestWrapper implements HttpServletRequest
 {
 	private static final String CHARSET_REGEX = "[ |\t]*(charset)[ |\t]*=[ |\t]*['|\"]?([^\"^'^;^,]*)['|\"]?";
     private static final Pattern CHARSET_PATTERN = Pattern.compile(CHARSET_REGEX, Pattern.CASE_INSENSITIVE);
@@ -48,17 +52,12 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	/** The nano session. */
 	protected IHTTPSession session;
 	
-//	/** The contextpath. */
-//	protected String contextpath;
-//	
-//	/** The path info. */
-//	protected String pathinfo;
-//	
-//	/** The servlet path. */
-//	protected String servletpath;
-	
 	/** The request attributes. */
 	protected Map<String, Object> attributes;
+	
+	/** The async context. */
+	protected NanoAsyncContext context;
+	
 	
 	private String getDetailFromContentHeader(String contentTypeHeader, Pattern pattern, String defaultValue, int group) 
 	{
@@ -69,7 +68,7 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	/**
 	 *  Create a new wrapper.
 	 */
-	public HttpServletRequestWrapper(IHTTPSession session)
+	public NanoHttpServletRequestWrapper(IHTTPSession session)
 	{
 		this.session = session;
 	}
@@ -176,29 +175,31 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	public String getProtocol()
 	{
 		// todo: version
-		String uri = session.getUri();
-		return uri.toLowerCase().contains("https")? "HTTPS": "HTTP";
+		String host = session.getHeaders().get("host");
+		return host.toLowerCase().contains("https")? "HTTPS": "HTTP";
 	}
 	    
 	public String getScheme()
 	{
-		String uri = session.getUri();
-		// todo:
-		return uri;
+		String host = session.getHeaders().get("host");
+		return host.toLowerCase().contains("https")? "https": "http";
 	}
 	    
 	public String getServerName()
 	{
-		String uri = session.getUri();
-		// todo:
-		return uri;
+		String host = session.getHeaders().get("host");
+		if(host!=null)
+		{
+			int idx = host.indexOf(":");
+			if(idx!=-1)
+				host = host.substring(0, idx);
+		}
+		return host;
 	}
 	    
 	public int getServerPort()
 	{
-		String uri = session.getUri();
-		// todo:
-		return 80;
+		return getLocalPort();
 	}
 	    
 	public BufferedReader getReader() throws IOException
@@ -272,7 +273,33 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	
 	public int getLocalPort()
 	{
-		throw new UnsupportedOperationException();
+		// todo: 443 for https
+		int ret = 80;
+		
+		String host = session.getHeaders().get("host");
+		if(host!=null)
+		{
+			int idx = host.indexOf(":");
+			if(idx!=-1)
+			{
+				String rest = host.substring(idx+1);
+				idx = rest.indexOf("/");
+				if(idx!=-1)
+				{
+					rest = rest.substring(0, idx);
+				}
+				
+				try
+				{
+					ret = Integer.parseInt(rest);
+				}
+				catch(Exception e)
+				{
+					// nop
+				}
+			}
+		}
+		return ret;
 	}
 	
 	public ServletContext getServletContext()
@@ -282,28 +309,36 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	
 	public AsyncContext startAsync() throws IllegalStateException
 	{
-		throw new UnsupportedOperationException();
+		if(context==null)
+			context = new NanoAsyncContext(null, null);
+		
+		context.start(null);
+		
+		return context;
 	}
+	
 	 
-	public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) 
+	public AsyncContext startAsync(ServletRequest request, ServletResponse response) 
 		throws IllegalStateException
 	{
-		throw new UnsupportedOperationException();
+		if(context==null)
+			context = new NanoAsyncContext(request, response);
+		return context;
 	}
 	   
 	public boolean isAsyncStarted()
 	{
-		throw new UnsupportedOperationException();
+		return context!=null? context.isStarted(): false;
 	}
 	
 	public boolean isAsyncSupported()
 	{
-		return false;
+		return true;
 	}
 	
 	public AsyncContext getAsyncContext()
 	{
-		throw new UnsupportedOperationException();
+		return context;
 	}
 	
 	public DispatcherType getDispatcherType()
@@ -379,14 +414,10 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 		throw new UnsupportedOperationException();
 	}
 
-	public String getPathTranslated()
-	{
-		throw new UnsupportedOperationException();
-	}
-
 	public String getContextPath()
 	{
-		throw new UnsupportedOperationException();
+		// todo: how to implment?!
+		return "";
 	}
 	    
 	public String getQueryString()
@@ -427,7 +458,7 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	public String getServletPath()
 	{
 		// todo
-		throw new UnsupportedOperationException();
+		return "";
 	}
 	    
 	public HttpSession getSession(boolean create)
@@ -468,7 +499,7 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	    
 	public boolean isRequestedSessionIdFromUrl()
 	{
-		// todo
+		// todoServletRequest request, ServletResponse response
 		throw new UnsupportedOperationException();
 	}
 
@@ -506,33 +537,6 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	}
 
 	//-------- additional methods --------
-	
-//	/**
-//	 *  Set the contextpath.
-//	 *  @param contextpath The contextpath to set
-//	 */
-//	public void setContextPath(String contextpath)
-//	{
-//		this.contextpath = contextpath;
-//	}
-//
-//	/**
-//	 *  Set the pathinfo.
-//	 *  @param pathinfo The pathinfo to set
-//	 */
-//	public void setPathInfo(String pathinfo)
-//	{
-//		this.pathinfo = pathinfo;
-//	}
-//
-//	/**
-//	 *  Set the servletpath.
-//	 *  @param servletpath The servletpath to set
-//	 */
-//	public void setServletPath(String servletpath)
-//	{
-//		this.servletpath = servletpath;
-//	}
 	
 	public static class DateHandler
 	{
@@ -604,5 +608,163 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	    {
 	    	return formatter[0].format(new Date(date));
 	    }
+	}
+	
+	public static class NanoAsyncContext implements AsyncContext
+	{
+		protected boolean started;
+		protected boolean completed;
+		protected List<AsyncListener> listeners = new ArrayList<>();
+		protected ServletRequest request;
+		protected ServletResponse response;
+		protected Timer timer;
+		protected long timeout;
+		
+		public NanoAsyncContext(ServletRequest request, ServletResponse response)
+		{
+			this.request = request;
+			this.response = response;
+		}
+		
+		@Override
+		public void start(Runnable run) 
+		{
+			started = true;
+			notifyListeners(NotifyType.STARTED);
+		}
+		
+		@Override
+		public void setTimeout(long timeout) 
+		{
+			if(timer==null)
+			{
+				this.timeout = timeout;
+				timer = new Timer();
+				timer.schedule(new TimerTask()
+				{
+					@Override
+					public void run()
+					{
+						
+					}
+				}, timeout);
+			}
+		}
+		
+		@Override
+		public boolean hasOriginalRequestAndResponse() 
+		{
+			return request!=null && response!=null;
+		}
+		
+		@Override
+		public long getTimeout() 
+		{
+			return timeout;
+		}
+		
+		@Override
+		public ServletResponse getResponse() 
+		{
+			return response;
+		}
+		
+		@Override
+		public ServletRequest getRequest() 
+		{
+			return request;
+		}
+		
+		@Override
+		public void dispatch(ServletContext context, String path) 
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void dispatch(String path) 
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void dispatch() 
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public <T extends AsyncListener> T createListener(Class<T> clazz) throws ServletException 
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void complete() 
+		{
+			completed = true;
+			notifyListeners(NotifyType.COMPLETED);
+		}
+		
+		@Override
+		public void addListener(AsyncListener listener, ServletRequest servletRequest, ServletResponse servletResponse) 
+		{
+			// todo: request response
+			listeners.add(listener);
+			
+			if(started)
+				notifyListeners(NotifyType.STARTED);
+			if(completed)
+				notifyListeners(NotifyType.COMPLETED);
+		}
+		
+		@Override
+		public void addListener(AsyncListener listener) 
+		{
+			listeners.add(listener);
+			
+			if(started)
+				notifyListeners(NotifyType.STARTED);
+			if(completed)
+				notifyListeners(NotifyType.COMPLETED);
+		}
+
+		public boolean isStarted() 
+		{
+			return started;
+		}
+		
+		public enum NotifyType
+		{
+			STARTED, TIMEOUT, COMPLETED, ERROR
+		}
+		
+		protected void notifyListeners(NotifyType type)
+		{
+			for(AsyncListener lis: listeners)
+			{
+				try
+				{
+					if(type==NotifyType.STARTED)
+						lis.onStartAsync(new AsyncEvent(this));
+					else if (type==NotifyType.TIMEOUT)
+						lis.onTimeout(new AsyncEvent(this));
+					else if(type==NotifyType.COMPLETED)
+						lis.onComplete(new AsyncEvent(this));
+					else if(type==NotifyType.ERROR)
+						lis.onError(new AsyncEvent(this));
+				}
+				catch(Exception e)
+				{
+					// nop
+				}
+			}
+		}
+	}
+
+	@Override
+	public String getPathTranslated() 
+	{
+		throw new UnsupportedOperationException();
 	}
 }

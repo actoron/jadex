@@ -12,6 +12,8 @@ dependencies
 	api project(':platform:bridge')
 	api project(':kernels:base')
 	api project(':kernels:micro')
+	
+	// TODO: move process engine to separate package (for exclude from minimal)
 	api project(':kernels:bpmn')
 	api project(':rules:eca')
 	
