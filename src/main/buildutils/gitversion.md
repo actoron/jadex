@@ -43,13 +43,13 @@ are read from `src/main/buildutils/jadexversion.properties`.
 
 ### Building from cloned Git repo
 
-1. **Release build:**  A release build occurs when the `HEAD` is tagged with
+1. **Release build (always reproducible):**  A release build occurs when the `HEAD` is tagged with
    `<#major>.<#minor>.n`, i.e. prior to kicking of the release build, the
    developer should create the appropriate tag (`gradlew release`?).
    The build stores hash and the timestamp of the latest commit in
    `version.properties` and `jadexversion.properties`.
 
-2. **Non-dirty build:** A non-dirty build is a non-release build in a `clean`
+2. **Non-dirty build (always reproducible):** A non-dirty build is a non-release build in a `clean`
    repository, i.e., the workdir state corresponds to the latest commit, but
    the `HEAD` is not tagged with a release version. The build chooses patch
    version *n* as the smallest non-negative integer value such that no prior
@@ -60,27 +60,29 @@ are read from `src/main/buildutils/jadexversion.properties`.
    If the build runs on `stable` or `master` branch, the `[<branchname>-]`
    part is omitted.
 
-3. **Dirty build:** A build with modified files in the workdir. Like in the
-   non-dirty build, the build chooses patch version *n* as the smallest
-   non-negative integer value such that no prior tag `<#major>.<#minor>.m`
-   exists, with *m>=n*. The build appends `-[<branchname>-]SNAPSHOT` as
-   version suffix and stores the *current time* as timestamp. Commit hash
-   of the latest commit are stored for reference to know on which git state
-   the modifications are based on.
+3. **Dirty build (not reproducible):** A build with modified files in the
+   workdir. Like in the non-dirty build, the build chooses patch version *n*
+   as the smallest non-negative integer value such that no prior tag
+   `<#major>.<#minor>.m` exists, with *m>=n*. The build appends 
+   `-[<branchname>-]SNAPSHOT` as version suffix and stores the *current
+   time* as timestamp. Commit hash of the latest commit are stored for
+   reference to know on which git state the modifications are based on.
 
 ### Building from copied source folder
 
-1. **Distribution sources:** The distribution sources contain a processed
-   `src/main/buildutils/jadexversion.properties`, which contains
-   build information from git state. By default, the build assumes a dirty
-   (i.e. modified) source tree and thus increments *n* and appends `SNAPSHOT`
-   (cf. dirty build from git). When `-Pdirty=false` is supplied during a
-   build of a non-modified `sources.zip`, the build produces an exact copy
-   of the original distribution (cf. `checkDist` task).
+1. **Distribution sources (potentially reproducible):** The distribution
+   sources contain a processed `src/main/buildutils/jadexversion.properties`,
+   which contains build information from git state. By default, the build
+   assumes a dirty (i.e. modified) source tree and thus increments *n* and
+   appends `SNAPSHOT` (cf. dirty build from git). When `-Pdirty=false`
+   is supplied during a build of a non-modified `sources.zip`, the build
+   produces an exact copy of the original distribution (cf. `checkDist`
+   task).
     
-2. **Non-distribution sources:** When obtaining a copy of the sources, e.g.,
-   download .zip from Github, no build or git information is available.
-   The build version thus will be `<#major>.<#minor>.9999-SNAPSHOT`.
+2. **Non-distribution sources (not reproducible):** When obtaining a flat copy
+   of the sources, e.g., download .zip from Github, no build or git information
+   is available. The build version thus always will be
+   `<#major>.<#minor>.9999-SNAPSHOT`.
 
 ## Changes to previous scheme
 
