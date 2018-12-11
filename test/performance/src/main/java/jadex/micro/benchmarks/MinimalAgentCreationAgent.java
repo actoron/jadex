@@ -121,8 +121,9 @@ public class MinimalAgentCreationAgent
 			args.put("num", Integer.valueOf(num+1));
 //				System.out.println("Args: "+num+" "+args);
 
-			agent.createComponent(
-				new CreationInfo(null, args, nested ? agent.getId() : agent.getId().getParent(), null, null, null, null, null, agent.getDescription().getResourceIdentifier()).setName(createPeerName(num+1, agent.getId())).setFilename(MinimalAgentCreationAgent.this.getClass().getName()+".class"));
+			IExternalAccess creator = nested ? agent : agent.getExternalAccess(agent.getId().getRoot());
+			creator.createComponent(
+				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()).setName(createPeerName(num+1, agent.getId())).setFilename(MinimalAgentCreationAgent.this.getClass().getName()+".class"));
 		}
 		else
 		{
