@@ -1,8 +1,9 @@
+
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -27,12 +28,6 @@ public class BuildVersionManager
 {
 	//-------- constants --------
 	
-	/** Path to previously generated properties file with major and minor version (use this if present, removed by 'gradlew clean' or 'gradlew cleanCreateVersionInfo'). */
-	public static final String	BUILD_PROPS_PATH	= "build/jadexversion.properties";
-	
-	/** Path to source tree properties file with major and minor version (use if not yet generated). */
-	public static final String	SOURCE_PROPS_PATH	= "src/main/buildutils/jadexversion.properties";
-	
 	/** Prefix of properties for major and minor as set by user. */
 	public static final String	SOURCE_PROPS_PREFIX	= "jadexversion_";
 	
@@ -45,76 +40,26 @@ public class BuildVersionManager
 		TIMESTAMP_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 	
-	//-------- attributes --------
-	
-	/** The (root) project. */
-	protected Project	project;
-	
-	/** The build version info, read lazily to allow clean task to execute first. */
-	protected BuildVersionInfo	info;
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Create a build version manager for the given project.
-	 */
-	public BuildVersionManager(Project project)
-	{
-		this.project	= project;
-	}
-	
 	//-------- methods --------
 
 	/**
-	 *  Manager is used as version object so we generate a nice version string on access.
-	 */
-	@Override
-	public String toString()
-	{
-		return getInfo().toString();
-	}
-	
-	/**
-	 *  The version info object.
-	 */
-	public synchronized BuildVersionInfo	getInfo()
-	{
-		Thread.dumpStack();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.exit(0);
-		if(info==null)
-		{
-			info	= fetchVersionInfo();
-			System.out.println("Fetched version info: "+info);
-		}
-		return info;
-	}
-	
-	//-------- helper methods --------
-	
-	/**
 	 *  Fetch version information from local state.
 	 *  See gitversion.md for details.
+	 *  @param project	The gradle root project
+	 *  @param path	The path to the properties file relative to the project directory.
 	 */
-	protected BuildVersionInfo	fetchVersionInfo()
+	public static BuildVersionInfo	fetchVersionInfo(Project project, String path)
 	{
 		BuildVersionInfo	ret;
 		
 		// Fetch major and minor from file
-		File	pfile	= new File(project.getProjectDir(), BUILD_PROPS_PATH);
-		if(!pfile.exists())
-			pfile	= new File(project.getProjectDir(), SOURCE_PROPS_PATH);
+		File	pfile	= new File(project.getProjectDir(), path);
 		Properties	props	= new Properties();
 		try(InputStream is= new FileInputStream(pfile))
 		{
 			props.load(is);
-			System.out.println("Loaded version info from: "+pfile.getCanonicalPath());
-			props.store(new PrintWriter(System.out), null);
+//			System.out.println("Loaded version info from: "+pfile.getCanonicalPath());
+//			props.store(new PrintWriter(System.out), null);
 		}
 		catch(Exception e)
 		{
@@ -124,7 +69,7 @@ public class BuildVersionManager
 		try
 		{
 			// Try if build info is included in properties, i.e. when built from dist sources -> use values from prop.
-			ret	= fetchVersionInfoFromProps(props);
+			ret	= fetchVersionInfoFromProps(project, props);
 		}
 		catch(Exception e)
 		{
@@ -138,7 +83,7 @@ public class BuildVersionManager
 				.readEnvironment() // scan environment GIT_* variables
 				.build())
 			{
-				ret	= fetchVersionInfoFromRepo(major, minor, repository);
+				ret	= fetchVersionInfoFromRepo(project, major, minor, repository);
 			}
 			catch(Exception e2)
 			{
@@ -151,10 +96,12 @@ public class BuildVersionManager
 		return ret;
 	}
 
+	//-------- internal methods --------
+	
 	/**
 	 *  Fetch version info for build from dist sources.
 	 */
-	protected BuildVersionInfo fetchVersionInfoFromProps(Properties props)
+	protected static BuildVersionInfo fetchVersionInfoFromProps(Project project, Properties props)
 	{
 		// Increment patch and append '-SNAPSHOT' unless dirty=false was set.
 		Object	pdirty	= project.getProperties().get("dirty");
@@ -166,7 +113,7 @@ public class BuildVersionManager
 	 *  Fetch version info for build from git repo.
 	 *  @throws IOException in case of errors. 
 	 */
-	protected BuildVersionInfo fetchVersionInfoFromRepo(int major, int minor, Repository repository) throws Exception
+	protected static BuildVersionInfo fetchVersionInfoFromRepo(Project project, int major, int minor, Repository repository) throws Exception
 	{
 		boolean dirty	= !Git.wrap(repository).status().call().isClean();
 		String branch	= repository.getBranch();

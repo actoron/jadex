@@ -111,4 +111,43 @@ public class BuildVersionInfo
     	
     	return new BuildVersionInfo(major, minor, patch, branch, timestamp, commit, snapshot);
     }
+    
+    @Override
+    public boolean equals(Object obj)
+    {
+    	if(obj==this)
+    		return true;
+    	if(obj instanceof BuildVersionInfo)
+    	{
+    		BuildVersionInfo	i2	= (BuildVersionInfo) obj;
+    		boolean	ret	= major==i2.major
+    			&& minor==i2.minor
+    			&& patch==i2.patch
+    			&& snapshot==i2.snapshot
+    			&& branch.equals(i2.branch)
+				&& commit.equals(i2.commit)
+				&& timestamp.equals(i2.timestamp);
+    		
+    		System.out.println("Equals "+this+" vs. "+obj+" = "+ret);
+    		return ret;
+    	}
+    	else
+    	{
+    		return false;
+    	}
+    }
+    
+    @Override
+    public int hashCode() {
+    	int hash	= 31;
+    	hash	*= major +31;
+    	hash	*= minor +31;
+    	hash	*= patch +31;
+    	hash	*= branch.hashCode() +31;
+    	hash	*= commit.hashCode() +31;
+    	hash	*= timestamp.hashCode() +31;
+    	hash	*= snapshot ? 31 : 13;
+    	return hash;
+    }
+    
 }

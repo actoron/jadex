@@ -58,10 +58,12 @@ buildscript
 //apply plugin: 'eclipse'
 //eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 
-version	= new BuildVersionManager(project)
+project.ext.versionInfo	= BuildVersionManager.fetchVersionInfo(project, "src/main/buildutils/jadexversion.properties")
+println 'Fetched version info:\n' + versionInfo.propertiesString
 
 allprojects
 {
+	version	= versionInfo.toString()
 	def gsuffix = ""
 	if (getProjectDepth(project) > 1)
 	{
@@ -124,21 +126,20 @@ allprojects
 // Create version.properties with new timestamp (i.e. after clean)
 task createVersionInfo(type: Copy) {
 	
-	doFirst {
-		// Hack: Force evaluation of version info before copy starts, because copy creates output file first and thus version manager would try to load newly created (empty) output
-		println 'Creating new jadexversion.properties for ' + version.info
-	}
 	into project.buildDir
 	from('src/main/buildutils') {
 		include 'jadexversion.properties'
-		expand( [versionInfoProperties: {-> version.info.propertiesString}])
+		filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [versionInfoProperties: versionInfo.propertiesString])
+		//expand( [versionInfoProperties: versionInfo.propertiesString])
 	}
 	mustRunAfter clean
+	outputs.upToDateWhen {
+		versionInfo.equals(BuildVersionManager.fetchVersionInfo(project, "build/jadexversion.properties"))
+	}
 }
 
 subprojects
 {
-	version = rootProject.version
     def mainSrcDir  = 'src/main/java'
     def testSrcDir  = 'src/test/java'
     def junit       = 'junit:junit:4.11'
@@ -377,10 +378,9 @@ subprojects
         processResources {
 			filesMatching('**/version.properties')
 			{
-				//filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [versionInfoProperties: versionInfo.propertiesString])
-				expand( [versionInfoProperties: {->version.info.propertiesString}])
+				filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [versionInfoProperties: versionInfo.propertiesString])
+				//expand( [versionInfoProperties: versionInfo.propertiesString])
 			}
-			dependsOn(rootProject.createVersionInfo)	// depend on create for reproducibility
 		}
 
         afterEvaluate {
@@ -403,14 +403,14 @@ subprojects
 	addJavaDocJarTask(project)
 	addSourcesJarTask(project)
 
-//	// needs to be applied after android + java plugins:
-//	if(project.getChildProjects().isEmpty()) {
-////		println 'publishing leaf project ' + project
-//		apply from: "$rootDir/src/main/buildutils/publishing.gradle"
+	// needs to be applied after android + java plugins:
+	if(project.getChildProjects().isEmpty()) {
+//		println 'publishing leaf project ' + project
+		apply from: "$rootDir/src/main/buildutils/publishing.gradle"
+	}
+//	else {
+//		println 'not publishing grouping project ' + project
 //	}
-////	else {
-////		println 'not publishing grouping project ' + project
-////	}
 
 	
 	// process schemas and generate schemadocs
@@ -445,10 +445,7 @@ subprojects
 
 		task srcZip(type: Zip, dependsOn: rootProject.createVersionInfo) {
 			destinationDir new File(rootProject.distsDir, "sources")
-			
-			doFirst {	// Set archive name lazily to avoid version evaluation before clean
-				srcZip.archiveName 'jadex-'  + distname + '-' + project.version + '-sources.zip'
-			}
+			archiveName 'jadex-'  + distname + '-' + project.version + '-sources.zip'
 			
 			// Add all included artifact projects and their parents (but exclude root project for addons)
 			def projs = new HashSet();	// keep track of added projects to avoid duplicates
@@ -508,8 +505,8 @@ subprojects
 					from (example) {
 						into example.getName()
 						include rootProject.ext.filterfiles.split("\\s*,\\s*")
-//						filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: project.version])
-						expand( [jadex_build_version: project.version])
+						filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: project.version])
+						//expand( [jadex_build_version: project.version])
 					}
 				}
 			}
@@ -518,11 +515,8 @@ subprojects
 		// Create distZip task
 		task distZip(type: Zip) {
 			def commercial = false
-			
-			doFirst {	// Set archive name lazily to avoid version evaluation before clean
-				distZip.archiveName 'jadex-'  + distname  + '-' + project.version + '.zip'
-			
-//			gradle.projectsEvaluated() {
+			archiveName 'jadex-'  + distname  + '-' + project.version + '.zip'
+			gradle.projectsEvaluated() {
 				// Add all included artifact projects and their parents (but exclude root project for addons)
 				def projs = new HashSet();	// keep track of added projects to avoid duplicates
 				def projs_orig = new HashSet();	// compare hierarchy vs arts only
@@ -610,15 +604,15 @@ subprojects
 							into 'jadex-'  + project.version
 							include	rootProject.ext.filterfiles.split("\\s*,\\s*")
 							exclude	rootProject.ext.execfiles.split("\\s*,\\s*")
-//							filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: project.version])
-							expand( [jadex_build_version: project.version])
+							filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: project.version])
+							//expand( [jadex_build_version: project.version])
 						}
 						// 3) executable files with new permissions (always filtered)
 						from(new File(sp.projectDir, '/dist/files')) {
 							into 'jadex-'  + project.version
 							include	rootProject.ext.execfiles.split("\\s*,\\s*")
-//							filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: project.version])
-							expand( [jadex_build_version: project.version])
+							filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: project.version])
+							//expand( [jadex_build_version: project.version])
 							fileMode 0755	// Does not work with 755!?
 						}
 						
@@ -637,15 +631,15 @@ subprojects
 			
 				println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
 				destinationDir new File(rootProject.distsDir, commercial? 'commercial' : 'noncommercial')
-//			}
+			}
 			
-				// Copy generated srcZip
-				from(project.srcZip.outputs) {
-					into 'jadex-'  + project.version
-					rename {name -> isaddon ? 'sources-' + distname + '.zip' : 'sources.zip'}
-				}
-			}		
+			// Copy generated srcZip
+			from(project.srcZip.outputs) {
+				into 'jadex-'  + project.version
+				rename {name -> isaddon ? 'sources-' + distname + '.zip' : 'sources.zip'}
+			}
 		}
+		
 		// TODO: checkDist for addons too.
 		if(!isaddon) {
 			task checkDist()  {
@@ -693,18 +687,15 @@ task copyJavaDocSources(type: Copy) {
 task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	def sourcedir = project.distsDir.getCanonicalPath() + '/javadocworkdir'
 	source(sourcedir)
-	
-	doFirst {	// Lazy for version
-		destinationDir = new File(project.distsDir.getCanonicalPath() + '/jadex-' + project.version + '-javadoc')
-		options.docTitle("Jadex Active Component Platform ${project.version} API")
-		options.windowTitle("Jadex Active Component Platform ${project.version} API")
-	}
+	destinationDir = new File(project.distsDir.getCanonicalPath() + '/jadex-' + project.version + '-javadoc')
 
 	options.encoding 'UTF-8'
 	options.docEncoding 'UTF-8'
 	options.charSet 'UTF-8'
 	options.quiet()
 
+	options.docTitle("Jadex Active Component Platform ${project.version} API")
+	options.windowTitle("Jadex Active Component Platform ${project.version} API")
 	options.group('Core Packages','jadex.commons*:jadex.bridge*')
 	options.group('Micro Agent Packages','jadex.micro*')
 	options.group('BPMN Process Packages','jadex.bpmn*')
