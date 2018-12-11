@@ -2,20 +2,6 @@ pipeline {
   agent { label 'jadex-jenkins-agent' }
   stages {
   
-    // Determine version to build
-	stage('Prepare') {
-	  steps {
-	    script {
-	      //sh 'printenv'
-	      
-		  def build_util = load "src/main/buildutils/jenkinsutil.groovy"
-	      def buildname = build_util.fetchNextBuildNameFromGitTag()
-          currentBuild.displayName = buildname.full
-          env.BUILD_VERSION_SUFFIX = buildname.suffix
-	    }
-	  }
-	}
-	
 	// Build and check if all tests pass before doing anything else 
 	stage('Build and Test') {
 	  steps {
@@ -34,7 +20,7 @@ pipeline {
 	  parallel {
 		stage('Dist') {
 		  steps {
-			sh './gradlew -Pdist=publishdists checkDists'
+			sh './gradlew -Pdist=publishdists checkDist'
 		  }
 		}
 		stage('HTML/PDF Docs') {

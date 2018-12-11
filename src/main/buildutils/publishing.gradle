@@ -294,9 +294,9 @@ if (!isCommercial(project)) {
             websiteUrl = 'https://www.activecomponents.org'
             desc = 'Jadex Active Components Platform'
             version {
-                name = jadex_build_version
+                name = project.version
                 released = new Date()
-                vcsTag = jadex_build_version
+                vcsTag = project.version
                 if (getVar('centraluser', project) != null) {
                     mavenCentralSync {
                         sync = false //[Default: true] Determines whether to sync the version to Maven Central.

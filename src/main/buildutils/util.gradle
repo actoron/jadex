@@ -161,8 +161,8 @@ def excludeNonAndroidRuntimeFromApk(Project project, Dependency dep, List alread
 /**
  * Adds schema processing tasks for generating files to be uploaded
  * 1. Generate schemadocs using XSLT
- * 2. Copy and filter release XSDs to build dir, putting the current $jadex_build_version value in content and name
- * 3. Copy and filter dev XSDs to build dir, puting the '${jadex_build_version}' (literally) in the name
+ * 2. Copy and filter release XSDs to build dir, putting the current $project.version value in content and name
+ * 3. Copy and filter dev XSDs to build dir, putting the '${jadex_build_version}' (literally) in the name
  */
 def addSchemaTasks(Project project) {
     project.tasks.create('schemadocs').doLast {
@@ -190,12 +190,12 @@ def addSchemaTasks(Project project) {
 			)
             filterset(begintoken: '${', endtoken: '}')
             {
-                filter(token: 'jadex_build_version', value: jadex_build_version)
+                filter(token: 'jadex_build_version', value: project.version)
             }
 			mapper(
 				type: 'regexp',
 				from: '(.+)\\.(.+)',
-				to:	"\\1-$jadex_build_version.\\2"
+				to:	"\\1-${project.version}.\\2"
 			)
         }
 	}

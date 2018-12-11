@@ -7,8 +7,6 @@ import org.apache.tools.ant.filters.*
 
 apply plugin: 'java-library' // needed for distsDir on root project level
 
-apply from: "$rootDir/src/main/buildutils/versioning.gradle"
-
 def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
 	maindistsuffix += '-' + dname
@@ -30,24 +28,6 @@ project.ext.keepplural = new HashSet<String>()
 project.ext.keepplural.add('rules')
 project.ext.keepplural.add('tools')
 project.ext.keepplural.add('applications')
-
-// unix timestamp from git: git log -1 --pretty=format:%ct
-project.ext.timestamp	= null
-// Get timestamp from sources if defined (i.e. build from dist sources)
-def propFile = new File(project.projectDir, "src/main/buildutils/jadexversion.properties")
-if (propFile.exists()) {
-	def props = new Properties()
-	props.load(new FileReader(propFile))
-	def	propstamp	= props.getProperty("jadextimestamp")
-	project.ext.timestamp = propstamp.equals('${SRCDIST_TIMESTAMP}') ? null : propstamp
-}
-//println 'timestamp: ' + project.ext.timestamp
-// Generate new timestamp (i.e. build from git sources)
-if(timestamp==null) {
-	project.ext.timestamp	= new Date().format('yyyyMMdd.HHmmss')
-//	println 'timestamp: '+project.ext.timestamp
-}
-
 
 def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
 
@@ -78,9 +58,10 @@ buildscript
 //apply plugin: 'eclipse'
 //eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 
+version	= new BuildVersionManager(project)
+
 allprojects
 {
-	version = rootProject.version
 	def gsuffix = ""
 	if (getProjectDepth(project) > 1)
 	{
@@ -143,18 +124,21 @@ allprojects
 // Create version.properties with new timestamp (i.e. after clean)
 task createVersionInfo(type: Copy) {
 	
-	println 'gitversion: ' + BuildVersionManager.fetchVersionInfo(project)
-	
-	into project.buildDir.getCanonicalPath()
+	doFirst {
+		// Hack: Force evaluation of version info before copy starts, because copy creates output file first and thus version manager would try to load newly created (empty) output
+		println 'Creating new jadexversion.properties for ' + version.info
+	}
+	into project.buildDir
 	from('src/main/buildutils') {
 		include 'jadexversion.properties'
-		expand(SRCDIST_JADEXVERSION: version.toString(), SRCDIST_PATCH_LEVEL: version.patch ?: '', SRCDIST_TIMESTAMP: project.ext.timestamp, SRCDIST_COMMIT: '', SRCDIST_BRANCH: '')
+		expand( [versionInfoProperties: {-> version.info.propertiesString}])
 	}
+	mustRunAfter clean
 }
-createVersionInfo.mustRunAfter clean
 
 subprojects
 {
+	version = rootProject.version
     def mainSrcDir  = 'src/main/java'
     def testSrcDir  = 'src/test/java'
     def junit       = 'junit:junit:4.11'
@@ -248,7 +232,7 @@ subprojects
 		// strip "-debug" from .aar and .apks to include them in dist
 		onVariantOutput(project, com.android.builder.core.BuilderConstants.RELEASE) {output ->
 			def fileName = output.outputFileName
-			output.outputFileName = new File(output.outputFile.parent, "$archivesBaseName-${version}${fileName.substring(fileName.lastIndexOf("."))}").getName()
+			output.outputFileName = new File(output.outputFile.parent, "$archivesBaseName-${project.version}${fileName.substring(fileName.lastIndexOf("."))}").getName()
 		}
 
     	android {
@@ -259,7 +243,7 @@ subprojects
                 minSdkVersion android_minSdkVersion
                 targetSdkVersion android_targetSdkVersion
                 versionCode 1
-				versionName jadex_build_version
+				versionName project.version
 				multiDexEnabled true
             }
 
@@ -393,11 +377,11 @@ subprojects
         processResources {
 			filesMatching('**/version.properties')
 			{
-				filter{String line -> line.replace('${jadex_build_version}', project.version.toString())}
-				filter{String line -> line.replace('${timestamp}', rootProject.ext.timestamp)}
+				//filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [versionInfoProperties: versionInfo.propertiesString])
+				expand( [versionInfoProperties: {->version.info.propertiesString}])
 			}
+			dependsOn(rootProject.createVersionInfo)	// depend on create for reproducibility
 		}
-		processResources.dependsOn(":createVersionInfo")
 
         afterEvaluate {
         	// Set correct bootclasspath for each project, depending on sourceCompatibility
@@ -419,14 +403,14 @@ subprojects
 	addJavaDocJarTask(project)
 	addSourcesJarTask(project)
 
-	// needs to be applied after android + java plugins:
-	if(project.getChildProjects().isEmpty()) {
-//		println 'publishing leaf project ' + project
-		apply from: "$rootDir/src/main/buildutils/publishing.gradle"
-	}
-//	else {
-//		println 'not publishing grouping project ' + project
+//	// needs to be applied after android + java plugins:
+//	if(project.getChildProjects().isEmpty()) {
+////		println 'publishing leaf project ' + project
+//		apply from: "$rootDir/src/main/buildutils/publishing.gradle"
 //	}
+////	else {
+////		println 'not publishing grouping project ' + project
+////	}
 
 	
 	// process schemas and generate schemadocs
@@ -461,7 +445,10 @@ subprojects
 
 		task srcZip(type: Zip, dependsOn: rootProject.createVersionInfo) {
 			destinationDir new File(rootProject.distsDir, "sources")
-			archiveName 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
+			
+			doFirst {	// Set archive name lazily to avoid version evaluation before clean
+				srcZip.archiveName 'jadex-'  + distname + '-' + project.version + '-sources.zip'
+			}
 			
 			// Add all included artifact projects and their parents (but exclude root project for addons)
 			def projs = new HashSet();	// keep track of added projects to avoid duplicates
@@ -521,7 +508,8 @@ subprojects
 					from (example) {
 						into example.getName()
 						include rootProject.ext.filterfiles.split("\\s*,\\s*")
-						filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: jadex_build_version])
+//						filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: project.version])
+						expand( [jadex_build_version: project.version])
 					}
 				}
 			}
@@ -530,8 +518,11 @@ subprojects
 		// Create distZip task
 		task distZip(type: Zip) {
 			def commercial = false
-			archiveName 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-			gradle.projectsEvaluated() {
+			
+			doFirst {	// Set archive name lazily to avoid version evaluation before clean
+				distZip.archiveName 'jadex-'  + distname  + '-' + project.version + '.zip'
+			
+//			gradle.projectsEvaluated() {
 				// Add all included artifact projects and their parents (but exclude root project for addons)
 				def projs = new HashSet();	// keep track of added projects to avoid duplicates
 				def projs_orig = new HashSet();	// compare hierarchy vs arts only
@@ -549,7 +540,7 @@ subprojects
 							def assembletask	= sp.tasks.find {isAndroidLibraryProject(sp) ? it.name.equals('bundleReleaseAar') : it.name.equals('packageRelease')} // apk debug???
 							if(assembletask!=null) {
 								from(assembletask.outputs) {
-									into 'jadex-'  + jadex_build_version + (isAndroidLibraryProject(sp) ? '/lib' : '/apps')
+									into 'jadex-'  + project.version + (isAndroidLibraryProject(sp) ? '/lib' : '/apps')
 									exclude '/tmp/**', '/release/**', 'output.json'
 								}
 							}
@@ -572,7 +563,7 @@ subprojects
 //									mytasks	= sp.tasks.matching {it.name.equals('jar')}
 								mytasks.each {task ->
 									from(task.outputs) {
-										into 'jadex-'  + jadex_build_version + '/apps'
+										into 'jadex-'  + project.version + '/apps'
 									}
 								}
 							}
@@ -584,7 +575,7 @@ subprojects
 //									println 'outputs: ' + task + ', ' + task.outputs.files.files
 									//&& !sp.getPath().contains(':distributions:')	// Legacy(?) hack: do not include distribution projects, todo: include? or exclude all dist/no-content projects
 									from(task.outputs) {
-										into 'jadex-'  + jadex_build_version + '/lib'
+										into 'jadex-'  + project.version + '/lib'
 									}
 								}
 		
@@ -596,7 +587,7 @@ subprojects
 									detached.each { file ->
 										if (!extdists.contains(file)) {
 											from (file.getParent()) {
-												into 'jadex-'  + jadex_build_version + '/lib'
+												into 'jadex-'  + project.version + '/lib'
 												includes = [file.getName()]
 											}
 											extdists.add(file)
@@ -609,23 +600,25 @@ subprojects
 						// Files to be included from dist/files directories
 						// 1) plain files w/o filtering or executable flag
 						from(new File(sp.projectDir, '/dist/files')) {
-							into 'jadex-'  + jadex_build_version
+							into 'jadex-'  + project.version
 							include	'*/**'
 							exclude rootProject.ext.filterfiles.split("\\s*,\\s*")
 							exclude rootProject.ext.execfiles.split("\\s*,\\s*")
 						}
 						// 2) files with filtering but not executable
 						from(new File(sp.projectDir, '/dist/files')) {
-							into 'jadex-'  + jadex_build_version
+							into 'jadex-'  + project.version
 							include	rootProject.ext.filterfiles.split("\\s*,\\s*")
 							exclude	rootProject.ext.execfiles.split("\\s*,\\s*")
-							filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: jadex_build_version])
+//							filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: project.version])
+							expand( [jadex_build_version: project.version])
 						}
 						// 3) executable files with new permissions (always filtered)
 						from(new File(sp.projectDir, '/dist/files')) {
-							into 'jadex-'  + jadex_build_version
+							into 'jadex-'  + project.version
 							include	rootProject.ext.execfiles.split("\\s*,\\s*")
-							filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: jadex_build_version])
+//							filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [jadex_build_version: project.version])
+							expand( [jadex_build_version: project.version])
 							fileMode 0755	// Does not work with 755!?
 						}
 						
@@ -634,7 +627,7 @@ subprojects
 							it.name.startsWith('exampleZip')
 						}.each { task ->
 							from(task.outputs) {
-								into 'jadex-'  + jadex_build_version
+								into 'jadex-'  + project.version
 							}
 						}
 	
@@ -644,12 +637,24 @@ subprojects
 			
 				println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
 				destinationDir new File(rootProject.distsDir, commercial? 'commercial' : 'noncommercial')
-			}
+//			}
 			
-			// Copy generated srcZip
-			from(project.srcZip.outputs) {
-				into 'jadex-'  + jadex_build_version
-				rename {name -> isaddon ? 'sources-' + distname + '.zip' : 'sources.zip'}
+				// Copy generated srcZip
+				from(project.srcZip.outputs) {
+					into 'jadex-'  + project.version
+					rename {name -> isaddon ? 'sources-' + distname + '.zip' : 'sources.zip'}
+				}
+			}		
+		}
+		// TODO: checkDist for addons too.
+		if(!isaddon) {
+			task checkDist()  {
+				description	= "Rebuild the distribution from source.zip and check if newly generated dist.zip matches original."
+				dependsOn distZip
+				
+				doLast {
+					checkDistZip(distname, arts, isaddon)
+				}
 			}
 		}
 	}
@@ -688,15 +693,18 @@ task copyJavaDocSources(type: Copy) {
 task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	def sourcedir = project.distsDir.getCanonicalPath() + '/javadocworkdir'
 	source(sourcedir)
-	destinationDir = new File(project.distsDir.getCanonicalPath() + '/jadex-' + jadex_build_version + '-javadoc')
+	
+	doFirst {	// Lazy for version
+		destinationDir = new File(project.distsDir.getCanonicalPath() + '/jadex-' + project.version + '-javadoc')
+		options.docTitle("Jadex Active Component Platform ${project.version} API")
+		options.windowTitle("Jadex Active Component Platform ${project.version} API")
+	}
 
 	options.encoding 'UTF-8'
 	options.docEncoding 'UTF-8'
 	options.charSet 'UTF-8'
 	options.quiet()
 
-	options.docTitle("Jadex Active Component Platform ${project.version} API")
-	options.windowTitle("Jadex Active Component Platform ${project.version} API")
 	options.group('Core Packages','jadex.commons*:jadex.bridge*')
 	options.group('Micro Agent Packages','jadex.micro*')
 	options.group('BPMN Process Packages','jadex.bpmn*')
@@ -743,7 +751,7 @@ task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 //
 //							filterset begintoken: '${', endtoken: '}',
 //							{
-//								filter token: 'jadex_build_version', value: jadex_build_version
+//								filter token: 'jadex_build_version', value: project.version
 //							}
 //						}
 //						ant.copy todir: preprocessdir + '/' + ex.getName(),
@@ -821,7 +829,7 @@ def checkDistZip(distname, arts, isaddon)
 	}
 	def rebuilddirfile = new File(project.distsDir, 'rebuild/'+distname);
 	rebuilddirfile.mkdirs()
-	def srczip	= new File(project.distsDir, 'sources/jadex-' + distname  + '-' + jadex_build_version + '-sources.zip')
+	def srczip	= new File(project.distsDir, 'sources/jadex-' + distname  + '-' + project.version + '-sources.zip')
 
 	// Extract and build sources.zip
 	ant.unzip(src: srczip, dest: rebuilddirfile)
@@ -836,6 +844,12 @@ def checkDistZip(distname, arts, isaddon)
 	artefactBuild.startParameter.projectProperties << ["dist": distname]
 	artefactBuild.execute()
 	
+	// For debugging srcZip
+	def srczip2	= new File(rebuilddirfile, 'sources/build/distributions/sources/jadex-'  + distname  + '-' + project.version + '-sources.zip')
+	def srcdiff	= diffZips(srczip.getCanonicalPath(), srczip2.getCanonicalPath())
+	if(srcdiff.length()!=0)
+		throw new RuntimeException("Rebuilt srcZip does not match original: "+srcdiff);
+	
 //	// For debugging bluetooth aar
 //	if(subprojectmap.get(":android:bluetooth")!=null) {
 //		def zip1	= new File(project.projectDir, 'android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
@@ -843,19 +857,19 @@ def checkDistZip(distname, arts, isaddon)
 //		def diff	= diffZips(zip1, zip2)
 //		if(diff.length()!=0)
 //			throw new RuntimeException("Rebuilt bluetooth classes.jar does not match original: "+diff);		
-//		zip1	= new File(project.projectDir, 'android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
-//		zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
+//		zip1	= new File(project.projectDir, 'android/bluetooth/build/outputs/aar/bluetooth-' + project.version + '.aar')
+//		zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/outputs/aar/bluetooth-' + project.version + '.aar')
 //		diff	= diffZips(zip1, zip2)
 //		if(diff.length()!=0)
-//			throw new RuntimeException("Rebuilt bluetooth-" + jadex_build_version + ".aar does not match original: "+diff);		
+//			throw new RuntimeException("Rebuilt bluetooth-" + project.version + ".aar does not match original: "+diff);		
 //	}
 	
 	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-	def distzip = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-	def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+	def distzip = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + project.version + '.zip'
+	def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + project.version + '.zip'
 	def diff	= diffZips(distzip, distzip2)
 	if(diff.length()!=0)
-		throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);		
+		throw new RuntimeException("Rebuilt jadex-" + distname + "-" + project.version + ".zip does not match original: "+diff);		
 }
 
 //def createDistZip(distname, arts, isaddon)
@@ -869,8 +883,8 @@ def checkDistZip(distname, arts, isaddon)
 //	def preprocessdirfile = new File(project.distsDir, 'tmp/'+distname)
 //	preprocessdirfile.mkdirs()
 //	def preprocessdir = preprocessdirfile.getCanonicalPath()
-//	def foldername = 'jadex-'  + jadex_build_version
-//	def zipfilename = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + 'Old.zip'
+//	def foldername = 'jadex-'  + project.version
+//	def zipfilename = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + project.version + 'Old.zip'
 //	def distdir = project.distsDir.getCanonicalPath()
 //	def ant = new groovy.util.AntBuilder()
 //	def extdists = new HashSet()
@@ -888,16 +902,16 @@ def checkDistZip(distname, arts, isaddon)
 //
 //			filterset begintoken: '${', endtoken: '}',
 //			{
-//				filter token: 'jadex_build_version', value: jadex_build_version
+//				filter token: 'jadex_build_version', value: project.version
 //			}
 //		}
 //		if (isaddon)
 //		{
-//			ant.copy file: project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname  + '-' + jadex_build_version + '-sources.zip', tofile: preprocessdir + '/sources-' + distname + '.zip'
+//			ant.copy file: project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname  + '-' + project.version + '-sources.zip', tofile: preprocessdir + '/sources-' + distname + '.zip'
 //		}
 //		else
 //		{
-//			ant.copy file: project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname  + '-' + jadex_build_version + '-sources.zip', tofile: preprocessdir + '/sources.zip'
+//			ant.copy file: project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname  + '-' + project.version + '-sources.zip', tofile: preprocessdir + '/sources.zip'
 //		}
 //		ant.zip destfile: zipfilename,
 //		{
@@ -961,11 +975,11 @@ def checkDistZip(distname, arts, isaddon)
 //	}
 //	
 //	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-//	def distzip11 = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + 'Old.zip'
-//	def distzip22 = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+//	def distzip11 = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + project.version + 'Old.zip'
+//	def distzip22 = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + project.version + '.zip'
 //	def difff	= diffZips(distzip11, distzip22)
 //	if(difff.length()!=0)
-//		throw new RuntimeException("Gradle based jadex-" + distname + "-" + jadex_build_version + ".zip does not match old ant based: "+difff);
+//		throw new RuntimeException("Gradle based jadex-" + distname + "-" + project.version + ".zip does not match old ant based: "+difff);
 //}
 //
 //
@@ -974,7 +988,7 @@ def checkDistZip(distname, arts, isaddon)
 //	//-------- old ant zip for reference --------
 //	def mainzipdir = 'sources/'
 //	String maindir = project.projectDir.getCanonicalPath()
-//	String zipfilename = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sourcesOld.zip'
+//	String zipfilename = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + project.version + '-sourcesOld.zip'
 //	def ant = new groovy.util.AntBuilder()
 //	ant.sequential {
 //		zip destfile: zipfilename,
@@ -1014,11 +1028,11 @@ def checkDistZip(distname, arts, isaddon)
 //	}
 //
 //	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-//	def zip1 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sourcesOld.zip'
-//	def zip2 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
+//	def zip1 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + project.version + '-sourcesOld.zip'
+//	def zip2 = project.distsDir.getCanonicalPath() + '/sources/jadex-'  + distname + '-' + project.version + '-sources.zip'
 //	def diff	= diffZips(zip1, zip2)
 //	if(diff.length()!=0)
-//		throw new RuntimeException("New jadex-" + distname + "-" + jadex_build_version + "-sources.zip does not match original: "+diff);
+//		throw new RuntimeException("New jadex-" + distname + "-" + project.version + "-sources.zip does not match original: "+diff);
 //}
 
 task performanceTest() {
