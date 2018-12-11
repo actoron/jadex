@@ -84,7 +84,7 @@ public class StartPeerPlan extends Plan
 			long upera = (used-startmem.longValue())/max/1024;
 			System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 
-			long end = getTime();
+			long end = System.currentTimeMillis();
 			System.out.println("Last peer created. "+max+" agents started.");
 			double dur = ((double)end-starttime.longValue())/1000.0;
 			double pera = dur/max;
@@ -93,7 +93,7 @@ public class StartPeerPlan extends Plan
 //			waitFor(300000);
 
 			// Delete prior agents.
-			long	killstarttime	= getTime();
+			long	killstarttime	= System.currentTimeMillis();
 			for(int cnt=max; cnt>0; cnt--)
 			{
 				if(cnt!=num)
@@ -104,7 +104,7 @@ public class StartPeerPlan extends Plan
 					System.out.println("Successfully destroyed peer: "+name);
 				}
 			}
-			long killend = getTime();
+			long killend = System.currentTimeMillis();
 			System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 			double killdur = ((double)killend-killstarttime)/1000.0;
 			double killpera = killdur/(max-1);
@@ -152,7 +152,7 @@ public class StartPeerPlan extends Plan
 //		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), lis, null);
 //		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
 		
-		IComponentIdentifier aid = getAgent().createComponent(
+		IComponentIdentifier aid = getAgent().getExternalAccess(getComponentIdentifier().getParent()).createComponent(
 			new CreationInfo(null, args, getComponentDescription().getResourceIdentifier()).setName(name).setFilename("/jadex/bdi/benchmarks/AgentCreation.agent.xml"))
 			.get().getId();
 		return aid;

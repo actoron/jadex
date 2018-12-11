@@ -26,7 +26,7 @@ public class AppLoop
 			if(i%100==0)
 				System.out.println(i);
 			IFuture<IExternalAccess> fut
-				= platform.createComponent(new CreationInfo("jadex/bdi/examples/hunterprey_classic/HunterPrey.application.xml"));
+				= platform.createComponent(new CreationInfo().setFilename("jadex/bdi/examples/hunterprey_classic/HunterPrey.application.xml"));
 			fut.get().killComponent().get();
 			fut.get().getResultsAsync().get();
 		}

@@ -146,12 +146,16 @@ public class SClassReader
 			classnameindex = is.readUnsignedShort();
 			try
 			{
-				byte[] enc = strings.get(SUtil.bytesToShort(strings.get(classnameindex), 0) & 0xFFFF);
-				if (enc != null)
+				byte[] ref = strings.get(classnameindex);
+				if (ref != null)
 				{
-					String superclassname = decodeModifiedUtf8(enc);
-					superclassname = superclassname.replace('/', '.');
-					ret.setSuperClassName(superclassname);
+					byte[] enc = strings.get(SUtil.bytesToShort(ref, 0) & 0xFFFF);
+					if (enc != null)
+					{
+						String superclassname = decodeModifiedUtf8(enc);
+						superclassname = superclassname.replace('/', '.');
+						ret.setSuperClassName(superclassname);
+					}
 				}
 			}
 			catch (Exception e)

@@ -935,8 +935,12 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 					// todo: rid
 //					System.out.println("curcall: "+getName(components[i], model, j+1)+" "+CallAccess.getCurrentInvocation().getCause());
 //					cms.createComponent(getName(components[i], model, j+1), type.getName(),
-					CreationInfo ci = new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), component.getId(),
-						suspend,  synchronous, monitoring, model.getAllImports(), bindings, null);
+					CreationInfo ci = new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model));
+					ci.setSuspend(suspend);
+					ci.setSynchronous(synchronous);
+					ci.setMonitoring(monitoring);
+					ci.setImports(model.getAllImports());
+					ci.setRequiredServiceBindings(bindings);
 					ci.setName(getName(components[i], model, j+1));
 					ci.setFilename(getFilename(components[i], model));
 					

@@ -3,7 +3,6 @@ package jadex.launch.test;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -17,7 +16,6 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.Tuple;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -58,7 +56,7 @@ public class MicroCreationTest //extends TestCase
 		Future<Map<String, Object>> fut = new Future<Map<String, Object>>();
 		final Future<Map<String, Object>> ffut = fut;
 		Map<String, Object>	args = new HashMap<String, Object>();
-		args.put("max", Integer.valueOf(10000));
+		args.put("max", Integer.valueOf(3000));
 //		cms.createComponent(null, "jadex/micro/benchmarks/ParallelAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 //		cms.createComponent(null, "jadex/micro/benchmarks/PojoAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
 		platform.createComponent(new CreationInfo(args).setFilename("jadex/micro/benchmarks/BlockingAgentCreationAgent.class"))
@@ -73,7 +71,7 @@ public class MicroCreationTest //extends TestCase
 		});
 		
 		// 2 times timeout should do on all build servers. if test fails, check if platform has become slower ;-)
-		Map<String, Object> results = fut.get(2*timeout);
+		Map<String, Object> results = fut.get(20*timeout);
 
 		// Write values to property files for hudson plot plugin.
 		for(Iterator<Map.Entry<String, Object>> it=results.entrySet().iterator(); it.hasNext(); )

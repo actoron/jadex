@@ -286,7 +286,7 @@ public class HelplinePanel extends JPanel
 				}
 				catch(ServiceNotFoundException snfe)
 				{
-					CreationInfo ci	= new CreationInfo(Collections.singletonMap("person", (Object)person), ia.getId()).setFilename(HelplineAgent.class.getName()+".class").setName(person);
+					CreationInfo ci	= new CreationInfo(Collections.singletonMap("person", (Object)person)).setFilename(HelplineAgent.class.getName()+".class").setName(person);
 					ia.createComponent(ci)
 						.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IHelpline>(ret)
 					{

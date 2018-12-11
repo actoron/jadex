@@ -1714,7 +1714,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									setOwner(ret.getId(), desc);
 //									System.out.println("env create: "+cid);
 									IFuture<IExternalAccess> future = exta.createComponent(
-										new CreationInfo(null, null, getExternalAccess().getId(), false, model.getAllImports()).setFilename(filename).setName(cid.getLocalName()));
+										new CreationInfo().setImports(model.getAllImports()).setFilename(filename).setName(cid.getLocalName()));
 									future.addResultListener(new IResultListener()
 									{
 										public void resultAvailable(Object result)

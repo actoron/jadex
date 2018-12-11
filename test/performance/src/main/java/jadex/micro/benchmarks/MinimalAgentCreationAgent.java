@@ -82,7 +82,6 @@ public class MinimalAgentCreationAgent
 		
 		if(args.get("num")==null)
 		{
-			IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
 			System.gc();
 			try
 			{
@@ -91,7 +90,7 @@ public class MinimalAgentCreationAgent
 			catch(InterruptedException e){}
 			
 			Long startmem = Long.valueOf(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
-			Long starttime = Long.valueOf(clock.getTime());
+			Long starttime = Long.valueOf(System.currentTimeMillis());
 			args.put("num", Integer.valueOf(1));
 			args.put("startmem", startmem);
 			args.put("starttime", starttime);
@@ -122,13 +121,13 @@ public class MinimalAgentCreationAgent
 			args.put("num", Integer.valueOf(num+1));
 //				System.out.println("Args: "+num+" "+args);
 
-			agent.createComponent(
-				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, agent.getDescription().getResourceIdentifier()).setName(createPeerName(num+1, agent.getId())).setFilename(MinimalAgentCreationAgent.this.getClass().getName()+".class"));
+			IExternalAccess creator = nested ? agent : agent.getExternalAccess(agent.getId().getRoot());
+			creator.createComponent(
+				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier()).setName(createPeerName(num+1, agent.getId())).setFilename(MinimalAgentCreationAgent.this.getClass().getName()+".class"));
 		}
 		else
 		{
-			IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
-			final long end = clock.getTime();
+			final long end = System.currentTimeMillis();
 			
 			System.gc();
 			try
@@ -169,8 +168,7 @@ public class MinimalAgentCreationAgent
 							@Classname("deletePeers")
 							public IFuture<Void> execute(final IInternalAccess ia)
 							{
-								IClockService clock = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IClockService.class, ServiceScope.PLATFORM));
-								((MinimalAgentCreationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
+								((MinimalAgentCreationAgent)ia.getFeature(IPojoComponentFeature.class).getPojoAgent()).deletePeers(max, System.currentTimeMillis(), dur, pera, omem, upera, max, nested);
 								return IFuture.DONE;
 							}
 						});

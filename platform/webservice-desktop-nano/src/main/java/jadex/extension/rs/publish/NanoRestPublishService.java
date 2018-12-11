@@ -1,8 +1,12 @@
 package jadex.extension.rs.publish;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.IStatus;
@@ -10,6 +14,7 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.commons.future.Future;
 
 /**
  *  Publish service using Nano.
@@ -29,17 +34,63 @@ public class NanoRestPublishService extends ExternalRestPublishService
 		{
 			System.out.println("serve called: "+session.getUri());
 			
+			Response[] ret = new Response[1];
+			
 			NanoHttpServletRequestWrapper req = new NanoHttpServletRequestWrapper(session);
 			NanoHttpServletResponseWrapper resp = new NanoHttpServletResponseWrapper(session);
 			
+			// todo: make handle request use async context return 
 			handleRequest(req, resp, null).get();
 			
-			IStatus status = Response.Status.lookup(resp.getStatus());
-			String mimetype = resp.getContentType();
-			String txt = resp.getOutbuf().toString();
-			newFixedLengthResponse(status, mimetype, txt);
+			Future<Void> wait = new Future<>();
 			
-			return null;
+			Runnable run = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					IStatus status = Response.Status.lookup(resp.getStatus());
+					String mimetype = resp.getContentType();
+					String txt = resp.getOutbuf().toString();
+					ret[0] = newFixedLengthResponse(status, mimetype, txt);
+				}
+			};
+			
+			if(req.isAsyncStarted())
+			{
+				req.getAsyncContext().addListener(new AsyncListener()
+				{
+					@Override
+					public void onTimeout(AsyncEvent event) throws IOException
+					{
+					}
+					
+					@Override
+					public void onStartAsync(AsyncEvent event) throws IOException
+					{
+					}
+					
+					@Override
+					public void onError(AsyncEvent event) throws IOException
+					{
+					}
+					
+					@Override
+					public void onComplete(AsyncEvent event) throws IOException
+					{
+						run.run();
+						wait.setResult(null);
+					}
+				});
+			}
+			else
+			{
+				run.run();
+			}
+			
+			wait.get();
+			
+			return ret[0];
 		}
 	}
 	
@@ -49,6 +100,8 @@ public class NanoRestPublishService extends ExternalRestPublishService
 	@ServiceStart
 	public void start()
 	{
+		super.init();
+		
 		System.out.println("Nano started");
 	}
   

@@ -621,7 +621,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
 						
-						ia.createComponent(new CreationInfo(args, ia.getId().getParent()).setName(player.getName()).setFilename("jadex/bdi/examples/blackjack/player/Player.agent.xml"))
+						ia.getExternalAccess(ia.getId().getParent()).createComponent(new CreationInfo(args).setName(player.getName()).setFilename("jadex/bdi/examples/blackjack/player/Player.agent.xml"))
 							.addResultListener(new IResultListener<IExternalAccess>()
 						{
 							public void resultAvailable(IExternalAccess playerexta)
