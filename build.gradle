@@ -58,7 +58,9 @@ buildscript
 //apply plugin: 'eclipse'
 //eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 
-project.ext.versionInfo	= BuildVersionManager.fetchVersionInfo(project, "src/main/buildutils/jadexversion.properties")
+def pdirty	= gradle.startParameter.getProjectProperties().get('dirty')
+def dirty	= pdirty==null || !pdirty.equals("false");
+project.ext.versionInfo	= BuildVersionManager.fetchVersionInfo(project, "src/main/buildutils/jadexversion.properties", dirty)
 println 'Fetched version info:\n' + versionInfo.propertiesString
 
 allprojects
@@ -134,7 +136,7 @@ task createVersionInfo(type: Copy) {
 	}
 	mustRunAfter clean
 	outputs.upToDateWhen {
-		versionInfo.equals(BuildVersionManager.fetchVersionInfo(project, "build/jadexversion.properties"))
+		versionInfo.equals(BuildVersionManager.fetchVersionInfo(project, "build/jadexversion.properties", false))
 	}
 }
 

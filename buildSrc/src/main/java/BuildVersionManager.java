@@ -47,8 +47,9 @@ public class BuildVersionManager
 	 *  See gitversion.md for details.
 	 *  @param project	The gradle root project
 	 *  @param path	The path to the properties file relative to the project directory.
+	 *  @param dirty	True, if dirty workdir should be assumed when not in git repo tree.
 	 */
-	public static BuildVersionInfo	fetchVersionInfo(Project project, String path)
+	public static BuildVersionInfo	fetchVersionInfo(Project project, String path, boolean dirty)
 	{
 		BuildVersionInfo	ret;
 		
@@ -69,7 +70,7 @@ public class BuildVersionManager
 		try
 		{
 			// Try if build info is included in properties, i.e. when built from dist sources -> use values from prop.
-			ret	= fetchVersionInfoFromProps(project, props);
+			ret	= fetchVersionInfoFromProps(project, props, dirty);
 		}
 		catch(Exception e)
 		{
@@ -101,12 +102,18 @@ public class BuildVersionManager
 	/**
 	 *  Fetch version info for build from dist sources.
 	 */
-	protected static BuildVersionInfo fetchVersionInfoFromProps(Project project, Properties props)
+	protected static BuildVersionInfo fetchVersionInfoFromProps(Project project, Properties props, boolean dirty)
 	{
-		// Increment patch and append '-SNAPSHOT' unless dirty=false was set.
-		Object	pdirty	= project.getProperties().get("dirty");
-		boolean	dirty	= pdirty==null || !pdirty.equals("false");
-		return BuildVersionInfo.fromProperties(props, dirty);
+		// By default -> increment patch and set to snapshot unless -Pdirty=false was set.
+    	if(dirty)
+    	{
+        	int patch	= Integer.parseInt(props.getProperty(BUILD_PROPS_PREFIX+"patch"));
+        	props.setProperty(BUILD_PROPS_PREFIX+"patch", ""+(patch+1));
+        	props.setProperty(BUILD_PROPS_PREFIX+"snapshot", "true");
+        	props.setProperty(BUILD_PROPS_PREFIX+"timestamp", TIMESTAMP_FORMAT.format(new Date()));
+    	}
+		
+		return BuildVersionInfo.fromProperties(props);
 	}
 
 	/**

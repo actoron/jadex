@@ -89,9 +89,8 @@ public class BuildVersionInfo
     /**
      *  Read build version info from properties.
      *  @param props	The properties as produced by {@link #getPropertiesString()}.
-     *  @param dirty	When set and the properties do not already denote a snapshot -> increment patch and set snapshot flag. 
      */
-    public static BuildVersionInfo	fromProperties(Properties props, boolean dirty)
+    public static BuildVersionInfo	fromProperties(Properties props)
     {
     	int major	= Integer.parseInt(props.getProperty(PROPS_PREFIX+"major"));
     	int minor	= Integer.parseInt(props.getProperty(PROPS_PREFIX+"minor"));
@@ -100,14 +99,6 @@ public class BuildVersionInfo
     	String timestamp	= props.getProperty(PROPS_PREFIX+"timestamp");
     	String commit	= props.getProperty(PROPS_PREFIX+"commit");
     	boolean	snapshot	= Boolean.parseBoolean(props.getProperty(PROPS_PREFIX+"snapshot"));
-    	
-    	// Default when building from dist sources is to assume dirty and thus produce snapshot
-    	// Disabled by -Pdirty=false when e.g. running checkDist on non-snapshot
-    	if(dirty && !snapshot)
-    	{
-    		patch++;
-    		snapshot	= true;
-    	}
     	
     	return new BuildVersionInfo(major, minor, patch, branch, timestamp, commit, snapshot);
     }
