@@ -10,9 +10,6 @@ import java.util.regex.Pattern
 def workspaceRootDir = "..${File.separator}.."
 ext.workspaceRootDir = workspaceRootDir
 
-apply from: "${workspaceRootDir}/src/main/buildutils/versioning.gradle"
-
-
 buildscript {
     repositories
     {
