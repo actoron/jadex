@@ -1,5 +1,3 @@
-
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,9 +45,9 @@ public class BuildVersionManager
 	 *  See gitversion.md for details.
 	 *  @param project	The gradle root project
 	 *  @param path	The path to the properties file relative to the project directory.
-	 *  @param dirty	True, if dirty workdir should be assumed when not in git repo tree.
+	 *  @param forcedirty	True, if dirty work dir should be assumed when not in git repo tree.
 	 */
-	public static BuildVersionInfo	fetchVersionInfo(Project project, String path, boolean dirty)
+	public static BuildVersionInfo	fetchVersionInfo(Project project, String path, boolean forcedirty)
 	{
 		BuildVersionInfo	ret;
 		
@@ -70,11 +68,11 @@ public class BuildVersionManager
 		try
 		{
 			// Try if build info is included in properties, i.e. when built from dist sources -> use values from prop.
-			ret	= fetchVersionInfoFromProps(project, props, dirty);
+			ret	= fetchVersionInfoFromProps(project, props, forcedirty);
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			// No build info included -> try to read local git repo.
 			int major	= Integer.parseInt(props.getProperty(SOURCE_PROPS_PREFIX+"major"));
 			int minor	= Integer.parseInt(props.getProperty(SOURCE_PROPS_PREFIX+"minor"));
@@ -101,15 +99,21 @@ public class BuildVersionManager
 	
 	/**
 	 *  Fetch version info for build from dist sources.
+	 *  Fails if props can not be parsed (i.e. on unprocessed source props).
 	 */
-	protected static BuildVersionInfo fetchVersionInfoFromProps(Project project, Properties props, boolean dirty)
+	protected static BuildVersionInfo fetchVersionInfoFromProps(Project project, Properties props, boolean forcedirty)
 	{
-		// By default -> increment patch and set to snapshot unless -Pdirty=false was set.
-    	if(dirty)
+		// Always create new timestamp unless -PnoForceDirty=true was set (e.g. for checkDist).
+    	if(forcedirty)
     	{
-        	int patch	= Integer.parseInt(props.getProperty(BUILD_PROPS_PREFIX+"patch"));
-        	props.setProperty(BUILD_PROPS_PREFIX+"patch", ""+(patch+1));
-        	props.setProperty(BUILD_PROPS_PREFIX+"snapshot", "true");
+    		boolean snapshot	= Boolean.parseBoolean(props.getProperty(BUILD_PROPS_PREFIX+"snapshot"));
+    		// Increment patch when initially not snapshot
+    		if(!snapshot)
+    		{
+    			int patch	= Integer.parseInt(props.getProperty(BUILD_PROPS_PREFIX+"patch"));
+        		props.setProperty(BUILD_PROPS_PREFIX+"patch", ""+(patch+1));
+        		props.setProperty(BUILD_PROPS_PREFIX+"snapshot", "true");
+    		}
         	props.setProperty(BUILD_PROPS_PREFIX+"timestamp", TIMESTAMP_FORMAT.format(new Date()));
     	}
 		

@@ -102,6 +102,22 @@ public class BuildVersionInfo
     	
     	return new BuildVersionInfo(major, minor, patch, branch, timestamp, commit, snapshot);
     }
+
+    /**
+     *  Check if two version info objects are the same except for the timestamp
+     */
+    public boolean equalsIgnoreTimestamp(BuildVersionInfo i2)
+    {
+		boolean	ret	= major==i2.major
+			&& minor==i2.minor
+			&& patch==i2.patch
+			&& snapshot==i2.snapshot
+			&& branch.equals(i2.branch)
+			&& commit.equals(i2.commit);
+		
+		System.out.println("equalsIgnoreTimestamp "+this+" vs. "+i2+" = "+ret);
+		return ret;
+    }
     
     @Override
     public boolean equals(Object obj)
@@ -111,16 +127,8 @@ public class BuildVersionInfo
     	if(obj instanceof BuildVersionInfo)
     	{
     		BuildVersionInfo	i2	= (BuildVersionInfo) obj;
-    		boolean	ret	= major==i2.major
-    			&& minor==i2.minor
-    			&& patch==i2.patch
-    			&& snapshot==i2.snapshot
-    			&& branch.equals(i2.branch)
-				&& commit.equals(i2.commit)
+    		return equalsIgnoreTimestamp(i2)
 				&& timestamp.equals(i2.timestamp);
-    		
-    		System.out.println("Equals "+this+" vs. "+obj+" = "+ret);
-    		return ret;
     	}
     	else
     	{
@@ -140,5 +148,4 @@ public class BuildVersionInfo
     	hash	*= snapshot ? 31 : 13;
     	return hash;
     }
-    
 }

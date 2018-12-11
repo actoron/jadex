@@ -58,9 +58,10 @@ buildscript
 //apply plugin: 'eclipse'
 //eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 
-def pdirty	= gradle.startParameter.getProjectProperties().get('dirty')
-def dirty	= pdirty==null || !pdirty.equals("false");
-project.ext.versionInfo	= BuildVersionManager.fetchVersionInfo(project, "src/main/buildutils/jadexversion.properties", dirty)
+// Generate new timestamp for snapshot build unless -Pnoforcedirty=true is given
+def forcedirty	= !findProperty("noforcedirty")
+println 'forcedirty: ' + forcedirty + ', ' +forcedirty.class
+project.ext.versionInfo	= BuildVersionManager.fetchVersionInfo(project, "src/main/buildutils/jadexversion.properties", forcedirty)
 println 'Fetched version info:\n' + versionInfo.propertiesString
 
 allprojects
@@ -136,7 +137,14 @@ task createVersionInfo(type: Copy) {
 	}
 	mustRunAfter clean
 	outputs.upToDateWhen {
-		versionInfo.equals(BuildVersionManager.fetchVersionInfo(project, "build/jadexversion.properties", false))
+		if(new File(project.projectDir, "build/jadexversion.properties").exists()) {
+			def newInfo	= BuildVersionManager.fetchVersionInfo(project, "build/jadexversion.properties", false)
+			if(versionInfo.equalsIgnoreTimestamp(newInfo)) {
+				project.ext.versionInfo	= newInfo	// Use timestamp from previous build if no changes otherwise
+				return true
+			}
+		}
+		return false
 	}
 }
 
@@ -377,11 +385,16 @@ subprojects
             testImplementation junit
         }
 
-        processResources {
-			filesMatching('**/version.properties')
-			{
-				filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [versionInfoProperties: versionInfo.propertiesString])
-				//expand( [versionInfoProperties: versionInfo.propertiesString])
+		if(!sourceSets.main.resources.filter({file->file.name.equals('version.properties')}).isEmpty()) {
+//			println 'processResources: ' + project
+	        processResources {
+				filesMatching('**/version.properties')
+				{
+					filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [versionInfoProperties: versionInfo.propertiesString])
+					//expand( [versionInfoProperties: versionInfo.propertiesString])
+				}
+				dependsOn rootProject.createVersionInfo
+				
 			}
 		}
 
@@ -834,7 +847,7 @@ def checkDistZip(distname, arts, isaddon)
 	artefactBuild.buildFile = project.file(new File(rebuilddirfile, "sources/build.gradle"))
 	artefactBuild.tasks = ["distZip"]
 	artefactBuild.startParameter.excludedTaskNames	= ["test", "javadoc"]
-	artefactBuild.startParameter.projectProperties << ["dist": distname]
+	artefactBuild.startParameter.projectProperties << [dist: distname, noforcedirty: true]
 	artefactBuild.execute()
 	
 	// For debugging srcZip
