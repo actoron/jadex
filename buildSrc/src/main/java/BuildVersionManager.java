@@ -58,8 +58,8 @@ public class BuildVersionManager
 		try(InputStream is= new FileInputStream(pfile))
 		{
 			props.load(is);
-//			System.out.println("Loaded version info from: "+pfile.getCanonicalPath());
-//			props.store(new PrintWriter(System.out), null);
+			System.out.println("Loaded version info from: "+pfile.getCanonicalPath());
+			props.store(new java.io.PrintWriter(System.out), null);
 		}
 		catch(Exception e)
 		{
@@ -73,7 +73,7 @@ public class BuildVersionManager
 		}
 		catch(Exception e)
 		{
-//			e.printStackTrace();
+			e.printStackTrace();
 			// No build info included -> try to read local git repo.
 			int major	= Integer.parseInt(props.getProperty(SOURCE_PROPS_PREFIX+"major"));
 			int minor	= Integer.parseInt(props.getProperty(SOURCE_PROPS_PREFIX+"minor"));
@@ -88,7 +88,7 @@ public class BuildVersionManager
 			catch(Exception e2)
 			{
 				// Not in git repo -> use major.minor.9999-SNAPSHOT and current time. (branch is unknown)
-//				e2.printStackTrace();
+				e2.printStackTrace();
 				ret	= new BuildVersionInfo(major, minor, 9999, null, TIMESTAMP_FORMAT.format(new Date()), null, true);
 			}
 		}
