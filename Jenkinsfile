@@ -11,6 +11,11 @@ pipeline {
 		  // todo: why build hangs with distzip and javadoc?
 		  // No 'clean' when already done for android-gradle-plugin
 		  sh './gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue'
+		  // Fetch build version and set it
+		  def props = readProperties  file:'build/jadexversion.properties'
+		  script {
+		      currentBuild.displayName = props['jadex_build_version']
+		  }
 		}
 	  }
 	}
