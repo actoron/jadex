@@ -1072,7 +1072,11 @@ task testReport(type: TestReport) {
 }
 
 task checkReproducible(type: Exec) {
+	def command	= 'mkdir -p /jadex/.reproduce/ && cd /jadex/.reproduce/' +
+		' && if [ -d /jadex/.reproduce/jadex ]; then cd /jadex/.reproduce/jadex && git pull; else git clone /jadex/.git && cd /jadex/.reproduce/jadex; fi' +
+		' && git checkout ' + versionInfo.branch
+		' && git checkout ' + versionInfo.commit
 	commandLine ('docker', 'run', '--rm', '--name', 'reproduce',
-		'-v', project.projectDir.canonicalPath + ':/scratch',
-		'ubuntu', 'sh', '-c', '"echo \'hello\' >> /scratch/out.txt"')
+		'-v', project.projectDir.canonicalPath + ':/jadex',
+		'--entrypoint', '/bin/sh', 'alpine/git', '-c', "\"$command\"")
 }
