@@ -50,7 +50,7 @@ buildscript
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
 		classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
 		classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0" // for nexus-oss auto-close
-    }
+	}
 
     apply from: "$rootDir/src/main/buildutils/util.gradle"
 }
@@ -1069,4 +1069,10 @@ task testReport(type: TestReport) {
     // Include the results from the `test` task in all subprojects
     //reportOn subprojects*.test
 	reportOn subprojects.collect { it.tasks.withType(Test).collect {it.binResultsDir} }
+}
+
+task checkReproducible(type: Exec) {
+	commandLine ('docker', 'run', '--rm', '--name', 'reproduce',
+		'-v', project.projectDir.canonicalPath + ':/scratch',
+		'ubuntu', 'sh', '-c', '"echo \'hello\' >> /scratch/out.txt"')
 }
