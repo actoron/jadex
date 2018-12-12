@@ -393,7 +393,7 @@ subprojects
 					filter(ReplaceTokens, beginToken: '${', endToken: '}', tokens: [versionInfoProperties: versionInfo.propertiesString])	//version props evaluated lazily!
 					//expand( [versionInfoProperties: versionInfo.propertiesString])
 				}
-				dependsOn rootProject.createVersionInfo
+				inputs.files rootProject.createVersionInfo.outputs.files	// re-process when jadexversion.properties has changes
 			}
 		}
 
