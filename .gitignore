@@ -54,3 +54,4 @@ jadex-platform-standalone-launch/highscore.dmp
 /tools/runtimetools-swing/jcc.settings.json
 /platform/webservice-websocket/node_modules
 /fastbuild.bat
+/.reproduce
