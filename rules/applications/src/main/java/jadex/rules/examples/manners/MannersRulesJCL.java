@@ -1,4 +1,4 @@
-package jadex.rules.examples.manners;import jadex.rules.parser.conditions.ParserHelper;import jadex.rules.rulesystem.IAction;import jadex.rules.rulesystem.ICondition;import jadex.rules.rulesystem.IRule;import jadex.rules.rulesystem.IVariableAssignments;import jadex.rules.rulesystem.rules.Rule;import jadex.rules.state.IOAVState;
+package jadex.rules.examples.manners;import jadex.rules.parser.conditions.ParserHelper;import jadex.rules.rulesystem.IAction;import jadex.rules.rulesystem.ICondition;import jadex.rules.rulesystem.IRule;import jadex.rules.rulesystem.IVariableAssignments;import jadex.rules.rulesystem.rules.Rule;import jadex.rules.state.IOAVState;
 /**
  *  The rules of the manners benchmark using Java condition language (JCL).
  */
