@@ -1,1 +1,10 @@
 *.java eol=lf
+*.xml eol=lf
+*.xsl eol=lf
+*.xsd eol=lf
+*.bpmn2 eol=lf
+*.gradle eol=lf
+*.properties eol=lf
+*.md eol=lf
+*.sh eol=lf
+gradlew eol=lf
