@@ -2,10 +2,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.Properties;
-import java.util.TimeZone;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
@@ -33,10 +35,15 @@ public class BuildVersionManager
 	public static final String	BUILD_PROPS_PREFIX	= BuildVersionInfo.PROPS_PREFIX;
 	
 	/** The date formatter for time stamps. */
-	public static final SimpleDateFormat TIMESTAMP_FORMAT	= new SimpleDateFormat("yyyyMMddHHmmss");
-	{
-		TIMESTAMP_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-	}
+	// No simple date formatter as we need locale independent values, grrr.
+	public static final DateTimeFormatter TIMESTAMP_FORMATTER = new DateTimeFormatterBuilder()
+		.appendValue(ChronoField.YEAR, 4)
+		.appendValue(ChronoField.MONTH_OF_YEAR, 2)
+		.appendValue(ChronoField.DAY_OF_MONTH, 2)
+		.appendValue(ChronoField.HOUR_OF_DAY, 2)
+		.appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+		.appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+	    .toFormatter().withZone(ZoneOffset.UTC);
 	
 	//-------- methods --------
 
@@ -88,7 +95,7 @@ public class BuildVersionManager
 			{
 				// Not in git repo -> use major.minor.9999-SNAPSHOT and current time. (branch is unknown)
 				e2.printStackTrace();
-				ret	= new BuildVersionInfo(major, minor, 9999, null, TIMESTAMP_FORMAT.format(new Date()), null, true);
+				ret	= new BuildVersionInfo(major, minor, 9999, null, TIMESTAMP_FORMATTER.format(Instant.now()), null, true);
 			}
 		}
 		
@@ -114,7 +121,7 @@ public class BuildVersionManager
         		props.setProperty(BUILD_PROPS_PREFIX+"patch", ""+(patch+1));
         		props.setProperty(BUILD_PROPS_PREFIX+"snapshot", "true");
     		}
-        	props.setProperty(BUILD_PROPS_PREFIX+"timestamp", TIMESTAMP_FORMAT.format(new Date()));
+        	props.setProperty(BUILD_PROPS_PREFIX+"timestamp", TIMESTAMP_FORMATTER.format(Instant.now()));
     	}
 		
 		return BuildVersionInfo.fromProperties(props);
@@ -158,7 +165,7 @@ public class BuildVersionManager
 			if(dirty)
 			{
 				patch++;
-                timestamp	= TIMESTAMP_FORMAT.format(new Date());	// Timestamp for reference in version properties, not part of version string.
+                timestamp	= TIMESTAMP_FORMATTER.format(Instant.now());	// Timestamp for reference in version properties, not part of version string.
 			}
 			else
 			{
@@ -171,7 +178,7 @@ public class BuildVersionManager
 		            try (RevWalk walk = new RevWalk(repository))
 		            {
 		                RevCommit commit = walk.parseCommit(head);
-		                timestamp	= TIMESTAMP_FORMAT.format(new Date(1000L*commit.getCommitTime()));	// Unix timestamp w/o milliseconds
+		                timestamp	= TIMESTAMP_FORMATTER.format(Instant.ofEpochSecond(commit.getCommitTime()));
 		                walk.dispose();
 		            }
 				}
