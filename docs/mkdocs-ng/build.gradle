@@ -10,6 +10,19 @@ import java.util.regex.Pattern
 def workspaceRootDir = "..${File.separator}.."
 ext.workspaceRootDir = workspaceRootDir
 
+// Create and fetch build version from root dir (hack???)
+def artefactBuild = project.tasks.create([name: "createVersionInfo", type: GradleBuild])
+artefactBuild.buildFile = project.file(new File(workspaceRootDir, "build.gradle"))
+artefactBuild.tasks = ["createVersionInfo"]
+artefactBuild.startParameter.projectProperties << [dist: 'nothing']
+artefactBuild.execute()
+project.file(new File(workspaceRootDir, "build/jadexversion.properties")).withInputStream { inputstream ->
+	def vprops	= new Properties()
+	vprops.load(inputstream)
+	project.version	= vprops.getProperty('jadex_build_version')
+	println 'Using build version: ' + version
+} 
+
 buildscript {
     repositories
     {
@@ -116,7 +129,7 @@ task serveDocs (type: MkDocsTask) {
  */
 task buildDocsPdf (type:PandocTask, dependsOn: ['buildPandocDockerImage', processDocs, copyLatexTemplate]) {
     baseName = 'jadex-mkdocs'
-    version = jadex_build_version
+    version = project.version
     dockerImageName = 'jadexpandoc'
 }
 
@@ -229,9 +242,9 @@ class PandocTask extends DockerTask {
 class BuildPandocImageTask extends DockerTask {
     @TaskAction
     def action() {
-        if ("which pandoc".execute().text.trim().empty
-                && docker != null
-                && !docker.empty) {
+//        if ("which pandoc".execute().text.trim().empty
+//                && docker != null
+//                && !docker.empty) {
             // remove old image
 //            println "Removing old pandoc docker image..."
 //            println "$docker rmi $dockerImageName".execute().text
@@ -239,7 +252,7 @@ class BuildPandocImageTask extends DockerTask {
             def p = ("$docker build -t $dockerImageName "+project.file('.')).execute()
             p.inputStream.eachLine{println it}
             p.waitFor()
-        }
+//        }
     }
 }
 
@@ -280,8 +293,9 @@ class DockerTask extends DefaultTask {
 
     String dockerImageName
 
-    protected String docker = "which docker".execute().text.trim()
-
+    //protected String docker = "which docker".execute().text.trim()
+	protected String docker = "docker"
+	
     def boolean forceDocker = project.hasProperty('forceDocker') ? project.property('forceDocker') : false
 
     def launchDockerProcess(builder) {
@@ -309,16 +323,16 @@ class DockerTask extends DefaultTask {
 
     def ProcessBuilder getProcessBuilderForCommand(String cmd, String[] args, String[] dockerArgs, boolean pullFirst = true) {
         def ProcessBuilder result;
-        def cmdPath = "which $cmd".execute().text.trim()
+//        def cmdPath = "which $cmd".execute().text.trim()
         def allArgs
 
         if (args == null) {
             args = []
         }
-        if (cmdPath != null && !cmdPath.empty && !forceDocker) {
-            allArgs = [cmdPath]
-        } else if (docker != null && !docker.empty) {
-            println "No $cmd binary found, but you have docker!"
+//        if (cmdPath != null && !cmdPath.empty && !forceDocker) {
+//            allArgs = [cmdPath]
+//        } else if (docker != null && !docker.empty) {
+//            println "No $cmd binary found, but you have docker!"
             if (pullFirst) {
                 println "Downloading $dockerImageName docker image..."
                 pullDockerImage(dockerImageName);
@@ -328,9 +342,9 @@ class DockerTask extends DefaultTask {
             allArgs = [docker, 'run', '--name=' + dockerContainerName]
             allArgs.addAll(dockerArgs)
             allArgs.add(dockerImageName)
-        } else {
-            System.err.println("No $cmd binary or docker found! Install $cmd or docker to continue.")
-        }
+//        } else {
+//            System.err.println("No $cmd binary or docker found! Install $cmd or docker to continue.")
+//        }
 
         allArgs.addAll(args)
         result = new ProcessBuilder(allArgs);
@@ -345,8 +359,7 @@ class DockerTask extends DefaultTask {
         def p = builder.start()
         p.waitFor()
         if (p.exitValue() != 0) {
-            println p.text
-            System.exit(p.exitValue())
+			throw new Error('Pull failed: ' + p.text)
         }
     }
 

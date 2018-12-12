@@ -59,6 +59,7 @@ allprojects.parallelStream().forEach({ proj ->
 println 'Project dependencies evaluated in ' + (System.currentTimeMillis() - ts) + 'ms.'
 
 gradle.ext.distartmap.put('everything', allprojects)
+gradle.ext.distartmap.put('nothing', [])
 
 /* Add metapackages */
 allprojects.each { proj ->
