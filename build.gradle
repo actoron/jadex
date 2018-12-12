@@ -836,6 +836,12 @@ def checkDistZip(distname, arts, isaddon)
 	rebuilddirfile.mkdirs()
 	def srczip	= new File(project.distsDir, 'sources/jadex-' + distname  + '-' + project.version + '-sources.zip')
 
+	// For debugging srcZip
+	def srczip2	= new File(rebuilddirfile, 'sources/build/distributions/sources/jadex-'  + distname  + '-' + project.version + '-sources.zip')
+	def srcdiff	= diffZips(srczip.getCanonicalPath(), srczip2.getCanonicalPath())
+	if(srcdiff.length()!=0)
+		throw new RuntimeException("Rebuilt srcZip does not match original: "+srcdiff);
+	
 	// Extract and build sources.zip
 	ant.unzip(src: srczip, dest: rebuilddirfile)
 //	// Hack!!! extract minimal zip also, as addons do not build on their own 
@@ -848,12 +854,6 @@ def checkDistZip(distname, arts, isaddon)
 	artefactBuild.startParameter.excludedTaskNames	= ["test", "javadoc"]
 	artefactBuild.startParameter.projectProperties << [dist: distname, noforcedirty: true]
 	artefactBuild.execute()
-	
-//	// For debugging srcZip
-//	def srczip2	= new File(rebuilddirfile, 'sources/build/distributions/sources/jadex-'  + distname  + '-' + project.version + '-sources.zip')
-//	def srcdiff	= diffZips(srczip.getCanonicalPath(), srczip2.getCanonicalPath())
-//	if(srcdiff.length()!=0)
-//		throw new RuntimeException("Rebuilt srcZip does not match original: "+srcdiff);
 	
 //	// For debugging bluetooth aar
 //	if(subprojectmap.get(":android:bluetooth")!=null) {
