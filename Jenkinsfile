@@ -57,6 +57,10 @@ pipeline {
   post {
     always {
       junit allowEmptyResults: true, testResults: '**/test-results/**/*.xml'
+	  script {
+		  def props = readProperties  file:'build/jadexversion.properties'
+	      currentBuild.displayName = props['jadex_build_version']
+	  }
     }
   }
 }
