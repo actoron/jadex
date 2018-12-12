@@ -493,7 +493,7 @@ subprojects
 				}
 				
 				// Add build helper project
-				def helpdir	= new File(rootProject.projectDir, "buildsrc")
+				def helpdir	= new File(rootProject.projectDir, "buildSrc")
 				from(helpdir) {
 					into 'sources' + helpdir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
 					includes = ['*.properties', '*.gradle', 'src/**', 'dist/**', 'lib/**', 'gradle/**', 'gradlew.bat']
