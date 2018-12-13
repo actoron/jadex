@@ -477,7 +477,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 		{
 			public void customResultAvailable(Void result)
 			{
-//				System.out.println("Starting service: "+is.getId()+" "+component.getComponentFeature(IExecutionFeature.class).isComponentThread());
+//				System.out.println("Starting service: "+is.getServiceId()+" "+component.getFeature(IExecutionFeature.class).isComponentThread());
 				is.startService().addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)

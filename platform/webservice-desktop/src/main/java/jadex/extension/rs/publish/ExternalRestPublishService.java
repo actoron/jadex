@@ -193,17 +193,20 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
     		    	if(infopid.endsWith("/"))
     		    		infopid = infopid.substring(0, infopid.length()-1);
     		    	
-    		    	// If tolerant url notation cut off first part till real publish part
-    		    	URI uri = new URI(infopid.replace("[", "").replace("]", ""));
+    		    	URI uri = convertUri(infopid);
     		    	
-    		    	String pid = infopid;
-    		    	if(pid.startsWith("["))
-    		    	{
-    		    		pid = pid.substring(pid.indexOf("]")+1);
-    		    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
-//	        		    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
-    		    	}
+//    		    	// If tolerant url notation cut off first part till real publish part
+//    		    	URI uri = new URI(infopid.replace("[", "").replace("]", ""));
+//    		    	
+//    		    	String pid = infopid;
+//    		    	if(pid.startsWith("["))
+//    		    	{
+//    		    		pid = pid.substring(pid.indexOf("]")+1);
+//    		    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
+////	        		    uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
+//    		    	}
     		    	
+//    		    	System.out.println("Adding http handler to server: "+uri.getPath());
     		        component.getLogger().info("Adding http handler to server: "+uri.getPath());
     		        
     		        // is overridden by nano to return nano server :-( cast then does not work
@@ -301,17 +304,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	{
 		try
 	    {
-			URI uri = null;
-	    	if(pid.startsWith("["))
-	    	{
-	    		pid = pid.substring(pid.indexOf("]")+1);
-	    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
-//		    		uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
-	    	}
-	    	else
-	    	{
-	    		uri = new URI(pid);
-	    	}
+			URI uri = convertUri(pid);
 	    	
 	        component.getLogger().info("Adding http handler to server: "+uri.getPath());
 	        
@@ -376,7 +369,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	{
 	    throw new UnsupportedOperationException();
 	}
-	
+		
 	/**
 	 *  Produce overview site of published services.
 	 */
@@ -444,5 +437,48 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 		ret.append("</body>\n</html>\n");
 
 		return ret.toString();
+	}
+	
+	/**
+	 *  Convert the publish id to uri.
+	 */
+	public URI convertUri(String pid)
+	{
+		try
+		{
+			URI uri = null;
+	    	if(pid.startsWith("["))
+	    	{
+	    		pid = pid.substring(pid.indexOf("]")+1);
+	    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
+	//	    	uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
+	    	}
+	    	else
+	    	{
+	    		uri = new URI(pid);
+	    	}
+	    	return uri;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		
+//		return null;
+    	
+//    	if(pid.endsWith("/"))
+//    		pid = infopid.substring(0, infopid.length()-1);
+//    	
+//    	// If tolerant url notation cut off first part till real publish part
+//    	URI uri = new URI(infopid.replace("[", "").replace("]", ""));
+//    	
+//    	String pid = infopid;
+//    	if(pid.startsWith("["))
+//    	{
+//    		pid = pid.substring(pid.indexOf("]")+1);
+//    		uri = new URI(DEFAULT_COMPLETECONTEXT+pid);
+////		    uri = new URI("http://DEFAULTHOST:0/DEFAULTAPP/"+pid);
+//    	}
 	}
 }

@@ -1,13 +1,16 @@
 package jadex.extension.rs.publish;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import javax.servlet.AsyncEvent;
@@ -69,8 +72,9 @@ public class NanoRestPublishService extends ExternalRestPublishService
 				{
 					IStatus status = Response.Status.lookup(resp.getStatus());
 					String mimetype = resp.getContentType();
-					String txt = resp.getOutbuf().toString();
-					ret[0] = newFixedLengthResponse(status, mimetype, txt);
+					byte[] out = resp.getOutput().toByteArray();
+					InputStream is = new ByteArrayInputStream(out);
+					ret[0] = newFixedLengthResponse(status, mimetype, is, out.length);
 				}
 			};
 			
@@ -104,6 +108,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 			else
 			{
 				run.run();
+				wait.setResult(null);
 			}
 			
 			wait.get();
@@ -118,9 +123,11 @@ public class NanoRestPublishService extends ExternalRestPublishService
 	@ServiceStart
 	public void start()
 	{
-		super.init();
-		
-		System.out.println("Nano started");
+		if(!inited)
+    	{
+    		super.init();
+    		System.out.println("Nano started: "+component.getId());
+    	}
 	}
   
 	@ServiceShutdown
@@ -157,7 +164,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
  
         	if(server==null)
             {
-        		System.out.println("Starting new server: "+uri.getPort());
+//        		System.out.println("Starting new server: "+uri.getPort());
                 server = new Server(uri.getPort());
  
                 server.start();
@@ -229,7 +236,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
     /**
      *  Publish file resources from the classpath.
      */
-	// "[http://localhost:8081/]", "META-INF/resources";
+	// example "[http://localhost:8081/]", "META-INF/resources";
     public IFuture<Void> publishResources(final String pid, final String rootpath)
     {
 		final Future<Void>	ret	= new Future<Void>();
@@ -248,19 +255,20 @@ public class NanoRestPublishService extends ExternalRestPublishService
 					{
 						try
 					    {
-							URI uri = null;
-							String mpid = pid;
-														
-							if(mpid.startsWith("["))
-							{
-								mpid = mpid.substring(1);
-								mpid = mpid.replace("]", "");
-							}
+							URI uri = convertUri(pid);
 							
-							if(mpid.endsWith("/"))
-								mpid = mpid.substring(0, mpid.length()-1);
-							
-							uri = new URI(mpid);
+//							String mpid = pid;
+//														
+//							if(mpid.startsWith("["))
+//							{
+//								mpid = mpid.substring(1);
+//								mpid = mpid.replace("]", "");
+//							}
+//							
+//							if(mpid.endsWith("/"))
+//								mpid = mpid.substring(0, mpid.length()-1);
+//							
+//							uri = new URI(mpid);
 							
 //					    	if(mpid.startsWith("["))
 //					    	{
@@ -288,19 +296,35 @@ public class NanoRestPublishService extends ExternalRestPublishService
 									if(url.equals("/") || url.length()==0)
 										url = "/index.html";
 									
-//									int idx = url.indexOf("/");
-//									idx = url.indexOf("/", idx+1);
-//									idx = url.indexOf("/", idx+1);
-//									String path = url.substring(idx+1);
-
 									String fp = rootpath+url;
 									
-									System.out.println("serve path: "+fp);
+									// All java variants do not work properly :-(
+//									MimetypesFileTypeMap ftm = new MimetypesFileTypeMap();
+//									String mime = ftm.getContentType(fp);
+//									String mimeType = Files.probeContentType();
+//									String mime = MimeTypes.getMimeType(fp);
+									String mime = SUtil.guessContentTypeByFilename(fp);
+									
+//									System.out.println("MIME: "+fp+" "+mime);
+									
+									if(mime!=null)
+										response.setContentType(mime);
+									
+//									System.out.println("serve path: "+fp);
 									
 									File f = getFile(cl, fp);
-									 
-									OutputStream os = response.getOutputStream();
-									SUtil.copyStream(new FileInputStream(f), os);
+									if(f!=null && f.exists())
+									{
+										response.setStatus(200);
+										OutputStream os = response.getOutputStream();
+										int size = SUtil.copyStream(getInputStream(f), os);
+//										System.out.println("filesize: "+fp+" "+size);
+									}
+									else
+									{
+//										System.out.println("file not found: "+fp);
+										response.setStatus(404);
+									}
 								}
 							};
 							if(ph.containsSubhandlerForExactUri(null, uri.getPath()))
@@ -329,23 +353,40 @@ public class NanoRestPublishService extends ExternalRestPublishService
     
     public static File getFile(ClassLoader cl, String path) throws IOException
 	{
-		if("file".equals(getURL(cl, path).getProtocol()))
-		{
-			return SUtil.getFile(getURL(cl, path));
-		}
-		else if("jar".equals(getURL(cl, path).getProtocol()))
-		{
-			String jar = getURL(cl, path).getPath();
-			String entry = null;
-			if(jar.contains("!/"))
+    	URL url = getURL(cl, path);
+    	
+    	if(url!=null)
+    	{
+			if("file".equals(getURL(cl, path).getProtocol()))
 			{
-				entry = jar.substring(jar.indexOf("!/")+2);
-				jar	= jar.substring(0, jar.indexOf("!/"));
+				return SUtil.getFile(getURL(cl, path));
 			}
-			return new JarAsDirectory(new URL(jar).getPath(), new ZipEntry(entry));
-		}
+			else if("jar".equals(getURL(cl, path).getProtocol()))
+			{
+				String jar = getURL(cl, path).getPath();
+				String entry = null;
+				if(jar.contains("!/"))
+				{
+					entry = jar.substring(jar.indexOf("!/")+2);
+					jar	= jar.substring(0, jar.indexOf("!/"));
+				}
+				return new JarAsDirectory(new URL(jar).getPath(), new ZipEntry(entry));
+			}
+    	}
 		
-		throw new UnsupportedOperationException();
+		return null;
+	}
+    
+    public static java.io.InputStream getInputStream(File f) throws IOException
+	{
+		if(f instanceof JarAsDirectory)
+		{
+			return new JarFile(((JarAsDirectory)f).getJarPath()).getInputStream(((JarAsDirectory)f).getZipEntry());
+		}
+		else
+		{
+			return new FileInputStream(f);
+		}
 	}
     
     public static URL getURL(ClassLoader cl, String path)
@@ -353,15 +394,19 @@ public class NanoRestPublishService extends ExternalRestPublishService
 		return cl.getResource(path);
 	}
 
-//	public IFuture<Void> mirrorHttpServer(URI sourceserveruri, URI targetserveruri, PublishInfo info)
-//	{
-//        throw new UnsupportedOperationException();
-//	}
-//
-//
-//	public IFuture<Void> shutdownHttpServer(URI uri)
-//	{
-//        throw new UnsupportedOperationException();
-//	}
+    /**
+	 *  Convert the publish id to uri.
+	 */
+	public URI convertUri(String pid)
+	{
+		try
+		{
+			return new URI(pid.replace("[", "").replace("]", ""));
+		}
+		catch(Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
+	}
 }
 
