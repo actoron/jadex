@@ -33,6 +33,9 @@ public class BuildVersionInfo
     /** Flag to indicate a non-clean build (i.e. with local modifications not under version control). */
     public final boolean	snapshot;
 
+    /** Flag to indicate a release (i.e. a matching tag exists in git). */
+    public final boolean	release;
+
     //-------- constructors --------
     
     /**
@@ -45,10 +48,11 @@ public class BuildVersionInfo
      * @param timestamp	The time stamp of the latest commit (for clean builds) or of the build itself (for snapshot builds).
      * @param commit	The commit hash of the latest commit (if built from cloned repo).
      * @param snapshot	Flag to indicate a non-clean build (i.e. with local modifications not under version control).
+     * @param release	Flag to indicate a release (i.e. a matching tag exists in git).
      */
     public BuildVersionInfo(int major, int minor, int patch,
     	String branch, String timestamp, String commit,
-    	boolean snapshot)
+    	boolean snapshot, boolean release)
     {
         this.major	= major;
         this.minor	= minor;
@@ -57,6 +61,7 @@ public class BuildVersionInfo
         this.timestamp	= timestamp;
         this.commit	= commit;
         this.snapshot	= snapshot;
+        this.release	= release;
     }
 
     /**
@@ -66,6 +71,7 @@ public class BuildVersionInfo
     public String toString()
     {
     	return major+"."+minor+"."+patch
+    		+ (release ? "" : "-beta")
     		+ (branch!=null && !branch.isEmpty() ? "-"+branch : "")
     		+ (snapshot ? "-SNAPSHOT" : "-"+timestamp);
     }
@@ -83,7 +89,8 @@ public class BuildVersionInfo
 		+  PROPS_PREFIX + "branch\t= " + branch + "\n"
 		+  PROPS_PREFIX + "timestamp\t= " + timestamp + "\n"
 		+  PROPS_PREFIX + "commit\t= " + commit + "\n"
-		+  PROPS_PREFIX + "snapshot\t= " + snapshot + "\n";
+		+  PROPS_PREFIX + "snapshot\t= " + snapshot + "\n"
+		+  PROPS_PREFIX + "release\t= " + release + "\n";
     }
 
     /**
@@ -99,8 +106,9 @@ public class BuildVersionInfo
     	String timestamp	= props.getProperty(PROPS_PREFIX+"timestamp");
     	String commit	= props.getProperty(PROPS_PREFIX+"commit");
     	boolean	snapshot	= Boolean.parseBoolean(props.getProperty(PROPS_PREFIX+"snapshot"));
+    	boolean	release	= Boolean.parseBoolean(props.getProperty(PROPS_PREFIX+"release"));
     	
-    	return new BuildVersionInfo(major, minor, patch, branch, timestamp, commit, snapshot);
+    	return new BuildVersionInfo(major, minor, patch, branch, timestamp, commit, snapshot, release);
     }
 
     /**
@@ -112,6 +120,7 @@ public class BuildVersionInfo
 			&& minor==i2.minor
 			&& patch==i2.patch
 			&& snapshot==i2.snapshot
+			&& release==i2.release
 			&& branch.equals(i2.branch)
 			&& commit.equals(i2.commit);
 		
@@ -146,6 +155,7 @@ public class BuildVersionInfo
     	hash	*= commit.hashCode() +31;
     	hash	*= timestamp.hashCode() +31;
     	hash	*= snapshot ? 31 : 13;
+    	hash	*= release ? 31 : 13;
     	return hash;
     }
 }

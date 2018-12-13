@@ -95,7 +95,7 @@ public class BuildVersionManager
 			{
 				// Not in git repo -> use major.minor.9999-SNAPSHOT and current time. (branch is unknown)
 				e2.printStackTrace();
-				ret	= new BuildVersionInfo(major, minor, 9999, null, TIMESTAMP_FORMATTER.format(Instant.now()), null, true);
+				ret	= new BuildVersionInfo(major, minor, 9999, null, TIMESTAMP_FORMATTER.format(Instant.now()), null, true, false);
 			}
 		}
 		
@@ -172,6 +172,7 @@ public class BuildVersionManager
         }
 
 		// Found a tag to derive actual patch number?
+		boolean	release	= false;
 		if(latest!=null)
 		{
 			System.out.println("Found latest tag matching "+prefix+"<patch>: 'SHA-1 "+latest.getName()+"' with patch number "+patch);
@@ -185,13 +186,18 @@ public class BuildVersionManager
 			}
 			
 			// Increment patch when clean workdir, but latest patch tag not at head
-			else if(!latest.equals(head))
+			else if(head.equals(latest))
+			{
+				System.out.println("Found tag at head. Doing release build.");
+				release	= true;
+			}
+			else
 			{
 				System.out.println("Head "+head.getName()+" not at latest tag "+latest.getName()+". Using (incremented) prerelease patch.");
 				patch++;
 			}
 		}
 		
-		return new BuildVersionInfo(major, minor, patch, branch, timestamp, head.getName(), dirty);
+		return new BuildVersionInfo(major, minor, patch, branch, timestamp, head.getName(), dirty, release);
 	}
 }
