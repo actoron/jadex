@@ -719,9 +719,9 @@ subprojects
 				def srcZip1	= srcZip.outputs.files.files.iterator().next()
 				
 				// Cannot copy without container, cf. https://github.com/moby/moby/issues/25245
-				commandLine ('docker run -d --rm --name jadex-reproducible -v jadex-reproducible:/root alpine tail -f /dev/null' +
+				commandLine (('docker run -d --rm --name jadex-reproducible -v jadex-reproducible:/root alpine tail -f /dev/null' +
 				' && docker cp jadex-reproducible:/root/jadex/build/distributions/sources/'+srcZip1.name+'build/reproduce/'+
-				' && docker stop jadex-reproducible')
+				' && docker stop jadex-reproducible').split(' '))
 				
 				doLast {
 					def srcZip2	= new File(rootProject.projectDir, 'build/reproduce/'+srcZip1.name)
