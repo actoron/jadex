@@ -190,7 +190,7 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 		{
 			b.append(res.get(0));
 			if(i+1<res.size())
-				b.append(".");
+				b.append(":");
 		}
 		return b.toString();
 	}
