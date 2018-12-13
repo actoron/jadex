@@ -715,13 +715,18 @@ subprojects
 					println 'WARNING: Reproducibility check only works on clean workdirs. Please stash/commit/revert your local changes.'
 				}
 				
+				onlyIf {	// doFirst {} does not run before Exec (?) so we throw the exception in onlyIf
+					if(!System.getProperty("os.name").toLowerCase().contains("windows"))
+						throw new GradleException("This task is currently windows only.");
+					return true
+				}
+				
 				inputs.files	srcZip.outputs.files
 				def srcZip1	= srcZip.outputs.files.files.iterator().next()
 				
 				// Cannot copy without container, cf. https://github.com/moby/moby/issues/25245
-				commandLine (('docker run -d --rm --name jadex-reproducible -v jadex-reproducible:/root alpine tail -f /dev/null' +
-				' && docker cp jadex-reproducible:/root/jadex/build/distributions/sources/'+srcZip1.name+'build/reproduce/'+
-				' && docker stop jadex-reproducible').split(' '))
+				commandLine (('cmd /c "docker run -d --rm --name jadex-reproducible -v jadex-reproducible:/root alpine tail -f /dev/null' +
+				' && docker cp jadex-reproducible:/root/jadex/build/distributions/sources/'+srcZip1.name+' build/reproduce/').split(" "))
 				
 				doLast {
 					def srcZip2	= new File(rootProject.projectDir, 'build/reproduce/'+srcZip1.name)
@@ -730,6 +735,9 @@ subprojects
 						throw new RuntimeException("Reproduced srcZip does not match original: "+diff);		
 				}
 				
+				finalizedBy tasks.create(name: 'DockerStop', type: Exec) {
+					commandLine ('docker stop jadex-reproducible'.split(" "))
+				}
 				dependsOn reproducibleDist
 			}
 		}
