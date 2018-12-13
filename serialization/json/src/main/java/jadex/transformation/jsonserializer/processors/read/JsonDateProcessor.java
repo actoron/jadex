@@ -2,6 +2,7 @@ package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class JsonDateProcessor implements ITraverseProcessor
 	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
-		return object instanceof JsonObject && SReflect.isSupertype(Date.class, clazz) && !SReflect.isSupertype(Timestamp.class, clazz);
+		return object instanceof JsonObject && (SReflect.isSupertype(Date.class, clazz) || SReflect.isSupertype(SimpleDateFormat.class, clazz)) && !SReflect.isSupertype(Timestamp.class, clazz);
 	}
 	
 	/**
@@ -42,11 +43,19 @@ public class JsonDateProcessor implements ITraverseProcessor
 	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		JsonObject obj = (JsonObject)object;
+		Class<?> clazz = SReflect.getClass(type);
+		Object ret = null;
 		
-		long time = obj.getLong("value", 0);
-		Date ret = new Date(time);
-//		traversed.put(object, ret);
-//		((JsonReadContext)context).addKnownObject(ret);
+		if (SReflect.isSupertype(Date.class, clazz))
+		{
+			long time = obj.getLong("value", 0);
+			ret = new Date(time);
+		}
+		else if (SReflect.isSupertype(SimpleDateFormat.class, clazz))
+		{
+			String pattern = obj.getString("pattern", "");
+			ret = new SimpleDateFormat(pattern);
+		}
 		
 		JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
 		if(idx!=null)

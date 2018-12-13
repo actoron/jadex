@@ -55,7 +55,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 		{
 			for(int i=0; i<args.length; i++)
 			{
-				IComponentIdentifier aid = getAgent().createComponent(new CreationInfo(config, args[i], getComponentIdentifier()).setFilename(type)).get().getId();
+				IComponentIdentifier aid = getAgent().createComponent(new CreationInfo(config, args[i]).setFilename(type)).get().getId();
 				agents.add(aid);
 			}
 		}

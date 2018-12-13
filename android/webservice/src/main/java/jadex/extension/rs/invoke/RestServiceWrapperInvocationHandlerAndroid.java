@@ -68,6 +68,12 @@ import org.springframework.web.client.RestTemplate;
 @Service // Used here only to pass allow proxy to be used as service (check is delegated to handler)
 public class RestServiceWrapperInvocationHandlerAndroid implements InvocationHandler
 {
+	static
+	{
+		// Make sure to probe for the Java 9+/Android/Bouncycastle bug...
+		SUtil.getSecureRandom();
+	}
+	
 	public static String[] defaultimports = new String[]{"jadex.extension.rs.invoke.*", 
 		"jadex.extension.rs.invoke.annotation.*", "jadex.extension.rs.invoke.mapper.*"};
 	

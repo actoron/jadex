@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import jadex.commons.SUtil;
 import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
@@ -191,17 +192,19 @@ public class DataOutputEncodingContext extends AbstractEncodingContext
 			sid = stringpool.size();
 			stringpool.put(string, sid);
 			writeVarInt(sid);
-			try
+			
+			if (string != null)
 			{
-				byte[] encodedString = string.getBytes("UTF-8");
+				byte[] encodedString = string.getBytes(SUtil.UTF8);
 				
 				writeVarInt(encodedString.length);
 				write(encodedString);
 			}
-			catch (UnsupportedEncodingException e)
+			else
 			{
-				throw new RuntimeException(e);
+				writeVarInt(Integer.MAX_VALUE + 1L);
 			}
+			
 		}
 		else
 		{

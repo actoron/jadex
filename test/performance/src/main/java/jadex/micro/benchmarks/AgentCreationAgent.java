@@ -98,8 +98,9 @@ public class AgentCreationAgent
 			args.put("num", Integer.valueOf(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-			agent.getExternalAccess(agent.getId().getParent()).createComponent(
-				new CreationInfo(null, args, nested ? agent.getId() : null, null, null, null, null, null, agent.getDescription().getResourceIdentifier())
+			IExternalAccess creator = nested ? agent : agent.getExternalAccess(agent.getId().getRoot());
+			creator.createComponent(
+				new CreationInfo(null, args, agent.getDescription().getResourceIdentifier())
 				.setName(createPeerName(num+1, agent.getId())).setFilename(AgentCreationAgent.this.getClass().getName()+".class"));
 		}
 		else

@@ -9,15 +9,16 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.security.Provider;
+import java.security.KeyStore;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.net.ssl.TrustManagerFactory;
 
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Object;
@@ -99,6 +100,7 @@ import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.security.random.SecureThreadedRandom;
@@ -133,6 +135,33 @@ public class SSecurity
 	{
 		SUtil.ensureNonblockingSecureRandom();
 		getSecureRandom();
+		
+		if (SReflect.isAndroid())
+		{
+			// Probe for a weird bug caused by the interaction between
+			// Java 9+, Android and Bouncycastle
+			try
+			{
+	            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+	            tmf.init((KeyStore) null);
+			}
+			catch (Exception e)
+			{
+				// Bug appears to be there, attempt fix...
+				String oldstoretype = System.getProperty("javax.net.ssl.trustStoreType");
+				System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+				try
+				{
+		            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		            tmf.init((KeyStore) null);
+				}
+				catch (Exception e1)
+				{
+					// The fix did not work, restore initial state...
+					System.setProperty("javax.net.ssl.trustStoreType", oldstoretype);
+				}
+			}
+		}
 	}
 	
 	/**
