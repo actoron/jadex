@@ -710,33 +710,33 @@ subprojects
 			
 			task reproducibleCheck(type: Exec) {
 				description	= "Check check if the distribution in linux docker matches (windows?) host build."
-				
-				if(versionInfo.snapshot) doFirst {
-					println 'WARNING: Reproducibility check only works on clean workdirs. Please stash/commit/revert your local changes.'
-				}
-				
-				onlyIf {	// doFirst {} does not run before Exec (?) so we throw the exception in onlyIf
-					if(!System.getProperty("os.name").toLowerCase().contains("windows"))
-						throw new GradleException("This task is currently windows only.");
-					return true
-				}
-				
+
 				inputs.files	srcZip.outputs.files
 				def srcZip1	= srcZip.outputs.files.files.iterator().next()
+				def srcZip2	= new File(rootProject.projectDir, 'build/reproduce/'+srcZip1.name)
+				outputs.files(srcZip2)
+				
+				doFirst {
+					if(!System.getProperty("os.name").toLowerCase().contains("windows"))
+						throw new GradleException("This task is currently windows only.");
+					if(versionInfo.snapshot)
+						println 'WARNING: Reproducibility check only works on clean workdirs. Please stash/commit/revert your local changes.'
+					srcZip2.parentFile.mkdirs()
+				}
 				
 				// Cannot copy without container, cf. https://github.com/moby/moby/issues/25245
 				commandLine (('cmd /c "docker run -d --rm --name jadex-reproducible -v jadex-reproducible:/root alpine tail -f /dev/null' +
-				' && docker cp jadex-reproducible:/root/jadex/build/distributions/sources/'+srcZip1.name+' build/reproduce/').split(" "))
+				' && docker cp jadex-reproducible:/root/jadex/build/distributions/sources/'+srcZip1.name+' '+srcZip2.parentFile.canonicalPath).split(" "))
 				
 				doLast {
-					def srcZip2	= new File(rootProject.projectDir, 'build/reproduce/'+srcZip1.name)
 					def diff	= diffZips(srcZip1.canonicalPath, srcZip2.canonicalPath)
 					if(diff.length()!=0)
 						throw new RuntimeException("Reproduced srcZip does not match original: "+diff);		
 				}
 				
 				finalizedBy tasks.create(name: 'DockerStop', type: Exec) {
-					commandLine ('docker stop jadex-reproducible'.split(" "))
+					if(System.getProperty("os.name").toLowerCase().contains("windows"))
+						commandLine ('docker stop jadex-reproducible'.split(" "))
 				}
 				dependsOn reproducibleDist
 			}
