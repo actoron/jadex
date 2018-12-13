@@ -149,12 +149,12 @@ task createVersionInfo(type: Copy) {
 }
 
 task checkReproducibleClone(type: Exec) {
-	def command	= 'mkdir -p /jadex/.reproduce/ && cd /jadex/.reproduce/' +
-		' && if [ -d /jadex/.reproduce/jadex ]; then cd /jadex/.reproduce/jadex && git pull; else git clone --no-local /jadex/.git && cd /jadex/.reproduce/jadex; fi' +
+	def command	= 'if [ -d /root/jadex ]; then cd /root/jadex && git pull; else git clone --no-local /jadex/.git && cd /root/jadex; fi' +
 		' && git checkout ' + versionInfo.branch
 		' && git checkout ' + versionInfo.commit
 	commandLine ('docker', 'run', '--rm', '--name', 'reproduce',
-		'-v', project.projectDir.canonicalPath + ':/jadex',
+		'-v', 'reproduce:/root',
+		'-v', project.projectDir.canonicalPath + ':/jadex:ro',
 		'--entrypoint', '/bin/sh', 'alpine/git', '-c', "\"$command\"")
 }
 
@@ -678,27 +678,27 @@ subprojects
 
 			task checkReproducibleBuild(type: Exec) {
 				description	= "Rebuild the distribution in cloned extra directory within docker to have linux build artifacts even when running on windows."
-				def command	= 'cd /jadex/.reproduce/jadex' +
+				def command	= 'cd /root/jadex' +
 					' && ./gradlew -Pdist='+distname+' distZip --info'
 				commandLine ('docker', 'run', '--rm', '--name', 'reproduce',
-					'-v', rootProject.projectDir.canonicalPath + ':/jadex',
-					'-v', 'gradlecache:/root',
+					'-v', 'reproduce:/root',
 					'--entrypoint', '/bin/sh', 'openjdk:8-alpine', '-c', "\"$command\"")
 				
 				dependsOn checkReproducibleClone
 			}
 			
-			task checkReproducibleDist() {
-				description	= "Rebuild the distribution in linux docker and check if it matches (windows?) host build."
+			task checkReproducibleDist(type: Exec) {
+				description	= "Check check if the distribution in linux docker matches (windows?) host build."
 				
 				inputs.files	srcZip.outputs.files
+				def srcZip1	= srcZip.outputs.files.files.iterator().next()
+				commandLine ('docker', 'cp', 'reproduce:/root/jadex/build/distributions/sources/'+srcZip1.name, 'build/reproduce/')
 				
 				doLast {
 					if(versionInfo.snapshot)
 						println 'WARNING: Reproducibility check only works on clean workdirs. Please stash/commit/revert your local changes.'
 						
-					def srcZip1	= srcZip.outputs.files.files.iterator().next()
-					def srcZip2	= new File(rootProject.projectDir, '.reproduce/jadex/build/distributions/sources/'+srcZip1.name)
+					def srcZip2	= new File(rootProject.projectDir, 'build/reproduce/'+srcZip1.name)
 					def diff	= diffZips(srcZip1.canonicalPath, srcZip2.canonicalPath)
 					if(diff.length()!=0)
 						throw new RuntimeException("Reproduced srcZip does not match original: "+diff);		
