@@ -187,7 +187,7 @@ public class BuildVersionManager
 			// Increment patch when clean workdir, but latest patch tag not at head
 			else if(!latest.equals(head))
 			{
-				System.out.println("Head "+head+" not at latest tag "+latest+". Using (incremented) prerelease patch.");
+				System.out.println("Head "+head.getName()+" not at latest tag "+latest.getName()+". Using (incremented) prerelease patch.");
 				patch++;
 			}
 		}
