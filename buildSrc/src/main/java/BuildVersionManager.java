@@ -136,6 +136,8 @@ public class BuildVersionManager
 		boolean dirty	= !Git.wrap(repository).status().call().isClean();
 		String branch	= repository.getBranch();
 		
+		System.out.println("Found branch "+branch+" in "+repository.getDirectory().getCanonicalPath());
+		
 //		String	tags	= git.describe().setMatch(major+"."+minor+".*").abbrev(0).call();	// --abbrev=0 not supported :(, cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=537883
 		String	prefix	= "refs/tags/"+major+"."+minor+".";
 		int	patch	= 0;
@@ -150,41 +152,46 @@ public class BuildVersionManager
 				{
 					latest	= ref.getObjectId();
 					patch	= tagpatch;
+//					System.out.println("Found newer tag "+latest+" with version "+patch);
 				}
 			}
 			catch(NumberFormatException nfe)
 			{
-//				System.out.println("Ignoring tag: "+spatch);
+				System.out.println("Ignoring tag: "+prefix+spatch);
 			}
 		}
 		
-		// Increment patch when dirty or latest tag not at head
+		// Use head for commit hash and timestamp
+		ObjectId head = repository.resolve("HEAD");
 		String	timestamp	= null;
+        try (RevWalk walk = new RevWalk(repository))
+        {
+            RevCommit commit = walk.parseCommit(head);
+            timestamp	= TIMESTAMP_FORMATTER.format(Instant.ofEpochSecond(commit.getCommitTime()));
+            walk.dispose();
+        }
+
+		// Found a tag to derive actual patch number?
 		if(latest!=null)
 		{
+			System.out.println("Found latest tag matching "+prefix+"<patch>: 'SHA-1 "+latest.getName()+"' with patch number "+patch);
+			
+			// Increment patch and use current time when workdir is dirty 
 			if(dirty)
 			{
 				patch++;
                 timestamp	= TIMESTAMP_FORMATTER.format(Instant.now());	// Timestamp for reference in version properties, not part of version string.
+				System.out.println("Snapshot (dirty) build: using current time (UTC) "+timestamp);
 			}
-			else
+			
+			// Increment patch when clean workdir, but latest patch tag not at head
+			else if(!latest.equals(head))
 			{
-				// Clean workdir -> when not at head then increment patch and add timestamp from latest commit
-				ObjectId head = repository.resolve("HEAD");
-				if(!latest.equals(head))
-				{
-					patch++;
-					latest	= head;
-		            try (RevWalk walk = new RevWalk(repository))
-		            {
-		                RevCommit commit = walk.parseCommit(head);
-		                timestamp	= TIMESTAMP_FORMATTER.format(Instant.ofEpochSecond(commit.getCommitTime()));
-		                walk.dispose();
-		            }
-				}
+				System.out.println("Head "+head+" not at latest tag "+latest+". Using (incremented) prerelease patch.");
+				patch++;
 			}
 		}
 		
-		return new BuildVersionInfo(major, minor, patch, branch, timestamp, latest.getName(), dirty);
+		return new BuildVersionInfo(major, minor, patch, branch, timestamp, head.getName(), dirty);
 	}
 }

@@ -60,9 +60,9 @@ buildscript
 
 // Generate new timestamp for snapshot build unless -Pnoforcedirty=true is given
 def forcedirty	= !findProperty("noforcedirty")
-println 'forcedirty: ' + forcedirty + ', ' +forcedirty.class
+println 'Found -Pnoforcedirty: ' + !forcedirty
 project.ext.versionInfo	= BuildVersionManager.fetchVersionInfo(project, "src/main/buildutils/jadexversion.properties", forcedirty)
-println 'Fetched version info:\n' + versionInfo.propertiesString
+println 'Generated version info:\n' + versionInfo.propertiesString
 
 allprojects
 {
