@@ -133,7 +133,8 @@ public class BuildVersionManager
 	 */
 	protected static BuildVersionInfo fetchVersionInfoFromRepo(Project project, int major, int minor, Repository repository) throws Exception
 	{
-		boolean dirty	= !Git.wrap(repository).status().call().isClean();
+		Git git	= Git.wrap(repository);
+		boolean dirty	= !git.status().call().isClean();
 		String branch	= repository.getBranch();
 		
 		System.out.println("Found branch "+branch+" in "+repository.getDirectory().getCanonicalPath());
@@ -141,7 +142,7 @@ public class BuildVersionManager
 //		String	tags	= git.describe().setMatch(major+"."+minor+".*").abbrev(0).call();	// --abbrev=0 not supported :(, cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=537883
 		String	prefix	= "refs/tags/"+major+"."+minor+".";
 		int	patch	= 0;
-		ObjectId	latest	= null;
+		Ref	latest	= null;
 		for(Ref ref: repository.getRefDatabase().getRefsByPrefix(prefix))
 		{
 			String	spatch	= ref.getName().substring(prefix.length());
@@ -150,14 +151,14 @@ public class BuildVersionManager
 				int	tagpatch	= Integer.parseInt(spatch);
 				if(tagpatch>=patch)
 				{
-					latest	= ref.getObjectId();
+					latest	= ref;
 					patch	= tagpatch;
 //					System.out.println("Found newer tag "+latest+" with version "+patch);
 				}
 			}
 			catch(NumberFormatException nfe)
 			{
-				System.out.println("Ignoring tag: "+prefix+spatch);
+//				System.out.println("Ignoring tag: "+prefix+spatch);
 			}
 		}
 		
@@ -175,26 +176,34 @@ public class BuildVersionManager
 		boolean	release	= false;
 		if(latest!=null)
 		{
-			System.out.println("Found latest tag matching "+prefix+"<patch>: 'SHA-1 "+latest.getName()+"' with patch number "+patch);
+			System.out.println("Found latest tag matching "+prefix+"<patch> with patch number "+patch);
 			
 			// Increment patch and use current time when workdir is dirty 
 			if(dirty)
 			{
 				patch++;
                 timestamp	= TIMESTAMP_FORMATTER.format(Instant.now());	// Timestamp for reference in version properties, not part of version string.
-				System.out.println("Snapshot (dirty) build: using current time (UTC) "+timestamp);
+				System.out.println("Snapshot (dirty) build: incrementing patch and using current time (UTC) "+timestamp);
 			}
-			
-			// Increment patch when clean workdir, but latest patch tag not at head
-			else if(head.equals(latest))
-			{
-				System.out.println("Found tag at head. Doing release build.");
-				release	= true;
-			}
+
+			// If clean, check for tag on HEAD and set release.
 			else
 			{
-				System.out.println("Head "+head.getName()+" not at latest tag "+latest.getName()+". Using (incremented) prerelease patch.");
-				patch++;
+				// Get commit hash from tag, cf. https://stackoverflow.com/questions/27149949/list-commits-associated-with-a-given-tag-with-jgit
+		        Ref peeledRef = repository.getRefDatabase().peel(latest);
+		        ObjectId	tagcommit	= peeledRef.getPeeledObjectId();
+
+				if(head.equals(tagcommit))
+				{
+					System.out.println("Found tag at head. Doing release build.");
+					release	= true;
+				}
+				// Increment patch when clean workdir, but latest patch tag not at head
+				else
+				{
+					System.out.println("Git head "+head.getName()+" newer than latest release tag "+latest.getName()+". Using (incremented) prerelease patch.");
+					patch++;
+				}
 			}
 		}
 		

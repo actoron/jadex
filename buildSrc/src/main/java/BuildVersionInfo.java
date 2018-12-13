@@ -70,10 +70,17 @@ public class BuildVersionInfo
     @Override
     public String toString()
     {
-    	return major+"."+minor+"."+patch
-    		+ (release ? "" : "-beta")
-    		+ (branch!=null && !branch.isEmpty() ? "-"+branch : "")
-    		+ (snapshot ? "-SNAPSHOT" : "-"+timestamp);
+    	StringBuffer	ret	= new StringBuffer();
+    	ret.append(major).append(".").append(minor).append(".").append(patch);
+    	if(!release)
+    		ret.append("-beta");
+    	if(branch!=null && !branch.isEmpty())
+    		ret.append("-").append(branch);
+    	if(snapshot)
+    		ret.append("-SNAPSHOT");
+    	else if(!release)
+    		ret.append("-").append(timestamp);
+    	return ret.toString();
     }
     
     /**
