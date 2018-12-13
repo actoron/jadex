@@ -148,15 +148,26 @@ task createVersionInfo(type: Copy) {
 	}
 }
 
-task checkReproducibleClone(type: Exec) {
-	def command	= 'if [ -d /root/jadex ]; then cd /root/jadex && git pull; else git clone --no-local /jadex/.git && cd /root/jadex; fi' +
+task reproducibleClone(type: Exec) {
+	description 'Clone local jadex repo into /root/jadex of (new or existing) docker container volume named "jadex-reproducible".'
+	def command	= 'if [ -d /root/jadex ]; then cd /root/jadex && git pull; else cd /root && git clone --no-local /jadex/.git && cd jadex; fi' +
 		' && git checkout ' + versionInfo.branch
 		' && git checkout ' + versionInfo.commit
-	commandLine ('docker', 'run', '--rm', '--name', 'reproduce',
-		'-v', 'reproduce:/root',
+	commandLine ('docker', 'run', '--rm', '--name', 'jadex-reproducible',
+		'-v', 'jadex-reproducible:/root',
 		'-v', project.projectDir.canonicalPath + ':/jadex:ro',
 		'--entrypoint', '/bin/sh', 'alpine/git', '-c', "\"$command\"")
 }
+
+task reproducibleClean(type: Exec) {
+	description 'Execute Gradle clean on /root/jadex of docker container volume named "jadex-reproducible". Not triggered by normal gradle clean! USe "gradle clean reproducibleClean" instead.'
+	def command	= 'cd /root/jadex && ./gradlew clean'
+	commandLine ('docker', 'run', '--rm', '--name', 'jadex-reproducible',
+		'-v', 'jadex-reproducible:/root',
+		'--entrypoint', '/bin/sh', 'openjdk:8-alpine', '-c', "\"$command\"")	// TODO: android-sdk to clean android projects also.
+}
+
+// clean.dependsOn reproducibleClean // TODO: check if we have docker and volume exists otherwise skip docker clean
 
 subprojects
 {
@@ -676,35 +687,50 @@ subprojects
 				}
 			}
 
-			task checkReproducibleBuild(type: Exec) {
+			task reproducibleDist(type: Exec) {
 				description	= "Rebuild the distribution in cloned extra directory within docker to have linux build artifacts even when running on windows."
 				def command	= 'cd /root/jadex' +
 					' && ./gradlew -Pdist='+distname+' distZip --info'
-				commandLine ('docker', 'run', '--rm', '--name', 'reproduce',
-					'-v', 'reproduce:/root',
-					'--entrypoint', '/bin/sh', 'openjdk:8-alpine', '-c', "\"$command\"")
+				commandLine ('docker', 'run', '--rm',
+					'--name', 'jadex-reproducible',
+					'-v', 'jadex-reproducible:/root',
+					'--entrypoint', '/bin/sh',
+					project.path.contains('android') ? 'saschpe/android-sdk' : 'openjdk:8-alpine',	// image name, TODO: android (build inside docker does not yet work, cf. ngjenkins???)
+					'-c', "\"$command\"")
 				
-				dependsOn checkReproducibleClone
+				dependsOn reproducibleClone
+				
+				// Impose ordering between tasks of same type avoid parallel building in separate containers on same volume
+				// As project is configured incrementally -> wait for all existing tasks of same type except self
+				// -> first dist finds none, second dist finds first dists task, third dist find first and second...
+				def inhibitedBy	= rootProject.allprojects.collect {it.tasks.findByName("reproducibleDist")}.findAll {it!=null && it !=reproducibleDist}
+				println 'Dist ' + distname + ' has predecessors ' + inhibitedBy.collect {it.project.name} 
+				mustRunAfter inhibitedBy
 			}
 			
-			task checkReproducibleDist(type: Exec) {
+			task reproducibleCheck(type: Exec) {
 				description	= "Check check if the distribution in linux docker matches (windows?) host build."
+				
+				if(versionInfo.snapshot) doFirst {
+					println 'WARNING: Reproducibility check only works on clean workdirs. Please stash/commit/revert your local changes.'
+				}
 				
 				inputs.files	srcZip.outputs.files
 				def srcZip1	= srcZip.outputs.files.files.iterator().next()
-				commandLine ('docker', 'cp', 'reproduce:/root/jadex/build/distributions/sources/'+srcZip1.name, 'build/reproduce/')
+				
+				// Cannot copy without container, cf. https://github.com/moby/moby/issues/25245
+				commandLine ('docker run -d --rm --name jadex-reproducible -v jadex-reproducible:/root alpine tail -f /dev/null' +
+				' && docker cp jadex-reproducible:/root/jadex/build/distributions/sources/'+srcZip1.name+'build/reproduce/'+
+				' && docker stop jadex-reproducible')
 				
 				doLast {
-					if(versionInfo.snapshot)
-						println 'WARNING: Reproducibility check only works on clean workdirs. Please stash/commit/revert your local changes.'
-						
 					def srcZip2	= new File(rootProject.projectDir, 'build/reproduce/'+srcZip1.name)
 					def diff	= diffZips(srcZip1.canonicalPath, srcZip2.canonicalPath)
 					if(diff.length()!=0)
 						throw new RuntimeException("Reproduced srcZip does not match original: "+diff);		
 				}
 				
-				dependsOn checkReproducibleBuild
+				dependsOn reproducibleDist
 			}
 		}
 	}
