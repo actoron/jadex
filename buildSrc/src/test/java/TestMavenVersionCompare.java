@@ -21,6 +21,7 @@ public class TestMavenVersionCompare
 		
 		// How Maven interprets these versions: earlier means newer
 		
+		// Wrong order without '-beta' :(
 //		versions.put("nightly", new ComparableVersion("1.2.3-20181213135700"));
 //		versions.put("nightly-branch", new ComparableVersion("1.2.3-mybranch-20181213135700"));		
 //		versions.put("release-branch", new ComparableVersion("1.2.3-mybranch"));
@@ -29,6 +30,13 @@ public class TestMavenVersionCompare
 //		versions.put("snapshot", new ComparableVersion("1.2.3-SNAPSHOT"));
 
 		versions.put("release-newer", new ComparableVersion("1.2.4"));
+		
+		// TODO: Approach for releasing branches? -> in maven always newer than main release!?!?!?
+		versions.put("release-branch1", new ComparableVersion("1.2.3-xy-20181213135700"));
+		versions.put("release-branch2", new ComparableVersion("1.2.3-ab-20181213135700"));
+		versions.put("release-branch1", new ComparableVersion("1.2.3-xy"));
+		versions.put("release-branch2", new ComparableVersion("1.2.3-ab"));
+		
 		versions.put("lts", new ComparableVersion("1.2.3-sp"));
 		versions.put("release", new ComparableVersion("1.2.3"));
 		versions.put("snapshot", new ComparableVersion("1.2.3-SNAPSHOT"));
@@ -39,16 +47,9 @@ public class TestMavenVersionCompare
 		versions.put("release-branch", new ComparableVersion("1.2.3-beta-mybranch"));
 		versions.put("snapshot-branch", new ComparableVersion("1.2.3-beta-mybranch-SNAPSHOT"));
 		versions.put("beta", new ComparableVersion("1.2.3-beta"));
+		
 		versions.put("release-older", new ComparableVersion("1.2.2"));
 
-//		versions.put("nightly-branch", new ComparableVersion("1.2.3.20181213135700-mybranch"));		
-//		versions.put("nightly", new ComparableVersion("1.2.3.20181213135700"));
-//		versions.put("release-branch", new ComparableVersion("1.2.3-mybranch"));
-//		versions.put("snapshot-branch", new ComparableVersion("1.2.3-mybranch-SNAPSHOT"));
-//		versions.put("release", new ComparableVersion("1.2.3"));
-//		versions.put("snapshot", new ComparableVersion("1.2.3-SNAPSHOT"));
-
-		
 		String	previous	= null;
 		for(String version: versions.keySet())
 		{

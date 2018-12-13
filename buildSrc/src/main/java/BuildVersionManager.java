@@ -146,6 +146,9 @@ public class BuildVersionManager
 		for(Ref ref: repository.getRefDatabase().getRefsByPrefix(prefix))
 		{
 			String	spatch	= ref.getName().substring(prefix.length());
+//			// Support branch release by stripping '-branch' endings!?!?!?
+//			if(spatch.endsWith("-"+branch))
+//				spatch = spatch.substring(0, spatch.length() - branch.length() - 1);
 			try
 			{
 				int	tagpatch	= Integer.parseInt(spatch);

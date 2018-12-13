@@ -93,3 +93,10 @@ are read from `src/main/buildutils/jadexversion.properties`.
 
 2. Version information cannot be provided from environment. It is always
    solely determined based on existing sources and git state.
+
+## Otherwise Opinionated Approaches
+
+* [Commit hash as version number](https://blog.philipphauer.de/version-numbers-continuous-delivery-maven-docker/)
+* Explicit configuration with gradle tasks
+    * [reckon](https://github.com/ajoberstar/reckon)
+    * [nebula-release-plugin](https://github.com/nebula-plugins/nebula-release-plugin)
