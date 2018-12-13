@@ -2,6 +2,7 @@ package jadex.transformation.jsonserializer.processors.write;
 
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class JsonDateProcessor implements ITraverseProcessor
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		// Timestamp is handled separately
-		return SReflect.isSupertype(Date.class, clazz) && !SReflect.isSupertype(Timestamp.class, clazz);
+		return (SReflect.isSupertype(Date.class, clazz) || SReflect.isSupertype(SimpleDateFormat.class, clazz)) && !SReflect.isSupertype(Timestamp.class, clazz);
 	}
 	
 	/**
@@ -41,17 +42,32 @@ public class JsonDateProcessor implements ITraverseProcessor
 	{
 		JsonWriteContext wr = (JsonWriteContext)context;
 		wr.addObject(wr.getCurrentInputObject());
-	
-		Date d  = (Date)object;
 		
-		if(!wr.isWriteClass() && !wr.isWriteId())
+		if (object instanceof Date)
 		{
-			wr.writeString(SUtil.dateToIso8601(d));
+			Date d  = (Date)object;
+			
+			if(!wr.isWriteClass() && !wr.isWriteId())
+			{
+				wr.writeString(SUtil.dateToIso8601(d));
+			}
+			else
+			{
+				wr.write("{");
+				wr.writeNameValue("value", d.getTime());
+				if(wr.isWriteClass())
+					wr.write(",").writeClass(object.getClass());
+				if(wr.isWriteId())
+					wr.write(",").writeId();
+				wr.write("}");
+			}
 		}
-		else
+		else if (object instanceof SimpleDateFormat)
 		{
+			SimpleDateFormat sdf = (SimpleDateFormat) object;
+			
 			wr.write("{");
-			wr.writeNameValue("value", d.getTime());
+			wr.writeNameString("pattern", sdf.toPattern());
 			if(wr.isWriteClass())
 				wr.write(",").writeClass(object.getClass());
 			if(wr.isWriteId())

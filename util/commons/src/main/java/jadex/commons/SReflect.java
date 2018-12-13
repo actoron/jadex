@@ -5,6 +5,8 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -1659,6 +1661,80 @@ public class SReflect
 		}
 		
 		return ret;
+	}
+	
+	/** Reflective access to Class.getModule(). */
+	protected static final MethodHandle GET_MODULE;
+	
+	/** Reflective access to Module.isExported(). */
+	protected static final MethodHandle IS_EXPORTED;
+	static
+	{
+		MethodHandle getmodulemh = null;
+		MethodHandle isexportedmh = null;
+		try
+		{
+			Method getmodule = Class.class.getMethod("getModule");
+			getmodulemh = MethodHandles.lookup().unreflect(getmodule);
+			Class<?> moduleclazz = Class.forName("java.lang.Module");
+			Method isexported = moduleclazz.getMethod("isExported", String.class);
+			isexportedmh = MethodHandles.lookup().unreflect(isexported);
+		}
+		catch (Exception e)
+		{
+		}
+		GET_MODULE = getmodulemh;
+		IS_EXPORTED = isexportedmh;
+	}
+	
+	/**
+	 *  Gets a method that is exported by the module.
+	 *  
+	 *  @param clazz Class with the method.
+	 *  @param name Name of the method.
+	 *  @param params Method parameters.
+	 *  @return The method or null if not found.
+	 */
+	public static final Method getExportedMethod(Class<?> clazz, String name, Class<?>... params)
+	{
+		params = params == null ? new Class<?>[0] : params;
+		Method[] methods = SReflect.getAllMethods(clazz);
+		for (Method m : methods)
+		{
+			if (m.getName().equals(name) && Arrays.equals(params, m.getParameterTypes()))
+			{
+				if (isExported(m.getDeclaringClass()))
+					return m;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 *  Tests if the class is part of a package that the  containing module has exported.
+	 *  @param clazz The class.
+	 *  @return True, if exported.
+	 */
+	public static final boolean isExported(Class<?> clazz)
+	{
+		if (GET_MODULE != null)
+		{
+			try
+			{
+				Object module = GET_MODULE.invoke(clazz);
+				return (boolean) IS_EXPORTED.invoke(module, clazz.getPackage().getName());
+			}
+			catch (Throwable t)
+			{
+				t.printStackTrace();
+				throw SUtil.throwUnchecked(t);
+			}
+		}
+		else
+		{
+			// Java 8 has no modules so everything is exported.
+			return true;
+		}
 	}
 	
 	/**

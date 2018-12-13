@@ -9,6 +9,7 @@ import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.SStackTraceElementHelper;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
@@ -43,12 +44,16 @@ public class JsonStackTraceElementProcessor implements ITraverseProcessor
 		Class<?> clazz = SReflect.getClass(type);
 		JsonObject obj = (JsonObject)object;
 		
+		String classloadername = obj.getString("classloadername", null);
+		String modulename = obj.getString("modulename", null);
+		String moduleversion = obj.getString("moduleversion", null);
 		String classname = obj.getString("classname", null);
 		String methodname = obj.getString("methodname", null);
 		String filename = obj.getString("filename", null);
 		int linenumber = obj.getInt("linenumber", 0);
 		
-		StackTraceElement ret = new StackTraceElement(classname, methodname, filename, linenumber);
+		StackTraceElement ret = SStackTraceElementHelper.newInstance(classloadername, modulename, moduleversion, classname, methodname, filename, linenumber);
+//		StackTraceElement ret = new StackTraceElement(classname, methodname, filename, linenumber);
 //		traversed.put(object, ret);
 //		((JsonReadContext)context).addKnownObject(ret);
 		

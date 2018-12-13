@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.SStackTraceElementHelper;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
@@ -54,6 +55,24 @@ public class JsonStackTraceElementProcessor implements ITraverseProcessor
 		if(ste.getFileName()!=null && ste.getFileName().length()>0)
 		{
 			wr.writeNameString("filename", ste.getFileName());
+			wr.write(",");
+		}
+		String str = SStackTraceElementHelper.getClassLoaderName(ste);
+		if(str!=null)
+		{
+			wr.writeNameString("classloadername", SStackTraceElementHelper.getClassLoaderName(ste));
+			wr.write(",");
+		}
+		str = SStackTraceElementHelper.getModuleName(ste);
+		if(str!=null)
+		{
+			wr.writeNameString("modulename", SStackTraceElementHelper.getModuleName(ste));
+			wr.write(",");
+		}
+		str = SStackTraceElementHelper.getModuleVersion(ste);
+		if(str!=null)
+		{
+			wr.writeNameString("moduleversion", SStackTraceElementHelper.getModuleVersion(ste));
 			wr.write(",");
 		}
 		wr.writeNameValue("linenumber", ste.getLineNumber());

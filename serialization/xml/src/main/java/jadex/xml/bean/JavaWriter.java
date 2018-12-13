@@ -29,6 +29,7 @@ import jadex.commons.Tuple3;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.traverser.SStackTraceElementHelper;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -281,7 +282,7 @@ public class JavaWriter
 				new AttributeInfo(new AccessInfo("pattern", null, null, null,
 					new BeanAccessInfo(SimpleDateFormat.class.getMethod("applyPattern", String.class),
 						SimpleDateFormat.class.getMethod("toPattern"))))},
-				null, true, null, null	// Include methods for DateFormat properties
+				null, false, null, null
 			));
 			typeinfos.add(ti_simpledateformat);
 
@@ -823,16 +824,35 @@ public class JavaWriter
 				}
 			));
 			typeinfos.add(ti_th);
-			TypeInfo ti_ste = new TypeInfo(null, new ObjectInfo(StackTraceElement.class),
-				new MappingInfo(null, new AttributeInfo[]
-				{
-					new AttributeInfo(new AccessInfo("className", null)),
-					new AttributeInfo(new AccessInfo("methodName", null)),
-					new AttributeInfo(new AccessInfo("fileName", null)),
-					new AttributeInfo(new AccessInfo("lineNumber", null)),
-				}, null
-			));
-			typeinfos.add(ti_ste);
+			if (SStackTraceElementHelper.hasJava9())
+			{
+				TypeInfo ti_ste = new TypeInfo(null, new ObjectInfo(StackTraceElement.class),
+					new MappingInfo(null, new AttributeInfo[]
+					{
+						new AttributeInfo(new AccessInfo("classLoaderName", null)),
+						new AttributeInfo(new AccessInfo("moduleName", null)),
+						new AttributeInfo(new AccessInfo("moduleVersion", null)),
+						new AttributeInfo(new AccessInfo("className", null)),
+						new AttributeInfo(new AccessInfo("methodName", null)),
+						new AttributeInfo(new AccessInfo("fileName", null)),
+						new AttributeInfo(new AccessInfo("lineNumber", null)),
+					}, null
+				));
+				typeinfos.add(ti_ste);
+			}
+			else
+			{
+				TypeInfo ti_ste = new TypeInfo(null, new ObjectInfo(StackTraceElement.class),
+						new MappingInfo(null, new AttributeInfo[]
+						{
+							new AttributeInfo(new AccessInfo("className", null)),
+							new AttributeInfo(new AccessInfo("methodName", null)),
+							new AttributeInfo(new AccessInfo("fileName", null)),
+							new AttributeInfo(new AccessInfo("lineNumber", null)),
+						}, null
+					));
+				typeinfos.add(ti_ste);
+			}
 			
 			// java.math.BigInteger
 			TypeInfo ti_bi = new TypeInfo(new XMLInfo(new QName("typeinfo:java.math", "BigInteger")), 
