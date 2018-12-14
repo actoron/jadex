@@ -117,6 +117,9 @@ public class PathHandler implements IRequestHandler
 	 */
 	public void addSubhandler(String vhost, String path, IRequestHandler subhandler)
 	{
+		if(path.endsWith("/"))
+			path = path.substring(0, path.length()-1);
+		
 		subhandlers.put(new Tuple2<String, String>(vhost, path), new Tuple2<String, IRequestHandler>(path, subhandler));
 		subhandlercache = new HashMap<Tuple2<String,String>, Tuple2<String, IRequestHandler>>(subhandlers);
 	}
@@ -130,6 +133,9 @@ public class PathHandler implements IRequestHandler
 	 */
 	public boolean containsSubhandlerForExactUri(String vhost, String path)
 	{
+		if(path.endsWith("/"))
+			path = path.substring(0, path.length()-1);
+		
 		return subhandlers.containsKey(new Tuple2<String, String>(vhost, path));
 	}
 	
@@ -150,6 +156,9 @@ public class PathHandler implements IRequestHandler
 	 */
 	public void removeSubhandler(String vhost, String path)
 	{
+		if(path.endsWith("/"))
+			path = path.substring(0, path.length()-1);
+		
 		subhandlers.remove(new Tuple2<String, String>(vhost, path));
 		subhandlercache = new HashMap<Tuple2<String,String>, Tuple2<String, IRequestHandler>>(subhandlers);
 	}
@@ -163,6 +172,9 @@ public class PathHandler implements IRequestHandler
 	 */
 	protected Tuple2<String, IRequestHandler> findSubhandler(String host, String path)
 	{
+		if(path.endsWith("/"))
+			path = path.substring(0, path.length()-1);
+		
 		Tuple2<String, IRequestHandler> ret = null;
 		do
 		{

@@ -34,7 +34,6 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
 	protected long length;
 	protected String charencoding;
 	protected ServletOutputStream out;
-//	protected StringBuffer outbuf = new StringBuffer();
 	protected ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	protected PrintWriter writer;
 	
@@ -181,9 +180,6 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
     {
     	if(out==null)
     	{
-//    		outbuf = new StringBuffer();
-//    		bos = new ByteArrayOutputStream();
-    		
     		out = new ServletOutputStream() 
     		{
     			@Override
@@ -203,7 +199,6 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
 				{
 					return true;
 //					throw new UnsupportedOperationException();
-//					return false;
 				}
 			};
     	}

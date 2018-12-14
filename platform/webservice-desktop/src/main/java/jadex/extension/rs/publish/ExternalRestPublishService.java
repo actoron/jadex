@@ -221,7 +221,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	     				public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
 	     				{
 	     					if(service == null)
-	     						service = (IService) component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
+	     						service = (IService)component.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(serviceid)).get();
 	     					ExternalRestPublishService.this.handleRequest(service, mappings, request, response, null);
 	     				}
 	     			};

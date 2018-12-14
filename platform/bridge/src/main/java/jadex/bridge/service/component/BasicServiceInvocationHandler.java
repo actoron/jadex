@@ -6,13 +6,16 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import jadex.base.Starter;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.ServiceCall;
@@ -854,16 +857,25 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
 			// service.getServiceIdentifier().getServiceType()
 //			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports())}, handler); 
-			Class<?> ty = info.getType()!=null? info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports()): null;
-			if(ty==null)
-			{
-//				throw new IllegalArgumentException("Type must not null: "+ty);
-				ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class}, handler); 
-			}
-			else
-			{
-				ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, ty}, handler); 	
-			}
+//			Class<?> ty = info.getType()!=null? info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports()): null;
+			
+			ClassLoader cl = ia.getClassLoader();
+			IServiceIdentifier sid = service.getServiceId();
+			Set<Class<?>> ifaces = new HashSet<>();
+			ifaces.add(sid.getServiceType().getType(cl));
+			for(ClassInfo ci: sid.getServiceSuperTypes())
+				ifaces.add(ci.getType(cl));
+			ifaces.add(IService.class);
+			
+//			if(ty==null)
+//			{
+////				throw new IllegalArgumentException("Type must not null: "+ty);
+//				ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class}, handler); 
+//			}
+//			else
+//			{
+				ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), ifaces.toArray(new Class<?>[ifaces.size()]), handler); 	
+//			}
 			// todo: think about orders of decouping interceptors
 			// if we want the decoupling return interceptor to schedule back on an external caller actual order must be reversed
 			// now it can only schedule back on the hosting component of the required proxy
