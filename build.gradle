@@ -714,7 +714,7 @@ subprojects
 				inputs.files	srcZip.outputs.files
 				inputs.files	distZip.outputs.files
 				def srcZip1	= srcZip.outputs.files.files.iterator().next()
-				def dstZip1	= dstZip.outputs.files.files.iterator().next()
+				def dstZip1	= distZip.outputs.files.files.iterator().next()
 				def srcZip2	= new File(rootProject.projectDir, 'build/reproduce/'+srcZip1.name)
 				def dstZip2	= new File(rootProject.projectDir, 'build/reproduce/'+dstZip1.name)
 				outputs.files(srcZip2)
