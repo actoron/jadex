@@ -34,6 +34,7 @@ import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.commons.transformation.traverser.IErrorReporter;
+import jadex.commons.transformation.traverser.SStackTraceElementHelper;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -331,7 +332,7 @@ public class JavaReader
 				new AttributeInfo(new AccessInfo("pattern", null, null, null,
 					new BeanAccessInfo(SimpleDateFormat.class.getMethod("applyPattern", String.class),
 						SimpleDateFormat.class.getMethod("toPattern"))))},
-				null, true, null, null	// Include methods for DateFormat properties
+				null, false, null, null
 			));
 			typeinfos.add(ti_simpledateformat);
 
@@ -993,14 +994,20 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map<String, String> rawattributes) throws Exception
 					{
+						String clname = (String)rawattributes.get("classLoaderName");
+						String modname = (String)rawattributes.get("moduleName");
+						String modversion = (String)rawattributes.get("moduleVersion");
 						String decl = (String)rawattributes.get("className");
 						String mname = (String)rawattributes.get("methodName");
 						String fname = (String)rawattributes.get("fileName");
 						String num = (String)rawattributes.get("lineNumber");
-						return new StackTraceElement(decl, mname, fname, Integer.parseInt(num));
+						return SStackTraceElementHelper.newInstance(clname, modname, modversion, decl, mname, fname, Integer.parseInt(num));
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("classLoaderName", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("moduleName", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("moduleVersion", null, AccessInfo.IGNORE_READWRITE)),
 					new AttributeInfo(new AccessInfo("className", null, AccessInfo.IGNORE_READWRITE)),
 					new AttributeInfo(new AccessInfo("methodName", null, AccessInfo.IGNORE_READWRITE)),
 					new AttributeInfo(new AccessInfo("fileName", null, AccessInfo.IGNORE_READWRITE)),

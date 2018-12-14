@@ -14,7 +14,7 @@ import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
-import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
+import jadex.transformation.jsonserializer.processors.JsonWriteContext;
 
 /**
  *  Json processor for writing Jadex service identifiers.

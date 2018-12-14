@@ -1691,12 +1691,16 @@ public class StarterPanel extends JLayeredPane
 		final PublishEventLevel moni, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
 		final Future<IComponentIdentifier> ret = new Future<>(); 
-		
-		CreationInfo ci = new CreationInfo(configname, arguments, parco, suspend, sync, moni, null, null, rid);
+//		parco
+		CreationInfo ci = new CreationInfo(configname, arguments, rid);
 		ci.setName(name);
+		ci.setSuspend(suspend);
+		ci.setSynchronous(sync);
+		ci.setMonitoring(moni);
 		ci.setFilename(type);
 		
-		jcc.getPlatformAccess().createComponent(ci).addResultListener(new IResultListener<IExternalAccess>()
+		IExternalAccess creator = parco != null ? jcc.getPlatformAccess().getExternalAccess(parco) : jcc.getPlatformAccess();
+		creator.createComponent(ci).addResultListener(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(IExternalAccess result)
 			{

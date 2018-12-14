@@ -81,7 +81,7 @@ public class ComponentResultTestStep implements IComponentStep<Void>
 	{
 		final Future<Void>	fut	= new Future<Void>();
 
-		ia.createComponent(new CreationInfo(config, null, ia.getId()).setFilename("jadex/micro/testcases/Result.component.xml"))
+		ia.createComponent(new CreationInfo(config, null).setFilename("jadex/micro/testcases/Result.component.xml"))
 			.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(fut)
 		{
 			public void customResultAvailable(IExternalAccess result)

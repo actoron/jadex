@@ -310,7 +310,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	public AsyncContext startAsync() throws IllegalStateException
 	{
 		if(context==null)
-			context = new NanoAsyncContext(null, null);
+			context = new NanoAsyncContext(this, null);
 		
 		context.start(null);
 		
@@ -447,6 +447,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    
 	public String getRequestURI()
 	{
+		// todo: remove server/port
 		return session.getUri();
 	}
 	    

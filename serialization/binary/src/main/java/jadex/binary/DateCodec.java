@@ -2,6 +2,7 @@ package jadex.binary;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
 /**
- *  Codec for encoding and decoding Date objects.
+ *  Codec for encoding and decoding Date and SimpleDateFormat objects.
  *
  */
 public class DateCodec extends AbstractCodec
@@ -22,7 +23,7 @@ public class DateCodec extends AbstractCodec
 	 */
 	public boolean isApplicable(Class<?> clazz)
 	{
-		return Date.class.equals(clazz);
+		return Date.class.equals(clazz) || SimpleDateFormat.class.equals(clazz);
 	}
 	
 	/**
@@ -34,11 +35,20 @@ public class DateCodec extends AbstractCodec
 	 */
 	public Object createObject(Class<?> clazz, IDecodingContext context)
 	{
-		byte[] abuf = new byte[8];
-		context.read(abuf);
-		ByteBuffer buf = ByteBuffer.wrap(abuf);
-		buf.order(ByteOrder.BIG_ENDIAN);
-		Date ret = new Date(buf.getLong());
+		Object ret = null; 
+		if (Date.class.equals(clazz))
+		{
+			byte[] abuf = new byte[8];
+			context.read(abuf);
+			ByteBuffer buf = ByteBuffer.wrap(abuf);
+			buf.order(ByteOrder.BIG_ENDIAN);
+			ret = new Date(buf.getLong());
+		}
+		else if (SimpleDateFormat.class.equals(clazz))
+		{
+			String pattern = context.readString();
+			ret = new SimpleDateFormat(pattern);
+		}
 		return ret;
 	}
 	
@@ -60,12 +70,20 @@ public class DateCodec extends AbstractCodec
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> processors, MODE mode, Traverser traverser, ClassLoader targetcl, IEncodingContext ec)
 	{
-		long time = ((Date)object).getTime();
-		byte[] abuf = new byte[8];
-		ByteBuffer buf = ByteBuffer.wrap(abuf);
-		buf.order(ByteOrder.BIG_ENDIAN);
-		buf.putLong(time);
-		ec.write(abuf);
+		if (Date.class.equals(clazz))
+		{
+			long time = ((Date)object).getTime();
+			byte[] abuf = new byte[8];
+			ByteBuffer buf = ByteBuffer.wrap(abuf);
+			buf.order(ByteOrder.BIG_ENDIAN);
+			buf.putLong(time);
+			ec.write(abuf);
+		}
+		else if (SimpleDateFormat.class.equals(clazz))
+		{
+			String pattern = ((SimpleDateFormat) object).toPattern();
+			ec.writeString(pattern);
+		}
 		
 		return object;
 	}

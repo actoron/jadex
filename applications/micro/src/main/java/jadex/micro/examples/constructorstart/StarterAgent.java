@@ -37,6 +37,6 @@ public class StarterAgent
 	public static void main(String[] args)
 	{
 		IExternalAccess platform = Starter.createPlatform().get();
-		IExternalAccess agent = platform.createComponent(new CreationInfo().setPojo(new StarterAgent())).get();
+		IExternalAccess agent = platform.addComponent(new StarterAgent()).get();
 	}
 }

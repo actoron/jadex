@@ -216,14 +216,17 @@ public class CreateComponentTask implements ITask
 		// todo: rid
 		// todo: monitoring
 		PublishEventLevel elm = monitoring!=null && monitoring.booleanValue() ? PublishEventLevel.COARSE: PublishEventLevel.OFF;
-		CreationInfo ci = new CreationInfo(config, args, sub? instance.getId() : null, 
-			suspend, synchronous, elm,
-			instance.getModel().getAllImports(), bindings,
-			instance.getModel().getResourceIdentifier());
+		CreationInfo ci = new CreationInfo(config, args, instance.getModel().getResourceIdentifier());
 		ci.setFilename(model);
+		ci.setSuspend(suspend);
+		ci.setSynchronous(synchronous);
+		ci.setMonitoring(elm);
+		ci.setImports(instance.getModel().getAllImports());
+		ci.setRequiredServiceBindings(bindings);
 		ci.setName(name);
 		ci.setSuspend(true);
-		instance.createComponent(ci)
+		IExternalAccess creator = sub ? instance : instance.getExternalAccess(instance.getId().getRoot());
+		creator.createComponent(ci)
 			.addResultListener(instance.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(creationfuture)
 		{
 			@Override

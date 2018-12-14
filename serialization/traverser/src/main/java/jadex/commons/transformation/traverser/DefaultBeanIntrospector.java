@@ -126,8 +126,8 @@ public class DefaultBeanIntrospector implements IBeanIntrospector
 					List<Method> setters = new ArrayList<Method>();
 					for(int i=0; i<ms.length; i++)
 					{
-						// Only consider non-static methods
-						if((ms[i].getModifiers()&Modifier.STATIC)==0)
+						// Only consider non-static methods and exported methods
+						if((ms[i].getModifiers()&Modifier.STATIC)==0 && SReflect.isExported(ms[i].getDeclaringClass()))
 						{
 							String method_name = ms[i].getName();
 							if(ms[i].getParameterTypes().length==0)
@@ -171,11 +171,16 @@ public class DefaultBeanIntrospector implements IBeanIntrospector
 				{
 					int modifiers = fields[i].getModifiers();
 					String property_java_name = fields[i].getName();
-					if((includefields || fields[i].isAnnotationPresent(Include.class)) 
-						&& fields[i].getAnnotation(Exclude.class) == null && !beanprops.containsKey(property_java_name)
-						&& !(Modifier.isNative(modifiers) || Modifier.isStatic(modifiers)))
+					
+					// Only allow exported fields.
+					if (SReflect.isExported(fields[i].getDeclaringClass()))
 					{
-						beanprops.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
+						if((includefields || fields[i].isAnnotationPresent(Include.class)) 
+							&& fields[i].getAnnotation(Exclude.class) == null && !beanprops.containsKey(property_java_name)
+							&& !(Modifier.isNative(modifiers) || Modifier.isStatic(modifiers)))
+						{
+							beanprops.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
+						}
 					}
 				}
 

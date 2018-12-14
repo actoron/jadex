@@ -1,13 +1,8 @@
 package jadex.base;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.Provider;
-import java.security.Provider.Service;
-import java.security.Security;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 import jadex.bridge.BasicComponentIdentifier;
@@ -23,7 +17,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
@@ -39,11 +32,10 @@ import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
-import jadex.bridge.service.types.cms.CMSStatusEvent;
+import jadex.bridge.service.types.cms.CmsState;
+import jadex.bridge.service.types.cms.CmsState.CmsComponentState;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IBootstrapFactory;
-import jadex.bridge.service.types.cms.InitInfo;
-import jadex.bridge.service.types.cms.LockEntry;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
@@ -53,9 +45,7 @@ import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
 import jadex.commons.collection.BlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.collection.IRwMap;
@@ -67,7 +57,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.transformation.traverser.TransformSet;
 import jadex.javaparser.SJavaParser;
 
@@ -99,44 +88,11 @@ public class Starter
     /** The used to store the current network names. */
     public static String DATA_NETWORKNAMESCACHE = "networknamescache";
 
-    
-    /** The CMS component map. */
-    public static String DATA_COMPONENTMAP = "componentmap";
+    /** The CMS state. */
+    public static String DATA_CMSSTATE = "cmsstate";
 
     /** Constant for default timeout name. */
     public static String DATA_DEFAULT_TIMEOUT = "default_timeout";
-
-    /** The CMS initinfos. */
-    public static String DATA_INITINFOS = "initinfos";
-    
-    /** The CMS child counts. */
-    public static String DATA_CHILDCOUNTS = "childcounts";
-    
-    /** The CMS cleanup commands. */
-    public static String DATA_CLEANUPFUTURES = "cleanupfutures";
-    
-    /** The CMS cleanup commands. */
-    /**	The local filename cache (tuple(parent filename, child filename) -> local typename)*/
-    public static String  DATA_LOCALTYPES = "localtypes";
-    
-    /**	The CMS classloader cache (rid -> classloader)*/
-    public static String  DATA_CLASSLOADERS = "classloaders";
-    
-    /**	The CMS model cache (Tuple2<String, ClassLoader> -> Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>)*/
-    public static String  DATA_MODELCACHE = "modelcache";
-    
-    /** The CMS cid counts. */
-    public static String DATA_CIDCOUNTS = "cidcounts";
-    
-    /** The CMS cid counts. */
-    public static String DATA_LOCKENTRIES = "lockentries";
-    
-    /** The CMS listeners. */
-    public static String DATA_CMSLISTENERS = "listeners";
-    
-    /** The CMS lock. */
-    public static String DATA_CMSSEQ = "cmsseq";
-    
     
     /** The bootstrap component factory. */
     public static String DATA_PLATFORMACCESS = "$platformaccess";
@@ -402,8 +358,16 @@ public class Starter
 	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, final Map<String, Object> args)
+	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, Map<String, Object> pargs)
 	{
+		// Make all argument keys lower case.
+		final Map<String, Object> args = pargs != null ? new HashMap<>() : null;
+		if (args != null)
+		{
+			for (Map.Entry<String, Object> entry : pargs.entrySet())
+				args.put(entry.getKey() != null ? entry.getKey().toLowerCase() : null, entry.getValue()); 
+		}
+		
 //		System.out.println("Java Version: " + System.getProperty("java.version"));
 		final IPlatformConfiguration config = pconfig!=null? pconfig: PlatformConfigurationHandler.getDefault();
 		
@@ -526,6 +490,8 @@ public class Starter
 //				Class<?> pcclass = pc instanceof Class ? (Class<?>)pc : SReflect.classForName(pc.toString(), cl);
 //				final IPlatformComponentAccess component = (IPlatformComponentAccess)pcclass.newInstance();
 				final IPlatformComponentAccess component = SComponentManagementService.createPlatformComponent(cl);
+//				CmsComponentState compstate = new CmsComponentState();
+//				((CmsState) getPlatformValue(cid, DATA_CMSSTATE)).getComponentMap().put(cid, compstate);
 				
 				/** Here */
 //					rootconf.setPlatformAccess(component);
@@ -535,20 +501,10 @@ public class Starter
 				putPlatformValue(cid, IPlatformConfiguration.PLATFORMCONFIG, config);
 				putPlatformValue(cid, IPlatformConfiguration.PLATFORMMODEL, model);
 				
-				// All cms state uses the same lock
-				ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
-				
-				putPlatformValue(cid, DATA_COMPONENTMAP, new RwMapWrapper<>(new HashMap<IComponentIdentifier, IPlatformComponentAccess>(), lock));
-				putPlatformValue(cid, DATA_INITINFOS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, InitInfo>(), lock));
-				putPlatformValue(cid, DATA_CHILDCOUNTS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Integer>(), lock));
-				putPlatformValue(cid, DATA_CLEANUPFUTURES, new RwMapWrapper<>(new HashMap<IComponentIdentifier, IFuture<Map<String, Object>>>(), lock));
-				putPlatformValue(cid, DATA_LOCALTYPES, new RwMapWrapper<>(new HashMap<Tuple, String>(), lock));
-				putPlatformValue(cid, DATA_CLASSLOADERS, new RwMapWrapper<>(new LRU<IResourceIdentifier, ClassLoader>(500), lock));
-				putPlatformValue(cid, DATA_MODELCACHE, new RwMapWrapper<>(new LRU<Tuple2<String, ClassLoader>, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(500), lock));
-				putPlatformValue(cid, DATA_CIDCOUNTS, new RwMapWrapper<>(new HashMap<String, Integer>(), lock));
-				putPlatformValue(cid, DATA_CHILDCOUNTS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Integer>(), lock));
-				putPlatformValue(cid, DATA_LOCKENTRIES, new RwMapWrapper<>(new HashMap<IComponentIdentifier, LockEntry>(), lock));
-				putPlatformValue(cid, DATA_CMSLISTENERS, new RwMapWrapper<>(new HashMap<IComponentIdentifier, Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>>(), lock));
+				putPlatformValue(cid, DATA_CMSSTATE, new CmsState());
+				CmsComponentState compstate = new CmsComponentState();
+				compstate.setAccess(component);
+				((CmsState) getPlatformValue(cid, DATA_CMSSTATE)).getComponentMap().put(cid, compstate);
 				
 				// does not work as create with subscomponents is recursive
 //					/** The sequentializer to execute getNewFactory() one by one and not interleaved. */
@@ -662,8 +618,11 @@ public class Starter
 				{
 					public void customResultAvailable(Void result)
 					{
-						SComponentManagementService.removeInitInfo(cid);
-						SComponentManagementService.getComponents(cid).put(cid, component);
+//						SComponentManagementService.removeInitInfo(cid);
+//						CmsComponentState compstate = new CmsComponentState();
+//						((CmsState) getPlatformValue(cid, DATA_CMSSTATE)).getComponentMap().put(cid, compstate);
+//						compstate.setAccess(component);
+//						SComponentManagementService.getComponents(cid).put(cid, component);
 					
 						component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
 						{

@@ -26,7 +26,7 @@ public class ConfigElementRefPlan extends Plan
 		Map<String, Object> args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
 		getAgent().createComponent(
-			new CreationInfo(args, getComponentIdentifier()).setFilename("/jadex/bdi/testcases/misc/ConfigElementRefWorker.agent.xml")).get();
+			new CreationInfo(args).setFilename("/jadex/bdi/testcases/misc/ConfigElementRefWorker.agent.xml")).get();
 		
 		// Wait for init reports from worker agent.
 		IMessageEvent	msg	= waitForMessageEvent("inform_reports");

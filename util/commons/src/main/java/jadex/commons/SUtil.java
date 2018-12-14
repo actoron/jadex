@@ -1447,8 +1447,9 @@ public class SUtil
 	/**
 	 *  Copy all data from input to output stream.
 	 */
-	public static void copyStream(InputStream is, OutputStream os) 
+	public static int copyStream(InputStream is, OutputStream os) 
 	{
+		int ret = 0;
 		try
 		{
 	        byte[] buf = new byte[10 * 1024];
@@ -1456,6 +1457,7 @@ public class SUtil
 	        while((len = is.read(buf)) != -1) 
 	        {
 	            os.write(buf, 0, len);
+	            ret += len;
 	        }
 		}
 		catch(RuntimeException e)
@@ -1466,6 +1468,8 @@ public class SUtil
 		{
 			throw new RuntimeException(e);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -4399,7 +4403,7 @@ public class SUtil
 	{
 		assert url.getProtocol().equals("file");
 		
-		File	file;
+		File file;
 		try
 		{
 			file = new File(URLDecoder.decode(url.getFile(), "UTF-8"));
