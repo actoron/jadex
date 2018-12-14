@@ -358,8 +358,16 @@ public class Starter
 	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, final Map<String, Object> args)
+	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, Map<String, Object> pargs)
 	{
+		// Make all argument keys lower case.
+		final Map<String, Object> args = pargs != null ? new HashMap<>() : null;
+		if (args != null)
+		{
+			for (Map.Entry<String, Object> entry : pargs.entrySet())
+				args.put(entry.getKey() != null ? entry.getKey().toLowerCase() : null, entry.getValue()); 
+		}
+		
 //		System.out.println("Java Version: " + System.getProperty("java.version"));
 		final IPlatformConfiguration config = pconfig!=null? pconfig: PlatformConfigurationHandler.getDefault();
 		

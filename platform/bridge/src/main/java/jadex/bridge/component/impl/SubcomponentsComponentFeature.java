@@ -163,6 +163,18 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	}
 	
 	/**
+	 *  Starts a new POJO-component.
+	 *  
+	 *  @param pojocomponent The pojo object used as component.
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public IFuture<IExternalAccess> addComponent(Object pojocomponent)
+	{
+		CreationInfo ci = new CreationInfo().setPojo(pojocomponent);
+		return getComponent().createComponent(ci, null);
+	}
+	
+	/**
 	 *  Starts a new component.
 	 *  
 	 *  @param infos Start information.
@@ -171,14 +183,6 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	public IFuture<IExternalAccess> createComponent(CreationInfo info)
 	{
 		return getComponent().createComponent(info, null);
-//		if (info.getParent() == null || component.getId().equals(info.getParent()))
-//		{
-//			return getComponent().createComponent(info, null);
-//		}
-//		else
-//		{
-//			return component.getExternalAccess(info.getParent()).createComponent(info);
-//		}
 	}
 	
 	/**

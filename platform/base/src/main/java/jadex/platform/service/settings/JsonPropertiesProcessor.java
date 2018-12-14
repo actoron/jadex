@@ -13,8 +13,8 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
-import jadex.transformation.jsonserializer.processors.read.JsonReadContext;
-import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
+import jadex.transformation.jsonserializer.processors.JsonReadContext;
+import jadex.transformation.jsonserializer.processors.JsonWriteContext;
 
 public class JsonPropertiesProcessor implements ITraverseProcessor
 {
