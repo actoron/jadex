@@ -717,7 +717,7 @@ subprojects
 				def dstZip1	= distZip.outputs.files.files.iterator().next()
 				def srcZip2	= new File(rootProject.projectDir, 'build/reproduce/'+srcZip1.name)
 				def dstZip2	= new File(rootProject.projectDir, 'build/reproduce/'+dstZip1.name)
-				outputs.files(srcZip2)
+				outputs.files(srcZip2, dstZip2)
 				
 				doFirst {
 					if(!System.getProperty("os.name").toLowerCase().contains("windows"))
@@ -725,12 +725,15 @@ subprojects
 					if(versionInfo.snapshot)
 						println 'WARNING: Reproducibility check only works on clean workdirs. Please stash/commit/revert your local changes.'
 					srcZip2.parentFile.mkdirs()
+					dstZip2.parentFile.mkdirs()
 				}
 				
+				def srcZipRel	= rootProject.projectDir.toURI().relativize(srcZip1.toURI()).getPath();
+				def dstZipRel	= rootProject.projectDir.toURI().relativize(dstZip1.toURI()).getPath();
 				// Cannot copy without container, cf. https://github.com/moby/moby/issues/25245
 				commandLine (('cmd /c "docker run -d --rm --name jadex-reproducible -v jadex-reproducible:/root alpine tail -f /dev/null' +
-				' && docker cp jadex-reproducible:/root/jadex/build/distributions/sources/'+srcZip1.name+' '+srcZip2.parentFile.canonicalPath +
-				' && docker cp jadex-reproducible:/root/jadex/build/distributions/' + (commercial? 'commercial' : 'noncommercial') + '/'+dstZip1.name+' '+dstZip2.parentFile.canonicalPath).split(" "))
+				' && docker cp jadex-reproducible:/root/jadex/'+srcZipRel+' '+srcZip2.parentFile.canonicalPath +
+				' && docker cp jadex-reproducible:/root/jadex/'+dstZipRel+' '+dstZip2.parentFile.canonicalPath).split(" "))
 				
 				doLast {
 					def diffsrc	= diffZips(srcZip1.canonicalPath, srcZip2.canonicalPath)
