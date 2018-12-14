@@ -142,7 +142,8 @@ public class DefaultBeanIntrospector implements IBeanIntrospector
 								}
 							}
 							else if(method_name.startsWith("set")
-								&& ms[i].getParameterTypes().length == 1)
+								&& ms[i].getParameterTypes().length == 1
+								&& SReflect.isExported(ms[i].getDeclaringClass()))
 							{
 								setters.add(ms[i]);
 							}
