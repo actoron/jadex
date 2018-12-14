@@ -730,7 +730,7 @@ subprojects
 				// Cannot copy without container, cf. https://github.com/moby/moby/issues/25245
 				commandLine (('cmd /c "docker run -d --rm --name jadex-reproducible -v jadex-reproducible:/root alpine tail -f /dev/null' +
 				' && docker cp jadex-reproducible:/root/jadex/build/distributions/sources/'+srcZip1.name+' '+srcZip2.parentFile.canonicalPath +
-				' && docker cp jadex-reproducible:/root/jadex/build/distributions/sources/'+dstZip1.name+' '+dstZip2.parentFile.canonicalPath).split(" "))
+				' && docker cp jadex-reproducible:/root/jadex/build/distributions/' + (commercial? 'commercial' : 'noncommercial') + '/'+dstZip1.name+' '+dstZip2.parentFile.canonicalPath).split(" "))
 				
 				doLast {
 					def diffsrc	= diffZips(srcZip1.canonicalPath, srcZip2.canonicalPath)
