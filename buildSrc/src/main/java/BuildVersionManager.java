@@ -7,9 +7,15 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -136,32 +142,57 @@ public class BuildVersionManager
 		Git git	= Git.wrap(repository);
 		boolean dirty	= !git.status().call().isClean();
 		String branch	= repository.getBranch();
-		
 		System.out.println("Found branch "+branch+" in "+repository.getDirectory().getCanonicalPath());
 		
-//		String	tags	= git.describe().setMatch(major+"."+minor+".*").abbrev(0).call();	// --abbrev=0 not supported :(, cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=537883
-		String	prefix	= "refs/tags/"+major+"."+minor+".";
 		int	patch	= 0;
 		Ref	latest	= null;
-		for(Ref ref: repository.getRefDatabase().getRefsByPrefix(prefix))
+
+		// Fetches all tags and not only from current branch :(
+		String	prefix	= "refs/tags/"+major+"."+minor+".";
+		List<Ref>	allrefs	= repository.getRefDatabase().getRefsByPrefix(prefix);
+		// Build inverse lookup table for refs of each commit
+		Map<ObjectId, List<Ref>>	tags	=  new LinkedHashMap<>();
+		for(Ref ref: allrefs)
 		{
-			String	spatch	= ref.getName().substring(prefix.length());
-//			// Support branch release by stripping '-branch' endings!?!?!?
-//			if(spatch.endsWith("-"+branch))
-//				spatch = spatch.substring(0, spatch.length() - branch.length() - 1);
-			try
+			ObjectId	commit	= getCommitForTag(repository, ref);
+			List<Ref>	refs	= tags.get(commit);
+			if(refs==null)
 			{
-				int	tagpatch	= Integer.parseInt(spatch);
-				if(tagpatch>=patch)
-				{
-					latest	= ref;
-					patch	= tagpatch;
-//					System.out.println("Found newer tag "+latest+" with version "+patch);
-				}
+				refs	= new ArrayList<>();
+				tags.put(getCommitForTag(repository, ref), refs);
 			}
-			catch(NumberFormatException nfe)
+			refs.add(ref);
+		}
+		// Gets all commits on current branch in chronological order (newest first).
+		LogCommand	log	= git.log().add(repository.resolve(Constants.HEAD));
+		for(RevCommit commit: log.call())
+		{
+			List<Ref>	refs	= tags.get(commit.getId());
+			if(refs!=null)
 			{
-//				System.out.println("Ignoring tag: "+prefix+spatch);
+				for(Ref tag: refs)
+				{
+					String	spatch	= tag.getName().substring(prefix.length());
+//					// Support branch release by stripping '-branch' endings!?!?!?
+//					if(spatch.endsWith("-"+branch))
+//						spatch = spatch.substring(0, spatch.length() - branch.length() - 1);
+					try
+					{
+						int	tagpatch	= Integer.parseInt(spatch);
+						if(tagpatch>=patch)
+						{
+							latest	= tag;
+							patch	= tagpatch;
+							System.out.println("Found tag "+latest+" with version "+patch);
+						}
+					}
+					catch(NumberFormatException nfe)
+					{
+//						System.out.println("Ignoring tag: "+prefix+spatch);
+					}					
+				}
+				if(latest!=null)
+					break;
 			}
 		}
 		
@@ -192,11 +223,7 @@ public class BuildVersionManager
 			// If clean, check for tag on HEAD and set release.
 			else
 			{
-				// Get commit hash from tag, cf. https://stackoverflow.com/questions/27149949/list-commits-associated-with-a-given-tag-with-jgit
-		        Ref peeledRef = repository.getRefDatabase().peel(latest);
-		        ObjectId	tagcommit	= peeledRef.getPeeledObjectId();
-
-				if(head.equals(tagcommit))
+				if(head.equals(getCommitForTag(repository, latest)))
 				{
 					System.out.println("Found tag at head. Doing release build.");
 					release	= true;
@@ -211,5 +238,16 @@ public class BuildVersionManager
 		}
 		
 		return new BuildVersionInfo(major, minor, patch, branch, timestamp, head.getName(), dirty, release);
+	}
+
+	/**
+	 *  Get a commit for a tag.
+	 *  
+	 */
+	protected static ObjectId	getCommitForTag(Repository repository, Ref commit) throws IOException
+	{
+		// Get commit hash from tag, cf. https://stackoverflow.com/questions/27149949/list-commits-associated-with-a-given-tag-with-jgit
+        Ref peeledRef = repository.getRefDatabase().peel(commit);
+        return peeledRef.getPeeledObjectId();
 	}
 }
