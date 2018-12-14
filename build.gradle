@@ -711,38 +711,41 @@ subprojects
 			task reproducibleCheck(type: Exec) {
 				description	= "Check check if the distribution in linux docker matches (windows?) host build."
 
-				inputs.files	srcZip.outputs.files
-				inputs.files	distZip.outputs.files
-				def srcZip1	= srcZip.outputs.files.files.iterator().next()
-				def dstZip1	= distZip.outputs.files.files.iterator().next()
-				def srcZip2	= new File(rootProject.projectDir, 'build/reproduce/'+srcZip1.name)
-				def dstZip2	= new File(rootProject.projectDir, 'build/reproduce/'+dstZip1.name)
-				outputs.files(srcZip2, dstZip2)
-				
-				doFirst {
-					if(!System.getProperty("os.name").toLowerCase().contains("windows"))
-						throw new GradleException("This task is currently windows only.");
-					if(versionInfo.snapshot)
-						println 'WARNING: Reproducibility check only works on clean workdirs. Please stash/commit/revert your local changes.'
-					srcZip2.parentFile.mkdirs()
-					dstZip2.parentFile.mkdirs()
-				}
-				
-				def srcZipRel	= rootProject.projectDir.toURI().relativize(srcZip1.toURI()).getPath();
-				def dstZipRel	= rootProject.projectDir.toURI().relativize(dstZip1.toURI()).getPath();
-				// Cannot copy without container, cf. https://github.com/moby/moby/issues/25245
-				commandLine (('cmd /c "docker run -d --rm --name jadex-reproducible -v jadex-reproducible:/root alpine tail -f /dev/null' +
-				' && docker cp jadex-reproducible:/root/jadex/'+srcZipRel+' '+srcZip2.parentFile.canonicalPath +
-				' && docker cp jadex-reproducible:/root/jadex/'+dstZipRel+' '+dstZip2.parentFile.canonicalPath).split(" "))
-				
-				doLast {
-					def diffsrc	= diffZips(srcZip1.canonicalPath, srcZip2.canonicalPath)
-					if(diffsrc.length()!=0)
-						println("Reproduced srcZip does not match original: "+diffsrc);
-//						throw new RuntimeException("Reproduced srcZip does not match original: "+diffsrc);
-					def diffdst	= diffZips(dstZip1.canonicalPath, dstZip2.canonicalPath)
-					if(diffdst.length()!=0)
-						throw new RuntimeException("Reproduced distZip does not match original: "+diffdst);		
+				gradle.projectsEvaluated {	// Hack!!! needs to wait until distZip is configured...
+					inputs.files	srcZip.outputs.files
+					inputs.files	distZip.outputs.files
+					def srcZip1	= srcZip.outputs.files.files.iterator().next()
+					def dstZip1	= distZip.outputs.files.files.iterator().next()
+					def srcZip2	= new File(rootProject.projectDir, 'build/reproduce/'+srcZip1.name)
+					def dstZip2	= new File(rootProject.projectDir, 'build/reproduce/'+dstZip1.name)
+					outputs.files(srcZip2, dstZip2)
+					
+					doFirst {
+						if(!System.getProperty("os.name").toLowerCase().contains("windows"))
+							throw new GradleException("This task is currently windows only.");
+						if(versionInfo.snapshot)
+							println 'WARNING: Reproducibility check only works on clean workdirs. Please stash/commit/revert your local changes.'
+						srcZip2.parentFile.mkdirs()
+						dstZip2.parentFile.mkdirs()
+					}
+					
+					def srcZipRel	= rootProject.projectDir.toURI().relativize(srcZip1.toURI()).getPath();
+					def dstZipRel	= rootProject.projectDir.toURI().relativize(dstZip1.toURI()).getPath();
+//					println 'distZip ' + dstZipRel + ' from path ' + dstZip1.getPath()
+					// Cannot copy without container, cf. https://github.com/moby/moby/issues/25245
+					commandLine (('cmd /c "docker run -d --rm --name jadex-reproducible -v jadex-reproducible:/root alpine tail -f /dev/null' +
+					' && docker cp jadex-reproducible:/root/jadex/'+srcZipRel+' '+srcZip2.parentFile.canonicalPath +
+					' && docker cp jadex-reproducible:/root/jadex/'+dstZipRel+' '+dstZip2.parentFile.canonicalPath).split(" "))
+					
+					doLast {
+						def diffsrc	= diffZips(srcZip1.canonicalPath, srcZip2.canonicalPath)
+						if(diffsrc.length()!=0)
+							println("Reproduced srcZip does not match original: "+diffsrc);
+	//						throw new RuntimeException("Reproduced srcZip does not match original: "+diffsrc);
+						def diffdst	= diffZips(dstZip1.canonicalPath, dstZip2.canonicalPath)
+						if(diffdst.length()!=0)
+							throw new RuntimeException("Reproduced distZip does not match original: "+diffdst);		
+					}
 				}
 				
 				finalizedBy tasks.create(name: 'DockerStop', type: Exec) {
