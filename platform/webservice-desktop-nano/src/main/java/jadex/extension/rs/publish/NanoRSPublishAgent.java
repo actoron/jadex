@@ -18,8 +18,7 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices(
 {
 	@ProvidedService(name="publish_rs", type=IWebPublishService.class,
-		scope=ServiceScope.PLATFORM,
-		implementation=@Implementation(NanoRestPublishService.class))
+		scope=ServiceScope.PLATFORM, implementation=@Implementation(NanoRestPublishService.class))
 })
 @Properties(@NameValue(name="system", value="true"))
 public class NanoRSPublishAgent

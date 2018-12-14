@@ -1,10 +1,8 @@
 package jadex.extension.rs.publish;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
-import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,12 +30,12 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
 //	protected Response response;
 	
 	protected String contenttype;
-	protected int status;
+	protected int status = 200;
 	protected long length;
-//	protected String content;
 	protected String charencoding;
 	protected ServletOutputStream out;
-	protected StringBuffer outbuf = new StringBuffer();
+//	protected StringBuffer outbuf = new StringBuffer();
+	protected ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	protected PrintWriter writer;
 	
 	public NanoHttpServletResponseWrapper(IHTTPSession session)
@@ -79,10 +77,10 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
     {
     	this.status = sc;
     	this.contenttype = "text/html";
-    	outbuf.append("<html><head></head><body><h1>Error</h1>");
+    	getWriter().append("<html><head></head><body><h1>Error</h1>");
     	if(msg!=null)
-    		outbuf.append(msg);
-    	outbuf.append("</body></html>");
+    		getWriter().append(msg);
+    	getWriter().append("</body></html>");
     }
 
     public void sendError(int sc) throws IOException
@@ -183,17 +181,16 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
     {
     	if(out==null)
     	{
-    		StringBuffer buf = new StringBuffer();
+//    		outbuf = new StringBuffer();
+//    		bos = new ByteArrayOutputStream();
     		
     		out = new ServletOutputStream() 
     		{
     			@Override
-				public void write(int arg0) throws IOException 
+				public void write(int b) throws IOException 
 				{
-    				buf.append(arg0);
+    				bos.write(b);
 				}
-    			
-    			
 				
 				@Override
 				public void setWriteListener(WriteListener writeListener) 
@@ -204,7 +201,8 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
 				@Override
 				public boolean isReady() 
 				{
-					throw new UnsupportedOperationException();
+					return true;
+//					throw new UnsupportedOperationException();
 //					return false;
 				}
 			};
@@ -215,12 +213,10 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
     public PrintWriter getWriter() throws IOException
     {
     	if(writer==null)
-    		writer = new BufPrintWriter(outbuf);
+    		writer = new PrintWriter(bos);
     	
     	return writer;
     }
-    
-    
     
     public void setContentLength(int len)
     {
@@ -286,8 +282,13 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
     	hs.put(name, val);
     }
 
-	public StringBuffer getOutbuf() 
-	{
-		return outbuf;
-	}
+    public ByteArrayOutputStream getOutput()
+    {
+    	return bos;
+    }
+    
+//	public StringBuffer getOutbuf() 
+//	{
+//		return outbuf;
+//	}
 }

@@ -447,6 +447,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    
 	public String getRequestURI()
 	{
+		// todo: remove server/port
 		return session.getUri();
 	}
 	    
