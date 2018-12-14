@@ -38,6 +38,14 @@ public interface IExternalSubcomponentsFeature extends IExternalComponentFeature
 	public IFuture<String> getLocalTypeAsync();
 	
 	/**
+	 *  Starts a new POJO-component.
+	 *  
+	 *  @param pojocomponent The pojo object used as component.
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public IFuture<IExternalAccess> addComponent(Object pojocomponent);
+	
+	/**
 	 *  Starts a new component.
 	 *  
 	 *  @param infos Start information.
