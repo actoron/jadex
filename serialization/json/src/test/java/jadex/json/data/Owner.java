@@ -8,9 +8,9 @@ import java.util.Map;
 
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.transformation.jsonserializer.JsonTraverser;
-import jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor;
-import jadex.transformation.jsonserializer.processors.write.JsonMapProcessor;
-import jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonMapProcessor;
+import jadex.transformation.jsonserializer.processors.read.JsonToStringProcessor;
 
 public class Owner
 {

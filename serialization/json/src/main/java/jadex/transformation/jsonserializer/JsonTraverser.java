@@ -48,35 +48,35 @@ public class JsonTraverser extends Traverser
 	static
 	{
 		writeprocs = new ArrayList<ITraverseProcessor>();
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonRectangleProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonImageProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonColorProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonDateProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonTimestampProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonTupleProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonInetAddressProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLogRecordProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLoggingLevelProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonUUIDProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonClassProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonClassInfoProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonMultiCollectionProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonEnumProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonCertificateProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonArrayProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonStackTraceElementProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonThrowableProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonCalendarProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonCurrencyProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonSimpleDateFormatProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonCollectionProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonToStringProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLRUProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonMapProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonLocalDateTimeProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBigIntegerProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonOptionalProcessor());
-		writeprocs.add(new jadex.transformation.jsonserializer.processors.write.JsonBeanProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonRectangleProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonImageProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonColorProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonDateProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonTimestampProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonTupleProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonInetAddressProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLogRecordProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLoggingLevelProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonUUIDProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonClassProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonClassInfoProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonMultiCollectionProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonEnumProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCertificateProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonArrayProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonStackTraceElementProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonThrowableProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCalendarProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCurrencyProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonSimpleDateFormatProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonCollectionProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonToStringProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLRUProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonMapProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonLocalDateTimeProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBigIntegerProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonOptionalProcessor());
+		writeprocs.add(new jadex.transformation.jsonserializer.processors.read.JsonBeanProcessor());
 		
 		readprocs = new ArrayList<ITraverseProcessor>();
 		// JsonArrayProcessor needs to be first, because others don't check array marker:
@@ -484,7 +484,6 @@ public class JsonTraverser extends Traverser
 	 *  @param classloader The class loader.
 	 *  @return The decoded object.
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T objectFromString(String val, ClassLoader classloader, IErrorReporter rep, Class<T> clazz, List<ITraverseProcessor> processors, List<ITraverseProcessor> postprocessors)
 	{
 		return objectFromString(val, classloader, rep, clazz, processors, postprocessors, null);

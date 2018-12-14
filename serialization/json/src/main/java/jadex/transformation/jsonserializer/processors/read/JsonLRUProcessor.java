@@ -3,6 +3,7 @@ package jadex.transformation.jsonserializer.processors.read;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Set;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -14,11 +15,12 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 
 /**
  * 
  */
-public class JsonLRUProcessor implements ITraverseProcessor
+public class JsonLRUProcessor extends AbstractJsonProcessor
 {
 	/**
 	 *  Test if the processor is applicable.
@@ -27,11 +29,24 @@ public class JsonLRUProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+	protected boolean isApplicable(Object object, Type type, ClassLoader targetcl, JsonReadContext context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 //		return object instanceof JsonObject && (clazz==null || SReflect.isSupertype(LRU.class, clazz));
 		return object instanceof JsonObject && SReflect.isSupertype(LRU.class, clazz);
+	}
+	
+	/**
+	 *  Test if the processor is applicable.
+	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return True, if is applicable. 
+	 */
+	protected boolean isApplicable(Object object, Type type, ClassLoader targetcl, JsonWriteContext context)
+	{
+		Class<?> clazz = SReflect.getClass(type);
+		return SReflect.isSupertype(LRU.class, clazz);
 	}
 	
 	/**
@@ -41,9 +56,11 @@ public class JsonLRUProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	@SuppressWarnings("unchecked")
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
+		@SuppressWarnings("rawtypes")
 		LRU ret = (LRU)getReturnObject(object, clazz);
 		JsonObject obj = (JsonObject)object;
 //		traversed.put(object, ret);
@@ -59,9 +76,10 @@ public class JsonLRUProcessor implements ITraverseProcessor
 			ret.setMaxEntries(maxentries);
 		}
 		
-		Object cl = traverser.doTraverse(obj.get("cleaner"), null, conversionprocessors, processors, mode, targetcl, context);
+		@SuppressWarnings("rawtypes")
+		ILRUEntryCleaner cl = (ILRUEntryCleaner) traverser.doTraverse(obj.get("cleaner"), null, conversionprocessors, processors, mode, targetcl, context);
 //		Object cl = traverser.doTraverse(obj.get("cleaner"), null, traversed, preprocessors, processors, postprocessors, clone, targetcl, context);
-		ret.setCleaner((ILRUEntryCleaner)cl);
+		ret.setCleaner(cl);
 		
 		if(obj.get("__keys")==null)
 		{
@@ -103,20 +121,123 @@ public class JsonLRUProcessor implements ITraverseProcessor
 	}
 	
 	/**
+	 *  Process an object.
+	 *  @param object The object.
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return The processed object.
+	 */
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
+	{
+		wr.addObject(wr.getCurrentInputObject());
+		
+		@SuppressWarnings("rawtypes")
+		LRU lru = (LRU)object;
+		
+		wr.write("{");
+		
+		wr.writeNameValue("max", lru.getMaxEntries());
+		
+		if(lru.getCleaner()!=null)
+		{
+			wr.write(",\"cleaner\":");
+			traverser.doTraverse(lru.getCleaner(), lru.getCleaner().getClass(), conversionprocessors, processors, mode, targetcl, wr);
+		}
+		
+		if(wr.isWriteClass())
+		{
+			wr.write(",");
+			wr.writeClass(object.getClass());
+		}
+		
+		if(wr.isWriteId())
+		{
+			wr.write(",");
+			wr.writeId();
+		}
+		
+		@SuppressWarnings("rawtypes")
+		Set keyset = lru.keySet();
+		@SuppressWarnings("unchecked")
+		Object[] keys = keyset.toArray(new Object[keyset.size()]);
+		
+		if(keys.length>0)
+		{
+			wr.write(",");
+			
+			boolean keystring = true;
+			for(int i=0; i<keys.length && keystring; i++)
+			{
+				if (!(keys[i] instanceof String))
+				{
+					keystring = false;
+					break;
+				}
+			}
+			
+			if(keystring)
+			{
+				for(int i=0; i<keys.length; i++)
+				{
+					Object val = lru.get(keys[i]);
+					Class<?> valclazz = val!=null? val.getClass(): null;
+					Object key = keys[i];
+					
+					wr.write("\"").write(key.toString()).write("\":");
+					traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, wr);
+				}
+			}
+			else
+			{
+				wr.write("\"__keys\":[");
+				wr.incObjectCount();
+				for(int i=0; i<keys.length; i++)
+				{
+					if(i>0)
+						wr.write(",");
+					Object key = keys[i];
+					Class<?> keyclazz = key != null? key.getClass() : null;
+					traverser.doTraverse(key, keyclazz, conversionprocessors, processors, mode, targetcl, wr);
+				}
+				wr.write("]");
+				
+				wr.write(",\"__values\":[");
+				wr.incObjectCount();
+				for(int i=0; i<keys.length; i++)
+				{
+					if(i>0)
+						wr.write(",");
+					Object val = lru.get(keys[i]);
+					Class<?> valclazz = val!=null? val.getClass(): null;
+					
+					traverser.doTraverse(val, valclazz, conversionprocessors, processors, mode, targetcl, wr);
+				}
+				wr.write("]");
+			}
+		}
+		
+		wr.write("}");
+		
+		return object;
+	}
+	
+	/**
 	 * 
 	 */
-	public Object getReturnObject(Object object, Class clazz)
+	protected Object getReturnObject(Object object, Class<?> clazz)
 	{
 		Object ret = object;
 		
 		try
 		{
-			ret = clazz.newInstance();
+			ret = clazz.getDeclaredConstructor().newInstance();
 		}
 		catch(Exception e)
 		{
 			// Using linked hash map as default to avoid loosing order if has order.
-			ret = new LRU();
+			@SuppressWarnings("rawtypes")
+			LRU lru = new LRU();
+			ret = lru;
 		}
 		
 		return ret;

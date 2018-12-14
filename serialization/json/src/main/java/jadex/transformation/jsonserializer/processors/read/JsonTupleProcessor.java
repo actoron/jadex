@@ -15,11 +15,12 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 
 /**
  * 
  */
-public class JsonTupleProcessor implements ITraverseProcessor
+public class JsonTupleProcessor extends AbstractJsonProcessor
 {	
 	/**
 	 *  Test if the processor is applicable.
@@ -28,7 +29,20 @@ public class JsonTupleProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+	protected boolean isApplicable(Object object, Type type, ClassLoader targetcl, JsonReadContext context)
+	{
+		Class<?> clazz = SReflect.getClass(type);
+		return SReflect.isSupertype(Tuple.class, clazz);
+	}
+	
+	/**
+	 *  Test if the processor is applicable.
+	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return True, if is applicable. 
+	 */
+	protected boolean isApplicable(Object object, Type type, ClassLoader targetcl, JsonWriteContext context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return SReflect.isSupertype(Tuple.class, clazz);
@@ -41,7 +55,7 @@ public class JsonTupleProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		JsonObject obj = (JsonObject)object;
@@ -49,11 +63,15 @@ public class JsonTupleProcessor implements ITraverseProcessor
 		Tuple ret = null;
 		if(clazz.equals(Tuple3.class))
 		{
-			ret = new Tuple3(null, null, null);
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			Tuple3 t3 = new Tuple3(null, null, null);
+			ret = t3;
 		}
 		else if (clazz.equals(Tuple2.class))
 		{
-			ret = new Tuple2(null, null);
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			Tuple2 t2 = new Tuple2(null, null);
+			ret = t2;
 		}
 		else
 		{
@@ -80,5 +98,28 @@ public class JsonTupleProcessor implements ITraverseProcessor
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Process an object.
+	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *  @return The processed object.
+	 */
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
+	{
+		wr.addObject(wr.getCurrentInputObject());
+
+		Object[] entities = ((Tuple)object).getEntities();
+		wr.write("{");
+		wr.write("\"values\":");
+		traverser.doTraverse(entities, entities.getClass(), conversionprocessors, processors, mode, targetcl, wr);
+		if(wr.isWriteClass())
+			wr.write(",").writeClass(object.getClass());
+		if(wr.isWriteId())
+			wr.write(",").writeId();
+		wr.write("}");
+	
+		return object;
 	}
 }

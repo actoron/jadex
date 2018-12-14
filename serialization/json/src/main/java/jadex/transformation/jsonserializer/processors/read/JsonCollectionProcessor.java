@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -16,11 +17,12 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 
 /**
  * 
  */
-public class JsonCollectionProcessor implements ITraverseProcessor
+public class JsonCollectionProcessor extends AbstractJsonProcessor
 {
 	/**
 	 *  Test if the processor is applicable.
@@ -29,11 +31,24 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+	protected boolean isApplicable(Object object, Type type, ClassLoader targetcl, JsonReadContext context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return (object instanceof JsonArray && SReflect.isSupertype(Collection.class, clazz) || 
 			(object instanceof JsonObject && ((JsonObject)object).get(JsonTraverser.COLLECTION_MARKER)!=null));
+	}
+	
+	/**
+	 *  Test if the processor is applicable.
+	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return True, if is applicable. 
+	 */
+	protected boolean isApplicable(Object object, Type type, ClassLoader targetcl, JsonWriteContext context)
+	{
+		Class<?> clazz = SReflect.getClass(type);
+		return SReflect.isSupertype(Collection.class, clazz);
 	}
 	
 	/**
@@ -43,7 +58,8 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	@SuppressWarnings("unchecked")
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		JsonArray array;
 		JsonValue idx = null;
@@ -61,6 +77,7 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 			idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
 		}
 		
+		@SuppressWarnings("rawtypes")
 		Collection ret = (Collection)getReturnObject(object, clazz);
 //		traversed.put(object, ret);
 //		((JsonReadContext)context).addKnownObject(ret);
@@ -83,17 +100,71 @@ public class JsonCollectionProcessor implements ITraverseProcessor
 		
 		return ret;
 	}
+	
+	/**
+	 *  Process an object.
+	 *  @param object The object.
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return The processed object.
+	 */
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext wr)
+	{
+		wr.addObject(wr.getCurrentInputObject());
+		
+		Class<?> clazz = SReflect.getClass(type);
+		
+		if(wr.isWriteClass() || wr.isWriteId())
+		{
+			wr.write("{");
+			if(wr.isWriteClass())
+			{
+				wr.writeClass(clazz);
+				wr.write(",");
+			}
+			if(wr.isWriteId())
+			{
+				wr.writeId();
+				wr.write(",");
+			}
+			wr.writeString(JsonTraverser.COLLECTION_MARKER);
+			wr.write(":");
+		}
+	
+		wr.write("[");
+		
+		Collection<?> col = (Collection<?>)object;
+		
+		Iterator<?> it = col.iterator();
+		for(int i=0; i<col.size(); i++) 
+		{
+			if(i>0)
+				wr.write(",");
+			Object val = it.next();
+			traverser.doTraverse(val, val.getClass(), conversionprocessors, processors, mode, targetcl, wr);
+		}
+		
+		wr.write("]");
+		
+		if(wr.isWriteClass() || wr.isWriteId())
+		{
+			wr.write("}");
+		}
+		
+		return object;
+	}
 
 	/**
 	 *  Get the return object.
 	 */
-	public Object getReturnObject(Object object, Class<?> clazz)
+	@SuppressWarnings("rawtypes")
+	protected Object getReturnObject(Object object, Class<?> clazz)
 	{
 		Object ret = object;
 		
 		try
 		{
-			ret = clazz.newInstance();
+			ret = clazz.getDeclaredConstructor().newInstance();
 		}
 		catch(Exception e)
 		{

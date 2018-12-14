@@ -6,12 +6,11 @@ import java.util.Map;
 import com.eclipsesource.json.JsonObject;
 
 import jadex.commons.SReflect;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
  *  Processor for reading nested maps.
  */
-public class JsonNestedMapProcessor extends JsonMapProcessor implements ITraverseProcessor
+public class JsonNestedMapProcessor extends JsonMapProcessor
 {
 	/**
 	 *  Test if the processor is applicable.

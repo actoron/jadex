@@ -2,7 +2,6 @@ package jadex.transformation.jsonserializer.processors.read;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 import com.eclipsesource.json.JsonObject;
 

@@ -8,20 +8,29 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.commons.SReflect;
-import jadex.commons.transformation.BeanIntrospectorFactory;
-import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 
 /**
  * 
  */
-public class JsonThrowableProcessor implements ITraverseProcessor
+public class JsonThrowableProcessor extends JsonBeanProcessor
 {
-	/** Bean introspector for inspecting beans. */
-	protected IBeanIntrospector intro = BeanIntrospectorFactory.getInstance().getBeanIntrospector(500);
+	/**
+	 *  Test if the processor is applicable.
+	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return True, if is applicable. 
+	 */
+	protected boolean isApplicable(Object object, Type type, ClassLoader targetcl, JsonReadContext context)
+	{
+		Class<?> clazz = SReflect.getClass(type);
+		return object instanceof JsonObject && SReflect.isSupertype(Throwable.class, clazz);
+	}
 	
 	/**
 	 *  Test if the processor is applicable.
@@ -30,10 +39,10 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+	protected boolean isApplicable(Object object, Type type, ClassLoader targetcl, JsonWriteContext context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
-		return object instanceof JsonObject && SReflect.isSupertype(Throwable.class, clazz);
+		return SReflect.isSupertype(Throwable.class, clazz);
 	}
 	
 	/**
@@ -43,7 +52,7 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		Object ret = null;
 		Class<?> clazz = SReflect.getClass(type);
@@ -57,7 +66,7 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 			cause = (Throwable)traverser.traverse(cau, Throwable.class, conversionprocessors, processors, mode, targetcl, context);
 //			cause = (Throwable)traverser.traverse(cau, Throwable.class, preprocessors, processors, postprocessors, targetcl, context);
 		
-		Class<?> cl = JsonPrimitiveObjectProcessor.getClazz(object, targetcl);
+//		Class<?> cl = JsonPrimitiveObjectProcessor.getClazz(object, targetcl);
 		
 		try
 		{
@@ -150,11 +159,59 @@ public class JsonThrowableProcessor implements ITraverseProcessor
 			if(idx!=null)
 				((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 			
-			JsonBeanProcessor.traverseProperties(object, clazz, conversionprocessors, processors, mode, traverser, targetcl, ret, context, intro);
+			JsonBeanProcessor.readProperties(object, clazz, conversionprocessors, processors, mode, traverser, targetcl, ret, context, intro);
 //			JsonBeanProcessor.traverseProperties(object, clazz, traversed, processors, postprocessors, traverser, clone, targetcl, ret, context, intro);
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Process an object.
+	 *  @param object The object.
+	 * @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return The processed object.
+	 */
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonWriteContext context)
+	{
+		JsonWriteContext wr = (JsonWriteContext)context;
+		wr.addObject(wr.getCurrentInputObject());
+		
+		Throwable t = (Throwable)object;
+		
+		wr.write("{");
+		
+		boolean first = true;
+		if(wr.isWriteClass())
+		{
+			wr.writeClass(object.getClass());
+			first = false;
+		}
+		
+		if(t.getMessage()!=null)
+		{
+			if(!first)
+				wr.write(",");
+			wr.write("\"msg\":");
+			traverser.doTraverse(t.getMessage(), String.class, conversionprocessors, processors, mode, targetcl, context);
+			first = false;
+		}
+		if(t.getCause()!=null)
+		{
+			if(!first)
+				wr.write(",");
+			wr.write("\"cause\":");
+			Object val = t.getCause();
+			traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, conversionprocessors, processors, mode, targetcl, context);
+			first = false;
+		}
+		
+		writeProperties(object, conversionprocessors, processors, mode, traverser, targetcl, context, intro, first);
+		
+		wr.write("}");
+		
+		return object;
 	}
 }
 

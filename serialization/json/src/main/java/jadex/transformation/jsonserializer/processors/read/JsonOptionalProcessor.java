@@ -13,45 +13,46 @@ import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.transformation.jsonserializer.JsonTraverser;
+import jadex.transformation.jsonserializer.processors.write.JsonWriteContext;
 
 /**
  *  java.util.Optional processor for reading json objects.
  */
-public class JsonOptionalProcessor implements ITraverseProcessor
+public class JsonOptionalProcessor extends AbstractJsonProcessor
 {
 	/** Bean introspector for inspecting beans. */
-	protected IBeanIntrospector intro = BeanIntrospectorFactory.getInstance().getBeanIntrospector(5000);
+	protected IBeanIntrospector intro = BeanIntrospectorFactory.getInstance().getBeanIntrospector(500);
 
 	/**
 	 * Name of the java 8 optional class.
 	 */
-	private static final String OPTIONAL_CLASSNAME = "java.util.Optional";
+	protected static final String OPTIONAL_CLASSNAME = "java.util.Optional";
 
 	/**
 	 * Cached Class.
 	 */
-	private Class<?> optionalClass;
+	protected Class<?> optionalClass;
 	/**
 	 * Cached Method.
 	 */
-	private Method ofMethod;
+	protected Method ofMethod;
 	/**
 	 * Cached Method.
 	 */
-	private Method emptyMethod;
+	protected Method emptyMethod;
 	/**
 	 * Cached Method.
 	 */
-	private Method getMethod;
+	protected Method getMethod;
 	/**
 	 * Cached Method.
 	 */
-	private Method isPresentMethod;
+	protected Method isPresentMethod;
 
 	/**
 	 * Init caches if not initialized.
 	 */
-	private void init() {
+	protected void init() {
 		if (optionalClass == null) {
 			optionalClass = SReflect.classForName0(OPTIONAL_CLASSNAME, null);
 			ofMethod = SReflect.getMethod(optionalClass, "of", new Class[]{Object.class});
@@ -68,7 +69,20 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+	protected boolean isApplicable(Object object, Type type, ClassLoader targetcl, JsonReadContext context)
+	{
+		Class<?> clazz = SReflect.getClass(type);
+		return (clazz != null) && OPTIONAL_CLASSNAME.equals(clazz.getName());
+	}
+	
+	/**
+	 *  Test if the processor is applicable.
+	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return True, if is applicable. 
+	 */
+	protected boolean isApplicable(Object object, Type type, ClassLoader targetcl, JsonWriteContext context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
 		return (clazz != null) && OPTIONAL_CLASSNAME.equals(clazz.getName());
@@ -81,7 +95,7 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, Traverser.MODE mode, ClassLoader targetcl, Object context)
+	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, Traverser.MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
 		init();
 		Object ret = null;
@@ -109,5 +123,50 @@ public class JsonOptionalProcessor implements ITraverseProcessor
 		}
 
 		return ret;
+	}
+	
+	/**
+	 *  Process an object.
+	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return The processed object.
+	 */
+	protected Object writeObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, Traverser.MODE mode, ClassLoader targetcl, JsonWriteContext wr)
+	{
+		init();
+		wr.addObject(object);
+
+		wr.write("{");
+
+		boolean first = true;
+		if(wr.isWriteClass())
+		{
+			wr.writeClass(object.getClass());
+			first = false;
+		}
+
+		try {
+			Boolean isPresent = (Boolean) isPresentMethod.invoke(object);
+			if (!first)
+				wr.write(",");
+			wr.write("\"isPresent\":");
+			traverser.doTraverse(isPresent, Boolean.class, conversionprocessors, processors, mode, targetcl, wr);
+
+			Object subobject = null;
+			if (isPresent) {
+				if (!first)
+					wr.write(",");
+				wr.write("\"subobject\":");
+				subobject = getMethod.invoke(object);
+				traverser.doTraverse(subobject, subobject.getClass(), conversionprocessors, processors, mode, targetcl, wr);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		wr.write("}");
+
+		return object;
 	}
 }
