@@ -1,3 +1,5 @@
+description "A starting point for the Jadex turorials or your own Jadex projects."
+
 apply plugin: 'java'
 
 def jadex_version	= "${jadex_build_version}"
