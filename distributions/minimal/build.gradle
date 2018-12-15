@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.*
+
 description 'Jadex minimal distribution for running the middleware with core features only (e.g. without GUI).'
 
 dependencies
@@ -9,4 +11,23 @@ dependencies
 	api project(':transports:tcp')
 	api project(':transports:relaytransport')
 	api project(':transports:websockettransport')
+}
+
+gradle.projectsEvaluated() {
+	def qsdir	= subprojectmap.get(':applications:quickstart').projectDir
+	try {	// Hack!!! called multiple times but only last with correct object!?
+		exampleZip
+			.from(new File(qsdir, 'src/main/java/jadex/quickstart/cleanerworld')) {
+				into 'jadex-example-project/src/main/java/quickstart/cleanerworld'
+				include '*.*'
+				filter { line ->
+					line.startsWith('//')		? null :	// Remove outcommented parts (leaves normal indented comments) 
+					line.startsWith('package')	? 'package quickstart.cleanerworld;' :
+					line.contains('conf.addComponent') ? null :	// Remove extra components and add default component below
+					line.toLowerCase().contains('add your cleaner') ? line + '\n\t\tconf.addComponent("quickstart/cleanerworld/SimpleCleanerAgent.class");' :
+					line	// keep all other lines.
+				}
+//				filter ( FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf') )
+			}
+	} catch(Exception e) {println 'ex: '+e}
 }
