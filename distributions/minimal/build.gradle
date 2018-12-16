@@ -13,21 +13,37 @@ dependencies
 	api project(':transports:websockettransport')
 }
 
-gradle.projectsEvaluated() {
-	def qsdir	= subprojectmap.get(':applications:quickstart').projectDir
-	try {	// Hack!!! called multiple times but only last with correct object!?
-		exampleZip
-			.from(new File(qsdir, 'src/main/java/jadex/quickstart/cleanerworld')) {
-				into 'jadex-example-project/src/main/java/quickstart/cleanerworld'
-				include '*.*'
-				filter { line ->
-					line.startsWith('//')		? null :	// Remove outcommented parts (leaves normal indented comments) 
-					line.startsWith('package')	? 'package quickstart.cleanerworld;' :
-					line.contains('conf.addComponent') ? null :	// Remove extra components and add default component below
-					line.toLowerCase().contains('add your cleaner') ? line + '\n\t\tconf.addComponent("quickstart/cleanerworld/SimpleCleanerAgent.class");' :
-					line	// keep all other lines.
-				}
-//				filter ( FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf') )
-			}
-	} catch(Exception e) {println 'ex: '+e}
+// Add uptodate applications-quickstart sources to example project
+try {	// fails for 'new File(project.projectDir,...)' before evaluation!?
+	def qsdir	= new File(rootProject.projectDir, 'applications/quickstart/src/main/java/jadex/quickstart/cleanerworld')
+//	println 'qsdir ' +qsdir
+	if(!qsdir.exists()) {
+		// Copy from generated when building from distsrc
+		qsdir	= new File(project.projectDir, 'dist/generated/jadex-example-project/src/main/java/quickstart/cleanerworld')
+	}
+	copySources(exampleZip, qsdir, 'jadex-example-project/src/main/java/quickstart/cleanerworld')
+	
+	// Copy into generated for different srcZips (re-copy for reproducible file order, as its only reproducible per from/into, not across all from/intos of zip task :( )
+	project.parent.subprojects.collect({p -> p.tasks.matching{it.name.equals('srcZip')}}).flatten().each { srcZipTask ->
+//		println 'distartmap: '	+ srcZipTask + ', ' + gradle.ext.distartmap.get(srcZipTask.project.name)
+		if(gradle.ext.distartmap.get(srcZipTask.project.name).contains(project.path)) {
+//			println 'contained in ' + srcZipTask
+			copySources(srcZipTask, qsdir, 'sources/distributions/minimal/dist/generated/jadex-example-project/src/main/java/quickstart/cleanerworld')
+		}
+	}
+} catch (Exception e) { println 'ex: ' + e }
+
+def copySources(task, sourcedir, targetdir) {
+	task.from(sourcedir) {
+		into targetdir
+		include '*.*'
+		filter { line ->
+			line.startsWith('//')		? null :	// Remove outcommented parts (leaves normal indented comments)
+			line.startsWith('package')	? 'package quickstart.cleanerworld;' :
+			line.contains('conf.addComponent') ? null :	// Remove extra components and add default component below
+			line.toLowerCase().contains('add your cleaner') ? line + '\n\t\tconf.addComponent("quickstart/cleanerworld/SimpleCleanerAgent.class");' :
+			line	// keep all other lines.
+		}
+//			filter ( FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf') )
+	}
 }
