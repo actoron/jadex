@@ -1088,10 +1088,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		        {
 		        	if(response.getHeader("Content-Type")==null)
 		        		response.setHeader("Content-Type", mt);
-		        	if(ret==null)
-		        	{
-		        		System.out.println("dfhil");
-		        	}
 			        out.write(ret);
 		        }
 	        	else

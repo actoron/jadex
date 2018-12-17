@@ -610,7 +610,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		if(sid==null && query.getMultiplicity().getFrom()>0)
 			throw new ServiceNotFoundException(query.toString());
-		
+				
 		// Fetches service and wraps result in proxy, if required. 
 		@SuppressWarnings("unchecked")
 		T ret = sid!=null ? (T)createServiceProxy(sid, info) : null;
@@ -626,6 +626,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	public <T>  ITerminableIntermediateFuture<T> resolveServices(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
 		ITerminableIntermediateFuture<T> ret;
+		
+		if(query.getServiceType().toString().indexOf("ITransportInfoService")!=-1)
+			System.out.println("here");
 		
 		// Check if remote
 		ISearchQueryManagerService sqms = isRemote(query) ? searchLocalService(new ServiceQuery<>(ISearchQueryManagerService.class).setMultiplicity(Multiplicity.ZERO_ONE)) : null;
@@ -711,6 +714,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	public <T> Collection<T> resolveLocalServices(ServiceQuery<T> query, RequiredServiceInfo info)
 	{
 		enhanceQuery(query, true);
+		
+		if(query.getServiceType().toString().indexOf("ITransportInfoService")!=-1)
+			System.out.println("here");
 		
 		IServiceRegistry registry = ServiceRegistry.getRegistry(getInternalAccess());
 		Collection<IServiceIdentifier> results =  registry.searchServices(query);
@@ -922,7 +928,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			}
 		}
 		
-		if (event != null)
+		if(event != null)
 		{
 			event.setService(service);
 			service = event;
