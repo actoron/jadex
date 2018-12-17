@@ -1,4 +1,4 @@
-package jadex.quickstart.cleanerworld;
+package jadex.quickstart.cleanerworld.single;
 
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -9,7 +9,7 @@ import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
- *  Simple cleaner with a main loop for moving randomly.
+ *  Possible solution for exercise zero (non-BDI cleaner).
  */
 @Agent
 public class SimpleCleanerAgentZero

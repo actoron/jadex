@@ -57,8 +57,8 @@ public class NanoRestPublishService extends ExternalRestPublishService
 			
 			Response[] ret = new Response[1];
 			
-			NanoHttpServletRequestWrapper req = new NanoHttpServletRequestWrapper(session);
 			NanoHttpServletResponseWrapper resp = new NanoHttpServletResponseWrapper(session);
+			NanoHttpServletRequestWrapper req = new NanoHttpServletRequestWrapper(session, resp);
 			
 			// todo: make handle request use async context return 
 			handleRequest(req, resp, null).get();

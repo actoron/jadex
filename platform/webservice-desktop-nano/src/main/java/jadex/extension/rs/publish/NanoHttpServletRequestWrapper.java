@@ -58,6 +58,9 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	/** The async context. */
 	protected NanoAsyncContext context;
 	
+	/** The response (for async context). */
+	protected HttpServletResponse response;
+	
 	
 	private String getDetailFromContentHeader(String contentTypeHeader, Pattern pattern, String defaultValue, int group) 
 	{
@@ -68,9 +71,10 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	/**
 	 *  Create a new wrapper.
 	 */
-	public NanoHttpServletRequestWrapper(IHTTPSession session)
+	public NanoHttpServletRequestWrapper(IHTTPSession session, HttpServletResponse response)
 	{
 		this.session = session;
+		this.response = response;
 	}
 	
 	public Object getAttribute(String name)
@@ -310,7 +314,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	public AsyncContext startAsync() throws IllegalStateException
 	{
 		if(context==null)
-			context = new NanoAsyncContext(null, null);
+			context = new NanoAsyncContext(this, response);
 		
 		context.start(null);
 		

@@ -1,7 +1,7 @@
 # Goals and Plans
 
 This exercise introduces the BDI model and shows how to generate agent actions by using the
-goal and plan concepts of Jadex. Specifically, you will learn how add goals and plans to an agent
+goal and plan concepts of Jadex. Specifically, you will learn how to add goals and plans to an agent
 and how to control the plan selection and plan execution processes with goal flags.
 
 
@@ -21,7 +21,7 @@ The so called *means-end reasoning* process is at the heart of this model. For e
 the agent will form intentions how to satisfy it. The selection of suitable desires is in turn based
 on the current beliefs of an agent. In concrete software implementations of the BDI model (such as Jadex),
 desires and intentions are replaced by more concrete notions of goals and plans.
-Goals can be stated, e.g., as a boolean expression that represents a word state to be achieved.
+Goals can be stated, e.g., as a boolean expression that represents a world state to be achieved.
 Plans are procedural recipes of actions (e.g. code to be executed for achieving a goal).
 Instead of abstract desires, a software agent in Jadex has a dynamic set of concrete goals to be pursued.
 Instead of forming arbitrary intentions, a Jadex agent selects existing plans from its so called *plan library*
@@ -274,7 +274,7 @@ Backup you current solution as `CleanerBDIAgentA2.java`.
 </div>
 
 One advantage of the BDI model is the clean separation between *what* an agent should achieve (goals)
-and *how* it can achieve it (plans). Often, there a many different ways to achieve the same result.
+and *how* it can achieve it (plans). Often, there are many different ways to achieve the same result.
 In BDI agents this is naturally reflected by the possibility to have many plans that all are suitable candidates
 for pursuing the same goal.
 
