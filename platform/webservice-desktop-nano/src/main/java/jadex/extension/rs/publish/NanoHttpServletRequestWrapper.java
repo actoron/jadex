@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -35,11 +36,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionContext;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 import fi.iki.elonen.NanoHTTPD.CookieHandler;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
+import jadex.commons.SUtil;
 
 /**
  *  Wrapper of HttpServletRequest for nano.
@@ -48,9 +51,12 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 {
 	private static final String CHARSET_REGEX = "[ |\t]*(charset)[ |\t]*=[ |\t]*['|\"]?([^\"^'^;^,]*)['|\"]?";
     private static final Pattern CHARSET_PATTERN = Pattern.compile(CHARSET_REGEX, Pattern.CASE_INSENSITIVE);
+    
+    /** Http header for the session id. */
+	public static final String HEADER_NANO_SESSIONID = "x-nano-sessionid";
 	 
 	/** The nano session. */
-	protected IHTTPSession session;
+	protected IHTTPSession nanosession;
 	
 	/** The request attributes. */
 	protected Map<String, Object> attributes;
@@ -61,6 +67,12 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	/** The response (for async context). */
 	protected HttpServletResponse response;
 	
+	/** The header map (case insensitive). */
+	protected Map<String, String> headers;
+	
+	/** The http session. */
+	protected NanoHttpSession session;
+	
 	
 	private String getDetailFromContentHeader(String contentTypeHeader, Pattern pattern, String defaultValue, int group) 
 	{
@@ -69,11 +81,21 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	}
 	
 	/**
+	 *  Get the header fields.
+	 */
+	protected Map<String, String> getHeaders()
+	{
+		if(headers==null)
+			headers = SUtil.convertMapKeysToLowercase(nanosession.getHeaders());
+		return headers;
+	}
+	
+	/**
 	 *  Create a new wrapper.
 	 */
 	public NanoHttpServletRequestWrapper(IHTTPSession session, HttpServletResponse response)
 	{
-		this.session = session;
+		this.nanosession = session;
 		this.response = response;
 	}
 	
@@ -89,7 +111,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    
 	public String getCharacterEncoding()
 	{
-		return getDetailFromContentHeader(session.getHeaders().get("content-type"), CHARSET_PATTERN, null, 2);
+		return getDetailFromContentHeader(getHeaders().get("content-type"), CHARSET_PATTERN, null, 2);
 	}
 	
 	public void setCharacterEncoding(String env) throws UnsupportedEncodingException
@@ -111,7 +133,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    
 	public String getContentType()
 	{
-		return session.getHeaders().get("content-type");
+		return getHeaders().get("content-type");
 	}
 	    
 	public ServletInputStream getInputStream() throws IOException
@@ -120,7 +142,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    {
 	        public int read() throws IOException 
 	        {
-	        	return session.getInputStream().read();
+	        	return nanosession.getInputStream().read();
 	        }
 	        
 	        @Override
@@ -145,25 +167,25 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	     
 	public String getParameter(String name)
 	{
-		 List<String> ret = session.getParameters().get(name);
+		 List<String> ret = nanosession.getParameters().get(name);
 		 return ret!=null? ret.get(0): null;
 	}
 	    
 	public Enumeration<String> getParameterNames()
 	{
-		return session.getParameters()!=null? new Vector<String>(session.getParameters().keySet()).elements(): null;
+		return nanosession.getParameters()!=null? new Vector<String>(nanosession.getParameters().keySet()).elements(): null;
 	}
 	        
 	public String[] getParameterValues(String name)
 	{
-		List<String> ret = session.getParameters().get(name);
+		List<String> ret = nanosession.getParameters().get(name);
 		return ret!=null? ret.toArray(new String[ret.size()]): null;
 	}
 	 
 	public Map<String, String[]> getParameterMap()
 	{
 		Map<String, String[]> ret = null;
-		Map<String, List<String>> ps = session.getParameters();
+		Map<String, List<String>> ps = nanosession.getParameters();
 		if(ps!=null)
 		{
 			ret = new HashMap<>();
@@ -179,19 +201,19 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	public String getProtocol()
 	{
 		// todo: version
-		String host = session.getHeaders().get("host");
+		String host = getHeaders().get("host");
 		return host.toLowerCase().contains("https")? "HTTPS": "HTTP";
 	}
 	    
 	public String getScheme()
 	{
-		String host = session.getHeaders().get("host");
+		String host = getHeaders().get("host");
 		return host.toLowerCase().contains("https")? "https": "http";
 	}
 	    
 	public String getServerName()
 	{
-		String host = session.getHeaders().get("host");
+		String host = getHeaders().get("host");
 		if(host!=null)
 		{
 			int idx = host.indexOf(":");
@@ -213,12 +235,12 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    
 	public String getRemoteAddr()
 	{
-		return session.getRemoteIpAddress();
+		return nanosession.getRemoteIpAddress();
 	}
 	    
 	public String getRemoteHost()
 	{
-		return session.getRemoteHostName();
+		return nanosession.getRemoteHostName();
 	}
 	    
 	public void setAttribute(String name, Object o)
@@ -246,7 +268,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    
 	public boolean isSecure()
 	{
-		return session.getUri().indexOf("https")!=-1;
+		return nanosession.getUri().indexOf("https")!=-1;
 	}
 	    
 	public RequestDispatcher getRequestDispatcher(String path)
@@ -280,7 +302,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 		// todo: 443 for https
 		int ret = 80;
 		
-		String host = session.getHeaders().get("host");
+		String host = getHeaders().get("host");
 		if(host!=null)
 		{
 			int idx = host.indexOf(":");
@@ -357,7 +379,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	
 	public Cookie[] getCookies()
 	{
-		CookieHandler ch = session.getCookies();
+		CookieHandler ch = nanosession.getCookies();
 		
 		List<Cookie> ret = new ArrayList<Cookie>();
 		for(String cname: ch)
@@ -385,13 +407,13 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 
 	public String getHeader(String name)
 	{
-		return session.getHeaders().get(name);
+		return getHeaders().get(name);
 	}
 
 	public Enumeration<String> getHeaders(String name)
 	{
 		// todo: does nano support more than one header of same name?!
-		String hs = session.getHeaders().get(name);
+		String hs = getHeaders().get(name);
 		Vector<String> ret = new Vector<>();
 		ret.add(hs);
 		return ret.elements();
@@ -399,7 +421,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    
 	public Enumeration<String> getHeaderNames()
 	{
-		return new Vector<String>(session.getHeaders().keySet()).elements();
+		return new Vector<String>(getHeaders().keySet()).elements();
 	}
 	    
 	public int getIntHeader(String name)
@@ -410,7 +432,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    
 	public String getMethod()
 	{
-		return session.getMethod().toString();
+		return nanosession.getMethod().toString();
 	}
 	    
 	public String getPathInfo()
@@ -426,7 +448,7 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    
 	public String getQueryString()
 	{
-		return session.getQueryParameterString();
+		return nanosession.getQueryParameterString();
 	}
 	    
 	public String getRemoteUser()
@@ -452,12 +474,12 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	public String getRequestURI()
 	{
 		// todo: remove server/port
-		return session.getUri();
+		return nanosession.getUri();
 	}
 	    
 	public StringBuffer getRequestURL()
 	{
-		return new StringBuffer(session.getUri());
+		return new StringBuffer(nanosession.getUri());
 	}
 
 	public String getServletPath()
@@ -468,14 +490,33 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    
 	public HttpSession getSession(boolean create)
 	{
-		// todo
-		throw new UnsupportedOperationException();
+		if(session==null)
+		{
+			String id = getHeader(HEADER_NANO_SESSIONID);
+			
+			if(id!=null)
+			{
+				session = NanoHttpSession.sessions.get(id);
+				if(!session.isValid())
+				{
+					NanoHttpSession.sessions.remove(id);
+					id = null;
+				}
+			}
+			
+			if(id==null && create)
+			{
+				id = SUtil.createUniqueId();
+				session = new NanoHttpSession(id);
+				NanoHttpSession.sessions.put(id, session);
+			}
+		}
+		return session;
 	}
 
 	public HttpSession getSession()
 	{
-		// todo
-		throw new UnsupportedOperationException();
+		return getSession(true);
 	}
 
 	public String changeSessionId()
@@ -767,6 +808,149 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 		}
 	}
 
+	public static class NanoHttpSession implements HttpSession
+	{
+		public static final Map<String, NanoHttpSession> sessions = Collections.synchronizedMap(new HashMap<>());
+		
+		protected String id;
+		protected Map<String, Object> attributes;
+		protected int interval;
+		protected long access;
+		protected long created;
+		
+		public NanoHttpSession(String id)
+		{
+			this.id = id;
+			this.created = System.currentTimeMillis();
+			this.access = created;
+			this.interval = 1000*60*20; // 20 mins 
+		}
+
+		@Override
+		public void setMaxInactiveInterval(int interval)
+		{
+			access = System.currentTimeMillis();
+			this.interval = interval;
+		}
+		
+		@Override
+		public void setAttribute(String name, Object value)
+		{
+			access = System.currentTimeMillis();
+			if(attributes==null)
+				attributes = new HashMap<>();
+			attributes.put(name, value);
+		}
+		
+		@Override
+		public void removeValue(String name)
+		{
+			removeAttribute(name);
+		}
+		
+		@Override
+		public void removeAttribute(String name)
+		{
+			access = System.currentTimeMillis();
+			if(attributes!=null)
+				attributes.remove(name);
+		}
+		
+		@Override
+		public void putValue(String name, Object value)
+		{
+			setAttribute(name, value);
+		}
+		
+		@Override
+		public boolean isNew()
+		{
+			// todo
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void invalidate()
+		{
+			sessions.remove(id);
+		}
+		
+		@Override
+		public String[] getValueNames()
+		{
+			access = System.currentTimeMillis();
+			return attributes==null? SUtil.EMPTY_STRING_ARRAY: attributes.keySet().toArray(new String[attributes.size()]);
+		}
+		
+		@Override
+		public Object getValue(String name)
+		{
+			access = System.currentTimeMillis();
+			return getAttribute(name);
+		}
+		
+		@Override
+		public HttpSessionContext getSessionContext()
+		{
+			// todo
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public ServletContext getServletContext()
+		{
+			// todo
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public int getMaxInactiveInterval()
+		{
+			access = System.currentTimeMillis();
+			return interval;
+		}
+		
+		@Override
+		public long getLastAccessedTime()
+		{
+			return access;
+		}
+		
+		@Override
+		public String getId()
+		{
+			access = System.currentTimeMillis();
+			return id;
+		}
+		
+		@Override
+		public long getCreationTime()
+		{
+			access = System.currentTimeMillis();
+			return created;
+		}
+		
+		@Override
+		public Enumeration<String> getAttributeNames()
+		{
+			access = System.currentTimeMillis();
+			return attributes==null? new Vector<String>().elements(): new Vector<String>(attributes.keySet()).elements();
+		}
+		
+		@Override
+		public Object getAttribute(String name)
+		{
+			access = System.currentTimeMillis();
+			return attributes==null? null: attributes.get(name);
+		}
+		
+		protected boolean isValid()
+		{
+			long cur = System.currentTimeMillis();
+			return interval-(cur-access)>0;
+		}
+	}
+	
 	@Override
 	public String getPathTranslated() 
 	{

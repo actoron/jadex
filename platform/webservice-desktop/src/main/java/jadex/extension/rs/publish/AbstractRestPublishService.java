@@ -332,6 +332,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         // request info manages an ongoing conversation
         if(requestinfos.containsKey(callid))
         {
+//        	System.out.println("received existing call: "+request);
+        	
         	RequestInfo	rinfo = requestinfos.get(callid);
         	
         	// Result already available?
@@ -359,6 +361,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         }
         else if(callid!=null)
         {
+//        	System.out.println("callid not found: "+callid);
+        	
         	writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), null, null, request, response, true);
         
 //        	if(request.isAsyncStarted())
@@ -367,6 +371,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         // handle new call
         else
         {
+//        	System.out.println("received new call: "+request);
+        	
             String methodname = request.getPathInfo();
 
             if(methodname!=null && methodname.startsWith("/"))
@@ -398,7 +404,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     	final String fcallid = SUtil.createUniqueId(methodname);
 //                		System.out.println("sav2");
                     	saveRequestContext(fcallid, ctx);
-                    	final RequestInfo	rinfo	= new RequestInfo(mi);	
+                    	final RequestInfo rinfo = new RequestInfo(mi);	
                     	requestinfos.put(fcallid, rinfo);
 //                    	System.out.println("added context: "+fcallid+" "+ctx);
                     	
@@ -448,6 +454,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     	    	if(rinfo.isTerminated())
                     	    	{
                     	    		// nop -> ignore late results (i.e. when terminated due to browser offline).
+//                    	    		System.out.println("ignoring late result: "+result);
                     	    	}
                     	    	
                     			// Browser waiting for result -> send immediately
@@ -457,7 +464,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     				AsyncContext ctx = cls.iterator().next();
                     				cls.remove(ctx);
                     				
-//                    				System.out.println("removed context: "+callid+" "+ctx);
+//                    				System.out.println("direct answer to browser request, removed context: "+callid+" "+ctx);
                     				if(command!=null)
                     				{
                     					// Timer update (or other command???)
@@ -491,7 +498,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				        				// TODO: which timeout? (client vs server).
 				        				if(System.currentTimeMillis() - rinfo.getTimestamp()>Starter.getDefaultTimeout(component.getId()))
 				        				{
-//				        					System.out.println("terminating "+result);
+//				        					System.out.println("terminating due to timeout: "+exception);
 				        					rinfo.setTerminated();
 				        					if(ret instanceof ITerminableFuture<?>)
 				        					{
@@ -508,12 +515,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     				// Exception -> store until requested.
                     				if(!rinfo.isTerminated() && exception!=null)
                     				{
+//                    					System.out.println("storing exception till browser requests: "+exception);
                     					rinfo.setException(exception);
                     				}
                     				
                     				// Normal result -> store until requested. (check for command==null to also store null values as results).
                     				else if(!rinfo.isTerminated() && command==null)
                     				{
+//                    					System.out.println("storing result till browser requests: "+result);
                     					rinfo.addResult(result);
                     				}
                     				
@@ -1010,8 +1019,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         	if(status>0)
         		response.setStatus(status);
         	
-            // acceptable media types for response
-        	String mts = request.getHeader("Accept");
+            // acceptable media types for response (HTTP is case insensitive!)
+        	String mts = request.getHeader("accept");
             List<String> cl = parseMimetypes(mts);
             sr = mi==null? null: mi.getProducedMediaTypes();
             if(sr==null || sr.size()==0)
@@ -1068,11 +1077,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        {
 	        	String ret = null;
 	        	String mt = null;
-	        	if (sr != null)
+	        	if(sr != null)
 	        	{
 		        	for(String mediatype: sr)
 		        	{
-		        		mediatype	= mediatype.trim();	// e.g. sent with leading space from edge, grrr 
+		        		mediatype = mediatype.trim();	// e.g. sent with leading space from edge, grrr 
 		        		Collection<IObjectStringConverter> convs = converters.get(mediatype);
 		        		if(convs!=null && convs.size()>0)
 		        		{	
@@ -1089,6 +1098,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		        	if(response.getHeader("Content-Type")==null)
 		        		response.setHeader("Content-Type", mt);
 			        out.write(ret);
+//			        System.out.println("Response content: "+ret);
 		        }
 	        	else
 	  	        {
@@ -1980,7 +1990,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     	protected long	lastcheck;
     	
     	/**
-    	 * 
+    	 *  Create a request info.
     	 */
 		public RequestInfo(MappingInfo mappingInfo)
 		{
@@ -2016,9 +2026,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		public void addResult(Object result)
 		{
 			if(results==null)
-			{
 				results	= new ArrayDeque<>();
-			}
 			results.add(result);
 		}
 
@@ -2052,7 +2060,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		 *  @throws NullPointerException if there were never any results
 		 *  @throws NoSuchElementException if the last result was already consumed.
 		 */
-		public Object	getNextResult()
+		public Object getNextResult()
 		{
 			return results.remove();
 		}

@@ -73,11 +73,12 @@ public class JettyRestPublishService extends AbstractRestPublishService
     /** Infos for unpublishing. */
     protected Map<IServiceIdentifier, Tuple2<Server, ContextHandler>> unpublishinfos = new HashMap<IServiceIdentifier, Tuple2<Server,ContextHandler>>();
     
-    @ServiceStart
-    public void start()
-    {
-    	System.out.println("Jetty started");
-    }
+//    @ServiceStart
+//    public void start()
+//    {
+//    	super.init();
+//    	System.out.println("Jetty started");
+//    }
     
     @ServiceShutdown
     public void stop()

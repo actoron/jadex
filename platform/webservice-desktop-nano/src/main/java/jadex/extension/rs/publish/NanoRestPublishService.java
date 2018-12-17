@@ -17,6 +17,7 @@ import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.IStatus;
@@ -53,7 +54,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 		@Override 
 		public Response serve(IHTTPSession session) 
 		{
-			System.out.println("serve called: "+session.getUri());
+//			System.out.println("serve called: "+session.getUri());
 			
 			Response[] ret = new Response[1];
 			
@@ -75,6 +76,11 @@ public class NanoRestPublishService extends ExternalRestPublishService
 					byte[] out = resp.getOutput().toByteArray();
 					InputStream is = new ByteArrayInputStream(out);
 					ret[0] = newFixedLengthResponse(status, mimetype, is, out.length);
+					for(String hn: resp.getHeaderNames())
+						ret[0].addHeader(hn, resp.getHeader(hn));
+					HttpSession ses = req.getSession(false);
+					if(ses!=null)
+						ret[0].addHeader(NanoHttpServletRequestWrapper.HEADER_NANO_SESSIONID, ses.getId());
 				}
 			};
 			
