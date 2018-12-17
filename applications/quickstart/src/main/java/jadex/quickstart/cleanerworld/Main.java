@@ -18,6 +18,10 @@ import jadex.quickstart.cleanerworld.gui.EnvironmentGui;
 /**
  *  Main class for starting a cleanerworld scenario
  */
+// This file and all other files in same directory are copied to jadex-example-project.zip
+// Lines immediately starting with a '//' comment (like this line) are removed for dist
+// Lines with 'conf.addComponent' are removed for dist
+// After the 'Add your cleaner...' line, an 'addComponent' line is added for the default SimpleCleanerAgent for dist
 public class Main
 {
 	/** Use higher values (e.g. 2.0) for faster cleaner movement and lower values (e.g. 0.5) for slower movement. */
@@ -43,8 +47,8 @@ public class Main
 
 		// Add BDI kernel (required when running BDI agents)
 		conf.setValue("kernel_bdi", true);
-        
-        // Add your cleaner agent(s)
+
+		// Add your cleaner agent(s)
 //		conf.addComponent("jadex/quickstart/cleanerworld/SimpleCleanerAgentZero.class");
 
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentA0.class");

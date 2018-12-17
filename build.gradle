@@ -469,7 +469,7 @@ subprojects
 					from(sp.projectDir) {
 						into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
 						includes = ['*.properties', '*.gradle', 'src/**', 'dist/**', 'lib/**', 'gradle/**', 'gradlew.bat']
-						excludes = ['secret.properties', '**/.gradle', 'src/main/config', 'src/main/buildutils/jadexversion.properties']
+						excludes = ['secret.properties', '**/.gradle', 'src/main/config', 'src/main/buildutils/jadexversion.properties', 'dist/generated/**']
 					}
 					from(sp.projectDir) {
 						into 'sources' + sp.projectDir.canonicalPath.replace(File.separator, "/").substring(prefixsize)
