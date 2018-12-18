@@ -62,10 +62,10 @@ public class Main
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentC0.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentC1.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentC2.class");
-//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD1.class");
+		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD1.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD2.class");
 //		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgentD3a.class");
-		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgent.class");
+//		conf.addComponent("jadex/quickstart/cleanerworld/single/CleanerBDIAgent.class");
 		
 //		conf.addComponent("quickstart/cleanerworld/multi/messaging/SimpleMessagingCleanerAgent.class");
 //		conf.addComponent("quickstart/cleanerworld/multi/messaging/SimpleMessagingCleanerAgent.class");
