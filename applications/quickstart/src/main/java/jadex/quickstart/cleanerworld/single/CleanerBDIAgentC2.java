@@ -21,7 +21,7 @@ import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
 /**
- *  Separate Maintain and Target Conditions.
+ *  A Plan for Finding a Charging Station
  */
 @Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
 public class CleanerBDIAgentC2
