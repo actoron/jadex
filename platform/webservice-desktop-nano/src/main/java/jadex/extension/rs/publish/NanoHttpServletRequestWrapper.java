@@ -2,18 +2,23 @@ package jadex.extension.rs.publish;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,13 +30,21 @@ import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterRegistration;
+import javax.servlet.FilterRegistration.Dynamic;
 import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRegistration;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.SessionCookieConfig;
+import javax.servlet.SessionTrackingMode;
+import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,6 +68,9 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
     /** Http header for the session id. */
 	public static final String HEADER_NANO_SESSIONID = "x-nano-sessionid";
 	 
+	/** The servlet contexts. */
+	protected static Map<String, NanoServletContext> contexts;
+	
 	/** The nano session. */
 	protected IHTTPSession nanosession;
 	
@@ -72,7 +88,6 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	
 	/** The http session. */
 	protected NanoHttpSession session;
-	
 	
 	private String getDetailFromContentHeader(String contentTypeHeader, Pattern pattern, String defaultValue, int group) 
 	{
@@ -330,7 +345,18 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	
 	public ServletContext getServletContext()
 	{
-		throw new UnsupportedOperationException();
+		synchronized(this)
+		{
+			if(contexts==null)
+				contexts = Collections.synchronizedMap(new HashMap<>());
+		}
+		NanoServletContext ret = contexts.get(getContextPath());
+		if(ret==null)
+		{
+			ret = new NanoServletContext();
+			contexts.put(getContextPath(), ret);
+		}
+		return ret;
 	}
 	
 	public AsyncContext startAsync() throws IllegalStateException
@@ -948,6 +974,339 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 		{
 			long cur = System.currentTimeMillis();
 			return interval-(cur-access)>0;
+		}
+	}
+	
+	/**
+	 * todo: context values are just stored locally
+	 * contexts are not cached but always 
+	 */
+	public static class NanoServletContext implements ServletContext
+	{
+		protected Map<String, String> initparams;
+		protected Map<String, Object> attributes;
+		
+		@Override
+		public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes)
+		{
+		}
+		
+		@Override
+		public boolean setInitParameter(String name, String value)
+		{
+			if(initparams==null)
+				initparams = new HashMap<>();
+			initparams.put(name, value);
+			return true;
+		}
+		
+		@Override
+		public void setAttribute(String name, Object object)
+		{
+			if(attributes==null)
+				attributes = new HashMap<>();
+			attributes.put(name, object);
+		}
+		
+		@Override
+		public void removeAttribute(String name)
+		{
+			if(attributes!=null)
+				attributes.remove(name);
+		}
+		
+		@Override
+		public void log(String message, Throwable throwable)
+		{
+			System.out.println("Log: "+message+" "+throwable);
+		}
+		
+		@Override
+		public void log(Exception exception, String msg)
+		{
+			System.out.println("Log: "+msg+" "+exception);
+		}
+		
+		@Override
+		public void log(String msg)
+		{
+			System.out.println("Log: "+msg);
+		}
+		
+		@Override
+		public String getVirtualServerName()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public SessionCookieConfig getSessionCookieConfig()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public Enumeration<Servlet> getServlets()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public Map<String, ? extends ServletRegistration> getServletRegistrations()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public ServletRegistration getServletRegistration(String servletName)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public Enumeration<String> getServletNames()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public String getServletContextName()
+		{
+			return "";
+		}
+		
+		@Override
+		public Servlet getServlet(String name) throws ServletException
+		{
+			throw new UnsupportedOperationException();			
+		}
+		
+		@Override
+		public String getServerInfo()
+		{
+			// todo: version
+			return "nano";
+		}
+		
+		@Override
+		public Set<String> getResourcePaths(String path)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public InputStream getResourceAsStream(String path)
+		{
+			return SUtil.getResource0(path, getClassLoader());
+		}
+		
+		@Override
+		public URL getResource(String path) throws MalformedURLException
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public RequestDispatcher getRequestDispatcher(String path)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public String getRealPath(String path)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public RequestDispatcher getNamedDispatcher(String name)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public int getMinorVersion()
+		{
+			// todo
+			return 0;
+		}
+		
+		@Override
+		public String getMimeType(String file)
+		{
+			return SUtil.guessContentTypeByFilename(file);
+		}
+		
+		@Override
+		public int getMajorVersion()
+		{
+			// todo: 
+			return 0;
+		}
+		
+		@Override
+		public JspConfigDescriptor getJspConfigDescriptor()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public Enumeration<String> getInitParameterNames()
+		{
+			return initparams==null? null: new Vector<String>(initparams.keySet()).elements();
+		}
+		
+		@Override
+		public String getInitParameter(String name)
+		{
+			return initparams==null? null: initparams.get(name);
+		}
+		
+		@Override
+		public Map<String, ? extends FilterRegistration> getFilterRegistrations()
+		{
+			throw new UnsupportedOperationException();
+
+		}
+		
+		@Override
+		public FilterRegistration getFilterRegistration(String filterName)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public Set<SessionTrackingMode> getEffectiveSessionTrackingModes()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public int getEffectiveMinorVersion()
+		{
+			// todo
+			return 0;
+		}
+		
+		@Override
+		public int getEffectiveMajorVersion()
+		{
+			// todo
+			return 0;
+		}
+		
+		@Override
+		public Set<SessionTrackingMode> getDefaultSessionTrackingModes()
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public String getContextPath()
+		{
+			return null;
+		}
+		
+		@Override
+		public ServletContext getContext(String uripath)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public ClassLoader getClassLoader()
+		{
+			return getClassLoader();
+		}
+		
+		@Override
+		public Enumeration<String> getAttributeNames()
+		{
+			return attributes==null? null: new Vector<String>(attributes.keySet()).elements();
+		}
+		
+		@Override
+		public Object getAttribute(String name)
+		{
+			return attributes==null? null: attributes.get(name);
+		}
+		
+		@Override
+		public void declareRoles(String... roleNames)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public <T extends Servlet> T createServlet(Class<T> clazz) throws ServletException
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public <T extends EventListener> T createListener(Class<T> clazz) throws ServletException
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public <T extends Filter> T createFilter(Class<T> clazz) throws ServletException
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public javax.servlet.ServletRegistration.Dynamic addServlet(String servletName, Class< ? extends Servlet> servletClass)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public javax.servlet.ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public javax.servlet.ServletRegistration.Dynamic addServlet(String servletName, String className)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void addListener(Class< ? extends EventListener> listenerClass)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public <T extends EventListener> void addListener(T t)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void addListener(String className)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public Dynamic addFilter(String filterName, Class< ? extends Filter> filterClass)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public Dynamic addFilter(String filterName, Filter filter)
+		{
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public Dynamic addFilter(String filterName, String className)
+		{
+			throw new UnsupportedOperationException();
 		}
 	}
 	
