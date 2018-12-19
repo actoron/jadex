@@ -5,7 +5,7 @@ The general idea is to consider systems to be composed of components acting as s
 Hence, it is very similar to the Service Component Architecture (SCA) approach and extends it with agents-oriented concepts. 
 In contrast to SCA, components are always active entities, i.e. they posses autonomy with respect to what they do and when they perform actions making them akin to agents. In contrast to agents, communication is preferably done using service invocations.
 
-Read more about Active Components at [www.activecomponents.org] and visit our [documentation pages](https://download.actoron.com/docs/releases/latest/jadex-mkdocs/).
+Read more about Active Components at www.activecomponents.org and visit our [documentation pages](https://download.actoron.com/docs/releases/latest/jadex-mkdocs/).
 
 # Maven/Gradle dependencies
 
