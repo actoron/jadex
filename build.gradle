@@ -815,7 +815,7 @@ def checkDistZip(task, distname, arts, isaddon)
 	artefactBuild.startParameter.excludedTaskNames	= ["test", "javadoc"]
 	artefactBuild.startParameter.projectProperties << ["dist": distname]
 	
-	artefactBuild.doFirst {
+	def unzip	= project.tasks.create([name: "unzipSources"+distname.substring(0,1).toUpperCase()+distname.substring(1)]).doLast {
 		// Extract and build sources.zip
 		def srczip	= new File(project.distsDir, 'sources/jadex-' + distname  + '-' + jadex_build_version + '-sources.zip')
 		ant.unzip(src: srczip, dest: rebuilddirfile)
@@ -823,6 +823,7 @@ def checkDistZip(task, distname, arts, isaddon)
 //		if(isaddon)
 //			ant.unzip(src: new File(project.distsDir, 'tmp/minimal/sources.zip'), dest: rebuilddirfile)
 	}
+	artefactBuild.dependsOn unzip
 	
 	artefactBuild.doLast {
 		//	// For debugging bluetooth aar
