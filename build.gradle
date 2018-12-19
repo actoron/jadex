@@ -309,22 +309,24 @@ subprojects
 				project.tasks.matching {
 //					it.name.startsWith('transformResourcesWithMergeJavaRes')
 					it.name.startsWith('transformClassesAndResourcesWithSyncLibJars')
-				}.each {task -> task.doFirst {
+				}.each {task ->
 					// Intercept jar input to rebuild jar beforehands LOL :(
 					task.getInputs().getFiles().filter({it.getName().endsWith(".jar")}).getFiles().each {file ->
 						def rebuilddir	= new File(file.getParentFile(), "rebuild")
-						rebuilddir.mkdirs()
-						ant.unzip(src: file, dest: rebuilddir)
-						project.tasks.create([name: "rebuildJar", type: Zip]) {
+						task.dependsOn project.tasks.create([name: "rebuildJar"+file.name, type: Zip]) {
 							destinationDir file.getParentFile()
 							archiveName file.getName()
 							from(rebuilddir) {
 								includes = ['*/**']
 							}
-						}.execute()
+							doFirst {
+								rebuilddir.mkdirs()
+								ant.unzip(src: file, dest: rebuilddir)
+							}
+						}
 //						println 'Rebuilt generated jar ' + file.getCanonicalPath() + ' ' + file.exists()
 					}
-				}}
+				}
 			}
 		}
 
@@ -789,62 +791,68 @@ task distZips()  {
 
 task checkDists()  {
 	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
-
-	doLast {
-		gradle.ext.selecteddists.parallelStream().forEach {selecteddist ->
-			if(!selecteddist.startsWith('addon'))	// Exclude addons for now. TODO: fix addon dists!
-			{
-				def arts = gradle.ext.distartmap.get(selecteddist)
-				checkDistZip(selecteddist, arts, selecteddist.startsWith('addon'))
-			}
+	def self	= project.checkDists
+	gradle.ext.selecteddists.parallelStream().forEach {selecteddist ->
+		if(!selecteddist.startsWith('addon'))	// Exclude addons for now. TODO: fix addon dists!
+		{
+			def arts = gradle.ext.distartmap.get(selecteddist)
+			checkDistZip(self, selecteddist, arts, selecteddist.startsWith('addon'))
 		}
 	}
 	dependsOn subprojects.collect({p -> p.tasks.matching{it.name.equals('distZip')}}).flatten()
 }
 
-def checkDistZip(distname, arts, isaddon)
+def checkDistZip(task, distname, arts, isaddon)
 {
-	def commercial = false
-	arts.each { artname ->
-		commercial |= isCommercial(project.ext.subprojectmap.get(artname))
-	}
 	def rebuilddirfile = new File(project.distsDir, 'rebuild/'+distname);
 	rebuilddirfile.mkdirs()
-	def srczip	= new File(project.distsDir, 'sources/jadex-' + distname  + '-' + jadex_build_version + '-sources.zip')
-
-	// Extract and build sources.zip
-	ant.unzip(src: srczip, dest: rebuilddirfile)
-//	// Hack!!! extract minimal zip also, as addons do not build on their own 
-//	if(isaddon)
-//		ant.unzip(src: new File(project.distsDir, 'tmp/minimal/sources.zip'), dest: rebuilddirfile)
+	
 	// https://stackoverflow.com/questions/26459067/how-to-run-gradle-script-from-gradle
+	// https://discuss.gradle.org/t/replacement-for-task-execute/27545
 	def artefactBuild = project.tasks.create([name: "checkDist"+distname.substring(0,1).toUpperCase()+distname.substring(1), type: GradleBuild])
 	artefactBuild.buildFile = project.file(new File(rebuilddirfile, "sources/build.gradle"))
 	artefactBuild.tasks = ["distZip"]
 	artefactBuild.startParameter.excludedTaskNames	= ["test", "javadoc"]
 	artefactBuild.startParameter.projectProperties << ["dist": distname]
-	artefactBuild.execute()
 	
-//	// For debugging bluetooth aar
-//	if(subprojectmap.get(":android:bluetooth")!=null) {
-//		def zip1	= new File(project.projectDir, 'android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
-//		def zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
-//		def diff	= diffZips(zip1, zip2)
-//		if(diff.length()!=0)
-//			throw new RuntimeException("Rebuilt bluetooth classes.jar does not match original: "+diff);		
-//		zip1	= new File(project.projectDir, 'android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
-//		zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
-//		diff	= diffZips(zip1, zip2)
-//		if(diff.length()!=0)
-//			throw new RuntimeException("Rebuilt bluetooth-" + jadex_build_version + ".aar does not match original: "+diff);		
-//	}
+	artefactBuild.doFirst {
+		// Extract and build sources.zip
+		def srczip	= new File(project.distsDir, 'sources/jadex-' + distname  + '-' + jadex_build_version + '-sources.zip')
+		ant.unzip(src: srczip, dest: rebuilddirfile)
+//		// Hack!!! extract minimal zip also, as addons do not build on their own
+//		if(isaddon)
+//			ant.unzip(src: new File(project.distsDir, 'tmp/minimal/sources.zip'), dest: rebuilddirfile)
+	}
 	
-	// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-	def distzip = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-	def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-	def diff	= diffZips(distzip, distzip2)
-	if(diff.length()!=0)
-		throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);		
+	artefactBuild.doLast {
+		//	// For debugging bluetooth aar
+		//	if(subprojectmap.get(":android:bluetooth")!=null) {
+		//		def zip1	= new File(project.projectDir, 'android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
+		//		def zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
+		//		def diff	= diffZips(zip1, zip2)
+		//		if(diff.length()!=0)
+		//			throw new RuntimeException("Rebuilt bluetooth classes.jar does not match original: "+diff);
+		//		zip1	= new File(project.projectDir, 'android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
+		//		zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
+		//		diff	= diffZips(zip1, zip2)
+		//		if(diff.length()!=0)
+		//			throw new RuntimeException("Rebuilt bluetooth-" + jadex_build_version + ".aar does not match original: "+diff);
+		//	}
+			
+		def commercial = false
+		arts.each { artname ->
+			commercial |= isCommercial(project.ext.subprojectmap.get(artname))
+		}
+		// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
+		def distzip = project.distsDir.getCanonicalPath() + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+		def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+		def diff	= diffZips(distzip, distzip2)
+		if(diff.length()!=0)
+			throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
+	}
+	
+	task.dependsOn artefactBuild
+		
 }
 
 //def createDistZip(distname, arts, isaddon)
