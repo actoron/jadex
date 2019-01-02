@@ -1,7 +1,6 @@
 package jadex.binary;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 
 public class FramingBSTest extends BSTest
 {

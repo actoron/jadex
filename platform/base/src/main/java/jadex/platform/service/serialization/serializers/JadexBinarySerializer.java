@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import jadex.binary.SBinarySerializer;
-import jadex.binary.SerializationConfig;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.IErrorReporter;

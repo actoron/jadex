@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.DefaultErrorReporter;
 import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;

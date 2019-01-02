@@ -41,6 +41,7 @@ import jadex.platform.service.serialization.codecs.LZ4Codec;
 import jadex.platform.service.serialization.codecs.SnappyCodec;
 import jadex.platform.service.serialization.codecs.XZCodec;
 import jadex.platform.service.serialization.serializers.JadexBinarySerializer;
+import jadex.platform.service.serialization.serializers.JadexFramedBinarySerializer;
 import jadex.platform.service.serialization.serializers.JadexJsonSerializer;
 
 /**
@@ -83,7 +84,9 @@ public class SerializationServices implements ISerializationServices
 		serializers.put(serial.getSerializerId(), serial);
 		serial = new JadexJsonSerializer();
 		serializers.put(serial.getSerializerId(), serial);
-		sendserializer = serializers.get(0);
+		serial = new JadexFramedBinarySerializer();
+		serializers.put(serial.getSerializerId(), serial);
+		sendserializer = serializers.get(2);
 		codecs = new HashMap<Integer, ICodec>();
 		ICodec codec = new SnappyCodec();
 		codecs.put(codec.getCodecId(), codec);
