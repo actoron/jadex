@@ -67,8 +67,8 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 @ProvidedServices({
 	@ProvidedService(scope=ServiceScope.PLATFORM, type=ITransportService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(scope=ServiceScope.PLATFORM, type=ITransportInfoService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(scope=ServiceScope.PLATFORM, type=IMemstatService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW))
+	@ProvidedService(scope=ServiceScope.PLATFORM, type=ITransportInfoService.class, implementation=@Implementation(expression="$pojoagent")),//, proxytype=Implementation.PROXYTYPE_RAW)),
+//	@ProvidedService(scope=ServiceScope.PLATFORM, type=IMemstatService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW))
 })
 public class AbstractTransportAgent2<Con> implements ITransportService, ITransportHandler<Con>, ITransportInfoService, IMemstatService, IInternalService
 {

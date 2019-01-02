@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,16 +28,15 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
 	/** The nano session. */
 	protected IHTTPSession session;
 	
-	/** The response. */
-//	protected Response response;
-	
 	protected String contenttype;
 	protected int status = 200;
 	protected long length;
 	protected String charencoding;
+	protected Map<String, String> headers;
 	protected ServletOutputStream out;
 	protected ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	protected PrintWriter writer;
+	
 	
 	public NanoHttpServletResponseWrapper(IHTTPSession session)
 	{
@@ -94,7 +95,7 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
     
     public void setDateHeader(String name, long date)
     {
-    	session.getHeaders().put(name, DateHandler.format(date));
+    	setHeaderInternal(name, DateHandler.format(date));
     }
     
     public void addDateHeader(String name, long date)
@@ -104,7 +105,7 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
     
     public void setHeader(String name, String value)
     {
-    	session.getHeaders().put(name, value);
+    	setHeaderInternal(name, value);
     }
     
     public void addHeader(String name, String value)
@@ -114,7 +115,7 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
 
     public void setIntHeader(String name, int value)
     {
-    	session.getHeaders().put(name, ""+value);
+    	setHeaderInternal(name, ""+value);
     }
 
     public void addIntHeader(String name, int value)
@@ -143,12 +144,12 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
 
     public String getHeader(String name)
     {
-    	return session.getHeaders().get(name);
+    	return headers!=null? headers.get(name): null;
     }
 
     public Collection<String> getHeaders(String name)
     {
-    	String h = session.getHeaders().get(name);
+    	String h = getHeader(name);
     	StringTokenizer stok = new StringTokenizer(h, ",");
     	List<String> ret = new ArrayList<>();
     	while(stok.hasMoreTokens())
@@ -158,7 +159,7 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
     
     public Collection<String> getHeaderNames()
     {
-    	return session.getHeaders().keySet();
+    	return headers==null? Collections.EMPTY_LIST: headers.keySet();
     }
     
     public void setCharacterEncoding(String charset)
@@ -268,22 +269,26 @@ public class NanoHttpServletResponseWrapper implements HttpServletResponse
     	throw new UnsupportedOperationException();
     }
     
+    protected void setHeaderInternal(String name, String val)
+    {
+    	if(headers==null)
+    		headers = new HashMap<>();
+    	headers.put(name, val);
+    }
+    
     protected void addHeaderInternal(String name, String val)
     {
-    	Map<String, String> hs = session.getHeaders();
-    	String oval = hs.get(name);
+    	if(headers==null)
+    		headers = new HashMap<>();
+    	String oval = headers.get(name);
     	if(oval!=null)
     		val = oval+","+val;
-    	hs.put(name, val);
+    	headers.put(name, val);
     }
 
     public ByteArrayOutputStream getOutput()
     {
+    	try{ getWriter().flush(); } catch(Exception e) {e.printStackTrace();}
     	return bos;
     }
-    
-//	public StringBuffer getOutbuf() 
-//	{
-//		return outbuf;
-//	}
 }

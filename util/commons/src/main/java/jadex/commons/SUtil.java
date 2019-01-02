@@ -840,6 +840,23 @@ public class SUtil
 		}
 		return str.toString();
 	}
+	
+	/**
+	 *  Create a map copy with all keys in lowercase.
+	 *  @param map The original map.
+	 *  @return The converted map.
+	 */
+	public static <T> Map<String, T> convertMapKeysToLowercase(Map<String, T> map)
+	{
+		Map<String, T> ret = new HashMap<>();
+		
+		for(Map.Entry<String, T> entry: SUtil.notNull(map).entrySet())
+		{
+			ret.put(entry.getKey().toLowerCase(), entry.getValue());
+		}
+		
+		return ret;
+	}
 
 	/**
 	 * Get the singular of a word in plural. Does NOT find all correct singular.

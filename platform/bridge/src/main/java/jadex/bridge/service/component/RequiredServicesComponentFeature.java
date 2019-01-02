@@ -715,9 +715,6 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 		enhanceQuery(query, true);
 		
-		if(query.getServiceType().toString().indexOf("ITransportInfoService")!=-1)
-			System.out.println("here");
-		
 		IServiceRegistry registry = ServiceRegistry.getRegistry(getInternalAccess());
 		Collection<IServiceIdentifier> results =  registry.searchServices(query);
 		
