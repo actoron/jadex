@@ -1,11 +1,15 @@
 package jadex.binary;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
+import jadex.commons.SUtil;
+import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
@@ -38,10 +42,22 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 	/** The cache for non-inner classes. */
 	protected Set<Class<?>> nonanonclasscache = new HashSet<Class<?>>();
 	
+	/** The string pool. */
+	protected Map<String, Integer> stringpool;
+	
+	/** Cache for class IDs. */
+	protected Map<Class<?>, Integer> classidcache;
+	
+	/** The class name pool. */
+	protected Map<String, Integer> classnamepool;
+	
+	/** The package fragment pool. */
+	protected Map<String, Integer> fragpool;
+	
 	/** The bytes written to the output. */
 	protected long writtenbytes;
 	
-	public AbstractEncodingContext(Object rootobject, Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader)
+	public AbstractEncodingContext(Object rootobject, Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader, SerializationConfig config)
 	{
 		this.knownobjects = new IdentityHashMap<Object, Long>();
 		this.rootobject = rootobject;
@@ -49,6 +65,10 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 		this.preprocessors = preprocessors;
 		this.classloader = classloader;
 		this.ignorewriteclass = false;
+		classidcache = new HashMap<Class<?>, Integer>();
+		stringpool = config==null?new HashMap<String, Integer>():config.createEncodingStringPool();
+		classnamepool = config==null?new HashMap<String, Integer>():config.createEncodingClassnamePool();
+		fragpool = config==null?new HashMap<String, Integer>():config.createEncodingFragPool();
 	}
 	
 	/**
@@ -153,5 +173,191 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 	protected boolean isIgnoreNextClassWrite()
 	{
 		return ignorewriteclass;
+	}
+	
+	/**
+	 *  Writes a VarInt.
+	 *  
+	 *  @param value Value being written.
+	 */
+	public void writeVarInt(long value)
+	{
+		try
+		{
+			write(VarInt.encode(value));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Writes a signed VarInt.
+	 *  
+	 *  @param value Value being written.
+	 */
+	public void writeSignedVarInt(long value)
+	{
+		boolean neg = value < 0;
+		value = Math.abs(value);
+		long mask = Long.highestOneBit(value) << 2;
+		if (neg)
+		{
+			mask |= mask >> 1;
+		}
+		value = value | (mask);
+		writeVarInt(value);
+	}
+	
+	/**
+	 * 
+	 * @param string
+	 */
+	public void writeString(String string)
+	{
+		pooledWrite(stringpool, string);
+	}
+	
+	/**
+	 * 
+	 * @param clazz
+	 */
+	public void writeClass(Class<?> clazz)
+	{
+
+		if(!isIgnoreNextClassWrite())
+		{
+			Integer classid = classidcache.get(clazz);
+			if (classid == null)
+			{
+				String	classname	= STransformation.registerClass(clazz);
+				classid = writeClassname(classname);
+				classidcache.put(clazz, classid);
+			}
+			else
+			{
+				writeVarInt(classid.intValue());
+			}
+		}
+		else
+		{
+			setIgnoreNextClassWrite(false);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public int writeClassname(String name)
+	{
+		Integer classid = classnamepool.get(name);
+		if (classid == null)
+		{
+			classid = classnamepool.size();
+			classnamepool.put(name, classid);
+			writeVarInt(classid.intValue());
+			
+			int lppos = name.lastIndexOf('.');
+			if (lppos < 0)
+			{
+				writeVarInt(0);
+				pooledWrite(fragpool, name);
+			}
+			else
+			{
+				String pkgname = name.substring(0, lppos);
+				String classname = name.substring(lppos + 1);
+				
+				StringTokenizer tok = new StringTokenizer(pkgname, ".");
+				writeVarInt(tok.countTokens());
+				while (tok.hasMoreElements())
+				{
+					String frag = tok.nextToken();
+					pooledWrite(fragpool, frag);
+				}
+				pooledWrite(fragpool, classname);
+			}
+		}
+		else
+		{
+			writeVarInt(classid.intValue());
+		}
+		
+		
+		return classid.intValue();
+	}
+	
+	/**
+	 *  Writes a boolean.
+	 *  @param bool The boolean.
+	 */
+	public void writeBoolean(boolean bool)
+	{
+		writeByte((byte) (bool? 1 : 0));
+	}
+	
+	/**
+	 *  Starts an object frame
+	 *  when using a context with framing support.
+	 */
+	public void startObjectFrame()
+	{
+		startObjectFrame(false);
+	}
+	
+	/**
+	 *  Starts an object frame
+	 *  when using a context with framing support.
+	 *  
+	 *  @param fixedsize If true, use fixed-size (integer) framing.
+	 *  				 Set true if the object being framed is expected
+	 *  				 to be larger than 127 bytes (same type of object MUST use
+	 *  				 either fixed OR variable framing).
+	 */
+	public void startObjectFrame(boolean fixedsize)
+	{
+		// default no framing
+	}
+	
+	/**
+	 *  Stops an object frame
+	 *  when using a context with framing support.
+	 */
+	public void stopObjectFrame()
+	{
+		// default no framing
+	}
+	
+	/**
+	 * Writes a string using a pool.
+	 * 
+	 * @param string
+	 */
+	protected void pooledWrite(Map<String, Integer> pool, String string)
+	{
+		Integer sid = pool.get(string);
+		if(sid == null)
+		{
+			sid = pool.size();
+			pool.put(string, sid);
+			writeVarInt(sid);
+			
+			if (string != null)
+			{
+				byte[] encodedString = string.getBytes(SUtil.UTF8);
+				
+				writeVarInt(encodedString.length);
+				write(encodedString);
+			}
+			else
+			{
+				writeVarInt(Integer.MAX_VALUE + 1L);
+			}
+		}
+		else
+		{
+			writeVarInt(sid);
+		}
 	}
 }

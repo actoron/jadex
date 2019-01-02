@@ -335,7 +335,7 @@ public class SReflect
 //					}
 					catch(Throwable e)
 					{
-//						e.printStackTrace();
+						e.printStackTrace();
 //						if(name.indexOf("AgentPlan")!=-1)
 //							e.printStackTrace();
 						// Catch anything as sometimes strange errors appear

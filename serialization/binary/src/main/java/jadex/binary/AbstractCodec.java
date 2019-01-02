@@ -21,6 +21,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
 	{
 		IEncodingContext ec = (IEncodingContext) context;
+		
 		Class<?> clazz = SReflect.getClass(type);
 		
 //		if(canReference(orig, clazz, ec))
@@ -34,7 +35,11 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 		
 		ec.writeClass(clazz);
 		
+		ec.startObjectFrame(isFixedFrame());
+		
 		object = encode(object, clazz, conversionprocessors, processors, mode, traverser, targetcl, ec);
+		
+		ec.stopObjectFrame();
 		
 		return object;
 	}
@@ -111,6 +116,8 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 */
 	public Object decode(Class<?> clazz, IDecodingContext context)
 	{
+		context.startObjectFrame(isFixedFrame());
+		
 		Object ret = createObject(clazz, context);
 		// Remap class in case there was a search for the correct inner class.
 		if(ret != null)
@@ -119,6 +126,9 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 		}
 		recordKnownDecodedObject(ret, context);
 		ret = decodeSubObjects(ret, clazz, context);
+		
+		context.stopObjectFrame();
+		
 		return ret;
 	}
 	
@@ -171,4 +181,21 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @return True, if the decoder can decode this class.
 	 */
 	public abstract boolean isApplicable(Class<?> clazz);
+	
+	/**
+	 *  Declares if the codec should use fixed or variable framing in framing mode.
+	 *  Variable framing tends to be more space-efficient especially for small object
+	 *  but can be more costly to encode when the object is larger than 127 bytes.
+	 *  
+	 *  Addendum: Testing seems to suggest that the performance impact is below
+	 *  measuring noise, therefore variable-size framing is now enabled for all codecs.
+	 *  
+	 *  Default is false (variable encoding).
+	 *  
+	 *  @return True, if fixed size framing should be used.
+	 */
+	protected boolean isFixedFrame()
+	{
+		return false;
+	}
 }
