@@ -2459,25 +2459,28 @@ public class SComponentManagementService
 	{
 		CmsState state = getState(cid);
 		IPlatformComponentAccess ret = null;
-		try
+		if (state != null)
 		{
-			try(IAutoLock l = state.readLock())
+			try
 			{
-				CmsComponentState compstate = state.getComponent(cid);
-				if (compstate != null)
+				try(IAutoLock l = state.readLock())
 				{
-					ret = compstate.getAccess();
-					if(ret==null)
+					CmsComponentState compstate = state.getComponent(cid);
+					if (compstate != null)
 					{
-						InitInfo ii = compstate.getInitInfo();
-						if(ii!=null)
-							ret	= ii.getComponent();
+						ret = compstate.getAccess();
+						if(ret==null)
+						{
+							InitInfo ii = compstate.getInitInfo();
+							if(ii!=null)
+								ret	= ii.getComponent();
+						}
 					}
 				}
 			}
-		}
-		finally
-		{
+			finally
+			{
+			}
 		}
 		
 		return ret;
