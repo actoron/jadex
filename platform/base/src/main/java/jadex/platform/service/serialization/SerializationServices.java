@@ -249,7 +249,7 @@ public class SerializationServices implements ISerializationServices
 						localversion.getMajorVersion() == remoteversion.getMajorVersion())
 					{
 						sameversioncache.put(receiverplatform, Boolean.TRUE);
-						System.out.println("Switched to optimized serializer for " + receiverplatform);
+//						System.out.println("Switched to optimized serializer for " + receiverplatform);
 						return optimizedsendserializer;
 					}
 					else
