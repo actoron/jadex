@@ -67,13 +67,14 @@ public class SerializationServices implements ISerializationServices
 	protected ISerializer optimizedsendserializer;
 	
 	/** All available serializers */
-	protected Map<Integer, ISerializer> serializers;
+	protected ISerializer[] serializers;
+//	protected Map<Integer, ISerializer> serializers;
 	
 	/** Codecs used for sending. */
 	protected ICodec[] sendcodecs;
 	
 	/** All available codecs. */
-	protected Map<Integer, ICodec> codecs;
+	protected ICodec[] codecs;
 	
 	/** Preprocessors for encoding. */
 	protected ITraverseProcessor[] preprocessors;
@@ -95,25 +96,29 @@ public class SerializationServices implements ISerializationServices
 	{
 		sameversioncache = new RwMapWrapper<>(new LRU<>(100));
 		rrm	= new RemoteReferenceModule(comp);
-		serializers = new HashMap<Integer, ISerializer>();
+//		serializers = new HashMap<Integer, ISerializer>();
+		serializers = new ISerializer[3];
 		ISerializer serial = new JadexBinarySerializer();
-		serializers.put(serial.getSerializerId(), serial);
+//		serializers.put(serial.getSerializerId(), serial);
+		serializers[serial.getSerializerId()] = serial;
 		serial = new JadexJsonSerializer();
-		serializers.put(serial.getSerializerId(), serial);
+//		serializers.put(serial.getSerializerId(), serial);
+		serializers[serial.getSerializerId()] = serial;
 		serial = new JadexFramedBinarySerializer();
-		serializers.put(serial.getSerializerId(), serial);
-		defaultsendserializer = serializers.get(2);
-		optimizedsendserializer = serializers.get(0);
-		codecs = new HashMap<Integer, ICodec>();
+//		serializers.put(serial.getSerializerId(), serial);
+		serializers[serial.getSerializerId()] = serial;
+		defaultsendserializer = serializers[2];
+		optimizedsendserializer = serializers[0];
+		codecs = new ICodec[4];
 		ICodec codec = new SnappyCodec();
-		codecs.put(codec.getCodecId(), codec);
+		codecs[codec.getCodecId()] = codec;
 		codec = new GZIPCodec();
-		codecs.put(codec.getCodecId(), codec);
+		codecs[codec.getCodecId()] = codec;
 		codec = new LZ4Codec();
-		codecs.put(codec.getCodecId(), codec);
+		codecs[codec.getCodecId()] = codec;
 		codec = new XZCodec();
-		codecs.put(codec.getCodecId(), codec);
-		sendcodecs = new ICodec[] { codecs.get(3) };
+		codecs[codec.getCodecId()] = codec;
+		sendcodecs = new ICodec[] { codecs[3] };
 		List<ITraverseProcessor> procs = createPreprocessors();
 		preprocessors = procs.toArray(new ITraverseProcessor[procs.size()]);
 		procs = createPostprocessors();
@@ -195,7 +200,7 @@ public class SerializationServices implements ISerializationServices
 						raw = enc;
 						for(int i = codecsize - 1; i >= 0; --i)
 						{
-							raw = getCodecs().get(SUtil.bytesToInt(enc, (i << 4) + 8)).decode(raw, offset, raw.length - offset);
+							raw = getCodecs()[SUtil.bytesToInt(enc, (i << 4) + 8)].decode(raw, offset, raw.length - offset);
 							offset = 0;
 						}
 					}
@@ -205,14 +210,15 @@ public class SerializationServices implements ISerializationServices
 						System.arraycopy(enc, prefixsize, raw, 0, raw.length);
 					}
 					
-					ISerializer serial = getSerializers().get(SUtil.bytesToInt(enc, 2));
+					int serialid = SUtil.bytesToInt(enc, 2);
+					ISerializer serial = getSerializers()[serialid];
 					Map<String, Object> context = new HashMap<String, Object>();
 					context.put("header", header);
 					context.put("component", component);
 					ret = serial.decode(raw, component.getClassLoader(), getPostprocessors(), null, context);
 				}
 			}
-			catch (IndexOutOfBoundsException e)
+			catch (ArrayIndexOutOfBoundsException e)
 			{
 				ret = null;
 			}
@@ -268,7 +274,7 @@ public class SerializationServices implements ISerializationServices
 	 *  @param platform Sending platform.
 	 *  @return Serializers.
 	 */
-	public Map<Integer, ISerializer> getSerializers()
+	public ISerializer[] getSerializers()
 	{
 		return serializers;
 	}
@@ -289,7 +295,7 @@ public class SerializationServices implements ISerializationServices
 	 *  
 	 *  @return Codecs.
 	 */
-	public Map<Integer, ICodec> getCodecs()
+	public ICodec[] getCodecs()
 	{
 		return codecs;
 	}
