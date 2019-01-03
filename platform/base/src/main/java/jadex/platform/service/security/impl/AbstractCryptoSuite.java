@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.JadexVersion;
 import jadex.platform.service.security.ICryptoSuite;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.SecurityInfo;
@@ -37,6 +38,9 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	
 	/** The handshake ID. */
 	protected String handshakeid;
+	
+	/** The remote Jadex version. */
+	protected JadexVersion remoteversion = new JadexVersion();
 	
 	/** Checks if a message ID is valid */
 	protected synchronized boolean isValid(long msgid)
@@ -138,5 +142,23 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	public void setHandshakeId(String id)
 	{
 		handshakeid = id;
+	}
+	
+	/**
+	 *  Gets the version of the remote Jadex platform.
+	 *  @return The Jadex version.
+	 */
+	public JadexVersion getRemoteVersion()
+	{
+		return remoteversion;
+	}
+	
+	/**
+	 *  Sets the version of the remote Jadex platform.
+	 *  @param jadexversion The Jadex version.
+	 */
+	public void setRemoteVersion(JadexVersion jadexversion)
+	{
+		remoteversion = jadexversion;
 	}
 }

@@ -20,24 +20,31 @@ public class VersionInfo
 	//-------- constants --------
 
 	/** The version info singleton. */
-	protected static final VersionInfo	instance	= new VersionInfo();
+	
+	protected static final VersionInfo instance = new VersionInfo();
 	
 	/** The text date format (e.g. January 13, 2012). */
-	public final DateFormat	DATE_FORMAT_TEXT	= new SimpleDateFormat("MMMM d, yyyy");
+	public final DateFormat	DATE_FORMAT_TEXT = new SimpleDateFormat("MMMM d, yyyy");
 	
 	/** The short date format (e.g. 2012/01/13). */
-	public final DateFormat	DATE_FORMAT_NUMBER	= new SimpleDateFormat("yyyy/MM/dd");
+	public final DateFormat	DATE_FORMAT_NUMBER = new SimpleDateFormat("yyyy/MM/dd");
 
 	/** The short date format (e.g. 2012/01/13). */
-	public final DateFormat	DATE_FORMAT_TIMESTAMP	= new SimpleDateFormat("yyyyMMdd.HHmmss");
+	public final DateFormat	DATE_FORMAT_TIMESTAMP = new SimpleDateFormat("yyyyMMdd.HHmmss");
 
 	//-------- attributes --------
 	
 	/** The version string (e.g. 2.2-RC1). */
 	protected String version;
-
+	
+	/** The Jadex version as bean object. */
+	protected JadexVersion jadexversion;
+	
 	/** The release date. */
-	protected Date	date;
+	protected Date date;
+	
+	/** The release date. */
+	protected Date buildtime;
 
 	//-------- constructors --------
 	
@@ -48,6 +55,7 @@ public class VersionInfo
 	{
 		try
 		{
+			jadexversion = new JadexVersion();
 			Properties	props	= new Properties();
 			InputStream	is	= VersionInfo.class.getResourceAsStream("version.properties");
 			props.load(is);
@@ -76,6 +84,14 @@ public class VersionInfo
 						is	= new FileInputStream(settings);
 						props.load(is);
 						is.close();
+						try
+						{
+							jadexversion.setMinorVersion(Integer.parseInt(props.getProperty("jadexversion_minor")));
+							jadexversion.setMajorVersion(Integer.parseInt(props.getProperty("jadexversion_major")));
+						}
+						catch (Exception e)
+						{
+						}
 						version	= props.getProperty("jadexversion_major")
 							+ "." + props.getProperty("jadexversion_minor") + "-DEVELOPMENT";
 						break;
@@ -129,6 +145,35 @@ public class VersionInfo
 	public Date getDate()
 	{
 		return date;
+	}
+	
+	/**
+	 *  Returns the version of Jadex.
+	 * 
+	 *  @return Version of Jadex.
+	 */
+	public JadexVersion getJadexVersion()
+	{
+		return jadexversion;
+	}
+	
+	/**
+	 *  Attempts to estimate the build time of the Jadex version in use.
+	 *  @return The build time.
+	 */
+	public synchronized Date getBuildTime()
+	{
+		if (buildtime == null)
+			return getDate();
+		return buildtime;
+	}
+	
+	/**
+	 *  Sets the build time through external mechanism.
+	 */
+	public synchronized void setBuildTime(Date buildtime)
+	{
+		this.buildtime = buildtime;
 	}
 	
 	/**

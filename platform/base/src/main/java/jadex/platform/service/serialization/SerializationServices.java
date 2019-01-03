@@ -11,6 +11,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.JadexVersion;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
@@ -28,9 +30,13 @@ import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
+import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.collection.IRwMap;
+import jadex.commons.collection.LRU;
+import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.IUserContextContainer;
 import jadex.commons.transformation.traverser.TransformProcessor;
@@ -54,8 +60,11 @@ public class SerializationServices implements ISerializationServices
 	/** The remote reference module */
 	protected RemoteReferenceModule rrm;
 	
-	/** Serializer used for sending. */
-	protected ISerializer sendserializer;
+	/** Default serializer used for sending. */
+	protected ISerializer defaultsendserializer;
+	
+	/** Optimized serializer used for sending to platforms with the same version. */
+	protected ISerializer optimizedsendserializer;
 	
 	/** All available serializers */
 	protected Map<Integer, ISerializer> serializers;
@@ -74,10 +83,17 @@ public class SerializationServices implements ISerializationServices
 	
 	/** The reference class cache (clazz->boolean (is reference)). */
 	protected Map<Class<?>, boolean[]> references;
+	
+	/** The security service which injects itself once available. */
+	protected ISecurityService secserv;
+	
+	/** Cache for identifying platforms with the same version. */
+	protected IRwMap<IComponentIdentifier, Boolean> sameversioncache;
 
 	/** Creates the management. */
 	public SerializationServices(IComponentIdentifier comp)
 	{
+		sameversioncache = new RwMapWrapper<>(new LRU<>(100));
 		rrm	= new RemoteReferenceModule(comp);
 		serializers = new HashMap<Integer, ISerializer>();
 		ISerializer serial = new JadexBinarySerializer();
@@ -86,7 +102,8 @@ public class SerializationServices implements ISerializationServices
 		serializers.put(serial.getSerializerId(), serial);
 		serial = new JadexFramedBinarySerializer();
 		serializers.put(serial.getSerializerId(), serial);
-		sendserializer = serializers.get(2);
+		defaultsendserializer = serializers.get(2);
+		optimizedsendserializer = serializers.get(0);
 		codecs = new HashMap<Integer, ICodec>();
 		ICodec codec = new SnappyCodec();
 		codecs.put(codec.getCodecId(), codec);
@@ -114,7 +131,7 @@ public class SerializationServices implements ISerializationServices
 	public byte[] encode(IMsgHeader header, IInternalAccess component, Object obj)
 	{
 		IComponentIdentifier receiver = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
-		ISerializer serial = getSendSerializer(receiver);
+		ISerializer serial = getSendSerializer(receiver.getRoot());
 		Map<String, Object> ctx = new HashMap<String, Object>();
 		ctx.put("header", header);
 		ctx.put("component", component);
@@ -209,10 +226,40 @@ public class SerializationServices implements ISerializationServices
 	 *  @param receiver Receiving platform.
 	 *  @return Serializer.
 	 */
-	public ISerializer getSendSerializer(IComponentIdentifier receiver)
+	public ISerializer getSendSerializer(IComponentIdentifier receiverplatform)
 	{
 //		return (ISerializer) PlatformConfiguration.getPlatformValue(platform, PlatformConfiguration.DATA_SEND_SERIALIZER);
-		return sendserializer;
+		Boolean sameversion = sameversioncache.get(receiverplatform);
+		if (Boolean.TRUE.equals(sameversion))
+			return optimizedsendserializer;
+		
+		if (sameversion == null && secserv != null)
+		{
+			JadexVersion remoteversion = secserv.getJadexVersion(receiverplatform.getRoot());
+			if (remoteversion != null)
+			{
+				if (remoteversion.isUnknown())
+				{
+					sameversioncache.put(receiverplatform, Boolean.FALSE);
+				}
+				else
+				{
+					JadexVersion localversion = VersionInfo.getInstance().getJadexVersion();
+					if (localversion.getMinorVersion() == remoteversion.getMinorVersion() &&
+						localversion.getMajorVersion() == remoteversion.getMajorVersion())
+					{
+						sameversioncache.put(receiverplatform, Boolean.TRUE);
+						System.out.println("Switched to optimized serializer for " + receiverplatform);
+						return optimizedsendserializer;
+					}
+					else
+					{
+						sameversioncache.put(receiverplatform, Boolean.FALSE);
+					}
+				}
+			}
+		}
+		return defaultsendserializer;
 	}
 	
 	/**
@@ -556,6 +603,16 @@ public class SerializationServices implements ISerializationServices
 	public List<ITraverseProcessor> getCloneProcessors()
 	{
 		return rrm.getCloneProcessors();
+	}
+	
+	/**
+	 *  Injects the security service.
+	 *  
+	 *  @param secserv The security service.
+	 */
+	public void setSecurityService(ISecurityService secserv)
+	{
+		this.secserv = secserv;
 	}
 	
 	/**

@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class SClassReader
 	 *  @param inputstream The input stream of the class file. 
 	 *  @return The class infos.
 	 */
-	public static final ClassInfo getClassInfo(String cachekey, InputStream inputstream)
+	public static final ClassInfo getClassInfo(String cachekey, InputStream inputstream, Date lastmodified)
 	{
 		Object	ret;
 //		if(CICACHE.containsKey(cachekey))
@@ -57,6 +58,8 @@ public class SClassReader
 		
 		if(ret instanceof ClassInfo)
 		{
+			if (((ClassInfo) ret).getLastModified() == null && lastmodified != null)
+				((ClassInfo) ret).setLastModified(lastmodified);
 			return (ClassInfo)ret;
 		}
 		else
@@ -972,6 +975,9 @@ public class SClassReader
     	/** Method infos, if available. */
     	protected List<MethodInfo> methodinfos;
     	
+    	/** Last modified date of the class file if available. */
+    	protected Date lastmodified;
+    	
     	/**
     	 *  Create a new classinfo.
     	 */
@@ -1112,6 +1118,23 @@ public class SClassReader
 		protected void setMethodInfos(List<MethodInfo> methodinfos)
 		{
 			this.methodinfos = methodinfos;
+		}
+		
+		/**
+		 *  Gets the last modified date if it was supplied.
+		 *  @return Last modified date if available, null otherwise.
+		 */
+		public Date getLastModified()
+		{
+			return lastmodified;
+		}
+		
+		/**
+		 *  Sets the last modified date.
+		 */
+		public void setLastModified(Date lastmodified)
+		{
+			this.lastmodified = lastmodified;
 		}
 
 		/**

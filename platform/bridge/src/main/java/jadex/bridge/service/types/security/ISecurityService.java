@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.JadexVersion;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
@@ -202,6 +203,16 @@ public interface ISecurityService
 	 *  @return The current networks names.
 	 */
 	public IFuture<Set<String>> getNetworkNames();
+	
+	/**
+	 *  Opportunistically returns the remote Jadex version if known.
+	 *  
+	 *  @param remoteid ID of the remote platform.
+	 *  @return Null, if the version is cannot be determined, a JadexVersion otherwise.
+	 *  		Note that the JadexVersion can still be an unknown version (as determined by isUnknown),
+	 *  		which means that the platform itself reported an unknown version.
+	 */
+	public JadexVersion getJadexVersion(IComponentIdentifier remoteid);
 	
 //	/**
 //	 *  Gets the current network names. 
