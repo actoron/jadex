@@ -477,7 +477,7 @@ public class Starter
 				String pfname = args!=null && args.containsKey(IPlatformConfiguration.PLATFORM_NAME)? (String)args.get(IPlatformConfiguration.PLATFORM_NAME): config.getPlatformName();
 //				Object pfname = config.getValue(RootComponentConfiguration.PLATFORM_NAME);
 //				rootConfig.setValue(RootComponentConfiguration.PLATFORM_NAME, pfname);
-				final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname.toString(): null);
+				final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname: null);
 				if(IComponentIdentifier.LOCAL.get()==null)
 					IComponentIdentifier.LOCAL.set(cid);
 				
@@ -757,10 +757,10 @@ public class Starter
 				buf.append(tok);
 			}
 		}
-		platformname = buf.toString();
+		platformname = SUtil.intern(buf.toString());
 		
 		// Create an instance of the component.
-		return new BasicComponentIdentifier(platformname);
+		return new BasicComponentIdentifier(platformname).getRoot();
 	}
 	
 	/**

@@ -12,6 +12,7 @@ import java.util.WeakHashMap;
  */
 public class WeakKeyValueMap<K, V>	implements Map<K, V>
 {
+	/** The internal delegate map. */
 	protected WeakHashMap<K, WeakReference<V>> content = new WeakHashMap<K, WeakReference<V>>();
 	
 	public WeakKeyValueMap()

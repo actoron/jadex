@@ -16,6 +16,9 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 	/** The component name. */
 	protected String name;
 	
+	/** Cache for platform name for getRoot() calls. */
+	protected String root;
+	
 //	/** Attribute for slot resolvers. */
 //	protected IComponentIdentifier[]	resolvers;
 
@@ -54,7 +57,7 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 		{
 			throw new IllegalArgumentException("Invalid component identifier: "+name);			
 		}
-		this.name = name;
+		this.name = SUtil.intern(name);
 //		this.addresses	= addresses;
 	}
 	
@@ -87,6 +90,18 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 	public BasicComponentIdentifier(IComponentIdentifier cid)
 	{
 		this(cid.getName());//, cid.getAddresses());
+	}
+	
+	/**
+	 *  Creates an identifier with known root (used by getRoot()).
+	 *  
+	 *  @param name The global name.
+	 *  @param root The root name.
+	 */
+	private BasicComponentIdentifier(String name, String root)
+	{
+		this.name = name;
+		this.root = root;
 	}
 	
 //	/**
@@ -125,7 +140,7 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 		{
 			throw new NullPointerException();
 		}
-		this.name = name;
+		this.name = SUtil.intern(name);
 	}
 	
 //	/**
@@ -280,7 +295,7 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 	public IComponentIdentifier getRoot()
 	{
 //		return new ComponentIdentifier(getPlatformName(), getAddresses(), getResolvers());
-		return new BasicComponentIdentifier(getPlatformName());//, getAddresses());
+		return new BasicComponentIdentifier(getPlatformName(), getPlatformName());//, getAddresses());
 	}
 
 	//--------- methods --------
@@ -333,13 +348,17 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 	 */
 	public String getPlatformName()
 	{
-		String ret = getName();
-		int idx;
-		if((idx = ret.indexOf('@')) != -1)
-			ret = ret.substring(idx + 1);
-		if((idx = ret.lastIndexOf(':')) != -1)
-			ret = ret.substring(idx + 1);
-		return ret;
+		if (root == null)
+		{
+			String rootname = getName();
+			int idx;
+			if((idx = rootname.indexOf('@')) != -1)
+				rootname = rootname.substring(idx + 1);
+			if((idx = rootname.lastIndexOf(':')) != -1)
+				rootname = rootname.substring(idx + 1);
+			root = SUtil.intern(rootname);
+		}
+		return root;
 	}
 	
 	/**
@@ -403,8 +422,9 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 	public boolean equals(Object obj)
 	{
 		return this==obj
-			|| obj instanceof IComponentIdentifier
-				&& SUtil.equals(name, ((IComponentIdentifier)obj).getName());
+			|| (obj instanceof BasicComponentIdentifier && (((BasicComponentIdentifier) obj).name == name))
+			|| (obj instanceof IComponentIdentifier
+				&& SUtil.equals(name, ((IComponentIdentifier)obj).getName()));
 	}
 	
 	/**
@@ -432,6 +452,48 @@ public class BasicComponentIdentifier implements IComponentIdentifier, Cloneable
 		}
 		return name;
 	}
+	
+//	public static void main(String[] args)
+//	{
+//		for (int j = 0; j < 5; ++j)
+//		{
+//			long ts = System.currentTimeMillis();
+//			for (int i = 0; i < 1000000; ++i)
+//			{
+//				new String("TestTestTestTest0").intern();
+//				new String("TestTestTestTest1").intern();
+//				new String("TestTestTestTest2").intern();
+//				new String("TestTestTestTest3").intern();
+//				new String("TestTestTestTest4").intern();
+//				new String("TestTestTestTest5").intern();
+//				new String("TestTestTestTest6").intern();
+//				new String("TestTestTestTest7").intern();
+//				new String("TestTestTestTest8").intern();
+//				new String("TestTestTestTest9").intern();
+//			}
+//			ts = System.currentTimeMillis() - ts;
+//			System.out.println("Java intern took: " + ts);
+//		}
+//		for (int j = 0; j < 5; ++j)
+//		{
+//			long ts = System.currentTimeMillis();
+//			for (int i = 0; i < 1000000; ++i)
+//			{
+//				SUtil.intern(new String("TestTestTestTest0"));
+//				SUtil.intern(new String("TestTestTestTest1"));
+//				SUtil.intern(new String("TestTestTestTest2"));
+//				SUtil.intern(new String("TestTestTestTest3"));
+//				SUtil.intern(new String("TestTestTestTest4"));
+//				SUtil.intern(new String("TestTestTestTest5"));
+//				SUtil.intern(new String("TestTestTestTest6"));
+//				SUtil.intern(new String("TestTestTestTest7"));
+//				SUtil.intern(new String("TestTestTestTest8"));
+//				SUtil.intern(new String("TestTestTestTest9"));
+//			}
+//			ts = System.currentTimeMillis() - ts;
+//			System.out.println("Jadex intern took: " + ts);
+//		}
+//	}
 	
 //	/**
 //	 *  Main for testing.
