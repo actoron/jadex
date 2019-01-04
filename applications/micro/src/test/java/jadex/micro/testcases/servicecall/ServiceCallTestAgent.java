@@ -59,7 +59,7 @@ public class ServiceCallTestAgent extends TestAgent
 	
 	/** The invocation count. */
 	@AgentArgument
-	protected int max	= 1000;
+	protected int max	= 100;
 	
 	//-------- methods --------
 	
