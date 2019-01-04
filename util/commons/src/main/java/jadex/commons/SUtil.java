@@ -66,6 +66,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.Vector;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -77,8 +78,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import jadex.commons.collection.IAutoLock;
+import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
+import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.collection.SCollection;
+import jadex.commons.collection.WeakKeyValueMap;
 import jadex.commons.random.FastThreadedRandom;
 
 
@@ -3180,6 +3185,34 @@ public class SUtil
 			}
 		}
 		return file;
+	}
+	
+	/** The pool used for interning strings. */
+	static final IRwMap<String, String> internpool = new RwMapWrapper<String, String>(new WeakKeyValueMap<>());
+	
+	/**
+	 *  Optimized version of String.intern() that actually uses String.intern() but
+	 *  provides faster lookups if the String is already interned.
+	 * 
+	 *  @param string The String being interned.
+	 *  @return The interned String.
+	 */
+	public static final String intern(String string)
+	{
+		String ret = internpool.get(string);
+		if (ret == null)
+		{
+			try (IAutoLock l = internpool.writeLock())
+			{
+				ret = internpool.get(string);
+				if (ret == null)
+				{
+					ret = string.intern();
+					internpool.put(ret, ret);
+				}
+			}
+		}
+		return ret;
 	}
 	
 	/**
