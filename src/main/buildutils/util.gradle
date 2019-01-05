@@ -499,6 +499,25 @@ def diffZips(zip1, zip2) {
 	return diff;
 }
 
+// rezip a file after it has been created by a task
+def createRezipTask(task, file) {
+//	println 'Scheduling rezip of file ' + file + ' created by ' + task
+	// Unzip after archive is built.
+	def newname	= 'rebuild/'+task.name+file.name
+	def rebuilddir	= new File(task.project.buildDir, newname)
+	task.doLast {
+//		println 'Unzipping generated ' + file.getCanonicalPath()
+		rebuilddir.mkdirs()
+		ant.unzip(src: file, dest: rebuilddir)
+	}
+	// Rezip after task completed
+	task.finalizedBy task.project.tasks.create([name: newname.replace('/', '_'), type: Zip]) {
+		destinationDir file.parentFile
+		archiveName file.name
+		from(rebuilddir) { includes = ['*/**'] }
+//		doLast { println 'Rezipped generated ' + file.getCanonicalPath() }
+	}
+}
 
 // make functions externally visible
 
@@ -526,4 +545,5 @@ ext {
     singularize = this.&singularize
     getArtifactName = this.&getArtifactName
     diffZips = this.&diffZips
+	createRezipTask	= this.&createRezipTask
 }

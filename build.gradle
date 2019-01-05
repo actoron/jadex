@@ -242,12 +242,6 @@ subprojects
 
         if (ENABLE_ECLIPSE_ANDROID_WORKAROUNDS) addEclipseWorkarounds(project)
 
-		// strip "-debug" from .aar and .apks to include them in dist
-		onVariantOutput(project, com.android.builder.core.BuilderConstants.RELEASE) {output ->
-			def fileName = output.outputFileName
-			output.outputFileName = new File(output.outputFile.parent, "$archivesBaseName-${version}${fileName.substring(fileName.lastIndexOf("."))}").getName()
-		}
-
     	android {
             compileSdkVersion android_compileSdkVersion
             buildToolsVersion android_buildToolsVersion
@@ -302,30 +296,28 @@ subprojects
 //		if(project.parent!=null && project.parent.parent!=null && project.parent.parent.parent!=null)
 //			println 'Deep android project: '+project
 
-		// Android zips are not produced by gradle zip task -> no reproducibleFileOrder=true setting possible, grrr
-		// cf. https://issuetracker.google.com/issues/67597902
-		if(isAndroidLibraryProject(project)) {
-			project.afterEvaluate {
-				project.tasks.matching {
-//					it.name.startsWith('transformResourcesWithMergeJavaRes')
-					it.name.startsWith('transformClassesAndResourcesWithSyncLibJars')
-				}.each {task ->
-					// Intercept jar input to rebuild jar beforehands LOL :(
-					task.getInputs().getFiles().filter({it.getName().endsWith(".jar")}).getFiles().each {file ->
-						def rebuilddir	= new File(file.getParentFile(), "rebuild")
-						task.dependsOn project.tasks.create([name: "rebuildJar"+file.name, type: Zip]) {
-							destinationDir file.getParentFile()
-							archiveName file.getName()
-							from(rebuilddir) {
-								includes = ['*/**']
-							}
-							doFirst {
-								rebuilddir.mkdirs()
-								ant.unzip(src: file, dest: rebuilddir)
-							}
-						}
-//						println 'Rebuilt generated jar ' + file.getCanonicalPath() + ' ' + file.exists()
+		//		if(project.parent!=null && project.parent.parent!=null && project.parent.parent.parent!=null)
+		//			println 'Deep android project: '+project
+
+		project.afterEvaluate() {
+			// Android jars/aars are not produced by gradle archive task -> no reproducibleFileOrder=true setting possible, grrr
+			if(isAndroidLibraryProject(project)) {
+				project.tasks.toArray().each { task ->	// Avoid concurrent modification when adding rezip tasks
+					task.outputs.files.filter({it.canonicalPath.endsWith('packaged-classes'+File.separator+'release'+File.separator+'classes.jar')}).each { file ->
+						createRezipTask(task, file)
 					}
+				}
+			}
+			// strip "-debug" from .aar and .apks to include them in dist
+			else {
+				project.android.applicationVariants.all {variant ->
+       				variant.outputs.each {output ->
+						if(output.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
+							def fileName = output.outputFileName
+							output.outputFileName = archivesBaseName + '-' + version + fileName.substring(fileName.lastIndexOf('.'))
+//							println 'output file name: ' + fileName + ' converted to: ' + output.outputFileName
+						}
+       				} 
 				}
 			}
 		}
@@ -790,7 +782,7 @@ task distZips()  {
 
 
 task checkDists()  {
-	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
+	description	= "Rebuild from zips of selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
 	def self	= project.checkDists
 	gradle.ext.selecteddists.parallelStream().forEach {selecteddist ->
 		if(!selecteddist.startsWith('addon'))	// Exclude addons for now. TODO: fix addon dists!
@@ -824,6 +816,7 @@ def checkDistZip(task, distname, arts, isaddon)
 //			ant.unzip(src: new File(project.distsDir, 'tmp/minimal/sources.zip'), dest: rebuilddirfile)
 	}
 	artefactBuild.dependsOn unzip
+	unzip.dependsOn subprojects.collect({p -> p.tasks.matching{it.name.equals('srcZip')}}).flatten()
 	
 	artefactBuild.doLast {
 		//	// For debugging bluetooth aar
