@@ -639,55 +639,65 @@ subprojects
 		}
 		
 		if(!isaddon) {
-			// Create unzipSources task
-			task unzipSources(type: Copy) {
-				dependsOn srcZip
-				from zipTree(project.srcZip.outputs.files.first())
-				into new File(project.buildDir, 'rebuild')
-	//			// Hack!!! extract minimal zip also, as addons do not build on their own
-	//			if(isaddon)
-	//				ant.unzip(src: new File(project.distsDir, 'tmp/minimal/sources.zip'), dest: rebuilddirfile)
-	//			doLast {
-	//				println 'unzipped from ' + project.srcZip.outputs.files.first() + ' to ' + project.unzipSources.outputs.files.files.first()
-	//			}
-			}
-			
-			// Create checkDist task
-			// https://stackoverflow.com/questions/26459067/how-to-run-gradle-script-from-gradle
-			// https://discuss.gradle.org/t/replacement-for-task-execute/27545
-			task checkDist(type: GradleBuild) {
-				dependsOn unzipSources, distZip
-				def rebuilddirfile	= project.unzipSources.outputs.files.files.first()
-				buildFile = new File(rebuilddirfile, 'sources/build.gradle')
-				tasks = ["distZip"]
-				startParameter.projectProperties << ["dist": distname]
-				
-				doLast {
-					//	// For debugging bluetooth aar
-					//	if(subprojectmap.get(":android:bluetooth")!=null) {
-					//		def zip1	= new File(project.projectDir, 'android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
-					//		def zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
-					//		def diff	= diffZips(zip1, zip2)
-					//		if(diff.length()!=0)
-					//			throw new RuntimeException("Rebuilt bluetooth classes.jar does not match original: "+diff);
-					//		zip1	= new File(project.projectDir, 'android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
-					//		zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
-					//		diff	= diffZips(zip1, zip2)
-					//		if(diff.length()!=0)
-					//			throw new RuntimeException("Rebuilt bluetooth-" + jadex_build_version + ".aar does not match original: "+diff);
-					//	}
-						
-					// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
-					def distzip = project.distZip.outputs.files.first().canonicalPath
-					def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-					def diff	= diffZips(distzip, distzip2)
-					if(diff.length()!=0)
-						throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
-	//				else
-	//					println 'distributions match: '+distzip+', '+distzip2
+		// Create unzipSources task
+		task unzipSources(type: Copy) {
+			dependsOn srcZip
+			from zipTree(project.srcZip.outputs.files.first())
+			into new File(project.buildDir, 'rebuild')
+//			// Hack!!! extract minimal zip also, as addons do not build on their own
+//			doLast {
+//				println 'unzipped from ' + project.srcZip.outputs.files.first() + ' to ' + project.unzipSources.outputs.files.files.first()
+//			}
+		}
+		if(isaddon) {
+			gradle.projectsEvaluated {
+				def minimal	= subprojectmap.get(':distributions:minimal')
+				if(minimal!=null) {
+					project.unzipSources.dependsOn project.tasks.create([name: 'unzipSourcesMinimal', type: Copy]) {
+						dependsOn minimal.srcZip
+						from zipTree(minimal.srcZip.outputs.files.first())
+						into new File(project.buildDir, 'rebuild')
+					}
 				}
 			}
-		}	
+		}
+
+		// Create checkDist task
+		// https://stackoverflow.com/questions/26459067/how-to-run-gradle-script-from-gradle
+		// https://discuss.gradle.org/t/replacement-for-task-execute/27545
+		task checkDist(type: GradleBuild) {
+			dependsOn unzipSources, distZip
+			def rebuilddirfile	= project.unzipSources.outputs.files.files.first()
+			buildFile = new File(rebuilddirfile, 'sources/build.gradle')
+			tasks = ["distZip"]
+			startParameter.projectProperties << ["dist": distname]
+			
+			doLast {
+				//	// For debugging bluetooth aar
+				//	if(subprojectmap.get(":android:bluetooth")!=null) {
+				//		def zip1	= new File(project.projectDir, 'android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
+				//		def zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
+				//		def diff	= diffZips(zip1, zip2)
+				//		if(diff.length()!=0)
+				//			throw new RuntimeException("Rebuilt bluetooth classes.jar does not match original: "+diff);
+				//		zip1	= new File(project.projectDir, 'android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
+				//		zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
+				//		diff	= diffZips(zip1, zip2)
+				//		if(diff.length()!=0)
+				//			throw new RuntimeException("Rebuilt bluetooth-" + jadex_build_version + ".aar does not match original: "+diff);
+				//	}
+					
+				// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
+				def distzip = project.distZip.outputs.files.first().canonicalPath
+				def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+				def diff	= diffZips(distzip, distzip2)
+				if(diff.length()!=0)
+					throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
+//				else
+//					println 'distributions match: '+distzip+', '+distzip2
+			}
+		}
+		}//end if(!isaddon)
 	}
 }
 
