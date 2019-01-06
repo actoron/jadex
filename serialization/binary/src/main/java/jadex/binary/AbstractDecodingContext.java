@@ -322,6 +322,38 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 	}
 	
 	/**
+	 *  Starts an object frame
+	 *  when using a context with framing support.
+	 */
+	public void startObjectFrame()
+	{
+		startObjectFrame(false);
+	}
+	
+	/**
+	 *  Starts an object frame
+	 *  when using a context with framing support.
+	 *  
+	 *  @param fixedsize If true, use fixed-size (integer) framing.
+	 *  				 Set true if the object being framed is expected
+	 *  				 to be larger than 127 bytes (same type of object MUST use
+	 *  				 either fixed OR variable framing).
+	 */
+	public void startObjectFrame(boolean fixedsize)
+	{
+		// default no framing
+	}
+	
+	/**
+	 *  Stops an object frame
+	 *  when using a context with framing support.
+	 */
+	public void stopObjectFrame()
+	{
+		// default no framing
+	}
+	
+	/**
 	 *  Reads a number of bytes from the buffer.
 	 *  
 	 *  @param count Number of bytes.

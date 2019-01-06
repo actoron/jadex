@@ -26,6 +26,7 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.component.DependencyResolver;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
@@ -202,6 +203,15 @@ public class PlatformAgent
 		List<CreationInfo> infos = new ArrayList<>();
 		for (ClassInfo ci : cis)
 		{
+			if (ci.getLastModified() != null && ci.getClassName().startsWith("jadex."))
+			{
+				VersionInfo vinfo = VersionInfo.getInstance();
+				synchronized (vinfo)
+				{
+					if (vinfo.getBuildTime().before(ci.getLastModified()))
+						vinfo.setBuildTime(ci.getLastModified());
+				}
+			}
 			isSystemComponent(ci, classloader);
 			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
 			EnumInfo ei = (EnumInfo)ai.getValue("autostart");
@@ -246,7 +256,6 @@ public class PlatformAgent
 				infos.add(info);
 			}
 		}
-		
 		agent.getFeature(ISubcomponentsFeature.class).createComponents(infos.toArray(new CreationInfo[infos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
 		{
 			public void resultAvailable(Collection<IExternalAccess> result)

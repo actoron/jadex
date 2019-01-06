@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1878,7 +1879,7 @@ public class SReflect
 						{
 							JarEntry je = jar.getJarEntry(jename);
 							InputStream is = jar.getInputStream(je);
-							ClassInfo ci = SClassReader.getClassInfo(jarname+jename, is);
+							ClassInfo ci = SClassReader.getClassInfo(jarname+jename, is, new Date(je.getLastModifiedTime().toMillis()));
 							if(classfilter.filter(ci))
 							{
 								ret.add(ci);
@@ -1894,9 +1895,10 @@ public class SReflect
 				{
 					for(String filename: entry.getValue())
 					{
-						try(FileInputStream is = new FileInputStream(filename))
+						File inputfile = new File(filename);
+						try(FileInputStream is = new FileInputStream(inputfile))
 						{
-							ClassInfo ci = SClassReader.getClassInfo(filename, is);
+							ClassInfo ci = SClassReader.getClassInfo(filename, is, new Date(inputfile.lastModified()));
 							if(classfilter.filter(ci))
 							{
 								ret.add(ci);

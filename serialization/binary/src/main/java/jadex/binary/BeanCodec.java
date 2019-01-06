@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -175,59 +174,6 @@ public class BeanCodec extends AbstractCodec
 		
 		writeBeanProperties(object, clazz, preprocessors, processors, traverser, mode, ec, intro);
 		
-//		Map props = intro.getBeanProperties(clazz, true, false);
-//		
-//		List<String> names = new ArrayList<String>();
-//		List<Object> values = new ArrayList<Object>();
-//		List<Class> clazzes = new ArrayList<Class>();
-//		for(Iterator it=props.keySet().iterator(); it.hasNext(); )
-//		{
-//			BeanProperty prop = (BeanProperty)props.get(it.next());
-//			Object val = prop.getPropertyValue(object);
-//			if (val != null)
-//			{
-//				names.add(prop.getName());
-//				clazzes.add(prop.getType());
-//				values.add(val);
-//			}
-//		}
-//		ec.writeVarInt(names.size());
-//		
-//		for (int i = 0; i < names.size(); ++i)
-//		{
-//			ec.writeString(names.get(i));
-//			Object val = values.get(i);
-//			traverser.doTraverse(val, clazzes.get(i), traversed, processors, clone, null, ec);
-//		}
-		
-		/*for(Iterator it=props.keySet().iterator(); it.hasNext(); )
-		{
-			try
-			{
-				String name = (String)it.next();
-				BeanProperty prop = (BeanProperty)props.get(name);
-				if (prop.getGetter() != null && prop.getSetter() != null)
-				{
-					Object val = prop.getGetter().invoke(object, new Object[0]);
-					//System.out.println(val);
-					//System.out.println(prop.getName());
-					//if (val == null)
-						//BinarySerializer.NULL_HANDLER.process(val, prop.getType(), null, null, null, false, context);
-					//else
-						//traverser.doTraverse(val, prop.getType(), traversed, processors, clone, context);
-					if (val != null)
-					{
-						ec.writeString(name);
-						traverser.doTraverse(val, prop.getType(), traversed, processors, clone, context);
-					}
-				}
-			}
-			catch(Exception e)
-			{
-				throw SUtil.throwUnchecked(e);
-			}
-		}*/
-		
 		return object;
 	}
 	
@@ -314,6 +260,14 @@ public class BeanCodec extends AbstractCodec
 			}
 		}
 	}
+	
+	/**
+	 *  Bean object use fixed framing since they tend to be large.
+	 */
+//	protected boolean isFixedFrame()
+//	{
+//		return false;
+//	}
 	
 	/**
 	 *  Attempts to find the correct inner class (compilers have different ways enumerating anonymous inner classes).
