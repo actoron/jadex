@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import org.bouncycastle.util.Pack;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.JadexVersion;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.platform.service.security.ICryptoSuite;
 import jadex.platform.service.security.SecurityAgent;
@@ -28,8 +29,12 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	/** The handshake ID. */
 	protected String handshakeid;
 	
+	/** The remote Jadex version. */
+	protected JadexVersion remoteversion;
+	
 	public UnsafeNullCryptoSuite()
 	{
+		remoteversion = new JadexVersion();
 		Logger.getLogger("security").warning("Unsafe crypto suite enabled: " + getClass().getName());
 	}
 	
@@ -167,5 +172,23 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 		{
 			super(sender, conversationid);
 		}
+	}
+	
+	/**
+	 *  Gets the version of the remote Jadex platform.
+	 *  @return The Jadex version.
+	 */
+	public JadexVersion getRemoteVersion()
+	{
+		return remoteversion;
+	}
+	
+	/**
+	 *  Sets the version of the remote Jadex platform.
+	 *  @param jadexversion The Jadex version.
+	 */
+	public void setRemoteVersion(JadexVersion jadexversion)
+	{
+		remoteversion = jadexversion;
 	}
 }

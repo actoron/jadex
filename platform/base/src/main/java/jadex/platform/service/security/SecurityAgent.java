@@ -34,6 +34,8 @@ import jadex.bridge.BasicComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.JadexVersion;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMessageFeature;
@@ -56,6 +58,7 @@ import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.IAutoLock;
 import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.RwMapWrapper;
@@ -85,6 +88,7 @@ import jadex.platform.service.security.handshake.InitialHandshakeFinalMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeMessage;
 import jadex.platform.service.security.handshake.InitialHandshakeReplyMessage;
 import jadex.platform.service.security.impl.NHCurve448ChaCha20Poly1305Suite;
+import jadex.platform.service.serialization.SerializationServices;
 
 /**
  *  Agent that provides the security service.
@@ -218,6 +222,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected Map<String, HandshakeState> initializingcryptosuites = new HashMap<String, HandshakeState>();
 	
 	/** CryptoSuites currently in use. */
+	// TODO: Expiration / configurable LRU required to mitigate DOS attacks.
 	protected IRwMap<String, ICryptoSuite> currentcryptosuites = new RwMapWrapper<>(new HashMap<String, ICryptoSuite>());
 	
 	/** CryptoSuites that are expiring with expiration time. */
@@ -247,6 +252,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (handshaketimeout <= 0)
 			handshaketimeout = 60000;
 		final Future<Void> ret = new Future<Void>();
+		
+		((SerializationServices) SerializationServices.getSerializationServices(agent.getId().getRoot())).setSecurityService(this);
 		
 		loadSettings().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{
@@ -1400,6 +1407,22 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		});
 	}
 	
+	/**
+	 *  Opportunistically returns the remote Jadex version if known.
+	 *  
+	 *  @param remoteid ID of the remote platform.
+	 *  @return Null, if the version is cannot be determined, a JadexVersion otherwise.
+	 *  		Note that the JadexVersion can still be an unknown version (as determined by isUnknown),
+	 *  		which means that the platform itself reported an unknown version.
+	 */
+	public JadexVersion getJadexVersion(IComponentIdentifier remoteid)
+	{
+		ICryptoSuite cs = currentcryptosuites.get(remoteid.toString());
+		if (cs != null)
+			return cs.getRemoteVersion();
+		return null;
+	}
+	
 	//---- Internal direct access methods. ----
 	
 	/**
@@ -1666,9 +1689,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 * 
 	 *  @param name Name of the suite.
 	 *  @param convid Conversation ID of handshake.
+	 *  @param remoteversion The remote Jadex version.
 	 *  @return The suite, null if not found.
 	 */
-	protected ICryptoSuite createCryptoSuite(String name, String convid)
+	protected ICryptoSuite createCryptoSuite(String name, String convid, JadexVersion remoteversion)
 	{
 		ICryptoSuite ret = null;
 		try
@@ -1676,8 +1700,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			Class<?> clazz = allowedcryptosuites.get(name);
 			if (clazz != null)
 			{
-				ret = (ICryptoSuite) clazz.newInstance();
+				ret = (ICryptoSuite) clazz.getConstructor().newInstance();
 				ret.setHandshakeId(convid);
+				ret.setRemoteVersion(remoteversion);
 			}
 		}
 		catch (Exception e)
@@ -2056,8 +2081,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				ICryptoSuite oldcs = currentcryptosuites.get(rplat.toString());
 				if (oldcs != null)
 				{
-					currentcryptosuites.getWriteLock().lock();
-					try
+					try (IAutoLock l = currentcryptosuites.writeLock())
 					{
 						if (oldcs.equals(currentcryptosuites.get(rplat.toString())))
 						{
@@ -2070,10 +2094,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							expireCryptosuite(rplat.toString());
 						}
 					}
-					finally
-					{
-						currentcryptosuites.getWriteLock().unlock();
-					}
 				}
 				
 				initializingcryptosuites.put(rplat.toString(), state);
@@ -2085,7 +2105,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 //					expiringcryptosuites.add(rplat.toString(), new Tuple2<ICryptoSuite, Long>(oldcs, System.currentTimeMillis() + timeout));
 //				}
 				
-				InitialHandshakeReplyMessage reply = new InitialHandshakeReplyMessage(getComponentIdentifier(), state.getConversationId(), chosensuite);
+				InitialHandshakeReplyMessage reply = new InitialHandshakeReplyMessage(getComponentIdentifier(), state.getConversationId(), chosensuite, VersionInfo.getInstance().getJadexVersion());
 				
 				sendSecurityHandshakeMessage(imsg.getSender(), reply);
 			}
@@ -2099,7 +2119,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					String convid = state.getConversationId();
 					if (convid != null && convid.equals(rm.getConversationId()))
 					{
-						ICryptoSuite suite = createCryptoSuite(rm.getChosenCryptoSuite(), convid);
+						JadexVersion remoteversion = rm.getJadexVersion();
+						// Fallback to unknown if unavailable.
+						if (remoteversion == null)
+							remoteversion = new JadexVersion();
+						ICryptoSuite suite = createCryptoSuite(rm.getChosenCryptoSuite(), convid, remoteversion);
 						
 						if (suite == null)
 						{
@@ -2109,7 +2133,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						else
 						{
 							state.setCryptoSuite(suite);
-							InitialHandshakeFinalMessage fm = new InitialHandshakeFinalMessage(agent.getId(), rm.getConversationId(), rm.getChosenCryptoSuite());
+							InitialHandshakeFinalMessage fm = new InitialHandshakeFinalMessage(agent.getId(), rm.getConversationId(), rm.getChosenCryptoSuite(), VersionInfo.getInstance().getJadexVersion());
 							sendSecurityHandshakeMessage(rm.getSender(), fm);
 						}
 					}
@@ -2125,7 +2149,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					String convid = state.getConversationId();
 					if (convid != null && convid.equals(fm.getConversationId()))
 					{
-						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite(), convid);
+						JadexVersion remoteversion = fm.getJadexVersion();
+						// Fallback to unknown if unavailable.
+						if (remoteversion == null)
+							remoteversion = new JadexVersion();
+						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite(), convid, remoteversion);
 						agent.getLogger().info("Suite: " + (suite != null?suite.getClass().toString():"null"));
 						
 						if (suite == null)

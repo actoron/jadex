@@ -11,6 +11,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.JadexVersion;
+import jadex.bridge.VersionInfo;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.IInternalMessageFeature;
@@ -28,9 +30,13 @@ import jadex.bridge.service.types.registry.IPeerRegistrySynchronizationService;
 import jadex.bridge.service.types.registry.ISuperpeerRegistrySynchronizationService;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
+import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.collection.IRwMap;
+import jadex.commons.collection.LRU;
+import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.IUserContextContainer;
 import jadex.commons.transformation.traverser.TransformProcessor;
@@ -41,6 +47,7 @@ import jadex.platform.service.serialization.codecs.LZ4Codec;
 import jadex.platform.service.serialization.codecs.SnappyCodec;
 import jadex.platform.service.serialization.codecs.XZCodec;
 import jadex.platform.service.serialization.serializers.JadexBinarySerializer;
+import jadex.platform.service.serialization.serializers.JadexFramedBinarySerializer;
 import jadex.platform.service.serialization.serializers.JadexJsonSerializer;
 
 /**
@@ -53,17 +60,21 @@ public class SerializationServices implements ISerializationServices
 	/** The remote reference module */
 	protected RemoteReferenceModule rrm;
 	
-	/** Serializer used for sending. */
-	protected ISerializer sendserializer;
+	/** Default serializer used for sending. */
+	protected ISerializer defaultsendserializer;
+	
+	/** Optimized serializer used for sending to platforms with the same version. */
+	protected ISerializer optimizedsendserializer;
 	
 	/** All available serializers */
-	protected Map<Integer, ISerializer> serializers;
+	protected ISerializer[] serializers;
+//	protected Map<Integer, ISerializer> serializers;
 	
 	/** Codecs used for sending. */
 	protected ICodec[] sendcodecs;
 	
 	/** All available codecs. */
-	protected Map<Integer, ICodec> codecs;
+	protected ICodec[] codecs;
 	
 	/** Preprocessors for encoding. */
 	protected ITraverseProcessor[] preprocessors;
@@ -73,27 +84,41 @@ public class SerializationServices implements ISerializationServices
 	
 	/** The reference class cache (clazz->boolean (is reference)). */
 	protected Map<Class<?>, boolean[]> references;
+	
+	/** The security service which injects itself once available. */
+	protected ISecurityService secserv;
+	
+	/** Cache for identifying platforms with the same version. */
+	protected IRwMap<IComponentIdentifier, Boolean> sameversioncache;
 
 	/** Creates the management. */
 	public SerializationServices(IComponentIdentifier comp)
 	{
+		sameversioncache = new RwMapWrapper<>(new LRU<>(100));
 		rrm	= new RemoteReferenceModule(comp);
-		serializers = new HashMap<Integer, ISerializer>();
+//		serializers = new HashMap<Integer, ISerializer>();
+		serializers = new ISerializer[3];
 		ISerializer serial = new JadexBinarySerializer();
-		serializers.put(serial.getSerializerId(), serial);
+//		serializers.put(serial.getSerializerId(), serial);
+		serializers[serial.getSerializerId()] = serial;
 		serial = new JadexJsonSerializer();
-		serializers.put(serial.getSerializerId(), serial);
-		sendserializer = serializers.get(0);
-		codecs = new HashMap<Integer, ICodec>();
+//		serializers.put(serial.getSerializerId(), serial);
+		serializers[serial.getSerializerId()] = serial;
+		serial = new JadexFramedBinarySerializer();
+//		serializers.put(serial.getSerializerId(), serial);
+		serializers[serial.getSerializerId()] = serial;
+		defaultsendserializer = serializers[2];
+		optimizedsendserializer = serializers[0];
+		codecs = new ICodec[4];
 		ICodec codec = new SnappyCodec();
-		codecs.put(codec.getCodecId(), codec);
+		codecs[codec.getCodecId()] = codec;
 		codec = new GZIPCodec();
-		codecs.put(codec.getCodecId(), codec);
+		codecs[codec.getCodecId()] = codec;
 		codec = new LZ4Codec();
-		codecs.put(codec.getCodecId(), codec);
+		codecs[codec.getCodecId()] = codec;
 		codec = new XZCodec();
-		codecs.put(codec.getCodecId(), codec);
-		sendcodecs = new ICodec[] { codecs.get(3) };
+		codecs[codec.getCodecId()] = codec;
+		sendcodecs = new ICodec[] { codecs[3] };
 		List<ITraverseProcessor> procs = createPreprocessors();
 		preprocessors = procs.toArray(new ITraverseProcessor[procs.size()]);
 		procs = createPostprocessors();
@@ -111,7 +136,7 @@ public class SerializationServices implements ISerializationServices
 	public byte[] encode(IMsgHeader header, IInternalAccess component, Object obj)
 	{
 		IComponentIdentifier receiver = (IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER);
-		ISerializer serial = getSendSerializer(receiver);
+		ISerializer serial = getSendSerializer(receiver.getRoot());
 		Map<String, Object> ctx = new HashMap<String, Object>();
 		ctx.put("header", header);
 		ctx.put("component", component);
@@ -175,7 +200,7 @@ public class SerializationServices implements ISerializationServices
 						raw = enc;
 						for(int i = codecsize - 1; i >= 0; --i)
 						{
-							raw = getCodecs().get(SUtil.bytesToInt(enc, (i << 4) + 8)).decode(raw, offset, raw.length - offset);
+							raw = getCodecs()[SUtil.bytesToInt(enc, (i << 4) + 8)].decode(raw, offset, raw.length - offset);
 							offset = 0;
 						}
 					}
@@ -185,14 +210,15 @@ public class SerializationServices implements ISerializationServices
 						System.arraycopy(enc, prefixsize, raw, 0, raw.length);
 					}
 					
-					ISerializer serial = getSerializers().get(SUtil.bytesToInt(enc, 2));
+					int serialid = SUtil.bytesToInt(enc, 2);
+					ISerializer serial = getSerializers()[serialid];
 					Map<String, Object> context = new HashMap<String, Object>();
 					context.put("header", header);
 					context.put("component", component);
 					ret = serial.decode(raw, component.getClassLoader(), getPostprocessors(), null, context);
 				}
 			}
-			catch (IndexOutOfBoundsException e)
+			catch (ArrayIndexOutOfBoundsException e)
 			{
 				ret = null;
 			}
@@ -206,10 +232,40 @@ public class SerializationServices implements ISerializationServices
 	 *  @param receiver Receiving platform.
 	 *  @return Serializer.
 	 */
-	public ISerializer getSendSerializer(IComponentIdentifier receiver)
+	public ISerializer getSendSerializer(IComponentIdentifier receiverplatform)
 	{
 //		return (ISerializer) PlatformConfiguration.getPlatformValue(platform, PlatformConfiguration.DATA_SEND_SERIALIZER);
-		return sendserializer;
+		Boolean sameversion = sameversioncache.get(receiverplatform);
+		if (Boolean.TRUE.equals(sameversion))
+			return optimizedsendserializer;
+		
+		if (sameversion == null && secserv != null)
+		{
+			JadexVersion remoteversion = secserv.getJadexVersion(receiverplatform.getRoot());
+			if (remoteversion != null)
+			{
+				if (remoteversion.isUnknown())
+				{
+					sameversioncache.put(receiverplatform, Boolean.FALSE);
+				}
+				else
+				{
+					JadexVersion localversion = VersionInfo.getInstance().getJadexVersion();
+					if (localversion.getMinorVersion() == remoteversion.getMinorVersion() &&
+						localversion.getMajorVersion() == remoteversion.getMajorVersion())
+					{
+						sameversioncache.put(receiverplatform, Boolean.TRUE);
+//						System.out.println("Switched to optimized serializer for " + receiverplatform);
+						return optimizedsendserializer;
+					}
+					else
+					{
+						sameversioncache.put(receiverplatform, Boolean.FALSE);
+					}
+				}
+			}
+		}
+		return defaultsendserializer;
 	}
 	
 	/**
@@ -218,7 +274,7 @@ public class SerializationServices implements ISerializationServices
 	 *  @param platform Sending platform.
 	 *  @return Serializers.
 	 */
-	public Map<Integer, ISerializer> getSerializers()
+	public ISerializer[] getSerializers()
 	{
 		return serializers;
 	}
@@ -239,7 +295,7 @@ public class SerializationServices implements ISerializationServices
 	 *  
 	 *  @return Codecs.
 	 */
-	public Map<Integer, ICodec> getCodecs()
+	public ICodec[] getCodecs()
 	{
 		return codecs;
 	}
@@ -553,6 +609,16 @@ public class SerializationServices implements ISerializationServices
 	public List<ITraverseProcessor> getCloneProcessors()
 	{
 		return rrm.getCloneProcessors();
+	}
+	
+	/**
+	 *  Injects the security service.
+	 *  
+	 *  @param secserv The security service.
+	 */
+	public void setSecurityService(ISecurityService secserv)
+	{
+		this.secserv = secserv;
 	}
 	
 	/**

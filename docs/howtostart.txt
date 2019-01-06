@@ -1,21 +1,14 @@
-Jadex V2 can be launched in the following ways:
+Jadex can be launched in the following ways:
 
-a) directly via java from the distribution directory:
-java -jar lib/jadex-platform-standalone-launch-${jadex_build_version}.jar
+a) directly from the distribution directory:
+./jadex.sh (Linux)
+jadex.bat (Windows)
 
-b) on Windows machines also via the batch file:
-jadex.bat
-
-c) on Linux machines also via the shell script file
-   (need to set executable flag on file):
-jadex.sh
-
-d) given that you build the project yourself you can directly invoke the platform class
+b) given that you build the project yourself you can directly invoke the platform class
   (classpath needs to be set by your build environment such as eclipse appropriately):
 java jadex.base.Starter
 
-
-In all four cases you can choose to disable the awareness feature,
+In all cases you can choose to disable the awareness feature,
 which is active by default. The awareness feature will find all
 Jadex platforms in the network, which also have awareness
 activated. The remote platforms can be administered through the JCC,
@@ -26,10 +19,10 @@ with the following option:
 For Windows, you can also use the jadex_no_awareness.bat file.
 For Linux, you can also use the jadex_no_awareness.sh file.
 
-
 The BPMN editor for graphical modeling of BPMN workflows can be started using the provided scripts:
-bpmn_editor.bat
-bpmn_editor.sh
+./bpmn_editor.sh (Linux)
+bpmn_editor.bat (Windows)
+
 
 
 Further information (user guides, tutorials) is available at:
