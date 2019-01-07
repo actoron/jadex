@@ -10,19 +10,10 @@ import jadex.binary.SBinarySerializer;
 import jadex.binary.SerializationConfig;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.component.impl.RemoteExecutionComponentFeature;
-import jadex.bridge.component.impl.remotecommands.RemoteBackwardCommand;
-import jadex.bridge.component.impl.remotecommands.RemoteFinishedCommand;
-import jadex.bridge.component.impl.remotecommands.RemoteForwardCmdCommand;
-import jadex.bridge.component.impl.remotecommands.RemoteIntermediateResultCommand;
-import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
-import jadex.bridge.component.impl.remotecommands.RemotePullCommand;
-import jadex.bridge.component.impl.remotecommands.RemoteResultCommand;
-import jadex.bridge.component.impl.remotecommands.RemoteTerminationCommand;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.platform.service.message.relaytransport.RelayTransportAgent;
 
 /**
  *  The Jadex Binary serializer. Codec supports parallel
@@ -100,8 +91,8 @@ public class JadexBinarySerializer implements ISerializer
 		"APPLICATION_GLOBAL",
 		"GLOBAL",
 		RemoteExecutionComponentFeature.RX_ID,
-		RelayTransportAgent.FORWARD_SENDER,
-		RelayTransportAgent.FORWARD_DEST,
+		"__fw_sender__", //RelayTransportAgent.FORWARD_SENDER,
+		"__fw_dest__", //RelayTransportAgent.FORWARD_DEST,
 		IMsgHeader.SENDER,
 		IMsgHeader.RECEIVER,
 		IMsgHeader.CONVERSATION_ID,
