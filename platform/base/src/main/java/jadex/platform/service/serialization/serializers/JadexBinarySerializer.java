@@ -7,10 +7,22 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import jadex.binary.SBinarySerializer;
+import jadex.binary.SerializationConfig;
+import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.impl.RemoteExecutionComponentFeature;
+import jadex.bridge.component.impl.remotecommands.RemoteBackwardCommand;
+import jadex.bridge.component.impl.remotecommands.RemoteFinishedCommand;
+import jadex.bridge.component.impl.remotecommands.RemoteForwardCmdCommand;
+import jadex.bridge.component.impl.remotecommands.RemoteIntermediateResultCommand;
+import jadex.bridge.component.impl.remotecommands.RemoteMethodInvocationCommand;
+import jadex.bridge.component.impl.remotecommands.RemotePullCommand;
+import jadex.bridge.component.impl.remotecommands.RemoteResultCommand;
+import jadex.bridge.component.impl.remotecommands.RemoteTerminationCommand;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.platform.service.message.relaytransport.RelayTransportAgent;
 
 /**
  *  The Jadex Binary serializer. Codec supports parallel
@@ -28,7 +40,64 @@ public class JadexBinarySerializer implements ISerializer
 	
 	/** The debug flag. */
 	protected boolean DEBUG = false;
-//	
+
+	protected static SerializationConfig CONFIG = new SerializationConfig(new String[] {
+		"jadex",
+		"bridge",
+		"platform",
+		"service",
+		"commons",
+		"component",
+		"impl",
+		"remotecommands",
+		"Tuple2",
+		"IService",
+		"ClassInfo",
+		"ClassInfo[]",
+		"MethodInfo",
+		"MsgHeader",
+		"BasicComponentIdentifier",
+		"RemoteFinishedCommand",
+		"RemoteForwardCmdCommand",
+		"RemoteIntermediateResultCommand",
+		"RemotePullCommand",
+		"RemoteBackwardCommand",
+		"RemoteResultCommand",
+		"RemoteTerminationCommand",
+		"RemoteMethodInvocationCommand",
+		"java",
+		"lang",
+		"util",
+		"String",
+		"Boolean",
+		"Integer",
+		"ArrayList",
+		"HashSet",
+		"HashMap",
+		"Collections$UnmodifiableSet",
+		"Long",
+		"FALSE",
+		"TRUE",
+		"0",
+		"1",
+		"name",
+		"properties",
+		"typeName",
+		"serviceName",
+		"serviceType",
+		"networkNames",
+		"scope",
+		"security",
+		"GLOBAL",
+		RemoteExecutionComponentFeature.RX_ID,
+		RelayTransportAgent.FORWARD_SENDER,
+		RelayTransportAgent.FORWARD_DEST,
+		IMsgHeader.SENDER,
+		IMsgHeader.RECEIVER,
+		IMsgHeader.CONVERSATION_ID,
+		IMsgHeader.XID
+	});
+	
 //	protected static SerializationConfig CONFIG = new SerializationConfig(new String[] {
 //		"doSendMessage",
 //		"MapCodec.java",
@@ -245,7 +314,7 @@ public class JadexBinarySerializer implements ISerializer
 	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs, Object usercontext)
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		SBinarySerializer.writeObjectToStream(baos, val, preprocs!=null?Arrays.asList(preprocs):null, null, usercontext, classloader, null);//, CONFIG);
+		SBinarySerializer.writeObjectToStream(baos, val, preprocs!=null?Arrays.asList(preprocs):null, null, usercontext, classloader, CONFIG);
 		
 		byte[] ret = baos.toByteArray();
 		
@@ -291,7 +360,7 @@ public class JadexBinarySerializer implements ISerializer
 	public Object decode(InputStream is, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext)
 	{
 		
-		Object ret = SBinarySerializer.readObjectFromStream(is, postprocs!=null?Arrays.asList(postprocs):null, usercontext, classloader, null, null);// CONFIG);
+		Object ret = SBinarySerializer.readObjectFromStream(is, postprocs!=null?Arrays.asList(postprocs):null, usercontext, classloader, null, CONFIG);
 		
 		try
 		{

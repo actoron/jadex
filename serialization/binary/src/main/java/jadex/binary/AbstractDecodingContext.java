@@ -23,7 +23,7 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 	protected List<IDecoderHandler> decoderhandlers;
 	
 	/** Handler for versioned operations. */
-	protected IVersionedHandler versionedhandler = new VersionedHandler3();
+	protected IVersionedHandler versionedhandler = new VersionedHandler4();
 	
 	/** The String pool. */
 	protected List<String> stringpool;
@@ -32,7 +32,7 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 	protected List<String> classnamepool;
 	
 	/** The package fragment pool. */
-	protected List<String> pkgpool;
+//	protected List<String> pkgpool;
 	
 	/** A user context. */
 	protected Object usercontext;
@@ -72,13 +72,13 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 		{
 			this.stringpool = new ArrayList<String>();
 			this.classnamepool = new ArrayList<String>();
-			this.pkgpool = new ArrayList<String>();
+//			this.pkgpool = new ArrayList<String>();
 		}
 		else
 		{
 			this.stringpool = config.createDecodingStringPool3();
 			this.classnamepool = config.createDecodingClassnamePool3();
-			this.pkgpool = config.createDecodingFragPool3();
+//			this.pkgpool = config.createDecodingFragPool3();
 		}
 	}
 	
@@ -309,16 +309,35 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 	{
 		if (version == 2)
 		{
-			versionedhandler = new VersionedHandler2();
 			if (config!=null)
 			{
+				versionedhandler = new VersionedHandler2(config.createDecodingFragPool2());
 				this.stringpool = config.createDecodingStringPool2();
 				this.classnamepool = config.createDecodingClassnamePool2();
-				this.pkgpool = config.createDecodingFragPool2();
+			}
+			else
+			{
+				versionedhandler = new VersionedHandler2(null);
 			}
 		}
-		else if (version != 3)
+		else if (version == 3)
+		{
+			if (config!=null)
+			{
+				versionedhandler = new VersionedHandler3(config.createDecodingFragPool2());
+				this.stringpool = config.createDecodingStringPool2();
+				this.classnamepool = config.createDecodingClassnamePool2();
+//				this.pkgpool = config.createDecodingFragPool2();
+			}
+			else
+			{
+				versionedhandler = new VersionedHandler3(null);
+			}
+		}
+		else if (version != 4)
+		{
 			throw new IllegalArgumentException("Binary format version is not supported: " + version);
+		}
 	}
 	
 	/**
@@ -389,9 +408,58 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 		public String readClassname();
 	}
 	
+	/** Operations for format version 4. */
+	protected class VersionedHandler4 implements IVersionedHandler
+	{
+		/**
+		 *  Helper method for decoding a class name.
+		 *  @return String encoded at the current position.
+		 */
+		 public String readClassname()
+		{
+			String ret = null;
+			
+			int classid = (int) readVarInt();
+			if (classid >= classnamepool.size())
+			{
+				int count = (int) readVarInt();
+				StringBuilder cnb = new StringBuilder();
+				for (int i = 0; i < (count - 1); ++i)
+				{
+					cnb.append(pooledRead(stringpool));
+					cnb.append(".");
+				}
+				
+				cnb.append(pooledRead(stringpool));
+				ret = cnb.toString();
+				classnamepool.add(ret);
+			}
+			else
+			{
+				ret = classnamepool.get(classid);
+			}
+			
+			ret	= STransformation.getClassname(ret);
+				
+			setCurrentClassName(ret);
+			return ret;
+		}
+	}
+	
 	/** Operations for format version 3. */
 	protected class VersionedHandler3 implements IVersionedHandler
 	{
+		/**
+		 *  Create Handler.
+		 */
+		public VersionedHandler3(List<String> pkgpool)
+		{
+			this.pkgpool = pkgpool != null ? pkgpool : new ArrayList<>();
+		}
+		
+		/** The package fragment pool. */
+		protected List<String> pkgpool = new ArrayList<>();
+		
 		/**
 		 *  Helper method for decoding a class name.
 		 *  @return String encoded at the current position.
@@ -430,6 +498,17 @@ public abstract class AbstractDecodingContext implements IDecodingContext
 	/** Operations for format version 2. */
 	protected class VersionedHandler2 implements IVersionedHandler
 	{
+		/** The package fragment pool. */
+		protected List<String> pkgpool;
+		
+		/**
+		 *  Create Handler.
+		 */
+		public VersionedHandler2(List<String> pkgpool)
+		{
+			this.pkgpool = pkgpool != null ? pkgpool : new ArrayList<>();
+		}
+		
 		/**
 		 *  Helper method for decoding a class name.
 		 *  @return String encoded at the current position.

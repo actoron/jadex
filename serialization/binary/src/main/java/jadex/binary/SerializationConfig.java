@@ -45,8 +45,23 @@ public class SerializationConfig
 	 *  Initializes the config.
 	 *  @param predefinedclassnames Class names to predefine as known.
 	 */
+	public SerializationConfig(String[] predefinedstrings)
+	{
+		this(predefinedstrings, null);
+		System.out.println("Stringnum " + predefinedstrings.length);
+	}
+	
+	/**
+	 *  Initializes the config.
+	 *  @param predefinedclassnames Class names to predefine as known.
+	 *  @deprecated Class fragments merged with string pooling in v4.
+	 */
+	@Deprecated
 	public SerializationConfig(String[] predefinedstrings, String[] predefinedclassnames)
 	{
+		predefinedstrings = predefinedstrings != null ? predefinedstrings : new String[0];
+		predefinedclassnames = predefinedclassnames != null ? predefinedclassnames : new String[0];
+		
 		predefineClassnames2(predefinedclassnames);
 		predefineClassnames3(predefinedclassnames);
 		

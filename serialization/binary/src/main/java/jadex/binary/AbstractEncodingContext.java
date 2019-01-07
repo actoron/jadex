@@ -52,7 +52,7 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 	protected Map<String, Integer> classnamepool;
 	
 	/** The package fragment pool. */
-	protected Map<String, Integer> fragpool;
+//	protected Map<String, Integer> fragpool;
 	
 	/** The bytes written to the output. */
 	protected long writtenbytes;
@@ -68,7 +68,7 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 		classidcache = new HashMap<Class<?>, Integer>();
 		stringpool = config==null?new HashMap<String, Integer>():config.createEncodingStringPool();
 		classnamepool = config==null?new HashMap<String, Integer>():config.createEncodingClassnamePool();
-		fragpool = config==null?new HashMap<String, Integer>():config.createEncodingFragPool();
+//		fragpool = config==null?new HashMap<String, Integer>():config.createEncodingFragPool();
 	}
 	
 	/**
@@ -258,26 +258,34 @@ public abstract class AbstractEncodingContext implements IEncodingContext
 			classnamepool.put(name, classid);
 			writeVarInt(classid.intValue());
 			
-			int lppos = name.lastIndexOf('.');
-			if (lppos < 0)
-			{
-				writeVarInt(0);
-				pooledWrite(fragpool, name);
-			}
-			else
-			{
-				String pkgname = name.substring(0, lppos);
-				String classname = name.substring(lppos + 1);
-				
-				StringTokenizer tok = new StringTokenizer(pkgname, ".");
-				writeVarInt(tok.countTokens());
-				while (tok.hasMoreElements())
-				{
-					String frag = tok.nextToken();
-					pooledWrite(fragpool, frag);
-				}
-				pooledWrite(fragpool, classname);
-			}
+			String[] namefragments = name.split("\\.");
+			writeVarInt(namefragments.length);
+			for (String frag : namefragments)
+				writeString(frag);
+			
+//			int lppos = name.lastIndexOf('.');
+//			if (lppos < 0)
+//			{
+//				writeVarInt(0);
+////				pooledWrite(fragpool, name);
+//				pooledWrite(stringpool, name);
+//			}
+//			else
+//			{
+//				String pkgname = name.substring(0, lppos);
+//				String classname = name.substring(lppos + 1);
+//				
+//				StringTokenizer tok = new StringTokenizer(pkgname, ".");
+//				writeVarInt(tok.countTokens());
+//				while (tok.hasMoreElements())
+//				{
+//					String frag = tok.nextToken();
+////					pooledWrite(fragpool, frag);
+//					pooledWrite(stringpool, frag);
+//				}
+////				pooledWrite(fragpool, classname);
+//				pooledWrite(stringpool, classname);
+//			}
 		}
 		else
 		{

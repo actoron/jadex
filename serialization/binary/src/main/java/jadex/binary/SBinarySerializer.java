@@ -27,7 +27,7 @@ public class SBinarySerializer
 	protected static final byte MAGIC_BYTE = -13;
 	
 	/** Serializer version */
-	protected static final int VERSION = 3;
+	protected static final int VERSION = 4;
 	
 	/** Marker for null values */
 	protected static final String NULL_MARKER = "0";
