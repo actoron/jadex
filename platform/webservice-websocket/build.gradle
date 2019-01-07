@@ -59,7 +59,7 @@ node {
 	download = true
 }
 
-task createOutputDir << {
+task createOutputDir doLast {
 	file("$buildDir/js").mkdir();
 }
 
@@ -80,7 +80,7 @@ compileTypeScript {
 //	outFile = file("$buildDir/ts/jadex.js")
 }
 
-task mergeTypings(dependsOn: compileTypeScript) << {
+task mergeTypings(dependsOn: compileTypeScript) doLast {
 	File tsDir = file("$buildDir/ts");
 	File typingsOutfile = file("$buildDir/js/jadex.d.ts");
 	def typeFiles = tsDir.listFiles(new FilenameFilter() {
