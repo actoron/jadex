@@ -48,7 +48,6 @@ public class SerializationConfig
 	public SerializationConfig(String[] predefinedstrings)
 	{
 		this(predefinedstrings, null);
-		System.out.println("Stringnum " + predefinedstrings.length);
 	}
 	
 	/**
