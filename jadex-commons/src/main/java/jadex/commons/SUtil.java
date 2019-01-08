@@ -5358,7 +5358,7 @@ public class SUtil
 	
 	/**
 	 *  Try to find the correct classpath root directories for current build tool chain.
-	 *  Tries bin (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
+	 *  Tries bin and bin/main (e.g. eclipse), build/classes/main (gradle), target/classes (maven)
 	 *  and uses the directory with the newest file.
 	 */
 	public static File[]	findOutputDirs(String projectroot)
@@ -5367,23 +5367,44 @@ public class SUtil
 		
 		List<List<File>>	candidates	= new ArrayList<List<File>>();
 		
-		// eclipse
-		candidates.add(new ArrayList<File>(Arrays.asList(
-			new File(projectDir, "bin"))));
-		
+		// eclipse old
+		if(!new File(new File(projectDir, "bin"), "main").exists())
+		{
+			candidates.add(new ArrayList<File>(Arrays.asList(
+				new File(projectDir, "bin"))));
+		}
+		else
+		{
+			// eclipse new
+			candidates.add(new ArrayList<File>(Arrays.asList(
+				new File(new File(projectDir, "bin"), "main"))));
+//			if (includeTestClasses) {
+				candidates.get(candidates.size()-1).add(
+					new File(new File(projectDir, "bin"), "test"));
+//			}
+		}
+			
 		// gradle
 		candidates.add(new ArrayList<File>(Arrays.asList(
-			new File(new File(new File(projectDir, "build"), "classes"),  "main"),
-			new File(new File(new File(projectDir, "build"), "classes"),  "test"),
-			new File(new File(new File(projectDir, "build"), "resources"),  "main"),
-			new File(new File(new File(projectDir, "build"), "resources"),  "test"))));
-		
+			new File(new File(new File(new File(projectDir, "build"), "classes"),"java"),  "main"),
+			new File(new File(new File(projectDir, "build"), "resources"),  "main"))));
+//		if (includeTestClasses) {
+			candidates.get(candidates.size()-1).add(
+				new File(new File(new File(new File(projectDir, "build"), "classes"),"java"),  "test"));
+			candidates.get(candidates.size()-1).add(
+				new File(new File(new File(projectDir, "build"), "resources"),  "test"));
+//		}
+
 		// maven
 		candidates.add(new ArrayList<File>(Arrays.asList(
 			new File(new File(projectDir, "target"), "classes"),
-			new File(new File(projectDir, "target"), "test-classes"),
-			new File(new File(projectDir, "target"), "resources"),
-			new File(new File(projectDir, "target"), "test-resources"))));
+			new File(new File(projectDir, "target"), "resources"))));
+//		if (includeTestClasses) {
+			candidates.get(candidates.size()-1).add(
+				new File(new File(projectDir, "target"), "test-classes"));
+			candidates.get(candidates.size()-1).add(
+				new File(new File(projectDir, "target"), "test-resources"));
+//		}
 		
 		// Choose newest list of files based on first entry
 		List<File>	found	= null;
@@ -5393,7 +5414,7 @@ public class SUtil
 			if(cand.get(0).exists())
 			{
 				long	mod	= SUtil.getLastModified(cand.get(0));
-				if(mod>retmod)
+				if(mod>=retmod)
 				{
 					found	= cand;
 					retmod	= mod;
@@ -5412,7 +5433,7 @@ public class SUtil
 				}
 			}
 		}
-		
+
 		return found!=null ? found.toArray(new File[found.size()]) : new File[0];
 	}
 
@@ -5424,10 +5445,16 @@ public class SUtil
 	 * @return File
 	 */
 	private static File findDirForProject(String project) {
-		File result = new File(project);
-		if (!result.exists()) {
-			result = new File("../" + project);
+		File	cur	= new File(".").getAbsoluteFile();
+		File result;
+		do 
+		{
+			result = new File(cur, project);
+			cur	= cur.getParentFile();
 		}
+		while(!result.exists() && cur!=null);
+		
 		return result;
+
 	}
 }
