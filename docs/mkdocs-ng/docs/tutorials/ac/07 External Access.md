@@ -35,7 +35,7 @@ As a basis for the subsequent exercises in this chapter a new agent is used: the
 ```java
 
 // Reply if the message contains the keyword.
-ChatBotF1Agent	chatbot	= (ChatBotF1Agent)((IPojoMicroAgent)agent).getPojoAgent();
+ChatBotF1Agent chatbot = (ChatBotF1Agent)agent.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
 if(text.toLowerCase().indexOf(chatbot.getKeyword().toLowerCase())!=-1)
 {
   ...
@@ -95,7 +95,7 @@ getActiveComponent().scheduleStep(new IComponentStep<String[]>()
 {
   public IFuture<String[]> execute(IInternalAccess ia)
   {
-    ChatBotF3Agent chatbot = (ChatBotF3Agent)((IPojoMicroAgent)ia).getPojoAgent();
+    ChatBotF3Agent chatbot = (ChatBotF3Agent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
     return new Future<String[]>(new String[]{chatbot.getKeyword(), chatbot.getReply()});
   }
 })
@@ -166,7 +166,7 @@ getActiveComponent().scheduleStep(new IComponentStep<String[]>()
   public IFuture<String[]> execute(IInternalAccess ia)
   {
     // This code is executed on a potentially remote component.
-    ChatBotF3Agent chatbot = (ChatBotF3Agent)((IPojoMicroAgent)ia).getPojoAgent();
+    ChatBotF3Agent chatbot = (ChatBotF3Agent)ia.getComponentFeature(IPojoComponentFeature.class).getPojoAgent();
     return new Future<String[]>(new String[]{chatbot.getKeyword(), chatbot.getReply()});
   }
 })
