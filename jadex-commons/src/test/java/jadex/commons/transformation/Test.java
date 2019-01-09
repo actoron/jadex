@@ -1214,7 +1214,11 @@ public abstract class Test extends TestCase
 				if(e1.getClass().equals(e2.getClass()))
 				{
 					ret = Arrays.equals(e1.getStackTrace(), e2.getStackTrace())? 0: -1;
+					if(ret!=0)
+						throw new RuntimeException("Not equal: " + Arrays.toString(e1.getStackTrace()) + ", " + Arrays.toString(e2.getStackTrace()));
 				}
+				else
+					throw new RuntimeException("Not equal: " + e1.getClass() + ", " + e2.getClass());
 				return ret;
 			}
 		});
