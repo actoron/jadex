@@ -325,7 +325,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 * 	Get the model type from the class info.
 	 *  @return null, if no BDI model.
 	 */
-	public String getLoadableType(ClassInfo ci)
+	public static String getLoadableType(ClassInfo ci)
 	{
 		String	ret	= null;
 		AnnotationInfo ai	= ci.getAnnotation(Agent.class.getName());

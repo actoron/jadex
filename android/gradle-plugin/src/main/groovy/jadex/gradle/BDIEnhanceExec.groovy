@@ -1,5 +1,6 @@
 package jadex.gradle
 
+import jadex.bdiv3.BDIAgentFactory
 import jadex.bdiv3.AbstractAsmBdiClassGenerator
 import jadex.bdiv3.ByteKeepingASMBDIClassGenerator
 import jadex.bdiv3.KernelBDIV3Agent
@@ -9,6 +10,7 @@ import jadex.bridge.ResourceIdentifier
 import jadex.bridge.nonfunctional.annotation.NameValue
 import jadex.gradle.exceptions.BDIEnhanceException;
 import jadex.maven.ResourceUtils
+import jadex.commons.SClassReader
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.IOFileFilter
@@ -45,16 +47,15 @@ class BDIEnhanceExec {
         logger = Logging.getLogger(this.getClass());
 
         bdiFileFilter = new IOFileFilter() {
-            def kernelTypes = getBDIKernelTypes()
 
             boolean accept(File dir, String name) {
                 boolean result = false;
-                for (String string : kernelTypes) {
-                    if (name.endsWith(string)) {
-                        result = true;
-                        break;
-                    }
-                }
+				File	f	= new File(dir, name) 
+				if(!f.isDirectory()) {
+					f.withInputStream { stream ->
+						result	= BDIAgentFactory.getLoadableType(SClassReader.getClassInfo(stream))!=null
+					}
+				}
                 return result;
             }
 
@@ -193,37 +194,4 @@ class BDIEnhanceExec {
         return result.toArray(new String[result.size()]);
     }
 
-
-    private List<String> getBDIKernelTypes()
-    {
-        def annotation = KernelBDIV3Agent.getAnnotation(jadex.micro.annotation.Properties);
-
-        NameValue[] value = annotation.value()
-
-        String types = null;
-        for (int i = 0; i < value.length; i++)
-        {
-            logger.debug("possible annotation: " + value[i]);
-            if (value[i].name().equals("kernel.types"))
-            {
-                types = value[i].value();
-            }
-        }
-
-        final List<String> kernelTypes = new ArrayList<String>();
-        int begin = types.indexOf("\"");;
-        while (begin != -1)
-        {
-            int end = types.indexOf("\"", begin + 1);
-            String kernelType = types.substring(begin + 1, end);
-            if (kernelType.length() > 0)
-            {
-                kernelTypes.add(kernelType);
-            }
-            begin = types.indexOf("\"", end + 1);
-        }
-
-        logger.debug("KernelBDIV3 Types: " + kernelTypes);
-        return kernelTypes;
-    }
 }

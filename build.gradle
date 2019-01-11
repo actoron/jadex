@@ -210,8 +210,8 @@ subprojects
 			dependencies {
 //				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
 //						version: "$project.version.major.$project.version.minor.+"
-				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
-						version: "4.0.22"
+				classpath group: 'org.activecomponents.jadex', name: 'jadex-android-gradle-plugin',
+						version: "4.0.140"
 			}
 		}
 
