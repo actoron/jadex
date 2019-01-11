@@ -12,5 +12,10 @@ dependencies
 //	api project(':platform:webservice-desktop')
 	api project(':platform:webservice-desktop-grizzly') // todo: do not depend on specific server
 	
+	// Needed for Java 11+
+	implementation 'javax.xml.bind:jaxb-api:2.3.0'
+	implementation 'javax.xml.ws:jaxws-api:2.3.0'
+	implementation 'javax.jws:javax.jws-api:1.1'
+	
 	api 'org.codehaus.jackson:jackson-mapper-asl:1.9.3'
 }
