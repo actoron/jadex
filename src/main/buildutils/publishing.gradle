@@ -205,7 +205,10 @@ publishing {
 
     publications {
 
-        if (canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project))) {  // dont publish apks
+		// DON'T use cansign, it prevents local publishing without keys.
+		//if ((canSign) && (!isAndroidProject(project) || isAndroidLibraryProject(project))) {  // dont publish apks
+        if (!isAndroidProject(project) || isAndroidLibraryProject(project)) {  // dont publish apks
+        
             MyPublication(MavenPublication) {
                 if (isWebApplicationProject(project)) {
                     from components.web
