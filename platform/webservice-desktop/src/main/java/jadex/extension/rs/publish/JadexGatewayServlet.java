@@ -116,7 +116,7 @@ public class JadexGatewayServlet extends HttpServlet
 				{
 					Class<?> cmdcl = SReflect.classForName(config.getInitParameter(cname), null);
 					@SuppressWarnings("unchecked")
-					ICommand<IExternalAccess> cmd = (ICommand<IExternalAccess>)cmdcl.newInstance();
+					ICommand<IExternalAccess> cmd = (ICommand<IExternalAccess>)cmdcl.getConstructor().newInstance();
 					initcmds.add(cmd);
 				}
 				catch(Exception e)
@@ -161,9 +161,7 @@ public class JadexGatewayServlet extends HttpServlet
 			
 			if(ret==null)
 			{
-				IPlatformConfiguration pc = PlatformConfigurationHandler.getDefault();
-			    pc.setGui(false);
-			    pc.getExtendedPlatformConfiguration().setRsPublish(true);
+				IPlatformConfiguration pc = getPlatformConfig();
 			
 			    ret = Starter.createPlatform(pc).get();
 			    
@@ -172,13 +170,25 @@ public class JadexGatewayServlet extends HttpServlet
 			
 			Integer refcount = (Integer) ctx.getAttribute(JADEX_PLATFORM_REFCOUNT);
 			if (refcount == null)
-				refcount = new Integer(1);
+				refcount = Integer.valueOf(1);
 			else
-				refcount = new Integer(refcount.intValue() + 1);
+				refcount = Integer.valueOf(refcount.intValue() + 1);
 			ctx.setAttribute(JADEX_PLATFORM_REFCOUNT, refcount);
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Provides the platform config.
+	 *  @return The platform config.
+	 */
+	protected IPlatformConfiguration getPlatformConfig()
+	{
+		IPlatformConfiguration pc = PlatformConfigurationHandler.getDefault();
+	    pc.setGui(false);
+	    pc.getExtendedPlatformConfiguration().setRsPublish(true);
+	    return pc;
 	}
 	
 	/**
@@ -334,7 +344,7 @@ public class JadexGatewayServlet extends HttpServlet
 			}
 			else
 			{
-				refcount = new Integer(refcount.intValue() - 1);
+				refcount = Integer.valueOf(refcount.intValue() - 1);
 				ctx.setAttribute(JADEX_PLATFORM_REFCOUNT, refcount);
 			}
 		}
