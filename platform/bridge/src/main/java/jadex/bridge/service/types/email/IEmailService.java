@@ -9,7 +9,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 /**
  *  The email service allows for sending and receiving emails.
  */
-@Service(system=true)
+@Service()
 public interface IEmailService
 {
 	/**
