@@ -21,7 +21,8 @@ pipeline {
 	  steps {
 	    // not required?
 	    //sh './gradlew -Pdist=addongradleplugin clean :android:gradle-plugin:test publishToMavenLocal -x javadoc -x processSchemas'
-		wrap([$class: 'Xvfb']) {
+		// https://stackoverflow.com/questions/51632572/jenkins-pipeline-wrap-stages-for-xvfb-start
+		wrap([$class: 'Xvfb', debug: true, parallelBuild: true]) {
 		  // todo: why build hangs with distzip and javadoc?
 		  // No 'clean' when already done for android-gradle-plugin
 		  sh './gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue'
