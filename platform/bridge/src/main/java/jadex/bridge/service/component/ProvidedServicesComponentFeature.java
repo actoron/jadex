@@ -1034,20 +1034,26 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			
 //			synchronized(servicelisteners)
 //			{
+			if (servicelisteners != null)
+			{
 				if (servicelisteners.containsKey(sid))
 				{
 					MethodListenerHandler hndlr = servicelisteners.get(sid);
 					servicelisteners.put(ssid, hndlr);
 				}
+			}
 //			}
 			
 //			synchronized(serviceinfos)
 //			{
+			if (serviceinfos != null)
+			{
 				if (serviceinfos.containsKey(sid))
 				{
 					ProvidedServiceInfo info = serviceinfos.get(sid);
 					serviceinfos.put(ssid, info);
 				}
+			}
 //			}
 			
 			ServiceRegistry.getRegistry(component.getId().getRoot()).updateService(ssid);
