@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.types.transport.PlatformData;
+import jadex.bridge.service.search.ServiceEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -24,6 +24,6 @@ public interface IWebJCCService
 	 *  Get events about known platforms.
 	 *  @return Events for platforms.
 	 */
-	public ISubscriptionIntermediateFuture<IComponentIdentifier> subscribeToPlatforms();
+	public ISubscriptionIntermediateFuture<ServiceEvent<IComponentIdentifier>> subscribeToPlatforms();
 	
 }

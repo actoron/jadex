@@ -80,7 +80,8 @@ public interface IExternalRequiredServicesFeature extends IExternalComponentFeat
 	/**
 	 *  Add a service query.
 	 *  Continuously searches for matching services.
-	 *  @param query	The search query.
+	 *  Use query setEventMode to retrieve also removals.
+	 *  @param query The search query.
 	 *  @return Future providing the corresponding services as intermediate results.
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query);

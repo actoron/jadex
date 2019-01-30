@@ -58,12 +58,23 @@ public class SlidingCuckooFilter
 	 */
 	public void insert(String string)
 	{
-		if (!currentfilter.insert(string))
+		if(!currentfilter.insert(string))
 		{
 			expiringfilter = currentfilter;
 			currentfilter = createFilter(expiringfilter.getCapacity());
 			currentfilter.insert(string);
 		}
+	}
+	
+	/**
+	 *  Delete a value from the filter.
+	 *  @param val The value to delete.
+	 */
+	public void delete(String val)
+	{
+		currentfilter.delete(val);
+		if(expiringfilter!=null)
+			expiringfilter.delete(val);
 	}
 	
 	/**

@@ -1,19 +1,26 @@
 package jadex.tools.web;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
-import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.Boolean3;
+import jadex.commons.IResultCommand;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.ProvidedService;
@@ -28,7 +35,7 @@ import jadex.micro.annotation.Publish;
 )
 @Agent(autostart=Boolean3.TRUE,
 	predecessors="jadex.extension.rs.publish.JettyRSPublishAgent") // Hack! could be other publish agent :-(
-public class JCCWebAgent 
+public class JCCWebAgent implements IWebJCCService
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -46,17 +53,53 @@ public class JCCWebAgent
 	 */
 	public IFuture<Collection<IComponentIdentifier>> getPlatforms()
 	{
-		agent.addQuery(new ServiceQuery<>(IExternalAccess.class));
-		return null;
+		Future<Collection<IComponentIdentifier>> ret = new Future<>();
+		
+		ITerminableIntermediateFuture<IExternalAccess> ret1 = agent.searchServices(new ServiceQuery<>(IExternalAccess.class, ServiceScope.NETWORK));
+		ITerminableIntermediateFuture<IExternalAccess> ret2 = agent.searchServices(new ServiceQuery<>(IExternalAccess.class, ServiceScope.GLOBAL));
+	
+		FutureBarrier<Collection<IExternalAccess>> bar = new FutureBarrier<>();
+		bar.addFuture(ret1);
+		bar.addFuture(ret2);
+		
+		bar.waitFor().addResultListener(new ExceptionDelegationResultListener<Void, Collection<IComponentIdentifier>>(ret)
+		{
+			@Override
+			public void customResultAvailable(Void result) throws Exception
+			{
+				Collection<IExternalAccess> col1 = bar.getResult(0);
+				Collection<IExternalAccess> col2 = bar.getResult(1);
+				Collection<IComponentIdentifier> col = new HashSet<>();
+				for(IExternalAccess ex: col1)
+					col.add(ex.getId());
+				for(IExternalAccess ex: col2)
+					col.add(ex.getId());
+				ret.setResult(col);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
 	 *  Get events about known platforms.
 	 *  @return Events for platforms.
 	 */
-	public ISubscriptionIntermediateFuture<PlatformData> subscribeToPlatforms()
+	public ISubscriptionIntermediateFuture<ServiceEvent<IComponentIdentifier>> subscribeToPlatforms()
 	{
-		return null;
+		ISubscriptionIntermediateFuture<ServiceEvent<IExternalAccess>> net = agent.addQuery(new ServiceQuery<>(IExternalAccess.class, ServiceScope.NETWORK).setEventMode());
+		ISubscriptionIntermediateFuture<ServiceEvent<IExternalAccess>> glo = agent.addQuery(new ServiceQuery<>(IExternalAccess.class, ServiceScope.GLOBAL).setEventMode());
+
+		ISubscriptionIntermediateFuture<ServiceEvent<IComponentIdentifier>> ret = SFuture.combineSubscriptionFutures(agent, net, glo, new IResultCommand<ServiceEvent<IComponentIdentifier>, ServiceEvent<IExternalAccess>>()
+		{
+			@Override
+			public ServiceEvent<IComponentIdentifier> execute(ServiceEvent<IExternalAccess> res)
+			{
+				return new ServiceEvent<IComponentIdentifier>(res.getService().getId(), res.getType());
+			}
+		});
+		
+		return ret;
 	}
 
 }	
