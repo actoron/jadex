@@ -47,7 +47,7 @@ public class JCCWebAgent
 	public IFuture<Collection<IComponentIdentifier>> getPlatforms()
 	{
 		agent.addQuery(new ServiceQuery<>(IExternalAccess.class));
-		
+		return null;
 	}
 	
 	/**
@@ -56,7 +56,7 @@ public class JCCWebAgent
 	 */
 	public ISubscriptionIntermediateFuture<PlatformData> subscribeToPlatforms()
 	{
-		
+		return null;
 	}
 
 }	
