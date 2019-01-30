@@ -60,7 +60,7 @@ import jadex.micro.annotation.Publish;
 )
 // TODO: service dependencies instead of predecessors
 @Agent(autostart=Boolean3.FALSE,
-	predecessors="jadex.extension.rs.publish.JettyRSPublishAgent")
+	predecessors="jadex.extension.rs.publish.JettyRSPublishAgent") // Hack! could be other publish agent :-(
 public class StatusAgent implements IStatusService
 {
 	@Agent
