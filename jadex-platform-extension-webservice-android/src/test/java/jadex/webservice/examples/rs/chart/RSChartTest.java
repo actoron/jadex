@@ -11,9 +11,11 @@ import jadex.commons.future.ThreadSuspendable;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import android.graphics.Color;
 
+@Ignore // TODO: is RS hello test sufficient or does this test add anything useful?
 public class RSChartTest
 {
 	private IExternalAccess extAcc;
