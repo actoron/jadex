@@ -241,18 +241,26 @@ public class SComponentManagementService
     	CmsState cmsstate = getState(agent.getId());
     	try(IAutoLock l = cmsstate.writeLock())
     	{
-    		CmsComponentState compstate = cmsstate.getComponent(cid);
-    		if (compstate == null)
+    		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> col = null;
+    		if (cid != null)
     		{
-    			ret.setException(new IllegalStateException("Component not found: " + cid));
-    			return ret;
+	    		CmsComponentState compstate = cmsstate.getComponent(cid);
+	    		if (compstate == null)
+	    		{
+	    			ret.setException(new IllegalStateException("Component not found: " + cid));
+	    			return ret;
+	    		}
+	    		compstate.getCmsListeners();
+	    		if(col==null)
+		    	{
+		    		col = new ArrayList<SubscriptionIntermediateFuture<CMSStatusEvent>>();
+		    		compstate.setCmsListeners(col);
+		    	}
     		}
-    		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> col = compstate.getCmsListeners();
-	    	if(col==null)
-	    	{
-	    		col = new ArrayList<SubscriptionIntermediateFuture<CMSStatusEvent>>();
-	    		compstate.setCmsListeners(col);
-	    	}
+    		else
+    		{
+    			col = cmsstate.getAllListeners();
+    		}
 	    	col.add(ret);
     	}
     	
