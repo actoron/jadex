@@ -90,6 +90,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("Exception occurred: "+exception);
 			}
 
 			@Override

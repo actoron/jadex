@@ -107,6 +107,7 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("Exception occurred: "+exception);
 			}
 
 			@Override

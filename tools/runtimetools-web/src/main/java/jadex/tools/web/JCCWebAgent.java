@@ -29,11 +29,10 @@ import jadex.micro.annotation.Publish;
 
 @ProvidedServices(@ProvidedService(name="webjcc", type=IWebJCCService.class,
 		scope=ServiceScope.PLATFORM,
-		//implementation=@Implementation(expression="$pojoagent"),
 		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="[http://localhost:8080/]webjcc"
 	))
 )
-@Agent(autostart=Boolean3.TRUE,
+@Agent(autostart=Boolean3.FALSE,
 	predecessors="jadex.extension.rs.publish.JettyRSPublishAgent") // Hack! could be other publish agent :-(
 public class JCCWebAgent implements IWebJCCService
 {
@@ -43,6 +42,8 @@ public class JCCWebAgent implements IWebJCCService
 	@AgentCreated
 	protected IFuture<Void>	setup()
 	{
+		getPlatforms();
+		
 		IWebPublishService wps = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IWebPublishService.class));
 		return wps.publishResources("[http://localhost:8080/]", "META-INF/resources2");
 	}
@@ -74,6 +75,9 @@ public class JCCWebAgent implements IWebJCCService
 					col.add(ex.getId());
 				for(IExternalAccess ex: col2)
 					col.add(ex.getId());
+				
+				System.out.println("found platforms: "+col);
+				
 				ret.setResult(col);
 			}
 		});

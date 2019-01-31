@@ -53,7 +53,7 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 	protected Map<String, Object> params;
 	
 	/**
-	 * Creates the property.
+	 *  Creates the property.
 	 */
 	public TagProperty(IInternalAccess comp, IService service, MethodInfo method, Map<String, Object> params)
 	{
@@ -97,6 +97,18 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 				{
 					tags.addAll(tags2);
 				}
+				found = true;
+			}
+			
+			// get values directyl from init parameters under TAG_0, TAG_1 ... (from @Tags)
+			if(params.containsKey(NAME+"_0"))
+			{
+				List<Object> vals = new ArrayList<>();
+				for(int i=0; params.containsKey(NAME+"_"+i); i++)
+				{
+					vals.add(params.get(NAME+"_"+i));
+				}
+				tags = createRuntimeTags(vals, component.getExternalAccess());
 				found = true;
 			}
 			

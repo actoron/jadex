@@ -589,15 +589,12 @@ public class VisualProcessViewPanel extends JPanel
 				@Override
 				public void exceptionOccurred(Exception exception)
 				{
-					// TODO Auto-generated method stub
-					
+					System.out.println("Exception occurred: "+exception);
 				}
 
 				@Override
 				public void resultAvailable(Collection<CMSStatusEvent> result)
 				{
-					// TODO Auto-generated method stub
-					
 				}
 
 				@Override

@@ -701,6 +701,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("Exception occurred: "+exception);
 			}
 
 			@Override

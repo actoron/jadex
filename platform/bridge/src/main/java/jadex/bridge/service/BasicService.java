@@ -341,18 +341,18 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 							
 							IValueFetcher vf = (IValueFetcher) internalaccess.getFetcher();
 							Class<?>[] sertypes = new Class<?>[] { type, BasicService.this.impltype };
-							for (int si = 0; si < sertypes.length; ++si)
+							for(int si = 0; si < sertypes.length; ++si)
 							{
 								if(sertypes[si] != null && sertypes[si].isAnnotationPresent(Tags.class))
 								{
 									Tags anntags = (Tags)sertypes[si].getAnnotation(Tags.class);
 									String[] tags = anntags != null ? anntags.value() : null;
-									if (tags != null && tags.length > 0)
+									if(tags != null && tags.length > 0)
 									{
-										for (int i = 0; i < tags.length; ++i)
+										for(int i = 0; i < tags.length; ++i)
 										{
 											Object tagval = SJavaParser.evaluateExpression(tags[i], null, vf, internalaccess.getClassLoader());
-											if (tagval instanceof String)
+											if(tagval instanceof String)
 												coll.add((String) tagval);
 											else
 												internalaccess.getLogger().warning("Invalid tag value, ignored: " + tagval + " " + tags[i]);

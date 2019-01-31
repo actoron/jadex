@@ -44,6 +44,7 @@ import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.nonfunctional.annotation.SNameValue;
+import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
@@ -53,6 +54,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -280,6 +282,7 @@ public class MicroClassReader
 		boolean breaksdone = false;
 		boolean nfpropsdone = false;
 		boolean featdone = false;
+		boolean tagsdone = false;
 		
 		boolean addfeat = false;
 		Set<String> configdone = new HashSet<String>();
@@ -432,6 +435,31 @@ public class MicroClassReader
 				
 				// todo!
 //				nfpropsdone = val.replace();
+			}
+			
+			// Take all, upper replace lower
+			if(!tagsdone && isAnnotationPresent(cma, Tags.class, cl))
+			{
+				Tags val = (Tags)getAnnotation(cma, Tags.class, cl);
+				
+				List<Object> nfps = (List<Object>)getOrCreateList("nfproperties", toset);
+				
+				List<UnparsedExpression> params = new ArrayList<>();
+				
+				if(val.argumentname().length()>0)
+					params.add(new UnparsedExpression(TagProperty.ARGUMENT, "\"val.argumentname()\""));
+				
+				for(int i=0; i<val.value().length; i++)
+				{
+					params.add(new UnparsedExpression(TagProperty.NAME+"_"+i, val.value()[i]));
+				}
+				
+				NFPropertyInfo pi = new NFPropertyInfo(TagProperty.NAME, new ClassInfo(TagProperty.class), params);
+					
+				nfps.add(pi);
+				
+				// todo!
+//				tagsdone = val.replace();
 			}
 			
 			// Take newest version

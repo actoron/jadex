@@ -70,7 +70,6 @@ import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.IAutoLock;
-import jadex.commons.collection.IRwMap;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
