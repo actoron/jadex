@@ -1,7 +1,9 @@
 package jadex.bridge.service.types.cms;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -51,6 +53,7 @@ public class CmsState
 	{
 		ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
 		
+		allcomponentslisteners = new ArrayList<>();
 		componentmap = new RwMapWrapper<>(new HashMap<>(), lock);
 		localtypes = new RwMapWrapper<>(new HashMap<>(), lock);
 		classloaders = new RwMapWrapper<>(new LRU<>(500), lock);
@@ -107,6 +110,11 @@ public class CmsState
 		
 		CmsComponentState state = componentmap.get(cid);
 		return state != null ? state.getCmsListeners() : null;
+	}
+	
+	public Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> getAllListeners()
+	{
+		return allcomponentslisteners;
 	}
 	
 	/**

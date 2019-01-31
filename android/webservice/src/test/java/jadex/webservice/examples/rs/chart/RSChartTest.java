@@ -18,6 +18,7 @@ import jadex.commons.future.ThreadSuspendable;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -25,6 +26,7 @@ import org.robolectric.annotation.Config;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
+@Ignore // TODO: is RS hello test sufficient or does this test add anything useful?
 public class RSChartTest
 {
 	private IExternalAccess extAcc;
