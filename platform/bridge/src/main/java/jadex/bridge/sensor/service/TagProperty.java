@@ -108,7 +108,11 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 				{
 					vals.add(params.get(NAME+"_"+i));
 				}
-				tags = createRuntimeTags(vals, component.getExternalAccess());
+				Collection<String> ts = createRuntimeTags(vals, component.getExternalAccess());
+				if(tags==null)
+					tags = ts;
+				else
+					tags.addAll(ts);
 				found = true;
 			}
 			
@@ -162,6 +166,11 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 			{
 				ret.add(it.next());
 			}
+		}
+		else
+		{
+			ret = new ArrayList<String>();
+			ret.add(""+obj);
 		}
 		
 		return ret;

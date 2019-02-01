@@ -14,6 +14,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.modelinfo.NFPropertyInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
@@ -24,10 +25,12 @@ import jadex.bridge.nonfunctional.NFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.nonfunctional.annotation.SNameValue;
+import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.MethodInfo;
@@ -241,7 +244,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 //	}
 	
 	/**
-	 * 
+	 *  Init the service and method nf properties. 
 	 */
 	public IFuture<Void> initNFProperties(final IInternalService ser, Class<?> impltype)
 	{
@@ -276,6 +279,12 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			if(sclazz.isAnnotationPresent(NFProperties.class))
 			{
 				addNFProperties(sclazz.getAnnotation(NFProperties.class), ser).addResultListener(lis);
+				cnt++;
+			}
+			
+			if(sclazz.isAnnotationPresent(Tags.class))
+			{
+				addTags(sclazz.getAnnotation(Tags.class), ser).addResultListener(lis);
 				cnt++;
 			}
 			
@@ -322,6 +331,28 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Add nf properties from a type.
+	 */
+	public IFuture<Void> addTags(Tags tags, IService ser)
+	{
+		INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(ser.getServiceId());
+		
+		List<UnparsedExpression> params = new ArrayList<>();
+		
+		if(tags.argumentname().length()>0)
+			params.add(new UnparsedExpression(TagProperty.ARGUMENT, "\""+tags.argumentname()+"\""));
+		
+		for(int i=0; i<tags.value().length; i++)
+		{
+			params.add(new UnparsedExpression(TagProperty.NAME+"_"+i, tags.value()[i]));
+		}
+		
+		INFProperty<?, ?> prop = AbstractNFProperty.createProperty(TagProperty.class, getInternalAccess(), ser, null, params);
+		
+		return prov.addNFProperty(prop);
 	}
 	
 	/**
