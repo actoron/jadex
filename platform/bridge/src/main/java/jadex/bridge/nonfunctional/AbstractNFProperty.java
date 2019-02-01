@@ -140,7 +140,6 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 								{
 									ps.put(entry.getName(), entry.getValue());
 								}
-								
 							}
 						}
 						

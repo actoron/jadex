@@ -54,6 +54,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.Tag;
 import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.types.factory.SComponentFactory;
@@ -440,18 +441,26 @@ public class MicroClassReader
 			// Take all, upper replace lower
 			if(!tagsdone && isAnnotationPresent(cma, Tags.class, cl))
 			{
-				Tags val = (Tags)getAnnotation(cma, Tags.class, cl);
+				Tags tags = (Tags)getAnnotation(cma, Tags.class, cl);
 				
 				List<Object> nfps = (List<Object>)getOrCreateList("nfproperties", toset);
 				
 				List<UnparsedExpression> params = new ArrayList<>();
 				
-				if(val.argumentname().length()>0)
-					params.add(new UnparsedExpression(TagProperty.ARGUMENT, "\"val.argumentname()\""));
+//				if(val.argumentname().length()>0)
+//					params.add(new UnparsedExpression(TagProperty.ARGUMENT, "\"val.argumentname()\""));
 				
-				for(int i=0; i<val.value().length; i++)
+				for(int i=0; i<tags.value().length; i++)
 				{
-					params.add(new UnparsedExpression(TagProperty.NAME+"_"+i, val.value()[i]));
+					Tag tag = tags.value()[i];
+					
+					if(tag.include().length()>0)
+					{
+						//Object val = SJavaParser.evaluateExpression(tag.include(), agent.getModel().getAllImports(), getInternalAccess().getFetcher(), getInternalAccess().getClassLoader());
+						//if(val instanceof Boolean && ((Boolean)val).booleanValue())
+						params.add(new UnparsedExpression(TagProperty.NAME+"_condition_"+i, tag.value()));
+						params.add(new UnparsedExpression(TagProperty.NAME+"_"+i, tag.value()));
+					}
 				}
 				
 				NFPropertyInfo pi = new NFPropertyInfo(TagProperty.NAME, new ClassInfo(TagProperty.class), params);

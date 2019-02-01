@@ -8,6 +8,8 @@ import jadex.bridge.component.IExternalSubcomponentsFeature;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.Tag;
+import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.component.IExternalProvidedServicesFeature;
 import jadex.bridge.service.component.IExternalRequiredServicesFeature;
 import jadex.commons.future.IFuture;
@@ -19,8 +21,13 @@ import jadex.commons.future.IFuture;
  */
 @Reference
 @Service
+//@Tags(value="$component.getId().getRoot().equals($component.getId())? \"PLATFORM\": null")
+@Tags(@Tag(include="$component.getId().getRoot().equals($component.getId())", value=IExternalAccess.PLATFORM_INTERNAL))
 public interface IExternalAccess extends IExternalExecutionFeature, IExternalArgumentsResultsFeature, IExternalProvidedServicesFeature, IExternalRequiredServicesFeature, IExternalSubcomponentsFeature, IExternalMonitoringComponentFeature, IExternalNFPropertyComponentFeature //extends INFPropertyProvider//extends IRemotable
 {
+	public static final String PLATFORM = "platform";
+	public static final String PLATFORM_INTERNAL = "\"platform\"";
+	
 	//-------- cache --------
 	
 	/**

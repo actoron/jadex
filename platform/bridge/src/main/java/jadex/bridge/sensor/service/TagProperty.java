@@ -11,6 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.VersionInfo;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
 import jadex.bridge.service.IService;
@@ -18,6 +19,7 @@ import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  Tagging a service with a string for searching specifically
@@ -93,7 +95,7 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 				{
 					tags = tags2;
 				}
-				else
+				else if(tags2!=null)
 				{
 					tags.addAll(tags2);
 				}
@@ -106,8 +108,28 @@ public class TagProperty extends AbstractNFProperty<Collection<String>, Void>
 				List<Object> vals = new ArrayList<>();
 				for(int i=0; params.containsKey(NAME+"_"+i); i++)
 				{
-					vals.add(params.get(NAME+"_"+i));
+					Object v = params.get(NAME+"_"+i);
+					String val = v instanceof String? (String)v: ""+v;
+					String cond = (String)params.get(NAME+"_include_"+i);
+					if(cond!=null && cond.length()>0)
+					{
+						try
+						{
+							Object c = SJavaParser.evaluateExpression(cond, component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
+							if(c instanceof Boolean && ((Boolean)c).booleanValue())
+								vals.add(val);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+					else
+					{
+						vals.add(val);
+					}
 				}
+				
 				Collection<String> ts = createRuntimeTags(vals, component.getExternalAccess());
 				if(tags==null)
 					tags = ts;
