@@ -5,8 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import jadex.bridge.sensor.service.TagProperty;
-
 /**
  *  Service search tags.
  */
@@ -14,15 +12,20 @@ import jadex.bridge.sensor.service.TagProperty;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Tags
 {
+//	/**
+//	 *  The tags as strings or expressions (using %{})
+//	 */
+//	public String[] value() default {};
+//	
+//	/**
+//	 *  Argument name for fetching tag values.
+//	 */
+//	public String argumentname() default ""; 
+
 	/**
-	 *  The tags as strings or expressions (using %{})
+	 *  The tags as strings or expression
 	 */
-	public String[] value() default {};
-	
-	/**
-	 *  Argument name for fetching tag values.
-	 */
-	public String argumentname() default ""; 
+	public Tag[] value() default {};
 }
 
 // from jadex.micro.testcases.nfservicetags.ITestService

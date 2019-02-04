@@ -131,8 +131,15 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 							ps = new HashMap<String, Object>();
 							for(UnparsedExpression entry: params)
 							{
-								Object val = SJavaParser.evaluateExpression(entry.getValue(), comp.getModel().getAllImports(), comp.getFetcher(), comp.getClassLoader());
-								ps.put(entry.getName(), val);
+								try
+								{
+									Object val = SJavaParser.evaluateExpression(entry.getValue(), comp.getModel().getAllImports(), comp.getFetcher(), comp.getClassLoader());
+									ps.put(entry.getName(), val);
+								}
+								catch(Exception ex3)
+								{
+									ps.put(entry.getName(), entry.getValue());
+								}
 							}
 						}
 						
