@@ -2110,7 +2110,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	// Todo: hack??? should be internal to CMS!?
 	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid)
 	{
-		return getComponent().getDescription(cid);
+ 		// redirect remote calls 
+		if(!getComponent().getId().getRoot().equals(cid.getRoot()))
+			return getExternalAccess(cid).getDescription(cid);
+		else
+			return getComponent().getDescription(cid);
 	}
 	
 	/**

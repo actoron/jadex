@@ -291,7 +291,7 @@ public class PlatformAgent
 		// scope network or global?!
 		ISubscriptionIntermediateFuture<IExternalAccess> query = agent.addQuery(new ServiceQuery<>(IExternalAccess.class)
 			.setScope(ServiceScope.NETWORK));
-//					.setScope(ServiceScope.GLOBAL));
+//			.setScope(ServiceScope.GLOBAL));
 		query.addResultListener(new IIntermediateResultListener<IExternalAccess>()
 		{
 			public void intermediateResultAvailable(IExternalAccess result)

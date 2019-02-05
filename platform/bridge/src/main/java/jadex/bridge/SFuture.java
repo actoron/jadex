@@ -372,7 +372,7 @@ public class SFuture
 	{
 		final SlidingCuckooFilter scf = new SlidingCuckooFilter();
 	
-		SubscriptionIntermediateFuture<T> ret = (SubscriptionIntermediateFuture)FutureFunctionality
+		ISubscriptionIntermediateFuture<T> ret = (ISubscriptionIntermediateFuture)FutureFunctionality
 			.getDelegationFuture(f1, new ComponentFutureFunctionality(ia)
 		{
 			@Override
@@ -441,12 +441,14 @@ public class SFuture
 			}
 		});
 		
+		SFuture.avoidCallTimeouts((IntermediateFuture)ret, ia);
+		
 		// Add remote results to future
 		if(f2!=null)
 		{
 			f2.addIntermediateResultListener(result-> 
 			{
-				ret.addIntermediateResult((T)result);
+				((IntermediateFuture)ret).addIntermediateResult((T)result);
 			}, exception -> {}); // Ignore exception (printed when no listener supplied)
 		}
 		
