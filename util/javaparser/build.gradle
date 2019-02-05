@@ -4,3 +4,26 @@ dependencies
 {
 	api project(':util:commons')
 }
+
+// JavaCC compilation
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath group: 'ca.coglinc', name: 'javacc-gradle-plugin', version: '2.4.0'
+		classpath group: 'net.java.dev.javacc', name: 'javacc', version: '3.2'
+	}
+}
+apply plugin: 'ca.coglinc.javacc'
+
+// JavaCC compilation in Eclipse
+sourceSets {
+	main {
+		java {
+			srcDir compileJavacc.outputDirectory
+			srcDir compileJjtree.outputDirectory
+		}
+	}
+}
+eclipseClasspath.dependsOn("compileJavacc")
