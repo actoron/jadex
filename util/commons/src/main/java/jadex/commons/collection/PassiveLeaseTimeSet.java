@@ -295,11 +295,14 @@ public class PassiveLeaseTimeSet<E> implements ILeaseTimeSet<E>
 	 */
 	public void touch(E e, long leasetime)
 	{
-	   	times.put(e, new Tuple2<Long, Long>(getExpirationTime(leasetime), leasetime));
-		// Does only reorder when element is added again :-(
-		// http://stackoverflow.com/questions/6952660/java-priority-queue-reordering-when-editing-elements
-		entries.remove(e);
-		entries.add(e);
+		if (entries.contains(e))
+		{
+		   	times.put(e, new Tuple2<Long, Long>(getExpirationTime(leasetime), leasetime));
+			// Does only reorder when element is added again :-(
+			// http://stackoverflow.com/questions/6952660/java-priority-queue-reordering-when-editing-elements
+			entries.remove(e);
+			entries.add(e);
+		}
 		checkStale();
 	}
 	
