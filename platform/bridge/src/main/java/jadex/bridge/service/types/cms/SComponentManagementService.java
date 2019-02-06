@@ -70,7 +70,6 @@ import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.IAutoLock;
-import jadex.commons.collection.IRwMap;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -836,9 +835,13 @@ public class SComponentManagementService
 		// Hack, to retrieve description from component itself in init phase
 		if(desc==null)
 		{
-			InitInfo ii= getState(cid).getInitInfo(cid);
-			if(ii!=null)
-				desc = (CMSComponentDescription)ii.getComponent().getInternalAccess().getDescription();
+			CmsState state = getState(agent.getId());
+			if(state!=null)
+			{
+				InitInfo ii = state.getInitInfo(cid);
+				if(ii!=null)
+					desc = (CMSComponentDescription)ii.getComponent().getInternalAccess().getDescription();
+			}
 		}
 					
 		if(desc!=null)
@@ -2467,7 +2470,7 @@ public class SComponentManagementService
 	{
 		CmsState state = getState(cid);
 		IPlatformComponentAccess ret = null;
-		if (state != null)
+		if(state != null)
 		{
 			try
 			{

@@ -20,9 +20,7 @@ import java.awt.event.ItemListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -336,7 +334,7 @@ public class StarterPanel extends JLayeredPane
 								for(int i=0; i<max; i++)
 								{
 									Future fut = new Future();
-									IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
+									IResultListener<Map<String, Object>> killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
 									createComponent(StarterPanel.this.jcc, modelrid, typename, null, configname, args, 
 										suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 //										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
@@ -352,7 +350,7 @@ public class StarterPanel extends JLayeredPane
 							else
 							{
 								Future fut = new Future();
-								IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
+								IResultListener<Map<String, Object>> killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
 								createComponent(StarterPanel.this.jcc, modelrid, typename, an, configname, args, 
 									suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 //									mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
@@ -1576,7 +1574,7 @@ public class StarterPanel extends JLayeredPane
 	/**
 	 *  Listener that is called on component kill.
 	 */
-	public class KillListener extends SwingDefaultResultListener<Collection<Tuple2<String, Object>>>
+	public class KillListener extends SwingDefaultResultListener<Map<String, Object>>
 	{
 		/** The model info. */
 		protected IModelInfo model;
@@ -1613,25 +1611,25 @@ public class StarterPanel extends JLayeredPane
 		/**
 		 *  Called when result is available.
 		 */
-		public void customResultAvailable(Collection<Tuple2<String, Object>> result)
+		public void customResultAvailable(Map<String, Object> result)
 		{
 //			System.out.println("fullname: "+fullname+" "+model.getFilename());
 			
-			Map<String, Object> res = null;
-			if(result!=null)
-			{
-				res = new HashMap<String, Object>();
-				for(Iterator<Tuple2<String, Object>> it=result.iterator(); it.hasNext(); )
-				{
-					Tuple2<String, Object> tup = it.next();
-					res.put(tup.getFirstEntity(), tup.getSecondEntity());
-				}
-			}
+//			Map<String, Object> res = null;
+//			if(result!=null)
+//			{
+//				res = new HashMap<String, Object>();
+//				for(Iterator<Tuple2<String, Object>> it=result.iterator(); it.hasNext(); )
+//				{
+//					Tuple2<String, Object> tup = it.next();
+//					res.put(tup.getFirstEntity(), tup.getSecondEntity());
+//				}
+//			}
 			
 			if(cid!=null)
 			{
 				String tmp = (String)model.getFullName();
-				resultsets.add(tmp, new Object[]{cid, res});
+				resultsets.add(tmp, new Object[]{cid, result});
 				if(fullname.equals(model.getFullName()))
 				{
 					selectavail.addItem(cid);
@@ -1686,9 +1684,9 @@ public class StarterPanel extends JLayeredPane
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
 	public static IFuture<IComponentIdentifier> createComponent(final IControlCenter jcc, final IResourceIdentifier rid, final String type, final String name, 
-		final String configname, final Map arguments, final Boolean suspend, 
+		final String configname, final Map<String, Object> arguments, final Boolean suspend, 
 		final Boolean sync, 
-		final PublishEventLevel moni, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
+		final PublishEventLevel moni, final IResultListener<Map<String, Object>> killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
 		final Future<IComponentIdentifier> ret = new Future<>(); 
 //		parco

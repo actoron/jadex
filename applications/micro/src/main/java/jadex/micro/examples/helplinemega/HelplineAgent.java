@@ -45,7 +45,7 @@ public class HelplineAgent	implements IHelpline
 	
 	/** The name of the person of interest. */
 	@AgentArgument
-	protected String	person;
+	protected String person;
 	
 	/** The agent. */
 	@Agent

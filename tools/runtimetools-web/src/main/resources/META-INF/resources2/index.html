@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Web JCC</title>
+		
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="stylesheet" href="css/style.css">
+		
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.13.2/riot+compiler.js"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/riot-route@3.1.4/dist/route.js"></script>
+		<script type="riot/tag" src="tags/app.tag"></script>
+		<script type="riot/tag" src="tags/about.tag"></script>
+		<script type="riot/tag" src="tags/imprint.tag"></script>
+		<script type="riot/tag" src="tags/privacy.tag"></script>
+		<script type="riot/tag" src="tags/platforms.tag"></script>
+		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<app></app>
+		
+		<script type="text/javascript">
+			// Add a format method for Date 
+			Date.prototype.yyyymmdd = function(sep) {
+				var mm = (this.getMonth() + 1).toString();
+				var dd = this.getDate().toString();
+				return [this.getFullYear(), (mm.length===2 ? '' : '0')+mm, (dd.length===2 ? '' : '0')+dd].join(sep? sep: '');
+			};
+			//var now = new Date();
+			//alert(now.yyyymmdd()+" "+now.yyyymmdd('-'));
+			
+			Array.prototype.equals = function(a, b) {
+				if (a === b) return true;
+				if (a == null || b == null) return false;
+				if (a.length != b.length) return false;
+			
+				for (var i = 0; i < a.length; ++i) {
+			    	if (a[i] !== b[i]) return false;
+			  	}
+			  	return true;
+			};
+			
+			// https://riot.js.org/api/
+	    	// Note: users of In-browser compilation will need to wrap calls to riot.mount in riot.compile in order to get returned tag instances.
+	    	// Without this, calls to riot.mount will return undefined.
+			riot.compile(function() {
+				var Store = function() {
+					riot.observable(this);
+					this.language = "en";
+					this.switchLanguage = function() 
+					{
+						if(this.language=="en") {
+		 		    		this.language="de";
+						} 
+						else {
+		 		    		this.language="en";
+						}
+						this.trigger('language', this.language);  
+						//console.log(this.language);
+					};
+				};
+				riot.store = new Store();
+				
+				var cnt = 0;
+				
+				var langmixin = {
+					//self: null,
+					//lang: "en",
+					messages: {
+			    		en: {
+			   				message: {
+			   					home: "Home",
+			   					privacy: "Privacy",
+			   					imprint: "Imprint",
+			   					about: "About"
+			    			}
+			  			},
+				    	de: {
+							message: {
+								home: "Home",
+								privacy: "Datenschutz",
+			   					imprint: "Impressum",
+								about: "Über"
+							}
+			  			}
+					},
+					init: function() {
+						// var must not be omitted here. otherwise it will automatically create a global variable
+						var self = this;
+						//console.log("created: "+self.id);
+						self.id = cnt++;
+						//console.log("created: "+self.id);
+						riot.store.on('language', function(l) {
+							self.lang = l;
+							//console.log("lang: "+l+" "+self.id);
+							self.update();
+						});
+						self.lang = riot.store.language;
+					},
+					translate: function(text) {
+						var msg = this.messages[this.lang];
+						if(msg) 
+						{
+							var toks = text.split('.');
+							var tmp = msg;
+							for(i=0; tmp!=null && i<toks.length; i++) 
+							{
+								tmp = tmp[toks[i]];
+							}
+							//console.log("text: "+text+" "+tmp);
+							return tmp;
+						}
+						else 
+						{
+							return null;
+						}
+					},
+					$t: function(text) 
+					{
+						return this.translate(text);
+					},
+					getLanguage: function() 
+					{
+						return this.lang=='de'? 0: 1;
+					},
+					createErrorMessage: function(text, data) 
+					{
+						var txt = data!=null? data: "No further info";
+						var msg = {type: "error", text: text+txt};
+						riot.store.trigger('message', msg);
+					},
+					createInfoMessage: function(text) 
+					{
+						var msg = {type: "info", text: text};
+						riot.store.trigger('message', msg);
+					},
+					clearMessage: function() 
+					{
+						riot.store.trigger('message', null);
+					}
+				};
+				riot.mixin(langmixin);
+				
+		    	riot.mount('*');
+		    	
+		    	var curpage = null;
+		    	var target = "div#content";
+		    	var routes = ["platforms", "about", "imprint", "privacy"];
+		    	riot.store.language = "en";
+		    	
+		    	route(function changePath(path) {
+		    		//console.log(path);
+		    		if(path.length==0)
+		    			path="platforms";
+		    		if(routes.includes(path)) { 
+		    			if(curpage)
+							curpage.unmount(true);
+		    	        var tags = riot.mount(target, path);
+		    	        curpage = tags[0];
+		    	        //console.log(tags);
+		    		}
+		    	});
+		    	
+		    	//document.getElementById("lang").addEventListener("click", function() {
+		    		//console.log("switch language");
+		    	//	riot.store.switchLanguage();
+		    	//}, false);
+		    	
+		    	route.start(true);
+		    	
+		    	riot.store.switchLanguage();
+			});
+		</script>
+	</body>
+</html>

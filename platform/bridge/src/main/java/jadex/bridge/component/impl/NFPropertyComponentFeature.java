@@ -14,6 +14,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.modelinfo.NFPropertyInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
@@ -24,10 +25,13 @@ import jadex.bridge.nonfunctional.NFPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.nonfunctional.annotation.SNameValue;
+import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.Tag;
+import jadex.bridge.service.annotation.Tags;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.MethodInfo;
@@ -41,6 +45,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.javaparser.SJavaParser;
 
 /**
  *  Feature for non functional properties of the component, provided/required services and methods.
@@ -113,7 +118,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 				}
 			}
 		}
-		
+				
 		// now done in basic service
 //		IProvidedServicesFeature psf = getComponent().getComponentFeature(IProvidedServicesFeature.class);
 //		if(psf!=null)
@@ -241,7 +246,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 //	}
 	
 	/**
-	 * 
+	 *  Init the service and method nf properties. 
 	 */
 	public IFuture<Void> initNFProperties(final IInternalService ser, Class<?> impltype)
 	{
@@ -279,6 +284,12 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 				cnt++;
 			}
 			
+			if(sclazz.isAnnotationPresent(Tags.class))
+			{
+				addTags(sclazz.getAnnotation(Tags.class), ser).addResultListener(lis);
+				cnt++;
+			}
+			
 			Method[] methods = sclazz.getMethods();
 			for(Method m : methods)
 			{
@@ -301,7 +312,7 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 		
 		// Set the number of issued calls
 		lis.setMax(cnt);
-		
+
 		return ret;
 	}
 	
@@ -321,6 +332,50 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 			prov.addNFProperty(prop).addResultListener(lis);
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Add nf properties from a type.
+	 */
+	public IFuture<Void> addTags(Tags tags, IService ser)
+	{
+		INFMixedPropertyProvider prov = getProvidedServicePropertyProvider(ser.getServiceId());
+		
+		List<UnparsedExpression> params = new ArrayList<>();
+		
+//		if(tags.argumentname().length()>0)
+//			params.add(new UnparsedExpression(TagProperty.ARGUMENT, "\""+tags.argumentname()+"\""));
+		
+		for(int i=0; i<tags.value().length; i++)
+		{
+			Tag tag = tags.value()[i];
+			
+			if(tag.include().length()>0)
+			{
+				try
+				{
+					Object val = SJavaParser.evaluateExpression(tag.include(), getInternalAccess().getModel().getAllImports(), getInternalAccess().getFetcher(), getInternalAccess().getClassLoader());
+					if(val instanceof Boolean && ((Boolean)val).booleanValue())
+						params.add(new UnparsedExpression(TagProperty.NAME+"_"+i, tag.value()));
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			else
+			{
+				params.add(new UnparsedExpression(TagProperty.NAME+"_"+i, tag.value()));
+			}
+		}
+		
+		IFuture<Void> ret = IFuture.DONE;
+		if(params.size()>0)
+		{
+			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(TagProperty.class, getInternalAccess(), ser, null, params);
+			ret = prov.addNFProperty(prop);
+		}
 		return ret;
 	}
 	

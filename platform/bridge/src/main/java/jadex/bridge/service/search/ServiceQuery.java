@@ -401,7 +401,7 @@ public class ServiceQuery<T>
 	public ServiceQuery<ServiceEvent<T>> setEventMode()
 	{
 		this.eventmode = true;
-		return (ServiceQuery<ServiceEvent<T>>) this;
+		return (ServiceQuery<ServiceEvent<T>>)this;
 	}
 	
 	/**

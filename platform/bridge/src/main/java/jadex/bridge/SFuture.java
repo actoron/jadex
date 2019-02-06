@@ -3,6 +3,16 @@ package jadex.bridge;
 import jadex.base.Starter;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.ComponentFutureFunctionality;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.ServiceEvent;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.search.ServiceRegistry;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
+import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
+import jadex.bridge.service.types.registryv2.SlidingCuckooFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IForwardCommandFuture;
@@ -18,6 +28,7 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.PullIntermediateDelegationFuture;
 import jadex.commons.future.PullSubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.Tuple2Future;
@@ -338,5 +349,109 @@ public class SFuture
 		return ret;
 	}
 	
-
+	/**
+	 *  Combine results of two subscription futures and exclude duplicates 
+	 *  (uses sliding cuckoo filter with toString() on results).
+	 *  @param f1 Future 1.
+	 *  @param f2 Future 2.
+	 *  @return A future combining results of f1 and f2.
+	 */
+	public static <T> ISubscriptionIntermediateFuture<T> combineSubscriptionFutures(IInternalAccess ia, ISubscriptionIntermediateFuture<T> f1, ISubscriptionIntermediateFuture<T> f2)
+	{
+		return combineSubscriptionFutures(ia, f1, f2, null);
+	}
+	
+	/**
+	 *  Combine results of two subscription futures and exclude duplicates 
+	 *  (uses sliding cuckoo filter with toString() on results).
+	 *  @param f1 Future 1.
+	 *  @param f2 Future 2.
+	 *  @return A future combining results of f1 and f2.
+	 */
+	public static <T, E> ISubscriptionIntermediateFuture<T> combineSubscriptionFutures(IInternalAccess ia, ISubscriptionIntermediateFuture<E> f1, ISubscriptionIntermediateFuture<E> f2, IResultCommand<T, E> cmd)
+	{
+		final SlidingCuckooFilter scf = new SlidingCuckooFilter();
+	
+		ISubscriptionIntermediateFuture<T> ret = (ISubscriptionIntermediateFuture)FutureFunctionality
+			.getDelegationFuture(f1, new ComponentFutureFunctionality(ia)
+		{
+			@Override
+			public Object handleIntermediateResult(Object result) throws Exception
+			{
+				// Drop result when already in cuckoo filter
+				
+				if(result instanceof ServiceEvent)
+				{
+					ServiceEvent se = (ServiceEvent)result;
+					
+					if(ServiceEvent.SERVICE_REMOVED == se.getType())
+					{
+						return removeValue(result);
+					}
+					else if(ServiceEvent.SERVICE_ADDED == se.getType())
+					{
+						return addValue(result);
+					}
+					return DROP_INTERMEDIATE_RESULT;
+				}
+				// In case of no service events always new elements are reported
+				else
+				{
+					return addValue(result);
+				}
+			}
+			
+			protected Object addValue(Object val)
+			{
+				if(scf.contains(val.toString()))
+				{
+					return DROP_INTERMEDIATE_RESULT;
+				}
+				else
+				{
+					// todo: allow transforming the results?!
+					scf.insert(val.toString());
+					T res = cmd!=null? cmd.execute((E)val): (T)val;
+					return res;
+				}
+			}
+			
+			protected Object removeValue(Object val)
+			{
+				if(scf.contains(val.toString()))
+				{
+					scf.delete(val.toString());
+					T res = cmd!=null? cmd.execute((E)val): (T)val;
+					return res;
+				}
+				else
+				{
+					return DROP_INTERMEDIATE_RESULT;
+				}
+			}
+			
+			@Override
+			public void handleTerminated(Exception reason)
+			{
+				// TODO: multi delegation future with multiple sources but one target?
+				if(f2!=null)
+					f2.terminate(reason);
+				
+				super.handleTerminated(reason);
+			}
+		});
+		
+		SFuture.avoidCallTimeouts((IntermediateFuture)ret, ia);
+		
+		// Add remote results to future
+		if(f2!=null)
+		{
+			f2.addIntermediateResultListener(result-> 
+			{
+				((IntermediateFuture)ret).addIntermediateResult((T)result);
+			}, exception -> {}); // Ignore exception (printed when no listener supplied)
+		}
+		
+		return ret;
+	}
 }

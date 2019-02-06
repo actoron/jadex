@@ -1093,7 +1093,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						{
 							// Forward result to user query
 							Object res = result;
-							if (query.isEventMode())
+							if(query.isEventMode())
 								res = new ServiceEvent(result, ServiceEvent.SERVICE_ADDED);
 							
 							SubscriptionIntermediateFuture rawfut = retfut;

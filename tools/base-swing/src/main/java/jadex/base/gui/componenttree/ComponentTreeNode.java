@@ -230,7 +230,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 	 */
 	public ISwingTreeNode	createComponentNode(final IComponentDescription desc)
 	{
-		ISwingTreeNode	node	= getModel().getNode(desc.getName());
+		ISwingTreeNode node = getModel().getNode(desc.getName());
 		if(node==null)
 		{
 			// hack
@@ -701,6 +701,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("Exception occurred: "+exception);
 			}
 
 			@Override

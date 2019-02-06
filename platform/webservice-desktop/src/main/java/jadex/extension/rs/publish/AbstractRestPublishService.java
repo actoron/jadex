@@ -322,7 +322,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
         // check if call is an intermediate result fetch
         String callid = request.getHeader(HEADER_JADEX_CALLID);
-               
+        
 //        Enumeration<String> hs = request.getHeaderNames();
 //        for(String s=hs.nextElement(); hs.hasMoreElements(); s=hs.nextElement())
 //        {
@@ -332,7 +332,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         // request info manages an ongoing conversation
         if(requestinfos.containsKey(callid))
         {
-//        	System.out.println("received existing call: "+request);
+        	System.out.println("received existing call: "+request+" "+callid);
         	
         	RequestInfo	rinfo = requestinfos.get(callid);
         	
@@ -361,7 +361,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         }
         else if(callid!=null)
         {
-//        	System.out.println("callid not found: "+callid);
+        	System.out.println("callid not found: "+callid);
         	
         	writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), null, null, request, response, true);
         
@@ -371,7 +371,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         // handle new call
         else
         {
-//        	System.out.println("received new call: "+request);
+        	System.out.println("received new call: "+request);
         	
             String methodname = request.getPathInfo();
 
@@ -449,7 +449,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     	     */
                     	    protected void handleResult(Object result, Throwable exception, Object command)
                     	    {
-//                    	    	System.out.println("handleResult: "+result+", "+exception+", "+command+", "+Thread.currentThread());
+                    	    	System.out.println("handleResult: "+result+", "+exception+", "+command+", "+Thread.currentThread());
                     	    	
                     	    	if(rinfo.isTerminated())
                     	    	{
