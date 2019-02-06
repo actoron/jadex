@@ -105,12 +105,15 @@ public class UniversalClasspathResource extends Resource
 
 	public void close()
 	{
-		throw new UnsupportedOperationException();
+		// this is called! nop?
+		//throw new UnsupportedOperationException();
 	}
 
 	public boolean delete() throws SecurityException
 	{
-		throw new UnsupportedOperationException();
+		// nop?
+//		throw new UnsupportedOperationException();
+		return true;
 	}
 
 	public boolean exists()

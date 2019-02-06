@@ -7,14 +7,14 @@
 		<link rel="icon" href="favicon.ico" type="image/x-icon">
 		<link rel="stylesheet" href="css/style.css">
 		
-		<script src="js/axios.js"></script>
-		
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.13.2/riot+compiler.js"></script>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/riot-route@3.1.4/dist/route.js"></script>
 		<script type="riot/tag" src="tags/app.tag"></script>
 		<script type="riot/tag" src="tags/about.tag"></script>
 		<script type="riot/tag" src="tags/imprint.tag"></script>
 		<script type="riot/tag" src="tags/privacy.tag"></script>
+		<script type="riot/tag" src="tags/platforms.tag"></script>
 		
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -150,13 +150,13 @@
 		    	
 		    	var curpage = null;
 		    	var target = "div#content";
-		    	var routes = ["about", "imprint", "privacy"];
+		    	var routes = ["platforms", "about", "imprint", "privacy"];
 		    	riot.store.language = "en";
 		    	
 		    	route(function changePath(path) {
 		    		//console.log(path);
 		    		if(path.length==0)
-		    			path="about";
+		    			path="platforms";
 		    		if(routes.includes(path)) { 
 		    			if(curpage)
 							curpage.unmount(true);
