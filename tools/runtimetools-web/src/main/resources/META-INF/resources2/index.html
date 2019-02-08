@@ -15,6 +15,7 @@
 		<script type="riot/tag" src="tags/imprint.tag"></script>
 		<script type="riot/tag" src="tags/privacy.tag"></script>
 		<script type="riot/tag" src="tags/platforms.tag"></script>
+		<script type="riot/tag" src="tags/platform.tag"></script>
 		
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -150,17 +151,30 @@
 		    	
 		    	var curpage = null;
 		    	var target = "div#content";
-		    	var routes = ["platforms", "about", "imprint", "privacy"];
+		    	var routes = ["platforms", "platform", "about", "imprint", "privacy"];
 		    	riot.store.language = "en";
 		    	
-		    	route(function changePath(path) {
+		    	// As subpaths are supplied by separate args, internally arguments are used
+		    	route(function changePath(path) 
+		    	{
+		    		path = path.toLowerCase();
+		    		var paths = [];
+		    		var params = null;
+		    		for(i=0; i<arguments.length; i++)
+		    		{
+		    			if(arguments[i].indexOf("=")!=-1)
+		    				params = arguments[i];
+		    			else
+		    				paths.push(arguments[i]);
+		    		}
 		    		//console.log(path);
 		    		if(path.length==0)
 		    			path="platforms";
-		    		if(routes.includes(path)) { 
+		    		if(routes.includes(path)) 
+		    		{ 
 		    			if(curpage)
 							curpage.unmount(true);
-		    	        var tags = riot.mount(target, path);
+		    	        var tags = riot.mount(target, path, {paths: paths, params: params});
 		    	        curpage = tags[0];
 		    	        //console.log(tags);
 		    		}

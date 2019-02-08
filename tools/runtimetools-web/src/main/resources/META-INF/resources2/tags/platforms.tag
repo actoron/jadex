@@ -18,7 +18,7 @@
 				</tr>
 				
 				<tr each="{x in orderBy(platforms)}"> <!-- class="{connecting: !x.connected}" --> 
-					<td>{x}</td>
+					<td><a href="#/platform/{x}">{x}</a></td>
 					<!--  <td>{x.connected}</td>
 					<td>{x.protocol}</td> -->
 				</tr>
@@ -35,8 +35,6 @@
 		// todo: order by name
 		orderBy(data) 
 		{ 
-			console.log('start sorting'); 
-			
 			var order = self.reversed ? -1 : 1;
 			
 			var res = data.slice().sort(function(a, b) 
@@ -50,6 +48,13 @@
 			}) 
 			return res; 
 		}
+		
+		/*showPlatform(event)
+		{
+			var cid = event.item.x;
+			
+			alert("showPlatform: "+x);
+		}*/
 		
 		function getIntermediate(path, handler, error) 
 		{

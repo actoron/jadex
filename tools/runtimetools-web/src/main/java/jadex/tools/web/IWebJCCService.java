@@ -1,6 +1,7 @@
 package jadex.tools.web;
 
 import java.util.Collection;
+import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
@@ -25,5 +26,10 @@ public interface IWebJCCService
 	 *  @return Events for platforms.
 	 */
 	public ISubscriptionIntermediateFuture<ServiceEvent<IComponentIdentifier>> subscribeToPlatforms();
+	
+	/**
+	 *  Get the JCC plugin html fragments.
+	 */
+	public IFuture<Map<String, String>> getPluginFragments();
 	
 }
