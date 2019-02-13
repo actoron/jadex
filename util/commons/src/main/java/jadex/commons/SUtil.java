@@ -4616,7 +4616,7 @@ public class SUtil
 			fis = new FileInputStream(file);
 			ret = readStream(fis);
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
 			close(fis);
 			throwUnchecked(e);

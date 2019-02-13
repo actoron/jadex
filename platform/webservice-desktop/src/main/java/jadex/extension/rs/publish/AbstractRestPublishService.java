@@ -377,6 +377,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
             if(methodname!=null && methodname.startsWith("/"))
                 methodname = methodname.substring(1);
+            if(methodname!=null && methodname.endsWith("()"))
+            	methodname = methodname.substring(0, methodname.length()-2);
 
             if(mappings.containsKey(methodname))
             {
@@ -1703,7 +1705,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			stylecss = sc.useDelimiter("\\A").next();
 			
 			String	stripes	= SUtil.loadBinary("jadex/extension/rs/publish/jadex_stripes.png");
-			stylecss	= stylecss.replace("$stripes", stripes);
+			stylecss = stylecss.replace("$stripes", stripes);
 			
 	//			System.out.println(functionsjs);
 		}

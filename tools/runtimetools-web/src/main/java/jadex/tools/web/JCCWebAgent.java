@@ -1,7 +1,11 @@
 package jadex.tools.web;
 
+import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Scanner;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -15,11 +19,11 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.Boolean3;
 import jadex.commons.IResultCommand;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
@@ -106,5 +110,54 @@ public class JCCWebAgent implements IWebJCCService
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get the JCC plugin html fragments.
+	 */
+	public IFuture<Map<String, String>> getPluginFragments()
+	{
+		// todo search for running webjcc services and ask for plugin fragment
+		
+		Map<String, String> ret = new HashMap<>();
+		
+		ret.put("starter", loadTag("jadex/tools/web/starter.tag"));
+		ret.put("security", loadTag("jadex/tools/web/security.tag"));
+		
+		//System.out.println("fragments: "+ret);
+		
+		return new Future<Map<String, String>>(ret);
+	}
 
+	/**
+	 * 
+	 */
+	public String loadTag(String name)
+	{
+		String ret;
+		
+		Scanner sc = null;
+		try
+		{
+			InputStream is = SUtil.getResource0(name, agent.getClassLoader());
+			sc = new Scanner(is);
+			ret = sc.useDelimiter("\\A").next();
+			
+	//		System.out.println(ret);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		finally
+		{
+			if(sc!=null)
+			{
+				sc.close();
+			}
+		}
+		
+		return ret;
+	}
+	
 }	
