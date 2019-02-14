@@ -1,5 +1,6 @@
 package jadex.launch.test;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,6 +8,9 @@ import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.cms.CreationInfo;
 
 /**
@@ -20,7 +24,7 @@ public class DirectConnectionDemo
 	 */
 	private static void	createRemotePlatform()
 	{
-		String[]	platformargs	= new String[]
+		String[] platformargs = new String[]
 		{
 			"-awareness", "false",
 			"-relay", "false",
@@ -36,19 +40,21 @@ public class DirectConnectionDemo
 	private static void	createAndConnectLocalPlatform()
 	{
 		// Address of remote platform
-		String	remote_name	= "test_remote";
-		String	remote_addr	= "tcp-mtp://localhost:12345";
-		IComponentIdentifier	remote_cid	= new ComponentIdentifier(remote_name, new String[]{remote_addr});
+		String remote_name = "test_remote";
+		String remote_addr = "tcp://localhost:12345";
+		IComponentIdentifier remote_cid = new ComponentIdentifier(remote_name);//, new String[]{remote_addr});
 		
 		// Start local platform
-		String[]	platformargs	= new String[]
+		String[] platformargs = new String[]
 		{
 			"-awareness", "false",
 			"-relay", "false",
 			"-platformname", "test_local"
+			//"-logging", "true"
 		};
-		IExternalAccess	platform	= Starter.createPlatform(platformargs).get();
-		
+		IExternalAccess	platform = Starter.createPlatform(platformargs).get();
+		ITransportAddressService tas = platform.searchService(new ServiceQuery<ITransportAddressService>(ITransportAddressService.class)).get();
+		tas.addManualAddresses(Arrays.asList(new TransportAddress(new ComponentIdentifier(remote_name), remote_addr)));
 		
 		// Create proxy for remote platform such that remote services are found
 		Map<String, Object>	args = new HashMap<String, Object>();

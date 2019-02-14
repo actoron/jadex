@@ -10,7 +10,6 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
 import jadex.bridge.ClassInfo;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;

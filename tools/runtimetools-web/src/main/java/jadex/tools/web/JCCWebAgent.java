@@ -114,7 +114,7 @@ public class JCCWebAgent implements IWebJCCService
 	/**
 	 *  Get the JCC plugin html fragments.
 	 */
-	public IFuture<Map<String, String>> getPluginFragments()
+	public IFuture<Map<String, String>> getPluginFragments()//IComponentIdentifier cid)
 	{
 		// todo search for running webjcc services and ask for plugin fragment
 		

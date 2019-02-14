@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -97,7 +97,7 @@ public class PingingAgent
 		
 		if(receiver==null)
 		{
-			receiver = new BasicComponentIdentifier("Ping", agent.getId().getParent());
+			receiver = new ComponentIdentifier("Ping", agent.getId().getParent());
 		}
 //			createComponentIdentifier("Ping").addResultListener(new DefaultResultListener()
 //			{

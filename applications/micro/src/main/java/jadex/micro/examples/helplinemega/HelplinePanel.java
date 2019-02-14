@@ -27,7 +27,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -281,7 +281,7 @@ public class HelplinePanel extends JPanel
 				final Future<IHelpline>	ret	= new Future<IHelpline>();
 				try
 				{
-					IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class).setProvider(new BasicComponentIdentifier(person, ia.getId())));
+					IHelpline	helpline	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelpline.class).setProvider(new ComponentIdentifier(person, ia.getId())));
 					ret.setResult(helpline);
 				}
 				catch(ServiceNotFoundException snfe)

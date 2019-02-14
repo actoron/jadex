@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -173,7 +173,7 @@ public abstract class AbstractTransportAgent<Con> implements ITransportService, 
 		{
 			assert header.length == 0;
 			String name = new String(body, SUtil.UTF8);
-			cand.setTarget(new BasicComponentIdentifier(name));
+			cand.setTarget(new ComponentIdentifier(name));
 		}
 		else
 		{

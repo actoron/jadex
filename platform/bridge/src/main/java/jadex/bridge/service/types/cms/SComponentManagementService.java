@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
@@ -689,12 +689,12 @@ public class SComponentManagementService
 	{
 		// checks components and init infos
 		
-		BasicComponentIdentifier ret = null;
+		ComponentIdentifier ret = null;
 		
 		CmsState cmsstate = getState(agent.getId());
 		if(platformname==null)
 			platformname = agent.getId().getName();
-		ret = new BasicComponentIdentifier(localname+"@"+platformname);
+		ret = new ComponentIdentifier(localname+"@"+platformname);
 		
 		if(uniqueids || cmsstate.getComponent(ret) != null)
 		{
@@ -706,12 +706,12 @@ public class SComponentManagementService
 				if(cnt==null)
 				{
 					cmsstate.getCidCounts().put(key, Integer.valueOf(1));
-					ret = new BasicComponentIdentifier(localname+"@"+platformname);
+					ret = new ComponentIdentifier(localname+"@"+platformname);
 				}
 				else
 				{
 					cmsstate.getCidCounts().put(key, Integer.valueOf(cnt.intValue()+1));
-					ret = new BasicComponentIdentifier(localname+cnt+"@"+platformname); // Hack?!
+					ret = new ComponentIdentifier(localname+cnt+"@"+platformname); // Hack?!
 				}
 			}
 			while(cmsstate.getComponent(ret) != null);
@@ -1855,7 +1855,7 @@ public class SComponentManagementService
 					IPlatformComponentAccess component = null;
 					ComponentCreationInfo cci = null;
 					Collection<IComponentFeatureFactory> features = null;
-					BasicComponentIdentifier tmpcid = null;
+					ComponentIdentifier tmpcid = null;
 					CMSComponentDescription tmpad = null;
 					IInternalAccess tmppad = null;
 					IModelInfo tmplmodel = null;
@@ -1883,7 +1883,7 @@ public class SComponentManagementService
 						// TODO!!!!! use unique setting
 						
 						// The name is generated using a) the defined name else b) the name hint c) the model name as basis
-						tmpcid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: tmplmodel.getNameHint()!=null? tmplmodel.getNameHint(): tmplmodel.getName(), paname, agent, true);//, addresses);
+						tmpcid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: tmplmodel.getNameHint()!=null? tmplmodel.getNameHint(): tmplmodel.getName(), paname, agent, true);//, addresses);
 						
 						// Defer component services being found from registry
 						ServiceRegistry.getRegistry(agent).addExcludedComponent(tmpcid);
@@ -1925,7 +1925,7 @@ public class SComponentManagementService
 					final CMSComponentDescription ad = tmpad;
 					final IInternalAccess pad = tmppad;
 					final IModelInfo lmodel = tmplmodel;
-					final BasicComponentIdentifier cid = tmpcid;
+					final ComponentIdentifier cid = tmpcid;
 					
 					// Invoke create on platform component
 					component.create(cci, features);

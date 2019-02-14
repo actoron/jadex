@@ -6,7 +6,7 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -45,9 +45,9 @@ public class DestroyComponentTask implements ITask
 			String name = (String)context.getParameterValue("name");
 //			cid = ces.createComponentIdentifier(name, true, null);
 			if(name.indexOf("@")==-1)
-				cid = new BasicComponentIdentifier(name);
+				cid = new ComponentIdentifier(name);
 			else
-				cid = new BasicComponentIdentifier(name, instance.getId().getParent());
+				cid = new ComponentIdentifier(name, instance.getId().getParent());
 		}
 		
 		IFuture<Map<String, Object>> tmp = instance.getExternalAccess(cid).killComponent();

@@ -37,7 +37,7 @@ import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -137,7 +137,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
-				dealeraid = new BasicComponentIdentifier(LOCAL_DEALER, access.getId().getParent());
+				dealeraid = new ComponentIdentifier(LOCAL_DEALER, access.getId().getParent());
 				dealertf.setText(dealeraid.getName());
 				return IFuture.DONE;
 			}
@@ -153,7 +153,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 //						dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
-						dealeraid = new BasicComponentIdentifier(dealertf.getText());
+						dealeraid = new ComponentIdentifier(dealertf.getText());
 						return IFuture.DONE;
 					}
 				});

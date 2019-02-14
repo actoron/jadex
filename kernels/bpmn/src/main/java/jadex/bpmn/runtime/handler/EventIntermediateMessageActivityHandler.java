@@ -2,7 +2,7 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMessageFeature;
@@ -61,7 +61,7 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		if(rec instanceof String)
 		{
 			// Special case -> string converted to sibling cid.
-			receiver	= new BasicComponentIdentifier((String)rec, instance.getId().getParent());
+			receiver	= new ComponentIdentifier((String)rec, instance.getId().getParent());
 		}
 		else
 		{

@@ -12,7 +12,7 @@ import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -760,7 +760,7 @@ public class Starter
 		platformname = SUtil.intern(buf.toString());
 		
 		// Create an instance of the component.
-		return new BasicComponentIdentifier(platformname).getRoot();
+		return new ComponentIdentifier(platformname).getRoot();
 	}
 	
 	/**

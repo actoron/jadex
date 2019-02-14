@@ -6,7 +6,7 @@ import java.util.Map;
 import jadex.base.test.TestReport;
 import jadex.bdiv3x.features.IBDIXAgentFeature;
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -36,7 +36,7 @@ public class GetExternalAccessPlan extends Plan
 		Future<Void>	wait	= new Future<>();
 
 		// Create component.
-		IComponentIdentifier cid = new BasicComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', ':'));
+		IComponentIdentifier cid = new ComponentIdentifier("ExternalAccessWorker@"+getComponentIdentifier().getName().replace('@', ':'));
 		Map<String, Object>	args	= new HashMap<>();
 		args.put("future", wait);
 		IFuture<IExternalAccess> init = getAgent().createComponent(

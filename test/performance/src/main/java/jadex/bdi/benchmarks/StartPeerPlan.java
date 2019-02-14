@@ -3,7 +3,7 @@ package jadex.bdi.benchmarks;
 import java.util.Map;
 
 import jadex.bdiv3x.runtime.Plan;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.collection.SCollection;
@@ -175,7 +175,7 @@ public class StartPeerPlan extends Plan
 //		lis.waitForResult();
 		
 //		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
-		IComponentIdentifier aid = new BasicComponentIdentifier(name, getComponentIdentifier().getRoot());
+		IComponentIdentifier aid = new ComponentIdentifier(name, getComponentIdentifier().getRoot());
 		IFuture<Map<String, Object>> ret = getAgent().getExternalAccess(aid).killComponent();
 		ret.get();
 	}

@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IComponentFeatureFactory;
@@ -122,7 +122,7 @@ public class MicroserviceFactory extends BasicService implements IComponentFacto
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public MicroserviceFactory(String providerid)
 	{
-		super(new BasicComponentIdentifier(providerid), IComponentFactory.class, null);
+		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new MicroserviceModelLoader();
 	}
 	

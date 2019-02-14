@@ -3,7 +3,7 @@ package jadex.micro.benchmarks;
 import java.util.HashMap;
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -209,7 +209,7 @@ public class MegaParallelStarterAgent
 	{
 		final String name = subname+"_#"+cnt;
 //		System.out.println("Destroying peer: "+name);
-		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId());
+		IComponentIdentifier aid = new ComponentIdentifier(name, agent.getId());
 		IResultListener lis = new IResultListener()
 		{
 			public void resultAvailable(Object result)

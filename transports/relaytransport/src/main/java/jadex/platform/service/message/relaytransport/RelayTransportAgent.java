@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -1039,7 +1039,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	 */
 	protected IComponentIdentifier getRtComponent(IComponentIdentifier platformid)
 	{
-		return new BasicComponentIdentifier("rt", platformid);
+		return new ComponentIdentifier("rt", platformid);
 	}
 	
 	/**

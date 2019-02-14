@@ -28,7 +28,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
@@ -88,7 +88,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		IResourceIdentifier res = null;
 		try
 		{
-			res = new ResourceIdentifier(new LocalResourceIdentifier(new BasicComponentIdentifier("PSEUDO"), new URL("http://SYSTEMCPRID")), null);
+			res = new ResourceIdentifier(new LocalResourceIdentifier(new ComponentIdentifier("PSEUDO"), new URL("http://SYSTEMCPRID")), null);
 		}
 		catch(Exception e)
 		{

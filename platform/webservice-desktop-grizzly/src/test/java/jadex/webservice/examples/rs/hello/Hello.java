@@ -11,7 +11,7 @@ import javax.ws.rs.core.UriInfo;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.extension.rs.publish.JadexXMLBodyReader;
 import jadex.xml.bean.JavaWriter;
@@ -21,7 +21,7 @@ public class Hello extends BasicService
 {
 	public Hello() 
 	{
-		super(new BasicComponentIdentifier(), IHelloService.class, null);
+		super(new ComponentIdentifier(), IHelloService.class, null);
 	}
 	
 	@Context 

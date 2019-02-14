@@ -3,7 +3,7 @@ package jadex.platform.service.cli.commands;
 import java.util.Collection;
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
@@ -79,7 +79,7 @@ public class SwitchPlatformCommand extends ACliCommand
 		}
 		else
 		{
-			final IComponentIdentifier cid = new BasicComponentIdentifier((String)args.get(null));
+			final IComponentIdentifier cid = new ComponentIdentifier((String)args.get(null));
 			
 			comp.searchServices( new ServiceQuery<>(IInternalCliService.class, ServiceScope.GLOBAL))
 				.addResultListener(new IIntermediateResultListener<IInternalCliService>()

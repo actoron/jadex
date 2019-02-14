@@ -5,7 +5,6 @@ import java.util.Map;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -20,6 +19,7 @@ import jadex.commons.future.IFuture;
  *  IMathService interface via its service provider.
  *  On the 'local' platform the 'user' agent is created, which fetches the
  *  add service via the remote management service (by knowing the remote platform name/address). 
+ *  
  */
 public class StartScenario
 {
@@ -69,8 +69,10 @@ public class StartScenario
 									{
 //										System.out.println("started remote: "+result);
 										
-										IComponentIdentifier rrms = new ComponentIdentifier("rms@remote", 
-											new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
+										// todo: fixme
+										IComponentIdentifier rrms = null;
+//										IComponentIdentifier rrms = new ComponentIdentifier("rms@remote", 
+//											new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 										
 										lplat.createComponent(
 											new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{rrms})).setName("proxy").setFilename("jadex.platform.service.remote.ProxyAgent.class"))

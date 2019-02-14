@@ -54,7 +54,7 @@ public class ProxyAgent	implements IProxyAgentService
 	
 	/**  The remote component identifier. */
 	@AgentArgument("component")
-	protected IComponentIdentifier	rcid;
+	protected IComponentIdentifier rcid;
 	
 	/** The remote cms. */
 	protected ILibraryService rcms;
@@ -166,7 +166,7 @@ public class ProxyAgent	implements IProxyAgentService
 	/**
 	 *  Get the component identifier of the remote platform.
 	 */
-	public IFuture<IComponentIdentifier>	getRemoteComponentIdentifier()
+	public IFuture<IComponentIdentifier> getRemoteComponentIdentifier()
 	{
 //		return new Future<IComponentIdentifier>(((RemoteServiceContainer)getServiceContainer()).getRemoteComponentIdentifier());
 		return new Future<IComponentIdentifier>(rcid);
@@ -176,7 +176,7 @@ public class ProxyAgent	implements IProxyAgentService
 	 *  Set or update the component identifier of the remote platform,
 	 *  i.e., top reflect new transport addresses.
 	 */
-	public IFuture<Void>	setRemoteComponentIdentifier(IComponentIdentifier cid)
+	public IFuture<Void> setRemoteComponentIdentifier(IComponentIdentifier cid)
 	{
 //		((RemoteServiceContainer)getServiceContainer()).setRemoteComponentIdentifier(cid);
 		rcid = cid;
@@ -239,7 +239,7 @@ public class ProxyAgent	implements IProxyAgentService
 	/**
 	 *  Refresh the latency value.
 	 */
-	public IFuture<Void>	refreshLatency()
+	public IFuture<Void> refreshLatency()
 	{
 //		if(getAgentAdapter().isExternalThread())
 //			System.out.println("gagagaggagaq");

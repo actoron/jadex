@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -338,7 +338,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 							if (remotepf == null && body.length > 0)
 							{
 								// server receiving name
-								remotepf = new BasicComponentIdentifier((new String(body, SUtil.UTF8)).intern());
+								remotepf = new ComponentIdentifier((new String(body, SUtil.UTF8)).intern());
 								boolean notconnected = false;
 								if (canDecide(remotepf))
 								{
@@ -389,7 +389,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 							else if (remotepf != null && body.length > 0)
 							{
 								// client receiving name
-								IComponentIdentifier rcvdpf = new BasicComponentIdentifier(new String(body, SUtil.UTF8));
+								IComponentIdentifier rcvdpf = new ComponentIdentifier(new String(body, SUtil.UTF8));
 								if (rcvdpf.equals(remotepf))
 								{
 									establishConnection(remotepf, con);

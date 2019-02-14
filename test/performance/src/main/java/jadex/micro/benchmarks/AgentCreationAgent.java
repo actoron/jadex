@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -136,7 +136,7 @@ public class AgentCreationAgent
 			{
 //				IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
 				String	initial	= createPeerName(1, agent.getId());
-				IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
+				IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getId().getRoot());
 				agent.getExternalAccessAsync(cid).addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess exta)
@@ -184,7 +184,7 @@ public class AgentCreationAgent
 		final String name = createPeerName(cnt, agent.getId());
 //		System.out.println("Destroying peer: "+name);
 //		IComponentManagementService cms = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IComponentManagementService.class, ServiceScope.PLATFORM));
-		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
+		IComponentIdentifier aid = new ComponentIdentifier(name, agent.getId().getRoot());
 		agent.getExternalAccess(aid).killComponent().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Map<String, Object>>()
 		{
 			public void resultAvailable(Map<String, Object> results)
