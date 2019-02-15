@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.13.2/riot+compiler.js"></script>
+	</head>
+	
+	<body>
+	
+	<template id="my_tag">
+	  <mytag>
+	    <p>{greeting}, World!</p>
+	    this.greeting = 'Hello';
+	    console.log('hiiiiii');
+	  </mytag>
+	</template>
+
+	<mytag></mytag>
+
+	<script>
+		var tag = riot.compile(my_tag.innerHTML);
+		riot.mount("mytag");
+		
+		var html = "<mytag2><h1>bla<\/h1><script type=\"riot/tag\">console.log('xxx')<\/script><\/mytag2>";
+		var tag2 = riot.compile(html);
+		
+ 		//var html = "<h1>bla<\/h1>";
+
+  		//var js = riot.compile("console.log('hiiiiii')", true);
+  		riot.tag("mytag", html, null, null, "function(){console.log('hiii222')}");
+ 		
+  		riot.mount("mytag");
+ 	</script>
+
+	</body>
+</html>
+
+
+
+
+<script>
+
+</script>

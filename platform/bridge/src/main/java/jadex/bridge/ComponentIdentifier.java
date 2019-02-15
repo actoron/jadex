@@ -3,12 +3,14 @@ package jadex.bridge;
 import java.io.Serializable;
 
 import jadex.commons.SUtil;
+import jadex.commons.transformation.annotations.Alias;
 
 
 /**
  * A component identifier. Name is unique and has the form <name>@<platform>
  */
 // Called basic to avoid incompatibilities with older releases due to new transport identifier
+@Alias("jadex.bridge.BasicComponentIdentifier")
 public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Serializable
 {
 	//-------- attributes ----------

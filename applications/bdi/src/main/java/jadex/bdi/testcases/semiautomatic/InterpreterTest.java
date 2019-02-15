@@ -136,7 +136,7 @@ public class InterpreterTest
 //
 //	public IComponentIdentifier getComponentIdentifier()
 //	{
-//		return new BasicComponentIdentifier("nonname@noname");
+//		return new ComponentIdentifier("nonname@noname");
 //	}
 //	
 //	public boolean isExternalThread()

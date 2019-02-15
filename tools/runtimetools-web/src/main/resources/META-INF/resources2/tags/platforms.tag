@@ -49,13 +49,6 @@
 			return res; 
 		}
 		
-		/*showPlatform(event)
-		{
-			var cid = event.item.x;
-			
-			alert("showPlatform: "+x);
-		}*/
-		
 		function getIntermediate(path, handler, error) 
 		{
 			var	func = function(resp)
@@ -66,6 +59,7 @@
 				var callid = resp.headers["x-jadex-callid"];
 				if(callid!=null)
 					axios.get(path, {headers: {'x-jadex-callid': callid}}, self.transform).then(func).catch(error); 
+				return this.PROMISE_DONE;
 			};
 			axios.get(path, self.transform).then(func).catch(error);
 		}
@@ -98,12 +92,14 @@
 			function(resp)
 			{
 				updatePlatform(resp.data.service.name, resp.data.service.type);
+				return this.PROMISE_DONE;
 			},
 			function(resp)
 			{
 				console.log("Err: "+JSON.stringify(resp));
 				self.serverdown = true;
 				self.update();
+				return this.PROMISE_DONE;
 			});
 	</script>
 

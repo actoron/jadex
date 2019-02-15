@@ -13,7 +13,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  
  */
 @Service(system=true)
-public interface IWebJCCService 
+public interface IJCCWebService 
 {
 	/**
 	 *  Get the established connections.
@@ -30,6 +30,6 @@ public interface IWebJCCService
 	/**
 	 *  Get the JCC plugin html fragments.
 	 */
-	public IFuture<Map<String, String>> getPluginFragments();
+	public IFuture<Map<String, String>> getPluginFragments(IComponentIdentifier cid);
 	
 }

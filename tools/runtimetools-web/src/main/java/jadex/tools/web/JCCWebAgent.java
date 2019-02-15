@@ -20,10 +20,12 @@ import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.Boolean3;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
@@ -32,14 +34,14 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Publish;
 
-@ProvidedServices(@ProvidedService(name="webjcc", type=IWebJCCService.class,
+@ProvidedServices(@ProvidedService(name="webjcc", type=IJCCWebService.class,
 		scope=ServiceScope.PLATFORM,
 		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="[http://localhost:8080/]webjcc"
 	))
 )
 @Agent(autostart=Boolean3.TRUE,
 	predecessors="jadex.extension.rs.publish.JettyRSPublishAgent") // Hack! could be other publish agent :-(
-public class JCCWebAgent implements IWebJCCService
+public class JCCWebAgent implements IJCCWebService
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -114,18 +116,36 @@ public class JCCWebAgent implements IWebJCCService
 	/**
 	 *  Get the JCC plugin html fragments.
 	 */
-	public IFuture<Map<String, String>> getPluginFragments()//IComponentIdentifier cid)
+	public IFuture<Map<String, String>> getPluginFragments(IComponentIdentifier cid)
 	{
-		// todo search for running webjcc services and ask for plugin fragment
+		Future<Map<String, String>> ret = new Future<>();
 		
-		Map<String, String> ret = new HashMap<>();
+		// If not local platform
+		if(cid!=null && !cid.getRoot().equals(agent.getId().getRoot()))
+		{
+			agent.searchService(new ServiceQuery<IJCCWebService>(IJCCWebService.class).setSearchStart(cid.getRoot()))
+				.addResultListener(new ExceptionDelegationResultListener<IJCCWebService, Map<String, String>>(ret)
+			{
+				@Override
+				public void customResultAvailable(IJCCWebService jccser) throws Exception
+				{
+					jccser.getPluginFragments(cid).addResultListener(new DelegationResultListener<>(ret));
+				}
+			});
+		}
+		else
+		{
+			Map<String, String> res = new HashMap<>();
 		
-		ret.put("starter", loadTag("jadex/tools/web/starter.tag"));
-		ret.put("security", loadTag("jadex/tools/web/security.tag"));
+			res.put("starter", loadTag("jadex/tools/web/starter.tag"));
+			res.put("security", loadTag("jadex/tools/web/security.tag"));
+		
+			ret.setResult(res);
+		}
 		
 		//System.out.println("fragments: "+ret);
 		
-		return new Future<Map<String, String>>(ret);
+		return ret;
 	}
 
 	/**

@@ -45,6 +45,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.base.Starter;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -77,6 +78,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.IStringObjectConverter;
 import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -137,12 +139,24 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     /** The media type converters. */
     protected MultiCollection<String, IObjectStringConverter> converters;
     
+    /** The basic type converter. */
+    protected BasicTypeConverter basicconverters;
+    
     /**
      *  The service init.
      */
     @ServiceStart
     public IFuture<Void> init()
     {
+    	basicconverters = new BasicTypeConverter();
+    	basicconverters.addConverter(IComponentIdentifier.class, new IStringObjectConverter()
+		{
+			public Object convertString(String val, Object context) throws Exception
+			{
+				return new ComponentIdentifier(val);
+			}
+		});
+    	
     	converters = new MultiCollection<String, IObjectStringConverter>();
     	requestinfos	= new LinkedHashMap<String, RequestInfo>();
     	
@@ -836,9 +850,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	            	{
 	            		targetparams[i] = p;
 	            	}
-	            	else if(p instanceof String && ((String)p).length()>0 && BasicTypeConverter.isExtendedBuiltInType(ts[i]))
+	            	else if(p instanceof String && ((String)p).length()>0 && basicconverters.isSupportedType(ts[i]))
 	            	{
-	            		targetparams[i] = BasicTypeConverter.getExtendedStringConverter(ts[i]).convertString((String)p, null);
+	            		targetparams[i] = basicconverters.getStringConverter(ts[i]).convertString((String)p, null);
 	            	}
 	            	
 	            	// varargs support -> convert matching single value to singleton array
