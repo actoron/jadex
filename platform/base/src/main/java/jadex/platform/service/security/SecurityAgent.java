@@ -30,6 +30,7 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 
 import jadex.base.Starter;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -253,7 +254,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			handshaketimeout = 60000;
 		final Future<Void> ret = new Future<Void>();
 		
-		((SerializationServices) SerializationServices.getSerializationServices(agent.getId().getRoot())).setSecurityService(this);
+		((SerializationServices)SerializationServices.getSerializationServices(agent.getId().getRoot())).setSecurityService(this);
 		
 		loadSettings().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 		{
@@ -2364,5 +2365,18 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Invoke a method reflectively.
+	 *  @param servicename The service interface name.
+	 *  @param methodname The method name.
+	 *  @param argtypes The argument types (can be null if method exists only once).
+	 *  @param args The arguments.
+	 *  @return The result.
+	 */
+	public IFuture<Object> invokeMethod(String servicename, String methodname, ClassInfo[] argtypes, Object[] args)
+	{
+		return new Future<Object>(new UnsupportedOperationException());
 	}
 }

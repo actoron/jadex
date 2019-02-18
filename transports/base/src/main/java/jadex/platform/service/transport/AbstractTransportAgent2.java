@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import jadex.base.Starter;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -846,5 +847,18 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	public void setServiceIdentifier(IServiceIdentifier sid)
 	{
 		this.sid = sid;
+	}
+	
+	/**
+	 *  Invoke a method reflectively.
+	 *  @param servicename The service interface name.
+	 *  @param methodname The method name.
+	 *  @param argtypes The argument types (can be null if method exists only once).
+	 *  @param args The arguments.
+	 *  @return The result.
+	 */
+	public IFuture<Object> invokeMethod(String servicename, String methodname, ClassInfo[] argtypes, Object[] args)
+	{
+		return new Future<Object>(new UnsupportedOperationException());
 	}
 }

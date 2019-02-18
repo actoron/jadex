@@ -6,27 +6,46 @@
 	
 	<body>
 	
-	<template id="my_tag">
+	<!-- <div id="my_tag">
 	  <mytag>
-	    <p>{greeting}, World!</p>
+	  	<h1>huhu</h1>
+	 	console.log('wurst');
+	    <!-- <p>{greeting}, World!</p>
+	    <script>
 	    this.greeting = 'Hello';
 	    console.log('hiiiiii');
+	    </script>
 	  </mytag>
-	</template>
+	</div> -->
 
 	<mytag></mytag>
 
 	<script>
+	
+		/*function compileTag(html)
+		{
+			var div = document.createElement('div');
+			div.setAttribute("id", "mytag");
+			div.innerHTML = html.trim();
+			
+			document.body.appendChild(div);
+			//var elem = div.firstChild; 
+			var c = riot.compile(mytag.innerHTML);
+			//document.removeChild(div);
+		}*/
+	
 		var tag = riot.compile(my_tag.innerHTML);
-		riot.mount("mytag");
+		//riot.mount("mytag");
 		
-		var html = "<mytag2><h1>bla<\/h1><script type=\"riot/tag\">console.log('xxx')<\/script><\/mytag2>";
+		// does only work with newline characters
+		var html = "<mytag>\n<h1>bla<\/h1>\n<script>\nconsole.log('xxx')\n<\/script>\n<\/mytag>";
 		var tag2 = riot.compile(html);
+		var tag2 = compileTag(html);
 		
  		//var html = "<h1>bla<\/h1>";
 
   		//var js = riot.compile("console.log('hiiiiii')", true);
-  		riot.tag("mytag", html, null, null, "function(){console.log('hiii222')}");
+  		//riot.tag("mytag", html, null, null, "function(){console.log('hiii222')}");
  		
   		riot.mount("mytag");
  	</script>

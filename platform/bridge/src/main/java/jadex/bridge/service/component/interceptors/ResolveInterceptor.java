@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
@@ -58,6 +59,8 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			SERVICEMETHODS.add(IService.class.getMethod("getServiceId", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
+			SERVICEMETHODS.add(IService.class.getMethod("invokeMethod", new Class[]{String.class, String.class, ClassInfo[].class, Object[].class}));
+
 			// internal methods???
 			SERVICEMETHODS.add(IInternalService.class.getMethod("setServiceIdentifier", new Class[]{IServiceIdentifier.class}));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("setComponentAccess", new Class[]{IInternalAccess.class}));

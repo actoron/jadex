@@ -278,6 +278,69 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	}
 	
 	/**
+	 *  Invoke a method reflectively.
+	 *  @param servicename The service interface name.
+	 *  @param methodname The method name.
+	 *  @param argtypes The argument types (can be null if method exists only once).
+	 *  @param args The arguments.
+	 *  @return The result.
+	 */
+	public IFuture<Object> invokeMethod(String servicename, String methodname, ClassInfo[] argtypes, Object[] args)
+	{
+		Future<Object> ret = new Future<>();
+		
+		//try
+		//{
+			//Class<?> iface = SReflect.findClass(servicename, internalaccess.getModel().getAllImports(), internalaccess.getClassLoader());
+			
+			Method m = null;
+			if(argtypes==null)
+			{
+				Method[] methods = SReflect.getMethods(this.getClass(), methodname);
+				if(methods.length!=1)
+				{
+					ret.setException(new IllegalArgumentException("Multiple messages with name: "+methodname));
+				}
+				else
+				{
+					m = methods[0];
+				}
+			}
+			else
+			{
+				Class<?>[] ats = new Class[argtypes.length];
+				
+				for(int i=0; i<argtypes.length; i++)
+					ats[i] = argtypes[i].getType(internalaccess.getClassLoader(), internalaccess.getModel().getAllImports());
+				
+				m = SReflect.getMethod(this.getClass(), methodname, ats);
+			}
+			
+			if(m!=null)
+			{
+				try
+				{
+					ret = (Future)m.invoke(this, args);
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Method not found: "+methodname));
+			}
+		//}
+		//catch(ClassNotFoundException e)
+		//{
+		//	ret.setException(e);
+		//}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Get a service property.
 	 *  @return The service property (if any).
 	 * /

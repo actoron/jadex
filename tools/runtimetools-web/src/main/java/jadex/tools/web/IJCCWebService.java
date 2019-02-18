@@ -32,4 +32,9 @@ public interface IJCCWebService
 	 */
 	public IFuture<Map<String, String>> getPluginFragments(IComponentIdentifier cid);
 	
+	/**
+	 *  Invoke a Jadex service on the managed platform.
+	 */
+	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, String servicetype, String methodname, Object[] args);
+	
 }

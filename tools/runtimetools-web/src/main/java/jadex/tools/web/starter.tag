@@ -1,4 +1,4 @@
-<cms>
+<starter>
 
 	<h1>Starter {cid}</h1>
 	
@@ -8,8 +8,9 @@
 		var self = this;
 		self.cid = opts!=null? opts.cid: null;
 		
-		self.update();
+		var my_service = "jadex.tools.web.IStarterService";
 		
-		console.log("starter cid is: "+self.cid);
+		
+		self.update();
 	</script>
-</cms>
+</starter>

@@ -19,7 +19,6 @@ import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  Object serializer for encoding to and decoding from a compact binary format.
- *
  */
 public class SBinarySerializer
 {
@@ -82,7 +81,7 @@ public class SBinarySerializer
 	/** 
 	 *  Handlers for decoding.
 	 */
-	protected static final List<IDecoderHandler> DECODER_HANDLERS;
+	public static final List<IDecoderHandler> DECODER_HANDLERS;
 	static
 	{
 		DECODER_HANDLERS = new ArrayList<IDecoderHandler>();

@@ -7,10 +7,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceEvent;
@@ -25,7 +27,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
@@ -147,9 +148,36 @@ public class JCCWebAgent implements IJCCWebService
 		
 		return ret;
 	}
+	
+	/**
+	 *  Invoke a Jadex service on the managed platform.
+	 */
+	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, String servicetype, String methodname, Object[] args)
+	{
+		Future<Object> ret = new Future<Object>();
+		
+//		// If not local platform
+//		if(cid!=null && !cid.getRoot().equals(agent.getId().getRoot()))
+//		{
+//			agent.searchService(new ServiceQuery<IService>(new ClassInfo(servicetype)).setSearchStart(cid.getRoot()))
+//				.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
+//			{
+//				@Override
+//				public void customResultAvailable(IService jccser) throws Exception
+//				{
+//					
+//				}
+//			});
+//		}
+//		else
+//		{
+//		}
+		
+		return ret;
+	}
 
 	/**
-	 * 
+	 *  Load a tag html code per resource name.
 	 */
 	public String loadTag(String name)
 	{

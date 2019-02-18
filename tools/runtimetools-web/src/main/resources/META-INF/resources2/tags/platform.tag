@@ -11,7 +11,7 @@
 	<div id="plugin"></div>
 
 	<script>
-		var test = "<cms><h1>Starter</h1><script>alert('hiiiiiii')<\/script><\/cms>";
+		//var test = "<cms><h1>Starter</h1><script>alert('hiiiiiii')<\/script><\/cms>";
 	
 		var self = this;
 		self.plugins = [];
@@ -25,8 +25,9 @@
 				curplugin.unmount(true);
 			
 			var p = event.item.p;
-			console.log("tag and mount: "+p.name+" "+self.cid+" "+test);
-			riot.tag(p.name, test);
+			console.log("tag and mount: "+p.name+" "+self.cid+" "+p.html);
+			riot.compile(p.html);
+			//riot.tag(p.name, p.html);
 			
 			var tags = riot.mount("div#plugin", p.name, {cid: self.cid});
 			curplugin = tags[0];

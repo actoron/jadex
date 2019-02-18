@@ -240,7 +240,7 @@ public class ServiceQuery<T>
 	 */
 	public ServiceQuery(Class<T> servicetype, ServiceScope scope)
 	{
-		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, null);
+		this(servicetype == null ?(ClassInfo) null : new ClassInfo(servicetype), scope, null);
 	}
 	
 //	
@@ -323,6 +323,14 @@ public class ServiceQuery<T>
 	public ServiceQuery(Class<T> servicetype, ServiceScope scope, IComponentIdentifier owner)
 	{
 		this(servicetype == null ? (ClassInfo) null : new ClassInfo(servicetype), scope, owner);
+	}
+	
+	/**
+	 *  Create a new service query.
+	 */
+	public ServiceQuery(ClassInfo servicetype)
+	{
+		this(servicetype, null, null);
 	}
 	
 	/**
