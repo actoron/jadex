@@ -14,6 +14,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -23,6 +24,7 @@ import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -47,6 +49,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	public static final Set<Method> SERVICEMETHODS;
 	protected static final Method START_METHOD;
 	protected static final Method SHUTDOWN_METHOD;
+	protected static final Method INVOKE_METHOD;
 //	protected static final Method CREATESID_METHOD;
 	
 	static
@@ -55,11 +58,11 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		{
 			START_METHOD = IInternalService.class.getMethod("startService", new Class[0]);
 			SHUTDOWN_METHOD = IInternalService.class.getMethod("shutdownService", new Class[0]);
+			INVOKE_METHOD = IService.class.getMethod("invokeMethod", new Class[]{String.class, String.class, ClassInfo[].class, Object[].class});
 			SERVICEMETHODS = new HashSet<Method>();
 			SERVICEMETHODS.add(IService.class.getMethod("getServiceId", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
-			SERVICEMETHODS.add(IService.class.getMethod("invokeMethod", new Class[]{String.class, String.class, ClassInfo[].class, Object[].class}));
 
 			// internal methods???
 			SERVICEMETHODS.add(IInternalService.class.getMethod("setServiceIdentifier", new Class[]{IServiceIdentifier.class}));
@@ -105,6 +108,9 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+//		if(sic.getMethod().getName().indexOf("invoke")!=-1)
+//			System.out.println("herere");
+		
 		Object service = sic.getObject();
 		if(service instanceof ServiceInfo)
 		{
@@ -119,6 +125,25 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			{
 				// invoke 1) domain service shutdown 2) basic service shutdown
 				invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, ServiceShutdown.class, false).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			else if(INVOKE_METHOD.equals(sic.getMethod()))
+			{
+				// If reflective method invokeMethod() is invoked it will be redirected to the real method
+				// String servicename, String methodname, ClassInfo[] argtypes, Object[] args)
+				sic.setObject(si.getDomainService());
+				
+				List<Object> args = sic.getArguments();
+				String sername = (String)args.get(0);
+				String methodname = (String)args.get(1);
+				ClassInfo[] argtypes = (ClassInfo[])args.get(2);
+				Object[] as = (Object[])args.get(3);
+				
+				Method m = BasicService.getInvokeMethod(si.getDomainService().getClass(), ia.getClassLoader(), methodname, argtypes);
+				sic.setMethod(m);
+
+				sic.setArguments(SUtil.arrayToList(as));
+				
+				sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else if(SERVICEMETHODS.contains(sic.getMethod()))
 			{

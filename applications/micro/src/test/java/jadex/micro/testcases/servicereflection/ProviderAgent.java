@@ -21,6 +21,7 @@ public class ProviderAgent implements IExampleService
 	 */
 	public IFuture<String> getInfo()
 	{
+		System.out.println("invoked info method");
 		return new Future<String>("info");
 	}
 	
@@ -29,6 +30,7 @@ public class ProviderAgent implements IExampleService
 	 */
 	public IFuture<Integer> add(int a, int b)
 	{
+		System.out.println("invoked add method: "+a+" "+b);
 		return new Future<Integer>(a+b);
 	}
 }

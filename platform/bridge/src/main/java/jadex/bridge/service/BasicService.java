@@ -293,28 +293,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		//{
 			//Class<?> iface = SReflect.findClass(servicename, internalaccess.getModel().getAllImports(), internalaccess.getClassLoader());
 			
-			Method m = null;
-			if(argtypes==null)
-			{
-				Method[] methods = SReflect.getMethods(this.getClass(), methodname);
-				if(methods.length!=1)
-				{
-					ret.setException(new IllegalArgumentException("Multiple messages with name: "+methodname));
-				}
-				else
-				{
-					m = methods[0];
-				}
-			}
-			else
-			{
-				Class<?>[] ats = new Class[argtypes.length];
-				
-				for(int i=0; i<argtypes.length; i++)
-					ats[i] = argtypes[i].getType(internalaccess.getClassLoader(), internalaccess.getModel().getAllImports());
-				
-				m = SReflect.getMethod(this.getClass(), methodname, ats);
-			}
+			Method m = getInvokeMethod(this.getClass(), internalaccess.getClassLoader(), methodname, argtypes);
 			
 			if(m!=null)
 			{
@@ -338,6 +317,37 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		//}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get method that should be invoked on target object.
+	 */
+	public static Method getInvokeMethod(Class<?> target, ClassLoader cl, String methodname, ClassInfo[] argtypes)
+	{
+		Method m = null;
+		if(argtypes==null)
+		{
+			Method[] methods = SReflect.getMethods(target, methodname);
+			if(methods.length!=1)
+			{
+				throw new IllegalArgumentException("Multiple messages with name: "+methodname);
+			}
+			else
+			{
+				m = methods[0];
+			}
+		}
+		else
+		{
+			Class<?>[] ats = new Class[argtypes.length];
+			
+			for(int i=0; i<argtypes.length; i++)
+				ats[i] = argtypes[i].getType(cl, null);
+			
+			m = SReflect.getMethod(target, methodname, ats);
+		}
+		
+		return m;
 	}
 	
 	/**
