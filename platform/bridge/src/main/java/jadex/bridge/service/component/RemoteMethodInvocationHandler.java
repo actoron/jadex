@@ -1190,16 +1190,20 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 	public static IService	createRemoteServiceProxy(IInternalAccess localcomp, IServiceIdentifier remotesvc)
 	{
 		Collection<Class<?>> interfaces	= new LinkedHashSet<>();
-		interfaces.add(remotesvc.getServiceType().getType(localcomp.getClassLoader()));
+		Class<?> cl = remotesvc.getServiceType().getType(localcomp.getClassLoader());
+		if(cl!=null)
+			interfaces.add(cl);
 		interfaces.add(IService.class);
 		if(remotesvc.getServiceSuperTypes()!=null)
 		{
 			for(ClassInfo ci: remotesvc.getServiceSuperTypes())
 			{
-				interfaces.add(ci.getType(localcomp.getClassLoader()));
+				cl = ci.getType(localcomp.getClassLoader());
+				if(cl!=null)
+					interfaces.add(cl);
 			}
 		}
-		Class<?>[]	ainterfaces	= interfaces.toArray(new Class[interfaces.size()]);
+		Class<?>[] ainterfaces = interfaces.toArray(new Class[interfaces.size()]);
 		 
 		// TODO: reduce number of required objects for remote reference?
 		ProxyInfo pi = new ProxyInfo(ainterfaces);
