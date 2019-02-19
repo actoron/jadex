@@ -82,6 +82,7 @@ public class SBinarySerializer
 	 *  Handlers for decoding.
 	 */
 	public static final List<IDecoderHandler> DECODER_HANDLERS;
+	
 	static
 	{
 		DECODER_HANDLERS = new ArrayList<IDecoderHandler>();

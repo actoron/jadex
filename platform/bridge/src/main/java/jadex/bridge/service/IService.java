@@ -42,6 +42,8 @@ public interface IService //extends INFMixedPropertyProvider //extends IRemotabl
 	public Map<String, Object> getPropertyMap();
 	
 	/**
+	 *  todo: support also blackbox args (e.g. byte[]) as args could also use classes that are not available.
+	 * 
 	 *  Invoke a method reflectively.
 	 *  @param methodname The method name.
 	 *  @param argtypes The argument types (can be null if method exists only once).

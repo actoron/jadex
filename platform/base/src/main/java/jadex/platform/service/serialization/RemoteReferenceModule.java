@@ -1875,7 +1875,9 @@ public class RemoteReferenceModule
 				}
 			});
 		}
-		return new ArrayList(processors);
+		
+//		return new ArrayList(processors);
+		return processors;
 	}
 	
 	/**

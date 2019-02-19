@@ -1,4 +1,4 @@
-package jadex.micro.testcases.servicereflection;
+package jadex.bdiv3.testcases.servicereflection;
 
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
@@ -12,8 +12,8 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IExampleService.class))
-public class ProviderAgent implements IExampleService
+@ProvidedServices(@ProvidedService(type=INotVisibleService.class))
+public class NotVisibleProviderAgent implements INotVisibleService
 {
 //	@Agent
 //	protected IInternalAccess agent;

@@ -631,4 +631,13 @@ public class SerializationServices implements ISerializationServices
 	{
 		return (ISerializationServices)Starter.getPlatformValue(platform, Starter.DATA_SERIALIZATIONSERVICES);
 	}
+
+	/**
+	 *  Get the remote reference module.
+	 *  @return the remote reference module.
+	 */
+	public RemoteReferenceModule getRemoteReferenceModule()
+	{
+		return rrm;
+	}
 }
