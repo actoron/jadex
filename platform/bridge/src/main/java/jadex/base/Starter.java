@@ -288,6 +288,13 @@ public class Starter
 	}
 	
 	/**
+	 *  Init method that can be overridden to customize the platform before startup.
+	 */
+	public static void init(IComponentIdentifier platform)
+	{
+	}
+	
+	/**
 	 *  Create the platform.
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
@@ -614,6 +621,9 @@ public class Starter
 				initRescueThread(cid, config);	// Required for bootstrapping init.
 
 				IBootstrapFactory fac = (IBootstrapFactory)SComponentManagementService.getComponentFactory(cid);
+				
+				// Empty init can be overridden by users
+				init(cid);
 				
 				fac.startService(component.getInternalAccess(), rid).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 				{
