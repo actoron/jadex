@@ -3,6 +3,7 @@ package jadex.micro.testcases.servicereflection;
 import java.io.File;
 import java.util.Arrays;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -151,5 +152,12 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 		tc.addReport(tr);
 		
 		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
+	}
+
+	@Override
+	public void setConfig(IPlatformConfiguration config)
+	{
+		config.setValue("superpeerclient.debugservices", "INotVisibleService");
+		super.setConfig(config);
 	}
 }
