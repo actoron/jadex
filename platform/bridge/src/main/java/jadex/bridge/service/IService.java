@@ -43,13 +43,12 @@ public interface IService //extends INFMixedPropertyProvider //extends IRemotabl
 	
 	/**
 	 *  Invoke a method reflectively.
-	 *  @param servicename The service interface name.
 	 *  @param methodname The method name.
 	 *  @param argtypes The argument types (can be null if method exists only once).
 	 *  @param args The arguments.
 	 *  @return The result.
 	 */
-	public IFuture<Object> invokeMethod(String servicename, String methodname, ClassInfo[] argtypes, Object[] args);
+	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args);
 
 //	/**
 //	 *  Get an external interface feature.

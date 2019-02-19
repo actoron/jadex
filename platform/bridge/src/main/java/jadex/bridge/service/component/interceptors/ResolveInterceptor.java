@@ -58,7 +58,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		{
 			START_METHOD = IInternalService.class.getMethod("startService", new Class[0]);
 			SHUTDOWN_METHOD = IInternalService.class.getMethod("shutdownService", new Class[0]);
-			INVOKE_METHOD = IService.class.getMethod("invokeMethod", new Class[]{String.class, String.class, ClassInfo[].class, Object[].class});
+			INVOKE_METHOD = IService.class.getMethod("invokeMethod", new Class[]{String.class, ClassInfo[].class, Object[].class});
 			SERVICEMETHODS = new HashSet<Method>();
 			SERVICEMETHODS.add(IService.class.getMethod("getServiceId", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
@@ -133,10 +133,9 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				sic.setObject(si.getDomainService());
 				
 				List<Object> args = sic.getArguments();
-				String sername = (String)args.get(0);
-				String methodname = (String)args.get(1);
-				ClassInfo[] argtypes = (ClassInfo[])args.get(2);
-				Object[] as = (Object[])args.get(3);
+				String methodname = (String)args.get(0);
+				ClassInfo[] argtypes = (ClassInfo[])args.get(1);
+				Object[] as = (Object[])args.get(2);
 				
 				Method m = BasicService.getInvokeMethod(si.getDomainService().getClass(), ia.getClassLoader(), methodname, argtypes);
 				sic.setMethod(m);

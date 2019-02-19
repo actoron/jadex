@@ -45,7 +45,7 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 			IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(ProviderAgent.class.getName()+".class"));
 			cid = fut.get().getId();
 			IService ser = (IService)agent.searchService(new ServiceQuery(new ClassInfo("jadex.micro.testcases.servicereflection.IExampleService"))).get();
-			Object result = ser.invokeMethod("jadex.micro.testcases.servicereflection.IExampleService", "add", null, new Object[]{1,2}).get();
+			Object result = ser.invokeMethod("add", null, new Object[]{1,2}).get();
 			System.out.println("Got result: "+result);
 			tr.setSucceeded(true);
 		}

@@ -279,42 +279,32 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	
 	/**
 	 *  Invoke a method reflectively.
-	 *  @param servicename The service interface name.
 	 *  @param methodname The method name.
 	 *  @param argtypes The argument types (can be null if method exists only once).
 	 *  @param args The arguments.
 	 *  @return The result.
 	 */
-	public IFuture<Object> invokeMethod(String servicename, String methodname, ClassInfo[] argtypes, Object[] args)
+	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args)
 	{
 		Future<Object> ret = new Future<>();
 		
-		//try
-		//{
-			//Class<?> iface = SReflect.findClass(servicename, internalaccess.getModel().getAllImports(), internalaccess.getClassLoader());
-			
-			Method m = getInvokeMethod(this.getClass(), internalaccess.getClassLoader(), methodname, argtypes);
-			
-			if(m!=null)
+		Method m = getInvokeMethod(this.getClass(), internalaccess.getClassLoader(), methodname, argtypes);
+		
+		if(m!=null)
+		{
+			try
 			{
-				try
-				{
-					ret = (Future)m.invoke(this, args);
-				}
-				catch(Exception e)
-				{
-					ret.setException(e);
-				}
+				ret = (Future)m.invoke(this, args);
 			}
-			else
+			catch(Exception e)
 			{
-				ret.setException(new RuntimeException("Method not found: "+methodname));
+				ret.setException(e);
 			}
-		//}
-		//catch(ClassNotFoundException e)
-		//{
-		//	ret.setException(e);
-		//}
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Method not found: "+methodname));
+		}
 		
 		return ret;
 	}
