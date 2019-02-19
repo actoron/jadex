@@ -122,7 +122,7 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 			IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo().setFilename("jadex.bdiv3.testcases.servicereflection.NotVisibleProviderAgent.class"));
 			cid = fut.get().getId();
 			System.out.println("platform local:"+agent.getId().getRoot()+" platform remote: "+platform);
-			IService lser = (IService)agent.searchService(new ServiceQuery(ILibraryService.class).setSearchStart(platform.getId()).setScope(ServiceScope.GLOBAL)).get();
+			IService lser = (IService)agent.searchService(new ServiceQuery(ILibraryService.class).setSearchStart(platform.getId()).setScope(ServiceScope.PLATFORM)).get();
 			System.out.println("libser: "+lser.getServiceId().getProviderId());
 			IService ser = (IService)agent.searchService(new ServiceQuery(new ClassInfo("jadex.bdiv3.testcases.servicereflection.INotVisibleService")).setSearchStart(platform.getId()).setScope(ServiceScope.PLATFORM)).get();
 			Object result = ser.invokeMethod("add", null, new Object[]{1,2}).get();
