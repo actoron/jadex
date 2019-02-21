@@ -9,6 +9,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.extension.rs.publish.annotation.ParametersMapper;
 
 /**
  *  
@@ -36,6 +37,6 @@ public interface IJCCWebService
 	/**
 	 *  Invoke a Jadex service on the managed platform.
 	 */
-	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, String methodname, ClassInfo[] argtypes, Object[] args);
+	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, String methodname, Object[] args, ClassInfo[] argtypes);
 	
 }

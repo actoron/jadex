@@ -2,19 +2,21 @@
 
 	<!-- <h2>Starter {cid}</h2>  -->
 	
-	<h3>Available Component Models</h3>
-	<table class="table table-bordered" class="modellist">
-		<thead>
-    		<tr>
-    			<th>Model name</th>
-    		</tr>
-    	</thead>
-		<tbody>
-			<tr each="{x in orderBy(models)}">
-				<td><a href="{getMethodPrefix()+'&methodname=createComponent&modelname=['+x+']'}">{x}</a></td>
-			</tr>
-		</tbody>
-	</table>
+	<div class="container">
+		<h3>Available Component Models</h3>
+		<table class="table table-bordered" class="modellist">
+			<thead>
+	    		<tr>
+	    			<th>Model name</th>
+	    		</tr>
+	    	</thead>
+			<tbody>
+				<tr each="{x in orderBy(models)}">
+					<td><a href="{getMethodPrefix()+'&methodname=createComponent&modelname=['+x+']'+'&contenttype=application/json'}">{x}</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 	
 	<style>
 	    #modellist {

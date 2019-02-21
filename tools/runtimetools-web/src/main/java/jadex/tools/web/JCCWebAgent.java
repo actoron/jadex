@@ -165,7 +165,7 @@ public class JCCWebAgent implements IJCCWebService, IStarterWebService
 	/**
 	 *  Invoke a Jadex service on the managed platform.
 	 */
-	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, final String methodname, final ClassInfo[] argtypes, final Object[] args)
+	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, final String methodname, final Object[] args, final ClassInfo[] argtypes)
 	{
 		final Future<Object> ret = new Future<Object>();
 		

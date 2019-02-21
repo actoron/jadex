@@ -729,6 +729,18 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        // acceptable media types for input
 	    	String mts = request.getHeader("Content-Type");
 	        List<String> cl = parseMimetypes(mts);
+	        
+	        // For GET requests attributes 'contenttype' are added
+	        if(inparamsmap!=null)
+	        {
+	        	Collection<String> cs = inparamsmap.remove("contenttype");
+	        	for(String c: SUtil.notNull(cs))
+	        	{
+	        		if(!cl.contains(c))
+	        			cl.add(c);
+	        	}
+	        }
+	        
 	        List<String> sr = mi.getProducedMediaTypes();
 	        if(sr==null || sr.size()==0)
 	        {
@@ -744,6 +756,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 //	        if(sr.size()==0)
 //	            System.out.println("found no acceptable in types.");
 	        
+	        // The order of in parameters is corrected with respect to the target parameter order
 	        Object[] inparams = inparamsmap==null? SUtil.EMPTY_OBJECT_ARRAY: new Object[inparamsmap.size()];
 	        
 	        if(inparamsmap!=null)
@@ -763,9 +776,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        }
 	        
 	        String ct = request.getHeader("Content-Type");
-	        if (ct == null)
+	        if(ct == null)
 	        	ct = request.getHeader("Accept");
-	        if ((inparams == null || inparams.length == 0) && types.length > 0 && ct != null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
+	        
+	        if((inparams == null || inparams.length == 0) && types.length > 0 && ct != null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
 	        {
 	        	try
 	        	{
@@ -827,6 +841,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	            }
 	            else
 	            {
+	            	// 
 	//           	System.out.println("automapping detected");
 	                Class<?>[] ts = method.getParameterTypes();
 	                targetparams = new Object[ts.length];
@@ -837,11 +852,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	                        targetparams[0] = inparamsmap;
 	                        ((Map)targetparams[0]).putAll(extractCallerValues(request));
 	                    }
-	//                    else if(SReflect.isSupertype(ts[0], MultivaluedMap.class))
-	//                    {
-	//                        targetparams[0] = SInvokeHelper.convertMultiMap(inparamsmap);
-	//                        ((Map)targetparams[0]).putAll(SInvokeHelper.extractCallerValues(request));
-	//                    }
 	                }
 	            }
 	        }
@@ -854,6 +864,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	            for(int i=0; i<targetparams.length && i<inparams.length; i++)
 	            {
 	            	Object p = inparams[i];
+	            	
 	            	if(p!=null && SReflect.isSupertype(ts[i], p.getClass()))
 	            	{
 	            		targetparams[i] = p;
