@@ -158,23 +158,16 @@ public class PlatformAgent
 //	}
 	
 	/**
-	 *  Called when platform startup finished.
+	 * 
+	 * @return
 	 */
-	@AgentCreated
-	public IFuture<Void> init()
+	public static URL[] getClasspathUrls(ClassLoader classloader)
 	{
-		Future<Void> ret = new Future<>();
-//		System.out.println("Start scanning...");
-		long start = System.currentTimeMillis();
-				
-		// Class name -> instance name
-		Map<String, String> names = new HashMap<String, String>();
-
 		Set<URL> urlset = new HashSet<>();
 		String[] cpaths = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
-		if (cpaths != null)
+		if(cpaths != null)
 		{
-			for (String cpath : cpaths)
+			for(String cpath : cpaths)
 			{
 				try
 				{
@@ -190,29 +183,45 @@ public class PlatformAgent
 				}
 			}
 		}
-		ClassLoader classloader = PlatformAgent.class.getClassLoader();
+		
 		if(classloader instanceof URLClassLoader)
 			urlset.addAll(Arrays.asList(((URLClassLoader)classloader).getURLs()));
 		URL[] urls = urlset.toArray(new URL[urlset.size()]);
-		
+		return urls;
+	}
+	
+	/**
+	 *  Called when platform startup finished.
+	 */
+	@AgentCreated
+	public IFuture<Void> init()
+	{
+		Future<Void> ret = new Future<>();
+//		System.out.println("Start scanning...");
+		long start = System.currentTimeMillis();
+				
+		// Class name -> instance name
+		Map<String, String> names = new HashMap<String, String>();
+
+		URL[] urls = getClasspathUrls(PlatformAgent.class.getClassLoader());
 		// Remove JVM jars
 		urls = SUtil.removeSystemUrls(urls);
 		
 		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
 		
 		List<CreationInfo> infos = new ArrayList<>();
-		for (ClassInfo ci : cis)
+		for(ClassInfo ci : cis)
 		{
-			if (ci.getLastModified() != null && ci.getClassName().startsWith("jadex."))
+			if(ci.getLastModified() != null && ci.getClassName().startsWith("jadex."))
 			{
 				VersionInfo vinfo = VersionInfo.getInstance();
-				synchronized (vinfo)
+				synchronized(vinfo)
 				{
-					if (vinfo.getBuildTime().before(ci.getLastModified()))
+					if(vinfo.getBuildTime().before(ci.getLastModified()))
 						vinfo.setBuildTime(ci.getLastModified());
 				}
 			}
-			isSystemComponent(ci, classloader);
+			isSystemComponent(ci, PlatformAgent.class.getClassLoader());
 			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
 			EnumInfo ei = (EnumInfo)ai.getValue("autostart");
 			String val = ei.getValue();

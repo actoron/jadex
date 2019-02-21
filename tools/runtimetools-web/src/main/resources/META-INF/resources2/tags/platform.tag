@@ -25,7 +25,7 @@
 				curplugin.unmount(true);
 			
 			var p = event.item.p;
-			console.log("tag and mount: "+p.name+" "+self.cid+" "+p.html);
+			//console.log("tag and mount: "+p.name+" "+self.cid+" "+p.html);
 			riot.compile(p.html);
 			//riot.tag(p.name, p.html);
 			

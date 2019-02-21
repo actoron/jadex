@@ -3,6 +3,7 @@ package jadex.tools.web;
 import java.util.Collection;
 import java.util.Map;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceEvent;
@@ -35,6 +36,6 @@ public interface IJCCWebService
 	/**
 	 *  Invoke a Jadex service on the managed platform.
 	 */
-	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, String servicetype, String methodname, Object[] args);
+	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, String methodname, ClassInfo[] argtypes, Object[] args);
 	
 }

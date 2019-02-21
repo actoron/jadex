@@ -44,6 +44,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -286,13 +287,7 @@ public class Starter
 //					}
 //				}, 5000);
 	}
-	
-	/**
-	 *  Init method that can be overridden to customize the platform before startup.
-	 */
-	public static void init(IComponentIdentifier platform)
-	{
-	}
+
 	
 	/**
 	 *  Create the platform.
@@ -623,7 +618,8 @@ public class Starter
 				IBootstrapFactory fac = (IBootstrapFactory)SComponentManagementService.getComponentFactory(cid);
 				
 				// Empty init can be overridden by users
-				init(cid);
+				if(config.getInitCommand()!=null)
+					config.getInitCommand().execute(cid);
 				
 				fac.startService(component.getInternalAccess(), rid).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 				{
