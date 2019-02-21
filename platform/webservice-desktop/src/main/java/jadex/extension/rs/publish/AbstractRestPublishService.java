@@ -45,6 +45,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.base.Starter;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -154,6 +155,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			public Object convertString(String val, Object context) throws Exception
 			{
 				return new ComponentIdentifier(val);
+			}
+		});
+    	basicconverters.addConverter(ClassInfo.class, new IStringObjectConverter()
+		{
+			public Object convertString(String val, Object context) throws Exception
+			{
+				return new ClassInfo(val);
 			}
 		});
     	
@@ -769,11 +777,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        			List<ITraverseProcessor> procs = null;
 	        			if (SReflect.isSupertype(Map.class, types[0]))
 		        			procs = JsonTraverser.nestedreadprocs;
-	        			inparams = new Object[] { JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], procs) };
+	        			inparams = new Object[]{JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], procs)};
 	        		}
 	        		else if (types.length == 1 && json.trim().startsWith("\""))
 	        		{
-	        			inparams = new Object[] { JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], null) };
+	        			inparams = new Object[]{JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], null)};
 	        		}
 	        		else
 	        		{

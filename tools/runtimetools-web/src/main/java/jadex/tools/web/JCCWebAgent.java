@@ -1,12 +1,17 @@
 package jadex.tools.web;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -17,10 +22,15 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.Boolean3;
+import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.AnnotationInfo;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -34,15 +44,18 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Publish;
+import jadex.platform.PlatformAgent;
 
-@ProvidedServices(@ProvidedService(name="webjcc", type=IJCCWebService.class,
+@ProvidedServices(
+{
+	@ProvidedService(name="jccweb", type=IJCCWebService.class,
 		scope=ServiceScope.PLATFORM,
-		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="[http://localhost:8080/]webjcc"
-	))
-)
+		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="[http://localhost:8080/]webjcc")),
+	@ProvidedService(name="starterweb", type=IStarterWebService.class)
+})
 @Agent(autostart=Boolean3.TRUE,
 	predecessors="jadex.extension.rs.publish.JettyRSPublishAgent") // Hack! could be other publish agent :-(
-public class JCCWebAgent implements IJCCWebService
+public class JCCWebAgent implements IJCCWebService, IStarterWebService
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -152,26 +165,21 @@ public class JCCWebAgent implements IJCCWebService
 	/**
 	 *  Invoke a Jadex service on the managed platform.
 	 */
-	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, String servicetype, String methodname, Object[] args)
+	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, final String methodname, final ClassInfo[] argtypes, final Object[] args)
 	{
-		Future<Object> ret = new Future<Object>();
+		final Future<Object> ret = new Future<Object>();
 		
-//		// If not local platform
-//		if(cid!=null && !cid.getRoot().equals(agent.getId().getRoot()))
-//		{
-//			agent.searchService(new ServiceQuery<IService>(new ClassInfo(servicetype)).setSearchStart(cid.getRoot()))
-//				.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
-//			{
-//				@Override
-//				public void customResultAvailable(IService jccser) throws Exception
-//				{
-//					
-//				}
-//			});
-//		}
-//		else
-//		{
-//		}
+		// Search service with startpoint of given platform 
+		agent.searchService(new ServiceQuery<IService>(servicetype).setSearchStart(cid.getRoot()).setScope(ServiceScope.PLATFORM))
+			.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
+		{
+			@Override
+			public void customResultAvailable(IService ser) throws Exception
+			{
+				System.out.println("Invoking service method: "+ser+" "+methodname);
+				ser.invokeMethod(methodname, argtypes, args).addResultListener(new DelegationResultListener<>(ret));
+			}
+		});
 		
 		return ret;
 	}
@@ -208,4 +216,40 @@ public class JCCWebAgent implements IJCCWebService
 		return ret;
 	}
 	
+	/**
+	 *  Get all startable component models.
+	 *  @return The file names of the component models.
+	 */
+	public IFuture<Collection<String>> getComponentModels()
+	{
+		URL[] urls = PlatformAgent.getClasspathUrls(this.getClass().getClassLoader());
+		// Remove JVM jars
+		urls = SUtil.removeSystemUrls(urls);
+		
+		Set<SClassReader.ClassInfo> cis = SReflect.scanForClassInfos(urls, null, new IFilter<SClassReader.ClassInfo>()
+		{
+			public boolean filter(SClassReader.ClassInfo ci)
+			{
+				boolean ret = false;
+				AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
+				if(ai!=null)
+					ret = true;
+				return ret;
+			}
+		});
+		
+		List<String> res = cis.stream().map(a -> a.getClassName()).collect(Collectors.toList());
+				
+		//System.out.println("Models found: "+res);
+		return new Future<Collection<String>>(res);
+	}
+	
+	/**
+	 *  Create a component for a model.
+	 */
+	public IFuture<IComponentIdentifier> createComponent(ClassInfo model)
+	{
+		IExternalAccess comp = agent.createComponent(new CreationInfo().setFilename(model.getTypeName())).get();
+		return new Future<IComponentIdentifier>(comp.getId());
+	}
 }	

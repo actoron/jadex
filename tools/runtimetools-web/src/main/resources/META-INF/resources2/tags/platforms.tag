@@ -42,10 +42,10 @@
 				return a===b? 0: a > b? order: -order 
 			});
 			
-			res.forEach(function(q) 
+			/*res.forEach(function(q) 
 			{ 
 				console.log(q); 
-			}) 
+			})*/ 
 			return res; 
 		}
 		
