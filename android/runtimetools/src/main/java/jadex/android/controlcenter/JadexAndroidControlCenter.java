@@ -5,7 +5,7 @@ import jadex.android.controlcenter.settings.AComponentSettings;
 import jadex.android.controlcenter.settings.AServiceSettings;
 import jadex.android.controlcenter.settings.ISettings;
 import jadex.android.service.JadexPlatformService;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -205,7 +205,7 @@ public class JadexAndroidControlCenter extends OptionsMenuDelegatingPreferenceAc
 		Preference componentViewer = new Preference(this);
 		componentViewer.setTitle("Component Viewer");
 		Intent intent = new Intent(this, ComponentViewer.class);
-		intent.putExtra(EXTRA_PLATFORMID, (BasicComponentIdentifier) platformId);
+		intent.putExtra(EXTRA_PLATFORMID, (ComponentIdentifier) platformId);
 		componentViewer.setIntent(intent);
 		root.addPreference(componentViewer);
 

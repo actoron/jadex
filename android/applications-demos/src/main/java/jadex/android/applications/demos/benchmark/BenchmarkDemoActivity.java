@@ -3,7 +3,7 @@ package jadex.android.applications.demos.benchmark;
 import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
 import jadex.base.IPlatformConfiguration;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -133,7 +133,7 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 			}
 			if(item.getItemId()==R.id.benchmark_remote || item.getItemId()==R.id.benchmark_remotecodec)
 			{
-				args.put("echo", new BasicComponentIdentifier("echo@echo"));
+				args.put("echo", new ComponentIdentifier("echo@echo"));
 //					new String[]{SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/"}));
 //					new String[]{SRelay.ADDRESS_SCHEME+"grisougarfield.dyndns.org:52339/relay/"}));
 			}

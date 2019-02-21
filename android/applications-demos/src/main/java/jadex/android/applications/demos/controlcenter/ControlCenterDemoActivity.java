@@ -3,7 +3,7 @@ package jadex.android.applications.demos.controlcenter;
 import jadex.android.JadexAndroidActivity;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.annotation.Reference;
 import android.content.Intent;
@@ -23,7 +23,7 @@ public class ControlCenterDemoActivity extends JadexAndroidActivity
 	{
 		super.onPlatformStarted(result);
 		Intent i = new Intent(this, JadexAndroidControlCenter.class);
-		i.putExtra("platformId", (BasicComponentIdentifier) platformId);
+		i.putExtra("platformId", (ComponentIdentifier) platformId);
 		startActivity(i);
 	}
 	
