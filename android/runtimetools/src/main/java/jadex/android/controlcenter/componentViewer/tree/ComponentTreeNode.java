@@ -11,7 +11,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -587,8 +586,8 @@ public class ComponentTreeNode extends AbstractTreeNode implements IActiveCompon
 		ArrayList<PropertyItem> props = new ArrayList<PropertyItem>();
 		props.add(new PropertyItem("Name", desc.getName().getName()));
 		
-		String[]	addresses	= desc.getName() instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)desc.getName()).getAddresses() : null;
-		props.add(new PropertyItem("Adresses", (addresses != null ? addresses : SUtil.EMPTY_STRING_ARRAY)));
+//		String[]	addresses	= desc.getName() instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)desc.getName()).getAddresses() : null;
+//		props.add(new PropertyItem("Adresses", (addresses != null ? addresses : SUtil.EMPTY_STRING_ARRAY)));
 		
 		props.add(new PropertyItem("Type", desc.getType()));
 		props.add(new PropertyItem("Model name", desc.getModelName()));
