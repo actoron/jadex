@@ -2,6 +2,7 @@ package jadex.micro.testcases.servicereflection;
 
 import java.util.Arrays;
 
+import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -17,6 +18,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.Boolean3;
+import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -114,7 +116,9 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 		{
 			//System.out.println(Class.forName("jadex.bdiv3.testcases.servicereflection.INotVisibleService"));
 //			System.out.println("curdir: "+new File(".").getAbsolutePath());
-			IExternalAccess platform = Starter.createPlatform(STest.getDefaultTestConfig(this.getClass()), new String[]{"-libpath", "../bdiv3/bin/test"}).get();
+			IPlatformConfiguration	config	= STest.getDefaultTestConfig(this.getClass());
+			config.setValue("libpath", SUtil.findOutputDirs("applications/bdiv3", true));
+			IExternalAccess platform = Starter.createPlatform(config).get();
 //			ILibraryService libser = platform.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class)).get();
 //			libser.addURL(parid, url).get();
 			IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo().setFilename("jadex.bdiv3.testcases.servicereflection.NotVisibleProviderAgent.class"));
