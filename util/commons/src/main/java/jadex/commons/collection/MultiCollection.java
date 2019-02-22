@@ -495,13 +495,11 @@ public class MultiCollection<K, V> implements Map<K, Collection<V>>, Serializabl
 	 *  @param key	The key.
 	 *  @return The collection of associated values.
 	 */
-	public Collection<V>	getCollection(Object key)
+	public Collection<V> getCollection(Object key)
 	{
-		Collection<V> ret	= get(key);
+		Collection<V> ret = get(key);
 		if(ret==null)
-		{
 			ret	= Collections.EMPTY_LIST;
-		}
 		return ret;
 	}
 	

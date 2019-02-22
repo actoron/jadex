@@ -1,4 +1,4 @@
-package jadex.tools.web;
+package jadex.tools.web.starter;
 
 import java.util.Collection;
 
@@ -6,12 +6,13 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
+import jadex.tools.web.jcc.IJCCPluginService;
 
 /**
- *  
+ *  Interface for the starter plugin service.
  */
 @Service
-public interface IStarterWebService
+public interface IJCCStarterService extends IJCCPluginService
 {
 	/**
 	 *  Get all startable component models.

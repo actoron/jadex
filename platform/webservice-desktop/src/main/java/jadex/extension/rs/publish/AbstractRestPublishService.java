@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
@@ -144,7 +146,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     protected MultiCollection<String, IObjectStringConverter> converters;
     
     /** The basic type converter. */
-    protected BasicTypeConverter basicconverters;
+//    protected BasicTypeConverter basicconverters;
     
     /**
      *  The service init.
@@ -152,21 +154,21 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     @ServiceStart
     public IFuture<Void> init()
     {
-    	basicconverters = new BasicTypeConverter();
-    	basicconverters.addConverter(IComponentIdentifier.class, new IStringObjectConverter()
-		{
-			public Object convertString(String val, Object context) throws Exception
-			{
-				return new ComponentIdentifier(val);
-			}
-		});
-    	basicconverters.addConverter(ClassInfo.class, new IStringObjectConverter()
-		{
-			public Object convertString(String val, Object context) throws Exception
-			{
-				return new ClassInfo(val);
-			}
-		});
+//    	basicconverters = new BasicTypeConverter();
+//    	basicconverters.addConverter(IComponentIdentifier.class, new IStringObjectConverter()
+//		{
+//			public Object convertString(String val, Object context) throws Exception
+//			{
+//				return new ComponentIdentifier(val);
+//			}
+//		});
+//    	basicconverters.addConverter(ClassInfo.class, new IStringObjectConverter()
+//		{
+//			public Object convertString(String val, Object context) throws Exception
+//			{
+//				return new ClassInfo(val);
+//			}
+//		});
     	
     	converters = new MultiCollection<String, IObjectStringConverter>();
     	requestinfos	= new LinkedHashMap<String, RequestInfo>();
@@ -684,7 +686,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     	{
 	    	Object[] targetparams = null;
 	    
-	        MultiCollection<String, String> inparamsmap = null;
+	        Map<String, Object> inparamsmap = null;
 	        
 	        // parameters for query string (must be parsed to keep order) and 
 	        // posted form data not for multi-part
@@ -694,11 +696,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        if(request.getContentType()!=null && request.getContentType().startsWith(MediaType.MULTIPART_FORM_DATA) && request.getParts().size()>0)
 	        {
 	            if(inparamsmap==null)
-	                inparamsmap = new MultiCollection<String, String>(new LinkedHashMap<String, Collection<String>>(), ArrayList.class);
+	                inparamsmap = new HashMap<>();
 	            for(Part part: request.getParts())
 	            {
 	                byte[] data = SUtil.readStream(part.getInputStream());
-	                inparamsmap.add(part.getName(), new String(data));
+//	                inparamsmap.add(part.getName(), new String(data));
+	                addEntry(inparamsmap, part.getName(), new String(data));
 	            }
 	        }
 	        	        
@@ -734,9 +737,18 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        // For GET requests attributes 'contenttype' are added
 	        if(inparamsmap!=null)
 	        {
-	        	Collection<String> cs = inparamsmap.remove("contenttype");
-	        	for(String c: SUtil.notNull(cs))
+	        	Object cs = inparamsmap.remove("contenttype");
+	        	if(cs instanceof Collection)
 	        	{
+		        	for(String c: (Collection<String>)cs)
+		        	{
+		        		if(!cl.contains(c))
+		        			cl.add(c);
+		        	}
+	        	}
+	        	else if(cs instanceof String)
+	        	{
+	        		String c = (String)cs;
 	        		if(!cl.contains(c))
 	        			cl.add(c);
 	        	}
@@ -759,14 +771,15 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        
 	        // The order of in parameters is corrected with respect to the target parameter order
 	        Object[] inparams = inparamsmap==null? SUtil.EMPTY_OBJECT_ARRAY: new Object[inparamsmap.size()];
-	        
+//	        Object[] inparams = inparamsmap==null? SUtil.EMPTY_OBJECT_ARRAY: new Object[Math.max(inparamsmap.size(), method.getParameterTypes().length)];
+	    	        
 	        if(inparamsmap!=null)
 	        {
 	        	int i = 0;
 	        	List<String> pnames = getParameterNames(method);
 	        	for(String pname: pnames!=null ? pnames : inparamsmap.keySet())
 	        	{
-	        		inparams[i++] = inparamsmap.getObject(pname);
+	        		inparams[i++] = inparamsmap.get(pname);
 	        	}
 	        }
 	        
@@ -866,20 +879,37 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	            {
 	            	Object p = inparams[i];
 	            	
-	            	if(p!=null && SReflect.isSupertype(ts[i], p.getClass()))
+	            	if(p!=null)
 	            	{
-	            		targetparams[i] = p;
-	            	}
-	            	else if(p instanceof String && ((String)p).length()>0 && basicconverters.isSupportedType(ts[i]))
-	            	{
-	            		targetparams[i] = basicconverters.getStringConverter(ts[i]).convertString((String)p, null);
-	            	}
+	            		Object v = Starter.convertParameter(p, ts[i]);
 	            	
-	            	// varargs support -> convert matching single value to singleton array
-	            	else if(p!=null && ts[i].isArray() && SReflect.isSupertype(ts[i].getComponentType(), p.getClass()))
-	            	{
-	            		targetparams[i] = Array.newInstance(ts[i].getComponentType(), 1);
-	            		Array.set(targetparams[i], 0, p);
+	            		if(v!=null)
+	            		{
+	            			targetparams[i] = v;
+	            		}
+	            		else if(p!=null && ts[i].isArray())
+		            	{
+		            		// fill in collection 
+		            		if(p instanceof Collection)
+		            		{
+		            			Collection<Object> col = (Collection<Object>)p;
+		            			Object ar = Array.newInstance(ts[i].getComponentType(), col.size());
+		            			targetparams[i] = ar;
+		            			Iterator<Object> it = col.iterator();
+		            			for(int j=0; j<col.size(); j++)
+		            			{
+		            				v = Starter.convertParameter(it.next(), ts[i].getComponentType());
+		            				if(v!=null)
+		            					Array.set(ar, j, v);
+		            			}
+		            		}
+		            		// varargs support -> convert matching single value to singleton array
+		            		else if(SReflect.isSupertype(ts[i].getComponentType(), p.getClass()))
+		            		{
+		            			targetparams[i] = Array.newInstance(ts[i].getComponentType(), 1);
+		            			Array.set(targetparams[i], 0, p);
+		            		}
+		            	}
 	            	}
 	            }
 	            
@@ -911,6 +941,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     		throw new RuntimeException(e);
     	}
     }
+    
+   
 
     /**
      *  Convert a parameter string to an object if is json or xml.
@@ -1274,14 +1306,74 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         return mimetypes;
     }
 
+//    /**
+//     *  Split the query and save the order.
+//     */
+//    public static MultiCollection<String, String> splitQueryString(String query) throws Exception
+//    {
+//        MultiCollection<String, String> ret = new MultiCollection<String, String>(new LinkedHashMap<String, Collection<String>>(), ArrayList.class);
+//        
+//        String[] pairs = query.split("&");
+//        Map<String, Set<Tuple2<Integer, String>>> compacted = new HashMap<>();
+//        
+//        for(String pair : pairs)
+//        {
+//            int idx = pair.indexOf("=");
+//            String key = URLDecoder.decode(pair.substring(0, idx), "UTF-8");
+//            String val = URLDecoder.decode(pair.substring(idx + 1), "UTF-8");
+//            
+//            idx = key.indexOf("_");
+//            boolean added = false;
+//            if(idx!=-1)
+//            {
+//            	String p = key.substring(idx+1);
+//            	try
+//            	{
+//            		int pos = Integer.parseInt(p);
+//            		String ckey = key.substring(0, idx);
+//            		Set<Tuple2<Integer, String>> col = compacted.get(ckey);
+//            		if(col==null)
+//            		{
+//            			col = new TreeSet<>(new Comparator<Tuple2<Integer, String>>() 
+//            			{
+//            				public int compare(Tuple2<Integer, String> o1, Tuple2<Integer, String> o2) 
+//            				{
+//            					return o1.getFirstEntity()-o2.getFirstEntity();
+//            				}
+//						});
+//            			compacted.put(ckey, col);
+//            		}
+//            		added = true;
+//            		col.add(new Tuple2<Integer, String>(pos, val));
+//            	}
+//            	catch(Exception e)
+//            	{
+//            	}
+//            }
+//            if(!added)
+//            	ret.add(key, val);
+//        }
+//        
+//        //compacted.entrySet().stream().forEach(e -> { List<String> data = e.getValue().stream().map(a -> a.getSecondEntity()).collect(Collectors.toList()); ret.add(e.getKey(), data);});
+//        for(Map.Entry<String, Set<Tuple2<Integer, String>>> entry: compacted.entrySet())
+//        {
+//        	List<String> data = entry.getValue().stream().map(a -> a.getSecondEntity()).collect(Collectors.toList());
+//        	ret.add(entry.getKey(), (String)data);
+//        }
+//        
+//        return ret;
+//    }
+    
     /**
      *  Split the query and save the order.
      */
-    public static MultiCollection<String, String> splitQueryString(String query) throws Exception
+    public static Map<String, Object> splitQueryString(String query) throws Exception
     {
-        MultiCollection<String, String> ret = new MultiCollection<String, String>(new LinkedHashMap<String, Collection<String>>(), ArrayList.class);
+        Map<String, Object> ret = new LinkedHashMap<String, Object>();
+        
         String[] pairs = query.split("&");
         Map<String, Set<Tuple2<Integer, String>>> compacted = new HashMap<>();
+        
         for(String pair : pairs)
         {
             int idx = pair.indexOf("=");
@@ -1317,9 +1409,56 @@ public abstract class AbstractRestPublishService implements IWebPublishService
             	}
             }
             if(!added)
-            	ret.add(key, val);
+            {
+            	addEntry(ret, key, val);
+            }
         }
+        
+        compacted.entrySet().stream().forEach(e -> { List<String> data = e.getValue().stream().map(a -> a.getSecondEntity()).collect(Collectors.toList()); addEntry(ret, e.getKey(), data);});
+        /*for(Map.Entry<String, Set<Tuple2<Integer, String>>> entry: compacted.entrySet())
+        {
+        	List<String> data = entry.getValue().stream().map(a -> a.getSecondEntity()).collect(Collectors.toList());
+        	//addEntry(ret, entry.getKey(), data, true);
+        	//ret.add(entry.getKey(), (String)data);
+        }*/
+        
         return ret;
+    }
+    
+    /**
+     * 
+     * @param ret
+     * @param key
+     * @param val
+     */
+    protected static void addEntry(Map<String, Object> ret, String key, Object val)
+    {
+    	if(ret.containsKey(key))
+    	{
+    		Object v = ret.get(key);
+    		if(v instanceof String)
+    		{
+    			List<String> col = new ArrayList<>();
+    			col.add((String)v);
+    			if(val instanceof Collection)
+    				col.addAll((Collection)val);
+    			else
+    				col.add((String)val);
+    			ret.put(key, col);
+    		}
+    		else if(v instanceof Collection)
+    		{
+    			Collection<String> col = (Collection<String>)v;
+    			if(val instanceof Collection)
+    				col.addAll((Collection)val);
+    			else
+    				col.add((String)val);
+    		}
+    	}
+    	else
+    	{
+    		ret.put(key, val);
+    	}
     }
 
     /**

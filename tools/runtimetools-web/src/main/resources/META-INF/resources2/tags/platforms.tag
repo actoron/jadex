@@ -66,7 +66,7 @@
 		
 		function updatePlatform(platform, rem)
 		{
-			console.log("updatePlatform: "+platform+" "+rem);
+			//console.log("updatePlatform: "+platform+" "+rem);
 			
 			var	found = false;
 			

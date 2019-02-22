@@ -1,4 +1,4 @@
-package jadex.tools.web;
+package jadex.tools.web.jcc;
 
 import java.util.Collection;
 import java.util.Map;
@@ -9,7 +9,6 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.extension.rs.publish.annotation.ParametersMapper;
 
 /**
  *  

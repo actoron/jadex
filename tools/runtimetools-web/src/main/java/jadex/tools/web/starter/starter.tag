@@ -12,7 +12,7 @@
 	    	</thead>
 			<tbody>
 				<tr each="{x in orderBy(models)}">
-					<td><a href="{getMethodPrefix()+'&methodname=createComponent&modelname=['+x+']'+'&contenttype=application/json'}">{x}</a></td>
+					<td><a href="{getMethodPrefix()+'&methodname=createComponent&args_0='+x+'&argtypes_0=jadex.bridge.ClassInfo'}">{x}</a></td>
 				</tr>
 			</tbody>
 		</table>
@@ -28,12 +28,13 @@
 	
 	<script>
 		//console.log("starter: "+opts);
+		// +'&contenttype=application/json'
 		
 		var self = this;
 		self.cid = opts!=null? opts.cid: null;
 		self.models = [];
 		
-		var myservice = "jadex.tools.web.IStarterWebService";
+		var myservice = "jadex.tools.web.starter.IJCCStarterService";
 		
 		getMethodPrefix()
 		{
@@ -61,10 +62,6 @@
 				return a===b? 0: a > b? order: -order 
 			});
 			
-			res.forEach(function(q) 
-			{ 
-				console.log(q); 
-			}) 
 			return res; 
 		}
 	</script>

@@ -1,4 +1,4 @@
-package jadex.tools.web;
+package jadex.tools.web.status;
 
 import java.util.ArrayList;
 import java.util.Arrays;

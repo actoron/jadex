@@ -21,10 +21,14 @@
 		
 		showPlugin(event)
 		{
+			showPlugin(event.item.p);
+		}
+		
+		showPlugin2(p)
+		{
 			if(curplugin!=null)
 				curplugin.unmount(true);
 			
-			var p = event.item.p;
 			//console.log("tag and mount: "+p.name+" "+self.cid+" "+p.html);
 			riot.compile(p.html);
 			//riot.tag(p.name, p.html);
@@ -52,7 +56,11 @@
 			    i++;
 			});
 			
-			self.update();
+			if(i>0)
+				self.showPlugin2(self.plugins[0]);
+			else
+				self.update();
+			
 			return this.PROMISE_DONE;
 			
 		}).catch(function(err) 

@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
@@ -136,6 +137,17 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				String methodname = (String)args.get(0);
 				ClassInfo[] argtypes = (ClassInfo[])args.get(1);
 				Object[] as = (Object[])args.get(2);
+				
+				if(argtypes!=null)
+				{
+					for(int i=0; i<argtypes.length; i++)
+					{
+						Class<?> target = argtypes[i].getType(ia.getClassLoader());
+						Object cval = Starter.convertParameter(as[i], target);
+						if(cval!=null)
+							as[i] = cval;
+					}
+				}
 				
 				Method m = BasicService.getInvokeMethod(si.getDomainService().getClass(), ia.getClassLoader(), methodname, argtypes);
 				sic.setMethod(m);
