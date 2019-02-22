@@ -379,6 +379,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		final TerminableIntermediateFuture<IServiceIdentifier> ret = new TerminableIntermediateFuture<IServiceIdentifier>();
 		
 		long	timeout	= ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
+		if(debug(query))
+			System.out.println(agent+" searchRemoteServices: timeout="+timeout+", time="+System.currentTimeMillis());			
 		
 		// Check for awareness service
 		Collection<IPassiveAwarenessService>	pawas	= agent.getFeature(IRequiredServicesFeature.class)
@@ -411,8 +413,6 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						}
 						
 						filter.insert(platform.toString());
-						if(debug(query))
-							System.out.println(agent + " searching remote platform: "+platform+", "+query);
 						
 						// Only (continue to) search remote when future not yet finished or cancelled.
 						if(!ret.isDone())
@@ -423,8 +423,14 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							IRemoteRegistryService rrs = (IRemoteRegistryService) RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
 							if(timeout>0)
 							{
-								ServiceCall.getOrCreateNextInvocation().setTimeout((long)(timeout*0.9));
+								long	to	= (long) (timeout*0.9);
+								to	= Math.min(to, Math.max(1, timeout-1000));	// At least 1 sec. less thamn original timeout (hack for very small timeouts, e.g. in test cases)
+								ServiceCall.getOrCreateNextInvocation().setTimeout(to);
+								if(debug(query))
+									System.out.println(agent + " searching remote platform: "+platform+", timeout="+to+", time="+System.currentTimeMillis());
 							}
+							if(debug(query))
+								System.out.println(agent + " searching remote platform: "+platform+", "+query);
 							final IFuture<Set<IServiceIdentifier>> remotesearch = rrs.searchServices(query);
 							
 	//						System.out.println(agent + " searching remote platform3: "+platform+", "+query);
@@ -435,7 +441,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 //									try
 //									{
 										if(debug(query))
-											System.out.println(agent + " searched remote platform: "+platform+", "+result);
+											System.out.println(agent + " searched remote platform: "+platform+", "+result+", timeout="+timeout+", time="+System.currentTimeMillis());
 //									}
 //									catch(RuntimeException e)
 //									{
