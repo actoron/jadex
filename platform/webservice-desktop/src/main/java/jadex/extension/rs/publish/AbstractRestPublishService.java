@@ -12,6 +12,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,7 +20,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
@@ -686,9 +689,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        // parameters for query string (must be parsed to keep order) and 
 	        // posted form data not for multi-part
 	        if(request.getQueryString()!=null)
-	        {
 	            inparamsmap = splitQueryString(request.getQueryString());
-	        }
 	
 	        if(request.getContentType()!=null && request.getContentType().startsWith(MediaType.MULTIPART_FORM_DATA) && request.getParts().size()>0)
 	        {
@@ -700,7 +701,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	                inparamsmap.add(part.getName(), new String(data));
 	            }
 	        }
-	        
+	        	        
 	        MappingInfo mi = null;
 	        if(mis.size()==1)
 	        {
@@ -1280,10 +1281,43 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     {
         MultiCollection<String, String> ret = new MultiCollection<String, String>(new LinkedHashMap<String, Collection<String>>(), ArrayList.class);
         String[] pairs = query.split("&");
+        Map<String, Set<Tuple2<Integer, String>>> compacted = new HashMap<>();
         for(String pair : pairs)
         {
             int idx = pair.indexOf("=");
-            ret.add(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+            String key = URLDecoder.decode(pair.substring(0, idx), "UTF-8");
+            String val = URLDecoder.decode(pair.substring(idx + 1), "UTF-8");
+            
+            idx = key.indexOf("_");
+            boolean added = false;
+            if(idx!=-1)
+            {
+            	String p = key.substring(idx+1);
+            	try
+            	{
+            		int pos = Integer.parseInt(p);
+            		String ckey = key.substring(0, idx);
+            		Set<Tuple2<Integer, String>> col = compacted.get(ckey);
+            		if(col==null)
+            		{
+            			col = new TreeSet<>(new Comparator<Tuple2<Integer, String>>() 
+            			{
+            				public int compare(Tuple2<Integer, String> o1, Tuple2<Integer, String> o2) 
+            				{
+            					return o1.getFirstEntity()-o2.getFirstEntity();
+            				}
+						});
+            			compacted.put(ckey, col);
+            		}
+            		added = true;
+            		col.add(new Tuple2<Integer, String>(pos, val));
+            	}
+            	catch(Exception e)
+            	{
+            	}
+            }
+            if(!added)
+            	ret.add(key, val);
         }
         return ret;
     }

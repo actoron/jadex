@@ -1,5 +1,8 @@
 package jadex.micro.testcases.servicescope;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
@@ -105,4 +108,5 @@ public class ServiceScopeTestAgent extends JunitAgentTest
 		
 		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", tc);
 	}
+	
 }
