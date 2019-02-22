@@ -2,10 +2,8 @@ package jadex.micro.testcases.authenticate;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeSet;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.TestReport;
@@ -14,6 +12,7 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -43,7 +42,7 @@ public class AuthenticateTestAgent extends TestAgent
 {
 	//-------- test settings --------
 	
-	// Define expected test results for scenarios (un=unrestricted, cus=custom, def=default).
+	// Define expected test results for scenarios (un=unrestricted, cus=custom/role, def=default).
 	protected static boolean[][]	tests	= new boolean[][]
 	{
 		// Annot.:		un		def		cus		cus2	def		cus		un		def
@@ -202,19 +201,10 @@ public class AuthenticateTestAgent extends TestAgent
 				}
 				else
 				{
-					// Sort results by toString -->  Basic... goes first, then Overriding...
-					Collection<ITestService>	sorted	= new TreeSet<ITestService>(new Comparator<ITestService>()
-					{
-						@Override
-						public int compare(ITestService o1, ITestService o2)
-						{
-							return o1.toString().compareTo(o2.toString());
-						}
-					});
-					sorted.addAll(result);
-					System.out.println("Sorted services: "+sorted);
-					
-					final Iterator<ITestService>	it	= sorted.iterator();
+					// Sort results by provider.name -->  Basic... goes first, then Overriding...
+					final Iterator<ITestService>	it	= result.stream().sorted(
+							(s1, s2) -> ((IService)s1).getServiceId().getProviderId().getName()
+								.compareTo(((IService)s2).getServiceId().getProviderId().getName())).iterator();
 					invokeService(it.next())
 						.addResultListener(new DelegationResultListener<boolean[]>(ret)
 					{
