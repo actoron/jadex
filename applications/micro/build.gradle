@@ -15,6 +15,10 @@ sourceSets
 	}
 }
 
+// Hack for ReflectionInvocationTest, which needs to use bdiv3 test classes without dependency
+afterEvaluate {
+	test.dependsOn project(':applications:bdiv3').compileTestJava
+}
 
 dependencies 
 {
@@ -32,7 +36,7 @@ dependencies
 	testImplementation project(':transports:tcp')
 	testImplementation project(':transports:websockettransport')
 	testImplementation project(':transports:relaytransport')
-	
+
 	api 'com.github.sarxos:webcam-capture:0.3.9'
 	api 'org.jcodec:jcodec:0.1.5'
 }
