@@ -1,5 +1,6 @@
 package jadex.micro.testcases.servicereflection;
 
+import java.io.File;
 import java.util.Arrays;
 
 import jadex.base.IPlatformConfiguration;
@@ -51,7 +52,7 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 		{
 			IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(ProviderAgent.class.getName()+".class"));
 			cid = fut.get().getId();
-			IService ser = (IService)agent.searchService(new ServiceQuery(new ClassInfo("jadex.micro.testcases.servicereflection.IExampleService"))).get();
+			IService ser = (IService)agent.searchService(new ServiceQuery<>(new ClassInfo("jadex.micro.testcases.servicereflection.IExampleService"))).get();
 			Object result = ser.invokeMethod("add", null, new Object[]{1,2}).get();
 			System.out.println("Got result: "+result);
 			tr.setSucceeded(true);
@@ -83,7 +84,7 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 			IExternalAccess platform = Starter.createPlatform().get();
 			IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo().setFilename(ProviderAgent.class.getName()+".class"));
 			cid = fut.get().getId();
-			IService ser = (IService)platform.searchService(new ServiceQuery(new ClassInfo("jadex.micro.testcases.servicereflection.IExampleService")).setScope(ServiceScope.PLATFORM)).get();
+			IService ser = (IService)platform.searchService(new ServiceQuery<>(new ClassInfo("jadex.micro.testcases.servicereflection.IExampleService")).setScope(ServiceScope.PLATFORM)).get();
 			Object result = ser.invokeMethod("add", null, new Object[]{1,2}).get();
 			System.out.println("Got result: "+result);
 			tr.setSucceeded(true);
@@ -114,10 +115,10 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 		tr = new TestReport("#3", "Test if reflective remote call without service interface class works");
 		try
 		{
-			//System.out.println(Class.forName("jadex.bdiv3.testcases.servicereflection.INotVisibleService"));
-//			System.out.println("curdir: "+new File(".").getAbsolutePath());
+			File[]	dirs	= SUtil.findOutputDirs("applications/bdiv3", true);
+			System.out.println(agent+" outputs: "+Arrays.toString(dirs));
 			IPlatformConfiguration	config	= STest.getDefaultTestConfig(this.getClass());
-			config.setValue("libpath", SUtil.findOutputDirs("applications/bdiv3", true));
+			config.setValue("libpath", dirs);
 			IExternalAccess platform = Starter.createPlatform(config).get();
 //			ILibraryService libser = platform.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class)).get();
 //			libser.addURL(parid, url).get();
