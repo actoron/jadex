@@ -1,4 +1,0 @@
-# avoid mixed line endings (lf for generated lines vs. crlf for lines copied from .jjt) when generated on windows
-src/main/jjtree/jadex/javaparser/javaccimpl/*.jjt text eol=lf
-build/generated/javacc/jadex/javaparser/javaccimpl/*.java text eol=lf
-build/generated/jjtree/jadex/javaparser/javaccimpl/*.jj text eol=lf
