@@ -2,7 +2,6 @@ package jadex.tools.web.starter;
 
 import java.util.Collection;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
@@ -23,5 +22,5 @@ public interface IJCCStarterService extends IJCCPluginService
 	/**
 	 *  Create a component for a model.
 	 */
-	public IFuture<IComponentIdentifier> createComponent(ClassInfo model);
+	public IFuture<IComponentIdentifier> createComponent(String model);
 }

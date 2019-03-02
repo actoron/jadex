@@ -2576,18 +2576,24 @@ public class SUtil
 	 * @param transporturi Transport-style URI (tcp-mtp://hostpart:port or tcp-mtp://[h:o:s:t%scope]:port for ipv6)
 	 * @return URI
 	 */
-	public static URI toURI(String transporturi) {
+	public static URI toURI(String transporturi) 
+	{
 		URI ret = null;
-		try {
+		try 
+		{
 			// by default, transporturis should be valid URIs.
 			ret = new URI(transporturi);
-			if (ret.getHost() == null) { // URI may not throw, but instead use the whole string as "authority" :(
+			if (ret.getHost() == null) 
+			{ // URI may not throw, but instead use the whole string as "authority" :(
 				throw new URISyntaxException(transporturi, "No hostname found while converting to URI");
 			}
-		} catch (URISyntaxException e) {
+		} 
+		catch (URISyntaxException e) 
+		{
 			// for backword compatibility, handle wrongly formatted IPv6 transport "addresses"
 			// see https://www.ietf.org/rfc/rfc2732.txt for correct format.
-			if (transporturi.contains("%") && !transporturi.contains("[")) {
+			if (transporturi.contains("%") && !transporturi.contains("[")) 
+			{
 //				tcp-mtp://fe80:0:0:0:8cf:5aff:feeb:f199%eth0:42716
 				int schemaend = transporturi.indexOf("://");
 				int portdiv = transporturi.lastIndexOf(':');
@@ -2600,21 +2606,21 @@ public class SUtil
 				{
 					port = Integer.parseInt(transporturi.substring(portdiv+1));
 				}
-					try 
-					{
-						ret =  new URI(scheme, null, hostname, port, null, null, null);
-//						System.out.println("silently converted wrongly formatted URI: " + transporturi);
-					} 
-					catch (URISyntaxException e1) 
-					{
-						e1.printStackTrace();
-						rethrowAsUnchecked(e);
-					}
-				} 
-				else 
+				try 
 				{
+					ret =  new URI(scheme, null, hostname, port, null, null, null);
+//						System.out.println("silently converted wrongly formatted URI: " + transporturi);
+				} 
+				catch (URISyntaxException e1) 
+				{
+					e1.printStackTrace();
 					rethrowAsUnchecked(e);
 				}
+			} 
+			else 
+			{
+				rethrowAsUnchecked(e);
+			}
 		}
 		return ret;
 	}
@@ -2994,7 +3000,7 @@ public class SUtil
 	/**
 	 *  Get bytes as human readable string.
 	 */
-	public static String	bytesToString(long bytes)
+	public static String bytesToString(long bytes)
 	{
 		String ret;
 		if(bytes>0)

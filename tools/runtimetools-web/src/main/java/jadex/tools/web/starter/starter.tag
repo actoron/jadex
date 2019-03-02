@@ -12,7 +12,7 @@
 	    	</thead>
 			<tbody>
 				<tr each="{x in orderBy(models)}">
-					<td><a href="{getMethodPrefix()+'&methodname=createComponent&args_0='+x+'&argtypes_0=jadex.bridge.ClassInfo'}">{x}</a></td>
+					<td><a href="{getMethodPrefix()+'&methodname=createComponent&args_0='+x+'&argtypes_0=java.lang.String'}">{x}</a></td>
 				</tr>
 			</tbody>
 		</table>

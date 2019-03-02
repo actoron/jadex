@@ -150,11 +150,17 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				}
 				
 				Method m = BasicService.getInvokeMethod(si.getDomainService().getClass(), ia.getClassLoader(), methodname, argtypes);
-				sic.setMethod(m);
-
-				sic.setArguments(SUtil.arrayToList(as));
-				
-				sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+				if(m!=null)
+				{
+					sic.setMethod(m);
+					sic.setArguments(SUtil.arrayToList(as));
+					sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				else
+				{
+					sic.setResult(new RuntimeException("Method not found: "+methodname+" "+Arrays.toString(argtypes)));
+					return IFuture.DONE;
+				}
 			}
 			else if(SERVICEMETHODS.contains(sic.getMethod()))
 			{

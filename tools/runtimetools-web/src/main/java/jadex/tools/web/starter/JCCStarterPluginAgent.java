@@ -1,6 +1,7 @@
 package jadex.tools.web.starter;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
@@ -12,6 +13,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
@@ -76,19 +78,19 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 		// Remove JVM jars
 		urls = SUtil.removeSystemUrls(urls);
 		
-		Set<SClassReader.ClassInfo> cis = SReflect.scanForClassInfos(urls, null, new IFilter<SClassReader.ClassInfo>()
+		Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(urls, null, new IFilter<SClassReader.ClassFileInfo>()
 		{
-			public boolean filter(SClassReader.ClassInfo ci)
+			public boolean filter(SClassReader.ClassFileInfo ci)
 			{
 				boolean ret = false;
-				AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
+				AnnotationInfo ai = ci.getClassInfo().getAnnotation(Agent.class.getName());
 				if(ai!=null)
 					ret = true;
 				return ret;
 			}
 		});
 		
-		List<String> res = cis.stream().map(a -> a.getClassName()).collect(Collectors.toList());
+		List<String> res = cis.stream().map(a -> a.getFilename()).collect(Collectors.toList());
 				
 		//System.out.println("Models found: "+res);
 		return new Future<Collection<String>>(res);
@@ -97,9 +99,44 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 	/**
 	 *  Create a component for a model.
 	 */
-	public IFuture<IComponentIdentifier> createComponent(ClassInfo model)
+	public IFuture<IComponentIdentifier> createComponent(String filename)
 	{
-		IExternalAccess comp = agent.createComponent(new CreationInfo().setFilename(model.getTypeName()+".class")).get();
+		System.out.println("webjcc start: "+filename);
+		
+		// Search rid of the filename
+		// Must scan available rids of platform and compare start points :-(
+		
+		ILibraryService ls = agent.getLocalService(ILibraryService.class);
+		List<IResourceIdentifier> rids = ls.getAllResourceIdentifiers().get();
+		
+		IResourceIdentifier rid = null;
+		for(IResourceIdentifier r: rids)
+		{
+			if(r.getLocalIdentifier()!=null && r.getLocalIdentifier().getUri()!=null)
+			{
+				try
+				{
+					String test = r.getLocalIdentifier().getUri().toString();
+					URI u = SUtil.toURL(filename).toURI();
+					if(u.toString().startsWith(test))
+					{
+//						System.out.println("found: "+r);
+						rid = r;
+						break;
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		CreationInfo ci = new CreationInfo().setFilename(filename);
+		if(rid!=null)
+			ci.setResourceIdentifier(rid);
+		
+		IExternalAccess comp = agent.createComponent(ci).get();
 		return new Future<IComponentIdentifier>(comp.getId());
 	}
 	

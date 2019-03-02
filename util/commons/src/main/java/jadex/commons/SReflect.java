@@ -37,6 +37,7 @@ import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import jadex.commons.SClassReader.ClassFileInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.collection.SCollection;
 import jadex.commons.collection.WeakValueMap;
@@ -1848,17 +1849,18 @@ public class SReflect
 		return ret.toArray(new String[ret.size()]);
 	}
 	
-	protected static Map<Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>, Set<ClassInfo>> CICACHE	= Collections.synchronizedMap(new LinkedHashMap<>());
+	// This cache cannot really work due to a key with plain objects like filters (other filter object = new entry)
+//	protected static Map<Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>, Set<ClassInfo>> CICACHE	= Collections.synchronizedMap(new LinkedHashMap<>());
 	
 	/**
 	 *  Scan for component classes in the classpath.
 	 */
 	public static Set<ClassInfo> scanForClassInfos(URL[] urls, IFilter<Object> filefilter, IFilter<ClassInfo> classfilter)
 	{
-		Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>	key
-			= new Tuple3<>(new HashSet<>(Arrays.asList(urls)), filefilter, classfilter);
+//		Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>	key
+//			= new Tuple3<>(new HashSet<>(Arrays.asList(urls)), filefilter, classfilter);
 		
-		Set<ClassInfo> ret = CICACHE.get(key);
+		Set<ClassInfo> ret = null;//CICACHE.get(key);
 		if(ret==null)
 		{
 			ret	= new LinkedHashSet<>();
@@ -1912,7 +1914,81 @@ public class SReflect
 					}
 				}
 			}
-			CICACHE.put(key, ret);
+//			CICACHE.put(key, ret);
+//			System.out.println("scanned class infos cache size: "+CICACHE.size());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Scan for component classes in the classpath.
+	 */
+	public static Set<ClassFileInfo> scanForClassFileInfos(URL[] urls, IFilter<Object> filefilter, IFilter<ClassFileInfo> classfilter)
+	{
+//		Tuple3<Set<URL>, IFilter<Object>, IFilter<ClassInfo>>	key
+//			= new Tuple3<>(new HashSet<>(Arrays.asList(urls)), filefilter, classfilter);
+		
+//		Set<ClassInfo> ret = CICACHE.get(key);
+		
+		Set<ClassFileInfo> ret = null;
+		
+		if(ret==null)
+		{
+			ret	= new LinkedHashSet<>();
+			
+			if(filefilter==null)
+				filefilter = new jadex.commons.FileFilter("$", false, ".class");
+			Map<String, Set<String>> files = SReflect.scanForFiles2(urls, filefilter);
+			
+			//int cnt = 0;
+			for(Map.Entry<String, Set<String>> entry: files.entrySet())
+			{
+				String jarname = entry.getKey();
+				if(jarname!=null)
+				{
+					try(JarFile jar	= new JarFile(jarname))
+					{
+						for(String jename: entry.getValue())
+						{
+							JarEntry je = jar.getJarEntry(jename);
+							InputStream is = jar.getInputStream(je);
+							ClassInfo ci = SClassReader.getClassInfo(jarname+jename, is, new Date(je.getLastModifiedTime().toMillis()));
+							ClassFileInfo cfi = new ClassFileInfo(ci, jarname+jename);
+							if(classfilter.filter(cfi))
+							{
+								ret.add(cfi);
+							}
+						}
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				else
+				{
+					for(String filename: entry.getValue())
+					{
+						File inputfile = new File(filename);
+						try(FileInputStream is = new FileInputStream(inputfile))
+						{
+							ClassInfo ci = SClassReader.getClassInfo(filename, is, new Date(inputfile.lastModified()));
+							ClassFileInfo cfi = new ClassFileInfo(ci, filename);
+							if(classfilter.filter(cfi))
+							{
+								ret.add(new ClassFileInfo(ci, filename));
+							}
+	//						System.out.println(cnt++);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+//			CICACHE.put(key, ret);
 //			System.out.println("scanned class infos cache size: "+CICACHE.size());
 		}
 		
