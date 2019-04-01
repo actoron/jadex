@@ -90,6 +90,7 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 			}
 		});
 		
+		// Collect filenames of models to load the models without knowing the rid (can then be extracted)
 		List<String> res = cis.stream().map(a -> a.getFilename()).collect(Collectors.toList());
 				
 		//System.out.println("Models found: "+res);
@@ -103,40 +104,7 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 	{
 		System.out.println("webjcc start: "+filename);
 		
-		// Search rid of the filename
-		// Must scan available rids of platform and compare start points :-(
-		
-		ILibraryService ls = agent.getLocalService(ILibraryService.class);
-		List<IResourceIdentifier> rids = ls.getAllResourceIdentifiers().get();
-		
-		IResourceIdentifier rid = null;
-		for(IResourceIdentifier r: rids)
-		{
-			if(r.getLocalIdentifier()!=null && r.getLocalIdentifier().getUri()!=null)
-			{
-				try
-				{
-					String test = r.getLocalIdentifier().getUri().toString();
-					URI u = SUtil.toURL(filename).toURI();
-					if(u.toString().startsWith(test))
-					{
-//						System.out.println("found: "+r);
-						rid = r;
-						break;
-					}
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		CreationInfo ci = new CreationInfo().setFilename(filename);
-		if(rid!=null)
-			ci.setResourceIdentifier(rid);
-		
-		IExternalAccess comp = agent.createComponent(ci).get();
+		IExternalAccess comp = agent.createComponent(new CreationInfo().setFilename(filename)).get();
 		return new Future<IComponentIdentifier>(comp.getId());
 	}
 	

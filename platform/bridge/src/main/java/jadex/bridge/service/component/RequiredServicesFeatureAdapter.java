@@ -42,6 +42,17 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	
 	/**
 	 *  Resolve a required service of a given type.
+	 *  Synchronous method only for locally available services.
+	 *  @param type The service type.
+	 *  @return The service.
+	 */
+	public <T> T getLocalService0(Class<T> type)
+	{
+		return delegate.getLocalService0(type);
+	}
+	
+	/**
+	 *  Resolve a required service of a given type.
 	 *  Asynchronous method for locally as well as remotely available services.
 	 *  @param type The service type.
 	 *  @return The service.
@@ -116,7 +127,7 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	{
 		return delegate.getLocalServices(type);
 	}
-
+	
 	//-------- methods for searching --------
 	
 	/**

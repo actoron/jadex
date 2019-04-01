@@ -26,9 +26,17 @@ public interface IRequiredServicesFeature extends IExternalRequiredServicesFeatu
 	 *  Resolve a declared required service of a given type.
 	 *  Synchronous method only for locally available services.
 	 *  @param type The service type.
-	 *  @return The service or ServiceNotFoundException
+	 *  @return The service or ServiceNotFoundException.
 	 */
 	public <T> T getLocalService(Class<T> type);
+	
+	/**
+	 *  Resolve a declared required service of a given type.
+	 *  Synchronous method only for locally available services.
+	 *  @param type The service type.
+	 *  @return The service or null.
+	 */
+	public <T> T getLocalService0(Class<T> type);
 	
 	/**
 	 *  Resolve a declared required services of a given name.

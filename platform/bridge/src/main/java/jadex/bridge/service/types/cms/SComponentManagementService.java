@@ -2,6 +2,7 @@ package jadex.bridge.service.types.cms;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -955,29 +956,82 @@ public class SComponentManagementService
 			ret.setResult(ci.getResourceIdentifier());
 		}
 		// Local parent //(but not platform -> platform now has valid rid).
-		else if(ci!=null 
+		else //if(ci!=null 
 //			&& !ci.getParent().equals(root.getComponentIdentifier())
 //			&& (ci.getParent()==null || !isRemoteComponent(ci.getParent(), agent)) //FIXME: PARENT
 //			&& !initinfos.containsKey(ci.getParent())	// does not work during init as external access is not available!?
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
-			)
+			//)
 		{
-			//IExternalAccess ea = getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), agent); //FIXME: PARENT
-			IExternalAccess ea = getExternalAccess(agent.getId(), agent);
-			ea.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, IResourceIdentifier>(ret)
+//			IExternalAccess ea = getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), agent); //FIXME: PARENT
+
+			// fix local parent case!
+			
+			// check if filename is full path (and thus file url)
+			URI u = null;
+			try
 			{
-				public void customResultAvailable(IModelInfo model)
+				u = SUtil.toURL(ci.getFilename()).toURI();
+			}
+			catch(Exception e)
+			{
+//				e.printStackTrace();
+			}
+			if(u!=null)
+			{
+				final URI fu = u;
+				ILibraryService ls = agent.getLocalService0(ILibraryService.class);
+				if(ls!=null)
 				{
-					ret.setResult(model.getResourceIdentifier());
+					ls.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, IResourceIdentifier>(ret)
+					{
+						@Override
+						public void customResultAvailable(List<IResourceIdentifier> rids) throws Exception
+						{
+							IResourceIdentifier rid = null;
+							for(IResourceIdentifier r: rids)
+							{
+								if(r.getLocalIdentifier()!=null && r.getLocalIdentifier().getUri()!=null)
+								{
+									String test = r.getLocalIdentifier().getUri().toString();
+									
+									if(fu.toString().startsWith(test))
+									{
+	//									System.out.println("found: "+r);
+										rid = r;
+										break;
+									}
+								}
+							}		
+							
+//							System.out.println("loading1: "+ci.getFilename()+" with rid: "+rid);
+							ret.setResult(rid);
+						}
+					});
 				}
-			}));
+			}
+			else
+			{
+				// todo: is this ok (why use platform agent, cannot load extra added agents froms jars then)? 
+				// Could also use 'null' for all CPs  
+				
+				IExternalAccess ea = getExternalAccess(agent.getId(), agent);
+				ea.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, IResourceIdentifier>(ret)
+				{
+					public void customResultAvailable(IModelInfo model)
+					{
+//						System.out.println("loading2: "+ci.getFilename()+" with rid: "+model.getResourceIdentifier());
+						ret.setResult(model.getResourceIdentifier());
+					}
+				}));
+			}
 		}
 		// Remote or no parent or platform as parent
-		else
-		{
-			// null resource identifier for searching in all current libservice resources.
-			ret.setResult(null);
-		}
+//		else
+//		{
+//			// null resource identifier for searching in all current libservice resources.
+//			ret.setResult(null);
+//		}
 		return ret;
 	}
 	

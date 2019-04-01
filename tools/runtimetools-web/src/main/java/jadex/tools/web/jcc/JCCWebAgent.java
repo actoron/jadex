@@ -44,7 +44,7 @@ import jadex.micro.annotation.Publish;
 		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="[http://localhost:8080/]webjcc"))
 	//@ProvidedService(name="starterweb", type=IStarterWebService.class)
 })
-@Agent(autostart=Boolean3.TRUE,
+@Agent(autostart=Boolean3.FALSE,
 	predecessors="jadex.extension.rs.publish.JettyRSPublishAgent") // Hack! could be other publish agent :-(
 public class JCCWebAgent implements IJCCWebService
 {
