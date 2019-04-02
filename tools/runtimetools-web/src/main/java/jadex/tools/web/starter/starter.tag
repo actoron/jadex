@@ -1,16 +1,18 @@
 <starter>
 	<div class="container-fluid">
-		<div class="row">
-			<div class="col-12">
-				<h3>Available Component Models</h3>
+		<div class="sticky-top" style="background-color: rgba(255,255,255,0.8)">
+			<div class="row">
+				<div class="col-12">
+					<h3>Available Component Models</h3>
+				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-11 p-1">
-				<input type="text" ref="filename" style="width: 100%"">
-			</div>
-			<div class="col-1 p-1">
-				<button class="float-right" style="width: 100%" onclick="{start}">Start</button>
+			<div class="row">
+				<div class="col-11 p-1">
+					<input type="text" ref="filename" style="width: 100%">
+				</div>
+				<div class="col-1 p-1">
+					<button class="float-right" style="width: 100%" onclick="{start}">Start</button>
+				</div>
 			</div>
 		</div>
 		<div class="row">
