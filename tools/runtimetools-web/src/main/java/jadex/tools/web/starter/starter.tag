@@ -1,33 +1,23 @@
 <starter>
-
-	<!-- <h2>Starter {cid}</h2>  -->
-	
-	<div class="container">
-		<h3>Available Component Models</h3>
-		<table class="table table-bordered" class="modellist">
-			<thead>
-	    		<tr>
-	    			<th>Model name</th>
-	    		</tr>
-	    	</thead>
-			<tbody>
-				<div id="modeltree">
-					<ul>
-						<li>Root node 1
-				        	<ul>
-				          		<li id="child_node_1">Child node 1</li>
-				          		<li>Child node 2</li>
-				        	</ul>
-				      	</li>
-				      	<li>Root node 2</li>
-				    </ul>
-				</div>
-				
-				<tr each="{x in orderBy(models)}">
-					<td><a href="{getMethodPrefix()+'&methodname=createComponent&args_0='+x+'&argtypes_0=java.lang.String'}">{x}</a></td>
-				</tr>
-			</tbody>
-		</table>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12">
+				<h3>Available Component Models</h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-11 p-1">
+				<input type="text" ref="filename" style="width: 100%"">
+			</div>
+			<div class="col-1 p-1">
+				<button class="float-right" style="width: 100%" onclick="{start}">Start</button>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12">
+				<div id="modeltree"></div>
+			</div>
+		</div>
 	</div>
 	
 	<style>
@@ -43,9 +33,10 @@
 	
 	<script>
 		//console.log("starter: "+opts);
-		// +'&contenttype=application/json'
+
+		var treeid = "modeltree";
 		
-		$(function() { $('#modeltree').jstree(
+		$(function() { $('#'+treeid).jstree(
 		{
 			"core" : {"check_callback" : true}//,
 			//"plugins" : ["dnd","contextmenu"]
@@ -54,6 +45,7 @@
 		var self = this;
 		self.cid = opts!=null? opts.cid: null;
 		self.models = [];
+		self.selected = null;
 		
 		var myservice = "jadex.tools.web.starter.IJCCStarterService";
 		
@@ -68,10 +60,22 @@
 			//console.log(resp.data);
 			
 			self.models = resp.data;
-			createModelTree();
+			createModelTree(treeid);
+			$("#modeltree").jstree('open_all');
 			self.update();
 		});
-			
+		
+		this.on('mount', function()
+		{
+		    console.log("adding listener");
+			$('#'+treeid).on('select_node.jstree', function (e, data) 
+			{
+				selected = data.instance.get_path(data.node,'/');
+				self.refs.filename.value = selected;
+				//console.log('Selected: ' + selected); 
+			});
+		});
+		
 		self.update();
 		
 		// todo: order by name
@@ -87,69 +91,66 @@
 			return res; 
 		}
 		
-		function createModelTree()
+		start(e)
 		{
-			$('#modeltree').empty();
-			
-			createNodes('modeltree', self.models[0]);
-			
-			/*for(i=0; i<self.models.length; i++)
+			console.log(e+" "+selected);
+			if(selected!=null)
 			{
-				if(self.models[i].indexOf("\\")!=-1)
-					sep = "\\";
-				var parts = self.models[i].split(sep);
-				
-				var lastprefix = 'modeltree';
-				var prefix = '';
-				for(j=0; j<parts.length; j++)
+				axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
 				{
-					prefix = lastprefix+"_"+parts[j];
-					if(document.getElementById(prefix)==null)
-					{
-						createNode('modeltree', lastprefix, prefix, parts[j], 'last');
-					}
-					else
-					{
-						console.log("exists: "+prefix);
-					}
-					lastprefix = prefix;
-				}
-			}*/
+					console.log("started: "+resp.data);
+				});
+			}
+		}
+		
+		function createModelTree(treeid)
+		{
+			empty(treeid);
+			
+			for(var i=0; i<self.models.length; i++)
+			{
+				//console.log(self.models[i]);
+				createNodes(treeid, self.models[i]);
+			}
+		}
+		
+		function empty(treeid)
+		{
+			// $('#'+treeid).empty(); has problem when readding nodes :-(
+
+			var roots = $('#'+treeid).jstree().get_node('#').children;
+			for(var i=0; i<roots.length; i++)
+			{
+				$('#'+treeid).jstree('delete_node', roots[i]);
+			}
 		}
 		
 		function createNodes(treeid, model)
 		{
-			alert("here");
-			
+			var sep = "/";
 			if(model.indexOf("\\")!=-1)
 				sep = "\\";
 			var parts = model.split(sep);
 			
-			var lastprefix = treeid;
-			var prefix = '';
+			var lastprefix = '';
+			var prefix = parts[0];
 			
-			var cnt = 0;
-			
-			var func = function()
+			for(var i=0; i<parts.length; i++)
 			{
-				console.log("donefunc");
+				prefix = !lastprefix? parts[i]: lastprefix+sep+parts[i];
+				if(!$('#'+treeid).jstree('get_node', prefix))
+					createNode(treeid, lastprefix, prefix, parts[i], 'last');
+				//else
+				//	console.log("not creating: "+prefix);
 				lastprefix = prefix;
-				if(++cnt<parts.length)
-				{
-					prefix = lastprefix+"_"+parts[cnt];
-					createNode(treeid, lastprefix, prefix, parts[cnt], 'last', this);
-				}
-			};
-			
-			createNode(treeid, lastprefix, prefix, parts[cnt], 'last', func);
+			}
 		}
 		
 		// createNode(parent, id, text, position), position 'first' or 'last'
-		function createNode(treeid, parent_node_id, new_node_id, new_node_text, position, donefunc) 
+		function createNode(treeid, parent_node_id, new_node_id, new_node_text, position)//, donefunc) 
 		{
-			var pa = document.getElementById(parent_node_id);
-			console.log('modeltree'+" "+pa+" "+parent_node_id+" "+new_node_id+" "+new_node_text);
-			$('#'+treeid).jstree().create_node(pa, {"text": new_node_text, "id": new_node_id }, 'last', donefunc);	
+			//console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
+			$('#'+treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
 		}
 	</script>
 </starter>
