@@ -10,6 +10,7 @@ import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
+
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 public class JsonEnumProcessor extends AbstractJsonProcessor
@@ -24,7 +25,7 @@ public class JsonEnumProcessor extends AbstractJsonProcessor
 	protected boolean isApplicable(Object object, Type type, ClassLoader targetcl, JsonReadContext context)
 	{
 		Class<?> clazz = SReflect.getClass(type);
-		return object instanceof JsonObject && clazz!=null && clazz.isEnum();
+		return (object instanceof JsonObject || object instanceof JsonValue) && clazz!=null && clazz.isEnum();
 	}
 	
 	/**
@@ -49,20 +50,30 @@ public class JsonEnumProcessor extends AbstractJsonProcessor
 	 */
 	protected Object readObject(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, JsonReadContext context)
 	{
-		JsonObject obj = (JsonObject)object;
-		Class<?> clazz = SReflect.getClass(type);
+		Enum ret = null;
 		
-		String val = obj.getString("value", null);
-		
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		Enum ret = Enum.valueOf((Class<Enum>)clazz, val);
-		
-//		traversed.put(object, ret);
-//		((JsonReadContext)context).addKnownObject(ret);
-		
-		JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
-		if(idx!=null)
-			((JsonReadContext)context).addKnownObject(ret, idx.asInt());
+		if(object instanceof JsonObject)
+		{
+			JsonObject obj = (JsonObject)object;
+			Class<?> clazz = SReflect.getClass(type);
+			
+			String val = obj.getString("value", null);
+			
+			ret = Enum.valueOf((Class<Enum>)clazz, val);
+			
+			JsonValue idx = (JsonValue)obj.get(JsonTraverser.ID_MARKER);
+			if(idx!=null)
+				((JsonReadContext)context).addKnownObject(ret, idx.asInt());
+//			traversed.put(object, ret);
+//			((JsonReadContext)context).addKnownObject(ret);
+		}
+		else if(object instanceof JsonValue)
+		{
+			String val = ((JsonValue)object).asString();
+			Class<?> clazz = SReflect.getClass(type);
+			
+			ret = Enum.valueOf((Class<Enum>)clazz, val);
+		}
 		
 		return ret;
 	}

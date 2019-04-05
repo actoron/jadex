@@ -1,6 +1,6 @@
 <starter>
 	<div class="container-fluid">
-		<div class="sticky-top bgwhitealpha m-2 p-2">
+		<div hide="{model==null}" class="sticky-top bgwhitealpha m-2 p-2">
 			<div class="row m-1">
 				<div class="col-12">
 					<h3>Settings</h3>
@@ -221,11 +221,15 @@
 			console.log(e+" "+selected);
 			if(selected!=null)
 			{
-				var conf = self.refs.config.options[e.selectedIndex]!=null? self.refs.config.options[e.selectedIndex].value: null;
-				var gen = self.refs.autogen.checked;
-				var name = self.refs.name.value;
-				var gencnt = self.refs.gencnt.value;
+				var conf = self.refs.config.value;
+				var sync = self.refs.synchronous.checked;
+				var sus = self.refs.suspended.checked;
+				var mon = self.refs.monitoring.value;
 				
+				var gen = self.refs.autogen.checked;
+				var gencnt = self.refs.gencnt.value;
+				var name = self.refs.name.value;
+
 				var args = {};
 				if(self.model!=null && self.model.arguments!=null)
 				{
@@ -237,7 +241,14 @@
 					}
 				}
 				
-				var ci = {configname: conf, name: name, filename: self.model.filename};
+				var ci = {filename: selected};
+				if(conf!=null && conf.length>0)
+					ci.configuration = conf;
+				ci.synchronous = sync;
+				ci.suspended = sus;
+				ci.monitoring = mon;
+				if(name!=null && name.length>0)
+					ci.name = name;
 				
 				//axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
 				axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", self.transform).then(function(resp)

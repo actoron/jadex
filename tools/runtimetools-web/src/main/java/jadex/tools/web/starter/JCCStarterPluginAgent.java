@@ -119,9 +119,9 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 	 */
 	public IFuture<IComponentIdentifier> createComponent(CreationInfo ci)
 	{
-		System.out.println("webjcc start: "+ci);
+		System.out.println("webjcc start: "+ci+", "+Thread.currentThread());
 		
-		IExternalAccess comp = agent.createComponent(ci).get();
+		IExternalAccess comp = agent.getExternalAccess(agent.getId().getRoot()).createComponent(ci).get();
 		return new Future<IComponentIdentifier>(comp.getId());
 	}
 	
