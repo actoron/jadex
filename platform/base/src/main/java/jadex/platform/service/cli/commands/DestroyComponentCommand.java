@@ -3,7 +3,7 @@ package jadex.platform.service.cli.commands;
 import java.util.Iterator;
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.SUtil;
@@ -31,7 +31,7 @@ public class DestroyComponentCommand extends ACliCommand
 			{
 				val += "@"+pfn;
 			}
-			return new BasicComponentIdentifier(val);
+			return new ComponentIdentifier(val);
 		}
 	};
 	

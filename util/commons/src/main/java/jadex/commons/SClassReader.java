@@ -956,6 +956,68 @@ public class SClassReader
     }
     
     /**
+     *  Class for infos about a class with full filename.
+     */
+    public static class ClassFileInfo
+    {
+    	/** The class info. */
+    	protected ClassInfo classinfo;
+    	
+    	/** The filename. */
+    	protected String filename;
+    	
+    	/**
+    	 *  Create a new info.
+    	 */
+		public ClassFileInfo() 
+		{
+		}
+    	
+    	/**
+    	 *  Create a new info.
+    	 * @param classinfo
+    	 * @param filename
+    	 */
+		public ClassFileInfo(ClassInfo classinfo, String filename) 
+		{
+			this.classinfo = classinfo;
+			this.filename = filename;
+		}
+
+		/**
+		 * @return the classinfo
+		 */
+		public ClassInfo getClassInfo() 
+		{
+			return classinfo;
+		}
+
+		/**
+		 * @param classinfo the classinfo to set
+		 */
+		public void setClassInfo(ClassInfo classinfo) 
+		{
+			this.classinfo = classinfo;
+		}
+
+		/**
+		 * @return the filename
+		 */
+		public String getFilename() 
+		{
+			return filename;
+		}
+
+		/**
+		 * @param filename the filename to set
+		 */
+		public void setFilename(String filename) 
+		{
+			this.filename = filename;
+		} 
+    }
+    
+    /**
      *  Class for infos about a class.
      */
     public static class ClassInfo extends AnnotatedEntity

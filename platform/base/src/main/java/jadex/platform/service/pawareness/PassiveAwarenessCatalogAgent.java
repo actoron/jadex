@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
@@ -104,7 +104,7 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 	 */
 	public IFuture<Void> removePlatform(String name)
 	{
-		IComponentIdentifier id = new BasicComponentIdentifier(name);
+		IComponentIdentifier id = new ComponentIdentifier(name);
 		Collection<TransportAddress> addrs = catalog.remove(id);
 		if (addrs == null)
 		{
@@ -161,10 +161,10 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 			String name = url.substring(protend + 3, nameend);
 			String addr = url.substring(nameend + 1);
 			
-			IComponentIdentifier relayid = new BasicComponentIdentifier(name);
+			IComponentIdentifier relayid = new ComponentIdentifier(name);
 			if (!agent.getId().getRoot().equals(relayid))
 			{
-				ret = new TransportAddress(new BasicComponentIdentifier(name), prot, addr);
+				ret = new TransportAddress(new ComponentIdentifier(name), prot, addr);
 			}
 			// else ignore self
 		}

@@ -1,9 +1,12 @@
 package jadex.bridge.service.types.serialization;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMsgHeader;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 /**
@@ -51,6 +54,21 @@ public interface ISerializationServices
 	 *  @return The clone processors.
 	 */
 	public List<ITraverseProcessor> getCloneProcessors();
+	
+	/**
+	 *  Convert object to string.
+	 *  @param val The value.
+	 *  @return The string value.
+	 */
+	public String convertObjectToString(Object val, Class<?> type, ClassLoader cl, String mediatype, Object context);
+	
+	/**
+	 *  Convert string to object.
+	 *  @param val The value.
+	 *  @return The object.
+	 */
+	public Object convertStringToObject(String val, Class<?> type, ClassLoader cl, String mediatype, Object context);
+
 	
 //	/**
 //	 *  Gets the remote reference management.

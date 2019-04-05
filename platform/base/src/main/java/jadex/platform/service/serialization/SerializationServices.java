@@ -2,9 +2,15 @@ package jadex.platform.service.serialization;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
@@ -37,6 +43,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.RwMapWrapper;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.IUserContextContainer;
 import jadex.commons.transformation.traverser.TransformProcessor;
@@ -46,6 +53,7 @@ import jadex.platform.service.serialization.codecs.GZIPCodec;
 import jadex.platform.service.serialization.codecs.LZ4Codec;
 import jadex.platform.service.serialization.codecs.SnappyCodec;
 import jadex.platform.service.serialization.codecs.XZCodec;
+import jadex.platform.service.serialization.serializers.JadexBasicTypeSerializer;
 import jadex.platform.service.serialization.serializers.JadexBinarySerializer;
 import jadex.platform.service.serialization.serializers.JadexFramedBinarySerializer;
 import jadex.platform.service.serialization.serializers.JadexJsonSerializer;
@@ -107,6 +115,9 @@ public class SerializationServices implements ISerializationServices
 		serial = new JadexFramedBinarySerializer();
 //		serializers.put(serial.getSerializerId(), serial);
 		serializers[serial.getSerializerId()] = serial;
+		serial = new JadexBasicTypeSerializer();
+//		serializers.put(serial.getSerializerId(), serial);
+		serializers[serial.getSerializerId()] = serial;
 		defaultsendserializer = serializers[2];
 		optimizedsendserializer = serializers[0];
 		codecs = new ICodec[4];
@@ -118,7 +129,7 @@ public class SerializationServices implements ISerializationServices
 		codecs[codec.getCodecId()] = codec;
 		codec = new XZCodec();
 		codecs[codec.getCodecId()] = codec;
-		sendcodecs = new ICodec[] { codecs[3] };
+		sendcodecs = new ICodec[]{codecs[3]};
 		List<ITraverseProcessor> procs = createPreprocessors();
 		preprocessors = procs.toArray(new ITraverseProcessor[procs.size()]);
 		procs = createPostprocessors();
@@ -630,5 +641,53 @@ public class SerializationServices implements ISerializationServices
 	public static final ISerializationServices getSerializationServices(IComponentIdentifier platform)
 	{
 		return (ISerializationServices)Starter.getPlatformValue(platform, Starter.DATA_SERIALIZATIONSERVICES);
+	}
+
+	/**
+	 *  Get the remote reference module.
+	 *  @return the remote reference module.
+	 */
+	public RemoteReferenceModule getRemoteReferenceModule()
+	{
+		return rrm;
+	}
+	
+	/**
+	 *  Get the string converters (can convert to and from string, possibly only for some types).
+	 *  @return The converters.
+	 */
+	public Map<String, IStringConverter> getStringConverters()
+	{
+		return (Map<String, IStringConverter>)Arrays.stream(serializers).filter(new Predicate<ISerializer>() 
+		{
+			public boolean test(ISerializer t) 
+			{
+				return t instanceof IStringConverter;
+			}
+		}).collect((Collector)Collectors.toMap(IStringConverter::getType, Function.identity()));
+	}
+	
+	/**
+	 *  Convert object to string.
+	 *  @param val The value.
+	 *  @return The string value.
+	 */
+	public String convertObjectToString(Object val, Class<?> type, ClassLoader cl, String mediatype, Object context)
+	{
+		mediatype = mediatype!=null? mediatype: "basic";
+		IStringConverter conv = getStringConverters().get(mediatype);
+		return conv.convertObject(val, type, cl, context);	
+	}
+	
+	/**
+	 *  Convert string to object.
+	 *  @param val The value.
+	 *  @return The object.
+	 */
+	public Object convertStringToObject(String val, Class<?> type, ClassLoader cl, String mediatype, Object context)
+	{
+		mediatype = mediatype!=null? mediatype: "basic";
+		IStringConverter conv = getStringConverters().get(mediatype);
+		return conv.convertString(val, type, cl, context);
 	}
 }

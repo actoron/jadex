@@ -23,7 +23,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
 //      Logger.getLogger("ComponentTest").log(Level.INFO, "Trying to guess TestAgent name...");
         String className = this.getClass().getName();
         this.comp = extendWithClassIfNeeded(className);
-        this.config = STest.getDefaultTestConfig(getClass());
+        setConfig(STest.getDefaultTestConfig(getClass()));
     }
 
     /**
@@ -48,6 +48,7 @@ public abstract class JunitAgentTest extends ComponentTestLazyPlatform
 
     /**
      * Set platform config.
+     * Override to add/change config values.
      * @param config
      */
     public void setConfig(IPlatformConfiguration config) 

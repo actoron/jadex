@@ -3,7 +3,7 @@ package jadex.micro.benchmarks;
 import java.util.HashMap;
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -138,7 +138,7 @@ public class ParallelAgentCreationAgent
 									{
 										String name = createPeerName(i);
 //												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
-										final IComponentIdentifier cid = new BasicComponentIdentifier(name, agent.getId().getRoot());
+										final IComponentIdentifier cid = new ComponentIdentifier(name, agent.getId().getRoot());
 										agent.getExternalAccess(cid).killComponent().addResultListener(new IResultListener<Map<String, Object>>()
 										{
 											public void resultAvailable(Map<String, Object> result)

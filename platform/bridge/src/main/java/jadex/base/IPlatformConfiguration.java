@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.commons.ICommand;
 
 /**
  *  Interface for platform configuration.
@@ -807,6 +809,18 @@ public interface IPlatformConfiguration //extends IStarterConfiguration, IRootCo
      *  @param value The superpeer client flag.
      */
     public void setSuperpeerClient(boolean value);
+    
+    /**
+     *  Get the init command.
+     *  @return The cmd.
+     */
+    public ICommand<IComponentIdentifier> getInitCommand();
+
+    /**
+     *  Set the init cmd.
+     *  @param value The init cmd.
+     */
+    public void setInitCommand(ICommand<IComponentIdentifier> cmd);
     
 ////  /**
 ////  *  Get the kernel names.

@@ -5,7 +5,7 @@ import java.util.Collections;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 
@@ -63,6 +63,6 @@ public class RemoteMessagingTest
 //		cms.createComponent(SenderAgent.class.getName()+".class",
 		access2.createComponent(
 			new CreationInfo(Collections.singletonMap("receiver",
-				(Object)new BasicComponentIdentifier("Receiver", access1.getId()))).setFilename(BenchmarkAgent.class.getName()+".class")).get();
+				(Object)new ComponentIdentifier("Receiver", access1.getId()))).setFilename(BenchmarkAgent.class.getName()+".class")).get();
 	}
 }

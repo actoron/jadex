@@ -12,7 +12,8 @@ import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ClassInfo;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -25,6 +26,7 @@ import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.ServiceQuery;
@@ -44,6 +46,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
+import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -58,6 +61,8 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.BasicTypeConverter;
+import jadex.commons.transformation.IStringObjectConverter;
 import jadex.commons.transformation.traverser.TransformSet;
 import jadex.javaparser.SJavaParser;
 
@@ -107,6 +112,36 @@ public class Starter
 //    public static String DATA_SUPERPEER = "superpeer";
 
     
+   
+    
+    
+    /**
+     *  Convert a (string) parameter
+     *  @param val
+     *  @param target
+     *  @return
+     */
+    public static Object convertParameter(Object val, Class<?> target)
+    {
+    	Object ret = null;
+    	
+    	if(val!=null && SReflect.isSupertype(target, val.getClass()))
+    	{
+    		ret = val;
+    	}
+    	else if(val instanceof String && ((String)val).length()>0 && Starter.BASICCONVERTER.isSupportedType(target))
+    	{
+    		try
+    		{
+    			ret = Starter.BASICCONVERTER.getStringConverter(target).convertString((String)val, null);
+    		}
+    		catch(Exception e)
+    		{
+    		}
+    	}
+    	
+    	return ret;
+    }
 
 	/** Global platform data. For each platform stored by  */
     protected static final IRwMap<IComponentIdentifier, IRwMap<String, Object>> platformmem = new RwMapWrapper<IComponentIdentifier, IRwMap<String, Object>>(new HashMap<IComponentIdentifier, IRwMap<String, Object>>());
@@ -286,6 +321,7 @@ public class Starter
 //					}
 //				}, 5000);
 	}
+
 	
 	/**
 	 *  Create the platform.
@@ -583,7 +619,7 @@ public class Starter
 				try
 				{
 					Class<?> serialservclass = Class.forName("jadex.platform.service.serialization.SerializationServices", true, cl);
-					ISerializationServices servs = (ISerializationServices) serialservclass.getConstructor(IComponentIdentifier.class).newInstance(cid);
+					ISerializationServices servs = (ISerializationServices)serialservclass.getConstructor(IComponentIdentifier.class).newInstance(cid);
 					putPlatformValue(cid, DATA_SERIALIZATIONSERVICES, servs);
 				}
 				catch (Exception e)
@@ -614,6 +650,10 @@ public class Starter
 				initRescueThread(cid, config);	// Required for bootstrapping init.
 
 				IBootstrapFactory fac = (IBootstrapFactory)SComponentManagementService.getComponentFactory(cid);
+				
+				// Empty init can be overridden by users
+				if(config.getInitCommand()!=null)
+					config.getInitCommand().execute(cid);
 				
 				fac.startService(component.getInternalAccess(), rid).addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 				{
@@ -760,7 +800,7 @@ public class Starter
 		platformname = SUtil.intern(buf.toString());
 		
 		// Create an instance of the component.
-		return new BasicComponentIdentifier(platformname).getRoot();
+		return new ComponentIdentifier(platformname).getRoot();
 	}
 	
 	/**

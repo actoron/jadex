@@ -8,7 +8,7 @@ import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.impl.RPlan;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -140,7 +140,7 @@ public class CreationBDI
 		
 			// Use initial component to kill others
 			String	initial	= createPeerName(0, agent.getId());
-			IComponentIdentifier	cid	= new BasicComponentIdentifier(initial, agent.getId().getRoot());
+			IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getId().getRoot());
 			agent.getExternalAccess(cid).scheduleStep(new IComponentStep<Void>()
 			{
 				@Classname("deletePeers")
@@ -162,7 +162,7 @@ public class CreationBDI
 		final long omem, final double upera)
 	{
 		final String name = createPeerName(cnt, agent.getId());
-		IComponentIdentifier aid = new BasicComponentIdentifier(name, agent.getId().getRoot());
+		IComponentIdentifier aid = new ComponentIdentifier(name, agent.getId().getRoot());
 		agent.getExternalAccess(aid).killComponent().addResultListener(new DefaultResultListener<Map<String, Object>>()
 		{
 			public void resultAvailable(Map<String, Object> result)

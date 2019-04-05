@@ -7,7 +7,7 @@
 		<link rel="icon" href="favicon.ico" type="image/x-icon">
 		<link rel="stylesheet" href="css/style.css">
 		
-		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.13.2/riot+compiler.js"></script>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/riot-route@3.1.4/dist/route.js"></script>
 		<script type="riot/tag" src="tags/app.tag"></script>
@@ -21,6 +21,9 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
 	</head>
 	<body>
 		<app></app>
@@ -45,6 +48,9 @@
 			  	}
 			  	return true;
 			};
+			
+			// not using var to set a global variable
+			PROMISE_DOME = Promise.resolve("Dummy response to keep the console quiet")
 			
 			// https://riot.js.org/api/
 	    	// Note: users of In-browser compilation will need to wrap calls to riot.mount in riot.compile in order to get returned tag instances.
@@ -179,11 +185,6 @@
 		    	        //console.log(tags);
 		    		}
 		    	});
-		    	
-		    	//document.getElementById("lang").addEventListener("click", function() {
-		    		//console.log("switch language");
-		    	//	riot.store.switchLanguage();
-		    	//}, false);
 		    	
 		    	route.start(true);
 		    	

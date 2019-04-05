@@ -39,7 +39,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.ServiceQuery;
@@ -373,7 +373,7 @@ public class ComponentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				addSelectedAgent(new BasicComponentIdentifier("@"+access.getId().getPlatformName()), list);
+				addSelectedAgent(new ComponentIdentifier("@"+access.getId().getPlatformName()), list);
 			}
 		});
 		remove.addActionListener(new ActionListener()

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>JsTree Test</title>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.7/jstree.min.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.7/themes/default/style.min.css" />
+	
+		<script type="text/javascript">
+			$(function() { $('#jstree').jstree(
+			{
+				"core" : {"check_callback" : true}//,
+				//"plugins" : ["dnd","contextmenu"]
+			})});
+			
+			var self = this;
+			self.models = ["a/b/c/d/e/f", "a/b/cc", "a/c/d"];
+			var treeid = "jstree";
+
+			function createModelTree(treeid)
+			{
+				empty(treeid);
+				
+				for(var i=0; i<self.models.length; i++)
+				{
+					console.log(self.models[i]);
+					createNodes(treeid, self.models[i]);
+				}
+			}
+			
+			function empty(treeid)
+			{
+				// $('#'+treeid).empty(); has problem when readding nodes :-(
+
+				var roots = $('#'+treeid).jstree().get_node('#').children;
+				for(var i=0; i<roots.length; i++)
+				{
+					$('#'+treeid).jstree('delete_node', roots[i]);
+				}
+			}
+			
+			function createNodes(treeid, model)
+			{
+				var sep = "/";
+				if(model.indexOf("\\")!=-1)
+					sep = "\\";
+				var parts = model.split(sep);
+				
+				var lastprefix = '';
+				var prefix = parts[0];
+				
+				for(var i=0; i<parts.length; i++)
+				{
+					prefix = !lastprefix? parts[i]: lastprefix+sep+parts[i];
+					if(!$('#'+treeid).jstree('get_node', prefix))
+						createNode(treeid, lastprefix, prefix, parts[i], 'last');
+					else
+						console.log("not creating: "+prefix);
+					lastprefix = prefix;
+				}
+			}
+			
+			// createNode(parent, id, text, position), position 'first' or 'last'
+			function createNode(treeid, parent_node_id, new_node_id, new_node_text, position)//, donefunc) 
+			{
+				console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
+				
+				$('#'+treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
+			}
+			
+			document.addEventListener("DOMContentLoaded", function()
+			{
+				$('#'+treeid).on('ready.jstree', function (e, data) {
+				     createModelTree(treeid);
+				});
+				
+				$('#'+treeid).on('select_node.jstree', function (e, data) 
+				{
+					var path = data.instance.get_path(data.node,'/');
+					console.log('Selected: ' + path); 
+				});
+				
+				//setTimeout(function(){alert('hi'); empty(treeid); 
+				//	$('#'+treeid).jstree('create_node', '#', {"text": "aa", "id": "aa"}, 'last');}, 3000);
+			});
+		</script>
+	</head>
+	
+	<body>
+	
+		<div id="jstree"></div>
+	
+	</body>
+	
+</html>

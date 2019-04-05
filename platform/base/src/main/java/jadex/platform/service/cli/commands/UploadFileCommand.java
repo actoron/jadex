@@ -6,7 +6,7 @@ import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Map;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -76,7 +76,7 @@ public class UploadFileCommand extends ACliCommand
 		final String s = (String)args.get("-s");
 		final String d = (String)args.get("-d");
 		final String pname = (String)args.get("-p");
-		final IComponentIdentifier p = pname==null? null: new BasicComponentIdentifier(pname);
+		final IComponentIdentifier p = pname==null? null: new ComponentIdentifier(pname);
 		
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
 		

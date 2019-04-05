@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.13.2/riot+compiler.js"></script>
+	</head>
+	
+	<body>
+	
+	<!-- <div id="my_tag">
+	  <mytag>
+	  	<h1>huhu</h1>
+	 	console.log('wurst');
+	    <!-- <p>{greeting}, World!</p>
+	    <script>
+	    this.greeting = 'Hello';
+	    console.log('hiiiiii');
+	    </script>
+	  </mytag>
+	</div> -->
+
+	<mytag></mytag>
+
+	<script>
+	
+		/*function compileTag(html)
+		{
+			var div = document.createElement('div');
+			div.setAttribute("id", "mytag");
+			div.innerHTML = html.trim();
+			
+			document.body.appendChild(div);
+			//var elem = div.firstChild; 
+			var c = riot.compile(mytag.innerHTML);
+			//document.removeChild(div);
+		}*/
+	
+		var tag = riot.compile(my_tag.innerHTML);
+		//riot.mount("mytag");
+		
+		// does only work with newline characters
+		var html = "<mytag>\n<h1>bla<\/h1>\n<script>\nconsole.log('xxx')\n<\/script>\n<\/mytag>";
+		var tag2 = riot.compile(html);
+		var tag2 = compileTag(html);
+		
+ 		//var html = "<h1>bla<\/h1>";
+
+  		//var js = riot.compile("console.log('hiiiiii')", true);
+  		//riot.tag("mytag", html, null, null, "function(){console.log('hiii222')}");
+ 		
+  		riot.mount("mytag");
+ 	</script>
+
+	</body>
+</html>
+
+
+
+
+<script>
+
+</script>

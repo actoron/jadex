@@ -102,12 +102,17 @@ public class RestWebSocket extends Endpoint
 
 	/** debug flag (print stacktraces of unsuccessful service calls etc) **/
 	protected boolean debug;
+	
+	/** The basic type converters. */
+	protected BasicTypeConverter basicconverters;
 
 	/**
 	 *  Create a new rest websocket.
 	 */
 	public RestWebSocket()
 	{
+		this.basicconverters = new BasicTypeConverter();
+		
 		this.readprocs = JsonTraverser.getDefaultReadProcessorsCopy();
 		this.writeprocs = JsonTraverser.getDefaultWriteProcessorsCopy();
 		
@@ -1076,9 +1081,9 @@ public class RestWebSocket extends Endpoint
 			
 			if(value instanceof String)
 			{
-				if(BasicTypeConverter.isExtendedBuiltInType(targetclass))
+				if(basicconverters.isSupportedType(targetclass))
 				{
-					IStringObjectConverter conv = BasicTypeConverter.getExtendedStringConverter(targetclass);
+					IStringObjectConverter conv = basicconverters.getStringConverter(targetclass);
 					Object cval = conv.convertString((String)value, null);
 					ret = cval;
 				}

@@ -5,7 +5,7 @@ dependencies
 	api project(':util:commons')
 }
 
-// JavaCC compilation
+// JavaCC compilation in gradle
 buildscript {
 	repositories {
 		mavenCentral()
@@ -17,7 +17,10 @@ buildscript {
 }
 apply plugin: 'ca.coglinc.javacc'
 
-// JavaCC compilation in Eclipse
+// Hack for Eclipse -> generate files to src dir so eclipse finds them on import
+// No automatic jjtree/javacc generation in eclipse -> need to call gradle task manually when changing ParserImpl.jjt
+compileJavacc.outputDirectory	= file('src/generated/javacc')
+compileJjtree.outputDirectory	= file('src/generated/jjtree')
 sourceSets {
 	main {
 		java {
@@ -26,4 +29,3 @@ sourceSets {
 		}
 	}
 }
-eclipseClasspath.dependsOn("compileJavacc")

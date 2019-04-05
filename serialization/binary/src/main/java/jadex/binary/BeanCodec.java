@@ -154,12 +154,19 @@ public class BeanCodec extends AbstractCodec
 				
 				Classname cn = getAnonClassName(clazz);
 				
-				if (cn == null)
-					throw new RuntimeException("Anonymous Class without Classname identifier not supported: " + String.valueOf(clazz));
+				if(cn == null)
+				{
+					String msg = String.valueOf(clazz);
+					msg += " methods: ";
+					for(Method m : clazz.getDeclaredMethods())
+						msg += " "+m.getName();
+					msg += " fields: ";
+					for(Field f : clazz.getDeclaredFields())
+						msg += " "+f.getName();
+					throw new RuntimeException("Anonymous Class without Classname identifier not supported: " + msg);
+				}
 				
 				ec.writeString(cn.value());
-				
-				
 			}
 			else
 			{

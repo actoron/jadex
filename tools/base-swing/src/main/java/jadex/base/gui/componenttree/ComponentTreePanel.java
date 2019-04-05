@@ -74,6 +74,7 @@ import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.transformation.annotations.Classname;
 
 /**
  *  A panel displaying components on the platform as tree.
@@ -221,6 +222,8 @@ public class ComponentTreePanel extends JSplitPane
 		{
 			propcmd = new ICommand<IMonitoringEvent>() 
 			{
+				String prophandler;
+				
 				public void execute(final IMonitoringEvent ev) 
 				{
 					SwingUtilities.invokeLater(new Runnable()
@@ -475,6 +478,8 @@ public class ComponentTreePanel extends JSplitPane
 								{
 									ea.scheduleStep(new IComponentStep<Void>()
 									{
+										@Classname("showProperties")
+										
 										public IFuture<Void>	execute(IInternalAccess access)
 										{
 											showProperties(new ObjectInspectorPanel(access));
@@ -914,6 +919,8 @@ public class ComponentTreePanel extends JSplitPane
 				
 		access.scheduleStep(new IComponentStep<IComponentDescription[]>()
 		{
+			@Classname("getComponentDescriptions")
+			
 			@Override
 			public IFuture<IComponentDescription[]> execute(IInternalAccess ia)
 			{

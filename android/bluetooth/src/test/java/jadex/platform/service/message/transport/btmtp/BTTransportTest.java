@@ -12,19 +12,22 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.bridge.service.types.cms.PlatformComponent;
+import jadex.bridge.service.types.address.ITransportAddressService;
+import jadex.bridge.service.types.address.TransportAddress;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.Writer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,16 +57,19 @@ public class BTTransportTest {
 		map.put("key1", "val1");
 		map.put("key2", "val2");
 
-		sender = new ComponentIdentifier("senderComponent",
-				new String[] { "bt-mtp://" + TestConstants.adapterAddress2 });
+		sender = new ComponentIdentifier("senderComponent");
 
-		ArrayList<ITransportComponentIdentifier> receivers = new ArrayList<ITransportComponentIdentifier>();
+		ArrayList<IComponentIdentifier> receivers = new ArrayList<IComponentIdentifier>();
 
-		receivers.add(new ComponentIdentifier("component1",
-				new String[] { "bt-mtp://" + TestConstants.sampleAddress }));
-		receivers.add(new ComponentIdentifier("component2",
-				new String[] { "bt-mtp://"
-						+ TestConstants.defaultAdapterAddress }));
+		receivers.add(new ComponentIdentifier("component1"));
+		receivers.add(new ComponentIdentifier("component2"));
+		
+		// TODO: use real platform for testing
+//		ITransportAddressService	tas	= sp.searchLocalService(new ServiceQuery<>(ITransportAddressService.class));
+//		tas.addManualAddresses(Arrays.asList(
+//			new TransportAddress(new ComponentIdentifier("senderComponent"), "bt-mtp", TestConstants.adapterAddress2),
+//			new TransportAddress(new ComponentIdentifier("component1"), "bt-mtp", TestConstants.sampleAddress),
+//			new TransportAddress(new ComponentIdentifier("component2"), "bt-mtp", TestConstants.defaultAdapterAddress)));
 
 //		message = new MessageEnvelope(map, receivers,
 //				SFipa.FIPA_MESSAGE_TYPE.getName());

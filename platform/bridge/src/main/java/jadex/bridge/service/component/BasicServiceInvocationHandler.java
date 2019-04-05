@@ -854,28 +854,25 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			// are automatically pushed to the req component thread
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, false, true));
-//			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
-			// service.getServiceIdentifier().getServiceType()
-//			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports())}, handler); 
-//			Class<?> ty = info.getType()!=null? info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports()): null;
 			
+			// Collect service interfaces (if interfaces are not present they are omitted. 
 			ClassLoader cl = ia.getClassLoader();
 			IServiceIdentifier sid = service.getServiceId();
 			Set<Class<?>> ifaces = new HashSet<>();
-			ifaces.add(sid.getServiceType().getType(cl));
+			Class<?> iface = sid.getServiceType().getType(cl);
+			if(iface!=null)
+				ifaces.add(iface);
 			for(ClassInfo ci: sid.getServiceSuperTypes())
-				ifaces.add(ci.getType(cl));
+			{
+				iface = ci.getType(cl);
+				if(iface!=null)
+					ifaces.add(iface);
+			}
+			
 			ifaces.add(IService.class);
 			
-//			if(ty==null)
-//			{
-////				throw new IllegalArgumentException("Type must not null: "+ty);
-//				ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class}, handler); 
-//			}
-//			else
-//			{
-				ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), ifaces.toArray(new Class<?>[ifaces.size()]), handler); 	
-//			}
+			ret = (IService)ProxyFactory.newProxyInstance(ia.getClassLoader(), ifaces.toArray(new Class<?>[ifaces.size()]), handler); 	
+			
 			// todo: think about orders of decouping interceptors
 			// if we want the decoupling return interceptor to schedule back on an external caller actual order must be reversed
 			// now it can only schedule back on the hosting component of the required proxy

@@ -16,7 +16,7 @@ import jadex.micro.annotation.Arguments;
  *  Implements passive awareness via multicast.
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE, autostart=Boolean3.TRUE,
+@Agent(autoprovide = Boolean3.TRUE, autostart=Boolean3.FALSE,
 	predecessors="jadex.platform.service.address.TransportAddressAgent",
 	successors="jadex.platform.service.registryv2.SuperpeerClientAgent"
 )

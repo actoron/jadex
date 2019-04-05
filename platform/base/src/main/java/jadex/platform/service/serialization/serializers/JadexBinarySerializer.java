@@ -50,7 +50,7 @@ public class JadexBinarySerializer implements ISerializer
 		"ClassInfo[]",
 		"MethodInfo",
 		"MsgHeader",
-		"BasicComponentIdentifier",
+		"ComponentIdentifier",
 		"ServiceScope",
 		"RemoteFinishedCommand",
 		"RemoteForwardCmdCommand",

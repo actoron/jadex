@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.eclipsesource.json.JsonObject;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -42,6 +42,6 @@ public class JsonComponentIdentifierProcessor implements ITraverseProcessor
 	{
 		JsonObject obj = (JsonObject)object;
 		
-		return new BasicComponentIdentifier(obj.get("name").asString());
+		return new ComponentIdentifier(obj.get("name").asString());
 	}
 }

@@ -1,8 +1,9 @@
-package jadex.tools.web;
+package jadex.tools.web.jcc;
 
 import java.util.Collection;
 import java.util.Map;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceEvent;
@@ -13,7 +14,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  
  */
 @Service(system=true)
-public interface IWebJCCService 
+public interface IJCCWebService 
 {
 	/**
 	 *  Get the established connections.
@@ -30,6 +31,11 @@ public interface IWebJCCService
 	/**
 	 *  Get the JCC plugin html fragments.
 	 */
-	public IFuture<Map<String, String>> getPluginFragments();
+	public IFuture<Map<String, String>> getPluginFragments(IComponentIdentifier cid);
+	
+	/**
+	 *  Invoke a Jadex service on the managed platform.
+	 */
+	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, String methodname, Object[] args, ClassInfo[] argtypes);
 	
 }

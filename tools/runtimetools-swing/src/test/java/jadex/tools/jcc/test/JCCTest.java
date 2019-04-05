@@ -8,7 +8,7 @@ import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -47,7 +47,7 @@ public class JCCTest //extends TestCase
 		timeout	= Starter.getDefaultTimeout(platform.getId());
 		
 		IExternalAccess	jcc	= (IExternalAccess)platform.getExternalAccessAsync(
-			new BasicComponentIdentifier("jcc", platform.getId())).get(timeout);
+			new ComponentIdentifier("jcc", platform.getId())).get(timeout);
 		
 		jcc.scheduleStep(new IComponentStep<Void>()
 		{

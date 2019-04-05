@@ -1,4 +1,4 @@
-package jadex.tools.web;
+package jadex.tools.web.status;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,7 +64,7 @@ import jadex.micro.annotation.Publish;
 public class StatusAgent implements IStatusService
 {
 	@Agent
-	protected IInternalAccess	agent;
+	protected IInternalAccess agent;
 	
 	@AgentCreated
 	protected IFuture<Void>	setup()

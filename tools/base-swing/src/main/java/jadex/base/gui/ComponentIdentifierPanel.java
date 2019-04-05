@@ -21,7 +21,6 @@ import javax.swing.table.DefaultTableModel;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
@@ -41,7 +40,8 @@ public class ComponentIdentifierPanel extends JPanel
 	protected IExternalAccess access;
 	
 	/** The component identifier.*/
-	protected ITransportComponentIdentifier cid;
+//	protected ITransportComponentIdentifier cid;
+	protected IComponentIdentifier cid;
 
 	/** The name textfield. */
 	protected JTextField tfname; 
@@ -70,7 +70,7 @@ public class ComponentIdentifierPanel extends JPanel
 	public ComponentIdentifierPanel(IComponentIdentifier cid, final IExternalAccess access)
 	{
 		this.access = access;
-		this.cid	= cid!=null? new ComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new ComponentIdentifier(""); 
+		this.cid = new ComponentIdentifier(cid); //cid!=null? new ComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new ComponentIdentifier(""); 
 		this.editable	= true;
 
 		// Initialize component.
@@ -91,7 +91,7 @@ public class ComponentIdentifierPanel extends JPanel
 		{
 			public void tableChanged(TableModelEvent e)
 			{
-				ComponentIdentifierPanel.this.cid = new ComponentIdentifier(ComponentIdentifierPanel.this.cid.getName(), taddresses.getEntries());
+				ComponentIdentifierPanel.this.cid = new ComponentIdentifier(ComponentIdentifierPanel.this.cid.getName());//, taddresses.getEntries());
 				cidChanged();
 			}
 		});
@@ -187,7 +187,7 @@ public class ComponentIdentifierPanel extends JPanel
 	 */
 	public void setComponentIdentifier(IComponentIdentifier cid)
 	{
-		this.cid	= cid!=null? new ComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new ComponentIdentifier();
+		this.cid = new ComponentIdentifier(cid); //!=null? new ComponentIdentifier(cid.getName(), cid instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)cid).getAddresses() : null): new ComponentIdentifier();
 		refresh();
 	}
 
@@ -219,11 +219,46 @@ public class ComponentIdentifierPanel extends JPanel
 //			tfname.getDocument().addDocumentListener(namelistener);
 		}
 		
-		taddresses.setEntries(this.cid.getAddresses());
-		taddresses.refresh();
-		this.invalidate();
-		this.validate();
-		this.repaint();
+		final IComponentIdentifier fcid = this.cid;
+		access.searchService(new ServiceQuery<ITransportAddressService>(ITransportAddressService.class))
+		.addResultListener(new IResultListener<ITransportAddressService>()
+		{
+			@Override
+			public void resultAvailable(ITransportAddressService tas)
+			{
+				tas.getAddresses(fcid).addResultListener(new SwingResultListener<>(new IResultListener<List<TransportAddress>>()
+				{
+					@Override
+					public void resultAvailable(List<TransportAddress> ads)
+					{
+						taddresses.setEntries(ads.toArray(new String[0]));
+						taddresses.refresh();
+						invalidate();
+						validate();
+						repaint();
+					}
+					
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				}));
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		});
+		
+//		taddresses.setEntries(this.cid.getAddresses());
+//		taddresses.refresh();
+		
+//		this.invalidate();
+//		this.validate();
+//		this.repaint();
 	}
 
 	//-------- helper classes --------
@@ -248,7 +283,7 @@ public class ComponentIdentifierPanel extends JPanel
 		protected void	update()
 		{
 			nameediting	= true;
-			ComponentIdentifierPanel.this.cid	= new ComponentIdentifier(tfname.getText(), ComponentIdentifierPanel.this.cid.getAddresses());
+			ComponentIdentifierPanel.this.cid	= new ComponentIdentifier(tfname.getText()); // ComponentIdentifierPanel.this.cid.getAddresses()
 			cidChanged();
 			nameediting	= false;
 		}

@@ -2,6 +2,7 @@ package jadex.bridge.service;
 
 import java.util.Map;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
@@ -39,6 +40,17 @@ public interface IService //extends INFMixedPropertyProvider //extends IRemotabl
 	 */
 	@Raw
 	public Map<String, Object> getPropertyMap();
+	
+	/**
+	 *  todo: support also blackbox args (e.g. byte[]) as args could also use classes that are not available.
+	 * 
+	 *  Invoke a method reflectively.
+	 *  @param methodname The method name.
+	 *  @param argtypes The argument types (can be null if method exists only once).
+	 *  @param args The arguments.
+	 *  @return The result.
+	 */
+	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args);
 
 //	/**
 //	 *  Get an external interface feature.

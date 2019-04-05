@@ -311,6 +311,28 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	}
 	
 	/**
+	 *  Resolve a required service of a given type.
+	 *  Synchronous method only for locally available services.
+	 *  @param type The service type.
+	 *  @return The service.
+	 */
+	public <T> T getLocalService0(Class<T> type)
+	{
+		RequiredServiceInfo info = getServiceInfo(type);
+		if(info==null)
+		{
+			// Convenience case: switch to search when type not declared
+			return searchLocalService(new ServiceQuery<>(type).setMultiplicity(Multiplicity.ZERO_ONE));
+		}
+		else
+		{
+			ServiceQuery<T> sq = (ServiceQuery<T>)getServiceQuery(info).setMultiplicity(Multiplicity.ZERO_ONE);
+			return resolveLocalService(sq, info);
+			
+		}
+	}
+	
+	/**
 	 *  Resolve a required services of a given name.
 	 *  Synchronous method only for locally available services.
 	 *  @param name The services name.

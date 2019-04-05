@@ -35,13 +35,13 @@ function getIntermediate($http, path, handler, error)
 	$http.get(path).then(func, error);
 }
 
-function	updatePlatform($scope, platform)
+function updatePlatform($scope, platform)
 {
 	var	found	= false;
-	$scope.platforms	= $scope.platforms===undefined ? [] : $scope.platforms;
+	$scope.platforms = $scope.platforms===undefined ? [] : $scope.platforms;
 	for(var i=0; i<$scope.platforms.length; i++)
 	{
-		found	= $scope.platforms[i].platform.name==platform.platform.name
+		found = $scope.platforms[i].platform.name==platform.platform.name
 			&& $scope.platforms[i].protocol==platform.protocol;
 		if(found)
 		{

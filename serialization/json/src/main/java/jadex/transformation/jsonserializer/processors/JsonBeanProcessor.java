@@ -285,7 +285,7 @@ public class JsonBeanProcessor extends AbstractJsonProcessor
 			if(value instanceof String)
 			{
 //				IStringObjectConverter conv = BasicTypeConverter.getBasicStringConverter(targetclazz);
-				IStringObjectConverter conv = BasicTypeConverter.getExtendedStringConverter(targetclazz);
+				IStringObjectConverter conv = BasicTypeConverter.CONVERTERS.getStringConverter(targetclazz);
 				if(conv!=null)
 				{
 					try

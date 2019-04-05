@@ -1,16 +1,16 @@
-package jadex.tools.web;
+package jadex.tools.web.jcc;
 
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Scanner;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceEvent;
@@ -19,7 +19,7 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.Boolean3;
 import jadex.commons.IResultCommand;
-import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
@@ -32,14 +32,21 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Publish;
 
-@ProvidedServices(@ProvidedService(name="webjcc", type=IWebJCCService.class,
+/**
+ *  Frontend controller web jcc agent.
+ *  
+ *  Uses invokeServiceMethod() to delegate calls to the corresponding platforms (accessed by frontend).
+ */
+@ProvidedServices(
+{
+	@ProvidedService(name="jccweb", type=IJCCWebService.class,
 		scope=ServiceScope.PLATFORM,
-		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="[http://localhost:8080/]webjcc"
-	))
-)
-@Agent(autostart=Boolean3.TRUE,
+		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="[http://localhost:8080/]webjcc"))
+	//@ProvidedService(name="starterweb", type=IStarterWebService.class)
+})
+@Agent(autostart=Boolean3.FALSE,
 	predecessors="jadex.extension.rs.publish.JettyRSPublishAgent") // Hack! could be other publish agent :-(
-public class JCCWebAgent implements IWebJCCService
+public class JCCWebAgent implements IJCCWebService
 {
 	@Agent
 	protected IInternalAccess agent;
@@ -114,50 +121,66 @@ public class JCCWebAgent implements IWebJCCService
 	/**
 	 *  Get the JCC plugin html fragments.
 	 */
-	public IFuture<Map<String, String>> getPluginFragments()
+	public IFuture<Map<String, String>> getPluginFragments(IComponentIdentifier cid)
 	{
-		// todo search for running webjcc services and ask for plugin fragment
+		Future<Map<String, String>> ret = new Future<>();
 		
-		Map<String, String> ret = new HashMap<>();
+		// If not local platform
+		if(cid!=null && !cid.getRoot().equals(agent.getId().getRoot()))
+		{
+			agent.searchService(new ServiceQuery<IJCCWebService>(IJCCWebService.class).setSearchStart(cid.getRoot()))
+				.addResultListener(new ExceptionDelegationResultListener<IJCCWebService, Map<String, String>>(ret)
+			{
+				@Override
+				public void customResultAvailable(IJCCWebService jccser) throws Exception
+				{
+					jccser.getPluginFragments(cid).addResultListener(new DelegationResultListener<>(ret));
+				}
+			});
+		}
+		else
+		{
+			Map<String, String> res = new HashMap<>();
+			
+			Collection<IJCCPluginService> pluginsers = agent.searchLocalServices(new ServiceQuery<IJCCPluginService>(IJCCPluginService.class, ServiceScope.PLATFORM));
+			
+			for(IJCCPluginService ser: pluginsers)
+			{
+				String name = ser.getPluginName().get();
+				String tag = ser.getPluginComponent().get();
+				res.put(name, tag);
+			}
 		
-		ret.put("starter", loadTag("jadex/tools/web/starter.tag"));
-		ret.put("security", loadTag("jadex/tools/web/security.tag"));
+			//res.put("starter", loadTag("jadex/tools/web/starter.tag"));
+			//res.put("security", loadTag("jadex/tools/web/security.tag"));
+		
+			ret.setResult(res);
+		}
 		
 		//System.out.println("fragments: "+ret);
-		
-		return new Future<Map<String, String>>(ret);
-	}
-
-	/**
-	 * 
-	 */
-	public String loadTag(String name)
-	{
-		String ret;
-		
-		Scanner sc = null;
-		try
-		{
-			InputStream is = SUtil.getResource0(name, agent.getClassLoader());
-			sc = new Scanner(is);
-			ret = sc.useDelimiter("\\A").next();
-			
-	//		System.out.println(ret);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-		finally
-		{
-			if(sc!=null)
-			{
-				sc.close();
-			}
-		}
 		
 		return ret;
 	}
 	
+	/**
+	 *  Invoke a Jadex service on the managed platform.
+	 */
+	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, final String methodname, final Object[] args, final ClassInfo[] argtypes)
+	{
+		final Future<Object> ret = new Future<Object>();
+		
+		// Search service with startpoint of given platform 
+		agent.searchService(new ServiceQuery<IService>(servicetype).setSearchStart(cid.getRoot()).setScope(ServiceScope.PLATFORM))
+			.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
+		{
+			@Override
+			public void customResultAvailable(IService ser) throws Exception
+			{
+				System.out.println("Invoking service method: "+ser+" "+methodname);
+				ser.invokeMethod(methodname, argtypes, args).addResultListener(new DelegationResultListener<>(ret));
+			}
+		});
+		
+		return ret;
+	}
 }	

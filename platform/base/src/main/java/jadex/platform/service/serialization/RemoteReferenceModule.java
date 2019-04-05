@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -99,7 +99,7 @@ public class RemoteReferenceModule
 		refs.put(Inet4Address.class, tf);
 		refs.put(Inet6Address.class, tf);
 		refs.put(IComponentIdentifier.class, tf);
-		refs.put(BasicComponentIdentifier.class, tf);
+		refs.put(ComponentIdentifier.class, tf);
 		Class<?> ti = SReflect.classForName0("jadex.xml.TypeInfo", RemoteReferenceModule.class.getClassLoader());
 		if(ti!=null)
 			refs.put(ti, tf);
@@ -1875,7 +1875,9 @@ public class RemoteReferenceModule
 				}
 			});
 		}
-		return new ArrayList(processors);
+		
+//		return new ArrayList(processors);
+		return processors;
 	}
 	
 	/**

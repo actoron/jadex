@@ -2,6 +2,7 @@ package jadex.bridge.service.types.cms;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentNotFoundException;
 import jadex.bridge.ComponentTerminatedException;
@@ -689,12 +690,12 @@ public class SComponentManagementService
 	{
 		// checks components and init infos
 		
-		BasicComponentIdentifier ret = null;
+		ComponentIdentifier ret = null;
 		
 		CmsState cmsstate = getState(agent.getId());
 		if(platformname==null)
 			platformname = agent.getId().getName();
-		ret = new BasicComponentIdentifier(localname+"@"+platformname);
+		ret = new ComponentIdentifier(localname+"@"+platformname);
 		
 		if(uniqueids || cmsstate.getComponent(ret) != null)
 		{
@@ -706,12 +707,12 @@ public class SComponentManagementService
 				if(cnt==null)
 				{
 					cmsstate.getCidCounts().put(key, Integer.valueOf(1));
-					ret = new BasicComponentIdentifier(localname+"@"+platformname);
+					ret = new ComponentIdentifier(localname+"@"+platformname);
 				}
 				else
 				{
 					cmsstate.getCidCounts().put(key, Integer.valueOf(cnt.intValue()+1));
-					ret = new BasicComponentIdentifier(localname+cnt+"@"+platformname); // Hack?!
+					ret = new ComponentIdentifier(localname+cnt+"@"+platformname); // Hack?!
 				}
 			}
 			while(cmsstate.getComponent(ret) != null);
@@ -945,39 +946,92 @@ public class SComponentManagementService
 	 *  @param platform	The component id.
 	 *  @return	The class loader.
 	 */
-	protected static IFuture<IResourceIdentifier> getResourceIdentifier(final CreationInfo ci, IInternalAccess agent)
+	public static IFuture<IResourceIdentifier> getResourceIdentifier(String filename, IResourceIdentifier rid, IInternalAccess agent)
 	{
 		final Future<IResourceIdentifier>	ret	= new Future<IResourceIdentifier>();
 		
 		// User supplied resource identifier.
-		if(ci!=null && ci.getResourceIdentifier()!=null)
+		if(rid!=null)
 		{
-			ret.setResult(ci.getResourceIdentifier());
+			ret.setResult(rid);
 		}
 		// Local parent //(but not platform -> platform now has valid rid).
-		else if(ci!=null 
+		else //if(ci!=null 
 //			&& !ci.getParent().equals(root.getComponentIdentifier())
 //			&& (ci.getParent()==null || !isRemoteComponent(ci.getParent(), agent)) //FIXME: PARENT
 //			&& !initinfos.containsKey(ci.getParent())	// does not work during init as external access is not available!?
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
-			)
+			//)
 		{
-			//IExternalAccess ea = getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), agent); //FIXME: PARENT
-			IExternalAccess ea = getExternalAccess(agent.getId(), agent);
-			ea.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, IResourceIdentifier>(ret)
+//			IExternalAccess ea = getExternalAccess(ci.getParent()==null? agent.getId(): ci.getParent(), agent); //FIXME: PARENT
+
+			// fix local parent case!
+			
+			// check if filename is full path (and thus file url)
+			URI u = null;
+			try
 			{
-				public void customResultAvailable(IModelInfo model)
+				u = SUtil.toURL(filename).toURI();
+			}
+			catch(Exception e)
+			{
+//				e.printStackTrace();
+			}
+			if(u!=null)
+			{
+				final URI fu = u;
+				ILibraryService ls = agent.getLocalService0(ILibraryService.class);
+				if(ls!=null)
 				{
-					ret.setResult(model.getResourceIdentifier());
+					ls.getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, IResourceIdentifier>(ret)
+					{
+						@Override
+						public void customResultAvailable(List<IResourceIdentifier> rids) throws Exception
+						{
+							IResourceIdentifier rid = null;
+							for(IResourceIdentifier r: rids)
+							{
+								if(r.getLocalIdentifier()!=null && r.getLocalIdentifier().getUri()!=null)
+								{
+									String test = r.getLocalIdentifier().getUri().toString();
+									
+									if(fu.toString().startsWith(test))
+									{
+	//									System.out.println("found: "+r);
+										rid = r;
+										break;
+									}
+								}
+							}		
+							
+//							System.out.println("loading1: "+ci.getFilename()+" with rid: "+rid);
+							ret.setResult(rid);
+						}
+					});
 				}
-			}));
+			}
+			else
+			{
+				// todo: is this ok (why use platform agent, cannot load extra added agents froms jars then)? 
+				// Could also use 'null' for all CPs  
+				
+				IExternalAccess ea = getExternalAccess(agent.getId(), agent);
+				ea.getModelAsync().addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IModelInfo, IResourceIdentifier>(ret)
+				{
+					public void customResultAvailable(IModelInfo model)
+					{
+//						System.out.println("loading2: "+ci.getFilename()+" with rid: "+model.getResourceIdentifier());
+						ret.setResult(model.getResourceIdentifier());
+					}
+				}));
+			}
 		}
 		// Remote or no parent or platform as parent
-		else
-		{
-			// null resource identifier for searching in all current libservice resources.
-			ret.setResult(null);
-		}
+//		else
+//		{
+//			// null resource identifier for searching in all current libservice resources.
+//			ret.setResult(null);
+//		}
 		return ret;
 	}
 	
@@ -1524,7 +1578,7 @@ public class SComponentManagementService
 	{
 		Future<Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>> ret = new Future<>();
 		
-		getResourceIdentifier(cinfo, agent).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IResourceIdentifier, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(ret)
+		getResourceIdentifier(modelname==null && cinfo!=null? cinfo.getFilename(): modelname, cinfo!=null? cinfo.getResourceIdentifier(): null, agent).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IResourceIdentifier, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(ret)
 		{
 			public void customResultAvailable(final IResourceIdentifier rid)
 			{
@@ -1855,7 +1909,7 @@ public class SComponentManagementService
 					IPlatformComponentAccess component = null;
 					ComponentCreationInfo cci = null;
 					Collection<IComponentFeatureFactory> features = null;
-					BasicComponentIdentifier tmpcid = null;
+					ComponentIdentifier tmpcid = null;
 					CMSComponentDescription tmpad = null;
 					IInternalAccess tmppad = null;
 					IModelInfo tmplmodel = null;
@@ -1883,7 +1937,7 @@ public class SComponentManagementService
 						// TODO!!!!! use unique setting
 						
 						// The name is generated using a) the defined name else b) the name hint c) the model name as basis
-						tmpcid = (BasicComponentIdentifier)generateComponentIdentifier(name!=null? name: tmplmodel.getNameHint()!=null? tmplmodel.getNameHint(): tmplmodel.getName(), paname, agent, true);//, addresses);
+						tmpcid = (ComponentIdentifier)generateComponentIdentifier(name!=null? name: tmplmodel.getNameHint()!=null? tmplmodel.getNameHint(): tmplmodel.getName(), paname, agent, true);//, addresses);
 						
 						// Defer component services being found from registry
 						ServiceRegistry.getRegistry(agent).addExcludedComponent(tmpcid);
@@ -1925,7 +1979,7 @@ public class SComponentManagementService
 					final CMSComponentDescription ad = tmpad;
 					final IInternalAccess pad = tmppad;
 					final IModelInfo lmodel = tmplmodel;
-					final BasicComponentIdentifier cid = tmpcid;
+					final ComponentIdentifier cid = tmpcid;
 					
 					// Invoke create on platform component
 					component.create(cci, features);

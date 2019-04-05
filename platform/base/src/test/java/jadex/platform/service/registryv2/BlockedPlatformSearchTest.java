@@ -44,7 +44,8 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(BlockedPlatformSearchTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*5));
-		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
+//		baseconf.setValue("superpeerclient.debugservices", true);
+//		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 
 		// Remote only -> no simulation please
 		baseconf.getExtendedPlatformConfiguration().setSimul(false);
@@ -93,6 +94,7 @@ public class BlockedPlatformSearchTest extends AbstractInfrastructureTest
 		try
 		{
 			// Search multi (i.e. multiplicity 0..)
+			System.out.println("Searching multi: "+System.currentTimeMillis());			
 			Collection<ITestService>	results	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			assertTrue(results.isEmpty());
 			System.out.println("Search multi: "+results);

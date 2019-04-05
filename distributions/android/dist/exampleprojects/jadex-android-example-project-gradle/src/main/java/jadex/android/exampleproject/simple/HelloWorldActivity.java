@@ -7,7 +7,7 @@ import jadex.android.controlcenter.JadexAndroidControlCenter;
 import jadex.android.exampleproject.MyEvent;
 import jadex.android.exampleproject.R;
 import jadex.base.RootComponentConfiguration;
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.DefaultResultListener;
@@ -90,7 +90,7 @@ public class HelloWorldActivity extends JadexAndroidActivity
 			if (isPlatformRunning())
 			{
 				Intent i = new Intent(this, JadexAndroidControlCenter.class);
-				i.putExtra("platformId", (BasicComponentIdentifier) platformId);
+				i.putExtra("platformId", (ComponentIdentifier) platformId);
 				startActivity(i);
 			} else
 			{

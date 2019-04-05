@@ -18,13 +18,11 @@ import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ITransportComponentIdentifier;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.examples.presentationtimer.common.State;
 
 public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDListItem>
 {
-
 	protected JLabel	platformLabel;
 	protected JTextArea	platformAddresses;
 	protected JLabel	stateLabel;
@@ -39,16 +37,19 @@ public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDLis
 		
 		add(Box.createRigidArea(new Dimension(0,5)));
 		
-		add(new JLabel("platformname") {{
+		add(new JLabel("platformname") {
+		{
 			setAlignmentX(LEFT_ALIGNMENT);
 			platformLabel = this;
 		}});
 		
-		add(new JPanel() {{
+		add(new JPanel() {
+		{
 			setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 			setOpaque(false);
 			setAlignmentX(LEFT_ALIGNMENT);
-			add(new JLabel("state") {{
+			add(new JLabel("state") {
+			{
 				setForeground(Color.gray);
 				stateLabel = this;
 				setAlignmentX(LEFT_ALIGNMENT);
@@ -56,7 +57,8 @@ public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDLis
 			
 			add(Box.createRigidArea(new Dimension(10, 0)));
 
-			add(new JLabel("time") {{
+			add(new JLabel("time") {
+			{
 				setForeground(Color.gray);
 				timeLabel = this;
 				setAlignmentX(LEFT_ALIGNMENT);
@@ -64,7 +66,8 @@ public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDLis
 		}});
 		
 		
-		add(new JTextArea("addrs") {{
+		add(new JTextArea("addrs") {
+		{
 			Font font = getFont();
 			setFont(font.deriveFont((float)(font.getSize()*0.85)));
 			setAlignmentX(LEFT_ALIGNMENT);
@@ -82,17 +85,20 @@ public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDLis
 		CDListItem item = list.getModel().getElementAt(index);
 		
 		InvocationHandler invocationHandler = Proxy.getInvocationHandler(item.getService());
-		if (invocationHandler instanceof BasicServiceInvocationHandler) {
+		if(invocationHandler instanceof BasicServiceInvocationHandler) {
 			BasicServiceInvocationHandler sih = (BasicServiceInvocationHandler) invocationHandler;
 			
 			IComponentIdentifier providerId = sih.getServiceIdentifier().getProviderId();
 			String platformName = providerId.getName();
-			String[] addr;
-			if (providerId instanceof ITransportComponentIdentifier) {
-				addr = ((ITransportComponentIdentifier)providerId).getAddresses();
-			} else {
-				addr = new String[0];
-			}
+			String[] addr = new String[0];
+//			if(providerId instanceof ITransportComponentIdentifier) 
+//			{
+//				addr = ((ITransportComponentIdentifier)providerId).getAddresses();
+//			} 
+//			else 
+//			{
+//				addr = new String[0];
+//			}
 			this.platformLabel.setText(platformName);
 			this.platformAddresses.setText(formatAddrs(addr));
 		}
@@ -100,15 +106,21 @@ public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDLis
 		State state = item.getStatus();
 		String time = item.getTime();
 		
-		if (state != null) {
+		if(state != null) 
+		{
 			stateLabel.setText(state.toString());
-		} else {
+		} 
+		else 
+		{
 			stateLabel.setText("State unknown");
 		}
 		
-		if (time != null) {
+		if(time != null) 
+		{
 			timeLabel.setText(time);
-		} else {
+		} 
+		else 
+		{
 			timeLabel.setText("??:??");
 		}
 		
@@ -143,9 +155,11 @@ public class CDListCellRenderer extends JPanel implements ListCellRenderer<CDLis
 		return this;
 	}
 
-	private String formatAddrs(String[] addr) {
+	private String formatAddrs(String[] addr) 
+	{
 		StringBuilder stringBuilder = new StringBuilder("");
-		for (String string : addr) {
+		for (String string : addr) 
+		{
 			stringBuilder.append("\n");
 			stringBuilder.append(string);
 		}

@@ -32,8 +32,8 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 	 */
 	public IFuture<Void> execute(ServiceInvocationContext sic)
 	{
-//		if(sic.getMethod().getName().equals("ma1"))
-//			System.out.println("ggghhh");
+//		if(sic.getMethod().getName().indexOf("invoke")!=-1)
+//			System.out.println("herere");
 		
 		try
 		{

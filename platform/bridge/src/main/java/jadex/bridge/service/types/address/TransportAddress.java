@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import jadex.bridge.BasicComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 
 /**
@@ -41,6 +41,43 @@ public class TransportAddress
 		this.platformid = platformid;
 		this.transporttype = transporttype;
 		this.address = address;
+	}
+	
+	/**
+	 *  Creates the address.
+	 * 
+	 *  @param platformid The platform ID.
+	 *  @param address The address in form scheme1://addi1
+	 */
+	public TransportAddress(IComponentIdentifier platformid, String address)
+	{
+		this.platformid = platformid;
+		
+		if(address != null)
+		{
+			StringTokenizer stok = new StringTokenizer(address, ",");
+			while(stok.hasMoreTokens())
+			{
+				String all = stok.nextToken();
+				int idx = all.indexOf("://");
+				transporttype = all.substring(0, idx);
+				address = all.substring(idx+3);
+			}
+		}
+	}
+	
+	/**
+	 *  Convert a string to transport addresses.
+	 *  @param platform The platform name
+	 *  @param address The address
+	 */
+	public static TransportAddress fromString()
+	{
+		TransportAddress ret = null;
+		
+		
+		
+		return ret;
 	}
 	
 	/**
@@ -155,7 +192,7 @@ public class TransportAddress
 				int idxs = part.indexOf("{");
 				if(idxs!=-1)
 				{
-					String name = part.substring(0, idxs);
+					String name = part.substring(0, idxs); // platform name
 					String rest = part.substring(idxs+1, part.length());
 					StringTokenizer stok2 = new StringTokenizer(rest, ",");
 					while(stok2.hasMoreTokens())
@@ -164,12 +201,37 @@ public class TransportAddress
 						int idx = all.indexOf("://");
 						String scheme = all.substring(0, idx);
 						String addi = all.substring(idx+3);
-						ret.add(new TransportAddress(new BasicComponentIdentifier(name), scheme, addi));
+						ret.add(new TransportAddress(new ComponentIdentifier(name), scheme, addi));
 					}
 				}
 			}
 		}
 		return ret.toArray(new TransportAddress[ret.size()]);
+	}
+	
+	/**
+	 *  Convert a string to transport addresses.
+	 *  @param platform The platform name
+	 *  @param address The address
+	 */
+	public static TransportAddress fromString(IComponentIdentifier platform, String address)
+	{
+		TransportAddress ret = null;
+		
+		if(address != null)
+		{
+			StringTokenizer stok = new StringTokenizer(address, ",");
+			while(stok.hasMoreTokens())
+			{
+				String all = stok.nextToken();
+				int idx = all.indexOf("://");
+				String scheme = all.substring(0, idx);
+				String addi = all.substring(idx+3);
+				ret = new TransportAddress(platform, scheme, addi);
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
