@@ -36,6 +36,8 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 	/** The serializer id. */
 	public static final int SERIALIZER_ID = 1;
 	
+	public static final String TYPE = IStringConverter.TYPE_JSON;
+	
 	/** The debug flag. */
 	protected boolean DEBUG = false;
 	
@@ -153,7 +155,7 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 	 */
 	public String getType()
 	{
-		return "json";
+		return TYPE;
 	}
 	
 	protected static class JsonByteArrayWriteProcessor implements ITraverseProcessor
@@ -191,7 +193,14 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 	{
 		public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 		{
-			return (object instanceof JsonObject) && ("bytearray".equals(((JsonObject) object).get(JsonTraverser.CLASSNAME_MARKER).asString()));
+			boolean ret = false;
+			if(object instanceof JsonObject)
+			{
+				JsonValue c = ((JsonObject)object).get(JsonTraverser.CLASSNAME_MARKER);
+				String cl = c!=null? c.asString(): null;
+				ret = "bytearray".equals(cl);
+			}
+			return ret;
 		}
 
 		public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
@@ -205,5 +214,15 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 				((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 			return ret;
 		}
+	}
+	
+	/**
+	 *  Test if the type can be converted.
+	 *  @param clazz The class.
+	 *  @return True if can be converted.
+	 */
+	public boolean isSupportedType(Class<?> clazz)
+	{
+		return true;
 	}
 }

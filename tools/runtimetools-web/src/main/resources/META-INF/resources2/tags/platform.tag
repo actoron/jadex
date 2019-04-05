@@ -2,14 +2,16 @@
 
 	<h1>Platform {cid}</h1>
 
-	<ul class="nav">
-		<li each="{p in plugins}" class="nav-item">
-    		<div class="nav-link" onclick="{parent.showPlugin}">{p.name}</div>
-  		</li>
-	</ul>
+	<nav class="navbar navbar-light bg-light">
+		<ul class="navbar-nav mr-auto">
+			<li each="{p in plugins}" class="nav-item">
+	    		<div class="nav-link " onclick="{parent.showPlugin}"><h2>{p.name.toUpperCase()}</h2></div>
+	  		</li>
+		</ul>
+	</nav>
 	
 	<div id="plugin"></div>
-
+	
 	<script>
 		//var test = "<cms><h1>Starter</h1><script>alert('hiiiiiii')<\/script><\/cms>";
 	

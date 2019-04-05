@@ -1,6 +1,5 @@
 package jadex.bridge.service.types.serialization;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +53,12 @@ public interface ISerializationServices
 	 *  @return The clone processors.
 	 */
 	public List<ITraverseProcessor> getCloneProcessors();
+	
+	/**
+	 *  Get the string converters (can convert to and from string, possibly only for some types).
+	 *  @return The converters.
+	 */
+	public Map<String, IStringConverter> getStringConverters();
 	
 	/**
 	 *  Convert object to string.

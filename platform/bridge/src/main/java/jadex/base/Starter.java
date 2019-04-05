@@ -12,7 +12,6 @@ import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -21,12 +20,10 @@ import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.VersionInfo;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.ServiceQuery;
@@ -46,7 +43,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
-import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -61,8 +57,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.transformation.BasicTypeConverter;
-import jadex.commons.transformation.IStringObjectConverter;
 import jadex.commons.transformation.traverser.TransformSet;
 import jadex.javaparser.SJavaParser;
 
@@ -110,39 +104,7 @@ public class Starter
     // todo: cannot be used because registry needs to know when superpeer changes (remap queries)
 //    /** Constant for the superpeer. */
 //    public static String DATA_SUPERPEER = "superpeer";
-
     
-   
-    
-    
-    /**
-     *  Convert a (string) parameter
-     *  @param val
-     *  @param target
-     *  @return
-     */
-    public static Object convertParameter(Object val, Class<?> target)
-    {
-    	Object ret = null;
-    	
-    	if(val!=null && SReflect.isSupertype(target, val.getClass()))
-    	{
-    		ret = val;
-    	}
-    	else if(val instanceof String && ((String)val).length()>0 && Starter.BASICCONVERTER.isSupportedType(target))
-    	{
-    		try
-    		{
-    			ret = Starter.BASICCONVERTER.getStringConverter(target).convertString((String)val, null);
-    		}
-    		catch(Exception e)
-    		{
-    		}
-    	}
-    	
-    	return ret;
-    }
-
 	/** Global platform data. For each platform stored by  */
     protected static final IRwMap<IComponentIdentifier, IRwMap<String, Object>> platformmem = new RwMapWrapper<IComponentIdentifier, IRwMap<String, Object>>(new HashMap<IComponentIdentifier, IRwMap<String, Object>>());
 //	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();

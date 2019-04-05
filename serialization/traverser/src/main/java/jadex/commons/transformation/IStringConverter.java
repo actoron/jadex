@@ -5,6 +5,10 @@ package jadex.commons.transformation;
  */
 public interface IStringConverter 
 {
+	public static final String TYPE_BASIC = "basic";
+	public static final String TYPE_JSON = "json";
+	public static final String TYPE_XML = "xml";
+	
 	/**
 	 *  Convert a string to an object.
 	 *  @param val The string.
@@ -28,4 +32,11 @@ public interface IStringConverter
 	 *  @return The object.
 	 */
 	public String getType();
+	
+	/**
+	 *  Test if the type can be converted.
+	 *  @param clazz The class.
+	 *  @return True if can be converted.
+	 */
+	public boolean isSupportedType(Class<?> clazz);
 }

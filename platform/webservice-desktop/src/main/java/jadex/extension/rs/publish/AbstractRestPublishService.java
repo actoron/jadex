@@ -67,6 +67,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
+import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -84,6 +85,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.traverser.IErrorReporter;
@@ -95,6 +97,8 @@ import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
 import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
+import jadex.micro.annotation.Component;
+import jadex.platform.service.serialization.SerializationServices;
 import jadex.transformation.jsonserializer.JsonTraverser;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -881,7 +885,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	            	
 	            	if(p!=null)
 	            	{
-	            		Object v = Starter.convertParameter(p, ts[i]);
+	            		Object v = convertParameter(p, ts[i]);
 	            	
 	            		if(v!=null)
 	            		{
@@ -898,7 +902,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		            			Iterator<Object> it = col.iterator();
 		            			for(int j=0; j<col.size(); j++)
 		            			{
-		            				v = Starter.convertParameter(it.next(), ts[i].getComponentType());
+		            				v = convertParameter(it.next(), ts[i].getComponentType());
 		            				if(v!=null)
 		            					Array.set(ar, j, v);
 		            			}
@@ -942,7 +946,36 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     	}
     }
     
-   
+    /**
+     *  Convert a (string) parameter
+     *  @param val
+     *  @param target
+     *  @return
+     */
+    public Object convertParameter(Object val, Class<?> target)
+    {
+    	Object ret = null;
+    	
+    	ISerializationServices ser = SerializationServices.getSerializationServices(component.getId().getRoot());
+    	IStringConverter conv = ser.getStringConverters().get(IStringConverter.TYPE_BASIC);
+    	
+    	if(val!=null && SReflect.isSupertype(target, val.getClass()))
+    	{
+    		ret = val;
+    	}
+    	else if(val instanceof String && ((String)val).length()>0 && conv.isSupportedType(target))
+    	{
+    		try
+    		{
+    			ret = conv.convertString((String)val, target, component.getClassLoader(), null);
+    		}
+    		catch(Exception e)
+    		{
+    		}
+    	}
+    	
+    	return ret;
+    }
 
     /**
      *  Convert a parameter string to an object if is json or xml.

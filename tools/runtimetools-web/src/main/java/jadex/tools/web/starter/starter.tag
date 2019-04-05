@@ -38,6 +38,22 @@
 					<input class="w100" type="number" value="1" ref="gencnt"></input>
 				</div>
 			</div>
+			<div class="row m-1">
+				<div class="col-4">
+					<input type="checkbox" ref="suspended">Suspended</input>
+				</div>
+				<div class="col-4">
+					<input type="checkbox" ref="synchronous">Synchronous</input>
+				</div>
+				<div class="col-4">
+					<select ref="monitoring" class="w100">
+   						<option value="OFF">OFF</option> 
+   						<option value="COARSE">COARSE</option> 
+   						<option value="MEDIUM">MEDIUM</option> 
+   						<option value="FINE">FINE</option> 
+ 					</select>
+ 				</div>
+			</div>
 			<div hide="getArguments().length>0" class="row m-1" each="{arg, i in getArguments()}">
 				<div class="col-4"">
 					{"["+arg.clazz.value+"] "+arg.name}
