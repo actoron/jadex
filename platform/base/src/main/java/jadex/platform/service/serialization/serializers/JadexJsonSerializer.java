@@ -13,6 +13,7 @@ import com.eclipsesource.json.JsonValue;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.Base64;
 import jadex.commons.SUtil;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -28,7 +29,7 @@ import jadex.transformation.jsonserializer.processors.JsonWriteContext;
  *  
  *  Converts object -> byte[] and byte[] -> object.
  */
-public class JadexJsonSerializer implements ISerializer
+public class JadexJsonSerializer implements ISerializer, IStringConverter
 {
 	//-------- constants --------
 	
@@ -75,9 +76,7 @@ public class JadexJsonSerializer implements ISerializer
 		byte[] ret = JsonTraverser.objectToByteArray(val, classloader, null, true, true, null, preprocs!=null?Arrays.asList(preprocs):null, writeprocs, usercontext);
 		
 		if(DEBUG)
-		{
 			System.out.println("encode message: "+(new String(ret, SUtil.UTF8)));
-		}
 		return ret;
 	}
 
@@ -89,9 +88,7 @@ public class JadexJsonSerializer implements ISerializer
 	public Object decode(byte[] bytes, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext)
 	{
 		if(DEBUG)
-		{
 			System.out.println("decode message: "+(new String((byte[])bytes, SUtil.UTF8)));
-		}
 		return JsonTraverser.objectFromByteArray(bytes, classloader, rep, null, null, readprocs, postprocs!=null?Arrays.asList(postprocs):null, usercontext);
 	}
 	
@@ -123,6 +120,40 @@ public class JadexJsonSerializer implements ISerializer
 		
 		
 		return decode(bytes, classloader, postprocs, rep, usercontext);
+	}
+	
+	/**
+	 *  Convert a string to an object.
+	 *  @param val The string.
+	 *  @param type The target type.
+	 *  @param context The context.
+	 *  @return The object.
+	 */
+	public Object convertString(String val, Class<?> type, ClassLoader cl, Object context)
+	{
+		return JsonTraverser.objectFromString(val, cl, null, type, readprocs, null, context);
+	}
+	
+	/**
+	 *  Convert an object to a string.
+	 *  @param val The object.
+	 *  @param type The encoding type.
+	 *  @param context The context.
+	 *  @return The object.
+	 */
+	public String convertObject(Object val, Class<?> type, ClassLoader cl, Object context)
+	{
+		// does not use type currently?!
+		return JsonTraverser.objectToString(val, cl, true, true, null, null, writeprocs, context);
+	}
+	
+	/**
+	 *  Get the type of string that can be processed (xml, json, plain).
+	 *  @return The object.
+	 */
+	public String getType()
+	{
+		return "json";
 	}
 	
 	protected static class JsonByteArrayWriteProcessor implements ITraverseProcessor

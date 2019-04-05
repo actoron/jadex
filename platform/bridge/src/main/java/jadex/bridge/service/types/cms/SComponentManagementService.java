@@ -946,14 +946,14 @@ public class SComponentManagementService
 	 *  @param platform	The component id.
 	 *  @return	The class loader.
 	 */
-	protected static IFuture<IResourceIdentifier> getResourceIdentifier(final CreationInfo ci, IInternalAccess agent)
+	public static IFuture<IResourceIdentifier> getResourceIdentifier(String filename, IResourceIdentifier rid, IInternalAccess agent)
 	{
 		final Future<IResourceIdentifier>	ret	= new Future<IResourceIdentifier>();
 		
 		// User supplied resource identifier.
-		if(ci!=null && ci.getResourceIdentifier()!=null)
+		if(rid!=null)
 		{
-			ret.setResult(ci.getResourceIdentifier());
+			ret.setResult(rid);
 		}
 		// Local parent //(but not platform -> platform now has valid rid).
 		else //if(ci!=null 
@@ -971,7 +971,7 @@ public class SComponentManagementService
 			URI u = null;
 			try
 			{
-				u = SUtil.toURL(ci.getFilename()).toURI();
+				u = SUtil.toURL(filename).toURI();
 			}
 			catch(Exception e)
 			{
@@ -1578,7 +1578,7 @@ public class SComponentManagementService
 	{
 		Future<Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>> ret = new Future<>();
 		
-		getResourceIdentifier(cinfo, agent).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IResourceIdentifier, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(ret)
+		getResourceIdentifier(modelname==null && cinfo!=null? cinfo.getFilename(): modelname, cinfo!=null? cinfo.getResourceIdentifier(): null, agent).addResultListener(createResultListener(agent, new ExceptionDelegationResultListener<IResourceIdentifier, Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>>(ret)
 		{
 			public void customResultAvailable(final IResourceIdentifier rid)
 			{

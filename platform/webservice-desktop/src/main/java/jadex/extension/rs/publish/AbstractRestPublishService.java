@@ -800,25 +800,25 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	        		byte[] jsonbytes = SUtil.readStream(request.getInputStream());
 	        		
 	        		String json = new String(jsonbytes, SUtil.UTF8);
-	        		if (types.length == 1 && json.trim().startsWith("{"))
+	        		if(types.length == 1 && json.trim().startsWith("{"))
 	        		{
 	        			List<ITraverseProcessor> procs = null;
-	        			if (SReflect.isSupertype(Map.class, types[0]))
+	        			if(SReflect.isSupertype(Map.class, types[0]))
 		        			procs = JsonTraverser.nestedreadprocs;
 	        			inparams = new Object[]{JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], procs)};
 	        		}
-	        		else if (types.length == 1 && json.trim().startsWith("\""))
+	        		else if(types.length == 1 && json.trim().startsWith("\""))
 	        		{
 	        			inparams = new Object[]{JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], null)};
 	        		}
 	        		else
 	        		{
-	        			JsonArray array = (JsonArray) Json.parse(json);
+	        			JsonArray array = (JsonArray)Json.parse(json);
 	        			inparams = new Object[array.size()];
 	        			for(int i=0; i<array.size(); i++)
 	        			{
 	        				List<ITraverseProcessor> procs = null;
-		        			if (SReflect.isSupertype(Map.class, types[i]))
+		        			if(SReflect.isSupertype(Map.class, types[i]))
 			        			procs = JsonTraverser.nestedreadprocs;
 	        				JsonValue val = array.get(i);
 	        				inparams[i] = JsonTraverser.objectFromString(val.toString(), component.getClassLoader(), null, types[i], procs);

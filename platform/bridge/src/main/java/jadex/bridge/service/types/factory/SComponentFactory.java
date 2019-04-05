@@ -40,6 +40,7 @@ import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -209,6 +210,7 @@ public class SComponentFactory
 			throw new IllegalArgumentException("Model must not be null.");
 		if(model.length()==0)
 			throw new IllegalArgumentException();
+		
 		return exta.scheduleStep(new IComponentStep<IModelInfo>()
 		{
 			@Classname("loadModel")
@@ -216,27 +218,34 @@ public class SComponentFactory
 			{
 				final Future<IModelInfo> ret = new Future<IModelInfo>();
 				
-				IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
-				fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
+				SComponentManagementService.getResourceIdentifier(model, rid, ia).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, IModelInfo>(ret) 
 				{
-					public void customResultAvailable(IComponentFactory fac)
+					@Override
+					public void customResultAvailable(IResourceIdentifier result) throws Exception 
 					{
-						fac.loadModel(model, null, rid)
-							.addResultListener(new DelegationResultListener<IModelInfo>(ret));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						if(exception instanceof ServiceNotFoundException)
+						IFuture<IComponentFactory> fut = getFactory(new FactoryFilter(model, null, rid), ia);
+						fut.addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 						{
-							ret.setResult(null);
-						}
-						else
-						{
-							super.exceptionOccurred(exception);
-						}
+							public void customResultAvailable(IComponentFactory fac)
+							{
+								fac.loadModel(model, null, rid)
+									.addResultListener(new DelegationResultListener<IModelInfo>(ret));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if(exception instanceof ServiceNotFoundException)
+								{
+									ret.setResult(null);
+								}
+								else
+								{
+									super.exceptionOccurred(exception);
+								}
+							}
+						}));
 					}
-				}));
+				});
 				
 				return ret;
 			}
