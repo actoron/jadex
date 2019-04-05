@@ -112,27 +112,8 @@ public class Starter
 //    public static String DATA_SUPERPEER = "superpeer";
 
     
-    /** The basic type converter. */
-    public static BasicTypeConverter BASICCONVERTER;
+   
     
-    static
-    {
-    	BASICCONVERTER = new BasicTypeConverter();
-    	BASICCONVERTER.addConverter(IComponentIdentifier.class, new IStringObjectConverter()
-		{
-			public Object convertString(String val, Object context) throws Exception
-			{
-				return new ComponentIdentifier(val);
-			}
-		});
-    	BASICCONVERTER.addConverter(ClassInfo.class, new IStringObjectConverter()
-		{
-			public Object convertString(String val, Object context) throws Exception
-			{
-				return new ClassInfo(val);
-			}
-		});
-    }
     
     /**
      *  Convert a (string) parameter

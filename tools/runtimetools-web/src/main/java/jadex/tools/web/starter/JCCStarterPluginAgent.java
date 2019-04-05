@@ -14,7 +14,10 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.SComponentManagementService;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
 import jadex.commons.IFilter;
@@ -22,6 +25,7 @@ import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -38,9 +42,11 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent(autostart=Boolean3.TRUE)
 public class JCCStarterPluginAgent implements IJCCStarterService
 {
+	/** The agent. */
 	@Agent
 	protected IInternalAccess agent;
 	
+	/** The plugin component string. */
 	protected String component;
 	
 	/**
@@ -102,10 +108,31 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 	 */
 	public IFuture<IComponentIdentifier> createComponent(String filename)
 	{
-		System.out.println("webjcc start: "+filename);
+//		System.out.println("webjcc start: "+filename);
 		
 		IExternalAccess comp = agent.createComponent(new CreationInfo().setFilename(filename)).get();
 		return new Future<IComponentIdentifier>(comp.getId());
+	}
+	
+	/**
+	 *  Create a component for a model.
+	 */
+	public IFuture<IComponentIdentifier> createComponent(CreationInfo ci)
+	{
+		System.out.println("webjcc start: "+ci);
+		
+		IExternalAccess comp = agent.createComponent(ci).get();
+		return new Future<IComponentIdentifier>(comp.getId());
+	}
+	
+	/**
+	 *  Load a component model.
+	 *  @param filename The filename.
+	 *  @return The component model.
+	 */
+	public IFuture<IModelInfo> loadComponentModel(String filename)
+	{
+		return SComponentFactory.loadModel(agent.getExternalAccess(), filename, null);
 	}
 	
 	/**

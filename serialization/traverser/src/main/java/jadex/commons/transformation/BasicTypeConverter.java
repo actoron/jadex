@@ -14,7 +14,7 @@ import jadex.commons.SUtil;
 /**
  *  Converter for basic types.
  */
-public class BasicTypeConverter //implements ITypeConverter
+public class BasicTypeConverter //implements IStringObjectConverter
 {
 	//-------- static part --------
 	
@@ -115,6 +115,32 @@ public class BasicTypeConverter //implements ITypeConverter
 	public BasicTypeConverter(Map<Class<?>, IStringObjectConverter> converters)
 	{
 		this.converters = converters!=null? converters: new HashMap<>(extconverters);
+	}
+	
+	/**
+	 *  Convert a string value.
+	 *  @param val The string value.
+	 *  @param type The target class.
+	 *  @param context The conversion context.
+	 *  @return The converted value.
+	 */
+	public Object convertString(String val, Class<?> type, Object context) throws Exception
+	{
+		IStringObjectConverter conv = getStringConverter(type);
+		return conv==null? null: conv.convertString(val, context);
+	}
+	
+	/**
+	 *  Convert a string value.
+	 *  @param val The string value.
+	 *  @param type The target class.
+	 *  @param context The conversion context.
+	 *  @return The converted value.
+	 */
+	public String convertObject(Object val, Class<?> type, Object context) throws Exception
+	{
+		IObjectStringConverter conv = getObjectConverter(type==null && val!=null? val.getClass(): type);
+		return conv==null? null: conv.convertObject(val, context);
 	}
 	
 	/**

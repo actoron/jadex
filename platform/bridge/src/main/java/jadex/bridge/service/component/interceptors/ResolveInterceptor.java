@@ -23,6 +23,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -144,6 +145,13 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 					{
 						Class<?> target = argtypes[i].getType(ia.getClassLoader());
 						Object cval = Starter.convertParameter(as[i], target);
+
+						/*ISerializationServices
+						if(cval==null && as[i] instanceof String)
+						{
+							JsonTraverser
+						}*/
+						
 						if(cval!=null)
 							as[i] = cval;
 					}

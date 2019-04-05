@@ -807,13 +807,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		        			procs = JsonTraverser.nestedreadprocs;
 	        			inparams = new Object[]{JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], procs)};
 	        		}
-	        		else if (types.length == 1 && json.trim().startsWith("\""))
+	        		else if(types.length == 1 && json.trim().startsWith("\""))
 	        		{
 	        			inparams = new Object[]{JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], null)};
 	        		}
 	        		else
 	        		{
-	        			JsonArray array = (JsonArray) Json.parse(json);
+	        			JsonArray array = (JsonArray)Json.parse(json);
 	        			inparams = new Object[array.size()];
 	        			for(int i=0; i<array.size(); i++)
 	        			{
