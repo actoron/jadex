@@ -79,7 +79,13 @@
 			</div>
 		</div>
 		<div class="row m-1" hide="{models.length==0}">
-			<div class="col-12">
+			<div class="col-12 m-1">
+				<input class="w100" type="text" list="models"></input>
+				<datalist id=models>
+					<option class="w100" each="{model in getModelNames()}" value="{model.name+' ['+model.pck+']'}"/>
+				</datalist>
+			</div>
+			<div class="col-12 m-1">
 				<div id="modeltree"></div> <!-- class="scroll" -->
 			</div>
 		</div>
@@ -89,6 +95,7 @@
 		 	</div>
 		 </div>
 	</div>
+</div>
 	
 	<style>
 	    #modellist {
@@ -216,6 +223,27 @@
 			return self.model!=null? self.model.arguments: [];
 		}
 		
+		getModelNames()
+		{
+			var ret = [];
+			if(self.models.length>0)
+			{
+				for(var i=0; i<self.models.length; i++)
+				{
+					var n = self.models[i][1].lastIndexOf(".");
+					if(n>=0)
+					{
+						ret.push({name: self.models[i][1].substring(n+1), pck: self.models[i][1].substring(0,n)});
+					}
+					else
+					{
+						ret.push({name: self.models[i][1], pck: null});
+					}
+				}
+			}
+			return ret;
+		}
+		
 		start(e)
 		{
 			console.log(e+" "+selected);
@@ -265,7 +293,7 @@
 			for(var i=0; i<self.models.length; i++)
 			{
 				//console.log(self.models[i]);
-				createNodes(treeid, self.models[i]);
+				createNodes(treeid, self.models[i][1]);
 			}
 		}
 		
@@ -282,9 +310,10 @@
 		
 		function createNodes(treeid, model)
 		{
-			var sep = "/";
-			if(model.indexOf("\\")!=-1)
-				sep = "\\";
+			var sep = ".";
+			//var sep = "/";
+			//if(model.indexOf("\\")!=-1)
+			//	sep = "\\";
 			var parts = model.split(sep);
 			
 			var lastprefix = '';

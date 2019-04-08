@@ -17,9 +17,9 @@ public interface IJCCStarterService extends IJCCPluginService
 {
 	/**
 	 *  Get all startable component models.
-	 *  @return The file names of the component models.
+	 *  @return The filenames and classnames of the component models.
 	 */
-	public IFuture<Collection<String>> getComponentModels();
+	public IFuture<Collection<String[]>> getComponentModels();
 	
 	/**
 	 *  Load a component model.

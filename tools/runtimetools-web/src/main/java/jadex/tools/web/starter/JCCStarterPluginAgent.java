@@ -74,7 +74,7 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 	 *  Get all startable component models.
 	 *  @return The file names of the component models.
 	 */
-	public IFuture<Collection<String>> getComponentModels()
+	public IFuture<Collection<String[]>> getComponentModels()
 	{
 		ILibraryService ls = agent.getLocalService(ILibraryService.class);
 		URL[] urls = ls.getAllURLs().get().toArray(new URL[0]);
@@ -97,10 +97,10 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 		});
 		
 		// Collect filenames of models to load the models without knowing the rid (can then be extracted)
-		List<String> res = cis.stream().map(a -> a.getFilename()).collect(Collectors.toList());
+		List<String[]> res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
 				
 		//System.out.println("Models found: "+res);
-		return new Future<Collection<String>>(res);
+		return new Future<Collection<String[]>>(res);
 	}
 	
 	/**
