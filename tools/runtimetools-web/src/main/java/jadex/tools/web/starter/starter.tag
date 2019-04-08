@@ -80,9 +80,9 @@
 		</div>
 		<div class="row m-1" hide="{models.length==0}">
 			<div class="col-12 m-1">
-				<input class="w100" type="text" list="models"></input>
+				<input class="w100" type="text" list="models" onchange="{select}" ref="modelchooser"></input>
 				<datalist id=models>
-					<option class="w100" each="{model in getModelNames()}" value="{model.name+' ['+model.pck+']'}"/>
+					<option class="w100" each="{model in getModelNames()}" value="{model.name+' ['+model.pck+']'}"></option>
 				</datalist>
 			</div>
 			<div class="col-12 m-1">
@@ -170,17 +170,7 @@
 		    //console.log("adding listener");
 			$('#'+treeid).on('select_node.jstree', function (e, data) 
 			{
-				selected = data.instance.get_path(data.node,'/');
-				self.refs.filename.value = selected;
-				
-				axios.get(self.getMethodPrefix()+'&methodname=loadComponentModel&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
-				{
-					console.log("model is: "+resp.data);
-					self.model = resp.data;
-					self.update();
-				});
-
-				self.update();
+				self.selectModel(data.instance.get_path(data.node,'/'));
 				//console.log('Selected: ' + selected); 
 			});
 		});
@@ -242,6 +232,28 @@
 				}
 			}
 			return ret;
+		}
+		
+		selectModel(filename)
+		{
+			self.refs.filename.value = filename;
+			//self.update();
+			
+			axios.get(self.getMethodPrefix()+'&methodname=loadComponentModel&args_0='+filename+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
+			{
+				console.log("model is: "+resp.data);
+				self.model = resp.data;
+				self.update();
+			});
+		}
+		
+		select(e)
+		{
+			console.log(self.refs.modelchooser.selectionStart);
+			var sel = self.refs.modelchooser.selectionStart;
+			var filename = self.models[sel][0];
+			
+			self.selectModel(filename);
 		}
 		
 		start(e)
