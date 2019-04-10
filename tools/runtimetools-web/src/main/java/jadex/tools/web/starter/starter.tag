@@ -130,20 +130,15 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>-->
 	
 	<script>
-		//console.log("starter: "+opts);
-	
+		console.log("starter: "+opts);
+		
 		var self = this;
+
 		self.cid = opts!=null? opts.cid: null;
 		self.models = []; // available component models [filename, classname]
 		self.model = null; // loaded model
 		
 		var treeid = "modeltree";
-		
-		$(function() { $('#'+treeid).jstree(
-		{
-			"core" : {"check_callback" : true}//,
-			//"plugins" : ["dnd","contextmenu"]
-		})});
 		
 		var myservice = "jadex.tools.web.starter.IJCCStarterService";
 		
@@ -151,28 +146,6 @@
 		{
 			return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
 		}
-		
-		// no args here
-		axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
-		{
-			//console.log(resp.data);
-			
-			self.models = resp.data;
-			createModelTree(treeid);
-			$("#modeltree").jstree('open_all');
-			self.update();
-		});
-		
-		this.on('mount', function()
-		{
-		    //console.log("adding listener");
-			$('#'+treeid).on('select_node.jstree', function (e, data) 
-			{
-				self.selectModel(data.instance.get_path(data.node,'/'));
-			});
-		});
-		
-		self.update();
 		
 		// todo: order by name
 		orderBy(data) 
@@ -362,5 +335,37 @@
 			//console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
 			$('#'+treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
 		}
+		
+		// dynamically load jstree lib and style
+		self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
+		{
+			// init tree
+			$(function() { $('#'+treeid).jstree(
+			{
+				"core" : {"check_callback" : true}//,
+				//"plugins" : ["dnd","contextmenu"]
+			})});
+			
+			// no args here
+			axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
+			{
+				//console.log(resp.data);
+				self.models = resp.data;
+				createModelTree(treeid);
+				$("#modeltree").jstree('open_all');
+				self.update();
+			});
+			
+			self.on('mount', function()
+			{
+			    //console.log("adding listener");
+				$('#'+treeid).on('select_node.jstree', function (e, data) 
+				{
+					self.selectModel(data.instance.get_path(data.node,'/'));
+				});
+			});
+			
+			//self.update();
+		})
 	</script>
 </starter>

@@ -22,9 +22,8 @@
 		<script src="libs/popper_1.14.0.min.js"></script>
 		<script src="libs/bootstrap_4.1.0.min.js"></script>
 		
-		<!-- todo: remove here jstree for starter -->
-		<script src="libs/jstree_3.2.1.min.js"></script>
-		<link rel="stylesheet" href="libs/jstree_3.2.1.min.css" />
+		<!-- <script src="libs/jstree_3.2.1.min.js"></script>
+		<link rel="stylesheet" href="libs/jstree_3.2.1.min.css" /> -->
 	</head>
 	<body>
 		<app></app>
@@ -51,7 +50,9 @@
 			};
 			
 			// not using var to set a global variable
-			PROMISE_DOME = Promise.resolve("Dummy response to keep the console quiet")
+			PROMISE_DOME = Promise.resolve("Dummy response to keep the console quiet");
+			
+			
 			
 			// https://riot.js.org/api/
 	    	// Note: users of In-browser compilation will need to wrap calls to riot.mount in riot.compile in order to get returned tag instances.
@@ -153,6 +154,122 @@
 					}
 				};
 				riot.mixin(langmixin);
+				
+				var loader = 
+				{
+				    getHead: function()
+				    {
+				    	return document.getElementsByTagName("head")[0];
+				    },
+				    withNoCache: function(filename)
+				    {
+			            if(filename.indexOf("?") === -1)
+			            {
+			                filename += "?no_cache=" + new Date().getTime();
+			            }
+			            else
+			            {
+			                filename += "&no_cache=" + new Date().getTime();
+			            }
+			            return filename;
+			        },
+				    loadStyle: function(i, files, callback)
+			        {
+			        	if(i>=files.length)
+			        	{
+			        		callback();
+			        	}
+			        	else
+			        	{
+			        		var self = this;
+			        		var link = document.createElement("link");
+				            link.rel = "stylesheet";
+				            link.type = "text/css";
+				            link.href = self.withNoCache(files[i]);
+				            
+				            link.onload = function ()
+				            {
+				            	console.log('Loaded style: ' + files[i]);
+				            	self.loadStyle(i+1, files, callback);
+				            };
+				            link.onerror = function ()
+				            {
+				                console.log('Error loading style: ' + files[i]);
+				                self.loadStyle(i+1, files, callback);
+				            };
+				            
+				            console.log('Loading style ' + files[i]);
+				           	self.getHead().appendChild(link);
+			        	}
+			        },
+			        loadScript: function(i, files, callback)
+			        {
+			        	if(i>=files.length)
+			        	{
+			        		callback();
+			        	}
+			        	else
+			        	{
+			        		var self = this;
+				            var script = document.createElement('script');
+				            script.type = 'text/javascript';
+				            script.src = self.withNoCache(files[i]);
+				            
+				            script.onload = function ()
+				            {
+				                console.log('Loaded script: ' + files[i]);
+				                self.loadScript(i+1, files, callback);
+				            };
+				            script.onerror = function ()
+				            {
+				                console.log('Error loading script: ' + files[i]);
+				                self.loadScript(i+1, files, callback);
+				            };
+				            
+				            console.log('Loading script ' + files[i]);
+				            self.getHead().appendChild(script);
+			        	}
+			        },
+			        loadFiles: function(files, callback)
+			        {
+			        	var self = this;
+			        	
+			        	 // this.m_head = document.head; // IE9+ only
+				        var endsWith = function(str, suffix)
+				        {
+				            if(str === null || suffix === null)
+				                return false;
+				            return str.indexOf(suffix, str.length - suffix.length) !== -1;
+				        }
+			        	
+			        	var jsfiles = [];
+				        var cssfiles = [];
+				        
+			        	for(var i = 0; i < files.length; ++i)
+				        {
+				        	if(endsWith(files[i], ".css"))
+				            {
+				                cssfiles.push(files[i]);
+				            }
+				            else if(endsWith(files[i], ".js"))
+				            {
+				                jsfiles.push(files[i]);
+				            }
+				            else
+				            {
+				                self.log('Error unknown filetype "' + files[i] + '".');
+				            }
+				        }
+			        	
+			        	// loads recursively
+			            self.loadStyle(0, cssfiles, function()
+			            {
+			            	self.loadScript(0, jsfiles, callback);
+			            });
+			        },
+			       
+				};
+				riot.mixin(loader);
 				
 		    	riot.mount('*');
 		    	
