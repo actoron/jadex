@@ -95,7 +95,6 @@
 		 	</div>
 		 </div>
 	</div>
-</div>
 	
 	<style>
 	    #modellist {
@@ -135,9 +134,8 @@
 	
 		var self = this;
 		self.cid = opts!=null? opts.cid: null;
-		self.models = [];
-		self.selected = null;
-		self.model = null;
+		self.models = []; // available component models [filename, classname]
+		self.model = null; // loaded model
 		
 		var treeid = "modeltree";
 		
@@ -171,7 +169,6 @@
 			$('#'+treeid).on('select_node.jstree', function (e, data) 
 			{
 				self.selectModel(data.instance.get_path(data.node,'/'));
-				//console.log('Selected: ' + selected); 
 			});
 		});
 		
@@ -249,17 +246,32 @@
 		
 		select(e)
 		{
-			console.log(self.refs.modelchooser.selectionStart);
-			var sel = self.refs.modelchooser.selectionStart;
-			var filename = self.models[sel][0];
+			// does not work :-(
+			//var sel = self.refs.modelchooser.selectionStart;
+			var sel = self.refs.modelchooser.value;
 			
-			self.selectModel(filename);
+			var opts = self.refs.modelchooser.list.options;
+			var idx = -1;
+			for(var i=0; i<opts.length; i++)
+			{
+				if(opts[i].value==sel)
+				{
+					idx = i;
+					break;
+				}
+			}
+			console.log(idx);
+			
+			if(idx>-1)
+			{
+				var filename = self.models[idx][0];
+				self.selectModel(filename);
+			}
 		}
 		
 		start(e)
 		{
-			console.log(e+" "+selected);
-			if(selected!=null)
+			if(self.model!=null)
 			{
 				var conf = self.refs.config.value;
 				var sync = self.refs.synchronous.checked;
@@ -281,7 +293,7 @@
 					}
 				}
 				
-				var ci = {filename: selected};
+				var ci = {filename: self.model.filename};
 				if(conf!=null && conf.length>0)
 					ci.configuration = conf;
 				ci.synchronous = sync;
@@ -291,8 +303,10 @@
 					ci.name = name;
 				
 				//axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+selected+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
+				//console.log("starting: "+ci);
 				axios.get(self.getMethodPrefix()+'&methodname=createComponent&args_0='+JSON.stringify(ci)+"&argtypes_0=jadex.bridge.service.types.cms.CreationInfo", self.transform).then(function(resp)
 				{
+					// todo: show running components?!
 					console.log("started: "+resp.data);
 				});
 			}
