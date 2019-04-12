@@ -4,8 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
+import jadex.binary.IDecoderHandler;
 import jadex.binary.SBinarySerializer;
 import jadex.binary.SerializationConfig;
 import jadex.bridge.component.IMsgHeader;
@@ -14,6 +18,13 @@ import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.platform.service.serialization.serializers.JadexJsonSerializer.JsonByteArrayReadProcessor;
+import jadex.platform.service.serialization.serializers.JadexJsonSerializer.JsonByteArrayWriteProcessor;
+import jadex.platform.service.serialization.serializers.jsonread.JsonComponentIdentifierProcessor;
+import jadex.platform.service.serialization.serializers.jsonwrite.JsonResourceIdentifierProcessor;
+import jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceIdentifierProcessor;
+import jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceProcessor;
+import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  The Jadex Binary serializer. Codec supports parallel
@@ -99,6 +110,24 @@ public class JadexBinarySerializer implements ISerializer
 		IMsgHeader.XID
 	});
 	
+	/** The write processors. */
+	public List<ITraverseProcessor> writeprocs;
+	
+	/** The read processors. */
+	public List<IDecoderHandler> readprocs;
+	
+	/**
+	 *  Create a new serializer.
+	 */
+	public JadexBinarySerializer()
+	{
+		writeprocs = Collections.synchronizedList(new ArrayList<ITraverseProcessor>());
+		writeprocs.addAll(SBinarySerializer.ENCODER_HANDLERS);
+		
+		readprocs = Collections.synchronizedList(new ArrayList<IDecoderHandler>());
+		readprocs.addAll(SBinarySerializer.DECODER_HANDLERS);
+	}
+	
 	//-------- methods --------
 	
 	/**
@@ -120,14 +149,12 @@ public class JadexBinarySerializer implements ISerializer
 	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs, Object usercontext)
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		SBinarySerializer.writeObjectToStream(baos, val, preprocs!=null?Arrays.asList(preprocs):null, null, usercontext, classloader, CONFIG);
+		SBinarySerializer.writeObjectToStream(baos, val, preprocs!=null?Arrays.asList(preprocs):null, writeprocs, usercontext, classloader, CONFIG);
 		
 		byte[] ret = baos.toByteArray();
 		
 		if(DEBUG)
-		{
 			System.out.println("encode message: "+(new String(ret, SUtil.UTF8)));
-		}
 		return ret;
 	}
 
@@ -139,9 +166,7 @@ public class JadexBinarySerializer implements ISerializer
 	public Object decode(byte[] bytes, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext)
 	{
 		if(DEBUG)
-		{
 			System.out.println("decode message: "+(new String((byte[])bytes, SUtil.UTF8)));
-		}
 		
 		InputStream is = new ByteArrayInputStream((byte[]) bytes);
 		
@@ -165,8 +190,7 @@ public class JadexBinarySerializer implements ISerializer
 	 */
 	public Object decode(InputStream is, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext)
 	{
-		
-		Object ret = SBinarySerializer.readObjectFromStream(is, postprocs!=null?Arrays.asList(postprocs):null, usercontext, classloader, null, CONFIG);
+		Object ret = SBinarySerializer.readObjectFromStream(is, postprocs!=null?Arrays.asList(postprocs):null, usercontext, classloader, null, CONFIG, readprocs);
 		
 		try
 		{
@@ -176,7 +200,15 @@ public class JadexBinarySerializer implements ISerializer
 		{
 		}
 		
-		
 		return ret;
+	}
+	
+	/**
+	 *  Add a processor pair.
+	 */
+	public void addProcessor(IDecoderHandler readproc, ITraverseProcessor writeproc)
+	{
+		readprocs.add(0, readproc);
+		writeprocs.add(0, writeproc);
 	}
 }

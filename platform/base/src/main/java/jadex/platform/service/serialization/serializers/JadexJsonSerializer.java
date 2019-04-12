@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.eclipsesource.json.JsonObject;
@@ -18,6 +19,10 @@ import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
+import jadex.platform.service.serialization.serializers.jsonread.JsonComponentIdentifierProcessor;
+import jadex.platform.service.serialization.serializers.jsonwrite.JsonResourceIdentifierProcessor;
+import jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceIdentifierProcessor;
+import jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceProcessor;
 import jadex.transformation.jsonserializer.JsonTraverser;
 import jadex.transformation.jsonserializer.processors.JsonReadContext;
 import jadex.transformation.jsonserializer.processors.JsonWriteContext;
@@ -41,19 +46,32 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 	/** The debug flag. */
 	protected boolean DEBUG = false;
 	
-	public static List<ITraverseProcessor> writeprocs;
-	public static List<ITraverseProcessor> readprocs;
-	static
+	/** The write processors. */
+	public List<ITraverseProcessor> writeprocs;
+	
+	/** The read processors. */
+	public List<ITraverseProcessor> readprocs;
+	
+	/**
+	 *  Create a new serializer.
+	 */
+	public JadexJsonSerializer()
 	{
-		writeprocs = new ArrayList<ITraverseProcessor>();
+		writeprocs = Collections.synchronizedList(new ArrayList<ITraverseProcessor>());
 		writeprocs.add(new JsonByteArrayWriteProcessor());
+		writeprocs.add(new JsonResourceIdentifierProcessor());
+		writeprocs.add(new JsonServiceIdentifierProcessor());
+		writeprocs.add(new JsonServiceProcessor());
 		writeprocs.addAll(JsonTraverser.writeprocs);
 		
-		readprocs = new ArrayList<ITraverseProcessor>();
+		readprocs = Collections.synchronizedList(new ArrayList<ITraverseProcessor>());
 		readprocs.add(new JsonByteArrayReadProcessor());
+		readprocs.add(new JsonComponentIdentifierProcessor());
+		readprocs.add(new jadex.platform.service.serialization.serializers.jsonread.JsonResourceIdentifierProcessor());
+		readprocs.add(new jadex.platform.service.serialization.serializers.jsonread.JsonServiceIdentifierProcessor());
+		readprocs.add(new jadex.platform.service.serialization.serializers.jsonread.JsonServiceProcessor());
 		readprocs.addAll(JsonTraverser.readprocs);
 	}
-	
 	
 	//-------- methods --------
 	
@@ -214,6 +232,15 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 				((JsonReadContext)context).addKnownObject(ret, idx.asInt());
 			return ret;
 		}
+	}
+	
+	/**
+	 *  Add a read/write processor pair.
+	 */
+	public void addProcessor(ITraverseProcessor read, ITraverseProcessor write)
+	{
+		readprocs.add(0, read);
+		writeprocs.add(0, write);
 	}
 	
 	/**

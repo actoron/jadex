@@ -9,6 +9,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.core.Response;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -56,7 +58,7 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 	public IFuture<String> getPluginComponent()
 	{
 		if(component==null)
-			component = loadTag("jadex/tools/web/starter/starter.tag");
+			component = internalLoadResource("jadex/tools/web/starter/starter.tag");
 		
 		return new Future<String>(component);
 	}
@@ -136,9 +138,22 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 	}
 	
 	/**
-	 *  Load a tag html code per resource name.
+	 *  Load a string-based ressource (style or js).
+	 *  @param filename The filename.
+	 *  @return The text from the file.
 	 */
-	public String loadTag(String name)
+	public IFuture<Response> loadResource(String filename)
+	{
+		String res = internalLoadResource(filename);
+		String mt = SUtil.guessContentTypeByFilename(filename);
+		Response r = Response.ok(res).header("Content-Type", mt).build();
+		return new Future<Response>(r);
+	}
+	
+	/**
+	 *  Load a resource per resource name.
+	 */
+	public String internalLoadResource(String name)
 	{
 		String ret;
 		
@@ -149,7 +164,7 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 			sc = new Scanner(is);
 			ret = sc.useDelimiter("\\A").next();
 			
-	//		System.out.println(ret);
+			System.out.println("loading: "+name+" "+ret.length());
 		}
 		catch(Exception e)
 		{

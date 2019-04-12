@@ -8,15 +8,17 @@ import java.util.List;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
+/**
+ *  Deep cloner.
+ */
 public class SCloner
 {
-	
 	/**
 	 *  Check if a context is a clone contexxt.
 	 *  @param context The context.
 	 *  @return True, if context is a clone context.
 	 */
-	protected static final boolean isCloneContext(Object context)
+	public static final boolean isCloneContext(Object context)
 	{
 		return context instanceof CloneContext;
 	}
@@ -64,6 +66,12 @@ public class SCloner
 	 */
 	public static final Object clone(Object object, Traverser traverser, List<ITraverseProcessor> processors, ClassLoader targetcl)
 	{
+//		if(object!=null)
+//		{
+//			if(object.getClass().toString().indexOf("Response")!=-1)
+//				System.out.println("cloning: "+object.getClass());
+//		}
+		
 		traverser = traverser != null? traverser:Traverser.getInstance();
 		return traverser.traverse(object, null, null, processors == null? Traverser.getDefaultProcessors():processors, Traverser.MODE.PLAIN, targetcl, new CloneContext());
 	}

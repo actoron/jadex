@@ -14,8 +14,10 @@ dependencies
 	api 'javassist:javassist:3.12.1.GA'
 	api 'javax.servlet:javax.servlet-api:3.1.0'
 	//api 'javax.websocket:javax.websocket-api:1.1'
+	
+	api	'org.glassfish.jersey.core:jersey-common:2.28'
 
-	testImplementation 'org.glassfish.jersey.core:jersey-client:2.26'
-	testImplementation 'org.glassfish.jersey.inject:jersey-hk2:2.26'
+	testImplementation 'org.glassfish.jersey.core:jersey-client:2.28'
+	testImplementation 'org.glassfish.jersey.inject:jersey-hk2:2.28'
 
 }

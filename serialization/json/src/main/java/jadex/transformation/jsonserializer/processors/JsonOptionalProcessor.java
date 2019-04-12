@@ -51,8 +51,10 @@ public class JsonOptionalProcessor extends AbstractJsonProcessor
 	/**
 	 * Init caches if not initialized.
 	 */
-	protected void init() {
-		if (optionalClass == null) {
+	protected void init() 
+	{
+		if (optionalClass == null) 
+		{
 			optionalClass = SReflect.classForName0(OPTIONAL_CLASSNAME, null);
 			ofMethod = SReflect.getMethod(optionalClass, "of", new Class[]{Object.class});
 			emptyMethod = SReflect.getMethod(optionalClass, "empty", new Class[]{});
@@ -98,26 +100,35 @@ public class JsonOptionalProcessor extends AbstractJsonProcessor
 	{
 		init();
 		Object ret = null;
-		try {
+		try 
+		{
 			JsonObject obj = (JsonObject) object;
 			boolean isPresent = obj.getBoolean("isPresent", false);
-			if (isPresent) {
+			if(isPresent) 
+			{
 				JsonValue subJson = obj.get("subobject");
 				Object subObject;
-				if (subJson != null) {
+				if(subJson != null) 
+				{
 					subObject = traverser.traverse(subJson, Object.class, conversionprocessors, processors, mode, targetcl, context);
 					ret =	ofMethod.invoke(optionalClass, subObject);
-				} else {
+				} 
+				else 
+				{
 					ret = emptyMethod.invoke(optionalClass);
 				}
-			} else {
+			} 
+			else 
+			{
 				ret = emptyMethod.invoke(optionalClass);
 			}
 
 			JsonValue idx = ((JsonObject)object).get(JsonTraverser.ID_MARKER);
 			if(idx!=null)
 				((JsonReadContext)context).addKnownObject(ret, idx.asInt());
-		} catch (Exception e) {
+		} 
+		catch (Exception e) 
+		{
 			throw new RuntimeException(e);
 		}
 

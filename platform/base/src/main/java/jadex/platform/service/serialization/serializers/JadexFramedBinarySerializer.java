@@ -52,9 +52,7 @@ public class JadexFramedBinarySerializer implements ISerializer
 		byte[] ret = SBinarySerializer.writeObjectToFramedArray(val, preprocs!=null?Arrays.asList(preprocs):null, null, usercontext, classloader, null);
 		
 		if(DEBUG)
-		{
 			System.out.println("encode message: "+(new String(ret, SUtil.UTF8)));
-		}
 		return ret;
 	}
 
@@ -66,9 +64,7 @@ public class JadexFramedBinarySerializer implements ISerializer
 	public Object decode(byte[] bytes, ClassLoader classloader, ITraverseProcessor[] postprocs, IErrorReporter rep, Object usercontext)
 	{
 		if(DEBUG)
-		{
 			System.out.println("decode message: "+(new String((byte[])bytes, SUtil.UTF8)));
-		}
 		
 		InputStream is = new ByteArrayInputStream((byte[]) bytes);
 		

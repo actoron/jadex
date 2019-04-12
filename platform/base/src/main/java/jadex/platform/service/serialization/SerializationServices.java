@@ -290,6 +290,16 @@ public class SerializationServices implements ISerializationServices
 	}
 	
 	/**
+	 *  Returns a serializer per id.
+	 *  @param id The id.
+	 *  @return The serializer.
+	 */
+	public ISerializer getSerializer(int id)
+	{
+		return id<serializers.length? serializers[id]: null;
+	}
+	
+	/**
 	 *  Returns the codecs for sending.
 	 *  
 	 *  @param receiver Receiving platform.

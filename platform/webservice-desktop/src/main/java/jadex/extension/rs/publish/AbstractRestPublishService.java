@@ -50,8 +50,6 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.base.Starter;
-import jadex.bridge.ClassInfo;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -83,22 +81,24 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
-import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringConverter;
-import jadex.commons.transformation.IStringObjectConverter;
 import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
+import jadex.extension.rs.publish.binary.BinaryResponseProcessor;
+import jadex.extension.rs.publish.clone.CloneResponseProcessor;
+import jadex.extension.rs.publish.json.JsonResponseProcessor;
 import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
 import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
-import jadex.micro.annotation.Component;
 import jadex.platform.service.serialization.SerializationServices;
+import jadex.platform.service.serialization.serializers.JadexBinarySerializer;
+import jadex.platform.service.serialization.serializers.JadexJsonSerializer;
 import jadex.transformation.jsonserializer.JsonTraverser;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -149,30 +149,24 @@ public abstract class AbstractRestPublishService implements IWebPublishService
     /** The media type converters. */
     protected MultiCollection<String, IObjectStringConverter> converters;
     
-    /** The basic type converter. */
-//    protected BasicTypeConverter basicconverters;
-    
     /**
      *  The service init.
      */
     @ServiceStart
     public IFuture<Void> init()
     {
-//    	basicconverters = new BasicTypeConverter();
-//    	basicconverters.addConverter(IComponentIdentifier.class, new IStringObjectConverter()
-//		{
-//			public Object convertString(String val, Object context) throws Exception
-//			{
-//				return new ComponentIdentifier(val);
-//			}
-//		});
-//    	basicconverters.addConverter(ClassInfo.class, new IStringObjectConverter()
-//		{
-//			public Object convertString(String val, Object context) throws Exception
-//			{
-//				return new ClassInfo(val);
-//			}
-//		});
+    	// Add rs 'Response' converters
+    	// todo: support for xml ?!
+    	// todo: use preprocessors (would work for all serializers) ?!
+    	ISerializationServices ss = SerializationServices.getSerializationServices(component.getId());
+    	JadexJsonSerializer jser = (JadexJsonSerializer)ss.getSerializer(JadexJsonSerializer.SERIALIZER_ID);
+    	JsonResponseProcessor jrp = new JsonResponseProcessor();
+    	jser.addProcessor(jrp, jrp);
+    	JadexBinarySerializer bser = (JadexBinarySerializer)ss.getSerializer(JadexBinarySerializer.SERIALIZER_ID);
+    	BinaryResponseProcessor brp = new BinaryResponseProcessor();
+    	bser.addProcessor(brp, brp);
+    	ss.getCloneProcessors().add(0, new CloneResponseProcessor());
+    	//System.out.println("added response processors for: "+component.getId().getRoot());
     	
     	converters = new MultiCollection<String, IObjectStringConverter>();
     	requestinfos	= new LinkedHashMap<String, RequestInfo>();
@@ -363,7 +357,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         // request info manages an ongoing conversation
         if(requestinfos.containsKey(callid))
         {
-        	System.out.println("received existing call: "+request+" "+callid);
+        	//System.out.println("received existing call: "+request+" "+callid);
         	
         	RequestInfo	rinfo = requestinfos.get(callid);
         	
@@ -392,7 +386,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         }
         else if(callid!=null)
         {
-        	System.out.println("callid not found: "+callid);
+        	//System.out.println("callid not found: "+callid);
         	
         	writeResponse(null, Response.Status.NOT_FOUND.getStatusCode(), null, null, request, response, true);
         
@@ -402,7 +396,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
         // handle new call
         else
         {
-        	System.out.println("received new call: "+request);
+        	//System.out.println("received new call: "+request);
         	
             String methodname = request.getPathInfo();
 
@@ -482,7 +476,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                     	     */
                     	    protected void handleResult(Object result, Throwable exception, Object command)
                     	    {
-                    	    	System.out.println("handleResult: "+result+", "+exception+", "+command+", "+Thread.currentThread());
+//                    	    	System.out.println("handleResult: "+result+", "+exception+", "+command+", "+Thread.currentThread());
                     	    	
                     	    	if(rinfo.isTerminated())
                     	    	{
@@ -1187,7 +1181,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		        		if(convs!=null && convs.size()>0)
 		        		{	
 			        		mt = mediatype;
-		        			Object input = result instanceof Response? ((Response) result).getEntity() : result;
+		        			Object input = result instanceof Response? ((Response)result).getEntity() : result;
 		        			ret = convs.iterator().next().convertObject(input, null);
 		        			break;
 		        		}
@@ -1203,9 +1197,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		        }
 	        	else
 	  	        {
-	        		System.out.println("cannot convert result, writing as string: "+result);
-	        		response.setHeader("Content-Type", MediaType.TEXT_PLAIN);
-	        		out.write(result.toString());
+	        		if(response.getHeader("Content-Type")==null)
+	        			response.setHeader("Content-Type", MediaType.TEXT_PLAIN);
+	        		if(!(result instanceof String) && !(result instanceof Response))
+	        			System.out.println("cannot convert result, writing as string: "+result);
+	        		
+	        		out.write(result instanceof Response? ""+((Response)result).getEntity(): result.toString());
 	  	        }
 	        	
 	            // for testing with browser

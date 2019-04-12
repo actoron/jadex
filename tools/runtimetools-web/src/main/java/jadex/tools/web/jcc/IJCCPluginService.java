@@ -20,4 +20,5 @@ public interface IJCCPluginService
 	 *  @return The plugin name.
 	 */
 	public IFuture<String> getPluginName();
+	
 }

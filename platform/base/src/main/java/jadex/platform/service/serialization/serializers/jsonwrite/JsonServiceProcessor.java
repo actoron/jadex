@@ -1,10 +1,9 @@
-package org.activecomponents.webservice.json.write;
+package jadex.platform.service.serialization.serializers.jsonwrite;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import jadex.bridge.service.IService;

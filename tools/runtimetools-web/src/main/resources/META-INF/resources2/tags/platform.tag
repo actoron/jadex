@@ -68,7 +68,7 @@
 		}).catch(function(err) 
 		{
 			console.log("err: "+err);	
-			return this.PROMISE_DONE;
+			//return this.PROMISE_DONE;
 		});
 		
 		self.update();

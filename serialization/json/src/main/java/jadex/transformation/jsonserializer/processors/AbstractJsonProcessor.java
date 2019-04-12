@@ -7,6 +7,9 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.commons.transformation.traverser.Traverser.MODE;
 
+/**
+ * 
+ */
 public abstract class AbstractJsonProcessor implements ITraverseProcessor
 {
 	/**

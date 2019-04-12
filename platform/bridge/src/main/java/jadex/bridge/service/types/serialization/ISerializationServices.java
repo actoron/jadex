@@ -5,6 +5,7 @@ import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.service.types.message.ISerializer;
 import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
@@ -105,13 +106,18 @@ public interface ISerializationServices
 //	 */
 //	public ISerializer getSendSerializer(IComponentIdentifier receiver);
 	
-//	/**
-//	 *  Returns all serializers.
-//	 *  
-//	 *  @param platform Sending platform.
-//	 *  @return Serializers.
-//	 */
-//	public Map<Integer, ISerializer> getSerializers();
+	/**
+	 *  Returns all serializers.
+	 *  @return Serializers.
+	 */
+	public ISerializer[] getSerializers();
+	
+	/**
+	 *  Returns a serializer per id.
+	 *  @param id The id.
+	 *  @return The serializer.
+	 */
+	public ISerializer getSerializer(int id);
 	
 //	/**
 //	 *  Returns the codecs for sending.

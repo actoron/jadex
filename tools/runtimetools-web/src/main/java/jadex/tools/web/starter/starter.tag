@@ -336,8 +336,17 @@
 			$('#'+treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
 		}
 		
+		var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
+		var res2 = "jadex/tools/web/starter/libs/jstree_3.3.7.js";
+		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+
+		console.log(ures1);
+		console.log(ures2);
+		
 		// dynamically load jstree lib and style
-		self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
+		//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
+		self.loadFiles([ures1], [ures2], function()
 		{
 			// init tree
 			$(function() { $('#'+treeid).jstree(

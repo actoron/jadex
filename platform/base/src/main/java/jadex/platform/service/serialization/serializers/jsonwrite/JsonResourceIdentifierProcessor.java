@@ -1,4 +1,4 @@
-package org.activecomponents.webservice.json.write;
+package jadex.platform.service.serialization.serializers.jsonwrite;
 
 import java.lang.reflect.Type;
 import java.net.URI;

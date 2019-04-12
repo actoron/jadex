@@ -163,7 +163,8 @@
 				    },
 				    withNoCache: function(filename)
 				    {
-			            if(filename.indexOf("?") === -1)
+				    	return filename;
+			            /*if(filename.indexOf("?") === -1)
 			            {
 			                filename += "?no_cache=" + new Date().getTime();
 			            }
@@ -171,7 +172,7 @@
 			            {
 			                filename += "&no_cache=" + new Date().getTime();
 			            }
-			            return filename;
+			            return filename;*/
 			        },
 				    loadStyle: function(i, files, callback)
 			        {
@@ -230,36 +231,9 @@
 				            self.getHead().appendChild(script);
 			        	}
 			        },
-			        loadFiles: function(files, callback)
+			        loadFiles: function(cssfiles, jsfiles, callback)
 			        {
 			        	var self = this;
-			        	
-			        	 // this.m_head = document.head; // IE9+ only
-				        var endsWith = function(str, suffix)
-				        {
-				            if(str === null || suffix === null)
-				                return false;
-				            return str.indexOf(suffix, str.length - suffix.length) !== -1;
-				        }
-			        	
-			        	var jsfiles = [];
-				        var cssfiles = [];
-				        
-			        	for(var i = 0; i < files.length; ++i)
-				        {
-				        	if(endsWith(files[i], ".css"))
-				            {
-				                cssfiles.push(files[i]);
-				            }
-				            else if(endsWith(files[i], ".js"))
-				            {
-				                jsfiles.push(files[i]);
-				            }
-				            else
-				            {
-				                self.log('Error unknown filetype "' + files[i] + '".');
-				            }
-				        }
 			        	
 			        	// loads recursively
 			            self.loadStyle(0, cssfiles, function()

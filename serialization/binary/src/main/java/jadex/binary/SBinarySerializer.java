@@ -295,7 +295,7 @@ public class SBinarySerializer
 	 */
 	public static Object readObjectFromByteArray(byte[] val, List<ITraverseProcessor> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter)
 	{
-		return readObjectFromStream(new ByteArrayInputStream(val), postprocessors, usercontext, classloader, errorreporter, null);
+		return readObjectFromStream(new ByteArrayInputStream(val), postprocessors, usercontext, classloader, errorreporter, null, null);
 	}
 	
 	/**
@@ -321,6 +321,19 @@ public class SBinarySerializer
 	 */
 	public static Object readObjectFromStream(InputStream is, List<ITraverseProcessor> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter, SerializationConfig config)
 	{
+		return readObjectFromStream(is, null, null, classloader, null, null, null);
+	}
+	
+	/**
+	 *  Convert a byte array to an object.
+	 *  @param val The byte array.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader.
+	 *  @param errorreporter The error reporter, may be null in which case the default reporter is used.
+	 *  @return The decoded object.
+	 */
+	public static Object readObjectFromStream(InputStream is, List<ITraverseProcessor> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter, SerializationConfig config, List<IDecoderHandler> decoders)
+	{
 		try
 		{
 			byte mbyte = (byte) is.read();
@@ -335,11 +348,9 @@ public class SBinarySerializer
 		}
 		
 		
-		if (errorreporter == null)
-		{
+		if(errorreporter == null)
 			errorreporter = new DefaultErrorReporter();
-		}
-		IDecodingContext context = new StreamDecodingContext(is, DECODER_HANDLERS, postprocessors, usercontext, classloader, errorreporter, config);
+		IDecodingContext context = new StreamDecodingContext(is, decoders==null? DECODER_HANDLERS: decoders, postprocessors, usercontext, classloader, errorreporter, config);
 		int streamver = (int) context.readVarInt();
 		if (streamver > VERSION)
 		{
@@ -433,7 +444,7 @@ public class SBinarySerializer
 	 *  @param context The decoding context.
 	 *  @return Decoded object.
 	 */
-	protected static Object decodeObject(IDecodingContext context)
+	public static Object decodeObject(IDecodingContext context)
 	{
 		String classname = context.readClassname();
 		
