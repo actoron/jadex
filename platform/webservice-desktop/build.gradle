@@ -13,6 +13,10 @@ dependencies
 
 	api 'javassist:javassist:3.12.1.GA'
 	api 'javax.servlet:javax.servlet-api:3.1.0'
+	
+	// WS packages removed in Java 11
+	implementation 'javax.xml.ws:jaxws-api:2.3.1'
+	implementation 'com.sun.xml.ws:rt:2.3.2'
 	//api 'javax.websocket:javax.websocket-api:1.1'
 	
 	api	'org.glassfish.jersey.core:jersey-common:2.28'
