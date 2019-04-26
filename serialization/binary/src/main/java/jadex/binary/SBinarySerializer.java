@@ -321,7 +321,7 @@ public class SBinarySerializer
 	 */
 	public static Object readObjectFromStream(InputStream is, List<ITraverseProcessor> postprocessors, Object usercontext, ClassLoader classloader, IErrorReporter errorreporter, SerializationConfig config)
 	{
-		return readObjectFromStream(is, null, null, classloader, null, null, null);
+		return readObjectFromStream(is, postprocessors, usercontext, classloader, errorreporter, config, null);
 	}
 	
 	/**
