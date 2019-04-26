@@ -154,6 +154,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	{
 		boolean ret = true;
 		
+		System.out.println("got message " + incomingmessage.getClass().getName() + " " + incomingmessage.getConversationId() + " " + incomingmessage.getMessageId() + " " + nextstep + " " + System.identityHashCode(this));
+		
 		if (nextstep == 0 && incomingmessage instanceof InitialHandshakeFinalMessage)
 		{
 //			ts = System.currentTimeMillis();
@@ -167,8 +169,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), sem);
 			nextstep = 1;
 		}
-		else if (nextstep == 0 && incomingmessage instanceof StartExchangeMessage)
+		else if (nextstep == -1 && incomingmessage instanceof StartExchangeMessage)
 		{
+			System.out.println("proc startexchange");
 			StartExchangeMessage sem = (StartExchangeMessage) incomingmessage;
 			
 			AckExchangeMessage reply = new AckExchangeMessage(agent.getComponentIdentifier(), sem.getConversationId());
@@ -195,9 +198,10 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			}
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
-			nextstep = 2;
+			nextstep = -2;
 			
 			hashednetworknames = getHashedNetworkNames(agent.getInternalNetworks().keySet(), challenge);
+			System.out.println("finished proc startexchange " + nextstep);
 		}
 		else if (nextstep == 1 && incomingmessage instanceof AckExchangeMessage)
 		{
@@ -235,9 +239,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			reply.setPlatformNameSig(getPlatformNameSignature(pubkey, agent.getInternalPlatformNameCertificate()));
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
-			nextstep = 3;
+			nextstep = 2;
 		}
-		else if (nextstep == 2 && incomingmessage instanceof KeyExchangeMessage)
+		else if (nextstep == -2 && incomingmessage instanceof KeyExchangeMessage)
 		{
 			KeyExchangeMessage kx = (KeyExchangeMessage) incomingmessage;
 			
@@ -277,9 +281,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			reply.setPlatformNameSig(getPlatformNameSignature(pubkey, agent.getInternalPlatformNameCertificate()));
 			
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), reply);
-			nextstep = 4;
+			nextstep = -3;
 		}
-		else if (nextstep == 3 && incomingmessage instanceof KeyExchangeMessage)
+		else if (nextstep == 2 && incomingmessage instanceof KeyExchangeMessage)
 		{
 			KeyExchangeMessage kx = (KeyExchangeMessage) incomingmessage;
 			
@@ -316,10 +320,10 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			agent.sendSecurityHandshakeMessage(kx.getSender(), rdy);
 			
 			ret = false;
-			nextstep = 5;
+			nextstep = Integer.MAX_VALUE;
 //			System.out.println("Handshake took: " + (System.currentTimeMillis() - ts));
 		}
-		else if (nextstep == 4 && incomingmessage instanceof ReadyMessage)
+		else if (nextstep == -3 && incomingmessage instanceof ReadyMessage)
 		{
 			key = generateChaChaKey();
 //			System.out.println("Shared Key2: " + Arrays.toString(key) + " " + secinf.isAuthenticated());
@@ -332,7 +336,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			authsuite = null;
 			
 			ret = false;
-			nextstep = 5;
+			nextstep = Integer.MIN_VALUE;
 		}
 		else
 		{
@@ -340,6 +344,16 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Sets if the suite represents the initializer.
+	 * @param initializer True, if initializer.
+	 */
+	public void setInitializer(boolean initializer)
+	{
+		if (initializer)
+			nextstep = -1;
 	}
 	
 	/**
@@ -850,6 +864,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 */
 		public StartExchangeMessage()
 		{
+			System.out.println("CREATE SEM BEAN: " + messageid);
 		}
 		
 		/**
@@ -858,6 +873,14 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		public StartExchangeMessage(IComponentIdentifier sender, String conversationid)
 		{
 			super(sender, conversationid);
+			System.out.println("CREATE SEM: " + messageid);
+		}
+		
+		@Override
+		public void setSender(IComponentIdentifier sender) {
+			System.out.println("SEM SENDER " + sender);
+			(new RuntimeException()).printStackTrace();
+			super.setSender(sender);
 		}
 
 		/**

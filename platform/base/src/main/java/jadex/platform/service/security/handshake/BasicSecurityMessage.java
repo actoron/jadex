@@ -1,6 +1,7 @@
 package jadex.platform.service.security.handshake;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
 
 /**
  *  Base class for security messages.
@@ -13,6 +14,9 @@ public class BasicSecurityMessage
 	
 	/** The conversation ID. */
 	protected String conversationid;
+	
+	/** The unique message ID to filter duplicates. */
+	protected String messageid;
 	
 	/**
 	 *  Create message.
@@ -70,6 +74,25 @@ public class BasicSecurityMessage
 		this.conversationid = conversationid;
 	}
 	
+	/**
+	 *  Get the message ID.
+	 *  @return Message ID.
+	 */
+	public String getMessageId()
+	{
+		return messageid;
+	}
+	
+	/**
+	 *  Sets the message ID.
+	 *  @param messageid The message ID.
+	 */
+	public void setMessageId(String messageid)
+	{
+		System.out.println("SET MSG ID: " + messageid + " " + this.messageid);
+		this.messageid = messageid;
+	}
+
 	@Override
 	public String toString()
 	{

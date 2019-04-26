@@ -1,6 +1,10 @@
 package jadex.platform.service.security;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jadex.commons.future.Future;
+import jadex.platform.service.security.handshake.BasicSecurityMessage;
 
 /**
  *  Class maintaining the state of a handshake in progress.
@@ -18,6 +22,9 @@ public class HandshakeState
 	
 	/** Time when the handshake expires. */
 	protected long expirationtime;
+	
+	/** Arrived handshake messages to filter duplicates. */
+	protected Set<String> arrivedmessages = new HashSet<>();
 	
 	/**
 	 *  Sets the expiration time of the handshake.
@@ -97,5 +104,18 @@ public class HandshakeState
 	public void setCryptoSuite(ICryptoSuite cryptosuite)
 	{
 		this.cryptosuite = cryptosuite;
+	}
+	
+	/**
+	 *  Filters for duplicate handshake messages.
+	 *  @param msg The message
+	 *  @return True, if message is duplicate. 
+	 */
+	public boolean isDuplicate(BasicSecurityMessage msg)
+	{
+		if (arrivedmessages != null && arrivedmessages.contains(msg.getMessageId()))
+			return true;
+		arrivedmessages.add(msg.getMessageId());
+		return false;
 	}
 }
