@@ -130,7 +130,9 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>-->
 	
 	<script>
-		console.log("starter: "+opts);
+		//console.log("starter: "+opts);
+		
+		console.log(this.getLanguage());
 		
 		var self = this;
 
@@ -341,8 +343,8 @@
 		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 
-		console.log(ures1);
-		console.log(ures2);
+		//console.log(ures1);
+		//console.log(ures2);
 		
 		// dynamically load jstree lib and style
 		//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
