@@ -2076,7 +2076,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				if (chosensuite == null)
 					return;
-				System.out.println("Create handshake");
 				state = new HandshakeState();
 				state.setResultFuture(fut);
 				state.setConversationId(imsg.getConversationId());

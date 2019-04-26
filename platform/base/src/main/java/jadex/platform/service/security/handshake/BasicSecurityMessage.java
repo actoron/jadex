@@ -89,7 +89,6 @@ public class BasicSecurityMessage
 	 */
 	public void setMessageId(String messageid)
 	{
-		System.out.println("SET MSG ID: " + messageid + " " + this.messageid);
 		this.messageid = messageid;
 	}
 

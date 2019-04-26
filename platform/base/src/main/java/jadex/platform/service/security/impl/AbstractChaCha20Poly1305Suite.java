@@ -154,7 +154,7 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 	{
 		boolean ret = true;
 		
-		System.out.println("got message " + incomingmessage.getClass().getName() + " " + incomingmessage.getConversationId() + " " + incomingmessage.getMessageId() + " " + nextstep + " " + System.identityHashCode(this));
+//		System.out.println("got message " + incomingmessage.getClass().getName() + " " + incomingmessage.getConversationId() + " " + incomingmessage.getMessageId() + " " + nextstep + " " + System.identityHashCode(this));
 		
 		if (nextstep == 0 && incomingmessage instanceof InitialHandshakeFinalMessage)
 		{
@@ -171,7 +171,6 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		}
 		else if (nextstep == -1 && incomingmessage instanceof StartExchangeMessage)
 		{
-			System.out.println("proc startexchange");
 			StartExchangeMessage sem = (StartExchangeMessage) incomingmessage;
 			
 			AckExchangeMessage reply = new AckExchangeMessage(agent.getComponentIdentifier(), sem.getConversationId());
@@ -201,7 +200,6 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			nextstep = -2;
 			
 			hashednetworknames = getHashedNetworkNames(agent.getInternalNetworks().keySet(), challenge);
-			System.out.println("finished proc startexchange " + nextstep);
 		}
 		else if (nextstep == 1 && incomingmessage instanceof AckExchangeMessage)
 		{
@@ -864,7 +862,6 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		 */
 		public StartExchangeMessage()
 		{
-			System.out.println("CREATE SEM BEAN: " + messageid);
 		}
 		
 		/**
@@ -873,16 +870,8 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 		public StartExchangeMessage(IComponentIdentifier sender, String conversationid)
 		{
 			super(sender, conversationid);
-			System.out.println("CREATE SEM: " + messageid);
 		}
 		
-		@Override
-		public void setSender(IComponentIdentifier sender) {
-			System.out.println("SEM SENDER " + sender);
-			(new RuntimeException()).printStackTrace();
-			super.setSender(sender);
-		}
-
 		/**
 		 *  Gets the challenge.
 		 *
