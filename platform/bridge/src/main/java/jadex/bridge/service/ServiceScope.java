@@ -9,9 +9,11 @@ import java.util.Set;
  */
 public enum ServiceScope
 {
-	/** Marker for default scope to be replaced automatically according to context;
+	/** 
+	 *  Marker for default scope to be replaced automatically according to context;
 	 *  for required services (search scope): the default scope is 'platform' for system services and 'application' for non-system services,
-	 *  for provided services (publication scope): the default scope is always platform.*/
+	 *  for provided services (publication scope): the default scope is always platform.
+	 */
 	DEFAULT,
 
 	/** None component scope (nothing will be searched, forces required service creation). */

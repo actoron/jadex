@@ -43,13 +43,4 @@ public interface IJCCStarterService extends IJCCPluginService
 	 *  @return The component id.
 	 */
 	public IFuture<IComponentIdentifier> createComponent(CreationInfo ci);
-	
-	/**
-	 *  Load a string-based resource (style or js).
-	 *  @param filename The filename.
-	 *  @return The text from the file.
-	 */
-	//public IFuture<String> loadResource(String filename);
-	public IFuture<Response> loadResource(String filename);
-
 }

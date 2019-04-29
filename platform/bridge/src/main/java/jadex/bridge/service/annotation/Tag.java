@@ -16,7 +16,7 @@ public @interface Tag
 	public String value();
 
 	/**
-	 *  Condition to check if the value should be included. 
+	 *  Condition to check if the value/tag should be included. 
 	 */
 	public String include() default "";
 }

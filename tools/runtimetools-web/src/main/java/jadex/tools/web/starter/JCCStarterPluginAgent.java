@@ -1,24 +1,17 @@
 package jadex.tools.web.starter;
 
-import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
@@ -27,42 +20,20 @@ import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.tools.web.jcc.JCCPluginAgent;
 
 /**
  *  Starter web jcc plugin.
  */
-@ProvidedServices(
-{
-	@ProvidedService(name="starterweb", type=IJCCStarterService.class)
-})
+@ProvidedServices({@ProvidedService(name="starterweb", type=IJCCStarterService.class)})
 @Agent(autostart=Boolean3.TRUE)
-public class JCCStarterPluginAgent implements IJCCStarterService
+public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarterService
 {
-	/** The agent. */
-	@Agent
-	protected IInternalAccess agent;
-	
-	/** The plugin component string. */
-	protected String component;
-	
-	/**
-	 *  Get the plugin component (html).
-	 *  @return The plugin code.
-	 */
-	public IFuture<String> getPluginComponent()
-	{
-		if(component==null)
-			component = internalLoadResource("jadex/tools/web/starter/starter.tag");
-		
-		return new Future<String>(component);
-	}
-	
 	/**
 	 *  Get the plugin name.
 	 *  @return The plugin name.
@@ -70,6 +41,15 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 	public IFuture<String> getPluginName()
 	{
 		return new Future<String>("starter");
+	}
+	
+	/**
+	 *  Get the plugin UI path.
+	 *  @return The plugin ui path.
+	 */
+	public String getPluginUIPath()
+	{
+		return "jadex/tools/web/starter/starter.tag";
 	}
 	
 	/**
@@ -137,48 +117,4 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 		return SComponentFactory.loadModel(agent.getExternalAccess(), filename, null);
 	}
 	
-	/**
-	 *  Load a string-based ressource (style or js).
-	 *  @param filename The filename.
-	 *  @return The text from the file.
-	 */
-	public IFuture<Response> loadResource(String filename)
-	{
-		String res = internalLoadResource(filename);
-		String mt = SUtil.guessContentTypeByFilename(filename);
-		Response r = Response.ok(res).header("Content-Type", mt).build();
-		return new Future<Response>(r);
-	}
-	
-	/**
-	 *  Load a resource per resource name.
-	 */
-	public String internalLoadResource(String name)
-	{
-		String ret;
-		
-		Scanner sc = null;
-		try
-		{
-			InputStream is = SUtil.getResource0(name, agent.getClassLoader());
-			sc = new Scanner(is);
-			ret = sc.useDelimiter("\\A").next();
-			
-			System.out.println("loading: "+name+" "+ret.length());
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-		finally
-		{
-			if(sc!=null)
-			{
-				sc.close();
-			}
-		}
-		
-		return ret;
-	}
 }

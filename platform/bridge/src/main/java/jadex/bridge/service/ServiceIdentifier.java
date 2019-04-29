@@ -218,7 +218,14 @@ public class ServiceIdentifier implements IServiceIdentifier
 	public void setScope(ServiceScope scope)
 	{
 		// default publication scope is platform
-		this.scope = scope!=null ? scope : ServiceScope.PLATFORM;
+		
+		//if(ServiceScope.DEFAULT.equals(scope))
+		//	System.out.println("setting def");
+		
+		// Replace DEFAULT with PLATFORM scope (do we want this here or during resolution?) 
+		
+		this.scope = scope!=null && !ServiceScope.DEFAULT.equals(scope)? 
+			scope : ServiceScope.PLATFORM;
 	}
 	
 	/**
