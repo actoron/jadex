@@ -36,9 +36,20 @@ public class JsonString
 	 */
 	public boolean equals(Object obj)
 	{
+		if (obj == null)
+		{
+			return false;
+		}
 		if (obj instanceof JsonString)
 		{
-			((JsonString) obj).json.equals(json);
+			JsonString jsonString = (JsonString) obj;
+			if (jsonString.json == null)
+			{
+				return json == null;
+			} else
+			{
+				jsonString.json.equals(json);
+			}
 		}
 		return false;
 	}
