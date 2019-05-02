@@ -30,15 +30,15 @@
 							<div class="col-12">
 								<table class="table">
 									<thead>
-			    						<tr>
-			      							<th scope="col">Network Name</th>
-			      							<th scope="col">Network Secret</th>
+			    						<tr class="d-flex">
+			      							<th class="col-4" scope="col">Network Name</th>
+			      							<th class="col-8" scope="col">Network Secret</th>
 									    </tr>
 			  						</thead>
 			  						<tbody>
-			    						<tr each="{net in getNetworks()}">
-			      							<td>{net[0]}</td>
-			     							<td>{net[1]}</td>
+			    						<tr class="d-flex" each="{net in getNetworks()}">
+			      							<td class="col-4">{net[0]}</td>
+			     							<td class="col-8">{net[1]}</td>
 									    </tr>
 									</tbody>
 								</table>
@@ -94,9 +94,9 @@
 			  						</thead>
 			  						<tbody>
 			    						<tr each="{na in getNameAuthorities()}">
-			      							<td>{nameAuthorities[0]}</td>
-			     							<td>{nameAuthorities[1]}</td>
-			     							<td>{nameAuthorities[2]}</td>
+			      							<td>{na[0]}</td>
+			     							<td>{na[1]}</td>
+			     							<td>{na[2]}</td>
 									    </tr>
 									</tbody>
 								</table>
@@ -112,15 +112,43 @@
 				</div>
 				<div id="collapseFive" class="collapse" data-parent="#accordion">
 					<div class="card-body">
+						<div class="row m-1">
+							<div class="col-12">
+								<table class="table">
+									<thead>
+			    						<tr>
+			      							<th scope="col-5">Trusted Platform Name</th>
+									    </tr>
+			  						</thead>
+			  						<tbody>
+			    						<tr each="{na in getTrustedPlatformNames()}">
+			      							<td>{na}</td>
+									    </tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	
+		<div class="row m-1">
+			<div class="col">
+				<button type="button" class="btn btn-success" onclick="{refresh}">Refresh</button>
+			</div>
+		</div>
 	</div>
 	
+	<style>
+		table {
+			overflow-wrap: break-word;
+			table-layout: fixed
+		}
+	</style>
+	
 	<script>
-		//console.log("security: "+opts);
+		console.log("security: "+opts);
 		
 		var self = this;
 
@@ -149,6 +177,11 @@
 			return self.secstate!=null? self.secstate.nameAuthorities: [];
 		}
 		
+		getTrustedPlatformNames()
+		{
+			return self.secstate!=null? self.secstate.trustedPlatformNames: [];
+		}
+		
 		useSecret(e)
 		{
 			var val = self.refs.usesecret.value;
@@ -171,13 +204,17 @@
 			});
 		}
 		
-		axios.get(self.getMethodPrefix()+'&methodname=getSecurityState', self.transform).then(function(resp)
+		refresh()
 		{
-			console.log("ss: "+resp.data);
-			self.secstate = resp.data;
-			self.update();
-		});
+			axios.get(self.getMethodPrefix()+'&methodname=getSecurityState', self.transform).then(function(resp)
+			{
+				console.log("ss: "+resp.data);
+				self.secstate = resp.data;
+				self.update();
+			});
+		}
 		
-		self.update();
+		self.refresh();
+		//self.update();
 	</script>
 </security>

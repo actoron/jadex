@@ -1,19 +1,27 @@
 package jadex.transformation.jsonserializer;
 
+import jadex.commons.SUtil;
+import jadex.commons.transformation.annotations.Include;
+
 /**
  *  Class representing a string containing JSON.
  *  This class can be used as parameter or return
  *  value in services to circumvent the conversion
  *  stage and directly accept or return raw JSON.
- *
  */
 public class JsonString
 {
-	/**
-	 *  The concrete JSON string.
-	 */
+	/** The concrete JSON string. */
+	@Include
 	protected String json;
 	
+	/**
+	 *  Create a new JsonString object.
+	 */
+	public JsonString()
+	{
+	}
+
 	/**
 	 *  Creates the JsonString object.
 	 *  @param json The JSON.
@@ -36,22 +44,13 @@ public class JsonString
 	 */
 	public boolean equals(Object obj)
 	{
-		if (obj == null)
-		{
-			return false;
-		}
-		if (obj instanceof JsonString)
+		boolean ret = false;
+		if(obj instanceof JsonString)
 		{
 			JsonString jsonString = (JsonString) obj;
-			if (jsonString.json == null)
-			{
-				return json == null;
-			} else
-			{
-				jsonString.json.equals(json);
-			}
+			ret = SUtil.equals(jsonString.json, json);
 		}
-		return false;
+		return ret;
 	}
 	
 	/**

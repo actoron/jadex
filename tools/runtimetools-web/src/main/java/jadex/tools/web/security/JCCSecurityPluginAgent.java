@@ -1,5 +1,6 @@
 package jadex.tools.web.security;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -128,13 +129,11 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 						ss.setRoles(nets);
 					}));
 				
-				/*bar.addFuture(s.getNameAuthorities()
-					.thenAccept((Set<String> as) ->
-					{
-						List<String[]> res = as.stream().flatMap(ri-> 
-							ri.getValue().stream().map(v->new String[]{ri.getKey(), v})).collect(Collectors.toList());
-						ss.setRoles(nets);
-					}));*/
+				bar.addFuture(s.getNameAuthoritiesInfo()
+					.thenAccept((String[][] as) -> {ss.setNameAuthorities(Arrays.asList(as));}));
+				
+				bar.addFuture(s.getTrustedPlatforms()
+					.thenAccept((Set<String> as) -> {ss.setTrustedPlatformNames(as);}));
 					
 				return bar.waitFor();
 			}).thenAccept((Void)->ret.setResult(ss));
@@ -154,6 +153,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 		protected List<String[]> networks;
 		protected List<String[]> roles;
 		protected List<String[]> nameauthorities;
+		protected Set<String> trustedplatformnames;
 		
 		/**
 		 *  Create a new security state.
@@ -279,6 +279,22 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 		public void setNameAuthorities(List<String[]> nameAuthorities)
 		{
 			this.nameauthorities = nameAuthorities;
+		}
+
+		/**
+		 * @return the trustedplatformnames
+		 */
+		public Set<String> getTrustedPlatformNames()
+		{
+			return trustedplatformnames;
+		}
+
+		/**
+		 * @param trustedplatformnames the trustedplatformnames to set
+		 */
+		public void setTrustedPlatformNames(Set<String> trustedplatformnames)
+		{
+			this.trustedplatformnames = trustedplatformnames;
 		}
 	}
 }

@@ -13,7 +13,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.platform.service.servicepool.ICService;
 import jadex.transformation.jsonserializer.JsonString;
 
 @Agent(autoprovide = Boolean3.TRUE)
@@ -42,17 +41,20 @@ public class JsonStringTest extends JunitAgentTest
 			IJsonStringService service = agent.searchService(new ServiceQuery<>(IJsonStringService.class)).get();
 			JsonString jsonString = service.getJsonString().get();
 
-			if (JsonStringAgent.JSON_STRING.equals(jsonString))
+			if(JsonStringAgent.JSON_STRING.equals(jsonString))
 			{
 				tr.setSucceeded(true);
-			} else
+			} 
+			else
 			{
 				tr.setFailed("JsonString serialization failed; expected: '" + JsonStringAgent.JSON_STRING + "'; actual: '" + jsonString + "';");
 			}
-		} catch (Exception e)
+		} 
+		catch (Exception e)
 		{
 			tr.setReason("Exception occurred: " + e);
-		} finally
+		} 
+		finally
 		{
 			agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1, new TestReport[]{tr}));
 			agent.killComponent();

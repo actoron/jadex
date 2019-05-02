@@ -68,6 +68,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.jtable.StringArrayTableModel;
 import jadex.commons.security.SSecurity;
 import jadex.commons.transformation.traverser.SCloner;
 import jadex.micro.annotation.Agent;
@@ -2371,6 +2372,56 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get infos about name authorities.
+	 *  Format is [{subjectid,dn,custom},...]
+	 *  @return Infos about the name authorities.
+	 */
+	public IFuture<String[][]> getNameAuthoritiesInfo()
+	{
+		final Set<String> nas = getNameAuthorities().get();
+		final Set<String> custom = getCustomNameAuthorities().get();
+		Map<String, String> nacerts = new HashMap<>();
+		
+		String[][] ret = null;
+		if(nas != null && nas.size() > 0)
+		{
+			ret = new String[nas.size()][3];
+			
+			int i = 0;
+			for(String cert : nas)
+			{
+				String subjectid = null;
+				String dn = null;
+				InputStream is = null;
+				try
+				{
+					subjectid = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert).getSubject());
+					dn = SSecurity.readCertificateFromPEM(cert).getSubject().toString();
+				}
+				catch (Exception e)
+				{
+				}
+				finally
+				{
+					SUtil.close(is);
+				}
+				
+				nacerts.put(dn, cert);
+				ret[i][0] = subjectid != null? subjectid : "";
+				ret[i][1] = dn != null ? dn : "";
+				ret[i][2] = custom.contains(cert) ? "Custom CA" : "Java CA";
+				++i;
+			}
+		}
+		else
+		{
+			ret = new String[0][0];
+		}
+		
+		return new Future<String[][]>(ret);
 	}
 	
 	/**

@@ -144,6 +144,13 @@ public interface ISecurityService
 	 */
 	public IFuture<Set<String>> getNameAuthorities();
 	
+	/**
+	 *  Get infos about name authorities.
+	 *  Format is [{subjectid,dn,custom},...]
+	 *  @return Infos about the name authorities.
+	 */
+	public IFuture<String[][]> getNameAuthoritiesInfo();
+	
 	/** 
 	 *  Gets all authorities not defined in the Java trust store for authenticating platform names.
 	 *  @return List of name authorities.
