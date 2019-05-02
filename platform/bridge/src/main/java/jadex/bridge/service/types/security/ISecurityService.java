@@ -100,14 +100,12 @@ public interface ISecurityService
 	
 	/**
 	 *  Gets the current known networks and secrets. 
-	 *  
 	 *  @return The current networks and secrets.
 	 */
 	public IFuture<MultiCollection<String, String>> getAllKnownNetworks();
 	
 	/** 
 	 *  Adds an authority for authenticating platform names.
-	 *  
 	 *  @param secret The secret, only X.509 secrets allowed.
 	 *  @return Null, when done.
 	 */
@@ -115,7 +113,6 @@ public interface ISecurityService
 	
 	/** 
 	 *  Remvoes an authority for authenticating platform names.
-	 *  
 	 *  @param secret The secret, only X.509 secrets allowed.
 	 *  @return Null, when done.
 	 */
@@ -123,7 +120,6 @@ public interface ISecurityService
 	
 	/** 
 	 *  Adds a name of an authenticated platform to allow access.
-	 *  
 	 *  @param name The platform name, name must be authenticated with certificate.
 	 *  @return Null, when done.
 	 */
@@ -131,7 +127,6 @@ public interface ISecurityService
 	
 	/** 
 	 *  Adds a name of an authenticated platform to allow access.
-	 *  
 	 *  @param name The platform name.
 	 *  @return Null, when done.
 	 */
@@ -145,21 +140,18 @@ public interface ISecurityService
 	
 	/** 
 	 *  Gets all authorities for authenticating platform names.
-	 *  
 	 *  @return List of all name authorities.
 	 */
 	public IFuture<Set<String>> getNameAuthorities();
 	
 	/** 
 	 *  Gets all authorities not defined in the Java trust store for authenticating platform names.
-	 *  
 	 *  @return List of name authorities.
 	 */
 	public IFuture<Set<String>> getCustomNameAuthorities();
 	
 	/**
 	 *  Gets the secret of a platform if available.
-	 * 
 	 *  @param cid ID of the platform.
 	 *  @return Encoded secret or null.
 	 */
@@ -175,7 +167,6 @@ public interface ISecurityService
 	
 	/**
 	 *  Adds a role for an entity (platform or network name).
-	 *  
 	 *  @param entity The entity name.
 	 *  @param role The role name.
 	 *  @return Null, when done.
@@ -184,7 +175,6 @@ public interface ISecurityService
 	
 	/**
 	 *  Adds a role of an entity (platform or network name).
-	 *  
 	 *  @param entity The entity name.
 	 *  @param role The role name.
 	 *  @return Null, when done.
@@ -193,7 +183,6 @@ public interface ISecurityService
 	
 	/**
 	 *  Gets a copy of the current role map.
-	 *  
 	 *  @return Copy of the role map.
 	 */
 	public IFuture<Map<String, Set<String>>> getRoleMap();
@@ -206,7 +195,6 @@ public interface ISecurityService
 	
 	/**
 	 *  Opportunistically returns the remote Jadex version if known.
-	 *  
 	 *  @param remoteid ID of the remote platform.
 	 *  @return Null, if the version is cannot be determined, a JadexVersion otherwise.
 	 *  		Note that the JadexVersion can still be an unknown version (as determined by isUnknown),

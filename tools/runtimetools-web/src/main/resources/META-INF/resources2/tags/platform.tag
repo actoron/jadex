@@ -2,10 +2,10 @@
 
 	<h1>Platform {cid}</h1>
 
-	<nav class="navbar navbar-light bg-light">
+	<nav id="plugins" class="navbar navbar-expand-sm navbar-light bg-light">
 		<ul class="navbar-nav mr-auto">
 			<li each="{p in plugins}" class="nav-item">
-	    		<div class="nav-link " onclick="{parent.showPlugin}"><h2>{p.name.toUpperCase()}</h2></div>
+	    		<div class="nav-link" onclick="{parent.showPlugin}"><h2>{p.name.toUpperCase()}</h2></div>
 	  		</li>
 		</ul>
 	</nav>
@@ -13,8 +13,6 @@
 	<div id="plugin"></div>
 	
 	<script>
-		//var test = "<cms><h1>Starter</h1><script>alert('hiiiiiii')<\/script><\/cms>";
-	
 		var self = this;
 		self.plugins = [];
 		self.cid = opts!=null && opts.paths!=null && opts.paths.length>1? opts.paths[1]: "";
@@ -23,7 +21,13 @@
 		
 		showPlugin(event)
 		{
-			showPlugin(event.item.p);
+			// Logic for setting the active link in the navbar
+			var el = $('#plugins .navbar-nav').find('li.active');
+			for(var i=0; i<el.length; i++)
+				el[i].classList.remove('active');
+			event.target.parentElement.parentElement.classList.add("active");
+			
+			self.showPlugin2(event.item.p);
 		}
 		
 		showPlugin2(p)

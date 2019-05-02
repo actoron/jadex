@@ -1157,7 +1157,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 					public void run()
 					{
 						String[][] table = null;
-						if (nas != null && nas.size() > 0)
+						if(nas != null && nas.size() > 0)
 						{
 							table = new String[nas.size()][3];
 							nacerts.clear();

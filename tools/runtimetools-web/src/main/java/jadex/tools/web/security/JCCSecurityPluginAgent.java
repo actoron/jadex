@@ -1,10 +1,14 @@
 package jadex.tools.web.security;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
@@ -78,6 +82,8 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 		
 		FutureBarrier<Void> bar = new FutureBarrier<>();
 
+		// alternative code with less indentition but repeatedly fetches service
+		
 //		bar.addFuture(agent.getService(ISecurityService.class)
 //			.then((ISecurityService s) -> s.getPlatformSecret(agent.getId()))
 //			.thenAccept((String s) -> ss.setPlatformSecret(s)));
@@ -104,11 +110,34 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 					.thenAccept((Boolean b) -> ss.setPrintSecret(b)));
 				bar.addFuture(s.isUsePlatformSecret()
 					.thenAccept((Boolean b) -> ss.setUseSecret(b)));
-				bar.addFuture(s.getNetworkNames()
-					.thenAccept((Set<String> n) -> ss.setNetworkNames(n.toArray(new String[0]))));
+				bar.addFuture(s.getAllKnownNetworks()
+					.thenAccept((MultiCollection<String, String> ns) ->
+					{
+//						List<Tuple2<String, String>> nets = ns.entrySet().stream().flatMap(mi-> 
+//							mi.getValue().stream().map(v->new Tuple2<String, String>(mi.getKey(), v))).collect(Collectors.toList());
+						List<String[]> nets = ns.entrySet().stream().flatMap(mi-> 
+							mi.getValue().stream().map(v->new String[]{mi.getKey(), v})).collect(Collectors.toList());
+						ss.setNetworks(nets);
+					}));
+				
+				bar.addFuture(s.getRoleMap()
+					.thenAccept((Map<String, Set<String>> rs) ->
+					{
+						List<String[]> nets = rs.entrySet().stream().flatMap(ri-> 
+							ri.getValue().stream().map(v->new String[]{ri.getKey(), v})).collect(Collectors.toList());
+						ss.setRoles(nets);
+					}));
+				
+				/*bar.addFuture(s.getNameAuthorities()
+					.thenAccept((Set<String> as) ->
+					{
+						List<String[]> res = as.stream().flatMap(ri-> 
+							ri.getValue().stream().map(v->new String[]{ri.getKey(), v})).collect(Collectors.toList());
+						ss.setRoles(nets);
+					}));*/
 					
 				return bar.waitFor();
-			}).thenAccept((Void)->ret.setResult(null));
+			}).thenAccept((Void)->ret.setResult(ss));
 		
 		return ret;
 	}
@@ -121,8 +150,10 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 		protected String platformsecret;
 		protected boolean usesecret;
 		protected boolean printsecret;
-		protected String[] networknames;
-		protected Object[] networksecrets;
+//		protected List<Tuple2<String, String>> networks;
+		protected List<String[]> networks;
+		protected List<String[]> roles;
+		protected List<String[]> nameauthorities;
 		
 		/**
 		 *  Create a new security state.
@@ -170,50 +201,39 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 		}
 		
 		/**
-		 *  Get the networknames.
-		 *  @return The networknames
-		 */
-		public String[] getNetworkNames()
+		 *  Get the networks.
+		 *  @return The networks
+		 * /
+		public List<Tuple2<String, String>> getNetworks()
 		{
-			return networknames;
-		}
-		
+			return networks;
+		}*/
+
 		/**
-		 *  Set the networknames.
-		 *  @param networknames The networknames to set
-		 */
-		public SecurityState setNetworkNames(String[] networknames)
+		 *  Set the networks.
+		 *  @param networks The networks to set
+		 * /
+		public void setNetworks(List<Tuple2<String, String>> networks)
 		{
-			this.networknames = networknames;
-			return this;
-		}
-		
+			this.networks = networks;
+		}*/
+
 		/**
-		 *  Get the networksecrets.
-		 *  @return The networksecrets
+		 *  Get the networks.
+		 *  @return The networks
 		 */
-		public Object[] getNetworkSecrets()
+		public List<String[]> getNetworks()
 		{
-			return networksecrets;
-		}
-		
-		/**
-		 *  Set the networksecrets.
-		 *  @param networksecrets The networksecrets to set
-		 */
-		public SecurityState setNetworkSecrets(Object[] networksecrets)
-		{
-			this.networksecrets = networksecrets;
-			return this;
+			return networks;
 		}
 
 		/**
-		 *  Get the platformsecret.
-		 *  @return The platformsecret
+		 *  Set the networks.
+		 *  @param networks The networks to set
 		 */
-		public String getPlatformSecret()
+		public void setNetworks(List<String[]> networks)
 		{
-			return platformsecret;
+			this.networks = networks;
 		}
 
 		/**
@@ -223,6 +243,42 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 		public void setPlatformSecret(String platformsecret)
 		{
 			this.platformsecret = platformsecret;
+		}
+
+		/**
+		 *  Get the roles.
+		 *  @return The roles
+		 */
+		public List<String[]> getRoles()
+		{
+			return roles;
+		}
+
+		/**
+		 *  Set the roles.
+		 *  @param roles The roles to set
+		 */
+		public void setRoles(List<String[]> roles)
+		{
+			this.roles = roles;
+		}
+
+		/**
+		 *  Get the nameAuthorities.
+		 *  @return The nameAuthorities
+		 */
+		public List<String[]> getNameAuthorities()
+		{
+			return nameauthorities;
+		}
+
+		/**
+		 *  Set the nameAuthorities.
+		 *  @param nameAuthorities The nameAuthorities to set
+		 */
+		public void setNameAuthorities(List<String[]> nameAuthorities)
+		{
+			this.nameauthorities = nameAuthorities;
 		}
 	}
 }

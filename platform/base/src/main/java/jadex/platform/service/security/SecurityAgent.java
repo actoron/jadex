@@ -1056,7 +1056,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				for(Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
 				{
-					for (AbstractAuthenticationSecret secret : entry.getValue())
+					for(AbstractAuthenticationSecret secret : entry.getValue())
 						ret.add(entry.getKey(), secret.toString());
 				}
 				
