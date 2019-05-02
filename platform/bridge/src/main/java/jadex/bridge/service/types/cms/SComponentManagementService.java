@@ -807,15 +807,25 @@ public class SComponentManagementService
 		IComponentDescription[] ret = null;
 		
 		CmsState cmsstate = getState(agent.getId());
+		List<IComponentDescription> cdsc = new ArrayList<>();
 		try(IAutoLock l = cmsstate.readLock())
 		{
-			ret = new IComponentDescription[cmsstate.getComponentMap().size()];
-			int i=0;
-			for(Iterator<CmsComponentState> it=cmsstate.getComponentMap().values().iterator(); i<ret.length; i++)
+//			ret = new IComponentDescription[cmsstate.getComponentMap().size()];
+//			int i=0;
+//			for(Iterator<CmsComponentState> it=cmsstate.getComponentMap().values().iterator(); i<ret.length; i++)
+//			{
+//				ret[i] = (IComponentDescription)((CMSComponentDescription)it.next().getAccess().getInternalAccess().getDescription()).clone();
+//			}
+			
+			// Component access may be null if component is terminating, only include components with access available.
+			for(Iterator<CmsComponentState> it=cmsstate.getComponentMap().values().iterator(); it.hasNext(); )
 			{
-				ret[i] = (IComponentDescription)((CMSComponentDescription)it.next().getAccess().getInternalAccess().getDescription()).clone();
+				CmsComponentState compstate = it.next();
+				if (compstate != null)
+					cdsc.add((IComponentDescription) ((CMSComponentDescription) compstate.getAccess().getInternalAccess().getDescription()).clone());
 			}
 		}
+		ret = cdsc.toArray(new IComponentDescription[cdsc.size()]);
 		
 		fut.setResult(ret);
 		return fut;

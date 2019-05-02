@@ -223,7 +223,7 @@ public class CmsState
 		}
 
 		/**
-		 *  Gets the access.
+		 *  Gets the access. This may return null, e.g. if component is terminating.
 		 *
 		 *  @return The access.
 		 */
