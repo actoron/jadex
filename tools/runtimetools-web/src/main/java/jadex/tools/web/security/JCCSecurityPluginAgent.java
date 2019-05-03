@@ -58,7 +58,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	public IFuture<Void> setUseSecret(boolean usesecret)
 	{
 		return agent.getService(ISecurityService.class)
-			.thenAccept(s -> s.setUsePlatformSecret(usesecret));
+			.then(s -> s.setUsePlatformSecret(usesecret));
 	}
 	
 	/**
@@ -68,7 +68,31 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	public IFuture<Void> setPrintSecret(boolean printsecret)
 	{
 		return agent.getService(ISecurityService.class)
-			.thenAccept(s -> s.setPrintPlatformSecret(printsecret));
+			.then(s -> s.setPrintPlatformSecret(printsecret));
+	}
+	
+	/**
+	 *  Adds a role for an entity (platform or network name).
+	 *  @param entity The entity name.
+	 *  @param role The role name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addRole(String entity, String role)
+	{
+		return agent.getService(ISecurityService.class)
+			.then(s -> s.addRole(entity, role));
+	}
+	
+	/**
+	 *  Adds a role of an entity (platform or network name).
+	 *  @param entity The entity name.
+	 *  @param role The role name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeRole(String entity, String role)
+	{
+		return agent.getService(ISecurityService.class)
+			.then(s -> s.removeRole(entity, role));
 	}
 	
 	/**

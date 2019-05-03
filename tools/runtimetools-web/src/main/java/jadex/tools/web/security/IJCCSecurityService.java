@@ -28,4 +28,20 @@ public interface IJCCSecurityService extends IJCCPluginService
 	 *  @param printsecret The flag.
 	 */
 	public IFuture<Void> setPrintSecret(boolean printsecret);
+	
+	/**
+	 *  Adds a role for an entity (platform or network name).
+	 *  @param entity The entity name.
+	 *  @param role The role name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addRole(String entity, String role);
+	
+	/**
+	 *  Adds a role of an entity (platform or network name).
+	 *  @param entity The entity name.
+	 *  @param role The role name.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeRole(String entity, String role);
 }

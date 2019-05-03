@@ -4,7 +4,7 @@
 
 	<nav id="plugins" class="navbar navbar-expand-sm navbar-light bg-light">
 		<ul class="navbar-nav mr-auto">
-			<li each="{p in plugins}" class="nav-item">
+			<li each="{p in plugins}" class="nav-item active">
 	    		<div class="nav-link" onclick="{parent.showPlugin}"><h2>{p.name.toUpperCase()}</h2></div>
 	  		</li>
 		</ul>
@@ -13,6 +13,8 @@
 	<div id="plugin"></div>
 	
 	<script>
+		console.log("platform");
+		
 		var self = this;
 		self.plugins = [];
 		self.cid = opts!=null && opts.paths!=null && opts.paths.length>1? opts.paths[1]: "";
@@ -61,7 +63,7 @@
 			    
 			    i++;
 			});
-			
+						
 			if(i>0)
 				self.showPlugin2(self.plugins[0]);
 			else

@@ -65,11 +65,23 @@
 			  						</thead>
 			  						<tbody>
 			    						<tr each="{roles in getRoles()}">
-			      							<td>{roles[0]}</td>
-			     							<td>{roles[1]}</td>
+			      							<td onclick="{selectRole}">{roles[0]}</td>
+			     							<td onclick="{selectRole}">{roles[1]}</td>
 									    </tr>
 									</tbody>
 								</table>
+							</div>
+						</div>
+						<div class="row m-1">
+							<div class="col-4">
+								<input type="text" placeholder="Entity" ref="entity" onchange="{update}" required>
+							</div>
+							<div class="col-4">
+								<input type="text" placeholder="Role" ref="role" onchange="{update}" required>
+							</div>
+							<div class="col-4">
+								<button type="button" class="btn" onclick="{addRole}" disabled="{isRoleDisabled()}">Add</button>
+								<button type="button" class="btn" onclick="{removeRole}" disabled="{isRoleDisabled()}">Remove</button>
 							</div>
 						</div>
 					</div>
@@ -212,6 +224,48 @@
 				self.secstate = resp.data;
 				self.update();
 			});
+		}
+		
+		addRole(e)
+		{
+			var en = self.refs.entity.value;
+			var ro = self.refs.role.value;
+			
+			console.log("add role: "+en+" "+ro);
+			
+			axios.get(self.getMethodPrefix()+'&methodname=addRole&args_0='+en+'&args_1='+ro, self.transform).then(function(resp)
+			{
+				console.log("added role: "+en+" "+ro);
+				self.refresh();
+			});
+		}
+		
+		removeRole(e)
+		{
+			var en = self.refs.entity.value;
+			var ro = self.refs.role.value;
+			
+			console.log("remove role: "+en+" "+ro);
+			
+			axios.get(self.getMethodPrefix()+'&methodname=removeRole&args_0='+en+'&args_1='+ro, self.transform).then(function(resp)
+			{
+				console.log("removed role: "+en+" "+ro);
+				self.refresh();
+			});
+		}
+		
+		selectRole(e)
+		{
+			//console.log(e);
+			self.refs.entity.value = e.item.roles[0];
+			self.refs.role.value = e.item.roles[1];
+		}
+		
+		isRoleDisabled()
+		{
+			var ret = self.refs.entity.value.length==0 || self.refs.role.value.length==0;
+			//console.log("isRoleDis: "+ret);
+			return ret;
 		}
 		
 		self.refresh();

@@ -1345,7 +1345,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 {
                     mimetypes = new ArrayList<String>();
                 }
-                mimetypes.add(mt + charset != null ? charset : "");
+                mimetypes.add(mt + (charset != null ? charset : ""));
             }
         }
         return mimetypes;

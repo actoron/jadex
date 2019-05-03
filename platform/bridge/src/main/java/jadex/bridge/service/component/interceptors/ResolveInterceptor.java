@@ -141,8 +141,20 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				ClassInfo[] argtypes = (ClassInfo[])args.get(1);
 				Object[] as = (Object[])args.get(2);
 				
-				if(argtypes!=null)
+				Method m = BasicService.getInvokeMethod(si.getDomainService().getClass(), ia.getClassLoader(), methodname, argtypes);
+				
+				if(m!=null)
 				{
+					if(argtypes==null)
+					{
+						Class<?>[] cls = m.getParameterTypes();
+						argtypes = new ClassInfo[cls.length];
+						for(int i=0; i<argtypes.length; i++)
+						{
+							argtypes[i] = new ClassInfo(cls[i]);
+						}
+					}
+					
 					for(int i=0; i<argtypes.length; i++)
 					{
 						Class<?> target = argtypes[i].getType(ia.getClassLoader());
@@ -172,11 +184,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 						if(cval!=null)
 							as[i] = cval;
 					}
-				}
 				
-				Method m = BasicService.getInvokeMethod(si.getDomainService().getClass(), ia.getClassLoader(), methodname, argtypes);
-				if(m!=null)
-				{
 					sic.setMethod(m);
 					sic.setArguments(SUtil.arrayToList(as));
 					sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
