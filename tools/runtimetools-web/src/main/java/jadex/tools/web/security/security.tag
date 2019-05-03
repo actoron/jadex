@@ -44,6 +44,64 @@
 								</table>
 							</div>
 						</div>
+						<div class="row m-1">
+							<div class="col">
+								<input class="w100" type="text" placeholder="Network Name" ref="nn" required>
+							</div>
+						</div>
+						<div class="row m-1">
+							<div class="col">
+								<div class="btn-group btn-group-toggle" data-toggle="buttons">
+									<label class="btn btn-secondary active" onclick="{networksOptionsClicked}">
+										<input type="radio" name="options" id="option1" autocomplete="off" checked> Key
+									</label>
+									<label class="btn btn-secondary" onclick="{networksOptionsClicked}">
+										<input type="radio" name="options" id="option2" autocomplete="off"> Password
+									</label>
+									<label class="btn btn-secondary" onclick="{networksOptionsClicked}">
+										<input type="radio" name="options" id="option3" autocomplete="off"> X509 Certificates
+									</label>
+									<label class="btn btn-secondary" onclick="{networksOptionsClicked}">
+										<input type="radio" name="options" id="option4" autocomplete="off"> Encoded Secret
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="row m-1 p-0" show="{nn_option=='option1'}">
+							<div class="col m-0 p-0">
+								<div class="row m-0 p-0">
+									<div class="col-9">
+										<input class="w100" type="text" placeholder="Key">
+									</div>
+									<div class="col-3">
+										<button type="button" class="btn" onclick="{generateRandom}">Generate Random</button>
+									</div>
+								</div>
+								<div class="row m-0 p-0">
+									<div class="col-9">
+										<input class="w100" type="text" placeholder="Password (min 16 characters, 24 recommended)">
+									</div>
+									<div class="col-3">
+										<button type="button" class="btn" onclick="{generateFromPassword}">Generate From Password</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row m-1" show="{nn_option=='option2'}">
+							<div class="col">
+								Option 2
+							</div>
+						</div>
+						<div class="row m-1" show="{nn_option=='option3'}">
+							<div class="col">
+								Option 3
+							</div>
+						</div>
+						<div class="row m-1" show="{nn_option=='option4'}">
+							<div class="col">
+								Option 4
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -157,10 +215,13 @@
 			overflow-wrap: break-word;
 			table-layout: fixed
 		}
+		.w100 {
+			width: 100%;
+		}
 	</style>
 	
 	<script>
-		console.log("security: "+opts);
+		console.log("security222: "+opts);
 		
 		var self = this;
 
@@ -168,10 +229,23 @@
 		var myservice = "jadex.tools.web.security.IJCCSecurityService";
 		
 		self.secstate = {};
+		self.nn_option = "option1";
+		
+		$("#nn_opts :input").change(function() 
+		{
+			console.log(this); 
+		});
 		
 		getMethodPrefix()
 		{
 			return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
+		}
+		
+		networksOptionsClicked(e)
+		{
+			//console.log("change: "+e);
+			self.nn_option = e.target.children[0].id;
+			self.update();
 		}
 		
 		getNetworks()
