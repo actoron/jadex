@@ -54,7 +54,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 		@Override 
 		public Response serve(IHTTPSession session) 
 		{
-			System.out.println("serve called: "+session.getUri());
+			//System.out.println("serve called: "+session.getUri());
 			
 			Response[] ret = new Response[1];
 			
@@ -304,7 +304,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 									
 									String fp = rootpath+url;
 									
-									System.out.println("handling: "+url);
+									//System.out.println("handling: "+url);
 									
 									// All java variants do not work properly :-(
 //									MimetypesFileTypeMap ftm = new MimetypesFileTypeMap();
