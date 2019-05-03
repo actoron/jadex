@@ -194,7 +194,9 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 					{
 						try
 						{
-							runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
+							runner.stop();;
+							// Broken in Java 11, method removed.
+							//runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
 						}
 						catch(UnsupportedOperationException e)
 						{
