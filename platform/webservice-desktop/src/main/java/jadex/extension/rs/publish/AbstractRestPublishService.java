@@ -1192,7 +1192,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		        {
 	        		// If no charset is specified, default to UTF-8 instead
 	        		// of HTTP default which is ISO-8859-1.
-	        		if (mt.startsWith("text") && !mt.contains("charset"))
+	        		if(mt.startsWith("text") && !mt.contains("charset"))
 	        			mt = mt + "; charset=utf-8";
 	        		
 		        	if(response.getHeader("Content-Type")==null)

@@ -54,7 +54,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 		@Override 
 		public Response serve(IHTTPSession session) 
 		{
-//			System.out.println("serve called: "+session.getUri());
+			System.out.println("serve called: "+session.getUri());
 			
 			Response[] ret = new Response[1];
 			
@@ -304,12 +304,18 @@ public class NanoRestPublishService extends ExternalRestPublishService
 									
 									String fp = rootpath+url;
 									
+									System.out.println("handling: "+url);
+									
 									// All java variants do not work properly :-(
 //									MimetypesFileTypeMap ftm = new MimetypesFileTypeMap();
 //									String mime = ftm.getContentType(fp);
 //									String mimeType = Files.probeContentType();
 //									String mime = MimeTypes.getMimeType(fp);
 									String mime = SUtil.guessContentTypeByFilename(fp);
+									
+									// add charset as UTF-8 :-(, for link tag otherwise some ISO charset is default
+									if(mime!=null && mime.startsWith("text") && !mime.contains("charset"))
+					        			mime = mime + ";charset=utf-8";
 									
 //									System.out.println("MIME: "+fp+" "+mime);
 									
