@@ -221,6 +221,13 @@ public interface IFuture<E>
 	 */
 	public IFuture<Void> acceptEither(IFuture<E> other, Consumer<E> action, Class<?> futuretype);
 	
+	/**
+	 *  Sequential execution of async methods via implicit delegation.
+	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  @param ret The 
+	 *  @return Future of the result of the second async call (=ret).
+	 */
+	public <T> IFuture<T> then(final Function<E, IFuture<T>> function);
 	
 	/**
 	 *  Sequential execution of async methods via implicit delegation.

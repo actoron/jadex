@@ -116,14 +116,14 @@ public class RestWebSocket extends Endpoint
 		this.readprocs = JsonTraverser.getDefaultReadProcessorsCopy();
 		this.writeprocs = JsonTraverser.getDefaultWriteProcessorsCopy();
 		
-		writeprocs.add(0, new org.activecomponents.webservice.json.write.JsonServiceProcessor());
-		writeprocs.add(0, new org.activecomponents.webservice.json.write.JsonServiceIdentifierProcessor());
-		writeprocs.add(0, new org.activecomponents.webservice.json.write.JsonResourceIdentifierProcessor());
+		writeprocs.add(0, new jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceProcessor());
+		writeprocs.add(0, new jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceIdentifierProcessor());
+		writeprocs.add(0, new jadex.platform.service.serialization.serializers.jsonwrite.JsonResourceIdentifierProcessor());
 		
-		readprocs.add(0, new org.activecomponents.webservice.json.read.JsonServiceProcessor());
-		readprocs.add(0, new org.activecomponents.webservice.json.read.JsonServiceIdentifierProcessor());
-		readprocs.add(0, new org.activecomponents.webservice.json.read.JsonComponentIdentifierProcessor());
-		readprocs.add(0, new org.activecomponents.webservice.json.read.JsonResourceIdentifierProcessor());
+		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonServiceProcessor());
+		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonServiceIdentifierProcessor());
+		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonComponentIdentifierProcessor());
+		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonResourceIdentifierProcessor());
 		
 		this.partials = new HashMap<String, Map<Integer,String>>();
 	}

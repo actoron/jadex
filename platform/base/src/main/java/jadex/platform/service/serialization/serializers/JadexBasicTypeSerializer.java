@@ -36,6 +36,8 @@ public class JadexBasicTypeSerializer implements ISerializer, IStringConverter
 	
 	/** The serializer id. */
 	public static final int SERIALIZER_ID = 3;
+
+	public static final String TYPE = IStringConverter.TYPE_BASIC;
 	
 	/** The debug flag. */
 	protected boolean DEBUG = false;
@@ -152,6 +154,16 @@ public class JadexBasicTypeSerializer implements ISerializer, IStringConverter
 	 */
 	public String getType()
 	{
-		return "basic";
+		return TYPE;
+	}
+	
+	/**
+	 *  Test if the type can be converted.
+	 *  @param clazz The class.
+	 *  @return True if can be converted.
+	 */
+	public boolean isSupportedType(Class<?> clazz)
+	{
+		return converter.isSupportedType(clazz);
 	}
 }

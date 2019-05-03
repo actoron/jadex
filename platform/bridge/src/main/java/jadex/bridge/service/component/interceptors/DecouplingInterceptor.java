@@ -176,7 +176,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 							}
 						} : this.filter;
 						
-						List<ITraverseProcessor> procs = getSerializationServices().getCloneProcessors();
+						List<ITraverseProcessor> procs = new ArrayList<>(getSerializationServices().getCloneProcessors());
 						procs.add(procs.size()-2, new FilterProcessor(filter));
 						copyargs.add(SCloner.clone(args[i], procs));
 //						copyargs.add(Traverser.traverseObject(args[i], null, procs, null, true, null));
@@ -296,7 +296,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						return obj==value ? false : deffilter.filter(obj);
 					}
 				} : deffilter;
-				List<ITraverseProcessor> procs = getSerializationServices().getCloneProcessors();
+				List<ITraverseProcessor> procs = new ArrayList<>(getSerializationServices().getCloneProcessors());
 				procs.add(procs.size()-1, new FilterProcessor(filter));
 				res = SCloner.clone(value, procs);
 //				res = Traverser.traverseObject(value, null, procs, null, true, null);

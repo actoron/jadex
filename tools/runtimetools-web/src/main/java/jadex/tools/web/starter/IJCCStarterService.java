@@ -2,6 +2,8 @@ package jadex.tools.web.starter;
 
 import java.util.Collection;
 
+import javax.ws.rs.core.Response;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Service;
@@ -17,9 +19,9 @@ public interface IJCCStarterService extends IJCCPluginService
 {
 	/**
 	 *  Get all startable component models.
-	 *  @return The file names of the component models.
+	 *  @return The filenames and classnames of the component models.
 	 */
-	public IFuture<Collection<String>> getComponentModels();
+	public IFuture<Collection<String[]>> getComponentModels();
 	
 	/**
 	 *  Load a component model.

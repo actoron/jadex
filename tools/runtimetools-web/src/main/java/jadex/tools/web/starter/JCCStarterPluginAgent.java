@@ -1,22 +1,17 @@
 package jadex.tools.web.starter;
 
-import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jadex.bridge.ClassInfo;
+import javax.ws.rs.core.Response;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
@@ -25,42 +20,20 @@ import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.tools.web.jcc.JCCPluginAgent;
 
 /**
  *  Starter web jcc plugin.
  */
-@ProvidedServices(
-{
-	@ProvidedService(name="starterweb", type=IJCCStarterService.class)
-})
+@ProvidedServices({@ProvidedService(name="starterweb", type=IJCCStarterService.class)})
 @Agent(autostart=Boolean3.TRUE)
-public class JCCStarterPluginAgent implements IJCCStarterService
+public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarterService
 {
-	/** The agent. */
-	@Agent
-	protected IInternalAccess agent;
-	
-	/** The plugin component string. */
-	protected String component;
-	
-	/**
-	 *  Get the plugin component (html).
-	 *  @return The plugin code.
-	 */
-	public IFuture<String> getPluginComponent()
-	{
-		if(component==null)
-			component = loadTag("jadex/tools/web/starter/starter.tag");
-		
-		return new Future<String>(component);
-	}
-	
 	/**
 	 *  Get the plugin name.
 	 *  @return The plugin name.
@@ -71,10 +44,19 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 	}
 	
 	/**
+	 *  Get the plugin UI path.
+	 *  @return The plugin ui path.
+	 */
+	public String getPluginUIPath()
+	{
+		return "jadex/tools/web/starter/starter.tag";
+	}
+	
+	/**
 	 *  Get all startable component models.
 	 *  @return The file names of the component models.
 	 */
-	public IFuture<Collection<String>> getComponentModels()
+	public IFuture<Collection<String[]>> getComponentModels()
 	{
 		ILibraryService ls = agent.getLocalService(ILibraryService.class);
 		URL[] urls = ls.getAllURLs().get().toArray(new URL[0]);
@@ -97,10 +79,10 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 		});
 		
 		// Collect filenames of models to load the models without knowing the rid (can then be extracted)
-		List<String> res = cis.stream().map(a -> a.getFilename()).collect(Collectors.toList());
+		List<String[]> res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
 				
 		//System.out.println("Models found: "+res);
-		return new Future<Collection<String>>(res);
+		return new Future<Collection<String[]>>(res);
 	}
 	
 	/**
@@ -119,9 +101,9 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 	 */
 	public IFuture<IComponentIdentifier> createComponent(CreationInfo ci)
 	{
-		System.out.println("webjcc start: "+ci);
+		System.out.println("webjcc start: "+ci+", "+Thread.currentThread());
 		
-		IExternalAccess comp = agent.createComponent(ci).get();
+		IExternalAccess comp = agent.getExternalAccess(agent.getId().getRoot()).createComponent(ci).get();
 		return new Future<IComponentIdentifier>(comp.getId());
 	}
 	
@@ -135,35 +117,4 @@ public class JCCStarterPluginAgent implements IJCCStarterService
 		return SComponentFactory.loadModel(agent.getExternalAccess(), filename, null);
 	}
 	
-	/**
-	 *  Load a tag html code per resource name.
-	 */
-	public String loadTag(String name)
-	{
-		String ret;
-		
-		Scanner sc = null;
-		try
-		{
-			InputStream is = SUtil.getResource0(name, agent.getClassLoader());
-			sc = new Scanner(is);
-			ret = sc.useDelimiter("\\A").next();
-			
-	//		System.out.println(ret);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-		finally
-		{
-			if(sc!=null)
-			{
-				sc.close();
-			}
-		}
-		
-		return ret;
-	}
 }

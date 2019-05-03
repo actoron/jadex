@@ -1136,12 +1136,12 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 //        return ret;
 //    }
 	
-	/**
-	 *  Sequential execution of async methods via implicit delegation.
-	 *  @param function Function that takes the result of this future as input and delivers future(t). 
-	 *  @param ret The 
-	 *  @return Future of the result of the second async call (=ret).
-	 */
+//	/**
+//	 *  Sequential execution of async methods via implicit delegation.
+//	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+//	 *  @param ret The 
+//	 *  @return Future of the result of the second async call (=ret).
+//	 */
 //	public <T> IFuture<T> thenApplyAndDelegate(final Function<E, IFuture<T>> function, Class<?> futuretype, final Future<T> ret)
 //    {
 //        this.addResultListener(new ExceptionDelegationResultListener<E, T>(ret)
@@ -1154,6 +1154,26 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 //        });
 //        return ret;
 //    }
+	
+	/**
+	 *  Sequential execution of async methods via implicit delegation.
+	 *  @param function Function that takes the result of this future as input and delivers future(t). 
+	 *  @param ret The 
+	 *  @return Future of the result of the second async call (=ret).
+	 */
+	public <T> IFuture<T> then(final Function<E, IFuture<T>> function)
+    {
+		Future<T> ret = new Future<>();
+        this.addResultListener(new ExceptionDelegationResultListener<E, T>(ret)
+        {
+        	public void customResultAvailable(E result)
+        	{
+        		 IFuture<T> res = function.apply(result);
+                 res.addResultListener(new DelegationResultListener<T>(ret));
+        	}	
+        });
+        return ret;
+    }
 	
 	/**
 	 *  Sequential execution of async methods via implicit delegation.

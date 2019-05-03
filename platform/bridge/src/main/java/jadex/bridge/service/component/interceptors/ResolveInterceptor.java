@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
@@ -31,6 +32,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.IStringConverter;
 
 /**
  *  The resolve interceptor is responsible for determining
@@ -144,13 +146,28 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 					for(int i=0; i<argtypes.length; i++)
 					{
 						Class<?> target = argtypes[i].getType(ia.getClassLoader());
-						Object cval = Starter.convertParameter(as[i], target);
-
-						/*ISerializationServices
-						if(cval==null && as[i] instanceof String)
+						
+						Object cval = as[i];
+						
+						if(as[i]!=null && !SReflect.isSupertype(target, as[i].getClass()))
 						{
-							JsonTraverser
-						}*/
+							if(as[i] instanceof String)
+							{
+								//SerializationServices.getSerializationServices();
+								ISerializationServices ser = (ISerializationServices)Starter.getPlatformValue(ia.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+								Map<String, IStringConverter> convs = ser.getStringConverters();
+								
+								// todo: make more generic (should save expected format so that it has not to try out)
+								IStringConverter c = convs.get(IStringConverter.TYPE_BASIC);
+								cval = c.convertString((String)as[i], target, ia.getClassLoader(), null);
+								
+								if(cval==null)
+								{
+									c = convs.get(IStringConverter.TYPE_JSON);
+									cval = c.convertString((String)as[i], target, ia.getClassLoader(), null);
+								}
+							}
+						}
 						
 						if(cval!=null)
 							as[i] = cval;

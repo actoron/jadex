@@ -3,7 +3,6 @@ package jadex.platform.service.serialization;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +104,7 @@ public class SerializationServices implements ISerializationServices
 		sameversioncache = new RwMapWrapper<>(new LRU<>(100));
 		rrm	= new RemoteReferenceModule(comp);
 //		serializers = new HashMap<Integer, ISerializer>();
-		serializers = new ISerializer[3];
+		serializers = new ISerializer[4];
 		ISerializer serial = new JadexBinarySerializer();
 //		serializers.put(serial.getSerializerId(), serial);
 		serializers[serial.getSerializerId()] = serial;
@@ -288,6 +287,16 @@ public class SerializationServices implements ISerializationServices
 	public ISerializer[] getSerializers()
 	{
 		return serializers;
+	}
+	
+	/**
+	 *  Returns a serializer per id.
+	 *  @param id The id.
+	 *  @return The serializer.
+	 */
+	public ISerializer getSerializer(int id)
+	{
+		return id<serializers.length? serializers[id]: null;
 	}
 	
 	/**

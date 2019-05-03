@@ -68,6 +68,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.jtable.StringArrayTableModel;
 import jadex.commons.security.SSecurity;
 import jadex.commons.transformation.traverser.SCloner;
 import jadex.micro.annotation.Agent;
@@ -1056,7 +1057,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				for(Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
 				{
-					for (AbstractAuthenticationSecret secret : entry.getValue())
+					for(AbstractAuthenticationSecret secret : entry.getValue())
 						ret.add(entry.getKey(), secret.toString());
 				}
 				
@@ -1691,9 +1692,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param name Name of the suite.
 	 *  @param convid Conversation ID of handshake.
 	 *  @param remoteversion The remote Jadex version.
+	 *  @param initializer True, if suite should represent the initializer.
 	 *  @return The suite, null if not found.
 	 */
-	protected ICryptoSuite createCryptoSuite(String name, String convid, JadexVersion remoteversion)
+	protected ICryptoSuite createCryptoSuite(String name, String convid, JadexVersion remoteversion, boolean initializer)
 	{
 		ICryptoSuite ret = null;
 		try
@@ -1704,6 +1706,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				ret = (ICryptoSuite) clazz.getConstructor().newInstance();
 				ret.setHandshakeId(convid);
 				ret.setRemoteVersion(remoteversion);
+				ret.setInitializer(initializer);
 			}
 		}
 		catch (Exception e)
@@ -1779,8 +1782,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param message The message.
 	 *  @return Null, when sent.
 	 */
-	public void sendSecurityHandshakeMessage(final IComponentIdentifier receiver, Object message)
+	public void sendSecurityHandshakeMessage(final IComponentIdentifier receiver, BasicSecurityMessage message)
 	{
+		message.setMessageId(SUtil.createUniqueId());
 		sendSecurityMessage(receiver, message).addResultListener(new IResultListener<Void>()
 		{
 			public void exceptionOccurred(Exception exception)
@@ -2073,7 +2077,6 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				if (chosensuite == null)
 					return;
-				
 				state = new HandshakeState();
 				state.setResultFuture(fut);
 				state.setConversationId(imsg.getConversationId());
@@ -2118,13 +2121,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (state != null)
 				{
 					String convid = state.getConversationId();
-					if (convid != null && convid.equals(rm.getConversationId()))
+					if (convid != null && convid.equals(rm.getConversationId()) && !state.isDuplicate(rm))
 					{
 						JadexVersion remoteversion = rm.getJadexVersion();
 						// Fallback to unknown if unavailable.
 						if (remoteversion == null)
 							remoteversion = new JadexVersion();
-						ICryptoSuite suite = createCryptoSuite(rm.getChosenCryptoSuite(), convid, remoteversion);
+						ICryptoSuite suite = createCryptoSuite(rm.getChosenCryptoSuite(), convid, remoteversion, true);
 						
 						if (suite == null)
 						{
@@ -2148,13 +2151,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (state != null)
 				{
 					String convid = state.getConversationId();
-					if (convid != null && convid.equals(fm.getConversationId()))
+					if (convid != null && convid.equals(fm.getConversationId()) && !state.isDuplicate(fm))
 					{
 						JadexVersion remoteversion = fm.getJadexVersion();
 						// Fallback to unknown if unavailable.
 						if (remoteversion == null)
 							remoteversion = new JadexVersion();
-						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite(), convid, remoteversion);
+						ICryptoSuite suite = createCryptoSuite(fm.getChosenCryptoSuite(), convid, remoteversion, false);
 						agent.getLogger().info("Suite: " + (suite != null?suite.getClass().toString():"null"));
 						
 						if (suite == null)
@@ -2184,22 +2187,26 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				HandshakeState state = initializingcryptosuites.get(secmsg.getSender().getRoot().toString());
 				if (state != null && state.getConversationId().equals(secmsg.getConversationId()) && state.getCryptoSuite() != null)
 				{
-					try
+					String convid = state.getConversationId();
+					if (convid != null && convid.equals(secmsg.getConversationId()) && !state.isDuplicate(secmsg))
 					{
-						if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
+						try
 						{
-							if (debug)
-								System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().isTrustedPlatform());
-							currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
-							initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
-							state.getResultFuture().setResult(state.getCryptoSuite());
+							if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
+							{
+								if (debug)
+									System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().isTrustedPlatform());
+								currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
+								initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
+								state.getResultFuture().setResult(state.getCryptoSuite());
+							}
 						}
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-						state.getResultFuture().setException(e);
-						initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
+						catch (Exception e)
+						{
+							e.printStackTrace();
+							state.getResultFuture().setException(e);
+							initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
+						}
 					}
 				}
 			}
@@ -2365,6 +2372,56 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get infos about name authorities.
+	 *  Format is [{subjectid,dn,custom},...]
+	 *  @return Infos about the name authorities.
+	 */
+	public IFuture<String[][]> getNameAuthoritiesInfo()
+	{
+		final Set<String> nas = getNameAuthorities().get();
+		final Set<String> custom = getCustomNameAuthorities().get();
+		Map<String, String> nacerts = new HashMap<>();
+		
+		String[][] ret = null;
+		if(nas != null && nas.size() > 0)
+		{
+			ret = new String[nas.size()][3];
+			
+			int i = 0;
+			for(String cert : nas)
+			{
+				String subjectid = null;
+				String dn = null;
+				InputStream is = null;
+				try
+				{
+					subjectid = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert).getSubject());
+					dn = SSecurity.readCertificateFromPEM(cert).getSubject().toString();
+				}
+				catch (Exception e)
+				{
+				}
+				finally
+				{
+					SUtil.close(is);
+				}
+				
+				nacerts.put(dn, cert);
+				ret[i][0] = subjectid != null? subjectid : "";
+				ret[i][1] = dn != null ? dn : "";
+				ret[i][2] = custom.contains(cert) ? "Custom CA" : "Java CA";
+				++i;
+			}
+		}
+		else
+		{
+			ret = new String[0][0];
+		}
+		
+		return new Future<String[][]>(ret);
 	}
 	
 	/**

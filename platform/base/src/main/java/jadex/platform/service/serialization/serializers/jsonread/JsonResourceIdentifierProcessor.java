@@ -1,4 +1,4 @@
-package org.activecomponents.webservice.json.read;
+package jadex.platform.service.serialization.serializers.jsonread;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;

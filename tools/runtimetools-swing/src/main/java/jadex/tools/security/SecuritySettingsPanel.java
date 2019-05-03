@@ -1149,55 +1149,56 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				final Set<String> nas = secservice.getNameAuthorities().get();
-				final Set<String> custom = secservice.getCustomNameAuthorities().get();
+				final String[][] info = secservice.getNameAuthoritiesInfo().get();
+				
+//				final Set<String> nas = secservice.getNameAuthorities().get();
+//				final Set<String> custom = secservice.getCustomNameAuthorities().get();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
 					{
-						String[][] table = null;
-						if (nas != null && nas.size() > 0)
-						{
-							table = new String[nas.size()][3];
-							nacerts.clear();
-							
-							int i = 0;
-							for (String cert : nas)
-							{
-								String subjectid = null;
-								String dn = null;
-								InputStream is = null;
-								try
-								{
-									subjectid = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert).getSubject());
-									dn = SSecurity.readCertificateFromPEM(cert).getSubject().toString();
-								}
-								catch (Exception e)
-								{
-								}
-								finally
-								{
-									SUtil.close(is);
-								}
-								
-								nacerts.put(dn, cert);
-								
-								table[i][0] = subjectid != null ? subjectid : "";
-								table[i][1] = dn != null ? dn : "";
-								table[i][2] = custom.contains(cert) ? "Custom CA" : "Java CA";
-								++i;
-							}
-						}
-						else
-						{
-							table = new String[0][0];
-						}
-						
-						StringArrayTableModel model = new StringArrayTableModel(table);
+//						String[][] table = null;
+//						if(nas != null && nas.size() > 0)
+//						{
+//							table = new String[nas.size()][3];
+//							nacerts.clear();
+//							
+//							int i = 0;
+//							for (String cert : nas)
+//							{
+//								String subjectid = null;
+//								String dn = null;
+//								InputStream is = null;
+//								try
+//								{
+//									subjectid = SSecurity.getCommonName(SSecurity.readCertificateFromPEM(cert).getSubject());
+//									dn = SSecurity.readCertificateFromPEM(cert).getSubject().toString();
+//								}
+//								catch (Exception e)
+//								{
+//								}
+//								finally
+//								{
+//									SUtil.close(is);
+//								}
+//								
+//								nacerts.put(dn, cert);
+//								
+//								table[i][0] = subjectid != null ? subjectid : "";
+//								table[i][1] = dn != null ? dn : "";
+//								table[i][2] = custom.contains(cert) ? "Custom CA" : "Java CA";
+//								++i;
+//							}
+//						}
+//						else
+//						{
+//							table = new String[0][0];
+//						}
+//						
+						StringArrayTableModel model = new StringArrayTableModel(info);
 						model.setColumnNames(new String[] { "Subject Common Name", "Subject Distinguished Name", "Type" });
 						natable.setModel(model);
-						
 					}
 				});
 				

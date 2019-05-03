@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Web JCC</title>
+		
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="stylesheet" href="css/style.css">
+		
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.13.2/riot+compiler.js"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/riot-route@3.1.4/dist/route.js"></script>
+		<script type="riot/tag" src="tags/app.tag"></script>
+		<script type="riot/tag" src="tags/about.tag"></script>
+		<script type="riot/tag" src="tags/imprint.tag"></script>
+		<script type="riot/tag" src="tags/privacy.tag"></script>
+		<script type="riot/tag" src="tags/platforms.tag"></script>
+		<script type="riot/tag" src="tags/platform.tag"></script>
+		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		
+		<!-- todo: remove here jstree for starter -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+	
+		<link rel="import" href="index_body.html">
+	</head>
+	
+	<body>
+		<!-- body loaded as import -->
+		<script>
+		    var link = document.querySelector('link[rel="import"]');
+		    var content = link.import;
+		    var el = content.querySelector('app');
+		    document.body.appendChild(el.cloneNode(true));
+		</script>
+	</body>
+</html>

@@ -826,7 +826,8 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		boolean ret = false;
 		
-		ServiceScope scope = ser.getScope()!=null? ser.getScope(): ServiceScope.PLATFORM;
+		ServiceScope scope = ser.getScope()!=null && !ServiceScope.DEFAULT.equals(ser.getScope())?
+			ser.getScope(): ServiceScope.PLATFORM;
 		
 		if(ServiceScope.GLOBAL.equals(scope))
 		{

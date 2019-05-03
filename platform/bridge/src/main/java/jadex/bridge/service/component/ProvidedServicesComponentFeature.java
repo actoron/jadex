@@ -1249,7 +1249,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	 *  Add a service to the component. 
 	 *  @param type The service interface.
 	 *  @param service The service.
-	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
+	 *  @param proxytype The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
 	public IFuture<Void> addService(final String name, final Class<?> type, final String proxytype, 
 		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info, ServiceScope scope)
@@ -1265,7 +1265,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 			getInternalAccess(), service, name, type, proxytype, ics, moni, 
-			info, ServiceScope.DEFAULT.equals(scope) ? info.getScope() : scope);
+			info, ServiceScope.DEFAULT.equals(scope) && info!=null? info.getScope() : scope);
 		
 		addService(proxy, info);
 		initService(proxy).addResultListener(new DelegationResultListener<Void>(ret));

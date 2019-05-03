@@ -161,4 +161,12 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	{
 		remoteversion = jadexversion;
 	}
+	
+	/**
+	 *  Sets if the suite represents the protocol initializer.
+	 * @param initializer True, if initializer.
+	 */
+	public void setInitializer(boolean initializer)
+	{
+	}
 }

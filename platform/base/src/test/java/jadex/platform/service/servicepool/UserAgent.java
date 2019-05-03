@@ -43,7 +43,7 @@ import jadex.micro.annotation.Results;
 	@RequiredService(name="aser", type=IAService.class),
 	@RequiredService(name="bser", type=IBService.class)
 })
-@ComponentTypes(@ComponentType(name="spa", filename="jadex.platform.service.servicepool.ServicePoolAgent.class"))
+@ComponentTypes(@ComponentType(name="spa", clazz=ServicePoolAgent.class))
 @Configurations(@Configuration(name="default", components=@Component(type="spa")))
 
 @Results(@Result(name="testresults", clazz=Testcase.class))

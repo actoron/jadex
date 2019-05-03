@@ -80,4 +80,10 @@ public interface ICryptoSuite
 	 *  @param jadexversion The Jadex version.
 	 */
 	public void setRemoteVersion(JadexVersion jadexversion);
+	
+	/**
+	 *  Sets if the suite represents the protocol initializer.
+	 * @param initializer True, if initializer.
+	 */
+	public void setInitializer(boolean initializer);
 }

@@ -9,7 +9,7 @@ import jadex.commons.Base64;
 import jadex.commons.SUtil;
 
 /**
- * 
+ *  Static config class for tests.
  */
 public class STest 
 {
