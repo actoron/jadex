@@ -1296,11 +1296,21 @@ public abstract class AbstractRestPublishService implements IWebPublishService
                 String tok = stok.nextToken();
                 StringTokenizer substok = new StringTokenizer(tok, ";");
                 String mt = substok.nextToken();
+                String charset = null;
+                while (substok.hasMoreTokens())
+                {
+                	String subtok = substok.nextToken().trim();
+                	if (subtok.startsWith("charset"))
+                	{
+                		charset = "; " + subtok;
+                		break;
+                	}
+                }
                 if(mimetypes==null)
                 {
                     mimetypes = new ArrayList<String>();
                 }
-                mimetypes.add(mt);
+                mimetypes.add(mt + charset != null ? charset : "");
             }
         }
         return mimetypes;
