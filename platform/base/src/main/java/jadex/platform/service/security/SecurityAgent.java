@@ -968,7 +968,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	public IFuture<Void> setNetwork(final String networkname, final String secret)
 	{
-		if (secret == null)
+		if(networkname==null || networkname.length()==0)
+			return new Future<>(new IllegalArgumentException("Networkname is null."));
+		if(secret==null || secret.length()==0)
 			return new Future<>(new IllegalArgumentException("Secret is null."));
 		
 		return agent.scheduleStep(new IComponentStep<Void>()
@@ -978,11 +980,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				AbstractAuthenticationSecret asecret = AbstractAuthenticationSecret.fromString(secret);
 				
 				Collection<AbstractAuthenticationSecret> secrets = networks.get(networkname);
-				if (secrets != null && secrets.contains(asecret))
+				if(secrets != null && secrets.contains(asecret))
 					return IFuture.DONE;
 				
 				networks.add(networkname, asecret);
-				if (asecret.canSign())
+				if(asecret.canSign())
 					networknames.add(networkname);
 				
 				saveSettings();
@@ -1669,12 +1671,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							{
 								currentcryptosuites.getWriteLock().unlock();
 							}
-							for (String pfname : pfnames)
+							for(String pfname : pfnames)
 								initializeHandshake(pfname);
 							
 							cryptoreset = null;
 							
-							if (debug)
+							if(debug)
 								System.out.println("Cryptosuites reset.");
 							
 							return IFuture.DONE;
@@ -1878,19 +1880,19 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		settings.put("printsecret", printsecret);
 		settings.put("refuseunauth", refuseunauth);
 		
-		if (platformsecret != null)
+		if(platformsecret != null)
 			settings.put("platformsecret", platformsecret);
 		if(networks != null && networks.size() > 0)
 			settings.put("networks", networks);
-		if (remoteplatformsecrets != null && remoteplatformsecrets.size() > 0)
+		if(remoteplatformsecrets != null && remoteplatformsecrets.size() > 0)
 			settings.put("remoteplatformsecrets", remoteplatformsecrets);
-		if (roles != null && roles.size() > 0)
+		if(roles != null && roles.size() > 0)
 			settings.put("roles", roles);
-		if (platformnamecertificate != null)
+		if(platformnamecertificate != null)
 			settings.put("platformnamecertificate", platformnamecertificate);
-		if (customnameauthorities != null && customnameauthorities.size() > 0)
+		if(customnameauthorities != null && customnameauthorities.size() > 0)
 			settings.put("nameauthorities", customnameauthorities);
-		if (trustedplatforms != null && trustedplatforms.size() > 0)
+		if(trustedplatforms != null && trustedplatforms.size() > 0)
 			settings.put("trustedplatforms", trustedplatforms);
 		
 		getSettingsService().saveState(PROPERTIES_ID, settings);

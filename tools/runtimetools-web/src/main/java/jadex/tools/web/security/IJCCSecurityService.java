@@ -44,4 +44,20 @@ public interface IJCCSecurityService extends IJCCPluginService
 	 *  @return Null, when done.
 	 */
 	public IFuture<Void> removeRole(String entity, String role);
+	
+	/**
+	 *  Adds a new network.
+	 *  @param networkname The network name.
+	 *  @param secret The secret, null to remove.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addNetwork(String networkname, String secret);
+	
+	/**
+	 *  Remove a network.
+	 *  @param networkname The network name.
+	 *  @param secret The secret, null to remove the network completely.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeNetwork(String networkname, String secret);
 }

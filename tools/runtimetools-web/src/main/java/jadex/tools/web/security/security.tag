@@ -36,7 +36,7 @@
 									    </tr>
 			  						</thead>
 			  						<tbody>
-			    						<tr class="d-flex" each="{net in getNetworks()}">
+			    						<tr class="d-flex" each="{net in getNetworks()}" onclick="{selectNetwork}">
 			      							<td class="col-4">{net[0]}</td>
 			     							<td class="col-8">{net[1]}</td>
 									    </tr>
@@ -46,7 +46,7 @@
 						</div>
 						<div class="row m-1">
 							<div class="col">
-								<input class="w100" type="text" placeholder="Network Name" ref="nn" required>
+								<input class="w100 h100" type="text" placeholder="Network Name" ref="network" onchange="{update}" required>
 							</div>
 						</div>
 						<div class="row m-1">
@@ -69,20 +69,25 @@
 						</div>
 						<div class="row m-1 p-0" show="{nn_option=='option1'}">
 							<div class="col m-0 p-0">
-								<div class="row m-0 p-0">
+								<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 									<div class="col-9">
-										<input class="w100" type="text" placeholder="Key">
+										<input class="w100 h100" type="text" placeholder="Key" ref="key" disabled="true">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn" onclick="{generateRandom}">Generate Random</button>
+										<button type="button" class="btn w100 h100" onclick="{generateRandom}">Generate Random</button>
 									</div>
 								</div>
-								<div class="row m-0 p-0">
-									<div class="col-9">
-										<input class="w100" type="text" placeholder="Password (min 16 characters, 24 recommended)">
+								<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
+									<div class="col-6">
+										<input class="w100 h100" type="text" placeholder="Password (min 16 characters, 24 recommended)" ref="pass">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn" onclick="{generateFromPassword}">Generate From Password</button>
+										<div class="progress w100 h100">
+  											<div class="progress-bar progress-bar-striped" style="width: {progress}%">{progress}%</div>
+										</div> 
+									</div>
+									<div class="col-3">
+										<button type="button" class="btn w100 h100" onclick="{generateFromPassword}">Generate From Password</button>
 									</div>
 								</div>
 							</div>
@@ -100,6 +105,13 @@
 						<div class="row m-1" show="{nn_option=='option4'}">
 							<div class="col">
 								Option 4
+							</div>
+						</div>
+						<div class="row m-1">
+							<div class="col-9">
+							</div>
+							<div class="col-3">
+								<button type="button" class="btn w100" onclick="{addNetwork}" disabled="{isNetworkDisabled()}">Add Network</button>
 							</div>
 						</div>
 					</div>
@@ -218,6 +230,9 @@
 		.w100 {
 			width: 100%;
 		}
+		.h100 {
+			height: 100%;
+		}
 	</style>
 	
 	<script>
@@ -230,6 +245,9 @@
 		
 		self.secstate = {};
 		self.nn_option = "option1";
+		self.progress = 0;
+		self.network = null;
+		self.secret = null;
 		
 		$("#nn_opts :input").change(function() 
 		{
@@ -297,6 +315,9 @@
 				console.log("ss: "+resp.data);
 				self.secstate = resp.data;
 				self.update();
+			}).catch(error => 
+			{
+			    console.log(error);
 			});
 		}
 		
@@ -341,6 +362,125 @@
 			//console.log("isRoleDis: "+ret);
 			return ret;
 		}
+		
+		generateRandom()
+		{
+			var key = new Uint8Array(32);
+			crypto.getRandomValues(key);
+			var b64key = btoa(String.fromCharCode.apply(null, key));
+			//console.log("key: "+key);
+			//console.log("b64key: "+b64key);
+			self.refs.key.value = "key:"+b64key;
+			self.secret = self.refs.key.value;
+			self.update();
+			return key;
+		}
+		
+		generateFromPassword()
+		{
+			var pass = self.refs.pass.value;
+			
+			if(pass.length<16)
+			{
+				console.log("Minimum 16 characters");
+			}
+			else if(self.progress!=0)
+			{
+				console.log("Key generation is running");
+			}
+			else
+			{
+				var passb = stringToUtf8(pass);
+				var saltb = passb;
+				scrypt(passb, saltb, 131072, 8, 4, 32, function(error, progress, key) 
+				{
+		        	if(error) 
+		        	{
+		            	console.log("err: "+error);
+		            } 
+		        	else if(key) 
+		        	{
+		        		console.log("key: "+key);
+		            	self.refs.key.value = "key:"+btoa(String.fromCharCode.apply(null, key));
+		            	self.progress = 0;
+		            	self.secret = self.refs.key.value;
+		            	self.update();
+		        	} 
+		        	else
+		        	{
+		        		//console.log("progress: "+progress);
+		        		var oldp = self.progress;
+		        		self.progress = Math.round(progress*100);
+		        		if(self.progress!=oldp)
+		        			self.update();
+		        	}
+				});
+			}
+		}
+		
+		isNetworkDisabled()
+		{
+			var network = self.refs.network.value;
+			var ret = network==null || network.length==0 || self.secret==null;
+			//console.log("isNetworkDis: "+ret);
+			return ret;
+		}
+		
+		/* setNetwork()
+		{
+			self.network = self.refs.network.value;
+		}*/
+		
+		addNetwork()
+		{
+			var network = self.refs.network.value;
+			console.log("add network: "+network+" "+self.secret);
+			
+			axios.get(self.getMethodPrefix()+'&methodname=addNetwork&args_0='+network+'&args_1='+self.secret, self.transform).then(function(resp)
+			{
+				console.log("added network: "+network+" "+self.secret);
+				self.refresh();
+			});
+		}
+		
+		selectNetwork(e)
+		{
+			console.log(e.item);
+		}
+		
+		stringToUtf8 = function(str) 
+		{
+			var out = [], p = 0;
+			for(var i = 0; i < str.length; i++) 
+			{
+				var c = str.charCodeAt(i);
+			    if(c < 128) 
+			    {
+			    	out[p++] = c;
+			    } 
+			    else if(c < 2048) 
+			    {
+			    	out[p++] = (c >> 6) | 192;
+			    	out[p++] = (c & 63) | 128;
+			    } 
+			    else if(((c & 0xFC00) == 0xD800) && (i + 1) < str.length &&
+			        ((str.charCodeAt(i + 1) & 0xFC00) == 0xDC00)) 
+				{
+			    	c = 0x10000 + ((c & 0x03FF) << 10) + (str.charCodeAt(++i) & 0x03FF);
+			    	out[p++] = (c >> 18) | 240;
+			    	out[p++] = ((c >> 12) & 63) | 128;
+			    	out[p++] = ((c >> 6) & 63) | 128;
+			    	out[p++] = (c & 63) | 128;
+			    } 
+			    else 
+			    {
+			    	out[p++] = (c >> 12) | 224;
+			    	out[p++] = ((c >> 6) & 63) | 128;
+			    	out[p++] = (c & 63) | 128;
+				}
+			}
+			return out;
+		};
 		
 		self.refresh();
 		//self.update();
