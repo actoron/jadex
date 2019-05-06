@@ -983,13 +983,18 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if(secrets != null && secrets.contains(asecret))
 					return IFuture.DONE;
 				
+				//System.out.println("networknames before: "+networknames);
+				
 				networks.add(networkname, asecret);
 				if(asecret.canSign())
 					networknames.add(networkname);
 				
+				//System.out.println("networknames after: "+networknames);
+				
 				saveSettings();
 				
 				return resetCryptoSuites();
+				//return IFuture.DONE;
 			}
 		});
 	}
