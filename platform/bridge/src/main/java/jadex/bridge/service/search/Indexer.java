@@ -456,7 +456,7 @@ public class Indexer<T>
 				Set<String> svals = totest.get(keyname);
 				
 				// All tags of query must be contained in service
-				if(mode==null || mode)
+				if(mode==null || mode) // TRUE=AND
 				{
 					for(String val: vs)
 					{
@@ -469,7 +469,7 @@ public class Indexer<T>
 					boolean found = false;
 					for(String val: vs)
 					{
-						if(svals.contains(val))
+						if(svals!=null && svals.contains(val))
 						{
 							found = true;
 							break;

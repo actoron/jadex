@@ -74,7 +74,7 @@
 										<input class="w100 h100" type="text" placeholder="Key" ref="key" disabled="true">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn w100 h100" onclick="{generateRandom}">Generate Random</button>
+										<button type="button" class="btn w100 h100" onclick="{generateRandom}">Generate Random Key</button>
 									</div>
 								</div>
 								<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
@@ -87,7 +87,7 @@
 										</div> 
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn w100 h100" onclick="{generateFromPassword}">Generate From Password</button>
+										<button type="button" class="btn w100 h100" onclick="{generateFromPassword}">Derive Key From Password</button>
 									</div>
 								</div>
 							</div>
@@ -96,7 +96,7 @@
 							<div class="col m-0 p-0">
 								<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
 									<div class="col-12">
-										<input class="w100 h100" type="text" placeholder="Password (min 10 characters)" ref="pass2" onchange="{update}">
+										<input class="w100 h100" type="text" placeholder="Password (min 10 characters)" ref="pass2" onchange="{pass2Changed}">
 									</div>
 								</div>
 							</div>
@@ -462,6 +462,12 @@
 		selectNetwork(e)
 		{
 			console.log(e.item);
+		}
+		
+		pass2Changed(e)
+		{
+			self.secret = "pw:"+self.refs.pass2.value;
+			self.update();
 		}
 		
 		stringToUtf8 = function(str) 
