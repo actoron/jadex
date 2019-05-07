@@ -991,6 +991,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				//System.out.println("networknames after: "+networknames);
 				
+				//ServiceRegistry.getRegistry(agent.getId().getRoot()).updateService(null, "networks");
+				ServiceRegistry.getRegistry(agent.getId().getRoot()).updateService(null);
+				
 				saveSettings();
 				
 				return resetCryptoSuites();

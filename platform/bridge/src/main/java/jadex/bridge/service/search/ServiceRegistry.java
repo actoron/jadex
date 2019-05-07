@@ -76,7 +76,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 //	@SuppressWarnings("unchecked")
 	public IServiceIdentifier searchService(final ServiceQuery<?> query)
 	{
-//		if(query.toString().indexOf("IEnvironment")!=-1)
+//		if(query.toString().indexOf("ISecurity")!=-1)
 //			System.out.println("sdgo");
 		
 		IServiceIdentifier ret = null;
@@ -230,13 +230,13 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public void updateService(IServiceIdentifier service)
 	{
-		if (service == null)
+		if(service == null)
 		{
 			rwlock.writeLock().lock();
 			Set<IServiceIdentifier> services = indexer.getAllValues();
 			try
 			{
-				for (IServiceIdentifier ser : services)
+				for(IServiceIdentifier ser : services)
 				{
 					indexer.removeValue(ser);
 					indexer.addValue(ser);
@@ -247,7 +247,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				rwlock.writeLock().unlock();
 			}
 			
-			for (IServiceIdentifier ser : services)
+			for(IServiceIdentifier ser : services)
 				checkQueries(ser, ServiceEvent.SERVICE_CHANGED);
 		}
 		else
@@ -268,12 +268,45 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	}
 	
 	/**
+	 *  Updates a service if the service meta-information
+	 *  has changes.
+	 *  
+	 *  @param service The service (null = all).
+	 */
+	public void updateService(IServiceIdentifier service, String propname)
+	{
+		if(indexer.isIndexed(propname) && service==null)
+		{
+			rwlock.writeLock().lock();
+			Set<IServiceIdentifier> services = indexer.getAllValues();
+			try
+			{
+				indexer.updateIndex(propname);
+			}
+			finally
+			{
+				rwlock.writeLock().unlock();
+			}
+			
+			// todo: get only changed?!
+			for(IServiceIdentifier ser : services)
+				checkQueries(ser, ServiceEvent.SERVICE_CHANGED);
+		}
+		else
+		{
+			updateService(service);
+		}
+	}
+	
+	/**
 	 *  Remove a service from the registry.
 	 *  @param sid The service id.
 	 */
 	// write
 	public void removeService(IServiceIdentifier service)
 	{
+		//System.out.println("removing service: "+service);
+		
 		Lock lock = rwlock.writeLock();
 		lock.lock();
 		try

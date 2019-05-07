@@ -93,8 +93,12 @@
 							</div>
 						</div>
 						<div class="row m-1" show="{nn_option=='option2'}">
-							<div class="col">
-								Option 2
+							<div class="col m-0 p-0">
+								<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
+									<div class="col-12">
+										<input class="w100 h100" type="text" placeholder="Password (min 10 characters)" ref="pass2" onchange="{update}">
+									</div>
+								</div>
 							</div>
 						</div>
 						<div class="row m-1" show="{nn_option=='option3'}">
@@ -421,7 +425,19 @@
 		isNetworkDisabled()
 		{
 			var network = self.refs.network.value;
-			var ret = network==null || network.length==0 || self.secret==null;
+			if(network==null || network.length==0)
+				return true;
+			
+			var ret = true;
+			if(self.nn_option=='option1')
+			{
+				ret = self.secret==null;
+			}
+			else if(self.nn_option=='option2')
+			{
+				var pw = self.refs.pass2.value;
+				ret = pw==null || pw.length<10; 
+			}
 			//console.log("isNetworkDis: "+ret);
 			return ret;
 		}

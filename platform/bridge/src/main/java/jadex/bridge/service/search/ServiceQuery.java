@@ -144,6 +144,11 @@ public class ServiceQuery<T>
 	//Hack!!! should not be public??? 
 	public static final String[]	NETWORKS_NOT_SET	= new String[]{"__NETWORKS_NOT_SET__"};	// TODO: new String[0] for better performance, but unable to check remotely after marshalling!
 	
+	/** Default matching modes set the elements with OR semantics. */
+	public static final Map<String, Boolean> DEFAULT_MATCHINGMODES = SUtil.createHashMap(
+		new String[]{ServiceKeyExtractor.KEY_TYPE_TAGS, ServiceKeyExtractor.KEY_TYPE_NETWORKS}, 
+		new Boolean[]{Boolean.FALSE, Boolean.FALSE});
+	
 	//-------- attributes --------
 	
 	/** The service type. */
@@ -683,8 +688,6 @@ public class ServiceQuery<T>
 		return ret;
 	}
 	
-	
-		
 	/**
 	 *  Get the matching mode for a key.
 	 *  @param key The key name.
@@ -692,7 +695,7 @@ public class ServiceQuery<T>
 	 */
 	public Boolean getMatchingMode(String key)
 	{
-		return matchingmodes!=null? matchingmodes.get(key): null;
+		return matchingmodes==null? DEFAULT_MATCHINGMODES.get(key): matchingmodes.get(key);
 	}
 	
 	/**
@@ -703,7 +706,7 @@ public class ServiceQuery<T>
 	public ServiceQuery<T> setMatchingMode(String key, Boolean and)
 	{
 		if(matchingmodes==null)
-			matchingmodes = new HashMap<String, Boolean>();
+			matchingmodes = new HashMap<String, Boolean>(DEFAULT_MATCHINGMODES);
 		matchingmodes.put(key, and);
 		return this;
 	}
