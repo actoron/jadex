@@ -36,12 +36,19 @@
 									    </tr>
 			  						</thead>
 			  						<tbody>
-			    						<tr class="d-flex" each="{net in getNetworks()}" onclick="{selectNetwork}">
+			    						<tr class="d-flex net" each="{net in getNetworks()}" onclick="{selectNetwork}">
 			      							<td class="col-4">{net[0]}</td>
 			     							<td class="col-8">{net[1]}</td>
 									    </tr>
 									</tbody>
 								</table>
+							</div>
+						</div>
+						<div class="row m-1">
+							<div class="col-9">
+							</div>
+							<div class="col-3">
+								<button type="button" class="btn w100" onclick="{removeNetwork}" disabled="{isNetworkRemoveDisabled()}">Remove Network</button>
 							</div>
 						</div>
 						<div class="row m-1">
@@ -74,7 +81,7 @@
 										<input class="w100 h100" type="text" placeholder="Key" ref="key" disabled="true">
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn w100 h100" onclick="{generateRandom}">Generate Random Key</button>
+										<button type="button" class="btn w100 h100" onclick="{generateRandom}">Generate Key</button>
 									</div>
 								</div>
 								<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
@@ -87,7 +94,7 @@
 										</div> 
 									</div>
 									<div class="col-3">
-										<button type="button" class="btn w100 h100" onclick="{generateFromPassword}">Derive Key From Password</button>
+										<button type="button" class="btn w100 h100" onclick="{generateFromPassword}">Derive Key</button>
 									</div>
 								</div>
 							</div>
@@ -138,9 +145,9 @@
 									    </tr>
 			  						</thead>
 			  						<tbody>
-			    						<tr each="{roles in getRoles()}">
-			      							<td onclick="{selectRole}">{roles[0]}</td>
-			     							<td onclick="{selectRole}">{roles[1]}</td>
+			    						<tr class="role" each="{roles in getRoles()}" onclick="{selectRole}">
+			      							<td>{roles[0]}</td>
+			     							<td>{roles[1]}</td>
 									    </tr>
 									</tbody>
 								</table>
@@ -179,7 +186,7 @@
 									    </tr>
 			  						</thead>
 			  						<tbody>
-			    						<tr each="{na in getNameAuthorities()}">
+			    						<tr class="na" each="{na in getNameAuthorities()}" onclick="{selectNameAuthority}">
 			      							<td>{na[0]}</td>
 			     							<td>{na[1]}</td>
 			     							<td>{na[2]}</td>
@@ -207,11 +214,20 @@
 									    </tr>
 			  						</thead>
 			  						<tbody>
-			    						<tr each="{na in getTrustedPlatformNames()}">
-			      							<td>{na}</td>
+			    						<tr class="tpn" each="{tpn in getTrustedPlatformNames()}" onclick="{selectTrustedPlatformName}">
+			      							<td>{tpn}</td>
 									    </tr>
 									</tbody>
 								</table>
+							</div>
+						</div>
+						<div class="row m-1">
+							<div class="col-8">
+								<input type="text" placeholder="Trusted Platform Name" ref="tpn" onchange="{update}" required>
+							</div>
+							<div class="col-4">
+								<button type="button" class="btn" onclick="{addTrustedPlatformName}" disabled="{isTrustedPlatformNameDisabled()}">Add</button>
+								<button type="button" class="btn" onclick="{removeTrustedPlatformName}" disabled="{isTrustedPlatformNameDisabled()}">Remove</button>
 							</div>
 						</div>
 					</div>
@@ -237,10 +253,13 @@
 		.h100 {
 			height: 100%;
 		}
+		.selected {
+			background-color: rgba(255,255,0,0.5); 
+		}
 	</style>
 	
 	<script>
-		console.log("security222: "+opts);
+		//console.log("security plugin started: "+opts);
 		
 		var self = this;
 
@@ -250,8 +269,8 @@
 		self.secstate = {};
 		self.nn_option = "option1";
 		self.progress = 0;
-		self.network = null;
 		self.secret = null;
+		self.selected = null;
 		
 		$("#nn_opts :input").change(function() 
 		{
@@ -356,6 +375,7 @@
 		selectRole(e)
 		{
 			//console.log(e);
+			self.selectRow("role", e.currentTarget);
 			self.refs.entity.value = e.item.roles[0];
 			self.refs.role.value = e.item.roles[1];
 		}
@@ -442,10 +462,10 @@
 			return ret;
 		}
 		
-		/* setNetwork()
+		isNetworkRemoveDisabled()
 		{
-			self.network = self.refs.network.value;
-		}*/
+			return self.selected == null;
+		}
 		
 		addNetwork()
 		{
@@ -459,9 +479,90 @@
 			});
 		}
 		
+		removeNetwork()
+		{			
+			if(self.selected!=null)
+			{
+				console.log("remove network: "+self.selected);
+
+				axios.get(self.getMethodPrefix()+'&methodname=removeNetwork&args_0='+self.selected[0]+'&args_1='+self.selected[1], self.transform).then(function(resp)
+				{
+					console.log("removed network: "+self.selected);
+					self.refresh();
+				});
+			}
+		}
+		
 		selectNetwork(e)
 		{
-			console.log(e.item);
+			//console.log(e.item);
+			self.selectRow("net", e.currentTarget);
+			self.selected = e.item.net;
+		}
+		
+		selectNameAuthority(e)
+		{
+			self.selectRow("na", e.currentTarget);
+		}
+		
+		selectTrustedPlatformName(e)
+		{
+			self.selectRow("tpn", e.currentTarget);
+			self.refs.tpn.value = e.item.tpn;
+		}
+		
+		isTrustedPlatformNameDisabled()
+		{
+			var ret = self.refs.tpn.value.length==0;
+			//console.log("isTPNDis: "+ret);
+			return ret;
+		}
+		
+		addTrustedPlatformName()
+		{
+			var name = self.refs.tpn.value;
+			
+			if(name.length>0)
+			{
+				axios.get(self.getMethodPrefix()+'&methodname=addTrustedPlatformName&args_0='+name, self.transform).then(function(resp)
+				{
+					console.log("added trusted platform name: "+name);
+					self.refresh();
+				});
+			}
+		}
+		
+		removeTrustedPlatformName(e)
+		{
+			var name = self.refs.tpn.value;
+			
+			if(name.length>0)
+			{
+				axios.get(self.getMethodPrefix()+'&methodname=removeTrustedPlatformName&args_0='+name, self.transform).then(function(resp)
+				{
+					console.log("removed trusted platform name: "+name);
+					self.refresh();
+				});
+			}
+		}
+		
+		/** Select a row. Finds all rows via clazz and selected current. Deselects rest. */
+		selectRow(clazz, selel)
+		{
+			var sel = -1;
+			var oldsel = -1;
+			var elems = document.querySelectorAll("."+clazz);
+			for(var i=0; i<elems.length; i++)
+			{
+				if(elems[i].classList.contains("selected"))
+					oldsel = i;
+				if(elems[i]==selel)
+					sel = i;
+				
+				elems[i].classList.remove("selected");	
+			}
+			if(sel!=oldsel)
+				selel.classList.add("selected");
 		}
 		
 		pass2Changed(e)

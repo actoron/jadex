@@ -120,6 +120,28 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	}
 	
 	/**
+	 *  Adds a trusted platform name.
+	 *  @param name The name.
+	 *  @return null, when done.
+	 */
+	public IFuture<Void> addTrustedPlatformName(String name)
+	{
+		return agent.getService(ISecurityService.class)
+			.then(s -> s.addTrustedPlatform(name));
+	}
+	
+	/**
+	 *  Removes a trusted platform name.
+	 *  @param name The name.
+	 *  @return null, when done.
+	 */
+	public IFuture<Void> removeTrustedPlatformName(String name)
+	{
+		return agent.getService(ISecurityService.class)
+			.then(s -> s.removeTrustedPlatform(name));
+	}
+	
+	/**
 	 *  Get security state.
 	 *  @return The security state.
 	 */

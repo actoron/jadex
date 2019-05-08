@@ -60,4 +60,19 @@ public interface IJCCSecurityService extends IJCCPluginService
 	 *  @return Null, when done.
 	 */
 	public IFuture<Void> removeNetwork(String networkname, String secret);
+	
+	/**
+	 *  Adds a trusted platform name.
+	 *  @param name The name.
+	 *  @return null, when done.
+	 */
+	public IFuture<Void> addTrustedPlatformName(String name);
+	
+	/**
+	 *  Removes a trusted platform name.
+	 *  @param name The name.
+	 *  @return null, when done.
+	 */
+	public IFuture<Void> removeTrustedPlatformName(String name);
+
 }
