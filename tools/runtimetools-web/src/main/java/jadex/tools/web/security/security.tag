@@ -16,6 +16,12 @@
 								<input type="checkbox" ref="printsecret" onclick="{printSecret}" checked="{secstate.printSecret}">Print secret</input>
 							</div>
 						</div>
+						<div class="row m-1">
+							<div class="col-12">
+								<label for="platformsecret">Platform Secret (Password, Key, Certificate)</label>
+  								<textarea class="form-control rounded-0" id="platformsecret" rows="10" ref="platformsecret" disabled="true">{secstate.platformSecret}</textarea>
+							</div>
+						</div>
       				</div>
     			</div>
   			</div>
@@ -114,8 +120,13 @@
 							</div>
 						</div>
 						<div class="row m-1" show="{nn_option=='option4'}">
-							<div class="col">
-								Option 4
+							<div class="col m-0 p-0">
+								<div class="row ml-0 mr-0 mb-0 mt-1 p-0">
+									<div class="col-12">
+										<label for="rawsecret">Secret (Password, Key, Certificate) in Jadex format (pw:, key:, pem:)</label>
+  										<textarea class="form-control rounded-0" id="rawsecret" rows="10" ref="rawsecret" onchange="{rawSecretChanged}"></textarea>
+									</div>
+								</div>
 							</div>
 						</div>
 						<div class="row m-1">
@@ -223,7 +234,7 @@
 						</div>
 						<div class="row m-1">
 							<div class="col-8">
-								<input type="text" placeholder="Trusted Platform Name" ref="tpn" onchange="{update}" required>
+								<input class="w100 h100" type="text" placeholder="Trusted Platform Name" ref="tpn" onchange="{update}" required>
 							</div>
 							<div class="col-4">
 								<button type="button" class="btn" onclick="{addTrustedPlatformName}" disabled="{isTrustedPlatformNameDisabled()}">Add</button>
@@ -458,6 +469,15 @@
 				var pw = self.refs.pass2.value;
 				ret = pw==null || pw.length<10; 
 			}
+			else if(self.nn_option=='option3')
+			{
+			}
+			else if(self.nn_option=='option4')
+			{
+				var s = self.refs.rawsecret.value;
+				ret = s==null || s.length==0; 
+			}
+			
 			//console.log("isNetworkDis: "+ret);
 			return ret;
 		}
@@ -568,6 +588,12 @@
 		pass2Changed(e)
 		{
 			self.secret = "pw:"+self.refs.pass2.value;
+			self.update();
+		}
+		
+		rawSecretChanged(e)
+		{
+			self.secret = self.refs.rawsecret.value;
 			self.update();
 		}
 		

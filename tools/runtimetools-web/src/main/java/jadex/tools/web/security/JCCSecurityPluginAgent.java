@@ -314,6 +314,15 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 		{
 			this.platformsecret = platformsecret;
 		}
+		
+		/**
+		 *  Get the platformsecret.
+		 *  @return The platformsecret
+		 */
+		public String getPlatformSecret()
+		{
+			return platformsecret;
+		}
 
 		/**
 		 *  Get the roles.

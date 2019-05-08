@@ -1292,10 +1292,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			public IFuture<String> execute(IInternalAccess ia)
 			{
 				AbstractAuthenticationSecret secret = null;
-				if (cid == null)
+				if(cid == null)
 					secret = getInternalPlatformSecret();
 				else
-					getInternalPlatformSecret(cid);
+					secret = getInternalPlatformSecret(cid);
 				return new Future<String>(secret != null ? secret.toString() : null);
 			}
 		});
