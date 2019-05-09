@@ -54,10 +54,10 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	public static final String DEFAULT_COMPLETECONTEXT = "http://"+DEFAULT_HOST+":"+DEFAULT_PORT+"/"+DEFAULT_APP+"/";
 	
 	/** The servers per service id (for unpublishing). */
-	protected Map<IServiceIdentifier, Tuple2<PathHandler, URI>> sidservers;
+	protected Map<IServiceIdentifier, Tuple2<IPathHandler, URI>> sidservers;
 	
 	/** The servers per port. */
-	protected Map<Integer, PathHandler> portservers;
+	protected Map<Integer, IPathHandler> portservers;
 	
 	/** Inited flag because impl is used for 2 services. */
 	protected boolean inited;
@@ -97,7 +97,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 		String err = null;
 		if(portservers!=null)
 		{
-			PathHandler ph = portservers.get(Integer.valueOf(request.getLocalPort()));
+			IPathHandler ph = portservers.get(Integer.valueOf(request.getLocalPort()));
 
 			// If tolerant mode (todo) use default server (one might not know the hostname port before deployment)
 			if(ph==null)
@@ -178,6 +178,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	{
 		Future<Void> ret = new Future<>();
 		
+		// subpath -> mapping info
         IFuture<MultiCollection<String, MappingInfo>> fut = evaluateMapping(serviceid, info);
         
         fut.addResultListener(new ExceptionDelegationResultListener<MultiCollection<String, MappingInfo>, Void>(ret)
@@ -210,9 +211,9 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
     		        component.getLogger().info("Adding http handler to server: "+uri.getPath());
     		        
     		        // is overridden by nano to return nano server :-( cast then does not work
-//	        		        PathHandler ph = (PathHandler)getHttpServer(uri, info);
+//	        		  PathHandler ph = (PathHandler)getHttpServer(uri, info);
     		        getHttpServer(uri, info);
-    		        PathHandler ph = portservers.get(uri.getPort());
+    		        IPathHandler ph = portservers.get(uri.getPort());
 	        		
 	        		IRequestHandler rh = new IRequestHandler()
 	     			{
@@ -234,8 +235,8 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	     			ph.addSubhandler(null, uri.getPath(), rh);
 	     	        
 	     	        if(sidservers==null)
-	     	            sidservers = new HashMap<IServiceIdentifier, Tuple2<PathHandler, URI>>();
-	     	        sidservers.put(serviceid, new Tuple2<PathHandler, URI>(ph, uri));
+	     	            sidservers = new HashMap<IServiceIdentifier, Tuple2<IPathHandler, URI>>();
+	     	        sidservers.put(serviceid, new Tuple2<IPathHandler, URI>(ph, uri));
 	     	        ret.setResult(null);
         		}
         	    catch(Exception e)
@@ -263,10 +264,11 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
             if(server==null)
             {
                 System.out.println("Starting new server: "+uri.getPort());
-                PathHandler ph = new PathHandler();
+                IPathHandler ph = new PathHandler();
+                //IPathHandler ph = new PathHandler2();
 
                 if(portservers==null)
-                    portservers = new HashMap<Integer, PathHandler>();
+                    portservers = new HashMap<Integer, IPathHandler>();
                 portservers.put(uri.getPort(), ph);
                 server = ph;
             }
@@ -289,7 +291,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	 */
 	public IFuture<Void> unpublishService(IServiceIdentifier sid)
 	{
-		Tuple2<PathHandler, URI> tup = sidservers.get(sid);
+		Tuple2<IPathHandler, URI> tup = sidservers.get(sid);
 		if(tup!=null)
 		{
 			tup.getFirstEntity().removeSubhandler(null, tup.getSecondEntity().getPath());
@@ -310,7 +312,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	        
 //	        PathHandler ph = (PathHandler)getHttpServer(uri, null);
 	        getHttpServer(uri, null);
-	        PathHandler ph = portservers.get(uri.getPort());
+	        IPathHandler ph = portservers.get(uri.getPort());
 	        
 	        IRequestHandler rh = new IRequestHandler()
 			{
@@ -373,7 +375,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	/**
 	 *  Produce overview site of published services.
 	 */
-	public String getServicesInfo(HttpServletRequest request, PathHandler ph)
+	public String getServicesInfo(HttpServletRequest request, IPathHandler ph)
 	{
 		StringBuffer ret = new StringBuffer();
 		

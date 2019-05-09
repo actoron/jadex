@@ -8,8 +8,8 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IExternalAccess;
 
 /**
- * Junit compatible test class to be extended either by agents that provide test results
- * or by separate classes that provide a name of an agent that provides test results using the constructor.
+ *  Junit compatible test class to be extended either by agents that provide test results
+ *  or by separate classes that provide a name of an agent that provides test results using the constructor.
  */
 public abstract class JunitAgentTest extends ComponentTestLazyPlatform 
 {

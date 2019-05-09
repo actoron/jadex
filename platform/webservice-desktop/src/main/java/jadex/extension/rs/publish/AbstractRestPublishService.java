@@ -276,6 +276,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
     /**
      *  Handle a web request.
+     *  @param service The service.
+     *  @param mappings The collected mapping infos for the service.
+     *  @param request The request.
+     *  @param response The response.
      */
     public void handleRequest(IService service, MultiCollection<String, MappingInfo> mappings, final HttpServletRequest request, final HttpServletResponse response, Object[] others) throws IOException, ServletException// String target, Request baseRequest, 
     {

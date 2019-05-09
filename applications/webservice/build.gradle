@@ -11,6 +11,7 @@ dependencies
 	api project(':platform:webservice')
 //	api project(':platform:webservice-desktop')
 	api project(':platform:webservice-desktop-grizzly') // todo: do not depend on specific server
+//	api project(':platform:webservice-desktop-nano') 
 	
 	api 'org.codehaus.jackson:jackson-mapper-asl:1.9.3'
 }
