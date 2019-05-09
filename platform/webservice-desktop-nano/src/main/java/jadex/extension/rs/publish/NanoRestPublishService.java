@@ -44,6 +44,12 @@ import jadex.commons.future.IFuture;
 @Service
 public class NanoRestPublishService extends ExternalRestPublishService
 {
+	/** The servers per port. */
+	protected Map<Integer, Server> portservers2;
+	
+	/**
+	 *  Inner class representing a nano server.
+	 */
 	public class Server extends NanoHTTPD 
 	{
 		public Server(int port) 
@@ -122,10 +128,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 			return ret[0];
 		}
 	}
-	
-	/** The servers per port. */
-	protected Map<Integer, Server> portservers2;
-	
+		
 	@ServiceStart
 	public void start()
 	{
@@ -358,8 +361,6 @@ public class NanoRestPublishService extends ExternalRestPublishService
 			}
 		});
 			
-		
-	    
 	    return ret;
     }
     

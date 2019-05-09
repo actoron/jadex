@@ -42,10 +42,7 @@ import jadex.micro.annotation.AgentKilled;
 /**
  *  Publish service without Jersey directly using Jetty container.
  *  
- *  todo: make abstract base class without Jetty deps
- *  
  *  note: Jetty releases are Java 1.8 only.
- *  
  */
 @Service
 public class JettyRestPublishService extends AbstractRestPublishService

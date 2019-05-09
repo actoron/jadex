@@ -104,9 +104,7 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 /**
- *  Publish service without Jersey directly using Jetty container.
- *  
- *  todo: make abstract base class without Jetty deps
+ *  Publish service without Jersey directly using different containers (in concrete impls).  
  */
 @Service
 public abstract class AbstractRestPublishService implements IWebPublishService
