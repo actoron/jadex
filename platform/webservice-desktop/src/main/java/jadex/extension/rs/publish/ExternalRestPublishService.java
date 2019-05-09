@@ -178,6 +178,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	{
 		Future<Void> ret = new Future<>();
 		
+		// subpath -> mapping info
         IFuture<MultiCollection<String, MappingInfo>> fut = evaluateMapping(serviceid, info);
         
         fut.addResultListener(new ExceptionDelegationResultListener<MultiCollection<String, MappingInfo>, Void>(ret)
@@ -263,8 +264,8 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
             if(server==null)
             {
                 System.out.println("Starting new server: "+uri.getPort());
-                //IPathHandler ph = new PathHandler();
-                IPathHandler ph = new PathHandler2();
+                IPathHandler ph = new PathHandler();
+                //IPathHandler ph = new PathHandler2();
 
                 if(portservers==null)
                     portservers = new HashMap<Integer, IPathHandler>();
