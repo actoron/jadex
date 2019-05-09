@@ -11,7 +11,7 @@ import jadex.commons.Tuple2;
 /**
  *  Main handler dealing with incoming request.
  */
-public class PathHandler implements IRequestHandler
+public class PathHandler implements IPathHandler
 {
 	/** 
 	 *  Published subhandlers.
@@ -20,7 +20,7 @@ public class PathHandler implements IRequestHandler
 	 */
 	protected Map<Tuple2<String, String>, Tuple2<String, IRequestHandler>> subhandlers;
 	
-	/** Published subhandler matching cache. */
+	/** Published subhandler matching cache. Adds already resolved handlers for requested paths. */
 	protected Map<Tuple2<String, String>, Tuple2<String, IRequestHandler>> subhandlercache;
 	
 	/**
@@ -150,8 +150,8 @@ public class PathHandler implements IRequestHandler
 	}
 	
 	/**
-	 * 
-	 * @param vhost Virtual host specification.
+	 *  Remove a subhandler.
+	 *  @param vhost Virtual host specification.
 	 *  @param path Path being handled.
 	 */
 	public void removeSubhandler(String vhost, String path)
