@@ -179,12 +179,12 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 		Future<Void> ret = new Future<>();
 		
 		// subpath -> mapping info
-        IFuture<MultiCollection<String, MappingInfo>> fut = evaluateMapping(serviceid, info);
+        IFuture<PathManager<MappingInfo>> fut = evaluateMapping(serviceid, info);
         
-        fut.addResultListener(new ExceptionDelegationResultListener<MultiCollection<String, MappingInfo>, Void>(ret)
+        fut.addResultListener(new ExceptionDelegationResultListener<PathManager<MappingInfo>, Void>(ret)
 		{
         	@Override
-        	public void customResultAvailable(MultiCollection<String, MappingInfo> mappings)
+        	public void customResultAvailable(PathManager<MappingInfo> mappings)
         	{
         		try
         		{
