@@ -87,6 +87,7 @@ import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
+import jadex.extension.rs.publish.PathHandler2.SubHandler;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.binary.BinaryResponseProcessor;
@@ -1604,7 +1605,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		            }
 
 		            // Natural mapping using simply all declared methods
-		            natret.add(m.getName(), new MappingInfo(null, m, m.getName()));
+		            natret.add(m.getName(), new MappingInfo(null, m, m.getName())); // httpmethod, method, path
 		        }
 
 		        return new Future<MultiCollection<String, MappingInfo>>(ret.size()>0? ret: natret);
@@ -2232,7 +2233,58 @@ public abstract class AbstractRestPublishService implements IWebPublishService
             return path==null && method==null && httpmethod==null;
         }
     }
+
+    /**
+     * 
+     */
+    public static class ServiceMethodMappingInfos
+    {
+    	protected List<Map<String, Collection<MappingInfo>>> paths;
+
+    	/**
+    	 *  Create a new info.
+    	 */
+    	public ServiceMethodMappingInfos(MultiCollection<String, MappingInfo> minfos)
+    	{
+    		minfos.values().stream().flatMap(x -> x.stream()).forEach(x -> addMappingInfo(x));
+    	}
+    	
+    	/**
+    	 *  Adds a new info.
+    	 */
+    	public void addMappingInfo(MappingInfo mi)
+    	{
+    		String path = mi.getPath();
+    		if(path.endsWith("/"))
+    			path = path.substring(0, path.length()-1);
+    		
+    		StringTokenizer stok = new StringTokenizer(path, "/");
+    		for(int i=0; stok.hasMoreTokens(); i++)
+    		{
+    			String pe = stok.nextToken();
+    			if(pe.startsWith("{") && pe.endsWith("}"))
+    				pe = "*";
+
+    			Map<String, Collection<MappingInfo>> hmap = paths.get(i);
+    			if(hmap==null)
+    				hmap = new HashMap<>();
+    			
+    			Collection<MappingInfo> handlers = hmap.get(pe);
+    			if(handlers==null)
+    			{
+    				handlers = new ArrayList<MappingInfo>();
+    				hmap.put(pe, handlers);
+    			}	
+    			handlers.add(mi);
+    		}
+    	}
+    }
     
+    
+    
+    /**
+     * 
+     */
     public static class RequestInfo
     {
     	protected Queue<Object> results;
