@@ -209,7 +209,7 @@ public class PathManager<T>
 	 *  Get the variable bindings for path variables.
 	 *  @param elem The element.
 	 *  @return The variables for the element.
-	 */
+	 * /
 	public Map<String, String> getBindingsForElement(T elem)
 	{	
 		Map<String, String> ret = new HashMap<>();
@@ -240,7 +240,7 @@ public class PathManager<T>
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get a path part map for a level.
@@ -322,11 +322,11 @@ public class PathManager<T>
 		pm.addPathElement("a/b/c/d", "a/b/c/d");
 		pm.addPathElement("aa/bb/{cc}", "aa/bb/{cc}");
 		
-		System.out.println("a/b/c: "+pm.getElementForPath("a/b/c")+" "+pm.getBindingsForElement("a/b/c"));
-		System.out.println("a/bbb/c: "+pm.getElementForPath("a/bbb/c")+" "+pm.getBindingsForElement("a/bbb/c"));
-		System.out.println("a/dummy/c: "+pm.getElementForPath("a/dummy/c")+" "+pm.getBindingsForElement("a/dummy/c"));
-		System.out.println("a/b/c/d: "+pm.getElementForPath("a/b/c/d")+" "+pm.getBindingsForElement("a/b/c/d"));
-		System.out.println("d/b/c: "+pm.getElementForPath("d/b/c")+" "+pm.getBindingsForElement("d/b/c"));
-		System.out.println("a/lok/doc: "+pm.getElementForPath("a/lok/doc")+" "+pm.getBindingsForElement("a/lok/doc"));
+		System.out.println("a/b/c: "+pm.getElementForPath("a/b/c")+" "+pm.getBindingsForPath("a/b/c"));
+		System.out.println("a/bbb/c: "+pm.getElementForPath("a/bbb/c")+" "+pm.getBindingsForPath("a/bbb/c"));
+		System.out.println("a/dummy/c: "+pm.getElementForPath("a/dummy/c")+" "+pm.getBindingsForPath("a/dummy/c"));
+		System.out.println("a/b/c/d: "+pm.getElementForPath("a/b/c/d")+" "+pm.getBindingsForPath("a/b/c/d"));
+		System.out.println("d/b/c: "+pm.getElementForPath("d/b/c")+" "+pm.getBindingsForPath("d/b/c"));
+		System.out.println("a/lok/doc: "+pm.getElementForPath("a/lok/doc")+" "+pm.getBindingsForPath("a/lok/doc"));
 	}
 }

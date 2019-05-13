@@ -16,28 +16,18 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
-import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
 
 /**
  *  Publish service without Jersey directly using Jetty container.
@@ -116,12 +106,13 @@ public class JettyRestPublishService extends AbstractRestPublishService
     {
     	Future<Void> ret = new Future<>();
 		
-        IFuture<MultiCollection<String, MappingInfo>> fut = evaluateMapping(serviceid, info);
-        
-        fut.addResultListener(new ExceptionDelegationResultListener<MultiCollection<String, MappingInfo>, Void>(ret)
+//        IFuture<MultiCollection<String, MappingInfo>> fut = evaluateMapping(serviceid, info);
+        IFuture<PathManager<MappingInfo>> fut = evaluateMapping(serviceid, info);
+               
+        fut.addResultListener(new ExceptionDelegationResultListener<PathManager<MappingInfo>, Void>(ret)
 		{
         	@Override
-        	public void customResultAvailable(MultiCollection<String, MappingInfo> mappings)
+        	public void customResultAvailable(PathManager<MappingInfo> pm)
         	{
         		try
                 {
@@ -148,7 +139,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
                             if(request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) 
                             	baseRequest.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
                         	
-                        	handleRequest(service, mappings, request, response, new Object[]{target, baseRequest});
+                        	handleRequest(service, pm, request, response, new Object[]{target, baseRequest});
                         	
 //                          System.out.println("handler is: "+uri.getPath());
                             baseRequest.setHandled(true);

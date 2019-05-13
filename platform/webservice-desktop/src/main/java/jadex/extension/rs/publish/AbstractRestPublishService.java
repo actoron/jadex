@@ -421,7 +421,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		// handle new call
 		else
 		{
-			// System.out.println("received new call: "+request);
+			System.out.println("received new call: "+request);
 
 			String methodname = request.getPathInfo();
 
@@ -430,9 +430,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			if(methodname != null && methodname.endsWith("()"))
 				methodname = methodname.substring(0, methodname.length() - 2);
 
-			// todo: support more mappinginfos per 
+			final String fmn = methodname;
 			Collection<MappingInfo> mis = pm.getElementsForPath(methodname);
-			List<Map<String, String>> bindings = mis.stream().map(x -> pm.getBindingsForElement(x)).collect(Collectors.toList());
+			List<Map<String, String>> bindings = mis.stream().map(x -> pm.getBindingsForPath(fmn)).collect(Collectors.toList());
 			
 			if(mis!=null && mis.size()>0)
 			{
@@ -759,6 +759,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			if(request.getQueryString() != null)
 				inparamsmap = splitQueryString(request.getQueryString());
 
+			// Read multi-part form data
 			if(request.getContentType() != null && request.getContentType().startsWith(MediaType.MULTIPART_FORM_DATA) && request.getParts().size() > 0)
 			{
 				if(inparamsmap == null)
@@ -773,18 +774,23 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 			// Find correct method using paramter count
 			MappingInfo mi = null;
+			Map<String, String> binding = null;
 			if(mis.size() == 1)
 			{
 				mi = mis.iterator().next();
+				binding = bindings.get(0);
 			}
 			else
 			{
 				int psize = inparamsmap == null ? 0 : inparamsmap.size();
+				Iterator<Map<String, String>> bit = bindings.iterator();
 				for(MappingInfo tst : mis)
 				{
-					if(psize == tst.getMethod().getParameterTypes().length)
+					Map<String, String> b = bit.next();
+					if(psize+b.size() == tst.getMethod().getParameterTypes().length)
 					{
 						mi = tst;
+						binding = b;
 						break;
 					}
 				}
@@ -792,6 +798,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 			if(mi == null)
 				throw new RuntimeException("No method mapping found.");
+			
+			// Add path infos from binding to inparamsmap
+			if(binding!=null && binding.size()>0)
+			{
+				if(inparamsmap==null)
+					inparamsmap = new HashMap<>();
+				inparamsmap.putAll(binding);
+			}
 
 			Method method = mi.getMethod();
 			
@@ -847,10 +861,34 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			if(inparamsmap != null)
 			{
 				int i = 0;
-				List<String> pnames = getParameterNames(method);
-				for(String pname : pnames != null ? pnames : inparamsmap.keySet())
+				//List<String> pnames = getParameterNames(method);
+//				for(String pname : pnames != null ? pnames : inparamsmap.keySet())
+//				{
+//					inparams[i++] = inparamsmap.get(pname);
+//				}
+				List<Tuple2<String, String>> pinfos = getParameterInfos(method);
+				Iterator<String> innames = inparamsmap.keySet().iterator();
+				for(Tuple2<String, String> pinfo: pinfos)
 				{
-					inparams[i++] = inparamsmap.get(pname);
+					String inname = innames.hasNext()? innames.next(): null;
+					if("name".equals(pinfo.getFirstEntity()))
+					{
+						inparams[i++] = inparamsmap.get(pinfo.getSecondEntity());
+					}
+					else if("path".equals(pinfo.getFirstEntity()))
+					{
+						inparams[i++] = inparamsmap.get(pinfo.getSecondEntity());
+						//binding.get(pinfo.getSecondEntity());
+					}
+					else if("query".equals(pinfo.getFirstEntity()))
+					{
+						// query params are in normal parameter map
+						inparams[i++] = inparamsmap.get(pinfo.getSecondEntity());
+					}
+					else if(inname!=null)
+					{
+						inparams[i++] = inparamsmap.get(inname);
+					}
 				}
 			}
 
@@ -864,6 +902,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			if(ct == null)
 				ct = request.getHeader("Accept");
 
+			// Read parameter from stream (message body)
 			if((inparams == null || inparams.length == 0) && types.length > 0 && ct != null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
 			{
 				try
@@ -909,7 +948,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				ParametersMapper mm = method.getAnnotation(ParametersMapper.class);
 				if(!mm.automapping())
 				{
-					Class< ? > pclazz = mm.value().clazz();
+					Class<?> pclazz = mm.value().clazz();
 					Object mapper;
 					if(!Object.class.equals(pclazz))
 					{
@@ -2338,43 +2377,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		}
 
 		/**
-		 * 
-		 */
-		public List<Tuple2<String, String>> getParameterInfo()
-		{
-			List<Tuple2<String, String>> ret = new ArrayList<>();
-			
-			Annotation[][] anns = method.getParameterAnnotations();
-			
-			for(int i=0; i<anns.length; i++)
-			{
-				for(Annotation ann: anns[i])
-				{
-					if(ann instanceof PathParam)
-					{
-						PathParam pp = (PathParam)ann;
-						String name = pp.value();
-						ret.add(new Tuple2<String, String>("path", name));
-		            }
-					else if(ann instanceof QueryParam)
-					{
-						QueryParam qp = (QueryParam)ann;
-						String name = qp.value();
-						ret.add(new Tuple2<String, String>("query", name));
-					}
-					else if(ann instanceof ParameterInfo)
-					{
-						ParameterInfo qp = (ParameterInfo)ann;
-						String name = qp.value();
-						ret.add(new Tuple2<String, String>("name", name));
-					}
-		        }
-			}
-			
-			return ret;
-		}
-		
-		/**
 		 * Test if has no settings.
 		 */
 		public boolean isEmpty()
@@ -2492,15 +2494,51 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		}
 	}
 
+	/**
+	 * 
+	 */
+	public List<Tuple2<String, String>> getParameterInfos(Method method)
+	{
+		List<Tuple2<String, String>> ret = new ArrayList<>();
+		
+		Annotation[][] anns = method.getParameterAnnotations();
+		
+		for(int i=0; i<anns.length; i++)
+		{
+			for(Annotation ann: anns[i])
+			{
+				if(ann instanceof PathParam)
+				{
+					PathParam pp = (PathParam)ann;
+					String name = pp.value();
+					ret.add(new Tuple2<String, String>("path", name));
+	            }
+				else if(ann instanceof QueryParam)
+				{
+					QueryParam qp = (QueryParam)ann;
+					String name = qp.value();
+					ret.add(new Tuple2<String, String>("query", name));
+				}
+				else if(ann instanceof ParameterInfo)
+				{
+					QueryParam qp = (QueryParam)ann;
+					String name = qp.value();
+					ret.add(new Tuple2<String, String>("name", name));
+				}
+	        }
+		}
+		
+		return ret;
+	}
+	
 	// Should be in SReflect but requires asm
 	// and also exists in SHelper
-
 	/**
 	 * Get parameter names via asm reader.
 	 * 
 	 * @param m The method.
 	 * @return The list of parameter names or null
-	 */
+	 * /
 	public static List<String> getParameterNames(Method m)
 	{
 		List<String> ret = null;
@@ -2590,7 +2628,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		// }
 
 		return ret;
-	}
+	}*/
 
 	/**
 	 * Extract caller values like ip and browser.

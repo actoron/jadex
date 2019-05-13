@@ -491,13 +491,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				remoteplatformsecrets = getProperty("remoteplatformsecrets", args, settings, remoteplatformsecrets);
 				roles = getProperty("roles", args, settings, roles);
 				
-				if (printsecret)
+				if(printsecret)
 				{
-					for (Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
+					for(Map.Entry<String, Collection<AbstractAuthenticationSecret>> entry : networks.entrySet())
 					{
-						if (entry.getValue() != null && !GLOBAL_NETWORK_NAME.equals(entry.getKey()))
+						if(entry.getValue() != null && !GLOBAL_NETWORK_NAME.equals(entry.getKey()))
 						{
-							for (AbstractAuthenticationSecret secret : entry.getValue())
+							for(AbstractAuthenticationSecret secret : entry.getValue())
 								System.out.println("Available network '" + entry.getKey() + "' with secret " + secret);
 						}
 					}
