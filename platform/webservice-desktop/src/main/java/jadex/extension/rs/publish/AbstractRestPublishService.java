@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
@@ -91,7 +89,6 @@ import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.traverser.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.extension.rs.publish.AbstractRestPublishService.MappingInfo.HttpMethod;
-import jadex.extension.rs.publish.PathHandler2.SubHandler;
 import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.binary.BinaryResponseProcessor;
@@ -2365,6 +2362,12 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						String name = qp.value();
 						ret.add(new Tuple2<String, String>("query", name));
 					}
+					else if(ann instanceof ParameterInfo)
+					{
+						ParameterInfo qp = (ParameterInfo)ann;
+						String name = qp.value();
+						ret.add(new Tuple2<String, String>("name", name));
+					}
 		        }
 			}
 			
@@ -2378,7 +2381,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			return path == null && method == null && httpmethod == null;
 		}
-		
 	}
 
 	/**
