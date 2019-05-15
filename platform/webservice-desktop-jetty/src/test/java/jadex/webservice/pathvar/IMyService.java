@@ -1,5 +1,9 @@
 package jadex.webservice.pathvar;
 
+import java.util.Date;
+import java.util.Map;
+
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -32,4 +36,16 @@ public interface IMyService
 	
 	@Path("{p1}/xyz/")
 	public IFuture<String> method6(@PathParam("p1") String p1, @QueryParam("name") String name);
+
+	@Path("jkl/{p1}")
+	public IFuture<String> method7(@FormParam("f1") String f1, @PathParam("p1") String p1);
+	
+	@Path("ok")
+	public IFuture<String> method8(@FormParam("f2") int f2, @FormParam("f1") Date f1);
+	
+	@Path("ok2")
+	public IFuture<String> method9(Map<String, Object> vals);
+	
+	@Path("ok3")
+	public IFuture<String> method10(@QueryParam("q1") Integer q1, Integer p2);
 }

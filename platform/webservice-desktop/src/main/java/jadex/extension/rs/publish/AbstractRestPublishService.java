@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.OPTIONS;
@@ -49,6 +50,8 @@ import javax.ws.rs.core.Response;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonObject.Member;
 import com.eclipsesource.json.JsonValue;
 
 import jadex.base.Starter;
@@ -114,28 +117,26 @@ import jadex.xml.bean.JavaWriter;
 public abstract class AbstractRestPublishService implements IWebPublishService
 {
 	/** Async context info. */
-	public static final String									ASYNC_CONTEXT_INFO			= "__cinfo";
+	public static final String ASYNC_CONTEXT_INFO = "__cinfo";
 
 	/** Http header for the call id. */
-	public static final String									HEADER_JADEX_CALLID			= "x-jadex-callid";
+	public static final String HEADER_JADEX_CALLID = "x-jadex-callid";
 
-	/**
-	 * Http header for the call id siganlling that this is the last response.
-	 */
-	public static final String									HEADER_JADEX_CALLFINISHED	= "x-jadex-callidfin";
+	/** Http header for the call id siganlling that this is the last response. */
+	public static final String HEADER_JADEX_CALLFINISHED = "x-jadex-callidfin";
 
 	/** Http header for the call id. */
-	public static final String									HEADER_JADEX_CLIENTTIMEOUT	= "x-jadex-clienttimeout";
+	public static final String HEADER_JADEX_CLIENTTIMEOUT = "x-jadex-clienttimeout";
 
 	/** Finished result marker. */
-	public static final String									FINISHED					= "__finished__";
+	public static final String FINISHED	= "__finished__";
 
 	/** Some basic media types for service invocations. */
-	public static List<String>									PARAMETER_MEDIATYPES		= Arrays.asList(new String[]{MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML});
+	public static List<String> PARAMETER_MEDIATYPES = Arrays.asList(new String[]{MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML});
 
 	/** The component. */
 	@ServiceComponent
-	protected IInternalAccess									component;
+	protected IInternalAccess component;
 
 	// /** The servers per service id. */
 	// protected Map<IServiceIdentifier, Server> sidservers;
@@ -752,18 +753,20 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			Object[] targetparams = null;
 
-			Map<String, Object> inparamsmap = null;
+			Map<String, Object> inparamsmap = new HashMap<>();
+			
+			String ct = request.getHeader("Content-Type");
+			if(ct == null)
+				ct = request.getHeader("Accept");
 
 			// parameters for query string (must be parsed to keep order) and
 			// posted form data not for multi-part
 			if(request.getQueryString() != null)
-				inparamsmap = splitQueryString(request.getQueryString());
+				inparamsmap.putAll(splitQueryString(request.getQueryString()));
 
 			// Read multi-part form data
 			if(request.getContentType() != null && request.getContentType().startsWith(MediaType.MULTIPART_FORM_DATA) && request.getParts().size() > 0)
 			{
-				if(inparamsmap == null)
-					inparamsmap = new HashMap<>();
 				for(Part part : request.getParts())
 				{
 					byte[] data = SUtil.readStream(part.getInputStream());
@@ -771,7 +774,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					addEntry(inparamsmap, part.getName(), new String(data));
 				}
 			}
-
+					
 			// Find correct method using paramter count
 			MappingInfo mi = null;
 			Map<String, String> binding = null;
@@ -782,7 +785,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			}
 			else
 			{
-				int psize = inparamsmap == null ? 0 : inparamsmap.size();
+				int psize = inparamsmap.size();
 				Iterator<Map<String, String>> bit = bindings.iterator();
 				for(MappingInfo tst : mis)
 				{
@@ -801,39 +804,32 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			
 			// Add path infos from binding to inparamsmap
 			if(binding!=null && binding.size()>0)
-			{
-				if(inparamsmap==null)
-					inparamsmap = new HashMap<>();
 				inparamsmap.putAll(binding);
-			}
 
 			Method method = mi.getMethod();
 			
 			// target method types
 			Class<?>[] types = mi.getMethod().getParameterTypes();
-
+			
 			// acceptable media types for input
 			String mts = request.getHeader("Content-Type");
 			List<String> cl = parseMimetypes(mts);
 
 			// For GET requests attributes 'contenttype' are added
-			if(inparamsmap != null)
+			Object cs = inparamsmap.remove("contenttype");
+			if(cs instanceof Collection)
 			{
-				Object cs = inparamsmap.remove("contenttype");
-				if(cs instanceof Collection)
+				for(String c : (Collection<String>)cs)
 				{
-					for(String c : (Collection<String>)cs)
-					{
-						if(!cl.contains(c))
-							cl.add(c);
-					}
-				}
-				else if(cs instanceof String)
-				{
-					String c = (String)cs;
 					if(!cl.contains(c))
 						cl.add(c);
 				}
+			}
+			else if(cs instanceof String)
+			{
+				String c = (String)cs;
+				if(!cl.contains(c))
+					cl.add(c);
 			}
 
 			List<String> sr = mi.getProducedMediaTypes();
@@ -846,6 +842,105 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				sr.retainAll(cl);
 			}
 
+			Tuple2<List<Tuple2<String, String>>, Map<String, Class<?>>> pinfos = getParameterInfos(method);
+			
+			// is a @FormParam parameter used by the user?
+			boolean hasformparam = false;
+			for(Tuple2<String, String> pinfo: pinfos.getFirstEntity())
+			{
+				hasformparam = "form".equals(pinfo.getFirstEntity());
+				if(hasformparam)
+					break;
+			}
+			
+			// Read parameter from stream (message body)
+			//if((inparams == null || inparams.length == 0) && types.length > 0 && ct != null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
+			//{
+			byte[] bytes = SUtil.readStream(request.getInputStream());
+	
+			if(bytes.length>0)
+			{
+				String str = new String(bytes, SUtil.UTF8);
+				
+				if(ct!=null && ct.trim().startsWith("application/x-www-form-urlencoded"))
+				{
+//					System.out.println(str);
+					Map<String, Object> vals = splitQueryString(str);
+					inparamsmap.putAll(vals);
+				}
+				else if(ct!=null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
+				{
+					// if only one target argument
+					if(types.length == 1)
+					{
+						// if is json object
+						if(str.trim().startsWith("{"))
+						{
+							// Map as first argument
+							Object arg0 = convertJsonValue(str, types[0], component.getClassLoader(), true);
+							inparamsmap.put("0", arg0);
+						}
+						else if(str.trim().startsWith("\""))
+						{
+							// try to directly convert to target type
+							Object arg0 = JsonTraverser.objectFromString(str, component.getClassLoader(), null, types[0], null);
+							inparamsmap.put("0", arg0);
+						}
+					}
+					// multiple arguments
+					else
+					{
+						// Array of objects as arguments
+						JsonValue args = Json.parse(str);
+						
+						if(args instanceof JsonArray)
+						{
+							JsonArray array = (JsonArray)args;
+							for(int i = 0; i < array.size(); i++)
+							{
+								inparamsmap.put(""+i, convertJsonValue(array.get(i).toString(), types[i], component.getClassLoader(), false));
+							}
+						}
+						else if(args instanceof JsonObject)
+						{
+							JsonObject jobj = (JsonObject)args;
+							if(hasformparam)
+							{
+								Map<String, Class<?>> typesmap = pinfos.getSecondEntity();
+								// put all contained objects in the params map
+								int[] i = new int[1];
+								final Map<String, Object> finparamsmap = inparamsmap;
+								jobj.forEach((Member x)->
+								{
+									i[0]++;
+									Class<?> type = typesmap.get(x.getName());
+									if(type!=null)
+									{
+										Object val = convertJsonValue(x.getValue().toString(), type, component.getClassLoader(), false);
+										finparamsmap.put(x.getName(), val);
+									}
+									else
+									{
+										System.out.println("Ignoring argument with no type: "+x.getName());
+										//throw new RuntimeException("Unable to determine argument type: "+x.getName());
+									}
+								});
+							}
+							else
+							{
+//								if(type==null && i[0]<types.length)
+//									type = types[i[0]];
+//								else
+							}
+						}
+					}
+				}
+				else
+				{
+					throw new RuntimeException("Content type not supported for body: "+ct);
+				}
+			}
+			
 			// if(sr.size()>0)
 			// System.out.println("found acceptable in types: "+sr);
 			// if(sr.size()==0)
@@ -853,42 +948,40 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 			// The order of in parameters is corrected with respect to the
 			// target parameter order
-			Object[] inparams = inparamsmap == null ? SUtil.EMPTY_OBJECT_ARRAY : new Object[inparamsmap.size()];
+			Object[] inparams = new Object[inparamsmap.size()];
 			// Object[] inparams = inparamsmap==null? SUtil.EMPTY_OBJECT_ARRAY:
 			// new Object[Math.max(inparamsmap.size(),
 			// method.getParameterTypes().length)];
 
-			if(inparamsmap != null)
+			int cnt = 0;
+			Iterator<String> innames = inparamsmap.keySet().iterator();
+			// Iterate over given method parameter annotations in order
+			for(Tuple2<String, String> pinfo: pinfos.getFirstEntity())
 			{
-				int i = 0;
-				//List<String> pnames = getParameterNames(method);
-//				for(String pname : pnames != null ? pnames : inparamsmap.keySet())
-//				{
-//					inparams[i++] = inparamsmap.get(pname);
-//				}
-				List<Tuple2<String, String>> pinfos = getParameterInfos(method);
-				Iterator<String> innames = inparamsmap.keySet().iterator();
-				for(Tuple2<String, String> pinfo: pinfos)
+				String inname = innames.hasNext()? innames.next(): null;
+				
+				if("name".equals(pinfo.getFirstEntity()))
 				{
-					String inname = innames.hasNext()? innames.next(): null;
-					if("name".equals(pinfo.getFirstEntity()))
-					{
-						inparams[i++] = inparamsmap.get(pinfo.getSecondEntity());
-					}
-					else if("path".equals(pinfo.getFirstEntity()))
-					{
-						inparams[i++] = inparamsmap.get(pinfo.getSecondEntity());
-						//binding.get(pinfo.getSecondEntity());
-					}
-					else if("query".equals(pinfo.getFirstEntity()))
-					{
-						// query params are in normal parameter map
-						inparams[i++] = inparamsmap.get(pinfo.getSecondEntity());
-					}
-					else if(inname!=null)
-					{
-						inparams[i++] = inparamsmap.get(inname);
-					}
+					inparams[cnt++] = inparamsmap.get(pinfo.getSecondEntity());
+				}
+				else if("path".equals(pinfo.getFirstEntity()))
+				{
+					inparams[cnt++] = inparamsmap.get(pinfo.getSecondEntity());
+					//binding.get(pinfo.getSecondEntity());
+				}
+				else if("query".equals(pinfo.getFirstEntity()))
+				{
+					// query params are in normal parameter map
+					inparams[cnt++] = inparamsmap.get(pinfo.getSecondEntity());
+				}
+				else if("form".equals(pinfo.getFirstEntity()))
+				{
+					// query params are in normal parameter map
+					inparams[cnt++] = inparamsmap.get(pinfo.getSecondEntity());
+				}
+				else if(inname!=null)
+				{
+					inparams[cnt++] = inparamsmap.get(inname);
 				}
 			}
 
@@ -896,50 +989,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			{
 				if(inparams[i] instanceof String)
 					inparams[i] = convertParameter(sr, (String)inparams[i], types[i]);
-			}
-
-			String ct = request.getHeader("Content-Type");
-			if(ct == null)
-				ct = request.getHeader("Accept");
-
-			// Read parameter from stream (message body)
-			if((inparams == null || inparams.length == 0) && types.length > 0 && ct != null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
-			{
-				try
-				{
-					byte[] jsonbytes = SUtil.readStream(request.getInputStream());
-
-					String json = new String(jsonbytes, SUtil.UTF8);
-					if(types.length == 1 && json.trim().startsWith("{"))
-					{
-						List<ITraverseProcessor> procs = null;
-						if(SReflect.isSupertype(Map.class, types[0]))
-							procs = JsonTraverser.nestedreadprocs;
-						inparams = new Object[]{JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], procs)};
-					}
-					else if(types.length == 1 && json.trim().startsWith("\""))
-					{
-						inparams = new Object[]{JsonTraverser.objectFromString(json, component.getClassLoader(), null, types[0], null)};
-					}
-					else
-					{
-						JsonArray array = (JsonArray)Json.parse(json);
-						inparams = new Object[array.size()];
-						for(int i = 0; i < array.size(); i++)
-						{
-							List<ITraverseProcessor> procs = null;
-							if(SReflect.isSupertype(Map.class, types[i]))
-								procs = JsonTraverser.nestedreadprocs;
-							JsonValue val = array.get(i);
-							inparams[i] = JsonTraverser.objectFromString(val.toString(), component.getClassLoader(), null, types[i], procs);
-						}
-
-					}
-				}
-				catch(Exception e)
-				{
-					component.getLogger().warning("No GET parameters and error parsing POST parameters for method: " + method + ", " + e);
-				}
 			}
 
 			if(method.isAnnotationPresent(ParametersMapper.class))
@@ -1054,6 +1103,21 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		}
 	}
 
+	/**
+	 *  Convert a json string to a java object.
+	 *  @param val The json string.
+	 *  @param type The target class.
+	 *  @param cl The classloader.
+	 *  @param tomap Flag, if a (nested) map should be read (only possible if type is map too).
+	 */
+	public static Object convertJsonValue(String val, Class<?> type, ClassLoader cl, boolean tomap)
+	{
+		List<ITraverseProcessor> procs = null;
+		if(tomap && SReflect.isSupertype(Map.class, type))
+			procs = JsonTraverser.nestedreadprocs;
+		return JsonTraverser.objectFromString(val.toString(), cl, null, type, procs);
+	}
+	
 	/**
 	 * Convert a (string) parameter
 	 * 
@@ -2497,11 +2561,13 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/**
 	 * 
 	 */
-	public List<Tuple2<String, String>> getParameterInfos(Method method)
+	public Tuple2<List<Tuple2<String, String>>, Map<String, Class<?>>> getParameterInfos(Method method)
 	{
 		List<Tuple2<String, String>> ret = new ArrayList<>();
+		Map<String, Class<?>> targettypes = new HashMap<>();
 		
 		Annotation[][] anns = method.getParameterAnnotations();
+		Class<?>[] types = method.getParameterTypes();
 		
 		for(int i=0; i<anns.length; i++)
 		{
@@ -2512,23 +2578,45 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					PathParam pp = (PathParam)ann;
 					String name = pp.value();
 					ret.add(new Tuple2<String, String>("path", name));
+					targettypes.put(name, types[i]);
 	            }
 				else if(ann instanceof QueryParam)
 				{
 					QueryParam qp = (QueryParam)ann;
 					String name = qp.value();
 					ret.add(new Tuple2<String, String>("query", name));
+					targettypes.put(name, types[i]);
+				}
+				else if(ann instanceof FormParam)
+				{
+					FormParam qp = (FormParam)ann;
+					String name = qp.value();
+					ret.add(new Tuple2<String, String>("form", name));
+					targettypes.put(name, types[i]);
 				}
 				else if(ann instanceof ParameterInfo)
 				{
 					QueryParam qp = (QueryParam)ann;
 					String name = qp.value();
 					ret.add(new Tuple2<String, String>("name", name));
+					targettypes.put(name, types[i]);
+				}
+				else
+				{
+					String name = ""+i;
+					ret.add(new Tuple2<String, String>("name", name));
+					targettypes.put(name, types[i]);
 				}
 	        }
+			if(anns[i].length==0)
+			{
+				String name = ""+i;
+				ret.add(new Tuple2<String, String>("name", name));
+				targettypes.put(name, types[i]);
+			}
 		}
 		
-		return ret;
+		return new Tuple2<>(ret, targettypes);
 	}
 	
 	// Should be in SReflect but requires asm
