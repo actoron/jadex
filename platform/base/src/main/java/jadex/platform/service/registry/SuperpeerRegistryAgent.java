@@ -1,4 +1,4 @@
-package jadex.platform.service.registryv2;
+package jadex.platform.service.registry;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,9 +23,9 @@ import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQueryInfo;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.registryv2.ISuperpeerCollaborationService;
-import jadex.bridge.service.types.registryv2.ISuperpeerService;
-import jadex.bridge.service.types.registryv2.ISuperpeerStatusService;
+import jadex.bridge.service.types.registry.ISuperpeerCollaborationService;
+import jadex.bridge.service.types.registry.ISuperpeerService;
+import jadex.bridge.service.types.registry.ISuperpeerStatusService;
 import jadex.commons.Boolean3;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;

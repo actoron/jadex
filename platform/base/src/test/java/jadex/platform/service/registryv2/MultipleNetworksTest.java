@@ -4,6 +4,8 @@ package jadex.platform.service.registryv2;
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
+import jadex.platform.service.registry.SuperpeerClientAgent;
+import jadex.platform.service.registry.SuperpeerRegistryAgent;
 
 /**
  *  Test search and query functionality in multiple overlapping networks.

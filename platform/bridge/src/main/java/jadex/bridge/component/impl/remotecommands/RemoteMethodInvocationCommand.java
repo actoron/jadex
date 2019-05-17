@@ -11,7 +11,7 @@ import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
+import jadex.bridge.service.types.registry.IRemoteRegistryService;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;

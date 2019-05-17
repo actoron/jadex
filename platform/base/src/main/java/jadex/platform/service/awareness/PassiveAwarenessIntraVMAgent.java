@@ -1,4 +1,4 @@
-package jadex.platform.service.pawareness;
+package jadex.platform.service.awareness;
 
 import java.util.Collections;
 import java.util.HashMap;

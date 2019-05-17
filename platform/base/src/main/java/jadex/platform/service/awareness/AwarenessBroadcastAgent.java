@@ -1,4 +1,4 @@
-package jadex.platform.service.pawareness;
+package jadex.platform.service.awareness;
 
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
@@ -21,7 +21,7 @@ import jadex.micro.annotation.Arguments;
 	@Argument(name="address", clazz=String.class, defaultvalue="\"255.255.255.255\""),
 	@Argument(name="port", clazz=int.class, defaultvalue="33091")
 })
-public class PassiveAwarenessBroadcastAgent	extends PassiveAwarenessLocalNetworkBaseAgent
+public class AwarenessBroadcastAgent	extends PassiveAwarenessLocalNetworkBaseAgent
 {
 	/**
 	 *  At startup create a multicast socket for listening.

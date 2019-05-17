@@ -1,4 +1,4 @@
-package jadex.platform.service.pawareness;
+package jadex.platform.service.awareness;
 
 import java.util.ArrayList;
 import java.util.Collection;

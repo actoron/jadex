@@ -1,4 +1,4 @@
-package jadex.platform.service.registryv2;
+package jadex.platform.service.registry;
 
 import java.util.Collections;
 import java.util.Set;
@@ -14,7 +14,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
+import jadex.bridge.service.types.registry.IRemoteRegistryService;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;

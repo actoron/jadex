@@ -1,4 +1,4 @@
-package jadex.platform.service.pawareness;
+package jadex.platform.service.awareness;
 
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;

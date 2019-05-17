@@ -1,4 +1,4 @@
-package jadex.bridge.service.types.registryv2;
+package jadex.bridge.service.types.registry;
 
 import jadex.commons.SUtil;
 import net.cinnom.nanocuckoo.ConcurrentSwapSafety;

@@ -1,4 +1,4 @@
-package jadex.platform.service.pawareness;
+package jadex.platform.service.awareness;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
