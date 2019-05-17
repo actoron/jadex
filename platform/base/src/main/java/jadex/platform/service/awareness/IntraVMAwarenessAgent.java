@@ -1,4 +1,4 @@
-package jadex.platform.service.pawareness;
+package jadex.platform.service.awareness;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ import jadex.micro.annotation.Agent;
 	successors="jadex.platform.service.registryv2.SuperpeerClientAgent",
 	autostart=Boolean3.FALSE
 )
-public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //extends PassiveAwarenessBaseAgent
+public class IntraVMAwarenessAgent implements IPassiveAwarenessService //extends PassiveAwarenessBaseAgent
 {
 	//-------- constants --------
 	
@@ -43,7 +43,7 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 	protected static final ReadWriteLock disclock = new ReentrantReadWriteLock(false);
 	
 	/** The started discovery agents. */
-	protected static final Map<IComponentIdentifier, PassiveAwarenessIntraVMAgent> discoveries	= new HashMap<IComponentIdentifier, PassiveAwarenessIntraVMAgent>();
+	protected static final Map<IComponentIdentifier, IntraVMAwarenessAgent> discoveries	= new HashMap<IComponentIdentifier, IntraVMAwarenessAgent>();
 	
 	//-------- attributes --------
 	
@@ -91,7 +91,7 @@ public class PassiveAwarenessIntraVMAgent implements IPassiveAwarenessService //
 	 */
 	public IFuture<List<TransportAddress>> getPlatformAddresses(IComponentIdentifier platformid)
 	{
-		PassiveAwarenessIntraVMAgent remote = null;
+		IntraVMAwarenessAgent remote = null;
 		disclock.readLock().lock();
 		remote = discoveries.get(platformid);
 		disclock.readLock().unlock();

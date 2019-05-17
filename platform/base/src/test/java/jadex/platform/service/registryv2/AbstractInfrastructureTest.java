@@ -17,7 +17,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.registryv2.ISuperpeerStatusService;
+import jadex.bridge.service.types.registry.ISuperpeerStatusService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 

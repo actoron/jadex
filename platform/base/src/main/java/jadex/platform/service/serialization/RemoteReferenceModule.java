@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -297,10 +297,10 @@ public class RemoteReferenceModule
 		// todo: dgc, i.e. remember that target is a remote object (for which a proxyinfo is sent away).
 			
 		ProxyInfo ret = new ProxyInfo(remoteinterfaces);
-		Map<String, Object> properties = null;
+		//Map<String, Object> properties = null;
 		
 		// Hack! as long as registry is not there
-		String[] imports = null;
+		//String[] imports = null;
 //		ClassLoader	cl	= null;
 		
 		// todo: remove support for properties?! or fix 
@@ -470,7 +470,7 @@ public class RemoteReferenceModule
 					{
 						try
 						{
-							IMethodReplacement	mr	= (IMethodReplacement)rep.newInstance();
+							IMethodReplacement	mr	= (IMethodReplacement)rep.getConstructor().newInstance();
 							ret.addMethodReplacement(new MethodInfo(methods[j]), mr);
 						}
 						catch(Exception e)
@@ -941,7 +941,7 @@ public class RemoteReferenceModule
 	 *  Get a proxy for a proxy reference.
 	 *  @param pr The proxy reference.
 	 */
-	public Object getProxy(ProxyReference pr, ClassLoader classloader, boolean tolerant)
+	public Object getProxy(ProxyReference pr, ClassLoader classloader)
 	{
 		Object ret;
 		
@@ -984,11 +984,6 @@ public class RemoteReferenceModule
 				if(cl!=null)
 				{
 					tmp.add(cl);
-				}
-				else if(tolerant)
-				{
-					if(!tmp.contains(IBrokenProxy.class))
-						tmp.add(IBrokenProxy.class);
 				}
 				else 
 				{

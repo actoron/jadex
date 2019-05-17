@@ -37,7 +37,7 @@ import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
+import jadex.bridge.service.types.registry.ISearchQueryManagerService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IFilter;

@@ -1,4 +1,4 @@
-package jadex.platform.service.registryv2;
+package jadex.platform.service.registry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,10 +34,10 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
-import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
-import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
-import jadex.bridge.service.types.registryv2.ISuperpeerService;
-import jadex.bridge.service.types.registryv2.SlidingCuckooFilter;
+import jadex.bridge.service.types.registry.IRemoteRegistryService;
+import jadex.bridge.service.types.registry.ISearchQueryManagerService;
+import jadex.bridge.service.types.registry.ISuperpeerService;
+import jadex.bridge.service.types.registry.SlidingCuckooFilter;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;

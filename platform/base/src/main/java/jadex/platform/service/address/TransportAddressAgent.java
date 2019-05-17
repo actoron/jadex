@@ -234,13 +234,10 @@ public class TransportAddressAgent implements ITransportAddressService
 							//if (ret == null && !hasSuperPeer())
 							if (ret == null)
 							{
-								ret = searchAddressesByAskPassiveAwareness(platformid);
+								ret = searchAddressesByAskAwareness(platformid);
 								
 								if (ret == null)
 								ret = searchAddressesByAskRemote(platformid);
-								
-								if (ret == null)
-									ret = searchAddressesByAskAwareness(platformid);
 								
 								// Case not needed?
 //								if (ret == null)
@@ -447,7 +444,7 @@ public class TransportAddressAgent implements ITransportAddressService
 	 *  @param platformid The platform ID.
 	 *  @return The addresses.
 	 */
-	protected List<TransportAddress> searchAddressesByAskPassiveAwareness(IComponentIdentifier platformid)
+	protected List<TransportAddress> searchAddressesByAskAwareness(IComponentIdentifier platformid)
 	{
 		if (!pawalookup)
 			return null;
@@ -477,32 +474,6 @@ public class TransportAddressAgent implements ITransportAddressService
 		}
 		
 		addAddresses(ret);
-		
-		return ret;
-	}
-	
-	/**
-	 *  Searches for addresses using super peer.
-	 * 
-	 *  @param platformid The platform ID.
-	 *  @return The addresses.
-	 */
-	protected List<TransportAddress> searchAddressesByAskAwareness(IComponentIdentifier platformid)
-	{
-		if (!awalookup)
-			return null;
-		
-		List<TransportAddress> ret = null;
-		IAwarenessManagementService awa = agent.getFeature(IRequiredServicesFeature.class)
-			.searchLocalService(new ServiceQuery<>(IAwarenessManagementService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-		if(awa!=null)
-		{
-			DiscoveryInfo info = awa.getPlatformInfo(platformid).get();
-			if (info != null)
-				ret = info.getAddresses();
-
-			addAddresses(ret);
-		}
 		
 		return ret;
 	}

@@ -1,4 +1,4 @@
-package jadex.platform.service.pawareness;
+package jadex.platform.service.awareness;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -26,7 +26,7 @@ import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
-import jadex.bridge.service.types.registryv2.SlidingCuckooFilter;
+import jadex.bridge.service.types.registry.SlidingCuckooFilter;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.Boolean3;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -47,7 +47,7 @@ import jadex.micro.annotation.AgentArgument;
 	successors="jadex.platform.service.registryv2.SuperpeerClientAgent",
 	autostart=Boolean3.FALSE
 )
-public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveAwarenessService
+public abstract class LocalNetworkAwarenessBaseAgent	implements IPassiveAwarenessService
 {
 	//-------- agent arguments --------
 	
