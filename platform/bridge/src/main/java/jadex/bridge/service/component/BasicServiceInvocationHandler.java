@@ -45,6 +45,7 @@ import jadex.bridge.service.component.interceptors.MethodCallListenerInterceptor
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
+import jadex.bridge.service.component.interceptors.TracingInterceptor;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -740,6 +741,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		if(!PROXYTYPE_RAW.equals(proxytype))
 		{
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
+			//handler.addFirstServiceInterceptor(new TracingInterceptor(ia));
+
 //			if(monitoring)
 //				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
 //			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, false));

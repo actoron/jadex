@@ -11,6 +11,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  sources: publishing new events
  *  consumers: subscribing for event patterns 
  */
+// todo: remove class
 @Service(system=true)
 public interface IMonitoringService
 {

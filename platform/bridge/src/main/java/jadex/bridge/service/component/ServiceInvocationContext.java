@@ -157,7 +157,7 @@ public class ServiceInvocationContext
 	protected IServiceIdentifier sid;
 
 //	public Exception ex;
-	
+		
 	//-------- constructors --------
 	
 	/**
