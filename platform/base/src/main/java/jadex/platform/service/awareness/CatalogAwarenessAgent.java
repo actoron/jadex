@@ -34,7 +34,7 @@ import jadex.micro.annotation.AgentCreated;
 	successors="jadex.platform.service.registryv2.SuperpeerClientAgent",
 	autostart=Boolean3.TRUE
 )
-public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
+public class CatalogAwarenessAgent implements IPassiveAwarenessService
 {
 	protected static final String DEFAULT_URLS = "ws://ssp1@ngrelay1.actoron.com:80";
 	
@@ -54,7 +54,7 @@ public class PassiveAwarenessCatalogAgent implements IPassiveAwarenessService
 	/**
 	 *  Creates the catalog agent empty.
 	 */
-	public PassiveAwarenessCatalogAgent()
+	public CatalogAwarenessAgent()
 	{
 		
 	}

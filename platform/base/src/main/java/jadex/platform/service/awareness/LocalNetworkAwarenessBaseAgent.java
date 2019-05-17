@@ -47,7 +47,7 @@ import jadex.micro.annotation.AgentArgument;
 	successors="jadex.platform.service.registryv2.SuperpeerClientAgent",
 	autostart=Boolean3.FALSE
 )
-public abstract class PassiveAwarenessLocalNetworkBaseAgent	implements IPassiveAwarenessService
+public abstract class LocalNetworkAwarenessBaseAgent	implements IPassiveAwarenessService
 {
 	//-------- agent arguments --------
 	
