@@ -2,8 +2,6 @@ package jadex.tools.web.starter;
 
 import java.util.Collection;
 
-import javax.ws.rs.core.Response;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Service;
@@ -14,7 +12,7 @@ import jadex.tools.web.jcc.IJCCPluginService;
 /**
  *  Interface for the starter plugin service.
  */
-@Service
+@Service(system=true)
 public interface IJCCStarterService extends IJCCPluginService
 {
 	/**

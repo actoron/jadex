@@ -8,7 +8,7 @@ import jadex.tools.web.security.JCCSecurityPluginAgent.SecurityState;
 /**
  *  Interface for the jcc security service.
  */
-@Service
+@Service(system=true)
 public interface IJCCSecurityService extends IJCCPluginService
 {
 	/**
