@@ -29,6 +29,7 @@ import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
 import jadex.bridge.service.types.registry.SlidingCuckooFilter;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.Boolean3;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -116,7 +117,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IPassiveAwarenes
 //		}
 
 		// Start listening thread.
-		IDaemonThreadPoolService	dtps	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IDaemonThreadPoolService.class));
+		IDaemonThreadPoolService dtps = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IDaemonThreadPoolService.class));
 		dtps.executeForever(new Receiver(recvsocket, true));
 		// Also listen for single-cast response messages -> TODO: use NIO to spare one thread
 		dtps.executeForever(new Receiver(sendsocket, false));
@@ -176,8 +177,12 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IPassiveAwarenes
 				public void resultAvailable(Void result)
 				{
 					// Search for other platforms
+					long delay = timeout>0 ? (long)(timeout*waitfactor) : Starter.getScaledDefaultTimeout(agent.getId(), waitfactor);
+					if(delay==-1)
+						delay = (long)(SUtil.DEFTIMEOUT_DEFAULT*waitfactor);
+					//System.out.println("delay is: "+delay);
 					agent.getFeature(IExecutionFeature.class)
-						.waitForDelay(timeout>0 ? (long)(timeout*waitfactor) : Starter.getScaledDefaultTimeout(agent.getId(), waitfactor), true)
+						.waitForDelay(delay, true)
 						.addResultListener(new IResultListener<Void>()
 					{
 						@Override

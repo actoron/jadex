@@ -416,6 +416,7 @@ public class SUtil
 	
 	/** Default timeout e.g. from environment. */
 	public static final long DEFTIMEOUT;
+	public static final long DEFTIMEOUT_DEFAULT = 30000;
 	static
 	{
 		// Set deftimeout from environment, if set.
@@ -441,7 +442,7 @@ public class SUtil
 		
 		Long ret = dtoprop!=null? Long.parseLong(dtoprop): null;
 		if(ret==null)
-			ret = SReflect.isAndroid() ? 60000L : 30000;
+			ret = SReflect.isAndroid()? DEFTIMEOUT_DEFAULT*2 : DEFTIMEOUT_DEFAULT;
 		DEFTIMEOUT	= ret;
 	}
 
