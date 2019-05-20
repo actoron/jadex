@@ -153,7 +153,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IPassiveAwarenes
 	{
 		if(search == null)
 		{
-			long	timeout	= ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
+			long timeout = ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
 			
 //			System.out.println("New search");
 			search	= new IntermediateFuture<IComponentIdentifier>();

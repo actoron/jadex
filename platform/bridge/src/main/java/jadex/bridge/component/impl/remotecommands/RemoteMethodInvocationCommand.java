@@ -123,6 +123,8 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 				try
 				{
 					Method m = method.getMethod(access.getClassLoader());
+					//if(m.getName().startsWith("method"))
+					//	System.out.println("here");
 					Object service = access.getFeature(IProvidedServicesFeature.class).getProvidedService(sid);
 					if(service==null)
 					{
