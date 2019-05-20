@@ -15,7 +15,6 @@ import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.propagation.TextMapExtractAdapter;
-import io.opentracing.propagation.TextMapInject;
 import io.opentracing.propagation.TextMapInjectAdapter;
 import io.opentracing.util.GlobalTracer;
 import jadex.base.Starter;
