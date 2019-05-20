@@ -26,13 +26,13 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	//-------- attributes --------
 	
 	/** The target id. */
-	private Object	target;
+	private Object target;
 	
 	/** The remote method. */
-	private MethodInfo	method;
+	private MethodInfo method;
 	
 	/** The arguments. */
-	private Object[]	args;
+	private Object[] args;
 
 	/**
 	 *  Create a remote method invocation command.
@@ -114,7 +114,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 //		if(method.toString().toLowerCase().indexOf("getdesc")!=-1)
 //			System.out.println("Executing requested remote method invocation: "+access.getId()+", "+method);
 		
-		Object	ret	= null;
+		Object ret	= null;
 		if(target instanceof IServiceIdentifier)
 		{
 			IServiceIdentifier	sid	= (IServiceIdentifier)target;
@@ -122,8 +122,8 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			{
 				try
 				{
-					Method	m	= method.getMethod(access.getClassLoader());
-					Object	service	= access.getFeature(IProvidedServicesFeature.class).getProvidedService(sid);
+					Method m = method.getMethod(access.getClassLoader());
+					Object service = access.getFeature(IProvidedServicesFeature.class).getProvidedService(sid);
 					if(service==null)
 					{
 						ret = new Future<Object>(new ServiceNotFoundException(sid.getServiceType()+" on component: "+access));
@@ -210,8 +210,8 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	@Override
 	public Security	getSecurityLevel(IInternalAccess access)
 	{
-		Security	level	= null;
-		Method	m0	= method.getMethod(access.getClassLoader());
+		Security level = null;
+		Method m0 = method.getMethod(access.getClassLoader());
 		
 //		// Special case for service search -> use security settings of service type, if any (hack???) -> changed IRemoteRegistryService to unrestricted instead
 //		if(SEARCHMETHOD.equals(m0) && ((ServiceQuery<?>)args[0]).getServiceType()!=null)
@@ -254,7 +254,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 				level	= m0.getAnnotation(Security.class);
 				if(level==null)
 				{
-					Class<?>	type	= sid.getServiceType().getType(access.getClassLoader());
+					Class<?> type = sid.getServiceType().getType(access.getClassLoader());
 					level	= type!=null ? type.getAnnotation(Security.class) : null;
 				}
 			}
@@ -263,7 +263,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		// Default: use method annotation, if any.
 		else if(level==null)
 		{
-			level	= m0.getAnnotation(Security.class);
+			level = m0.getAnnotation(Security.class);
 		}
 		
 		// level==null -> disallow direct access to components (overridden by trusted platform)

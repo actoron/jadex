@@ -11,6 +11,13 @@ import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import io.opentracing.Span;
+import io.opentracing.SpanContext;
+import io.opentracing.propagation.Format.Builtin;
+import io.opentracing.propagation.TextMapExtractAdapter;
+import io.opentracing.propagation.TextMapInject;
+import io.opentracing.propagation.TextMapInjectAdapter;
+import io.opentracing.util.GlobalTracer;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
@@ -28,6 +35,7 @@ import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.interceptors.SpanContextInfo;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.ISerializer;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
@@ -414,6 +422,31 @@ public class SerializationServices implements ISerializationServices
 			}
 		});
 		
+		
+		procs.add(new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+			{
+				return SpanContextInfo.class.equals(type);
+			}
+			
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			{
+				try
+				{
+					SpanContextInfo sci = (SpanContextInfo)object;
+					//Map<String, Object> ctx = (Map<String, Object>)((IUserContextContainer)context).getUserContext();
+					SpanContext sc = GlobalTracer.get().extract(Builtin.TEXT_MAP_EXTRACT, new TextMapExtractAdapter(sci.getValues()));
+					return sc;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		});
+		
 		return procs;
 	}
 	
@@ -573,6 +606,35 @@ public class SerializationServices implements ISerializationServices
 			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
 			{
 				return object instanceof ServiceOutputConnectionProxy;
+			}
+		});
+		
+		// Handle tracing spans
+		procs.add(new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
+			{
+				return object instanceof Span;
+			}
+			
+			public Object process(Object object, Type type, Traverser traverser, List<ITraverseProcessor> conversionprocessors, List<ITraverseProcessor> processors, MODE mode, ClassLoader targetcl, Object context)
+			{
+				try
+				{
+					// Converts the span(context) to a simple map -> SpanContextInfo
+					
+					Span span = (Span)object;
+					SpanContext sc = span.context();
+					Map<String, String> vals = new HashMap<>();
+					GlobalTracer.get().inject(sc, Builtin.TEXT_MAP_INJECT, new TextMapInjectAdapter(vals));
+					System.out.println("span: "+vals);
+					
+					return new SpanContextInfo(vals);
+				}
+				catch(Exception e)
+				{
+					throw SUtil.throwUnchecked(e);
+				}
 			}
 		});
 		

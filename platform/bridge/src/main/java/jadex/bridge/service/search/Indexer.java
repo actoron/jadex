@@ -121,8 +121,9 @@ public class Indexer<T>
 							if(iset != null)
 								tmp.addAll(iset);
 						}
-						if(!tmp.isEmpty())
-							valuesets.add(tmp);
+						
+						//if(!tmp.isEmpty()) // must always be added because otherwise no results are removed!
+						valuesets.add(tmp);
 					}
 				}
 			}

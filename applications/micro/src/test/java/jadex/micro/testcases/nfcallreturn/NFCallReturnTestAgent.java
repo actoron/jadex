@@ -201,7 +201,7 @@ public class NFCallReturnTestAgent extends TestAgent
 			public void customResultAvailable(ITestService ts)
 			{
 				// Unwrap required proxy (TODO: easier get without proxy? also for users???)
-				BasicServiceInvocationHandler	bsih	= (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(ts);
+				BasicServiceInvocationHandler bsih = (BasicServiceInvocationHandler)ProxyFactory.getInvocationHandler(ts);
 				ts	= (ITestService)bsih.getDomainService();
 				callService(ts, tr).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}

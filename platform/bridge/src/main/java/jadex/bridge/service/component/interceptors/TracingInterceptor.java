@@ -158,3 +158,5 @@ class JadexScopeManager implements ScopeManager
 		 return call==null? null: (Span)call.getProperty("span");
 	 }
 }
+
+

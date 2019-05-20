@@ -249,7 +249,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		CallAccess.resetNextInvocation();
 		
 		@SuppressWarnings("unchecked")
-		Class<IFuture<T>>	clazz	= (Class<IFuture<T>>)(IFuture.class.isAssignableFrom(method.getReturnType())
+		Class<IFuture<T>> clazz = (Class<IFuture<T>>)(IFuture.class.isAssignableFrom(method.getReturnType())
 			? (Class<IFuture<T>>)method.getReturnType()
 			: IFuture.class);
 		
