@@ -84,7 +84,7 @@ public class STest
     	
 		// Enable intravm awareness, transport and security
 		config.setSuperpeerClient(true);
-		config.setValue("passiveawarenessintravm", true);
+		config.setValue("intravmawareness", true);
         config.setValue("intravm", true);
         config.getExtendedPlatformConfiguration().setSecurity(true);
 		config.setNetworkNames(new String[] { testnetwork_name });
