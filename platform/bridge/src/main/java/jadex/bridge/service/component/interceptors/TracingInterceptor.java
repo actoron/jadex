@@ -5,11 +5,14 @@ import java.lang.reflect.Field;
 import io.opentracing.Scope;
 import io.opentracing.ScopeManager;
 import io.opentracing.Span;
+import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.mock.MockTracer;
 import io.opentracing.util.GlobalTracer;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -66,13 +69,42 @@ public class TracingInterceptor extends ComponentThreadInterceptor
 			e.printStackTrace();
 		}
 		
-		Span span = t.buildSpan(sic.getMethod().getName()).start();
+		String methodname = sic.getMethod().getName();
+		ServiceCall sc = ServiceCall.getCurrentInvocation();
+		
+		// What is this for a case that there is no service call?!
+		if(sc==null)
+		{
+			sc = CallAccess.createServiceCall(IComponentIdentifier.LOCAL.get(), null);
+			CallAccess.setCurrentInvocation(sc);
+		}
+		
+		Object paspan = sc.getProperty("span");
+		Span span = null;
+		if(paspan instanceof SpanContext)
+		{
+			span = GlobalTracer.get().buildSpan(methodname).asChildOf((SpanContext)paspan).start();
+		}
+		else if(paspan instanceof Span)
+		{
+			span = GlobalTracer.get().buildSpan(methodname).asChildOf((Span)paspan).start();
+		}
+		else if(paspan==null)
+		{
+			span = GlobalTracer.get().buildSpan(methodname).start();
+		}
+		else
+		{
+			System.out.println("unknown span class: "+paspan);
+		}
 		
 		//ServiceCall sc = CallAccess.getCurrentInvocation();
 		//Span parentspan = (Span)sc.getProperty("span");
 		//sic.getNextServiceCall()
 		
-		Scope scope = t.activateSpan(span); // activate the span
+		Scope scope = null;
+		if(span!=null)
+			scope = t.activateSpan(span); // activate the span
 		
 		sic.invoke().addResultListener(new ReturnValueResultListener(ret, sic, span, scope));
 			
