@@ -1799,14 +1799,18 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-//				exception.printStackTrace();
+				exception.printStackTrace();
 				if (debug)
 					System.out.println("Failure send message to and removing suite for: "+receiver.getRoot().toString());
 				
 				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
 				if(state != null)
 				{
-					state.getResultFuture().setException(new SecurityException("Could not reach " + receiver + " for handshake."));
+					// Return the actual  exception (likely communication error) instead of a made-up security exception.
+					// This is a communication error, not a security error.
+					state.getResultFuture().setException(exception);
+					
+					//state.getResultFuture().setException(new SecurityException("Could not reach " + receiver + " for handshake."));
 //					{
 //						@Override
 //						public void printStackTrace()
