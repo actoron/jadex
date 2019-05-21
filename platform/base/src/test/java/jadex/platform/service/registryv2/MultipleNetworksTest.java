@@ -21,7 +21,7 @@ public class MultipleNetworksTest
 	{
 		// Common base configuration
 		IPlatformConfiguration	baseconfig	= PlatformConfigurationHandler.getMinimalComm();
-		baseconfig.addComponent("jadex.platform.service.pawareness.PassiveAwarenessIntraVMAgent.class");
+		baseconfig.addComponent("jadex.platform.service.awareness.IntraVMAwarenessAgent.class");
 //		baseconfig.setGui(true);
 //		baseconfig.setLogging(true);
 		

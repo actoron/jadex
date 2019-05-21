@@ -14,7 +14,7 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.bridge.service.types.awareness.IAwarenessService;
 import jadex.commons.security.SSecurity;
 
 /**
@@ -38,9 +38,9 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 	{
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(BroadcastAwarenessTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
-		baseconf.setValue("passiveawarenessintravm", false);
-		baseconf.setValue("passiveawarenessbroadcast", true);
-		baseconf.setValue("passiveawarenessbroadcast.port", customport);
+		baseconf.setValue("intravmawareness", false);
+		baseconf.setValue("broadcastawareness", true);
+		baseconf.setValue("broadcastawareness.port", customport);
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*3));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 
@@ -79,7 +79,7 @@ public class BroadcastAwarenessTest	extends AbstractSearchQueryTest
 		createPlatform(PROCONF);	
 		createPlatform(PROCONF);
 		
-		IPassiveAwarenessService	pawa	= client.searchService(new ServiceQuery<>(IPassiveAwarenessService.class)).get();
+		IAwarenessService	pawa	= client.searchService(new ServiceQuery<>(IAwarenessService.class)).get();
 		assertTrue("Found broadcast awareness? "+pawa, pawa.toString().toLowerCase().contains("broadcast"));
 		
 		Collection<IComponentIdentifier>	found	= pawa.searchPlatforms().get();

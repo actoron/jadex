@@ -47,9 +47,9 @@ public class PlatformsTest //extends TestCase
 		"-saveonexit", "false",
 		"-welcome", "false",
 		"-printpass", "false",
-		"-passiveawarenessmulticast", "false", // avoid interference with other tests
-		"-passiveawarenessbroadcast", "false", // avoid interference with other tests
-		"-passiveawarenesscatalog", "false", // avoid interference outside world
+		"-multicastawareness", "false", // avoid interference with other tests
+		"-broadcastawareness", "false", // avoid interference with other tests
+		"-catalogawareness", "false", // avoid interference outside world
 //		"-deftimeout", ""+TIMEOUT
 	};
 	

@@ -1,4 +1,4 @@
-package jadex.bridge.service.types.pawareness;
+package jadex.bridge.service.types.awareness;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import jadex.commons.future.IIntermediateFuture;
  *  Locate other platforms without polling.
  */
 @Service(system=true)
-public interface IPassiveAwarenessService
+public interface IAwarenessService
 {
 	/**
 	 *  Try to find other platforms and finish after timeout.

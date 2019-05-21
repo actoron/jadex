@@ -25,7 +25,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
-import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.bridge.service.types.awareness.IAwarenessService;
 import jadex.bridge.service.types.registry.SlidingCuckooFilter;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.Boolean3;
@@ -48,7 +48,7 @@ import jadex.micro.annotation.AgentArgument;
 	successors="jadex.platform.service.registryv2.SuperpeerClientAgent",
 	autostart=Boolean3.FALSE
 )
-public abstract class LocalNetworkAwarenessBaseAgent	implements IPassiveAwarenessService
+public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessService
 {
 	//-------- agent arguments --------
 	
@@ -143,7 +143,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IPassiveAwarenes
 		sendsocket.close();
 	}
 
-	// -------- IPassiveAwarenessService --------
+	// -------- IAwarenessService --------
 
 	/**
 	 * Try to find other platforms and finish after timeout. Immediately returns

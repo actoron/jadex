@@ -18,7 +18,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
-import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.bridge.service.types.awareness.IAwarenessService;
 import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -35,7 +35,7 @@ import jadex.micro.annotation.Agent;
 	successors="jadex.platform.service.registryv2.SuperpeerClientAgent",
 	autostart=Boolean3.FALSE
 )
-public class IntraVMAwarenessAgent implements IPassiveAwarenessService //extends PassiveAwarenessBaseAgent
+public class IntraVMAwarenessAgent implements IAwarenessService
 {
 	//-------- constants --------
 	
@@ -64,7 +64,7 @@ public class IntraVMAwarenessAgent implements IPassiveAwarenessService //extends
 	{
 		IComponentIdentifier pfid = agent.getId().getRoot();
 		disclock.writeLock().lock();
-//		for(PassiveAwarenessIntraVMAgent otheragent: discoveries.values())
+//		for(IntraVMAwarenessAgent otheragent: discoveries.values())
 //			otheragent.announceNewPlatform(pfid);
 		discoveries.put(pfid, this);
 		disclock.writeLock().unlock();
@@ -81,7 +81,7 @@ public class IntraVMAwarenessAgent implements IPassiveAwarenessService //extends
 		disclock.writeLock().unlock();
 	}
 	
-	//-------- IPassiveAwarenessService interface --------
+	//-------- IAwarenessService interface --------
 	
 	/**
 	 *  Gets the address for a platform ID using the awareness mechanism.

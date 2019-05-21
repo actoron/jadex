@@ -23,7 +23,7 @@ import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
-import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.bridge.service.types.awareness.IAwarenessService;
 import jadex.commons.Boolean3;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -39,8 +39,6 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
-import jadex.platform.service.security.SecurityAgent;
 
 /**
  *  Agent that provides the security service.
@@ -453,8 +451,8 @@ public class TransportAddressAgent implements ITransportAddressService
 		
 		try
 		{
-			Collection<IPassiveAwarenessService> awas = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IPassiveAwarenessService.class));
-			for (IPassiveAwarenessService awa : awas)
+			Collection<IAwarenessService> awas = agent.getFeature(IRequiredServicesFeature.class).searchLocalServices(new ServiceQuery<>(IAwarenessService.class));
+			for (IAwarenessService awa : awas)
 			{
 				try
 				{

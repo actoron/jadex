@@ -33,7 +33,7 @@ import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.bridge.service.types.awareness.IAwarenessService;
 import jadex.bridge.service.types.registry.IRemoteRegistryService;
 import jadex.bridge.service.types.registry.ISearchQueryManagerService;
 import jadex.bridge.service.types.registry.ISuperpeerService;
@@ -383,15 +383,15 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			System.out.println(agent+" searchRemoteServices: timeout="+timeout+", time="+System.currentTimeMillis());			
 		
 		// Check for awareness service
-		Collection<IPassiveAwarenessService>	pawas	= agent.getFeature(IRequiredServicesFeature.class)
-			.searchLocalServices(new ServiceQuery<>(IPassiveAwarenessService.class));
+		Collection<IAwarenessService>	pawas	= agent.getFeature(IRequiredServicesFeature.class)
+			.searchLocalServices(new ServiceQuery<>(IAwarenessService.class));
 		if(!pawas.isEmpty())
 		{
 			// Count awa search + platform searches (+ async filtering, if any).
 			final AtomicInteger	cnt	= new AtomicInteger(pawas.size());
 			SlidingCuckooFilter	filter	= new SlidingCuckooFilter();
 			
-			for(IPassiveAwarenessService pawa: pawas)
+			for(IAwarenessService pawa: pawas)
 			{
 				if(debug(query))
 					System.out.println(agent+" pawa.searchPlatforms(): "+pawa);
