@@ -747,7 +747,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
 //			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, false));
 			
-			
 			try
 			{
 				Class<?> clazz = sid.getServiceType().getType(ia.getClassLoader());
