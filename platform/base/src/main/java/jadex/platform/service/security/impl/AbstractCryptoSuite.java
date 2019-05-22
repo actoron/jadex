@@ -33,6 +33,9 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	/** Missing IDs with expiration time. (Id, Expiration Time)*/
 	protected Set<Long> missingids = new LinkedHashSet<Long>();
 	
+	/** Creation time of the suite. */
+	protected long creationtime = System.currentTimeMillis();
+	
 	/** The message security info used after key exchange and authentication. */
 	protected SecurityInfo secinf;
 	
@@ -122,6 +125,16 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 			 secinf.getNetworks().isEmpty() &&
 			 !secinf.isAdminPlatform()))
 			throw new SecurityException("Unauthenticated connection not allowed: " + remoteid);
+	}
+	
+	/**
+	 *  Returns the creation time of the crypto suite.
+	 *  
+	 *  @return The creation time.
+	 */
+	public long getCreationTime()
+	{
+		return creationtime;
 	}
 	
 	/**
