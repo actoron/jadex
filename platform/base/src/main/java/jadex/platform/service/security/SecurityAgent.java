@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
@@ -68,7 +70,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.gui.jtable.StringArrayTableModel;
 import jadex.commons.security.SSecurity;
 import jadex.commons.transformation.traverser.SCloner;
 import jadex.micro.annotation.Agent;
@@ -187,6 +188,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/** Handshake reset scale factor. */
 	@AgentArgument
 	protected double resettimeoutscale = 0.02;
+	
+	/** 
+	 *  Lifetime of session keys, after which the handshake is repeated
+	 *  and a new session key is generated.
+	 */
+	@AgentArgument
+	protected long sessionkeylifetime = 10 * 60 * 1000;
 	
 	/** Flag enabling debug printouts. */
 	@AgentArgument
@@ -1597,7 +1605,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							return ia.getFeature(IExecutionFeature.class).waitForDelay(handshaketimeout << 1, new IComponentStep<Void>()
+							long delay = Math.min(handshaketimeout << 1, sessionkeylifetime << 1);
+							return ia.getFeature(IExecutionFeature.class).waitForDelay(delay, new IComponentStep<Void>()
 							{
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
@@ -1628,6 +1637,27 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			{
 				entry.getValue().getResultFuture().setException(new TimeoutException("Handshake timed out with platform: " + entry.getKey()));
 				it.remove();
+			}
+		}
+		
+		// Check for expired suites.
+		// This is a two-step process because suites have a long lifespan after handshake,
+		// i.e. typically there are no expired suites. In order to optimize locking, we
+		// first check whether it is even worth to acquire a write lock by checking with a read lock.
+		boolean hasexpiredsuites = false;
+		Predicate<Map.Entry<String, ICryptoSuite>> isexpired = ent -> (ent.getValue().isExpiring() || (ent.getValue().getCreationTime() + sessionkeylifetime) < time);
+		try (IAutoLock l = currentcryptosuites.readLock())
+		{
+			hasexpiredsuites = currentcryptosuites.entrySet().stream().anyMatch(isexpired);
+		}
+		
+		// If we have something expired, we do a thorough check and clean
+		// with a write lock in place.
+		if (hasexpiredsuites)
+		{
+			try (IAutoLock l = currentcryptosuites.writeLock())
+			{
+				currentcryptosuites.entrySet().stream().filter(isexpired).map(e -> e.getKey()).collect(Collectors.toList()).forEach(this::expireCryptosuite);
 			}
 		}
 		

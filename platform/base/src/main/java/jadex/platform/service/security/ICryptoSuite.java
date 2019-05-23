@@ -45,6 +45,13 @@ public interface ICryptoSuite
 	public boolean isExpiring();
 	
 	/**
+	 *  Returns the creation time of the crypto suite.
+	 *  
+	 *  @return The creation time.
+	 */
+	public long getCreationTime();
+	
+	/**
 	 *  Handles handshake messages.
 	 *  
 	 *  @param agent The security agent object.
