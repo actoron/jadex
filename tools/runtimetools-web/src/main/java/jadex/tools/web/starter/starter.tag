@@ -75,6 +75,12 @@
 		</div>
 		<div class="row m-1">
 			<div class="col-12">
+				<h3>Components</h3>
+				<components/>
+			</div>
+		</div>
+		<div class="row m-1">
+			<div class="col-12">
 				<h3>Available Models</h3>
 			</div>
 		</div>
@@ -125,9 +131,6 @@
   			100% { transform: rotate(360deg); }
 		}
 	</style>
-	
-	<!-- how to load external js/style for tag
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>-->
 	
 	<script>
 		//console.log("starter: "+opts);
@@ -338,6 +341,11 @@
 			$('#'+treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
 		}
 		
+		/*function createUrl(res)
+		{
+			return self.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
+		}*/
+			
 		var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
 		var res2 = "jadex/tools/web/starter/libs/jstree_3.3.7.js";
 		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
@@ -348,6 +356,8 @@
 		
 		// dynamically load jstree lib and style
 		//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
+		
+		// load files is only for javascript and css because it is added to dom
 		self.loadFiles([ures1], [ures2], function()
 		{
 			// init tree
@@ -357,13 +367,28 @@
 				//"plugins" : ["dnd","contextmenu"]
 			})});
 			
+			// load components tag
+			var res = "jadex/tools/web/starter/components.tag";
+			axios.get(self.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
+			{
+				riot.compile(resp.data);
+				//riot.tag(p.name, p.html);
+				var tags = riot.mount("components", {cid: self.cid});
+				
+				axios.get(self.getMethodPrefix()+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
+				{
+					self.components = resp.data;
+					self.update();
+				});
+			});
+			
 			// no args here
 			axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
 			{
 				//console.log(resp.data);
 				self.models = resp.data;
 				createModelTree(treeid);
-				$("#modeltree").jstree('open_all');
+				$('#'+treeid).jstree('open_all');
 				self.update();
 			});
 			
@@ -377,6 +402,6 @@
 			});
 			
 			//self.update();
-		})
+		});
 	</script>
 </starter>

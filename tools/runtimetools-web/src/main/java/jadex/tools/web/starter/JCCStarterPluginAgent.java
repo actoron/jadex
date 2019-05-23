@@ -10,8 +10,11 @@ import javax.ws.rs.core.Response;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
@@ -115,6 +118,15 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	public IFuture<IModelInfo> loadComponentModel(String filename)
 	{
 		return SComponentFactory.loadModel(agent.getExternalAccess(), filename, null);
+	}
+	
+	/**
+	 *  Get the component descriptions.
+	 *  @return The component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> getComponentDescriptions()
+	{
+		return SComponentManagementService.getComponentDescriptions(agent);
 	}
 	
 }

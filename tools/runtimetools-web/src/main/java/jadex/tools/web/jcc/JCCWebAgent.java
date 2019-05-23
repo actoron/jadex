@@ -1,5 +1,6 @@
 package jadex.tools.web.jcc;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -168,6 +169,8 @@ public class JCCWebAgent implements IJCCWebService
 	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, final String methodname, final Object[] args, final ClassInfo[] argtypes)
 	{
 		final Future<Object> ret = new Future<Object>();
+		
+		System.out.println("invokeServiceMethod: "+servicetype+" "+methodname+" "+Arrays.toString(args));
 		
 		// Search service with startpoint of given platform 
 		agent.searchService(new ServiceQuery<IService>(servicetype).setSearchStart(cid.getRoot()).setScope(ServiceScope.PLATFORM))

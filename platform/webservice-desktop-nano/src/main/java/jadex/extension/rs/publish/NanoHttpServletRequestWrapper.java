@@ -53,6 +53,7 @@ import javax.servlet.http.HttpSessionContext;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
+import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.CookieHandler;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import jadex.commons.SUtil;
@@ -153,31 +154,40 @@ public class NanoHttpServletRequestWrapper implements HttpServletRequest
 	    
 	public ServletInputStream getInputStream() throws IOException
 	{
-	   return new ServletInputStream()
-	    {
-	        public int read() throws IOException 
-	        {
-	        	return nanosession.getInputStream().read();
-	        }
-	        
-	        @Override
-	        public boolean isFinished()
-	        {
-	        	throw new UnsupportedOperationException();
-	        }
-	        
-	        @Override
-	        public boolean isReady()
-	        {
-	        	throw new UnsupportedOperationException();
-	        }
-	        
-	        @Override
-	        public void setReadListener(ReadListener readListener)
-	        {
-	        	throw new UnsupportedOperationException();
-	        }
-	    };
+		// Nano always returns stream :-(
+		if(NanoHTTPD.Method.GET.equals(nanosession.getMethod())
+			|| NanoHTTPD.Method.HEAD.equals(nanosession.getMethod()))
+		{
+			return null;
+		}
+		else
+		{
+			return new ServletInputStream()
+			{
+		        public int read() throws IOException 
+		        {
+		        	return nanosession.getInputStream().read();
+		        }
+		        
+		        @Override
+		        public boolean isFinished()
+		        {
+		        	throw new UnsupportedOperationException();
+		        }
+		        
+		        @Override
+		        public boolean isReady()
+		        {
+		        	throw new UnsupportedOperationException();
+		        }
+		        
+		        @Override
+		        public void setReadListener(ReadListener readListener)
+		        {
+		        	throw new UnsupportedOperationException();
+		        }
+		    };
+		}
 	}
 	     
 	public String getParameter(String name)

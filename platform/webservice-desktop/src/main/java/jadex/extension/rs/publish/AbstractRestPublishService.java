@@ -753,7 +753,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			Object[] targetparams = null;
 
-			Map<String, Object> inparamsmap = new HashMap<>();
+			Map<String, Object> inparamsmap = new LinkedHashMap<>();
 			
 			String ct = request.getHeader("Content-Type");
 			if(ct == null)
@@ -856,9 +856,19 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// Read parameter from stream (message body)
 			//if((inparams == null || inparams.length == 0) && types.length > 0 && ct != null && (ct.trim().startsWith("application/json") || ct.trim().startsWith("test/plain")))
 			//{
-			byte[] bytes = SUtil.readStream(request.getInputStream());
-	
-			if(bytes.length>0)
+			byte[] bytes = null;
+			try
+			{
+				// Nano can throw exception here :-(
+				InputStream is = request.getInputStream();
+				if(is!=null)
+					bytes = SUtil.readStream(is);
+			}
+			catch(Exception e)
+			{
+			}
+			
+			if(bytes!=null && bytes.length>0)
 			{
 				String str = new String(bytes, SUtil.UTF8);
 				
@@ -958,6 +968,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// Iterate over given method parameter annotations in order
 			for(Tuple2<String, String> pinfo: pinfos.getFirstEntity())
 			{
+				if(cnt>=inparams.length)
+					break;
+				
 				String inname = innames.hasNext()? innames.next(): null;
 				
 				if("name".equals(pinfo.getFirstEntity()))
@@ -979,7 +992,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 					// query params are in normal parameter map
 					inparams[cnt++] = inparamsmap.get(pinfo.getSecondEntity());
 				}
-				else if(inname!=null)
+				else if(inname!=null && inparamsmap.get(inname)!=null)
+				{
+					inparams[cnt++] = inparamsmap.get(inname);
+				}
+				else if("no".equals(pinfo.getFirstEntity()))
 				{
 					inparams[cnt++] = inparamsmap.get(inname);
 				}
@@ -1031,7 +1048,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// natural auto map if there are in parameters
 			else
 			{
-				Class< ? >[] ts = method.getParameterTypes();
+				Class<?>[] ts = method.getParameterTypes();
 				targetparams = new Object[ts.length];
 
 				for(int i = 0; i < targetparams.length && i < inparams.length; i++)
@@ -2604,14 +2621,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				else
 				{
 					String name = ""+i;
-					ret.add(new Tuple2<String, String>("name", name));
+					ret.add(new Tuple2<String, String>("no", name));
 					targettypes.put(name, types[i]);
 				}
 	        }
 			if(anns[i].length==0)
 			{
 				String name = ""+i;
-				ret.add(new Tuple2<String, String>("name", name));
+				ret.add(new Tuple2<String, String>("no", name));
 				targettypes.put(name, types[i]);
 			}
 		}

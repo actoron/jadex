@@ -127,36 +127,31 @@
 		
 		var loader = 
 		{
+			loaded: {},
 		    getHead: function()
 		    {
 		    	return document.getElementsByTagName("head")[0];
 		    },
-		    withNoCache: function(filename)
-		    {
-		    	return filename;
-	            /*if(filename.indexOf("?") === -1)
-	            {
-	                filename += "?no_cache=" + new Date().getTime();
-	            }
-	            else
-	            {
-	                filename += "&no_cache=" + new Date().getTime();
-	            }
-	            return filename;*/
-	        },
 		    loadStyle: function(i, files, callback)
 	        {
 	        	if(i>=files.length)
 	        	{
 	        		callback();
 	        	}
+	        	else if(this.loaded[files[i]!=null])
+	        	{
+	        		console.log("already loaded css: "+files[i]);
+	        		self.loadStyle(i+1, files, callback);
+	        	}
 	        	else
 	        	{
+	        		this.loaded[files[i]] = files[i];
+	        		
 	        		var self = this;
 	        		var link = document.createElement("link");
 		            link.rel = "stylesheet";
 		            link.type = "text/css";
-		            link.href = self.withNoCache(files[i]);
+		            link.href = files[i];
 		            
 		            link.onload = function ()
 		            {
@@ -179,12 +174,19 @@
 	        	{
 	        		callback();
 	        	}
+	        	else if(this.loaded[files[i]!=null])
+	        	{
+	        		console.log("already loaded script: "+files[i]);
+	        		self.loadScript(i+1, files, callback);
+	        	}
 	        	else
 	        	{
+	        		this.loaded[files[i]] = files[i];
+	        		
 	        		var self = this;
 		            var script = document.createElement('script');
 		            script.type = 'text/javascript';
-		            script.src = self.withNoCache(files[i]);
+		            script.src = files[i];
 		            
 		            script.onload = function ()
 		            {

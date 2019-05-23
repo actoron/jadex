@@ -3,9 +3,11 @@ package jadex.tools.web.starter;
 import java.util.Collection;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
 import jadex.tools.web.jcc.IJCCPluginService;
 
@@ -41,4 +43,10 @@ public interface IJCCStarterService extends IJCCPluginService
 	 *  @return The component id.
 	 */
 	public IFuture<IComponentIdentifier> createComponent(CreationInfo ci);
+	
+	/**
+	 *  Get the component descriptions.
+	 *  @return The component descriptions.
+	 */
+	public IFuture<IComponentDescription[]> getComponentDescriptions();
 }
