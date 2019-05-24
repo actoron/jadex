@@ -6,11 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.Response;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -25,6 +22,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.micro.MinimalAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -61,31 +59,41 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public IFuture<Collection<String[]>> getComponentModels()
 	{
-		ILibraryService ls = agent.getLocalService(ILibraryService.class);
-		URL[] urls = ls.getAllURLs().get().toArray(new URL[0]);
-		
-//		URL[] urls = PlatformAgent.getClasspathUrls(this.getClass().getClassLoader());
-//		System.out.println("URLs1: "+Arrays.toString(urls));
-		// Remove JVM jars
-		urls = SUtil.removeSystemUrls(urls);
-		
-		Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(urls, null, new IFilter<SClassReader.ClassFileInfo>()
+		// Scanning takes some time and is thus delegated to a worker agent allowing this agent to process other requests
+		return agent.createComponent(new CreationInfo().setFilenameClass(MinimalAgent.class)).thenCompose((IExternalAccess ea) ->
 		{
-			public boolean filter(SClassReader.ClassFileInfo ci)
+			return ea.scheduleStep(ia ->
 			{
-				boolean ret = false;
-				AnnotationInfo ai = ci.getClassInfo().getAnnotation(Agent.class.getName());
-				if(ai!=null)
-					ret = true;
-				return ret;
-			}
-		});
-		
-		// Collect filenames of models to load the models without knowing the rid (can then be extracted)
-		List<String[]> res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
+				ILibraryService ls = ia.getLocalService(ILibraryService.class);
+				URL[] urls = ls.getAllURLs().get().toArray(new URL[0]);
 				
-		//System.out.println("Models found: "+res);
-		return new Future<Collection<String[]>>(res);
+//				URL[] urls = PlatformAgent.getClasspathUrls(this.getClass().getClassLoader());
+//				System.out.println("URLs1: "+Arrays.toString(urls));
+				// Remove JVM jars
+				urls = SUtil.removeSystemUrls(urls);
+				
+				Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(urls, null, new IFilter<SClassReader.ClassFileInfo>()
+				{
+					public boolean filter(SClassReader.ClassFileInfo ci)
+					{
+						boolean ret = false;
+						AnnotationInfo ai = ci.getClassInfo().getAnnotation(Agent.class.getName());
+						if(ai!=null)
+							ret = true;
+						return ret;
+					}
+				});
+				
+				// Collect filenames of models to load the models without knowing the rid (can then be extracted)
+				List<String[]> res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
+						
+				//System.out.println("Models found: "+res);
+				
+				ia.killComponent();
+				
+				return new Future<Collection<String[]>>(res);
+			});
+		});
 	}
 	
 	/**
@@ -126,9 +134,9 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public IFuture<IComponentDescription[]> getComponentDescriptions()
 	{
-		System.out.println("getCompDescs start");
+		//System.out.println("getCompDescs start");
 		IFuture<IComponentDescription[]> ret = SComponentManagementService.getComponentDescriptions(agent);
-		ret.thenAccept((IComponentDescription[] x) -> System.out.println("getCompDescs end:"+x));
+		//ret.thenAccept((IComponentDescription[] x) -> System.out.println("getCompDescs end:"+x));
 		return ret;
 	}
 	

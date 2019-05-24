@@ -56,27 +56,15 @@
 			return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
 		}
 		
-		// todo: order by name
-		orderBy(data) 
-		{ 
-			var order = self.reversed ? -1 : 1;
-			
-			var res = data.slice().sort(function(a, b) 
-			{ 
-				return a===b? 0: a > b? order: -order 
-			});
-			
-			return res; 
-		}
-		
 		refresh()
 		{
 			axios.get(self.getMethodPrefix()+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
 			{
-				console.log("descs are: "+resp.data);
+				//console.log("descs are: "+resp.data);
 				self.components = resp.data;
 				createTree(treeid);
-				$("#"+treeid).jstree('open_all');
+				//$("#"+treeid).jstree('open_all');
+				$("#"+treeid).jstree("open_node", $('#'+self.cid));
 				self.update();
 			});
 		}
@@ -168,9 +156,6 @@
 		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
 
-		//console.log(ures1);
-		//console.log(ures2);
-		
 		// dynamically load jstree lib and style
 		//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
 		self.loadFiles([ures1], [ures2], function()
@@ -180,8 +165,21 @@
 			// init tree
 			$(function() { $('#'+treeid).jstree(
 			{
-				"core" : {"check_callback" : true}//,
-				//"plugins" : ["dnd","contextmenu"]
+				"plugins": ["sort"],
+				"core": {"check_callback" : true},
+				'sort': function(a, b) 
+				{
+			        a1 = this.get_node(a);
+			        b1 = this.get_node(b);
+			        if(a1.icon == b1.icon)
+			        {
+			            return (a1.text > b1.text) ? 1 : -1;
+			        } 
+			        else 
+			        {
+			            return (a1.icon > b1.icon) ? 1 : -1;
+			        }
+				}
 			})});
 			
 			/*self.on('mount', function()

@@ -363,8 +363,21 @@
 			// init tree
 			$(function() { $('#'+treeid).jstree(
 			{
-				"core" : {"check_callback" : true}//,
-				//"plugins" : ["dnd","contextmenu"]
+				"core" : {"check_callback" : true},
+				"plugins" : ["sort"],
+				'sort': function(a, b) 
+				{
+			        a1 = this.get_node(a);
+			        b1 = this.get_node(b);
+			        if(a1.icon == b1.icon)
+			        {
+			            return (a1.text > b1.text) ? 1 : -1;
+			        } 
+			        else 
+			        {
+			            return (a1.icon > b1.icon) ? 1 : -1;
+			        }
+				}
 			})});
 			
 			// load components tag
@@ -382,7 +395,14 @@
 				//console.log(resp.data);
 				self.models = resp.data;
 				createModelTree(treeid);
-				$('#'+treeid).jstree('open_all');
+				//$('#'+treeid).jstree('open_all');
+				var childs = $('#'+treeid).jstree('get_node', '#').children;
+				for(var i=0; i<childs.length; i++)
+				{
+					$("#"+treeid).jstree("open_node", childs[i]);
+				}
+				console.log("models loaded");
+				//$("#"+treeid).jstree("open_node", '#');
 				self.update();
 			});
 			

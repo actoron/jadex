@@ -114,7 +114,8 @@ public class SResultListener {
      * @param delegate The future used for success delegation.
      * @return {@link IResultListener}
      */
-	public static <E> IResultListener<E> delegate(final Future<E> delegate) {
+	public static <E> IResultListener<E> delegate(final Future<E> delegate) 
+	{
 		return delegate(delegate, false);
 	}
 	
@@ -125,7 +126,8 @@ public class SResultListener {
      * @param undone Flag if undone methods should be used.
      * @return {@link IResultListener}
      */
-	public static <E> IResultListener<E> delegate(final Future<E> delegate, boolean undone) {
+	public static <E> IResultListener<E> delegate(final Future<E> delegate, boolean undone) 
+	{
 		return delegate(delegate, undone, null);
 	}
 	
@@ -136,7 +138,8 @@ public class SResultListener {
      * @param customResultListener Custom result listener that overwrites the delegation behaviour.
      * @return {@link IResultListener}
      */
-	public static <E> IResultListener<E> delegate(final Future<E> delegate, IFunctionalResultListener<E> customResultListener) {
+	public static <E> IResultListener<E> delegate(final Future<E> delegate, IFunctionalResultListener<E> customResultListener) 
+	{
 		return delegate(delegate, false, customResultListener);
 	}
 
@@ -148,7 +151,8 @@ public class SResultListener {
      * @param customResultListener Custom result listener that overwrites the delegation behaviour.
      * @return {@link IResultListener}
      */
-	public static <E> IResultListener<E> delegate(final Future<E> delegate, boolean undone, final IFunctionalResultListener<E> customResultListener) {
+	public static <E> IResultListener<E> delegate(final Future<E> delegate, boolean undone, final IFunctionalResultListener<E> customResultListener) 
+	{
 		return new DelegationResultListener<E>(delegate, undone, customResultListener);
 	}
 
@@ -162,7 +166,8 @@ public class SResultListener {
 	 * @param delegate The future used for intermediate and final result delegation.
 	 * @return {@link IntermediateDelegationResultListener}
 	 */
-	public static <E> IIntermediateResultListener<E> delegate(final IntermediateFuture<E> delegate) {
+	public static <E> IIntermediateResultListener<E> delegate(final IntermediateFuture<E> delegate) 
+	{
 		return delegate(delegate, false, null, null);
 	}
 
@@ -173,7 +178,8 @@ public class SResultListener {
 	 * @param undone Flag if undone methods should be used.
 	 * @return {@link IntermediateDelegationResultListener}
 	 */
-	public static <E> IIntermediateResultListener<E> delegate(final IntermediateFuture<E> delegate, boolean undone) {
+	public static <E> IIntermediateResultListener<E> delegate(final IntermediateFuture<E> delegate, boolean undone) 
+	{
 		return delegate(delegate, undone, null, null);
 	}
 
@@ -186,7 +192,9 @@ public class SResultListener {
 	 * @param customIntermediateResultListener Custom intermediate result listener that overwrites the delegation behaviour.
 	 * @return {@link IntermediateDelegationResultListener}
 	 */
-	public static <E> IIntermediateResultListener<E> delegate(final IntermediateFuture<E> delegate, boolean undone, IFunctionalResultListener<Collection<E>> customResultListener, IFunctionalIntermediateResultListener<E> customIntermediateResultListener) {
+	public static <E> IIntermediateResultListener<E> delegate(final IntermediateFuture<E> delegate, boolean undone, 
+		IFunctionalResultListener<Collection<E>> customResultListener, IFunctionalIntermediateResultListener<E> customIntermediateResultListener) 
+	{
 		return new IntermediateDelegationResultListener<E>(delegate, undone, customResultListener, customIntermediateResultListener);
 	}
 
@@ -201,20 +209,25 @@ public class SResultListener {
 	 * @param delegate The future used for success delegation.
 	 * @return {@link IResultListener}
 	 */
-	public static <E,F> ITuple2ResultListener<E,F> delegate(final Tuple2Future<E,F> delegate) {
-		return new DefaultTuple2ResultListener<E, F>() {
+	public static <E,F> ITuple2ResultListener<E,F> delegate(final Tuple2Future<E,F> delegate) 
+	{
+		return new DefaultTuple2ResultListener<E, F>() 
+		{
 			@Override
-			public void firstResultAvailable(E result) {
+			public void firstResultAvailable(E result) 
+			{
 				delegate.setFirstResult(result);
 			}
 
 			@Override
-			public void secondResultAvailable(F result) {
+			public void secondResultAvailable(F result) 
+			{
 				delegate.setSecondResult(result);
 			}
 
 			@Override
-			public void exceptionOccurred(Exception exception) {
+			public void exceptionOccurred(Exception exception) 
+			{
 				delegate.setException(exception);
 			}
 		};
@@ -234,7 +247,8 @@ public class SResultListener {
      * @param customResultListener The SuccessListener.
      * @return {@link IResultListener}
      */
-    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, final IFunctionalResultListener<E> customResultListener) {
+    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, final IFunctionalResultListener<E> customResultListener) 
+    {
     	return delegateExceptions(delegate, false, customResultListener);
     }
     
@@ -247,10 +261,13 @@ public class SResultListener {
      * @param customResultListener The SuccessListener.
      * @return {@link IResultListener}
      */
-    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, boolean undone, final IFunctionalResultListener<E> customResultListener) {
-    	return new ExceptionDelegationResultListener<E, T>(delegate, undone) {
+    public static <E,T> IResultListener<E> delegateExceptions(final Future<T> delegate, boolean undone, final IFunctionalResultListener<E> customResultListener) 
+    {
+    	return new ExceptionDelegationResultListener<E, T>(delegate, undone) 
+    	{
 			@Override
-			public void customResultAvailable(E result) {
+			public void customResultAvailable(E result) 
+			{
 				customResultListener.resultAvailable(result);
 			}
 		};
@@ -263,7 +280,8 @@ public class SResultListener {
      * @param countReachedListener Listener to be called when the given number is reached.
      * @return {@link CounterResultListener}
      */
-    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener) {
+    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener) 
+    {
     	return new CounterResultListener<E>(num, countReachedListener);
     }
     
@@ -275,7 +293,8 @@ public class SResultListener {
      * @param exListener Listener to be called for exceptions.
      * @return {@link CounterResultListener}
      */
-    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalExceptionListener exListener) {
+    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalExceptionListener exListener) 
+    {
     	return new CounterResultListener<E>(num, countReachedListener, exListener);
     }
 
@@ -288,7 +307,8 @@ public class SResultListener {
      * @param exListener Listener to be called for exceptions.
      * @return {@link CounterResultListener}
      */
-    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalResultListener<E> intermediateListener, IFunctionalExceptionListener exListener) {
+    public static <E> CounterResultListener<E> countResults(int num, IFunctionalResultListener<Void> countReachedListener, IFunctionalResultListener<E> intermediateListener, IFunctionalExceptionListener exListener) 
+    {
     	return new CounterResultListener<E>(num, countReachedListener, intermediateListener, exListener);
     }
     
@@ -315,9 +335,12 @@ public class SResultListener {
 	 */
 	public static <E> IResultListener<E> createResultListener(final IFunctionalResultListener<E> sucListener, final boolean defaultExceptionHandling)
 	{
-		if (defaultExceptionHandling) {
+		if (defaultExceptionHandling) 
+		{
 			return createResultListener(sucListener, printExceptions());
-		} else {
+		} 
+		else 
+		{
 			return createResultListener(sucListener, ignoreExceptions());
 		}
 	}

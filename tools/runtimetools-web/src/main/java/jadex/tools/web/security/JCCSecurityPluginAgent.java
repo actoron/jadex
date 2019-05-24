@@ -58,7 +58,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	public IFuture<Void> setUseSecret(boolean usesecret)
 	{
 		return agent.getService(ISecurityService.class)
-			.then(s -> s.setUsePlatformSecret(usesecret));
+			.thenCompose(s -> s.setUsePlatformSecret(usesecret));
 	}
 	
 	/**
@@ -68,7 +68,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	public IFuture<Void> setPrintSecret(boolean printsecret)
 	{
 		return agent.getService(ISecurityService.class)
-			.then(s -> s.setPrintPlatformSecret(printsecret));
+			.thenCompose(s -> s.setPrintPlatformSecret(printsecret));
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	public IFuture<Void> addRole(String entity, String role)
 	{
 		return agent.getService(ISecurityService.class)
-			.then(s -> s.addRole(entity, role));
+			.thenCompose(s -> s.addRole(entity, role));
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	public IFuture<Void> removeRole(String entity, String role)
 	{
 		return agent.getService(ISecurityService.class)
-			.then(s -> s.removeRole(entity, role));
+			.thenCompose(s -> s.removeRole(entity, role));
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	public IFuture<Void> addNetwork(String networkname, String secret)
 	{
 		return agent.getService(ISecurityService.class)
-			.then(s -> s.setNetwork(networkname, secret));
+			.thenCompose(s -> s.setNetwork(networkname, secret));
 	}
 	
 	/**
@@ -116,7 +116,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	public IFuture<Void> removeNetwork(String networkname, String secret)
 	{
 		return agent.getService(ISecurityService.class)
-			.then(s -> s.removeNetwork(networkname, secret));
+			.thenCompose(s -> s.removeNetwork(networkname, secret));
 	}
 	
 	/**
@@ -127,7 +127,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	public IFuture<Void> addTrustedPlatformName(String name)
 	{
 		return agent.getService(ISecurityService.class)
-			.then(s -> s.addTrustedPlatform(name));
+			.thenCompose(s -> s.addTrustedPlatform(name));
 	}
 	
 	/**
@@ -138,7 +138,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	public IFuture<Void> removeTrustedPlatformName(String name)
 	{
 		return agent.getService(ISecurityService.class)
-			.then(s -> s.removeTrustedPlatform(name));
+			.thenCompose(s -> s.removeTrustedPlatform(name));
 	}
 	
 	/**
@@ -173,7 +173,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 //		bar.waitFor().thenAccept((Void)->ret.setResult(null));
 		
 		agent.getService(ISecurityService.class)
-			.then((ISecurityService s) -> 
+			.thenCompose((ISecurityService s) -> 
 			{
 				bar.addFuture(s.getPlatformSecret(agent.getId())
 					.thenAccept((String sec) -> ss.setPlatformSecret(sec)));
