@@ -133,9 +133,9 @@
 	</style>
 	
 	<script>
-		//console.log("starter: "+opts);
+		console.log("starter: "+opts);
 		
-		console.log(this.getLanguage());
+		//console.log(this.getLanguage());
 		
 		var self = this;
 
@@ -374,12 +374,6 @@
 				riot.compile(resp.data);
 				//riot.tag(p.name, p.html);
 				var tags = riot.mount("components", {cid: self.cid});
-				
-				axios.get(self.getMethodPrefix()+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
-				{
-					self.components = resp.data;
-					self.update();
-				});
 			});
 			
 			// no args here

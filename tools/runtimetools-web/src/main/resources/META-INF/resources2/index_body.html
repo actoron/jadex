@@ -134,11 +134,13 @@
 		    },
 		    loadStyle: function(i, files, callback)
 	        {
-	        	if(i>=files.length)
+        		var self = this;
+
+        		if(i>=files.length)
 	        	{
 	        		callback();
 	        	}
-	        	else if(this.loaded[files[i]!=null])
+	        	else if(this.loaded[files[i]]!=null)
 	        	{
 	        		console.log("already loaded css: "+files[i]);
 	        		self.loadStyle(i+1, files, callback);
@@ -147,7 +149,6 @@
 	        	{
 	        		this.loaded[files[i]] = files[i];
 	        		
-	        		var self = this;
 	        		var link = document.createElement("link");
 		            link.rel = "stylesheet";
 		            link.type = "text/css";
@@ -170,11 +171,13 @@
 	        },
 	        loadScript: function(i, files, callback)
 	        {
-	        	if(i>=files.length)
+        		var self = this;
+
+        		if(i>=files.length)
 	        	{
 	        		callback();
 	        	}
-	        	else if(this.loaded[files[i]!=null])
+	        	else if(this.loaded[files[i]]!=null)
 	        	{
 	        		console.log("already loaded script: "+files[i]);
 	        		self.loadScript(i+1, files, callback);
@@ -183,7 +186,6 @@
 	        	{
 	        		this.loaded[files[i]] = files[i];
 	        		
-	        		var self = this;
 		            var script = document.createElement('script');
 		            script.type = 'text/javascript';
 		            script.src = files[i];

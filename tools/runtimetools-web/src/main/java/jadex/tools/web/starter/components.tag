@@ -38,9 +38,9 @@
 	</style>
 	
 	<script>
-		//console.log("starter: "+opts);
+		console.log("components: "+opts);
 		
-		console.log(this.getLanguage());
+		//console.log(this.getLanguage());
 		
 		var self = this;
 
@@ -73,7 +73,7 @@
 		{
 			axios.get(self.getMethodPrefix()+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
 			{
-				//console.log("descs are: "+resp.data);
+				console.log("descs are: "+resp.data);
 				self.components = resp.data;
 				createTree(treeid);
 				$("#"+treeid).jstree('open_all');

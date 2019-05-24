@@ -126,7 +126,10 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public IFuture<IComponentDescription[]> getComponentDescriptions()
 	{
-		return SComponentManagementService.getComponentDescriptions(agent);
+		System.out.println("getCompDescs start");
+		IFuture<IComponentDescription[]> ret = SComponentManagementService.getComponentDescriptions(agent);
+		ret.thenAccept((IComponentDescription[] x) -> System.out.println("getCompDescs end:"+x));
+		return ret;
 	}
 	
 }

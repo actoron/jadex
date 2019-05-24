@@ -422,7 +422,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		// handle new call
 		else
 		{
-			System.out.println("received new call: "+request);
+			//System.out.println("received new call: "+request);
 
 			String methodname = request.getPathInfo();
 

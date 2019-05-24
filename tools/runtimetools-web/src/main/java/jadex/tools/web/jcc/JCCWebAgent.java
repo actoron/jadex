@@ -179,7 +179,7 @@ public class JCCWebAgent implements IJCCWebService
 			@Override
 			public void customResultAvailable(IService ser) throws Exception
 			{
-				System.out.println("Invoking service method: "+ser+" "+methodname);
+				//System.out.println("Invoking service method: "+ser+" "+methodname);
 				ser.invokeMethod(methodname, argtypes, args).addResultListener(new DelegationResultListener<Object>(ret));
 //				{
 //					public void customResultAvailable(Object result)
