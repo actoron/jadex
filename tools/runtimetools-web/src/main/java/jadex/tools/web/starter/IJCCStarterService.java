@@ -3,6 +3,7 @@ package jadex.tools.web.starter;
 import java.util.Collection;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Service;
@@ -49,4 +50,9 @@ public interface IJCCStarterService extends IJCCPluginService
 	 *  @return The component descriptions.
 	 */
 	public IFuture<IComponentDescription[]> getComponentDescriptions();
+	
+	/**
+	 * Get a default icon for a file type.
+	 */
+	public IFuture<byte[]> loadComponentIcon(String type);
 }

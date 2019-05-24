@@ -31,5 +31,6 @@ public interface IJCCPluginService
 	 *  @return The text from the file.
 	 */
 	//public IFuture<String> loadResource(String filename);
-	public IFuture<Response> loadResource(String filename);
+	//public IFuture<Response> loadResource(String filename);
+	public IFuture<byte[]> loadResource(String filename);
 }

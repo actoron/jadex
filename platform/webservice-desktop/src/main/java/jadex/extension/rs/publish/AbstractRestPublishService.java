@@ -1362,118 +1362,129 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		try
 		{
 			// handle content
-			PrintWriter out = response.getWriter();
-			if(result != null)
+			if(result instanceof byte[])
 			{
-				String ret = null;
-				String mt = null;
-				if(sr != null)
+				response.getOutputStream().write((byte[])result);
+				if(response.getHeader("Content-Type") == null && sr!=null && sr.size()>0)
 				{
-					for(String mediatype : sr)
+					response.setHeader("Content-Type", sr.get(0));
+				}
+			}
+			else
+			{
+				PrintWriter out = response.getWriter();
+				if(result != null)
+				{
+					String ret = null;
+					String mt = null;
+					if(sr != null)
 					{
-						mediatype = mediatype.trim(); // e.g. sent with leading
-														// space from edge, grrr
-						Collection<IObjectStringConverter> convs = converters.get(mediatype);
-						if(convs != null && convs.size() > 0)
+						for(String mediatype : sr)
 						{
-							mt = mediatype;
-							Object input = result instanceof Response ? ((Response)result).getEntity() : result;
-							ret = convs.iterator().next().convertObject(input, null);
-							break;
+							mediatype = mediatype.trim(); // e.g. sent with leading
+															// space from edge, grrr
+							Collection<IObjectStringConverter> convs = converters.get(mediatype);
+							if(convs != null && convs.size() > 0)
+							{
+								mt = mediatype;
+								Object input = result instanceof Response ? ((Response)result).getEntity() : result;
+								ret = convs.iterator().next().convertObject(input, null);
+								break;
+							}
 						}
 					}
+	
+					if(mt != null)
+					{
+						// If no charset is specified, default to UTF-8 instead
+						// of HTTP default which is ISO-8859-1.
+						if(mt.startsWith("text") && !mt.contains("charset"))
+							mt = mt + "; charset=utf-8";
+	
+						if(response.getHeader("Content-Type") == null)
+							response.setHeader("Content-Type", mt);
+						out.write(ret);
+						// System.out.println("Response content: "+ret);
+					}
+					else
+					{
+						if(response.getHeader("Content-Type") == null)
+							response.setHeader("Content-Type", MediaType.TEXT_PLAIN + "; charset=utf-8");
+						if(!(result instanceof String) && !(result instanceof Response))
+							System.out.println("cannot convert result, writing as string: " + result);
+	
+						out.write(result instanceof Response ? "" + ((Response)result).getEntity() : result.toString());
+					}
+	
+					// for testing with browser
+					// http://brockallen.com/2012/04/27/change-firefoxs-default-accept-header-to-prefer-json-over-xml/
+	
+					// if(sr!=null && sr.contains(MediaType.APPLICATION_JSON))
+					// {
+					// System.out.println("write response in json");
+					// byte[] data = JsonTraverser.objectToByteArray(result,
+					// component.getClassLoader());
+					// if(response.getHeader("Content-Type")==null)
+					// response.setHeader("Content-Type",
+					// MediaType.APPLICATION_JSON);
+					// out.write(new String(data));
+					// }
+					// else if(sr!=null && sr.contains(MediaType.APPLICATION_XML))
+					// {
+					// System.out.println("write response in xml");
+					// byte[] data = JavaWriter.objectToByteArray(result,
+					// component.getClassLoader());
+					// if(response.getHeader("Content-Type")==null)
+					// response.setHeader("Content-Type",
+					// MediaType.APPLICATION_XML);
+					//
+					// // this code below writes <?xml... prolog only once>
+					//// byte[] data;
+					//// if(response.getHeader("Content-Type")==null)
+					//// {
+					//// response.setHeader("Content-Type",
+					// MediaType.APPLICATION_XML);
+					//// data = JavaWriter.objectToByteArray(result,
+					// component.getClassLoader());
+					//// }
+					//// else
+					//// {
+					//// // write without xml prolog
+					//// data = JavaWriter.objectToByteArray(result, null,
+					// component.getClassLoader(), null);
+					//// }
+					// out.write(new String(data));
+					// }
+					// else if(sr!=null && sr.contains("*/*"))
+					// {
+					// System.out.println("write response as json cause all is
+					// allowed");
+					// // use json if all is allowed
+					// if(response.getHeader("Content-Type")==null)
+					// response.setHeader("Content-Type",
+					// MediaType.APPLICATION_JSON);
+					// byte[] data = JsonTraverser.objectToByteArray(result,
+					// component.getClassLoader());
+					// out.write(new String(data));
+					// }
+					// else if(sr!=null && sr.contains(MediaType.TEXT_PLAIN)) //
+					// SReflect.isStringConvertableType(result.getClass())
+					// {
+					// System.out.println("write response as string");
+					// if(response.getHeader("Content-Type")==null)
+					// response.setContentType("text/plain; charset=utf-8");
+					// out.write(result.toString());
+					// }
+					// else
+					// {
+					// System.out.println("cannot convert result: "+result);
+					// }
+	
+					// causes tomcat 8 to throw nullpointer?
+					// out.flush();
 				}
-
-				if(mt != null)
-				{
-					// If no charset is specified, default to UTF-8 instead
-					// of HTTP default which is ISO-8859-1.
-					if(mt.startsWith("text") && !mt.contains("charset"))
-						mt = mt + "; charset=utf-8";
-
-					if(response.getHeader("Content-Type") == null)
-						response.setHeader("Content-Type", mt);
-					out.write(ret);
-					// System.out.println("Response content: "+ret);
-				}
-				else
-				{
-					if(response.getHeader("Content-Type") == null)
-						response.setHeader("Content-Type", MediaType.TEXT_PLAIN + "; charset=utf-8");
-					if(!(result instanceof String) && !(result instanceof Response))
-						System.out.println("cannot convert result, writing as string: " + result);
-
-					out.write(result instanceof Response ? "" + ((Response)result).getEntity() : result.toString());
-				}
-
-				// for testing with browser
-				// http://brockallen.com/2012/04/27/change-firefoxs-default-accept-header-to-prefer-json-over-xml/
-
-				// if(sr!=null && sr.contains(MediaType.APPLICATION_JSON))
-				// {
-				// System.out.println("write response in json");
-				// byte[] data = JsonTraverser.objectToByteArray(result,
-				// component.getClassLoader());
-				// if(response.getHeader("Content-Type")==null)
-				// response.setHeader("Content-Type",
-				// MediaType.APPLICATION_JSON);
-				// out.write(new String(data));
-				// }
-				// else if(sr!=null && sr.contains(MediaType.APPLICATION_XML))
-				// {
-				// System.out.println("write response in xml");
-				// byte[] data = JavaWriter.objectToByteArray(result,
-				// component.getClassLoader());
-				// if(response.getHeader("Content-Type")==null)
-				// response.setHeader("Content-Type",
-				// MediaType.APPLICATION_XML);
-				//
-				// // this code below writes <?xml... prolog only once>
-				//// byte[] data;
-				//// if(response.getHeader("Content-Type")==null)
-				//// {
-				//// response.setHeader("Content-Type",
-				// MediaType.APPLICATION_XML);
-				//// data = JavaWriter.objectToByteArray(result,
-				// component.getClassLoader());
-				//// }
-				//// else
-				//// {
-				//// // write without xml prolog
-				//// data = JavaWriter.objectToByteArray(result, null,
-				// component.getClassLoader(), null);
-				//// }
-				// out.write(new String(data));
-				// }
-				// else if(sr!=null && sr.contains("*/*"))
-				// {
-				// System.out.println("write response as json cause all is
-				// allowed");
-				// // use json if all is allowed
-				// if(response.getHeader("Content-Type")==null)
-				// response.setHeader("Content-Type",
-				// MediaType.APPLICATION_JSON);
-				// byte[] data = JsonTraverser.objectToByteArray(result,
-				// component.getClassLoader());
-				// out.write(new String(data));
-				// }
-				// else if(sr!=null && sr.contains(MediaType.TEXT_PLAIN)) //
-				// SReflect.isStringConvertableType(result.getClass())
-				// {
-				// System.out.println("write response as string");
-				// if(response.getHeader("Content-Type")==null)
-				// response.setContentType("text/plain; charset=utf-8");
-				// out.write(result.toString());
-				// }
-				// else
-				// {
-				// System.out.println("cannot convert result: "+result);
-				// }
-
-				// causes tomcat 8 to throw nullpointer?
-				// out.flush();
 			}
-
+			
 			complete(request, response);
 		}
 		catch(Exception e)

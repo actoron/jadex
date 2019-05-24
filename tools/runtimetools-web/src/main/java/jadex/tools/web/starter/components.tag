@@ -1,19 +1,19 @@
 <components>
-	<div class="container-fluid">
-		<div class="row m-1" hide="{components.length==0}">
-			<div class="col-12 m-1">
+	<div class="container-fluid m-0 p-0">
+		<div class="row m-0 p-0" hide="{components.length==0}">
+			<div class="col-12 m-0 p-0">
 				<div id="componenttree"></div>
 			</div>
 		</div>
-		<div class="row m-1" hide="{components.length==0}">
-			<div class="col-10">
+		<div class="row m-0 p-0" hide="{components.length==0}">
+			<div class="col-10 m-0 p-0">
 			</div>
-			<div class="col-2">
+			<div class="col-2 m-0 p-0">
 				<button class="float-right" onclick="{refresh}">Refresh</button>
 			</div>
 		</div>
-		<div class="row m-1" show="{components.length==0}">
-			<div class="col-12">
+		<div class="row m-0 p-0" show="{components.length==0}">
+			<div class="col-12 m-0 p-0">
 		 		<div class="loader"></div> 
 		 	</div>
 		 </div>
@@ -69,14 +69,33 @@
 			});
 		}
 		
+		// fixed types
+		var cloud = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/cloud.png';
+		var applications = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/applications.png';
+		var platform = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/platform.png';
+		var system = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/system.png';
+		
+		var types =
+		{
+			//"default" : {"icon": b},
+		    "cloud" : {"icon": cloud},
+		    "applications" : {"icon": applications},
+		    "platform" : {"icon": platform},
+		    "system" : {"icon": system}
+		}
+		
 		function createTree(treeid)
 		{
 			empty(treeid);
 			
+			var typemap = {};
+			for(var i=0; i<self.components.length; i++)
+				typemap[self.components[i].name.name] = self.components[i].type;
+			
 			for(var i=0; i<self.components.length; i++)
 			{
 				//console.log(self.models[i]);
-				createNodes(treeid, self.components[i]);
+				createNodes(treeid, self.components[i], typemap);
 			}
 		}
 		
@@ -91,7 +110,7 @@
 			}
 		}
 		
-		function createNodes(treeid, component)
+		function createNodes(treeid, component, typemap)
 		{
 			var cid = component.name.name; // todo: better json format?!
 			var parts = cid.split("@");
@@ -133,10 +152,33 @@
 			var lastname = '';
 			for(var i=0; i<names.length; i++)
 			{
-				var name = names[i].split("@")[0];
+				var parts = names[i].split("@");
+				var name = parts[0];
 				
 				if(!$('#'+treeid).jstree('get_node', names[i]))
-					createNode(treeid, lastname, names[i], name, 'last');
+				{
+					var type = typemap[names[i]];
+					var icon = null;
+					
+					if(type!=null && parts.length==1)
+						type = "platform";
+					
+					if(type==null)
+					{
+						if("Cloud"==name)
+							type = "cloud";
+						else if("Applications"==name)
+							type = "applications";
+						else if("System"==name) 
+							type = "system";
+					}
+					
+					if(types[type]==null)
+						icon = self.getMethodPrefix()+'&methodname=loadComponentIcon&args_0='+type;
+					//types[type] = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/language_de.png';
+					
+					createNode(treeid, lastname, names[i], name, 'last', type, icon);
+				}
 				//else
 				//	console.log("not creating: "+names[i]);
 				
@@ -145,10 +187,15 @@
 		}
 		
 		// createNode(parent, id, text, position), position 'first' or 'last'
-		function createNode(treeid, parent_node_id, new_node_id, new_node_text, position)//, donefunc) 
+		function createNode(treeid, parent_node_id, new_node_id, new_node_text, position, type, icon)//, donefunc) 
 		{
 			//console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
-			$('#'+treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
+			var n = {"text": new_node_text, "id": new_node_id};
+			if(type!=null)
+				n.type = type;
+			if(icon!=null)
+				n.icon = icon;
+			$('#'+treeid).jstree('create_node', '#'+parent_node_id, n, 'last');	
 		}
 		
 		var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
@@ -165,7 +212,7 @@
 			// init tree
 			$(function() { $('#'+treeid).jstree(
 			{
-				"plugins": ["sort"],
+				"plugins": ["sort", "types"],
 				"core": {"check_callback" : true},
 				'sort': function(a, b) 
 				{
@@ -179,8 +226,12 @@
 			        {
 			            return (a1.icon > b1.icon) ? 1 : -1;
 			        }
-				}
+				},
+				types
 			})});
+			
+			// setting an icon per node
+			//$('#'+treeid).jstree(true).set_icon(nodeId, "/images/blabla.png");
 			
 			/*self.on('mount', function()
 			{

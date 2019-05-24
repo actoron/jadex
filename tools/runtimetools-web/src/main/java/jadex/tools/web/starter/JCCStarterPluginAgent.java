@@ -125,7 +125,7 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public IFuture<IModelInfo> loadComponentModel(String filename)
 	{
-		return SComponentFactory.loadModel(agent.getExternalAccess(), filename, null);
+		return SComponentFactory.loadModel(agent, filename, null);
 	}
 	
 	/**
@@ -140,4 +140,11 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		return ret;
 	}
 	
+	/**
+	 * Get a default icon for a file type.
+	 */
+	public IFuture<byte[]> loadComponentIcon(String type)
+	{
+		return SComponentFactory.getFileTypeIcon(agent, type);
+	}
 }

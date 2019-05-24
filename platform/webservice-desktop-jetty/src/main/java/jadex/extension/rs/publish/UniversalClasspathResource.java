@@ -130,21 +130,25 @@ public class UniversalClasspathResource extends Resource
 
 	public java.io.File getFile() throws IOException
 	{
-		if("file".equals(getURL().getProtocol()))
+		if(getURL()!=null)
 		{
-			return SUtil.getFile(getURL());
-		}
-		else if("jar".equals(getURL().getProtocol()))
-		{
-			String	jar	= getURL().getPath();
-			String	entry	= null;
-			if(jar.contains("!/"))
+			if("file".equals(getURL().getProtocol()))
 			{
-				entry	= jar.substring(jar.indexOf("!/")+2);
-				jar	= jar.substring(0, jar.indexOf("!/"));
+				return SUtil.getFile(getURL());
 			}
-			return new JarAsDirectory(new URL(jar).getPath(), new ZipEntry(entry));
+			else if("jar".equals(getURL().getProtocol()))
+			{
+				String	jar	= getURL().getPath();
+				String	entry	= null;
+				if(jar.contains("!/"))
+				{
+					entry	= jar.substring(jar.indexOf("!/")+2);
+					jar	= jar.substring(0, jar.indexOf("!/"));
+				}
+				return new JarAsDirectory(new URL(jar).getPath(), new ZipEntry(entry));
+			}
 		}
+		
 		throw new UnsupportedOperationException();
 	}
 

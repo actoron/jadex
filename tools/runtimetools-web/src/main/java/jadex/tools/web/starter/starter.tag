@@ -74,13 +74,13 @@
 			</div>
 		</div>
 		<div class="row m-1">
-			<div class="col-12">
+			<div class="col-12 m-1">
 				<h3>Components</h3>
 				<components/>
 			</div>
 		</div>
 		<div class="row m-1">
-			<div class="col-12">
+			<div class="col-12 m-1">
 				<h3>Available Models</h3>
 			</div>
 		</div>
@@ -96,7 +96,7 @@
 			</div>
 		</div>
 		<div class="row m-1" show="{models.length==0}">
-			<div class="col-12">
+			<div class="col-12 m-1">
 		 		<div class="loader"></div> 
 		 	</div>
 		 </div>
