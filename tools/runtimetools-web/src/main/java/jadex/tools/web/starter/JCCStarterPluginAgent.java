@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.SComponentManagementService;
@@ -22,6 +23,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.MinimalAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
@@ -146,5 +148,13 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	public IFuture<byte[]> loadComponentIcon(String type)
 	{
 		return SComponentFactory.getFileTypeIcon(agent, type);
+	}
+	
+	/**
+	 *  Subscribe to component events
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> subscribeToComponentChanges()
+	{
+		return SComponentManagementService.listenToAll(agent);
 	}
 }

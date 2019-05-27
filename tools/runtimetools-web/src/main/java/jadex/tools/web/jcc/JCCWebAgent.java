@@ -14,6 +14,7 @@ import jadex.bridge.SFuture;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
@@ -166,9 +167,12 @@ public class JCCWebAgent implements IJCCWebService
 	/**
 	 *  Invoke a Jadex service on the managed platform.
 	 */
-	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, final String methodname, final Object[] args, final ClassInfo[] argtypes)
+	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
+			final String methodname, final Object[] args, final ClassInfo[] argtypes, final ClassInfo rettype)
 	{
-		final Future<Object> ret = new Future<Object>();
+		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;
+		
+		final Future<Object> ret = (Future<Object>)SFuture.getFuture(rtype);
 		
 		System.out.println("invokeServiceMethod: "+servicetype+" "+methodname+" "+Arrays.toString(args));
 		
@@ -180,14 +184,8 @@ public class JCCWebAgent implements IJCCWebService
 			public void customResultAvailable(IService ser) throws Exception
 			{
 				//System.out.println("Invoking service method: "+ser+" "+methodname);
-				ser.invokeMethod(methodname, argtypes, args).addResultListener(new DelegationResultListener<Object>(ret));
-//				{
-//					public void customResultAvailable(Object result)
-//					{
-//						System.out.println("result is: "+result);
-//						super.customResultAvailable(result);
-//					}
-//				});
+				IFuture<Object> fut = ser.invokeMethod(methodname, argtypes, args);
+				FutureFunctionality.connectDelegationFuture(ret, fut);
 			}
 		});
 		

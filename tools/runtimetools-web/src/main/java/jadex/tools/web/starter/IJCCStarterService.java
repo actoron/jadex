@@ -7,9 +7,11 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.tools.web.jcc.IJCCPluginService;
 
 /**
@@ -55,4 +57,9 @@ public interface IJCCStarterService extends IJCCPluginService
 	 * Get a default icon for a file type.
 	 */
 	public IFuture<byte[]> loadComponentIcon(String type);
+	
+	/**
+	 *  Subscribe to component events
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> subscribeToComponentChanges();
 }

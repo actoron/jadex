@@ -230,6 +230,11 @@
 				types
 			})});
 			
+			axios.get(self.getMethodPrefix()+'&methodname=subscribeToComponentChanges', self.transform).then(function(resp)
+			{
+				console.log("cms status event: "+resp.data);
+			});
+			
 			// setting an icon per node
 			//$('#'+treeid).jstree(true).set_icon(nodeId, "/images/blabla.png");
 			

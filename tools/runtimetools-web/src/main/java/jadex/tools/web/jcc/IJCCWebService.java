@@ -36,6 +36,7 @@ public interface IJCCWebService
 	/**
 	 *  Invoke a Jadex service on the managed platform.
 	 */
-	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, String methodname, Object[] args, ClassInfo[] argtypes);
+	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
+		String methodname, Object[] args, ClassInfo[] argtypes, ClassInfo rettype);
 	
 }
