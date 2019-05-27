@@ -1,12 +1,11 @@
 package jadex.tools.web.jcc;
 
-import javax.ws.rs.core.Response;
-
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 /**
- *  Marker interface for JCC plugin services.
+ *  Base interface for JCC plugin services.
+ *  Must be extended by all JCC plugin interfaces and services.
  */
 @Service
 public interface IJCCPluginService

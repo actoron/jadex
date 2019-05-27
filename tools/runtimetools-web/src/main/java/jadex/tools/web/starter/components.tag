@@ -200,14 +200,22 @@
 		
 		var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
 		var res2 = "jadex/tools/web/starter/libs/jstree_3.3.7.js";
-		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1;
+		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2;
 
 		// dynamically load jstree lib and style
 		//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
 		self.loadFiles([ures1], [ures2], function()
 		{
-			self.refresh();
+			axios.get(self.getMethodPrefix()+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture', self.transform).then(function(resp)
+			{
+				console.log("cms status event: "+resp.data);
+			});
+		});
+		
+		self.on('mount', function()
+		{
+			console.log("mounted components");
 			
 			// init tree
 			$(function() { $('#'+treeid).jstree(
@@ -230,24 +238,13 @@
 				types
 			})});
 			
-			axios.get(self.getMethodPrefix()+'&methodname=subscribeToComponentChanges', self.transform).then(function(resp)
+		    //console.log("adding listener");
+			/*$('#'+treeid).on('select_node.jstree', function (e, data) 
 			{
-				console.log("cms status event: "+resp.data);
-			});
-			
-			// setting an icon per node
-			//$('#'+treeid).jstree(true).set_icon(nodeId, "/images/blabla.png");
-			
-			/*self.on('mount', function()
-			{
-			    //console.log("adding listener");
-				$('#'+treeid).on('select_node.jstree', function (e, data) 
-				{
-					self.selectModel(data.instance.get_path(data.node,'/'));
-				});
+				self.selectModel(data.instance.get_path(data.node,'/'));
 			});*/
 			
-			//self.update();
-		})
+			self.refresh();
+		});
 	</script>
 </components>

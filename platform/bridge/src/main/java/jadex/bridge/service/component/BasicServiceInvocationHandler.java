@@ -32,6 +32,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.CheckIndex;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.CheckState;
+import jadex.bridge.service.annotation.FutureReturnType;
 import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -262,7 +263,36 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			
 			if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 			{
-				final Future<Object> fret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), 
+				Class<?> rettype = null;
+				Annotation[][] anss = method.getParameterAnnotations();
+				for(int i=0; i<anss.length; i++)
+				{
+					Annotation[] ans = anss[i];
+					for(Annotation an: ans)
+					{
+						if(an instanceof FutureReturnType)
+						{
+							Object t = myargs.get(i);
+							if(t instanceof Class)
+								rettype = (Class<?>)t;
+							else if(t instanceof ClassInfo)
+								rettype = ((ClassInfo)t).getType(comp.getClassLoader());
+							if(rettype!=null)
+								break;
+						}
+					}
+				}
+				/*if("invokeMethod".equals(method.getName()))
+				{
+					ClassInfo rtype = (ClassInfo)myargs.get(3);
+					if(rtype!=null)
+						rettype = rtype.getType(comp.getClassLoader());
+				}*/
+				
+				if(rettype==null)
+					rettype = method.getReturnType();
+				
+				final Future<Object> fret = (Future<Object>)FutureFunctionality.getDelegationFuture(rettype, 
 					new FutureFunctionality(logger));
 //					new ServiceCallFutureFunctionality(logger, sic.getLastServiceCall(), method.getName()));
 				ret	= fret;

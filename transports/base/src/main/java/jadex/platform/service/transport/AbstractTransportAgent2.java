@@ -856,7 +856,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	 *  @param args The arguments.
 	 *  @return The result.
 	 */
-	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args)
+	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args, ClassInfo rettype)
 	{
 		return new Future<Object>(new UnsupportedOperationException());
 	}

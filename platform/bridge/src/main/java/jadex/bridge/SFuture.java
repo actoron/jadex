@@ -273,6 +273,9 @@ public class SFuture
 	 */
 	public static Future<?> getFuture(Class<?> clazz)
 	{
+		if(clazz==null)
+			return new Future();
+		
 		Future<?> ret = null;
 		Exception ex	= null;
 		

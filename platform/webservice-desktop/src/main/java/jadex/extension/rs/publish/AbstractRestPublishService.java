@@ -958,50 +958,52 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 			// The order of in parameters is corrected with respect to the
 			// target parameter order
-			Object[] inparams = new Object[inparamsmap.size()];
-			// Object[] inparams = inparamsmap==null? SUtil.EMPTY_OBJECT_ARRAY:
-			// new Object[Math.max(inparamsmap.size(),
-			// method.getParameterTypes().length)];
-
-			int cnt = 0;
-			Iterator<String> innames = inparamsmap.keySet().iterator();
+			Object[] inparams = new Object[method.getParameterTypes().length];
+			
 			// Iterate over given method parameter annotations in order
-			for(Tuple2<String, String> pinfo: pinfos.getFirstEntity())
+			//for(Tuple2<String, String> pinfo: pinfos.getFirstEntity())
+			List<Integer> todo = new ArrayList<>();
+			for(int i=0; i<pinfos.getFirstEntity().size(); i++)
 			{
-				if(cnt>=inparams.length)
-					break;
-				
-				String inname = innames.hasNext()? innames.next(): null;
+				Tuple2<String, String> pinfo = pinfos.getFirstEntity().get(i);
 				
 				if("name".equals(pinfo.getFirstEntity()))
 				{
-					inparams[cnt++] = inparamsmap.get(pinfo.getSecondEntity());
+					inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
 				}
 				else if("path".equals(pinfo.getFirstEntity()))
 				{
-					inparams[cnt++] = inparamsmap.get(pinfo.getSecondEntity());
+					inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
 					//binding.get(pinfo.getSecondEntity());
 				}
 				else if("query".equals(pinfo.getFirstEntity()))
 				{
 					// query params are in normal parameter map
-					inparams[cnt++] = inparamsmap.get(pinfo.getSecondEntity());
+					inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
 				}
 				else if("form".equals(pinfo.getFirstEntity()))
 				{
 					// query params are in normal parameter map
-					inparams[cnt++] = inparamsmap.get(pinfo.getSecondEntity());
+					inparams[i] = inparamsmap.remove(pinfo.getSecondEntity());
 				}
-				else if(inname!=null && inparamsmap.get(inname)!=null)
+				else
 				{
-					inparams[cnt++] = inparamsmap.get(inname);
-				}
-				else if("no".equals(pinfo.getFirstEntity()))
-				{
-					inparams[cnt++] = inparamsmap.get(inname);
+					todo.add(i);
 				}
 			}
-
+			
+			Iterator<String> innames = inparamsmap.keySet().iterator();
+			for(int i: todo)
+			{
+				Tuple2<String, String> pinfo = pinfos.getFirstEntity().get(i);
+				String inname = innames.hasNext()? innames.next(): null;
+				
+				if("no".equals(pinfo.getFirstEntity()) && inname!=null && inparamsmap.get(inname)!=null)
+				{
+					inparams[i] = inparamsmap.get(inname);
+				}
+			}
+			
 			for(int i = 0; i < inparams.length; i++)
 			{
 				if(inparams[i] instanceof String)

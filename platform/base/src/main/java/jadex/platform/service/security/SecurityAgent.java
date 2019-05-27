@@ -2475,7 +2475,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param args The arguments.
 	 *  @return The result.
 	 */
-	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args)
+	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args, ClassInfo rettype)
 	{
 		return new Future<Object>(new UnsupportedOperationException());
 	}

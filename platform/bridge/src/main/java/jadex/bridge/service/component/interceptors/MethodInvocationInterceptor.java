@@ -176,7 +176,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			}
 			else
 			{
-				Future<?>	fut	= SFuture.getFuture(sic.getMethod().getReturnType());
+				Future<?> fut = SFuture.getFuture(sic.getMethod().getReturnType());
 				if(t instanceof Error)
 				{
 					fut.setException(new ErrorException((Error)t));

@@ -3,15 +3,19 @@ package jadex.tools.web.jcc;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.ws.rs.QueryParam;
+
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.annotation.FutureReturnType;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
- *  
+ *  Interface for the web platform that is used as front controller for
+ *  all interactions with other platforms.
  */
 @Service(system=true)
 public interface IJCCWebService 
@@ -37,6 +41,6 @@ public interface IJCCWebService
 	 *  Invoke a Jadex service on the managed platform.
 	 */
 	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
-		String methodname, Object[] args, ClassInfo[] argtypes, ClassInfo rettype);
+		String methodname, Object[] args, ClassInfo[] argtypes, @QueryParam("returntype") @FutureReturnType ClassInfo rettype);
 	
 }
