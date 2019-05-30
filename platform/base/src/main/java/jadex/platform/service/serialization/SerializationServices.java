@@ -421,7 +421,7 @@ public class SerializationServices implements ISerializationServices
 			}
 		});
 		
-		
+		// Processor for handling spans in tracing
 		procs.add(new ITraverseProcessor()
 		{
 			public boolean isApplicable(Object object, Type type, ClassLoader targetcl, Object context)
@@ -626,7 +626,7 @@ public class SerializationServices implements ISerializationServices
 					SpanContext sc = span.context();
 					Map<String, String> vals = new HashMap<>();
 					GlobalTracer.get().inject(sc, Builtin.TEXT_MAP_INJECT, new TextMapInjectAdapter(vals));
-					System.out.println("span: "+vals);
+					//System.out.println("span: "+vals);
 					
 					return new SpanContextInfo(vals);
 				}

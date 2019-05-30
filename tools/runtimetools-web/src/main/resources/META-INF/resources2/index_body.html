@@ -125,6 +125,24 @@
 		};
 		riot.mixin(langmixin);
 		
+		var jadexmixin = {
+			getIntermediate: function(path, handler, error) 
+			{
+				var	func = function(resp)
+				{
+					if(resp.status!=202)	// ignore updatetimer commands
+						handler(resp);
+
+					var callid = resp.headers["x-jadex-callid"];
+					if(callid!=null)
+						axios.get(path, {headers: {'x-jadex-callid': callid}}, self.transform).then(func).catch(error); 
+					return this.PROMISE_DONE;
+				};
+				axios.get(path, self.transform).then(func).catch(error);
+			}
+		};
+		riot.mixin(jadexmixin);
+		
 		var loader = 
 		{
 			loaded: {},

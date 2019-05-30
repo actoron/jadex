@@ -46,6 +46,7 @@
 
 		self.cid = opts!=null? opts.cid: null;
 		self.components = []; // component descriptions
+		self.typemap = null;
 		
 		var treeid = "componenttree";
 		
@@ -62,7 +63,12 @@
 			{
 				//console.log("descs are: "+resp.data);
 				self.components = resp.data;
-				createTree(treeid);
+				
+				self.typemap = {};
+				for(var i=0; i<self.components.length; i++)
+					self.typemap[self.components[i].name.name] = self.components[i].type;
+
+				self.createTree(treeid);
 				//$("#"+treeid).jstree('open_all');
 				$("#"+treeid).jstree("open_node", $('#'+self.cid));
 				self.update();
@@ -84,22 +90,18 @@
 		    "system" : {"icon": system}
 		}
 		
-		function createTree(treeid)
+		createTree(treeid)
 		{
-			empty(treeid);
-			
-			var typemap = {};
-			for(var i=0; i<self.components.length; i++)
-				typemap[self.components[i].name.name] = self.components[i].type;
-			
+			self.empty(treeid);
+						
 			for(var i=0; i<self.components.length; i++)
 			{
 				//console.log(self.models[i]);
-				createNodes(treeid, self.components[i], typemap);
+				self.createNodes(treeid, self.components[i]);
 			}
 		}
 		
-		function empty(treeid)
+		empty(treeid)
 		{
 			// $('#'+treeid).empty(); has problem when reading nodes :-(
 
@@ -110,7 +112,8 @@
 			}
 		}
 		
-		function createNodes(treeid, component, typemap)
+		// create node(s) for a component description
+		createNodes(treeid, component)
 		{
 			var cid = component.name.name; // todo: better json format?!
 			var parts = cid.split("@");
@@ -142,7 +145,10 @@
 						if(component.systemComponent)
 							names.unshift("System");
 						else
+						{
+							//console.log("creating App: "+name+" "+cid);
 							names.unshift("Applications");
+						}
 					}
 					
 					names.unshift(name);
@@ -157,7 +163,7 @@
 				
 				if(!$('#'+treeid).jstree('get_node', names[i]))
 				{
-					var type = typemap[names[i]];
+					var type = self.typemap[names[i]];
 					var icon = null;
 					
 					if(type!=null && parts.length==1)
@@ -176,8 +182,10 @@
 					if(types[type]==null)
 						icon = self.getMethodPrefix()+'&methodname=loadComponentIcon&args_0='+type;
 					//types[type] = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/language_de.png';
+
+					//console.log(cid+" "+type+" "+icon);
 					
-					createNode(treeid, lastname, names[i], name, 'last', type, icon);
+					self.createNode(treeid, lastname, names[i], name, 'last', type, icon);
 				}
 				//else
 				//	console.log("not creating: "+names[i]);
@@ -187,15 +195,25 @@
 		}
 		
 		// createNode(parent, id, text, position), position 'first' or 'last'
-		function createNode(treeid, parent_node_id, new_node_id, new_node_text, position, type, icon)//, donefunc) 
+		createNode(treeid, parent_node_id, new_node_id, new_node_text, position, type, icon)//, donefunc) 
 		{
 			//console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
+			//console.log("create node: "+new_node_id);
 			var n = {"text": new_node_text, "id": new_node_id};
 			if(type!=null)
 				n.type = type;
 			if(icon!=null)
 				n.icon = icon;
 			$('#'+treeid).jstree('create_node', '#'+parent_node_id, n, 'last');	
+		}
+			
+		deleteNode(treeid, nodeid)
+		{
+			//console.log("remove node: "+nodeid);
+			$("#"+treeid).jstree("delete_node", nodeid);
+			var apps = $('#'+treeid).jstree().get_node('Applications');
+			if(apps!=null && apps.children.length==0)
+				$("#"+treeid).jstree("delete_node", "Applications");
 		}
 		
 		var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
@@ -207,15 +225,32 @@
 		//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
 		self.loadFiles([ures1], [ures2], function()
 		{
-			axios.get(self.getMethodPrefix()+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture', self.transform).then(function(resp)
-			{
-				console.log("cms status event: "+resp.data);
-			});
+			var path = self.getMethodPrefix()+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
+
+			self.getIntermediate(path,
+				function(resp)
+				{
+					var event = resp.data;
+					//console.log("cms status event: "+event);
+					if(event.type.toLowerCase().indexOf("created")!=-1)
+					{
+						self.typemap[event.componentDescription.name.name] = event.componentDescription.type;
+						self.createNodes(treeid, event.componentDescription);
+					}
+					else if(event.type.toLowerCase().indexOf("terminated")!=-1)
+					{
+						self.deleteNode(treeid, event.componentDescription.name.name);
+					}
+				},
+				function(resp)
+				{
+					console.log("connection to platform lost: "+resp.data);
+				});
 		});
 		
 		self.on('mount', function()
 		{
-			console.log("mounted components");
+			//console.log("mounted components");
 			
 			// init tree
 			$(function() { $('#'+treeid).jstree(

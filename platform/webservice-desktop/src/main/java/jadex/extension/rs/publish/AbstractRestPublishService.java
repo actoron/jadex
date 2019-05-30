@@ -148,17 +148,17 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 * The internal request info containing also results per call (coming from
 	 * the called Jadex service).
 	 */
-	protected Map<String, RequestInfo>							requestinfos;
+	protected Map<String, RequestInfo> requestinfos;
 
 	/**
 	 * The requests per call (coming from the rest client). Signals on ongoing
 	 * conversation as long as callid is contained (results are not immediately
 	 * available).
 	 */
-	protected MultiCollection<String, AsyncContext>				requestspercall;
+	protected MultiCollection<String, AsyncContext> requestspercall;
 
 	/** The media type converters. */
-	protected MultiCollection<String, IObjectStringConverter>	converters;
+	protected MultiCollection<String, IObjectStringConverter> converters;
 
 	/**
 	 * The service init.
@@ -381,9 +381,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		// request info manages an ongoing conversation
 		if(requestinfos.containsKey(callid))
 		{
-			// System.out.println("received existing call: "+request+"
-			// "+callid);
-
 			RequestInfo rinfo = requestinfos.get(callid);
 
 			// Result already available?
@@ -402,13 +399,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), callid, rinfo.getMappingInfo(), request, response, true);
 			}
 
-			// No result yet -> store current request context until next result
-			// available
+			// No result yet -> store current request context until next result available
 			else
 			{
 				AsyncContext ctx = getAsyncContext(request);
 				saveRequestContext(callid, ctx);
 			}
+			
+			//System.out.println("received existing call: "+request+" "+callid);
 		}
 		else if(callid != null)
 		{
@@ -509,9 +507,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 								 */
 								protected void handleResult(Object result, Throwable exception, Object command)
 								{
-									// System.out.println("handleResult:
-									// "+result+", "+exception+", "+command+",
-									// "+Thread.currentThread());
+									// System.out.println("handleResult:"+result+", "+exception+", "+command+","+Thread.currentThread());
 
 									if(rinfo.isTerminated())
 									{
@@ -529,15 +525,11 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 										AsyncContext ctx = cls.iterator().next();
 										cls.remove(ctx);
 
-										// System.out.println("direct answer to
-										// browser request, removed context:
-										// "+callid+" "+ctx);
+										// System.out.println("direct answer to browser request, removed context:"+callid+" "+ctx);
 										if(command != null)
 										{
-											// Timer update (or other
-											// command???)
-											// HTTP 102 -> processing (not
-											// recognized by angular?)
+											// Timer update (or other command???)
+											// HTTP 102 -> processing (not recognized by angular?)
 											// HTTP 202 -> accepted
 											writeResponse(null, 202, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
 										}
@@ -550,8 +542,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 										}
 										else
 										{
-											// Normal result (or FINISHED as
-											// handled in writeResponse())
+											// Normal result (or FINISHED as handled in writeResponse())
 											result = FINISHED.equals(result) ? result : mapResult(method, result);
 											writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
 										}
@@ -604,16 +595,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 										// results).
 										else if(!rinfo.isTerminated() && command == null)
 										{
-											// System.out.println("storing
-											// result till browser requests:
-											// "+result);
+											//System.out.println("storing result till browser requests: "+result);
 											rinfo.addResult(result);
 										}
 
 										// else nop (no need to store timer
 										// updates). what about other commands?
 									}
-									// System.out.println("handleResult exit");
+									//System.out.println("handleResult exit: "+callid+" "+rinfo.getResults());
 								}
 							}));
 					}
@@ -2480,26 +2469,24 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	}
 
 	/**
-	 * 
+	 *  Struct for storing info about a request and the results.
 	 */
 	public static class RequestInfo
 	{
 		protected Queue<Object>	results;
 
-		protected MappingInfo	mappingInfo;
+		protected MappingInfo mappingInfo;
 
-		protected boolean		terminated;
+		protected boolean terminated;
 
-		protected Throwable		exception;
+		protected Throwable exception;
 
-		// to check time gap between last request from browser and current
-		// result
-		// if gap>timeout -> abort future as probably no browser listening any
-		// more
-		protected long			lastcheck;
+		// to check time gap between last request from browser and current result
+		// if gap>timeout -> abort future as probably no browser listening any more
+		protected long lastcheck;
 
 		/**
-		 * Create a request info.
+		 *  Create a request info.
 		 */
 		public RequestInfo(MappingInfo mappingInfo)
 		{
@@ -2507,11 +2494,18 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			this.lastcheck = System.currentTimeMillis();
 		}
 
+		/**
+		 *  Set it to terminated.
+		 */
 		public void setTerminated()
 		{
 			terminated = true;
 		}
 
+		/**
+		 *  Check if terminated
+		 *  @return True if terminated.
+		 */
 		public boolean isTerminated()
 		{
 			return terminated;
@@ -2577,6 +2571,14 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		public Object getNextResult()
 		{
 			return results.remove();
+		}
+		
+		/**
+		 * Get the results.
+		 */
+		public Object getResults()
+		{
+			return results;
 		}
 
 		/**

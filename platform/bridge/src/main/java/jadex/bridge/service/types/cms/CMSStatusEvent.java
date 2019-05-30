@@ -54,6 +54,24 @@ public class CMSStatusEvent
 	{
 		this.desc = desc;
 	}
+	
+	/**
+	 *  Get and set type are introduced to get the type explicitly (e.g. in json classname vanishes).
+	 *  Get the event type
+	 *  @return The event type.
+	 */
+	public String getType() 
+	{
+		return SReflect.getInnerClassName(this.getClass());
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(String type) 
+	{
+		// nop
+	}
 
 	/**
 	 *  Get the string representation.
