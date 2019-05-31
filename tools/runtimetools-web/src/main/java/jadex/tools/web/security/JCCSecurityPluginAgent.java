@@ -21,7 +21,7 @@ import jadex.tools.web.jcc.JCCPluginAgent;
 /**
  *  Security web jcc plugin.
  */
-@ProvidedServices({@ProvidedService(name="starterweb", type=IJCCSecurityService.class)})
+@ProvidedServices({@ProvidedService(name="securityweb", type=IJCCSecurityService.class)})
 @Agent(autostart=Boolean3.TRUE)
 public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecurityService
 {
