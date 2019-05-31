@@ -96,7 +96,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	public static final String	PROPERTY_TERMINATION_TIMEOUT	= "termination_timeout";
 	
 	/** External access method exempt from component suspension. */
-	public static final Set<String> SUSPEND_METHOD_EXPEMPTIONS;
+	public static final Set<String> SUSPEND_METHOD_EXEMPTIONS;
 	static
 	{
 		Set<String> tmp = new HashSet<>();
@@ -107,7 +107,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		tmp.add("killComponent");
 		tmp.add("killComponents");
 		tmp.add("stepComponent");
-		SUSPEND_METHOD_EXPEMPTIONS = Collections.unmodifiableSet(tmp);
+		SUSPEND_METHOD_EXEMPTIONS = Collections.unmodifiableSet(tmp);
 	}
 	
 	//-------- attributes --------
@@ -1582,7 +1582,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 					default:
 				};
 				
-				if(SUSPEND_METHOD_EXPEMPTIONS.contains(method.getName()))
+				if(SUSPEND_METHOD_EXEMPTIONS.contains(method.getName()))
 				{
 					// Only when running?
 					if (!shutdown)
