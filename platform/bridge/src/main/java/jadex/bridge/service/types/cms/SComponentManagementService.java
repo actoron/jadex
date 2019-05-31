@@ -1679,12 +1679,12 @@ public class SComponentManagementService
 	 * @param name
 	 * @return
 	 */
-	public static boolean isSystemComponent(String name, IModelInfo lmodel, CreationInfo cinfo, IInternalAccess agent)
+	public static boolean isSystemComponent(IModelInfo lmodel, CreationInfo cinfo, IComponentIdentifier pacid)
 	{
 		// check if system component is located in system tree
 		Map<String, Object> props = lmodel.getProperties();
 		
-		IComponentIdentifier pacid = getParentIdentifier(agent);
+		//IComponentIdentifier pacid = getParentIdentifier(agent);
 		
 		boolean ret = false; //"system".equals(name) && pacid.getParent()==null;
 		
@@ -1695,7 +1695,7 @@ public class SComponentManagementService
 		if(!ret)
 		{
 			// Is a "system" expression available? 
-			if(props.containsKey("system") && !"system".equals(name))
+			if(props.containsKey("system"))
 			{
 				UnparsedExpression uexp = (UnparsedExpression)props.get("system");
 				IParsedExpression exp = SJavaParser.parseExpression(uexp, lmodel.getAllImports(), null); // todo: classloader
@@ -1968,7 +1968,7 @@ public class SComponentManagementService
 						
 						// Create id and adapter.
 						
-						boolean systemcomponent = isSystemComponent(modelname, tmplmodel, cinfo, agent);
+						boolean systemcomponent = isSystemComponent(tmplmodel, cinfo, agent.getId().getParent());
 						
 						addParentLocking(cinfo, agent, inited);
 		
