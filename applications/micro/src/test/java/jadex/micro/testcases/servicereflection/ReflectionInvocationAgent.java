@@ -53,7 +53,7 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 			IFuture<IExternalAccess> fut = agent.createComponent(new CreationInfo().setFilename(ProviderAgent.class.getName()+".class"));
 			cid = fut.get().getId();
 			IService ser = (IService)agent.searchService(new ServiceQuery<>(new ClassInfo("jadex.micro.testcases.servicereflection.IExampleService"))).get();
-			Object result = ser.invokeMethod("add", null, new Object[]{1,2}).get();
+			Object result = ser.invokeMethod("add", null, new Object[]{1,2}, null).get();
 			System.out.println("Got result: "+result);
 			tr.setSucceeded(true);
 		}
@@ -85,7 +85,7 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 			IFuture<IExternalAccess> fut = platform.createComponent(new CreationInfo().setFilename(ProviderAgent.class.getName()+".class"));
 			cid = fut.get().getId();
 			IService ser = (IService)platform.searchService(new ServiceQuery<>(new ClassInfo("jadex.micro.testcases.servicereflection.IExampleService")).setScope(ServiceScope.PLATFORM)).get();
-			Object result = ser.invokeMethod("add", null, new Object[]{1,2}).get();
+			Object result = ser.invokeMethod("add", null, new Object[]{1,2}, null).get();
 			System.out.println("Got result: "+result);
 			tr.setSucceeded(true);
 		}
@@ -128,7 +128,7 @@ public class ReflectionInvocationAgent extends JunitAgentTest
 //			IService lser = (IService)agent.searchService(new ServiceQuery<>(ILibraryService.class).setSearchStart(platform.getId()).setScope(ServiceScope.PLATFORM)).get();
 //			System.out.println("libser: "+lser.getServiceId().getProviderId());
 			IService ser = (IService)agent.searchService(new ServiceQuery<>(new ClassInfo("jadex.bdiv3.testcases.servicereflection.INotVisibleService")).setSearchStart(platform.getId()).setScope(ServiceScope.PLATFORM)).get();
-			Object result = ser.invokeMethod("add", null, new Object[]{1,2}).get();
+			Object result = ser.invokeMethod("add", null, new Object[]{1,2}, null).get();
 			System.out.println("Got result: "+result+" "+Arrays.toString(ser.getClass().getInterfaces()));
 			tr.setSucceeded(true);
 		}
