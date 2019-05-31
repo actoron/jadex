@@ -323,7 +323,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			return;
 		}
 
-		// System.out.println("handleRequest: "+Thread.currentThread());
+		//System.out.println("handleRequest: "+Thread.currentThread());
 
 		// In case the call comes from an internally started server async is not
 		// already set

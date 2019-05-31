@@ -560,7 +560,7 @@ public class SComponentManagementService
 	 */
 	protected static InitInfo getParentInfo(CreationInfo cinfo, IInternalAccess agent)
 	{
-		final IComponentIdentifier paid = getParentIdentifier(cinfo, agent);
+		final IComponentIdentifier paid = getParentIdentifier(agent);
 		return getState(paid).getInitInfo(paid);
 	}
 	
@@ -578,7 +578,7 @@ public class SComponentManagementService
 		CmsState cmsstate = getState(agent.getId());
 		try(IAutoLock l = cmsstate.readLock())
 		{
-			IComponentIdentifier paid = getParentIdentifier(cinfo, agent);
+			IComponentIdentifier paid = getParentIdentifier(agent);
 			component = cmsstate.getAccess(paid);
 			if(component==null)
 			{
@@ -636,7 +636,7 @@ public class SComponentManagementService
 		// Parent already running.
 		else
 		{
-			CMSComponentDescription	padesc = (CMSComponentDescription)SComponentManagementService.getDescription(getParentIdentifier(cinfo, agent));
+			CMSComponentDescription	padesc = (CMSComponentDescription)SComponentManagementService.getDescription(getParentIdentifier(agent));
 			pasuspend = IComponentDescription.STATE_SUSPENDED.equals(padesc.getState());
 		}
 		// Suspend when set to suspend or when parent is also suspended or when specified in model.
@@ -852,23 +852,12 @@ public class SComponentManagementService
 	 *  @param cid The component identifier.
 	 *  @return The component description of this component.
 	 */
-	public static IFuture<IComponentDescription> getComponentDescription(final IComponentIdentifier cid, IInternalAccess agent)
+	public static IFuture<IComponentDescription> getComponentDescription(final IComponentIdentifier cid)
 	{
 		final Future<IComponentDescription> ret = new Future<IComponentDescription>();
 		
-		CMSComponentDescription desc = (CMSComponentDescription)SComponentManagementService.getDescription(cid);
-		// Hack, to retrieve description from component itself in init phase
-		if(desc==null)
-		{
-			CmsState state = getState(agent.getId());
-			if(state!=null)
-			{
-				InitInfo ii = state.getInitInfo(cid);
-				if(ii!=null)
-					desc = (CMSComponentDescription)ii.getComponent().getInternalAccess().getDescription();
-			}
-		}
-					
+		IComponentDescription desc = internalGetComponentDescription(cid);
+		
 		if(desc!=null)
 		{
 			ret.setResult(desc);
@@ -879,6 +868,29 @@ public class SComponentManagementService
 		}		
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the component description of a single component.
+	 *  @param cid The component identifier.
+	 *  @return The component description of this component.
+	 */
+	public static IComponentDescription internalGetComponentDescription(final IComponentIdentifier cid)
+	{
+		CMSComponentDescription desc = (CMSComponentDescription)SComponentManagementService.getDescription(cid);
+		// Hack, to retrieve description from component itself in init phase
+		if(desc==null)
+		{
+			CmsState state = getState(cid);
+			if(state!=null)
+			{
+				InitInfo ii = state.getInitInfo(cid);
+				if(ii!=null)
+					desc = (CMSComponentDescription)ii.getComponent().getInternalAccess().getDescription();
+			}
+		}
+					
+		return desc;
 	}
 	
 	// r: components
@@ -955,7 +967,7 @@ public class SComponentManagementService
 	 *  @param platform The component identifier.
 	 *  @return The parent component identifier.
 	 */
-	public static IComponentIdentifier getParentIdentifier(CreationInfo ci, IInternalAccess agent)
+	public static IComponentIdentifier getParentIdentifier(IInternalAccess agent)
 	{
 //		IComponentIdentifier ret = ci!=null && ci.getParent()!=null ? ci.getParent() : agent.getId().getRoot(); //FIXME 
 		IComponentIdentifier ret = agent.getId();
@@ -1667,49 +1679,57 @@ public class SComponentManagementService
 	 * @param name
 	 * @return
 	 */
-	protected static boolean isSystemComponent(String name, IModelInfo lmodel, CreationInfo cinfo, IInternalAccess agent)
+	public static boolean isSystemComponent(String name, IModelInfo lmodel, CreationInfo cinfo, IInternalAccess agent)
 	{
 		// check if system component is located in system tree
 		Map<String, Object> props = lmodel.getProperties();
 		
-		IComponentIdentifier pacid = getParentIdentifier(cinfo, agent);
+		IComponentIdentifier pacid = getParentIdentifier(agent);
 		
-		boolean ret = "system".equals(name) && pacid.getParent()==null;
+		boolean ret = false; //"system".equals(name) && pacid.getParent()==null;
 		
-		if(props.containsKey("system") && !"system".equals(name))
+		// If parent is system component (and it is not platform)
+		if(!ret)
+			ret = pacid!=null && pacid.getParent()!=null && internalGetComponentDescription(pacid).isSystemComponent();
+		
+		if(!ret)
 		{
-			UnparsedExpression uexp = (UnparsedExpression)props.get("system");
-			IParsedExpression exp = SJavaParser.parseExpression(uexp, lmodel.getAllImports(), null); // todo: classloader
-			SimpleValueFetcher fet = new SimpleValueFetcher()
+			// Is a "system" expression available? 
+			if(props.containsKey("system") && !"system".equals(name))
 			{
-				public Object fetchValue(String name) 
+				UnparsedExpression uexp = (UnparsedExpression)props.get("system");
+				IParsedExpression exp = SJavaParser.parseExpression(uexp, lmodel.getAllImports(), null); // todo: classloader
+				SimpleValueFetcher fet = new SimpleValueFetcher()
 				{
-					Object ret = null;
-					if("$config".equals(name) || "$configuration".equals(name))
+					public Object fetchValue(String name) 
 					{
-						if(cinfo.getConfiguration()!=null)
+						Object ret = null;
+						if("$config".equals(name) || "$configuration".equals(name))
 						{
-							ret = cinfo.getConfiguration();
-						}
-						else
-						{
-							String[] cs = lmodel.getConfigurationNames();
-							if(cs!=null && cs.length>0)
+							if(cinfo!=null && cinfo.getConfiguration()!=null)
 							{
-								ret = cs[0];
+								ret = cinfo.getConfiguration();
+							}
+							else
+							{
+								String[] cs = lmodel.getConfigurationNames();
+								if(cs!=null && cs.length>0)
+								{
+									ret = cs[0];
+								}
 							}
 						}
+						else if("$model".equals(name))
+						{
+							ret = lmodel;
+						}
+						return ret;
 					}
-					else if("$model".equals(name))
-					{
-						ret = lmodel;
-					}
-					return ret;
-				}
-			};
-			Boolean bool = (Boolean)exp.getValue(fet);
-			if(bool!=null && bool.booleanValue())// || (props.get("system").toString().indexOf("true")!=-1))
-				ret = true;
+				};
+				Boolean bool = (Boolean)exp.getValue(fet);
+				if(bool!=null && bool.booleanValue()) // || (props.get("system").toString().indexOf("true")!=-1))
+					ret = true;
+			}
 		}
 		
 		// Check if system is used in service (one declared system service is enough for component being systemcomponent)

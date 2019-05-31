@@ -729,7 +729,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	// Todo: hack??? should be internal to CMS!?
 	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid)
 	{
-		return SComponentManagementService.getComponentDescription(cid, getInternalAccess());
+		return SComponentManagementService.getComponentDescription(cid);
 	}
 
 	/**

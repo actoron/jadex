@@ -26,8 +26,8 @@ public class ComponentProperties extends PropertiesPanel
 
 		createTextField("Name");
 		
-		addFullLineComponent("Addresses_label", new JLabel("Addresses"));
-		addFullLineComponent("Addresses", SGUI.createReadOnlyTable());
+		//addFullLineComponent("Addresses_label", new JLabel("Addresses"));
+		//addFullLineComponent("Addresses", SGUI.createReadOnlyTable());
 		
 		createTextField("Type");
 		createTextField("Model name");
@@ -37,6 +37,7 @@ public class ComponentProperties extends PropertiesPanel
 		createTextField("Ownership");
 		createTextField("State");
 		createTextField("Processing state");
+		createTextField("System component");
 		
 //		createCheckBox("Master");
 //		createCheckBox("Daemon");
@@ -62,6 +63,7 @@ public class ComponentProperties extends PropertiesPanel
 		ILocalResourceIdentifier lid = desc.getResourceIdentifier().getLocalIdentifier();
 		getTextField("Resource Identifier").setText(gid==null? "n/a": gid);
 		getTextField("(global / local)").setText(lid==null? "n/a": lid.toString());
+		getTextField("System component").setText(""+desc.isSystemComponent());
 //		getTextField("Processing state").setText(desc.getProcessingState());
 //		getCheckBox("Master").setSelected(desc.isMaster());
 //		getCheckBox("Daemon").setSelected(desc.isDaemon());
@@ -69,10 +71,10 @@ public class ComponentProperties extends PropertiesPanel
 		getCheckBox("Synchronous").setSelected(desc.isSynchronous());
 //		getCheckBox("Persistable").setSelected(desc.isPersistable());
 		
-		JTable	list	= (JTable)getComponent("Addresses");
-		String[] addresses = null;// desc.getName() instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)desc.getName()).getAddresses() : null;
-		DefaultTableModel dtm = new DefaultTableModel();
-		dtm.addColumn("Addresses", addresses!=null ? addresses : SUtil.EMPTY_STRING_ARRAY);
-		list.setModel(dtm);
+		//JTable	list	= (JTable)getComponent("Addresses");
+		//String[] addresses = null;// desc.getName() instanceof ITransportComponentIdentifier ? ((ITransportComponentIdentifier)desc.getName()).getAddresses() : null;
+		//DefaultTableModel dtm = new DefaultTableModel();
+		//dtm.addColumn("Addresses", addresses!=null ? addresses : SUtil.EMPTY_STRING_ARRAY);
+		//list.setModel(dtm);
 	}
 }
