@@ -79,9 +79,9 @@
 				updatePlatform(resp.data.service.name, resp.data.service.type);
 				//return this.PROMISE_DONE;
 			},
-			function(resp)
+			function(err)
 			{
-				console.log("Err: "+JSON.stringify(resp));
+				console.log("Err: "+JSON.stringify(err));
 				self.serverdown = true;
 				self.update();
 				//return this.PROMISE_DONE;

@@ -239,12 +239,19 @@
 					}
 					else if(event.type.toLowerCase().indexOf("terminated")!=-1)
 					{
-						self.deleteNode(treeid, event.componentDescription.name.name);
+						try
+						{
+							self.deleteNode(treeid, event.componentDescription.name.name);
+						}
+						catch(ex)
+						{
+							console.log("Could not remove node: "+event.componentDescription.name.name);
+						}
 					}
 				},
-				function(resp)
+				function(err)
 				{
-					console.log("connection to platform lost: "+resp.data);
+					console.log("error occurred: "+err);
 				}
 			);
 		});

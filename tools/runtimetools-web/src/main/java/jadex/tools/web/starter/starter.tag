@@ -382,7 +382,7 @@
 			
 			// load components tag
 			var res = "jadex/tools/web/starter/components.tag";
-			axios.get(self.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
+			axios.get(self.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String").then(function(resp)
 			{
 				riot.compile(resp.data);
 				//riot.tag(p.name, p.html);
