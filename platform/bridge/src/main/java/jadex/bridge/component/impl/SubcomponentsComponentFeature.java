@@ -281,7 +281,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				
 				if (sysinfos != null)
 				{
-					if (!isSystemComponent(component.getModel()))
+					if (!component.getDescription().isSystemComponent())
 					{
 						ret.setException(new IllegalArgumentException(component.toString() + " attempted to start system component without being a system component."));
 						return;
