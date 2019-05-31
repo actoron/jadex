@@ -262,7 +262,8 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				{
 					IModelInfo model = tmpmodelmap.get(i).get().getFirstEntity();
 					
-					if (isSystemComponent(model))
+//					if (isSystemComponent(model))
+					if (SComponentManagementService.isSystemComponent(model, infos[i], component.getId()))
 					{
 						if (sysinfos == null)
 							sysinfos = new ArrayList<>();
@@ -1162,26 +1163,6 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
 	{
 		return getComponent().getFeature(IExecutionFeature.class).createResultListener(listener);
-	}
-	
-	/**
-	 *  Tests if the component model belongs to a system component.
-	 * 
-	 *  @param model The model.
-	 *  @return True, if system component.
-	 */
-	protected boolean isSystemComponent(IModelInfo model)
-	{
-		ProvidedServiceInfo[] provs = model.getProvidedServices();
-		if (provs != null)
-		{
-			for (ProvidedServiceInfo prov : provs)
-			{
-				if (prov.isSystemService())
-					return true;
-			}
-		}
-		return false;
 	}
 	
 	/**
