@@ -43,6 +43,15 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	}
 	
 	/**
+	 *  Get the plugin priority.
+	 *  @return The plugin priority.
+	 */
+	public IFuture<Integer> getPriority()
+	{
+		return new Future<Integer>(90);
+	}
+	
+	/**
 	 *  Get the plugin UI path.
 	 *  @return The plugin ui path.
 	 */

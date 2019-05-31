@@ -47,6 +47,15 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	}
 	
 	/**
+	 *  Get the plugin priority.
+	 *  @return The plugin priority.
+	 */
+	public IFuture<Integer> getPriority()
+	{
+		return new Future<Integer>(100);
+	}
+	
+	/**
 	 *  Get the plugin UI path.
 	 *  @return The plugin ui path.
 	 */

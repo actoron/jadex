@@ -17,6 +17,11 @@ public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloud
 	{
 		return new Future<>("cloudview");
 	}
+	
+	public IFuture<Integer> getPriority()
+	{
+		return new Future<Integer>(80);
+	}
 
 	public String getPluginUIPath()
 	{

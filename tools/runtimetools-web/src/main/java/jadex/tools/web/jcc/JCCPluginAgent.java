@@ -128,6 +128,12 @@ public abstract class JCCPluginAgent
 	public abstract IFuture<String> getPluginName();
 	
 	/**
+	 *  Get the plugin priority.
+	 *  @return The plugin priority.
+	 */
+	public abstract IFuture<Integer> getPriority();
+	
+	/**
 	 *  Get the plugin UI path.
 	 *  @return The plugin ui path.
 	 */

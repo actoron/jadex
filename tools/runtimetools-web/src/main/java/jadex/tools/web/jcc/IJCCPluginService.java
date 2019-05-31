@@ -22,6 +22,12 @@ public interface IJCCPluginService
 	 */
 	public IFuture<String> getPluginName();
 	
+	/**
+	 *  Get the plugin priority.
+	 *  @return The plugin priority.
+	 */
+	public IFuture<Integer> getPriority();
+	
 	// todo: Response is used to set the mimetype :-(
 	// should set in gateway near rest call
 	/**

@@ -4,7 +4,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -144,6 +147,8 @@ public class JCCWebAgent implements IJCCWebService
 		else
 		{
 			Map<String, String> res = new HashMap<>();
+			Map<String, Integer> es = new HashMap<>();
+			Map<String, String> res2 = new LinkedHashMap<>();
 			
 			Collection<IJCCPluginService> pluginsers = agent.searchLocalServices(new ServiceQuery<IJCCPluginService>(IJCCPluginService.class, ServiceScope.PLATFORM));
 			
@@ -152,12 +157,18 @@ public class JCCWebAgent implements IJCCWebService
 				String name = ser.getPluginName().get();
 				String tag = ser.getPluginComponent().get();
 				res.put(name, tag);
+				
+				Integer prio = ser.getPriority().get();
+				es.put(name, prio);
 			}
-		
+			
+			List<String> names = es.entrySet().stream().sorted((a, b) -> b.getValue()-a.getValue()).map(e->e.getKey()).collect(Collectors.toList());
+			names.stream().forEach(n-> res2.put(n, res.get(n)));
+			
 			//res.put("starter", loadTag("jadex/tools/web/starter.tag"));
 			//res.put("security", loadTag("jadex/tools/web/security.tag"));
 		
-			ret.setResult(res);
+			ret.setResult(res2);
 		}
 		
 		//System.out.println("fragments: "+ret);
