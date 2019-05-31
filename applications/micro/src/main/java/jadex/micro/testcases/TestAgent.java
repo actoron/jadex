@@ -19,6 +19,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -79,6 +80,9 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	@AgentBody
 	public IFuture<Void> body()
 	{
+		ISecurityService ss = agent.getLocalService(ISecurityService.class);
+		ss.setNetwork(STest.testnetwork_name, STest.testnetwork_pass).get();
+		
 //		agent.getLogger().severe("Testagent start: "+agent.getComponentDescription());
 		final Future<Void> ret = new Future<Void>();
 		
@@ -283,6 +287,7 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 		IPlatformConfiguration conf = STest.getDefaultTestConfig(getClass());
 		conf.getExtendedPlatformConfiguration().setSimul(false);
 		conf.getExtendedPlatformConfiguration().setSimulation(false);
+		//conf.getExtendedPlatformConfiguration().setDebugFutures(true);
 		createPlatform(conf, null).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess exta)

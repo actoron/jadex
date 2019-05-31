@@ -53,6 +53,16 @@ public class Indexer<T>
 	}
 	
 	/**
+	 *  Test if a property is indexed per name.
+	 *  @param indexname The index name.
+	 *  @return True, if is indexed.
+	 */
+	public boolean isIndexed(String indexname)
+	{
+		return indexedvalues.containsKey(indexname);
+	}
+	
+	/**
 	 *  Get values per specification. 'And' relates to inter-term, i.e. example
 	 *  type=ICMS, tags=a,b means an object must have both fulfilled. For multi-valued
 	 *  intra-term values it can be 'and' or 'or' as well.
@@ -61,6 +71,8 @@ public class Indexer<T>
 	 */
 	public Set<T> getValues(List<Tuple3<String, String[], Boolean>> spec)
 	{
+		//System.out.println("spec: "+spec);
+		
 		Set<T> ret = null;
 		if(spec == null || spec.size() == 0)
 		{
@@ -109,8 +121,9 @@ public class Indexer<T>
 							if(iset != null)
 								tmp.addAll(iset);
 						}
-						if(!tmp.isEmpty())
-							valuesets.add(tmp);
+						
+						//if(!tmp.isEmpty()) // must always be added because otherwise no results are removed!
+						valuesets.add(tmp);
 					}
 				}
 			}
@@ -444,7 +457,7 @@ public class Indexer<T>
 				Set<String> svals = totest.get(keyname);
 				
 				// All tags of query must be contained in service
-				if(mode==null || mode)
+				if(mode==null || mode) // TRUE=AND
 				{
 					for(String val: vs)
 					{
@@ -457,7 +470,7 @@ public class Indexer<T>
 					boolean found = false;
 					for(String val: vs)
 					{
-						if(svals.contains(val))
+						if(svals!=null && svals.contains(val))
 						{
 							found = true;
 							break;

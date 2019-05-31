@@ -157,7 +157,7 @@ public class ServiceInvocationContext
 	protected IServiceIdentifier sid;
 
 //	public Exception ex;
-	
+		
 	//-------- constructors --------
 	
 	/**
@@ -193,11 +193,6 @@ public class ServiceInvocationContext
 		// Problem: how to ensure that results are set in lastcall
 		CallAccess.resetNextInvocation();
 		
-//		if(caller!=null && caller.toString().startsWith("rms@") && method.getName().equals("getExternalAccess") && call==null)
-//		{
-//			System.out.println("hierskdfj");
-//		}
-
 		if(nextcall==null)
 		{
 	//		Map<String, Object> props = call!=null ? new HashMap<String, Object>(call.getProperties()) : new HashMap<String, Object>();

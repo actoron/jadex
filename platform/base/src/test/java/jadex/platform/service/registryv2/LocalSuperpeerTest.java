@@ -3,6 +3,7 @@ package jadex.platform.service.registryv2;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.test.util.STest;
+import jadex.platform.service.registry.SuperpeerRegistryAgent;
 
 /**
  *  Test basic search and query managing functionality

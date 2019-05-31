@@ -32,6 +32,9 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	/** The remote Jadex version. */
 	protected JadexVersion remoteversion;
 	
+	/** Creation time of the suite. */
+	protected long creationtime = System.currentTimeMillis();
+	
 	public UnsafeNullCryptoSuite()
 	{
 		remoteversion = new JadexVersion();
@@ -149,6 +152,16 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	public void setHandshakeId(String id)
 	{
 		handshakeid = id;
+	}
+	
+	/**
+	 *  Returns the creation time of the crypto suite.
+	 *  
+	 *  @return The creation time.
+	 */
+	public long getCreationTime()
+	{
+		return creationtime;
 	}
 	
 	/**

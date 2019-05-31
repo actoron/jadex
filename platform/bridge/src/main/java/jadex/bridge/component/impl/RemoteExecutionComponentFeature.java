@@ -10,6 +10,11 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import io.opentracing.Span;
+import io.opentracing.SpanContext;
+import io.opentracing.propagation.Format.Builtin;
+import io.opentracing.propagation.TextMapExtractAdapter;
+import io.opentracing.util.GlobalTracer;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -39,6 +44,7 @@ import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.component.interceptors.SpanContextInfo;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
@@ -249,7 +255,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		CallAccess.resetNextInvocation();
 		
 		@SuppressWarnings("unchecked")
-		Class<IFuture<T>>	clazz	= (Class<IFuture<T>>)(IFuture.class.isAssignableFrom(method.getReturnType())
+		Class<IFuture<T>> clazz = (Class<IFuture<T>>)(IFuture.class.isAssignableFrom(method.getReturnType())
 			? (Class<IFuture<T>>)method.getReturnType()
 			: IFuture.class);
 		
@@ -335,6 +341,8 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					ServiceCall	sc	= null;
 					if(cmd instanceof AbstractInternalRemoteCommand)
 					{
+						// Creates a new ServiceCall for the current call and copies the values
+						
 						// Create new hashmap to prevent remote manipulation of the map object
 						Map<String, Object>	nonfunc	= new HashMap<>(SUtil.notNull(((AbstractInternalRemoteCommand)cmd).getProperties()));
 //						if(nonfunc==null)
@@ -346,7 +354,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 						// After call creation it can be reset
 						IComponentIdentifier.LOCAL.set(getComponent().getId());
 					}
-					final ServiceCall	fsc	= sc;
+					final ServiceCall fsc = sc;
 					
 					final IFuture<?> retfut = cmd.execute(component, secinfos);
 					CallAccess.resetNextInvocation();

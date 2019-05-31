@@ -427,5 +427,13 @@ public class HttpServletRequestWrapper implements HttpServletRequest
 	{
 		this.servletpath = servletpath;
 	}
-	
+
+	/**
+	 *  Get the string representation.
+	 */
+	@Override
+	public String toString() 
+	{
+		return request!=null? request.getRequestURI()+" "+request.getParameter("methodname"): "ServletRequestWrapper";
+	}
 }

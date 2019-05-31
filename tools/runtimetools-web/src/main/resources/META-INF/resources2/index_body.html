@@ -125,38 +125,52 @@
 		};
 		riot.mixin(langmixin);
 		
+		var jadexmixin = {
+			getIntermediate: function(path, handler, error) 
+			{
+				var	func = function(resp)
+				{
+					if(resp.status!=202)	// ignore updatetimer commands
+						handler(resp);
+
+					var callid = resp.headers["x-jadex-callid"];
+					if(callid!=null)
+						axios.get(path, {headers: {'x-jadex-callid': callid}}, self.transform).then(func).catch(error); 
+					return this.PROMISE_DONE;
+				};
+				axios.get(path, self.transform).then(func).catch(error);
+			}
+		};
+		riot.mixin(jadexmixin);
+		
 		var loader = 
 		{
+			loaded: {},
 		    getHead: function()
 		    {
 		    	return document.getElementsByTagName("head")[0];
 		    },
-		    withNoCache: function(filename)
-		    {
-		    	return filename;
-	            /*if(filename.indexOf("?") === -1)
-	            {
-	                filename += "?no_cache=" + new Date().getTime();
-	            }
-	            else
-	            {
-	                filename += "&no_cache=" + new Date().getTime();
-	            }
-	            return filename;*/
-	        },
 		    loadStyle: function(i, files, callback)
 	        {
-	        	if(i>=files.length)
+        		var self = this;
+
+        		if(i>=files.length)
 	        	{
 	        		callback();
 	        	}
+	        	else if(this.loaded[files[i]]!=null)
+	        	{
+	        		//console.log("already loaded css: "+files[i]);
+	        		self.loadStyle(i+1, files, callback);
+	        	}
 	        	else
 	        	{
-	        		var self = this;
+	        		this.loaded[files[i]] = files[i];
+	        		
 	        		var link = document.createElement("link");
 		            link.rel = "stylesheet";
 		            link.type = "text/css";
-		            link.href = self.withNoCache(files[i]);
+		            link.href = files[i];
 		            
 		            link.onload = function ()
 		            {
@@ -175,16 +189,24 @@
 	        },
 	        loadScript: function(i, files, callback)
 	        {
-	        	if(i>=files.length)
+        		var self = this;
+
+        		if(i>=files.length)
 	        	{
 	        		callback();
 	        	}
+	        	else if(this.loaded[files[i]]!=null)
+	        	{
+	        		//console.log("already loaded script: "+files[i]);
+	        		self.loadScript(i+1, files, callback);
+	        	}
 	        	else
 	        	{
-	        		var self = this;
+	        		this.loaded[files[i]] = files[i];
+	        		
 		            var script = document.createElement('script');
 		            script.type = 'text/javascript';
-		            script.src = self.withNoCache(files[i]);
+		            script.src = files[i];
 		            
 		            script.onload = function ()
 		            {

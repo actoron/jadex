@@ -49,21 +49,6 @@
 			return res; 
 		}
 		
-		function getIntermediate(path, handler, error) 
-		{
-			var	func = function(resp)
-			{
-				if(resp.status!=202)	// ignore updatetimer commands
-					handler(resp);
-
-				var callid = resp.headers["x-jadex-callid"];
-				if(callid!=null)
-					axios.get(path, {headers: {'x-jadex-callid': callid}}, self.transform).then(func).catch(error); 
-				return this.PROMISE_DONE;
-			};
-			axios.get(path, self.transform).then(func).catch(error);
-		}
-		
 		function updatePlatform(platform, rem)
 		{
 			//console.log("updatePlatform: "+platform+" "+rem);
@@ -88,18 +73,18 @@
 			self.update();
 		}
 		
-		getIntermediate('webjcc/subscribeToPlatforms',
+		self.getIntermediate('webjcc/subscribeToPlatforms',
 			function(resp)
 			{
 				updatePlatform(resp.data.service.name, resp.data.service.type);
-				return this.PROMISE_DONE;
+				//return this.PROMISE_DONE;
 			},
 			function(resp)
 			{
 				console.log("Err: "+JSON.stringify(resp));
 				self.serverdown = true;
 				self.update();
-				return this.PROMISE_DONE;
+				//return this.PROMISE_DONE;
 			});
 	</script>
 

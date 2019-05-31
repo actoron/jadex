@@ -103,11 +103,11 @@ public abstract class AbstractAuthenticationSecret implements Cloneable
 		AbstractAuthenticationSecret ret = null;
 		
 		int ind = secret.indexOf(':');
-		if (ind > 0)
+		if(ind > 0)
 		{
 			String prefix = secret.substring(0, ind);
 			Class<?> secrettype = SECRET_TYPES.get(prefix);
-			if (secrettype != null)
+			if(secrettype != null)
 			{
 				try
 				{
@@ -120,9 +120,9 @@ public abstract class AbstractAuthenticationSecret implements Cloneable
 			}
 		}
 		
-		if (ret == null)
+		if(ret == null)
 		{
-			if (strict)
+			if(strict)
 				throw new IllegalArgumentException("Could not decode authentication secret: " + secret);
 			else
 				ret = new PasswordSecret(secret, false);

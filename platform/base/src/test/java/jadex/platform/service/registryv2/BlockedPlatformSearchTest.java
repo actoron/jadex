@@ -19,7 +19,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.registryv2.IRemoteRegistryService;
+import jadex.bridge.service.types.registry.IRemoteRegistryService;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

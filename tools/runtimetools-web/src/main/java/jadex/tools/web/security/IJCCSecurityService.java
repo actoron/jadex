@@ -8,7 +8,7 @@ import jadex.tools.web.security.JCCSecurityPluginAgent.SecurityState;
 /**
  *  Interface for the jcc security service.
  */
-@Service
+@Service(system=true)
 public interface IJCCSecurityService extends IJCCPluginService
 {
 	/**
@@ -44,4 +44,35 @@ public interface IJCCSecurityService extends IJCCPluginService
 	 *  @return Null, when done.
 	 */
 	public IFuture<Void> removeRole(String entity, String role);
+	
+	/**
+	 *  Adds a new network.
+	 *  @param networkname The network name.
+	 *  @param secret The secret, null to remove.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> addNetwork(String networkname, String secret);
+	
+	/**
+	 *  Remove a network.
+	 *  @param networkname The network name.
+	 *  @param secret The secret, null to remove the network completely.
+	 *  @return Null, when done.
+	 */
+	public IFuture<Void> removeNetwork(String networkname, String secret);
+	
+	/**
+	 *  Adds a trusted platform name.
+	 *  @param name The name.
+	 *  @return null, when done.
+	 */
+	public IFuture<Void> addTrustedPlatformName(String name);
+	
+	/**
+	 *  Removes a trusted platform name.
+	 *  @param name The name.
+	 *  @return null, when done.
+	 */
+	public IFuture<Void> removeTrustedPlatformName(String name);
+
 }

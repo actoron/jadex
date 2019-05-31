@@ -43,8 +43,8 @@ public class GlobalSuperpeerTest	extends AbstractSearchQueryTest
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(GlobalSuperpeerTest.class);
 		baseconf.setValue("superpeerclient.awaonly", false);
 		baseconf.setValue("superpeerclient.contimeout", WAITFACTOR*2);
-		baseconf.setValue("passiveawarenessintravm", false);
-		baseconf.setValue("passiveawarenesscatalog", true);
+		baseconf.setValue("intravmawareness", false);
+		baseconf.setValue("catalogawareness", true);
 		baseconf.setValue("rt", true);
 		baseconf.setValue("platformurls", "intravm://GlobalSuperpeerTestSSP@localhost:"+sspport);
 		baseconf.setNetworkNames(SecurityAgent.GLOBAL_NETWORK_NAME, STest.testnetwork_name);

@@ -19,7 +19,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.registry.RegistryEvent;
 import jadex.commons.future.FutureBarrier;
 
 /**
@@ -193,7 +192,8 @@ public class HelplineEvaluation
 	 */
 	protected static IPlatformConfiguration getConfig(String[] args)
 	{
-		RegistryEvent.LEASE_TIME	= 1000*60*60*24*365;
+		//RegistryEvent deleted: public static long LEASE_TIME = 10000;
+		//RegistryEvent.LEASE_TIME	= 1000*60*60*24*365;
 		
 		IPlatformConfiguration config	= PlatformConfigurationHandler.getDefaultNoGui();
 //		config.setLogging(true);

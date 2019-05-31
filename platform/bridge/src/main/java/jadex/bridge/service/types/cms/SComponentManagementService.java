@@ -821,8 +821,22 @@ public class SComponentManagementService
 			for(Iterator<CmsComponentState> it=cmsstate.getComponentMap().values().iterator(); it.hasNext(); )
 			{
 				CmsComponentState compstate = it.next();
-				if (compstate != null)
-					cdsc.add((IComponentDescription) ((CMSComponentDescription) compstate.getAccess().getInternalAccess().getDescription()).clone());
+				if(compstate != null)
+				{
+					IPlatformComponentAccess acc = compstate.getAccess();
+					if(acc!=null)
+					{
+						IInternalAccess ia = acc.getInternalAccess();
+						if(ia!=null)
+						{
+							IComponentDescription desc = ia.getDescription();
+							if(desc!=null)
+							{
+								cdsc.add((IComponentDescription)((CMSComponentDescription)desc).clone());
+							}
+						}
+					}
+				}
 			}
 		}
 		ret = cdsc.toArray(new IComponentDescription[cdsc.size()]);

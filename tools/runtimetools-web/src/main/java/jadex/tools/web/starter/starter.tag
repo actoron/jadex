@@ -74,7 +74,13 @@
 			</div>
 		</div>
 		<div class="row m-1">
-			<div class="col-12">
+			<div class="col-12 m-1">
+				<h3>Components</h3>
+				<components/>
+			</div>
+		</div>
+		<div class="row m-1">
+			<div class="col-12 m-1">
 				<h3>Available Models</h3>
 			</div>
 		</div>
@@ -90,7 +96,7 @@
 			</div>
 		</div>
 		<div class="row m-1" show="{models.length==0}">
-			<div class="col-12">
+			<div class="col-12 m-1">
 		 		<div class="loader"></div> 
 		 	</div>
 		 </div>
@@ -126,13 +132,10 @@
 		}
 	</style>
 	
-	<!-- how to load external js/style for tag
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>-->
-	
 	<script>
-		//console.log("starter: "+opts);
+		console.log("starter: "+opts);
 		
-		console.log(this.getLanguage());
+		//console.log(this.getLanguage());
 		
 		var self = this;
 
@@ -338,6 +341,11 @@
 			$('#'+treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
 		}
 		
+		/*function createUrl(res)
+		{
+			return self.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String";
+		}*/
+			
 		var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
 		var res2 = "jadex/tools/web/starter/libs/jstree_3.3.7.js";
 		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
@@ -348,14 +356,38 @@
 		
 		// dynamically load jstree lib and style
 		//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
+		
+		// load files is only for javascript and css because it is added to dom
 		self.loadFiles([ures1], [ures2], function()
 		{
 			// init tree
 			$(function() { $('#'+treeid).jstree(
 			{
-				"core" : {"check_callback" : true}//,
-				//"plugins" : ["dnd","contextmenu"]
+				"core" : {"check_callback" : true},
+				"plugins" : ["sort"],
+				'sort': function(a, b) 
+				{
+			        a1 = this.get_node(a);
+			        b1 = this.get_node(b);
+			        if(a1.icon == b1.icon)
+			        {
+			            return (a1.text > b1.text) ? 1 : -1;
+			        } 
+			        else 
+			        {
+			            return (a1.icon > b1.icon) ? 1 : -1;
+			        }
+				}
 			})});
+			
+			// load components tag
+			var res = "jadex/tools/web/starter/components.tag";
+			axios.get(self.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String", self.transform).then(function(resp)
+			{
+				riot.compile(resp.data);
+				//riot.tag(p.name, p.html);
+				var tags = riot.mount("components", {cid: self.cid});
+			});
 			
 			// no args here
 			axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
@@ -363,7 +395,14 @@
 				//console.log(resp.data);
 				self.models = resp.data;
 				createModelTree(treeid);
-				$("#modeltree").jstree('open_all');
+				//$('#'+treeid).jstree('open_all');
+				var childs = $('#'+treeid).jstree('get_node', '#').children;
+				for(var i=0; i<childs.length; i++)
+				{
+					$("#"+treeid).jstree("open_node", childs[i]);
+				}
+				console.log("models loaded");
+				//$("#"+treeid).jstree("open_node", '#');
 				self.update();
 			});
 			
@@ -377,6 +416,6 @@
 			});
 			
 			//self.update();
-		})
+		});
 	</script>
 </starter>

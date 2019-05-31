@@ -153,6 +153,8 @@ public class SecretWizard extends JWizard
 		node.addChild(finish);
 		choice.addChild(node);
 		
+		choice.addChild(finish);
+		
 		reset();
 		next();
 	}

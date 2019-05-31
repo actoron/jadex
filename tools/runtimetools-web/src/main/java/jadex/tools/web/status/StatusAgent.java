@@ -24,7 +24,7 @@ import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.memstat.IMemstatService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
-import jadex.bridge.service.types.registryv2.ISuperpeerService;
+import jadex.bridge.service.types.registry.ISuperpeerService;
 import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.Boolean3;

@@ -99,8 +99,10 @@ public class RestInvocationHelper
 				performRequest(exta, uri, path, headers, params, postplainjson, resttype, inurlparams, ret);
 			}
 		};
-		if (USE_THREADS)
+		if(USE_THREADS)
+		{
 			tp.execute(runnable);
+		}
 		else
 		{
 			Map<String, Object> restargs = new HashMap<String, Object>();

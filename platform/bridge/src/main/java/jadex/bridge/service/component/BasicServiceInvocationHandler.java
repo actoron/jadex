@@ -32,6 +32,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.CheckIndex;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.CheckState;
+import jadex.bridge.service.annotation.FutureReturnType;
 import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -45,6 +46,7 @@ import jadex.bridge.service.component.interceptors.MethodCallListenerInterceptor
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
+import jadex.bridge.service.component.interceptors.TracingInterceptor;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -261,7 +263,36 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			
 			if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 			{
-				final Future<Object> fret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), 
+				Class<?> rettype = null;
+				Annotation[][] anss = method.getParameterAnnotations();
+				for(int i=0; i<anss.length; i++)
+				{
+					Annotation[] ans = anss[i];
+					for(Annotation an: ans)
+					{
+						if(an instanceof FutureReturnType)
+						{
+							Object t = myargs.get(i);
+							if(t instanceof Class)
+								rettype = (Class<?>)t;
+							else if(t instanceof ClassInfo)
+								rettype = ((ClassInfo)t).getType(comp.getClassLoader());
+							if(rettype!=null)
+								break;
+						}
+					}
+				}
+				/*if("invokeMethod".equals(method.getName()))
+				{
+					ClassInfo rtype = (ClassInfo)myargs.get(3);
+					if(rtype!=null)
+						rettype = rtype.getType(comp.getClassLoader());
+				}*/
+				
+				if(rettype==null)
+					rettype = method.getReturnType();
+				
+				final Future<Object> fret = (Future<Object>)FutureFunctionality.getDelegationFuture(rettype, 
 					new FutureFunctionality(logger));
 //					new ServiceCallFutureFunctionality(logger, sic.getLastServiceCall(), method.getName()));
 				ret	= fret;
@@ -740,10 +771,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		if(!PROXYTYPE_RAW.equals(proxytype))
 		{
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
+			//handler.addFirstServiceInterceptor(new TracingInterceptor(ia));
+
 //			if(monitoring)
 //				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
 //			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, false));
-			
 			
 			try
 			{

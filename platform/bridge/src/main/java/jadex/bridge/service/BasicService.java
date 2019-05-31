@@ -13,6 +13,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.INFPropertyComponentFeature;
 import jadex.bridge.component.impl.NFPropertyComponentFeature;
@@ -284,9 +285,9 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 	 *  @param args The arguments.
 	 *  @return The result.
 	 */
-	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args)
+	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args, ClassInfo rettype)
 	{
-		Future<Object> ret = new Future<>();
+		Future<Object> ret = (Future<Object>)SFuture.getNoTimeoutFuture(rettype.getType(internalaccess.getClassLoader()), internalaccess);
 		
 		Method m = getInvokeMethod(this.getClass(), internalaccess.getClassLoader(), methodname, argtypes);
 		

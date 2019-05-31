@@ -1,5 +1,5 @@
 <app>
-	<nav class="navbar navbar-expand-lg navbar-dark navbar-fixed-top navbar-custom">
+	<nav class="navbar navbar-expand-lg navbar-custom navbar-fixed-top">
 		<div class="navbar-brand mr-auto">
  			<img src="images/jadex_logo_ac.png" width="200px"/>
 			<a class="navbar-brand pl-2" href="#">WebJCC</a>
@@ -62,6 +62,29 @@
     		<a href="#/imprint">{$t("message.imprint")}</a>
     	</div>
     </footer>
+
+	<style>
+		/* Navbar styling. */
+		/* background color. */
+		.navbar-custom {
+		    background-color: #aaaaaa;
+		}
+		/* brand and text color */
+		.navbar-custom .navbar-brand,
+		.navbar-custom .navbar-text {
+		    color: rgba(255,255,255,.8);
+		}
+		/* link color */
+		.navbar-custom .navbar-nav .nav-link {
+		    color: rgba(255,255,255,.5);
+		}
+		/* color of active or hovered links */
+		.navbar-custom .nav-item.active .nav-link,
+		.navbar-custom .nav-item:focus .nav-link,
+		.navbar-custom .nav-item:hover .nav-link {
+		    color: #ffffff;
+		}
+	</style>
 
     <script>
     	var self = this;

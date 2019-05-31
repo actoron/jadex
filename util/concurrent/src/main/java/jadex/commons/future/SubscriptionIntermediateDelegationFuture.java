@@ -91,9 +91,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
     	if(!(listener instanceof IIntermediateResultListener))
-    	{
     		throw new IllegalArgumentException("Subscription futures require intermediate listeners.");
-    	}
     	
 //    	if(storeforfirst)
 //    		e = new RuntimeException();

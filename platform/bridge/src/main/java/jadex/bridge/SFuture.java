@@ -10,8 +10,8 @@ import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
-import jadex.bridge.service.types.registryv2.ISearchQueryManagerService;
-import jadex.bridge.service.types.registryv2.SlidingCuckooFilter;
+import jadex.bridge.service.types.registry.ISearchQueryManagerService;
+import jadex.bridge.service.types.registry.SlidingCuckooFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -273,6 +273,9 @@ public class SFuture
 	 */
 	public static Future<?> getFuture(Class<?> clazz)
 	{
+		if(clazz==null)
+			return new Future();
+		
 		Future<?> ret = null;
 		Exception ex	= null;
 		

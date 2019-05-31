@@ -14,7 +14,7 @@ import jadex.base.test.util.STest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.types.pawareness.IPassiveAwarenessService;
+import jadex.bridge.service.types.awareness.IAwarenessService;
 import jadex.commons.security.SSecurity;
 
 /**
@@ -38,9 +38,9 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 	{
 		IPlatformConfiguration	baseconf	= STest.getDefaultTestConfig(MulticastAwarenessTest.class);
 		baseconf.setValue("superpeerclient.awaonly", true);
-		baseconf.setValue("passiveawarenessintravm", false);
-		baseconf.setValue("passiveawarenessmulticast", true);
-		baseconf.setValue("passiveawarenessmulticast.port", customport);
+		baseconf.setValue("intravmawareness", false);
+		baseconf.setValue("multicastawareness", true);
+		baseconf.setValue("multicastawareness.port", customport);
 		baseconf.setDefaultTimeout(Starter.getScaledDefaultTimeout(null, WAITFACTOR*3));
 		baseconf.getExtendedPlatformConfiguration().setDebugFutures(true);
 
@@ -79,7 +79,7 @@ public class MulticastAwarenessTest	extends AbstractSearchQueryTest
 		createPlatform(PROCONF);	
 		createPlatform(PROCONF);
 		
-		IPassiveAwarenessService	pawa	= client.searchService(new ServiceQuery<>(IPassiveAwarenessService.class)).get();
+		IAwarenessService	pawa	= client.searchService(new ServiceQuery<>(IAwarenessService.class)).get();
 		assertTrue("Found multicast awareness? "+pawa, pawa.toString().toLowerCase().contains("multicast"));
 		
 		Collection<IComponentIdentifier>	found	= pawa.searchPlatforms().get();

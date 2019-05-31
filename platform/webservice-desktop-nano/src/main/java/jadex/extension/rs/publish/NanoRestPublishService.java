@@ -44,6 +44,12 @@ import jadex.commons.future.IFuture;
 @Service
 public class NanoRestPublishService extends ExternalRestPublishService
 {
+	/** The servers per port. */
+	protected Map<Integer, Server> portservers2;
+	
+	/**
+	 *  Inner class representing a nano server.
+	 */
 	public class Server extends NanoHTTPD 
 	{
 		public Server(int port) 
@@ -54,7 +60,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 		@Override 
 		public Response serve(IHTTPSession session) 
 		{
-			System.out.println("serve called: "+session.getUri());
+			//System.out.println("serve called: "+session.getUri());
 			
 			Response[] ret = new Response[1];
 			
@@ -122,10 +128,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 			return ret[0];
 		}
 	}
-	
-	/** The servers per port. */
-	protected Map<Integer, Server> portservers2;
-	
+		
 	@ServiceStart
 	public void start()
 	{
@@ -304,7 +307,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 									
 									String fp = rootpath+url;
 									
-									System.out.println("handling: "+url);
+									//System.out.println("handling: "+url);
 									
 									// All java variants do not work properly :-(
 //									MimetypesFileTypeMap ftm = new MimetypesFileTypeMap();
@@ -358,8 +361,6 @@ public class NanoRestPublishService extends ExternalRestPublishService
 			}
 		});
 			
-		
-	    
 	    return ret;
     }
     

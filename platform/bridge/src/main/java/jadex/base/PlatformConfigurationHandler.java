@@ -845,10 +845,10 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.getExtendedPlatformConfiguration().setWsTransport(false);
 		config.getExtendedPlatformConfiguration().setRelayTransport(false);
 		// rootConfig.setSslTcpTransport(false);
-		config.setValue("passiveawarenessintravm", false);
-		config.setValue("passiveawarenesscatalog", false);
-		config.setValue("passiveawarenessmulticast", false);
-		config.setValue("passiveawarenessbroadcast", false);
+		config.setValue("intravmawareness", false);
+		config.setValue("catalogawareness", false);
+		config.setValue("multicastawareness", false);
+		config.setValue("broadcastawareness", false);
 
 		config.setValue("platformproxies", false);
 
@@ -906,7 +906,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 
 		// Registry & Awareness
 		config.setSuperpeerClient(true);
-		config.setValue("passiveawarenesscatalog", true);	// Catalog for SSPs
+		config.setValue("catalogawareness", true);	// Catalog for SSPs
 
 		return config;
 	}
@@ -923,7 +923,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		
 		// Registry & Awareness
 		config.setSuperpeerClient(true);
-		config.setValue("passiveawarenessmulticast", true);
+		config.setValue("multicastawareness", true);
 
 		return config;
 	}

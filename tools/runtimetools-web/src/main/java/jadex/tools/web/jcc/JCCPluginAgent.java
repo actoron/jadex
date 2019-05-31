@@ -3,8 +3,6 @@ package jadex.tools.web.jcc;
 import java.io.InputStream;
 import java.util.Scanner;
 
-import javax.ws.rs.core.Response;
-
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -83,13 +81,44 @@ public abstract class JCCPluginAgent
 	 *  Load a string-based ressource (style or js).
 	 *  @param filename The filename.
 	 *  @return The text from the file.
-	 */
+	 * /
 	public IFuture<Response> loadResource(String filename)
 	{
 		String res = internalLoadResource(filename);
 		String mt = SUtil.guessContentTypeByFilename(filename);
 		Response r = Response.ok(res).header("Content-Type", mt).build();
 		return new Future<Response>(r);
+	}*/
+	
+	/**
+	 *  Load a string-based ressource (style or js).
+	 *  @param filename The filename.
+	 *  @return The text from the file.
+	 */
+	public IFuture<byte[]> loadResource(String filename)
+	{
+		try
+		{
+		InputStream is = SUtil.getResource0(filename, agent.getClassLoader());
+		//String mt = SUtil.guessContentTypeByFilename(filename);
+		
+		byte[] data = SUtil.readStream(is);
+		/*StreamingOutput so = new StreamingOutput()
+		{
+			@Override
+			public void write(OutputStream output) throws IOException, WebApplicationException
+			{
+				SUtil.copyStream(is, output);
+			}
+		};*/
+		//Response r = Response.ok(data).header("Content-Type", mt).build();
+		
+		return new Future<byte[]>(data);
+		}
+		catch(Exception e)
+		{
+			return new Future<byte[]>(e);
+		}
 	}
 	
 	/**

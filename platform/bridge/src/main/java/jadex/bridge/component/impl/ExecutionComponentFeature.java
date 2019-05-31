@@ -481,12 +481,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public IFuture<Void> waitForDelay(final long delay, final boolean realtime)
 	{
+		if(delay==-1)
+			System.out.println("-11111111111");
+		
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		IClockService cs = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
 		if(cs!=null)
 		{
-			ITimedObject	to	=  	new ITimedObject()
+			ITimedObject to	= new ITimedObject()
 			{
 				public void timeEventOccurred(long currenttime)
 				{
