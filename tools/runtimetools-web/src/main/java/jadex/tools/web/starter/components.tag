@@ -5,13 +5,13 @@
 				<div id="componenttree"></div>
 			</div>
 		</div>
-		<div class="row m-0 p-0" hide="{components.length==0}">
+		<!-- <div class="row m-0 p-0" hide="{components.length==0}">
 			<div class="col-10 m-0 p-0">
 			</div>
 			<div class="col-2 m-0 p-0">
 				<button class="float-right" onclick="{refresh}">Refresh</button>
 			</div>
-		</div>
+		</div> -->
 		<div class="row m-0 p-0" show="{components.length==0}">
 			<div class="col-12 m-0 p-0">
 		 		<div class="loader"></div> 
@@ -245,7 +245,8 @@
 				function(resp)
 				{
 					console.log("connection to platform lost: "+resp.data);
-				});
+				}
+			);
 		});
 		
 		self.on('mount', function()
@@ -255,7 +256,7 @@
 			// init tree
 			$(function() { $('#'+treeid).jstree(
 			{
-				"plugins": ["sort", "types"],
+				"plugins": ["sort", "types", "contextmenu"],
 				"core": {"check_callback" : true},
 				'sort': function(a, b) 
 				{
@@ -270,7 +271,27 @@
 			            return (a1.icon > b1.icon) ? 1 : -1;
 			        }
 				},
-				types
+				types,
+				'contextmenu' : 
+				{
+			        'items': function menu(node) 
+					{
+			        	if(node.id.indexOf("@")==-1 && "System"!=node.id && "Applications"!=node.id)
+			        	{
+			        		return { 'Refresh': 
+			        			{
+	                                'label': "Refresh",
+	                                'action': function() {self.refresh();},
+	                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
+			        			} 
+			        		};
+			        	}
+			        	else
+			        	{
+			        		return null;
+			        	}
+					}
+			    }
 			})});
 			
 		    //console.log("adding listener");
