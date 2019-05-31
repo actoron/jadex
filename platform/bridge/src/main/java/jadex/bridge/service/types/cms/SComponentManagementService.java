@@ -1968,7 +1968,7 @@ public class SComponentManagementService
 						
 						// Create id and adapter.
 						
-						boolean systemcomponent = isSystemComponent(tmplmodel, cinfo, agent.getId().getParent());
+						boolean systemcomponent = isSystemComponent(tmplmodel, cinfo, agent.getId());
 						
 						addParentLocking(cinfo, agent, inited);
 		

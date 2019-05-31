@@ -146,7 +146,7 @@
 							names.unshift("System");
 						else
 						{
-							//console.log("creating App: "+name+" "+cid);
+							console.log("creating App: "+name+" "+cid);
 							names.unshift("Applications");
 						}
 					}
