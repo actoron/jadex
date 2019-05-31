@@ -569,7 +569,7 @@ public class Starter
 				
 				final CMSComponentDescription desc = new CMSComponentDescription(cid).setType(ctype).setModelName(model.getFullName())
 					.setResourceIdentifier(model.getResourceIdentifier()).setCreationTime(System.currentTimeMillis()).setCreator(caller)
-					.setMonitoring(monitoring).setFilename(model.getFilename()).setSystemComponent(true);
+					.setMonitoring(monitoring).setFilename(model.getFilename()).setSystemComponent(SComponentManagementService.isSystemComponent(model, null, null));
 
 				putPlatformValue(cid, DATA_REALTIMETIMEOUT, config.getValue(DATA_REALTIMETIMEOUT, model));
 //					rootConfig.setValue(PlatformConfiguration.DATA_REALTIMETIMEOUT, config.getValue(PlatformConfiguration.DATA_REALTIMETIMEOUT));
