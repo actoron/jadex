@@ -59,6 +59,7 @@
 		
 		refresh()
 		{
+			// Reload the component descriptions
 			axios.get(self.getMethodPrefix()+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
 			{
 				//console.log("descs are: "+resp.data);
@@ -73,6 +74,46 @@
 				$("#"+treeid).jstree("open_node", $('#'+self.cid));
 				self.update();
 			});
+			
+			self.refreshCMSSubscription();
+		}
+		
+		refreshCMSSubscription()
+		{
+			console.log("refreshCMSSubscription");
+			
+			var path = self.getMethodPrefix()+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
+
+			if(self.termcom!=null)
+				self.termcom("refreshing");
+			
+			self.termcom = self.getIntermediate(path,
+				function(resp)
+				{
+					var event = resp.data;
+					//console.log("cms status event: "+event);
+					if(event.type.toLowerCase().indexOf("created")!=-1)
+					{
+						self.typemap[event.componentDescription.name.name] = event.componentDescription.type;
+						self.createNodes(treeid, event.componentDescription);
+					}
+					else if(event.type.toLowerCase().indexOf("terminated")!=-1)
+					{
+						try
+						{
+							self.deleteNode(treeid, event.componentDescription.name.name);
+						}
+						catch(ex)
+						{
+							console.log("Could not remove node: "+event.componentDescription.name.name);
+						}
+					}
+				},
+				function(err)
+				{
+					console.log("error occurred: "+err);
+				}
+			);
 		}
 		
 		// fixed types
@@ -225,35 +266,7 @@
 		//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
 		self.loadFiles([ures1], [ures2], function()
 		{
-			var path = self.getMethodPrefix()+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
-
-			self.getIntermediate(path,
-				function(resp)
-				{
-					var event = resp.data;
-					//console.log("cms status event: "+event);
-					if(event.type.toLowerCase().indexOf("created")!=-1)
-					{
-						self.typemap[event.componentDescription.name.name] = event.componentDescription.type;
-						self.createNodes(treeid, event.componentDescription);
-					}
-					else if(event.type.toLowerCase().indexOf("terminated")!=-1)
-					{
-						try
-						{
-							self.deleteNode(treeid, event.componentDescription.name.name);
-						}
-						catch(ex)
-						{
-							console.log("Could not remove node: "+event.componentDescription.name.name);
-						}
-					}
-				},
-				function(err)
-				{
-					console.log("error occurred: "+err);
-				}
-			);
+			self.refresh();
 		});
 		
 		self.on('mount', function()
@@ -288,7 +301,7 @@
 			        		return { 'Refresh': 
 			        			{
 	                                'label': "Refresh",
-	                                'action': function() {self.refresh();},
+	                                'action': function() {self.refreshCMSSubscription();},
 	                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
 			        			} 
 			        		};
@@ -307,7 +320,7 @@
 				self.selectModel(data.instance.get_path(data.node,'/'));
 			});*/
 			
-			self.refresh();
+			//self.refresh();
 		});
 	</script>
 </components>

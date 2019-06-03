@@ -157,6 +157,8 @@
 				
 			getIntermediate: function(path, handler, error) 
 			{
+				//var mycallno = this.generateUUID();
+				
 				var	func = function(resp)
 				{
 					if(resp.status!=202)	// ignore updatetimer commands
@@ -165,10 +167,47 @@
 					var callid = resp.headers["x-jadex-callid"];
 					if(callid!=null)
 						axios.get(path, {headers: {'x-jadex-callid': callid}}, this.transform).then(func).catch(error); 
-					//return this.PROMISE_DONE;
+					
+					return callid;
 				};
-				axios.get(path, this.transform).then(func).catch(error);
+				
+				//this.calls[mycallno] = mycallno;
+				var prom = new Promise(function(resolve, reject)
+				{
+					axios.get(path, this.transform)
+						.then(function(resp) {var callid = func(resp); if(callid!=null) resolve(callid);})
+						.catch(function(err) {reject(err); error(err);});
+				});
+				
+				var termcom = function(reason)
+				{
+					prom.then(function(callid)
+					{
+						console.log("terminating: "+callid);
+						var r = reason==null? 'true': reason;
+						axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r}}, this.transform).then(func).catch(error); 
+					}).catch(function(err)
+					{
+						console.log("error: "+err);
+					});
+				}
+				
+				// return termination command
+				return termcom;
 			}
+			
+			/*generateUUID: function() 
+			{ 
+			    var d = new Date().getTime();
+			    if(typeof performance !== 'undefined' && typeof performance.now === 'function')
+			        d += performance.now();
+			    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) 
+			    {
+			        var r = (d + Math.random() * 16) % 16 | 0;
+			        d = Math.floor(d / 16);
+			        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+			    });
+			}*/
 		};
 		riot.mixin(jadexmixin);
 		

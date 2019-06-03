@@ -118,14 +118,18 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/** Async context info. */
 	public static final String ASYNC_CONTEXT_INFO = "__cinfo";
 
-	/** Http header for the call id. */
+	/** Http header for the call id (req and resp). */
 	public static final String HEADER_JADEX_CALLID = "x-jadex-callid";
 
-	/** Http header for the call id siganlling that this is the last response. */
+	/** Http header for the call id siganlling that this is the last response (resp). */
 	public static final String HEADER_JADEX_CALLFINISHED = "x-jadex-callidfin";
 
-	/** Http header for the call id. */
+	/** Http header for the client side timeout of calls (req). */
 	public static final String HEADER_JADEX_CLIENTTIMEOUT = "x-jadex-clienttimeout";
+	
+	/** Http header to terminate the call (req). */
+	public static final String HEADER_JADEX_TERMINATE = "x-jadex-terminate";
+
 
 	/** Finished result marker. */
 	public static final String FINISHED	= "__finished__";
@@ -369,19 +373,22 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 
 		// check if call is an intermediate result fetch
 		String callid = request.getHeader(HEADER_JADEX_CALLID);
+		String terminate = request.getHeader(HEADER_JADEX_TERMINATE);
 
-		// Enumeration<String> hs = request.getHeaderNames();
-		// for(String s=hs.nextElement(); hs.hasMoreElements();
-		// s=hs.nextElement())
-		// {
-		// System.out.println("header: "+s+" "+request.getHeader(s));
-		// }
-
+		System.out.println("handleRequest: "+callid+" "+terminate);
+		
 		// request info manages an ongoing conversation
 		if(requestinfos.containsKey(callid))
 		{
 			RequestInfo rinfo = requestinfos.get(callid);
 
+			// Terminate the future if requested
+			if(terminate!=null && rinfo.getFuture() instanceof ITerminableFuture)
+			{
+				System.out.println("Terminating call on client request: "+callid);
+				((ITerminableFuture)rinfo.getFuture()).terminate(new RuntimeException(terminate)); 
+			}
+			
 			// Result already available?
 			if(rinfo.checkForResult())
 			{
@@ -459,7 +466,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 						final String fcallid = SUtil.createUniqueId(methodname);
 						// System.out.println("sav2");
 						saveRequestContext(fcallid, ctx);
-						final RequestInfo rinfo = new RequestInfo(mi);
+						final RequestInfo rinfo = new RequestInfo(mi, (IFuture)ret);
 						requestinfos.put(fcallid, rinfo);
 						// System.out.println("added context: "+fcallid+"
 						// "+ctx);
@@ -563,8 +570,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 											// server).
 											if(System.currentTimeMillis() - rinfo.getTimestamp() > Starter.getDefaultTimeout(component.getId()))
 											{
-												// System.out.println("terminating
-												// due to timeout: "+exception);
+												// System.out.println("terminating due to timeout: "+exception);
 												rinfo.setTerminated();
 												if(ret instanceof ITerminableFuture< ? >)
 												{
@@ -2466,13 +2472,16 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		// to check time gap between last request from browser and current result
 		// if gap>timeout -> abort future as probably no browser listening any more
 		protected long lastcheck;
+		
+		protected IFuture<?> future;
 
 		/**
 		 *  Create a request info.
 		 */
-		public RequestInfo(MappingInfo mappingInfo)
+		public RequestInfo(MappingInfo mappingInfo, IFuture<?> future)
 		{
 			this.mappingInfo = mappingInfo;
+			this.future = future;
 			this.lastcheck = System.currentTimeMillis();
 		}
 
@@ -2569,6 +2578,15 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		public long getTimestamp()
 		{
 			return lastcheck;
+		}
+
+		/**
+		 *  Get the future.
+		 *  @return the future
+		 */
+		public IFuture<?> getFuture()
+		{
+			return future;
 		}
 	}
 
