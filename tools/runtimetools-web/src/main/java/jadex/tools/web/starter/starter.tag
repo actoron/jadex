@@ -1,6 +1,36 @@
 <starter>
 	<div class="container-fluid">
-		<div hide="{model==null}" class="sticky-top bgwhitealpha m-2 p-2">
+		<div class="row m-1">
+			<div class="col-12 m-1">
+				<h3>Components</h3>
+				<components/>
+			</div>
+		</div>
+		
+		<div class="row m-1">
+			<div class="col-12 m-1">
+				<h3>Available Models</h3>
+			</div>
+		</div>
+		
+		<div class="row m-1" hide="{models.length==0}">
+			<div class="col-12 m-1">
+				<input class="w100" type="text" list="models" onchange="{select}" ref="modelchooser"></input>
+				<datalist id=models>
+					<option class="w100" each="{model in getModelNames()}" value="{model.name+' ['+model.pck+']'}"></option>
+				</datalist>
+			</div>
+			<div class="col-12 m-1">
+				<div id="modeltree"></div> <!-- class="scroll" -->
+			</div>
+		</div>
+		<div class="row m-1" show="{models.length==0}">
+			<div class="col-12 m-1">
+		 		<div class="loader"></div> 
+		 	</div>
+		</div>
+		
+		<div hide="{model==null}" class="bgwhitealpha m-2 p-2"> <!-- sticky-top  -->
 			<div class="row m-1">
 				<div class="col-12">
 					<h3>Settings</h3>
@@ -73,33 +103,6 @@
 				</div>
 			</div>
 		</div>
-		<div class="row m-1">
-			<div class="col-12 m-1">
-				<h3>Components</h3>
-				<components/>
-			</div>
-		</div>
-		<div class="row m-1">
-			<div class="col-12 m-1">
-				<h3>Available Models</h3>
-			</div>
-		</div>
-		<div class="row m-1" hide="{models.length==0}">
-			<div class="col-12 m-1">
-				<input class="w100" type="text" list="models" onchange="{select}" ref="modelchooser"></input>
-				<datalist id=models>
-					<option class="w100" each="{model in getModelNames()}" value="{model.name+' ['+model.pck+']'}"></option>
-				</datalist>
-			</div>
-			<div class="col-12 m-1">
-				<div id="modeltree"></div> <!-- class="scroll" -->
-			</div>
-		</div>
-		<div class="row m-1" show="{models.length==0}">
-			<div class="col-12 m-1">
-		 		<div class="loader"></div> 
-		 	</div>
-		 </div>
 	</div>
 	
 	<style>
