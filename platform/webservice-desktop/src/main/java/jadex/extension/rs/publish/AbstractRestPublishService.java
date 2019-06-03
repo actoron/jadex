@@ -110,8 +110,7 @@ import jadex.xml.bean.JavaWriter;
 
 
 /**
- * Publish service without Jersey directly using different containers (in
- * concrete impls).
+ * Publish service without Jersey directly using different containers (in concrete impls).
  */
 @Service
 public abstract class AbstractRestPublishService implements IWebPublishService
@@ -679,23 +678,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 * @param pid The publish id (e.g. url or name).
 	 */
 	public abstract IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info);
-
-	// /**
-	// *
-	// */
-	// protected boolean removeCallWhenFinished(String callid)
-	// {
-	// boolean ret = false;
-	// if(requestspercall.get(callid).size()==0 &&
-	// (resultspercall.get(callid)==null ||
-	// resultspercall.get(callid).size()==0))
-	// {
-	// requestspercall.remove(callid);
-	// resultspercall.remove(callid);
-	// ret = true;
-	// }
-	// return ret;
-	// }
 
 	/**
 	 * Get or start an api to the http server.

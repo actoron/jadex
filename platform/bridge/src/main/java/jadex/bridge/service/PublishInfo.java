@@ -250,4 +250,13 @@ public class PublishInfo
 			this.properties = new ArrayList<UnparsedExpression>();
 		properties.add(new UnparsedExpression(name, val));
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	@Override
+	public String toString()
+	{
+		return "PublishInfo [pid=" + pid + ", mapping=" + mapping + "]";
+	}
 }

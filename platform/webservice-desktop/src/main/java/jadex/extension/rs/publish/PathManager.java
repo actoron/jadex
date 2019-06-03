@@ -90,7 +90,7 @@ public class PathManager<T>
 
 		StringTokenizer stok = new StringTokenizer(path, "/");
 		
-		Collection<T> res = null;
+		Collection<T> res = Collections.EMPTY_LIST;
 		for(int i=0; stok.hasMoreTokens(); i++)
 		{
 			String pe = stok.nextToken();
@@ -122,7 +122,6 @@ public class PathManager<T>
 		// remove handler with more path parts
 		int maxdepth = getPathDepth(path);
 		res = res.stream().filter(x -> getPathDepth(x)<=maxdepth).collect(Collectors.toList());
-		
 		Collections.sort(new ArrayList<T>(res), (x,y) -> getPathDepth(x)-getPathDepth(y));
 		
 		return res;

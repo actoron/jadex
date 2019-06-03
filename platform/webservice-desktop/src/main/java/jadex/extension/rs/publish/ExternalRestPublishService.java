@@ -111,6 +111,7 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					err = getServicesInfo(request, ph);
 				}
 			}
@@ -176,6 +177,8 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	 */
 	public IFuture<Void> publishService(final IServiceIdentifier serviceid, final PublishInfo info)
 	{
+		System.out.println("publish service: "+serviceid+" "+info);
+		
 		Future<Void> ret = new Future<>();
 		
 		// subpath -> mapping info

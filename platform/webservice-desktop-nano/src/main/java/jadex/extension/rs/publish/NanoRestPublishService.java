@@ -248,6 +248,8 @@ public class NanoRestPublishService extends ExternalRestPublishService
 	// example "[http://localhost:8081/]", "META-INF/resources";
     public IFuture<Void> publishResources(final String pid, final String rootpath)
     {
+    	System.out.println("publish resources: "+pid+" from "+rootpath);
+    	
 		final Future<Void>	ret	= new Future<Void>();
 		
 		IComponentIdentifier cid = ServiceCall.getLastInvocation()!=null && ServiceCall.getLastInvocation().getCaller()!=null? ServiceCall.getLastInvocation().getCaller() : component.getId();
