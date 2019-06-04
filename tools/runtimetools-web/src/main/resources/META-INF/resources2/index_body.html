@@ -194,6 +194,26 @@
 				
 				// return termination command
 				return termcom;
+			},
+			
+			createProxy: function(cid, servicetype)
+			{
+				let ret = new Proxy({cid: cid, type:servicetype, transform:self.transform},
+				{
+					get: function(service, prop)
+					{
+						let callstrprefix = 'webjcc/invokeServiceMethod?cid='+service.cid+'&servicetype='+service.type+'&methodname='+prop;
+						return function(...args)
+						{
+							let callstr = callstrprefix;
+							for (let i = 0; i < args.length; i++)
+								callstr += '&args_'+i+'='+args[i];
+							
+							return axios.get(callstr, service.transform);
+				        }
+					}
+			    });
+				return ret;
 			}
 			
 			/*generateUUID: function() 
