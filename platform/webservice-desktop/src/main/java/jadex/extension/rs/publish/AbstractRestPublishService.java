@@ -385,15 +385,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// Terminate the future if requested
 			if(terminate!=null && rinfo.getFuture() instanceof ITerminableFuture)
 			{
-				try
-				{
 				System.out.println("Terminating call on client request: "+callid);
 				((ITerminableFuture)rinfo.getFuture()).terminate(new RuntimeException(terminate)); 
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
 			}
 			
 			// Result already available?
@@ -747,6 +740,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// posted form data not for multi-part
 			if(request.getQueryString() != null)
 				inparamsmap.putAll(splitQueryString(request.getQueryString()));
+			// Hack, removes internal random id used to avoid browser cache
+			inparamsmap.remove("__random");
 
 			// Read multi-part form data
 			if(request.getContentType() != null && request.getContentType().startsWith(MediaType.MULTIPART_FORM_DATA) && request.getParts().size() > 0)
@@ -1335,6 +1330,10 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			response.addHeader("Access-Control-Allow-Credentials", "true ");
 			response.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
 			response.addHeader("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control");
+		
+			// add header for non-caching
+			response.addHeader("Cache-Control", "no-cache, no-store");
+			response.addHeader("Expires", "-1");
 		}
 
 		return sr;
@@ -1345,6 +1344,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected void writeResponseContent(Object result, HttpServletRequest request, HttpServletResponse response, List<String> sr)
 	{
+		if(result instanceof Exception)
+			System.out.println("result is exception: "+result);
+		
 		try
 		{
 			// handle content

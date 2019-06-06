@@ -42,16 +42,21 @@
 		
 		var self = this;
 
+		// https://github.com/riot/riot/issues/874
+		// riot seems to automount this tag without opts :-(
 		//self.cid = opts!=null? opts.cid: null;
 		if(opts!=null && opts.cid!=null)
 			self.cid = opts.cid;
+		if(self.cid==null && self.parent!=null && self.parent.opts!=null)
+			self.cid = self.parent.opts.cid;
+		
 		self.components = []; // component descriptions
 		self.typemap = null;
 	
 		console.log("components: "+self.cid);
 		
-		if(self.cid==null)
-			console.log("cid is null");
+		//if(self.cid==null)
+		//	console.log("cid is null");
 		
 		var treeid = "componenttree";
 		
@@ -91,9 +96,6 @@
 			
 			var path = self.prefix+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
 
-			if(path.indexOf("undefined")!=-1)
-				console.log("kaputti");
-			
 			if(self.termcom!=null)
 				self.termcom("refreshing");
 			
@@ -194,10 +196,12 @@
 					if(name.indexOf("@")==-1)
 					{
 						if(component.systemComponent)
+						{
 							names.unshift("System");
+						}
 						else
 						{
-							console.log("creating App: "+name+" "+cid);
+							//console.log("creating App: "+name+" "+cid);
 							names.unshift("Applications");
 						}
 					}

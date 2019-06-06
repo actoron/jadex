@@ -157,6 +157,13 @@
 				
 			getIntermediate: function(path, handler, error) 
 			{
+				// problem with hanging requests to same URL because of cache
+				// https://stackoverflow.com/questions/27513994/chrome-stalls-when-making-multiple-requests-to-same-resource
+				if(path.indexOf("?")==-1)
+					path = path+'?__random='+Math.random();
+				else 
+					path = path+'&__random='+Math.random();
+				
 				var terminated = false;
 		
 				var erfunc = function(err)
@@ -183,14 +190,14 @@
 
 					var callid = resp.headers["x-jadex-callid"];
 					if(callid!=null)
-						axios.get(path, {headers: {'x-jadex-callid': callid}}, this.transform).then(func).catch(erfunc); 
+						axios.get(path, {headers: {'x-jadex-callid': callid, 'cache-control': 'no-store'}}, this.transform).then(func).catch(erfunc); 
 					
 					return callid;
 				};
 				
 				var prom = new Promise(function(resolve, reject)
 				{
-					axios.get(path, this.transform)
+					axios.get(path, {headers: {'cache-control': 'no-cache'}}, this.transform)
 						.then(function(resp) 
 						{
 							var callid = func(resp); 
@@ -214,8 +221,11 @@
 						console.log("terminating: "+callid);
 						terminated = true;
 						var r = reason==null? 'true': reason;
-						axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r}}, this.transform)
+						
+						axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, headers: {'x-jadex-callid': callid, 'cache-control': 'no-cache'}}}, this.transform)
 							.then(func).catch(erfunc); 
+						
+						console.log("terminating sent: "+callid);
 					})
 					.catch(function(err)
 					{
