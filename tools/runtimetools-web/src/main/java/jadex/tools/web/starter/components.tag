@@ -38,29 +38,36 @@
 	</style>
 	
 	<script>
-		console.log("components: "+opts);
-		
 		//console.log(this.getLanguage());
 		
 		var self = this;
 
-		self.cid = opts!=null? opts.cid: null;
+		//self.cid = opts!=null? opts.cid: null;
+		if(opts!=null && opts.cid!=null)
+			self.cid = opts.cid;
 		self.components = []; // component descriptions
 		self.typemap = null;
+	
+		console.log("components: "+self.cid);
+		
+		if(self.cid==null)
+			console.log("cid is null");
 		
 		var treeid = "componenttree";
 		
 		var myservice = "jadex.tools.web.starter.IJCCStarterService";
 		
-		getMethodPrefix()
+		/*getMethodPrefix()
 		{
 			return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
-		}
+		}*/
+		
+		self.prefix = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
 		
 		refresh()
 		{
 			// Reload the component descriptions
-			axios.get(self.getMethodPrefix()+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
+			axios.get(self.prefix+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
 			{
 				//console.log("descs are: "+resp.data);
 				self.components = resp.data;
@@ -82,8 +89,11 @@
 		{
 			console.log("refreshCMSSubscription");
 			
-			var path = self.getMethodPrefix()+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
+			var path = self.prefix+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
 
+			if(path.indexOf("undefined")!=-1)
+				console.log("kaputti");
+			
 			if(self.termcom!=null)
 				self.termcom("refreshing");
 			
@@ -117,10 +127,10 @@
 		}
 		
 		// fixed types
-		var cloud = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/cloud.png';
-		var applications = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/applications.png';
-		var platform = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/platform.png';
-		var system = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/system.png';
+		var cloud = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/cloud.png';
+		var applications = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/applications.png';
+		var platform = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/platform.png';
+		var system = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/system.png';
 		
 		var types =
 		{
@@ -221,7 +231,7 @@
 					}
 					
 					if(types[type]==null)
-						icon = self.getMethodPrefix()+'&methodname=loadComponentIcon&args_0='+type;
+						icon = self.prefix+'&methodname=loadComponentIcon&args_0='+type;
 					//types[type] = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/language_de.png';
 
 					//console.log(cid+" "+type+" "+icon);
@@ -259,8 +269,8 @@
 		
 		var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
 		var res2 = "jadex/tools/web/starter/libs/jstree_3.3.7.js";
-		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1;
-		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2;
+		var ures1 = self.prefix+'&methodname=loadResource&args_0='+res1;
+		var ures2 = self.prefix+'&methodname=loadResource&args_0='+res2;
 
 		// dynamically load jstree lib and style
 		//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
@@ -302,7 +312,7 @@
 			        			{
 	                                'label': "Refresh",
 	                                'action': function() {self.refreshCMSSubscription();},
-	                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
+	                                'icon': self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
 			        			} 
 			        		};
 			        	}
@@ -321,6 +331,13 @@
 			});*/
 			
 			//self.refresh();
+		});
+		
+		self.on('unmount', function()
+		{
+			console.log('unmounted: '+self);
+			if(self.termcom!=null)
+				self.termcom("unmounted");
 		});
 	</script>
 </components>

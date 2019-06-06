@@ -157,26 +157,54 @@
 				
 			getIntermediate: function(path, handler, error) 
 			{
-				//var mycallno = this.generateUUID();
+				var terminated = false;
+		
+				var erfunc = function(err)
+				{
+					if(terminated)
+					{
+						console.log("already terminated");
+						return;
+					}
+					
+					error(err);
+				}
 				
 				var	func = function(resp)
 				{
+					if(terminated)
+					{
+						console.log("already terminated");
+						return;
+					}
+					
 					if(resp.status!=202)	// ignore updatetimer commands
 						handler(resp);
 
 					var callid = resp.headers["x-jadex-callid"];
 					if(callid!=null)
-						axios.get(path, {headers: {'x-jadex-callid': callid}}, this.transform).then(func).catch(error); 
+						axios.get(path, {headers: {'x-jadex-callid': callid}}, this.transform).then(func).catch(erfunc); 
 					
 					return callid;
 				};
 				
-				//this.calls[mycallno] = mycallno;
 				var prom = new Promise(function(resolve, reject)
 				{
 					axios.get(path, this.transform)
-						.then(function(resp) {var callid = func(resp); if(callid!=null) resolve(callid);})
-						.catch(function(err) {reject(err); error(err);});
+						.then(function(resp) 
+						{
+							var callid = func(resp); 
+							if(callid!=null) 
+							{
+								console.log("received callid: "+callid);
+								resolve(callid);
+							}
+						})
+						.catch(function(err) 
+						{
+							reject(err); 
+							erfunc(err);
+						});
 				});
 				
 				var termcom = function(reason)
@@ -184,9 +212,12 @@
 					prom.then(function(callid)
 					{
 						console.log("terminating: "+callid);
+						terminated = true;
 						var r = reason==null? 'true': reason;
-						axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r}}, this.transform).then(func).catch(error); 
-					}).catch(function(err)
+						axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r}}, this.transform)
+							.then(func).catch(erfunc); 
+					})
+					.catch(function(err)
 					{
 						console.log("error: "+err);
 					});

@@ -385,8 +385,15 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			// Terminate the future if requested
 			if(terminate!=null && rinfo.getFuture() instanceof ITerminableFuture)
 			{
+				try
+				{
 				System.out.println("Terminating call on client request: "+callid);
 				((ITerminableFuture)rinfo.getFuture()).terminate(new RuntimeException(terminate)); 
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 			
 			// Result already available?

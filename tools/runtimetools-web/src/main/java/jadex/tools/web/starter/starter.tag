@@ -135,16 +135,17 @@
 		}
 	</style>
 	
-	<script>
-		console.log("starter: "+opts);
-		
+	<script>		
 		//console.log(this.getLanguage());
 		
 		var self = this;
 
-		self.cid = opts!=null? opts.cid: null;
+		if(opts!=null && opts.cid!=null)
+			self.cid = opts.cid;
 		self.models = []; // available component models [filename, classname]
 		self.model = null; // loaded model
+		
+		console.log("starter: "+self.cid);
 		
 		var treeid = "modeltree";
 		
@@ -387,14 +388,27 @@
 			var res = "jadex/tools/web/starter/components.tag";
 			axios.get(self.getMethodPrefix()+'&methodname=loadResource&args_0='+res+"&argtypes_0=java.lang.String").then(function(resp)
 			{
+				if(self.unmounted)
+				{
+					console.log("starter already unmounted");
+					return;
+				}
+				
 				riot.compile(resp.data);
 				//riot.tag(p.name, p.html);
+				console.log("mount components tag with: "+self.cid);
 				var tags = riot.mount("components", {cid: self.cid});
 			});
 			
 			// no args here
 			axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
 			{
+				if(self.unmounted)
+				{
+					console.log("starter already unmounted");
+					return;
+				}
+				
 				//console.log(resp.data);
 				self.models = resp.data;
 				createModelTree(treeid);
@@ -416,6 +430,12 @@
 				{
 					self.selectModel(data.instance.get_path(data.node,'/'));
 				});
+			});
+			
+			self.on('unmount', function()
+			{
+				console.log("unmounted starter");
+				self.unmounted = true;
 			});
 			
 			//self.update();
