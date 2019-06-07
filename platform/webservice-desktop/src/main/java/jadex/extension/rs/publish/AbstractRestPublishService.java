@@ -81,6 +81,7 @@ import jadex.commons.collection.LeaseTimeSet;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
@@ -386,11 +387,21 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			if(terminate!=null && rinfo.getFuture() instanceof ITerminableFuture)
 			{
 				System.out.println("Terminating call on client request: "+callid);
-				((ITerminableFuture)rinfo.getFuture()).terminate(new RuntimeException(terminate)); 
+				// hmm, immediate response (should normally not be necessary)
+				// otherwise a (termination) exception is returned
+				//writeResponse(FINISHED, callid, rinfo.getMappingInfo(), request, response, false);
+				
+				// save context to answer request after future is set
+				AsyncContext ctx = getAsyncContext(request);
+				saveRequestContext(callid, ctx);
+				if(!"true".equals(terminate))
+					((ITerminableFuture)rinfo.getFuture()).terminate(new RuntimeException(terminate)); 
+				else
+					((ITerminableFuture)rinfo.getFuture()).terminate();
 			}
 			
 			// Result already available?
-			if(rinfo.checkForResult())
+			else if(rinfo.checkForResult())
 			{
 				// Normal result (or FINISHED as handled in writeResponse())
 				Object result = rinfo.getNextResult();
@@ -523,31 +534,46 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 										// result: "+result);
 									}
 
-									// Browser waiting for result -> send
-									// immediately
+									// Browser waiting for result -> send immediately
 									else if(requestspercall.containsKey(fcallid) && requestspercall.get(fcallid).size() > 0)
 									{
 										Collection<AsyncContext> cls = requestspercall.get(fcallid);
-										AsyncContext ctx = cls.iterator().next();
-										cls.remove(ctx);
-
+										
 										// System.out.println("direct answer to browser request, removed context:"+callid+" "+ctx);
 										if(command != null)
 										{
 											// Timer update (or other command???)
 											// HTTP 102 -> processing (not recognized by angular?)
 											// HTTP 202 -> accepted
+											AsyncContext ctx = cls.iterator().next();
+											cls.remove(ctx);
 											writeResponse(null, 202, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);
 										}
 										else if(exception != null)
 										{
 											// Service call (finally) failed.
 											result = mapResult(method, exception);
-											writeResponse(result, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), fcallid, mi, (HttpServletRequest)ctx.getRequest(),
-												(HttpServletResponse)ctx.getResponse(), true);
+											
+											int rescode = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
+											if(exception instanceof FutureTerminatedException)
+												rescode = Response.Status.OK.getStatusCode();
+											
+											//writeResponse(result, rescode, fcallid, mi, (HttpServletRequest)ctx.getRequest(),
+											//	(HttpServletResponse)ctx.getResponse(), true);
+											
+											// Answer ALL pending requests and so also remove waiting longpoll calls (e.g. when terminate arrives)
+											AsyncContext[] acs = cls.toArray(new AsyncContext[cls.size()]);
+											for(AsyncContext ac: acs)
+											{
+												writeResponse(result, rescode, fcallid, mi, (HttpServletRequest)ac.getRequest(),
+													(HttpServletResponse)ac.getResponse(), true);
+												cls.remove(ac);
+											}
 										}
 										else
 										{
+											AsyncContext ctx = cls.iterator().next();
+											cls.remove(ctx);
 											// Normal result (or FINISHED as handled in writeResponse())
 											result = FINISHED.equals(result) ? result : mapResult(method, result);
 											writeResponse(result, fcallid, mi, (HttpServletRequest)ctx.getRequest(), (HttpServletResponse)ctx.getResponse(), false);

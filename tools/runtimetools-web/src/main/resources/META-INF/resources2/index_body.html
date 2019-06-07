@@ -165,12 +165,16 @@
 					path = path+'&__random='+Math.random();
 				
 				var terminated = false;
+				var call;
 		
 				var erfunc = function(err)
 				{
+					//if(axios.isCancel(err))
+		             //   console.log('request canceled', err.message);
+					
 					if(terminated)
 					{
-						console.log("already terminated");
+						//console.log("call terminated: "+path);
 						return;
 					}
 					
@@ -181,29 +185,35 @@
 				{
 					if(terminated)
 					{
-						console.log("already terminated");
+						//console.log("call terminated: "+path);
 						return;
 					}
 					
 					if(resp.status!=202)	// ignore updatetimer commands
 						handler(resp);
 
+					call = axios.CancelToken.source();
 					var callid = resp.headers["x-jadex-callid"];
 					if(callid!=null)
-						axios.get(path, {headers: {'x-jadex-callid': callid, 'cache-control': 'no-store'}}, this.transform).then(func).catch(erfunc); 
+					{
+						//console.log("long-poll request sent: "+path);
+						axios.get(path, {cancelToken: call.token, headers: {'x-jadex-callid': callid, 'cache-control': 'no-store'}}, this.transform).then(func).catch(erfunc); 
+					}
 					
 					return callid;
 				};
 				
 				var prom = new Promise(function(resolve, reject)
 				{
-					axios.get(path, {headers: {'cache-control': 'no-cache'}}, this.transform)
+					//console.log("initial request sent: "+path);
+					call = axios.CancelToken.source();
+					axios.get(path, {cancelToken: call.token, headers: {'cache-control': 'no-cache'}}, this.transform)
 						.then(function(resp) 
 						{
 							var callid = func(resp); 
 							if(callid!=null) 
 							{
-								console.log("received callid: "+callid);
+								//console.log("received callid: "+callid);
 								resolve(callid);
 							}
 						})
@@ -216,20 +226,25 @@
 				
 				var termcom = function(reason)
 				{
-					prom.then(function(callid)
+					return new Promise(function(resolve, reject)
 					{
-						console.log("terminating: "+callid);
-						terminated = true;
-						var r = reason==null? 'true': reason;
-						
-						axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, headers: {'x-jadex-callid': callid, 'cache-control': 'no-cache'}}}, this.transform)
-							.then(func).catch(erfunc); 
-						
-						console.log("terminating sent: "+callid);
-					})
-					.catch(function(err)
-					{
-						console.log("error: "+err);
+						prom.then(function(callid)
+						{
+							if(call)
+					            call.cancel();
+							
+							terminated = true;
+							var r = reason==null? 'true': reason;
+							
+							//console.log("terminating request sent: "+path);
+							axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, headers: {'x-jadex-callid': callid, 'cache-control': 'no-cache'}}}, this.transform)
+								.then(resolve).catch(reject); 
+						})
+						.catch(function(err)
+						{
+							console.log("error: "+err);
+							reject(err);
+						});
 					});
 				}
 				

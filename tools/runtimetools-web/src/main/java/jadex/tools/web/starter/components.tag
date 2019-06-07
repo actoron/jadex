@@ -92,40 +92,52 @@
 		
 		refreshCMSSubscription()
 		{
-			console.log("refreshCMSSubscription");
+			//console.log("refreshCMSSubscription");
 			
 			var path = self.prefix+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
 
 			if(self.termcom!=null)
-				self.termcom("refreshing");
+				self.termcom().then(done).catch(err);
+				//self.termcom("refreshing").then(done).catch(err);
+			else
+				done();
 			
-			self.termcom = self.getIntermediate(path,
-				function(resp)
-				{
-					var event = resp.data;
-					//console.log("cms status event: "+event);
-					if(event.type.toLowerCase().indexOf("created")!=-1)
+			function err(err)
+			{
+				console.log(err);
+				done();
+			}
+			
+			function done()
+			{
+				self.termcom = self.getIntermediate(path,
+					function(resp)
 					{
-						self.typemap[event.componentDescription.name.name] = event.componentDescription.type;
-						self.createNodes(treeid, event.componentDescription);
-					}
-					else if(event.type.toLowerCase().indexOf("terminated")!=-1)
+						var event = resp.data;
+						//console.log("cms status event: "+event);
+						if(event.type.toLowerCase().indexOf("created")!=-1)
+						{
+							self.typemap[event.componentDescription.name.name] = event.componentDescription.type;
+							self.createNodes(treeid, event.componentDescription);
+						}
+						else if(event.type.toLowerCase().indexOf("terminated")!=-1)
+						{
+							try
+							{
+								self.deleteNode(treeid, event.componentDescription.name.name);
+							}
+							catch(ex)
+							{
+								console.log("Could not remove node: "+event.componentDescription.name.name);
+							}
+						}
+					},
+					function(err)
 					{
-						try
-						{
-							self.deleteNode(treeid, event.componentDescription.name.name);
-						}
-						catch(ex)
-						{
-							console.log("Could not remove node: "+event.componentDescription.name.name);
-						}
+						console.log("error occurred: "+err);
 					}
-				},
-				function(err)
-				{
-					console.log("error occurred: "+err);
-				}
-			);
+				);
+			}
 		}
 		
 		// fixed types

@@ -396,7 +396,7 @@
 				
 				riot.compile(resp.data);
 				//riot.tag(p.name, p.html);
-				console.log("mount components tag with: "+self.cid);
+				//console.log("mount components tag with: "+self.cid);
 				var tags = riot.mount("components", {cid: self.cid});
 			});
 			
