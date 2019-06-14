@@ -152,6 +152,7 @@ public class BDIEnhancer
 	{
 		/*Map<String, MethodInfo> m = new HashMap<>();
 		ClassInfo ci = SClassReader.getClassInfo(new FileInputStream("C:/tmp/bin/jadex/bdiv3/testcases/componentplans/ComponentPlanBDI.class"), true, true); 
+		ClassInfo ci = SClassReader.getClassInfo(new FileInputStream("/home/jander/git/jadex/applications/bdiv3/bintest/main/jadex/bdiv3/testcases/componentplans/ComponentPlanBDI.class"), true, true); 
 		for(MethodInfo mi: ci.getMethodInfos())
 		{
 //			System.out.println(mi.getMethodName()+" "+mi.getMethodDescriptor());
