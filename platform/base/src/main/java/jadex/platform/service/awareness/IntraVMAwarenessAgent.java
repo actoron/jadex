@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -126,7 +127,22 @@ public class IntraVMAwarenessAgent implements IAwarenessService
 		result.remove(agent.getId().getRoot());
 		return new IntermediateFuture<IComponentIdentifier>(result);
 	}
-
+	
+	/**
+	 *  Try to find other platforms while providing a quick answer.
+	 *  Services should respond to a call as close to instantaneous as possible, but
+	 *  with an upper bound of less than 1 second.
+	 *  Issues a new search, but answers using known platforms. On first request
+	 */
+	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
+	{
+		disclock.readLock().lock();
+		HashSet<IComponentIdentifier> result = new HashSet<IComponentIdentifier>(discoveries.keySet());
+		disclock.readLock().unlock();
+		result.remove(agent.getId().getRoot());
+		return new Future<Set<IComponentIdentifier>>(result);
+	}
+	
 //	/**
 //	 *  Immediately return known platforms and continuously publish newly found platforms.
 //	 *  Does no active searching.

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -124,6 +125,17 @@ public class CatalogAwarenessAgent implements IAwarenessService
 	public IIntermediateFuture<IComponentIdentifier> searchPlatforms()
 	{
 		return new IntermediateFuture<>(new LinkedHashSet<>(catalog.keySet()));
+	}
+	
+	/**
+	 *  Try to find other platforms while providing a quick answer.
+	 *  Services should respond to a call as close to instantaneous as possible, but
+	 *  with an upper bound of less than 1 second.
+	 *  Issues a new search, but answers using known platforms. On first request
+	 */
+	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
+	{
+		return new Future<Set<IComponentIdentifier>>(new LinkedHashSet<>(catalog.keySet()));
 	}
 	
 	/**

@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.awareness;
 
 import java.util.List;
+import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
@@ -19,6 +20,14 @@ public interface IAwarenessService
 	 *  Immediately returns known platforms and concurrently issues a new search, waiting for replies until the timeout.
 	 */
 	public IIntermediateFuture<IComponentIdentifier> searchPlatforms();
+	
+	/**
+	 *  Try to find other platforms while providing a quick answer.
+	 *  Services should respond to a call as close to instantaneous as possible, but
+	 *  with an upper bound of less than 1 second.
+	 *  Issues a new search, but answers using known platforms. On first request
+	 */
+	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast();
 	
 	/**
 	 *  Gets the address for a platform ID using the awareness mechanism.
