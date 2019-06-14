@@ -6,10 +6,13 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.base.Starter;
 import jadex.binary.SBinarySerializer;
@@ -87,6 +90,9 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	
 	/** The socket to receive. */
 	protected DatagramSocket recvsocket;
+	
+	/** Last time platforms where searched. */
+	protected long lastsearchplatform = 0;
 
 	// -------- agent lifecycle --------
 
@@ -152,6 +158,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	 */
 	public IIntermediateFuture<IComponentIdentifier> searchPlatforms()
 	{
+		lastsearchplatform = System.currentTimeMillis();
 		if(search == null)
 		{
 			long timeout = ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
@@ -226,6 +233,39 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 //		}
 
 		return search;
+	}
+	
+	/**
+	 *  Try to find other platforms while providing a quick answer.
+	 *  Services should respond to a call as close to instantaneous as possible, but
+	 *  with an upper bound of less than 1 second.
+	 *  Issues a new search, but answers using known platforms. On first request
+	 */
+	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
+	{
+		Future<Set<IComponentIdentifier>> ret = new Future<Set<IComponentIdentifier>>();
+		if (System.currentTimeMillis() - lastsearchplatform > 60000)
+		{
+			searchPlatforms().addResultListener(new IResultListener<Collection<IComponentIdentifier>>()
+			{
+				public void resultAvailable(Collection<IComponentIdentifier> result)
+				{
+					ret.setResult(new HashSet<IComponentIdentifier>(result));
+				};
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setResult(Collections.emptySet());
+				}
+			});
+		}
+		else
+		{
+			// Trigger search, but answer immediately.
+			searchPlatforms();
+			ret.setResult(new HashSet<IComponentIdentifier>(platforms.keySet()));
+		}
+		return ret;
 	}
 
 	// -------- template methods --------

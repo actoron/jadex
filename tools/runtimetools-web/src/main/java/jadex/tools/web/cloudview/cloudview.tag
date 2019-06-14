@@ -1,8 +1,10 @@
 <cloudview>
-	<div id="cloudgraph"></div>
-	<!-- <div class="row justify-content-center h-100">
-		<div id="cloudgraph" class="flex-grow-1 justify-content-center"></div>
-	</div> -->
+	<div>
+		<div id="cloudinfo">
+			<h1 id="mymessage">Platform</h1>
+		</div>
+		<div id="cloudgraph"></div>
+	</div>
 	
 	<script>
 		//console.log("security plugin started: "+opts);
@@ -10,11 +12,11 @@
 		var self = this;
 		
 		self.cid = opts!=null? opts.cid: null;
-		var myservice = "jadex.tools.web.cloudview.IJCCCloudviewService";
+		self.myservice = "jadex.tools.web.cloudview.IJCCCloudviewService";
 		
 		getMethodPrefix()
 		{
-			return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
+			return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+self.myservice;
 		}
 
 		//self.cid = opts!=null? opts.cid: null;
@@ -116,8 +118,10 @@
 		}
 		
 		function start() {
+			/*var bounds = self.cloudgraph.getBoundingClientRect();
+			self.cloudgraph.style.height="calc (100vh - " + bounds.top +"px);";*/ 
 			let graph = new VisGraph();
-			graph.addGroupNode('network2', 'network', '0');
+			/*graph.addGroupNode('network2', 'network', '0');
 			graph.addGroupNode('network1', 'network', '1');
 			graph.addGroupNode('jadexplatform1', 'platform', '2');
 			graph.addGroupNode('jadexplatform2', 'platform', '3');
@@ -127,10 +131,29 @@
 			graph.addEdge(0,3);
 			graph.addEdge(1,3);
 			graph.addEdge(1,4);
-			graph.addEdge(1,5);
-			let data = graph.getVisData();
+			graph.addEdge(1,5);*/
 			
-			self.network = new vis.Network(self.cloudgraph, data, graph.defaultOptions);
+			//alert('2 ' + typeof self.service);
+			self.service.getPlatformNetworks(self.cid).then(function(resp) {
+				let pfs = Object.keys(resp.data);
+				document.getElementById('mymessage').innerHTML="Hello " + pfs;
+				let knownnw = new Set();
+				for (let pf of pfs){
+					graph.addGroupNode(pf, 'platform', pf);
+					let nws = resp.data[pf];
+					for (let nw of nws){
+						if (!knownnw.has(nw)){
+							knownnw.add(nw);
+							graph.addGroupNode(nw, 'network', nw);
+						}
+						graph.addEdge(pf, nw);
+					}
+				}
+				let data = graph.getVisData();
+				self.network = new vis.Network(self.cloudgraph, data, graph.defaultOptions);
+			}).catch(function (error) {
+				alert(error);
+			});
 		};
 		
 		
@@ -142,6 +165,8 @@
 			let prefix = self.getMethodPrefix()+'&methodname=loadResource&args_0=';
 			self.loadFiles([prefix+css1, prefix+css2], [prefix+js1], function() {
 				self.cloudgraph = document.getElementById('cloudgraph');
+				self.service=self.createProxy(self.cid, self.myservice);
+				self.jccservice=self.createProxy(self.cid, 'IJCCWebService');
 				start();
 			});
 		});
