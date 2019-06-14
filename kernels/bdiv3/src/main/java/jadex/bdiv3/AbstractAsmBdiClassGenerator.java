@@ -35,6 +35,8 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.MethodInfo;
+import jadex.commons.SClassReader.ClassInfo;
+import jadex.commons.SClassReader.FieldInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -729,6 +731,26 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		{
 		}
 		return isEnhanced;
+	}
+	
+	/**
+	 * Returns whether a class is already enhanced.
+	 * @param clazz The clazz info.
+	 * @return true, if already enhanced, else false.
+	 */
+	public static boolean isEnhanced(ClassInfo clazz)
+	{
+		boolean ret = false;
+		List<FieldInfo> fis = clazz.getFieldInfos();
+		for(FieldInfo fi: fis)
+		{
+			if(GLOBALNAME_FIELD_NAME.equals(fi.getFieldName()))
+			{
+				ret = true;
+				break;
+			}
+		}
+		return ret;
 	}
 	
 	/**

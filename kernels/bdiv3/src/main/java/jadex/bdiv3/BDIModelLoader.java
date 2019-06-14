@@ -39,6 +39,15 @@ public class BDIModelLoader extends AbstractModelLoader
 		this.reader = BDIClassGeneratorFactory.getInstance().createBDIClassReader(this);
 	}
 
+	/**
+	 *  Set the generator.
+	 * 	@param gen the gen to set
+	 */
+	public void setGenerator(IBDIClassGenerator gen)
+	{
+		reader.setGenerator(gen);
+	}
+	
 	//-------- methods --------
 	
 	/**

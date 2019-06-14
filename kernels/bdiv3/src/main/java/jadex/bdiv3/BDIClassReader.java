@@ -110,7 +110,7 @@ public class BDIClassReader extends MicroClassReader
 	protected IBDIClassGenerator gen;
 	
 	/** The model loader for subcapabilities. */
-	protected BDIModelLoader	loader;
+	protected BDIModelLoader loader;
 	
 	/**
 	 *  Create a new bdi class reader.
@@ -121,6 +121,15 @@ public class BDIClassReader extends MicroClassReader
 		this.loader	= loader;
 	}
 	
+	/**
+	 *  Set the generator.
+	 * 	@param gen the gen to set
+	 */
+	public void setGenerator(IBDIClassGenerator gen)
+	{
+		this.gen = gen;
+	}
+
 	/**
 	 *  Load a  model.
 	 *  @param model The model (e.g. file name).
