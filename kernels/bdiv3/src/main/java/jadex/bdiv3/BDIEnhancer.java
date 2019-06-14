@@ -1,7 +1,7 @@
 package jadex.bdiv3;
 
-import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -17,8 +17,11 @@ import jadex.bdiv3.model.BDIModel;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
+import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassFileInfo;
+import jadex.commons.SClassReader.ClassInfo;
+import jadex.commons.SClassReader.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
@@ -103,7 +106,7 @@ public class BDIEnhancer
 				System.out.println("Processing: "+ci.getFilename());
 				
 				gen.clearRecentClassBytes();
-
+				
                 try
                 {
                 	BDIModel model = loader.loadComponentModel(ci.getFilename(), null, null, cl, new Object[]{new ResourceIdentifier(), null, null});
@@ -147,11 +150,16 @@ public class BDIEnhancer
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		/*ClassInfo ci = SClassReader.getClassInfo(new FileInputStream("C:/projects/jadex-newnew/jadex4/jadex/applications/bdiv3/bin/main/jadex/bdiv3/testcases/componentplans/ComponentPlanBDI.class"), true, true); 
+		Map<String, MethodInfo> m = new HashMap<>();
+		ClassInfo ci = SClassReader.getClassInfo(new FileInputStream("/home/jander/git/jadex/applications/bdiv3/bintest/main/jadex/bdiv3/testcases/componentplans/ComponentPlanBDI.class"), true, true); 
 		for(MethodInfo mi: ci.getMethodInfos())
 		{
-			System.out.println(mi.getMethodName()+" "+mi.getMethodDescriptor());
-		}*/
+//			System.out.println(mi.getMethodName()+" "+mi.getMethodDescriptor());
+			if(m.containsKey(mi.getMethodName()+" " + mi.getMethodDescriptor()))
+				System.out.println("Dup method: "+mi.getMethodName()+" "+mi.getMethodDescriptor());
+			else
+				m.put(mi.getMethodName()+" " + mi.getMethodDescriptor(), mi);
+		}
 		
 		String indir = "/home/jander/git/jadex/applications/bdiv3/bintest/main";
 		String outdir = null;//"C:/tmp/bdi";
