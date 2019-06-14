@@ -2,24 +2,23 @@ package jadex.bdiv3;
 
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import jadex.bdiv3.model.BDIModel;
 import jadex.bridge.ResourceIdentifier;
+import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
-import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassFileInfo;
-import jadex.commons.SClassReader.ClassInfo;
-import jadex.commons.SClassReader.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
@@ -54,14 +53,22 @@ public class BDIEnhancer
 		ByteKeepingASMBDIClassGenerator gen = new ByteKeepingASMBDIClassGenerator();
 		loader.setGenerator(gen);
 		
-		Set<ClassFileInfo> cis = SReflect.scanForClassFileInfos(new URL[]{inurl}, null, new IFilter<ClassFileInfo>()
+		Set<ClassFileInfo> cis = new HashSet<>();
+		FileFilter ff = new FileFilter(null, false, ".class");
+		Set<ClassFileInfo> allcis = SReflect.scanForClassFileInfos(new URL[]{inurl}, ff, new IFilter<ClassFileInfo>()
 		{
 			public boolean filter(ClassFileInfo ci)
 			{
 				AnnotationInfo ai = ci.getClassInfo().getAnnotation(Agent.class.getName());
-				return ai!=null;
+				if (ai != null)
+					cis.add(ci);
+				return true;
+				//return ai!=null;
 			}
 		});
+		
+		Map<String, String> classfiles = new HashMap<>();
+		allcis.stream().forEach(ci -> classfiles.put(ci.getClassInfo().getClassName(), ci.getFilename()));
 		
 		for(ClassFileInfo ci : cis)
 		{
@@ -106,25 +113,23 @@ public class BDIEnhancer
                 	SUtil.throwUnchecked(e);
                 }
 
-			    //System.out.println("Generating classes for: " + ci.getFilename());
-
                 for(Map.Entry<String, byte[]> entry: gen.getRecentClassBytes().entrySet())
                 {
                 	System.out.println("writing: "+entry.getKey());
                 	
                     byte[] bytes = entry.getValue();
-                    try
+                    
+                    Path p = Paths.get(indir);
+                	Path p2 = Paths.get(classfiles.get(entry.getKey()));
+                	Path relp = p.relativize(p2);
+                	
+                    // write enhanced class
+                    File enhfile = new File(outdir, relp.toString());
+                    enhfile.getParentFile().mkdirs();
+                    
+                    try(FileOutputStream fos = new FileOutputStream(enhfile))
                     {
-                    	Path p = Paths.get(indir);
-                    	Path p2 = Paths.get(ci.getFilename());
-                    	Path relp = p.relativize(p2);
-                    	
-                        // write enhanced class
-                        File enhfile = new File(outdir, relp.toString());
-                        enhfile.getParentFile().mkdirs();
-                        DataOutputStream dos = new DataOutputStream(new FileOutputStream(enhfile));
-                        dos.write(bytes);
-                        dos.close();
+                        fos.write(bytes);
                     }
                     catch(IOException e)
                     {
