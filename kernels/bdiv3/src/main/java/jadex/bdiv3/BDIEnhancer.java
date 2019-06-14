@@ -65,7 +65,7 @@ public class BDIEnhancer
 		
 		for(ClassFileInfo ci : cis)
 		{
-			if(gen.isEnhanced(ci.getClassInfo()))
+			if(AbstractAsmBdiClassGenerator.isEnhanced(ci))
 			{
 				System.out.println("Already enhanced: "+ci.getFilename());
 				
@@ -148,7 +148,7 @@ public class BDIEnhancer
 			System.out.println(mi.getMethodName()+" "+mi.getMethodDescriptor());
 		}*/
 		
-		String indir = "C:/projects/jadex-newnew/jadex4/jadex/applications/bdiv3/bin/main";
+		String indir = "/home/jander/git/jadex/applications/bdiv3/bintest/main";
 		String outdir = null;//"C:/tmp/bdi";
 		BDIEnhancer.enhanceBDIClasses(indir, outdir);
 	}

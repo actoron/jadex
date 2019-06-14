@@ -1,5 +1,7 @@
 package jadex.bdiv3;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -35,6 +37,8 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.MethodInfo;
+import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.ClassFileInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SClassReader.FieldInfo;
 import jadex.commons.SReflect;
@@ -738,10 +742,23 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	 * @param clazz The clazz info.
 	 * @return true, if already enhanced, else false.
 	 */
-	public static boolean isEnhanced(ClassInfo clazz)
+	public static boolean isEnhanced(ClassFileInfo clazzfileinfo)
 	{
 		boolean ret = false;
+		ClassInfo clazz = clazzfileinfo.getClassInfo();
 		List<FieldInfo> fis = clazz.getFieldInfos();
+		if (fis == null)
+		{
+			try
+			{
+				clazz = SClassReader.getClassInfo(new FileInputStream(clazzfileinfo.getFilename()), true, false);
+			}
+			catch (FileNotFoundException e)
+			{
+				SUtil.throwUnchecked(e);
+			}
+			fis = clazz.getFieldInfos();
+		}
 		for(FieldInfo fi: SUtil.notNull(fis))
 		{
 			if(GLOBALNAME_FIELD_NAME.equals(fi.getFieldName()))
