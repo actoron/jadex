@@ -1,25 +1,8 @@
 package jadex.bdiv3;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.ProtectionDomain;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
-import jadex.bdiv3.model.BDIModel;
-import jadex.commons.IFilter;
-import jadex.commons.SClassReader.AnnotationInfo;
-import jadex.commons.SClassReader.ClassFileInfo;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.micro.annotation.Agent;
 
 
 /**
@@ -36,7 +19,7 @@ public class ByteKeepingASMBDIClassGenerator extends ASMBDIClassGenerator
 	private Map<String, byte[]>	recentclassbytes;
 
 	/**
-	 * Constructor.
+	 *  Create a new generator.
 	 */
 	public ByteKeepingASMBDIClassGenerator()
 	{

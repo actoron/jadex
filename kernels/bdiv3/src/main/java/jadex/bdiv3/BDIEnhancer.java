@@ -110,8 +110,6 @@ public class BDIEnhancer
 
                 for(Map.Entry<String, byte[]> entry: gen.getRecentClassBytes().entrySet())
                 {
-                	System.out.println("writing: "+entry.getKey());
-                	
                     byte[] bytes = entry.getValue();
                     try
                     {
@@ -121,6 +119,7 @@ public class BDIEnhancer
                     	
                         // write enhanced class
                         File enhfile = new File(outdir, relp.toString());
+                        System.out.println("writing: "+enhfile.getAbsolutePath());
                         enhfile.getParentFile().mkdirs();
                         DataOutputStream dos = new DataOutputStream(new FileOutputStream(enhfile));
                         dos.write(bytes);
@@ -148,7 +147,8 @@ public class BDIEnhancer
 			System.out.println(mi.getMethodName()+" "+mi.getMethodDescriptor());
 		}*/
 		
-		String indir = "C:/projects/jadex-newnew/jadex4/jadex/applications/bdiv3/bin/main";
+		//String indir = "C:/projects/jadex-newnew/jadex4/jadex/applications/bdiv3/bin/main";
+		String indir = "C:/tmp/bin";
 		String outdir = null;//"C:/tmp/bdi";
 		BDIEnhancer.enhanceBDIClasses(indir, outdir);
 	}
