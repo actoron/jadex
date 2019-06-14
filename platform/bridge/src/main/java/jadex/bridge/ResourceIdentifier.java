@@ -180,7 +180,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (gid!=null? gid.hashCode(): lid.hashCode());
+		result = prime * result + (gid!=null? gid.hashCode(): lid!=null? lid.hashCode(): super.hashCode());
 		return result;
 	}
 

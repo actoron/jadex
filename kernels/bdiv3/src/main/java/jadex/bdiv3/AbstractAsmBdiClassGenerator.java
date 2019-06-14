@@ -742,7 +742,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	{
 		boolean ret = false;
 		List<FieldInfo> fis = clazz.getFieldInfos();
-		for(FieldInfo fi: fis)
+		for(FieldInfo fi: SUtil.notNull(fis))
 		{
 			if(GLOBALNAME_FIELD_NAME.equals(fi.getFieldName()))
 			{

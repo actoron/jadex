@@ -2,30 +2,23 @@ package jadex.bdiv3;
 
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import jadex.bdiv3.model.BDIModel;
-import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.VersionInfo;
-import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IFilter;
-import jadex.commons.SClassReader;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassFileInfo;
-import jadex.commons.SClassReader.ClassInfo;
-import jadex.commons.SClassReader.EnumInfo;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
 
 
@@ -37,33 +30,33 @@ import jadex.micro.annotation.Agent;
 public class ByteKeepingASMBDIClassGenerator extends ASMBDIClassGenerator
 {
 	/** Map containing all bytes of all classes ever computed **/
-	private Map<String, byte[]>	classBytes;
+	private Map<String, byte[]>	classbytes;
 
 	/** Map containing all classes computed since last clear call **/
-	private Map<String, byte[]>	recentClassBytes;
+	private Map<String, byte[]>	recentclassbytes;
 
 	/**
 	 * Constructor.
 	 */
 	public ByteKeepingASMBDIClassGenerator()
 	{
-		classBytes = new HashMap<String, byte[]>();
-		recentClassBytes = new HashMap<String, byte[]>();
+		classbytes = new HashMap<String, byte[]>();
+		recentclassbytes = new HashMap<String, byte[]>();
 	}
 
 	@Override
 	public Class<?> toClass(String name, byte[] data, ClassLoader loader, ProtectionDomain domain)
 	{
 		Class<?> result = null;
-		if(!classBytes.containsKey(name))
+		if(!classbytes.containsKey(name))
 		{
 			// return null if this class has already been enhanced before to avoid duplicates.
 			result = super.toClass(name, data, loader, domain); // maybe this isn't needed? just return null?
 			
 			if(result != null)
 			{
-				classBytes.put(name, data);
-				recentClassBytes.put(name, data);
+				classbytes.put(name, data);
+				recentclassbytes.put(name, data);
 			}
 		}
 		return result;
@@ -75,7 +68,7 @@ public class ByteKeepingASMBDIClassGenerator extends ASMBDIClassGenerator
 	 */
 	public Map<String, byte[]> getRecentClassBytes()
 	{
-		return recentClassBytes;
+		return recentclassbytes;
 	}
 
 	/**
@@ -83,87 +76,6 @@ public class ByteKeepingASMBDIClassGenerator extends ASMBDIClassGenerator
 	 */
 	public void clearRecentClassBytes()
 	{
-		recentClassBytes.clear();
-	}
-	
-	/**
-	 * 
-	 */
-	public static void enhanceBDIClasses(URL[] indirs, String outdir, ClassLoader cl)
-	{
-		//if(outdir==null)
-			//outdir = indir;
-			
-		BDIModelLoader loader = new BDIModelLoader();
-		ByteKeepingASMBDIClassGenerator gen = new ByteKeepingASMBDIClassGenerator();
-		loader.setGenerator(gen);
-		
-		Set<ClassFileInfo> cis = SReflect.scanForClassFileInfos(indirs, null, new IFilter<ClassFileInfo>()
-		{
-			public boolean filter(ClassFileInfo ci)
-			{
-				AnnotationInfo ai = ci.getClassInfo().getAnnotation(Agent.class.getName());
-				return ai!=null;
-			}
-		});
-		
-		for(ClassFileInfo ci : cis)
-		{
-			if(gen.isEnhanced(ci.getClassInfo()))
-			{
-				System.out.println("Already enhanced: "+ci.getFilename());
-				
-				// just copy file
-//                if(!indir.equals(outdir))
-//                {
-//                    File newFile = new File(outdir, relativePath);
-//                    if(!newFile.exists())
-//                    {
-//                        newFile.getParentFile().mkdirs();
-//                        FileUtils.copyFile(bdiFile, newFile);
-//                    }
-//                }
-			}
-			else
-			{
-				gen.clearRecentClassBytes();
-			    //BDIModel model = null;
-
-                try
-                {
-                	BDIModel model = (BDIModel)loader.loadModel(ci.getFilename(), null, null, null, null);
-                }
-                catch(Exception t)
-                {
-                	SUtil.rethrowAsUnchecked(t);
-                }
-
-			    System.out.println("Generating classes for: " + ci.getFilename());
-
-                for(Map.Entry<String, byte[]> entry: gen.getRecentClassBytes().entrySet())
-                {
-                    //String name = entry.getKey();
-                    byte[] bytes = entry.getValue();
-                    //String path = name.replace('.', File.separatorChar) + ".class";
-                    try
-                    {
-                        // write enhanced class
-                        File enhfile = new File(outdir, ci.getFilename());
-                        enhfile.getParentFile().mkdirs();
-                        DataOutputStream dos = new DataOutputStream(new FileOutputStream(enhfile));
-                        dos.write(bytes);
-                        dos.close();
-                    }
-                    catch(IOException e)
-                    {
-                        e.printStackTrace();
-                        // URLClassLoader.close() not in JDK 1.6
-                        if(cl instanceof URLClassLoader) 
-                            try{ ((URLClassLoader)cl).close(); } catch(IOException e2) {}
-                        throw new RuntimeException(e.getMessage());
-                    }
-                }
-			}
-		}
+		recentclassbytes.clear();
 	}
 }
