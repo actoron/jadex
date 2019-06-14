@@ -1,6 +1,5 @@
 package jadex.bdiv3;
 
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -9,11 +8,14 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import jadex.bdiv3.model.BDIModel;
 import jadex.bridge.ResourceIdentifier;
+import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
 import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
@@ -54,18 +56,26 @@ public class BDIEnhancer
 		ByteKeepingASMBDIClassGenerator gen = new ByteKeepingASMBDIClassGenerator();
 		loader.setGenerator(gen);
 		
-		Set<ClassFileInfo> cis = SReflect.scanForClassFileInfos(new URL[]{inurl}, null, new IFilter<ClassFileInfo>()
+		Set<ClassFileInfo> cis = new HashSet<>();
+		FileFilter ff = new FileFilter(null, false, ".class");
+		Set<ClassFileInfo> allcis = SReflect.scanForClassFileInfos(new URL[]{inurl}, ff, new IFilter<ClassFileInfo>()
 		{
 			public boolean filter(ClassFileInfo ci)
 			{
 				AnnotationInfo ai = ci.getClassInfo().getAnnotation(Agent.class.getName());
-				return ai!=null;
+				if (ai != null)
+					cis.add(ci);
+				return true;
+				//return ai!=null;
 			}
 		});
 		
+		Map<String, String> classfiles = new HashMap<>();
+		allcis.stream().forEach(ci -> classfiles.put(ci.getClassInfo().getClassName(), ci.getFilename()));
+		
 		for(ClassFileInfo ci : cis)
 		{
-			if(gen.isEnhanced(ci.getClassInfo()))
+			if(AbstractAsmBdiClassGenerator.isEnhanced(ci))
 			{
 				System.out.println("Already enhanced: "+ci.getFilename());
 				
@@ -96,7 +106,7 @@ public class BDIEnhancer
 				System.out.println("Processing: "+ci.getFilename());
 				
 				gen.clearRecentClassBytes();
-
+				
                 try
                 {
                 	BDIModel model = loader.loadComponentModel(ci.getFilename(), null, null, cl, new Object[]{new ResourceIdentifier(), null, null});
@@ -106,24 +116,23 @@ public class BDIEnhancer
                 	SUtil.throwUnchecked(e);
                 }
 
-			    //System.out.println("Generating classes for: " + ci.getFilename());
-
                 for(Map.Entry<String, byte[]> entry: gen.getRecentClassBytes().entrySet())
                 {
+                	System.out.println("writing: "+entry.getKey());
+                	
                     byte[] bytes = entry.getValue();
-                    try
+                    
+                    Path p = Paths.get(indir);
+                	Path p2 = Paths.get(classfiles.get(entry.getKey()));
+                	Path relp = p.relativize(p2);
+                	
+                    // write enhanced class
+                    File enhfile = new File(outdir, relp.toString());
+                    enhfile.getParentFile().mkdirs();
+                    
+                    try(FileOutputStream fos = new FileOutputStream(enhfile))
                     {
-                    	Path p = Paths.get(indir);
-                    	Path p2 = Paths.get(ci.getFilename());
-                    	Path relp = p.relativize(p2);
-                    	
-                        // write enhanced class
-                        File enhfile = new File(outdir, relp.toString());
-                        System.out.println("writing: "+enhfile.getAbsolutePath());
-                        enhfile.getParentFile().mkdirs();
-                        DataOutputStream dos = new DataOutputStream(new FileOutputStream(enhfile));
-                        dos.write(bytes);
-                        dos.close();
+                        fos.write(bytes);
                     }
                     catch(IOException e)
                     {
@@ -141,13 +150,18 @@ public class BDIEnhancer
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		/*ClassInfo ci = SClassReader.getClassInfo(new FileInputStream("C:/projects/jadex-newnew/jadex4/jadex/applications/bdiv3/bin/main/jadex/bdiv3/testcases/componentplans/ComponentPlanBDI.class"), true, true); 
+		/*Map<String, MethodInfo> m = new HashMap<>();
+		ClassInfo ci = SClassReader.getClassInfo(new FileInputStream("C:/tmp/bin/jadex/bdiv3/testcases/componentplans/ComponentPlanBDI.class"), true, true); 
 		for(MethodInfo mi: ci.getMethodInfos())
 		{
-			System.out.println(mi.getMethodName()+" "+mi.getMethodDescriptor());
+//			System.out.println(mi.getMethodName()+" "+mi.getMethodDescriptor());
+			if(m.containsKey(mi.getMethodName()+" " + mi.getMethodDescriptor()))
+				System.out.println("Dup method: "+mi.getMethodName()+" "+mi.getMethodDescriptor());
+			else
+				m.put(mi.getMethodName()+" " + mi.getMethodDescriptor(), mi);
 		}*/
 		
-		//String indir = "C:/projects/jadex-newnew/jadex4/jadex/applications/bdiv3/bin/main";
+		//String indir = "/home/jander/git/jadex/applications/bdiv3/bintest/main";
 		String indir = "C:/tmp/bin";
 		String outdir = null;//"C:/tmp/bdi";
 		BDIEnhancer.enhanceBDIClasses(indir, outdir);

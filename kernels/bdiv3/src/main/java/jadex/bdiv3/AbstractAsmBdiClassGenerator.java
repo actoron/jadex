@@ -1,11 +1,13 @@
 package jadex.bdiv3;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +37,8 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.MethodInfo;
+import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.ClassFileInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SClassReader.FieldInfo;
 import jadex.commons.SReflect;
@@ -189,19 +193,21 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 					List<Class<?>> allcz = SUtil.arrayToList(SReflect.getSuperInterfaces(new Class[]{IBDIAgent.class}));
 					allcz.add(IBDIAgent.class);
 //					allcz.add(INonUserAccess.class);
-					Set<Method> allms = new HashSet<Method>();
+					
+					Map<MethodInfo, Method> allms = new HashMap<MethodInfo, Method>();
 					for(Class<?> tmp: allcz)
 					{
 						Method[] mets = tmp.getDeclaredMethods();
 						for(Method m: mets)
 						{
-							allms.add(m);
+							allms.put(new MethodInfo(m), m);
 						}
 					}
 					
 					// Implement all methods
-					for(Method m: allms)
+					for(MethodInfo mi: allms.keySet())
 					{
+						Method m = allms.get(mi);
 						MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, m.getName(), Type.getMethodDescriptor(m), null, null);
 						Type ret = Type.getReturnType(mnode.desc);
 						InsnList nl = new InsnList();
@@ -738,10 +744,23 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	 * @param clazz The clazz info.
 	 * @return true, if already enhanced, else false.
 	 */
-	public static boolean isEnhanced(ClassInfo clazz)
+	public static boolean isEnhanced(ClassFileInfo clazzfileinfo)
 	{
 		boolean ret = false;
+		ClassInfo clazz = clazzfileinfo.getClassInfo();
 		List<FieldInfo> fis = clazz.getFieldInfos();
+		if(fis == null)
+		{
+			try
+			{
+				clazz = SClassReader.getClassInfo(new FileInputStream(clazzfileinfo.getFilename()), true, false);
+			}
+			catch (FileNotFoundException e)
+			{
+				SUtil.throwUnchecked(e);
+			}
+			fis = clazz.getFieldInfos();
+		}
 		for(FieldInfo fi: SUtil.notNull(fis))
 		{
 			if(GLOBALNAME_FIELD_NAME.equals(fi.getFieldName()))
