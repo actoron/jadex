@@ -1,11 +1,11 @@
 package jadex.bdiv3;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -17,22 +17,34 @@ import jadex.bdiv3.model.BDIModel;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
-import jadex.commons.SClassReader;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassFileInfo;
-import jadex.commons.SClassReader.ClassInfo;
-import jadex.commons.SClassReader.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
 
 /**
- * 
+ *  Helper class to enhance BDI classes at buildtime.
+ *  
+ *  Needs access the the BDI and dependent classes.
+ *  
+ *  Can be used as basis for custom build tool extensions (e.g. gradle task or maven plugin).
  */
 public class BDIEnhancer
 {
 	/**
-	 * 
+	 *  Enhance all BDI classes contained in a directory.
+	 *  
+	 *  If indir and outdir are the same (also outdir==null):
+	 *  	- BDI classes are enhance in place and replace old classes. All other files are not changed.
+	 *  	- Already enhanced BDI classes are detected and omitted.
+	 *  
+	 *  if outdir is different than indir:
+	 * 		- BDI classes are enhanced and copied to the outdir.
+	 * 		- All other files are copied without change to the outdir.
+	 *  
+	 *  @param indir The input directory (is recursivly scanned for BDI classes).
+	 *  @param outdir The output directory (null for the same as indir).
 	 */
 	public static void enhanceBDIClasses(String indir, String outdir)
 	{
@@ -49,6 +61,8 @@ public class BDIEnhancer
 			SUtil.throwUnchecked(e);
 		}
 		
+		Set<String> done = new HashSet<String>();
+		
 		ClassLoader origcl = BDIEnhancer.class.getClassLoader();
 		URLClassLoader cl = new URLClassLoader(new URL[]{inurl}, origcl);
 		
@@ -63,8 +77,16 @@ public class BDIEnhancer
 			public boolean filter(ClassFileInfo ci)
 			{
 				AnnotationInfo ai = ci.getClassInfo().getAnnotation(Agent.class.getName());
-				if (ai != null)
+				if(ai != null && 
+					(BDIAgentFactory.TYPE.equals(ai.getValue("type")) || ci.getFilename().indexOf("BDI")!=-1))
+				{
 					cis.add(ci);
+				}
+				else if(ai!=null)
+				{
+					System.out.println("found non-bdi agent: "+ci.getFilename());
+				}
+				
 				return true;
 				//return ai!=null;
 			}
@@ -78,28 +100,6 @@ public class BDIEnhancer
 			if(AbstractAsmBdiClassGenerator.isEnhanced(ci))
 			{
 				System.out.println("Already enhanced: "+ci.getFilename());
-				
-				// just copy file
-                if(!indir.equals(outdir))
-                {
-                	Path p = Paths.get(indir);
-                	Path p2 = Paths.get(ci.getFilename());
-                	Path relp = p.relativize(p2);
-                	
-                    File f = new File(outdir, relp.toString());
-                    if(!f.exists())
-                    {
-                    	f.getParentFile().mkdirs();
-                    	try
-                    	{
-                    		SUtil.copyFile(new File(ci.getFilename()), f);
-                    	}
-                    	catch(IOException e)
-                    	{
-                    		SUtil.throwUnchecked(e);
-                    	}
-                    }
-                }
 			}
 			else
 			{
@@ -133,6 +133,7 @@ public class BDIEnhancer
                     try(FileOutputStream fos = new FileOutputStream(enhfile))
                     {
                         fos.write(bytes);
+                        done.add(enhfile.getPath());
                     }
                     catch(IOException e)
                     {
@@ -143,6 +144,50 @@ public class BDIEnhancer
                 }
 			}
 		}
+		
+		// copy all other files rest
+        if(!indir.equals(outdir))
+        {
+        	final String foutdir = outdir;
+        	try
+        	{
+        		Files.walk(Paths.get(indir))
+        			.filter(file -> 
+        			{ 
+        				boolean ret = Files.isRegularFile(file) && !done.contains(file.toString());
+        				if(!ret)
+        					System.out.println("Not copying: "+file);
+        				return ret;
+        			})
+        			.forEach(file ->
+        			{
+        	        	Path p = Paths.get(indir);
+        	        	Path relp = p.relativize(file);
+        	        	
+        	            File f = new File(foutdir, relp.toString());
+        	            if(!f.exists())
+        	            {
+        	            	f.getParentFile().mkdirs();
+        	            	try
+        	            	{
+        	            		System.out.println("Copying: "+file);
+        	            		SUtil.copyFile(new File(file.toString()), f);
+        	            	}
+        	            	catch(IOException e)
+        	            	{
+        	            		SUtil.throwUnchecked(e);
+        	            	}
+        	            }
+        	            
+        	            done.add(f.getPath());
+        			});
+        	}
+        	catch(Exception e)
+        	{
+        		SUtil.throwUnchecked(e);
+        	}
+        }
+		
 	}
 	
 	/**
@@ -164,7 +209,8 @@ public class BDIEnhancer
 		
 		//String indir = "/home/jander/git/jadex/applications/bdiv3/bintest/main";
 		String indir = "C:/tmp/bin";
-		String outdir = null;//"C:/tmp/bdi";
+		String outdir ="C:/tmp/bdienh";
+		//String outdir = null;
 		BDIEnhancer.enhanceBDIClasses(indir, outdir);
 	}
 }

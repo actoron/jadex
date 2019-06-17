@@ -1217,7 +1217,7 @@ public class SClassReader
     	protected String type;
     	
     	/** Annotations nested in this annotation. */
-    	Map<String, Object> values;
+    	protected Map<String, Object> values;
     	
     	/**
     	 *  Creates the info.
