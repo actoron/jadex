@@ -115,4 +115,16 @@ public enum ServiceScope
 	{
 		return NETWORK_SCOPES.contains(this);
 	}
+	
+	/**
+	 *  Get the enum per string.
+	 *  @param val The value.
+	 *  @return The enum or null.
+	 */
+	public static ServiceScope getEnum(String val)
+	{
+		if(val==null)
+			return null;
+		return  ServiceScope.valueOf(val.toUpperCase());
+	}
 }

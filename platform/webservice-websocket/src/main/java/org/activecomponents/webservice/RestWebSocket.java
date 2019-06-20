@@ -136,7 +136,7 @@ public class RestWebSocket extends Endpoint
 		this.config = config;
 
 		this.debug = getServletContext().getInitParameter("servicecall_debug")!=null?
-				Boolean.parseBoolean(getServletContext().getInitParameter("servicecall_debug")): false;
+			Boolean.parseBoolean(getServletContext().getInitParameter("servicecall_debug")): false;
 
 		session.setMaxTextMessageBufferSize(8*1024);
 		
@@ -389,7 +389,7 @@ public class RestWebSocket extends Endpoint
 					}
 					else
 					{
-						IFuture<IService> res = (IFuture<IService>)platform.searchService(new ServiceQuery<>(type, ServiceScope.valueOf(scope)));
+						IFuture<IService> res = (IFuture<IService>)platform.searchService(new ServiceQuery<>(type, ServiceScope.getEnum(scope)));
 						res.addResultListener(new ExceptionDelegationResultListener<IService, String>(ret)
 						{
 							public void customResultAvailable(IService service)
@@ -404,7 +404,7 @@ public class RestWebSocket extends Endpoint
 				}
 				else
 				{
-					ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)platform.searchService(new ServiceQuery<>( type, ServiceScope.valueOf(scope)));
+					ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)platform.searchService(new ServiceQuery<>(type, ServiceScope.getEnum(scope)));
 					res.addResultListener(new IIntermediateResultListener<IService>()
 					{
 						public void intermediateResultAvailable(IService service)

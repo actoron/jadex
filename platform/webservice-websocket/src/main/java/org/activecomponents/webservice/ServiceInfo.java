@@ -7,6 +7,7 @@ import jadex.bridge.service.IServiceIdentifier;
 
 /**
  *  Service info.
+ *  Provides also method names because otherwise JS side would have to inspect Java interfaces.
  */
 public class ServiceInfo
 {
