@@ -404,7 +404,7 @@ public class RestWebSocket extends Endpoint
 				}
 				else
 				{
-					ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)platform.searchService(new ServiceQuery<>(type, ServiceScope.getEnum(scope)));
+					ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)platform.searchServices(new ServiceQuery<>(type, ServiceScope.getEnum(scope)));
 					res.addResultListener(new IIntermediateResultListener<IService>()
 					{
 						public void intermediateResultAvailable(IService service)
@@ -1258,7 +1258,6 @@ public class RestWebSocket extends Endpoint
 										}
 										catch(Exception e)
 										{
-//												System.out.println("Could not remove component from session: "+key);
 											System.out.println("Could not remove component from session: "+key);
 											e.printStackTrace();
 										}
@@ -1298,7 +1297,7 @@ public class RestWebSocket extends Endpoint
 
 
 	/**
-	 *
+	 *  Struct for serialized value.
 	 */
 	public static class SerializedValue
 	{

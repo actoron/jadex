@@ -38,6 +38,8 @@ public class SWebSocket
 	 */
 	public static IFuture<Void>	initContext(ServletContext context)
 	{
+		System.out.println("Init context for: "+context.getContextPath());
+		
 		FutureBarrier<IComponentIdentifier>	agents	= new FutureBarrier<IComponentIdentifier>();
 
 		// Create components specified in web.xml
