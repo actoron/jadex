@@ -1189,5 +1189,6 @@ var Jadex =
         JsonParser.registerClass(clazz);
     }
 };
+var jadex = Jadex;
 
 	

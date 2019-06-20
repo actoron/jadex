@@ -16,22 +16,22 @@ public interface IChatGuiService
 	/**
 	 *  Set the user name.
 	 */
-	public IFuture<Void>	setNickName(String nick);
+	public IFuture<Void> setNickName(String nick);
 	
 	/**
 	 *  Get the user name.
 	 */
-	public IFuture<String>	getNickName();
+	public IFuture<String> getNickName();
 	
 	/**
 	 *  Set the avatar image.
 	 */
-	public IFuture<Void>	setImage(byte[] image);
+	public IFuture<Void> setImage(byte[] image);
 	
 	/**
 	 *  Get the avatar image.
 	 */
-	public IFuture<byte[]>	getImage();
+	public IFuture<byte[]> getImage();
 	
 	// download directory
 	
@@ -43,7 +43,7 @@ public interface IChatGuiService
 	 */
 	// Not necessary due to SFuture.getNoTimeoutFuture
 //	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<ChatEvent>	subscribeToEvents();
+	public ISubscriptionIntermediateFuture<ChatEvent> subscribeToEvents();
 	
 	//-------- chatting --------
 	

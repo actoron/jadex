@@ -5,11 +5,6 @@
         <script src="wswebapi/jadex.js"></script>
         
         <script type="text/javascript">
-            var SCOPE_PLATFORM = Scopes.SCOPE_PLATFORM;
-            var SCOPE_GLOBAL = Scopes.SCOPE_GLOBAL;
-            var SCOPE_SESSION = Scopes.SCOPE_SESSION;
-            var jadex = Jadex;
-
 	        /*var service;
         	jadex.getService("org.activecomponents.webservice.IWebsocketTestService").then(function(ser) 
         	{ 
@@ -20,7 +15,7 @@
         	
         	function sayHelloTo(name)
         	{
-        		jadex.getService(serclazz, SCOPE_PLATFORM)
+        		jadex.getService(serclazz, Scopes.SCOPE_PLATFORM)
 	   				.then(function(service) 
 	   			{
 	       			service.sayHelloTo(!name? "Lars": name)

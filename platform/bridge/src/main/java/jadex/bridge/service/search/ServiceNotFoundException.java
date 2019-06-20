@@ -6,11 +6,6 @@ package jadex.bridge.service.search;
 public class ServiceNotFoundException extends RuntimeException
 {
 	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1578469236285544067L;
-
-	/**
 	 *  Create a new service not found exception.
 	 */
 	public ServiceNotFoundException(String message)

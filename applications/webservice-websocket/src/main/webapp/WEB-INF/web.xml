@@ -25,7 +25,7 @@
 		<param-value>org.activecomponents.webservice.WebsocketsTestAgent.class</param-value>
 	</context-param>
 	<context-param>
-		<param-name>jadex.bridge.service.types.chat.IChatGuiService</param-name>
+		<param-name>ws_serviceimpl_jadex.bridge.service.types.chat.IChatGuiService</param-name>
 		<param-value>jadex.platform.service.chat.ChatAgent.class</param-value>
 	</context-param>
 </web-app>  

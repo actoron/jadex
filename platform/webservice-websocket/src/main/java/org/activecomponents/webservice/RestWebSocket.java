@@ -51,7 +51,6 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -179,11 +178,27 @@ public class RestWebSocket extends Endpoint
 			}
 			else if(msg instanceof ServiceSearchMessage)
 			{
-				handleSearchServiceMessage(session, (ServiceSearchMessage)msg).addResultListener(new DelegationResultListener<String>(ret));
+				handleSearchServiceMessage(session, (ServiceSearchMessage)msg).addResultListener(new DelegationResultListener<String>(ret)
+				{
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						// TODO Auto-generated method stub
+						super.exceptionOccurred(exception);
+					}
+				});
 			}
 			else if(msg instanceof ServiceInvocationMessage)
 			{
-				handleServiceInvocationMessage(session, (ServiceInvocationMessage)msg).addResultListener(new DelegationResultListener<String>(ret));
+				handleServiceInvocationMessage(session, (ServiceInvocationMessage)msg).addResultListener(new DelegationResultListener<String>(ret)
+				{
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						// TODO Auto-generated method stub
+						super.exceptionOccurred(exception);
+					}
+				});
 			}
 			else if(msg instanceof ServiceTerminateInvocationMessage)
 			{
@@ -484,9 +499,16 @@ public class RestWebSocket extends Endpoint
 		{
 			public void customResultAvailable(IExternalAccess platform)
 			{
+				System.out.println("Searching service: "+sim.getServiceId()+" on platform: "+platform.getId());
 				IFuture<IService> fut = platform.searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(sim.getServiceId()));
 				fut.addResultListener(new ExceptionDelegationResultListener<IService, String>(ret)
 				{
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						super.exceptionOccurredIfUndone(exception);
+					}
+					
 					public void customResultAvailable(IService service) throws Exception
 					{
 						// todo: fundamental problem class loader.
@@ -500,7 +522,9 @@ public class RestWebSocket extends Endpoint
 						{
 							try
 							{
-								decparams[cnt] = JsonTraverser.objectFromString((String)encp, this.getClass().getClassLoader(), null, Object.class, readprocs);
+								//decparams[cnt] = JsonTraverser.objectFromString((String)encp, this.getClass().getClassLoader(), null, Object.class, readprocs);
+								// does not work with Object.class as type because ArrayProcessor checks class to be null or of array type
+								decparams[cnt] = JsonTraverser.objectFromString((String)encp, this.getClass().getClassLoader(), null, null, readprocs);
 								cnt++;
 							}
 							catch(Exception e)
@@ -1185,7 +1209,8 @@ public class RestWebSocket extends Endpoint
 	protected IFuture<String> sendException(Exception ex, String callid, Session session)
 	{
 //		System.out.println("removing call ex: "+callid);
-		if (debug) ex.printStackTrace();
+		if(debug) 
+			ex.printStackTrace();
 		return sendMessage(new ResultMessage(ex, callid), session);
 	}
 	

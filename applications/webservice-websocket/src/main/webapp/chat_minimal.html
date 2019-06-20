@@ -11,7 +11,7 @@
         	function message(text)
         	{
         		// each user gets his own chat agent
-        		jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+        		jadex.getService(serclazz, Scopes.SCOPE_SESSION).then(function(service) 
 	   			{
 	       			service.message(text, null, false).then(function()
 			  		{
@@ -30,7 +30,7 @@
         	}
         	
         	// Subscribe for chat events (messages, user state changes, etc.) 
-       		jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+       		jadex.getService(serclazz, Scopes.SCOPE_SESSION).then(function(service) 
    			{
    				var prom = service.subscribeToEvents(function(event)
  	       		{
@@ -55,7 +55,7 @@
    	   		});
    	   		
    	   		// Search the current users 
-   	   		jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+   	   		jadex.getService(serclazz, Scopes.SCOPE_SESSION).then(function(service) 
    			{
    	   			window.setInterval(function()
    	   			{

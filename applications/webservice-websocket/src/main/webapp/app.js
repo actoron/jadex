@@ -1,10 +1,5 @@
 var app = angular.module('app', []);
 
-var SCOPE_PLATFORM = jadex.Scopes.SCOPE_PLATFORM;
-var SCOPE_GLOBAL = jadex.Scopes.SCOPE_GLOBAL;
-var SCOPE_SESSION = jadex.Scopes.SCOPE_SESSION;
-var jadex = new jadex.Jadex();
-
 var serclazz = "jadex.bridge.service.types.chat.IChatGuiService";
  
 var ConnectionState = 
@@ -28,7 +23,7 @@ app.controller("ChatController", function($scope)
 	this.postMessage = function(text)
 	{
 		// each user gets his own chat agent
-		jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+		jadex.getService(serclazz, Scopes.SCOPE_SESSION).then(function(service) 
 		{
 			var recs = [];
 			for(var i=0; i<$scope.selected_users.length; i++)
@@ -70,7 +65,7 @@ app.controller("ChatController", function($scope)
 	}
 	
 	// Get my nickname
-	jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+	jadex.getService(serclazz, Scopes.SCOPE_SESSION).then(function(service) 
 	{
    		service.getNickName().then(function(nick)
 		{
@@ -88,7 +83,7 @@ app.controller("ChatController", function($scope)
    	{
     	if($scope.nick.length > 0) 
     	{
-			jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+			jadex.getService(serclazz, Scopes.SCOPE_SESSION).then(function(service) 
 			{
 				service.setNickName($scope.nick).then(function(res)
 				{
@@ -103,7 +98,7 @@ app.controller("ChatController", function($scope)
   	});
    	
    	// Get my image
-	jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+	jadex.getService(serclazz, Scopes.SCOPE_SESSION).then(function(service) 
 	{
    		service.getImage().then(function(avatar)
 		{
@@ -179,7 +174,7 @@ app.controller("ChatController", function($scope)
 	// Subscribe for chat events (messages, user state changes, etc.) 
   	function connect()
   	{
-		jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+		jadex.getService(serclazz, Scopes.SCOPE_SESSION).then(function(service) 
 		{
 			$scope.$apply($scope.connected = ConnectionState.CONNECTING);   
 			var prom = service.subscribeToEvents(function(event)
@@ -214,7 +209,7 @@ app.controller("ChatController", function($scope)
 	// Search the current users 
   	function updateUsers()
   	{
-		jadex.getService(serclazz, SCOPE_SESSION).then(function(service) 
+		jadex.getService(serclazz, Scopes.SCOPE_SESSION).then(function(service) 
 		{
 			console.log("updateUsers: "+cnt++);
 			$scope.users = [];

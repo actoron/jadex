@@ -251,7 +251,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 //			});
 			snapshotSearchRemoteServices(query).thenAccept(services ->
 			{
-				// improve code path to allow for early cancelation
+				// improve code path to allow for early cancellation
 				if (services.size() == 0)
 					ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
 				else
