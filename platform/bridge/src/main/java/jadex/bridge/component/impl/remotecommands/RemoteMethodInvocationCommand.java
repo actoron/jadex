@@ -192,6 +192,25 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		return fret;
 	}
 	
+	/**
+	 *  Checks if the remote command is internally valid.
+	 * 
+	 *  @param access The component access.
+	 *  @return Exception describing the error if invalid.
+	 */
+	public Exception isValid(IInternalAccess access)
+	{
+		try
+		{
+			method.getMethod(access.getClassLoader());
+		}
+		catch (Exception e)
+		{
+			return e;
+		}
+		return null;
+	}
+	
 	protected static final Method	SEARCHMETHOD;
 	static
 	{

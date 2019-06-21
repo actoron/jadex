@@ -16,4 +16,12 @@ public interface IRemoteCommand<T>
 	 *  @return A future for return value(s). May also be intermediate, subscription, etc.
 	 */
 	public IFuture<T>	execute(IInternalAccess access, ISecurityInfo secinf);
+	
+	/**
+	 *  Checks if the remote command is internally valid.
+	 * 
+	 *  @param access The component access.
+	 *  @return Exception describing the error if invalid.
+	 */
+	public Exception isValid(IInternalAccess access);
 }

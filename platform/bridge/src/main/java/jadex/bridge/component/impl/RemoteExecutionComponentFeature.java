@@ -10,11 +10,6 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import io.opentracing.Span;
-import io.opentracing.SpanContext;
-import io.opentracing.propagation.Format.Builtin;
-import io.opentracing.propagation.TextMapExtractAdapter;
-import io.opentracing.util.GlobalTracer;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -44,7 +39,6 @@ import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.component.interceptors.SpanContextInfo;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
@@ -335,132 +329,142 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			if(msg instanceof IRemoteCommand)
 			{
 				final IComponentIdentifier remote = (IComponentIdentifier) header.getProperty(IMsgHeader.SENDER);
-				if(checkSecurity(secinfos, header, msg))
+				Exception validityex = ((IRemoteCommand) msg).isValid(component);
+				if (validityex == null)
 				{
-					IRemoteCommand<?> cmd = (IRemoteCommand<?>)msg;
-					ServiceCall	sc	= null;
-					if(cmd instanceof AbstractInternalRemoteCommand)
+					if(checkSecurity(secinfos, header, msg))
 					{
-						// Creates a new ServiceCall for the current call and copies the values
-						
-						// Create new hashmap to prevent remote manipulation of the map object
-						Map<String, Object>	nonfunc	= new HashMap<>(SUtil.notNull(((AbstractInternalRemoteCommand)cmd).getProperties()));
-//						if(nonfunc==null)
-//							nonfunc = new HashMap<String, Object>();
-						nonfunc.put(ServiceCall.SECURITY_INFOS, secinfos);
-						IComponentIdentifier.LOCAL.set((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER));
-						// Local is used to set the caller in the new service call context
-						sc = ServiceCall.getOrCreateNextInvocation(nonfunc);
-						// After call creation it can be reset
-						IComponentIdentifier.LOCAL.set(getComponent().getId());
-					}
-					final ServiceCall fsc = sc;
-					
-					final IFuture<?> retfut = cmd.execute(component, secinfos);
-					CallAccess.resetNextInvocation();
-					if(incommands == null)
-						incommands = new HashMap<String, IFuture<?>>();
-					IFuture<?> prev	= incommands.put(rxid, retfut);
-					assert prev==null;
-					
-					final IResultListener<Void>	term;
-					if(retfut instanceof ITerminableFuture)
-					{
-						term = new IResultListener<Void>()
+						IRemoteCommand<?> cmd = (IRemoteCommand<?>)msg;
+						ServiceCall	sc	= null;
+						if(cmd instanceof AbstractInternalRemoteCommand)
 						{
-							public void exceptionOccurred(Exception exception)
+							// Creates a new ServiceCall for the current call and copies the values
+							
+							// Create new hashmap to prevent remote manipulation of the map object
+							Map<String, Object>	nonfunc	= new HashMap<>(SUtil.notNull(((AbstractInternalRemoteCommand)cmd).getProperties()));
+//							if(nonfunc==null)
+//								nonfunc = new HashMap<String, Object>();
+							nonfunc.put(ServiceCall.SECURITY_INFOS, secinfos);
+							IComponentIdentifier.LOCAL.set((IComponentIdentifier)header.getProperty(IMsgHeader.SENDER));
+							// Local is used to set the caller in the new service call context
+							sc = ServiceCall.getOrCreateNextInvocation(nonfunc);
+							// After call creation it can be reset
+							IComponentIdentifier.LOCAL.set(getComponent().getId());
+						}
+						final ServiceCall fsc = sc;
+						
+						final IFuture<?> retfut = cmd.execute(component, secinfos);
+						CallAccess.resetNextInvocation();
+						if(incommands == null)
+							incommands = new HashMap<String, IFuture<?>>();
+						IFuture<?> prev	= incommands.put(rxid, retfut);
+						assert prev==null;
+						
+						final IResultListener<Void>	term;
+						if(retfut instanceof ITerminableFuture)
+						{
+							term = new IResultListener<Void>()
 							{
-								((ITerminableFuture)retfut).terminate();
-								incommands.remove(rxid);
+								public void exceptionOccurred(Exception exception)
+								{
+									((ITerminableFuture)retfut).terminate();
+									incommands.remove(rxid);
+								}
+								
+								public void resultAvailable(Void result)
+								{
+								}
+							};
+						}
+						else
+						{
+							term	= null;
+						}
+						
+						retfut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener()
+						{
+							/** Result counter. */
+							int counter = Integer.MIN_VALUE;
+							
+							public void intermediateResultAvailable(Object result)
+							{
+								RemoteIntermediateResultCommand<?> rc = new RemoteIntermediateResultCommand(result, fsc!=null ? fsc.getProperties() : null);
+								rc.setResultCount(counter++);
+//								System.out.println("send RemoteIntermediateResultCommand to: "+remote);
+								IFuture<Void> fut = sendRxMessage(remote, rxid, rc);
+								if(term!=null)
+								{
+									fut.addResultListener(term);
+								}
 							}
 							
-							public void resultAvailable(Void result)
+							public void finished()
 							{
+								incommands.remove(rxid);
+								RemoteFinishedCommand<?> rc = new RemoteFinishedCommand(fsc!=null ? fsc.getProperties() : null);
+								rc.setResultCount(counter++);
+								sendRxMessage(remote, rxid, rc);
 							}
-						};
+							
+							public void resultAvailable(final Object result)
+							{
+//								getComponent().getLogger().severe("sending result: "+rxid+", "+result);
+								incommands.remove(rxid);
+								RemoteResultCommand<?> rc = new RemoteResultCommand(result, fsc!=null ? fsc.getProperties() : null);
+								final int msgcounter = counter++;
+								rc.setResultCount(msgcounter);
+								sendRxMessage(remote, rxid, rc).addResultListener(new IResultListener<Void>()
+								{
+									@Override
+									public void exceptionOccurred(Exception exception)
+									{
+										getComponent().getLogger().severe("sending result failed: "+rxid+", "+result+", "+exception);
+										// Serialization of result failed -> send back exception.
+										RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
+										rc.setResultCount(msgcounter);
+										sendRxMessage(remote, rxid, rc);
+									}
+									
+									@Override
+									public void resultAvailable(Void v)
+									{
+//										getComponent().getLogger().severe("sending result succeeded: "+rxid+", "+result);
+										// OK -> ignore
+									}
+								});
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								incommands.remove(rxid);
+								RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
+								rc.setResultCount(counter++);
+								sendRxMessage(remote, rxid, rc);
+							}
+							
+							public void commandAvailable(Object command)
+							{
+								RemoteForwardCmdCommand fc = new RemoteForwardCmdCommand(command);
+								fc.setResultCount(counter++);
+								IFuture<Void>	fut	= sendRxMessage(remote, rxid, fc);
+								if(term!=null)
+								{
+									fut.addResultListener(term);
+								}
+							}
+						}));
 					}
 					else
 					{
-						term	= null;
+						// Not allowed -> send back exception.
+						RemoteResultCommand<?> rc = new RemoteResultCommand(new SecurityException("Command "+msg.getClass()+" not allowed."), null);
+						sendRxMessage(remote, rxid, rc);	
 					}
-					
-					retfut.addResultListener(component.getFeature(IExecutionFeature.class).createResultListener(new IIntermediateFutureCommandResultListener()
-					{
-						/** Result counter. */
-						int counter = Integer.MIN_VALUE;
-						
-						public void intermediateResultAvailable(Object result)
-						{
-							RemoteIntermediateResultCommand<?> rc = new RemoteIntermediateResultCommand(result, fsc!=null ? fsc.getProperties() : null);
-							rc.setResultCount(counter++);
-//							System.out.println("send RemoteIntermediateResultCommand to: "+remote);
-							IFuture<Void> fut = sendRxMessage(remote, rxid, rc);
-							if(term!=null)
-							{
-								fut.addResultListener(term);
-							}
-						}
-						
-						public void finished()
-						{
-							incommands.remove(rxid);
-							RemoteFinishedCommand<?> rc = new RemoteFinishedCommand(fsc!=null ? fsc.getProperties() : null);
-							rc.setResultCount(counter++);
-							sendRxMessage(remote, rxid, rc);
-						}
-						
-						public void resultAvailable(final Object result)
-						{
-//							getComponent().getLogger().severe("sending result: "+rxid+", "+result);
-							incommands.remove(rxid);
-							RemoteResultCommand<?> rc = new RemoteResultCommand(result, fsc!=null ? fsc.getProperties() : null);
-							final int msgcounter = counter++;
-							rc.setResultCount(msgcounter);
-							sendRxMessage(remote, rxid, rc).addResultListener(new IResultListener<Void>()
-							{
-								@Override
-								public void exceptionOccurred(Exception exception)
-								{
-									getComponent().getLogger().severe("sending result failed: "+rxid+", "+result+", "+exception);
-									// Serialization of result failed -> send back exception.
-									RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
-									rc.setResultCount(msgcounter);
-									sendRxMessage(remote, rxid, rc);
-								}
-								
-								@Override
-								public void resultAvailable(Void v)
-								{
-//									getComponent().getLogger().severe("sending result succeeded: "+rxid+", "+result);
-									// OK -> ignore
-								}
-							});
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							incommands.remove(rxid);
-							RemoteResultCommand<?> rc = new RemoteResultCommand(exception, fsc!=null ? fsc.getProperties() : null);
-							rc.setResultCount(counter++);
-							sendRxMessage(remote, rxid, rc);
-						}
-						
-						public void commandAvailable(Object command)
-						{
-							RemoteForwardCmdCommand fc = new RemoteForwardCmdCommand(command);
-							fc.setResultCount(counter++);
-							IFuture<Void>	fut	= sendRxMessage(remote, rxid, fc);
-							if(term!=null)
-							{
-								fut.addResultListener(term);
-							}
-						}
-					}));
 				}
 				else
 				{
 					// Not allowed -> send back exception.
-					RemoteResultCommand<?> rc = new RemoteResultCommand(new SecurityException("Command "+msg.getClass()+" not allowed."), null);
+					RemoteResultCommand<?> rc = new RemoteResultCommand(validityex, null);
 					sendRxMessage(remote, rxid, rc);	
 				}
 			}
