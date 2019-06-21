@@ -56,7 +56,7 @@ import jadex.platform.service.security.SecurityAgent;
  */
 @Agent(name="spautoconf",
 	autoprovide=Boolean3.TRUE,
-	predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent", 
+	predecessors="jadex.platform.service.registry.SuperpeerClientAgent", 
 	autostart=Boolean3.FALSE)
 @Service
 public class AutoConfigRegistryAgent implements IAutoConfigRegistryService

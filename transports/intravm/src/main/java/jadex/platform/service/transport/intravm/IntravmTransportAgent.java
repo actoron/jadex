@@ -11,7 +11,7 @@ import jadex.platform.service.transport.ITransport;
 @Agent(name="intravm",
 	autostart=Boolean3.FALSE,
 	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
+	successors="jadex.platform.service.registry.SuperpeerClientAgent")
 public class IntravmTransportAgent extends AbstractTransportAgent2<IntravmTransport.HandlerHolder>
 {
 	//-------- abstract methods to be provided by concrete transport --------

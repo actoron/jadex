@@ -47,7 +47,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent(name="superpeer",
 	autostart=Boolean3.FALSE,
-	predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent")
+	predecessors="jadex.platform.service.registry.SuperpeerClientAgent")
 @Service
 @ProvidedServices(replace=true,
 	value={@ProvidedService(type=ISuperpeerService.class, scope=ServiceScope.GLOBAL),
