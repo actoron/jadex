@@ -178,27 +178,11 @@ public class RestWebSocket extends Endpoint
 			}
 			else if(msg instanceof ServiceSearchMessage)
 			{
-				handleSearchServiceMessage(session, (ServiceSearchMessage)msg).addResultListener(new DelegationResultListener<String>(ret)
-				{
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-						// TODO Auto-generated method stub
-						super.exceptionOccurred(exception);
-					}
-				});
+				handleSearchServiceMessage(session, (ServiceSearchMessage)msg).addResultListener(new DelegationResultListener<String>(ret));
 			}
 			else if(msg instanceof ServiceInvocationMessage)
 			{
-				handleServiceInvocationMessage(session, (ServiceInvocationMessage)msg).addResultListener(new DelegationResultListener<String>(ret)
-				{
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-						// TODO Auto-generated method stub
-						super.exceptionOccurred(exception);
-					}
-				});
+				handleServiceInvocationMessage(session, (ServiceInvocationMessage)msg).addResultListener(new DelegationResultListener<String>(ret));
 			}
 			else if(msg instanceof ServiceTerminateInvocationMessage)
 			{
@@ -500,15 +484,14 @@ public class RestWebSocket extends Endpoint
 			public void customResultAvailable(IExternalAccess platform)
 			{
 				System.out.println("Searching service: "+sim.getServiceId()+" on platform: "+platform.getId());
+				
+				
+				
 				IFuture<IService> fut = platform.searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(sim.getServiceId()));
+				
+				
 				fut.addResultListener(new ExceptionDelegationResultListener<IService, String>(ret)
 				{
-					@Override
-					public void exceptionOccurred(Exception exception)
-					{
-						super.exceptionOccurredIfUndone(exception);
-					}
-					
 					public void customResultAvailable(IService service) throws Exception
 					{
 						// todo: fundamental problem class loader.

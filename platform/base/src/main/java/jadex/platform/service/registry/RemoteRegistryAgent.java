@@ -34,8 +34,6 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices(@ProvidedService(type=IRemoteRegistryService.class, name=IRemoteRegistryService.REMOTE_REGISTRY_NAME, scope=ServiceScope.NETWORK))
 public class RemoteRegistryAgent implements IRemoteRegistryService
 {
-	
-	
 	/** Component access. */
 	@Agent
 	protected IInternalAccess ia;
@@ -91,6 +89,9 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 		checkSecurity(query);
 		
 		Set<IServiceIdentifier> ret = Collections.emptySet();
+		
+		if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
+			System.out.println("hereee");
 		
 		// Scope check why?
 //		boolean localowner = query.getOwner().getRoot().equals(platformid);

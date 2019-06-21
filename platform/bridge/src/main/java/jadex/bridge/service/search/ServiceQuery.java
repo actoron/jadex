@@ -660,6 +660,10 @@ public class ServiceQuery<T>
 	{
 		List<Tuple3<String, String[], Boolean>> ret = new ArrayList<Tuple3<String,String[],Boolean>>();
 		
+		// normal is both, i.e. unrestricted = null
+		if(unrestricted != null)
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_UNRESTRICTED, new String[]{platform.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_UNRESTRICTED)));
+		
 		if(platform != null)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[]{platform.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PLATFORM)));
 		
@@ -682,7 +686,7 @@ public class ServiceQuery<T>
 		
 		assert !Arrays.equals(networknames, NETWORKS_NOT_SET) : "Problem: query not enhanced before processing.";
 	
-		if(networknames != null && networknames.length > 0)
+		if((unrestricted==null || Boolean.FALSE.equals(unrestricted)) && networknames != null && networknames.length > 0)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_NETWORKS, networknames, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_NETWORKS)));
 		
 		return ret;

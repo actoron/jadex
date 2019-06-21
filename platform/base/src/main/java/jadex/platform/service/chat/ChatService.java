@@ -468,7 +468,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public IIntermediateFuture<IChatService> findUsers()
 	{
-		IIntermediateFuture<IChatService> ret	= agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
+		IIntermediateFuture<IChatService> ret = agent.getFeature(IRequiredServicesFeature.class).getServices("chatservices");
 //		ret.addResultListener(new DefaultResultListener<Collection<IChatService>>()
 //		{
 //			public void resultAvailable(Collection<IChatService> result)

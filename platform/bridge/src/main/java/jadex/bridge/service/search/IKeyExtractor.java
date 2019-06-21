@@ -7,6 +7,9 @@ import java.util.Set;
  */
 public interface IKeyExtractor<T>
 {
+	/** Match any value constant for values. Indexer checks if value is ANY and then it always matches.*/
+	public static String MATCH_ALWAYS = "always";
+	
 	/**
 	 *  Extracts key value from an object.
 	 *  

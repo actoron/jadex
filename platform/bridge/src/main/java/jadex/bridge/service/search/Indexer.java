@@ -100,19 +100,31 @@ public class Indexer<T>
 					if(tup.getThirdEntity()==null || tup.getThirdEntity())
 					{
 						// AND treatment. All sets are added to the set
+						
+						Set<T> always = index.get(IKeyExtractor.MATCH_ALWAYS);
+						
 						for(String key: tup.getSecondEntity())
 						{
 							Set<T> iset = index.get(key);
 							
 							if(iset == null || iset.isEmpty())
+								iset = always;
+							else if(always!=null)
+								iset.addAll(always);
+							
+							if(iset == null || iset.isEmpty())
 								return null;
 							
 							valuesets.add(iset);
-						}
+						}						
 					}
 					else // or
 					{
+						Set<T> always = index.get(IKeyExtractor.MATCH_ALWAYS);
+						
 						Set<T> tmp = new HashSet<T>();
+						if(always!=null)
+							tmp.addAll(always);
 						
 						for(String key: tup.getSecondEntity())
 						{
@@ -320,7 +332,6 @@ public class Indexer<T>
 		// Add value to set of all values
 		values.add(value);
 		
-		// Add value to 
 		if(indexedvalues != null)
 		{
 			for(Map.Entry<String, Map<String, Set<T>>> entry: indexedvalues.entrySet())

@@ -82,27 +82,27 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	
 	/** The agent. */
 	@Agent
-	protected IInternalAccess	agent;
+	protected IInternalAccess agent;
 	
 	/** The fallback polling search rate as factor of the default timeout. */
 	@AgentArgument
-	protected double	pollingrate	= POLLING_RATE;
+	protected double pollingrate = POLLING_RATE;
 	
 	/** The the connection timeout as factor of the default timeout. */
 	@AgentArgument
-	protected double	contimeout	= 1;
+	protected double contimeout	= 1;
 	
 	/** Use only awareness for remote search, i.e. no superpeers at all. */
 	// Used for tests for now
 	@AgentArgument
-	protected boolean	awaonly;
+	protected boolean awaonly;
 
 	/** Debug connection issues of polling mode for any of the named services (boolean or string with comma separated unqualified service interface names). */
 	@AgentArgument
-	protected Object	debugservices;
+	protected Object debugservices;
 	
 	/** The managed connections for each network. */
-	protected Map<String, NetworkManager>	connections;
+	protected Map<String, NetworkManager> connections;
 	
 	//-------- agent life cycle --------
 	
@@ -116,9 +116,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		connections	= new LinkedHashMap<>();
 		
 //		if(pollingrate!=POLLING_RATE)
-//		{
 //			System.out.println(agent+" using polling rate: "+pollingrate);
-//		}
 		
 		if(!awaonly)
 		{
@@ -252,7 +250,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			snapshotSearchRemoteServices(query).thenAccept(services ->
 			{
 				// improve code path to allow for early cancellation
-				if (services.size() == 0)
+				if(services.size() == 0)
 					ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
 				else
 					ret.setResultIfUndone(services.iterator().next());
@@ -389,7 +387,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		// TODO: termination? currently not used
 		final TerminableIntermediateFuture<IServiceIdentifier> ret = new TerminableIntermediateFuture<IServiceIdentifier>();
 		
-		long	timeout	= ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
+		long timeout = ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
 		if(debug(query))
 			System.out.println(agent+" searchRemoteServices: timeout="+timeout+", time="+System.currentTimeMillis());			
 		
@@ -524,8 +522,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	 *  Optimized to return quick results over accuracy for snapshot searches (searchServices vs. addQuery)
 	 */
 	protected <T> IFuture<Collection<IServiceIdentifier>> snapshotSearchRemoteServices(final ServiceQuery<T> query)
-	{
-
+	{	
 		final Future<Collection<IServiceIdentifier>> ret = new Future<Collection<IServiceIdentifier>>();
 		
 		long timeout = 500;	
@@ -577,6 +574,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		
 		pfbar.waitFor().thenAccept(finished -> 
 		{
+			if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
+				System.out.println("hereee");
+			
 			if (platforms.isEmpty())
 			{
 				ret.setResult(Collections.emptySet());
@@ -587,8 +587,10 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			count[0] = platforms.size();
 			for (IComponentIdentifier platform : platforms)
 			{
-				IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new ComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform), new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, ServiceScope.NETWORK, null, true);
-				IRemoteRegistryService rrs = (IRemoteRegistryService) RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
+				IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new ComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform),
+					new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, ServiceScope.NETWORK, null, true);
+				
+				IRemoteRegistryService rrs = (IRemoteRegistryService)RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
 				
 				ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
 				
@@ -601,6 +603,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				{
 					public void resultAvailable(final Set<IServiceIdentifier> result)
 					{
+						if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
+							System.out.println("hereee");
+						
 						if(debug(query))
 							System.out.println(agent + " searched remote platform: "+platform+", "+result+", timeout="+timeout+", time="+System.currentTimeMillis());
 						res.addAll(result);
@@ -614,6 +619,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					}
 					public void exceptionOccurred(Exception exception)
 					{
+						if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
+							System.out.println("hereee");
+						
 						resultAvailable(Collections.emptySet());
 						//searchdone.setResult(null);
 					}
@@ -633,7 +641,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	 */
 	protected String[] getQueryNetworks(ServiceQuery<?> query)
 	{
-		String[]	ret	=	query.getNetworkNames();
+		String[] ret = query.getNetworkNames();
 		
 		// If networks set, but query has global scope -> add global network
 		if(ret!=null)
