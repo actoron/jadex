@@ -16,7 +16,7 @@ import jadex.platform.service.transport.ITransport;
 @Agent(name="ws",
 	autostart=Boolean3.TRUE,
 	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registryv2.SuperpeerClientAgent")
+	successors="jadex.platform.service.registry.SuperpeerClientAgent")
 public class WebSocketTransportAgent extends AbstractTransportAgent2<IWebSocketConnection>
 {
 	/** Maximum size of websocket frame payloads. */

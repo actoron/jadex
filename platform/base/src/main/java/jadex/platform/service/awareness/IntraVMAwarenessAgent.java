@@ -33,7 +33,7 @@ import jadex.micro.annotation.Agent;
 @Service
 @Agent(autoprovide = Boolean3.TRUE,
 	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registryv2.SuperpeerClientAgent",
+	successors="jadex.platform.service.registry.SuperpeerClientAgent",
 	autostart=Boolean3.FALSE
 )
 public class IntraVMAwarenessAgent implements IAwarenessService

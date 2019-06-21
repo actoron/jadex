@@ -53,8 +53,8 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 		this.args	= args;
 //		System.out.println("created rmi command: "+target+" "+method.getName());
 		
-//		if(method.toString().toLowerCase().indexOf("getdesc")!=-1)
-//			System.out.println("Creating command for: "+method);
+		if(method.toString().toLowerCase().indexOf("registryv2")!=-1)
+			System.out.println("Creating command for: "+method);
 	}
 	
 	/**
@@ -253,7 +253,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 				// Todo: cache for speed?
 				try
 				{
-					level	= implclass.getDeclaredMethod(m0.getName(), m0.getParameterTypes()).getAnnotation(Security.class);
+					level = implclass.getDeclaredMethod(m0.getName(), m0.getParameterTypes()).getAnnotation(Security.class);
 				}
 				catch(Exception e)
 				{

@@ -46,7 +46,7 @@ import jadex.tools.starter.StarterPlugin;
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true", description="Save settings on exit?"),
 	@Argument(name="platforms", clazz=String.class, defaultvalue="null", description="Show JCC for platforms matching this name.")
 })
-@Agent(name="jcc", autostart=Boolean3.TRUE, predecessors="jadex.platform.service.registryv2.SuperpeerClientAgent")
+@Agent(name="jcc", autostart=Boolean3.TRUE, predecessors="jadex.platform.service.registry.SuperpeerClientAgent")
 @Properties(@NameValue(name="system", value="true"))
 public class JCCAgent implements IComponentStep<Void>
 {
