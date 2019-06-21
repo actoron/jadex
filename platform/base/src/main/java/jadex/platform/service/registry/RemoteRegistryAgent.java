@@ -105,33 +105,13 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	//-------- helper methods --------
 	
 	/**
-	 *  Check if a query is allowed by caller.
-	 *  @throws SecurityExcpetion if not allowed.
+	 *  Check if a query is allowed by caller or set query to unrestricted search only.
+	 *  
 	 */
-	// TODO: change query to unrestricted instead and always succeed by returning allowed subset of results. 
 	protected void checkSecurity(ServiceQuery<?> query)
 	{
-		boolean allowed	= true;
-		
 		ISecurityInfo	secinfos	= (ISecurityInfo)ServiceCall.getCurrentInvocation().getProperty(ServiceCall.SECURITY_INFOS);
 		if(secinfos==null || !secinfos.hasDefaultAuthorization())
-		{
-			allowed	= false;
-			if(query.getServiceType()!=null)
-			{
-				Class<?>	type	= query.getServiceType().getType(ia.getClassLoader());
-				Security	level	= type.getAnnotation(Security.class);
-				if(level!=null)
-				{
-					Set<String>	roles	= ServiceIdentifier.getRoles(level, ia);
-					allowed	= roles.contains(Security.UNRESTRICTED);
-				}
-			}
-		}
-		
-		if(!allowed)
-		{
-			throw new SecurityException("Search not allowed: "+query);
-		}
+			query.setUnrestricted(true);
 	}
 }

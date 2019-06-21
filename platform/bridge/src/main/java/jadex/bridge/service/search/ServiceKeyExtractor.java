@@ -91,7 +91,6 @@ public class ServiceKeyExtractor implements IKeyExtractor<IServiceIdentifier>
 	 *  @param service The service.
 	 *  @return The keys matching the type.
 	 */
-	@SuppressWarnings("unchecked")
 	public static final Set<String> getKeysStatic(String keytype, IServiceIdentifier serv)
 	{
 //		if(serv instanceof IService)

@@ -16,7 +16,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;

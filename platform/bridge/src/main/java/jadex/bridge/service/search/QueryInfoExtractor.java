@@ -49,13 +49,16 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 	
 	/** Key type for the query id. */
 	public static final String KEY_TYPE_ID = "id";
+	
+	/** Key type for the unrestricted services. */
+	public static final String KEY_TYPE_UNRESTRICTED = "unrestricted";
 
 	
 	/** The key types. */
 	public static final String[] QUERY_KEY_TYPES;
 	
 	/** The indexable types. */
-	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_SID, KEY_TYPE_NETWORKS};//, KEY_TYPE_ISREMOTE};
+	public static final String[] QUERY_KEY_TYPES_INDEXABLE = {KEY_TYPE_INTERFACE, KEY_TYPE_TAGS, KEY_TYPE_OWNER, KEY_TYPE_PROVIDER, KEY_TYPE_PLATFORM, KEY_TYPE_OWNER_PLATORM, KEY_TYPE_ID, KEY_TYPE_SID, KEY_TYPE_NETWORKS, KEY_TYPE_UNRESTRICTED};//, KEY_TYPE_ISREMOTE};
 	
 	static
 	{
@@ -219,6 +222,8 @@ public class QueryInfoExtractor implements IKeyExtractor<ServiceQueryInfo<?>>
 		
 		if (sid.getNetworkNames() != null)
 			ret.add(new Tuple2<>(KEY_TYPE_NETWORKS, sid.getNetworkNames().toArray(new String[sid.getNetworkNames().size()])));
+		
+		ret.add(new Tuple2<>(KEY_TYPE_UNRESTRICTED, new String[]{""+sid.isUnrestricted()}));
 		
 		return ret;
 	}
