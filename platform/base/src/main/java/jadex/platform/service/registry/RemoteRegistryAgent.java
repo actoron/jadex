@@ -90,8 +90,8 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 		
 		Set<IServiceIdentifier> ret = Collections.emptySet();
 		
-		if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
-			System.out.println("hereee");
+		//if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
+		//	System.out.println("hereee");
 		
 		// Scope check why?
 //		boolean localowner = query.getOwner().getRoot().equals(platformid);

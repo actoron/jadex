@@ -101,6 +101,7 @@ public class Indexer<T>
 					{
 						// AND treatment. All sets are added to the set
 						
+						// Elements that have been added with ALWAYS value
 						Set<T> always = index.get(IKeyExtractor.MATCH_ALWAYS);
 						
 						for(String key: tup.getSecondEntity())

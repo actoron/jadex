@@ -660,16 +660,21 @@ public class ServiceQuery<T>
 	{
 		List<Tuple3<String, String[], Boolean>> ret = new ArrayList<Tuple3<String,String[],Boolean>>();
 		
+		// Problem with normal vs resticted vs. unrestricted queries
+		// normal: - deliver all services (restr. and unrestr.). 
+		//         - unrestricted services do not need networks that fit to those from query (they can always be accessed). Therefore key extractor return MATCH_ALWAYS. important for normal queries
+		// restricted and unrestricted: use index to find only those. in case of unrestricted query the networks of the query will be omitted (they might have been automatically set)
+		
 		// normal is both, i.e. unrestricted = null
 		if(unrestricted != null)
-			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_UNRESTRICTED, new String[]{platform.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_UNRESTRICTED)));
+			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_UNRESTRICTED, new String[]{unrestricted.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_UNRESTRICTED)));
 		
 		if(platform != null)
 			ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PLATFORM, new String[]{platform.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PLATFORM)));
 		
 		if(ServiceScope.COMPONENT_ONLY.equals(scope))
 		{
-			if (searchstart != null)
+			if(searchstart != null)
 				ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[]{searchstart.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PROVIDER)));
 			else
 				ret.add(new Tuple3<String, String[], Boolean>(ServiceKeyExtractor.KEY_TYPE_PROVIDER, new String[]{owner.toString()}, getMatchingMode(ServiceKeyExtractor.KEY_TYPE_PROVIDER)));

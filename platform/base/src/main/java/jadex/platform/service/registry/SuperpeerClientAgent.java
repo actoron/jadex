@@ -574,8 +574,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		
 		pfbar.waitFor().thenAccept(finished -> 
 		{
-			if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
-				System.out.println("hereee");
+			//if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
+			//	System.out.println("hereee");
 			
 			if (platforms.isEmpty())
 			{
@@ -603,8 +603,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				{
 					public void resultAvailable(final Set<IServiceIdentifier> result)
 					{
-						if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
-							System.out.println("hereee");
+						//if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
+						//	System.out.println("hereee");
 						
 						if(debug(query))
 							System.out.println(agent + " searched remote platform: "+platform+", "+result+", timeout="+timeout+", time="+System.currentTimeMillis());
@@ -619,8 +619,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					}
 					public void exceptionOccurred(Exception exception)
 					{
-						if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
-							System.out.println("hereee");
+						//if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
+						//	System.out.println("hereee");
 						
 						resultAvailable(Collections.emptySet());
 						//searchdone.setResult(null);

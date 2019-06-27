@@ -6,7 +6,8 @@
 /**
  *  Asyncronously invoke the jadex puzzle service.
  */
-var newGame	= function(size) {
+var newGame	= function(size) 
+{
 	console.log("new game");
 	if(typeof jadex!='undefined') // Allow playing client-side only
 	{

@@ -9,3 +9,4 @@ dependencies
 {
 	api project(':platform:webservice-websocket')
 }
+

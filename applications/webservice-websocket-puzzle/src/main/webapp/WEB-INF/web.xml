@@ -14,7 +14,7 @@
 	
 	<!-- Jadex websocket server setup. Listener starts websocket at path from ws_url context parameter. -->
 	<listener>
-    	<listener-class>com.actoron.webservice.WebSocketInitListener</listener-class>
+    	<listener-class>org.activecomponents.webservice.WebSocketInitListener</listener-class>
 	</listener>
 	
 	<!-- Websocket URL - can be changed, if necessary. Include '<path>/jadex.js' in your HTML, e.g. 'wswebapi/jadex.js' for default websocket url. -->
@@ -26,7 +26,7 @@
 	
 	<!-- Session scope services declared with ws_serviceimpl_xxx -->
 	<context-param>
-		<param-name>ws_serviceimpl_com.actoron.examples.puzzleng.IPuzzleService</param-name>
-		<param-value>com.actoron.examples.puzzleng.PuzzleAgent.class</param-value>
+		<param-name>ws_serviceimpl_org.activecomponents.examples.puzzleng.IPuzzleService</param-name>
+		<param-value>org.activecomponents.examples.puzzleng.PuzzleAgent.class</param-value>
 	</context-param>
 </web-app>  
