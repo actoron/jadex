@@ -200,6 +200,7 @@ public interface ISecurityService
 	 *  Gets the current network names. 
 	 *  @return The current networks names.
 	 */
+	@Security(roles={Security.TRUSTED})
 	public IFuture<Set<String>> getNetworkNames();
 	
 	/**
@@ -209,6 +210,7 @@ public interface ISecurityService
 	 *  		Note that the JadexVersion can still be an unknown version (as determined by isUnknown),
 	 *  		which means that the platform itself reported an unknown version.
 	 */
+	@Security(roles={Security.TRUSTED})
 	public JadexVersion getJadexVersion(IComponentIdentifier remoteid);
 	
 //	/**

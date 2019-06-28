@@ -566,11 +566,13 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 				{
 					Set<String>	secroles = ServiceIdentifier.getRoles(((ISecuredRemoteCommand)msg).getSecurityLevel(getInternalAccess()), getInternalAccess());
 					
-					// No roles or default role means any authenticated platform or network.
-					if(secroles==null || !Collections.disjoint(secroles, secinfos.getRoles()))
-					{
+					// No service roles and trusted role is ok.
+					if (secroles == null && secinfos.getRoles().contains(Security.TRUSTED))
+						trusted = true;
+					
+					// Custom role match is ok
+					else if(!Collections.disjoint(secroles, secinfos.getRoles()))
 						trusted	= true;
-					}
 					
 					// Always allow 'unrestricted' access
 					else if(secroles.contains(Security.UNRESTRICTED))
