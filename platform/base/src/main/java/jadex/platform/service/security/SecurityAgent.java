@@ -51,6 +51,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
@@ -108,7 +109,7 @@ import jadex.platform.service.serialization.SerializationServices;
 		@Argument(name="roles", clazz=String.class, defaultvalue="null")
 	})
 //@Service // This causes problems because the wrong preprocessor is used (for pojo services instead of remote references)!!!
-@ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
+@ProvidedServices(@ProvidedService(type=ISecurityService.class, scope=ServiceScope.NETWORK, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW)))
 @Properties(value=@NameValue(name="system", value="true"))
 public class SecurityAgent implements ISecurityService, IInternalService
 {
@@ -151,7 +152,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	
 	/** Flag whether to refuse unauthenticated connections. */
 	@AgentArgument
-	protected boolean refuseunauth = false;
+	protected boolean refuseuntrusted = false;
 	
 	/** Flag if connection with platforms without authenticated names are allowed. */
 	@AgentArgument
@@ -277,7 +278,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				usesecret = getProperty("usesecret", args, settings, usesecret);
 				printsecret = getProperty("printsecret", args, settings, usesecret);
-				refuseunauth = getProperty("refuseunauth", args, settings, refuseunauth);
+				refuseuntrusted = getProperty("refuseuntrusted", args, settings, refuseuntrusted);
 				
 				if (args.get("platformnamecertificate") != null)
 					platformnamecertificate = (AbstractX509PemSecret) AbstractAuthenticationSecret.fromString((String) args.get("platformnamecertificate"), true);
@@ -1514,13 +1515,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	/**
-	 *  Checks whether to allow unauthenticated connections.
+	 *  Checks whether to allow untrusted connections.
 	 *  
 	 *  @return True, if used.
 	 */
-	public boolean getInternalRefuseUnauth()
+	public boolean getInternalRefuseUntrusted()
 	{
-		return refuseunauth;
+		return refuseuntrusted;
 	}
 	
 	/**
@@ -1556,8 +1557,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Sets the roles of a security info object.
 	 *  @param secinf Security info.
+	 *  @param defroles Default roles that should be added.
 	 */
-	public void setSecInfoRoles(SecurityInfo secinf)
+	public void setSecInfoMappedRoles(SecurityInfo secinf)
 	{
 		assert agent.isComponentThread();
 		Set<String> siroles = new HashSet<String>();
@@ -1580,7 +1582,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					siroles.add(network);
 			}
 		}
-		secinf.setRoles(siroles);
+		
+		// Admin role is automatically trusted.
+		if (siroles.contains(Security.ADMIN))
+			siroles.add(Security.TRUSTED);
+		
+		secinf.setMappedRoles(siroles);
 	}
 	
 	/**
@@ -1791,7 +1798,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			for (Map.Entry<String, ICryptoSuite> entry : currentcryptosuites.entrySet())
 			{
 				SecurityInfo secinfo = ((SecurityInfo) entry.getValue().getSecurityInfos());
-				setSecInfoRoles(secinfo);
+				setSecInfoMappedRoles(secinfo);
 			}
 			
 			for (Map.Entry<String, HandshakeState> entry : initializingcryptosuites.entrySet())
@@ -1804,7 +1811,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						SecurityInfo secinfo = (SecurityInfo) suite.getSecurityInfos();
 						if (secinfo != null)
-							setSecInfoRoles(secinfo);
+							setSecInfoMappedRoles(secinfo);
 					}
 				}
 			}
@@ -1922,7 +1929,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		
 		settings.put("usesecret", usesecret);
 		settings.put("printsecret", printsecret);
-		settings.put("refuseunauth", refuseunauth);
+		settings.put("refuseuntrusted", refuseuntrusted);
 		
 		if(platformsecret != null)
 			settings.put("platformsecret", platformsecret);
@@ -2241,7 +2248,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
 							{
 								if (debug)
-									System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().isTrustedPlatform());
+									System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().getRoles().contains(Security.TRUSTED));
 								currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
 								initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 								state.getResultFuture().setResult(state.getCryptoSuite());
@@ -2297,9 +2304,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 //					+" "+Arrays.toString(secinfos.getNetworks().toArray())
 //					+" "+Arrays.toString(suiteinfos.getNetworks().toArray())+"\n";
 					
-					if ((secinfos.isAdminPlatform() || !suiteinfos.isAdminPlatform()) &&
-						(secinfos.isTrustedPlatform() || !suiteinfos.isTrustedPlatform()) && 
-						SUtil.equals(secinfos.getAuthenticatedPlatformName(), suiteinfos.getAuthenticatedPlatformName()) || (suiteinfos.getAuthenticatedPlatformName() == null && secinfos.getAuthenticatedPlatformName() != null))
+					// Re-encryption must be carefully checked for unchanged privileges to avoid spoofing attacks:
+					// e.g. Privileged platform A makes privileged request for user passwords, then shuts down.
+					// Platform B spoofs name of platform A and thus intercepts response, then requests re-encryption
+					// with its own handshake with the original platform. To prevent this, the current handshake privileges
+					// must be compared to the original ones to ensure that they are identical.
+					if (SUtil.equals(secinfos.getRoles(), suiteinfos.getRoles()))
 					{
 						Set<String> msgnets = secinfos.getNetworks();
 						if (msgnets.containsAll(suiteinfos.getNetworks()))

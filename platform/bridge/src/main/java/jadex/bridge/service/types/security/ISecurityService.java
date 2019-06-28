@@ -8,6 +8,7 @@ import jadex.bridge.JadexVersion;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -28,6 +29,7 @@ import jadex.commons.future.IFuture;
 	@GuiClassName("jadex.android.controlcenter.settings.SecuritySettings")
 })
 @Service(system=true)
+@Security(roles={Security.ADMIN})
 public interface ISecurityService
 {
 	//-------- message-level encryption/authentication -------

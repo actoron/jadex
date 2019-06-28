@@ -1,11 +1,14 @@
 package jadex.platform.service.security.impl;
 
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bouncycastle.util.Pack;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.JadexVersion;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.platform.service.security.ICryptoSuite;
 import jadex.platform.service.security.SecurityAgent;
@@ -122,11 +125,9 @@ public class UnsafeNullCryptoSuite implements ICryptoSuite
 	{
 		secinf = new SecurityInfo();
 //		secinf.setPlatformAuthenticated(true);
-		secinf.setTrustedPlatform(true);
-		secinf.setAdminPlatform(true);
 		secinf.setNetworks(agent.getInternalNetworks().keySet());
 		secinf.setSharedNetworks(secinf.getNetworks());
-		secinf.setAllowDefaultAuthorization(true);
+		secinf.setFixedRoles(Stream.of(Security.ADMIN, Security.TRUSTED).collect(Collectors.toSet()));
 		
 		if (!(incomingmessage instanceof NullMessage))
 			agent.sendSecurityHandshakeMessage(incomingmessage.getSender(), new NullMessage(agent.getComponentIdentifier(), incomingmessage.getConversationId()));

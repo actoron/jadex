@@ -1,6 +1,7 @@
 package jadex.bridge.component.impl;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -555,7 +556,7 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			boolean	trusted	= false;
 			
 			// Admin platforms (i.e. in possession  of our platform key) can do anything.
-			if(secinfos.isAdminPlatform())
+			if(secinfos.getRoles().contains(Security.ADMIN))
 				trusted	= true;
 			
 			// Internal command -> safe to check as stated by command.
@@ -566,34 +567,15 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					Set<String>	secroles = ServiceIdentifier.getRoles(((ISecuredRemoteCommand)msg).getSecurityLevel(getInternalAccess()), getInternalAccess());
 					
 					// No roles or default role means any authenticated platform or network.
-					if(secroles==null || secroles.contains(Security.DEFAULT))
+					if(secroles==null || !Collections.disjoint(secroles, secinfos.getRoles()))
 					{
-						trusted	= secinfos.hasDefaultAuthorization();
+						trusted	= true;
 					}
 					
 					// Always allow 'unrestricted' access
 					else if(secroles.contains(Security.UNRESTRICTED))
 					{
 						trusted	= true;
-					}
-					
-					// TODO: currently no platform authentication in place
-//					// Check remote platform name
-//					else if(secroles.contains(secinfos.getAuthenticatedPlatformName()))
-//					{
-//						trusted	= true;
-//					}
-					
-					// Custom roles required by command. Check if at least one is authenticated.
-					else
-					{
-						// Assumption: secinfo role set (defined/authenticated roles of platform) usually larger than role set annotated at service / method.
-						for(String role: secroles)
-						{
-							trusted	= secinfos.getRoles().contains(role);
-							if(trusted)
-								break;
-						}
 					}
 				}
 				else

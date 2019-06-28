@@ -8,6 +8,7 @@ import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.JadexVersion;
+import jadex.bridge.service.annotation.Security;
 import jadex.platform.service.security.ICryptoSuite;
 import jadex.platform.service.security.SecurityAgent;
 import jadex.platform.service.security.SecurityInfo;
@@ -89,7 +90,7 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 	 *  
 	 *  @param remoteid The ID of the remote platform.
 	 *  @param authnets The networks the platform is part of and have been authenticated.
-	 *  @param platformauth Flag if the platform name itself was authenticated
+	 *  @param platformauth Flag if the platform secret was authenticated
 	 *  @param agent The security agent.
 	 */
 	protected void setupSecInfos(IComponentIdentifier remoteid, List<String> authnets, boolean platformauth, String authenticatedplatformname, SecurityAgent agent)
@@ -100,7 +101,12 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 			secinf.setAuthenticatedPlatformName(remoteid.toString());
 		else
 			secinf.setAuthenticatedPlatformName(authenticatedplatformname);
-		secinf.setAdminPlatform(platformauth);
+		
+		Set<String> fixedroles = new HashSet<>();
+		
+		if (platformauth)
+			fixedroles.add(Security.ADMIN);
+		
 		secinf.setNetworks(new HashSet<>(authnets));
 		
 		Set<String> sharednets = new HashSet<>(authnets);
@@ -108,11 +114,18 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 		secinf.setSharedNetworks(sharednets);
 		
 		if (authenticatedplatformname != null && agent.getInternalTrustedPlatforms().contains(authenticatedplatformname))
-			secinf.setTrustedPlatform(true);
+			fixedroles.add(Security.TRUSTED);
 		
-		secinf.setAllowDefaultAuthorization(agent.getInternalDefaultAuthorization());
+		if (agent.getInternalDefaultAuthorization() && secinf.getSharedNetworks() != null && secinf.getSharedNetworks().size() > 0)
+			fixedroles.add(Security.TRUSTED);
 		
-		agent.setSecInfoRoles(secinf);
+		// Admin role is automatically trusted.
+		if (fixedroles.contains(Security.ADMIN))
+			fixedroles.add(Security.TRUSTED);
+		
+		secinf.setFixedRoles(fixedroles);
+		
+		agent.setSecInfoMappedRoles(secinf);
 		
 		if (!agent.getInternalAllowNoAuthName() && secinf.getAuthenticatedPlatformName() == null)
 			throw new SecurityException("Connections to platforms with unauthenticated platform names are not allowed: " + remoteid);
@@ -120,11 +133,8 @@ public abstract class AbstractCryptoSuite implements ICryptoSuite
 		if (!agent.getInternalAllowNoNetwork() && secinf.getNetworks().isEmpty())
 			throw new SecurityException("Connections to platforms with no authenticated networks are not allowed: " + remoteid);
 		
-		if (agent.getInternalRefuseUnauth() && 
-			(secinf.getAuthenticatedPlatformName() == null &&
-			 secinf.getNetworks().isEmpty() &&
-			 !secinf.isAdminPlatform()))
-			throw new SecurityException("Unauthenticated connection not allowed: " + remoteid);
+		if (agent.getInternalRefuseUntrusted() && !secinf.getRoles().contains(Security.TRUSTED))
+			throw new SecurityException("Untrusted connection not allowed: " + remoteid);
 	}
 	
 	/**
