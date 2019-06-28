@@ -2,8 +2,10 @@ package jadex.platform.service.security;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.types.security.ISecurityInfo;
 
 /**
@@ -13,13 +15,13 @@ import jadex.bridge.service.types.security.ISecurityInfo;
 public class SecurityInfo implements ISecurityInfo
 {
 	/** Flag if the platform is an admin platform. */
-	protected boolean adminplatform;
+//	protected boolean adminplatform;
 	
 	/** Flag if the platform has a trusted name. */
-	protected boolean trustedplatform;
+//	protected boolean trustedplatform;
 	
 	/** Flag if default authorization is allowed. */
-	protected boolean allowdefaultauthorization;
+//	protected boolean allowdefaultauthorization;
 	
 	/** Platform name if authenticated. */
 	protected String platformname;
@@ -30,7 +32,13 @@ public class SecurityInfo implements ISecurityInfo
 	/** Networks containing the sender. */
 	protected Set<String> networks;
 	
-	/** Roles of the sender. */
+	/** Fixed roles of the sender. */
+	protected volatile Set<String> fixedroles;
+	
+	/** Roles based on mapping of the sender. */
+	protected volatile Set<String> mappedroles;
+	
+	/** Union of fixed and mapped roles. */
 	protected volatile Set<String> roles;
 	
 	/**
@@ -38,6 +46,7 @@ public class SecurityInfo implements ISecurityInfo
 	 */
 	public SecurityInfo()
 	{
+		roles = Collections.emptySet();
 	}
 	
 	/**
@@ -45,10 +54,10 @@ public class SecurityInfo implements ISecurityInfo
 	 *
 	 *  @return True if sender platform has default authorization.
 	 */
-	public boolean hasDefaultAuthorization()
-	{
-		return allowdefaultauthorization && (trustedplatform || adminplatform || (sharednetworks != null && sharednetworks.size() > 0));
-	}
+//	public boolean hasDefaultAuthorization()
+//	{
+//		return allowdefaultauthorization && (trustedplatform || adminplatform || (sharednetworks != null && sharednetworks.size() > 0));
+//	}
 	
 	/**
 	 *  Gets if the sender is authenticated.
@@ -95,60 +104,60 @@ public class SecurityInfo implements ISecurityInfo
 	 *
 	 *  @return True, if trusted.
 	 */
-	public boolean isAdminPlatform()
-	{
-		return adminplatform;
-	}
+//	public boolean isAdminPlatform()
+//	{
+//		return adminplatform;
+//	}
 
 	/**
 	 *  Sets the ID of the sender platform if it is trusted, null otherwise.
 	 *
 	 *  @param trustedplatform The ID of the sender platform if it is trusted, null otherwise.
 	 */
-	public void setAdminPlatform(boolean adminplatform)
-	{
-		this.adminplatform = adminplatform;
-	}
+//	public void setAdminPlatform(boolean adminplatform)
+//	{
+//		this.adminplatform = adminplatform;
+//	}
 	
 	/**
 	 *  Checks if the sender platform name is authenticated and trusted.
 	 *
 	 *  @return True, if trusted.
 	 */
-	public boolean isTrustedPlatform()
-	{
-		return trustedplatform;
-	}
+//	public boolean isTrustedPlatform()
+//	{
+//		return trustedplatform;
+//	}
 
 	/**
 	 *  Sets if the sender platform name is authenticated and trusted.
 	 *
 	 *  @param trustedplatform True, if trusted.
 	 */
-	public void setTrustedPlatform(boolean trustedplatform)
-	{
-		this.trustedplatform = trustedplatform;
-	}
+//	public void setTrustedPlatform(boolean trustedplatform)
+//	{
+//		this.trustedplatform = trustedplatform;
+//	}
 	
 	/**
 	 *  Checks if default authorization is allowed.
 	 *
 	 *  @return True, if allowed.
 	 */
-	public boolean isAllowDefaultAuthorization()
-	{
-		return allowdefaultauthorization;
-	}
+//	public boolean isAllowDefaultAuthorization()
+//	{
+//		return allowdefaultauthorization;
+//	}
 	
 	/**
 	 *  Sets if default authorization is allowed.
 	 *
 	 *  @param allowdefaultauthorization True, if allowed.
 	 */
-	public void setAllowDefaultAuthorization(boolean allowdefaultauthorization)
-	{
-		this.allowdefaultauthorization = allowdefaultauthorization;
-	}
+//	public void setAllowDefaultAuthorization(boolean allowdefaultauthorization)
+//	{
+//		this.allowdefaultauthorization = allowdefaultauthorization;
+//	}
 
 	/**
 	 *  Gets the authenticated networks of the sender.
@@ -199,14 +208,52 @@ public class SecurityInfo implements ISecurityInfo
 	{
 		return roles;
 	}
+	
+	/**
+	 *  Gets the fixed roles.
+	 *
+	 *  @return The fixed roles.
+	 */
+	public Set<String> getFixedRoles()
+	{
+		return fixedroles;
+	}
+	
+	/**
+	 *  Gets the mapped roles.
+	 *
+	 *  @return The mapped roles.
+	 */
+	public Set<String> getMappedRoles()
+	{
+		return mappedroles;
+	}
 
 	/**
-	 *  Sets the roles.
+	 *  Sets the fixed roles.
 	 *
-	 *  @param roles The roles.
+	 *  @param roles The fixed roles.
 	 */
-	public void setRoles(Set<String> roles)
+	public void setFixedRoles(Set<String> roles)
 	{
+		this.fixedroles = Collections.unmodifiableSet(roles);
+		roles = new HashSet<>(fixedroles);
+		if (mappedroles != null)
+			roles.addAll(mappedroles);
+		this.roles = Collections.unmodifiableSet(roles);
+	}
+	
+	/**
+	 *  Sets the mapped roles.
+	 *
+	 *  @param roles The mapped roles.
+	 */
+	public void setMappedRoles(Set<String> roles)
+	{
+		this.mappedroles = Collections.unmodifiableSet(roles);
+		roles = new HashSet<>(mappedroles);
+		if (fixedroles != null)
+			roles.addAll(fixedroles);
 		this.roles = Collections.unmodifiableSet(roles);
 	}
 
@@ -215,6 +262,6 @@ public class SecurityInfo implements ISecurityInfo
 	 */
 	public String toString()
 	{
-		return "Authenticated: " + hasDefaultAuthorization() + ", Trusted: " + trustedplatform + ", Admin: " + adminplatform + ", Networks: " + Arrays.toString(networks.toArray()); 
+		return "Trusted: " + getRoles().contains(Security.TRUSTED) + ", Admin: " + getRoles().contains(Security.ADMIN) + ", Networks: " + Arrays.toString(networks.toArray()); 
 	}
 }

@@ -112,7 +112,7 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	protected void checkSecurity(ServiceQuery<?> query)
 	{
 		ISecurityInfo	secinfos	= (ISecurityInfo)ServiceCall.getCurrentInvocation().getProperty(ServiceCall.SECURITY_INFOS);
-		if(secinfos==null || !secinfos.hasDefaultAuthorization())
+		if(secinfos==null || !secinfos.getRoles().contains(Security.TRUSTED))
 			query.setUnrestricted(true);
 	}
 }

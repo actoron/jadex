@@ -1,5 +1,6 @@
 package jadex.bridge.component.impl.remotecommands;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -23,6 +25,19 @@ import jadex.commons.future.IFuture;
  */
 public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteCommand	implements IRemoteCommand<T>, ISecuredRemoteCommand
 {
+	private static final Security DEFAULT_SYSTEM_SECURITY = new Security()
+	{
+		public Class<? extends Annotation> annotationType()
+		{
+			return Security.class;
+		}
+		
+		public String[] roles()
+		{
+			return new String[] { Security.ADMIN };
+		}
+	};
+	
 	//-------- attributes --------
 	
 	/** The target id. */
@@ -273,10 +288,16 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			{
 				// Specificity: method before class
 				level	= m0.getAnnotation(Security.class);
-				if(level==null)
+				Class<?> type = sid.getServiceType().getType(access.getClassLoader());
+				
+				if(level==null && type != null)
 				{
-					Class<?> type = sid.getServiceType().getType(access.getClassLoader());
-					level	= type!=null ? type.getAnnotation(Security.class) : null;
+					level = type.getAnnotation(Security.class);
+				}
+				
+				if(level==null && access.getDescription().isSystemComponent())
+				{
+					level = DEFAULT_SYSTEM_SECURITY;
 				}
 			}
 		}
@@ -287,7 +308,7 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			level = m0.getAnnotation(Security.class);
 		}
 		
-		// level==null -> disallow direct access to components (overridden by trusted platform)
+		// level==null -> disallow direct access to components (overridden by TRUSTED platform)
 		
 		return level;
 	}

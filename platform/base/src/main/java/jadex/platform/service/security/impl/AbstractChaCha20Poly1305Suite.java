@@ -299,8 +299,9 @@ public abstract class AbstractChaCha20Poly1305Suite extends AbstractCryptoSuite
 			List<String> authnets = verifyNetworkSignatures(remotepublickey, kx.getNetworkSigs(), agent.getInternalNetworks());
 			setupSecInfos(remoteid, authnets, platformauth, authenticatedpfname, agent);
 			
-			if (agent.getInternalRefuseUnauth() && !secinf.hasDefaultAuthorization())
-				throw new SecurityException("Unauthenticated connection not allowed.");
+			// Removed, checked during setupsecinf
+//			if (agent.getInternalRefuseUnauth() && (secinf.getRoles() == null || secinf.getRoles().isEmpty()))
+//				throw new SecurityException("Unauthenticated connection not allowed.");
 			
 			nonceprefix = Pack.littleEndianToInt(challenge, 0);
 			nonceprefix = ~nonceprefix;

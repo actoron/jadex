@@ -32,6 +32,7 @@ import jadex.bridge.component.streams.InputConnectionHandler;
 import jadex.bridge.component.streams.OutputConnection;
 import jadex.bridge.component.streams.OutputConnectionHandler;
 import jadex.bridge.component.streams.StreamPacket;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -1867,7 +1868,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	protected boolean isTrusted(ISecurityInfo secinfos)
 	{
-		return secinfos == null || secinfos.hasDefaultAuthorization();
+		return secinfos == null || secinfos.getRoles().contains(Security.TRUSTED);
 	}
 
 	/**
