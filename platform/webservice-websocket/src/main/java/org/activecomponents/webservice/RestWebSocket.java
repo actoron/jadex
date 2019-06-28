@@ -485,10 +485,7 @@ public class RestWebSocket extends Endpoint
 			{
 				System.out.println("Searching service: "+sim.getServiceId()+" on platform: "+platform.getId());
 				
-				
-				
 				IFuture<IService> fut = platform.searchService(new ServiceQuery<>((Class<IService>)null).setServiceIdentifier(sim.getServiceId()));
-				
 				
 				fut.addResultListener(new ExceptionDelegationResultListener<IService, String>(ret)
 				{
@@ -612,7 +609,7 @@ public class RestWebSocket extends Endpoint
 	}
 
 	/**
-	 *  Fin the correct method by its name and parameter values.
+	 *  Find the correct method by its name and parameter values.
 	 *  The parameter values are half-evaluated, i.e. if they are
 	 *  deserialized as far as possible. Still serialized parameters
 	 *  are saved as SerialiedObject. Those are deserialized using

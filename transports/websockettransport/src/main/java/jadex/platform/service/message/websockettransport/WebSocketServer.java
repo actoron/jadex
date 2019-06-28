@@ -18,7 +18,6 @@ import jadex.platform.service.transport.ITransportHandler;
 
 /**
  *  Server component of the websocket transport for incoming connections.
- *
  */
 public class WebSocketServer extends NanoWSD
 {

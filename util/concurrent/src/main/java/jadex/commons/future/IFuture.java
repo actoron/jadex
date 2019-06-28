@@ -1,5 +1,7 @@
 package jadex.commons.future;
 
+import java.util.concurrent.CompletableFuture;
+
 import jadex.commons.functional.BiFunction;
 import jadex.commons.functional.Consumer;
 import jadex.commons.functional.Function;
@@ -237,4 +239,10 @@ public interface IFuture<E>
 	 *  @return Future of the result of the second async call (=ret).
 	 */
 //	public <T> IFuture<T> thenApplyAndDelegate(final Function<E, IFuture<T>> function, Class<?> futuretype, final Future<T> ret);
+	
+	public <T> void exceptionally(Future<T> delegate);
+	
+	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function);
+	
+	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function, Class<?> futuretype);
 }

@@ -1175,6 +1175,45 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
         return ret;
     }*/
 	
+	public <T> void exceptionally(Future<T> delegate)
+	{
+		this.addResultListener(new IResultListener<E>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				delegate.setException(exception);
+			}
+			
+			@Override
+			public void resultAvailable(E result)
+			{
+			}
+		});
+	}
+	
+	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function)
+    {
+        return exceptionally(function, null);
+    }
+	
+	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function, Class<?> futuretype)
+    {
+		final Future<E> ret = getFuture(futuretype);
+
+		this.addResultListener(new DelegationResultListener<E>(ret)
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				 IFuture<E> res = function.apply(exception);
+                 res.addResultListener(SResultListener.delegate(ret));
+			}
+		});
+		
+        return ret;
+    }
+	
 	/**
 	 *  Sequential execution of async methods via implicit delegation.
 	 *  @param futuretype The type of the result future (cannot be automatically determined).
