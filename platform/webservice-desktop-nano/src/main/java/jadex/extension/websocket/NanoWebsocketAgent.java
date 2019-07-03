@@ -11,7 +11,7 @@ import jadex.micro.annotation.Properties;
 /**
  *  Agent that creates a nano websocket endpoint.
  */
-@Agent(autostart=Boolean3.TRUE)
+@Agent(autostart=Boolean3.FALSE)
 @Properties(@NameValue(name="system", value="true"))
 public class NanoWebsocketAgent
 {
