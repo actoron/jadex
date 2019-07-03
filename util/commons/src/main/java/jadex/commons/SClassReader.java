@@ -83,6 +83,11 @@ public class SClassReader
 	
 	public static final ClassInfo getClassInfo(String classname, ClassLoader cl)
 	{
+		return getClassInfo(classname, cl, false, false);
+	}
+	
+	public static final ClassInfo getClassInfo(String classname, ClassLoader cl, boolean includefields, boolean includemethods)
+	{
 		synchronized(CI_NAME_CACHE)
 		{
 			Map<String, ClassInfo> cache = CI_NAME_CACHE.get(cl);
@@ -98,11 +103,12 @@ public class SClassReader
 			}
 		}
 		ClassInfo ret = null;
-		InputStream is = cl.getResourceAsStream(classname.replace(".", "/") + ".class");
-		if (is != null)
-			ret = getClassInfo(is);
+		String s = classname.replace(".", "/") + ".class";
+		InputStream is = cl.getResourceAsStream(s);
+		if(is != null)
+			ret = getClassInfo(is, includefields, includemethods);
 		
-		if (ret != null)
+		if(ret != null)
 		{
 			synchronized(CI_NAME_CACHE)
 			{

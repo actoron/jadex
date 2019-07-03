@@ -6,20 +6,19 @@ import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
@@ -47,14 +46,11 @@ import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SClassReader.EnumInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.security.SSecurity;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
@@ -109,7 +105,7 @@ public class PlatformAgent
 	//-------- service creation helpers --------
 	
 	/** Create execution service. */
-	public static synchronized IExecutionService	createExecutionServiceImpl(Object asyncexecution, Object simulation, Object bisimulation, IInternalAccess component)
+	public static synchronized IExecutionService createExecutionServiceImpl(Object asyncexecution, Object simulation, Object bisimulation, IInternalAccess component)
 	{
 		if(Boolean.TRUE.equals(bisimulation))
 		{
@@ -117,7 +113,7 @@ public class PlatformAgent
 		}
 		else
 		{
-			boolean	sync	= Boolean.FALSE.equals(asyncexecution) || Boolean.TRUE.equals(simulation);
+			boolean	sync = Boolean.FALSE.equals(asyncexecution) || Boolean.TRUE.equals(simulation);
 			return sync ? new SyncExecutionService(component) : new AsyncExecutionService(component);
 		}
 	}
@@ -148,7 +144,7 @@ public class PlatformAgent
 	protected IInternalAccess agent;
 	
 	// enable startup monkey for randomized sequential component startup (dependency testing).
-	boolean STARTUP_MONKEY	= false;
+	public boolean STARTUP_RANDOM = false;
 	
 	// where should the defaults be defined (here or in the config)
 //	@Arguments
@@ -158,8 +154,8 @@ public class PlatformAgent
 //	}
 	
 	/**
-	 * 
-	 * @return
+	 *  Get the classpath urls.
+	 *  @return The classpath urls.
 	 */
 	public static URL[] getClasspathUrls(ClassLoader classloader)
 	{
@@ -199,15 +195,52 @@ public class PlatformAgent
 		Future<Void> ret = new Future<>();
 //		System.out.println("Start scanning...");
 		long start = System.currentTimeMillis();
+		Set<ClassInfo> cis;
 				
-		// Class name -> instance name
-		Map<String, String> names = new HashMap<String, String>();
-
-		URL[] urls = getClasspathUrls(PlatformAgent.class.getClassLoader());
-		// Remove JVM jars
-		urls = SUtil.removeSystemUrls(urls);
-		
-		Set<ClassInfo> cis = SReflect.scanForClassInfos(urls, null, filter);
+		if(agent.getArgument("startconfig")!=null)
+		{
+			cis = new HashSet<>();
+			String file = (String)agent.getArgument("startconfig");
+			InputStream is = SUtil.getResource0(file, agent.getClassLoader());
+			if(is!=null)
+			{
+				try
+				{
+					byte[] bytes = SUtil.readStream(is);
+					String str = new String(bytes, StandardCharsets.UTF_8);
+					StringTokenizer stok = new StringTokenizer(str, " "+SUtil.LF);
+					while(stok.hasMoreTokens())
+					{
+						String tok = stok.nextToken().trim();
+						if(tok.startsWith("//"))
+						{
+							System.out.println("Skipping: "+tok);
+							continue;
+						}
+						ClassInfo ci = SClassReader.getClassInfo(tok, agent.getClassLoader(), true, true);
+						if(ci!=null)
+							cis.add(ci);
+						else
+							System.out.println("Cannot read system agent: "+tok);
+					}
+				}
+				catch(IOException e)
+				{
+					System.out.println("Cannot read startconfig: "+file);
+				}
+			}
+			else
+			{
+				System.out.println("Cannot read startconfig: "+file);
+			}
+		}
+		else
+		{
+			URL[] urls = getClasspathUrls(PlatformAgent.class.getClassLoader());
+			// Remove JVM jars
+			urls = SUtil.removeSystemUrls(urls);
+			cis = SReflect.scanForClassInfos(urls, null, filter);
+		}
 		
 		List<CreationInfo> infos = new ArrayList<>();
 		for(ClassInfo ci : cis)
@@ -224,8 +257,9 @@ public class PlatformAgent
 			isSystemComponent(ci, PlatformAgent.class.getClassLoader());
 			AnnotationInfo ai = ci.getAnnotation(Agent.class.getName());
 			EnumInfo ei = (EnumInfo)ai.getValue("autostart");
-			String val = ei.getValue();
-			boolean ok = "true".equals(val.toLowerCase());
+			if(ei==null)
+				System.out.println("No autostart agent: "+ci);
+			boolean ok = ei==null? true: "true".equals(ei.getValue().toLowerCase());
 			String name = ai.getValue("name")==null || ((String)ai.getValue("name")).length()==0? null: (String)ai.getValue("name");
 			if(name!=null)
 			{
@@ -256,7 +290,7 @@ public class PlatformAgent
 				}
 			}
 			
-			if (ok)
+			if(ok)
 			{
 				CreationInfo info = new CreationInfo();
 				info.setName(name);
