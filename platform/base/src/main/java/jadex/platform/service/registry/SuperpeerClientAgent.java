@@ -777,6 +777,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 			assert localquery==null;
 			
 			agent.getLogger().info(agent+" searching for super peers for network "+networkname);
+			//System.out.println(agent+" searching for super peers for network "+networkname);
 			
 			// Also finds and adds locally available super peers -> locaL registry only contains local services, (local/remote) super peer manages separate registry
 			ServiceQuery<ISuperpeerService>	sq	= new ServiceQuery<>(ISuperpeerService.class, ServiceScope.GLOBAL).setNetworkNames(networkname);
@@ -794,7 +795,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 //						System.out.println(agent+" query result: "+sq.getId()+", "+sp);
 						
 						adjustConnectionTimeout();
-						agent.getLogger().info("Requesting super peer connection for network "+networkname+" from super peer: "+sp);
+						agent.getLogger().info(agent.getId()+" requesting super peer connection for network "+networkname+" from super peer: "+sp);
+						//System.out.println(agent.getId()+" requesting super peer connection for network "+networkname+" from super peer: "+sp);
 						ISubscriptionIntermediateFuture<Void>	regfut	= sp.registerClient(networkname);
 						regfut.addResultListener(new IIntermediateResultListener<Void>()
 						{
@@ -803,7 +805,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							{
 								// First command -> connected (shouldn't be any other commands).
 								agent.getLogger().info("Established super peer connection for network "+networkname+" with super peer: "+sp);
-								
+								//System.out.println(agent.getId()+" established super peer connection for network "+networkname+" with super peer: "+sp);
+											
 								// Check if the superpeer is genuine, i.e it is local or network is authenticated.
 								IComponentIdentifier	spid	= ((IService)sp).getServiceId().getProviderId();
 								if(!spid.getRoot().equals(agent.getId().getRoot()))
@@ -819,7 +822,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								// First connected super peer -> remember connection and stop search
 								if(running && superpeer==null)
 								{
-									agent.getLogger().info("Accepting super peer connection for network "+networkname+" from super peer: "+sp);
+									agent.getLogger().info(agent.getId()+" accepting super peer connection for network "+networkname+" from super peer: "+sp);
+									//System.out.println(agent.getId()+" accepting super peer connection for network "+networkname+" from super peer: "+sp);
 									
 									// Stop ongoing search, if any
 									stopSuperpeerSearch();
@@ -831,6 +835,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									for(QueryManager<?> qmanager: waitingqueries)
 									{
 										agent.getLogger().info("Started waiting query for network: "+networkname+", "+qmanager.query);
+										//System.out.println(agent.getId()+" started waiting query for network: "+networkname+", "+qmanager.query);
 										qmanager.updateQuery(new String[]{networkname});
 									}
 									waitingqueries.clear();
@@ -934,7 +939,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 							 */
 							protected void	checkConnectionRetry(Exception reason)
 							{
-//								System.out.println(agent+" super peer disconnected: "+sp+", ex="+reason);
+								//System.out.println(agent+" super peer disconnected: "+sp+", ex="+reason);
 								
 								// Connection still current but ended?
 								if(running && superpeer==sp)

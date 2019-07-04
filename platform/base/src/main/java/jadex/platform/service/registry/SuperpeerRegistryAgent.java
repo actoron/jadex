@@ -71,6 +71,11 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	/** Lookup for remote peer caches by network. */
 	protected MultiCollection<String, IServiceRegistry> peercaches = new MultiCollection<>();
 	
+	protected Set<SubscriptionIntermediateFuture<IComponentIdentifier>>	reglisteners	= new LinkedHashSet<>();
+	
+	protected Set<IComponentIdentifier>	clients	= new LinkedHashSet<>();
+
+	
 	/**
 	 *  Initiates the client registration procedure
 	 *  (super peer will answer initially with an empty intermediate result,
@@ -86,6 +91,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	{
 		final IComponentIdentifier client = ServiceCall.getCurrentInvocation().getCaller();
 		clients.add(client);
+		System.out.println("Client added: "+client+" "+networkname);
 		
 		// Listener notification as step to improve test behavior (e.g. AbstractSearchQueryTest)
 		agent.scheduleStep(new IComponentStep<Void>()
@@ -110,6 +116,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 //				System.out.println(agent+": Super peer connection with client "+client+" for network "+networkname+" terminated due to "+reason);
 				// TODO: when connection is lost, remove all services and queries from client.
 				// FIXME: Terminate on error/timeout?
+				System.out.println("Client removed: "+client+" "+networkname);
 				clients.remove(client);
 				clientqueries.remove(client);
 				serviceregistry.removeQueriesOfPlatform(client.getRoot());
@@ -446,10 +453,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	}
 	
 	//-------- superpeer status service --------
-	
-	protected Set<SubscriptionIntermediateFuture<IComponentIdentifier>>	reglisteners	= new LinkedHashSet<>();
-	protected Set<IComponentIdentifier>	clients	= new LinkedHashSet<>();
-	
+		
 	/**
 	 *  Get the clients that are currently registered to super peer.
 	 */
