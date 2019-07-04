@@ -166,25 +166,32 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		ISettingsService	settings	= access.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
-		settings.registerPropertiesProvider("simulationservice", SimulationService.this)
-			.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
+		ISettingsService settings = access.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(0));
+		if(settings!=null)
 		{
-			public void customResultAvailable(Void result)
+			settings.registerPropertiesProvider("simulationservice", SimulationService.this)
+				.addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)
 			{
-				exeservice	= ((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
-				clockservice	= ((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
-				if(startoninit)
+				public void customResultAvailable(Void result)
 				{
-					startoninit	= false;
-					start().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+					exeservice	= ((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+					clockservice	= ((IInternalRequiredServicesFeature)access.getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+					if(startoninit)
+					{
+						startoninit	= false;
+						start().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(new DelegationResultListener<Void>(ret)));
+					}
+					else
+					{
+						ret.setResult(null);
+					}
 				}
-				else
-				{
-					ret.setResult(null);
-				}
-			}
-		}));
+			}));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 
 		return ret;
 	}
