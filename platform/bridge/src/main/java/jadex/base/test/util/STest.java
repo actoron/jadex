@@ -86,6 +86,7 @@ public class STest
 		config.setSuperpeerClient(true);
 		config.setValue("intravmawareness", true);
         config.setValue("intravm", true);
+        config.setValue("security.handshaketimeoutscale", 0.2);
         config.getExtendedPlatformConfiguration().setSecurity(true);
 		config.setNetworkNames(new String[] { testnetwork_name });
 		config.setNetworkSecrets(new String[] { testnetwork_pass });
