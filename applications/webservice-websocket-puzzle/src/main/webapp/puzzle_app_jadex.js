@@ -11,7 +11,7 @@ var newGame	= function(size)
 	console.log("new game");
 	if(typeof jadex!='undefined') // Allow playing client-side only
 	{
-		jadex.getService("com.actoron.examples.puzzleng.IPuzzleService", SCOPE_SESSION).then(function(service) {
+		jadex.getService("org.activecomponents.examples.puzzleng.IPuzzleService", Scopes.SCOPE_SESSION).then(function(service) {
 			console.log("service found: "+JSON.stringify(service));
 			service.newGame(size).then(function()
 			{

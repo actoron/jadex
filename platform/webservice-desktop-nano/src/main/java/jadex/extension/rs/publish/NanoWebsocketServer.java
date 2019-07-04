@@ -1,4 +1,4 @@
-package jadex.extension.websocket;
+package jadex.extension.rs.publish;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activecomponents.webservice.RestWebSocket;
 import org.activecomponents.webservice.messages.BaseMessage;
 import org.activecomponents.webservice.messages.PartialMessage;
 import org.activecomponents.webservice.messages.PullResultMessage;
@@ -27,7 +26,6 @@ import org.activecomponents.webservice.messages.ServiceSearchMessage;
 import org.activecomponents.webservice.messages.ServiceTerminateInvocationMessage;
 import org.activecomponents.webservice.messages.ServiceUnprovideMessage;
 
-import fi.iki.elonen.NanoWSD;
 import fi.iki.elonen.NanoWSD.WebSocketFrame.CloseCode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -47,6 +45,7 @@ import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassFileInfo;
+import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -74,7 +73,7 @@ import jadex.transformation.jsonserializer.JsonTraverser;
 /**
  * 
  */
-public class WebsocketServer extends NanoWSD
+public class NanoWebsocketServer extends NanoHttpServer
 {
 	/** The platform. */
 	protected IExternalAccess platform;
@@ -111,9 +110,9 @@ public class WebsocketServer extends NanoWSD
 	 *  Creates the server.
 	 *  @param port Port of the server.
 	 */
-	public WebsocketServer(int port, IExternalAccess platform)
+	public NanoWebsocketServer(int port, IExternalAccess platform, IRequestHandlerService handler)
 	{
-		super(port);
+		super(port, handler);
 		//Logger.getLogger(NanoHTTPD.class.getName()).setLevel(Level.OFF);
 		//Logger.getLogger(NanoWSD.class.getName()).setLevel(Level.OFF);
 		
@@ -145,7 +144,7 @@ public class WebsocketServer extends NanoWSD
 	{
 		return platform;
 	}
-
+	
 	/**
 	 *  Opens a web socket.
 	 */
@@ -169,19 +168,17 @@ public class WebsocketServer extends NanoWSD
 		{
 			Exception e = new RuntimeException("Service type must not be null in service search");
 			sendException(e, ssc.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
-			ret.setException(e);
 			return ret;
 		}
 		
 //		final ServiceSearchMessage ssc = (ServiceSearchMessage)msg;
 //		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, ServiceScope.PLATFORM).get();
-		final Class<?> type = ssc.getType().getType(RestWebSocket.class.getClassLoader()); // todo: support default loader when using null
+		final Class<?> type = ssc.getType().getType(NanoWebsocketServer.class.getClassLoader()); // todo: support default loader when using null
 		
 		if(type==null)
 		{
 			Exception e = new RuntimeException("Service class not found: "+ssc.getType());
 			sendException(e, ssc.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
-			ret.setException(e);
 			return ret;
 		}
 		
@@ -292,7 +289,7 @@ public class WebsocketServer extends NanoWSD
 			{
 				// todo: fundamental problem class loader.
 				// Only the target component should need to know the service classes
-				Class<?> serclazz = service.getServiceId().getServiceType().getType(RestWebSocket.class.getClassLoader());
+				Class<?> serclazz = service.getServiceId().getServiceType().getType(NanoWebsocketServer.class.getClassLoader());
 
 				// decoded parameters
 				Object[] decparams = new Object[sim.getParameterValues().length];
@@ -414,6 +411,28 @@ public class WebsocketServer extends NanoWSD
 	{	
 		Future<String> ret = new Future<>();
 		
+		getMappings().thenAccept(c -> 
+		{
+			Collection<String> filenames = mappings.getCollection(typename);
+			
+			System.out.println("Mappings for: "+typename+" "+filenames);
+			
+			if(filenames.size()>0)
+				ret.setResult(filenames.iterator().next());
+			else
+				ret.setException(new RuntimeException("No mapping found for: "+typename));
+		}).exceptionally(ret);
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<MultiCollection<String, String>> getMappings()
+	{
+		final Future<MultiCollection<String, String>> ret = new Future<>();
+		
 		if(mappings==null)
 		{
 			mappings = new MultiCollection<>(new HashMap<>(), HashSet.class);
@@ -451,8 +470,8 @@ public class WebsocketServer extends NanoWSD
 								for(Object o: ps)
 								{
 									AnnotationInfo p = (AnnotationInfo)o;
-									String iface = (String)p.getValue("type");
-									mappings.add(iface, ci.getFilename());
+									ClassInfo iface = (ClassInfo)p.getValue("type");
+									mappings.add(iface.getClassName(), ci.getFilename());
 								}
 							}
 						}
@@ -462,22 +481,17 @@ public class WebsocketServer extends NanoWSD
 					}
 				});
 				
-				System.out.println("Found classes: "+allcis);
+				//System.out.println("Found classes: "+allcis);
 				
-				System.out.println();
+				ret.setResult(mappings);
 				
 				return IFuture.DONE;
 			});
 		}
-		
-		Collection<String> filenames = mappings.getCollection(typename);
-		
-		System.out.println("Mappings for: "+typename+" "+filenames);
-		
-		if(filenames.size()>0)
-			ret.setResult(filenames.iterator().next());
 		else
-			ret.setException(new RuntimeException("No mapping found for: "+typename));
+		{
+			ret.setResult(mappings);
+		}
 		
 		return ret;
 	}

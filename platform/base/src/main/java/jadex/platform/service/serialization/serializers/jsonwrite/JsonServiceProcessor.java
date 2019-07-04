@@ -61,7 +61,7 @@ public class JsonServiceProcessor implements ITraverseProcessor
 		}
 		
 		wr.write("{");
-//		wr.writeNameValue(com.actoron.webservice.json.read.JsonServiceProcessor.SERVICE_MARKER, 0).write(", ");
+//		wr.writeNameValue(org.activecomponents.webservice.json.read.JsonServiceProcessor.SERVICE_MARKER, 0).write(", ");
 //		wr.writeNameString("serviceIdentifier", service.getId().toString()).write(", ");
 		
 		wr.write("\"serviceIdentifier\":");

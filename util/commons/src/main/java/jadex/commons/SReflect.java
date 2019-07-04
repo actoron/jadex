@@ -812,7 +812,7 @@ public class SReflect
 	}
 
 	/**
-	 *  Get a method of the class.
+	 *  Get a public method of the class.
 	 *  Unlike {@link Class#getMethod(String, Class[])},
 	 *  this uses the methodcache.
 	 *  @param clazz	The class to search.
@@ -820,10 +820,10 @@ public class SReflect
 	 *  @param types	The parameter types.
 	 *  @return	The method (or null if not found).
 	 */
-	public static Method	getMethod(Class<?> clazz, String name, Class<?>[] types)
+	public static Method getMethod(Class<?> clazz, String name, Class<?>[] types)
 	{
-		Method	meth	= null;
-		Method[]	ms	= getMethods(clazz, name);
+		Method	meth = null;
+		Method[] ms = getMethods(clazz, name);
 		for(int i=0; i<ms.length; i++)
 		{
 			Class<?>[]	ptypes	= ms[i].getParameterTypes();
@@ -836,6 +836,37 @@ public class SReflect
 			if(match)
 			{
 				meth	= ms[i];
+				break;
+			}
+		}
+		return meth;
+	}
+	
+	/**
+	 *  Get a method of the class.
+	 *  Unlike {@link Class#getMethod(String, Class[])},
+	 *  this uses the methodcache.
+	 *  @param clazz The class to search.
+	 *  @param name	The name of the method to search for.
+	 *  @param types The parameter types.
+	 *  @return	The method (or null if not found).
+	 */
+	public static Method getAnyMethod(Class<?> clazz, String name, Class<?>[] types)
+	{
+		Method	meth = null;
+		Method[] ms = getAllMethods(clazz, name);
+		for(int i=0; i<ms.length; i++)
+		{
+			Class<?>[] ptypes = ms[i].getParameterTypes();
+			boolean	match = ptypes.length==types.length;
+			for(int j=0; match && j<ptypes.length; j++)
+			{
+				match = ptypes[j].equals(types[j]);
+			}
+
+			if(match)
+			{
+				meth = ms[i];
 				break;
 			}
 		}

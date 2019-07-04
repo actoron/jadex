@@ -1,7 +1,5 @@
 package jadex.commons.future;
 
-import java.util.concurrent.CompletableFuture;
-
 import jadex.commons.functional.BiFunction;
 import jadex.commons.functional.Consumer;
 import jadex.commons.functional.Function;
