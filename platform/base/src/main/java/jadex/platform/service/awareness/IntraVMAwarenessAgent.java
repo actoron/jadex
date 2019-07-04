@@ -134,14 +134,14 @@ public class IntraVMAwarenessAgent implements IAwarenessService
 	 *  with an upper bound of less than 1 second.
 	 *  Issues a new search, but answers using known platforms. On first request
 	 */
-	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
-	{
-		disclock.readLock().lock();
-		HashSet<IComponentIdentifier> result = new HashSet<IComponentIdentifier>(discoveries.keySet());
-		disclock.readLock().unlock();
-		result.remove(agent.getId().getRoot());
-		return new Future<Set<IComponentIdentifier>>(result);
-	}
+//	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
+//	{
+//		disclock.readLock().lock();
+//		HashSet<IComponentIdentifier> result = new HashSet<IComponentIdentifier>(discoveries.keySet());
+//		disclock.readLock().unlock();
+//		result.remove(agent.getId().getRoot());
+//		return new Future<Set<IComponentIdentifier>>(result);
+//	}
 	
 //	/**
 //	 *  Immediately return known platforms and continuously publish newly found platforms.

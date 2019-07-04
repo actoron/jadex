@@ -92,7 +92,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	protected DatagramSocket recvsocket;
 	
 	/** Last time platforms where searched. */
-	protected long lastsearchplatform = 0;
+//	protected long lastsearchplatform = 0;
 
 	// -------- agent lifecycle --------
 
@@ -158,7 +158,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	 */
 	public IIntermediateFuture<IComponentIdentifier> searchPlatforms()
 	{
-		lastsearchplatform = System.currentTimeMillis();
+//		lastsearchplatform = System.currentTimeMillis();
 		if(search == null)
 		{
 			long timeout = ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
@@ -241,32 +241,34 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	 *  with an upper bound of less than 1 second.
 	 *  Issues a new search, but answers using known platforms. On first request
 	 */
-	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
-	{
-		Future<Set<IComponentIdentifier>> ret = new Future<Set<IComponentIdentifier>>();
-		if (System.currentTimeMillis() - lastsearchplatform > 60000)
-		{
-			searchPlatforms().addResultListener(new IResultListener<Collection<IComponentIdentifier>>()
-			{
-				public void resultAvailable(Collection<IComponentIdentifier> result)
-				{
-					ret.setResult(new HashSet<IComponentIdentifier>(result));
-				};
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setResult(Collections.emptySet());
-				}
-			});
-		}
-		else
-		{
-			// Trigger search, but answer immediately.
-			searchPlatforms();
-			ret.setResult(new HashSet<IComponentIdentifier>(platforms.keySet()));
-		}
-		return ret;
-	}
+//	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
+//	{
+//		Future<Set<IComponentIdentifier>> ret = new Future<Set<IComponentIdentifier>>();
+//		if (System.currentTimeMillis() - lastsearchplatform > 60000)
+//		{
+//			System.out.println("Never searched, do search: " + lastsearchplatform);
+//			searchPlatforms().addResultListener(new IResultListener<Collection<IComponentIdentifier>>()
+//			{
+//				public void resultAvailable(Collection<IComponentIdentifier> result)
+//				{
+//					ret.setResult(new HashSet<IComponentIdentifier>(result));
+//				};
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					ret.setResult(Collections.emptySet());
+//				}
+//			});
+//		}
+//		else
+//		{
+//			System.out.println("Fast mode on: " + lastsearchplatform);
+//			// Trigger search, but answer immediately.
+//			searchPlatforms();
+//			ret.setResult(new HashSet<IComponentIdentifier>(platforms.keySet()));
+//		}
+//		return ret;
+//	}
 
 	// -------- template methods --------
 
