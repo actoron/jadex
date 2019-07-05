@@ -273,7 +273,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 									}
 									else
 									{
-//										System.out.println("file not found: "+fp);
+										System.out.println("file not found: "+fp);
 										response.setStatus(404);
 									}
 								}

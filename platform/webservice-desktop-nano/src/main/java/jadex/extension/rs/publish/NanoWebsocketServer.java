@@ -9,12 +9,18 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.activecomponents.webservice.messages.BaseMessage;
 import org.activecomponents.webservice.messages.PartialMessage;
@@ -71,12 +77,15 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
- * 
+ *  The nano websocket server handles websocket requests from clients like browsers.
+ *  
+ *  // todo: use the reflection mechanism for method invocation
+ *  
  */
 public class NanoWebsocketServer extends NanoHttpServer
 {
 	/** The platform. */
-	protected IExternalAccess platform;
+	protected IExternalAccess agent;
 	
 	/** The ongoing future calls from client. */
 	protected Map<String, IFuture<?>> incalls = new HashMap<String, IFuture<?>>();
@@ -110,13 +119,13 @@ public class NanoWebsocketServer extends NanoHttpServer
 	 *  Creates the server.
 	 *  @param port Port of the server.
 	 */
-	public NanoWebsocketServer(int port, IExternalAccess platform, IRequestHandlerService handler)
+	public NanoWebsocketServer(int port, IExternalAccess agent, IRequestHandlerService handler)
 	{
 		super(port, handler);
 		//Logger.getLogger(NanoHTTPD.class.getName()).setLevel(Level.OFF);
 		//Logger.getLogger(NanoWSD.class.getName()).setLevel(Level.OFF);
 		
-		this.platform = platform;
+		this.agent = agent;
 		
 		this.basicconverters = new BasicTypeConverter();
 		
@@ -133,8 +142,56 @@ public class NanoWebsocketServer extends NanoHttpServer
 		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonResourceIdentifierProcessor());
 		
 		this.partials = new HashMap<String, Map<Integer,String>>();
-		this.websockets = new HashMap<>();
+		this.websockets = Collections.synchronizedMap(new HashMap<>());
 	}
+	
+	@Override
+    public void start() throws IOException 
+	{
+        super.start();
+        
+        ScheduledExecutorService exes = Executors.newSingleThreadScheduledExecutor();
+//        ScheduledExecutorService exes = Executors.newSingleThreadScheduledExecutor(Void -> 
+//        {
+//        	Thread t = new Thread();
+//        	t.setDaemon(true);
+//        	return t;
+//        });
+        
+        final ScheduledFuture<?>[] f =new ScheduledFuture[1];
+        f[0] = exes.scheduleAtFixedRate(() -> 
+        {
+            if(isAlive())
+            {
+            	// Hack! https://www.bountysource.com/issues/44957864-websocket-closes-after-being-open
+                MyWebSocket[] wss; 
+                // values() delivers internal collection that is not synchronized
+                synchronized(websockets)
+                {
+                	wss = websockets.values().toArray(new MyWebSocket[0]);
+                }
+                
+                for(MyWebSocket ws : wss)
+                {
+                    try
+                    { 
+                    	//System.out.println("sending ping: "+ws.getHandshakeRequest().getUri());
+                    	ws.ping("ping".getBytes()); 
+                    }
+                    catch(Exception e)
+                    { 
+                    	// todo: remove
+                    	//websockets.remove
+                    }
+                }
+            }
+            else
+            {
+            	if(f[0]!=null)
+            		f[0].cancel(false);
+            }
+        }, 4, 4, TimeUnit.SECONDS);
+    }
 	
 	/**
 	 *  Get the platform.
@@ -142,7 +199,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 	 */
 	public IExternalAccess getPlatform()
 	{
-		return platform;
+		return agent;
 	}
 	
 	/**
@@ -173,14 +230,21 @@ public class NanoWebsocketServer extends NanoHttpServer
 		
 //		final ServiceSearchMessage ssc = (ServiceSearchMessage)msg;
 //		IComponentManagementService cms = SServiceProvider.getService(platform, IComponentManagementService.class, ServiceScope.PLATFORM).get();
-		final Class<?> type = ssc.getType().getType(NanoWebsocketServer.class.getClassLoader()); // todo: support default loader when using null
+		//final Class<?> type = ssc.getType().getType(NanoWebsocketServer.class.getClassLoader()); // todo: support default loader when using null
+//		if(type==null)
+//		{
+//			Exception e = new RuntimeException("Service class not found: "+ssc.getType());
+//			sendException(e, ssc.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
+//			return ret;
+//		}
 		
-		if(type==null)
+		if(ssc.getType()==null)
 		{
-			Exception e = new RuntimeException("Service class not found: "+ssc.getType());
+			Exception e = new RuntimeException("No service class: "+ssc);
 			sendException(e, ssc.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
 			return ret;
 		}
+		
 		
 		String scope = ssc.getScope()!=null? ssc.getScope(): ServiceScope.GLOBAL.name();
 //		System.out.println("Search service with scope: "+scope);
@@ -194,7 +258,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 				{
 					if(filename==null)
 					{
-						sendException(new RuntimeException("Could not create session component for service, no suitable ws_serviceimpl_<class> context parameter defined in web.xml "+type.getName()), ssc.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
+						sendException(new RuntimeException("Could not create session component for service, no suitable ws_serviceimpl_<class> context parameter defined in web.xml "+ssc.getType()), ssc.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
 					}
 					else
 					{
@@ -203,7 +267,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 						{
 							public void customResultAvailable(IExternalAccess access) throws Exception
 							{
-								IFuture<IService> res = (IFuture<IService>)access.searchService(new ServiceQuery<>((Class<IService>)type, ServiceScope.COMPONENT_ONLY));
+								IFuture<IService> res = (IFuture<IService>)access.searchService(new ServiceQuery<IService>(ssc.getType()).setScope(ServiceScope.COMPONENT_ONLY));
 								res.addResultListener(new ExceptionDelegationResultListener<IService, String>(ret)
 								{
 									public void customResultAvailable(IService service)
@@ -219,7 +283,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 			}
 			else
 			{
-				IFuture<IService> res = (IFuture<IService>)getPlatform().searchService(new ServiceQuery<>(type, ServiceScope.getEnum(scope)));
+				IFuture<IService> res = (IFuture<IService>)getPlatform().searchService(new ServiceQuery<IService>(ssc.getType()).setScope(ServiceScope.getEnum(scope)));
 				res.addResultListener(new ExceptionDelegationResultListener<IService, String>(ret)
 				{
 					public void customResultAvailable(IService service)
@@ -234,7 +298,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 		}
 		else
 		{
-			ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)getPlatform().searchServices(new ServiceQuery<>(type, ServiceScope.getEnum(scope)));
+			ITerminableIntermediateFuture<IService> res = (ITerminableIntermediateFuture<IService>)getPlatform().searchServices(new ServiceQuery<IService>(ssc.getType()).setScope(ServiceScope.getEnum(scope)));
 			res.addResultListener(new IIntermediateResultListener<IService>()
 			{
 				public void intermediateResultAvailable(IService service)
@@ -1409,7 +1473,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 		@Override
 		protected void onPong(WebSocketFrame pong)
 		{
-			System.out.println("onPong: "+pong.getTextPayload());
+			//System.out.println("onPong: "+pong.getTextPayload());
 		}
 	};
 }
