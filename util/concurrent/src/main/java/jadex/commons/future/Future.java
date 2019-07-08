@@ -1192,6 +1192,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		});
 	}
 	
+	public void delegate(Future<E> delegate)
+	{
+		this.addResultListener(new DelegationResultListener<>(delegate));
+	}
+	
 	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function)
     {
         return exceptionally(function, null);

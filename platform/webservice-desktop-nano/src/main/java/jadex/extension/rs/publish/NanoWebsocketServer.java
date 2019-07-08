@@ -33,6 +33,7 @@ import org.activecomponents.webservice.messages.ServiceTerminateInvocationMessag
 import org.activecomponents.webservice.messages.ServiceUnprovideMessage;
 
 import fi.iki.elonen.NanoWSD.WebSocketFrame.CloseCode;
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -42,13 +43,17 @@ import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.FutureReturnType;
 import jadex.bridge.service.component.IProvidedServicesFeature;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.commons.Base64;
 import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
+import jadex.commons.MethodInfo;
 import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SClassReader.ClassFileInfo;
 import jadex.commons.SClassReader.ClassInfo;
@@ -69,11 +74,13 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.BasicTypeConverter;
+import jadex.commons.transformation.IStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.MinimalAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.platform.service.serialization.SerializationServices;
 import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
@@ -94,10 +101,10 @@ public class NanoWebsocketServer extends NanoHttpServer
 	protected Map<String, Future<?>> outcalls = new HashMap<String, Future<?>>();
 	
 	/** The read processors. */
-	protected List<ITraverseProcessor> readprocs;
+	//protected List<ITraverseProcessor> readprocs;
 	
 	/** The write processors. */
-	protected List<ITraverseProcessor> writeprocs;
+	//protected List<ITraverseProcessor> writeprocs;
 	
 	/** The partial messages. 
 	    todo: cleanup per timeout */
@@ -115,6 +122,9 @@ public class NanoWebsocketServer extends NanoHttpServer
 	/** The interface -> impl file mappings. */
 	protected MultiCollection<String, String> mappings;
 	
+	/** The methodinfos per service interface. */
+	protected Map<jadex.bridge.ClassInfo, MethodInfo[]> serviceinfos;
+	
 	/** 
 	 *  Creates the server.
 	 *  @param port Port of the server.
@@ -129,20 +139,22 @@ public class NanoWebsocketServer extends NanoHttpServer
 		
 		this.basicconverters = new BasicTypeConverter();
 		
-		this.readprocs = JsonTraverser.getDefaultReadProcessorsCopy();
-		this.writeprocs = JsonTraverser.getDefaultWriteProcessorsCopy();
-		
-		writeprocs.add(0, new jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceProcessor());
-		writeprocs.add(0, new jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceIdentifierProcessor());
-		writeprocs.add(0, new jadex.platform.service.serialization.serializers.jsonwrite.JsonResourceIdentifierProcessor());
-		
-		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonServiceProcessor());
-		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonServiceIdentifierProcessor());
-		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonComponentIdentifierProcessor());
-		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonResourceIdentifierProcessor());
+//		this.readprocs = JsonTraverser.getDefaultReadProcessorsCopy();
+//		this.writeprocs = JsonTraverser.getDefaultWriteProcessorsCopy();
+//		
+//		writeprocs.add(0, new jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceProcessor());
+//		writeprocs.add(0, new jadex.platform.service.serialization.serializers.jsonwrite.JsonServiceIdentifierProcessor());
+//		writeprocs.add(0, new jadex.platform.service.serialization.serializers.jsonwrite.JsonResourceIdentifierProcessor());
+//		
+//		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonServiceProcessor());
+//		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonServiceIdentifierProcessor());
+//		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonComponentIdentifierProcessor());
+//		readprocs.add(0, new jadex.platform.service.serialization.serializers.jsonread.JsonResourceIdentifierProcessor());
 		
 		this.partials = new HashMap<String, Map<Integer,String>>();
 		this.websockets = Collections.synchronizedMap(new HashMap<>());
+		
+		this.serviceinfos = new HashMap<>();
 	}
 	
 	@Override
@@ -238,14 +250,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 //			return ret;
 //		}
 		
-		if(ssc.getType()==null)
-		{
-			Exception e = new RuntimeException("No service class: "+ssc);
-			sendException(e, ssc.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
-			return ret;
-		}
-		
-		
+		// default global or network?
 		String scope = ssc.getScope()!=null? ssc.getScope(): ServiceScope.GLOBAL.name();
 //		System.out.println("Search service with scope: "+scope);
 		
@@ -289,8 +294,8 @@ public class NanoWebsocketServer extends NanoHttpServer
 					public void customResultAvailable(IService service)
 					{
 						// Found service and now send back id for generating javascript proxy
-//								addService(service);
-//								sendResult(getServiceInfo(service), ssc.getCallid(), session, true).addResultListener(new DelegationResultListener<String>(ret));
+//						addService(service);
+//						sendResult(getServiceInfo(service), ssc.getCallid(), session, true).addResultListener(new DelegationResultListener<String>(ret));
 						sendResult(service, ssc.getCallid(), session, true).addResultListener(new DelegationResultListener<String>(ret));
 					}
 				});
@@ -304,7 +309,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 				public void intermediateResultAvailable(IService service)
 				{
 					System.out.println("Found service: "+service.getServiceId());
-//							addService(service);
+//					addService(service);
 					// End of call with finished() thus no addResultListener()
 					sendResult(service, ssc.getCallid(), session, false);//.addResultListener(new DelegationResultListener<String>(ret));
 //							sendResult(getServiceInfo(service), ssc.getCallid(), session, false);//.addResultListener(new DelegationResultListener<String>(ret));
@@ -334,6 +339,34 @@ public class NanoWebsocketServer extends NanoHttpServer
 		return ret;
 	}
 	
+//	/**
+//	 *  Invoke a Jadex service on the managed platform.
+//	 */
+//	public IFuture<Object> invokeServiceMethod(IComponentIdentifier cid, ClassInfo servicetype, 
+//		final String methodname, final Object[] args, final ClassInfo[] argtypes, @FutureReturnType final ClassInfo rettype)
+//	{
+//		Class<?> rtype = rettype!=null? rettype.getType(agent.getClassLoader(), agent.getModel().getAllImports()): null;
+//		
+//		final Future<Object> ret = (Future<Object>)SFuture.getNoTimeoutFuture(rtype, agent);
+//		
+//		System.out.println("invokeServiceMethod: "+servicetype+" "+methodname+" "+Arrays.toString(args)+" "+rettype);
+//		
+//		// Search service with startpoint of given platform 
+//		agent.searchService(new ServiceQuery<IService>(servicetype).setSearchStart(cid.getRoot()).setScope(ServiceScope.PLATFORM))
+//			.addResultListener(new ExceptionDelegationResultListener<IService, Object>(ret)
+//		{
+//			@Override
+//			public void customResultAvailable(IService ser) throws Exception
+//			{
+//				//System.out.println("Invoking service method: "+ser+" "+methodname);
+//				IFuture<Object> fut = ser.invokeMethod(methodname, argtypes, args, rettype);
+//				FutureFunctionality.connectDelegationFuture(ret, fut);
+//			}
+//		});
+//		
+//		return ret;
+//	}
+
 	/**
 	 *  Handle a service invocation method.
 	 *  @param session The session.
@@ -341,7 +374,32 @@ public class NanoWebsocketServer extends NanoHttpServer
 	 */
 	protected IFuture<String> handleServiceInvocationMessage(final IHTTPSession session, final ServiceInvocationMessage sim)
 	{
-		final Future<String> ret = new Future<String>();
+		Future<String> ret = new Future<>();
+		MethodInfo[] mis = serviceinfos.get(sim.getServiceId().getServiceType());
+		
+		int psize = sim.getParameterValues().length;
+		List<MethodInfo> fit = new ArrayList<>();
+		for(MethodInfo mi: mis)
+		{
+			if(mi.getName().equals(sim.getMethodName()) && psize==mi.getParameterTypeInfos().length)
+			{
+				fit.add(mi);
+			}
+		}
+		
+		if(fit.size()==0)
+			sendException(new RuntimeException("Method not found: "+sim.getMethodName()), sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
+		if(fit.size()>0)
+			sendException(new RuntimeException("Too many methods found: "+sim.getMethodName()), sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
+
+		MethodInfo mi = fit.get(0);
+		//Class<?> rtype = mi.getReturnTypeInfo().getType(this.getClass().getClassLoader());
+		
+		//final Future<Object> mret = (Future<Object>)SFuture.getNoTimeoutFuture(rtype, agent);
+
+		//System.out.println("invokeServiceMethod: "+servicetype+" "+methodname+" "+Arrays.toString(args)+" "+rettype);
+
+		//final Future<String> ret = new Future<String>();
 	
 		System.out.println("Searching service: "+sim.getServiceId()+" on platform: "+getPlatform().getId());
 		
@@ -351,118 +409,66 @@ public class NanoWebsocketServer extends NanoHttpServer
 		{
 			public void customResultAvailable(IService service) throws Exception
 			{
-				// todo: fundamental problem class loader.
-				// Only the target component should need to know the service classes
-				Class<?> serclazz = service.getServiceId().getServiceType().getType(NanoWebsocketServer.class.getClassLoader());
+				IFuture<?> res = service.invokeMethod(sim.getMethodName(), mi.getParameterTypeInfos(), sim.getParameterValues(), mi.getReturnTypeInfo());
+				//FutureFunctionality.connectDelegationFuture(ret, res);
 
-				// decoded parameters
-				Object[] decparams = new Object[sim.getParameterValues().length];
-				int cnt=0;
-				for(Object encp: sim.getParameterValues())
+				incalls.put(sim.getCallid(), (IFuture<?>)res);
+//				System.out.println("saving: "+sim.getCallid());
+
+				if(res instanceof IIntermediateFuture)
 				{
-					try
+					((IIntermediateFuture<Object>)res).addResultListener(new IIntermediateResultListener<Object>()
 					{
-						//decparams[cnt] = JsonTraverser.objectFromString((String)encp, this.getClass().getClassLoader(), null, Object.class, readprocs);
-						// does not work with Object.class as type because ArrayProcessor checks class to be null or of array type
-						decparams[cnt] = JsonTraverser.objectFromString((String)encp, this.getClass().getClassLoader(), null, null, readprocs);
-						cnt++;
-					}
-					catch(Exception e)
-					{
-						decparams[cnt++] = new SerializedValue((String)encp);
-					}
-				}
-				
-				Tuple2<java.lang.reflect.Method, Object[]> tup = findMethod(decparams, serclazz, sim.getMethodName());
-
-				java.lang.reflect.Method m = tup.getFirstEntity();
-				Object[] pvals = tup.getSecondEntity();
-
-				if(m==null)
-				{
-					sendException(new RuntimeException("Method not found: "+sim.getMethodName()), sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
-				}
-//				else if(m.getParameterTypes().length!=sim.getParameterValues().length)
-//				{
-//					sendException(new RuntimeException("Method signature differs: "+sim.getMethodName()), sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
-//				}
-				else
-				{
-					try
-					{
-						Object res = m.invoke(service, pvals);
-
-						if(res instanceof IFuture)
+						public void intermediateResultAvailable(Object result)
 						{
-							incalls.put(sim.getCallid(), (IFuture<?>)res);
-//									System.out.println("saving: "+sim.getCallid());
-
-							if(res instanceof IIntermediateFuture)
-							{
-								((IIntermediateFuture<Object>)res).addResultListener(new IIntermediateResultListener<Object>()
-								{
-									public void intermediateResultAvailable(Object result)
-									{
-//												System.out.println("ires: "+result+" "+sim.getCallid());
-										sendResult(result, sim.getCallid(), session, false);//.addResultListener(new DelegationResultListener<String>(ret));
-									}
-
-									public void exceptionOccurred(Exception e)
-									{
-										sendException(e, sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
-										incalls.remove(sim.getCallid());
-//												System.out.println("removed ex: "+sim.getCallid());
-									}
-
-									public void finished()
-									{
-										sendResult(null, sim.getCallid(), session, true).addResultListener(new DelegationResultListener<String>(ret));
-										incalls.remove(sim.getCallid());
-//												System.out.println("removed fin: "+sim.getCallid());
-									}
-
-									public void resultAvailable(Collection<Object> result)
-									{
-										sendResult(result, sim.getCallid(), session, true).addResultListener(new DelegationResultListener<String>(ret));
-										incalls.remove(sim.getCallid());
-//												System.out.println("removed ra: "+sim.getCallid());
-									}
-								});
-							}
-							else //if(res instanceof IFuture)
-							{
-								((IFuture<Object>)res).addResultListener(new IResultListener<Object>()
-								{
-									public void resultAvailable(Object result)
-									{
-										sendResult(result, sim.getCallid(), session, true).addResultListener(new DelegationResultListener<String>(ret));
-										incalls.remove(sim.getCallid());
-//												System.out.println("remove fut call res: "+sim.getCallid());
-									}
-
-									public void exceptionOccurred(Exception e)
-									{
-										sendException(e, sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
-										incalls.remove(sim.getCallid());
-//												System.out.println("remove fut call ex: "+sim.getCallid());
-									}
-								});
-							}
+//							System.out.println("ires: "+result+" "+sim.getCallid());
+							sendResult(result, sim.getCallid(), session, false);//.addResultListener(new DelegationResultListener<String>(ret));
 						}
-						else
+
+						public void exceptionOccurred(Exception e)
 						{
-							sendResult(res, sim.getCallid(), session, true).addResultListener(new DelegationResultListener<String>(ret));
+							sendException(e, sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
+							incalls.remove(sim.getCallid());
+//							System.out.println("removed ex: "+sim.getCallid());
 						}
-					}
-					catch(Exception e)
+
+						public void finished()
+						{
+							sendResult(null, sim.getCallid(), session, true).addResultListener(new DelegationResultListener<String>(ret));
+							incalls.remove(sim.getCallid());
+//							System.out.println("removed fin: "+sim.getCallid());
+						}
+
+						public void resultAvailable(Collection<Object> result)
+						{
+							sendResult(result, sim.getCallid(), session, true).addResultListener(new DelegationResultListener<String>(ret));
+							incalls.remove(sim.getCallid());
+//							System.out.println("removed ra: "+sim.getCallid());
+						}
+					});
+				}
+				else //if(res instanceof IFuture)
+				{
+					((IFuture<Object>)res).addResultListener(new IResultListener<Object>()
 					{
-                        IllegalArgumentException descriptiveException = new IllegalArgumentException("Trying to call: " + m + "\n\t with parameters: " + Arrays.toString(pvals), e);
-						sendException(descriptiveException, sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
-					}
+						public void resultAvailable(Object result)
+						{
+							sendResult(result, sim.getCallid(), session, true).addResultListener(new DelegationResultListener<String>(ret));
+							incalls.remove(sim.getCallid());
+//							System.out.println("remove fut call res: "+sim.getCallid());
+						}
+
+						public void exceptionOccurred(Exception e)
+						{
+							sendException(e, sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
+							incalls.remove(sim.getCallid());
+//							System.out.println("remove fut call ex: "+sim.getCallid());
+						}
+					});
 				}
 			}
 		});
-
+		
 		return ret;
 	}
 	
@@ -491,7 +497,8 @@ public class NanoWebsocketServer extends NanoHttpServer
 	}
 	
 	/**
-	 * 
+	 *  Generate a map of service interfaces and components. Helps
+	 *  to find a component that implements a service interface.
 	 */
 	protected IFuture<MultiCollection<String, String>> getMappings()
 	{
@@ -571,7 +578,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 	 *  @param serclazz The target class.
 	 *  @param methodname The method name
 	 *  @return The method and further decoded parameters.
-	 */
+	 * /
 	protected Tuple2<java.lang.reflect.Method, Object[]> findMethod(Object[] params, Class<?> serclazz, String methodname)
 	{
 		java.lang.reflect.Method ret = null;
@@ -699,7 +706,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 		}
 		
 		return new Tuple2<java.lang.reflect.Method, Object[]>(ret, pvals);
-	}
+	}*/
 	
 	/**
 	 *  Handle a provide service method. 
@@ -953,7 +960,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 	 *  Generate call parameters.
 	 *  @param vals The current parameters.
 	 *  @return The adapted method call parameters.
-	 */
+	 * /
 	protected Object[] generateParameters(Object[] vals, java.lang.reflect.Method m) throws Exception
 	{
 		Object[] ret = new Object[vals.length];
@@ -973,11 +980,11 @@ public class NanoWebsocketServer extends NanoHttpServer
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Convert a parameter to a target type.
-	 */
+	 * /
 	protected Object convertParameter(Object value, Type targettype) throws Exception
 	{
 		Class<?> targetclass = SReflect.getClass(targettype);
@@ -988,11 +995,13 @@ public class NanoWebsocketServer extends NanoHttpServer
 			String text = ((SerializedValue)value).getValue();
 			try
 			{
-				value = JsonTraverser.objectFromString(text, this.getClass().getClassLoader(), null, targetclass, readprocs);
+//				value = JsonTraverser.objectFromString(text, this.getClass().getClassLoader(), null, targetclass, readprocs);
+				value = convertToObject(text, targetclass);
 			}
 			catch(Exception e)
 			{
-				value = JsonTraverser.objectFromString(text, this.getClass().getClassLoader(), null, targetclasswrapped, readprocs);
+//				value = JsonTraverser.objectFromString(text, this.getClass().getClassLoader(), null, targetclasswrapped, readprocs);
+				value = convertToObject(text, targetclasswrapped);
 			}
 		}
 
@@ -1092,7 +1101,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Send a result message back to the client.
@@ -1101,7 +1110,37 @@ public class NanoWebsocketServer extends NanoHttpServer
 	{
 //		if(finished && res!=null && res.getClass().toString().indexOf("ChatEvent")!=-1)
 //			System.out.println("removing call: "+callid);
-		return sendMessage(new ResultMessage(res, callid, finished), session);
+	
+		Future<String> ret = new Future<>();
+		
+		// todo: sideeffect: move out of here!
+		
+		if(res instanceof IService)
+		{
+			IService ser = (IService)res;
+			jadex.bridge.ClassInfo iface = ser.getServiceId().getServiceType();
+			if(!serviceinfos.containsKey(iface))
+			{
+				ser.getMethodInfos().thenAccept(mis -> 
+				{
+					serviceinfos.put(iface, mis);
+					ServiceInfo si = new ServiceInfo(((IService)res).getServiceId(), mis);
+					sendMessage(new ResultMessage(si, callid, finished), session).delegate(ret);
+				});
+			}
+			else
+			{
+				MethodInfo[] mis = serviceinfos.get(iface);
+				ServiceInfo si = new ServiceInfo(((IService)res).getServiceId(), mis);
+				sendMessage(new ResultMessage(si, callid, finished), session).delegate(ret);
+			}
+		}
+		else
+		{
+			sendMessage(new ResultMessage(res, callid, finished), session).delegate(ret);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -1129,7 +1168,9 @@ public class NanoWebsocketServer extends NanoHttpServer
 			// TODO: unwrap types here instead frontend-side?
 
 			// ensure single threaded access to socket (how to do without lock)?
-			String data = JsonTraverser.objectToString(message, this.getClass().getClassLoader(), true, null, writeprocs);
+			//String data = JsonTraverser.objectToString(message, this.getClass().getClassLoader(), true, null, writeprocs);
+			String data = convertToString(message);
+			
 			synchronized(this)
 			{
 				getWebSocket(session).send(data);
@@ -1145,7 +1186,35 @@ public class NanoWebsocketServer extends NanoHttpServer
 	}
 	
 	/**
+	 *  Convert an object to the json string representation.
+	 *  @param val The value.
+	 *  @return The string representation.
+	 */
+	protected String convertToString(Object val)
+	{
+		ISerializationServices ser = (ISerializationServices)Starter.getPlatformValue(getPlatform().getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+		IStringConverter conv = ser.getStringConverters().get(IStringConverter.TYPE_JSON);
+		String data = conv.convertObject(val, null, this.getClass().getClassLoader(), null);
+		return data;
+	}
+	
+	/**
+	 *  Convert json to object representation.
+	 *  @param val The json value.
+	 *  @return The object.
+	 */
+	protected Object convertToObject(String val, Class<?> type)
+	{
+		ISerializationServices ser = (ISerializationServices)Starter.getPlatformValue(getPlatform().getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+		IStringConverter conv = ser.getStringConverters().get(IStringConverter.TYPE_JSON);
+		Object data = conv.convertString(val, type, this.getClass().getClassLoader(), null);
+		return data;
+	}
+	
+	/**
 	 *  Get or create a session component under the given key.
+	 *  
+	 *  // todo: create session component on other than gateway platform?!
 	 */
 	protected IFuture<IExternalAccess> getOrCreateSessionComponent(final String key, final IHTTPSession session, final String filename, final boolean create)
 	{
@@ -1304,6 +1373,67 @@ public class NanoWebsocketServer extends NanoHttpServer
 	}
 	
 	/**
+	 *  Service info struct with service id and method infos.
+	 */
+	public static class ServiceInfo
+	{
+		/** The service id. */
+		protected IServiceIdentifier sid;
+		
+		/** The method infos. */
+		protected MethodInfo[] methodinfos;
+
+		/**
+		 *  Create a new service info.
+		 */
+		public ServiceInfo()
+		{
+			// bean constructor
+		}
+		
+		/**
+		 *  Create a new service info.
+		 */
+		public ServiceInfo(IServiceIdentifier sid, MethodInfo[] methodInfos)
+		{
+			this.sid = sid;
+			this.methodinfos = methodInfos;
+		}
+
+		/**
+		 * @return the sid
+		 */
+		public IServiceIdentifier getServiceId()
+		{
+			return sid;
+		}
+		
+		/**
+		 * @param sid the sid to set
+		 */
+		public void setServiceId(IServiceIdentifier sid)
+		{
+			this.sid = sid;
+		}
+		
+		/**
+		 * @return the methodInfos
+		 */
+		public MethodInfo[] getMethodInfos()
+		{
+			return methodinfos;
+		}
+		
+		/**
+		 * @param methodInfos the methodInfos to set
+		 */
+		public void setMethodInfos(MethodInfo[] methodInfos)
+		{
+			this.methodinfos = methodInfos;
+		}
+	}
+	
+	/**
 	 *  Get websocket per session.
 	 *  @param session The session.
 	 *  @return The socket.
@@ -1364,7 +1494,8 @@ public class NanoWebsocketServer extends NanoHttpServer
 				// todo: problem classloader
 				// JSonServiceProcessor: service.getServiceIdentifier().getServiceType().getType(targetcl);
 				// problem getType(null) does not use default classloader but returns null :-(?!
-				final Object msg = JsonTraverser.objectFromString(txt, this.getClass().getClassLoader(), null, Object.class, readprocs);
+				//final Object msg = JsonTraverser.objectFromString(txt, this.getClass().getClassLoader(), null, Object.class, readprocs);
+				final Object msg = convertToObject(txt, null);
 				
 				if(msg instanceof PartialMessage)
 				{

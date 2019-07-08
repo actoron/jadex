@@ -67,6 +67,7 @@ public class JsonServiceProcessor implements ITraverseProcessor
 		wr.write("\"serviceIdentifier\":");
 		traverser.traverse(service.getServiceId(), IServiceIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
 		
+		// add method names for proxy gen
 		wr.write(",");
 		wr.write("\"methodNames\":");
 		traverser.traverse(ms, Set.class, conversionprocessors, processors, mode, targetcl, context);

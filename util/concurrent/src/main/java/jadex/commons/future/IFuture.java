@@ -243,4 +243,6 @@ public interface IFuture<E>
 	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function);
 	
 	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function, Class<?> futuretype);
+	
+	public void delegate(Future<E> delegate);
 }

@@ -57,7 +57,7 @@ public interface ISerializationServices
 	
 	/**
 	 *  Get the string converters (can convert to and from string, possibly only for some types).
-	 *  @return The converters.
+	 *  @return The converters by name (constants in IStringConverter).
 	 */
 	public Map<String, IStringConverter> getStringConverters();
 	

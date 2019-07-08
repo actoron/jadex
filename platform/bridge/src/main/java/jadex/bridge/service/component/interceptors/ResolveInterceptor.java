@@ -65,6 +65,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			INVOKE_METHOD = IService.class.getMethod("invokeMethod", new Class[]{String.class, ClassInfo[].class, Object[].class, ClassInfo.class});
 			SERVICEMETHODS = new HashSet<Method>();
 			SERVICEMETHODS.add(IService.class.getMethod("getServiceId", new Class[0]));
+			SERVICEMETHODS.add(IService.class.getMethod("getMethodInfos", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
 
