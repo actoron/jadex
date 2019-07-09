@@ -22,6 +22,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.activecomponents.webservice.ServiceInfo;
 import org.activecomponents.webservice.messages.BaseMessage;
 import org.activecomponents.webservice.messages.PartialMessage;
 import org.activecomponents.webservice.messages.PullResultMessage;
@@ -388,10 +389,16 @@ public class NanoWebsocketServer extends NanoHttpServer
 		}
 		
 		if(fit.size()==0)
+		{
 			sendException(new RuntimeException("Method not found: "+sim.getMethodName()), sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
-		if(fit.size()>0)
-			sendException(new RuntimeException("Too many methods found: "+sim.getMethodName()), sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
-
+			return ret;
+		}
+//		if(fit.size()>1)
+//		{
+//			sendException(new RuntimeException("Too many methods found: "+sim.getMethodName()), sim.getCallid(), session).addResultListener(new DelegationResultListener<String>(ret));
+//			return ret;
+//		}
+		
 		MethodInfo mi = fit.get(0);
 		//Class<?> rtype = mi.getReturnTypeInfo().getType(this.getClass().getClassLoader());
 		
@@ -1124,14 +1131,14 @@ public class NanoWebsocketServer extends NanoHttpServer
 				ser.getMethodInfos().thenAccept(mis -> 
 				{
 					serviceinfos.put(iface, mis);
-					ServiceInfo si = new ServiceInfo(((IService)res).getServiceId(), mis);
+					ServiceInfo si = new ServiceInfo(((IService)res).getServiceId(), getMethodNames(mis));
 					sendMessage(new ResultMessage(si, callid, finished), session).delegate(ret);
-				});
+				}).exceptionally(ret);
 			}
 			else
 			{
 				MethodInfo[] mis = serviceinfos.get(iface);
-				ServiceInfo si = new ServiceInfo(((IService)res).getServiceId(), mis);
+				ServiceInfo si = new ServiceInfo(((IService)res).getServiceId(), getMethodNames(mis));
 				sendMessage(new ResultMessage(si, callid, finished), session).delegate(ret);
 			}
 		}
@@ -1140,6 +1147,19 @@ public class NanoWebsocketServer extends NanoHttpServer
 			sendMessage(new ResultMessage(res, callid, finished), session).delegate(ret);
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Get the method names.
+	 *  @param mis The method infos.
+	 *  @return The method names.
+	 */
+	protected Set<String> getMethodNames(MethodInfo[] mis)
+	{
+		Set<String> ret = new HashSet<>();
+		for(MethodInfo mi: mis)
+			ret.add(mi.getName());
 		return ret;
 	}
 	
@@ -1369,67 +1389,6 @@ public class NanoWebsocketServer extends NanoHttpServer
 		public void setValue(String value)
 		{
 			this.value = value;
-		}
-	}
-	
-	/**
-	 *  Service info struct with service id and method infos.
-	 */
-	public static class ServiceInfo
-	{
-		/** The service id. */
-		protected IServiceIdentifier sid;
-		
-		/** The method infos. */
-		protected MethodInfo[] methodinfos;
-
-		/**
-		 *  Create a new service info.
-		 */
-		public ServiceInfo()
-		{
-			// bean constructor
-		}
-		
-		/**
-		 *  Create a new service info.
-		 */
-		public ServiceInfo(IServiceIdentifier sid, MethodInfo[] methodInfos)
-		{
-			this.sid = sid;
-			this.methodinfos = methodInfos;
-		}
-
-		/**
-		 * @return the sid
-		 */
-		public IServiceIdentifier getServiceId()
-		{
-			return sid;
-		}
-		
-		/**
-		 * @param sid the sid to set
-		 */
-		public void setServiceId(IServiceIdentifier sid)
-		{
-			this.sid = sid;
-		}
-		
-		/**
-		 * @return the methodInfos
-		 */
-		public MethodInfo[] getMethodInfos()
-		{
-			return methodinfos;
-		}
-		
-		/**
-		 * @param methodInfos the methodInfos to set
-		 */
-		public void setMethodInfos(MethodInfo[] methodInfos)
-		{
-			this.methodinfos = methodInfos;
 		}
 	}
 	

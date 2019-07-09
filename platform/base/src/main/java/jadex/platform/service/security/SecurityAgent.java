@@ -2524,6 +2524,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		while(todo.size()>0)
 		{
 			Class<?> cur = todo.iterator().next();
+			todo.remove(cur);
 			ms.addAll(SUtil.arrayToList(cur.getMethods()));
 			
 			cur = cur.getSuperclass();
@@ -2535,9 +2536,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		}
 		
 		MethodInfo[] ret = new MethodInfo[ms.size()];
-		for(Method m: ms)
+		Iterator<Method> it = ms.iterator();
+		for(int i=0; i<ms.size(); i++)
 		{
-			MethodInfo mi = new MethodInfo(m);
+			MethodInfo mi = new MethodInfo(it.next());
+			ret[i] = mi;
 		}
 		
 		return new Future<MethodInfo[]>(ret);
