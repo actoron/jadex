@@ -6,6 +6,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.service.annotation.FutureReturnType;
 import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.annotation.Reference;
+import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 
 
@@ -53,6 +54,12 @@ public interface IService //extends INFMixedPropertyProvider //extends IRemotabl
 	 *  @return The result.
 	 */
 	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args, @FutureReturnType ClassInfo returntype);
+	
+	/**
+	 *  Get reflective info about the service methods, args, return types.
+	 *  @return The method infos.
+	 */
+	public IFuture<MethodInfo[]> getMethodInfos();
 
 //	/**
 //	 *  Get an external interface feature.

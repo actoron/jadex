@@ -65,6 +65,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			INVOKE_METHOD = IService.class.getMethod("invokeMethod", new Class[]{String.class, ClassInfo[].class, Object[].class, ClassInfo.class});
 			SERVICEMETHODS = new HashSet<Method>();
 			SERVICEMETHODS.add(IService.class.getMethod("getServiceId", new Class[0]));
+			SERVICEMETHODS.add(IService.class.getMethod("getMethodInfos", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
 
@@ -112,8 +113,8 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		if(sic.getMethod().getName().indexOf("invoke")!=-1)
-//			System.out.println("herere");
+		//if(sic.getMethod().getName().indexOf("getMethodI")!=-1)
+		//	System.out.println("herere");
 		
 		Object service = sic.getObject();
 		if(service instanceof ServiceInfo)
@@ -156,6 +157,11 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 						}
 					}
 					
+					ISerializationServices ser = (ISerializationServices)Starter.getPlatformValue(ia.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+					Map<String, IStringConverter> convs = ser.getStringConverters();
+					IStringConverter jsonc = convs.get(IStringConverter.TYPE_JSON);
+					IStringConverter basicc = convs.get(IStringConverter.TYPE_BASIC);
+					
 					for(int i=0; i<argtypes.length; i++)
 					{
 						Class<?> target = argtypes[i].getType(ia.getClassLoader());
@@ -167,17 +173,27 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 							if(as[i] instanceof String)
 							{
 								//SerializationServices.getSerializationServices();
-								ISerializationServices ser = (ISerializationServices)Starter.getPlatformValue(ia.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
-								Map<String, IStringConverter> convs = ser.getStringConverters();
+								try
+								{
+									cval = jsonc.convertString((String)cval, target, ia.getClassLoader(), null);
+								}
+								catch(Exception e)
+								{
+								}
 								
 								// todo: make more generic (should save expected format so that it has not to try out)
-								IStringConverter c = convs.get(IStringConverter.TYPE_BASIC);
-								cval = c.convertString((String)as[i], target, ia.getClassLoader(), null);
-								
-								if(cval==null)
+								try
 								{
-									c = convs.get(IStringConverter.TYPE_JSON);
-									cval = c.convertString((String)as[i], target, ia.getClassLoader(), null);
+									cval = basicc.convertString((String)cval, target, ia.getClassLoader(), null);
+								}
+								catch(Exception e)
+								{
+								}
+								
+								if(cval!=null && !SReflect.getWrappedType(target).isInstance(cval))
+								{
+									sic.setResult(new RuntimeException("Arguments conversion problem: "+methodname+" "+as[i]+" "+cval+" "+target));
+									return IFuture.DONE;
 								}
 							}
 						}

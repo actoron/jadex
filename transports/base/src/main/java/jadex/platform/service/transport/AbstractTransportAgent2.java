@@ -1,10 +1,13 @@
 package jadex.platform.service.transport;
 
+import java.lang.reflect.Method;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +25,11 @@ import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMsgHeader;
 import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
@@ -37,6 +42,7 @@ import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bridge.service.types.transport.PlatformData;
 import jadex.commons.ICommand;
+import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BiHashMap;
@@ -859,5 +865,43 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args, ClassInfo rettype)
 	{
 		return new Future<Object>(new UnsupportedOperationException());
+	}
+	
+	/**
+	 *  Get reflective info about the service methods, args, return types.
+	 *  @return The method infos.
+	 */
+	public IFuture<MethodInfo[]> getMethodInfos()
+	{
+		Class<?> iface = sid.getServiceType().getType(agent.getClassLoader());
+		
+		Set<Method> ms = new HashSet<>();
+		
+		Set<Class<?>> todo = new HashSet<>();
+		todo.add(iface);
+		todo.add(IService.class);
+		while(todo.size()>0)
+		{
+			Class<?> cur = todo.iterator().next();
+			todo.remove(cur);
+			ms.addAll(SUtil.arrayToList(cur.getMethods()));
+			
+			cur = cur.getSuperclass();
+			while(cur!=null && cur.getAnnotation(Service.class)==null)
+				cur = cur.getSuperclass();
+			
+			if(cur!=null)
+				todo.add(cur);
+		}
+		
+		MethodInfo[] ret = new MethodInfo[ms.size()];
+		Iterator<Method> it = ms.iterator();
+		for(int i=0; i<ms.size(); i++)
+		{
+			MethodInfo mi = new MethodInfo(it.next());
+			ret[i] = mi;
+		}
+		
+		return new Future<MethodInfo[]>(ret);
 	}
 }

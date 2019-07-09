@@ -223,12 +223,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						}
 						else if(infos[j].getMethodInfo()!=null)
 						{
-							final Method m = SReflect.getMethod(agent.getClass(), infos[j].getMethodInfo().getName(), infos[j].getMethodInfo().getParameterTypes(component.getClassLoader()));
+							final Method m = SReflect.getAnyMethod(agent.getClass(), infos[j].getMethodInfo().getName(), infos[j].getMethodInfo().getParameterTypes(component.getClassLoader()));
 
 							if(infos[j].isQuery())
 							{
 								@SuppressWarnings("unchecked")
-								ServiceQuery<Object>	query	= new ServiceQuery<>((Class<Object>)info.getType().getType(getComponent().getClassLoader()), info.getDefaultBinding().getScope());
+								ServiceQuery<Object> query = new ServiceQuery<>((Class<Object>)info.getType().getType(getComponent().getClassLoader()), info.getDefaultBinding().getScope());
 								query	= info.getTags()==null || info.getTags().size()==0? query: query.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), component.getExternalAccess()); 
 								ISubscriptionIntermediateFuture<Object> sfut = getComponent().getFeature(IRequiredServicesFeature.class).addQuery(query);
 								lis2.resultAvailable(null);

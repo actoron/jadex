@@ -61,12 +61,13 @@ public class JsonServiceProcessor implements ITraverseProcessor
 		}
 		
 		wr.write("{");
-//		wr.writeNameValue(com.actoron.webservice.json.read.JsonServiceProcessor.SERVICE_MARKER, 0).write(", ");
+//		wr.writeNameValue(org.activecomponents.webservice.json.read.JsonServiceProcessor.SERVICE_MARKER, 0).write(", ");
 //		wr.writeNameString("serviceIdentifier", service.getId().toString()).write(", ");
 		
 		wr.write("\"serviceIdentifier\":");
 		traverser.traverse(service.getServiceId(), IServiceIdentifier.class, conversionprocessors, processors, mode, targetcl, context);
 		
+		// add method names for proxy gen
 		wr.write(",");
 		wr.write("\"methodNames\":");
 		traverser.traverse(ms, Set.class, conversionprocessors, processors, mode, targetcl, context);

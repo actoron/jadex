@@ -133,10 +133,10 @@ public class CatalogAwarenessAgent implements IAwarenessService
 	 *  with an upper bound of less than 1 second.
 	 *  Issues a new search, but answers using known platforms. On first request
 	 */
-	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
-	{
-		return new Future<Set<IComponentIdentifier>>(new LinkedHashSet<>(catalog.keySet()));
-	}
+//	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
+//	{
+//		return new Future<Set<IComponentIdentifier>>(new LinkedHashSet<>(catalog.keySet()));
+//	}
 	
 	/**
 	 *  Gets the address for a platform ID using the awareness mechanism.

@@ -1,10 +1,8 @@
 package jadex.extension.rs.publish;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
@@ -13,16 +11,12 @@ import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import javax.servlet.AsyncEvent;
-import javax.servlet.AsyncListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import fi.iki.elonen.NanoHTTPD;
-import fi.iki.elonen.NanoHTTPD.Response.IStatus;
 import jadex.base.JarAsDirectory;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
@@ -37,6 +31,7 @@ import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.micro.annotation.Agent;
 
 /**
  *  Publish service using Nano.
@@ -45,90 +40,8 @@ import jadex.commons.future.IFuture;
 public class NanoRestPublishService extends ExternalRestPublishService
 {
 	/** The servers per port. */
-	protected Map<Integer, Server> portservers2;
+	protected Map<Integer, NanoWebsocketServer> portservers2;
 	
-	/**
-	 *  Inner class representing a nano server.
-	 */
-	public class Server extends NanoHTTPD 
-	{
-		public Server(int port) 
-		{
-			super(port);
-		}
-		
-		@Override 
-		public Response serve(IHTTPSession session) 
-		{
-			//System.out.println("serve called: "+session.getUri());
-			
-			Response[] ret = new Response[1];
-			
-			NanoHttpServletResponseWrapper resp = new NanoHttpServletResponseWrapper(session);
-			NanoHttpServletRequestWrapper req = new NanoHttpServletRequestWrapper(session, resp);
-			
-			// todo: make handle request use async context return 
-			handleRequest(req, resp, null).get();
-			
-			Future<Void> wait = new Future<>();
-			
-			Runnable run = new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					IStatus status = Response.Status.lookup(resp.getStatus());
-					String mimetype = resp.getContentType();
-					byte[] out = resp.getOutput().toByteArray();
-					InputStream is = new ByteArrayInputStream(out);
-					ret[0] = newFixedLengthResponse(status, mimetype, is, out.length);
-					for(String hn: resp.getHeaderNames())
-						ret[0].addHeader(hn, resp.getHeader(hn));
-					HttpSession ses = req.getSession(false);
-					if(ses!=null)
-						ret[0].addHeader(NanoHttpServletRequestWrapper.HEADER_NANO_SESSIONID, ses.getId());
-				}
-			};
-			
-			if(req.isAsyncStarted())
-			{
-				req.getAsyncContext().addListener(new AsyncListener()
-				{
-					@Override
-					public void onTimeout(AsyncEvent event) throws IOException
-					{
-					}
-					
-					@Override
-					public void onStartAsync(AsyncEvent event) throws IOException
-					{
-					}
-					
-					@Override
-					public void onError(AsyncEvent event) throws IOException
-					{
-					}
-					
-					@Override
-					public void onComplete(AsyncEvent event) throws IOException
-					{
-						run.run();
-						wait.setResult(null);
-					}
-				});
-			}
-			else
-			{
-				run.run();
-				wait.setResult(null);
-			}
-			
-			wait.get();
-			
-			return ret[0];
-		}
-	}
-		
 	@ServiceStart
 	public void start()
 	{
@@ -144,7 +57,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 	{
 		if(portservers2 != null)
 		{
-			for(Map.Entry<Integer, Server> entry : portservers2.entrySet())
+			for(Map.Entry<Integer, NanoWebsocketServer> entry : portservers2.entrySet())
 			{
 				try
 				{
@@ -165,7 +78,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 	{
 		Object ps = super.getHttpServer(uri, info);
 		
-		Server server = null;
+		NanoWebsocketServer server = null;
 		 
         try
         {
@@ -174,12 +87,12 @@ public class NanoRestPublishService extends ExternalRestPublishService
         	if(server==null)
             {
 //        		System.out.println("Starting new server: "+uri.getPort());
-                server = new Server(uri.getPort());
+                server = new NanoWebsocketServer(uri.getPort(), component, this);
  
                 server.start();
  
                 if(portservers2==null)
-                	portservers2 = new HashMap<Integer, Server>();
+                	portservers2 = new HashMap<Integer, NanoWebsocketServer>();
                 portservers2.put(uri.getPort(), server);
              }
          }
@@ -244,10 +157,17 @@ public class NanoRestPublishService extends ExternalRestPublishService
 //
     /**
      *  Publish file resources from the classpath.
+     *  @param pid The publish url.
+     *  @param rootpath The classpath root path where to look for the reources.
      */
 	// example "[http://localhost:8081/]", "META-INF/resources";
     public IFuture<Void> publishResources(final String pid, final String rootpath)
     {
+//    	String rp = root;
+//    	if(rp.endsWith("/"))
+//    		rp = rp.substring(0, rp.length()-1);
+//    	final String rootpath = rp;
+    	
     	System.out.println("publish resources: "+pid+" from "+rootpath);
     	
 		final Future<Void>	ret	= new Future<Void>();
@@ -303,13 +223,27 @@ public class NanoRestPublishService extends ExternalRestPublishService
 								public void handleRequest(HttpServletRequest request, HttpServletResponse response, Object args) throws Exception
 								{
 									String url = request.getRequestURL().toString();
-
+									
+									// Remove the first part of the url containing the
+									String purl = pid;
+									if(purl.startsWith("["))
+							    		purl = purl.substring(pid.indexOf("]")+1);
+									int idx = url.indexOf(purl);
+									if(idx!=-1)
+										url = url.substring(idx+purl.length());
+									
 									if(url.equals("/") || url.length()==0)
 										url = "/index.html";
 									
-									String fp = rootpath+url;
+									String rp = rootpath;
+									if(rp.endsWith("/"))
+										rp = rp.substring(0, rp.length()-1);
 									
-									//System.out.println("handling: "+url);
+									String fp = rp+url;
+									if(fp.startsWith("/"))
+										fp = fp.substring(1);
+									
+									System.out.println("handling: "+url+" "+fp);
 									
 									// All java variants do not work properly :-(
 //									MimetypesFileTypeMap ftm = new MimetypesFileTypeMap();
@@ -339,7 +273,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 									}
 									else
 									{
-//										System.out.println("file not found: "+fp);
+										System.out.println("file not found: "+fp);
 										response.setStatus(404);
 									}
 								}

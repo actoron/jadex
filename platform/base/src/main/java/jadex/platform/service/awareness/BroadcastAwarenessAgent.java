@@ -21,7 +21,7 @@ import jadex.micro.annotation.Arguments;
 	@Argument(name="address", clazz=String.class, defaultvalue="\"255.255.255.255\""),
 	@Argument(name="port", clazz=int.class, defaultvalue="33091")
 })
-public class BroadcastAwarenessAgent	extends LocalNetworkAwarenessBaseAgent
+public class BroadcastAwarenessAgent extends LocalNetworkAwarenessBaseAgent
 {
 	/**
 	 *  At startup create a multicast socket for listening.

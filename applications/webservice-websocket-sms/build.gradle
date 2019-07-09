@@ -13,7 +13,7 @@ sourceSets.main.resources.srcDirs = ['src/main/java', 'src/main/webapp'];
 dependencies 
 {
 	// must be runtime. otherwise dependencies are not deployed 
-	compile project(':platform:webservice-websocket')
+	api project(':platform:webservice-websocket')
 }
 
 war

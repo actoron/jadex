@@ -27,7 +27,7 @@ public interface IAwarenessService
 	 *  with an upper bound of less than 1 second.
 	 *  Issues a new search, but answers using known platforms. On first request
 	 */
-	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast();
+//	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast();
 	
 	/**
 	 *  Gets the address for a platform ID using the awareness mechanism.

@@ -49,7 +49,7 @@ import jadex.transformation.jsonserializer.JsonTraverser;
 @ProvidedServices(@ProvidedService(name="myser", type=IMyService.class, scope=ServiceScope.PLATFORM,
 	implementation=@Implementation(expression="$pojoagent"),
 	publish=@Publish(publishtype=IPublishService.PUBLISH_RS, 
-	publishid="[http://localhost:8080/]myservice"
+	publishid="[http://localhost:7000/]myservice"
 )))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class PathVarAgent extends JunitAgentTest 
@@ -79,7 +79,7 @@ public class PathVarAgent extends JunitAgentTest
 	@AgentBody
 	public void body()
 	{
-		String baseurl = "http://localhost:8080/myservice";
+		String baseurl = "http://localhost:7000/myservice";
 		
 		final List<TestReport> reports = new ArrayList<>();
 		

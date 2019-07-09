@@ -11,7 +11,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  */
 @Service(system=true)
 // TODO: change supersuperpeer to globalsuperpeer?
-@Security(roles="%{true.equals($platformargs.supersuperpeer)? jadex.bridge.service.annotation.Security.UNRESTRICTED: jadex.bridge.service.annotation.Security.DEFAULT}")
+@Security(roles="%{true.equals($platformargs.supersuperpeer)? jadex.bridge.service.annotation.Security.UNRESTRICTED: jadex.bridge.service.annotation.Security.TRUSTED}")
 public interface ISuperpeerService extends IRemoteRegistryService
 {
 	/**

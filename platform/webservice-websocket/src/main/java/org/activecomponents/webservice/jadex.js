@@ -386,7 +386,8 @@ var JsonParser =
                 if("__classname" in obj) 
                 {
                     var className = obj["__classname"];
-                    if(className == "jadex.bridge.service.IService") 
+                    //if(className == "jadex.bridge.service.IService") 
+                    if(className == "org.activecomponents.webservice.ServiceInfo") 
                     {
                         obj = new Jadex.ServiceProxy(obj.serviceIdentifier, recurse(obj.methodNames, "methodNames", obj), url)
                     } 

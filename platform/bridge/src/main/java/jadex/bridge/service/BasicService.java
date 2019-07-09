@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -21,18 +23,18 @@ import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
-import jadex.bridge.service.annotation.Tags;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceRegistry;
-import jadex.commons.IValueFetcher;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.javaparser.SJavaParser;
 
 /**
  *  Basic service provide a simple default isValid() implementation
@@ -308,6 +310,44 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get reflective info about the service methods, args, return types.
+	 *  @return The method infos.
+	 */
+	public IFuture<MethodInfo[]> getMethodInfos()
+	{
+		Class<?> iface = sid.getServiceType().getType(internalaccess.getClassLoader());
+		
+		Set<Method> ms = new HashSet<>();
+		
+		Set<Class<?>> todo = new HashSet<>();
+		todo.add(iface);
+		todo.add(IService.class);
+		while(todo.size()>0)
+		{
+			Class<?> cur = todo.iterator().next();
+			todo.remove(cur);
+			ms.addAll(SUtil.arrayToList(cur.getMethods()));
+			
+			cur = cur.getSuperclass();
+			while(cur!=null && cur.getAnnotation(Service.class)==null)
+				cur = cur.getSuperclass();
+			
+			if(cur!=null)
+				todo.add(cur);
+		}
+		
+		MethodInfo[] ret = new MethodInfo[ms.size()];
+		Iterator<Method> it = ms.iterator();
+		for(int i=0; i<ms.size(); i++)
+		{
+			MethodInfo mi = new MethodInfo(it.next());
+			ret[i] = mi;
+		}
+		
+		return new Future<MethodInfo[]>(ret);
 	}
 	
 	/**
