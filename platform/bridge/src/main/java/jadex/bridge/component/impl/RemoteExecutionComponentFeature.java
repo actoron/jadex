@@ -1,7 +1,6 @@
 package jadex.bridge.component.impl;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -557,7 +556,9 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 			
 			// Admin platforms (i.e. in possession  of our platform key) can do anything.
 			if(secinfos.getRoles().contains(Security.ADMIN))
+			{
 				trusted	= true;
+			}
 			
 			// Internal command -> safe to check as stated by command.
 			else if(SAFE_COMMANDS.contains(msg.getClass()))
@@ -568,7 +569,9 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 					
 					// No service roles and trusted role is ok.
 					if (secroles == null && secinfos.getRoles().contains(Security.TRUSTED))
+					{
 						trusted = true;
+					}
 					
 					// Custom role match is ok
 					else if(!Collections.disjoint(secroles, secinfos.getRoles()))

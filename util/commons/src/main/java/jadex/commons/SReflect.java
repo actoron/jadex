@@ -962,6 +962,73 @@ public class SReflect
 
 		return ret.toArray(new Method[ret.size()]);
 	}
+	
+	/**
+	 *  Gets a declared methods similar to Class.getDeclaredMethod() but returns null instead of throwing exception.
+	 * 
+	 *  @param clazz The class being operated on.
+	 *  @param methodname Name of the method.
+	 *  @param parametertypes The parameter types.
+	 *  @return Method, if declared method is found in the class, null otherwise.
+	 */
+	public static final Method getDeclaredMethod0(Class<?> clazz, String methodname, Class<?>... parametertypes)
+	{
+		Method[] methods = clazz.getDeclaredMethods();
+		for (int i = 0; i < methods.length; ++i)
+		{
+			if (methods[i].getName().equals(methodname) && Arrays.equals(parametertypes, methods[i].getParameterTypes()))
+				return methods[i];
+		}
+		return null;
+	}
+	
+	/**
+	 *  Finds the declaring interface of a method in a multiple-inheritance interface using a breadth-first approach.
+	 * 
+	 *  @param iface The starting interface.
+	 *  @param methodname The method name.
+	 *  @param parametertypes The method parameter types.
+	 *  @return The declaring interface or null if none is found.
+	 */
+	public static final Class<?> getDeclaringInterface(Class<?> iface, String methodname, Class<?>... parametertypes)
+	{
+		assert iface != null && iface.isInterface();
+		Method declmeth = getDeclaredMethod0(iface, methodname, parametertypes);
+		
+		if (declmeth != null)
+			return iface;
+		else
+			return findDeclaringInterface(iface, methodname, parametertypes);
+	}
+	
+	/**
+	 *  Recursive breadth-first search of superinterfaces for a declaring interface of a specific method.
+	 * 
+	 *  @param iface The starting interface.
+	 *  @param methodname The method name.
+	 *  @param parametertypes The method parameter types.
+	 *  @return The declaring interface or null if none is found.
+	 */
+	private static final Class<?> findDeclaringInterface(Class<?> iface, String methodname, Class<?>... parametertypes)
+	{
+		Method declmeth = null;
+		Class<?>[] superinterfaces = iface.getInterfaces();
+		
+		for (int i = 0; i < superinterfaces.length; ++i)
+		{
+			declmeth = getDeclaredMethod0(superinterfaces[i], methodname, parametertypes);
+			if (declmeth != null)
+				return superinterfaces[i];
+		}
+		
+		for (int i = 0; i < superinterfaces.length; ++i)
+		{
+			Class<?> ret = findDeclaringInterface(superinterfaces[i], methodname, parametertypes);
+			if (ret != null)
+				return ret;
+		}
+		return null;
+	}
 
 	/**
 	 *  Get all fields of a class including public, protected
