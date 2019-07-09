@@ -168,7 +168,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	
 	/** Flag whether to use the default Java trust store. */
 	@AgentArgument
-	protected boolean loadjavatruststore = true;
+	protected boolean loadjavatruststore = false;
 	
 	/** Flag if the security should add a global network
 	 *  if no global network is set.
@@ -262,11 +262,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		long ts = System.currentTimeMillis();
 		if (handshaketimeout < 0)
 			handshaketimeout = (long) (Starter.getDefaultTimeout(agent.getId().getRoot()) * handshaketimeoutscale);
 		if (handshaketimeout <= 0)
 			handshaketimeout = 60000;
 		final Future<Void> ret = new Future<Void>();
+		ret.thenAccept(done -> System.out.println("Sec startup " + (System.currentTimeMillis() - ts)));
 		
 		((SerializationServices)SerializationServices.getSerializationServices(agent.getId().getRoot())).setSecurityService(this);
 		
