@@ -361,7 +361,7 @@ public class BasicService implements IInternalService //extends NFMethodProperty
 			Method[] methods = SReflect.getMethods(target, methodname);
 			if(methods.length!=1)
 			{
-				throw new IllegalArgumentException("Multiple messages with name: "+methodname);
+				throw new IllegalArgumentException("Multiple methods with name: "+methodname);
 			}
 			else
 			{
