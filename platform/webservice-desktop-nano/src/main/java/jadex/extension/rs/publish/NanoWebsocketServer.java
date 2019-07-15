@@ -35,7 +35,7 @@ public class NanoWebsocketServer extends NanoHttpServer
 		//Logger.getLogger(NanoHTTPD.class.getName()).setLevel(Level.OFF);
 		//Logger.getLogger(NanoWSD.class.getName()).setLevel(Level.OFF);
 		
-		this.server = new AbstractWebSocketServer(port, agent) 
+		this.server = new AbstractWebSocketServer(agent) 
 		{
 			@Override
 			public void sendWebSocketData(Object ws, String data) 
