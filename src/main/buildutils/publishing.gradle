@@ -206,7 +206,7 @@ publishing {
     publications {
 
         if (canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project))) {  // dont publish apks
-            MyPublication(MavenPublication) {
+            ProjectPublication(MavenPublication) {
                 if (isWebApplicationProject(project)) {
                     from components.web
                     // publish jar for web projects, too
@@ -283,9 +283,9 @@ if (!isCommercial(project)) {
     bintray {
         user = getVar('BINTRAY_USER', project)
         key = getVar('BINTRAY_KEY', project)
-        configurations = ['archives']
+        configurations = project.tasks.findByName('install') ? ['archives'] : null
         publish = true
-        publications = ['MyPublication']
+        publications = publishing.publications.contains('ProjectPublication') ? ['ProjectPublication'] : null
         pkg {
             repo = 'jadex'
             name = 'jadex'
@@ -321,36 +321,9 @@ if (canSign) {
 // uncomment with gradle 4.8
 // signing poms with maven-publish is supported with gradle 4.8, however, 4.8 seems to be incompatible with bintray 1.8 :/
 		if (!isAndroidProject(project) || isAndroidLibraryProject(project)) { // dont publish apks
-			sign publishing.publications.MyPublication
+			sign publishing.publications.ProjectPublication
 		}
 	}
-
-
-//    // remove once on gradle 4.8:
-//    // generate pom so it can be signed with gradle < 4.8
-//    // see https://medium.com/@nmauti/sign-and-publish-on-maven-central-a-project-with-the-new-maven-publish-gradle-plugin-22a72a4bfd4b
-//    if (!isAndroidProject(project) || isAndroidLibraryProject(project)) { // dont publish apks
-//        model {
-//            tasks.generatePomFileForMyPublicationPublication {
-//                destination = file("$buildDir/generated-pom.xml")
-//                //enabled = includedproject // pom must be built even if not used :(
-//            }
-//            tasks.publishMyPublicationPublicationToMavenLocal {
-//                dependsOn project.tasks.signArchives
-//                enabled = includedproject
-//            }
-//            if (canPublishToNexus) {
-//                tasks.publishMyPublicationPublicationToMavenRepository {
-//                    dependsOn project.tasks.signArchives
-//                    enabled = includedproject
-//                }
-//            }
-//            tasks.bintrayUpload {
-//                dependsOn project.tasks.signArchives
-//                enabled = includedproject
-//            }
-//        }
-//    }
 }
 
 
