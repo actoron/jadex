@@ -1,19 +1,14 @@
 package jadex.extension.rs.publish;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,14 +38,11 @@ import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.annotation.FutureReturnType;
 import jadex.bridge.service.component.IProvidedServicesFeature;
-import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
-import jadex.commons.Base64;
 import jadex.commons.FileFilter;
 import jadex.commons.IFilter;
 import jadex.commons.MethodInfo;
@@ -59,7 +51,6 @@ import jadex.commons.SClassReader.ClassFileInfo;
 import jadex.commons.SClassReader.ClassInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -75,13 +66,9 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IStringConverter;
-import jadex.commons.transformation.IStringObjectConverter;
-import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.micro.MinimalAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.platform.service.serialization.SerializationServices;
-import jadex.transformation.jsonserializer.JsonTraverser;
 
 /**
  *  The nano websocket server handles websocket requests from clients like browsers.
