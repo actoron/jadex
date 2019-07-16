@@ -10,11 +10,20 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.activecomponents.webservice.RestWebSocket;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.websocket.server.WebSocketHandler;
+import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
+import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
+import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
+import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
+
+import com.sun.xml.ws.api.server.Adapter;
 
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -174,18 +183,56 @@ public class JettyRestPublishService extends AbstractRestPublishService
 
         try
         {
-//            URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
+//          URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
             server = portservers==null? null: portservers.get(uri.getPort());
 
             if(server==null)
             {
                 System.out.println("Starting new server: "+uri.getPort());
                 server = new Server(uri.getPort());
-                server.dumpStdErr();
+                //server.dumpStdErr();
 
                 ContextHandlerCollection collhandler = new ContextHandlerCollection();
-                server.setHandler(collhandler);
 
+/*                WebSocketHandler wsh = new WebSocketHandler()
+                {
+                	@Override
+                	public void configure(WebSocketServletFactory factory)
+                	{
+                		factory.register(RestWebSocket.class);
+                	}
+                };
+                ContextHandler context = new ContextHandler();
+                //context.setContextPath("/wswebapi");
+                context.setContextPath("/ws");
+                context.setHandler(wsh);
+                //server.addHandler(context);
+                collhandler.addHandler(wsh);
+*/                
+                
+                ContextHandler ch = new ContextHandler("/wswebapi");
+                ch.setAllowNullPathInfo(true); // disable redirect from /ws to /ws/
+                final WebSocketCreator wsc = new WebSocketCreator() 
+                {
+                	public Object createWebSocket(ServletUpgradeRequest request, ServletUpgradeResponse response) 
+                	{
+                		return new JettyWebsocketServer(component);
+                	}
+                };
+                Handler wsh = new WebSocketHandler() 
+                {
+                	public void configure(WebSocketServletFactory factory) 
+                	{
+                		factory.setCreator(wsc);
+                		//factory.register(RestWebSocket.class);
+                	}
+                };
+                ch.setHandler(wsh);
+                
+                collhandler.addHandler(ch);
+                
+                server.setHandler(collhandler);
+                
                 server.start();
 //              server.join();
 
@@ -205,7 +252,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
 
         return server;
     }
-
+    
     /**
      *  Unpublish a service.
      *  @param sid The service identifier.
@@ -283,7 +330,7 @@ public class JettyRestPublishService extends AbstractRestPublishService
 			        	//final IService service = (IService) component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( serviceid)).get();
 			        	
 			            Server server = (Server)getHttpServer(uri, null);
-			            System.out.println("Adding http handler to server (jetty): "+uri.getPath());
+			            System.out.println("Adding http handler to server (jetty): "+uri.getPath()+" rootpath: "+rootpath);
 
 			            ContextHandlerCollection collhandler = (ContextHandlerCollection)server.getHandler();
 			            

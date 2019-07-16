@@ -340,7 +340,9 @@ public class NanoRestPublishService extends ExternalRestPublishService
     
     public static URL getURL(ClassLoader cl, String path)
 	{
-		return cl.getResource(path);
+		URL ret = cl.getResource(path);
+		System.out.println("Loaded: "+path+" result: "+ret);
+		return ret;
 	}
 
     /**
