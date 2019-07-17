@@ -268,7 +268,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if (handshaketimeout <= 0)
 			handshaketimeout = 60000;
 		final Future<Void> ret = new Future<Void>();
-		ret.thenAccept(done -> System.out.println("Sec startup " + (System.currentTimeMillis() - ts)));
+		//ret.thenAccept(done -> System.out.println("Sec startup " + (System.currentTimeMillis() - ts)));
 		
 		((SerializationServices)SerializationServices.getSerializationServices(agent.getId().getRoot())).setSecurityService(this);
 		

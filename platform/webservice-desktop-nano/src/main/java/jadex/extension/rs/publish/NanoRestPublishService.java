@@ -48,7 +48,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 		if(!inited)
     	{
     		super.init();
-    		System.out.println("Nano started: "+component.getId());
+    		//System.out.println("Nano started: "+component.getId());
     	}
 	}
   
@@ -341,7 +341,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
     public static URL getURL(ClassLoader cl, String path)
 	{
 		URL ret = cl.getResource(path);
-		System.out.println("Loaded: "+path+" result: "+ret);
+		//System.out.println("Loaded: "+path+" result: "+ret);
 		return ret;
 	}
 

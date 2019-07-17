@@ -46,6 +46,8 @@ public class JsonServiceProcessor implements ITraverseProcessor
 	
 		IService service = (IService)object;
 		Set<String> ms = new HashSet<String>();
+		
+		
 		Class<?> clazz = service.getServiceId().getServiceType().getType(targetcl);
 		while(clazz!=null)
 		{
