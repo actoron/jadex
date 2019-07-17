@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -882,6 +883,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		while(todo.size()>0)
 		{
 			Class<?> cur = todo.iterator().next();
+			todo.remove(cur);
 			ms.addAll(SUtil.arrayToList(cur.getMethods()));
 			
 			cur = cur.getSuperclass();
@@ -893,9 +895,11 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		}
 		
 		MethodInfo[] ret = new MethodInfo[ms.size()];
-		for(Method m: ms)
+		Iterator<Method> it = ms.iterator();
+		for(int i=0; i<ms.size(); i++)
 		{
-			MethodInfo mi = new MethodInfo(m);
+			MethodInfo mi = new MethodInfo(it.next());
+			ret[i] = mi;
 		}
 		
 		return new Future<MethodInfo[]>(ret);

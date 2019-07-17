@@ -202,6 +202,15 @@ public class MethodInfo
 	{
 		return returntype;
 	}
+	
+	/**
+	 *  Set the return type.
+	 *  @param returntype the returntype to set
+	 */
+	public void setReturnTypeInfo(ClassInfo returntype) 
+	{
+		this.returntype = returntype;
+	}
 
 	/**
 	 *  Sets the class name for retrieving the method.
@@ -216,7 +225,7 @@ public class MethodInfo
 	/**
 	 *  Gets the class name for retrieving the method.
 	 */
-	public String	getClassName()
+	public String getClassName()
 	{
 		return classname;
 	}

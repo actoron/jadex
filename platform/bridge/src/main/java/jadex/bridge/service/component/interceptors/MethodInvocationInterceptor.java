@@ -158,8 +158,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 //			if(sic.getMethod().getName().indexOf("Void")!=-1)
 //				System.out.println("e: "+sic.getMethod()+" "+sic.getObject()+" "+sic.getArgumentArray());
 
-			Throwable	t	= e instanceof InvocationTargetException
-					? ((InvocationTargetException)e).getTargetException() : e;
+			Throwable t = e instanceof InvocationTargetException? ((InvocationTargetException)e).getTargetException() : e;
 			
 			if(DEBUG)
 				e.printStackTrace();
