@@ -57,6 +57,13 @@ public class RestWebSocket extends Endpoint
 				Session session = (Session)ws;
 				return session.getUserProperties();
 			}
+			
+			// todo: make async?!
+			@Override
+			public IExternalAccess getPlatform() 
+			{
+				return SWebSocket.getPlatform(getServletContext()).get();
+			}
 		};
 	}
 	

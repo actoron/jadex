@@ -10,7 +10,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.activecomponents.webservice.AbstractWebSocketServer;
-import org.activecomponents.webservice.SWebSocket;
 
 import fi.iki.elonen.NanoWSD.WebSocketFrame.CloseCode;
 import jadex.bridge.IExternalAccess;

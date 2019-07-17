@@ -37,12 +37,20 @@ public class UniversalClasspathResource extends Resource
 	
 	public Resource addPath(String path) throws IOException ,java.net.MalformedURLException
 	{
-		return new UniversalClasspathResource(this.path+path);
+		if("/".equals(path))
+			return this;
+		else
+			return new UniversalClasspathResource(this.path+path);
 	}
 
 	public java.net.URL getURL()
 	{
-		return getClass().getClassLoader().getResource(path);
+		URL ret = getClass().getClassLoader().getResource(path);
+		if(ret==null && path.startsWith("/"))
+			ret = getClass().getClassLoader().getResource(path.substring(1));
+		if(ret==null && "/".equals(path))
+			ret = getClass().getClassLoader().getResource("index.html");
+		return ret;
 	}
 
 	public boolean isContainedIn(Resource r) throws java.net.MalformedURLException

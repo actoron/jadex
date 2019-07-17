@@ -26,6 +26,8 @@ project.subprojects.each { sp ->
 	addSubproject(sp)
 }
 
+project.ext.runtimearts = new HashMap<String, Set<String>>();
+
 project.ext.keepplural = new HashSet<String>()
 project.ext.keepplural.add('rules')
 project.ext.keepplural.add('tools')
@@ -136,6 +138,15 @@ allprojects
 			preserveFileTimestamps = false
 			reproducibleFileOrder = true
 		}
+		def confs = isAndroidProject(project) ? project.configurations.runtimeAndroid : project.configurations.runtimeClasspath
+		def files = rootProject.ext.runtimearts.get(project.getPath())
+		if (files == null)
+		{
+			files = new HashSet<>()
+			rootProject.ext.runtimearts.put(project.getPath(), files)
+		}
+		
+		files.addAll(confs.getFiles())
 	}
 }
 
@@ -455,7 +466,7 @@ subprojects
 		}
 
 		task srcZip(type: Zip, dependsOn: rootProject.createVersionInfo) {
-			destinationDir new File(rootProject.distsDir, "sources")
+			destinationDir new File(getDistsDir(rootProject), "sources")
 			archiveName 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
 			
 			// Add all included artifact projects and their parents (but exclude root project for addons)
@@ -498,7 +509,7 @@ subprojects
 			def examples	= dir.listFiles().findAll { it.isDirectory() }
 			examples.each { example ->
 				def task	= project.tasks.create([name: examples.size()==1 ? "exampleZip" : "exampleZip-" + example.getName(), type: Zip]) {
-					destinationDir new File(rootProject.distsDir, 'exampleprojects')
+					destinationDir new File(getDistsDir(rootProject), 'exampleprojects')
 					archiveName example.getName() + '.zip'
 					from (example) {
 						into example.getName()
@@ -576,9 +587,8 @@ subprojects
 								// copy all runtime deps:
 								if(sp.parent!=null) {
 									// 'runtimeElements' instead of 'runtime'!? cf. https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph
-									def runtimeConfig = distname.contains('android') ? sp.configurations.runtimeAndroid :sp.configurations.runtimeElements
-									def detached = getDetachedConfiguration(sp, runtimeConfig)
-									detached.each { file ->
+									
+									rootProject.ext.runtimearts.get(sp.getPath()).each{ file ->
 										if (!extdists.contains(file)) {
 											from (file.getParent()) {
 												into 'jadex-'  + jadex_build_version + '/lib'
@@ -628,7 +638,7 @@ subprojects
 				}
 			
 				println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
-				destinationDir new File(rootProject.distsDir, commercial? 'commercial' : 'noncommercial')
+				destinationDir new File(getDistsDir(rootProject), commercial? 'commercial' : 'noncommercial')
 			}
 			
 			// Copy generated srcZip
@@ -702,7 +712,7 @@ subprojects
 }
 
 task copyJavaDocSources(type: Copy) {
-	destinationDir = new File(project.distsDir.getCanonicalPath() + '/javadocworkdir')
+	destinationDir = new File(getDistsDir(project).getCanonicalPath() + '/javadocworkdir')
 	gradle.ext.maindistartifacts.each { artname ->
 		def sp = project.ext.subprojectmap.get(artname)
 		if (sp == null)
@@ -732,9 +742,9 @@ task copyJavaDocSources(type: Copy) {
 
 
 task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
-	def sourcedir = project.distsDir.getCanonicalPath() + '/javadocworkdir'
+	def sourcedir = getDistsDir(project).getCanonicalPath() + '/javadocworkdir'
 	source(sourcedir)
-	destinationDir = new File(project.distsDir.getCanonicalPath() + '/jadex-' + jadex_build_version + '-javadoc')
+	destinationDir = new File(getDistsDir(project).getCanonicalPath() + '/jadex-' + jadex_build_version + '-javadoc')
 
 	options.encoding 'UTF-8'
 	options.docEncoding 'UTF-8'
