@@ -303,7 +303,7 @@ public class PlatformAgent
 			}
 		}
 		
-		System.out.println("Scan size: " + scanfiles.size());
+		//System.out.println("Scan size: " + scanfiles.size());
 		
 		for (File f : scanfiles)
 		{
