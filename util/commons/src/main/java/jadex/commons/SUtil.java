@@ -1,5 +1,6 @@
 package jadex.commons;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -9,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -1368,7 +1370,7 @@ public class SUtil
 				if(url.getProtocol().equals("file"))
 				{
 					// Find out default encoding (might fail in applets).
-					String encoding = "ISO-8859-1";
+					String encoding = "UTF-8";
 					try
 					{
 						encoding = System.getProperty("file.encoding");
@@ -4654,6 +4656,9 @@ public class SUtil
 		}
 
 		buf.flush();
+		
+		// InputStream is exhausted, close ok? Seems reasonable...
+		close(is);
 
 		return buf.toByteArray();
 	}
@@ -4715,6 +4720,47 @@ public class SUtil
 		{
 			rethrowAsUnchecked(e);
 		}
+	}
+	
+	/**
+	 *  Reads a (text) stream line-wise and returns lines as array.
+	 *  @param is InputStream.
+	 *  @return Array of lines.
+	 */
+	public static String[] readStreamLines(InputStream is)
+	{
+		return readStreamLines(is, null);
+	}
+	
+	/**
+	 *  Reads a (text) stream line-wise and returns lines as array.
+	 *  @param is InputStream.
+	 *  @param encoding Character encoding, defaults to UTF8 if null.
+	 *  @return Array of lines.
+	 */
+	public static String[] readStreamLines(InputStream is, Charset encoding)
+	{
+		encoding = encoding == null ? UTF8 : encoding;
+		String[] ret = null;
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, encoding)))
+		{
+			List<String> lines = new ArrayList<>();
+			String line = reader.readLine();
+			while (line != null)
+			{
+				lines.add(line);
+				line = reader.readLine();
+			}
+			ret = lines.toArray(new String[lines.size()]);
+		}
+		catch (Exception e)
+		{
+			throw throwUnchecked(e);
+		}
+		
+		close(is);
+		
+		return ret;
 	}
 	
 	/**
