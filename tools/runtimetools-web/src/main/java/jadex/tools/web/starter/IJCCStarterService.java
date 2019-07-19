@@ -3,8 +3,6 @@ package jadex.tools.web.starter;
 import java.util.Collection;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
@@ -24,42 +22,36 @@ public interface IJCCStarterService extends IJCCPluginService
 	 *  Get all startable component models.
 	 *  @return The filenames and classnames of the component models.
 	 */
-	public IFuture<Collection<String[]>> getComponentModels();
+	//public IFuture<Collection<String[]>> getComponentModels();
+	public IFuture<Collection<String[]>> getComponentModels(IComponentIdentifier cid);
 	
 	/**
 	 *  Load a component model.
 	 *  @param filename The filename.
 	 *  @return The component model.
 	 */
-	public IFuture<IModelInfo> loadComponentModel(String filename);
-	
-	/**
-	 *  Create a component for a filename.
-	 *  @param filename The filename.
-	 *  @return The component id.
-	 * /
-	public IFuture<IComponentIdentifier> createComponent(String filename);*/
+	public IFuture<IModelInfo> loadComponentModel(String filename, IComponentIdentifier cid);
 	
 	/**
 	 *  Create a component for a filename.
 	 *  @param ci The creation info.
 	 *  @return The component id.
 	 */
-	public IFuture<IComponentIdentifier> createComponent(CreationInfo ci);
+	public IFuture<IComponentIdentifier> createComponent(CreationInfo ci, IComponentIdentifier cid);
 	
 	/**
 	 *  Get the component descriptions.
 	 *  @return The component descriptions.
 	 */
-	public IFuture<IComponentDescription[]> getComponentDescriptions();
+	public IFuture<IComponentDescription[]> getComponentDescriptions(IComponentIdentifier cid);
 	
 	/**
 	 * Get a default icon for a file type.
 	 */
-	public IFuture<byte[]> loadComponentIcon(String type);
+	public IFuture<byte[]> loadComponentIcon(String type, IComponentIdentifier cid);
 	
 	/**
 	 *  Subscribe to component events
 	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> subscribeToComponentChanges();
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> subscribeToComponentChanges(IComponentIdentifier cid);
 }

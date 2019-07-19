@@ -58,7 +58,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 		try 
 		{
 //			IComponentDescription[] descs = cms.getComponentDescriptions().get();
-			IComponentDescription[] descs = SComponentManagementService.getComponentDescriptions(agent).get();
+			IComponentDescription[] descs = SComponentManagementService.getComponentDescriptions(agent.getId()).get();
 			
 			System.out.println(Arrays.toString(descs));
 			tr1.setSucceeded(true);
@@ -90,7 +90,7 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 			
 			ILibraryService ls = getServiceProxy(agent, plat.getId(), ILibraryService.class);
 //			IComponentDescription[] descs = cms.getComponentDescriptions().get();
-			IComponentDescription[] descs = SComponentManagementService.getComponentDescriptions(agent).get();
+			IComponentDescription[] descs = SComponentManagementService.getComponentDescriptions(agent.getId()).get();
 			System.out.println(Arrays.toString(descs));
 			tr2.setSucceeded(true);
 		}

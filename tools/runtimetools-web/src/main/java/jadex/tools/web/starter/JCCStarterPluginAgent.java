@@ -1,30 +1,21 @@
 package jadex.tools.web.starter;
 
-import java.net.URL;
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
-import jadex.commons.IFilter;
-import jadex.commons.SClassReader;
-import jadex.commons.SClassReader.AnnotationInfo;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.micro.MinimalAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -68,64 +59,43 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 *  Get all startable component models.
 	 *  @return The file names of the component models.
 	 */
-	public IFuture<Collection<String[]>> getComponentModels()
+	public IFuture<Collection<String[]>> getComponentModels(final IComponentIdentifier cid)
 	{
-		// Scanning takes some time and is thus delegated to a worker agent allowing this agent to process other requests
-		return agent.createComponent(new CreationInfo().setFilenameClass(MinimalAgent.class)).thenCompose((IExternalAccess ea) ->
+		Future<Collection<String[]>> ret = new Future<>();
+		
+		if(cid==null || cid.hasSameRoot(cid))
 		{
-			return ea.scheduleStep(ia ->
-			{
-				ILibraryService ls = ia.getLocalService(ILibraryService.class);
-				URL[] urls = ls.getAllURLs().get().toArray(new URL[0]);
-				
-//				URL[] urls = PlatformAgent.getClasspathUrls(this.getClass().getClassLoader());
-//				System.out.println("URLs1: "+Arrays.toString(urls));
-				// Remove JVM jars
-				urls = SUtil.removeSystemUrls(urls);
-				
-				Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(urls, null, new IFilter<SClassReader.ClassFileInfo>()
-				{
-					public boolean filter(SClassReader.ClassFileInfo ci)
-					{
-						boolean ret = false;
-						AnnotationInfo ai = ci.getClassInfo().getAnnotation(Agent.class.getName());
-						if(ai!=null)
-							ret = true;
-						return ret;
-					}
-				});
-				
-				// Collect filenames of models to load the models without knowing the rid (can then be extracted)
-				List<String[]> res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
-						
-				//System.out.println("Models found: "+res);
-				
-				ia.killComponent();
-				
-				return new Future<Collection<String[]>>(res);
-			});
-		});
+			ILibraryService ls = agent.getLocalService(ILibraryService.class);
+			ls.getComponentModels().delegate(ret);
+		}
+		else
+		{
+			agent.searchService(new ServiceQuery<ILibraryService>(ILibraryService.class).setPlatform(cid).setScope(ServiceScope.PLATFORM))
+				.thenAccept(libs -> {libs.getComponentModels().delegate(ret);}).exceptionally(ret);
+		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Create a component for a model.
-	 */
+	 * /
 	public IFuture<IComponentIdentifier> createComponent(String filename)
 	{
 //		System.out.println("webjcc start: "+filename);
 		
 		IExternalAccess comp = agent.createComponent(new CreationInfo().setFilename(filename)).get();
 		return new Future<IComponentIdentifier>(comp.getId());
-	}
+	}*/
 	
 	/**
 	 *  Create a component for a model.
 	 */
-	public IFuture<IComponentIdentifier> createComponent(CreationInfo ci)
+	public IFuture<IComponentIdentifier> createComponent(CreationInfo ci, IComponentIdentifier cid)
 	{
-		System.out.println("webjcc start: "+ci+", "+Thread.currentThread());
+		//System.out.println("webjcc start: "+ci+", "+Thread.currentThread());
 		
-		IExternalAccess comp = agent.getExternalAccess(agent.getId().getRoot()).createComponent(ci).get();
+		IExternalAccess comp = agent.getExternalAccess(cid!=null? cid.getRoot(): agent.getId().getRoot()).createComponent(ci).get();
 		return new Future<IComponentIdentifier>(comp.getId());
 	}
 	
@@ -134,36 +104,36 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 *  @param filename The filename.
 	 *  @return The component model.
 	 */
-	public IFuture<IModelInfo> loadComponentModel(String filename)
+	public IFuture<IModelInfo> loadComponentModel(String filename, IComponentIdentifier cid)
 	{
-		return SComponentFactory.loadModel(agent, filename, null);
+		return SComponentFactory.loadModel(cid!=null? agent.getExternalAccess(cid): agent, filename, null);
 	}
 	
 	/**
 	 *  Get the component descriptions.
 	 *  @return The component descriptions.
 	 */
-	public IFuture<IComponentDescription[]> getComponentDescriptions()
+	public IFuture<IComponentDescription[]> getComponentDescriptions(IComponentIdentifier cid)
 	{
 		//System.out.println("getCompDescs start");
-		IFuture<IComponentDescription[]> ret = SComponentManagementService.getComponentDescriptions(agent);
-		//ret.thenAccept((IComponentDescription[] x) -> System.out.println("getCompDescs end:"+x));
-		return ret;
+		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
+		return ea.getDescriptions();
 	}
 	
 	/**
 	 * Get a default icon for a file type.
 	 */
-	public IFuture<byte[]> loadComponentIcon(String type)
+	public IFuture<byte[]> loadComponentIcon(String type, IComponentIdentifier cid)
 	{
-		return SComponentFactory.getFileTypeIcon(agent, type);
+		return SComponentFactory.getFileTypeIcon(cid!=null? agent.getExternalAccess(cid): agent, type);
 	}
 	
 	/**
 	 *  Subscribe to component events
 	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> subscribeToComponentChanges()
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> subscribeToComponentChanges(IComponentIdentifier cid)
 	{
-		return SComponentManagementService.listenToAll(agent);
+		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
+		return ea.listenToAll();
 	}
 }

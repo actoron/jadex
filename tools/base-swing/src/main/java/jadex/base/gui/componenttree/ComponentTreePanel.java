@@ -924,7 +924,7 @@ public class ComponentTreePanel extends JSplitPane
 			@Override
 			public IFuture<IComponentDescription[]> execute(IInternalAccess ia)
 			{
-				return SComponentManagementService.getComponentDescriptions(ia);
+				return SComponentManagementService.getComponentDescriptions(ia.getId());
 			}
 		}).addResultListener(new SwingDefaultResultListener()
 		{

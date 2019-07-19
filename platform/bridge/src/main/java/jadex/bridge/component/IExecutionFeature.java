@@ -84,7 +84,7 @@ public interface IExecutionFeature extends IExternalExecutionFeature
 	 */
 	// Todo: hack??? should be internal to CMS!?
 	public IComponentDescription getDescription();
-	
+		
 	/**
 	 *  Test if current thread is the component thread.
 	 *  @return True if the current thread is the component thread.

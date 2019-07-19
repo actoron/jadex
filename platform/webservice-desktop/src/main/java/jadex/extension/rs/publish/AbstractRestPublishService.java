@@ -376,7 +376,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		String callid = request.getHeader(HEADER_JADEX_CALLID);
 		String terminate = request.getHeader(HEADER_JADEX_TERMINATE);
 
-		System.out.println("handleRequest: "+callid+" "+terminate);
+		//System.out.println("handleRequest: "+callid+" "+terminate);
 		
 		// request info manages an ongoing conversation
 		if(requestinfos.containsKey(callid))

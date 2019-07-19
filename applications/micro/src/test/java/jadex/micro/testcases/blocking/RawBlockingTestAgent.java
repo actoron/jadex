@@ -29,7 +29,7 @@ public class RawBlockingTestAgent extends JunitAgentTest
 //			IComponentManagementService.class, ServiceScope.PLATFORM));
 		
 //		cms.getComponentDescriptions().get();
-		SComponentManagementService.getComponentDescriptions(agent).get();
+		SComponentManagementService.getComponentDescriptions(agent.getId()).get();
 		
 		agent.getFeature(IArgumentsResultsFeature.class).getResults().put("testresults", new Testcase(1,
 			new TestReport[]{new TestReport("#1", "Test blocking wait.", true, null)}));

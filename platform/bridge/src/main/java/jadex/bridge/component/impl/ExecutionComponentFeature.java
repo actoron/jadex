@@ -1974,6 +1974,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	}
 	
 	/**
+	 *  Add a component listener for all components of a platform.
+	 *  The listener is registered for component changes.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToAll()
+	{
+		return getComponent().listenToComponent(null);
+	}
+	
+	/**
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
 	 *  @param listener Called when the step is finished (result will be the component description).
@@ -2114,10 +2123,20 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid)
 	{
  		// redirect remote calls 
-		if(!getComponent().getId().getRoot().equals(cid.getRoot()))
+		if(!getComponent().getId().hasSameRoot(cid))
 			return getExternalAccess(cid).getDescription(cid);
 		else
 			return getComponent().getDescription(cid);
+	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription[]> getDescriptions()
+	{
+		return getComponent().getDescriptions();
 	}
 	
 	/**

@@ -59,7 +59,7 @@ public abstract class JCCPluginAgent
 			sc = new Scanner(is);
 			ret = sc.useDelimiter("\\A").next();
 			
-			System.out.println("loading: "+name+" "+ret.length());
+			//System.out.println("loading: "+name+" "+ret.length());
 		}
 		catch(Exception e)
 		{

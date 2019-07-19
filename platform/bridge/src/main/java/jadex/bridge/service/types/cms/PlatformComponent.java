@@ -731,6 +731,17 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	{
 		return SComponentManagementService.getComponentDescription(cid);
 	}
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription[]> getDescriptions()
+	{
+		return SComponentManagementService.getComponentDescriptions(getId());
+	}
+
 
 	/**
 	 *  Get a feature of the component.

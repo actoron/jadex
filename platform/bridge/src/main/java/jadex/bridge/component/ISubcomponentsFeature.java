@@ -1,8 +1,5 @@
 package jadex.bridge.component;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.commons.future.IFuture;
-
 /**
  *  Allows a component to have subcomponents.
  */

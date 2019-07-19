@@ -116,10 +116,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
 		final Future<Void> ret = new Future<Void>();
-		
-		//if(sic.getMethod().getName().indexOf("getMethodI")!=-1)
-		//	System.out.println("herere");
-		
+				
 		Object service = sic.getObject();
 		if(service instanceof ServiceInfo)
 		{
@@ -147,18 +144,24 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				Object[] as = (Object[])args.get(2);
 				//ClassInfo rettype = (ClassInfo)args.get(3);
 				
+				//if(methodname.indexOf("createComponent")!=-1)
+				//	System.out.println("herere");
+				
 				// todo: always try decoding strings with json?
-				for(int i=0; i<as.length; i++)
+				if(as!=null)
 				{
-					if(as[i] instanceof String)
+					for(int i=0; i<as.length; i++)
 					{
-						try
+						if(as[i] instanceof String)
 						{
-							Object val = convertFromJsonString((String)as[i], null);
-							as[i] = val;
-						}
-						catch(Exception e)
-						{
+							try
+							{
+								Object val = convertFromJsonString((String)as[i], null);
+								as[i] = val;
+							}
+							catch(Exception e)
+							{
+							}
 						}
 					}
 				}
@@ -347,11 +350,26 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		
 		if(argtypes!=null)
 		{
-			Class<?>[] types = new Class[argtypes.length];
-			for(int i=0; i<argtypes.length; i++)
-				types[i] = argtypes[i].getType(ia.getClassLoader());
-			ms = new java.lang.reflect.Method[1];
-			ms[0] = SReflect.getMethod(serclazz, methodname, types);
+//			Class<?>[] types = new Class[argtypes.length];
+//			for(int i=0; i<argtypes.length; i++)
+//				types[i] = argtypes[i].getType(ia.getClassLoader());
+//			ms = new java.lang.reflect.Method[1];
+//			ms[0] = SReflect.getMethod(serclazz, methodname, types);
+			
+			List<Method> okms = new ArrayList<>();
+			ms = SReflect.getMethods(serclazz, methodname);
+			for(int i=0; i<ms.length; i++)
+			{
+				Class<?>[] pts = ms[i].getParameterTypes();
+				boolean ok = true;
+				for(int j=0; j<pts.length && j<argtypes.length; j++)
+				{
+					if(!new ClassInfo(pts[j]).equals(argtypes[j]))
+						ok = false;
+				}
+				if(ok)
+					okms.add(ms[i]);
+			}
 		}
 		else
 		{
@@ -427,9 +445,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 					}
 
 					if(maybeok)
-					{
 						msmaybeok.add(meth);
-					}
 				}
 
 				if(msok.size()==1)
@@ -488,9 +504,9 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	 */
 	protected Object[] generateParameters(Object[] vals, java.lang.reflect.Method m) throws Exception
 	{
-		Object[] ret = new Object[vals.length];
+		Object[] ret = new Object[m.getParameterCount()];
 		
-		for(int i=0; i<ret.length; i++)
+		for(int i=0; i<ret.length && vals!=null && i<vals.length; i++)
 		{
 			if(vals[i]==null)
 			{
@@ -507,6 +523,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		return ret;
 	}
 	
+	
 	/**
 	 *  Convert a parameter to a target type.
 	 */
@@ -515,9 +532,14 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		Class<?> targetclass = SReflect.getClass(targettype);
 		Class<?> targetclasswrapped = SReflect.getWrappedType(targetclass);
 		
+		String text = null;
 		if(value instanceof SerializedValue)
+			text = ((SerializedValue)value).getValue();
+		else if(value instanceof String)
+			text = (String)value;
+		
+		if(text!=null)
 		{
-			String text = ((SerializedValue)value).getValue();
 			try
 			{
 //				value = JsonTraverser.objectFromString(text, this.getClass().getClassLoader(), null, targetclass, readprocs);
@@ -526,7 +548,13 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			catch(Exception e)
 			{
 //				value = JsonTraverser.objectFromString(text, this.getClass().getClassLoader(), null, targetclasswrapped, readprocs);
-				value = convertFromJsonString(text, targetclasswrapped);
+				try
+				{
+					value = convertFromJsonString(text, targetclasswrapped);
+				}
+				catch(Exception e2)
+				{
+				}
 			}
 		}
 

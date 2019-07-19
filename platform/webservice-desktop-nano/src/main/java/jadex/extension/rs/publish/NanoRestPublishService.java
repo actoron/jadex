@@ -243,7 +243,7 @@ public class NanoRestPublishService extends ExternalRestPublishService
 									if(fp.startsWith("/"))
 										fp = fp.substring(1);
 									
-									System.out.println("handling: "+url+" "+fp);
+									//System.out.println("handling: "+url+" "+fp);
 									
 									// All java variants do not work properly :-(
 //									MimetypesFileTypeMap ftm = new MimetypesFileTypeMap();
