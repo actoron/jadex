@@ -518,8 +518,6 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public void setPredecessors(String[] predecessors)
 	{
-		if (name.contains("Intravm"))
-			System.out.println("Got INAIAIA");
 		this.predecessors = predecessors;
 	}
 	
@@ -528,7 +526,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public void addSuccessors(String[] successors)
 	{
-		if (this.successors != null && this.successors.length > 0)
+		if(this.successors != null && this.successors.length > 0)
 		{
 			Set<String> tmp = new HashSet<>();
 			tmp.addAll(Arrays.asList(this.successors));

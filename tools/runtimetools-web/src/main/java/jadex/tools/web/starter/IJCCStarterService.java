@@ -14,6 +14,9 @@ import jadex.tools.web.jcc.IJCCPluginService;
 
 /**
  *  Interface for the starter plugin service.
+ *  
+ *  Note: cid needs to be always last parameter. It is used to remote 
+ *  control another platform using a webjcc plugin on the gateway.
  */
 @Service(system=true)
 public interface IJCCStarterService extends IJCCPluginService

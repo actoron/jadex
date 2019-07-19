@@ -1,6 +1,5 @@
 package jadex.tools.web.jcc;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +29,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
@@ -172,10 +172,9 @@ public class JCCWebAgent implements IJCCWebService
 		if(cid!=null && !cid.hasSameRoot(agent.getId().getRoot()))
 		{
 			agent.searchService(new ServiceQuery<IJCCWebService>(IJCCWebService.class).setSearchStart(cid.getRoot()))
-				.addResultListener(new ExceptionDelegationResultListener<IJCCWebService, Map<String, String>>(ret)
+				.addResultListener(new IResultListener<IJCCWebService>()
 			{
-				@Override
-				public void customResultAvailable(IJCCWebService jccser) throws Exception
+				public void resultAvailable(IJCCWebService jccser)
 				{
 					jccser.getPluginFragments(cid).thenAccept(m ->
 					{
@@ -185,6 +184,11 @@ public class JCCWebAgent implements IJCCWebService
 						}
 						ret.setResult(res2);
 					});
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setResult(res2);
 				}
 			});
 		}
@@ -231,14 +235,15 @@ public class JCCWebAgent implements IJCCWebService
 				
 				IService ser = (IService)agent.getLocalService(servicetype.getType(agent.getClassLoader()));
 				
-				Object[] args2 = new Object[args!=null? args.length: 1];
-				System.arraycopy(args, 0, args2, 0, args.length);
+				Object[] args2 = new Object[args!=null? args.length+1: 1];
+				if(args!=null)
+					System.arraycopy(args, 0, args2, 0, args.length);
 				args2[args2.length-1] = cid;
 				
 				ClassInfo[] argtypes2 = argtypes;
 				if(argtypes!=null)
 				{
-					argtypes2 = new ClassInfo[argtypes.length];
+					argtypes2 = new ClassInfo[argtypes.length+1];
 					System.arraycopy(argtypes, 0, argtypes2, 0, argtypes.length);
 					argtypes2[argtypes2.length-1] = new ClassInfo(IComponentIdentifier.class);
 				}
