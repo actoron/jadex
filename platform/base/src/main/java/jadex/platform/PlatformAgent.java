@@ -440,7 +440,7 @@ public class PlatformAgent
 				{
 					if(!result.getId().getRoot().equals(agent.getId().getRoot()))
 					{
-						System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
+						//System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
 						Map<String, Object> args = new HashMap<>();
 						args.put("component", result.getId());
 						agent.createComponent(new CreationInfo().setFilename("jadex.platform.service.remote.ProxyAgent.class")
