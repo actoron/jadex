@@ -831,13 +831,15 @@ public class MicroClassReader
 					AgentServiceSearch ser = getAnnotation(fields[i], AgentServiceSearch.class, cl);
 					RequiredService rs = ser.requiredservice();
 					
+					Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
+					
+					// This is still broken in the lazy case!
 					if(!rs.type().equals(Object.class))
 					{
 						if(ser.name().length()>0)
 							throw new IllegalArgumentException("Use 'name' to reference a required service OR use inline declaration of required service, not both.");
 						
-						Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
-						
+						// This needs to be outsider the check
 						RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
 						if(rsis.getName().length()==0)
 							rsis.setName(fields[i].getName());
@@ -866,29 +868,32 @@ public class MicroClassReader
 					AgentServiceQuery ser = getAnnotation(fields[i], AgentServiceQuery.class, cl);
 					RequiredService rs = ser.requiredservice();
 					
+					Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
+					
+					RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+					if(rsis.getName().length()==0)
+						rsis.setName(fields[i].getName());
+				
+					if(rsers.containsKey(rsis.getName()))
+					{
+						RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(rsis.getName());
+						if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
+							throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+rsis.getName());
+					}
+					else
+					{
+						rsers.put(rsis.getName(), rsis);
+					}
+					
 					if(!rs.type().equals(Object.class))
 					{
-						Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
 						
-						RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
-						if(rsis.getName().length()==0)
-							rsis.setName(fields[i].getName());
-					
-						if(rsers.containsKey(rsis.getName()))
-						{
-							RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(rsis.getName());
-							if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
-								throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+rsis.getName());
-						}
-						else
-						{
-							rsers.put(rsis.getName(), rsis);
-						}
 						
 						micromodel.addServiceInjection(rsis.getName(), new FieldInfo(fields[i]), true, true);
 					}
 					else
 					{
+						rsis.setType(new ClassInfo(fields[i].getType()));
 						String name = fields[i].getName();
 						micromodel.addServiceInjection(name, new FieldInfo(fields[i]), true, true);
 					}

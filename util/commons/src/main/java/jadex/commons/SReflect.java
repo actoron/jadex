@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -1239,6 +1240,64 @@ public class SReflect
 //		System.out.println("found: "+res);
 		
 		return clazz;
+	}
+	
+	/**
+	 *  Reflectively instantiates an object by heuristically matching the constructor parameters.
+	 *  
+	 *  @param classname Name of the object class.
+	 *  @param conparams Constructor parameters.
+	 *  @return Instantiated object.
+	 */
+	public static final Object newInstance(String classname, Object... conparams)
+	{
+		return newInstance(classname, SReflect.class.getClassLoader(), conparams);
+	}
+	
+	/**
+	 *  Reflectively instantiates an object by heuristically matching the constructor parameters.
+	 *  
+	 *  @param classname Name of the object class.
+	 *  @param cl The classloader to find the class.
+	 *  @param conparams Constructor parameters.
+	 *  @return Instantiated object.
+	 */
+	public static final Object newInstance(String classname, ClassLoader cl, Object... conparams)
+	{
+		try
+		{
+			Class<?> clazz = cl.loadClass(classname);
+			if (conparams.length == 0)
+				return clazz.getConstructor().newInstance();
+			
+			Constructor<?>[] cons = clazz.getConstructors();
+			for (Constructor<?> con : cons)
+			{
+				Class<?>[] params = con.getParameterTypes();
+				if (params.length == conparams.length)
+				{
+					boolean match = true;
+					for (int i = 0; i < params.length; ++i)
+					{
+						Class<?> conparamtype = conparams[i] != null ? conparams[i].getClass() : null;
+						if (conparamtype != null && !isSupertype(getWrappedType(params[i]), conparamtype))
+						{
+							match = false;
+							break;
+						}
+					}
+					if (match)
+					{
+						return con.newInstance(conparams);
+					}
+				}
+			}
+			throw new IllegalArgumentException("No constructor found: " + classname + " " + Arrays.toString(conparams));
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
 	}
 
 	/**

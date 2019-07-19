@@ -528,7 +528,13 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		
 		int[] levelnum = new int[1];
 		levelnum[0] = -1;
-		
+//		System.out.println("LEVELS " + levels.size());
+//		int iii = 0;
+//		for (Set<String> level : levels)
+//		{
+//			System.out.println("Level " + iii + ": " + Arrays.toString(level.toArray()));
+//			++iii;
+//		}
 		IResultListener<Void> levelrl = new IResultListener<Void>()
 		{
 			public void exceptionOccurred(Exception exception)
@@ -538,11 +544,19 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			
 			public void resultAvailable(Void result)
 			{
+				if (levels.size() > 1)
+				{
+					System.out.println("LEVELS: " + Arrays.toString(levels.toArray()));
+					for (Set<String> level : levels)
+						System.out.println(Arrays.toString(level.toArray()));
+					System.exit(0);
+				}
 				++levelnum[0];
 				if (levelnum[0] < levels.size())
 				{
 					FutureBarrier<IExternalAccess> levelbar = new FutureBarrier<>();
 					Set<String> level = levels.get(levelnum[0]);
+					Set<String> bk = new HashSet<>(level);
 					for (String mname : level)
 					{
 						Collection<CreationInfo> insts = instances.get(mname);
@@ -561,8 +575,10 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 									
 									public void resultAvailable(IExternalAccess result)
 									{
-										if (debug)
+//										if (debug)
 											System.out.println("Started: " + result);
+											bk.remove(mname);
+											System.out.println("REMAIN " + Arrays.toString(bk.toArray()));
 										ret.addIntermediateResultIfUndone(result);
 									};
 								});

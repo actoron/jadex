@@ -55,11 +55,13 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
+import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
 import jadex.platform.service.transport.AbstractTransportAgent;
 
 /**
@@ -67,9 +69,7 @@ import jadex.platform.service.transport.AbstractTransportAgent;
  */
 //@Agent(autoprovide=Boolean3.TRUE)
 @Agent(name="rt",
-	autostart=Boolean3.TRUE,
-	predecessors={"jadex.platform.service.address.TransportAddressAgent",
-		"jadex.platform.service.registry.SuperpeerClientAgent"})
+	autostart=Boolean3.TRUE)
 @Arguments({
 	// todo: see SuperpeerRegistrySynchronizationAgent
 //	@Argument(name="superpeers", clazz=String.class, defaultvalue="\"platformname1{scheme11://addi11,scheme12://addi12},platformname2{scheme21://addi21,scheme22://addi22}\""),
@@ -102,7 +102,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	/** The cms (cached for speed). */
 //	protected IComponentManagementService	cms;
 	
-	/** The security service. */
+	/** Security service. */
+	@AgentServiceQuery
 	protected ISecurityService secservice;
 	
 	/** Execution feature. */
@@ -192,8 +193,6 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 		intmsgfeat = (IInternalMessageFeature) agent.getFeature(IMessageFeature.class);
 		if(debug)
 			System.out.println(agent+": started relay transport");
-		
-		secservice = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class));
 		
 		routecache = new RwMapWrapper<>(new LRU<IComponentIdentifier, Tuple2<IComponentIdentifier, Integer>>(cachesize, null, true));
 		

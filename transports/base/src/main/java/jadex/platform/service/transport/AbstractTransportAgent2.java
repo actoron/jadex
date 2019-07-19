@@ -67,9 +67,11 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
 
 @Agent
 @ProvidedServices({
@@ -112,7 +114,12 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	protected IComponentIdentifier platformid;
 	
 	/** Security service. */
+	@AgentServiceQuery(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
 	protected ISecurityService secser;
+	
+	/** Transport address service. */
+	@AgentServiceQuery(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
+	protected ITransportAddressService tas;
 	
 	/** Serialization services. */
 	protected ISerializationServices serser;
@@ -156,8 +163,8 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		establishedconnections = wrappedmap;
 		restablishedconnections = new RwMapWrapper<>(econsbimap.flip(), wrappedmap.getLock());
 		
-		secser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(
-			new ServiceQuery<>(ISecurityService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW));
+		//secser = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(
+		//	new ServiceQuery<>(ISecurityService.class).setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW));
 		serser =  (ISerializationServices)Starter.getPlatformValue(platformid, Starter.DATA_SERIALIZATIONSERVICES);
 		
 		infosubscribers = new ArrayList<SubscriptionIntermediateFuture<PlatformData>>();
@@ -195,7 +202,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 						
 						agent.getLogger().info("Platform "+agent.getId().getPlatformName()+" listening to port " + iport + " for " + impl.getProtocolName() + " transport.");
 	
-						ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
+						//ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
 						
 	//					System.out.println("Transport addresses: "+agent+", "+saddresses);
 						tas.addLocalAddresses(saddresses).addResultListener(new DelegationResultListener<Void>(ret));

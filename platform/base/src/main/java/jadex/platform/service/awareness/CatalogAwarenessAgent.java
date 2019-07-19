@@ -30,11 +30,7 @@ import jadex.micro.annotation.AgentCreated;
  *
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE,
-	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registry.SuperpeerClientAgent",
-	autostart=Boolean3.TRUE
-)
+@Agent(autoprovide = Boolean3.TRUE,	autostart=Boolean3.TRUE)
 public class CatalogAwarenessAgent implements IAwarenessService
 {
 	protected static final String DEFAULT_URLS = "ws://ssp1@ngrelay1.actoron.com:80";
