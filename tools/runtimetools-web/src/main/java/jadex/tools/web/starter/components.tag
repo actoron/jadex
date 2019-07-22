@@ -303,7 +303,16 @@
 			$(function() { $('#'+treeid).jstree(
 			{
 				"plugins": ["sort", "types", "contextmenu"],
-				"core": {"check_callback" : true},
+				"core": 
+				{
+					"check_callback" : true//,
+					/*"data": function(node, cb) 
+					{
+						console.log("loading node: "+node.id);
+						cb.call(this, null);
+						//cb.call(this, ['Root 1', 'Root 2']);
+				    }*/
+				},
 				'sort': function(a, b) 
 				{
 			        a1 = this.get_node(a);
