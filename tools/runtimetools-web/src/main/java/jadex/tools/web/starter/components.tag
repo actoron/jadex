@@ -79,8 +79,14 @@
 				
 				self.typemap = {};
 				for(var i=0; i<self.components.length; i++)
-					self.typemap[self.components[i].name.name] = self.components[i].type;
-
+				{
+					// Can only be resolved as long as modelName is available
+					if("jadex.platform.service.remote.ProxyAgent"==self.components[i].modelName)
+						self.typemap[self.components[i].name.name] = "platform";
+					else 
+						self.typemap[self.components[i].name.name] = self.components[i].type;
+				}
+				
 				self.createTree(treeid);
 				//$("#"+treeid).jstree('open_all');
 				$("#"+treeid).jstree("open_node", $('#'+self.cid));
@@ -210,6 +216,10 @@
 						if(component.systemComponent)
 						{
 							names.unshift("System");
+						}
+						else if("jadex.platform.service.remote.ProxyAgent"==component.modelName) // Hack?!
+						{
+							names.unshift("Cloud");
 						}
 						else
 						{
