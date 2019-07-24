@@ -127,7 +127,7 @@
 						if(event.type.toLowerCase().indexOf("created")!=-1)
 						{
 							self.typemap[event.componentDescription.name.name] = event.componentDescription.type;
-							self.createNodes(treeid, event.componentDescription);
+							self.createNodes(treeid, event.componentDescription, true);
 						}
 						else if(event.type.toLowerCase().indexOf("terminated")!=-1)
 						{
@@ -185,7 +185,7 @@
 			for(var i=0; i<self.components.length; i++)
 			{
 				//console.log(self.models[i]);
-				self.createNodes(treeid, self.components[i]);
+				self.createNodes(treeid, self.components[i], false);
 			}
 		}
 		
@@ -201,7 +201,7 @@
 		}
 		
 		// create node(s) for a component description
-		createNodes(treeid, component)
+		createNodes(treeid, component, createnode)
 		{
 			var cid = component.name.name; // todo: better json format?!
 			var parts = cid.split("@");
@@ -280,17 +280,10 @@
 
 					//console.log(cid+" "+type+" "+icon);
 					
-					//self.createNode(treeid, lastname, names[i], name, 'last', type, icon);
-					
-					self.treedata[names[i]] = {"id": names[i], "text": name, "type": type, "icon": icon, "children": true};
-					var key = lastname==null || lastname.length==0? "#_children": lastname+"_children";
-					var children = self.treedata[key];
-					if(children==null)
-					{
-						children = [];
-						self.treedata[key] = children;
-					}
-					children.push(names[i]);
+					if(createnode)
+						self.createNode(treeid, lastname, names[i], name, 'last', type, icon);
+					else
+						self.createNodeData(names[i], name, type, icon, lastname);
 				}
 				//else
 				//	console.log("not creating: "+names[i]);
@@ -310,6 +303,19 @@
 			if(icon!=null)
 				n.icon = icon;
 			$('#'+treeid).jstree('create_node', '#'+parent_node_id, n, 'last');	
+		}
+			
+		createNodeData(id, name, type, icon, parent)
+		{
+			self.treedata[id] = {"id": id, "text": name, "type": type, "icon": icon, "children": true};
+			var key = parent==null || parent.length==0? "#_children": parent+"_children";
+			var children = self.treedata[key];
+			if(children==null)
+			{
+				children = [];
+				self.treedata[key] = children;
+			}
+			children.push(id);
 		}
 			
 		deleteNode(treeid, nodeid)
@@ -375,6 +381,7 @@
 										self.typemap[self.components[i].name.name] = self.components[i].type;
 
 									self.createTree(treeid);
+									self.refreshCMSSubscription();
 									self.update();
 									
 									var data = getChildData(node.id);

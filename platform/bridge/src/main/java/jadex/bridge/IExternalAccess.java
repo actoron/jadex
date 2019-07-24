@@ -23,7 +23,9 @@ import jadex.commons.future.IFuture;
 @Service
 //@Tags(value="$component.getId().getRoot().equals($component.getId())? \"PLATFORM\": null")
 @Tags(@Tag(include="$component.getId().getRoot().equals($component.getId())", value=IExternalAccess.PLATFORM_INTERNAL))
-public interface IExternalAccess extends IExternalExecutionFeature, IExternalArgumentsResultsFeature, IExternalProvidedServicesFeature, IExternalRequiredServicesFeature, IExternalSubcomponentsFeature, IExternalMonitoringComponentFeature, IExternalNFPropertyComponentFeature //extends INFPropertyProvider//extends IRemotable
+public interface IExternalAccess extends IExternalExecutionFeature, IExternalArgumentsResultsFeature, 
+	IExternalProvidedServicesFeature, IExternalRequiredServicesFeature, IExternalSubcomponentsFeature, 
+	IExternalMonitoringComponentFeature, IExternalNFPropertyComponentFeature //extends INFPropertyProvider//extends IRemotable
 {
 	public static final String PLATFORM = "platform";
 	public static final String PLATFORM_INTERNAL = "\"platform\"";
