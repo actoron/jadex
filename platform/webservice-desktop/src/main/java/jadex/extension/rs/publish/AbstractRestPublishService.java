@@ -190,10 +190,20 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		// todo: move this code out
 		IObjectStringConverter jsonc = new IObjectStringConverter()
 		{
+			// todo: HACK use other configuration
+			Map<String, Object> conv;
+			{
+				conv = new HashMap<>();
+				conv.put("writeclass", false);
+				conv.put("writeid", false);
+			}
+			
 			public String convertObject(Object val, Object context)
 			{
 				// System.out.println("write response in json");
-				byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, false, false, null, null, null);
+				
+				byte[] data = jser.encode(val, component.getClassLoader(), null, conv);
+				//byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, false, false, null, null, null);
 				return new String(data);
 			}
 		};
@@ -204,7 +214,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			public String convertObject(Object val, Object context)
 			{
-				byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null, null);
+				byte[] data = jser.encode(val, component.getClassLoader(), null, null);
+				//byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null, null);
 				return new String(data);
 			}
 		};
@@ -1038,7 +1049,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				}
 				else
 				{
-					//
 					// System.out.println("automapping detected");
 					Class< ? >[] ts = method.getParameterTypes();
 					targetparams = new Object[ts.length];
@@ -1370,6 +1380,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected void writeResponseContent(Object result, HttpServletRequest request, HttpServletResponse response, List<String> sr)
 	{
+		//if(result!=null && result.getClass().isArray())
+		//	System.out.println("jju");
+		
 		if(result instanceof Exception)
 			System.out.println("result is exception: "+result);
 		

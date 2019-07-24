@@ -1,10 +1,14 @@
 package jadex.tools.web.starter;
 
 import java.util.Collection;
+import java.util.Map;
 
+import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
@@ -13,6 +17,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
+import jadex.commons.MethodInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -135,5 +140,66 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	{
 		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
 		return ea.listenToAll();
+	}
+
+	// todo: second parameter with platform cid?! test
+	
+	/**
+	 *  Get infos about services (provided, required).
+	 *  @param cid The component id
+	 */
+	public IFuture<Object[]> getServiceInfos(IComponentIdentifier cid)
+	{
+		// can answer directly instead of delegation (schedules on component in SRemoteGui)
+		// todo: make service call instead of SRemoteGui
+		return SRemoteGui.getServiceInfos(agent.getExternalAccess(cid));
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param cid The component id.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos(IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req)
+	{
+		final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<>();
+		
+		IExternalAccess ea = cid!=null? agent.getExternalAccess(cid): sid!=null? agent.getExternalAccess(sid.getProviderId()): null;
+		
+		// required services and methods
+		if(req!=null && req.booleanValue())
+		{
+			if(mi!=null)
+			{
+				ea.getRequiredMethodNFPropertyMetaInfos(sid, mi).delegate(ret);
+			}
+			else
+			{
+				ea.getRequiredNFPropertyMetaInfos(sid).delegate(ret);
+			}
+		}
+		// provided services and methods
+		else if(sid!=null)
+		{
+			if(mi!=null)
+			{
+				ea.getMethodNFPropertyMetaInfos(sid, mi).delegate(ret);
+			}
+			else
+			{
+				ea.getNFPropertyMetaInfos(sid).delegate(ret);
+			}
+		}
+		// components
+		else if(ea!=null)
+		{
+			ea.getNFPropertyMetaInfos().delegate(ret);
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Provider not set."));
+		}
+		
+		return ret;
 	}
 }

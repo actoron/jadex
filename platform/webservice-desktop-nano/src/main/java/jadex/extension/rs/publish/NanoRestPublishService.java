@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import jadex.base.JarAsDirectory;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
@@ -31,7 +30,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.annotation.Agent;
 
 /**
  *  Publish service using Nano.

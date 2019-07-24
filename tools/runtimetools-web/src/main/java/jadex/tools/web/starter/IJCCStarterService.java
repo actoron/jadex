@@ -1,15 +1,22 @@
 package jadex.tools.web.starter;
 
 import java.util.Collection;
+import java.util.Map;
 
+import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.tools.web.jcc.IJCCPluginService;
 
 /**
@@ -57,4 +64,18 @@ public interface IJCCStarterService extends IJCCPluginService
 	 *  Subscribe to component events
 	 */
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> subscribeToComponentChanges(IComponentIdentifier cid);
+	
+	/**
+	 *  Get infos about services (provided, required).
+	 *  @param cid The component id
+	 */
+	public IFuture<Object[]> getServiceInfos(IComponentIdentifier cid);
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param cid The component id.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos(IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req);
+	
 }

@@ -144,7 +144,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				Object[] as = (Object[])args.get(2);
 				//ClassInfo rettype = (ClassInfo)args.get(3);
 				
-				//if(methodname.indexOf("createComponent")!=-1)
+				//if(methodname.indexOf("getNF")!=-1)
 				//	System.out.println("herere");
 				
 				// todo: always try decoding strings with json?

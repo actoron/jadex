@@ -12,6 +12,7 @@ import jadex.bridge.sensor.memory.MaxPermGenMemoryProperty;
 import jadex.bridge.sensor.memory.UsedMemoryProperty;
 import jadex.bridge.sensor.memory.UsedPermGenMemoryProperty;
 import jadex.bridge.sensor.time.ComponentUptimeProperty;
+import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Properties;
 
@@ -19,7 +20,7 @@ import jadex.micro.annotation.Properties;
  *  Agent that installs some top-level non-functional properties
  *  including the corresponding sensors.
  */
-@Agent
+@Agent(autostart=Boolean3.TRUE, name="sensors")
 @NFProperties(
 {
 	@NFProperty(MacAddressProperty.class),
