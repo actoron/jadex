@@ -1,10 +1,13 @@
 package jadex.tools.web.starter;
 
 import java.util.Collection;
+import java.util.Map;
 
+import jadex.base.SRemoteGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
@@ -135,5 +138,28 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	{
 		IExternalAccess ea = cid==null? agent: agent.getExternalAccess(cid);
 		return ea.listenToAll();
+	}
+
+	// todo: second parameter with platform cid?! test
+	
+	/**
+	 *  Get infos about services (provided, required).
+	 *  @param cid The component id
+	 */
+	public IFuture<Object[]> getServiceInfos(IComponentIdentifier cid)
+	{
+		// can answer directly instead of delegation (schedules on component in SRemoteGui)
+		// todo: make service call instead of SRemoteGui
+		return SRemoteGui.getServiceInfos(agent.getExternalAccess(cid));
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param cid The component id.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos(IComponentIdentifier cid)
+	{
+		return agent.getExternalAccess(cid).getNFPropertyMetaInfos();
 	}
 }

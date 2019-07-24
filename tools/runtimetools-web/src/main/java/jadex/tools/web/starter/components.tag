@@ -52,6 +52,7 @@
 		
 		self.components = []; // component descriptions
 		self.typemap = null;
+		self.treedata = {};
 	
 		console.log("components: "+self.cid);
 		
@@ -61,6 +62,7 @@
 		var treeid = "componenttree";
 		
 		var myservice = "jadex.tools.web.starter.IJCCStarterService";
+		//var extservice = "jadex.jadex.bridge.IExternalAccess";
 		
 		/*getMethodPrefix()
 		{
@@ -68,8 +70,9 @@
 		}*/
 		
 		self.prefix = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
+		//self.prefix_ext = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+extservice;
 		
-		refresh()
+		/*refresh()
 		{
 			// Reload the component descriptions
 			axios.get(self.prefix+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
@@ -88,7 +91,7 @@
 			});
 			
 			self.refreshCMSSubscription();
-		}
+		}*/
 		
 		refreshCMSSubscription()
 		{
@@ -145,6 +148,10 @@
 		var applications = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/applications.png';
 		var platform = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/platform.png';
 		var system = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/system.png';
+		var services = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/services.png';
+		var provided = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/provided.png';
+		var required = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required.png';
+		var required_mult = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required_multiple.png';
 		
 		var types =
 		{
@@ -152,7 +159,11 @@
 		    "cloud" : {"icon": cloud},
 		    "applications" : {"icon": applications},
 		    "platform" : {"icon": platform},
-		    "system" : {"icon": system}
+		    "system" : {"icon": system},
+		    "services" : {"icon": services},
+		    "provided" : {"icon": provided},
+		    "required" : {"icon": required},
+		    "required_multiple" : {"icon": required_mult}
 		}
 		
 		createTree(treeid)
@@ -228,7 +239,8 @@
 				var parts = names[i].split("@");
 				var name = parts[0];
 				
-				if(!$('#'+treeid).jstree('get_node', names[i]))
+				//if(!$('#'+treeid).jstree('get_node', names[i]))
+				if(self.treedata[names[i]]==null)
 				{
 					var type = self.typemap[names[i]];
 					var icon = null;
@@ -252,7 +264,17 @@
 
 					//console.log(cid+" "+type+" "+icon);
 					
-					self.createNode(treeid, lastname, names[i], name, 'last', type, icon);
+					//self.createNode(treeid, lastname, names[i], name, 'last', type, icon);
+					
+					self.treedata[names[i]] = {"id": names[i], "text": name, "type": type, "icon": icon, "children": true};
+					var key = lastname==null || lastname.length==0? "#_children": lastname+"_children";
+					var children = self.treedata[key];
+					if(children==null)
+					{
+						children = [];
+						self.treedata[key] = children;
+					}
+					children.push(names[i]);
 				}
 				//else
 				//	console.log("not creating: "+names[i]);
@@ -266,7 +288,7 @@
 		{
 			//console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
 			//console.log("create node: "+new_node_id);
-			var n = {"text": new_node_text, "id": new_node_id};
+			var n = {"text": new_node_text, "id": new_node_id}; //"children": true  "state": {"opened": false}
 			if(type!=null)
 				n.type = type;
 			if(icon!=null)
@@ -288,74 +310,204 @@
 		var ures1 = self.prefix+'&methodname=loadResource&args_0='+res1;
 		var ures2 = self.prefix+'&methodname=loadResource&args_0='+res2;
 
-		// dynamically load jstree lib and style
-		//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
-		self.loadFiles([ures1], [ures2], function()
-		{
-			self.refresh();
-		});
-		
 		self.on('mount', function()
 		{
-			//console.log("mounted components");
-			
-			// init tree
-			$(function() { $('#'+treeid).jstree(
+			console.log("mounted components tag");
+		
+			// dynamically load jstree lib and style
+			//self.loadFiles(["libs/jstree_3.2.1.min.css", "libs/jstree_3.2.1.min.js"], function()
+			self.loadFiles([ures1], [ures2], function()
 			{
-				"plugins": ["sort", "types", "contextmenu"],
-				"core": 
+				console.log("loaded jtree libs");
+				//self.refresh();
+				
+				// init tree
+				$(function() { $('#'+treeid).jstree(
 				{
-					"check_callback" : true//,
-					/*"data": function(node, cb) 
+					"plugins": ["sort", "types", "contextmenu"],
+					"core": 
 					{
-						console.log("loading node: "+node.id);
-						cb.call(this, null);
-						//cb.call(this, ['Root 1', 'Root 2']);
-				    }*/
-				},
-				'sort': function(a, b) 
-				{
-			        a1 = this.get_node(a);
-			        b1 = this.get_node(b);
-			        if(a1.icon == b1.icon)
-			        {
-			            return (a1.text > b1.text) ? 1 : -1;
-			        } 
-			        else 
-			        {
-			            return (a1.icon > b1.icon) ? 1 : -1;
-			        }
-				},
-				types,
-				'contextmenu' : 
-				{
-			        'items': function menu(node) 
+						"check_callback" : true,
+						"data": function(node, cb) 
+						{
+							function getChildData(id)
+							{
+								console.log("loading node: "+id);
+								
+								var children = self.treedata[id+"_children"];
+								var data = [];
+								if(children!=null)
+								{
+									for(var i=0; i<children.length; i++)
+									{
+										var node = self.treedata[children[i]];
+										data.push(node);
+									}
+								}
+								return data;
+							}
+							
+							if("#"===node.id)
+							{
+								axios.get(self.prefix+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
+								{
+									//console.log("descs are: "+resp.data);
+									self.components = resp.data;
+									
+									self.typemap = {};
+									for(var i=0; i<self.components.length; i++)
+										self.typemap[self.components[i].name.name] = self.components[i].type;
+
+									self.createTree(treeid);
+									self.update();
+									
+									var data = getChildData(node.id);
+									cb.call(this, data);
+								});
+							}
+							else
+							{
+								console.log("loading node: "+node.id);
+							
+								function cont()
+								{
+									var data = getChildData(node.id);
+									cb.call(this, data);
+								}
+								
+								if(node.type!=="system" && node.type!=="applications" && node.type!=="cloud")
+								{
+									axios.get(self.prefix+'&methodname=getNFPropertyMetaInfos&args_0='+node.id, self.transform)
+									.then(function(resp)
+									{
+										console.log("nf props:"+resp.data);										
+									})
+									.catch(function(e)
+									{
+										console.log("getNF exception: "+e);
+									});
+									
+									axios.get(self.prefix+'&methodname=getServiceInfos&args_0='+node.id, self.transform)
+									.then(function(resp)
+									{
+										//console.log("service infos: "+resp.data);
+										
+										var res = resp.data;
+										
+										if(res[0].length>0 || res[1].length>0)
+										{
+											var serid = node.id+"_services";
+			
+											var ch = [];
+											for(var i=0; i<res[0].length; i++)
+											{
+												var psid = serid+"_"+res[0][i].name;
+												var txt = res[0][i].type.value.split(".");
+												txt = txt[txt.length-1];
+												var psnode = {"id": psid, "text": txt, "type": "provided", "children": true};
+												ch.push(psnode);
+											}
+											
+											for(var i=0; i<res[1].length; i++)
+											{
+												var rsid = serid+"_"+res[1].name;
+												var txt = res[1][i].type.value.split(".");
+												var mult = res[1][i].multiple;
+												txt = txt[txt.length-1];
+												var rsnode = {"id": rsid, "text": txt, "type": mult? "required_multiple": "required", "children": true};
+												ch.push(rsnode);
+											}
+											
+											self.treedata[serid] = {"id": serid, "text": "Services", "type": "services", "children": ch};
+											
+											var key = node.id+"_children";
+											var children = self.treedata[key];
+											if(children==null)
+											{
+												children = [];
+												self.treedata[key] = children;
+											}
+											children.push(serid);
+										}
+										
+										cont();
+									})
+									.catch(function(e)
+									{
+										console.log("Err loading services for: "+node.id);
+										cont();
+									});
+								}
+								else
+								{
+									cont();									
+								}
+							}
+					    }
+					},
+					'sort': function(a, b) 
 					{
-			        	if(node.id.indexOf("@")==-1 && "System"!=node.id && "Applications"!=node.id)
-			        	{
-			        		return { 'Refresh': 
-			        			{
-	                                'label': "Refresh",
-	                                'action': function() {self.refreshCMSSubscription();},
-	                                'icon': self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
-			        			} 
-			        		};
-			        	}
-			        	else
-			        	{
-			        		return null;
-			        	}
-					}
-			    }
-			})});
-			
-		    //console.log("adding listener");
-			/*$('#'+treeid).on('select_node.jstree', function (e, data) 
-			{
-				self.selectModel(data.instance.get_path(data.node,'/'));
-			});*/
-			
-			//self.refresh();
+				        a1 = this.get_node(a);
+				        b1 = this.get_node(b);
+				        if(a1.icon == b1.icon)
+				        {
+				            return (a1.text > b1.text) ? 1 : -1;
+				        } 
+				        else 
+				        {
+				            return (a1.icon > b1.icon) ? 1 : -1;
+				        }
+					},
+					types,
+					'contextmenu' : 
+					{
+				        'items': function menu(node) 
+						{
+				        	if(node.id.indexOf("@")==-1 && "System"!=node.id && "Applications"!=node.id)
+				        	{
+				        		return { 'Refresh': 
+				        			{
+		                                'label': "Refresh",
+		                                'action': function() {self.refreshCMSSubscription();},
+		                                'icon': self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
+				        			} 
+				        		};
+				        	}
+				        	else
+				        	{
+				        		return null;
+				        	}
+						}
+				    }
+				})});
+				
+			    //console.log("adding listener");
+				/*$('#'+treeid).on('select_node.jstree', function (e, data) 
+				{
+					console.log("select: "+data.node.id);
+					//self.selectModel(data.instance.get_path(data.node,'/'));
+				});
+				
+				$('#'+treeid).on('open_node.jstree', function (e, data) 
+				{
+					console.log("open: "+data.node.id);
+					//self.selectModel(data.instance.get_path(data.node,'/'));
+				});*/
+				
+				/*$('#'+treeid).on('load_node.jstree', function(event, data) 
+				{
+					console.log("load node: "+data.node.id);
+				    var treeNode = data.node;
+				    if(treeNode.type === NODE_TYPE_FOLDER) 
+				    {
+				        domNode = fileTree.get_node(treeNode.id, true);
+				        domNode.addClass('jstree-open').removeClass('jstree-leaf');
+				        //data.node.state.loaded = false;
+				    }
+				});*/ 
+				
+				//self.refresh();
+			});
 		});
 		
 		self.on('unmount', function()
