@@ -26,7 +26,9 @@ public class CPULoadProperty extends NFRootProperty<Double, Void>
 	 */
 	public Double measureValue()
 	{
-		return OperatingSystemMXBeanFacade.getSystemCpuLoad();
+		Double ret = OperatingSystemMXBeanFacade.getSystemCpuLoad();
+		//System.out.println("measure value on cpu prop: "+ret);
+		return ret;
 	}
 }
 

@@ -78,4 +78,11 @@ public interface IJCCStarterService extends IJCCPluginService
 	 */
 	public IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos(IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req);
 	
+	/**
+	 *  Returns the values about a non-functional property of this service.
+	 *  @param cid The component id.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<Map<String, Object>> getNFPropertyValues(IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req, String name);
+
 }

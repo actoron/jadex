@@ -1711,20 +1711,31 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			}
 		}
 
-		compacted.entrySet().stream().forEach(e -> {
-			List<String> data = e.getValue().stream().map(a -> a.getSecondEntity()).collect(Collectors.toList());
+		compacted.entrySet().stream().forEach(e -> 
+		{
+			TreeSet<Tuple2<Integer, String>> vals = (TreeSet<Tuple2<Integer, String>>)e.getValue();
+			Tuple2<Integer, String> lastval = vals.last();
+			
+			String[] res = new String[lastval.getFirstEntity()+1];
+			
+			vals.stream().forEach(t -> res[t.getFirstEntity()] = t.getSecondEntity());
+			
+			List<String> data = Arrays.asList(res);
+			
+			// does not create empty slots in case of args_0, args_3, args_4
+			//List<String> data = e.getValue().stream().map(a -> a.getSecondEntity()).collect(Collectors.toList());
+			
 			addEntry(ret, e.getKey(), data);
 		});
-		/*
-		 * for(Map.Entry<String, Set<Tuple2<Integer, String>>> entry:
-		 * compacted.entrySet()) { List<String> data =
-		 * entry.getValue().stream().map(a ->
-		 * a.getSecondEntity()).collect(Collectors.toList()); //addEntry(ret,
-		 * entry.getKey(), data, true); //ret.add(entry.getKey(), (String)data);
-		 * }
-		 */
 
 		return ret;
+	}
+	
+	public static void main(String[] args) throws Exception
+	{
+		String query = "args_0=a&args_3=c";
+		Map<String, Object> res = splitQueryString(query);
+		System.out.println(query+ " -> "+res);
 	}
 
 	/**

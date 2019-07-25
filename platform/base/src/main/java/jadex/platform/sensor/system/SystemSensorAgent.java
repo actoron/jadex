@@ -20,7 +20,7 @@ import jadex.micro.annotation.Properties;
  *  Agent that installs some top-level non-functional properties
  *  including the corresponding sensors.
  */
-@Agent(autostart=Boolean3.TRUE, name="sensors")
+@Agent(autostart=Boolean3.TRUE, name="sensors", predecessors="jadex.platform.service.clock.ClockAgent")
 @NFProperties(
 {
 	@NFProperty(MacAddressProperty.class),
