@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 
 import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
@@ -23,7 +24,12 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.component.IMsgHeader;
+import jadex.bridge.component.impl.IInternalMessageFeature;
+import jadex.bridge.component.impl.MessageComponentFeature;
+import jadex.bridge.component.impl.MsgHeader;
+import jadex.bridge.component.impl.RemoteExecutionComponentFeature;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -35,7 +41,9 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
 import jadex.bridge.service.types.address.TransportAddress;
+import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.memstat.IMemstatService;
+import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportInfoService;
@@ -53,8 +61,10 @@ import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
@@ -169,14 +179,16 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		
 		infosubscribers = new ArrayList<SubscriptionIntermediateFuture<PlatformData>>();
 		
-		Future<Void> ret = new Future<>();
+		Future<Void> openportret = new Future<>();
+		FutureBarrier<Void> retbar = new FutureBarrier<>();
+		retbar.addFuture(openportret);
 		impl.init(this);
 		
 		// Set up server, if port given.
 		// If port==0 -> any free port
 		if(port >= 0)
 		{
-			impl.openPort(port).addResultListener(new ExceptionDelegationResultListener<Integer, Void>(ret)
+			impl.openPort(port).addResultListener(new ExceptionDelegationResultListener<Integer, Void>(openportret)
 			{
 				public void customResultAvailable(Integer iport) throws Exception
 				{
@@ -205,21 +217,39 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 						//ITransportAddressService tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
 						
 	//					System.out.println("Transport addresses: "+agent+", "+saddresses);
-						tas.addLocalAddresses(saddresses).addResultListener(new DelegationResultListener<Void>(ret));
+						tas.addLocalAddresses(saddresses).addResultListener(new DelegationResultListener<Void>(openportret));
 					}
 					catch(Exception e)
 					{
-						ret.setException(e);
+						openportret.setException(e);
 					}
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(null);
+			openportret.setResult(null);
 		}
 		
-		return ret;
+		Future<Void> secfut = new Future<>();
+		retbar.addFuture(secfut);
+		ServiceQuery<ISecurityService> secquery = new ServiceQuery<>(ISecurityService.class);
+		agent.sustainedSearchService(secquery).thenAccept( result ->
+		{
+			secser = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ISecurityService.class);
+			secfut.setResult(null);
+		});
+		
+		Future<Void> tasfut = new Future<>();
+		retbar.addFuture(tasfut);
+		ServiceQuery<ITransportAddressService> tasquery = new ServiceQuery<>(ITransportAddressService.class);
+		agent.sustainedSearchService(tasquery).thenAccept( result ->
+		{
+			tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
+			tasfut.setResult(null);
+		});
+		
+		return retbar.waitFor();
 	}
 	
 	@AgentKilled
@@ -329,7 +359,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		IComponentIdentifier remotepf = restablishedconnections.get(con);
 		if (remotepf != null)
 		{
-			AbstractTransportAgent.deliverRemoteMessage(agent, secser, serser, remotepf, header, body);
+			deliverRemoteMessage(agent, secser, serser, remotepf, header, body);
 		}
 		else
 		{
@@ -340,7 +370,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 					IComponentIdentifier remotepf = restablishedconnections.get(con);
 					if (remotepf != null)
 					{
-						AbstractTransportAgent.deliverRemoteMessage(agent, secser, serser, remotepf, header, body);
+						deliverRemoteMessage(agent, secser, serser, remotepf, header, body);
 					}
 					else
 					{
@@ -910,5 +940,124 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		}
 		
 		return new Future<MethodInfo[]>(ret);
+	}
+	
+	/**
+	 *  Delivers a remote message to a component.
+	 * 
+	 *  @param agent Agent performing the delivery.
+	 *  @param secser The security service.
+	 *  @param cms The component management service.
+	 *  @param serser The serialization services.
+	 *  @param source Source ID of the message.
+	 *  @param header The header of the message.
+	 *  @param body The body of the message.
+	 */
+	public static final void deliverRemoteMessage(final IInternalAccess agent, ISecurityService secser, final ISerializationServices serser, final IComponentIdentifier source, byte[] header, final byte[] body)
+	{
+		final Logger logger = agent.getLogger();
+		// First decrypt.
+		secser.decryptAndAuth(source, header).addResultListener(new IResultListener<Tuple2<ISecurityInfo, byte[]>>()
+		{
+			@Override
+			public void resultAvailable(Tuple2<ISecurityInfo, byte[]> tup)
+			{
+				if(tup.getSecondEntity() != null)
+				{
+					// Then decode header and deliver to receiver agent.
+					final IMsgHeader header = (IMsgHeader)serser.decode(null, agent, tup.getSecondEntity());
+					final IComponentIdentifier rec = (IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER);
+
+//					try
+//					{
+//						if(rec.getLocalName().equals("rt"))
+//							System.out.println("rec msg: "+rec+", "+header);
+//					}
+//					catch(Throwable t)
+//					{
+//						t.printStackTrace();
+//					}
+					
+					// Cannot use agent/cms.getExternalAccess(cid) because when remote call
+					// is in init the call will be delayed after init has finished (deadlock)
+					SComponentManagementService.scheduleStep(rec, new IComponentStep<Void>()
+					{
+						@Override
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+//							try
+//							{
+//								if(rec.getLocalName().equals("rt"))
+//									System.out.println("rec msg scheduled: "+rec+", "+header);
+//							}
+//							catch(Throwable t)
+//							{
+//								t.printStackTrace();
+//							}
+							IMessageFeature mf = ia.getFeature0(IMessageFeature.class);
+							if(mf instanceof IInternalMessageFeature)
+							{
+								((IInternalMessageFeature)mf).messageArrived(header, body);
+							}
+							return IFuture.DONE;
+						}
+					}).addResultListener(new IResultListener<Void>()
+					{
+						@Override
+						public void resultAvailable(Void result)
+						{
+							// NOP
+						}
+
+						@Override
+						public void exceptionOccurred(Exception exception)
+						{
+//							System.out.println("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+							logger.warning("Could not deliver message from platform " + source + " to " + rec + ": " + exception);
+							
+							// For undeliverable conversation messages -> send error reply (only for non-error messages). 
+							if((header.getProperty(IMsgHeader.CONVERSATION_ID)!=null || header.getProperty(RemoteExecutionComponentFeature.RX_ID)!=null)
+								&& header.getProperty(MessageComponentFeature.EXCEPTION)==null)
+							{
+								agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+								{
+									@Override
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										Map<String, Object>	addheaderfields	= ((MsgHeader)header).getProperties();
+										addheaderfields.put(MessageComponentFeature.EXCEPTION, exception);
+										ia.getFeature(IMessageFeature.class)
+											.sendMessage(null, addheaderfields, (IComponentIdentifier)header.getProperty(IMsgHeader.SENDER))
+											.addResultListener(new IResultListener<Void>()
+											{
+												@Override
+												public void exceptionOccurred(Exception exception)
+												{
+													logger.warning("Could send error message to " + header.getProperty(IMsgHeader.SENDER) + ": " + exception);
+												}
+												
+												@Override
+												public void resultAvailable(Void result)
+												{
+													// OK -> ignore
+//													System.out.println("Sent error message: "+header.getProperty(IMsgHeader.SENDER) + ", "+exception);
+												}
+											});
+										return IFuture.DONE;
+									}
+								});
+							}
+						}
+					});
+				}
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("Could not deliver message from platform " + source + ": " + exception);
+				logger.warning("Could not deliver message from platform " + source + ": " + exception);
+			}
+		});
 	}
 }

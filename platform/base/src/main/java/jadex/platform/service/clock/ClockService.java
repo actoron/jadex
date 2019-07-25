@@ -341,17 +341,17 @@ public class ClockService extends BasicService implements IClockService, IProper
 				{
 					public void customResultAvailable(Void result)
 					{
-						ISettingsService settings = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(0));
-						if(settings!=null)
-						{
-							settings.registerPropertiesProvider("clockservice", ClockService.this)
-								.addResultListener(new DelegationResultListener<Void>(ret));
-						}
-						else
-						{
+//						ISettingsService settings = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(0));
+//						if(settings!=null)
+//						{
+//							settings.registerPropertiesProvider("clockservice", ClockService.this)
+//								.addResultListener(new DelegationResultListener<Void>(ret));
+//						}
+//						else
+//						{
 							//System.out.println("Settings service not found by clock");
 							ret.setResult(null);
-						}
+//						}
 						
 //						component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM))
 //							.addResultListener(new IResultListener<ISettingsService>()
@@ -397,17 +397,17 @@ public class ClockService extends BasicService implements IClockService, IProper
 		{
 			public void customResultAvailable(Void result)
 			{
-				ISettingsService	settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
-				settings.deregisterPropertiesProvider("clockservice")
-					.addResultListener(new DelegationResultListener<Void>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
+//				ISettingsService	settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+//				settings.deregisterPropertiesProvider("clockservice")
+//					.addResultListener(new DelegationResultListener<Void>(ret)
+//				{
+//					public void customResultAvailable(Void result)
+//					{
 						ClockService.this.component	= null;
 						ClockService.this.clock	= null;
 						ret.setResult(null);
-					}
-				});
+//					}
+//				});
 			}
 		});
 		

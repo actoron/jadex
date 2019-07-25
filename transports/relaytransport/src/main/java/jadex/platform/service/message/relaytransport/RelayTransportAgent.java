@@ -7,8 +7,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jadex.base.Starter;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -61,8 +61,7 @@ import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
-import jadex.platform.service.transport.AbstractTransportAgent;
+import jadex.platform.service.transport.AbstractTransportAgent2;
 
 /**
  *  Agent implementing relay routing.
@@ -281,7 +280,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			final ISerializationServices serser = (ISerializationServices) Starter.getPlatformValue(agent.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
 			
 //			System.out.println("Final receiver, delivering to component: " + body);
-			AbstractTransportAgent.deliverRemoteMessage(agent, secservice, serser, source, unpacked.get(0), unpacked.get(1));
+			AbstractTransportAgent2.deliverRemoteMessage(agent, secservice, serser, source, unpacked.get(0), unpacked.get(1));
 			
 			TerminableFuture<Integer> ret = new TerminableFuture<>();
 			ret.setResult(PRIORITY);
@@ -898,7 +897,7 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 					
 					if (debug)
 						System.out.println(agent + ": Final receiver, delivering to component: " + fwdest);
-					AbstractTransportAgent.deliverRemoteMessage(agent, secservice, serser, source, unpacked.get(0), unpacked.get(1));
+					AbstractTransportAgent2.deliverRemoteMessage(agent, secservice, serser, source, unpacked.get(0), unpacked.get(1));
 				}
 			}
 		});

@@ -28,7 +28,6 @@ import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -54,7 +53,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -544,19 +542,19 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			
 			public void resultAvailable(Void result)
 			{
-				if (levels.size() > 1)
-				{
-					System.out.println("LEVELS: " + Arrays.toString(levels.toArray()));
-					for (Set<String> level : levels)
-						System.out.println(Arrays.toString(level.toArray()));
-					System.exit(0);
-				}
+//				if (levels.size() > 1)
+//				{
+//					System.out.println("LEVELS: " + Arrays.toString(levels.toArray()));
+//					for (Set<String> level : levels)
+//						System.out.println(Arrays.toString(level.toArray()));
+//					System.out.println("################### WARNING: MORE THAN ONE LEVEL ####################");
+//					SUtil.sleep(2000);
+//				}
 				++levelnum[0];
 				if (levelnum[0] < levels.size())
 				{
 					FutureBarrier<IExternalAccess> levelbar = new FutureBarrier<>();
 					Set<String> level = levels.get(levelnum[0]);
-					Set<String> bk = new HashSet<>(level);
 					for (String mname : level)
 					{
 						Collection<CreationInfo> insts = instances.get(mname);
@@ -575,10 +573,8 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 									
 									public void resultAvailable(IExternalAccess result)
 									{
-//										if (debug)
+										if (debug)
 											System.out.println("Started: " + result);
-											bk.remove(mname);
-											System.out.println("REMAIN " + Arrays.toString(bk.toArray()));
 										ret.addIntermediateResultIfUndone(result);
 									};
 								});
