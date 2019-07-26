@@ -2,25 +2,15 @@ package jadex.bridge.service.component;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.concurrent.TimeoutException;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.SFuture;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.ServiceInvalidException;
-import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.SResultListener;
 
 /**
  *  Lazy service proxy that resolves a service via a search command.
@@ -31,7 +21,10 @@ public class UnresolvedServiceInvocationHandler implements InvocationHandler
 	protected IInternalAccess ia;
 	
 	/** The service. */
-	protected Future<IService> delegate;
+	protected IService delegate;
+	
+	/** The service being acquired. */
+	IFuture<IService> delegatefut;
 	
 	/** The search query for a lazy proxy. */
 	protected ServiceQuery<?> query;
@@ -52,61 +45,51 @@ public class UnresolvedServiceInvocationHandler implements InvocationHandler
 	{
 		if (delegate == null)
 		{
-			delegate = new Future<>();
-			@SuppressWarnings("unchecked")
-			ISubscriptionIntermediateFuture<Object> queryfut = (ISubscriptionIntermediateFuture<Object>) ia.addQuery(query);
-			queryfut.addResultListener(new IIntermediateResultListener<Object>()
+			if (delegatefut == null)
 			{
-				public void intermediateResultAvailable(Object result)
+				@SuppressWarnings("unchecked")
+				IFuture<IService> fut = (IFuture<IService>) ia.searchService(query, null);
+				fut.thenAccept(serv ->
 				{
-					queryfut.terminate();
-					delegate.setResultIfUndone((IService) result);
-				}
-
-				public void resultAvailable(Collection<Object> result)
-				{
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-				public void finished()
-				{
-				};
-			});
-			
-			long timeout = ServiceCall.getNextInvocation() != null ? ServiceCall.getNextInvocation().getTimeout() : SUtil.DEFTIMEOUT;
-			ia.waitForDelay(timeout).thenAccept(done ->
+					delegate = serv;
+					delegatefut = null;
+				}).exceptionally(e -> delegatefut = null);
+				delegatefut = (IFuture<IService>) fut;
+			}
+			if (!SReflect.isSupertype(IFuture.class, method.getReturnType()))
 			{
-				queryfut.terminate();
-				delegate.setExceptionIfUndone(new ServiceNotFoundException("Service not found: " + query.toString()));
-			});
-			delegate.exceptionally(ex -> delegate = null);
-		}
-		
-		IService serv = null;
-		
-		Object ret = null;
-		try
-		{
-			serv = delegate.get();
-			ret = method.invoke(serv, args);
-			if (ret instanceof IFuture)
+				// Method is synchronous, no choice...
+				IService serv = delegatefut.get();
+				return method.invoke(serv, args);
+			}
+			else
 			{
-				((IFuture<?>) ret).exceptionally(e ->
+				Future<?> ret = FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality(ia.getLogger()));
+				delegatefut.addResultListener(new IResultListener<IService>()
 				{
-					if (e instanceof TimeoutException)
-						delegate = null;
+					public void resultAvailable(IService result)
+					{
+						IFuture<?> origret = null;
+						try
+						{
+							origret = (IFuture<?>) method.invoke(result, args);
+						}
+						catch (Exception e)
+						{
+							ret.setException(e);
+						}
+						FutureFunctionality.connectDelegationFuture(ret, origret);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
 				});
 				return ret;
 			}
 		}
-		catch (Exception e)
-		{
-			if (e instanceof TimeoutException)
-				delegate = null;
-			throw SUtil.throwUnchecked(e);
-		}
 		
-		return ret;
+		return method.invoke(delegate, args);
 	}
 }

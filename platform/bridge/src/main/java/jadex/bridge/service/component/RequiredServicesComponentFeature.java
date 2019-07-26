@@ -483,8 +483,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 
 			public void intermediateResultAvailable(T result)
 			{
-				queryfut.terminate();
 				ret.setResultIfUndone(result);
+				queryfut.terminate();
 			}
 
 			public void finished()
@@ -492,10 +492,10 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			}
 		});
 		long to = timeout;
-		component.waitForDelay(timeout, isRemote(query)).thenAccept(done -> 
+		//isRemote(query)
+		component.waitForDelay(timeout, true).thenAccept(done -> 
 		{
-			ret.setExceptionIfUndone(new ServiceNotFoundException("Service " + query + " not found in search period " + to));
-			queryfut.terminate();
+			queryfut.terminate(new ServiceNotFoundException("Service " + query + " not found in search period " + to));
 		});
 		return ret;
 	}
