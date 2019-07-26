@@ -8,6 +8,7 @@ bin
 *.copy
 keystore
 jadex_certstore.zip
+platform_auto.conf
 *.settings.xml
 settings_*
 alarmclock_settings.ser
