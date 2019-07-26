@@ -186,11 +186,11 @@ public class NFRPropertyProperties extends PropertiesPanel
 		});
 		
 		getTextField("Name").setText(propmi.getName());
-		getTextField("Type").setText(SReflect.getUnqualifiedTypeName(propmi.getType().getName()));
+		getTextField("Type").setText(propmi.getType().getClassNameOnly());
 		if(propmi.getUnit()!=null)
 		{
-			getTextField("Unit").setText(SReflect.getUnqualifiedTypeName(propmi.getUnit().getName()));
-			Class<?> ucl = propmi.getUnit();
+			getTextField("Unit").setText(propmi.getUnit().getClassNameOnly());
+			Class<?> ucl = propmi.getUnit().getType(this.getClass().getClassLoader()); // hmm, which classloader?!
 			if(Enum.class.isAssignableFrom(ucl))
 			{
 				Object[] vals = ucl.getEnumConstants();

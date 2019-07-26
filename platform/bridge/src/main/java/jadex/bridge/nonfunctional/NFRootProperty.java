@@ -34,9 +34,7 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 	{
 		super(comp, mi);
 		if(inject)
-		{
 			injectPropertyToRootComponent();
-		}
 	}
 	
 	/**

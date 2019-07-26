@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -93,7 +94,17 @@ public class JadexJsonSerializer implements ISerializer, IStringConverter
 	 */
 	public byte[] encode(Object val, ClassLoader classloader, ITraverseProcessor[] preprocs, Object usercontext)
 	{
-		byte[] ret = JsonTraverser.objectToByteArray(val, classloader, null, true, true, null, preprocs!=null?Arrays.asList(preprocs):null, writeprocs, usercontext);
+		boolean writeclass = true;
+		boolean writeid = true;
+		
+		if(usercontext instanceof Map)
+		{
+			Map conv = (Map)usercontext;
+			writeclass = conv.get("writeclass") instanceof Boolean? (Boolean)conv.get("writeclass"): true;
+			writeid = conv.get("writeid") instanceof Boolean? (Boolean)conv.get("writeid"): true;
+		}
+		
+		byte[] ret = JsonTraverser.objectToByteArray(val, classloader, null, writeclass, writeid, null, preprocs!=null?Arrays.asList(preprocs):null, writeprocs, usercontext);
 		
 		if(DEBUG)
 			System.out.println("encode message: "+(new String(ret, SUtil.UTF8)));

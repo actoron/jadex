@@ -50,7 +50,11 @@ public class JsonServiceIdentifierProcessor implements ITraverseProcessor
 		
 		// todo: supertypes, networknames, unrestricted???
 //		public ServiceIdentifier(IComponentIdentifier providerid, ClassInfo type, ClassInfo[] supertypes, String servicename, IResourceIdentifier rid, String scope, Set<String> networknames, boolean unrestricted)
-		ServiceIdentifier sid = new ServiceIdentifier(pid, new ClassInfo(obj.get("type").asString()), null, obj.get("name").asString(), rid, ServiceScope.valueOf(obj.get("scope").asString()), null, false);
+		String sertype = obj.get("type")!=null? obj.get("type").asString(): null;
+		String sername = obj.get("name")!=null? obj.get("name").asString(): null;
+		String scope = obj.get("scope")!=null? obj.get("scope").asString(): null;
+		
+		ServiceIdentifier sid = new ServiceIdentifier(pid, sertype!=null? new ClassInfo(sertype): null, null, sername, rid, scope!=null? ServiceScope.valueOf(scope): null, null, false);
 		return sid;
 	}
 }

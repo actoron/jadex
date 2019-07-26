@@ -230,7 +230,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			return new IntermediateFuture<>(new IllegalArgumentException("Creation infos must not be null or empty."));
 		FutureBarrier<Tuple3<IModelInfo, ClassLoader, Collection<IComponentFeatureFactory>>> modelbar = new FutureBarrier<>();
 		
-		if (debug)
+		if(debug)
 			System.out.println("createComponents: " + component + " " + Arrays.toString(infos));
 		
 		final Map<Integer, IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>>> tmpmodelmap = new HashMap<>();

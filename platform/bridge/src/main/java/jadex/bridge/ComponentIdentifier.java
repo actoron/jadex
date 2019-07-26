@@ -187,6 +187,19 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 //		return cid.getParent()==null? cid.getName(): cid.getLocalName()+":"+getSubcomponentName(cid);
 	}
 	
+	/**
+	 *  Test if this identifier has the same root as the cid.
+	 *  @param cid The component id.
+	 *  @return True, if the root is equal.
+	 */
+	public boolean hasSameRoot(IComponentIdentifier cid)
+	{
+		boolean ret = false;
+		if(cid!=null)
+			ret = cid.getRoot().equals(getRoot());
+		return ret;
+	}
+	
 //	/**
 //	 *  Get the application name. Equals the local component name in case it is a child of the platform.
 //	 *  broadcast@awa.plat1 -> awa
@@ -260,7 +273,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 *  @param name	The platform name.
 	 *  @return the stripped platform name.
 	 */
-	public static String	getPlatformPrefix(String name)
+	public static String getPlatformPrefix(String name)
 	{
 		// Strip auto-generated platform suffix.
 		if(name.indexOf('_')!=-1)

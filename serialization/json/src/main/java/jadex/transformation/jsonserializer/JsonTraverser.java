@@ -544,6 +544,7 @@ public class JsonTraverser extends Traverser
 	@SuppressWarnings("unchecked")
 	public static <T> T objectFromString(String val, ClassLoader classloader, IErrorReporter rep, Class<T> clazz, List<ITraverseProcessor> processors, List<ITraverseProcessor> postprocessors, Object usercontext)
 	{
+		Object ret;
 		rep = rep==null? DefaultErrorReporter.DEFAULT_ERROR_REPORTER: rep;
 		
 		try
@@ -552,15 +553,17 @@ public class JsonTraverser extends Traverser
 			JsonTraverser traverser = getReadTraverser();
 			JsonReadContext rc = new JsonReadContext();
 			rc.setUserContext(usercontext);
-			Object ret = traverser.traverse(value, clazz, postprocessors, processors!=null? processors: readprocs, Traverser.MODE.POSTPROCESS, classloader, rc);
-//			Object ret = traverser.traverse(value, clazz, null, processors!=null? processors: readprocs, postprocessors, classloader, rc);
+			ret = traverser.traverse(value, clazz, postprocessors, processors!=null? processors: readprocs, Traverser.MODE.POSTPROCESS, classloader, rc);
 	//		System.out.println("rc: "+rc.knownobjects);
-			return (T)ret;
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
 			throw SUtil.convertToRuntimeException(e);
 		}
+		
+		if(ret instanceof JsonValue) // do not return the raw jsonvalue object
+			throw new RuntimeException("Could not convert JsonValue to a Java class");
+		return (T)ret;
 	}
 	
 	/**

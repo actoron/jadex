@@ -6,7 +6,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.Boolean3;
 import jadex.commons.collection.MultiCollection;
@@ -61,23 +65,38 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	}
 	
 	/**
+	 *  Get the security service of the own platform or of cid platform.
+	 *  @param cid The platform id.
+	 *  @return 
+	 */
+	protected IFuture<ISecurityService> getSecurityService(IComponentIdentifier cid)
+	{
+		if(cid==null || cid.hasSameRoot(cid))
+		{
+			return agent.getService(ISecurityService.class);
+		}
+		else
+		{
+			return agent.searchService(new ServiceQuery<ISecurityService>(ISecurityService.class).setPlatform(cid).setScope(ServiceScope.PLATFORM));
+		}
+	}
+	
+	/**
 	 *  Set if the platform secret shall be used.
 	 *  @param usesecret The flag.
 	 */
-	public IFuture<Void> setUseSecret(boolean usesecret)
+	public IFuture<Void> setUseSecret(boolean usesecret, IComponentIdentifier cid)
 	{
-		return agent.getService(ISecurityService.class)
-			.thenCompose(s -> s.setUsePlatformSecret(usesecret));
+		return getSecurityService(cid).thenCompose(s -> s.setUsePlatformSecret(usesecret));
 	}
 	
 	/**
 	 *  Set if the platform secret shall be printed.
 	 *  @param printsecret The flag.
 	 */
-	public IFuture<Void> setPrintSecret(boolean printsecret)
+	public IFuture<Void> setPrintSecret(boolean printsecret, IComponentIdentifier cid)
 	{
-		return agent.getService(ISecurityService.class)
-			.thenCompose(s -> s.setPrintPlatformSecret(printsecret));
+		return getSecurityService(cid).thenCompose(s -> s.setPrintPlatformSecret(printsecret));
 	}
 	
 	/**
@@ -86,10 +105,9 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	 *  @param role The role name.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> addRole(String entity, String role)
+	public IFuture<Void> addRole(String entity, String role, IComponentIdentifier cid)
 	{
-		return agent.getService(ISecurityService.class)
-			.thenCompose(s -> s.addRole(entity, role));
+		return getSecurityService(cid).thenCompose(s -> s.addRole(entity, role));
 	}
 	
 	/**
@@ -98,10 +116,9 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	 *  @param role The role name.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> removeRole(String entity, String role)
+	public IFuture<Void> removeRole(String entity, String role, IComponentIdentifier cid)
 	{
-		return agent.getService(ISecurityService.class)
-			.thenCompose(s -> s.removeRole(entity, role));
+		return getSecurityService(cid).thenCompose(s -> s.removeRole(entity, role));
 	}
 	
 	/**
@@ -110,10 +127,9 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	 *  @param secret The secret, null to remove.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> addNetwork(String networkname, String secret)
+	public IFuture<Void> addNetwork(String networkname, String secret, IComponentIdentifier cid)
 	{
-		return agent.getService(ISecurityService.class)
-			.thenCompose(s -> s.setNetwork(networkname, secret));
+		return getSecurityService(cid).thenCompose(s -> s.setNetwork(networkname, secret));
 	}
 	
 	/**
@@ -122,10 +138,9 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	 *  @param secret The secret, null to remove the network completely.
 	 *  @return Null, when done.
 	 */
-	public IFuture<Void> removeNetwork(String networkname, String secret)
+	public IFuture<Void> removeNetwork(String networkname, String secret, IComponentIdentifier cid)
 	{
-		return agent.getService(ISecurityService.class)
-			.thenCompose(s -> s.removeNetwork(networkname, secret));
+		return getSecurityService(cid).thenCompose(s -> s.removeNetwork(networkname, secret));
 	}
 	
 	/**
@@ -133,10 +148,9 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	 *  @param name The name.
 	 *  @return null, when done.
 	 */
-	public IFuture<Void> addTrustedPlatformName(String name)
+	public IFuture<Void> addTrustedPlatformName(String name, IComponentIdentifier cid)
 	{
-		return agent.getService(ISecurityService.class)
-			.thenCompose(s -> s.addTrustedPlatform(name));
+		return getSecurityService(cid).thenCompose(s -> s.addTrustedPlatform(name));
 	}
 	
 	/**
@@ -144,17 +158,16 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 	 *  @param name The name.
 	 *  @return null, when done.
 	 */
-	public IFuture<Void> removeTrustedPlatformName(String name)
+	public IFuture<Void> removeTrustedPlatformName(String name, IComponentIdentifier cid)
 	{
-		return agent.getService(ISecurityService.class)
-			.thenCompose(s -> s.removeTrustedPlatform(name));
+		return getSecurityService(cid).thenCompose(s -> s.removeTrustedPlatform(name));
 	}
 	
 	/**
 	 *  Get security state.
 	 *  @return The security state.
 	 */
-	public IFuture<SecurityState> getSecurityState()
+	public IFuture<SecurityState> getSecurityState(IComponentIdentifier cid)
 	{
 		Future<SecurityState> ret = new Future<>();
 		
@@ -181,7 +194,7 @@ public class JCCSecurityPluginAgent extends JCCPluginAgent implements IJCCSecuri
 //			.thenAccept((Set<String> n) -> ss.setNetworkNames(n.toArray(new String[0]))));
 //		bar.waitFor().thenAccept((Void)->ret.setResult(null));
 		
-		agent.getService(ISecurityService.class)
+		getSecurityService(cid)
 			.thenCompose((ISecurityService s) -> 
 			{
 				bar.addFuture(s.getPlatformSecret(agent.getId())

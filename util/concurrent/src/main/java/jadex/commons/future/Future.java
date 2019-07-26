@@ -1193,9 +1193,49 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		});
 	}
 	
-	public void delegate(Future<E> delegate)
+	public void delegate(Future<E> target)
 	{
-		this.addResultListener(new DelegationResultListener<>(delegate));
+		if(target==null)
+			throw new IllegalArgumentException("Target must not null");
+		
+		if(target instanceof IPullSubscriptionIntermediateFuture)
+		{
+			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
+				(PullSubscriptionIntermediateDelegationFuture)target, (IPullSubscriptionIntermediateFuture)this);
+			this.addResultListener(lis);
+		}
+		else if(target instanceof IPullIntermediateFuture)
+		{
+			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
+				(PullIntermediateDelegationFuture)target, (IPullIntermediateFuture)this);
+			this.addResultListener(lis);
+		}
+		else if(target instanceof ISubscriptionIntermediateFuture)
+		{
+			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
+				(TerminableIntermediateDelegationFuture)target, (ISubscriptionIntermediateFuture)this);
+			this.addResultListener(lis);
+		}
+		else if(target instanceof ITerminableIntermediateFuture)
+		{
+			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
+				(TerminableIntermediateDelegationFuture)target, (ITerminableIntermediateFuture)this);
+			this.addResultListener(lis);
+		}
+		else if(target instanceof ITerminableFuture)
+		{
+			TerminableDelegationResultListener lis = new TerminableDelegationResultListener(
+				(TerminableDelegationFuture)target, (ITerminableFuture)this);
+			this.addResultListener(lis);
+		}
+		else if(target instanceof IIntermediateFuture)
+		{
+			this.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)target));
+		}
+		else
+		{
+			this.addResultListener(new DelegationResultListener(target));
+		}
 	}
 	
 	public IFuture<E> exceptionally(final Consumer<? super Exception> consumer)

@@ -1,5 +1,6 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.nonfunctional.INFProperty.Target;
 
 /**
@@ -18,13 +19,13 @@ public interface INFPropertyMetaInfo
 	 *  This is the Java type of the values.
 	 *  @return The type of the property.
 	 */
-	public Class<?> getType();
+	public ClassInfo getType();
 	
 	/**
 	 *  Gets the unit of the property.
 	 *  @return The unit of the property.
 	 */
-	public Class<?> getUnit();
+	public ClassInfo getUnit();
 
 	/**
 	 *  Checks if the property is dynamic.

@@ -800,13 +800,13 @@ public class SComponentManagementService
 	 *  Get the component descriptions.
 	 *  @return The component descriptions.
 	 */
-	public static IFuture<IComponentDescription[]> getComponentDescriptions(IInternalAccess agent)
+	public static IFuture<IComponentDescription[]> getComponentDescriptions(IComponentIdentifier cid)
 	{
 		Future<IComponentDescription[]> fut = new Future<IComponentDescription[]>();
 		
 		IComponentDescription[] ret = null;
 		
-		CmsState cmsstate = getState(agent.getId());
+		CmsState cmsstate = getState(cid);
 		List<IComponentDescription> cdsc = new ArrayList<>();
 		try(IAutoLock l = cmsstate.readLock())
 		{

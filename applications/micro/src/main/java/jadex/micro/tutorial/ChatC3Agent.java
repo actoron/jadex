@@ -34,7 +34,7 @@ public class ChatC3Agent
 //		{
 //			public void resultAvailable(final IComponentManagementService cms)
 //			{
-		SComponentManagementService.getComponentDescriptions(agent)
+		SComponentManagementService.getComponentDescriptions(agent.getId())
 //		cms.getComponentDescriptions()
 		.addResultListener(
 			new DefaultResultListener<IComponentDescription[]>()
