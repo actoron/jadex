@@ -62,14 +62,14 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.AgentServiceQuery;
 import jadex.platform.service.security.SecurityAgent;
 
 /**
  *  The super peer client agent is responsible for managing connections to super peers for each network.
  */
 @Agent(autoprovide=Boolean3.TRUE,
-	autostart=Boolean3.TRUE,
-	predecessors="jadex.platform.service.security.SecurityAgent")
+	autostart=Boolean3.TRUE)
 @Service
 public class SuperpeerClientAgent implements ISearchQueryManagerService
 {
@@ -104,6 +104,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	/** The managed connections for each network. */
 	protected Map<String, NetworkManager> connections;
 	
+	@AgentServiceQuery
+	protected ISecurityService secser;
+	
 	//-------- agent life cycle --------
 	
 	/**
@@ -120,8 +123,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		
 		if(!awaonly)
 		{
-			ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-			if(secser!=null)
+			//ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+			//if(secser!=null)
 			{
 				// Use all networks to include networks with public key only, e.g. global network
 				secser.getAllKnownNetworks().addResultListener(new ExceptionDelegationResultListener<MultiCollection<String, String>, Void>(ret)

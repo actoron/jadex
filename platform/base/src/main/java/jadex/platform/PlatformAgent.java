@@ -35,6 +35,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -76,7 +77,9 @@ import jadex.platform.service.security.SecurityAgent;
 {
 	@Argument(name=LOGGING_LEVEL, clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
 	@Argument(name=UNIQUEIDS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=PLATFORMPROXIES, clazz=boolean.class, defaultvalue="true")
+	@Argument(name=PLATFORMPROXIES, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="simulation", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="bisimulation", clazz=boolean.class, defaultvalue="false")
 })
 
 @ProvidedServices({
@@ -84,6 +87,8 @@ import jadex.platform.service.security.SecurityAgent;
 	// hack!!! no daemon here (possibly fixed?)
 	@ProvidedService(type=IDaemonThreadPoolService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createExecutionServiceImpl($args.asyncexecution, $args.simulation, $args.bisimulation, $component)", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IClockService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(
+			expression="$args.simulation==null || !$args.simulation.booleanValue()? new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component): new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component)", proxytype=Implementation.PROXYTYPE_RAW))
 //	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.bridge.service.types.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
 })
 

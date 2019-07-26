@@ -41,15 +41,14 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentServiceQuery;
 
 /**
  *  Implements passive awareness via multicast.
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE,
-	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registry.SuperpeerClientAgent",
-	autostart=Boolean3.FALSE
+@Agent(autoprovide = Boolean3.TRUE, autostart=Boolean3.FALSE
 )
 public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessService
 {
@@ -72,6 +71,9 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	/** The agent. */
 	@Agent
 	protected IInternalAccess agent;
+	
+	@AgentServiceQuery
+	protected ITransportAddressService tas;
 
 	/** The current search, if any. */
 	protected IntermediateFuture<IComponentIdentifier> search;
@@ -99,7 +101,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	/**
 	 *  At startup create a multicast socket for listening.
 	 */
-	@ServiceStart
+	@AgentCreated
 	public void	start() throws Exception
 	{
 		platforms = new LinkedHashMap<IComponentIdentifier, List<TransportAddress>>();
@@ -292,7 +294,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	protected IFuture<Void> sendInfo(final String address, final int port)
 	{
 		final Future<Void> ret = new Future<Void>();
-		ITransportAddressService tas = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITransportAddressService.class));
+		//tas = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITransportAddressService.class));
 		tas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Void>(ret)
 		{
 			@Override

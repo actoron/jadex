@@ -140,7 +140,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 		{
 			public void customResultAvailable(Void result)
 			{
-				libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class));
+				libservice	= provider.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ILibraryService.class).setMultiplicity(0));
 						
 				// Todo: hack!!! make extensions configurable also for reflective constructor (how?)
 				String[]	extensions	= new String[]
@@ -185,7 +185,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 					}
 				};
 				
-				libservice.addLibraryServiceListener(libservicelistener);
+				if (libservice != null)
+					libservice.addLibraryServiceListener(libservicelistener);
 				
 				ret.setResult(null);
 			}

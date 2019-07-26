@@ -28,7 +28,6 @@ import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -54,7 +53,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -528,7 +526,13 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		
 		int[] levelnum = new int[1];
 		levelnum[0] = -1;
-		
+//		System.out.println("LEVELS " + levels.size());
+//		int iii = 0;
+//		for (Set<String> level : levels)
+//		{
+//			System.out.println("Level " + iii + ": " + Arrays.toString(level.toArray()));
+//			++iii;
+//		}
 		IResultListener<Void> levelrl = new IResultListener<Void>()
 		{
 			public void exceptionOccurred(Exception exception)
@@ -538,6 +542,14 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			
 			public void resultAvailable(Void result)
 			{
+//				if (levels.size() > 1)
+//				{
+//					System.out.println("LEVELS: " + Arrays.toString(levels.toArray()));
+//					for (Set<String> level : levels)
+//						System.out.println(Arrays.toString(level.toArray()));
+//					System.out.println("################### WARNING: MORE THAN ONE LEVEL ####################");
+//					SUtil.sleep(2000);
+//				}
 				++levelnum[0];
 				if (levelnum[0] < levels.size())
 				{

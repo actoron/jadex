@@ -19,6 +19,8 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.IAutoLock;
+import jadex.commons.collection.RwAutoLock;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -37,7 +39,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	//-------- attributes --------
 	
 	/** Read-Write Lock */
-	protected ReadWriteLock rwlock;
+	protected RwAutoLock rwlock;
 	
 	/** The service indexer. */
 	protected Indexer<IServiceIdentifier> indexer;
@@ -61,7 +63,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public ServiceRegistry()
 	{
-		this.rwlock = new ReentrantReadWriteLock(false);
+		this.rwlock = new RwAutoLock();
 		this.proxyrwlock = new ReentrantReadWriteLock(false);
 		this.indexer = new Indexer<>(new ServiceKeyExtractor(), false, ServiceKeyExtractor.SERVICE_KEY_TYPES);
 		this.queries = new Indexer<ServiceQueryInfo<?>>(new QueryInfoExtractor(), true, QueryInfoExtractor.QUERY_KEY_TYPES_INDEXABLE);
@@ -161,7 +163,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	// write
 	public void addService(IServiceIdentifier service)
 	{
-		Lock lock = rwlock.writeLock();
+		Lock lock = rwlock.getWriteLock();
 		lock.lock();
 		try
 		{
@@ -186,9 +188,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			else
 			{
 				// Downgrade to read lock.
-				lock = rwlock.readLock();
+				lock = rwlock.getReadLock();
 				lock.lock();
-				rwlock.writeLock().unlock();
+				rwlock.getWriteLock().unlock();
 				
 				checkQueries(service, ServiceEvent.SERVICE_ADDED);
 			}
@@ -231,7 +233,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		if(service == null)
 		{
-			rwlock.writeLock().lock();
+			rwlock.getWriteLock().lock();
 			Set<IServiceIdentifier> services = indexer.getAllValues();
 			try
 			{
@@ -243,7 +245,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			}
 			finally
 			{
-				rwlock.writeLock().unlock();
+				rwlock.getWriteLock().unlock();
 			}
 			
 			for(IServiceIdentifier ser : services)
@@ -251,7 +253,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		else
 		{
-			rwlock.writeLock().lock();
+			rwlock.getWriteLock().lock();
 			try
 			{
 				indexer.removeValue(service);
@@ -259,7 +261,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			}
 			finally
 			{
-				rwlock.writeLock().unlock();
+				rwlock.getWriteLock().unlock();
 			}
 			
 			checkQueries(service, ServiceEvent.SERVICE_CHANGED);
@@ -276,7 +278,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		if(indexer.isIndexed(propname) && service==null)
 		{
-			rwlock.writeLock().lock();
+			rwlock.getWriteLock().lock();
 			Set<IServiceIdentifier> services = indexer.getAllValues();
 			try
 			{
@@ -284,7 +286,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			}
 			finally
 			{
-				rwlock.writeLock().unlock();
+				rwlock.getWriteLock().unlock();
 			}
 			
 			// todo: get only changed?!
@@ -306,22 +308,22 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		//System.out.println("removing service: "+service);
 		
-		Lock lock = rwlock.writeLock();
+		Lock lock = rwlock.getWriteLock();
 		lock.lock();
 		try
 		{
 			indexer.removeValue(service);
 			
 			// Downgrade to read lock.
-			lock = rwlock.readLock();
+			lock = rwlock.getReadLock();
 			lock.lock();
-			rwlock.writeLock().unlock();
+			rwlock.getWriteLock().unlock();
 			
 			checkQueries(service, ServiceEvent.SERVICE_REMOVED);
 		}
 		finally
 		{
-				lock.unlock();
+			lock.unlock();
 		}
 		
 		proxyrwlock.writeLock().lock();
@@ -344,7 +346,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		Set<IServiceIdentifier> pservs = null;
 		
-		Lock lock = rwlock.writeLock();
+		Lock lock = rwlock.getWriteLock();
 		lock.lock();
 		try
 		{
@@ -361,9 +363,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			}
 			
 			// Downgrade to read lock.
-			lock = rwlock.readLock();
+			lock = rwlock.getReadLock();
 			lock.lock();
-			rwlock.writeLock().unlock();
+			rwlock.getWriteLock().unlock();
 			
 			if(pservs!=null)
 			{
@@ -461,14 +463,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public Set<IServiceIdentifier> getAllServices()
 	{
-		rwlock.readLock().lock();
+		rwlock.getReadLock().lock();
 		try
 		{
 			return indexer.getAllValues();
 		}
 		finally
 		{
-			rwlock.readLock().unlock();
+			rwlock.getReadLock().unlock();
 		}
 	}
 
@@ -478,14 +480,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public Set<ServiceQueryInfo<?>> getAllQueries()
 	{
-		rwlock.readLock().lock();
+		rwlock.getReadLock().lock();
 		try
 		{
 			return queries.getAllValues();
 		}
 		finally
 		{
-			rwlock.readLock().unlock();
+			rwlock.getReadLock().unlock();
 		}
 	}
 	
@@ -500,7 +502,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public ReadWriteLock getLock()
 	{
-		return rwlock;
+		return rwlock.getLock();
 	}
 	
 	/**
@@ -527,7 +529,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				}
 			});
 			
-			rwlock.writeLock().lock();
+			rwlock.getWriteLock().lock();
 			Set<IServiceIdentifier> sers = null;
 			try
 			{
@@ -541,7 +543,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 			}
 			finally
 			{
-				rwlock.writeLock().unlock();
+				rwlock.getWriteLock().unlock();
 			}
 			
 			for (IServiceIdentifier ser : SUtil.notNull(sers))
@@ -564,7 +566,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	public void removeQuery(final ServiceQuery<?> query)
 	{
 		
-		rwlock.writeLock().lock();
+		rwlock.getWriteLock().lock();
 		try
 		{
 			Set<ServiceQueryInfo<?>> qi = queries.getValues(QueryInfoExtractor.KEY_TYPE_ID, query.getId());
@@ -579,7 +581,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		finally
 		{
-			rwlock.writeLock().unlock();
+			rwlock.getWriteLock().unlock();
 		}
 	}
 	
@@ -590,7 +592,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	// write
 	public void removeQueries(IComponentIdentifier owner)
 	{
-		rwlock.writeLock().lock();
+		rwlock.getWriteLock().lock();
 		try
 		{
 			Set<ServiceQueryInfo<?>> qs = queries.getValues(QueryInfoExtractor.KEY_TYPE_OWNER, owner.toString());
@@ -604,7 +606,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		finally
 		{
-			rwlock.writeLock().unlock();
+			rwlock.getWriteLock().unlock();
 		}
 	}
 	
@@ -615,7 +617,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	// write
 	public void removeQueriesOfPlatform(IComponentIdentifier platform)
 	{
-		rwlock.writeLock().lock();
+		rwlock.getWriteLock().lock();
 		Set<ServiceQueryInfo<?>> qinfos = new HashSet<ServiceQueryInfo<?>>();
 		try
 		{
@@ -633,7 +635,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		finally
 		{
-			rwlock.writeLock().unlock();
+			rwlock.getWriteLock().unlock();
 		}
 	}
 	
@@ -644,7 +646,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	// write
 	public void addExcludedComponent(IComponentIdentifier cid)
 	{
-		rwlock.writeLock().lock();
+		rwlock.getWriteLock().lock();
 		try
 		{
 			if (excludedservices == null)
@@ -653,7 +655,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		finally
 		{
-			rwlock.writeLock().unlock();
+			rwlock.getWriteLock().unlock();
 		}
 	}
 	
@@ -663,7 +665,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	public void removeExcludedComponent(IComponentIdentifier cid)
 	{
-		Lock lock = rwlock.writeLock();
+		Lock lock = rwlock.getWriteLock();
 		lock.lock();
 		try
 		{
@@ -702,14 +704,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		boolean inited;
 		IComponentIdentifier target = ser.getProviderId();
-		rwlock.readLock().lock();
+		rwlock.getReadLock().lock();
 		try
 		{
 			inited	= excludedservices == null || !excludedservices.containsKey(target);
 		}
 		finally
 		{
-			rwlock.readLock().unlock();
+			rwlock.getReadLock().unlock();
 		}
 		
 		return inited || getDotName(query.getOwner()).endsWith(getDotName(target));
@@ -725,9 +727,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		List<Tuple2<String, String[]>> spec = ((QueryInfoExtractor) queries.getKeyExtractor()).getIndexerSpec(ser);
-		
-		Set<ServiceQueryInfo<?>> sqis = queries.getValuesInverted(spec);
+		List<Tuple2<String, String[]>> spec = null;
+				Set<ServiceQueryInfo<?>> sqis = null;
+		try (IAutoLock l = rwlock.readLock())
+		{
+			spec = ((QueryInfoExtractor) queries.getKeyExtractor()).getIndexerSpec(ser);
+			
+			sqis = queries.getValuesInverted(spec);
+		}
 		
 //		Set<ServiceQueryInfo<?>> r1 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, ser.getServiceType().toString());
 //		Set<ServiceQueryInfo<?>> r2 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, "null");
@@ -919,14 +926,14 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected Set<IServiceIdentifier> getServices()
 	{
-		rwlock.readLock().lock();
+		rwlock.getReadLock().lock();
 		try
 		{
 			return indexer.getAllValues();
 		}
 		finally
 		{
-			rwlock.readLock().unlock();
+			rwlock.getReadLock().unlock();
 		}
 	}
 	
@@ -938,7 +945,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	 */
 	protected Set<IServiceIdentifier> getServices(final ServiceQuery<?> query)
 	{
-		rwlock.readLock().lock();
+		rwlock.getReadLock().lock();
 		try
 		{
 			Set<IServiceIdentifier> ret = indexer.getValues(query.getIndexerSearchSpec());
@@ -946,7 +953,7 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 		}
 		finally
 		{
-			rwlock.readLock().unlock();
+			rwlock.getReadLock().unlock();
 		}
 	}
 	

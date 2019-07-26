@@ -36,7 +36,9 @@ public class STest
     public static IPlatformConfiguration getLocalTestConfig(String test)
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-		config.setPlatformName(test+"-"+platno.getAndIncrement());
+        // Don't use testcase name as platform name, it contains slashes and clashes with path management.
+		//config.setPlatformName(test+"-"+platno.getAndIncrement());
+		config.setPlatformName("test"+"-"+platno.getAndIncrement());
 
         // Do not use multi factory as it is much too slow now :(
 //		config.setValue("kernel_multi", true);

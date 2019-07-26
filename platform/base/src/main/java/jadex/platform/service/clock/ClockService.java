@@ -34,12 +34,12 @@ import jadex.platform.service.threadpool.ThreadPoolService;
  *  A clock service abstracts away from clock implementations.
  *  The clock service is meant to be kept constant during runtime.
  */
-public class ClockService extends BasicService implements IClockService, IPropertiesProvider
+public class ClockService extends BasicService implements IClockService
 {
 	//-------- static part --------
 	
 	/** Shared clock for bisimulation, if any. */
-	protected static volatile IClock	bisimclock;	
+	protected static volatile IClock bisimclock;	
 	
 	//-------- attributes --------
 	
@@ -50,16 +50,13 @@ public class ClockService extends BasicService implements IClockService, IProper
 	protected IThreadPoolService threadpool;
 
 	/** The clock listeners. */
-	protected List listeners;
+	protected List<IChangeListener> listeners;
 	
 	/** The component. */
 	protected IInternalAccess component;
 
 	/** The clock type. */
 	protected ClockCreationInfo cinfo;
-	
-	/** Was simulation set via argument? */
-	protected Boolean simulation;
 	
 	/** The realtime timer. */
 	protected java.util.Timer timer;
@@ -69,22 +66,21 @@ public class ClockService extends BasicService implements IClockService, IProper
 	/**
 	 *  Create a new clock service.
 	 */
-	public ClockService(ClockCreationInfo cinfo, IInternalAccess component, Boolean simulation)
+	public ClockService(ClockCreationInfo cinfo, IInternalAccess component)
 	{
-		this(cinfo, component, null, simulation);
+		this(cinfo, component, null);
 	}
 	
 	/**
 	 *  Create a new clock service.
 	 */
-	public ClockService(ClockCreationInfo cinfo, IInternalAccess component, Map properties, Boolean simulation)
+	public ClockService(ClockCreationInfo cinfo, IInternalAccess component, Map properties)
 	{
 		super(component.getId(), IClockService.class, properties);
 
 		this.cinfo = cinfo;
 		this.component = component;
-		this.simulation = simulation;
-		this.listeners = Collections.synchronizedList(new ArrayList());
+		this.listeners = Collections.synchronizedList(new ArrayList<>());
 	}
 	
 	/**
@@ -341,17 +337,17 @@ public class ClockService extends BasicService implements IClockService, IProper
 				{
 					public void customResultAvailable(Void result)
 					{
-						ISettingsService settings = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(0));
-						if(settings!=null)
-						{
-							settings.registerPropertiesProvider("clockservice", ClockService.this)
-								.addResultListener(new DelegationResultListener<Void>(ret));
-						}
-						else
-						{
+//						ISettingsService settings = component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class).setMultiplicity(0));
+//						if(settings!=null)
+//						{
+//							settings.registerPropertiesProvider("clockservice", ClockService.this)
+//								.addResultListener(new DelegationResultListener<Void>(ret));
+//						}
+//						else
+//						{
 							//System.out.println("Settings service not found by clock");
 							ret.setResult(null);
-						}
+//						}
 						
 //						component.getComponentFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ISettingsService.class, ServiceScope.PLATFORM))
 //							.addResultListener(new IResultListener<ISettingsService>()
@@ -397,17 +393,17 @@ public class ClockService extends BasicService implements IClockService, IProper
 		{
 			public void customResultAvailable(Void result)
 			{
-				ISettingsService	settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
-				settings.deregisterPropertiesProvider("clockservice")
-					.addResultListener(new DelegationResultListener<Void>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
+//				ISettingsService	settings	= component.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
+//				settings.deregisterPropertiesProvider("clockservice")
+//					.addResultListener(new DelegationResultListener<Void>(ret)
+//				{
+//					public void customResultAvailable(Void result)
+//					{
 						ClockService.this.component	= null;
 						ClockService.this.clock	= null;
 						ret.setResult(null);
-					}
-				});
+//					}
+//				});
 			}
 		});
 		
@@ -443,7 +439,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 		IClock old	= clock;
 		boolean	start	= old!=null && IClock.STATE_RUNNING.equals(old.getState());
 		
-		Object	bisimulation	= component.getFeature(IArgumentsResultsFeature.class).getArguments().get("bisimulation");
+		Object bisimulation = component.getFeature(IArgumentsResultsFeature.class).getArguments().get("bisimulation");
 		if(Boolean.TRUE.equals(bisimulation))
 		{
 			synchronized(ClockService.class)
@@ -521,41 +517,41 @@ public class ClockService extends BasicService implements IClockService, IProper
 	/**
 	 *  Update from given properties.
 	 */
-	public IFuture<Void> setProperties(Properties props)
-	{
-		// Do not change clock when explicitly started in specific mode
-		if(simulation==null)
-		{
-			String	type	= props.getStringProperty("type");
-			long	delta	= props.getLongProperty("delta");
-			double	dilation	= props.getDoubleProperty("dilation");
-			
-			String	oldstate	= clock.getState();
-			setClock(type, threadpool);
-			clock.setDelta(delta);
-			if(clock instanceof ContinuousClock)
-				((ContinuousClock)clock).setDilation(dilation);
-			
-			if(IClock.STATE_RUNNING.equals(oldstate))
-			{
-				clock.start();
-			}
-		}
-		
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Write current state into properties.
-	 */
-	public IFuture<Properties> getProperties()
-	{
-		Properties	props	= new Properties();
-		props.addProperty(new Property("type", clock.getType()));
-		props.addProperty(new Property("delta", ""+clock.getDelta()));
-		if(clock instanceof ContinuousClock)
-			props.addProperty(new Property("dilation", ""+((ContinuousClock)clock).getDilation()));
-		
-		return new Future<Properties>(props);
-	}
+//	public IFuture<Void> setProperties(Properties props)
+//	{
+//		// Do not change clock when explicitly started in specific mode
+//		if(simulation==null)
+//		{
+//			String	type	= props.getStringProperty("type");
+//			long	delta	= props.getLongProperty("delta");
+//			double	dilation	= props.getDoubleProperty("dilation");
+//			
+//			String	oldstate	= clock.getState();
+//			setClock(type, threadpool);
+//			clock.setDelta(delta);
+//			if(clock instanceof ContinuousClock)
+//				((ContinuousClock)clock).setDilation(dilation);
+//			
+//			if(IClock.STATE_RUNNING.equals(oldstate))
+//			{
+//				clock.start();
+//			}
+//		}
+//		
+//		return IFuture.DONE;
+//	}
+//	
+//	/**
+//	 *  Write current state into properties.
+//	 */
+//	public IFuture<Properties> getProperties()
+//	{
+//		Properties	props	= new Properties();
+//		props.addProperty(new Property("type", clock.getType()));
+//		props.addProperty(new Property("delta", ""+clock.getDelta()));
+//		if(clock instanceof ContinuousClock)
+//			props.addProperty(new Property("dilation", ""+((ContinuousClock)clock).getDilation()));
+//		
+//		return new Future<Properties>(props);
+//	}
 }

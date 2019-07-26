@@ -172,6 +172,19 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 		return delegate.searchLocalServices(query);
 	}
 	
+	/**
+	 *  Performs a sustained search for a service. Attempts to find a service
+	 *  for a maximum duration until timeout occurs.
+	 *  
+	 *  @param query The search query.
+	 *  @param timeout Maximum time period to search.
+	 *  @return Service matching the query, exception if service is not found.
+	 */
+	public <T> IFuture<T> searchService(ServiceQuery<T> query, Long timeout)
+	{
+		return delegate.searchService(query, timeout);
+	}
+	
 	//-------- query methods --------
 
 	/**

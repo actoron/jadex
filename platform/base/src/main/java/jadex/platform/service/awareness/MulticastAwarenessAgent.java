@@ -9,6 +9,7 @@ import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 
@@ -16,10 +17,7 @@ import jadex.micro.annotation.Arguments;
  *  Implements passive awareness via multicast.
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE, autostart=Boolean3.FALSE,
-	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registry.SuperpeerClientAgent"
-)
+@Agent(autoprovide = Boolean3.TRUE, autostart=Boolean3.FALSE)
 @Arguments({
 	@Argument(name="address", clazz=String.class, defaultvalue="\"232.0.9.1\""),
 	@Argument(name="port", clazz=int.class, defaultvalue="32091")
@@ -29,7 +27,7 @@ public class MulticastAwarenessAgent	extends LocalNetworkAwarenessBaseAgent
 	/**
 	 *  At startup create a multicast socket for listening.
 	 */
-	@ServiceStart
+	@AgentCreated
 	public void	start() throws Exception
 	{
 		sendsocket	= new DatagramSocket(0);

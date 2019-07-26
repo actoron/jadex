@@ -3,6 +3,7 @@ package jadex.commons.future;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1237,26 +1238,33 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		}
 	}
 	
-	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function)
+	public IFuture<E> exceptionally(final Consumer<? super Exception> consumer)
     {
-        return exceptionally(function, null);
+        return exceptionally(consumer, null);
     }
 	
-	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function, Class<?> futuretype)
+	public IFuture<E> exceptionally(final Consumer<? super Exception> consumer, Class<?> futuretype)
     {
-		final Future<E> ret = getFuture(futuretype);
-
-		this.addResultListener(new DelegationResultListener<E>(ret)
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		IResultListener<E> reslis = new IIntermediateResultListener()
 		{
-			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				 IFuture<E> res = function.apply(exception);
-                 res.addResultListener(SResultListener.delegate(ret));
+				 consumer.accept(exception);
 			}
-		});
+			public void resultAvailable(Object result)
+			{
+			}
+			public void intermediateResultAvailable(Object result)
+			{
+			}
+			public void finished()
+			{
+			}
+		};
+		addResultListener(reslis);
 		
-        return ret;
+        return this;
     }
 	
 	/**

@@ -5,10 +5,12 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.IExecutionFeature;
@@ -20,6 +22,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.component.UnresolvedServiceInvocationHandler;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -131,7 +134,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								
 								// todo: disallow multiple field injections!
 								// This is problematic because search can defer the agent startup esp. when remote search
-								if(sfut.isDone())
+								if(sfut.isDone() && sfut.getException() == null)
 								{
 									try
 									{
@@ -150,13 +153,8 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								{
 									RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceInfo(sername);
 									Class<?> clz = rsi.getType().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
-									UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(new IResultCommand<IFuture<Object>, Void>()
-									{
-										public IFuture<Object> execute(Void args)
-										{
-											return sfut;
-										}
-									});
+									ServiceQuery<Object> query = RequiredServicesComponentFeature.getServiceQuery(component, info);
+									UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
 									Object proxy = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{IService.class, clz}, h);
 								
 									try
