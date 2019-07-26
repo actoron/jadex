@@ -2,7 +2,6 @@ package jadex.bridge.service.component;
 
 import java.util.Collection;
 
-import jadex.base.Starter;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -178,24 +177,12 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	 *  for a maximum duration until timeout occurs.
 	 *  
 	 *  @param query The search query.
-	 *  @return Service matching the query, exception if service is not found.
-	 */
-	public <T> IFuture<T> sustainedSearchService(ServiceQuery<T> query)
-	{
-		return delegate.sustainedSearchService(query);
-	}
-	
-	/**
-	 *  Performs a sustained search for a service. Attempts to find a service
-	 *  for a maximum duration until timeout occurs.
-	 *  
-	 *  @param query The search query.
 	 *  @param timeout Maximum time period to search.
 	 *  @return Service matching the query, exception if service is not found.
 	 */
-	public <T> IFuture<T> sustainedSearchService(ServiceQuery<T> query, long timeout)
+	public <T> IFuture<T> searchService(ServiceQuery<T> query, Long timeout)
 	{
-		return delegate.sustainedSearchService(query, timeout);
+		return delegate.searchService(query, timeout);
 	}
 	
 	//-------- query methods --------

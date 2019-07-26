@@ -462,24 +462,13 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 *  for a maximum duration until timeout occurs.
 	 *  
 	 *  @param query The search query.
-	 *  @return Service matching the query, exception if service is not found.
-	 */
-	public <T> IFuture<T> sustainedSearchService(ServiceQuery<T> query)
-	{
-		return sustainedSearchService(query, Starter.getDefaultTimeout(component.getId()));
-	}
-	
-	/**
-	 *  Performs a sustained search for a service. Attempts to find a service
-	 *  for a maximum duration until timeout occurs.
-	 *  
-	 *  @param query The search query.
 	 *  @param timeout Maximum time period to search.
 	 *  @return Service matching the query, exception if service is not found.
 	 */
-	public <T> IFuture<T> sustainedSearchService(ServiceQuery<T> query, long timeout)
+	public <T> IFuture<T> searchService(ServiceQuery<T> query, Long timeout)
 	{
 		Future<T> ret = new Future<T>();
+		timeout = timeout != null ? timeout : Starter.getDefaultTimeout(component.getId());
 		ISubscriptionIntermediateFuture<T> queryfut = addQuery(query);
 		queryfut.addResultListener(new IIntermediateResultListener<T>()
 		{
@@ -502,7 +491,12 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			{
 			}
 		});
-		component.waitForDelay(timeout, true).thenAccept(done -> ret.setExceptionIfUndone(new ServiceNotFoundException("Service " + query + " not found in search period " + timeout)));
+		long to = timeout;
+		component.waitForDelay(timeout, isRemote(query)).thenAccept(done -> 
+		{
+			ret.setExceptionIfUndone(new ServiceNotFoundException("Service " + query + " not found in search period " + to));
+			queryfut.terminate();
+		});
 		return ret;
 	}
 	

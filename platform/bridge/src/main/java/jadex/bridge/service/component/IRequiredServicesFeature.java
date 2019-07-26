@@ -2,7 +2,6 @@ package jadex.bridge.service.component;
 
 import java.util.Collection;
 
-import jadex.base.Starter;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -78,19 +77,10 @@ public interface IRequiredServicesFeature extends IExternalRequiredServicesFeatu
 	 *  for a maximum duration until timeout occurs.
 	 *  
 	 *  @param query The search query.
+	 *  @param timeout Maximum time period to search, null for default timeout.
 	 *  @return Service matching the query, exception if service is not found.
 	 */
-	public <T> IFuture<T> sustainedSearchService(ServiceQuery<T> query);
-	
-	/**
-	 *  Performs a sustained search for a service. Attempts to find a service
-	 *  for a maximum duration until timeout occurs.
-	 *  
-	 *  @param query The search query.
-	 *  @param timeout Maximum time period to search.
-	 *  @return Service matching the query, exception if service is not found.
-	 */
-	public <T> IFuture<T> sustainedSearchService(ServiceQuery<T> query, long timeout);
+	public <T> IFuture<T> searchService(ServiceQuery<T> query, Long timeout);
 	
 	
 	// Would be nice having methods below in external variant but requires special required proxy handling
