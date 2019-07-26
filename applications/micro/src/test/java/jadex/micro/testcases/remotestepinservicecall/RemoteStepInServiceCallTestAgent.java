@@ -31,7 +31,7 @@ import jadex.micro.testcases.TestAgent;
 {
 	@RequiredService(name="ts", type=ITestService.class, scope=ServiceScope.GLOBAL)
 })
-@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ITestService.class))
 public class RemoteStepInServiceCallTestAgent extends TestAgent	 implements ITestService
 {
 	/**

@@ -24,7 +24,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Test if in configurations provided service implementations can be overridden.
  */ 
-@ProvidedServices(@ProvidedService(type=IAService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IAService.class))
 @Configurations({
 	@Configuration(name="a", providedservices=@ProvidedService(type=IAService.class, 
 		implementation=@Implementation(expression="$pojoagent.getService()"))),

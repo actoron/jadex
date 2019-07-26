@@ -26,7 +26,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Simple test agent with one service.
  */
-@ProvidedServices(@ProvidedService(type=IBService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IBService.class))
 //@Results(@Result(name="exception", typename="Exception"))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IBService.class)

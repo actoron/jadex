@@ -24,7 +24,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IMessageQueueService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IMessageQueueService.class))
 public class MessageQueueAgent implements IMessageQueueService
 {
 	//-------- attributes --------

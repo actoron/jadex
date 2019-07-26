@@ -22,8 +22,7 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Agent(predecessors="jadex.micro.testcases.blocking.BlockAgent")
 @Service
-@ProvidedServices(@ProvidedService(type=IStepService.class,
-	implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IStepService.class))
 @RequiredServices(@RequiredService(name="block", type=IBlockService.class))
 public class StepAgent	implements	IStepService
 {

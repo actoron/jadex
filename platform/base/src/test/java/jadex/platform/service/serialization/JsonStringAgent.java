@@ -11,7 +11,7 @@ import jadex.transformation.jsonserializer.JsonString;
 
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type = IJsonStringService.class, implementation = @Implementation(expression = "$pojoagent")))
+@ProvidedServices(@ProvidedService(type = IJsonStringService.class))
 public class JsonStringAgent implements IJsonStringService
 {
 	public static final JsonString JSON_STRING = new JsonString("{\"hello\":\"World\"}");

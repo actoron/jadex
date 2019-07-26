@@ -25,7 +25,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that provides a service with a stream.
  */
-@ProvidedServices(@ProvidedService(type=IStreamService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IStreamService.class))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IStreamService.class)
 @Agent

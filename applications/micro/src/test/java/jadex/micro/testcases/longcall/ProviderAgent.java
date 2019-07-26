@@ -29,7 +29,7 @@ import jadex.micro.annotation.ProvidedServices;
  * 
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ITestService.class))
 @Service
 public class ProviderAgent implements ITestService
 {

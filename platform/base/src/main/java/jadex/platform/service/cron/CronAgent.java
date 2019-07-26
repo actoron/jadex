@@ -69,7 +69,7 @@ import jadex.micro.annotation.RequiredServices;
 	@Argument(name="useworkeragent", clazz=boolean.class, defaultvalue="true", description="Flag if a worker agent should be used to execute a cron job.")
 })
 @Service
-@ProvidedServices(@ProvidedService(type=ICronService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ICronService.class))
 @RequiredServices(@RequiredService(name="clockser", type=IClockService.class, scope=ServiceScope.PLATFORM))
 @Configurations(
 {

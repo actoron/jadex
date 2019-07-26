@@ -47,7 +47,6 @@ import jadex.transformation.jsonserializer.JsonTraverser;
  */
 @Agent
 @ProvidedServices(@ProvidedService(name="myser", type=IMyService.class, scope=ServiceScope.PLATFORM,
-	implementation=@Implementation(expression="$pojoagent"),
 	publish=@Publish(publishtype=IPublishService.PUBLISH_RS, 
 	publishid="[http://localhost:7000/]myservice"
 )))

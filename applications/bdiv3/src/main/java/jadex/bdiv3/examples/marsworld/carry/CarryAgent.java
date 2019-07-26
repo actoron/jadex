@@ -29,7 +29,7 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Agent(type=BDIAgentFactory.TYPE)
 @Service
-@ProvidedServices(@ProvidedService(type=ICarryService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ICarryService.class))
 @RequiredServices(@RequiredService(name="targetser", type=ITargetAnnouncementService.class, multiple=true))
 @Plans({
 	@Plan(trigger=@Trigger(goals=CarryAgent.CarryOre.class), body=@Body(CarryOrePlan.class)),

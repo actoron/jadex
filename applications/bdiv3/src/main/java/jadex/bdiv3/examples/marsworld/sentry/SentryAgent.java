@@ -33,7 +33,7 @@ import jadex.micro.annotation.RequiredServices;
 {
 	@Plan(trigger=@Trigger(goals=SentryAgent.AnalyzeTarget.class), body=@Body(AnalyzeTargetPlan.class))
 })
-@ProvidedServices(@ProvidedService(type=ITargetAnnouncementService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ITargetAnnouncementService.class))
 @RequiredServices(@RequiredService(name="produceser", multiple=true, type=IProduceService.class))
 public class SentryAgent extends BaseAgent implements ITargetAnnouncementService
 {

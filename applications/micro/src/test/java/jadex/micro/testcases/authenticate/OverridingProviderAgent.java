@@ -13,7 +13,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Agent implementing the test service and overriding settings.
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ITestService.class))
 @Service
 public class OverridingProviderAgent implements ITestService
 {
