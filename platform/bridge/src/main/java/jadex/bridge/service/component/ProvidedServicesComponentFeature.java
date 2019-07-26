@@ -99,9 +99,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			{
 				Object key = ps[i].getName()!=null? ps[i].getName(): ps[i].getType().getType(component.getClassLoader(), component.getModel().getAllImports());
 				if(sermap.put(key, ps[i])!=null)
-				{
 					throw new RuntimeException("Services with same type must have different name.");  // Is catched and set to ret below
-				}
 			}
 			
 			// Adapt services to configuration (if any).
