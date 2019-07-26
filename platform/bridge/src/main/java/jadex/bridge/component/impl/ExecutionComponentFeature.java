@@ -697,7 +697,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			IExecutionService exe	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+			IExecutionService exe = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
 			
 			// Do not use rescue thread for bisimulation of platform init/shutdown/zombie agents to avoid clock running out.
 			if(exe==null && SSimulation.isBisimulating(getInternalAccess()))

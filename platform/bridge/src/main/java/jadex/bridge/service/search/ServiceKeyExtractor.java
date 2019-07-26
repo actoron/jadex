@@ -107,7 +107,7 @@ public class ServiceKeyExtractor implements IKeyExtractor<IServiceIdentifier>
 			ClassInfo[] supertypes = serv.getServiceSuperTypes();
 			if (supertypes != null)
 			{
-				for (ClassInfo supertype : supertypes)
+				for(ClassInfo supertype : supertypes)
 					ret.add(supertype.toString());
 			}
 		}
@@ -133,7 +133,7 @@ public class ServiceKeyExtractor implements IKeyExtractor<IServiceIdentifier>
 		else if(KEY_TYPE_NETWORKS.equals(keytype))
 		{
 			if(!serv.isUnrestricted())
-				ret = new HashSet<String>(serv.getNetworkNames());
+				ret = serv.getNetworkNames()==null? null: new HashSet<String>(serv.getNetworkNames());
 			else
 				ret = new SetWrapper<String>(IKeyExtractor.MATCH_ALWAYS);
 		}

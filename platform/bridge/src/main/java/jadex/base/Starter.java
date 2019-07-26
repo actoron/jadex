@@ -106,7 +106,8 @@ public class Starter
 //    public static String DATA_SUPERPEER = "superpeer";
     
 	/** Global platform data. For each platform stored by  */
-    protected static final IRwMap<IComponentIdentifier, IRwMap<String, Object>> platformmem = new RwMapWrapper<IComponentIdentifier, IRwMap<String, Object>>(new HashMap<IComponentIdentifier, IRwMap<String, Object>>());
+    protected static final IRwMap<IComponentIdentifier, IRwMap<String, Object>> platformmem = 
+    	new RwMapWrapper<IComponentIdentifier, IRwMap<String, Object>>(new HashMap<IComponentIdentifier, IRwMap<String, Object>>());
 //	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();
 
 //	/** The shutdown in progress flag. */
@@ -492,8 +493,7 @@ public class Starter
 //				CmsComponentState compstate = new CmsComponentState();
 //				((CmsState) getPlatformValue(cid, DATA_CMSSTATE)).getComponentMap().put(cid, compstate);
 				
-				/** Here */
-//					rootconf.setPlatformAccess(component);
+//				rootconf.setPlatformAccess(component);
 				putPlatformValue(cid, DATA_PLATFORMACCESS, component);
 				putPlatformValue(cid, DATA_BOOTSTRAPFACTORY, cfac);
 //					putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, args);
@@ -709,7 +709,7 @@ public class Starter
 	 *  Internal method to create a component identifier.
 	 *  @param pfname The platform name.
 	 */
-	protected static IComponentIdentifier createPlatformIdentifier(String pfname)
+	public static IComponentIdentifier createPlatformIdentifier(String pfname)
 	{
 		// Build platform name.
 		String	platformname	= null; 

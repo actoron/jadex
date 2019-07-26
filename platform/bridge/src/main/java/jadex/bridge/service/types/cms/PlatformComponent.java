@@ -183,7 +183,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  
 	 *  @return A future to indicate when the initialization is done.
 	 */
-	public IFuture<Void>	init()
+	public IFuture<Void> init()
 	{
 //		state = ComponentLifecycleState.INIT;
 		
@@ -191,7 +191,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 //			System.out.println("init of: "+getComponentIdentifier());
 		
 		// Run init on component thread (hack!!! requires that execution feature works before its init)
-		IExecutionFeature exe	= getFeature(IExecutionFeature.class);
+		IExecutionFeature exe = getFeature(IExecutionFeature.class);
 		return exe.scheduleStep(new ImmediateComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
