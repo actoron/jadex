@@ -690,6 +690,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					type = types[0];
 				}
 			}
+			
 			Class<?> serclass = service.getClass();
 
 			BasicService mgmntservice = new BasicService(ia.getId(), type, serclass, null);

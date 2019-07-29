@@ -1,7 +1,6 @@
 package jadex.bpmn.features.impl;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,7 +39,7 @@ public class BpmnProvidedServicesFeature extends ProvidedServicesComponentFeatur
 	 *  Init a service.
 	 *  Overriden to allow for service implementations as BPMN processes using signal events.
 	 */
-	protected Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
+	public Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
 	{
 		Object ret = null;
 		ProvidedServiceImplementation	impl	= info.getImplementation();

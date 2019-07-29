@@ -41,13 +41,14 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
+import jadex.micro.InjectionInfoHolder;
 import jadex.micro.MicroModel;
 import jadex.micro.MicroModel.ServiceInjectionInfo;
 import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.features.IMicroServiceInjectionFeature;
 
 /**
- *  Inject required services into annotated field values.
+ *  Inject required services into annotated field values of the agent.
  *  Performed after subcomponent creation and provided service initialization.
  */
 public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeature	implements IMicroServiceInjectionFeature
@@ -82,6 +83,8 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		String[] sernames = model.getServiceInjectionNames();
 		Stream<Tuple2<String, ServiceInjectionInfo[]>> s = Arrays.stream(sernames).map(sername -> new Tuple2<String, ServiceInjectionInfo[]>(sername, model.getServiceInjections(sername)));
 		Map<String, ServiceInjectionInfo[]> serinfos = s.collect(Collectors.toMap(t -> t.getFirstEntity(), t -> t.getSecondEntity())); 
+
+		//InjectionInfoHolder ii = model.getInjectionInfoHolder();
 		
 		return injectServices(component, agent, sernames, serinfos, model.getModelInfo());
 	}
@@ -118,15 +121,16 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	
 					String sername = (String)SJavaParser.evaluateExpressionPotentially(sernames[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
 					
-					// Uses required service info to search service
-					RequiredServiceInfo	info = model.getService(sername);				
 										
 					for(int j=0; j<infos.length; j++)
 					{
+						// Uses required service info to search service
+						RequiredServiceInfo	info = infos[j].getRequiredServiceInfo()!=null? infos[j].getRequiredServiceInfo(): model.getService(sername);				
+						
 						if(infos[j].getFieldInfo()!=null)
 						{
 							final IFuture<Object> sfut = callgetService(sername, info, component);
-							final Field	f	= infos[j].getFieldInfo().getField(component.getClassLoader());
+							final Field	f = infos[j].getFieldInfo().getField(component.getClassLoader());
 							
 							// todo: what about multi case?
 							// why not add values to a collection as they come?!
@@ -242,6 +246,9 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						{
 							final Method m = SReflect.getAnyMethod(target.getClass(), infos[j].getMethodInfo().getName(), infos[j].getMethodInfo().getParameterTypes(component.getClassLoader()));
 
+							if(m==null)
+								System.out.println("fuck");
+							
 							if(infos[j].isQuery())
 							{
 								@SuppressWarnings("unchecked")

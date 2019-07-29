@@ -10,6 +10,7 @@ import java.util.Map;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
@@ -145,35 +146,35 @@ public class MicroModel extends CacheableKernelModel
 		return ii.getResultInjectionNames();
 	}
 	
-	/**
-	 *  Add an injection field.
-	 *  @param name The name.
-	 *  @param field The field. 
-	 */
-	public void addServiceInjection(String name, FieldInfo field, boolean lazy, boolean query)
-	{
-		ii.addServiceInjection(name, field, lazy, query);
-	}
-	
-	/**
-	 *  Add an injection method.
-	 *  @param name The name.
-	 *  @param method The method. 
-	 */
-	public void addServiceInjection(String name, MethodInfo method)
-	{
-		ii.addServiceInjection(name, method);
-	}
-	
-	/**
-	 *  Add an injection field.
-	 *  @param name The name.
-	 *  @param method The method. 
-	 */
-	public void addServiceInjection(String name, MethodInfo method, boolean query)
-	{
-		ii.addServiceInjection(name, method, query);
-	}
+//	/**
+//	 *  Add an injection field.
+//	 *  @param name The name.
+//	 *  @param field The field. 
+//	 */
+//	public void addServiceInjection(String name, FieldInfo field, boolean lazy, boolean query)
+//	{
+//		ii.addServiceInjection(name, field, lazy, query);
+//	}
+//	
+//	/**
+//	 *  Add an injection method.
+//	 *  @param name The name.
+//	 *  @param method The method. 
+//	 */
+//	public void addServiceInjection(String name, MethodInfo method)
+//	{
+//		ii.addServiceInjection(name, method);
+//	}
+//	
+//	/**
+//	 *  Add an injection field.
+//	 *  @param name The name.
+//	 *  @param method The method. 
+//	 */
+//	public void addServiceInjection(String name, MethodInfo method, boolean query)
+//	{
+//		ii.addServiceInjection(name, method, query);
+//	}
 	
 	/**
 	 *  Get the service injection fields.
@@ -311,35 +312,56 @@ public class MicroModel extends CacheableKernelModel
 	public static class ServiceInjectionInfo
 	{
 		/** The fieldinfo. */
-		protected FieldInfo fieldInfo;
+		protected FieldInfo fieldinfo;
 		
 		/** The methodinfo. */
-		protected MethodInfo methodInfo;
+		protected MethodInfo methodinfo;
 		
 		/** The lazy flag. */
 		protected boolean lazy;
 		
 		/** The query flag. */
 		protected boolean query;
+		
+		/** The required service info. */
+		protected RequiredServiceInfo reqserinfo;
 
 		/**
 		 *  Create a new injection info.
 		 */
-		public ServiceInjectionInfo(FieldInfo fieldInfo, boolean lazy, boolean query)
+		public ServiceInjectionInfo()
 		{
-			this.fieldInfo = fieldInfo;
-			this.lazy = lazy;
-			this.query = query;
 		}
 		
 		/**
 		 *  Create a new injection info.
-		 */
+		 * /
 		public ServiceInjectionInfo(MethodInfo methodInfo, boolean query)
 		{
-			this.methodInfo = methodInfo;
+			this.methodinfo = methodInfo;
 			this.query = query;
-		}
+		}*/
+		
+		/**
+		 *  Create a new injection info.
+		 * /
+		public ServiceInjectionInfo(FieldInfo fieldInfo, boolean lazy, boolean query)
+		{
+			this.fieldinfo = fieldInfo;
+			this.lazy = lazy;
+			this.query = query;
+		}*/
+		
+		/**
+		 *  Create a new injection info.
+		 * /
+		public ServiceInjectionInfo(FieldInfo fieldInfo, boolean lazy, boolean query, RequiredServiceInfo reqserinfo)
+		{
+			this.fieldinfo = fieldInfo;
+			this.lazy = lazy;
+			this.query = query;
+			this.reqserinfo = reqserinfo;
+		}*/
 
 		/**
 		 *  Get the fieldInfo.
@@ -347,16 +369,17 @@ public class MicroModel extends CacheableKernelModel
 		 */
 		public FieldInfo getFieldInfo()
 		{
-			return fieldInfo;
+			return fieldinfo;
 		}
 
 		/**
 		 *  Set the fieldInfo.
 		 *  @param fieldInfo The fieldInfo to set
 		 */
-		public void setFieldInfo(FieldInfo fieldInfo)
+		public ServiceInjectionInfo setFieldInfo(FieldInfo fieldInfo)
 		{
-			this.fieldInfo = fieldInfo;
+			this.fieldinfo = fieldInfo;
+			return this;
 		}
 
 		/**
@@ -365,16 +388,17 @@ public class MicroModel extends CacheableKernelModel
 		 */
 		public MethodInfo getMethodInfo()
 		{
-			return methodInfo;
+			return methodinfo;
 		}
 
 		/**
 		 *  Set the methodInfo.
 		 *  @param methodInfo The methodInfo to set
 		 */
-		public void setMethodInfo(MethodInfo methodInfo)
+		public ServiceInjectionInfo setMethodInfo(MethodInfo methodInfo)
 		{
-			this.methodInfo = methodInfo;
+			this.methodinfo = methodInfo;
+			return this;
 		}
 
 		/**
@@ -390,9 +414,10 @@ public class MicroModel extends CacheableKernelModel
 		 *  Set the lazy.
 		 *  @param lazy The lazy to set
 		 */
-		public void setLazy(boolean lazy)
+		public ServiceInjectionInfo setLazy(boolean lazy)
 		{
 			this.lazy = lazy;
+			return this;
 		}
 
 		/**
@@ -408,9 +433,29 @@ public class MicroModel extends CacheableKernelModel
 		 *  Set the query.
 		 *  @param query The query to set
 		 */
-		public void setQuery(boolean query)
+		public ServiceInjectionInfo setQuery(boolean query)
 		{
 			this.query = query;
+			return this;
+		}
+
+		/**
+		 *  Get the required service info.
+		 *  @return The requiredServiceInfo
+		 */
+		public RequiredServiceInfo getRequiredServiceInfo()
+		{
+			return reqserinfo;
+		}
+
+		/**
+		 *  Set the required service info.
+		 *  @param requiredServiceInfo the requiredServiceInfo to set
+		 */
+		public ServiceInjectionInfo setRequiredServiceInfo(RequiredServiceInfo requiredServiceInfo)
+		{
+			this.reqserinfo = requiredServiceInfo;
+			return this;
 		}
 	}
 }

@@ -40,6 +40,7 @@ import jadex.micro.features.impl.MicroInjectionComponentFeature;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
 import jadex.micro.features.impl.MicroMessageComponentFeature;
 import jadex.micro.features.impl.MicroPojoComponentFeature;
+import jadex.micro.features.impl.MicroProvidedServicesComponentFeature;
 import jadex.micro.features.impl.MicroServiceInjectionComponentFeature;
 
 
@@ -69,7 +70,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			MicroInjectionComponentFeature.FACTORY,
 			MicroServiceInjectionComponentFeature.FACTORY,
 			MicroLifecycleComponentFeature.FACTORY,
-			MicroMessageComponentFeature.FACTORY
+			MicroMessageComponentFeature.FACTORY,
+			MicroProvidedServicesComponentFeature.FACTORY
 		));
 
 	//-------- attributes --------

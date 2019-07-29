@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import jadex.bridge.ServiceCallInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
@@ -40,6 +41,9 @@ public class InjectionInfoHolder
 	
 	/** The service value calls. */
 	protected List<ServiceCallInfo> servicecalls;
+	
+	///** The required services map. */
+	//protected Map<String, RequiredServiceInfo> requiredserviceinfos;
 	
 	/**
 	 *  Add an injection field.
@@ -151,36 +155,48 @@ public class InjectionInfoHolder
 	 *  @param name The name.
 	 *  @param field The field. 
 	 */
-	public void addServiceInjection(String name, FieldInfo field, boolean lazy, boolean query)
+	public void addServiceInjection(String name, ServiceInjectionInfo si)
 	{
 		if(serviceinjections==null)
 			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
-		serviceinjections.add(name, new ServiceInjectionInfo(field, lazy, query));
-	}
-	
-	/**
-	 *  Add an injection method.
-	 *  @param name The name.
-	 *  @param method The method. 
-	 */
-	public void addServiceInjection(String name, MethodInfo method)
-	{
-		if(serviceinjections==null)
-			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
-		serviceinjections.add(name, new ServiceInjectionInfo(method, false));
+		serviceinjections.add(name, si);
 	}
 	
 	/**
 	 *  Add an injection field.
 	 *  @param name The name.
+	 *  @param field The field. 
+	 * /
+	public void addServiceInjection(String name, FieldInfo field, boolean lazy, boolean query)
+	{
+		if(serviceinjections==null)
+			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
+		serviceinjections.add(name, new ServiceInjectionInfo(field, lazy, query));
+	}*/
+	
+	/**
+	 *  Add an injection method.
+	 *  @param name The name.
 	 *  @param method The method. 
-	 */
+	 * /
+	public void addServiceInjection(String name, MethodInfo method)
+	{
+		if(serviceinjections==null)
+			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
+		serviceinjections.add(name, new ServiceInjectionInfo(method, false));
+	}*/
+	
+	/**
+	 *  Add an injection field.
+	 *  @param name The name.
+	 *  @param method The method. 
+	 * /
 	public void addServiceInjection(String name, MethodInfo method, boolean query)
 	{
 		if(serviceinjections==null)
 			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
 		serviceinjections.add(name, new ServiceInjectionInfo(method, query));
-	}
+	}*/
 	
 	/**
 	 *  Get the service injection fields.
@@ -251,5 +267,21 @@ public class InjectionInfoHolder
 	{
 		this.servicecalls = servicecalls;
 	}
+
+	/**
+	 * @return the requiredServiceInfos
+	 * /
+	public Map<String, RequiredServiceInfo> getRequiredServiceInfos()
+	{
+		return requiredserviceinfos;
+	}*/
+
+	/**
+	 * @param requiredServiceInfos the requiredServiceInfos to set
+	 * /
+	public void setRequiredServiceInfos(Map<String, RequiredServiceInfo> requiredServiceInfos)
+	{
+		this.requiredserviceinfos = requiredServiceInfos;
+	}*/
 	
 }

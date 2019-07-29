@@ -60,7 +60,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @ProvidedServices(
 {
-	@ProvidedService(name="cliser", scope=ServiceScope.PLATFORM, type=ICliService.class, implementation=@Implementation(expression="$pojoagent")),
+	@ProvidedService(name="cliser", scope=ServiceScope.PLATFORM, type=ICliService.class),
 	@ProvidedService(type=IInternalCliService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"cliser\")"))
 })
 @RequiredServices(

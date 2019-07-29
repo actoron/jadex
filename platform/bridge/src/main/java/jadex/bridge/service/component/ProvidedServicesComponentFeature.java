@@ -340,7 +340,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	/**
 	 *  Create a service implementation from description.
 	 */
-	protected Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
+	public Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
 	{
 		Object	ser	= null;
 		ProvidedServiceImplementation impl = info.getImplementation();

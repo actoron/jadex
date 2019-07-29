@@ -1,6 +1,5 @@
 package jadex.bdiv3.features.impl;
 
-import java.lang.reflect.Proxy;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,7 +39,7 @@ public class BDIProvidedServicesComponentFeature extends ProvidedServicesCompone
 	 *  Init a service.
 	 *  Overriden to allow for service implementations as BPMN processes using signal events.
 	 */
-	protected Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
+	public Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
 	{
 		// todo: cleanup this HACK!!!
 		if(getComponent().getFeature0(IPojoComponentFeature.class)!=null)
