@@ -19,6 +19,8 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.component.ProvidedServicesComponentFeature;
 import jadex.commons.IValueFetcher;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Overriden to allow for service implementations as BPMN processes using signal events.
@@ -39,9 +41,10 @@ public class BpmnProvidedServicesFeature extends ProvidedServicesComponentFeatur
 	 *  Init a service.
 	 *  Overriden to allow for service implementations as BPMN processes using signal events.
 	 */
-	public Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
+	public IFuture<Object> createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher)
 	{
-		Object ret = null;
+		Future<Object> ret = new Future<Object>();
+		//Object ret = null;
 		ProvidedServiceImplementation	impl	= info.getImplementation();
 		MBpmnModel model = (MBpmnModel)getComponent().getModel().getRawModel();
 		
@@ -90,7 +93,8 @@ public class BpmnProvidedServicesFeature extends ProvidedServicesComponentFeatur
 					{
 						if(methods.containsKey(meths[i]))
 						{
-							throw new RuntimeException("Ambiguous start events found for service method: "+meths[i]);
+							ret.setException(new RuntimeException("Ambiguous start events found for service method: "+meths[i]));
+							return ret;
 						}
 						else
 						{
@@ -101,20 +105,22 @@ public class BpmnProvidedServicesFeature extends ProvidedServicesComponentFeatur
 				
 				if(!methods.containsKey(meths[i].toString()))
 				{
-					throw new RuntimeException("No start event found for service method: "+meths[i]);
+					ret.setException(new RuntimeException("No start event found for service method: "+meths[i]));
+					return ret;
 				}
 			}
 
 //			System.out.println("Found mapping: "+methods);
 			// Todo: interceptors
-			ret = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{info.getType().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports())}, 
+			Object res = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{info.getType().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports())}, 
 				new ProcessServiceInvocationHandler(getInternalAccess(), methods));
+			ret.setResult(res);
 		}
 		
 		// External service implementation
 		else
 		{
-			ret	= super.createServiceImplementation(info, fetcher);
+			super.createServiceImplementation(info, fetcher).delegate(ret);
 		}
 		
 		return ret;

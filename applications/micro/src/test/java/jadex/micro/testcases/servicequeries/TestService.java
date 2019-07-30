@@ -41,13 +41,13 @@ public class TestService implements ITestService
 		{
 			List<IResourceIdentifier> fut = libser.getAllResourceIdentifiers().get();
 			tr2.setSucceeded(true);
-			res.add(tr);
+			res.add(tr2);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 			tr2.setFailed(e);
-			res.add(tr);
+			res.add(tr2);
 		}
 		
 		System.out.println(res);

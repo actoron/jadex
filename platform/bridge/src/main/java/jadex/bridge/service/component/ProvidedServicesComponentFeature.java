@@ -50,6 +50,7 @@ import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -90,93 +91,100 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		try
+		// Collect provided services from model (name or type -> provided service info)
+		ProvidedServiceInfo[] ps = component.getModel().getProvidedServices();
+		Map<Object, ProvidedServiceInfo> sermap = new LinkedHashMap<Object, ProvidedServiceInfo>();
+		for(int i=0; i<ps.length; i++)
 		{
-			// Collect provided services from model (name or type -> provided service info)
-			ProvidedServiceInfo[] ps = component.getModel().getProvidedServices();
-			Map<Object, ProvidedServiceInfo> sermap = new LinkedHashMap<Object, ProvidedServiceInfo>();
-			for(int i=0; i<ps.length; i++)
+			Object key = ps[i].getName()!=null? ps[i].getName(): ps[i].getType().getType(component.getClassLoader(), component.getModel().getAllImports());
+			if(sermap.put(key, ps[i])!=null)
 			{
-				Object key = ps[i].getName()!=null? ps[i].getName(): ps[i].getType().getType(component.getClassLoader(), component.getModel().getAllImports());
-				if(sermap.put(key, ps[i])!=null)
-					throw new RuntimeException("Services with same type must have different name.");  // Is catched and set to ret below
+				ret.setException(new RuntimeException("Services with same type must have different name."));  // Is catched and set to ret below
+				return ret;
 			}
-			
-			// Adapt services to configuration (if any).
-			if(component.getConfiguration()!=null)
+		}
+		
+		// Adapt services to configuration (if any).
+		if(component.getConfiguration()!=null)
+		{
+			ConfigurationInfo cinfo = component.getModel().getConfiguration(component.getConfiguration());
+			ProvidedServiceInfo[] cs = cinfo.getProvidedServices();
+			for(int i=0; i<cs.length; i++)
 			{
-				ConfigurationInfo cinfo = component.getModel().getConfiguration(component.getConfiguration());
-				ProvidedServiceInfo[] cs = cinfo.getProvidedServices();
-				for(int i=0; i<cs.length; i++)
-				{
-					Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType().getType(component.getClassLoader(), component.getModel().getAllImports());
-					ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
-					ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()), 
-						new ProvidedServiceImplementation(cs[i].getImplementation()), 
-						cs[i].getScope()!=null? cs[i].getScope(): psi.getScope(),
-						cs[i].getPublish()!=null? cs[i].getPublish(): psi.getPublish(), 
-						cs[i].getProperties()!=null? cs[i].getProperties() : psi.getProperties());
-					sermap.put(key, newpsi);
-				}
-			}
-			
-			// Add custom service infos from outside.
-			ProvidedServiceInfo[] pinfos = cinfo.getProvidedServiceInfos();
-			for(int i=0; pinfos!=null && i<pinfos.length; i++)
-			{
-				Object key = pinfos[i].getName()!=null? pinfos[i].getName(): pinfos[i].getType().getType(component.getClassLoader(), component.getModel().getAllImports());
+				Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType().getType(component.getClassLoader(), component.getModel().getAllImports());
 				ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
 				ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()), 
-					pinfos[i].getImplementation()!=null? new ProvidedServiceImplementation(pinfos[i].getImplementation()): psi.getImplementation(), 
-					pinfos[i].getScope()!=null? pinfos[i].getScope(): psi.getScope(),
-					pinfos[i].getPublish()!=null? pinfos[i].getPublish(): psi.getPublish(), 
-					pinfos[i].getProperties()!=null? pinfos[i].getProperties() : psi.getProperties());
+					new ProvidedServiceImplementation(cs[i].getImplementation()), 
+					cs[i].getScope()!=null? cs[i].getScope(): psi.getScope(),
+					cs[i].getPublish()!=null? cs[i].getPublish(): psi.getPublish(), 
+					cs[i].getProperties()!=null? cs[i].getProperties() : psi.getProperties());
 				sermap.put(key, newpsi);
 			}
-			
-			// Add external access service when not turned off
-			
-			Map<String, Object> args = getComponent().getInternalAccess().getArguments();
-			Boolean extaarg = (Boolean)args.get("externalaccess");
-			Boolean extaplatarg = (Boolean)((Map<String, Object>)Starter.getPlatformValue(getComponent().getId(), IPlatformConfiguration.PLATFORMARGS)).get("externalaccess");
-			boolean on = extaarg!=null? extaarg.booleanValue(): extaplatarg!=null? extaplatarg.booleanValue(): true;
+		}
+		
+		// Add custom service infos from outside.
+		ProvidedServiceInfo[] pinfos = cinfo.getProvidedServiceInfos();
+		for(int i=0; pinfos!=null && i<pinfos.length; i++)
+		{
+			Object key = pinfos[i].getName()!=null? pinfos[i].getName(): pinfos[i].getType().getType(component.getClassLoader(), component.getModel().getAllImports());
+			ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
+			ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()), 
+				pinfos[i].getImplementation()!=null? new ProvidedServiceImplementation(pinfos[i].getImplementation()): psi.getImplementation(), 
+				pinfos[i].getScope()!=null? pinfos[i].getScope(): psi.getScope(),
+				pinfos[i].getPublish()!=null? pinfos[i].getPublish(): psi.getPublish(), 
+				pinfos[i].getProperties()!=null? pinfos[i].getProperties() : psi.getProperties());
+			sermap.put(key, newpsi);
+		}
+		
+		// Add external access service when not turned off
+		
+		Map<String, Object> args = getComponent().getInternalAccess().getArguments();
+		Boolean extaarg = (Boolean)args.get("externalaccess");
+		Boolean extaplatarg = (Boolean)((Map<String, Object>)Starter.getPlatformValue(getComponent().getId(), IPlatformConfiguration.PLATFORMARGS)).get("externalaccess");
+		boolean on = extaarg!=null? extaarg.booleanValue(): extaplatarg!=null? extaplatarg.booleanValue(): true;
 //			System.out.println("on: "+on+" "+extaarg+" "+extaplatarg);
-			if(on)
-			{
-				ProvidedServiceImplementation impl = new ProvidedServiceImplementation();
-				impl.setValue("$component.getExternalAccess()");
-				// platform external access service will be published network wide, all others only on platform
-				ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, impl, 
-					getComponent().getId().equals(getComponent().getId().getRoot())? ServiceScope.NETWORK: ServiceScope.PLATFORM, null, null);
-				sermap.put("externalaccessservice", psi);
-			}
-			
-			// Instantiate service objects
-			for(ProvidedServiceInfo info: sermap.values())
-			{
-				// support scopeexp="..." or sufficient when custom scope in manual addService(...)?
+		if(on)
+		{
+			ProvidedServiceImplementation impl = new ProvidedServiceImplementation();
+			impl.setValue("$component.getExternalAccess()");
+			// platform external access service will be published network wide, all others only on platform
+			ProvidedServiceInfo psi= new ProvidedServiceInfo("externalaccessservice", IExternalAccess.class, impl, 
+				getComponent().getId().equals(getComponent().getId().getRoot())? ServiceScope.NETWORK: ServiceScope.PLATFORM, null, null);
+			sermap.put("externalaccessservice", psi);
+		}
+		
+		FutureBarrier<Void> bar = new FutureBarrier<>();
+		
+		// Instantiate service objects
+		for(ProvidedServiceInfo info: sermap.values())
+		{
+			// support scopeexp="..." or sufficient when custom scope in manual addService(...)?
 //				ServiceScope scope = info.getScope();
 //				scope = (String)SJavaParser.evaluateExpressionPotentially(scope, component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
 //				info.setScope(scope);
+			final Future<Void> fut = new Future<>();
+			bar.addFuture(fut);
+			
+			final ProvidedServiceImplementation	impl = info.getImplementation();
+			// Virtual service (e.g. promoted)
+			if(impl!=null && impl.getBinding()!=null)
+			{
+				RequiredServiceInfo rsi = new RequiredServiceInfo(BasicService.generateServiceName(info.getType().getType( 
+					component.getClassLoader(), component.getModel().getAllImports()))+":virtual", info.getType().getType(component.getClassLoader(), component.getModel().getAllImports()));
+				IServiceIdentifier sid = BasicService.createServiceIdentifier(component, 
+					rsi.getName(), rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()),
+					BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier(), info.getScope());
+				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
+					component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getId()));
 				
-				final ProvidedServiceImplementation	impl = info.getImplementation();
-				// Virtual service (e.g. promoted)
-				if(impl!=null && impl.getBinding()!=null)
+				addService(service, info);
+				fut.setResult(null);
+			}
+			else
+			{
+				createServiceImplementation(info, getComponent().getFetcher())
+					.thenAccept(ser ->
 				{
-					RequiredServiceInfo rsi = new RequiredServiceInfo(BasicService.generateServiceName(info.getType().getType( 
-						component.getClassLoader(), component.getModel().getAllImports()))+":virtual", info.getType().getType(component.getClassLoader(), component.getModel().getAllImports()));
-					IServiceIdentifier sid = BasicService.createServiceIdentifier(component, 
-						rsi.getName(), rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports()),
-						BasicServiceInvocationHandler.class, component.getModel().getResourceIdentifier(), info.getScope());
-					final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
-						component, sid, rsi, impl.getBinding(), component.getClassLoader(), Starter.isRealtimeTimeout(component.getId()));
-					
-					addService(service, info);
-				}
-				else
-				{
-					Object ser = createServiceImplementation(info, getComponent().getFetcher());
-					
 					// Implementation may null to disable service in some configurations.
 					if(ser!=null)
 					{
@@ -193,7 +201,14 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 								}
 								else
 								{
-									ics[i] = (IServiceInvocationInterceptor)ins[i].getClazz().getType(component.getClassLoader(), component.getModel().getAllImports()).newInstance();
+									try
+									{
+										ics[i] = (IServiceInvocationInterceptor)ins[i].getClazz().getType(component.getClassLoader(), component.getModel().getAllImports()).newInstance();
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+									}
 								}
 							}
 						}
@@ -208,11 +223,16 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 						
 						addService(proxy, info);
 					}
-				}
+					fut.setResult(null);
+					
+				}).exceptionally(e -> fut.setResult(null));
 			}
-			
+		}
+		
+		bar.waitFor().thenAccept(v ->
+		{
 			// Start the services.
-			Collection<IInternalService>	allservices	= getAllServices();
+			Collection<IInternalService> allservices = getAllServices();
 			if(!allservices.isEmpty())
 			{
 				initServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
@@ -221,11 +241,7 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 			{
 				ret.setResult(null);
 			}
-		}
-		catch(Exception e)
-		{
-			ret.setExceptionIfUndone(e);
-		}
+		}).exceptionally(ret);
 		
 		return ret;
 	}
@@ -340,8 +356,10 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 	/**
 	 *  Create a service implementation from description.
 	 */
-	public Object createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) throws Exception
+	public IFuture<Object> createServiceImplementation(ProvidedServiceInfo info, IValueFetcher fetcher) 
 	{
+		final Future<Object> ret = new Future<>();
+		
 		Object	ser	= null;
 		ProvidedServiceImplementation impl = info.getImplementation();
 		if(impl!=null && impl.getValue()!=null)
@@ -355,38 +373,43 @@ public class ProvidedServicesComponentFeature extends AbstractComponentFeature i
 //				System.out.println("sertype: "+fetcher.fetchValue("$servicetype")+" "+info.getName());
 				ser = SJavaParser.getParsedValue(impl, component.getModel().getAllImports(), fetcher, component.getClassLoader());
 //				System.out.println("added: "+ser+" "+model.getName());
+				ret.setResult(ser);
 			}
 			catch(RuntimeException e)
 			{
 //				e.printStackTrace();
-				throw new RuntimeException("Service creation error: "+info, e);
+				ret.setException(new RuntimeException("Service creation error: "+info, e));
 			}
 		}
 		else if(impl!=null && impl.getClazz()!=null)
 		{
 			if(impl.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports())!=null)
 			{
-				ser = impl.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports()).newInstance();
-			}
-			else
-			{
 				try
 				{
-					Class.forName("jadex.extension.rs.publish.JettyRestPublishService");
+					ser = impl.getClazz().getType(component.getClassLoader(), component.getModel().getAllImports()).newInstance();
+					ret.setResult(ser);
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					ret.setException(e);
 				}
-				throw new RuntimeException("Could not load service implementation class: "+impl.getClazz());
 			}
+			else
+			{
+				ret.setException(new RuntimeException("Could not load service implementation class: "+impl.getClazz()));
+			}
+		}
+		else
+		{
+			ret.setResult(null);
 		}
 //		else if(IExternalAccess.class.equals(info.getType().getType(getComponent().getClassLoader())))
 //		{
 //			ser = getComponent().getExternalAccess();
 //		}
 		
-		return ser;
+		return ret;
 	}
 	
 	/**

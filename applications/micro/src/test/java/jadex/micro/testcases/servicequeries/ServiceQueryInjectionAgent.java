@@ -37,9 +37,11 @@ public class ServiceQueryInjectionAgent extends JunitAgentTest
 		TestReport[] trs = ts.test().get();
 		
 		final Testcase tc = new Testcase();
+		tc.setTestCount(trs.length);
 		tc.setReports(trs);
 
 		agent.getResults().put("testresults", tc);
+		ret.setResult(null);
 		
 		return ret;
 	}
