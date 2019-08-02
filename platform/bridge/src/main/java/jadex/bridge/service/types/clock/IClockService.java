@@ -15,7 +15,7 @@ import jadex.commons.concurrent.IThreadPool;
  */
 @Excluded
 @Service(system=true)
-public interface IClockService extends IService
+public interface IClockService //extends IService
 {
 	/** Platform value key for flag if the clock is a simulation clock. */
 	public static final String SIMULATION_CLOCK_FLAG = "simclock";

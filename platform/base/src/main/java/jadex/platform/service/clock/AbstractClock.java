@@ -129,7 +129,7 @@ public abstract class AbstractClock implements IClock
 	/**
 	 *  Transfer state from another clock to this clock.
 	 */
-	protected void copyFromClock(IClock oldclock)
+	public void copyFromClock(IClock oldclock)
 	{
 		if(IClock.STATE_RUNNING.equals(state))
 			throw new RuntimeException("Cannot copy entries, while clock is running.");
