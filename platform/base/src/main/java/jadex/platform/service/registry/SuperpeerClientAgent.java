@@ -285,7 +285,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				if(manager.superpeer!=null)
 				{
 					if(debug(query))
-						System.out.println(agent+" searchServices() at superpeer: "+manager.superpeer);
+						System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+": "+query);
 					
 					foundsuperpeer	= true;
 					// Todo: remember searches for termination? -> more efficient to just let searches run out an ignore result?
@@ -297,7 +297,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						public void exceptionOccurred(Exception exception)
 						{
 							if(debug(query))
-								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" failed: "+exception);
+								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" failed: "+exception+", "+query);
 
 							if(track.decrementAndGet()==0)
 							{
@@ -309,7 +309,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 						public void resultAvailable(Set<IServiceIdentifier> result)
 						{
 							if(debug(query))
-								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" succeeded: "+result);
+								System.out.println(agent+" searchServices() at superpeer "+manager.superpeer+" succeeded: "+result+", "+query);
 
 							
 							if(!ret.isDone())
@@ -389,28 +389,28 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		
 		long timeout = ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
 		if(debug(query))
-			System.out.println(agent+" searchRemoteServices: timeout="+timeout+", time="+System.currentTimeMillis());			
+			System.out.println(agent+" searchRemoteServices: timeout="+timeout+", time="+System.currentTimeMillis()+", "+query);			
 		
 		// Check for awareness service
-		Collection<IAwarenessService>	pawas	= agent.getFeature(IRequiredServicesFeature.class)
+		Collection<IAwarenessService>	awas	= agent.getFeature(IRequiredServicesFeature.class)
 			.searchLocalServices(new ServiceQuery<>(IAwarenessService.class));
-		if(!pawas.isEmpty())
+		if(!awas.isEmpty())
 		{
 			// Count awa search + platform searches (+ async filtering, if any).
-			final AtomicInteger	cnt	= new AtomicInteger(pawas.size());
+			final AtomicInteger	cnt	= new AtomicInteger(awas.size());
 			SlidingCuckooFilter	filter	= new SlidingCuckooFilter();
 			
-			for(IAwarenessService pawa: pawas)
+			for(IAwarenessService awa: awas)
 			{
 				if(debug(query))
-					System.out.println(agent+" pawa.searchPlatforms(): "+pawa);
+					System.out.println(agent+" awa.searchPlatforms(): "+awa+", "+query);
 				
 				// Search for other platforms
 				if(timeout>0)
 				{
 					ServiceCall.getOrCreateNextInvocation().setTimeout((long)(timeout*0.9));
 				}
-				pawa.searchPlatforms().addResultListener(new IntermediateDefaultResultListener<IComponentIdentifier>()
+				awa.searchPlatforms().addResultListener(new IntermediateDefaultResultListener<IComponentIdentifier>()
 				{
 					@Override
 					public void intermediateResultAvailable(final IComponentIdentifier platform)
@@ -436,7 +436,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								to	= Math.min(to, Math.max(1, timeout-1000));	// At least 1 sec. less thamn original timeout (hack for very small timeouts, e.g. in test cases)
 								ServiceCall.getOrCreateNextInvocation().setTimeout(to);
 								if(debug(query))
-									System.out.println(agent + " searching remote platform: "+platform+", timeout="+to+", time="+System.currentTimeMillis());
+									System.out.println(agent + " searching remote platform: "+platform+", timeout="+to+", time="+System.currentTimeMillis()+", "+query);
 							}
 							if(debug(query))
 								System.out.println(agent + " searching remote platform: "+platform+", "+query);
@@ -450,7 +450,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 //									try
 //									{
 										if(debug(query))
-											System.out.println(agent + " searched remote platform: "+platform+", "+result+", timeout="+timeout+", time="+System.currentTimeMillis());
+											System.out.println(agent + " searched remote platform: "+platform+", "+result+", timeout="+timeout+", time="+System.currentTimeMillis()+", "+query);
 //									}
 //									catch(RuntimeException e)
 //									{
@@ -474,7 +474,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 								public void exceptionOccurred(Exception exception)
 								{
 									if(debug(query))
-										System.out.println(agent + " searched remote platform: "+platform+", "+exception);
+										System.out.println(agent + " searched remote platform: "+platform+", "+exception+", "+query);
 									doFinished();
 								}
 							});
@@ -485,7 +485,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					public void finished()
 					{
 						if(debug(query))
-							System.out.println(agent+" pawa.searchPlatforms() done: "+pawa);
+							System.out.println(agent+" awa.searchPlatforms() done: "+awa+", "+query);
 						doFinished();
 					}
 					
@@ -493,7 +493,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					public void exceptionOccurred(Exception exception)
 					{
 						if(debug(query))
-							System.out.println(agent+" pawa.searchPlatforms() exception: "+pawa+", "+exception);
+							System.out.println(agent+" awa.searchPlatforms() exception: "+awa+", "+exception+", "+query);
 						// ignore exception
 						doFinished();
 					}
@@ -528,7 +528,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		long timeout = 500;	
 		
 		// Check for awareness service
-		Collection<IAwarenessService> pawas = agent.getFeature(IRequiredServicesFeature.class)
+		Collection<IAwarenessService> awas = agent.getFeature(IRequiredServicesFeature.class)
 			.searchLocalServices(new ServiceQuery<>(IAwarenessService.class));
 		Set<IComponentIdentifier> platforms = new HashSet<IComponentIdentifier>();
 		
@@ -545,17 +545,17 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		}
 		else
 		{
-			for(IAwarenessService pawa: pawas)
+			for(IAwarenessService awa: awas)
 			{
 				if(debug(query))
-					System.out.println(agent+" pawa.searchPlatformsFast(): "+pawa);
+					System.out.println(agent+" awa.searchPlatformsFast(): "+awa+", "+query);
 				
 				// Search for other platforms
 				
 				ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
 				Future<Void> done = new Future<Void>();
 				pfbar.addFuture(done);
-				pawa.searchPlatformsFast().addResultListener(new IResultListener<Set<IComponentIdentifier>>()
+				awa.searchPlatformsFast().addResultListener(new IResultListener<Set<IComponentIdentifier>>()
 				{
 					@Override
 					public void resultAvailable(final Set<IComponentIdentifier> results)
@@ -693,7 +693,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		}
 		else if(debugservices instanceof String)
 		{
-			// String comparision: one of the comma separated strings in <debugservices> contained in <query.toString()>
+			// String comparison: one of the comma separated strings in <debugservices> contained in <query.toString()>
 			String	squery	= query.toString();
 			return Arrays.stream(((String)debugservices).split(","))
 				.anyMatch(s -> squery.indexOf(s.trim())!=-1);
