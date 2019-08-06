@@ -10,6 +10,7 @@ import java.util.Map;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
@@ -26,32 +27,14 @@ public class MicroModel extends CacheableKernelModel
 	/** The micro agent class. */
 	protected ClassInfo pojoclass;
 	
-	/** The agent injection targets. */
-	protected List<FieldInfo> agentinjections;
-
-	/** The parent injection targets. */
-	protected List<FieldInfo> parentinjections;
-
-	/** The argument injection targets. */
-	protected MultiCollection<String, Tuple2<FieldInfo, String>> argumentinjections;
-
-	/** The result injection targets. */
-	protected Map<String, Tuple3<FieldInfo, String, String>> resultinjections;
-	
-	/** The service injection targets. */
-	protected MultiCollection<String, ServiceInjectionInfo> serviceinjections;
-	
-	/** The feature injection targets. */
-	protected List<FieldInfo> featureinjections;
-	
 	/** The class loader. */
 	protected ClassLoader classloader;
 	
 	/** The agent methods for given annotations (if any). */
 	protected Map<Class<? extends Annotation>, MethodInfo>	agentmethods;
 	
-	/** The service value calls. */
-	protected List<ServiceCallInfo> servicecalls;
+	/** The injection info. */
+	protected InjectionInfoHolder ii;
 	
 	/**
 	 *  Create a new model.
@@ -59,6 +42,16 @@ public class MicroModel extends CacheableKernelModel
 	public MicroModel(IModelInfo modelinfo)
 	{
 		super(modelinfo);
+		this.ii = new InjectionInfoHolder();
+	}
+	
+	/**
+	 *  Get the injection info holder.
+	 *  @return The injection info.
+	 */
+	public InjectionInfoHolder getInjectionInfoHolder()
+	{
+		return ii;
 	}
 
 	/**
@@ -67,9 +60,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public void addAgentInjection(FieldInfo field)
 	{
-		if(agentinjections==null)
-			agentinjections = new ArrayList<FieldInfo>();
-		agentinjections.add(field);
+		ii.addAgentInjection(field);
 	}
 	
 	/**
@@ -78,7 +69,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public FieldInfo[] getAgentInjections()
 	{
-		return agentinjections==null? new FieldInfo[0]: (FieldInfo[])agentinjections.toArray(new FieldInfo[agentinjections.size()]);
+		return ii.getAgentInjections();
 	}
 	
 	/**
@@ -87,9 +78,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public void addParentInjection(FieldInfo field)
 	{
-		if(parentinjections==null)
-			parentinjections = new ArrayList<FieldInfo>();
-		parentinjections.add(field);
+		ii.addParentInjection(field);
 	}
 	
 	/**
@@ -98,7 +87,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public FieldInfo[] getParentInjections()
 	{
-		return parentinjections==null? new FieldInfo[0]: (FieldInfo[])parentinjections.toArray(new FieldInfo[parentinjections.size()]);
+		return ii.getParentInjections();
 	}
 	
 	/**
@@ -108,9 +97,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public void addArgumentInjection(String name, FieldInfo field, String convert)
 	{
-		if(argumentinjections==null)
-			argumentinjections = new MultiCollection<String, Tuple2<FieldInfo, String>>();
-		argumentinjections.add(name, new Tuple2<FieldInfo, String>(field, convert!=null && convert.length()==0? null: convert));
+		ii.addArgumentInjection(name, field, convert);
 	}
 	
 	/**
@@ -119,8 +106,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public Tuple2<FieldInfo, String>[] getArgumentInjections(String name)
 	{
-		Collection col = argumentinjections==null? null: (Collection)argumentinjections.get(name);
-		return col==null? new Tuple2[0]: (Tuple2<FieldInfo, String>[])col.toArray(new Tuple2[col.size()]);
+		return ii.getArgumentInjections(name);
 	}
 	
 	/**
@@ -129,8 +115,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public String[] getArgumentInjectionNames()
 	{
-		return argumentinjections==null? SUtil.EMPTY_STRING_ARRAY: 
-			(String[])argumentinjections.keySet().toArray(new String[argumentinjections.size()]);
+		return ii.getArgumentInjectionNames();
 	}
 	
 	/**
@@ -140,11 +125,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public void addResultInjection(String name, FieldInfo field, String convert, String convback)
 	{
-		if(resultinjections==null)
-			resultinjections = new HashMap<String, Tuple3<FieldInfo, String, String>>();
-		resultinjections.put(name, new Tuple3<FieldInfo, String, String>(field, 
-			convert!=null && convert.length()==0? null: convert,
-			convback!=null && convback.length()==0? null: convback));
+		ii.addResultInjection(name, field, convert, convback);
 	}
 	
 	/**
@@ -153,7 +134,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public Tuple3<FieldInfo, String, String> getResultInjection(String name)
 	{
-		return resultinjections==null? null: (Tuple3<FieldInfo, String, String>)resultinjections.get(name);
+		return ii.getResultInjection(name);
 	}
 	
 	/**
@@ -162,45 +143,38 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public String[] getResultInjectionNames()
 	{
-		return resultinjections==null? SUtil.EMPTY_STRING_ARRAY: 
-			(String[])resultinjections.keySet().toArray(new String[resultinjections.size()]);
+		return ii.getResultInjectionNames();
 	}
 	
-	/**
-	 *  Add an injection field.
-	 *  @param name The name.
-	 *  @param field The field. 
-	 */
-	public void addServiceInjection(String name, FieldInfo field, boolean lazy, boolean query)
-	{
-		if(serviceinjections==null)
-			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
-		serviceinjections.add(name, new ServiceInjectionInfo(field, lazy, query));
-	}
-	
-	/**
-	 *  Add an injection method.
-	 *  @param name The name.
-	 *  @param method The method. 
-	 */
-	public void addServiceInjection(String name, MethodInfo method)
-	{
-		if(serviceinjections==null)
-			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
-		serviceinjections.add(name, new ServiceInjectionInfo(method, false));
-	}
-	
-	/**
-	 *  Add an injection field.
-	 *  @param name The name.
-	 *  @param method The method. 
-	 */
-	public void addServiceInjection(String name, MethodInfo method, boolean query)
-	{
-		if(serviceinjections==null)
-			serviceinjections = new MultiCollection<String, ServiceInjectionInfo>();
-		serviceinjections.add(name, new ServiceInjectionInfo(method, query));
-	}
+//	/**
+//	 *  Add an injection field.
+//	 *  @param name The name.
+//	 *  @param field The field. 
+//	 */
+//	public void addServiceInjection(String name, FieldInfo field, boolean lazy, boolean query)
+//	{
+//		ii.addServiceInjection(name, field, lazy, query);
+//	}
+//	
+//	/**
+//	 *  Add an injection method.
+//	 *  @param name The name.
+//	 *  @param method The method. 
+//	 */
+//	public void addServiceInjection(String name, MethodInfo method)
+//	{
+//		ii.addServiceInjection(name, method);
+//	}
+//	
+//	/**
+//	 *  Add an injection field.
+//	 *  @param name The name.
+//	 *  @param method The method. 
+//	 */
+//	public void addServiceInjection(String name, MethodInfo method, boolean query)
+//	{
+//		ii.addServiceInjection(name, method, query);
+//	}
 	
 	/**
 	 *  Get the service injection fields.
@@ -208,8 +182,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public ServiceInjectionInfo[] getServiceInjections(String name)
 	{
-		Collection<ServiceInjectionInfo> col = serviceinjections==null? null: serviceinjections.get(name);
-		return col==null? new ServiceInjectionInfo[0]: (ServiceInjectionInfo[])col.toArray(new ServiceInjectionInfo[col.size()]);
+		return ii.getServiceInjections(name);
 	}
 	
 	/**
@@ -218,8 +191,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public String[] getServiceInjectionNames()
 	{
-		return serviceinjections==null? SUtil.EMPTY_STRING_ARRAY: 
-			(String[])serviceinjections.keySet().toArray(new String[serviceinjections.size()]);
+		return ii.getServiceInjectionNames();
 	}
 	
 	/**
@@ -229,9 +201,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public void addFeatureInjection(String name, FieldInfo field)
 	{
-		if(featureinjections==null)
-			featureinjections = new ArrayList<FieldInfo>();
-		featureinjections.add(field);
+		ii.addFeatureInjection(name, field);
 	}
 	
 	/**
@@ -240,7 +210,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public FieldInfo[] getFeatureInjections()
 	{
-		return featureinjections==null? new FieldInfo[0]: (FieldInfo[])featureinjections.toArray(new FieldInfo[featureinjections.size()]);
+		return ii.getFeatureInjections();
 	}
 	
 	/**
@@ -250,9 +220,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public void addServiceCall(ServiceCallInfo call)
 	{
-		if(servicecalls==null)
-			servicecalls = new ArrayList<ServiceCallInfo>();
-		servicecalls.add(call);
+		ii.addServiceCall(call);
 	}
 	
 	/**
@@ -261,7 +229,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public List<ServiceCallInfo> getServiceCalls()
 	{
-		return servicecalls;
+		return ii.getServiceCalls();
 	}
 	
 	/**
@@ -269,7 +237,7 @@ public class MicroModel extends CacheableKernelModel
 	 */
 	public void setServiceCalls(List<ServiceCallInfo> servicecalls)
 	{
-		this.servicecalls = servicecalls;
+		ii.setServiceCalls(servicecalls);
 	}
 	
 	/**
@@ -344,35 +312,56 @@ public class MicroModel extends CacheableKernelModel
 	public static class ServiceInjectionInfo
 	{
 		/** The fieldinfo. */
-		protected FieldInfo fieldInfo;
+		protected FieldInfo fieldinfo;
 		
 		/** The methodinfo. */
-		protected MethodInfo methodInfo;
+		protected MethodInfo methodinfo;
 		
 		/** The lazy flag. */
 		protected boolean lazy;
 		
 		/** The query flag. */
 		protected boolean query;
+		
+		/** The required service info. */
+		protected RequiredServiceInfo reqserinfo;
 
 		/**
 		 *  Create a new injection info.
 		 */
-		public ServiceInjectionInfo(FieldInfo fieldInfo, boolean lazy, boolean query)
+		public ServiceInjectionInfo()
 		{
-			this.fieldInfo = fieldInfo;
-			this.lazy = lazy;
-			this.query = query;
 		}
 		
 		/**
 		 *  Create a new injection info.
-		 */
+		 * /
 		public ServiceInjectionInfo(MethodInfo methodInfo, boolean query)
 		{
-			this.methodInfo = methodInfo;
+			this.methodinfo = methodInfo;
 			this.query = query;
-		}
+		}*/
+		
+		/**
+		 *  Create a new injection info.
+		 * /
+		public ServiceInjectionInfo(FieldInfo fieldInfo, boolean lazy, boolean query)
+		{
+			this.fieldinfo = fieldInfo;
+			this.lazy = lazy;
+			this.query = query;
+		}*/
+		
+		/**
+		 *  Create a new injection info.
+		 * /
+		public ServiceInjectionInfo(FieldInfo fieldInfo, boolean lazy, boolean query, RequiredServiceInfo reqserinfo)
+		{
+			this.fieldinfo = fieldInfo;
+			this.lazy = lazy;
+			this.query = query;
+			this.reqserinfo = reqserinfo;
+		}*/
 
 		/**
 		 *  Get the fieldInfo.
@@ -380,16 +369,17 @@ public class MicroModel extends CacheableKernelModel
 		 */
 		public FieldInfo getFieldInfo()
 		{
-			return fieldInfo;
+			return fieldinfo;
 		}
 
 		/**
 		 *  Set the fieldInfo.
 		 *  @param fieldInfo The fieldInfo to set
 		 */
-		public void setFieldInfo(FieldInfo fieldInfo)
+		public ServiceInjectionInfo setFieldInfo(FieldInfo fieldInfo)
 		{
-			this.fieldInfo = fieldInfo;
+			this.fieldinfo = fieldInfo;
+			return this;
 		}
 
 		/**
@@ -398,16 +388,17 @@ public class MicroModel extends CacheableKernelModel
 		 */
 		public MethodInfo getMethodInfo()
 		{
-			return methodInfo;
+			return methodinfo;
 		}
 
 		/**
 		 *  Set the methodInfo.
 		 *  @param methodInfo The methodInfo to set
 		 */
-		public void setMethodInfo(MethodInfo methodInfo)
+		public ServiceInjectionInfo setMethodInfo(MethodInfo methodInfo)
 		{
-			this.methodInfo = methodInfo;
+			this.methodinfo = methodInfo;
+			return this;
 		}
 
 		/**
@@ -423,9 +414,10 @@ public class MicroModel extends CacheableKernelModel
 		 *  Set the lazy.
 		 *  @param lazy The lazy to set
 		 */
-		public void setLazy(boolean lazy)
+		public ServiceInjectionInfo setLazy(boolean lazy)
 		{
 			this.lazy = lazy;
+			return this;
 		}
 
 		/**
@@ -441,9 +433,29 @@ public class MicroModel extends CacheableKernelModel
 		 *  Set the query.
 		 *  @param query The query to set
 		 */
-		public void setQuery(boolean query)
+		public ServiceInjectionInfo setQuery(boolean query)
 		{
 			this.query = query;
+			return this;
+		}
+
+		/**
+		 *  Get the required service info.
+		 *  @return The requiredServiceInfo
+		 */
+		public RequiredServiceInfo getRequiredServiceInfo()
+		{
+			return reqserinfo;
+		}
+
+		/**
+		 *  Set the required service info.
+		 *  @param requiredServiceInfo the requiredServiceInfo to set
+		 */
+		public ServiceInjectionInfo setRequiredServiceInfo(RequiredServiceInfo requiredServiceInfo)
+		{
+			this.reqserinfo = requiredServiceInfo;
+			return this;
 		}
 	}
 }

@@ -629,7 +629,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	}
 	
 	/**
-	 *  Create a basic invocation handler.
+	 *  Create a basic invocation handler for a provided service.
 	 */
 	protected static BasicServiceInvocationHandler createProvidedHandler(String name, IInternalAccess ia, Class<?> type, Object service, ProvidedServiceInfo info, ServiceScope scope)
 	{
@@ -690,6 +690,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 					type = types[0];
 				}
 			}
+			
 			Class<?> serclass = service.getClass();
 
 			BasicService mgmntservice = new BasicService(ia.getId(), type, serclass, null);

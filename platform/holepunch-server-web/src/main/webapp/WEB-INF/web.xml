@@ -3,14 +3,14 @@
   <display-name>actoron-holepunch-server-web</display-name>
   <servlet>
     <servlet-name>HolepunchServlet</servlet-name>
-    <servlet-class>com.actoron.udp.holepunching.server.web.HpServlet</servlet-class>
+    <servlet-class>org.activecomponents.udp.holepunching.server.web.HpServlet</servlet-class>
   </servlet>
   <servlet>
   	<description>
   	</description>
   	<display-name>HpServlet</display-name>
   	<servlet-name>HpServlet</servlet-name>
-  	<servlet-class>com.actoron.udp.holepunching.server.web.HpServlet</servlet-class>
+  	<servlet-class>org.activecomponents.udp.holepunching.server.web.HpServlet</servlet-class>
   </servlet>
   <servlet-mapping>
   	<servlet-name>HpServlet</servlet-name>
@@ -18,7 +18,7 @@
   </servlet-mapping>
   <listener>
   	<listener-class>
-  		com.actoron.udp.holepunching.server.web.HpServletContextListener
+  		org.activecomponents.udp.holepunching.server.web.HpServletContextListener
   	</listener-class>
   </listener>
 </web-app>

@@ -725,9 +725,19 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		List<Tuple2<String, String[]>> spec = ((QueryInfoExtractor) queries.getKeyExtractor()).getIndexerSpec(ser);
-		
-		Set<ServiceQueryInfo<?>> sqis = queries.getValuesInverted(spec);
+		List<Tuple2<String, String[]>> spec = null;
+		Set<ServiceQueryInfo<?>> sqis = null;
+		rwlock.readLock().lock();
+		try
+		{
+			spec = ((QueryInfoExtractor) queries.getKeyExtractor()).getIndexerSpec(ser);
+			
+			sqis = queries.getValuesInverted(spec);
+		}
+		finally
+		{
+			rwlock.readLock().unlock();
+		}
 		
 //		Set<ServiceQueryInfo<?>> r1 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, ser.getServiceType().toString());
 //		Set<ServiceQueryInfo<?>> r2 = queries.getValues(QueryInfoExtractor.KEY_TYPE_INTERFACE, "null");

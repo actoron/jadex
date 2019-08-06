@@ -36,7 +36,9 @@ public class STest
     public static IPlatformConfiguration getLocalTestConfig(String test)
     {
         IPlatformConfiguration config = PlatformConfigurationHandler.getMinimal();
-		config.setPlatformName(test+"-"+platno.getAndIncrement());
+        // Don't use testcase name as platform name, it contains slashes and clashes with path management.
+		//config.setPlatformName(test+"-"+platno.getAndIncrement());
+		config.setPlatformName("test"+"-"+platno.getAndIncrement());
 
         // Do not use multi factory as it is much too slow now :(
 //		config.setValue("kernel_multi", true);
@@ -86,6 +88,7 @@ public class STest
 		config.setSuperpeerClient(true);
 		config.setValue("intravmawareness", true);
         config.setValue("intravm", true);
+        config.setValue("security.handshaketimeoutscale", 0.2);
         config.getExtendedPlatformConfiguration().setSecurity(true);
 		config.setNetworkNames(new String[] { testnetwork_name });
 		config.setNetworkSecrets(new String[] { testnetwork_pass });

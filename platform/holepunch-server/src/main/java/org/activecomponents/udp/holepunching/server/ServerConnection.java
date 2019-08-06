@@ -302,7 +302,7 @@ public class ServerConnection implements Runnable, IConnectedHost, IRegisteredHo
 		
 		COMMAND_CLASSNAMES_WEB.addAll(classnames);
 		COMMAND_CLASSNAMES_WEB.remove("Register");
-		COMMAND_CLASSNAMES_WEB.add("com.actoron.udp.holepunching.server.webcommands.Register");
-		COMMAND_CLASSNAMES_WEB.add("com.actoron.udp.holepunching.server.webcommands.Listen");
+		COMMAND_CLASSNAMES_WEB.add("org.activecomponents.udp.holepunching.server.webcommands.Register");
+		COMMAND_CLASSNAMES_WEB.add("org.activecomponents.udp.holepunching.server.webcommands.Listen");
 	}
 }

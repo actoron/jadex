@@ -29,7 +29,7 @@ import jadex.micro.annotation.RequiredServices;
  *  The watchdog agent pings other watchdogs and issues an action,
  *  when a watchdog becomes unavailable.
  */
-@ProvidedServices(@ProvidedService(type=IWatchdogService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IWatchdogService.class))
 @RequiredServices(@RequiredService(name="watchdogs", type=IWatchdogService.class, multiple=true, scope=ServiceScope.GLOBAL))
 @Arguments(@Argument(clazz=long.class, name="delay", description="Delay between pings.", defaultvalue="3000"))
 @Service

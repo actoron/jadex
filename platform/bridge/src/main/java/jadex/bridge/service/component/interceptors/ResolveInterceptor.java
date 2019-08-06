@@ -1,13 +1,16 @@
 package jadex.bridge.service.component.interceptors;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
@@ -16,7 +19,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ProxyFactory;
 import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -25,9 +27,11 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.serialization.ISerializationServices;
+import jadex.commons.Base64;
 import jadex.commons.IParameterGuesser;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -65,6 +69,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			INVOKE_METHOD = IService.class.getMethod("invokeMethod", new Class[]{String.class, ClassInfo[].class, Object[].class, ClassInfo.class});
 			SERVICEMETHODS = new HashSet<Method>();
 			SERVICEMETHODS.add(IService.class.getMethod("getServiceId", new Class[0]));
+			SERVICEMETHODS.add(IService.class.getMethod("getMethodInfos", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
 
@@ -111,10 +116,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
 		final Future<Void> ret = new Future<Void>();
-		
-//		if(sic.getMethod().getName().indexOf("invoke")!=-1)
-//			System.out.println("herere");
-		
+				
 		Object service = sic.getObject();
 		if(service instanceof ServiceInfo)
 		{
@@ -142,52 +144,34 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				Object[] as = (Object[])args.get(2);
 				//ClassInfo rettype = (ClassInfo)args.get(3);
 				
-				Method m = BasicService.getInvokeMethod(si.getDomainService().getClass(), ia.getClassLoader(), methodname, argtypes);
+				//if(methodname.indexOf("getNF")!=-1)
+				//	System.out.println("herere");
 				
-				if(m!=null)
+				// todo: always try decoding strings with json?
+				if(as!=null)
 				{
-					if(argtypes==null)
+					for(int i=0; i<as.length; i++)
 					{
-						Class<?>[] cls = m.getParameterTypes();
-						argtypes = new ClassInfo[cls.length];
-						for(int i=0; i<argtypes.length; i++)
+						if(as[i] instanceof String)
 						{
-							argtypes[i] = new ClassInfo(cls[i]);
-						}
-					}
-					
-					for(int i=0; i<argtypes.length; i++)
-					{
-						Class<?> target = argtypes[i].getType(ia.getClassLoader());
-						
-						Object cval = as[i];
-						
-						if(as[i]!=null && !SReflect.isSupertype(target, as[i].getClass()))
-						{
-							if(as[i] instanceof String)
+							try
 							{
-								//SerializationServices.getSerializationServices();
-								ISerializationServices ser = (ISerializationServices)Starter.getPlatformValue(ia.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
-								Map<String, IStringConverter> convs = ser.getStringConverters();
-								
-								// todo: make more generic (should save expected format so that it has not to try out)
-								IStringConverter c = convs.get(IStringConverter.TYPE_BASIC);
-								cval = c.convertString((String)as[i], target, ia.getClassLoader(), null);
-								
-								if(cval==null)
-								{
-									c = convs.get(IStringConverter.TYPE_JSON);
-									cval = c.convertString((String)as[i], target, ia.getClassLoader(), null);
-								}
+								Object val = convertFromJsonString((String)as[i], null);
+								as[i] = val;
+							}
+							catch(Exception e)
+							{
 							}
 						}
-						
-						if(cval!=null)
-							as[i] = cval;
 					}
+				}
 				
-					sic.setMethod(m);
-					sic.setArguments(SUtil.arrayToList(as));
+				Tuple2<java.lang.reflect.Method, Object[]> res = findMethod(as, argtypes, si.getDomainService().getClass(), methodname);
+				
+				if(res.getFirstEntity()!=null)
+				{
+					sic.setMethod(res.getFirstEntity());
+					sic.setArguments(SUtil.arrayToList(res.getSecondEntity()));
 					sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
 				}
 				else
@@ -347,4 +331,420 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		return ret;
 	}
 	
+	/**
+	 *  Find the correct method by its name and parameter values.
+	 *  The parameter values are half-evaluated, i.e. if they are
+	 *  deserialized as far as possible. Still serialized parameters
+	 *  are saved as SerialiedObject. Those are deserialized using
+	 *  the parameter class as hint.
+	 *
+	 *  @param decparams Partially decoded parameters.
+	 *  @param serclazz The target class.
+	 *  @param methodname The method name
+	 *  @return The method and further decoded parameters.
+	 */
+	protected Tuple2<java.lang.reflect.Method, Object[]> findMethod(Object[] params, ClassInfo[] argtypes, Class<?> serclazz, String methodname)
+	{
+		java.lang.reflect.Method ret = null;
+		java.lang.reflect.Method[] ms = null;
+		
+		if(argtypes!=null)
+		{
+//			Class<?>[] types = new Class[argtypes.length];
+//			for(int i=0; i<argtypes.length; i++)
+//				types[i] = argtypes[i].getType(ia.getClassLoader());
+//			ms = new java.lang.reflect.Method[1];
+//			ms[0] = SReflect.getMethod(serclazz, methodname, types);
+			
+			List<Method> okms = new ArrayList<>();
+			ms = SReflect.getMethods(serclazz, methodname);
+			for(int i=0; i<ms.length; i++)
+			{
+				Class<?>[] pts = ms[i].getParameterTypes();
+				boolean ok = true;
+				for(int j=0; j<pts.length && j<argtypes.length; j++)
+				{
+					if(!new ClassInfo(pts[j]).equals(argtypes[j]))
+						ok = false;
+				}
+				if(ok)
+					okms.add(ms[i]);
+			}
+		}
+		else
+		{
+			ms = SReflect.getMethods(serclazz, methodname);
+		}
+		
+		Object[] pvals = null;
+
+		if(ms.length==1)
+		{
+			ret = ms[0];
+		}
+		else if(ms.length>1)
+		{
+			// Find the 'best' method
+
+			// First check the number of arguments
+			Set<java.lang.reflect.Method> msok = new HashSet<java.lang.reflect.Method>();
+			Set<java.lang.reflect.Method> msmaybeok = new HashSet<java.lang.reflect.Method>();
+
+			for(java.lang.reflect.Method tmp1: ms)
+			{
+				if(tmp1.getParameterTypes().length==params.length)
+				{
+					msok.add(tmp1);
+				}
+			}
+
+			if(msok.size()==1)
+			{
+				ret = msok.iterator().next();
+				if(ret.getParameterTypes().length!=params.length)
+					ret = null;
+			}
+			else if(msok.size()>1)
+			{
+				// Check the argument types
+
+				for(Iterator<java.lang.reflect.Method> it=msok.iterator(); it.hasNext();)
+				{
+					java.lang.reflect.Method meth = it.next();
+					boolean maybeok = true;
+					for(int i=0; i<meth.getParameterTypes().length; i++)
+					{
+						Class<?> ptype = meth.getParameterTypes()[i];
+						Object pval = params[i];
+
+						boolean ok = true;
+						if(pval!=null && !SUtil.NULL.equals(pval))
+						{
+							Class<?> wptype = SReflect.getWrappedType(ptype); // method parameter type
+							Class<?> wpvtype = SReflect.getWrappedType(pval.getClass()); // value type
+
+							ok = SReflect.isSupertype(wptype, wpvtype);
+
+							if(!ok)
+							{
+								// Javascript only has float (no integer etc.)
+								ok = SReflect.isSupertype(Number.class, wptype) &&
+									SReflect.isSupertype(Number.class, wpvtype);
+
+								// Test if we got String value and have a basic type or wrapper on the
+								maybeok &= SReflect.isSupertype(Number.class, wptype) &&
+									SReflect.isSupertype(String.class, wpvtype);
+							}
+						}
+
+						if(!ok)
+						{
+							it.remove();
+							break; // skip other parameters and try next method
+						}
+					}
+
+					if(maybeok)
+						msmaybeok.add(meth);
+				}
+
+				if(msok.size()==1)
+				{
+					ret = msok.iterator().next();
+				}
+				else if(msok.size()>1)
+				{
+					System.out.println("Found more than one method that could be applicable, choosing first: "+msok);
+					ret = msok.iterator().next();
+				}
+				else
+				{
+					if(msmaybeok.size()>0)
+					{
+						// check if parameter conversion works
+						// do this as long as a suitable method was found
+						for(Iterator<java.lang.reflect.Method> it=msmaybeok.iterator(); it.hasNext();)
+						{
+							java.lang.reflect.Method meth = it.next();
+
+							try
+							{
+								pvals = generateParameters(params, meth);
+								ret = meth;
+								break;
+							}
+							catch(Exception e)
+							{
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if(ret!=null && pvals==null)
+		{
+			try
+			{
+				pvals = generateParameters(params, ret);
+			}
+			catch(Exception e)
+			{
+				ret = null;
+			}
+		}
+		
+		return new Tuple2<java.lang.reflect.Method, Object[]>(ret, pvals);
+	}
+	
+	/**
+	 *  Generate call parameters.
+	 *  @param vals The current parameters.
+	 *  @return The adapted method call parameters.
+	 */
+	protected Object[] generateParameters(Object[] vals, java.lang.reflect.Method m) throws Exception
+	{
+		Object[] ret = new Object[m.getParameterCount()];
+		
+		for(int i=0; i<ret.length && vals!=null && i<vals.length; i++)
+		{
+			if(vals[i]==null)
+			{
+				ret[i] = null;
+				continue;
+			}
+			
+			Type wptype = m.getGenericParameterTypes()[i];
+//			Class<?> wptype = SReflect.getWrappedType(m.getParameterTypes()[i]);
+			
+			ret[i] = convertParameter(vals[i], wptype);
+		}
+		
+		return ret;
+	}
+	
+	
+	/**
+	 *  Convert a parameter to a target type.
+	 */
+	protected Object convertParameter(Object value, Type targettype) throws Exception
+	{
+		Class<?> targetclass = SReflect.getClass(targettype);
+		Class<?> targetclasswrapped = SReflect.getWrappedType(targetclass);
+		
+		String text = null;
+		if(value instanceof SerializedValue)
+			text = ((SerializedValue)value).getValue();
+		else if(value instanceof String)
+			text = (String)value;
+		
+		if(text!=null)
+		{
+			try
+			{
+//				value = JsonTraverser.objectFromString(text, this.getClass().getClassLoader(), null, targetclass, readprocs);
+				value = convertFromJsonString(text, targetclass);
+			}
+			catch(Exception e)
+			{
+//				value = JsonTraverser.objectFromString(text, this.getClass().getClassLoader(), null, targetclasswrapped, readprocs);
+				try
+				{
+					value = convertFromJsonString(text, targetclasswrapped);
+				}
+				catch(Exception e2)
+				{
+				}
+			}
+		}
+
+		Object ret = value;
+
+		Class<?> valuewrapped = SReflect.getWrappedType(value.getClass());
+
+		if(!SReflect.isSupertype(targetclass, valuewrapped))
+		{
+//			System.out.println("type problem: "+targetType+" "+actualValueWrapped+" "+sim.getParameterValues()[i]);
+			
+			if(value instanceof String)
+			{
+				if(isSupportedBasicType(targetclass))
+				{
+					Object cval = convertFromString((String)value, targetclass);
+					ret = cval;
+				}
+				// base 64 case (problem could be normal string?!)
+				else if(SReflect.isSupertype(byte[].class, targetclass))
+				{
+					ret = Base64.decode(((String) value).toCharArray());
+				}
+			}
+			// Javascript only has float (no integer etc.)
+			else if(SReflect.isSupertype(Number.class, targetclass) && SReflect.isSupertype(Number.class, valuewrapped))
+			{
+				if(Integer.class.equals(targetclasswrapped))
+				{
+					ret = ((Number)value).intValue();
+				}
+				else if(Long.class.equals(targetclasswrapped))
+				{
+					ret = ((Number)value).longValue();
+				}
+				else if(Double.class.equals(targetclasswrapped))
+				{
+					ret = ((Number)value).doubleValue();
+				}
+				else if(Float.class.equals(targetclasswrapped))
+				{
+					ret = ((Number)value).floatValue();
+				}
+				else if(Short.class.equals(targetclasswrapped))
+				{
+					ret = ((Number)value).shortValue();
+				}
+				else if(Byte.class.equals(targetclasswrapped))
+				{
+					ret = ((Number)value).byteValue();
+				}
+			}
+			else if(valuewrapped.isArray())
+			{
+				Type itype;
+				if(SReflect.isSupertype(List.class, targetclass))
+				{
+					ret = new ArrayList<Object>();
+					itype = SReflect.getInnerGenericType(targettype);
+				}
+				else if(SReflect.isSupertype(Set.class, targetclass))
+				{
+					ret = new HashSet<Object>();
+					itype = SReflect.getInnerGenericType(targettype);
+				}
+				else if(targetclass.isArray())
+				{
+					ret = Array.newInstance(targetclass.getComponentType(), Array.getLength(value));
+					itype = targetclass.getComponentType();
+				}
+				else
+				{
+					throw new RuntimeException("Parameter conversion not possible: "+value+" "+targettype);
+				}
+					
+				if(Array.getLength(value)>0)
+				{
+					for(int i=0; i<Array.getLength(value); i++)
+					{
+						Object v = convertParameter(Array.get(value, i), itype);
+						if(ret instanceof Collection)
+						{
+							((Collection)ret).add(v);
+						}
+						else
+						{
+							Array.set(ret, i, v);
+						}
+					}
+				}
+			}
+			else
+			{
+				throw new RuntimeException("Parameter conversion not possible: "+value+" "+targettype);
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Convert an object to the json string representation.
+	 *  @param val The value.
+	 *  @return The string representation.
+	 */
+	protected String convertToJsonString(Object val)
+	{
+		ISerializationServices ser = (ISerializationServices)Starter.getPlatformValue(ia.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+		IStringConverter conv = ser.getStringConverters().get(IStringConverter.TYPE_JSON);
+		String data = conv.convertObject(val, null, this.getClass().getClassLoader(), null);
+		return data;
+	}
+	
+	/**
+	 *  Convert json to object representation.
+	 *  @param val The json value.
+	 *  @return The object.
+	 */
+	protected Object convertFromJsonString(String val, Class<?> type)
+	{
+		ISerializationServices ser = (ISerializationServices)Starter.getPlatformValue(ia.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+		IStringConverter conv = ser.getStringConverters().get(IStringConverter.TYPE_JSON);
+		Object data = conv.convertString(val, type, this.getClass().getClassLoader(), null);
+		return data;
+	}
+	
+	/**
+	 *  Convert to object representation.
+	 *  @param val The string value.
+	 *  @return The object.
+	 */
+	protected Object convertFromString(String val, Class<?> type)
+	{
+		ISerializationServices ser = (ISerializationServices)Starter.getPlatformValue(ia.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+		IStringConverter conv = ser.getStringConverters().get(IStringConverter.TYPE_BASIC);
+		Object data = conv.convertString(val, type, this.getClass().getClassLoader(), null);
+		return data;
+	}
+	
+	/**
+	 *  Test if basic converter can handle this type.
+	 *  @param type The type.
+	 *  @return True if it can handle this type.
+	 */
+	protected boolean isSupportedBasicType(Class<?> type)
+	{
+		ISerializationServices ser = (ISerializationServices)Starter.getPlatformValue(ia.getId().getRoot(), Starter.DATA_SERIALIZATIONSERVICES);
+		IStringConverter conv = ser.getStringConverters().get(IStringConverter.TYPE_BASIC);
+		return conv.isSupportedType(type);
+	}
+	
+	/**
+	 *  Struct for serialized value.
+	 */
+	public static class SerializedValue
+	{
+		/** The serialized value. */
+		protected String value;
+
+		/**
+		 *  Create a new serialized value.
+		 */
+		public SerializedValue()
+		{
+		}
+
+		/**
+		 *  Create a new serialized value.
+		 */
+		public SerializedValue(String value)
+		{
+			this.value = value;
+		}
+
+		/**
+		 *  Get the value.
+		 *  @return The value
+		 */
+		public String getValue()
+		{
+			return value;
+		}
+
+		/**
+		 *  Set the value.
+		 *  @param value The value to set
+		 */
+		public void setValue(String value)
+		{
+			this.value = value;
+		}
+	}
 }

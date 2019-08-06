@@ -3,7 +3,6 @@ package jadex.platform.service.registry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -13,8 +12,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jadex.base.Starter;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -32,7 +31,6 @@ import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.awareness.IAwarenessService;
 import jadex.bridge.service.types.registry.IRemoteRegistryService;
@@ -45,7 +43,6 @@ import jadex.commons.Boolean3;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -62,14 +59,14 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.AgentServiceQuery;
 import jadex.platform.service.security.SecurityAgent;
 
 /**
  *  The super peer client agent is responsible for managing connections to super peers for each network.
  */
 @Agent(autoprovide=Boolean3.TRUE,
-	autostart=Boolean3.TRUE,
-	predecessors="jadex.platform.service.security.SecurityAgent")
+	autostart=Boolean3.TRUE)
 @Service
 public class SuperpeerClientAgent implements ISearchQueryManagerService
 {
@@ -104,6 +101,9 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	/** The managed connections for each network. */
 	protected Map<String, NetworkManager> connections;
 	
+	@AgentServiceQuery
+	protected ISecurityService secser;
+	
 	//-------- agent life cycle --------
 	
 	/**
@@ -120,8 +120,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		
 		if(!awaonly)
 		{
-			ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class).setMultiplicity(Multiplicity.ZERO_ONE));
-			if(secser!=null)
+			//ISecurityService	secser	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISecurityService.class).setMultiplicity(Multiplicity.ZERO_ONE));
+			//if(secser!=null)
 			{
 				// Use all networks to include networks with public key only, e.g. global network
 				secser.getAllKnownNetworks().addResultListener(new ExceptionDelegationResultListener<MultiCollection<String, String>, Void>(ret)
@@ -226,35 +226,35 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		// awa fallback when no superpeers
 		if(!foundsuperpeer)
 		{
-//			searchRemoteServices(query).addResultListener(new IntermediateDefaultResultListener<IServiceIdentifier>()
-//			{
-//				@Override
-//				public void intermediateResultAvailable(IServiceIdentifier result)
-//				{
-//					// Forward result if first
-//					ret.setResultIfUndone(result);					
-//				}
-//				
-//				@Override
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					ret.setExceptionIfUndone(exception);
-//				}
-//				
-//				@Override
-//				public void finished()
-//				{
-//					ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
-//				}
-//			});
-			snapshotSearchRemoteServices(query).thenAccept(services ->
+			searchRemoteServices(query).addResultListener(new IntermediateDefaultResultListener<IServiceIdentifier>()
 			{
-				// improve code path to allow for early cancellation
-				if(services.size() == 0)
+				@Override
+				public void intermediateResultAvailable(IServiceIdentifier result)
+				{
+					// Forward result if first
+					ret.setResultIfUndone(result);					
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setExceptionIfUndone(exception);
+				}
+				
+				@Override
+				public void finished()
+				{
 					ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
-				else
-					ret.setResultIfUndone(services.iterator().next());
+				}
 			});
+//			snapshotSearchRemoteServices(query).thenAccept(services ->
+//			{
+//				// improve code path to allow for early cancellation
+//				if(services.size() == 0)
+//					ret.setExceptionIfUndone(new ServiceNotFoundException(query.toString()));
+//				else
+//					ret.setResultIfUndone(services.iterator().next());
+//			});
 		}
 		
 		else if(track.decrementAndGet()==0)
@@ -339,8 +339,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		// polling fallback when no superpeers
 		if(!foundsuperpeer)
 		{
-			//return searchRemoteServices(query);
-			snapshotSearchRemoteServices(query).thenAccept(results -> ret.setResult(results));
+			return searchRemoteServices(query);
+//			snapshotSearchRemoteServices(query).thenAccept(results -> ret.setResult(results));
 		}
 		
 		else if(track.decrementAndGet()==0)
@@ -408,7 +408,16 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				// Search for other platforms
 				if(timeout>0)
 				{
-					ServiceCall.getOrCreateNextInvocation().setTimeout((long)(timeout*0.9));
+					// Use 1% of timeout to look for platforms, otherwise searches take too long!
+					long awatimeout = (long) (timeout*0.01);
+					
+					// But no less than 300ms
+					awatimeout = Math.max(300, awatimeout);
+					
+					// But never more than half the total timeout.
+					awatimeout = Math.min(timeout >> 1, awatimeout);
+					
+					ServiceCall.getOrCreateNextInvocation().setTimeout(awatimeout);
 				}
 				awa.searchPlatforms().addResultListener(new IntermediateDefaultResultListener<IComponentIdentifier>()
 				{
@@ -521,117 +530,117 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	 *  Search for services on remote platforms using direct queries and awareness.
 	 *  Optimized to return quick results over accuracy for snapshot searches (searchServices vs. addQuery)
 	 */
-	protected <T> IFuture<Collection<IServiceIdentifier>> snapshotSearchRemoteServices(final ServiceQuery<T> query)
-	{	
-		final Future<Collection<IServiceIdentifier>> ret = new Future<Collection<IServiceIdentifier>>();
-		
-		long timeout = 500;	
-		
-		// Check for awareness service
-		Collection<IAwarenessService> awas = agent.getFeature(IRequiredServicesFeature.class)
-			.searchLocalServices(new ServiceQuery<>(IAwarenessService.class));
-		Set<IComponentIdentifier> platforms = new HashSet<IComponentIdentifier>();
-		
-		FutureBarrier<Void> pfbar = new FutureBarrier<Void>();
-		if (query.getPlatform() != null)
-		{
-			platforms.add(query.getPlatform());
-			pfbar.addFuture(IFuture.DONE);
-		}
-		else if (query.getSearchStart() != null)
-		{
-			platforms.add(query.getSearchStart().getRoot());
-			pfbar.addFuture(IFuture.DONE);
-		}
-		else
-		{
-			for(IAwarenessService awa: awas)
-			{
-				if(debug(query))
-					System.out.println(agent+" awa.searchPlatformsFast(): "+awa+", "+query);
-				
-				// Search for other platforms
-				
-				ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
-				Future<Void> done = new Future<Void>();
-				pfbar.addFuture(done);
-				awa.searchPlatformsFast().addResultListener(new IResultListener<Set<IComponentIdentifier>>()
-				{
-					@Override
-					public void resultAvailable(final Set<IComponentIdentifier> results)
-					{
-						platforms.addAll(results);
-						done.setResult(null);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						done.setResult(null);
-					}
-				});
-			}
-		}
-		
-		pfbar.waitFor().thenAccept(finished -> 
-		{
-			//if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
-			//	System.out.println("hereee");
-			
-			if (platforms.isEmpty())
-			{
-				ret.setResult(Collections.emptySet());
-				return;
-			}
-			Set<IServiceIdentifier> res = new HashSet<>();
-			int[] count = new int[1];
-			count[0] = platforms.size();
-			for (IComponentIdentifier platform : platforms)
-			{
-				IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new ComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform),
-					new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, ServiceScope.NETWORK, null, true);
-				
-				IRemoteRegistryService rrs = (IRemoteRegistryService)RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
-				
-				ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
-				
-				if(debug(query))
-					System.out.println(agent + " searching remote platform: "+platform+", timeout="+timeout+", time="+System.currentTimeMillis());
-				
-				//Future<Void> searchdone = new Future<>();
-				//searchbar.addFuture(searchdone);
-				rrs.searchServices(query).addResultListener(new IResultListener<Set<IServiceIdentifier>>()
-				{
-					public void resultAvailable(final Set<IServiceIdentifier> result)
-					{
-						//if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
-						//	System.out.println("hereee");
-						
-						if(debug(query))
-							System.out.println(agent + " searched remote platform: "+platform+", "+result+", timeout="+timeout+", time="+System.currentTimeMillis());
-						res.addAll(result);
-						--count[0];
-						if (count[0] == 0)
-						{
-							ret.setResult(res);
-						}
-						//searchdone.setResult(null);
-						//System.out.println("searchbarL : " + searchbar.getCount() + " " + searchbar.waitFor().isDone() + " " + searchdone.isDone());
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						//if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
-						//	System.out.println("hereee");
-						
-						resultAvailable(Collections.emptySet());
-						//searchdone.setResult(null);
-					}
-				});
-			}
-//			searchbar.waitFor().thenAccept(fini -> ret.setResult(res));
-		});
-		
-		return ret;
-	}
+//	protected <T> IFuture<Collection<IServiceIdentifier>> snapshotSearchRemoteServices(final ServiceQuery<T> query)
+//	{	
+//		final Future<Collection<IServiceIdentifier>> ret = new Future<Collection<IServiceIdentifier>>();
+//		
+//		long timeout = 500;	
+//		
+//		// Check for awareness service
+//		Collection<IAwarenessService> pawas = agent.getFeature(IRequiredServicesFeature.class)
+//			.searchLocalServices(new ServiceQuery<>(IAwarenessService.class));
+//		Set<IComponentIdentifier> platforms = new HashSet<IComponentIdentifier>();
+//		
+//		FutureBarrier<Void> pfbar = new FutureBarrier<Void>();
+//		if (query.getPlatform() != null)
+//		{
+//			platforms.add(query.getPlatform());
+//			pfbar.addFuture(IFuture.DONE);
+//		}
+//		else if (query.getSearchStart() != null)
+//		{
+//			platforms.add(query.getSearchStart().getRoot());
+//			pfbar.addFuture(IFuture.DONE);
+//		}
+//		else
+//		{
+//			for(IAwarenessService pawa: pawas)
+//			{
+//				if(debug(query))
+//					System.out.println(agent+" pawa.searchPlatformsFast(): "+pawa);
+//				
+//				// Search for other platforms
+//				
+//				ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
+//				Future<Void> done = new Future<Void>();
+//				pfbar.addFuture(done);
+//				pawa.searchPlatformsFast().addResultListener(new IResultListener<Set<IComponentIdentifier>>()
+//				{
+//					@Override
+//					public void resultAvailable(final Set<IComponentIdentifier> results)
+//					{
+//						platforms.addAll(results);
+//						done.setResult(null);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						done.setResult(null);
+//					}
+//				});
+//			}
+//		}
+//		
+//		pfbar.waitFor().thenAccept(finished -> 
+//		{
+//			//if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
+//			//	System.out.println("hereee");
+//			
+//			if (platforms.isEmpty())
+//			{
+//				ret.setResult(Collections.emptySet());
+//				return;
+//			}
+//			Set<IServiceIdentifier> res = new HashSet<>();
+//			int[] count = new int[1];
+//			count[0] = platforms.size();
+//			for (IComponentIdentifier platform : platforms)
+//			{
+//				IServiceIdentifier rrsid = BasicService.createServiceIdentifier(new ComponentIdentifier(IRemoteRegistryService.REMOTE_REGISTRY_NAME, platform),
+//					new ClassInfo(IRemoteRegistryService.class), null, IRemoteRegistryService.REMOTE_REGISTRY_NAME, null, ServiceScope.NETWORK, null, true);
+//				
+//				IRemoteRegistryService rrs = (IRemoteRegistryService)RemoteMethodInvocationHandler.createRemoteServiceProxy(agent, rrsid);
+//				
+//				ServiceCall.getOrCreateNextInvocation().setTimeout(timeout);
+//				
+//				if(debug(query))
+//					System.out.println(agent + " searching remote platform: "+platform+", timeout="+timeout+", time="+System.currentTimeMillis());
+//				
+//				//Future<Void> searchdone = new Future<>();
+//				//searchbar.addFuture(searchdone);
+//				rrs.searchServices(query).addResultListener(new IResultListener<Set<IServiceIdentifier>>()
+//				{
+//					public void resultAvailable(final Set<IServiceIdentifier> result)
+//					{
+//						//if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
+//						//	System.out.println("hereee");
+//						
+//						if(debug(query))
+//							System.out.println(agent + " searched remote platform: "+platform+", "+result+", timeout="+timeout+", time="+System.currentTimeMillis());
+//						res.addAll(result);
+//						--count[0];
+//						if (count[0] == 0)
+//						{
+//							ret.setResult(res);
+//						}
+//						//searchdone.setResult(null);
+//						//System.out.println("searchbarL : " + searchbar.getCount() + " " + searchbar.waitFor().isDone() + " " + searchdone.isDone());
+//					}
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						//if(query.getServiceIdentifier()!=null && query.getServiceIdentifier().toString().indexOf("chat")!=-1)
+//						//	System.out.println("hereee");
+//						
+//						resultAvailable(Collections.emptySet());
+//						//searchdone.setResult(null);
+//					}
+//				});
+//			}
+////			searchbar.waitFor().thenAccept(fini -> ret.setResult(res));
+//		});
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Gets the networks relevant to the query.

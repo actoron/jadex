@@ -37,7 +37,7 @@ public class RemoteBlockingTestAgent	extends TestAgent
 			new ServiceQuery<>(ILibraryService.class)).get(Timeout.NONE);
 		
 //		cms.getComponentDescriptions().get(Timeout.NONE);
-		SComponentManagementService.getComponentDescriptions(agent).get(Timeout.NONE);
+		SComponentManagementService.getComponentDescriptions(agent.getId()).get(Timeout.NONE);
 		
 		tc.addReport(new TestReport("#1", "Test blocking wait.", true, null));
 		

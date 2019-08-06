@@ -1,10 +1,12 @@
 package jadex.bridge.service.types.library;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.CheckNotNull;
@@ -141,6 +143,14 @@ public interface ILibraryService
 	 *  @return The list of urls.
 	 */
 	public IFuture<List<URL>> getAllURLs();
+	
+	/**
+	 *  todo: support all component models
+	 *  
+	 *  Get all startable component models (currently only Java classes with @Agent).
+	 *  @return The file names of the component models.
+	 */
+	public IFuture<Collection<String[]>> getComponentModels();
 	
 	//-------- listener methods --------
 	

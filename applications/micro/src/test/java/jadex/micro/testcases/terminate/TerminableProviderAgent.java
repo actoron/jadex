@@ -25,7 +25,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITerminableService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=ITerminableService.class))
 @Description("Agent that provides a service with terminable future results")
 public class TerminableProviderAgent implements ITerminableService
 {

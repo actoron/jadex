@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.stream.Collectors;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -48,6 +49,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -55,10 +57,14 @@ import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.IFilter;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
+import jadex.commons.SClassReader;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -68,6 +74,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.micro.MinimalAgent;
+import jadex.micro.annotation.Agent;
 
 /**
  *  Library service for loading classpath elements.
@@ -141,6 +149,11 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/** The non-managed urls (cached for speed). */
 //	protected Set<URL>	nonmanaged;
 	protected Set<URI>	nonmanaged;
+	
+	
+	/** Cached list of component models. */
+	protected List<String[]> componentmodels;
+	protected IFuture<Collection<String[]>> search;
 	
 	//-------- constructors --------
 	
@@ -1701,6 +1714,68 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			ret.addAll(entry.getValue());
 		}
 		ret.remove(null);
+		return ret;
+	}
+	
+	/**
+	 *  todo: support all component models
+	 *  
+	 *  Get all startable component models (currently only Java classes with @Agent).
+	 *  @return The file names of the component models.
+	 */
+	public IFuture<Collection<String[]>> getComponentModels()
+	{
+		IFuture<Collection<String[]>> ret = null;
+		
+		if(search!=null)
+		{
+			ret = search;
+		}
+		else if(rids==null || componentmodels==null)
+		{
+			// Scanning takes some time and is thus delegated to a worker agent allowing this agent to process other requests
+			ret = component.createComponent(new CreationInfo().setFilenameClass(MinimalAgent.class)).thenCompose((IExternalAccess ea) ->
+			{
+				return ea.scheduleStep(ia ->
+				{
+					ILibraryService ls = ia.getLocalService(ILibraryService.class);
+					URL[] urls = ls.getAllURLs().get().toArray(new URL[0]);
+					
+			//		URL[] urls = PlatformAgent.getClasspathUrls(this.getClass().getClassLoader());
+			//		System.out.println("URLs1: "+Arrays.toString(urls));
+					// Remove JVM jars
+					urls = SUtil.removeSystemUrls(urls);
+					
+					Set<SClassReader.ClassFileInfo> cis = SReflect.scanForClassFileInfos(urls, null, new IFilter<SClassReader.ClassFileInfo>()
+					{
+						public boolean filter(SClassReader.ClassFileInfo ci)
+						{
+							boolean ret = false;
+							AnnotationInfo ai = ci.getClassInfo().getAnnotation(Agent.class.getName());
+							if(ai!=null)
+								ret = true;
+							return ret;
+						}
+					});
+					
+					// Collect filenames of models to load the models without knowing the rid (can then be extracted)
+					List<String[]> res = cis.stream().map(a -> new String[]{a.getFilename(), a.getClassInfo().getClassName()}).collect(Collectors.toList());
+							
+					//System.out.println("Models found: "+res);
+					
+					ia.killComponent();
+					
+					return new Future<Collection<String[]>>(res);
+				});
+			});
+			search = ret;
+			ret.thenAccept(x -> {componentmodels=(List<String[]>)x; search = null;}).exceptionally(x -> search = null);
+		}
+		else 
+		{
+			ret = new Future<Collection<String[]>>(componentmodels);
+		}
+			
 		return ret;
 	}
 }

@@ -18,8 +18,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  Sends back the same message it received. 
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=IEchoService.class,
-	implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IEchoService.class))
 @Service
 public class EchoAgent implements IEchoService
 {

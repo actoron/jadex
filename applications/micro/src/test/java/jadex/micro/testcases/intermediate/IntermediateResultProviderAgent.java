@@ -18,7 +18,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IIntermediateResultService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IIntermediateResultService.class))
 @Description("Agent that provides a service with intermediate results")
 public class IntermediateResultProviderAgent implements IIntermediateResultService
 {

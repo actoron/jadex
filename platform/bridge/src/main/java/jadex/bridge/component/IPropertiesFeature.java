@@ -11,5 +11,5 @@ public interface IPropertiesFeature
 	 *  @param name	The property name.
 	 *  @return The property value (if any).
 	 */
-	public Object	getProperty(String name);
+	public Object getProperty(String name);
 }

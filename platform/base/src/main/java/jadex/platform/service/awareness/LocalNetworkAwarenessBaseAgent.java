@@ -41,15 +41,14 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentServiceQuery;
 
 /**
  *  Implements passive awareness via multicast.
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE,
-	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registry.SuperpeerClientAgent",
-	autostart=Boolean3.FALSE
+@Agent(autoprovide = Boolean3.TRUE, autostart=Boolean3.FALSE
 )
 public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessService
 {
@@ -72,6 +71,9 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	/** The agent. */
 	@Agent
 	protected IInternalAccess agent;
+	
+	@AgentServiceQuery
+	protected ITransportAddressService tas;
 
 	/** The current search, if any. */
 	protected IntermediateFuture<IComponentIdentifier> search;
@@ -92,14 +94,14 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	protected DatagramSocket recvsocket;
 	
 	/** Last time platforms where searched. */
-	protected long lastsearchplatform = 0;
+//	protected long lastsearchplatform = 0;
 
 	// -------- agent lifecycle --------
 
 	/**
 	 *  At startup create a multicast socket for listening.
 	 */
-	@ServiceStart
+	@AgentCreated
 	public void	start() throws Exception
 	{
 		platforms = new LinkedHashMap<IComponentIdentifier, List<TransportAddress>>();
@@ -158,7 +160,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	 */
 	public IIntermediateFuture<IComponentIdentifier> searchPlatforms()
 	{
-		lastsearchplatform = System.currentTimeMillis();
+//		lastsearchplatform = System.currentTimeMillis();
 		if(search == null)
 		{
 			long timeout = ServiceCall.getCurrentInvocation()!=null ? ServiceCall.getCurrentInvocation().getTimeout() : 0;
@@ -241,32 +243,34 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	 *  with an upper bound of less than 1 second.
 	 *  Issues a new search, but answers using known platforms. On first request
 	 */
-	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
-	{
-		Future<Set<IComponentIdentifier>> ret = new Future<Set<IComponentIdentifier>>();
-		if (System.currentTimeMillis() - lastsearchplatform > 60000)
-		{
-			searchPlatforms().addResultListener(new IResultListener<Collection<IComponentIdentifier>>()
-			{
-				public void resultAvailable(Collection<IComponentIdentifier> result)
-				{
-					ret.setResult(new HashSet<IComponentIdentifier>(result));
-				};
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setResult(Collections.emptySet());
-				}
-			});
-		}
-		else
-		{
-			// Trigger search, but answer immediately.
-			searchPlatforms();
-			ret.setResult(new HashSet<IComponentIdentifier>(platforms.keySet()));
-		}
-		return ret;
-	}
+//	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
+//	{
+//		Future<Set<IComponentIdentifier>> ret = new Future<Set<IComponentIdentifier>>();
+//		if (System.currentTimeMillis() - lastsearchplatform > 60000)
+//		{
+//			System.out.println("Never searched, do search: " + lastsearchplatform);
+//			searchPlatforms().addResultListener(new IResultListener<Collection<IComponentIdentifier>>()
+//			{
+//				public void resultAvailable(Collection<IComponentIdentifier> result)
+//				{
+//					ret.setResult(new HashSet<IComponentIdentifier>(result));
+//				};
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					ret.setResult(Collections.emptySet());
+//				}
+//			});
+//		}
+//		else
+//		{
+//			System.out.println("Fast mode on: " + lastsearchplatform);
+//			// Trigger search, but answer immediately.
+//			searchPlatforms();
+//			ret.setResult(new HashSet<IComponentIdentifier>(platforms.keySet()));
+//		}
+//		return ret;
+//	}
 
 	// -------- template methods --------
 
@@ -290,7 +294,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	protected IFuture<Void> sendInfo(final String address, final int port)
 	{
 		final Future<Void> ret = new Future<Void>();
-		ITransportAddressService tas = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITransportAddressService.class));
+		//tas = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ITransportAddressService.class));
 		tas.getAddresses().addResultListener(new ExceptionDelegationResultListener<List<TransportAddress>, Void>(ret)
 		{
 			@Override

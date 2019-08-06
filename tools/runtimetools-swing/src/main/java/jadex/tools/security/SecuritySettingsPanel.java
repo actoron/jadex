@@ -2,7 +2,6 @@ package jadex.tools.security;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +30,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import jadex.base.Starter;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
@@ -43,10 +43,9 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
-import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.bridge.service.types.settings.IPlatformSettings;
 import jadex.commons.ICommand;
 import jadex.commons.Properties;
-import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -55,7 +54,6 @@ import jadex.commons.gui.JWizard;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.jtable.StringArrayTableModel;
 import jadex.commons.security.PemKeyPair;
-import jadex.commons.security.SSecurity;
 import jadex.platform.service.security.SecurityAgent;
 
 /**
@@ -70,7 +68,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	protected IExternalAccess jccaccess;
 	
 	/** The settings service. */
-	protected ISettingsService settingsservice;
+	protected IPlatformSettings settings;
 	
 	/** The security service. */
 	protected ISecurityService secservice;
@@ -126,7 +124,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 			{
 				IComponentIdentifier targetpf = sid.getProviderId().getRoot();
 				secservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISecurityService.class).setScope(ServiceScope.PLATFORM).setSearchStart(targetpf)).get();
-				settingsservice = ia.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>(ISettingsService.class).setScope(ServiceScope.PLATFORM).setSearchStart(targetpf)).get();
+				settings = Starter.getPlatformSettings(ia.getId());
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -145,12 +143,12 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 						main.add("Trusted Platform Names", createTrustedNamesPanel());
 						
 						certtree = new CertTree();
-						certtree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+						certtree.load(settings.loadFile(DEFAULT_CERT_STORE));
 						certtree.setSaveCommand(new ICommand<byte[]>()
 						{
 							public void execute(byte[] store)
 							{
-								settingsservice.saveFile(DEFAULT_CERT_STORE, store).get();
+								settings.saveFile(DEFAULT_CERT_STORE, store);
 							}
 						});
 						main.add("Certificate Store", certtree);
@@ -265,7 +263,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 
 			public void actionPerformed(ActionEvent e)
 			{
-				byte[] oldstore = settingsservice.loadFile(DEFAULT_CERT_STORE).get();
+				byte[] oldstore = settings.loadFile(DEFAULT_CERT_STORE);
 				SecretWizard wizard = new SecretWizard(oldstore);
 				
 				wizard.addTerminationListener(new AbstractAction()
@@ -711,7 +709,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 				adddialog.getContentPane().setLayout(new BorderLayout());
 				
 				CertTree nacerttree = new CertTree();
-				nacerttree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+				nacerttree.load(settings.loadFile(DEFAULT_CERT_STORE));
 				
 				adddialog.getContentPane().add(nacerttree, BorderLayout.CENTER);
 				
@@ -722,8 +720,8 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 					public void actionPerformed(ActionEvent e)
 					{
 						PemKeyPair keypair = nacerttree.getSelectedCert();
-						settingsservice.saveFile(DEFAULT_CERT_STORE, nacerttree.save()).get();
-						certtree.load(settingsservice.loadFile(DEFAULT_CERT_STORE).get());
+						settings.saveFile(DEFAULT_CERT_STORE, nacerttree.save());
+						certtree.load(settings.loadFile(DEFAULT_CERT_STORE));
 						adddialog.dispose();
 						if (keypair != null)
 						{
@@ -961,7 +959,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	 */
 	protected void setNetwork()
 	{
-		byte[] oldstore = settingsservice.loadFile(DEFAULT_CERT_STORE).get();
+		byte[] oldstore = settings.loadFile(DEFAULT_CERT_STORE);
 		SecretWizard wizard = new SecretWizard(oldstore);
 		//wizard.setEntity(nwn);
 		wizard.setEntityType("the network name");
@@ -1003,7 +1001,7 @@ public class SecuritySettingsPanel implements IServiceViewerPanel
 	 */
 	protected void writeCertStore(byte[] newstore)
 	{
-		settingsservice.saveFile(DEFAULT_CERT_STORE, newstore).get();
+		settings.saveFile(DEFAULT_CERT_STORE, newstore);
 		certtree.load(newstore);
 	}
 	

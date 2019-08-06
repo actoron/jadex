@@ -9,14 +9,31 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.7/themes/default/style.min.css" />
 	
 		<script type="text/javascript">
+		// init tree
 			$(function() { $('#jstree').jstree(
+			{
+				"plugins": ["sort", "types", "contextmenu"],
+				"core": 
+				{
+					"check_callback" : true,
+					"data": function(node, cb) 
+					{
+						console.log("loading node: "+node.id);
+						//cb.call(this, node.children.push('added'));
+						cb.call(this, [{"text": "Root 1", "children": true}, 'Root 2']);
+				    }
+				},
+			})});
+		
+			/*$(function() { $('#jstree').jstree(
 			{
 				"core" : {"check_callback" : true}//,
 				//"plugins" : ["dnd","contextmenu"]
-			})});
+			})});*/
 			
 			var self = this;
-			self.models = ["a/b/c/d/e/f", "a/b/cc", "a/c/d"];
+			
+			/*self.models = ["a/b/c/d/e/f", "a/b/cc", "a/c/d"];
 			var treeid = "jstree";
 
 			function createModelTree(treeid)
@@ -70,6 +87,7 @@
 				$('#'+treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
 			}
 			
+				
 			document.addEventListener("DOMContentLoaded", function()
 			{
 				$('#'+treeid).on('ready.jstree', function (e, data) {
@@ -84,7 +102,8 @@
 				
 				//setTimeout(function(){alert('hi'); empty(treeid); 
 				//	$('#'+treeid).jstree('create_node', '#', {"text": "aa", "id": "aa"}, 'last');}, 3000);
-			});
+			});*/
+			
 		</script>
 	</head>
 	

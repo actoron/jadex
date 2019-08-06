@@ -30,11 +30,7 @@ import jadex.micro.annotation.AgentCreated;
  *
  */
 @Service
-@Agent(autoprovide = Boolean3.TRUE,
-	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registry.SuperpeerClientAgent",
-	autostart=Boolean3.TRUE
-)
+@Agent(autoprovide = Boolean3.TRUE,	autostart=Boolean3.TRUE)
 public class CatalogAwarenessAgent implements IAwarenessService
 {
 	protected static final String DEFAULT_URLS = "ws://ssp1@ngrelay1.actoron.com:80";
@@ -133,10 +129,10 @@ public class CatalogAwarenessAgent implements IAwarenessService
 	 *  with an upper bound of less than 1 second.
 	 *  Issues a new search, but answers using known platforms. On first request
 	 */
-	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
-	{
-		return new Future<Set<IComponentIdentifier>>(new LinkedHashSet<>(catalog.keySet()));
-	}
+//	public IFuture<Set<IComponentIdentifier>> searchPlatformsFast()
+//	{
+//		return new Future<Set<IComponentIdentifier>>(new LinkedHashSet<>(catalog.keySet()));
+//	}
 	
 	/**
 	 *  Gets the address for a platform ID using the awareness mechanism.

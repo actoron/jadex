@@ -38,7 +38,8 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					comp.getLogger().warning("Exception in nfproperty: "+mi.getName()+" "+exception);
+					System.out.println("Exception in nfproperty: "+mi.getName()+" "+exception);
+					//comp.getLogger().warning("Exception in nfproperty: "+mi.getName()+" "+exception);
 				}
 				
 				protected void cont()

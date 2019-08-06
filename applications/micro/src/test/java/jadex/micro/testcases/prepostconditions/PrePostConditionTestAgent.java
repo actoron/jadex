@@ -31,7 +31,7 @@ import jadex.micro.annotation.Results;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IContractService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IContractService.class))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
 public class PrePostConditionTestAgent extends JunitAgentTest implements IContractService
 {

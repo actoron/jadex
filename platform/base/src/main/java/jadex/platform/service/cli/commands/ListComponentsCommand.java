@@ -70,7 +70,7 @@ public class ListComponentsCommand extends ACliCommand
 			@Override
 			public IFuture<IComponentDescription[]> execute(IInternalAccess ia)
 			{
-				return SComponentManagementService.getComponentDescriptions(ia);
+				return SComponentManagementService.getComponentDescriptions(ia.getId());
 			}
 		});
 	}

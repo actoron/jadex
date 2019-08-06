@@ -190,10 +190,20 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		// todo: move this code out
 		IObjectStringConverter jsonc = new IObjectStringConverter()
 		{
+			// todo: HACK use other configuration
+			Map<String, Object> conv;
+			{
+				conv = new HashMap<>();
+				conv.put("writeclass", false);
+				conv.put("writeid", false);
+			}
+			
 			public String convertObject(Object val, Object context)
 			{
 				// System.out.println("write response in json");
-				byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, false, false, null, null, null);
+				
+				byte[] data = jser.encode(val, component.getClassLoader(), null, conv);
+				//byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, false, false, null, null, null);
 				return new String(data);
 			}
 		};
@@ -204,7 +214,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		{
 			public String convertObject(Object val, Object context)
 			{
-				byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null, null);
+				byte[] data = jser.encode(val, component.getClassLoader(), null, null);
+				//byte[] data = JsonTraverser.objectToByteArray(val, component.getClassLoader(), null, true, true, null, null, null);
 				return new String(data);
 			}
 		};
@@ -376,7 +387,7 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 		String callid = request.getHeader(HEADER_JADEX_CALLID);
 		String terminate = request.getHeader(HEADER_JADEX_TERMINATE);
 
-		System.out.println("handleRequest: "+callid+" "+terminate);
+		//System.out.println("handleRequest: "+callid+" "+terminate);
 		
 		// request info manages an ongoing conversation
 		if(requestinfos.containsKey(callid))
@@ -1038,7 +1049,6 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 				}
 				else
 				{
-					//
 					// System.out.println("automapping detected");
 					Class< ? >[] ts = method.getParameterTypes();
 					targetparams = new Object[ts.length];
@@ -1370,6 +1380,9 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	 */
 	protected void writeResponseContent(Object result, HttpServletRequest request, HttpServletResponse response, List<String> sr)
 	{
+		//if(result!=null && result.getClass().isArray())
+		//	System.out.println("jju");
+		
 		if(result instanceof Exception)
 			System.out.println("result is exception: "+result);
 		
@@ -1698,20 +1711,31 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 			}
 		}
 
-		compacted.entrySet().stream().forEach(e -> {
-			List<String> data = e.getValue().stream().map(a -> a.getSecondEntity()).collect(Collectors.toList());
+		compacted.entrySet().stream().forEach(e -> 
+		{
+			TreeSet<Tuple2<Integer, String>> vals = (TreeSet<Tuple2<Integer, String>>)e.getValue();
+			Tuple2<Integer, String> lastval = vals.last();
+			
+			String[] res = new String[lastval.getFirstEntity()+1];
+			
+			vals.stream().forEach(t -> res[t.getFirstEntity()] = t.getSecondEntity());
+			
+			List<String> data = Arrays.asList(res);
+			
+			// does not create empty slots in case of args_0, args_3, args_4
+			//List<String> data = e.getValue().stream().map(a -> a.getSecondEntity()).collect(Collectors.toList());
+			
 			addEntry(ret, e.getKey(), data);
 		});
-		/*
-		 * for(Map.Entry<String, Set<Tuple2<Integer, String>>> entry:
-		 * compacted.entrySet()) { List<String> data =
-		 * entry.getValue().stream().map(a ->
-		 * a.getSecondEntity()).collect(Collectors.toList()); //addEntry(ret,
-		 * entry.getKey(), data, true); //ret.add(entry.getKey(), (String)data);
-		 * }
-		 */
 
 		return ret;
+	}
+	
+	public static void main(String[] args) throws Exception
+	{
+		String query = "args_0=a&args_3=c";
+		Map<String, Object> res = splitQueryString(query);
+		System.out.println(query+ " -> "+res);
 	}
 
 	/**

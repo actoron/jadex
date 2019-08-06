@@ -64,6 +64,13 @@ public interface IComponentIdentifier
 	 */
 	public String getDotName();
 	
+	/**
+	 *  Test if this identifier has the same root as the cid.
+	 *  @param cid The component id.
+	 *  @return True, if the root is equal.
+	 */
+	public boolean hasSameRoot(IComponentIdentifier cid);
+	
 //	/**
 //	 *  Get the application name. Equals the local component name in case it is a child of the platform.
 //	 *  broadcast@awa.plat1 -> awa

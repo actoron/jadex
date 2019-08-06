@@ -1,7 +1,5 @@
 package jadex.commons.future;
 
-import java.util.concurrent.CompletableFuture;
-
 import jadex.commons.functional.BiFunction;
 import jadex.commons.functional.Consumer;
 import jadex.commons.functional.Function;
@@ -242,7 +240,9 @@ public interface IFuture<E>
 	
 	public <T> void exceptionally(Future<T> delegate);
 	
-	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function);
+	public IFuture<E> exceptionally(final Consumer<? super Exception> consumer);
 	
-	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function, Class<?> futuretype);
+	public IFuture<E> exceptionally(final Consumer<? super Exception> function, Class<?> consumer);
+	
+	public void delegate(Future<E> delegate);
 }

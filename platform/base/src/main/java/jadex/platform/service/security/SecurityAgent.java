@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
@@ -47,19 +48,20 @@ import jadex.bridge.component.IUntrustedMessageHandler;
 import jadex.bridge.component.impl.IInternalExecutionFeature;
 import jadex.bridge.nonfunctional.annotation.NameValue;
 import jadex.bridge.service.IInternalService;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Security;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.bridge.service.types.security.ISecurityService;
-import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.bridge.service.types.settings.IPlatformSettings;
 import jadex.bridge.service.types.simulation.SSimulation;
 import jadex.commons.Boolean3;
+import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IAutoLock;
@@ -97,8 +99,7 @@ import jadex.platform.service.serialization.SerializationServices;
 /**
  *  Agent that provides the security service.
  */
-@Agent(autostart=Boolean3.TRUE,
-	predecessors="jadex.platform.service.clock.ClockAgent")
+@Agent(autostart=Boolean3.TRUE)
 @Arguments(value={
 		@Argument(name="usesecret", clazz=Boolean.class, defaultvalue="null"),
 		@Argument(name="printsecret", clazz=Boolean.class, defaultvalue="null"),
@@ -164,7 +165,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	
 	/** Flag whether to use the default Java trust store. */
 	@AgentArgument
-	protected boolean loadjavatruststore = true;
+	protected boolean loadjavatruststore = false;
 	
 	/** Flag if the security should add a global network
 	 *  if no global network is set.
@@ -258,11 +259,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	@AgentCreated
 	public IFuture<Void> start()
 	{
+		long ts = System.currentTimeMillis();
 		if (handshaketimeout < 0)
 			handshaketimeout = (long) (Starter.getDefaultTimeout(agent.getId().getRoot()) * handshaketimeoutscale);
 		if (handshaketimeout <= 0)
 			handshaketimeout = 60000;
 		final Future<Void> ret = new Future<Void>();
+		//ret.thenAccept(done -> System.out.println("Sec startup " + (System.currentTimeMillis() - ts)));
 		
 		((SerializationServices)SerializationServices.getSerializationServices(agent.getId().getRoot())).setSecurityService(this);
 		
@@ -1883,43 +1886,26 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	}
 	
 	/**
-	 *  Get the settings service.
-	 */
-	protected ISettingsService getSettingsService()
-	{
-		ISettingsService ret = null;
-		try
-		{
-			ret = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(ISettingsService.class));
-		}
-		catch (Exception e)
-		{
-		}
-		return ret;
-	}
-	
-	/**
 	 *  Loads the settings.
 	 */
 	@SuppressWarnings("unchecked")
 	protected IFuture<Map<String, Object>> loadSettings()
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
-		ISettingsService setserv = getSettingsService();
-		if (setserv != null)
+		IPlatformSettings set = Starter.getPlatformSettings(agent.getId());
+		if (set != null)
 		{
-			setserv.loadState(PROPERTIES_ID).addResultListener(new IResultListener<Object>()
+			Map<String, Object> result = null;
+			try
 			{
-				public void resultAvailable(Object result)
-				{
-					ret.setResult(result != null ? (Map<String, Object>) result : new HashMap<String, Object>());
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setResult(null);
-				}
-			});
+				result = (Map<String, Object>) set.loadState(PROPERTIES_ID);
+			}
+			catch (Exception e)
+			{
+			}
+			if (result == null)
+				result = Collections.emptyMap();
+			ret.setResult(result);
 		}
 		else
 		{
@@ -1933,9 +1919,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	protected void saveSettings()
 	{
-		ISettingsService setserv = getSettingsService();
-		if (setserv == null)
-			return;
+		IPlatformSettings set = Starter.getPlatformSettings(agent.getId());
 		
 		Map<String, Object> settings = new HashMap<String, Object>();
 		
@@ -1958,7 +1942,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		if(trustedplatforms != null && trustedplatforms.size() > 0)
 			settings.put("trustedplatforms", trustedplatforms);
 		
-		setserv.saveState(PROPERTIES_ID, settings);
+		set.saveState(PROPERTIES_ID, settings);
 		
 		/*jadex.commons.Properties settings = new jadex.commons.Properties();
 		
@@ -2502,5 +2486,43 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public IFuture<Object> invokeMethod(String methodname, ClassInfo[] argtypes, Object[] args, ClassInfo rettype)
 	{
 		return new Future<Object>(new UnsupportedOperationException());
+	}
+	
+	/**
+	 *  Get reflective info about the service methods, args, return types.
+	 *  @return The method infos.
+	 */
+	public IFuture<MethodInfo[]> getMethodInfos()
+	{
+		Class<?> iface = sid.getServiceType().getType(agent.getClassLoader());
+		
+		Set<Method> ms = new HashSet<>();
+		
+		Set<Class<?>> todo = new HashSet<>();
+		todo.add(iface);
+		todo.add(IService.class);
+		while(todo.size()>0)
+		{
+			Class<?> cur = todo.iterator().next();
+			todo.remove(cur);
+			ms.addAll(SUtil.arrayToList(cur.getMethods()));
+			
+			cur = cur.getSuperclass();
+			while(cur!=null && cur.getAnnotation(Service.class)==null)
+				cur = cur.getSuperclass();
+			
+			if(cur!=null)
+				todo.add(cur);
+		}
+		
+		MethodInfo[] ret = new MethodInfo[ms.size()];
+		Iterator<Method> it = ms.iterator();
+		for(int i=0; i<ms.size(); i++)
+		{
+			MethodInfo mi = new MethodInfo(it.next());
+			ret[i] = mi;
+		}
+		
+		return new Future<MethodInfo[]>(ret);
 	}
 }

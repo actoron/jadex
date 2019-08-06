@@ -31,8 +31,7 @@ import jadex.micro.annotation.RequiredServices;
  *  Wrapper for executing Java programs.
  */
 @Agent
-@ProvidedServices(@ProvidedService(type=IJavaWrapperService.class,
-	implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IJavaWrapperService.class))
 @RequiredServices({
 	@RequiredService(name="tpservice", type=IThreadPoolService.class, scope=ServiceScope.PLATFORM),
 	@RequiredService(name="libservice", type=ILibraryService.class, scope=ServiceScope.PLATFORM)

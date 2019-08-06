@@ -50,8 +50,7 @@ import jadex.micro.annotation.RequiredServices;
  *  
  *  It offers the executeCommand() method via the ICliService.
  */
-@Agent(autostart=Boolean3.TRUE,
-	predecessors="jadex.platform.service.security.SecurityAgent")
+@Agent(autostart=Boolean3.TRUE)
 @Service
 @Arguments(
 {
@@ -61,7 +60,7 @@ import jadex.micro.annotation.RequiredServices;
 })
 @ProvidedServices(
 {
-	@ProvidedService(name="cliser", scope=ServiceScope.PLATFORM, type=ICliService.class, implementation=@Implementation(expression="$pojoagent")),
+	@ProvidedService(name="cliser", scope=ServiceScope.PLATFORM, type=ICliService.class),
 	@ProvidedService(type=IInternalCliService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"cliser\")"))
 })
 @RequiredServices(

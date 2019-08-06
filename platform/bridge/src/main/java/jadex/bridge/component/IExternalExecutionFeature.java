@@ -1,20 +1,14 @@
 package jadex.bridge.component;
 
-import java.util.Collection;
 import java.util.Map;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ISearchConstraints;
 import jadex.bridge.service.types.cms.CMSStatusEvent;
-import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITuple2Future;
 
 /**
  *  External perspective of the execution feature. 
@@ -119,13 +113,18 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> repeatStep(long initialDelay, long delay, IComponentStep<T> step, boolean ignorefailures);
 	
-	
 	/**
 	 *  Add a component listener for a specific component.
 	 *  The listener is registered for component changes.
 	 *  @param cid	The component to be listened.
 	 */
 	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToComponent();
+	
+	/**
+	 *  Add a component listener for all components of a platform.
+	 *  The listener is registered for component changes.
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> listenToAll();
 	
 //	/**
 //	 * Search for components matching the given description.
@@ -229,4 +228,12 @@ public interface IExternalExecutionFeature extends IExternalComponentFeature
 	 */
 	// Todo: hack??? should be internal to CMS!?
 	public IFuture<IComponentDescription> getDescription(IComponentIdentifier cid);
+	
+	/**
+	 *  Get the component description.
+	 *  @return	The component description.
+	 */
+	// Todo: hack??? should be internal to CMS!?
+	public IFuture<IComponentDescription[]> getDescriptions();
+
 }

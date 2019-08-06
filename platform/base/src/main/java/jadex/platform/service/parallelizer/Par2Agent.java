@@ -31,9 +31,7 @@ import jadex.platform.service.servicepool.IServicePoolService;
  */
 @Agent
 @Service
-@ProvidedServices(
-	@ProvidedService(type=IParallelService.class, 
-		implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IParallelService.class))
 @RequiredServices(
 {
 	@RequiredService(name="poolser", type=IServicePoolService.class),

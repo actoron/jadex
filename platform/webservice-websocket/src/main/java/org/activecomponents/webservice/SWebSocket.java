@@ -27,7 +27,7 @@ public class SWebSocket
 	//-------- constants --------
 	
 	/** Attribute name for platform in context. */
-	public static final String	ATTR_PLATFORM	= "com.actoron.webservice.platform";
+	public static final String	ATTR_PLATFORM	= "org.activecomponents.webservice.platform";
 	
 	//-------- methods --------
 	

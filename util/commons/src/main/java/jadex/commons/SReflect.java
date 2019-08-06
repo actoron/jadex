@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -26,7 +27,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -512,6 +512,39 @@ public class SReflect
 		
 		return name;
 	}
+	
+	
+	/**
+	 *	Get unqualified type name.
+	 *  @return The unqualified (without package) name of a class.
+	 */
+	public static String getTypeName(String name)
+	{
+		if(name==null)
+			throw new IllegalArgumentException("Null not allowed.");
+		
+		int lpos = name.indexOf("<");
+		if(lpos>0)
+		{
+			String left = name.substring(0, lpos);
+			
+			left = makeNiceArrayNotation(left);
+			
+			String right = name.substring(lpos+1);
+			right = getTypeName(right);
+			name = left+"<"+right;
+		}
+		else
+		{
+			name = makeNiceArrayNotation(name);
+		}
+		
+		int pos = name.lastIndexOf(".");
+		if(pos!=-1)
+			name = name.substring(pos+1);
+		
+		return name;
+	}
 
 	/**
 	 *  Process a type name and replace array notation with nice one.
@@ -552,6 +585,7 @@ public class SReflect
 		return name;
 	}
 	
+	
 	public static void main(String[] args)
 	{
 //		System.out.println(getUnqualifiedTypeName("a.b.c.D<aa.F<ab.V><a.B>>>"));
@@ -559,21 +593,24 @@ public class SReflect
 //		System.out.println(String[][].class.getName()+" "+getUnqualifiedTypeName(String[][].class.getName()));
 	
 	
-		String a1 = Object[].class.getName();
-		String a2 = String[].class.getName();
-		String a3 = Integer[].class.getName();
-		String a4 = int[].class.getName();
-		String a5 = double[].class.getName();
-		String a6 = byte[].class.getName();
-		String a7 = Byte[].class.getName();
+//		String a1 = Object[].class.getName();
+//		String a2 = String[].class.getName();
+//		String a3 = Integer[].class.getName();
+//		String a4 = int[].class.getName();
+//		String a5 = double[].class.getName();
+//		String a6 = byte[].class.getName();
+//		String a7 = Byte[].class.getName();
+//		
+//		System.out.println(makeNiceArrayNotation(a1));
+//		System.out.println(makeNiceArrayNotation(a2));
+//		System.out.println(makeNiceArrayNotation(a3));
+//		System.out.println(makeNiceArrayNotation(a4));
+//		System.out.println(makeNiceArrayNotation(a5));
+//		System.out.println(makeNiceArrayNotation(a6));
+//		System.out.println(makeNiceArrayNotation(a7));
 		
-		System.out.println(makeNiceArrayNotation(a1));
-		System.out.println(makeNiceArrayNotation(a2));
-		System.out.println(makeNiceArrayNotation(a3));
-		System.out.println(makeNiceArrayNotation(a4));
-		System.out.println(makeNiceArrayNotation(a5));
-		System.out.println(makeNiceArrayNotation(a6));
-		System.out.println(makeNiceArrayNotation(a7));
+		System.out.println(getMethodSignature(SReflect.getMethod(Object.class, "main", new Class[] {String[].class})));
+		
 	}
 	
 	/**
@@ -672,11 +709,14 @@ public class SReflect
 	 */
 	public static String getMethodSignature(Method method)
 	{
+		if(method==null)
+			throw new IllegalArgumentException("Method must not null");
+		
 		StringBuffer buf = new StringBuffer();
 		try
 		{
 			Type rtype = method.getGenericReturnType();
-			buf.append(getUnqualifiedTypeName(rtype.toString())).append(" ");
+			buf.append(getTypeName(rtype.toString())).append(" ");
 		}
 		catch(Exception e)
 		{
@@ -688,8 +728,7 @@ public class SReflect
 			Type[] ptypes = method.getGenericParameterTypes();
 			for(int i=0; i<ptypes.length; i++)
 			{
-				// why unqualified?
-				buf.append(getUnqualifiedTypeName(ptypes[i].toString()));
+				buf.append(getTypeName(ptypes[i].toString()));
 				if(i+1<ptypes.length)
 					buf.append(", ");
 			}
@@ -812,7 +851,7 @@ public class SReflect
 	}
 
 	/**
-	 *  Get a method of the class.
+	 *  Get a public method of the class.
 	 *  Unlike {@link Class#getMethod(String, Class[])},
 	 *  this uses the methodcache.
 	 *  @param clazz	The class to search.
@@ -820,10 +859,10 @@ public class SReflect
 	 *  @param types	The parameter types.
 	 *  @return	The method (or null if not found).
 	 */
-	public static Method	getMethod(Class<?> clazz, String name, Class<?>[] types)
+	public static Method getMethod(Class<?> clazz, String name, Class<?>[] types)
 	{
-		Method	meth	= null;
-		Method[]	ms	= getMethods(clazz, name);
+		Method	meth = null;
+		Method[] ms = getMethods(clazz, name);
 		for(int i=0; i<ms.length; i++)
 		{
 			Class<?>[]	ptypes	= ms[i].getParameterTypes();
@@ -836,6 +875,37 @@ public class SReflect
 			if(match)
 			{
 				meth	= ms[i];
+				break;
+			}
+		}
+		return meth;
+	}
+	
+	/**
+	 *  Get a method of the class.
+	 *  Unlike {@link Class#getMethod(String, Class[])},
+	 *  this uses the methodcache.
+	 *  @param clazz The class to search.
+	 *  @param name	The name of the method to search for.
+	 *  @param types The parameter types.
+	 *  @return	The method (or null if not found).
+	 */
+	public static Method getAnyMethod(Class<?> clazz, String name, Class<?>[] types)
+	{
+		Method	meth = null;
+		Method[] ms = getAllMethods(clazz, name);
+		for(int i=0; i<ms.length; i++)
+		{
+			Class<?>[] ptypes = ms[i].getParameterTypes();
+			boolean	match = ptypes.length==types.length;
+			for(int j=0; match && j<ptypes.length; j++)
+			{
+				match = ptypes[j].equals(types[j]);
+			}
+
+			if(match)
+			{
+				meth = ms[i];
 				break;
 			}
 		}
@@ -961,6 +1031,73 @@ public class SReflect
 		}
 
 		return ret.toArray(new Method[ret.size()]);
+	}
+	
+	/**
+	 *  Gets a declared methods similar to Class.getDeclaredMethod() but returns null instead of throwing exception.
+	 * 
+	 *  @param clazz The class being operated on.
+	 *  @param methodname Name of the method.
+	 *  @param parametertypes The parameter types.
+	 *  @return Method, if declared method is found in the class, null otherwise.
+	 */
+	public static final Method getDeclaredMethod0(Class<?> clazz, String methodname, Class<?>... parametertypes)
+	{
+		Method[] methods = clazz.getDeclaredMethods();
+		for (int i = 0; i < methods.length; ++i)
+		{
+			if (methods[i].getName().equals(methodname) && Arrays.equals(parametertypes, methods[i].getParameterTypes()))
+				return methods[i];
+		}
+		return null;
+	}
+	
+	/**
+	 *  Finds the declaring interface of a method in a multiple-inheritance interface using a breadth-first approach.
+	 * 
+	 *  @param iface The starting interface.
+	 *  @param methodname The method name.
+	 *  @param parametertypes The method parameter types.
+	 *  @return The declaring interface or null if none is found.
+	 */
+	public static final Class<?> getDeclaringInterface(Class<?> iface, String methodname, Class<?>... parametertypes)
+	{
+		assert iface != null && iface.isInterface();
+		Method declmeth = getDeclaredMethod0(iface, methodname, parametertypes);
+		
+		if (declmeth != null)
+			return iface;
+		else
+			return findDeclaringInterface(iface, methodname, parametertypes);
+	}
+	
+	/**
+	 *  Recursive breadth-first search of superinterfaces for a declaring interface of a specific method.
+	 * 
+	 *  @param iface The starting interface.
+	 *  @param methodname The method name.
+	 *  @param parametertypes The method parameter types.
+	 *  @return The declaring interface or null if none is found.
+	 */
+	private static final Class<?> findDeclaringInterface(Class<?> iface, String methodname, Class<?>... parametertypes)
+	{
+		Method declmeth = null;
+		Class<?>[] superinterfaces = iface.getInterfaces();
+		
+		for (int i = 0; i < superinterfaces.length; ++i)
+		{
+			declmeth = getDeclaredMethod0(superinterfaces[i], methodname, parametertypes);
+			if (declmeth != null)
+				return superinterfaces[i];
+		}
+		
+		for (int i = 0; i < superinterfaces.length; ++i)
+		{
+			Class<?> ret = findDeclaringInterface(superinterfaces[i], methodname, parametertypes);
+			if (ret != null)
+				return ret;
+		}
+		return null;
 	}
 
 	/**
@@ -1103,6 +1240,64 @@ public class SReflect
 //		System.out.println("found: "+res);
 		
 		return clazz;
+	}
+	
+	/**
+	 *  Reflectively instantiates an object by heuristically matching the constructor parameters.
+	 *  
+	 *  @param classname Name of the object class.
+	 *  @param conparams Constructor parameters.
+	 *  @return Instantiated object.
+	 */
+	public static final Object newInstance(String classname, Object... conparams)
+	{
+		return newInstance(classname, SReflect.class.getClassLoader(), conparams);
+	}
+	
+	/**
+	 *  Reflectively instantiates an object by heuristically matching the constructor parameters.
+	 *  
+	 *  @param classname Name of the object class.
+	 *  @param cl The classloader to find the class.
+	 *  @param conparams Constructor parameters.
+	 *  @return Instantiated object.
+	 */
+	public static final Object newInstance(String classname, ClassLoader cl, Object... conparams)
+	{
+		try
+		{
+			Class<?> clazz = cl.loadClass(classname);
+			if (conparams.length == 0)
+				return clazz.getConstructor().newInstance();
+			
+			Constructor<?>[] cons = clazz.getConstructors();
+			for (Constructor<?> con : cons)
+			{
+				Class<?>[] params = con.getParameterTypes();
+				if (params.length == conparams.length)
+				{
+					boolean match = true;
+					for (int i = 0; i < params.length; ++i)
+					{
+						Class<?> conparamtype = conparams[i] != null ? conparams[i].getClass() : null;
+						if (conparamtype != null && !isSupertype(getWrappedType(params[i]), conparamtype))
+						{
+							match = false;
+							break;
+						}
+					}
+					if (match)
+					{
+						return con.newInstance(conparams);
+					}
+				}
+			}
+			throw new IllegalArgumentException("No constructor found: " + classname + " " + Arrays.toString(conparams));
+		}
+		catch (Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
+		}
 	}
 
 	/**

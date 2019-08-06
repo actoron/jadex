@@ -2,20 +2,22 @@ package jadex.bridge.component.impl.remotecommands;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IRemoteCommand;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
-import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.registry.IRemoteRegistryService;
 import jadex.bridge.service.types.security.ISecurityInfo;
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -266,13 +268,10 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			while(level==null && implclass!=null)
 			{
 				// Todo: cache for speed?
-				try
+				Method declmeth = SReflect.getDeclaredMethod0(implclass, m0.getName(), m0.getParameterTypes());
+				if (declmeth != null)
 				{
-					level = implclass.getDeclaredMethod(m0.getName(), m0.getParameterTypes()).getAnnotation(Security.class);
-				}
-				catch(Exception e)
-				{
-					// ignore (e.g. NoSuchMethodException)
+					level = declmeth.getAnnotation(Security.class);
 				}
 				
 				if(level==null)
@@ -287,12 +286,28 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 			if(level==null)
 			{
 				// Specificity: method before class
-				level	= m0.getAnnotation(Security.class);
+				level = m0.getAnnotation(Security.class);
 				Class<?> type = sid.getServiceType().getType(access.getClassLoader());
 				
 				if(level==null && type != null)
 				{
-					level = type.getAnnotation(Security.class);
+					type = SReflect.getDeclaringInterface(type, m0.getName(), m0.getParameterTypes());
+					
+					if (type != null)
+					{
+						Method declmeth = null;
+						try
+						{
+							declmeth = type.getDeclaredMethod(m0.getName(), m0.getParameterTypes());
+						}
+						catch (Exception e)
+						{
+							// Should not happen, we know the method is there...
+						}
+						level = declmeth.getAnnotation(Security.class);
+						if (level == null)
+							level = type.getAnnotation(Security.class);
+					}
 				}
 				
 				if(level==null && access.getDescription().isSystemComponent())

@@ -3,6 +3,7 @@ package jadex.commons.future;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,7 +52,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	
 	/** Debug flag. */
 	// Hack!!! Non-final to be setable from Starter 
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	
 	/** Disable Stack unfolding for easier debugging. */
 	// Hack!!! Non-final to be setable from Starter 
@@ -1192,26 +1193,78 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 		});
 	}
 	
-	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function)
+	public void delegate(Future<E> target)
+	{
+		if(target==null)
+			throw new IllegalArgumentException("Target must not null");
+		
+		if(target instanceof IPullSubscriptionIntermediateFuture)
+		{
+			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
+				(PullSubscriptionIntermediateDelegationFuture)target, (IPullSubscriptionIntermediateFuture)this);
+			this.addResultListener(lis);
+		}
+		else if(target instanceof IPullIntermediateFuture)
+		{
+			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
+				(PullIntermediateDelegationFuture)target, (IPullIntermediateFuture)this);
+			this.addResultListener(lis);
+		}
+		else if(target instanceof ISubscriptionIntermediateFuture)
+		{
+			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
+				(TerminableIntermediateDelegationFuture)target, (ISubscriptionIntermediateFuture)this);
+			this.addResultListener(lis);
+		}
+		else if(target instanceof ITerminableIntermediateFuture)
+		{
+			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
+				(TerminableIntermediateDelegationFuture)target, (ITerminableIntermediateFuture)this);
+			this.addResultListener(lis);
+		}
+		else if(target instanceof ITerminableFuture)
+		{
+			TerminableDelegationResultListener lis = new TerminableDelegationResultListener(
+				(TerminableDelegationFuture)target, (ITerminableFuture)this);
+			this.addResultListener(lis);
+		}
+		else if(target instanceof IIntermediateFuture)
+		{
+			this.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)target));
+		}
+		else
+		{
+			this.addResultListener(new DelegationResultListener(target));
+		}
+	}
+	
+	public IFuture<E> exceptionally(final Consumer<? super Exception> consumer)
     {
-        return exceptionally(function, null);
+        return exceptionally(consumer, null);
     }
 	
-	public IFuture<E> exceptionally(final Function<? super Exception, IFuture<E>> function, Class<?> futuretype)
+	public IFuture<E> exceptionally(final Consumer<? super Exception> consumer, Class<?> futuretype)
     {
-		final Future<E> ret = getFuture(futuretype);
-
-		this.addResultListener(new DelegationResultListener<E>(ret)
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		IResultListener<E> reslis = new IIntermediateResultListener()
 		{
-			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				 IFuture<E> res = function.apply(exception);
-                 res.addResultListener(SResultListener.delegate(ret));
+				 consumer.accept(exception);
 			}
-		});
+			public void resultAvailable(Object result)
+			{
+			}
+			public void intermediateResultAvailable(Object result)
+			{
+			}
+			public void finished()
+			{
+			}
+		};
+		addResultListener(reslis);
 		
-        return ret;
+        return this;
     }
 	
 	/**

@@ -10,10 +10,7 @@ import jadex.platform.service.transport.ITransport;
 /**
  *  Agent that implements TCP message transport.
  */
-@Agent(name="tcp",
-	autostart=Boolean3.TRUE,
-	predecessors="jadex.platform.service.address.TransportAddressAgent",
-	successors="jadex.platform.service.registry.SuperpeerClientAgent")
+@Agent(name="tcp", autostart=Boolean3.TRUE)
 public class TcpTransportAgent extends AbstractTransportAgent2<SocketChannel>
 {
 	//-------- abstract methods to be provided by concrete transport --------

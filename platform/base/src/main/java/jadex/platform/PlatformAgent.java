@@ -4,22 +4,24 @@ import static jadex.base.IPlatformConfiguration.LOGGING_LEVEL;
 import static jadex.base.IPlatformConfiguration.PLATFORMPROXIES;
 import static jadex.base.IPlatformConfiguration.UNIQUEIDS;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.IOException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.Starter;
@@ -33,6 +35,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -74,7 +77,9 @@ import jadex.platform.service.security.SecurityAgent;
 {
 	@Argument(name=LOGGING_LEVEL, clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
 	@Argument(name=UNIQUEIDS, clazz=boolean.class, defaultvalue="true"),
-	@Argument(name=PLATFORMPROXIES, clazz=boolean.class, defaultvalue="true")
+	@Argument(name=PLATFORMPROXIES, clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="simulation", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="bisimulation", clazz=boolean.class, defaultvalue="false")
 })
 
 @ProvidedServices({
@@ -82,6 +87,8 @@ import jadex.platform.service.security.SecurityAgent;
 	// hack!!! no daemon here (possibly fixed?)
 	@ProvidedService(type=IDaemonThreadPoolService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="new jadex.platform.service.threadpool.ThreadPoolService($args.threadpoolclass!=null ? jadex.commons.SReflect.classForName0($args.threadpoolclass, jadex.commons.SReflect.class.getClassLoader()).newInstance() : new jadex.commons.concurrent.JavaThreadPool(true), $component.getId())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(expression="PlatformAgent.createExecutionServiceImpl($args.asyncexecution, $args.simulation, $args.bisimulation, $component)", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IClockService.class, scope=ServiceScope.PLATFORM, implementation=@Implementation(
+			expression="$args.simulation==null || !$args.simulation.booleanValue()? new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component): new jadex.platform.service.clock.ClockService(new jadex.platform.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component)", proxytype=Implementation.PROXYTYPE_RAW))
 //	@ProvidedService(type=IComponentManagementService.class, name="cms", implementation=@Implementation(expression="new jadex.bridge.service.types.cms.ComponentManagementService($platformaccess, $bootstrapfactory, $args.uniqueids)"))
 })
 
@@ -101,6 +108,8 @@ public class PlatformAgent
 	/** Boolean if platform proxies should be created. */
 	@AgentArgument
 	protected boolean platformproxies;
+	
+	protected static final String STARTUP_CACHE_FILE = "platform_auto.conf";
 	
 	//-------- service creation helpers --------
 	
@@ -195,38 +204,79 @@ public class PlatformAgent
 		Future<Void> ret = new Future<>();
 //		System.out.println("Start scanning...");
 		long start = System.currentTimeMillis();
-		Set<ClassInfo> cis;
-				
-		if(agent.getArgument("startconfig")!=null)
+		
+		String file = (String) agent.getArgument("startconfig");
+		if (file==null)
 		{
-			cis = new HashSet<>();
-			String file = (String)agent.getArgument("startconfig");
+			File cache = new File(STARTUP_CACHE_FILE);
+			if (cache.exists() && !Boolean.TRUE.equals(agent.getArgument("rescan")))
+				file = cache.getAbsolutePath();
+		}
+		
+		HashMap<File, Set<ClassInfo>> codesources = new HashMap<>();
+		HashMap<File, Long> moddates = new HashMap<>();
+		
+		if(file!=null)
+		{
 			InputStream is = SUtil.getResource0(file, agent.getClassLoader());
 			if(is!=null)
 			{
-				try
+				String[] conflines = SUtil.readStreamLines(is);
+				
+				File codesource=null;
+				
+				for (String line : conflines)
 				{
-					byte[] bytes = SUtil.readStream(is);
-					String str = new String(bytes, StandardCharsets.UTF_8);
-					StringTokenizer stok = new StringTokenizer(str, " "+SUtil.LF);
-					while(stok.hasMoreTokens())
+					String tok = line.trim();
+					if(tok.startsWith("//"))
 					{
-						String tok = stok.nextToken().trim();
-						if(tok.startsWith("//"))
+						System.out.println("Skipping: "+tok);
+						continue;
+					}
+					
+					if(tok.startsWith("##"))
+					{
+						String metastr = tok.substring(2).trim();
+						if(metastr.length() > 0)
 						{
-							System.out.println("Skipping: "+tok);
-							continue;
+							String[] split = metastr.split("\\|");
+							if (split.length==2)
+							{
+								String codesourcestr = split[0].trim();
+								codesource = new File(codesourcestr);
+								long moddate = Long.valueOf(split[1].trim());
+								moddates.put(codesource, moddate);
+								if (!codesources.containsKey(codesource))
+									codesources.put(codesource, null);
+							}
+							else
+							{
+								System.out.println("Cannot read meta info: "+tok + " " + split.length);
+							}
 						}
+						else
+						{
+							System.out.println("Cannot read meta info: "+metastr);
+						}
+					}
+					else
+					{
 						ClassInfo ci = SClassReader.getClassInfo(tok, agent.getClassLoader(), true, true);
 						if(ci!=null)
+						{
+							Set<ClassInfo> cis = codesources.get(codesource);
+							if(cis==null)
+							{
+								cis = new HashSet<>();
+								codesources.put(codesource, cis);
+							}
 							cis.add(ci);
+						}
 						else
+						{
 							System.out.println("Cannot read system agent: "+tok);
+						}
 					}
-				}
-				catch(IOException e)
-				{
-					System.out.println("Cannot read startconfig: "+file);
 				}
 			}
 			else
@@ -234,12 +284,64 @@ public class PlatformAgent
 				System.out.println("Cannot read startconfig: "+file);
 			}
 		}
-		else
+		
+		URL[] urls = getClasspathUrls(PlatformAgent.class.getClassLoader());
+		// Remove JVM jars
+		urls = SUtil.removeSystemUrls(urls);
+		Set<File> cpfiles = Arrays.stream(urls).filter(url -> "file".equals(url.getProtocol())).map(url -> new File(SUtil.toURI(url))).collect(Collectors.toSet());
+		Set<File> scanfiles = new HashSet<>(cpfiles);
+		
+		boolean writecache = false;
+		for (Iterator<Map.Entry<File, Set<ClassInfo>>> it = codesources.entrySet().iterator(); it.hasNext(); )
 		{
-			URL[] urls = getClasspathUrls(PlatformAgent.class.getClassLoader());
-			// Remove JVM jars
-			urls = SUtil.removeSystemUrls(urls);
-			cis = SReflect.scanForClassInfos(urls, null, filter);
+			Map.Entry<File, Set<ClassInfo>> entry = it.next();
+			if (!cpfiles.contains(entry.getKey()) ||
+				!entry.getKey().exists())
+			{
+				it.remove();
+				scanfiles.remove(entry.getKey());
+				writecache = true;
+			}
+			else if (entry.getKey().lastModified() == moddates.get(entry.getKey()))
+			{
+				scanfiles.remove(entry.getKey());
+			}
+		}
+		
+		//System.out.println("Scan size: " + scanfiles.size());
+		
+		for (File f : scanfiles)
+		{
+			writecache = true;
+			Set<ClassInfo> infos = SReflect.scanForClassInfos(new URL[] {SUtil.toURL(f.toURI())}, null, filter);
+			codesources.put(f, infos);
+		}
+		
+		Set<ClassInfo> cis = codesources.values().stream().filter(cscis -> cscis != null).flatMap(cscis -> cscis.stream()).collect(Collectors.toSet());
+		
+		if (writecache)
+		{
+			File cache = new File(STARTUP_CACHE_FILE);
+			try (OutputStream os = new BufferedOutputStream(new FileOutputStream(cache)))
+			{
+				for (Map.Entry<File, Set<ClassInfo>> entry : codesources.entrySet())
+				{
+					if (entry.getValue() != null)
+					{
+						String line = "## " + entry.getKey().getAbsolutePath() + " | " + entry.getKey().lastModified() + "\n";
+						os.write(line.getBytes(SUtil.UTF8));
+						for (ClassInfo inf : entry.getValue())
+						{
+							line = inf.getClassName() + "\n";
+							os.write(line.getBytes(SUtil.UTF8));
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				agent.getLogger().warning("Failed to write startup cache: " + STARTUP_CACHE_FILE);
+			}
 		}
 		
 		List<CreationInfo> infos = new ArrayList<>();
@@ -343,7 +445,7 @@ public class PlatformAgent
 				{
 					if(!result.getId().getRoot().equals(agent.getId().getRoot()))
 					{
-						System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
+						//System.out.println("found platform: "+result.getId());//+" "+SComponentManagementService.containsComponent(result.getId()));
 						Map<String, Object> args = new HashMap<>();
 						args.put("component", result.getId());
 						agent.createComponent(new CreationInfo().setFilename("jadex.platform.service.remote.ProxyAgent.class")

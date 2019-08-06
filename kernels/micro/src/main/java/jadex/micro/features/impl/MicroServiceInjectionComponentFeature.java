@@ -2,9 +2,13 @@ package jadex.micro.features.impl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -16,16 +20,18 @@ import jadex.bridge.component.IPojoComponentFeature;
 import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
+import jadex.bridge.service.component.RequiredServicesComponentFeature;
 import jadex.bridge.service.component.UnresolvedServiceInvocationHandler;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
-import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -41,8 +47,10 @@ import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.features.IMicroServiceInjectionFeature;
 
 /**
- *  Inject required services into annotated field values.
+ *  Inject required services into annotated field values of the agent.
  *  Performed after subcomponent creation and provided service initialization.
+ *  
+ *  Method injectServices also used for injecting into separate service.
  */
 public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeature	implements IMicroServiceInjectionFeature
 {
@@ -69,11 +77,29 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	 */
 	public IFuture<Void> init()
 	{
+		MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
+		Object agent = getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
+
+		// Fetch all injection names - field and method injections
+		String[] sernames = model.getServiceInjectionNames();
+		Stream<Tuple2<String, ServiceInjectionInfo[]>> s = Arrays.stream(sernames).map(sername -> new Tuple2<String, ServiceInjectionInfo[]>(sername, model.getServiceInjections(sername)));
+		Map<String, ServiceInjectionInfo[]> serinfos = s.collect(Collectors.toMap(t -> t.getFirstEntity(), t -> t.getSecondEntity())); 
+
+		//InjectionInfoHolder ii = model.getInjectionInfoHolder();
+		
+		return injectServices(component, agent, sernames, serinfos, model.getModelInfo());
+	}
+	
+	/**
+	 * 
+	 * @param component
+	 * @param target
+	 * @return
+	 */
+	public static IFuture<Void> injectServices(IInternalAccess component, Object target, String[] sernames, Map<String, ServiceInjectionInfo[]> serinfos, IModelInfo model)
+	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final MicroModel model = (MicroModel)getComponent().getModel().getRawModel();
-		final Object agent = getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
-
 		// Inject required services
 		if(component.getFeature(IRequiredServicesFeature.class)==null)
 		{
@@ -82,7 +108,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		else
 		{
 			// Fetch all injection names - field and method injections
-			String[] sernames = model.getServiceInjectionNames();
+			//String[] sernames = model.getServiceInjectionNames();
 			
 			if(sernames.length>0)
 			{
@@ -91,20 +117,20 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		
 				for(int i=0; i<sernames.length; i++)
 				{
-					final ServiceInjectionInfo[] infos = model.getServiceInjections(sernames[i]);
+					final ServiceInjectionInfo[] infos = serinfos.get(sernames[i]); //model.getServiceInjections(sernames[i]);
 					final CounterResultListener<Void> lis2 = new CounterResultListener<Void>(infos.length, lis);
 	
 					String sername = (String)SJavaParser.evaluateExpressionPotentially(sernames[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
-					
-					// Uses required service info to search service
-					RequiredServiceInfo	info = model.getModelInfo().getService(sername);				
 										
 					for(int j=0; j<infos.length; j++)
 					{
+						// Uses required service info to search service
+						RequiredServiceInfo	info = infos[j].getRequiredServiceInfo()!=null? infos[j].getRequiredServiceInfo(): model.getService(sername);				
+						
 						if(infos[j].getFieldInfo()!=null)
 						{
-							final IFuture<Object> sfut = callgetService(sername, info);
-							final Field	f	= infos[j].getFieldInfo().getField(component.getClassLoader());
+							final IFuture<Object> sfut = callgetService(sername, info, component);
+							final Field	f = infos[j].getFieldInfo().getField(component.getClassLoader());
 							
 							// todo: what about multi case?
 							// why not add values to a collection as they come?!
@@ -116,7 +142,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								try
 								{
 									f.setAccessible(true);
-									f.set(agent, sfut);
+									f.set(target, sfut);
 									lis2.resultAvailable(null);
 								}
 								catch(Exception e)
@@ -131,12 +157,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								
 								// todo: disallow multiple field injections!
 								// This is problematic because search can defer the agent startup esp. when remote search
-								if(sfut.isDone())
+								if(sfut.isDone() && sfut.getException() == null)
 								{
 									try
 									{
 										f.setAccessible(true);
-										f.set(agent, sfut.get());
+										f.set(target, sfut.get());
 										lis2.resultAvailable(null);
 									}
 									catch(Exception e)
@@ -149,20 +175,15 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 									|| !infos[j].isLazy()))
 								{
 									RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceInfo(sername);
-									Class<?> clz = rsi.getType().getType(getComponent().getClassLoader(), getComponent().getModel().getAllImports());
-									UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(new IResultCommand<IFuture<Object>, Void>()
-									{
-										public IFuture<Object> execute(Void args)
-										{
-											return sfut;
-										}
-									});
-									Object proxy = ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{IService.class, clz}, h);
+									Class<?> clz = rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
+									ServiceQuery<Object> query = RequiredServicesComponentFeature.getServiceQuery(component, info);
+									UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
+									Object proxy = ProxyFactory.newProxyInstance(component.getClassLoader(), new Class[]{IService.class, clz}, h);
 								
 									try
 									{
 										f.setAccessible(true);
-										f.set(agent, proxy);
+										f.set(target, proxy);
 										lis2.resultAvailable(null);
 									}
 									catch(Exception e)
@@ -183,7 +204,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 											try
 											{
 												f.setAccessible(true);
-												f.set(agent, result);
+												f.set(component, result);
 												lis2.resultAvailable(null);
 											}
 											catch(Exception e)
@@ -223,14 +244,17 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						}
 						else if(infos[j].getMethodInfo()!=null)
 						{
-							final Method m = SReflect.getMethod(agent.getClass(), infos[j].getMethodInfo().getName(), infos[j].getMethodInfo().getParameterTypes(component.getClassLoader()));
+							final Method m = SReflect.getAnyMethod(target.getClass(), infos[j].getMethodInfo().getName(), infos[j].getMethodInfo().getParameterTypes(component.getClassLoader()));
 
+							if(m==null)
+								System.out.println("fuck");
+							
 							if(infos[j].isQuery())
 							{
 								@SuppressWarnings("unchecked")
-								ServiceQuery<Object>	query	= new ServiceQuery<>((Class<Object>)info.getType().getType(getComponent().getClassLoader()), info.getDefaultBinding().getScope());
+								ServiceQuery<Object> query = new ServiceQuery<>((Class<Object>)info.getType().getType(component.getClassLoader()), info.getDefaultBinding().getScope());
 								query	= info.getTags()==null || info.getTags().size()==0? query: query.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), component.getExternalAccess()); 
-								ISubscriptionIntermediateFuture<Object> sfut = getComponent().getFeature(IRequiredServicesFeature.class).addQuery(query);
+								ISubscriptionIntermediateFuture<Object> sfut = component.getFeature(IRequiredServicesFeature.class).addQuery(query);
 								lis2.resultAvailable(null);
 								
 								// Invokes methods for each intermediate result
@@ -247,7 +271,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 													try
 													{
 														m.setAccessible(true);
-														m.invoke(agent, new Object[]{result});
+														m.invoke(target, new Object[]{result});
 													}
 													catch(Throwable t)
 													{
@@ -286,7 +310,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 							}
 							else
 							{
-								final IFuture<Object> sfut = callgetService(sername, info);
+								final IFuture<Object> sfut = callgetService(sername, info, component);
 								
 								if(info.isMultiple())
 								{
@@ -308,7 +332,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 														try
 														{
 															m.setAccessible(true);
-															m.invoke(agent, new Object[]{result});
+															m.invoke(target, new Object[]{result});
 														}
 														catch(Throwable t)
 														{
@@ -337,7 +361,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 														try
 														{
 															m.setAccessible(true);
-															m.invoke(agent, new Object[]{ifut.getIntermediateResults()});
+															m.invoke(target, new Object[]{ifut.getIntermediateResults()});
 														}
 														catch(Throwable t)
 														{
@@ -379,7 +403,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 													try
 													{
 														m.setAccessible(true);
-														m.invoke(agent, new Object[]{result});
+														m.invoke(target, new Object[]{result});
 														lis2.resultAvailable(null);
 													}
 													catch(Throwable t)
@@ -415,28 +439,47 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		return ret;
 	}
 	
+	
 	/**
 	 *  Call
 	 *  @param sername
 	 *  @param info
 	 *  @return
 	 */
-	protected IFuture<Object> callgetService(String sername, RequiredServiceInfo info)
+	protected static IFuture<Object> callgetService(String sername, RequiredServiceInfo info, IInternalAccess component)
 	{
-		final IFuture<Object>	sfut;
-		if(info!=null && info.isMultiple())
+		final IFuture<Object> sfut;
+		
+		// if info is available use it. in case of services it is not available in the agent (model)
+		if(info!=null)
 		{
-			IFuture	ifut	= component.getFeature(IRequiredServicesFeature.class).getServices(sername);
-			sfut	= ifut;
+			if(info.isMultiple())
+			{
+				IFuture	ifut = component.searchServices(RequiredServicesComponentFeature.getServiceQuery(component, info));
+				sfut = ifut;
+			}
+			else
+			{
+				IFuture	ifut = component.searchService(RequiredServicesComponentFeature.getServiceQuery(component, info));
+				sfut = ifut;
+			}
 		}
 		else
 		{
-			sfut	= component.getFeature(IRequiredServicesFeature.class).getService(sername);					
+			if(info.isMultiple())
+			{
+				IFuture	ifut = component.getServices(sername);
+				sfut = ifut;
+			}
+			else
+			{
+				IFuture	ifut = component.getServices(sername);
+				sfut = ifut;
+			}
 		}
 		
 		return sfut;
 	}
-	
 	
 	/**
 	 *  Check if the feature potentially executed user code in body.
@@ -449,84 +492,4 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		return false;
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	public static class MyListener implements IIntermediateResultListener<Object>
-//	{
-//		protected IInternalAccess component;
-//		protected Method method;
-//		
-//		public MyListener(IInternalAccess component, Method method)
-//		{
-//			this.component = component;
-//			this.method = method;
-//		}
-//		
-//		public void intermediateResultAvailable(final Object result)
-//		{
-//			if(SReflect.isSupertype(method.getParameterTypes()[0], result.getClass()))
-//			{
-//				component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-//				{
-//					public IFuture<Void> execute(IInternalAccess ia)
-//					{
-//						try
-//						{
-//							method.setAccessible(true);
-//							method.invoke(component, new Object[]{result});
-//						}
-//						catch(Throwable t)
-//						{
-//							throw SUtil.throwUnchecked(t);
-//						}
-//						return IFuture.DONE;
-//					}
-//				});
-//			}
-//		}
-//		
-//		public void resultAvailable(Collection<Object> result)
-//		{
-//			finished();
-//		}
-//		
-//		public void finished()
-//		{
-//			// Inject all values at once if parameter is a collection
-//			if(SReflect.isSupertype(method.getParameterTypes()[0], Collection.class))
-//			{
-//				component.getComponentFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
-//				{
-//					public IFuture<Void> execute(IInternalAccess ia)
-//					{
-//						try
-//						{
-//							method.setAccessible(true);
-//							method.invoke(component, new Object[]{ifut.getIntermediateResults()});
-//						}
-//						catch(Throwable t)
-//						{
-//							throw SUtil.throwUnchecked(t);
-//						}
-//						return IFuture.DONE;
-//					}
-//				});
-//			}
-//		}
-//		
-//		public void exceptionOccurred(Exception e)
-//		{
-//			if(!(e instanceof ServiceNotFoundException)
-//				|| method.getAnnotation(AgentService.class).required())
-//			{
-//				component.getLogger().warning("Method injection failed: "+e);
-//			}
-//			else
-//			{
-//				// Call self with empty list as result.
-//				finished();
-//			}
-//		}
-//	}
 }

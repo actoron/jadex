@@ -4,6 +4,7 @@ import java.util.TimerTask;
 import java.util.logging.Logger;
 
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
@@ -203,7 +204,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IUndoneResu
 				IClockService clock	= ia.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IClockService.class).setMultiplicity(Multiplicity.ZERO_ONE));
 				if(clock!=null)
 				{
-					clock.isValid().addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Boolean>()
+					((IService)clock).isValid().addResultListener(ia.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Boolean>()
 					{
 						public void resultAvailable(Boolean valid)
 						{

@@ -41,6 +41,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.serialization.ISerializationServices;
+import jadex.bridge.service.types.settings.IPlatformSettings;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bytecode.vmhacks.VmHacks;
 import jadex.commons.SReflect;
@@ -97,6 +98,9 @@ public class Starter
     /** The bootstrap component factory. */
     public static String DATA_PLATFORMACCESS = "$platformaccess";
     
+    /** The platform settings. */
+    public static String DATA_PLATFORMSETTINGS = "$platformsettings";
+    
     /** The bootstrap component factory. */
     public static String DATA_BOOTSTRAPFACTORY = "$bootstrapfactory";
     
@@ -106,7 +110,8 @@ public class Starter
 //    public static String DATA_SUPERPEER = "superpeer";
     
 	/** Global platform data. For each platform stored by  */
-    protected static final IRwMap<IComponentIdentifier, IRwMap<String, Object>> platformmem = new RwMapWrapper<IComponentIdentifier, IRwMap<String, Object>>(new HashMap<IComponentIdentifier, IRwMap<String, Object>>());
+    protected static final IRwMap<IComponentIdentifier, IRwMap<String, Object>> platformmem = 
+    	new RwMapWrapper<IComponentIdentifier, IRwMap<String, Object>>(new HashMap<IComponentIdentifier, IRwMap<String, Object>>());
 //	protected static final Map<IComponentIdentifier, Map<String, Object>> platformmem = new HashMap<IComponentIdentifier, Map<String, Object>>();
 
 //	/** The shutdown in progress flag. */
@@ -476,8 +481,16 @@ public class Starter
 //				Object pfname = config.getValue(RootComponentConfiguration.PLATFORM_NAME);
 //				rootConfig.setValue(RootComponentConfiguration.PLATFORM_NAME, pfname);
 				final IComponentIdentifier cid = createPlatformIdentifier(pfname!=null? pfname: null);
+				
 				if(IComponentIdentifier.LOCAL.get()==null)
 					IComponentIdentifier.LOCAL.set(cid);
+				
+				boolean readonlysettings = false;
+				readonlysettings |= config.isReadOnly();
+				if (args != null)
+					readonlysettings |= Boolean.TRUE.equals(args.get("settings.readonly"));
+				IPlatformSettings settings = (IPlatformSettings) SReflect.newInstance("jadex.platform.service.settings.PlatformSettings", cid, readonlysettings);
+				putPlatformValue(cid, DATA_PLATFORMSETTINGS, settings);
 				
 				// Check if platform with same name exists in VM
 				if(getPlatformValue(cid, DATA_PLATFORMACCESS)!=null)
@@ -492,8 +505,7 @@ public class Starter
 //				CmsComponentState compstate = new CmsComponentState();
 //				((CmsState) getPlatformValue(cid, DATA_CMSSTATE)).getComponentMap().put(cid, compstate);
 				
-				/** Here */
-//					rootconf.setPlatformAccess(component);
+//				rootconf.setPlatformAccess(component);
 				putPlatformValue(cid, DATA_PLATFORMACCESS, component);
 				putPlatformValue(cid, DATA_BOOTSTRAPFACTORY, cfac);
 //					putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, args);
@@ -626,7 +638,6 @@ public class Starter
 //						((CmsState) getPlatformValue(cid, DATA_CMSSTATE)).getComponentMap().put(cid, compstate);
 //						compstate.setAccess(component);
 //						SComponentManagementService.getComponents(cid).put(cid, component);
-					
 						component.init().addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(fret)
 						{
 							public void customResultAvailable(Void result)
@@ -709,7 +720,7 @@ public class Starter
 	 *  Internal method to create a component identifier.
 	 *  @param pfname The platform name.
 	 */
-	protected static IComponentIdentifier createPlatformIdentifier(String pfname)
+	public static IComponentIdentifier createPlatformIdentifier(String pfname)
 	{
 		// Build platform name.
 		String	platformname	= null; 
@@ -1162,7 +1173,12 @@ public class Starter
 	{
 		platformmem.remove(platform.getRoot());
 	}
-
+	
+	public static final IPlatformSettings getPlatformSettings(IComponentIdentifier platform)
+	{
+		return (IPlatformSettings) getPlatformValue(platform, DATA_PLATFORMSETTINGS);
+	}
+	
 	/**
 	 * Get the default timeout.
 	 */

@@ -519,6 +519,13 @@ def createRezipTask(task, file) {
 	}
 }
 
+/**
+ * Replicates the distsDir removed in Gradle 6.0.
+ */
+def getDistsDir(proj) {
+	return new File(proj.buildDir, proj.distsDirName)
+}
+
 // make functions externally visible
 
 ext {
@@ -546,4 +553,5 @@ ext {
     getArtifactName = this.&getArtifactName
     diffZips = this.&diffZips
 	createRezipTask	= this.&createRezipTask
+	getDistsDir = this.&getDistsDir
 }

@@ -19,7 +19,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IPullResultService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IPullResultService.class))
 @Description("Agent that provides a service with intermediate results")
 public class PullResultProviderAgent implements IPullResultService
 {
