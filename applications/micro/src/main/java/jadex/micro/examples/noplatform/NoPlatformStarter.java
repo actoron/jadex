@@ -32,10 +32,13 @@ import jadex.micro.examples.helloworld.PojoHelloWorldAgent;
 import jadex.platform.service.serialization.SerializationServices;
 
 /**
- * 
+ *  Setting up a minimal Jadex to run components of a specific kernel. 
  */
 public class NoPlatformStarter
 {
+	/**
+	 *  Starts a component with few dependencies.
+	 */
 	public static void main(String[] args)
 	{
 		IExternalAccess platform = createPlatform().get();
