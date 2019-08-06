@@ -29,7 +29,7 @@ public @interface RequiredService
 	/** 
 	 *  The component internal service name. 
 	 */
-	public String name();
+	public String name() default "";
 	
 	/** 
 	 *  The service interface type. 

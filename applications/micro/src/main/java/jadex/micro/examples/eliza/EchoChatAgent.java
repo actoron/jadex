@@ -47,7 +47,7 @@ public class EchoChatAgent
 	@Agent
 	protected IInternalAccess	agent;
 	
-	/** The gui service for controlling the inner chat component. */
+	/** The gui service for controlling the inner chat component. $config is replaced by "intern" or "extern" */
 	@AgentServiceSearch(name="%{\"chat_\"+$config}")
 	protected IChatGuiService	chat;
 	

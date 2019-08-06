@@ -8,6 +8,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 /**
  *  Struct for information about a required service.
@@ -156,7 +157,7 @@ public class RequiredServiceInfo
 	public RequiredServiceInfo(String name, Class<?> type, boolean multiple, 
 		RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops, Collection<String> tags)
 	{
-		this(name, type!=null ? new ClassInfo(SReflect.getClassName(type)) : null,
+		this(name, type!=null? new ClassInfo(SReflect.getClassName(type)) : null,
 			multiple, binding, nfprops, tags);
 	}
 
@@ -166,7 +167,8 @@ public class RequiredServiceInfo
 	public RequiredServiceInfo(String name, ClassInfo type, boolean multiple, 
 		RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops, Collection<String> tags)
 	{
-		this.name = name;
+		this.name = name; //(name==null || name.length()==0)? SUtil.createPlainRandomId(type!=null? type.getTypeName(): "req_service", 5): name;
+		//System.out.println("reqname: "+this.name);
 		this.type	= type;
 		this.multiple = multiple;
 		this.binding = binding;
