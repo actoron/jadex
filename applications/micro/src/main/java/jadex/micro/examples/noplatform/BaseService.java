@@ -10,8 +10,8 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.FutureReturnType;
 import jadex.bridge.service.annotation.Raw;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -26,10 +26,11 @@ public class BaseService implements IService
 	/**
 	 * 
 	 */
-	public BaseService(IComponentIdentifier cid)
+	public BaseService(IComponentIdentifier cid, Class<?> iface)
 	{
 		this.cid = cid;
-		this.sid = BasicService.createServiceIdentifier(cid, new ClassInfo(IClockService.class), new ClassInfo[0], "clockservice", null, ServiceScope.PLATFORM, null, false);
+		this.sid = BasicService.createServiceIdentifier(cid, new ClassInfo(iface), new ClassInfo[0], 
+			SReflect.getUnqualifiedClassName(iface), null, ServiceScope.PLATFORM, null, false);
 	}
 	
 	/**
