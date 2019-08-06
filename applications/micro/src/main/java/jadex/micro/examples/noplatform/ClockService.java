@@ -3,30 +3,16 @@ package jadex.micro.examples.noplatform;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.TimerTask;
 
 import jadex.base.Starter;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.ServiceIdentifier;
-import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.annotation.FutureReturnType;
-import jadex.bridge.service.annotation.Raw;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.IChangeListener;
-import jadex.commons.MethodInfo;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.JavaThreadPool;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.platform.service.clock.AbstractClock;
 import jadex.platform.service.clock.ClockCreationInfo;
@@ -75,7 +61,7 @@ public class ClockService extends BaseService implements IClockService
 	 */
 	public ClockService(IComponentIdentifier cid, ClockCreationInfo cinfo, IThreadPool threadpool)
 	{
-		super(cid);
+		super(cid, IClockService.class);
 		this.listeners = Collections.synchronizedList(new ArrayList<>());
 		this.threadpool = threadpool;
 	}

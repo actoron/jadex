@@ -54,7 +54,7 @@ public class ExecutionService extends BaseService implements IExecutionService
 	 */
 	public ExecutionService(IComponentIdentifier cid, IThreadPool threadpool)
 	{
-		super(cid);
+		super(cid, IExecutionService.class);
 		
 		this.threadpool = threadpool;
 		this.executors	= SCollection.createHashMap();
