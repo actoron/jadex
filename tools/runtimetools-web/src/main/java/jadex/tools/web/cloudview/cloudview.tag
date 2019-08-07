@@ -1,7 +1,8 @@
 <cloudview>
 	<div>
 		<div id="cloudinfo">
-			<h1 id="mymessage">Platform</h1>
+			<h1 id="nodetitle"></h1>
+			<p id="nodedescription"></p>
 		</div>
 		<div id="cloudgraph"></div>
 	</div>
@@ -113,6 +114,9 @@
 						borderWidth: 0,
 						shape: 'square', size: 30, color: '#74b9ff' //color:'#3498db'
 					}
+				},
+				interaction: {
+					navigationButtons: true
 				}
 			};
 		}
@@ -134,9 +138,10 @@
 			graph.addEdge(1,5);*/
 			
 			//alert('2 ' + typeof self.service);
+			
 			self.service.getPlatformNetworks(self.cid).then(function(resp) {
 				let pfs = Object.keys(resp.data);
-				document.getElementById('mymessage').innerHTML="Hello " + pfs;
+				
 				let knownnw = new Set();
 				for (let pf of pfs){
 					graph.addGroupNode(pf, 'platform', pf);
@@ -151,6 +156,12 @@
 				}
 				let data = graph.getVisData();
 				self.network = new vis.Network(self.cloudgraph, data, graph.defaultOptions);
+				self.network.on('selectNode', function(context) {
+					document.getElementById('nodetitle').innerHTML=context.nodes[0];
+				});
+				self.network.on('doubleClick', function(context) {
+					alert('doubleClick');
+				});
 			}).catch(function (error) {
 				alert(error);
 			});
@@ -175,6 +186,5 @@
 			if (self.network != undefined)
 				self.network.destroy()
 		});
-		
 	</script>
 </cloudview>
