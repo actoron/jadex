@@ -94,7 +94,7 @@ import jadex.platform.service.security.SecurityAgent;
 
 @RequiredServices(
 {
-	@RequiredService(name="factoryservices", type=IComponentFactory.class, multiple=true)//, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+	@RequiredService(name="factoryservices", type=IComponentFactory.class)// multiple=true , binding=@Binding(scope=Binding.SCOPE_PLATFORM))
 })
 
 @Properties(

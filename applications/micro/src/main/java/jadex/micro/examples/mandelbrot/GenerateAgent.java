@@ -17,7 +17,7 @@ import jadex.micro.annotation.RequiredServices;
 @RequiredServices({
 	@RequiredService(name="displayservice", type=IDisplayService.class),
 	//TODO , binding=@Binding(create=true, creationinfo=@CreationInfo(type="Display"))),
-	@RequiredService(name="calculateservices", type=ICalculateService.class, multiple=true, scope=ServiceScope.GLOBAL),
+	@RequiredService(name="calculateservices", type=ICalculateService.class, scope=ServiceScope.GLOBAL), // multiple=true,
 	@RequiredService(name="generateservice", type=IGenerateService.class)
 })
 @Agent

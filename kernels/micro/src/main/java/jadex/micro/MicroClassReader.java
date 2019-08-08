@@ -527,16 +527,18 @@ public class MicroClassReader
 					{
 						RequiredServiceInfo rsis = createRequiredServiceInfo(vals[i], cl);
 					
-						if(rsers.containsKey(vals[i].name()))
-						{
-							RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
-							if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
-								throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+vals[i].name());
-						}
-						else
-						{
-							rsers.put(vals[i].name(), rsis);
-						}
+						checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+
+//						if(rsers.containsKey(vals[i].name()))
+//						{
+//							RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
+//							if(old.getMin()!=rsis.getMin() || old.getM()!=rsis.getMax() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
+//								throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+vals[i].name());
+//						}
+//						else
+//						{
+//							rsers.put(vals[i].name(), rsis);
+//						}
 					}
 				}
 			}
@@ -798,7 +800,7 @@ public class MicroClassReader
 							{
 								RequiredServiceBinding binding = createBinding(reqs[j]);
 								List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
-								RequiredServiceInfo rsi = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
+								RequiredServiceInfo rsi = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].min(), reqs[j].max(),// reqs[j].multiple(), 
 									binding, nfprops, Arrays.asList(reqs[j].tags()));
 		//						configinfo.setRequiredServices(rsis);
 								configinfo.addRequiredService(rsi);
@@ -1218,7 +1220,7 @@ public class MicroClassReader
 		}
 		
 		RequiredServiceInfo rsis = new RequiredServiceInfo(rs.name(), rs.type(), 
-			rs.multiple(), binding, nfprops, Arrays.asList(rs.tags()));
+			rs.min(), rs.max(), binding, nfprops, Arrays.asList(rs.tags())); // rs.multiple()
 		
 		return rsis;
 	}
@@ -2468,7 +2470,8 @@ public class MicroClassReader
 				
 				//RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
 				RequiredServiceInfo rsis = new RequiredServiceInfo(name, iftype, asq.scope());
-				rsis.setMultiple(asq.multiple());
+				//rsis.setMultiple(asq.multiple());
+				//rsis.setMax(RequiredServiceInfo.MANY);
 			
 				checkAndAddRequiredServiceInfo(rsis, rsers, cl);
 				
@@ -2505,7 +2508,8 @@ public class MicroClassReader
 		if(rsers.containsKey(rsis.getName()))
 		{
 			RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(rsis.getName());
-			if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
+			//if(old.isMultiple()!=rsis.isMultiple()
+			if(old.getMin()!=rsis.getMin() || old.getMax()!=rsis.getMax() || !old.getType().getType(cl).equals(rsis.getType().getType(cl)))
 				throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+rsis.getName());
 		}
 		else

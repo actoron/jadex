@@ -51,7 +51,7 @@ import jadex.micro.annotation.RequiredServices;
 @Agent(type=BDIAgentFactory.TYPE)
 @RequiredServices(
 {
-	@RequiredService(name="buyservice", type=IBuyBookService.class, multiple=true),
+	@RequiredService(name="buyservice", type=IBuyBookService.class), // multiple=true
 	@RequiredService(name="clockser", type=IClockService.class)
 })
 @Arguments(@Argument(name="initial_orders", clazz=Order[].class))

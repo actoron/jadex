@@ -550,10 +550,12 @@ public class SBpmnModelWriter
 					out.print(escapeString(iface));
 				}
 				
-				if (rs.isMultiple())
+				//if (rs.isMultiple())
+				if(rs.getMax()>1)
 				{
 					out.print("\" multi=\"");
-					out.print(escapeString(String.valueOf(rs.isMultiple())));
+//					out.print(escapeString(String.valueOf(rs.isMultiple())));
+					out.print(escapeString(String.valueOf(rs.getMax()>1)));
 				}
 				
 				if (rs.getDefaultBinding() != null)

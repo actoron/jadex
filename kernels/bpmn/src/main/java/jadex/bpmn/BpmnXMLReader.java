@@ -1732,12 +1732,12 @@ public class BpmnXMLReader
 								RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 								if(binding==null)
 									throw new RuntimeException("Unknown binding: "+bindingname);
-								rsi = new RequiredServiceInfo(name, type, multiple, binding, null, null);
+								rsi = new RequiredServiceInfo(name, type, -2, -2, binding, null, null); // multiple
 							}
 							else
 							{
 								rsi = new RequiredServiceInfo(name, type);
-								rsi.setMultiple(multiple);
+								//rsi.setMultiple(multiple);
 							}
 							mi.addRequiredService(rsi);
 							
@@ -1759,12 +1759,12 @@ public class BpmnXMLReader
 											RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 											if(binding==null)
 												throw new RuntimeException("Unknown binding: "+bindingname);
-											rsi = new RequiredServiceInfo(name, type, multiple, binding, null, null);
+											rsi = new RequiredServiceInfo(name, type, -2, -2, binding, null, null);
 										}
 										else
 										{
 											rsi = new RequiredServiceInfo(name, type);
-											rsi.setMultiple(multiple);
+											//rsi.setMultiple(multiple);
 										}
 										ci.addRequiredService(rsi);
 									}

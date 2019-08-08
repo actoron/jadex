@@ -6,12 +6,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import jadex.bridge.nonfunctional.annotation.NFRProperty;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 
 /**
  *  Required service data.
+ *  
+ *  todo: support hard constraints
+ *  todo: support ranking
  */
 @Target({ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -25,6 +29,12 @@ public @interface RequiredService
 	
 	/** The (default) decoupled proxy type (decouples from component thread to caller thread). */
 	public static final String	PROXYTYPE_DECOUPLED	= BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED;
+	
+	/** Constant for multiplicity many. */
+	public static final int MANY = RequiredServiceInfo.MANY;
+	
+	/** Constant for multiplicity undefined. */
+	public static final int UNDEFINED = RequiredServiceInfo.UNDEFINED;
 	
 	/** 
 	 *  The component internal service name. 
@@ -46,10 +56,20 @@ public @interface RequiredService
 	 */
 	public String[] tags() default {};
 
-	/** 
-	 *  Flag if multiple services should be returned. 
+//	/** 
+//	 *  Flag if multiple services should be returned. 
+//	 */
+//	public boolean multiple() default false;
+	
+	/**
+	 *  The minimum number of services.
 	 */
-	public boolean multiple() default false;
+	public int min() default UNDEFINED;
+	
+	/**
+	 *  The maximum number of services
+	 */
+	public int max() default UNDEFINED;
 
 //	/**
 //	 *  The binding.
@@ -64,6 +84,7 @@ public @interface RequiredService
 
 	/**
 	 *  The required service non functional properties.
+	 *  NOT used for search, but for adding required service properties.
 	 */
 	public NFRProperty[] nfprops() default {};
 	
@@ -72,10 +93,12 @@ public @interface RequiredService
 	/**
 	 *  The proxy type.
 	 */
+	@Deprecated
 	public String proxytype() default PROXYTYPE_DECOUPLED;
 	
 	/**
 	 *  The interceptors.
 	 */
+	@Deprecated
 	public Value[] interceptors() default {};	
 }

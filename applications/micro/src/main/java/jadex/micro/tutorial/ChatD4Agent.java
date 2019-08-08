@@ -21,7 +21,7 @@ import jadex.micro.annotation.RequiredServices;
 	interceptors=@Value(clazz=SpamInterceptorD4.class))))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class),
-	@RequiredService(name="chatservices", type=IExtendedChatService.class, multiple=true, scope=ServiceScope.PLATFORM)
+	@RequiredService(name="chatservices", type=IExtendedChatService.class, scope=ServiceScope.PLATFORM) // multiple=true,
 })
 public class ChatD4Agent
 {

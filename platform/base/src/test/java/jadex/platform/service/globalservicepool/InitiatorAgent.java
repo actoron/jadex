@@ -43,7 +43,7 @@ import jadex.platform.service.servicepool.PoolServiceInfo;
 @RequiredServices(
 {
 	@RequiredService(name="ts", type=ITestService.class, scope=ServiceScope.GLOBAL),
-	@RequiredService(name="aser", type=ITestService.class, multiple=true, scope=ServiceScope.GLOBAL,
+	@RequiredService(name="aser", type=ITestService.class, scope=ServiceScope.GLOBAL, // multiple=true,
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))
 })
 // Test requires starting/stopping multiple platforms and many test calls  -> increase test timeout

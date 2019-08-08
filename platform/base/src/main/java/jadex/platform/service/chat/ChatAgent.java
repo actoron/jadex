@@ -26,7 +26,7 @@ import jadex.micro.annotation.RequiredServices;
 	@ProvidedService(name="chatgui", scope=ServiceScope.PLATFORM, type=IChatGuiService.class, implementation=@Implementation(expression="$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl(\"chat\")"))
 })
 @RequiredServices(
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=ServiceScope.GLOBAL)
+	@RequiredService(name="chatservices", type=IChatService.class, scope=ServiceScope.GLOBAL) // multiple=true
 )
 @Arguments(@Argument(name="nosave", clazz=boolean.class, description="Don't save settings."))
 @Agent

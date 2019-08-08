@@ -69,6 +69,8 @@ public class ServiceQuery<T>
 		 */
 		public Multiplicity()
 		{
+			this.from = -2; // = UNDEFINED
+			this.to = -2;
 		}
 		
 		/**

@@ -15,11 +15,9 @@ import jadex.bdiv3.examples.marsworld.sentry.ITargetAnnouncementService;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -32,8 +30,8 @@ import jadex.micro.annotation.RequiredServices;
 @Service
 @ProvidedServices(@ProvidedService(type=IProduceService.class))
 @RequiredServices({
-	@RequiredService(name="targetser", type=ITargetAnnouncementService.class, multiple=true),
-	@RequiredService(name="carryser", type=ICarryService.class, multiple=true)
+	@RequiredService(name="targetser", type=ITargetAnnouncementService.class), // multiple=true
+	@RequiredService(name="carryser", type=ICarryService.class) // multiple=true
 })
 @Plans({
 	@Plan(trigger=@Trigger(goals=ProducerAgent.ProduceOre.class), body=@Body(ProduceOrePlan.class)),

@@ -25,8 +25,8 @@ import jadex.micro.annotation.RequiredServices;
 @Capability
 @Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.bdi.examples.shop.CustomerViewerPanel\""))
 @RequiredServices({
-	@RequiredService(name="localshopservices", type=IShopService.class, multiple=true, scope=ServiceScope.PLATFORM),
-	@RequiredService(name="remoteshopservices", type=IShopService.class, multiple=true, scope=ServiceScope.GLOBAL),
+	@RequiredService(name="localshopservices", type=IShopService.class, scope=ServiceScope.PLATFORM), //multiple=true,
+	@RequiredService(name="remoteshopservices", type=IShopService.class, scope=ServiceScope.GLOBAL), // multiple=true,
 })
 public class CustomerCapability
 {

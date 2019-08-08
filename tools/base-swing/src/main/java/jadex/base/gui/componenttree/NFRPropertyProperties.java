@@ -86,7 +86,7 @@ public class NFRPropertyProperties extends PropertiesPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				final boolean fmultiple = rinfo.isMultiple();
+				final boolean fmultiple = rinfo.getMax()>1;
 				final String fname = rinfo.getName();
 				ea.scheduleStep(new IComponentStep<Object>()
 				{

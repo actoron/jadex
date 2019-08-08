@@ -44,7 +44,7 @@ import jadex.micro.testcases.TestAgent;
 @RequiredServices(
 {
 	@RequiredService(name="ts", type=ITestService.class, scope=ServiceScope.GLOBAL),
-	@RequiredService(name="aser", type=ITestService.class, multiple=true, scope=ServiceScope.GLOBAL,
+	@RequiredService(name="aser", type=ITestService.class, scope=ServiceScope.GLOBAL, // multiple=true,
 		nfprops=@NFRProperty(value=LatencyProperty.class, methodname="methodA", methodparametertypes=long.class))
 })
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 4)")}) // cannot use $component.getId() because is extracted from test suite :-(

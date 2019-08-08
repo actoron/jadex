@@ -2358,7 +2358,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					return rs.getType();
 				case 2:
 				{
-					return rs.isMultiple();
+					return rs.getMax()>1;//rs.isMultiple();
 				}
 				case 3:
 				{
@@ -2447,7 +2447,9 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 				case 2:
 				{
-					rs.setMultiple((Boolean)value);
+					//rs.setMultiple((Boolean)value);
+					// -1 = MANY
+					rs.setMax(-1);
 					break;
 				}
 				case 3:
