@@ -1,7 +1,9 @@
 package jadex.micro.features.impl;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -95,7 +97,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	 * @param component
 	 * @param target
 	 * @return
-	 */
+	 * /
 	public static IFuture<Void> injectServices(IInternalAccess component, Object target, String[] sernames, Map<String, ServiceInjectionInfo[]> serinfos, IModelInfo model)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -127,6 +129,147 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						// Uses required service info to search service
 						
 						RequiredServiceInfo	info = infos[j].getRequiredServiceInfo()!=null? infos[j].getRequiredServiceInfo(): model.getService(sername);				
+						ServiceQuery<Object> query = ServiceQuery.getServiceQuery(component, info);
+						
+						// if query
+						if(infos[j].isQuery())
+						{
+							//@SuppressWarnings("unchecked")
+							//ServiceQuery<Object> query = new ServiceQuery<>((Class<Object>)info.getType().getType(component.getClassLoader()), info.getDefaultBinding().getScope());
+							//query = info.getTags()==null || info.getTags().size()==0? query: query.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), component.getExternalAccess()); 
+							
+							ISubscriptionIntermediateFuture<Object> sfut = component.getFeature(IRequiredServicesFeature.class).addQuery(query);
+							lis2.resultAvailable(null);
+							
+							// Invokes methods for each intermediate result
+							sfut.addResultListener(new IIntermediateResultListener<Object>()
+							{
+								public void intermediateResultAvailable(final Object result)
+								{
+									// todo: multiple parameters and wait until all are filled
+									
+									if(infos[j].getMethodInfo()!=null)
+									{
+										Method m = SReflect.getAnyMethod(target.getClass(), infos[j].getMethodInfo().getName(), infos[j].getMethodInfo().getParameterTypes(component.getClassLoader()));
+										Object[] args = new Object[m.getParameterCount()];
+										
+										boolean invoke = false;
+										for(int i=0; i<m.getParameterCount(); i++)
+										{
+											if(SReflect.isSupertype(m.getParameterTypes()[i], result.getClass()))
+											{
+												args[i] = result;
+												invoke = true;
+											}
+										}
+										
+										if(invoke)
+										{
+											component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+											{
+												public IFuture<Void> execute(IInternalAccess ia)
+												{
+													try
+													{
+														m.setAccessible(true);
+														m.invoke(target, args);
+													}
+													catch(Throwable t)
+													{
+														throw SUtil.throwUnchecked(t);
+													}
+													return IFuture.DONE;
+												}
+											});
+										}
+										else
+										{
+											component.getLogger().warning("cannot invoke method as result type does not fit parameter types: "+result+" "+m);
+										}
+									}
+									else if(infos[j].getFieldInfo()!=null)
+									{
+										final Field	f = infos[j].getFieldInfo().getField(component.getClassLoader());
+										Class<?> ft = f.getDeclaringClass();
+										boolean multiple = ft.isArray() || SReflect.isSupertype(Collection.class, ft) || info.getMax()>2;
+
+										if(ft.isArray())
+										{
+											Class<?> ct = ft.getComponentType();
+											if(SReflect.isSupertype(ct, result.getClass()))
+											{
+												Object ar = f.get(target);
+												
+												for(int i=0; i<Array.getLength(ar); i++)
+												{
+													if(Array.get(ar, i)==null)
+													{
+														try
+														{
+															f.setAccessible(true);
+															f.set(target, result);
+														}
+														catch(Exception e)
+														{
+															component.getLogger().warning("Field injection failed: "+e);
+														}
+													}
+												}
+											}
+											else
+											{
+												component.getLogger().warning("cannot invoke method as result type does not fit parameter types: "+result+" "+m);
+											}
+										}
+										else if(SReflect.isSupertype(Collection.class, ft))
+										{
+											Collection<Object> coll = (Collection<Object>)f.get(target);
+											if(coll==null)
+											{
+												coll = new ArrayList<Object>();
+												try
+												{
+													f.setAccessible(true);
+													f.set(target, coll);
+												}
+												catch(Exception e)
+												{
+													component.getLogger().warning("Field injection failed: "+e);
+												}
+											}
+											coll.add(result);
+										}
+									}
+								}
+								
+								public void resultAvailable(Collection<Object> result)
+								{
+									finished();
+								}
+								
+								public void finished()
+								{
+								}
+								
+								public void exceptionOccurred(Exception e)
+								{
+									if(!(e instanceof ServiceNotFoundException)
+										|| m.getAnnotation(AgentServiceSearch.class).required())
+									{
+										component.getLogger().warning("Method injection failed: "+e);
+									}
+									else
+									{
+										// Call self with empty list as result.
+										finished();
+									}
+								}
+							});
+						}
+						else
+						{
+							
+						}
 						
 						if(infos[j].getFieldInfo()!=null)
 						{
@@ -439,7 +582,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	
 	/**
@@ -457,12 +600,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		{
 			if(multiple)
 			{
-				IFuture	ifut = component.searchServices(RequiredServicesComponentFeature.getServiceQuery(component, info));
+				IFuture	ifut = component.searchServices(ServiceQuery.getServiceQuery(component, info));
 				sfut = ifut;
 			}
 			else
 			{
-				IFuture	ifut = component.searchService(RequiredServicesComponentFeature.getServiceQuery(component, info));
+				IFuture	ifut = component.searchService(ServiceQuery.getServiceQuery(component, info));
 				sfut = ifut;
 			}
 		}
@@ -492,6 +635,357 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	public boolean	hasUserBody()
 	{
 		return false;
+	}
+	
+	/**
+	 * 
+	 * @param component
+	 * @param target
+	 * @return
+	 */
+	public static IFuture<Void> injectServices(IInternalAccess component, Object target, String[] sernames, Map<String, ServiceInjectionInfo[]> serinfos, IModelInfo model)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		// Inject required services
+		if(component.getFeature(IRequiredServicesFeature.class)==null)
+		{
+			ret.setResult(null);
+		}
+		else
+		{
+			// Fetch all injection names - field and method injections
+			//String[] sernames = model.getServiceInjectionNames();
+			
+			if(sernames.length>0)
+			{
+				CounterResultListener<Void> lis = new CounterResultListener<Void>(sernames.length, 
+					new DelegationResultListener<Void>(ret));
+		
+				for(int i=0; i<sernames.length; i++)
+				{
+					final ServiceInjectionInfo[] infos = serinfos.get(sernames[i]); //model.getServiceInjections(sernames[i]);
+					final CounterResultListener<Void> lis2 = new CounterResultListener<Void>(infos.length, lis);
+	
+					String sername = (String)SJavaParser.evaluateExpressionPotentially(sernames[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
+										
+					for(int j=0; j<infos.length; j++)
+					{
+						// Uses required service info to search service
+						
+						RequiredServiceInfo	info = infos[j].getRequiredServiceInfo()!=null? infos[j].getRequiredServiceInfo(): model.getService(sername);				
+						
+						if(infos[j].getFieldInfo()!=null)
+						{
+							final Field	f = infos[j].getFieldInfo().getField(component.getClassLoader());
+							Class<?> ft = f.getDeclaringClass();
+							boolean multiple = ft.isArray() || SReflect.isSupertype(Collection.class, ft) || info.getMax()>2;
+
+							final IFuture<Object> sfut = callgetService(sername, info, component, multiple);
+							
+							// todo: what about multi case?
+							// why not add values to a collection as they come?!
+							// currently waits until the search has finished before injecting
+							
+							// Is annotation is at field and field is of type future directly set it
+							if(SReflect.isSupertype(IFuture.class, f.getType()))
+							{
+								try
+								{
+									f.setAccessible(true);
+									f.set(target, sfut);
+									lis2.resultAvailable(null);
+								}
+								catch(Exception e)
+								{
+									component.getLogger().warning("Field injection failed: "+e);
+									lis2.exceptionOccurred(e);
+								}	
+							}
+							else
+							{
+								// todo: disallow multiple field injections!
+								// This is problematic because search can defer the agent startup esp. when remote search
+								if(sfut.isDone() && sfut.getException() == null)
+								{
+									try
+									{
+										f.setAccessible(true);
+										f.set(target, sfut.get());
+										lis2.resultAvailable(null);
+									}
+									catch(Exception e)
+									{
+										component.getLogger().warning("Field injection failed: "+e);
+										lis2.exceptionOccurred(e);
+									}	
+								}
+								else if(infos[j].isLazy() && !multiple)
+								{
+									RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceInfo(sername);
+									Class<?> clz = rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
+									ServiceQuery<Object> query = ServiceQuery.getServiceQuery(component, info);
+									
+									UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
+									Object proxy = ProxyFactory.newProxyInstance(component.getClassLoader(), new Class[]{IService.class, clz}, h);
+								
+									try
+									{
+										f.setAccessible(true);
+										f.set(target, proxy);
+										lis2.resultAvailable(null);
+									}
+									catch(Exception e)
+									{
+										component.getLogger().warning("Field injection failed: "+e);
+										lis2.exceptionOccurred(e);
+									}
+								}
+								else
+								{
+									// todo: remove!
+									
+									// Wait for result and block init until available
+									// Dangerous because agent blocks
+									
+									sfut.addResultListener(new IResultListener<Object>()
+									{
+										public void resultAvailable(Object result)
+										{
+											try
+											{
+												f.setAccessible(true);
+												f.set(component, result);
+												lis2.resultAvailable(null);
+											}
+											catch(Exception e)
+											{
+												component.getLogger().warning("Field injection failed: "+e);
+												lis2.exceptionOccurred(e);
+											}	
+										}
+										
+										public void exceptionOccurred(Exception e)
+										{
+											if(!(e instanceof ServiceNotFoundException)
+												|| f.getAnnotation(AgentServiceSearch.class).required())
+											{
+												component.getLogger().warning("Field injection failed: "+e);
+												lis2.exceptionOccurred(e);
+											}
+											else
+											{
+												// Set empty list on exception (why only list, what about set etc?!)
+												if(SReflect.isSupertype(f.getType(), List.class))
+												{
+													// Call self with empty list as result.
+													resultAvailable(Collections.EMPTY_LIST);
+												}
+												else
+												{
+													// Don't set any value.
+													lis2.resultAvailable(null);
+												}
+											}
+										}
+									});
+								}
+								
+							}
+						}
+						else if(infos[j].getMethodInfo()!=null)
+						{
+							final Method m = SReflect.getAnyMethod(target.getClass(), infos[j].getMethodInfo().getName(), infos[j].getMethodInfo().getParameterTypes(component.getClassLoader()));
+
+							if(infos[j].isQuery())
+							{
+								@SuppressWarnings("unchecked")
+								ServiceQuery<Object> query = new ServiceQuery<>((Class<Object>)info.getType().getType(component.getClassLoader()), info.getDefaultBinding().getScope());
+								query	= info.getTags()==null || info.getTags().size()==0? query: query.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), component.getExternalAccess()); 
+								ISubscriptionIntermediateFuture<Object> sfut = component.getFeature(IRequiredServicesFeature.class).addQuery(query);
+								lis2.resultAvailable(null);
+								
+								// Invokes methods for each intermediate result
+								sfut.addResultListener(new IIntermediateResultListener<Object>()
+								{
+									public void intermediateResultAvailable(final Object result)
+									{
+										if(SReflect.isSupertype(m.getParameterTypes()[0], result.getClass()))
+										{
+											component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+											{
+												public IFuture<Void> execute(IInternalAccess ia)
+												{
+													try
+													{
+														m.setAccessible(true);
+														m.invoke(target, new Object[]{result});
+													}
+													catch(Throwable t)
+													{
+														throw SUtil.throwUnchecked(t);
+													}
+													return IFuture.DONE;
+												}
+											});
+										}
+									}
+									
+									public void resultAvailable(Collection<Object> result)
+									{
+										finished();
+									}
+									
+									public void finished()
+									{
+									}
+									
+									public void exceptionOccurred(Exception e)
+									{
+										if(!(e instanceof ServiceNotFoundException)
+											|| m.getAnnotation(AgentServiceSearch.class).required())
+										{
+											component.getLogger().warning("Method injection failed: "+e);
+										}
+										else
+										{
+											// Call self with empty list as result.
+											finished();
+										}
+									}
+								});
+								
+							}
+							else
+							{
+								boolean multiple = info.getMax()>2;
+								final IFuture<Object> sfut = callgetService(sername, info, component, multiple);
+								
+								if(multiple)
+								{
+									lis2.resultAvailable(null);
+									IFuture	tfut	= sfut;
+									final IIntermediateFuture<Object>	ifut	= (IIntermediateFuture<Object>)tfut;
+									
+									// Invokes methods for each intermediate result
+									ifut.addResultListener(new IIntermediateResultListener<Object>()
+									{
+										public void intermediateResultAvailable(final Object result)
+										{
+											if(SReflect.isSupertype(m.getParameterTypes()[0], result.getClass()))
+											{
+												component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+												{
+													public IFuture<Void> execute(IInternalAccess ia)
+													{
+														try
+														{
+															m.setAccessible(true);
+															m.invoke(target, new Object[]{result});
+														}
+														catch(Throwable t)
+														{
+															throw SUtil.throwUnchecked(t);
+														}
+														return IFuture.DONE;
+													}
+												});
+											}
+										}
+										
+										public void resultAvailable(Collection<Object> result)
+										{
+											finished();
+										}
+										
+										public void finished()
+										{
+											// Inject all values at once if parameter is a collection
+											if(SReflect.isSupertype(m.getParameterTypes()[0], Collection.class))
+											{
+												component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+												{
+													public IFuture<Void> execute(IInternalAccess ia)
+													{
+														try
+														{
+															m.setAccessible(true);
+															m.invoke(target, new Object[]{ifut.getIntermediateResults()});
+														}
+														catch(Throwable t)
+														{
+															throw SUtil.throwUnchecked(t);
+														}
+														return IFuture.DONE;
+													}
+												});
+											}
+										}
+										
+										public void exceptionOccurred(Exception e)
+										{
+											if(!(e instanceof ServiceNotFoundException)
+												|| m.getAnnotation(AgentServiceSearch.class).required())
+											{
+												component.getLogger().warning("Method injection failed: "+e);
+											}
+											else
+											{
+												// Call self with empty list as result.
+												finished();
+											}
+										}
+									});
+		
+								}
+								else
+								{
+									// Invoke method once if required service is not multiple
+									sfut.addResultListener(new IResultListener<Object>()
+									{
+										public void resultAvailable(final Object result)
+										{
+											component.getFeature(IExecutionFeature.class).scheduleStep(new IComponentStep<Void>()
+											{
+												public IFuture<Void> execute(IInternalAccess ia)
+												{
+													try
+													{
+														m.setAccessible(true);
+														m.invoke(target, new Object[]{result});
+														lis2.resultAvailable(null);
+													}
+													catch(Throwable t)
+													{
+														throw SUtil.throwUnchecked(t);
+													}
+													return IFuture.DONE;
+												}
+											});
+										}
+										
+										public void exceptionOccurred(Exception e)
+										{
+											if(!(e instanceof ServiceNotFoundException)
+												|| m.getAnnotation(AgentServiceSearch.class).required())
+											{
+												component.getLogger().warning("Method service injection failed: "+e);
+											}
+										}
+									});
+								}
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		
+		return ret;
 	}
 	
 }

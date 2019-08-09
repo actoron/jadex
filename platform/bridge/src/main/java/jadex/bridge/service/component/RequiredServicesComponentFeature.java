@@ -422,7 +422,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public <T> IFuture<T> searchService(ServiceQuery<T> query)
 	{
-		return resolveService(query, createServiceInfo(query));
+		return resolveService(query, ServiceQuery.createServiceInfo(query));
 	}
 	
 	/**
@@ -433,7 +433,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public <T> T searchLocalService(ServiceQuery<T> query)
 	{
-		return resolveLocalService(query, createServiceInfo(query));
+		return resolveLocalService(query, ServiceQuery.createServiceInfo(query));
 	}
 	
 	/**
@@ -443,7 +443,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public <T>  ITerminableIntermediateFuture<T> searchServices(ServiceQuery<T> query)
 	{
-		return resolveServices(query, createServiceInfo(query));
+		return resolveServices(query, ServiceQuery.createServiceInfo(query));
 	}
 	
 	/**
@@ -454,7 +454,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public <T> Collection<T> searchLocalServices(ServiceQuery<T> query)
 	{
-		return resolveLocalServices(query, createServiceInfo(query));
+		return resolveLocalServices(query, ServiceQuery.createServiceInfo(query));
 	}
 	
 	/**
@@ -532,7 +532,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
-		return resolveQuery(query, createServiceInfo(query));
+		return resolveQuery(query, ServiceQuery.createServiceInfo(query));
 	}
 	
 	//-------- event interface --------
@@ -626,7 +626,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		{
 			ServiceQuery<T> query = new ServiceQuery<>(type).setMultiplicity(Multiplicity.ZERO_ONE);
 			query.setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW);
-			return resolveLocalService(query, createServiceInfo(query));
+			return resolveLocalService(query, ServiceQuery.createServiceInfo(query));
 		}
 		catch(ServiceNotFoundException snfe)
 		{
@@ -641,7 +641,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	{
 		ServiceQuery<T> query = new ServiceQuery<>(type);
 		query.setRequiredProxyType(ServiceQuery.PROXYTYPE_RAW);
-		return resolveLocalServices(query, createServiceInfo(query));
+		return resolveLocalServices(query, ServiceQuery.createServiceInfo(query));
 	}
 
 	
@@ -935,50 +935,12 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	/**
 	 * When searching for declared service -> map required service declaration to service query.
 	 */
-	public static <T> ServiceQuery<T> getServiceQuery(IInternalAccess ia, RequiredServiceInfo info)
-	{
-		// TODO??? : no, but hardconstraints should be added, NFR props are not for search
-//		info.getNFRProperties();
-
-		// todo:
-//		info.getDefaultBinding().getComponentName();
-//		info.getDefaultBinding().getComponentType();
-		
-		ServiceQuery<T> ret = new ServiceQuery<T>(info.getType(), info.getDefaultBinding().getScope(), ia.getId());
-		//ret.setMultiplicity(info.isMultiple() ? Multiplicity.ZERO_MANY : Multiplicity.ONE);
-		
-		Multiplicity m = new Multiplicity();
-		if(info.getMin()!=RequiredServiceInfo.UNDEFINED)
-			m.setFrom(info.getMin());
-		if(info.getMax()!=RequiredServiceInfo.UNDEFINED)
-			m.setTo(info.getMax());
-		
-		if(info.getTags()!=null)
-			ret.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), ia.getExternalAccess());
-		
-		return ret;
-	}
-	
-	/**
-	 * When searching for declared service -> map required service declaration to service query.
-	 */
 	protected <T> ServiceQuery<T> getServiceQuery(RequiredServiceInfo info)
 	{
-		return getServiceQuery(getComponent().getInternalAccess(), info);
+		return ServiceQuery.getServiceQuery(getComponent().getInternalAccess(), info);
 	}
 	
-	/**
-	 *  When searching with query -> create required service info from service query.
-	 */
-	protected <T> RequiredServiceInfo createServiceInfo(ServiceQuery<T> query)
-	{
-		// TODO: multiplicity required here for info? should not be needed for proxy creation
-		RequiredServiceBinding binding = new RequiredServiceBinding(SUtil.createUniqueId(), query.getScope());
-		binding.setProxytype(query.getRequiredProxyType());
-		Multiplicity m = query.getMultiplicity();
-		return new RequiredServiceInfo(null, query.getServiceType(), m==null? RequiredServiceInfo.UNDEFINED: m.getFrom(), 
-			m==null? RequiredServiceInfo.UNDEFINED: m.getTo() , binding, null, query.getServiceTags()==null ? null : Arrays.asList(query.getServiceTags()));
-	}
+	
 	
 	/**
 	 *  Get the required service info for a name.

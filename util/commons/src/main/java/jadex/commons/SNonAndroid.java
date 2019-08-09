@@ -300,7 +300,8 @@ public class SNonAndroid
 				byte[] hwa = ni.getHardwareAddress();
 				if(hwa!=null && hwa.length>0)
 				{
-					String mac = Arrays.toString(hwa);
+					//String mac = Arrays.toString(hwa);
+					String mac = SUtil.getMacAddressAsString(hwa);
 					if(!res.contains(mac))
 					{
 						res.add(mac);
