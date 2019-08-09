@@ -702,7 +702,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			}
 			else
 			{
-				ret.setException(new ServiceNotFoundException(query.toString())); 				
+				ret.setException(new ServiceNotFoundException(query.toString()));
 			}
 		}
 		

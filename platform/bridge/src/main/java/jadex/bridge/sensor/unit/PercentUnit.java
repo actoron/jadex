@@ -12,7 +12,7 @@ public enum PercentUnit implements IConvertableUnit<Double>, IPrettyPrintUnit<Do
 	 */
 	public Double convert(Double value)
 	{
-		int val = (int)(value*100);
+		int val = (int)(value*10000);
 		double ret = ((double)val)/100;
 		return ret;
 	}

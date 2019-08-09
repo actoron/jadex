@@ -15,9 +15,9 @@ public class ServiceNotFoundException extends RuntimeException
 		//	System.out.println("gotcha");
 	}
 	
-//	public void printStackTrace()
-//	{
-//		Thread.dumpStack();
-//		super.printStackTrace();
-//	}
+	public void printStackTrace()
+	{
+		Thread.dumpStack();
+		super.printStackTrace();
+	}
 }
