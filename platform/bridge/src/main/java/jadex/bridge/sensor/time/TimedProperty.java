@@ -4,6 +4,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.SimpleValueNFProperty;
 import jadex.bridge.sensor.unit.TimeUnit;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Base property for time properties.

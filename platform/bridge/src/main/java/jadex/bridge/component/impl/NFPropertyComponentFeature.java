@@ -493,6 +493,17 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	}
 	
 	/**
+	 *  Returns the current value of a non-functional property of this component.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this component as string.
+	 */
+	public IFuture<String> getNFPropertyPrettyPrintValue(String name) 
+	{
+		return getComponentPropertyProvider().getNFPropertyPrettyPrintValue(name);
+	}
+	
+	/**
 	 *  Add a non-functional property.
 	 *  @param nfprop The property.
 	 */
@@ -740,6 +751,41 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	}
 	
 	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of this service as string.
+	 */
+	public IFuture<String> getNFPropertyPrettyPrintValue(IServiceIdentifier sid, String name) 
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getNFPropertyPrettyPrintValue(name);
+		}
+		else
+		{
+			final Future<String> ret = new Future<String>();
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<String>()
+					{
+						@Classname("getNFPropertyValue14+1")
+						public IFuture<String> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getNFPropertyPrettyPrintValue(name);
+						}
+					}).addResultListener(new DelegationResultListener<String>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+	/**
 	 *  Add a non-functional property.
 	 *  @param nfprop The property.
 	 */
@@ -969,7 +1015,10 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	
 	/**
 	 *  Returns the meta information about a non-functional property of the specified method.
-	 *  @param method The method targeted by this operation.
+	 *  @param method The
+	public IFuture<String> getMethodNFPropertyPrettyPrintValue(IServiceIdentifier sid, MethodInfo method, String name) 
+	{
+	} method targeted by this operation.
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of the specified method.
 	 */
@@ -1080,6 +1129,35 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 							return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyValue(method, name, unit);
 						}
 					}).addResultListener(new DelegationResultListener<T>(ret));
+				}
+			});
+			return ret;
+		}
+	}
+	
+
+	public IFuture<String> getMethodNFPropertyPrettyPrintValue(IServiceIdentifier sid, MethodInfo method, String name) 
+	{
+		if(sid.getProviderId().equals(getInternalAccess().getId()))
+		{
+			return getProvidedServicePropertyProvider(sid).getMethodNFPropertyPrettyPrintValue(method, name);
+		}
+		else
+		{
+			final Future<String> ret = new Future<String>();
+			component.getExternalAccessAsync(sid.getProviderId()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
+			{
+				public void customResultAvailable(IExternalAccess result)
+				{
+					result.scheduleStep(new ImmediateComponentStep<String>()
+					{
+						@Classname("getMethodNFPropertyPrettyPrintValue24+1")
+						public IFuture<String> execute(IInternalAccess ia)
+						{
+							INFPropertyComponentFeature nfp = ia.getFeature(INFPropertyComponentFeature.class);
+							return nfp.getProvidedServicePropertyProvider(sid).getMethodNFPropertyPrettyPrintValue(method, name);
+						}
+					}).addResultListener(new DelegationResultListener<String>(ret));
 				}
 			});
 			return ret;
@@ -1217,6 +1295,17 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	}
 	
 	/**
+	 *  Returns the current value of a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public IFuture<String> getRequiredNFPropertyPrettyPrintValue(IServiceIdentifier sid, String name) 
+	{
+		return getRequiredServicePropertyProvider(sid).getNFPropertyPrettyPrintValue(name);
+	}
+	
+	/**
 	 *  Add a non-functional property.
 	 *  @param nfprop The property.
 	 */
@@ -1318,6 +1407,19 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	}
 	
 	/**
+	 *  Returns the current value of a non-functional property of the specified method, performs unit conversion.
+	 *  @param method The method targeted by this operation.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of the specified method.
+	 */
+	public IFuture<String> getRequiredMethodNFPropertyPrettyPrintValue(IServiceIdentifier sid, MethodInfo method, String name) 
+	{
+		return getRequiredServicePropertyProvider(sid).getMethodNFPropertyPrettyPrintValue(method, name);
+	}
+	
+	/**
 	 *  Add a non-functional property.
 	 *  @param method The method targeted by this operation.
 	 *  @param nfprop The property.
@@ -1336,8 +1438,6 @@ public class NFPropertyComponentFeature extends AbstractComponentFeature impleme
 	{
 		return getRequiredServicePropertyProvider(sid).removeMethodNFProperty(method, name);
 	}
-	
-	
 	
 	/**
 	 *  Counter listener that allows to set the max after usage.

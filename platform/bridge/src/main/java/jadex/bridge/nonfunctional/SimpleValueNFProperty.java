@@ -1,8 +1,10 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.sensor.unit.IConvertableUnit;
+import jadex.bridge.sensor.unit.IPrettyPrintUnit;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -48,7 +50,6 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 					comp.getFeature(IExecutionFeature.class).waitForDelay(mi.getUpdateRate(), mi.isRealtime()).addResultListener(this);
 				}
 			};
-			
 			comp.getFeature(IExecutionFeature.class).waitForDelay(mi.getUpdateRate(), mi.isRealtime()).addResultListener(res);
 		}
 		else
@@ -58,7 +59,7 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 	}
 
 	/**
-	 *  Get the value.
+	 *  Get the value converted by a unit.
 	 */
 	public IFuture<T> getValue(U unit)
 	{
@@ -68,6 +69,43 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 		if(unit instanceof IConvertableUnit)
 			ret = ((IConvertableUnit<T>)unit).convert(ret);
 		return new Future<T>(ret);
+	}
+	
+	/**
+	 *  Returns the current value of the property in a human readable form.
+	 *  @return The current value of the property.
+	 */
+	public IFuture<String> getPrettyPrintValue()
+	{
+		Future<String> ret = new Future<>();
+		
+		getValue().thenAccept(v ->
+		{
+			NFPropertyMetaInfo mi = getMetaInfo();
+			ClassInfo ci = mi.getUnit();
+			if(ci!=null)
+			{
+				Class<?> cl = ci.getType(comp.getClassLoader());
+				if(cl.isEnum())
+				{
+					Object[] enums = cl.getEnumConstants();
+					if(enums!=null)
+					{
+						Object e = enums[0];
+						if(e instanceof IPrettyPrintUnit)
+						{
+							ret.setResult(((IPrettyPrintUnit<Object>)e).prettyPrint(v));
+						}
+					}
+				}
+			}
+			
+			// return raw value as string
+			if(!ret.isDone())
+				ret.setResult(""+v);
+		}).exceptionally(ret);
+	
+		return ret;
 	}
 	
 	/**

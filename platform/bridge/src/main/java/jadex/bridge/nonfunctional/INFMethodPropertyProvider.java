@@ -69,6 +69,14 @@ public interface INFMethodPropertyProvider
 	public <T, U> IFuture<T> getMethodNFPropertyValue(MethodInfo method, String name, U unit);
 	
 	/**
+	 *  Returns the current value of a non-functional property of this service method.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service method.
+	 */
+	public IFuture<String> getMethodNFPropertyPrettyPrintValue(MethodInfo method, String name);
+	
+	/**
 	 *  Add a non-functional property.
 	 *  @param method The method targeted by this operation.
 	 *  @param nfprop The property.
