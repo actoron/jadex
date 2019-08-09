@@ -1063,9 +1063,8 @@ public class SBpmnModelReader
 				rs.setName(name);
 				rs.setType(itrface);
 				if(multi != null)
-				{
-					rs.setMultiple(multi.booleanValue());
-				}
+					rs.setMax(RequiredServiceInfo.MANY);
+					//rs.setMultiple(multi.booleanValue());
 				rs.setDefaultBinding(new RequiredServiceBinding());
 				rs.getDefaultBinding().setScope(ServiceScope.valueOf(scope.toUpperCase()));
 				// Dropped in v4??

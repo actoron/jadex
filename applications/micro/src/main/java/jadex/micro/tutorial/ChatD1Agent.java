@@ -28,7 +28,7 @@ import jadex.micro.annotation.RequiredServices;
 	implementation=@Implementation(ChatServiceD1.class)))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class),
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=ServiceScope.PLATFORM)
+	@RequiredService(name="chatservices", type=IChatService.class, scope=ServiceScope.PLATFORM) // multiple=true,
 })
 public class ChatD1Agent
 {

@@ -18,7 +18,6 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -30,7 +29,7 @@ import jadex.micro.annotation.RequiredServices;
  *  when a watchdog becomes unavailable.
  */
 @ProvidedServices(@ProvidedService(type=IWatchdogService.class))
-@RequiredServices(@RequiredService(name="watchdogs", type=IWatchdogService.class, multiple=true, scope=ServiceScope.GLOBAL))
+@RequiredServices(@RequiredService(name="watchdogs", type=IWatchdogService.class, scope=ServiceScope.GLOBAL)) // multiple=true,
 @Arguments(@Argument(clazz=long.class, name="delay", description="Delay between pings.", defaultvalue="3000"))
 @Service
 @Agent

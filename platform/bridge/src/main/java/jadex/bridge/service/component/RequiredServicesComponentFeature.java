@@ -146,7 +146,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		Map<String, RequiredServiceInfo> sermap = new LinkedHashMap<String, RequiredServiceInfo>();
 		for(int i=0; i<ms.length; i++)
 		{
-			ms[i] = new RequiredServiceInfo(/*getServicePrefix()+*/ms[i].getName(), ms[i].getType().getType(cl, model.getAllImports()), ms[i].isMultiple(), 
+			ms[i] = new RequiredServiceInfo(/*getServicePrefix()+*/ms[i].getName(), ms[i].getType().getType(cl, model.getAllImports()), ms[i].getMin(), ms[i].getMax(), 
 				ms[i].getDefaultBinding(), ms[i].getNFRProperties(), ms[i].getTags());
 			sermap.put(ms[i].getName(), ms[i]);
 		}
@@ -158,7 +158,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			for(int i=0; i<cs.length; i++)
 			{
 				RequiredServiceInfo rsi = sermap.get(/*getServicePrefix()+*/cs[i].getName());
-				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), rsi.isMultiple(), 
+				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), ms[i].getMin(), ms[i].getMax(), 
 					new RequiredServiceBinding(cs[i].getDefaultBinding()), ms[i].getNFRProperties(), ms[i].getTags());
 				sermap.put(rsi.getName(), newrsi);
 			}
@@ -171,7 +171,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			for(int i=0; i<bindings.length; i++)
 			{
 				RequiredServiceInfo rsi = sermap.get(bindings[i].getName());
-				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), rsi.isMultiple(), 
+				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(cl, model.getAllImports()), ms[i].getMin(), ms[i].getMax(), 
 					new RequiredServiceBinding(bindings[i]), ms[i].getNFRProperties(), ms[i].getTags());
 				sermap.put(rsi.getName(), newrsi);
 			}
@@ -937,13 +937,21 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public static <T> ServiceQuery<T> getServiceQuery(IInternalAccess ia, RequiredServiceInfo info)
 	{
-		// TODO???
+		// TODO??? : no, but hardconstraints should be added, NFR props are not for search
 //		info.getNFRProperties();
+
+		// todo:
 //		info.getDefaultBinding().getComponentName();
 //		info.getDefaultBinding().getComponentType();
 		
 		ServiceQuery<T> ret = new ServiceQuery<T>(info.getType(), info.getDefaultBinding().getScope(), ia.getId());
-		ret.setMultiplicity(info.isMultiple() ? Multiplicity.ZERO_MANY : Multiplicity.ONE);
+		//ret.setMultiplicity(info.isMultiple() ? Multiplicity.ZERO_MANY : Multiplicity.ONE);
+		
+		Multiplicity m = new Multiplicity();
+		if(info.getMin()!=RequiredServiceInfo.UNDEFINED)
+			m.setFrom(info.getMin());
+		if(info.getMax()!=RequiredServiceInfo.UNDEFINED)
+			m.setTo(info.getMax());
 		
 		if(info.getTags()!=null)
 			ret.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), ia.getExternalAccess());
@@ -967,7 +975,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		// TODO: multiplicity required here for info? should not be needed for proxy creation
 		RequiredServiceBinding binding = new RequiredServiceBinding(SUtil.createUniqueId(), query.getScope());
 		binding.setProxytype(query.getRequiredProxyType());
-		return new RequiredServiceInfo(null, query.getServiceType(), false, binding, null, query.getServiceTags()==null ? null : Arrays.asList(query.getServiceTags()));
+		Multiplicity m = query.getMultiplicity();
+		return new RequiredServiceInfo(null, query.getServiceType(), m==null? RequiredServiceInfo.UNDEFINED: m.getFrom(), 
+			m==null? RequiredServiceInfo.UNDEFINED: m.getTo() , binding, null, query.getServiceTags()==null ? null : Arrays.asList(query.getServiceTags()));
 	}
 	
 	/**

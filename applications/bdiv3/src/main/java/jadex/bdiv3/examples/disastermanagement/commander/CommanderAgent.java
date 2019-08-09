@@ -44,9 +44,9 @@ import jadex.micro.annotation.RequiredServices;
 
 @RequiredServices(
 {
-	@RequiredService(name="treatvictimservices", type=ITreatVictimsService.class, multiple=true),
-	@RequiredService(name="extinguishfireservices", type=IExtinguishFireService.class, multiple=true),
-	@RequiredService(name="clearchemicalsservices", type=IClearChemicalsService.class, multiple=true)
+	@RequiredService(name="treatvictimservices", type=ITreatVictimsService.class), //, multiple=true
+	@RequiredService(name="extinguishfireservices", type=IExtinguishFireService.class), //, multiple=true
+	@RequiredService(name="clearchemicalsservices", type=IClearChemicalsService.class) //, multiple=true
 })
 @Plans(
 {

@@ -125,12 +125,16 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 					for(int j=0; j<infos.length; j++)
 					{
 						// Uses required service info to search service
+						
 						RequiredServiceInfo	info = infos[j].getRequiredServiceInfo()!=null? infos[j].getRequiredServiceInfo(): model.getService(sername);				
 						
 						if(infos[j].getFieldInfo()!=null)
 						{
-							final IFuture<Object> sfut = callgetService(sername, info, component);
 							final Field	f = infos[j].getFieldInfo().getField(component.getClassLoader());
+							Class<?> ft = f.getDeclaringClass();
+							boolean multiple = ft.isArray() || SReflect.isSupertype(Collection.class, ft) || info.getMax()>2;
+
+							final IFuture<Object> sfut = callgetService(sername, info, component, multiple);
 							
 							// todo: what about multi case?
 							// why not add values to a collection as they come?!
@@ -153,8 +157,6 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 							}
 							else
 							{
-								Class<?> ft = f.getDeclaringClass();
-								
 								// todo: disallow multiple field injections!
 								// This is problematic because search can defer the agent startup esp. when remote search
 								if(sfut.isDone() && sfut.getException() == null)
@@ -171,12 +173,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										lis2.exceptionOccurred(e);
 									}	
 								}
-								else if(!(info.isMultiple() || ft.isArray() || SReflect.isSupertype(Collection.class, ft) 
-									|| !infos[j].isLazy()))
+								else if(infos[j].isLazy() && !multiple)
 								{
 									RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceInfo(sername);
 									Class<?> clz = rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
 									ServiceQuery<Object> query = RequiredServicesComponentFeature.getServiceQuery(component, info);
+									
 									UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
 									Object proxy = ProxyFactory.newProxyInstance(component.getClassLoader(), new Class[]{IService.class, clz}, h);
 								
@@ -194,6 +196,8 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								}
 								else
 								{
+									// todo: remove!
+									
 									// Wait for result and block init until available
 									// Dangerous because agent blocks
 									
@@ -246,9 +250,6 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						{
 							final Method m = SReflect.getAnyMethod(target.getClass(), infos[j].getMethodInfo().getName(), infos[j].getMethodInfo().getParameterTypes(component.getClassLoader()));
 
-							if(m==null)
-								System.out.println("fuck");
-							
 							if(infos[j].isQuery())
 							{
 								@SuppressWarnings("unchecked")
@@ -310,9 +311,10 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 							}
 							else
 							{
-								final IFuture<Object> sfut = callgetService(sername, info, component);
+								boolean multiple = info.getMax()>2;
+								final IFuture<Object> sfut = callgetService(sername, info, component, multiple);
 								
-								if(info.isMultiple())
+								if(multiple)
 								{
 									lis2.resultAvailable(null);
 									IFuture	tfut	= sfut;
@@ -446,14 +448,14 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	 *  @param info
 	 *  @return
 	 */
-	protected static IFuture<Object> callgetService(String sername, RequiredServiceInfo info, IInternalAccess component)
+	protected static IFuture<Object> callgetService(String sername, RequiredServiceInfo info, IInternalAccess component, boolean multiple)
 	{
 		final IFuture<Object> sfut;
 		
 		// if info is available use it. in case of services it is not available in the agent (model)
 		if(info!=null)
 		{
-			if(info.isMultiple())
+			if(multiple)
 			{
 				IFuture	ifut = component.searchServices(RequiredServicesComponentFeature.getServiceQuery(component, info));
 				sfut = ifut;
@@ -466,7 +468,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		}
 		else
 		{
-			if(info.isMultiple())
+			if(multiple)
 			{
 				IFuture	ifut = component.getServices(sername);
 				sfut = ifut;

@@ -21,7 +21,7 @@ import jadex.micro.annotation.RequiredServices;
 
 @Agent
 @Service
-@RequiredServices(@RequiredService(name="aser", type=IAService.class, multiple=true, scope=ServiceScope.PLATFORM,
+@RequiredServices(@RequiredService(name="aser", type=IAService.class, scope=ServiceScope.PLATFORM, //  multiple=true,
 	nfprops=@NFRProperty(value=ExecutionTimeProperty.class, methodname="test")))
 public class UserAgent
 {

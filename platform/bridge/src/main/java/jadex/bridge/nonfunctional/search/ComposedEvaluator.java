@@ -18,7 +18,6 @@ import jadex.commons.future.IResultListener;
 
 /**
  *  Evaluator composed of multiple weighted evaluators.
- *
  */
 public class ComposedEvaluator<S> implements IServiceEvaluator, IServiceRanker<S>
 {

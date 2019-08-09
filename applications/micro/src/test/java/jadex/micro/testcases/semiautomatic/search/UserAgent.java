@@ -1,10 +1,8 @@
 package jadex.micro.testcases.semiautomatic.search;
 
 import java.util.Collection;
-import java.util.Map;
 
 import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
@@ -19,7 +17,7 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 @Agent
-@RequiredServices({@RequiredService(name = "testService", type = ITestService.class, multiple = true, scope=ServiceScope.PLATFORM)})
+@RequiredServices({@RequiredService(name = "testService", type = ITestService.class, scope=ServiceScope.PLATFORM)}) // multiple = true,
 public class UserAgent
 {
     @Agent

@@ -8,9 +8,12 @@ import java.util.Set;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.RemoteMethodInvocationHandler;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -19,6 +22,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -40,47 +44,24 @@ public class JCCCloudviewPluginAgent extends JCCPluginAgent implements IJCCCloud
 	{
 		final Future<Map<String, String[]>> ret = new Future<>();
 		IJCCWebService ws = agent.searchLocalService(new ServiceQuery<>(IJCCWebService.class));
-		ws.getPlatforms().addResultListener(new IResultListener<Collection<IComponentIdentifier>>()
+		ServiceCall.getOrCreateNextInvocation().setTimeout(1000);
+		ITerminableIntermediateFuture<IExternalAccess> pffut = agent.searchServices(new ServiceQuery<>(IExternalAccess.class, ServiceScope.GLOBAL).setServiceTags(IExternalAccess.PLATFORM));
+		pffut.addResultListener(new IResultListener<Collection<IExternalAccess>>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
 				ret.setResult(new HashMap<>());
 			}
-			public void resultAvailable(Collection<IComponentIdentifier> platforms)
+			public void resultAvailable(Collection<IExternalAccess> platforms)
 			{
 				FutureBarrier<Void> bar = new FutureBarrier<Void>();
 				final Map<String, String[]> res = new HashMap<String, String[]>();
-				for (final IComponentIdentifier id : platforms)
+				for (final IExternalAccess pf : platforms)
 				{
+					IComponentIdentifier id = pf.getId();
 					final Future<Void> done = new Future<Void>();
 					bar.addFuture(done);
-					/*agent.searchService(new ServiceQuery<>(ISecurityService.class).setPlatform(id).setScope(ServiceScope.PLATFORM).setSearchStart(id)).addResultListener(new IResultListener<ISecurityService>()
-					{
-						public void exceptionOccurred(Exception exception)
-						{
-							exception.printStackTrace();
-							done.setResult(null);
-						};
-						public void resultAvailable(ISecurityService secserv)
-						{
-							System.out.println("Got service for " + secserv);
-							secserv.getNetworkNames().addResultListener(new IResultListener<Set<String>>()
-							{
-								public void exceptionOccurred(Exception exception)
-								{
-									exception.printStackTrace();
-									done.setResult(null);
-								}
-								public void resultAvailable(Set<String> nws)
-								{
-									System.out.println("Got networks for " + id);
-									res.put(id.toString(), nws.stream().toArray(String[]::new));
-									done.setResult(null);
-								};
-							});
-						};
-					});*/
 					
 					ISecurityService secserv = null;
 					if ((new ComponentIdentifier(cid)).getRoot().equals(agent.getId().getRoot()))

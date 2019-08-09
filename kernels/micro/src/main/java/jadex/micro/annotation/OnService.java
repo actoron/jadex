@@ -37,21 +37,6 @@ public @interface OnService
 	
 	//-------- query details ---------
 	
-//	/** 
-//	 *  The service interface type. 
-//	 */
-//	public Class<?> type() default Object.class;
-//	
-//	/** 
-//	 *  Flag if multiple services should be returned. 
-//	 */
-//	public boolean multiple() default true; 
-//	
-//	/**
-//	 *  The search scope.
-//	 */
-//	public ServiceScope scope() default ServiceScope.DEFAULT;
-	
 	/**
 	 *  How long shall the query be active?
 	 *  -1 for ever

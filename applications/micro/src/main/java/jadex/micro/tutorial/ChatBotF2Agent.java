@@ -21,7 +21,7 @@ import jadex.micro.annotation.RequiredServices;
 @ProvidedServices(@ProvidedService(type=IChatService.class, 
 	implementation=@Implementation(ChatServiceF2.class)))
 @RequiredServices({
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=ServiceScope.PLATFORM)
+	@RequiredService(name="chatservices", type=IChatService.class, scope=ServiceScope.PLATFORM) //multiple=true, 
 })
 @Arguments({
 	@Argument(name="keyword", clazz=String.class, defaultvalue="\"nerd\"", description="The keyword to react to."),

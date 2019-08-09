@@ -262,6 +262,7 @@ public class RHardConstraints
 		else
 		{
 			final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+			
 			// dropped for v4???
 //			SServiceProvider.getServices(ea, type, scope, (IAsyncFilter<T>) hardconstraints.getRemotableFilter()).addResultListener(new IResultListener<Collection<T>>()
 //			{

@@ -27,6 +27,8 @@ dependencies
 										   ':transports:relaytransport',
 										   ':transports:websockettransport',
 										   ':platform:webservice-desktop',
+										   ':platform:webservice-desktop-nano',
+										   ':platform:webservice-websocket'
 										   // For IDEs: include manually to choose impl.
 //										   ':platform:webservice-desktop-jetty',
 //										   ':platform:webservice-desktop-grizzly',
