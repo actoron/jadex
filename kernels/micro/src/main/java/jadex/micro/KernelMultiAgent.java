@@ -115,7 +115,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentServiceQuery
+	@AgentServiceSearch
 	protected ILibraryService libservice; 
 	
 	/** The listeners. */

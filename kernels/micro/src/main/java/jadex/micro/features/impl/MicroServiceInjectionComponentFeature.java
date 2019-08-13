@@ -133,7 +133,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						ServiceQuery<Object> query = ServiceQuery.getServiceQuery(component, info);
 						
 						// if query
-						if(infos[j].getQuery()!=null && infos[j].getQuery().booleanValue() a)
+						if(infos[j].getQuery()!=null && infos[j].getQuery().booleanValue())
 						{
 							//ServiceQuery<Object> query = new ServiceQuery<>((Class<Object>)info.getType().getType(component.getClassLoader()), info.getDefaultBinding().getScope());
 							//query = info.getTags()==null || info.getTags().size()==0? query: query.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), component.getExternalAccess()); 
@@ -241,10 +241,10 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 											lis2.exceptionOccurred(e);
 										}
 									}
-									else if(infos[j].isLazy() && !multiple)
+									else if(infos[j].getLazy()!=null && infos[j].getLazy().booleanValue() && !multiple)
 									{
-										RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceInfo(sername);
-										Class<?> clz = rsi.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
+										//RequiredServiceInfo rsi = ((IInternalRequiredServicesFeature)component.getFeature(IRequiredServicesFeature.class)).getServiceInfo(sername);
+										Class<?> clz = info.getType().getType(component.getClassLoader(), component.getModel().getAllImports());
 										//ServiceQuery<Object> query = RequiredServicesComponentFeature.getServiceQuery(component, info);
 										
 										UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
@@ -387,7 +387,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	 */
 	protected static void setDirectFieldValue(Field f, Object target, Object result)
 	{
-		Class<?> ft = f.getDeclaringClass();
+		Class<?> ft = f.getType();
 		//boolean multiple = ft.isArray() || SReflect.isSupertype(Collection.class, ft) || info.getMax()>2;
 
 		if(SReflect.isSupertype(ft, result.getClass()))
@@ -489,6 +489,10 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 			{
 				throw SUtil.throwUnchecked(e);
 			}
+		}
+		else
+		{
+			throw new RuntimeException("injection error: "+f+" "+target+" "+result);
 		}
 	}
 

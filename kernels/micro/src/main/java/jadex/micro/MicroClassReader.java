@@ -2332,26 +2332,20 @@ public class MicroClassReader
 				AgentServiceSearch ser = getAnnotation(fields[i], AgentServiceSearch.class, cl);
 				RequiredService rs = ser.requiredservice();
 				
-				// This is still broken in the lazy case!
-				if(!rs.type().equals(Object.class))
-				{
-					if(ser.name().length()>0)
-						throw new IllegalArgumentException("Use 'name' to reference a required service OR use inline declaration of required service, not both.");
-					
-					// This needs to be outsider the check
-					RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
-					if(rsis.getName().length()==0)
-						rsis.setName(fields[i].getName());
+				//if(rsis.getName().length()==0)
+				//	rsis.setName(fields[i].getName());
 				
+				RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+				String name = ser.name().length()>0? ser.name(): fields[i].getName();
+				
+				if(Object.class.equals(rsis.getType().getType(cl)))
+					rsis.setType(new ClassInfo(fields[i].getType()));
+				
+				// references existing required service def or add it under this name
+				if(ser.name().length()>0)
 					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
-					
-					ii.addServiceInjection(rsis.getName(), new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i])).setLazy(ser.lazy()).setRequiredServiceInfo(rsis));
-				}
-				else
-				{
-					String name = ser.name().length()>0? ser.name(): fields[i].getName();
-					ii.addServiceInjection(name, new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i])).setLazy(ser.lazy()));
-				}
+				
+				ii.addServiceInjection(name, new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i])).setLazy(ser.lazy()).setQuery(false).setRequiredServiceInfo(rsis));
 			}
 			else if(isAnnotationPresent(fields[i], AgentServiceQuery.class, cl))
 			{
@@ -2359,56 +2353,41 @@ public class MicroClassReader
 				RequiredService rs = ser.requiredservice();
 				
 				//Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
+				//if(rsis.getName().length()==0)
+				//	rsis.setName(fields[i].getName());
 				
 				RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
-				if(rsis.getName().length()==0)
-					rsis.setName(fields[i].getName());
-			
-				if(!rs.type().equals(Object.class))
-				{
-					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
-					
-					ii.addServiceInjection(rsis.getName(), new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i])).setLazy(true).setQuery(true).setRequiredServiceInfo(rsis));
-				}
-				else
-				{
+				String name = rs.name().length()>0? rs.name(): fields[i].getName();
+				
+				if(Object.class.equals(rsis.getType().getType(cl)))
 					rsis.setType(new ClassInfo(fields[i].getType()));
-					String name = fields[i].getName();
-					
+				
+				if(rs.name().length()>0)
 					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
-					ii.addServiceInjection(name, new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i])).setLazy(true).setQuery(true).setRequiredServiceInfo(rsis));
-				}
+				
+				ii.addServiceInjection(name, new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i])).setLazy(true).setQuery(true).setRequiredServiceInfo(rsis));
+
 			}
 			else if(isAnnotationPresent(fields[i], OnService.class, cl))
 			{
 				OnService ser = getAnnotation(fields[i], OnService.class, cl);
 				RequiredService rs = ser.requiredservice();
+
+				RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+				String name = rs.name().length()>0? rs.name(): fields[i].getName();
 				
-				String name;
-				ServiceInjectionInfo sii = new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i]));
+				if(Object.class.equals(rsis.getType().getType(cl)))
+					rsis.setType(new ClassInfo(fields[i].getType()));
 						
-				// This is still broken in the lazy case!
-				if(!rs.type().equals(Object.class))
-				{
-					if(ser.name().length()>0)
-						throw new IllegalArgumentException("Use 'name' to reference a required service OR use inline declaration of required service, not both.");
-					
-					// This needs to be outsider the check
-					RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
-					if(rsis.getName().length()==0)
-						rsis.setName(fields[i].getName());
-				
+				if(ser.name().length()>0)
 					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
-					
-					sii.setRequiredServiceInfo(rsis);
-					name = rsis.getName();
-				}
-				else
-				{
-					name = ser.name().length()>0? ser.name(): fields[i].getName();
-				}
 				
-				sii.setQuery(ser.query().toBoolean());
+				ServiceInjectionInfo sii = new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i])).setRequiredServiceInfo(rsis);
+				
+				if(ser.query().toBoolean()!=null)
+					sii.setQuery(ser.query().toBoolean());
+				else
+					sii.setQuery(false); // default on fields is false
 				sii.setRequired(ser.required().toBoolean());
 				sii.setLazy(ser.required().toBoolean());
 				sii.setActive(ser.active());
@@ -2454,68 +2433,67 @@ public class MicroClassReader
 			if(isAnnotationPresent(methods[i], AgentServiceSearch.class, cl))
 			{
 				AgentServiceSearch ser = getAnnotation(methods[i], AgentServiceSearch.class, cl);
-				String name;
-				if(ser.name().length()>0)
-				{
-					 name	= ser.name();
-				}
-				else
-				{
-					name	= methods[i].getName();
-					name	= name.toLowerCase();
-					
-					// Guess the injection name
-					if(name.startsWith("add"))
-					{
-						name	= name.substring(3);
-						name	= SUtil.getPlural(name);
-					}
-					else if(name.startsWith("set"))
-					{
-						name	= name.substring(3);							
-					}
-				}
+				String name = ser.name().length()>0? ser.name(): guessName(methods[i].getName());
 				
 				RequiredServiceInfo rsis = createRequiredServiceInfo(ser.requiredservice(), cl);
-				checkAndAddRequiredServiceInfo(rsis, rsers, cl);
 				
-				ii.addServiceInjection(name, new ServiceInjectionInfo().setMethodInfo(new MethodInfo(methods[i])).setRequiredServiceInfo(rsis));
+				if(ser.name().length()>0)
+					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				
+				ii.addServiceInjection(name, new ServiceInjectionInfo().setMethodInfo(new MethodInfo(methods[i])).setRequiredServiceInfo(rsis).setQuery(false));
 			}
 			
 			if(isAnnotationPresent(methods[i], AgentServiceQuery.class, cl))
 			{
 				AgentServiceQuery asq = getAnnotation(methods[i], AgentServiceQuery.class, cl);
 				
-				String name = SUtil.createUniqueId(methods[i].getName());
+				//String name = SUtil.createUniqueId(methods[i].getName());
+				String name = asq.requiredservice().name().length()>0? asq.requiredservice().name(): guessName(methods[i].getName());
 				
-				Class<?> iftype = asq.type();
-				if(Object.class.equals(iftype))
-				{
-					Class<?>[] ptypes = methods[i].getParameterTypes();
-					for(Class<?> ptype: ptypes)
-					{
-						if(isAnnotationPresent(ptype, Service.class, cl))
-						{
-							iftype = ptype;
-							break;
-						}
-					}
-				}
-				
-				if(iftype==null || Object.class.equals(iftype))
-					throw new RuntimeException("No service interface found for service query");
+				// Find parameter that can be used for injection 
+				// todo: use parameter annotation to allow for more than one parameter
+				Class<?> iftype = Object.class.equals(asq.type())? guessParameterType(methods[i].getParameterTypes(), cl): asq.type();
 				
 				//RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
 				RequiredServiceInfo rsis = new RequiredServiceInfo(name, iftype, asq.scope());
 				//rsis.setMultiple(asq.multiple());
 				//rsis.setMax(RequiredServiceInfo.MANY);
 			
-				checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				//if(asq.requiredservice().name().length()>0)
+					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
 				
 				//ModelInfo mi = (ModelInfo)micromodel.getModelInfo();
 				//mi.addRequiredService(rsi);
 				
 				ii.addServiceInjection(name, new ServiceInjectionInfo().setMethodInfo(new MethodInfo(methods[i])).setQuery(true).setRequiredServiceInfo(rsis));
+			}
+			
+			if(isAnnotationPresent(methods[i], OnService.class, cl))
+			{
+				OnService ser = getAnnotation(methods[i], OnService.class, cl);
+				RequiredService rs = ser.requiredservice();
+				String name = ser.requiredservice().name().length()>0? ser.requiredservice().name(): guessName(methods[i].getName());
+				RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+				if(new ClassInfo(Object.class).equals(rsis.getType()))
+				{
+					Class<?> iftype = Object.class.equals(ser.requiredservice().type())? guessParameterType(methods[i].getParameterTypes(), cl): ser.requiredservice().type();
+					rsis.setType(new ClassInfo(iftype));
+				}
+				
+				ServiceInjectionInfo sii = new ServiceInjectionInfo().setMethodInfo(new MethodInfo(methods[i])).setRequiredServiceInfo(rsis);
+						
+				if(ser.requiredservice().name().length()>0)
+					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+				
+				if(ser.query().toBoolean()!=null)
+					sii.setQuery(ser.query().toBoolean());
+				else
+					sii.setQuery(true); // default on methods is true
+				sii.setRequired(ser.required().toBoolean());
+				sii.setLazy(ser.required().toBoolean());
+				sii.setActive(ser.active());
+				
+				ii.addServiceInjection(name, sii);
 			}
 
 			// todo: method name, parameters, intervals...
@@ -2530,12 +2508,60 @@ public class MicroClassReader
 	
 	/**
 	 * 
+	 */
+	protected static String guessName(String methodname)
+	{
+		String ret = methodname;
+	
+		ret	= ret.toLowerCase();
+			
+		// Guess the injection name
+		if(ret.startsWith("add"))
+		{
+			ret = ret.substring(3);
+			ret	= SUtil.getPlural(ret);
+		}
+		else if(ret.startsWith("set"))
+		{
+			ret	= ret.substring(3);							
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected static Class<?> guessParameterType(Class<?>[] ptypes, ClassLoader cl)
+	{
+		Class<?> iftype = null;
+		
+		for(Class<?> ptype: ptypes)
+		{
+			if(isAnnotationPresent(ptype, Service.class, cl))
+			{
+				iftype = ptype;
+				break;
+			}
+		}
+		
+		if(iftype==null || Object.class.equals(iftype))
+			throw new RuntimeException("No service interface found for service query");
+		
+		return iftype;
+	}
+	
+	/**
+	 * 
 	 * @param rsis
 	 * @param rsers
 	 * @param cl
 	 */
 	public static void checkAndAddRequiredServiceInfo(RequiredServiceInfo rsis, Map<String, Object> rsers, ClassLoader cl)
 	{
+		// Do not add definitions without name!
+		if(rsis.getName()==null || rsis.getName().length()==0)
+			return;
+		
 		//Map<String, Object> rsers = getOrCreateMap("reqservices", toset);
 		
 		//RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);

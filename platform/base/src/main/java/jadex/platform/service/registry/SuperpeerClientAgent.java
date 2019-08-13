@@ -63,6 +63,7 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentServiceQuery;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.platform.service.security.SecurityAgent;
 
 /**
@@ -104,7 +105,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	/** The managed connections for each network. */
 	protected Map<String, NetworkManager> connections;
 	
-	@AgentServiceQuery
+	//@AgentServiceQuery
+	@AgentServiceSearch
 	protected ISecurityService secser;
 	
 	//-------- agent life cycle --------

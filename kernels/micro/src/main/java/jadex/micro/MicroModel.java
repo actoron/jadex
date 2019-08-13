@@ -439,7 +439,7 @@ public class MicroModel extends CacheableKernelModel
 		 *  Set the query.
 		 *  @param query The query to set
 		 */
-		public ServiceInjectionInfo setQuery(boolean query)
+		public ServiceInjectionInfo setQuery(Boolean query)
 		{
 			this.query = query;
 			return this;

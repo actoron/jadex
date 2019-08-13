@@ -78,6 +78,7 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentServiceQuery;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -124,11 +125,11 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	protected IComponentIdentifier platformid;
 	
 	/** Security service. */
-	@AgentServiceQuery(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
+	@AgentServiceSearch(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
 	protected ISecurityService secser;
 	
 	/** Transport address service. */
-	@AgentServiceQuery(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
+	@AgentServiceSearch(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
 	protected ITransportAddressService tas;
 	
 	/** Serialization services. */
