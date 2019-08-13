@@ -98,7 +98,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	 * @param component
 	 * @param target
 	 * @return
-	 * /
+	 */
 	public static IFuture<Void> injectServices(IInternalAccess component, Object target, String[] sernames, Map<String, ServiceInjectionInfo[]> serinfos, IModelInfo model)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -133,7 +133,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						ServiceQuery<Object> query = ServiceQuery.getServiceQuery(component, info);
 						
 						// if query
-						if(infos[j].isQuery())
+						if(infos[j].getQuery()!=null && infos[j].getQuery().booleanValue() a)
 						{
 							//ServiceQuery<Object> query = new ServiceQuery<>((Class<Object>)info.getType().getType(component.getClassLoader()), info.getDefaultBinding().getScope());
 							//query = info.getTags()==null || info.getTags().size()==0? query: query.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), component.getExternalAccess()); 
@@ -380,7 +380,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		}
 		
 		return ret;
-	}*/
+	}
 	
 	/**
 	 * 
@@ -595,7 +595,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 	 * @param component
 	 * @param target
 	 * @return
-	 */
+	 * /
 	public static IFuture<Void> injectServices(IInternalAccess component, Object target, String[] sernames, Map<String, ServiceInjectionInfo[]> serinfos, IModelInfo model)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -939,6 +939,6 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		}
 		
 		return ret;
-	}
+	}*/
 	
 }

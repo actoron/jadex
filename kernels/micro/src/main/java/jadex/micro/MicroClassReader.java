@@ -96,6 +96,7 @@ import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.Parent;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -2377,6 +2378,42 @@ public class MicroClassReader
 					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
 					ii.addServiceInjection(name, new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i])).setLazy(true).setQuery(true).setRequiredServiceInfo(rsis));
 				}
+			}
+			else if(isAnnotationPresent(fields[i], OnService.class, cl))
+			{
+				OnService ser = getAnnotation(fields[i], OnService.class, cl);
+				RequiredService rs = ser.requiredservice();
+				
+				String name;
+				ServiceInjectionInfo sii = new ServiceInjectionInfo().setFieldInfo(new FieldInfo(fields[i]));
+						
+				// This is still broken in the lazy case!
+				if(!rs.type().equals(Object.class))
+				{
+					if(ser.name().length()>0)
+						throw new IllegalArgumentException("Use 'name' to reference a required service OR use inline declaration of required service, not both.");
+					
+					// This needs to be outsider the check
+					RequiredServiceInfo rsis = createRequiredServiceInfo(rs, cl);
+					if(rsis.getName().length()==0)
+						rsis.setName(fields[i].getName());
+				
+					checkAndAddRequiredServiceInfo(rsis, rsers, cl);
+					
+					sii.setRequiredServiceInfo(rsis);
+					name = rsis.getName();
+				}
+				else
+				{
+					name = ser.name().length()>0? ser.name(): fields[i].getName();
+				}
+				
+				sii.setQuery(ser.query().toBoolean());
+				sii.setRequired(ser.required().toBoolean());
+				sii.setLazy(ser.required().toBoolean());
+				sii.setActive(ser.active());
+				
+				ii.addServiceInjection(name, sii);
 			}
 			else if(isAnnotationPresent(fields[i], AgentFeature.class, cl))
 			{

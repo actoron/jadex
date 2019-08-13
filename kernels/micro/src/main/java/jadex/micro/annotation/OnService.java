@@ -24,7 +24,7 @@ public @interface OnService
 	/**
 	 *  Fail at startup if no service is found?
 	 */
-	public boolean required() default true;
+	public Boolean3 required() default Boolean3.NULL;
 	
 	/**
 	 *  todo: remove and replace by query.
@@ -33,13 +33,12 @@ public @interface OnService
 	 *  This can go wrong if first call is a synchronous message.
 	 *  If lazy is false, the agent might block when search takes time.
 	 */
-	public boolean lazy() default true;
+	public Boolean3 lazy() default Boolean3.NULL;
 	
 	//-------- query details ---------
 	
 	/**
 	 *  How long shall the query be active?
-	 *  -1 for ever
 	 */
 	public long active() default -1;
 	
