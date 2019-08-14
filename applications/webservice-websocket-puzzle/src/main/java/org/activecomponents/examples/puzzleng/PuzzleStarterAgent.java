@@ -1,11 +1,10 @@
 package org.activecomponents.examples.puzzleng;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.component.IRequiredServicesFeature;
-import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentServiceQuery;
+import jadex.micro.annotation.OnService;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Makes the web puzzler available by providing the
@@ -24,7 +23,8 @@ public class PuzzleStarterAgent
 	 *  Wait for the IWebPublishService and then publish the resources.
 	 *  @param pubser The publish service.
 	 */
-	@AgentServiceQuery
+	//@AgentServiceQuery
+	@OnService(requiredservice = @RequiredService(min = 1, max = 1))
 	protected void publish(IWebPublishService wps)
 	{
 		// does not need to create a puzzle agent as it uses session scope

@@ -12,6 +12,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -30,7 +31,8 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentServiceSearch
+	//@AgentServiceSearch
+	@OnService
 	protected ILibraryService cms;
 	
 	@AgentBody

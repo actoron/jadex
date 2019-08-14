@@ -59,6 +59,7 @@ import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.platform.service.transport.AbstractTransportAgent2;
@@ -102,7 +103,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 //	protected IComponentManagementService	cms;
 	
 	/** Security service. */
-	@AgentServiceQuery
+	//@AgentServiceQuery
+	@OnService
 	protected ISecurityService secservice;
 	
 	/** Execution feature. */

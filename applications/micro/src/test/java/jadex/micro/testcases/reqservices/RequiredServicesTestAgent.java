@@ -10,6 +10,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -26,11 +27,13 @@ public class RequiredServicesTestAgent extends JunitAgentTest
 	@Agent
 	protected IInternalAccess agent;
 
-	@AgentServiceSearch(name="clock", lazy=false)
+	//@AgentServiceSearch(name="clock", lazy=false)
+	@OnService
 	protected IClockService clockser;
 	
 	// todo: allow for omitting name=""
-	@AgentServiceSearch(lazy=false, requiredservice=@RequiredService(name="", type=ILibraryService.class))
+	//@AgentServiceSearch(lazy=false, requiredservice=@RequiredService(name="", type=ILibraryService.class))
+	@OnService
 	protected ILibraryService ls;
 
 	/**

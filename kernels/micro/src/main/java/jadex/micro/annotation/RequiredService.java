@@ -44,7 +44,7 @@ public @interface RequiredService
 	/** 
 	 *  The service interface type. 
 	 */
-	public Class<?> type();
+	public Class<?> type() default Object.class;
 	
 	/**
 	 *  The search scope.
