@@ -10,8 +10,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -33,7 +32,8 @@ public class StepAgent	implements	IStepService
 	protected IInternalAccess	agent;
 	
 	/** The blocking service. */
-	@AgentServiceSearch
+	//@AgentServiceSearch
+	@OnService
 	protected IBlockService	block;
 	
 	//-------- IIntermediateBlockingService interface --------

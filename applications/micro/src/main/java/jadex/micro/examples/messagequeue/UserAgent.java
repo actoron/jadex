@@ -9,9 +9,9 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -31,7 +31,8 @@ public class UserAgent
 	protected IInternalAccess agent;
 	
 	/** The message queue. */
-	@AgentServiceSearch
+	//@AgentServiceSearch
+	@OnService
 	protected IMessageQueueService mq;
 	
 	/** The topic argument. */

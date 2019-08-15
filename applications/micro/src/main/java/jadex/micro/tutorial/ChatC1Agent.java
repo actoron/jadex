@@ -7,8 +7,8 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -21,7 +21,8 @@ public class ChatC1Agent
 	protected IInternalAccess agent;
 	
 	// Lazy false means that agent init waits for service search being done
-	@AgentServiceSearch(lazy=false)
+	//@AgentServiceSearch(lazy=false)
+	@OnService
 	protected IClockService clockservice;
 	
 	@AgentBody

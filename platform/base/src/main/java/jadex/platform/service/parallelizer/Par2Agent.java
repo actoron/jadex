@@ -20,6 +20,7 @@ import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -44,7 +45,8 @@ public class Par2Agent implements IParallelService
 	//-------- attributes --------
 	
 	/** The pool service (injected by jadex runtime). */
-	@AgentServiceSearch
+//	@AgentServiceSearch
+	@OnService
 	protected IServicePoolService	poolser;
 	
 	/** The sequential service (set in init). */

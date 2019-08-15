@@ -44,6 +44,7 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.AgentServiceSearch;
+import jadex.micro.annotation.OnService;
 
 /**
  *  Implements passive awareness via multicast.
@@ -73,7 +74,8 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentServiceSearch
+	//@AgentServiceSearch
+	@OnService(query=Boolean3.TRUE, required=Boolean3.TRUE)
 	protected ITransportAddressService tas;
 
 	/** The current search, if any. */

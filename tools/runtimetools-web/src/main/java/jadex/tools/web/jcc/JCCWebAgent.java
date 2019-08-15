@@ -35,8 +35,10 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentServiceQuery;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Frontend controller web jcc agent.
@@ -70,7 +72,8 @@ public class JCCWebAgent implements IJCCWebService
 	 *  Wait for the IWebPublishService and then publish the resources.
 	 *  @param pubser The publish service.
 	 */
-	@AgentServiceQuery
+	//@AgentServiceQuery
+	@OnService(requiredservice = @RequiredService(min = 1, max = 1))
 	protected void publish(IWebPublishService wps)
 	{
 		//getPlatforms().get();

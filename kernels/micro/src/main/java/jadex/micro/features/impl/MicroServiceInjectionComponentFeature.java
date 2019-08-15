@@ -124,17 +124,20 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 					final CounterResultListener<Void> lis2 = new CounterResultListener<Void>(infos.length, lis);
 	
 					String sername = (String)SJavaParser.evaluateExpressionPotentially(sernames[i], component.getModel().getAllImports(), component.getFetcher(), component.getClassLoader());
-										
+							
+					if("secser".equals(sername))
+						System.out.println("sdbgjh");
+					
 					for(int j=0; j<infos.length; j++)
 					{
 						// Uses required service info to search service
 						
 						RequiredServiceInfo	info = infos[j].getRequiredServiceInfo()!=null? infos[j].getRequiredServiceInfo(): model.getService(sername);				
 						ServiceQuery<Object> query = ServiceQuery.getServiceQuery(component, info);
-						
+												
 						// if query
 						if(infos[j].getQuery()!=null && infos[j].getQuery().booleanValue())
-						{
+						{							
 							//ServiceQuery<Object> query = new ServiceQuery<>((Class<Object>)info.getType().getType(component.getClassLoader()), info.getDefaultBinding().getScope());
 							//query = info.getTags()==null || info.getTags().size()==0? query: query.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), component.getExternalAccess()); 
 							
@@ -143,19 +146,21 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								component.getFeature(IRequiredServicesFeature.class).addQuery(query, to):
 								component.getFeature(IRequiredServicesFeature.class).addQuery(query);
 							
-							lis2.resultAvailable(null);
+							if(infos[j].getRequired()==null || !infos[j].getRequired().booleanValue())
+								lis2.resultAvailable(null);
 							final int fj = j;
 							
 							// Invokes methods for each intermediate result
 							sfut.addResultListener(new IIntermediateResultListener<Object>()
 							{
+								boolean first = true;
 								public void intermediateResultAvailable(final Object result)
 								{
-									if(result==null)
+									/*if(result==null)
 									{
 										System.out.println("received null as service: "+infos[fj]);
 										return;
-									}
+									}*/
 									// todo: multiple parameters and using parameter annotations?!
 									// todo: multiple parameters and wait until all are filled?!
 									
@@ -170,6 +175,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										final Field	f = infos[fj].getFieldInfo().getField(component.getClassLoader());
 
 										setDirectFieldValue(f, target, result);
+									}
+									
+									if(first)
+									{
+										first = false;
+										lis2.resultAvailable(null);
 									}
 								}
 								
@@ -207,7 +218,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								final Field	f = infos[j].getFieldInfo().getField(component.getClassLoader());
 								Class<?> ft = f.getDeclaringClass();
 								boolean multiple = ft.isArray() || SReflect.isSupertype(Collection.class, ft) || info.getMax()>2;
-
+								
 								final IFuture<Object> sfut = callgetService(sername, info, component, multiple);
 
 								
@@ -274,7 +285,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 
 										// Wait for result and block init until available
 										// Dangerous because agent blocks
-										
+										final int fj = j;
 										sfut.addResultListener(new IResultListener<Object>()
 										{
 											public void resultAvailable(Object result)
@@ -293,7 +304,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 											public void exceptionOccurred(Exception e)
 											{
 												if(!(e instanceof ServiceNotFoundException)
-													|| f.getAnnotation(AgentServiceSearch.class).required())
+													|| (infos[fj].getRequired()!=null && infos[fj].getRequired().booleanValue()))
 												{
 													component.getLogger().warning("Field injection failed: "+e);
 													lis2.exceptionOccurred(e);
