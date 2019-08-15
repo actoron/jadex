@@ -2370,6 +2370,9 @@ public class MicroClassReader
 			}
 			else if(isAnnotationPresent(fields[i], OnService.class, cl))
 			{
+				if("secser".equals(fields[i].getName()))
+					System.out.println("secser");
+				
 				OnService ser = getAnnotation(fields[i], OnService.class, cl);
 				RequiredService rs = ser.requiredservice();
 

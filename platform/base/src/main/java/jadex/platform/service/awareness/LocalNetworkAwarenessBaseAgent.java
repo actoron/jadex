@@ -75,7 +75,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	protected IInternalAccess agent;
 	
 	//@AgentServiceSearch
-	@OnService
+	@OnService(query=Boolean3.TRUE, required=Boolean3.TRUE)
 	protected ITransportAddressService tas;
 
 	/** The current search, if any. */

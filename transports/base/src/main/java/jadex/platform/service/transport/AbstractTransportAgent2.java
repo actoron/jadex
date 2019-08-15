@@ -49,6 +49,7 @@ import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bridge.service.types.transport.PlatformData;
+import jadex.commons.Boolean3;
 import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
@@ -124,12 +125,12 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	protected IComponentIdentifier platformid;
 	
 	/** Security service. */
-	@OnService(requiredservice = @RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, type = Object.class))
+	@OnService(query=Boolean3.TRUE, required=Boolean3.TRUE, requiredservice = @RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, type = Object.class))
 	//@AgentServiceSearch(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
 	protected ISecurityService secser;
 	
 	/** Transport address service. */
-	@OnService(requiredservice = @RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, type = Object.class))
+	@OnService(query=Boolean3.TRUE, required=Boolean3.TRUE, requiredservice = @RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, type = Object.class))
 	//@AgentServiceSearch(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
 	protected ITransportAddressService tas;
 	

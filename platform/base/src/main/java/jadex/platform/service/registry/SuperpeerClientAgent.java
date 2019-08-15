@@ -108,7 +108,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	
 	//@AgentServiceQuery
 	//@AgentServiceSearch
-	@OnService(query = Boolean3.TRUE)
+	@OnService(query = Boolean3.TRUE, required = Boolean3.TRUE)
 	protected ISecurityService secser;
 	
 	//-------- agent life cycle --------

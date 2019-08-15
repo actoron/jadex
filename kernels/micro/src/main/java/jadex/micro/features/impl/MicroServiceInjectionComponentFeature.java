@@ -142,19 +142,21 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 							//query = info.getTags()==null || info.getTags().size()==0? query: query.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), component.getExternalAccess()); 
 							
 							ISubscriptionIntermediateFuture<Object> sfut = component.getFeature(IRequiredServicesFeature.class).addQuery(query);
-							lis2.resultAvailable(null);
+							if(infos[j].getRequired()==null || !infos[j].getRequired().booleanValue())
+								lis2.resultAvailable(null);
 							final int fj = j;
 							
 							// Invokes methods for each intermediate result
 							sfut.addResultListener(new IIntermediateResultListener<Object>()
 							{
+								boolean first = true;
 								public void intermediateResultAvailable(final Object result)
 								{
-									if(result==null)
+									/*if(result==null)
 									{
 										System.out.println("received null as service: "+infos[fj]);
 										return;
-									}
+									}*/
 									// todo: multiple parameters and using parameter annotations?!
 									// todo: multiple parameters and wait until all are filled?!
 									
@@ -169,6 +171,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										final Field	f = infos[fj].getFieldInfo().getField(component.getClassLoader());
 
 										setDirectFieldValue(f, target, result);
+									}
+									
+									if(first)
+									{
+										first = false;
+										lis2.resultAvailable(null);
 									}
 								}
 								
