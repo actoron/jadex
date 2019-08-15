@@ -235,7 +235,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		Future<Void> secfut = new Future<>();
 		retbar.addFuture(secfut);
 		ServiceQuery<ISecurityService> secquery = new ServiceQuery<>(ISecurityService.class);
-		agent.searchService(secquery, null).thenAccept( result ->
+		agent.searchService(secquery, 0).thenAccept( result ->
 		{
 			secser = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ISecurityService.class);
 			secfut.setResult(null);
@@ -244,7 +244,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		Future<Void> tasfut = new Future<>();
 		retbar.addFuture(tasfut);
 		ServiceQuery<ITransportAddressService> tasquery = new ServiceQuery<>(ITransportAddressService.class);
-		agent.searchService(tasquery, null).thenAccept( result ->
+		agent.searchService(tasquery, 0).thenAccept( result ->
 		{
 			tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
 			tasfut.setResult(null);

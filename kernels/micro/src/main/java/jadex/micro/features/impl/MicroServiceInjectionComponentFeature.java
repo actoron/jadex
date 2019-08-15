@@ -138,7 +138,11 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 							//ServiceQuery<Object> query = new ServiceQuery<>((Class<Object>)info.getType().getType(component.getClassLoader()), info.getDefaultBinding().getScope());
 							//query = info.getTags()==null || info.getTags().size()==0? query: query.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), component.getExternalAccess()); 
 							
-							ISubscriptionIntermediateFuture<Object> sfut = component.getFeature(IRequiredServicesFeature.class).addQuery(query);
+							long to = infos[j].getActive();
+							ISubscriptionIntermediateFuture<Object> sfut = to>0?
+								component.getFeature(IRequiredServicesFeature.class).addQuery(query, to):
+								component.getFeature(IRequiredServicesFeature.class).addQuery(query);
+							
 							lis2.resultAvailable(null);
 							final int fj = j;
 							

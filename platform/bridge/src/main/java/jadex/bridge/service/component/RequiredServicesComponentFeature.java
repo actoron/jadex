@@ -94,13 +94,12 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 */
 	public IFuture<Void> init()
 	{
-		
 		ServiceQuery<ISearchQueryManagerService> query = new ServiceQuery<>(ISearchQueryManagerService.class);
 		UnresolvedServiceInvocationHandler h = new UnresolvedServiceInvocationHandler(component, query);
 		//sqms = (ISearchQueryManagerService) ProxyFactory.newProxyInstance(getComponent().getClassLoader(), new Class[]{IService.class, ISearchQueryManagerService.class}, h);
 		
 		sqms = searchLocalService(new ServiceQuery<>(query).setMultiplicity(0));
-		if (sqms == null)
+		if(sqms == null)
 		{
 			delayedremotequeries = new ArrayList<>();
 			
@@ -117,7 +116,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 
 				public void intermediateResultAvailable(ISearchQueryManagerService result)
 				{
-					if (sqms == null)
+					if(sqms == null)
 					{
 						sqms = result;
 						sqmsfut.terminate();
@@ -462,14 +461,16 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	 *  for a maximum duration until timeout occurs.
 	 *  
 	 *  @param query The search query.
-	 *  @param timeout Maximum time period to search.
+	 *  @param timeout Maximum time period to search, -1 for no wait.
 	 *  @return Service matching the query, exception if service is not found.
 	 */
-	public <T> IFuture<T> searchService(ServiceQuery<T> query, Long timeout)
+	public <T> IFuture<T> searchService(ServiceQuery<T> query, long timeout)
 	{
 		Future<T> ret = new Future<T>();
-		timeout = timeout != null ? timeout : Starter.getDefaultTimeout(component.getId());
+		timeout = timeout != 0 ? timeout : Starter.getDefaultTimeout(component.getId());
+		
 		ISubscriptionIntermediateFuture<T> queryfut = addQuery(query);
+		
 		queryfut.addResultListener(new IIntermediateResultListener<T>()
 		{
 			public void resultAvailable(Collection<T> result)
@@ -491,17 +492,76 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			{
 			}
 		});
+		
 		long to = timeout;
 		//isRemote(query)
-		component.waitForDelay(timeout, true).thenAccept(done -> 
+		
+		if(to>0)
 		{
-			queryfut.terminate(new ServiceNotFoundException("Service " + query + " not found in search period " + to));
-		});
+			component.waitForDelay(timeout, true).thenAccept(done -> 
+			{
+				queryfut.terminate(new ServiceNotFoundException("Service " + query + " not found in search period " + to));
+			});
+		}
+		
 		return ret;
 	}
 	
 	//-------- query methods --------
 
+	/**
+	 *  Add a query for a declared required service.
+	 *  Continuously searches for matching services.
+	 *  @param name The name of the required service declaration.
+	 *  @return Future providing the corresponding services as intermediate results.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query, long timeout)
+	{
+		SubscriptionIntermediateDelegationFuture<T> ret = new SubscriptionIntermediateDelegationFuture<>();
+		
+		timeout = timeout != 0 ? timeout : Starter.getDefaultTimeout(component.getId());
+		
+		ISubscriptionIntermediateFuture<T> queryfut = addQuery(query);
+		
+		queryfut.addResultListener(new IIntermediateResultListener<T>()
+		{
+			public void resultAvailable(Collection<T> result)
+			{
+				for(T r: result)
+					intermediateResultAvailable(r);
+				finished();
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setExceptionIfUndone(exception);
+			}
+
+			public void intermediateResultAvailable(T result)
+			{
+				ret.addIntermediateResultIfUndone(result);
+			}
+
+			public void finished()
+			{
+				ret.setFinishedIfUndone();
+			}
+		});
+		
+		long to = timeout;
+		//isRemote(query)
+		
+		if(to>0)
+		{
+			component.waitForDelay(timeout, true).thenAccept(done -> 
+			{
+				queryfut.terminate(new ServiceNotFoundException("Service " + query + " not found in search period " + to));
+			});
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 *  Add a query for a declared required service.
 	 *  Continuously searches for matching services.
@@ -864,9 +924,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 //			return new SubscriptionIntermediateFuture<>(new IllegalStateException("No ISearchQueryManagerService found for remote query: "+query));
 //		}
 		ISubscriptionIntermediateFuture<T> tmpremotes = null;
-		if (isRemote(query))
+		if(isRemote(query))
 		{
-			if (sqms != null)
+			if(sqms != null)
 			{
 				tmpremotes = sqms.addQuery(query);
 			}
@@ -882,9 +942,12 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		// Query local registry
 		IServiceRegistry registry = ServiceRegistry.getRegistry(getInternalAccess());
-		ISubscriptionIntermediateFuture<?> localresults =  (ISubscriptionIntermediateFuture<?>)registry.addQuery(query);
+		ISubscriptionIntermediateFuture<?> localresults = (ISubscriptionIntermediateFuture<?>)registry.addQuery(query);
+		
+		final int[] resultcnt = new int[1];
+		
 		@SuppressWarnings({"unchecked", "rawtypes"})
-		ISubscriptionIntermediateFuture<T> ret = (ISubscriptionIntermediateFuture)FutureFunctionality
+		final ISubscriptionIntermediateFuture<T> ret = (ISubscriptionIntermediateFuture)FutureFunctionality
 			// Component functionality as local registry pushes results on arbitrary thread.
 			.getDelegationFuture(localresults, new ComponentFutureFunctionality(getInternalAccess())
 		{
@@ -898,8 +961,31 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 				}
 				else
 				{
-					scf.insert(result.toString());
-					return createServiceProxy(result, info);
+					// check multiplicity constraints
+					resultcnt[0]++;
+					int max = query.getMultiplicity().getTo();
+					
+					if(max<0 || resultcnt[0]<=max)
+					{
+						scf.insert(result.toString());
+						
+						// if next result is not allowed any more
+						if(resultcnt[0]+1<=max)
+						{
+							// Done as step to return the current value?!
+							component.scheduleStep(a ->
+							{
+								localresults.terminate(new RuntimeException("Max number of values received: "+max));
+								return IFuture.DONE;
+							});
+						}
+						
+						return createServiceProxy(result, info);
+					}
+					else
+					{
+						return DROP_INTERMEDIATE_RESULT;
+					}
 				}
 			}
 			
@@ -913,6 +999,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 				super.handleTerminated(reason);
 			}
 		});
+		
 		
 		// Add remote results to future (functionality handles wrapping)
 		if(remotes!=null)

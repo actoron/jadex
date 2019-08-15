@@ -180,7 +180,7 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	 *  @param timeout Maximum time period to search.
 	 *  @return Service matching the query, exception if service is not found.
 	 */
-	public <T> IFuture<T> searchService(ServiceQuery<T> query, Long timeout)
+	public <T> IFuture<T> searchService(ServiceQuery<T> query, long timeout)
 	{
 		return delegate.searchService(query, timeout);
 	}
@@ -218,6 +218,17 @@ public class RequiredServicesFeatureAdapter implements IRequiredServicesFeature
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
 		return delegate.addQuery(query);
+	}
+	
+	/**
+	 *  Add a service query.
+	 *  Continuously searches for matching services.
+	 *  @param query	The search query.
+	 *  @return Future providing the corresponding service or ServiceNotFoundException when not found.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query, long timeout)
+	{
+		return delegate.addQuery(query, timeout);
 	}
 	
 	//-------- template methods --------
