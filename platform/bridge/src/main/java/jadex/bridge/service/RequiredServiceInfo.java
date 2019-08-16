@@ -79,6 +79,11 @@ public class RequiredServiceInfo
 //	/** Upwards scope. */
 //	public static final String SCOPE_UPWARDS = "upwards";
 	
+	/** Constant for multiplicity many. */
+	public static final int MANY = -1;
+	
+	/** Constant for multiplicity undefined. */
+	public static final int UNDEFINED = -2;
 	
 	//-------- attributes --------
 
@@ -93,8 +98,14 @@ public class RequiredServiceInfo
 	/** The service tags to search for. */
 	protected Collection<String> tags;
 	
-	/** Flag if multiple services should be returned. */
-	protected boolean multiple;
+	///** Flag if multiple services should be returned. */
+	//protected boolean multiple;
+	
+	/** The min number of services. */
+	protected int min;
+	
+	/** The max number of services. */
+	protected int max;
 	
 //	/** The multiplex type. */
 //	protected ClassInfo multiplextype;
@@ -110,7 +121,7 @@ public class RequiredServiceInfo
 	
 	// nf props for required service
 	
-	/** The nf props. */
+	/** The nf props. This is not for search but adds NF props*/
 	protected List<NFRPropertyInfo> nfproperties;
 	
 	//-------- constructors --------
@@ -147,28 +158,31 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class<?> type, ServiceScope scope)
 	{
-		this(name, type, false, new RequiredServiceBinding(name, scope), null, null);
+		this(name, type, UNDEFINED, UNDEFINED, new RequiredServiceBinding(name, scope), null, null);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class<?> type, boolean multiple, 
+	public RequiredServiceInfo(String name, Class<?> type, int min, int max, //boolean multiple, 
 		RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops, Collection<String> tags)
 	{
-		this(name, type!=null ? new ClassInfo(SReflect.getClassName(type)) : null,
-			multiple, binding, nfprops, tags);
+		this(name, type!=null? new ClassInfo(SReflect.getClassName(type)) : null,
+			min, max, binding, nfprops, tags);
 	}
 
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, ClassInfo type, boolean multiple, 
+	public RequiredServiceInfo(String name, ClassInfo type, int min, int max, //boolean multiple, 
 		RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops, Collection<String> tags)
 	{
-		this.name = name;
+		this.name = name; //(name==null || name.length()==0)? SUtil.createPlainRandomId(type!=null? type.getTypeName(): "req_service", 5): name;
+		//System.out.println("reqname: "+this.name);
 		this.type	= type;
-		this.multiple = multiple;
+		//this.multiple = multiple;
+		this.min = min;
+		this.max = max;
 		this.binding = binding;
 		this.nfproperties = nfprops;
 		this.tags = tags;
@@ -212,24 +226,60 @@ public class RequiredServiceInfo
 		this.type = type;
 	}
 	
+//	/**
+//	 *  Get the multiple.
+//	 *  @return the multiple.
+//	 */
+//	public boolean isMultiple()
+//	{
+//		return multiple;
+//	}
+//
+//	/**
+//	 *  Set the multiple.
+//	 *  @param multiple The multiple to set.
+//	 */
+//	public void setMultiple(boolean multiple)
+//	{
+//		this.multiple = multiple;
+//	}
+	
 	/**
-	 *  Get the multiple.
-	 *  @return the multiple.
+	 *  Get the max number of services.
+	 *  @return The max number.
 	 */
-	public boolean isMultiple()
+	public int getMax()
 	{
-		return multiple;
+		return max;
 	}
 
 	/**
-	 *  Set the multiple.
-	 *  @param multiple The multiple to set.
+	 *  Set the max number of services.
+	 *  @param max The max number to set.
 	 */
-	public void setMultiple(boolean multiple)
+	public void setMax(int max)
 	{
-		this.multiple = multiple;
+		this.max = max;
 	}
 	
+	/**
+	 *  Get the minimum number of services.
+	 *  @return The min number of services.
+	 */
+	public int getMin()
+	{
+		return min;
+	}
+
+	/** 
+	 *  Set the min number of services.
+	 *  @param min The min number to set.
+	 */
+	public void setMin(int min)
+	{
+		this.min = min;
+	}
+
 	/**
 	 *  Get the binding.
 	 *  @return the binding.

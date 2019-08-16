@@ -40,6 +40,12 @@ public interface INFProperty<T, U>
 	public IFuture<T> getValue(U unit);
 	
 	/**
+	 *  Returns the current value of the property in a human readable form.
+	 *  @return The current value of the property.
+	 */
+	public IFuture<String> getPrettyPrintValue();
+	
+	/**
 	 *  Property was removed and should be disposed.
 	 */
 	public IFuture<Void> dispose();

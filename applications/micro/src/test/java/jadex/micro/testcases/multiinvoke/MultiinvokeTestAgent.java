@@ -34,7 +34,7 @@ import jadex.micro.annotation.Results;
 /**
  *  Agent that uses a multiplexed service.
  */
-@RequiredServices(@RequiredService(name="ms", type=IExampleService.class, multiple=true))
+@RequiredServices(@RequiredService(name="ms", type=IExampleService.class)) // multiple=true
 //	multiplextype=IMultiplexExampleService.class))	// TODO? removed in v4
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @Agent

@@ -1846,7 +1846,7 @@ public class BpmnXMLReader
 						{
 							String name = table.getCellValue(row, 0);
 							String typename = table.getCellValue(row, 1);
-							String multi = table.getCellValue(row, 2);
+							//String multi = table.getCellValue(row, 2);
 							String bindingname = table.getCellValue(row, 3);
 							// todo:
 							String mtypename = null;//table.getCellValue(row, 4);
@@ -1854,7 +1854,7 @@ public class BpmnXMLReader
 								bindingname	= null;
 //							Class<?> type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
 //							Class<?> mtype = mtypename==null? null: SReflect.findClass0(mtypename, mi.getAllImports(), context.getClassLoader());
-							boolean multiple = new Boolean(multi).booleanValue();
+							//boolean multiple = new Boolean(multi).booleanValue();
 							
 							RequiredServiceInfo rsi;
 							if(bindingname!=null)
@@ -1862,13 +1862,14 @@ public class BpmnXMLReader
 								RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 								if(binding==null)
 									throw new RuntimeException("Unknown binding: "+bindingname);
-								rsi = new RequiredServiceInfo(name, new ClassInfo(typename), multiple, binding, null, null);
+//								rsi = new RequiredServiceInfo(name, new ClassInfo(typename), multiple, binding, null, null);
+								rsi = new RequiredServiceInfo(name, new ClassInfo(typename), -2, -2, binding, null, null);
 							}
 							else
 							{
 //								rsi = new RequiredServiceInfo(name, type);
-								rsi = new RequiredServiceInfo(name, new ClassInfo(typename), false, new RequiredServiceBinding(name, ServiceScope.APPLICATION), null, null);
-								rsi.setMultiple(multiple);
+								rsi = new RequiredServiceInfo(name, new ClassInfo(typename), -2, -2, new RequiredServiceBinding(name, ServiceScope.APPLICATION), null, null);
+								//rsi.setMultiple(multiple);
 							}
 							mi.addRequiredService(rsi);
 							
@@ -1890,13 +1891,13 @@ public class BpmnXMLReader
 											RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 											if(binding==null)
 												throw new RuntimeException("Unknown binding: "+bindingname);
-											rsi = new RequiredServiceInfo(name, new ClassInfo(typename), multiple, binding, null, null);
+											rsi = new RequiredServiceInfo(name, new ClassInfo(typename), -2, 2, binding, null, null);
 										}
 										else
 										{
 //											rsi = new RequiredServiceInfo(name, new ClassInfo(typename));
-											rsi = new RequiredServiceInfo(name, new ClassInfo(typename), false, new RequiredServiceBinding(name, ServiceScope.APPLICATION), null, null);
-											rsi.setMultiple(multiple);
+											rsi = new RequiredServiceInfo(name, new ClassInfo(typename), -2, -2, new RequiredServiceBinding(name, ServiceScope.APPLICATION), null, null);
+											//rsi.setMultiple(multiple);
 										}
 										ci.addRequiredService(rsi);
 									}

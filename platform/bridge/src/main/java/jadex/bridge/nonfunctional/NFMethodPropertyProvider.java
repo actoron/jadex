@@ -252,6 +252,35 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 	}
 	
 	/**
+	 *  Returns the current value of a non-functional property of this service method.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service method.
+	 */
+	public IFuture<String> getMethodNFPropertyPrettyPrintValue(MethodInfo method, String name) 
+	{
+		Future<String> ret = new Future<String>();
+		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
+		INFProperty<?, ?> prop = (INFProperty<?, ?>) (nfmap != null? nfmap.get(name) : null);
+		if(prop != null)
+		{
+			try
+			{
+				prop.getPrettyPrintValue().addResultListener(new DelegationResultListener<String>(ret));
+			}
+			catch (Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret = (Future<String>)getNFPropertyPrettyPrintValue(name);
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Add a non-functional property.
 	 *  @param method The method targeted by this operation.
 	 *  @param nfprop The property.

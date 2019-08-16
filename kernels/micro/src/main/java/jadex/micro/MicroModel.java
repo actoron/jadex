@@ -318,10 +318,16 @@ public class MicroModel extends CacheableKernelModel
 		protected MethodInfo methodinfo;
 		
 		/** The lazy flag. */
-		protected boolean lazy;
+		protected Boolean lazy;
 		
 		/** The query flag. */
-		protected boolean query;
+		protected Boolean query;
+		
+		/** The required flag (fail if not present). */
+		protected Boolean required;
+		
+		/** The active period for query. */
+		protected long active;
 		
 		/** The required service info. */
 		protected RequiredServiceInfo reqserinfo;
@@ -405,7 +411,7 @@ public class MicroModel extends CacheableKernelModel
 		 *  Get the lazy.
 		 *  @return the lazy
 		 */
-		public boolean isLazy()
+		public Boolean getLazy()
 		{
 			return lazy;
 		}
@@ -414,7 +420,7 @@ public class MicroModel extends CacheableKernelModel
 		 *  Set the lazy.
 		 *  @param lazy The lazy to set
 		 */
-		public ServiceInjectionInfo setLazy(boolean lazy)
+		public ServiceInjectionInfo setLazy(Boolean lazy)
 		{
 			this.lazy = lazy;
 			return this;
@@ -424,7 +430,7 @@ public class MicroModel extends CacheableKernelModel
 		 *  Get the query.
 		 *  @return the query
 		 */
-		public boolean isQuery()
+		public Boolean getQuery()
 		{
 			return query;
 		}
@@ -433,7 +439,7 @@ public class MicroModel extends CacheableKernelModel
 		 *  Set the query.
 		 *  @param query The query to set
 		 */
-		public ServiceInjectionInfo setQuery(boolean query)
+		public ServiceInjectionInfo setQuery(Boolean query)
 		{
 			this.query = query;
 			return this;
@@ -456,6 +462,38 @@ public class MicroModel extends CacheableKernelModel
 		{
 			this.reqserinfo = requiredServiceInfo;
 			return this;
+		}
+
+		/**
+		 * @return the required
+		 */
+		public Boolean getRequired() 
+		{
+			return required;
+		}
+
+		/**
+		 * @param required the required to set
+		 */
+		public void setRequired(Boolean required) 
+		{
+			this.required = required;
+		}
+
+		/**
+		 * @return the active
+		 */
+		public long getActive() 
+		{
+			return active;
+		}
+
+		/**
+		 * @param active the active to set
+		 */
+		public void setActive(long active) 
+		{
+			this.active = active;
 		}
 	}
 }

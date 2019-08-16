@@ -7,6 +7,8 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentServiceQuery;
+import jadex.micro.annotation.OnService;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Makes the web app available by providing the
@@ -25,7 +27,8 @@ public class WebsocketTestStarterAgent
 	 *  Wait for the IWebPublishService and then publish the resources.
 	 *  @param pubser The publish service.
 	 */
-	@AgentServiceQuery
+	//@AgentServiceQuery
+	@OnService(requiredservice = @RequiredService(min = 1, max = 1))
 	protected void publish(IWebPublishService pubser)
 	{
 		agent.createComponent(new CreationInfo().setFilenameClass(WebsocketsTestAgent.class)).get();

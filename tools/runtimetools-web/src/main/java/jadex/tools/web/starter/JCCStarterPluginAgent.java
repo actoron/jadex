@@ -222,11 +222,13 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		{
 			if(mi!=null)
 			{
-				ret = ea.getRequiredMethodNFPropertyValue(sid, mi, name);
+				//ret = ea.getRequiredMethodNFPropertyValue(sid, mi, name);
+				ret = (Future)ea.getRequiredMethodNFPropertyPrettyPrintValue(sid, mi, name);
 			}
 			else
 			{
-				ret = ea.getRequiredNFPropertyValue(sid, name);
+				//ret = ea.getRequiredNFPropertyValue(sid, name);
+				ret = (Future)ea.getRequiredNFPropertyPrettyPrintValue(sid, name);
 			}
 		}
 		// provided services and methods
@@ -234,17 +236,20 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 		{
 			if(mi!=null)
 			{
-				ret = ea.getMethodNFPropertyValue(sid, mi, name);
+				//ret = ea.getMethodNFPropertyValue(sid, mi, name);
+				ret = (Future)ea.getMethodNFPropertyPrettyPrintValue(sid, mi, name);
 			}
 			else
 			{
-				ret = ea.getNFPropertyValue(sid, name);
+				//ret = ea.getNFPropertyValue(sid, name);
+				ret = (Future)ea.getNFPropertyPrettyPrintValue(sid, name);
 			}
 		}
 		// components
 		else if(ea!=null)
 		{
-			ret = ea.getNFPropertyValue(name);
+			//ret = ea.getNFPropertyValue(name);
+			ret = (Future)ea.getNFPropertyPrettyPrintValue(name);
 		}
 		else
 		{

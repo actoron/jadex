@@ -33,7 +33,7 @@ import jadex.micro.annotation.RequiredServices;
 	implementation=@Implementation(value=ChatServiceD5.class)))
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class),
-	@RequiredService(name="chatservices", type=IChatService.class, multiple=true, scope=ServiceScope.GLOBAL),
+	@RequiredService(name="chatservices", type=IChatService.class, scope=ServiceScope.GLOBAL), // multiple=true,
 	@RequiredService(name="regservice", type=IRegistryServiceE3.class)
 })
 @Arguments({

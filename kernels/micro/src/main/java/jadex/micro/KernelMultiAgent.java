@@ -64,6 +64,7 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -115,7 +116,7 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentServiceQuery
+	@OnService
 	protected ILibraryService libservice; 
 	
 	/** The listeners. */

@@ -16,7 +16,7 @@ import jadex.micro.annotation.ProvidedServices;
 /**
  *  Agent that provides the library service.
  */
-@Agent(autostart=Boolean3.TRUE)
+@Agent(autostart=Boolean3.FALSE)
 @Arguments({
 	@Argument(name="libpath", clazz=String.class),
 	@Argument(name="baseclassloader", clazz=ClassLoader.class),

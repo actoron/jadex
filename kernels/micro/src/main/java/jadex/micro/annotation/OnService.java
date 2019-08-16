@@ -5,26 +5,26 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import jadex.commons.Boolean3;
+
 /**
- *  Injects a service into a field or a method of a component.
- *  The referenced service must be declared with a {@link RequiredService} annotation.
- *  
- *  Use @OnService instead
+ * 
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Deprecated
-public @interface AgentServiceSearch
+public @interface OnService
 {
 	/**
-	 *  The required service name that is used for searching the service.
+	 *  Should be used as service query.
 	 */
-	public String name() default "";
+	public Boolean3 query() default Boolean3.NULL;
+	
+	//-------- search details --------
 	
 	/**
 	 *  Fail at startup if no service is found?
 	 */
-	public boolean required() default true;
+	public Boolean3 required() default Boolean3.NULL;
 	
 	/**
 	 *  todo: remove and replace by query.
@@ -33,16 +33,25 @@ public @interface AgentServiceSearch
 	 *  This can go wrong if first call is a synchronous message.
 	 *  If lazy is false, the agent might block when search takes time.
 	 */
-	public boolean lazy() default true;
+	public Boolean3 lazy() default Boolean3.NULL;
+	
+	//-------- query details ---------
+	
+	/**
+	 *  How long shall the query be active?
+	 */
+	public long active() default -1;
+	
+	//-------- required service spec --------
+	
+	/**
+	 *  The required service name that is used for searching the service.
+	 */
+	public String name() default "";
 	
 	/**
 	 *  Define a required service inline. If given no name it will receive
 	 *  the field name as name. 
 	 */
 	public RequiredService requiredservice() default @RequiredService(name="", type=Object.class);
-	
-//	/**
-//	 *  Should be used as service query.
-//	 */
-//	public boolean isquery() default false;
 }

@@ -10,7 +10,8 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentServiceQuery;
+import jadex.micro.annotation.OnService;
+import jadex.micro.annotation.RequiredService;
 
 /**
  *  Simple agent that uses globally available time services.
@@ -21,7 +22,8 @@ public class TimeUserAgent
 	/**
 	 *  Subscribe to any newly found time service and print the results when they arrive.
 	 */
-	@AgentServiceQuery(scope=ServiceScope.GLOBAL)
+	//@AgentServiceQuery(scope=ServiceScope.GLOBAL)
+	@OnService(requiredservice = @RequiredService(scope = ServiceScope.GLOBAL))
 	public void	addTimeService(ITimeService timeservice)
 	{
 		String	location	= timeservice.getLocation().get();

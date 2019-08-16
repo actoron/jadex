@@ -101,7 +101,7 @@ public class RequiredServiceNode extends AbstractSwingTreeNode
 	 */
 	public Icon	getSwingIcon()
 	{
-		return info.isMultiple()? icons.getIcon("services"): icons.getIcon("service");
+		return info.getMax()>1? icons.getIcon("services"): icons.getIcon("service");
 	}
 
 	/**

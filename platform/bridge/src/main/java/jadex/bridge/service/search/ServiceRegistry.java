@@ -544,9 +544,9 @@ public class ServiceRegistry implements IServiceRegistry // extends AbstractServ
 				rwlock.writeLock().unlock();
 			}
 			
-			for (IServiceIdentifier ser : SUtil.notNull(sers))
+			for(IServiceIdentifier ser : SUtil.notNull(sers))
 			{
-				if (checkRestrictions(query, ser))
+				if(checkRestrictions(query, ser))
 				{
 					dispatchQueryEvent(ret, ser, ServiceEvent.SERVICE_ADDED);
 				}

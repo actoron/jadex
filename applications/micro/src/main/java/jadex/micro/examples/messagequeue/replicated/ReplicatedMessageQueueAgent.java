@@ -41,7 +41,7 @@ import jadex.micro.examples.messagequeue.Event;
 @Service
 @ProvidedServices({@ProvidedService(type = IMessageQueueReplicableService.class),
 	@ProvidedService(type = IMessageQueueReplicationService.class) })
-@RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, multiple = true, scope = ServiceScope.GLOBAL, name = "replication"))
+@RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, scope = ServiceScope.GLOBAL, name = "replication")) // multiple = true,
 @Arguments(@Argument(name = "searchinterval", clazz = Integer.class, defaultvalue = "1000"))
 public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableService, IMessageQueueReplicationService 
 {

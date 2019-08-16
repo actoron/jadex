@@ -9,7 +9,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentServiceQuery;
+import jadex.micro.annotation.OnService;
 
 /**
  * 
@@ -19,7 +19,8 @@ public class TestService implements ITestService
 	@AgentArgument
 	protected String testarg;
 	
-	@AgentServiceQuery
+	//@AgentServiceQuery
+	@OnService
 	protected ILibraryService libser;
 	
 	/**

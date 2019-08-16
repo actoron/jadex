@@ -7,7 +7,6 @@ import jadex.commons.future.IFuture;
 
 /**
  *  Interfaces for non-functional ranking mechanism for services.
- *
  */
 public interface IServiceRanker<S>
 {

@@ -10,10 +10,14 @@ import java.util.Set;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.sensor.service.TagProperty;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.search.ServiceQuery.Multiplicity;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
 
@@ -69,6 +73,8 @@ public class ServiceQuery<T>
 		 */
 		public Multiplicity()
 		{
+			this.from = -2; // = UNDEFINED
+			this.to = -2;
 		}
 		
 		/**
@@ -884,6 +890,46 @@ public class ServiceQuery<T>
 			return searchstart != null ? searchstart.getRoot() : owner.getRoot();
 			
 		return null;
+	}
+	
+	/**
+	 * When searching for declared service -> map required service declaration to service query.
+	 */
+	public static <T> ServiceQuery<T> getServiceQuery(IInternalAccess ia, RequiredServiceInfo info)
+	{
+		// TODO??? : no, but hardconstraints should be added, NFR props are not for search
+//		info.getNFRProperties();
+
+		// todo:
+//		info.getDefaultBinding().getComponentName();
+//		info.getDefaultBinding().getComponentType();
+		
+		ServiceQuery<T> ret = new ServiceQuery<T>(info.getType(), info.getDefaultBinding().getScope(), ia.getId());
+		//ret.setMultiplicity(info.isMultiple() ? Multiplicity.ZERO_MANY : Multiplicity.ONE);
+		
+		Multiplicity m = new Multiplicity();
+		if(info.getMin()!=RequiredServiceInfo.UNDEFINED)
+			m.setFrom(info.getMin());
+		if(info.getMax()!=RequiredServiceInfo.UNDEFINED)
+			m.setTo(info.getMax());
+		
+		if(info.getTags()!=null)
+			ret.setServiceTags(info.getTags().toArray(new String[info.getTags().size()]), ia.getExternalAccess());
+		
+		return ret;
+	}
+	
+	/**
+	 *  When searching with query -> create required service info from service query.
+	 */
+	public static <T> RequiredServiceInfo createServiceInfo(ServiceQuery<T> query)
+	{
+		// TODO: multiplicity required here for info? should not be needed for proxy creation
+		RequiredServiceBinding binding = new RequiredServiceBinding(SUtil.createUniqueId(), query.getScope());
+		binding.setProxytype(query.getRequiredProxyType());
+		Multiplicity m = query.getMultiplicity();
+		return new RequiredServiceInfo(null, query.getServiceType(), m==null? RequiredServiceInfo.UNDEFINED: m.getFrom(), 
+			m==null? RequiredServiceInfo.UNDEFINED: m.getTo() , binding, null, query.getServiceTags()==null ? null : Arrays.asList(query.getServiceTags()));
 	}
 
 	/**

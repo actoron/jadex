@@ -29,6 +29,7 @@ import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -79,7 +80,8 @@ public class DirectoryDownloaderAgent
 	protected long	interval;
 	
 	/** The thread pool for asynchronous download. */
-	@AgentServiceSearch(lazy=false)
+	//@AgentServiceSearch(lazy=false)
+	@OnService
 	protected IDaemonThreadPoolService	tp;
 	
 	/** The connection manager for open connections. */

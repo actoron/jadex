@@ -49,6 +49,7 @@ import jadex.bridge.service.types.serialization.ISerializationServices;
 import jadex.bridge.service.types.transport.ITransportInfoService;
 import jadex.bridge.service.types.transport.ITransportService;
 import jadex.bridge.service.types.transport.PlatformData;
+import jadex.commons.Boolean3;
 import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
@@ -64,7 +65,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
@@ -77,8 +77,9 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.AgentServiceQuery;
+import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -124,11 +125,13 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	protected IComponentIdentifier platformid;
 	
 	/** Security service. */
-	@AgentServiceQuery(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
+	@OnService(query=Boolean3.TRUE, required=Boolean3.TRUE, requiredservice = @RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, type = Object.class))
+	//@AgentServiceSearch(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
 	protected ISecurityService secser;
 	
 	/** Transport address service. */
-	@AgentServiceQuery(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
+	@OnService(query=Boolean3.TRUE, required=Boolean3.TRUE, requiredservice = @RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, type = Object.class))
+	//@AgentServiceSearch(requiredservice=@RequiredService(proxytype=ServiceQuery.PROXYTYPE_RAW, name = "", type = Object.class))
 	protected ITransportAddressService tas;
 	
 	/** Serialization services. */
@@ -234,7 +237,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		Future<Void> secfut = new Future<>();
 		retbar.addFuture(secfut);
 		ServiceQuery<ISecurityService> secquery = new ServiceQuery<>(ISecurityService.class);
-		agent.searchService(secquery, null).thenAccept( result ->
+		agent.searchService(secquery, 0).thenAccept( result ->
 		{
 			secser = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ISecurityService.class);
 			secfut.setResult(null);
@@ -243,7 +246,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		Future<Void> tasfut = new Future<>();
 		retbar.addFuture(tasfut);
 		ServiceQuery<ITransportAddressService> tasquery = new ServiceQuery<>(ITransportAddressService.class);
-		agent.searchService(tasquery, null).thenAccept( result ->
+		agent.searchService(tasquery, 0).thenAccept( result ->
 		{
 			tas = ((IInternalRequiredServicesFeature)agent.getFeature(IRequiredServicesFeature.class)).getRawService(ITransportAddressService.class);
 			tasfut.setResult(null);

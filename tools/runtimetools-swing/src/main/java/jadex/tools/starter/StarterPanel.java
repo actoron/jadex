@@ -1473,7 +1473,8 @@ public class StarterPanel extends JLayeredPane
 				for(int i=0; i<required.length; i++)
 				{
 					((DefaultTableModel)requiredt.getModel()).addRow(new Object[]{required[i].getName(), 
-						SReflect.getUnqualifiedTypeName(required[i].getType().getTypeName()), required[i].isMultiple()});
+						SReflect.getUnqualifiedTypeName(required[i].getType().getTypeName()), required[i].getMax()>1});
+						//SReflect.getUnqualifiedTypeName(required[i].getType().getTypeName()), required[i].isMultiple()});
 				}
 //				requiredt.getColumn("Interface").setCellRenderer(new ClassRenderer());
 

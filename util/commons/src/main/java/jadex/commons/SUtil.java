@@ -5004,10 +5004,9 @@ public class SUtil
 		for(int i=0; ret==null && i<adrs.length; i++)
 		{
 			// Use first real, i.e. non-tunnel, mac address
-			if(!"[0, 0, 0, 0, 0, 0, 0, -32]".equals(adrs[i]))
-			{
+			//if(!"[0, 0, 0, 0, 0, 0, 0, -32]".equals(adrs[i]))
+			if(!"00:00:00:00:00:00:00:e0".equals(adrs[i].toLowerCase()))	
 				ret	= adrs[i];
-			}
 		}
 		return ret;
 	}
@@ -5022,8 +5021,10 @@ public class SUtil
 		{
 			if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
 			{
-				macs	= SNonAndroid.getMacAddresses();
-			} else {
+				macs = SNonAndroid.getMacAddresses();
+			} 
+			else 
+			{
 				macs = new String[0];
 			}
 		}
@@ -6198,6 +6199,24 @@ public class SUtil
 			if (nonblocking != defnative && nonblocking != null && defnative != null)
 				p.put("SecureRandom.NativePRNG", nonblocking);
 		}
+	}
+	
+	/**
+	 *  Convert a mac address to a string.
+	 *  @param mac The address.
+	 *  @return The string.
+	 */
+	public static String getMacAddressAsString(byte[] mac)
+	{
+		StringBuilder sb = new StringBuilder(18);
+	    for(byte b : mac) 
+	    {
+	        if(sb.length() > 0)
+	        	sb.append(':');
+	        sb.append(String.format("%02x", b));
+	    }
+	    
+	    return sb.toString();
 	}
 	
 	/**

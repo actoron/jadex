@@ -48,7 +48,7 @@ public class UnresolvedServiceInvocationHandler implements InvocationHandler
 			if (delegatefut == null)
 			{
 				@SuppressWarnings("unchecked")
-				IFuture<IService> fut = (IFuture<IService>) ia.searchService(query, null);
+				IFuture<IService> fut = (IFuture<IService>) ia.searchService(query, 0);
 				fut.thenAccept(serv ->
 				{
 					delegate = serv;

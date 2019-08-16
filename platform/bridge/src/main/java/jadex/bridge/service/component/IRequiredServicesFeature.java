@@ -77,10 +77,10 @@ public interface IRequiredServicesFeature extends IExternalRequiredServicesFeatu
 	 *  for a maximum duration until timeout occurs.
 	 *  
 	 *  @param query The search query.
-	 *  @param timeout Maximum time period to search, null for default timeout.
+	 *  @param timeout Maximum time period to search, 0 for default timeout, -1 for no wait.
 	 *  @return Service matching the query, exception if service is not found.
 	 */
-	public <T> IFuture<T> searchService(ServiceQuery<T> query, Long timeout);
+	public <T> IFuture<T> searchService(ServiceQuery<T> query, long timeout);
 	
 	
 	// Would be nice having methods below in external variant but requires special required proxy handling
@@ -92,6 +92,14 @@ public interface IRequiredServicesFeature extends IExternalRequiredServicesFeatu
 	 *  @return Future providing the corresponding services as intermediate results.
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(String name);
+	
+	/**
+	 *  Add a query for a declared required service.
+	 *  Continuously searches for matching services.
+	 *  @param name The name of the required service declaration.
+	 *  @return Future providing the corresponding services as intermediate results.
+	 */
+	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query, long timeout);
 	
 	/**
 	 *  Add a query for a declared required service.

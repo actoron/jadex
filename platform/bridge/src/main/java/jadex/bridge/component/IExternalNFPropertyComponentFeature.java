@@ -14,49 +14,59 @@ import jadex.commons.future.IFuture;
  */
 public interface IExternalNFPropertyComponentFeature extends IExternalComponentFeature
 {
+	//-------- component --------
+	
 	/**
-	 *  Returns the declared names of all non-functional properties of this service.
-	 *  @return The names of the non-functional properties of this service.
+	 *  Returns the declared names of all non-functional properties of this component.
+	 *  @return The names of the non-functional properties of this component.
 	 */
 	public IFuture<String[]> getNFPropertyNames();
 	
 	/**
-	 *  Returns the names of all non-functional properties of this service.
-	 *  @return The names of the non-functional properties of this service.
+	 *  Returns the names of all non-functional properties of this component.
+	 *  @return The names of the non-functional properties of this component.
 	 */
 	public IFuture<String[]> getNFAllPropertyNames();
 	
 	/**
-	 *  Returns the meta information about a non-functional property of this service.
+	 *  Returns the meta information about a non-functional property of this component.
 	 *  @param name Name of the property.
-	 *  @return The meta information about a non-functional property of this service.
+	 *  @return The meta information about a non-functional property of this component.
 	 */
 	public IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos();
 	
 	/**
-	 *  Returns the meta information about a non-functional property of this service.
+	 *  Returns the meta information about a non-functional property of this component.
 	 *  @param name Name of the property.
-	 *  @return The meta information about a non-functional property of this service.
+	 *  @return The meta information about a non-functional property of this component.
 	 */
 	public IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(String name);
 	
 	/**
-	 *  Returns the current value of a non-functional property of this service.
+	 *  Returns the current value of a non-functional property of this component.
 	 *  @param name Name of the property.
 	 *  @param type Type of the property value.
-	 *  @return The current value of a non-functional property of this service.
+	 *  @return The current value of a non-functional property of this component.
 	 */
 	public <T> IFuture<T> getNFPropertyValue(String name);
 	
 	/**
-	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  Returns the current value of a non-functional property of this component, performs unit conversion.
 	 *  @param name Name of the property.
 	 *  @param type Type of the property value.
 	 *  @param unit Unit of the property value.
-	 *  @return The current value of a non-functional property of this service.
+	 *  @return The current value of a non-functional property of this component.
 	 */
 //	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit);
 	public <T, U> IFuture<T> getNFPropertyValue(final String name, final U unit);
+	
+	/**
+	 *  Returns the current value of a non-functional property of this component.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this component as string.
+	 */
+	public IFuture<String> getNFPropertyPrettyPrintValue(String name);
 	
 	/**
 	 *  Add a non-functional property.
@@ -75,7 +85,7 @@ public interface IExternalNFPropertyComponentFeature extends IExternalComponentF
 	 */
 	public IFuture<Void> shutdownNFPropertyProvider();
 	
-	//-------- service methods --------
+	//-------- provided services --------
 	
 	/**
 	 *  Returns the declared names of all non-functional properties of this service.
@@ -119,6 +129,15 @@ public interface IExternalNFPropertyComponentFeature extends IExternalComponentF
 	 *  @return The current value of a non-functional property of this service.
 	 */
 	public <T, U> IFuture<T> getNFPropertyValue(IServiceIdentifier sid, String name, U unit);
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of this service as string.
+	 */
+	public IFuture<String> getNFPropertyPrettyPrintValue(IServiceIdentifier sid, String name);
 	
 	/**
 	 *  Add a non-functional property.
@@ -193,6 +212,16 @@ public interface IExternalNFPropertyComponentFeature extends IExternalComponentF
 	public <T, U> IFuture<T> getMethodNFPropertyValue(IServiceIdentifier sid, MethodInfo method, String name, U unit);
 	
 	/**
+	 *  Returns the current value of a non-functional property of the specified method, performs unit conversion.
+	 *  @param method The method targeted by this operation.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of the specified method.
+	 */
+	public IFuture<String> getMethodNFPropertyPrettyPrintValue(IServiceIdentifier sid, MethodInfo method, String name);
+	
+	/**
 	 *  Add a non-functional property.
 	 *  @param method The method targeted by this operation.
 	 *  @param nfprop The property.
@@ -206,7 +235,7 @@ public interface IExternalNFPropertyComponentFeature extends IExternalComponentF
 	 */
 	public IFuture<Void> removeMethodNFProperty(IServiceIdentifier sid, MethodInfo method, String name);
 
-	//-------- required properties --------
+	//-------- required services --------
 	
 	/**
 	 *  Returns the declared names of all non-functional properties of this service.
@@ -243,6 +272,14 @@ public interface IExternalNFPropertyComponentFeature extends IExternalComponentF
 	public <T> IFuture<T> getRequiredNFPropertyValue(IServiceIdentifier sid, String name);
 	
 	/**
+	 *  Returns the current value of a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public IFuture<String> getRequiredNFPropertyPrettyPrintValue(IServiceIdentifier sid, String name);
+	
+	/**
 	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
 	 *  @param name Name of the property.
 	 *  @param type Type of the property value.
@@ -267,6 +304,8 @@ public interface IExternalNFPropertyComponentFeature extends IExternalComponentF
 	 *  Shutdown the provider.
 	 */
 	public IFuture<Void> shutdownRequiredNFPropertyProvider(IServiceIdentifier sid);
+	
+	//-------- required service methods --------
 	
 	/**
 	 *  Returns meta information about a non-functional properties of all methods.
@@ -320,6 +359,10 @@ public interface IExternalNFPropertyComponentFeature extends IExternalComponentF
 	 *  @return The current value of a non-functional property of the specified method.
 	 */
 	public <T, U> IFuture<T> getRequiredMethodNFPropertyValue(IServiceIdentifier sid, MethodInfo method, String name, U unit);
+	
+	
+	public IFuture<String> getRequiredMethodNFPropertyPrettyPrintValue(IServiceIdentifier sid, MethodInfo method, String name);
+
 	
 	/**
 	 *  Add a non-functional property.

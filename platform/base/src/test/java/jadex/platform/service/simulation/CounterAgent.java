@@ -10,8 +10,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.OnService;
 
 /**
  *  Agent that counts and stores values in static list.
@@ -31,7 +30,8 @@ public class CounterAgent
 	protected int	increment	= 3;
 	
 	/** The clock service. */
-	@AgentServiceSearch(requiredservice=@RequiredService(name="clock", type=IClockService.class))
+	//@AgentServiceSearch(requiredservice=@RequiredService(name="clock", type=IClockService.class))
+	@OnService
 	protected IClockService	clock;
 	
 	/**

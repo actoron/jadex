@@ -54,7 +54,7 @@ public class RequiredServiceProperties	extends	PropertiesPanel
 		
 		getTextField("Name").setText(info.getName());
 		getTextField("Type").setText(info.getType().getTypeName());
-		getTextField("Multiple").setText(""+info.isMultiple());
+		getTextField("Multiple").setText(""+(info.getMax()>1));
 		RequiredServiceBinding bind = info.getDefaultBinding();
 		StringBuffer buf = new StringBuffer();
 		buf.append("scope="+bind.getScope());
