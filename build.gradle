@@ -349,13 +349,17 @@ subprojects
             testImplementation junit
         }
 
-		configurations {
-			all {
-				dependencies.all {
-					dep -> excludeNonAndroidRuntimeFromApk(project, dep)
-				}
-			}
-		}
+		println '### Todo ###: Fix Android APK building with newer Gradle(?)'
+		// see https://docs.gradle.org/current/userguide/customizing_dependency_resolution_behavior.html
+		// E.g. try https://docs.gradle.org/current/javadoc/or/gradle/api/artifacts/Configuration.html#withDependencies-org.gradle.api.Action-
+		// or https://docs.gradle.org/current/javadoc/org/gradle/api/artifacts/DependencySubstitutions.html#all-org.gradle.api.Action-
+//		configurations {
+//			all {
+//				dependencies.all {
+//					dep -> excludeNonAndroidRuntimeFromApk(project, dep)
+//				}
+//			}
+//		}
 
 
     }

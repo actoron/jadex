@@ -297,7 +297,7 @@ public class SimulationSettings extends AServiceSettings {
 			}
 		};
 
-		final String id = "ClockPanel" + SimulationSettings.this.hashCode() + "@" + simService.getClockService().getServiceId();
+		final String id = "ClockPanel" + SimulationSettings.this.hashCode() + "@" + ((IService)simService.getClockService()).getServiceId();
 
 		getComponentForService().addResultListener(new DefaultResultListener<IExternalAccess>() {
 

@@ -112,7 +112,7 @@ public class RequiredServiceNode extends AbstractTreeNode implements IAndroidTre
 		props.add(new PropertyItem("Name", info.getName()));
 		props.add(new PropertyItem("Type", info.getType().getTypeName()));
 		
-		props.add(new PropertyItem("Multiple", ""+info.isMultiple()));
+//		props.add(new PropertyItem("Multiple", ""+info.isMultiple()));
 		
 		RequiredServiceBinding bind = info.getDefaultBinding();
 		StringBuffer buf = new StringBuffer();
