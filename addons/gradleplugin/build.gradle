@@ -4,3 +4,11 @@ dependencies
 {
 	api project(':android:gradle-plugin')
 }
+
+// Why necessary now? wasn't before...
+repositories {
+    maven
+    {
+        url "https://maven.google.com"
+    }
+}

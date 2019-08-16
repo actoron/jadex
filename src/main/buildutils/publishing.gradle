@@ -285,7 +285,7 @@ if (!isCommercial(project)) {
         key = getVar('BINTRAY_KEY', project)
         configurations = project.tasks.findByName('install') ? ['archives'] : null
         publish = true
-        publications = publishing.publications.contains('ProjectPublication') ? ['ProjectPublication'] : null
+        publications = publishing.publications.any {it.name.equals('ProjectPublication')} ? ['ProjectPublication'] : null
         pkg {
             repo = 'jadex'
             name = 'jadex'

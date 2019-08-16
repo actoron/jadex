@@ -21,7 +21,7 @@
 				$component.getFeature(jadex.bridge.service.component.IProvidedServicesFeature.class).getProvidedServiceRawImpl("chat")
 			</implementation>
 		</providedservice>
-		<requiredservice name="chatservices" class="IChatService" multiple="true">
+		<requiredservice name="chatservices" class="IChatService">
 			<binding dynamic="true" scope="global"/>
 		</requiredservice>
 	</services>

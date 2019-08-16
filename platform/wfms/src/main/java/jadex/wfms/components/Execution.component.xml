@@ -31,7 +31,7 @@
 		<requiredservice name="aaa_service" class="IAAAService">
 			<binding recover="true" scope="global" />
 		</requiredservice>
-		<requiredservice name="execution_services" class="IExecutionService" multiple="true">
+		<requiredservice name="execution_services" class="IExecutionService" >
 			<binding scope="global" dynamic="true" />
 		</requiredservice>
 		

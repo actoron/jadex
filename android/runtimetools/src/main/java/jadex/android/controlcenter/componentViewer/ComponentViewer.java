@@ -223,7 +223,7 @@ public class ComponentViewer extends MetaActivity implements ServiceConnection
 			@Override
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IFuture<IComponentDescription[]> fut = SComponentManagementService.getComponentDescriptions(ia);
+				IFuture<IComponentDescription[]> fut = SComponentManagementService.getComponentDescriptions(ia.getId());
 				fut.addResultListener(new DefaultResultListener<IComponentDescription[]>()
 				{
 

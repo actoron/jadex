@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 
 /**
- *  The jadex parser parses all types of expressions in ADF and queries.
+ *  The Jadex parser parses all types of expressions in ADF and queries.
  */
 class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants, ParserImplConstants {/*@bgen(jjtree)*/
   protected JJTParserImplState jjtree = new JJTParserImplState();//-------- constants --------

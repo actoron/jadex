@@ -19,7 +19,7 @@
 			</implementation>
 		</providedservice>
 		
-		<requiredservice name="aaa_services" class="IAAAService" multiple="true">
+		<requiredservice name="aaa_services" class="IAAAService" >
 			<binding scope="global" dynamic="true" />
 		</requiredservice>
 	</services>

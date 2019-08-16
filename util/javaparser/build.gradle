@@ -5,7 +5,25 @@ dependencies
 	api project(':util:commons')
 }
 
-// JavaCC compilation in gradle
+// Skip javacc tasks to avoid git crlf issues unless a javacc task is explicitly given as gradle command like so:
+// ./gradlew compileJavacc
+def javacctasks	= ["compileJavacc", "compileJjtree"] as Set
+tasks.whenTaskAdded{ task ->
+	if( javacctasks.contains(task.name)
+		&& !project.gradle.startParameter.taskNames.any {taskname ->
+			return javacctasks.any {taskname.contains(it) } }) {
+	
+		task.enabled = false
+		println "Disabled $task"
+	}
+}
+
+// Generate into 'src' folder instead of 'build' to be checked into repo
+def javaccOutputDirectory	= file('src/generated/javacc')
+def jjtreeOutputDirectory	= file('src/generated/jjtree')
+
+// JavaCC plugin and settings
+apply plugin: 'ca.coglinc.javacc'
 buildscript {
 	repositories {
 		mavenCentral()
@@ -15,17 +33,15 @@ buildscript {
 		classpath group: 'net.java.dev.javacc', name: 'javacc', version: '3.2'
 	}
 }
-apply plugin: 'ca.coglinc.javacc'
+compileJavacc.outputDirectory	= javaccOutputDirectory
+compileJjtree.outputDirectory	= jjtreeOutputDirectory
 
-// Hack for Eclipse -> generate files to src dir so eclipse finds them on import
-// No automatic jjtree/javacc generation in eclipse -> need to call gradle task manually when changing ParserImpl.jjt
-compileJavacc.outputDirectory	= file('src/generated/javacc')
-compileJjtree.outputDirectory	= file('src/generated/jjtree')
+// Use parser generator ouput dirs as src dirs for java compilation (e.g. eclipse import)
 sourceSets {
 	main {
 		java {
-			srcDir compileJavacc.outputDirectory
-			srcDir compileJjtree.outputDirectory
+			srcDir javaccOutputDirectory
+			srcDir jjtreeOutputDirectory
 		}
 	}
 }

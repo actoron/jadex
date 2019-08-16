@@ -109,6 +109,7 @@ def excludeNonAndroidRuntimeFromApk(Project project, Dependency dep, List alread
     if (!(dep instanceof DefaultProjectDependency) || alreadyChecked.contains(dep)) {
         // terminate
     } else {
+//        println "excludeNonAndroidRuntimeFromApk: project=$project, dep=$dep"
         alreadyChecked.add(dep)
         // recurse to children
         dep.dependencyProject.configurations.all {conf ->
@@ -127,6 +128,7 @@ def excludeNonAndroidRuntimeFromApk(Project project, Dependency dep, List alread
                 project.configurations.all { conf ->
                     def relevantName = conf.name.toLowerCase()
                     if (relevantName.contains('apk') || relevantName.contains('runtime')) {
+//		                println "excluding $exDep.group:$exDep.name from $conf for $project"
                         conf.exclude(group: exDep.group, module: exDep.name)
                     }
                 }
