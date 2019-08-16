@@ -9,6 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
@@ -32,6 +33,7 @@ import jadex.bridge.service.ServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.IServiceRegistry;
+import jadex.bridge.service.search.MultiplicityException;
 import jadex.bridge.service.search.ServiceEvent;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.ServiceQuery;
@@ -500,7 +502,15 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		{
 			component.waitForDelay(timeout, true).thenAccept(done -> 
 			{
-				queryfut.terminate(new ServiceNotFoundException("Service " + query + " not found in search period " + to));
+				Multiplicity m = query.getMultiplicity();
+				if(m.getFrom()>0)
+				{
+					queryfut.terminate(new ServiceNotFoundException("Service " + query + " not found in search period " + to));
+				}
+				else
+				{
+					queryfut.terminate();
+				}
 			});
 		}
 		
@@ -523,6 +533,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		
 		ISubscriptionIntermediateFuture<T> queryfut = addQuery(query);
 		
+		final int[] resultcnt = new int[1];
 		queryfut.addResultListener(new IIntermediateResultListener<T>()
 		{
 			public void resultAvailable(Collection<T> result)
@@ -539,6 +550,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 
 			public void intermediateResultAvailable(T result)
 			{
+				resultcnt[0]++;
 				ret.addIntermediateResultIfUndone(result);
 			}
 
@@ -555,7 +567,19 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		{
 			component.waitForDelay(timeout, true).thenAccept(done -> 
 			{
-				queryfut.terminate(new ServiceNotFoundException("Service " + query + " not found in search period " + to));
+				Exception e;
+				Multiplicity m = query.getMultiplicity();
+				if(m.getFrom()>0 && resultcnt[0]<m.getFrom()
+					|| m.getTo()>0 && resultcnt[0]>m.getTo())
+				{
+					e = new MultiplicityException("["+m.getFrom()+"-"+m.getTo()+"]"+", resultcnt="+resultcnt[0]);
+				}
+				else
+				{
+					e = new TimeoutException();
+					//new ServiceNotFoundException("Service " + query + " not found in search period " + to)
+				}
+				queryfut.terminate(e);
 			});
 		}
 		
@@ -747,7 +771,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					return createServiceProxy(result, info);
 				}
 			});
-			((IInternalExecutionFeature) component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
+			((IInternalExecutionFeature)component.getFeature(IExecutionFeature.class)).addSimulationBlocker(ret);
 			
 //			}
 		}
@@ -814,6 +838,10 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 ////			return new TerminableIntermediateFuture<>(new IllegalStateException("No ISearchQueryManagerService found for remote search: "+query));
 //		}
 		
+		//final int min = query.getMultiplicity()!=null? query.getMultiplicity().getFrom(): -1;
+		final int max = query.getMultiplicity()!=null? query.getMultiplicity().getTo(): -1;
+		final int[] resultcnt = new int[1];
+		
 		// Local only -> create future, fill results, and set to finished.
 		if(!isRemote(query) || sqms == null)
 		{
@@ -821,23 +849,42 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			ret	= fut;
 			
 			// Find local matches (also enhances query, hack!?)
-			Collection<T>	locals	= resolveLocalServices(query, info);
+			Collection<T> locals = resolveLocalServices(query, info);
 			for(T result: locals)
 			{
-				fut.addIntermediateResult(result);
+				if(max<0 || ++resultcnt[0]<=max)
+				{
+					fut.addIntermediateResult(result);
+					// if next result is not allowed any more
+					if(max>0 && resultcnt[0]+1>max)
+					{
+						// Finish the user side and terminate the source side
+						fut.setFinishedIfUndone();
+						Exception reason = new MultiplicityException("Max number of values received: "+max);
+						fut.terminate(reason);
+					}
+				}
+				else
+				{
+					break;
+				}
 			}
-			fut.setFinished();
+			fut.setFinishedIfUndone();
 		}
-		
+
 		// Find remote matches, if needed
 		else
 		{
 			enhanceQuery(query, true);
 			SlidingCuckooFilter scf = new SlidingCuckooFilter();
+			
+			// Search remotely and connect to delegation future.
+			ITerminableIntermediateFuture<IServiceIdentifier> remotes = sqms.searchServices(query);
 
+			final IntermediateFuture<IServiceIdentifier>[] futs = new IntermediateFuture[1];
+			
 			// Combined delegation future for local and remote results.
-			@SuppressWarnings("unchecked")
-			IntermediateFuture<IServiceIdentifier>	fut	= (IntermediateFuture<IServiceIdentifier>)FutureFunctionality
+			futs[0] = (IntermediateFuture<IServiceIdentifier>)FutureFunctionality
 				.getDelegationFuture(ITerminableIntermediateFuture.class, new ComponentFutureFunctionality(getInternalAccess())
 			{
 				@Override
@@ -850,9 +897,41 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					}
 					else
 					{
-						scf.insert(result.toString());
-						return createServiceProxy(result, info);
+						if(max<0 || ++resultcnt[0]<=max)
+						{
+							scf.insert(result.toString());
+							// if next result is not allowed any more
+							if(max>0 && resultcnt[0]+1>max)
+							{
+								// Finish the user side and terminate the source side
+								futs[0].setFinishedIfUndone();
+								Exception reason = new MultiplicityException("Max number of values received: "+max);
+								System.out.println("fut terminate: "+hashCode());
+								remotes.terminate(reason);
+							}
+							
+							return createServiceProxy(result, info);
+						}
+						else
+						{
+							System.out.println("fut drop: "+hashCode());
+							return DROP_INTERMEDIATE_RESULT;
+						}
 					}
+				}
+				
+				@Override
+				public void handleTerminated(Exception reason)
+				{
+					System.out.println("fut terminated: "+hashCode());
+					super.handleTerminated(reason);
+				}
+				
+				@Override
+				public void handleFinished(Collection<Object> results) throws Exception
+				{
+					System.out.println("fut fin: "+hashCode());
+					super.handleFinished(results);
 				}
 			});
 			
@@ -861,21 +940,60 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			Collection<IServiceIdentifier> results =  registry.searchServices(query);
 			for(IServiceIdentifier result: results)
 			{
-				fut.addIntermediateResult(result);
+				if(max<0 || ++resultcnt[0]<=max)
+				{
+					futs[0].addIntermediateResult(result);
+					// if next result is not allowed any more
+					if(max>0 && resultcnt[0]+1>max)
+					{
+						// Finish the user side and terminate the source side
+						futs[0].setFinishedIfUndone();
+						Exception reason = new MultiplicityException("Max number of values received: "+max);
+						((ITerminableIntermediateFuture<IServiceIdentifier>)futs[0]).terminate(reason);
+					}
+				}
+				else
+				{
+					break;
+				}
 			}
-			
-			// Search remotely and connect to delegation future.
-//			ServiceCall.getOrCreateNextInvocation().setTimeout(Starter.getScaledDefaultTimeout(getComponent().getId(), 1.2));	// Done in SuperpeerClient
-			ITerminableIntermediateFuture<IServiceIdentifier> remotes = sqms.searchServices(query);
+
 //			System.out.println("Search: "+query);
 //			remotes.addResultListener(res -> System.out.println("Search finished: "+query));
-			FutureFunctionality.connectDelegationFuture(fut, remotes);
+			FutureFunctionality.connectDelegationFuture(futs[0], remotes); // target, source
 			
 			@SuppressWarnings("unchecked")
-			IIntermediateFuture<T>	casted	= (IIntermediateFuture<T>)fut;
+			IIntermediateFuture<T>	casted	= (IIntermediateFuture<T>)futs[0];
 			ret	= (ITerminableIntermediateFuture<T>)casted;
 //			ret.addResultListener(res -> System.out.println("ret finished: "+query));
 		}
+		
+		// print outs for debugging
+		ret.addResultListener(new IIntermediateResultListener<T>()
+		{
+			@Override
+			public void intermediateResultAvailable(T result)
+			{
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("ex: "+exception+" "+hashCode());
+			}
+			
+			@Override
+			public void finished()
+			{
+				System.out.println("fini: "+hashCode());
+			}
+			
+			@Override
+			public void resultAvailable(Collection<T> result)
+			{
+				System.out.println("resa: "+hashCode());
+			}
+		});
 		
 		return ret;
 	}
@@ -945,9 +1063,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		ISubscriptionIntermediateFuture<?> localresults = (ISubscriptionIntermediateFuture<?>)registry.addQuery(query);
 		
 		final int[] resultcnt = new int[1];
-		
-		@SuppressWarnings({"unchecked", "rawtypes"})
-		final ISubscriptionIntermediateFuture<T> ret = (ISubscriptionIntermediateFuture)FutureFunctionality
+		final ISubscriptionIntermediateFuture<T>[] ret = new ISubscriptionIntermediateFuture[1];
+		ret[0] = (ISubscriptionIntermediateFuture)FutureFunctionality
 			// Component functionality as local registry pushes results on arbitrary thread.
 			.getDelegationFuture(localresults, new ComponentFutureFunctionality(getInternalAccess())
 		{
@@ -970,14 +1087,20 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 						scf.insert(result.toString());
 						
 						// if next result is not allowed any more
-						if(resultcnt[0]+1<=max)
+						if(max>0 && resultcnt[0]+1>max)
 						{
 							// Done as step to return the current value?!
-							component.scheduleStep(a ->
-							{
-								localresults.terminate(new RuntimeException("Max number of values received: "+max));
-								return IFuture.DONE;
-							});
+//							component.scheduleStep(a ->
+//							{
+								// handleTerminated() not called on delegation future, because is a backward command to source future
+								// should invoke on delegation future (but how)?
+								((IntermediateFuture)ret[0]).setFinishedIfUndone();
+								Exception reason = new MultiplicityException("Max number of values received: "+max);
+								if(remotes!=null)
+									remotes.terminate(reason);
+								localresults.terminate(reason);
+							//	return IFuture.DONE;
+							//});
 						}
 						
 						return createServiceProxy(result, info);
@@ -992,6 +1115,8 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			@Override
 			public void handleTerminated(Exception reason)
 			{
+				//System.out.println("terminated called: "+reason);
+				
 				// TODO: multi delegation future with multiple sources but one target?
 				if(remotes!=null)
 					remotes.terminate(reason);
@@ -1000,6 +1125,31 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			}
 		});
 		
+		// print outs for debugging
+		/*ret.addResultListener(new IIntermediateResultListener<T>()
+		{
+			@Override
+			public void intermediateResultAvailable(T result)
+			{
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("ex: "+exception+" "+hashCode());
+			}
+			
+			@Override
+			public void finished()
+			{
+				System.out.println("fini: "+hashCode());
+			}
+			
+			@Override
+			public void resultAvailable(Collection<T> result)
+			{
+			}
+		});*/
 		
 		// Add remote results to future (functionality handles wrapping)
 		if(remotes!=null)
@@ -1008,13 +1158,13 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 				result->
 				{
 					@SuppressWarnings("unchecked")
-					IntermediateFuture<T> fut = (IntermediateFuture<T>)ret;
-					fut.addIntermediateResult(result);
+					IntermediateFuture<T> fut = (IntermediateFuture<T>)ret[0];
+					fut.addIntermediateResultIfUndone(result);
 				},
 				exception -> {}); // Ignore exception (printed when no listener supplied)
 		}
 		
-		return ret;
+		return ret[0];
 	}
 	
 	//-------- helper methods --------
@@ -1141,15 +1291,11 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 	protected <T> void enhanceQuery(ServiceQuery<T> query, boolean multi)
 	{
 //		if(shutdowned)
-//		{
 //			return new Future<T>(new ComponentTerminatedException(id));
-//		}
 
 		// Set owner if not set
 		if(query.getOwner()==null)
-		{
 			query.setOwner(getComponent().getId());
-		}
 		
 		// Set scope if not set
 		if(ServiceScope.DEFAULT.equals(query.getScope()))
@@ -1164,6 +1310,9 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			// Fix multiple flag according to single/multi method 
 			query.setMultiplicity(multi ? Multiplicity.ZERO_MANY : Multiplicity.ONE);
 		}
+		
+		//if(query.getMultiplicity()!=null && query.getMultiplicity().getTo()==0)
+		//	throw new MultiplicityException();
 		
 		// Network names not set by user?
 		if(Arrays.equals(query.getNetworkNames(), ServiceQuery.NETWORKS_NOT_SET))

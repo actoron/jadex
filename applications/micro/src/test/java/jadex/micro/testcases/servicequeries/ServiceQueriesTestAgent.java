@@ -35,10 +35,6 @@ import jadex.micro.testcases.TestAgent;
  *  The user agent uses service queries. 
  */
 @Agent(keepalive=Boolean3.FALSE)
-@RequiredServices(
-{
-	//@RequiredService(name="exaser", type=IExampleService.class, binding=@Binding(scope=ServiceScope.PLATFORM))
-})
 @Results(@Result(name="testresults", clazz=Testcase.class))
 // Todo: long timeouts really necessary?
 @Properties({@NameValue(name=Testcase.PROPERTY_TEST_TIMEOUT, value="jadex.base.Starter.getScaledDefaultTimeout(null, 2)")}) // cannot use $component.getId() because is extracted from test suite :-(
@@ -61,13 +57,16 @@ public class ServiceQueriesTestAgent extends TestAgent
 		
 		IRequiredServicesFeature rsf = agent.getFeature(IRequiredServicesFeature.class);
 		
-		// Create user as subcomponent -> should be able to find the service with publication scope application
+		// Create user as subcomponent -> should be able to find the service with publication scope application 
 		final int cnt = 3;
 		IComponentIdentifier[] cids = new IComponentIdentifier[cnt];
-		final TestReport tr = new TestReport("#1", "Test if ");
+		
+		final TestReport tr = new TestReport("#1", "Test if services can be found by query");
+		
 		try
 		{
-			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(new ServiceQuery<>(IExampleService.class, local? ServiceScope.PLATFORM: ServiceScope.GLOBAL));
+			ISubscriptionIntermediateFuture<IExampleService> queryfut = rsf.addQuery(
+				new ServiceQuery<>(IExampleService.class, local? ServiceScope.APPLICATION: ServiceScope.GLOBAL));
 			queryfut.addResultListener(new IIntermediateResultListener<IExampleService>()
 			{
 				int num = 0;

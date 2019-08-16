@@ -818,7 +818,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean	doSetResult(Collection<Object> result, boolean undone)
+	protected boolean doSetResult(Collection<Object> result, boolean undone)
 	{
 		try
 		{

@@ -1,8 +1,5 @@
 package jadex.micro.testcases.servicescope;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
