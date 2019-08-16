@@ -63,7 +63,7 @@
 	</plans>
 
 	<services>
-		<requiredservice name="paintservices" class="IPaintMoneyService" multiple="true">
+		<requiredservice name="paintservices" class="IPaintMoneyService" >
 			<binding scope="platform"/>
 		</requiredservice>
 	</services>

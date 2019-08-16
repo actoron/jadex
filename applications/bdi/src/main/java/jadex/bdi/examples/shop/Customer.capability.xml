@@ -57,10 +57,10 @@
 	</plans>
 	
 	<services>
-		<requiredservice name="localshopservices" class="IShopService" multiple="true">
+		<requiredservice name="localshopservices" class="IShopService" >
 			<binding scope="platform"/>
 		</requiredservice>
-		<requiredservice name="remoteshopservices" class="IShopService" multiple="true">
+		<requiredservice name="remoteshopservices" class="IShopService" >
 			<binding scope="global"/>
 		</requiredservice>
 	</services>
