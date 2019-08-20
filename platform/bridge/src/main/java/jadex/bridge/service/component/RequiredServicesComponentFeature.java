@@ -900,37 +900,44 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 						if(max<0 || ++resultcnt[0]<=max)
 						{
 							scf.insert(result.toString());
-							// if next result is not allowed any more
-							if(max>0 && resultcnt[0]+1>max)
-							{
-								// Finish the user side and terminate the source side
-								futs[0].setFinishedIfUndone();
-								Exception reason = new MultiplicityException("Max number of values received: "+max);
-								System.out.println("fut terminate: "+hashCode());
-								remotes.terminate(reason);
-							}
-							
 							return createServiceProxy(result, info);
 						}
 						else
 						{
-							System.out.println("fut drop: "+hashCode());
+							//System.out.println("fut drop: "+hashCode());
 							return DROP_INTERMEDIATE_RESULT;
 						}
 					}
 				}
 				
 				@Override
+				public void handleAfterIntermediateResult(Object result) throws Exception
+				{
+					if(DROP_INTERMEDIATE_RESULT.equals(result))
+						return;
+					
+					// if next result is not allowed any more
+					if(max>0 && resultcnt[0]+1>max)
+					{
+						// Finish the user side and terminate the source side
+						futs[0].setFinishedIfUndone();
+						Exception reason = new MultiplicityException("Max number of values received: "+max);
+						//System.out.println("fut terminate: "+hashCode());
+						remotes.terminate(reason);
+					}
+				}
+				
+				@Override
 				public void handleTerminated(Exception reason)
 				{
-					System.out.println("fut terminated: "+hashCode());
+					//System.out.println("fut terminated: "+hashCode());
 					super.handleTerminated(reason);
 				}
 				
 				@Override
 				public void handleFinished(Collection<Object> results) throws Exception
 				{
-					System.out.println("fut fin: "+hashCode());
+					//System.out.println("fut fin: "+hashCode());
 					super.handleFinished(results);
 				}
 			});
@@ -969,7 +976,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 		}
 		
 		// print outs for debugging
-		ret.addResultListener(new IIntermediateResultListener<T>()
+		/*ret.addResultListener(new IIntermediateResultListener<T>()
 		{
 			@Override
 			public void intermediateResultAvailable(T result)
@@ -993,7 +1000,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 			{
 				System.out.println("resa: "+hashCode());
 			}
-		});
+		});*/
 		
 		return ret;
 	}
@@ -1085,30 +1092,30 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 					if(max<0 || resultcnt[0]<=max)
 					{
 						scf.insert(result.toString());
-						
-						// if next result is not allowed any more
-						if(max>0 && resultcnt[0]+1>max)
-						{
-							// Done as step to return the current value?!
-//							component.scheduleStep(a ->
-//							{
-								// handleTerminated() not called on delegation future, because is a backward command to source future
-								// should invoke on delegation future (but how)?
-								((IntermediateFuture)ret[0]).setFinishedIfUndone();
-								Exception reason = new MultiplicityException("Max number of values received: "+max);
-								if(remotes!=null)
-									remotes.terminate(reason);
-								localresults.terminate(reason);
-							//	return IFuture.DONE;
-							//});
-						}
-						
 						return createServiceProxy(result, info);
 					}
 					else
 					{
 						return DROP_INTERMEDIATE_RESULT;
 					}
+				}
+			}
+			
+			@Override
+			public void handleAfterIntermediateResult(Object result) throws Exception
+			{
+				if(DROP_INTERMEDIATE_RESULT.equals(result))
+					return;
+				
+				int max = query.getMultiplicity().getTo();
+				// if next result is not allowed any more
+				if(max>0 && resultcnt[0]+1>max)
+				{
+					((IntermediateFuture)ret[0]).setFinishedIfUndone();
+					Exception reason = new MultiplicityException("Max number of values received: "+max);
+					if(remotes!=null)
+						remotes.terminate(reason);
+					localresults.terminate(reason);
 				}
 			}
 			

@@ -136,7 +136,7 @@ public class FutureFunctionality
 	/**
 	 *  Optionally alter a result.
 	 */
-	public Object	handleResult(Object result)	throws Exception
+	public Object handleResult(Object result) throws Exception
 	{
 		return result;
 	}
@@ -144,9 +144,16 @@ public class FutureFunctionality
 	/**
 	 *  Optionally alter a result.
 	 */
-	public Object	handleIntermediateResult(Object result)	throws Exception
+	public Object handleIntermediateResult(Object result) throws Exception
 	{
 		return result;
+	}
+	
+	/**
+	 *  Perform code after an intermediate result has been added.
+	 */
+	public void handleAfterIntermediateResult(Object result) throws Exception
+	{
 	}
 	
 	/**
@@ -409,8 +416,10 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingPullSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{
@@ -529,7 +538,7 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean	doSetResult(Collection<Object> result, boolean undone)
+	protected boolean doSetResult(Collection<Object> result, boolean undone)
 	{
 		try
 		{
@@ -556,13 +565,15 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 	 *  Overwritten to change result, if necessary.
 	 */
 	@Override
-	protected boolean	doAddIntermediateResult(Object result, boolean undone)
+	protected boolean doAddIntermediateResult(Object result, boolean undone)
 	{
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingPullIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{
@@ -714,8 +725,10 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingSubscriptionIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{
@@ -850,8 +863,10 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingTerminableIntermediateDelegationFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{
@@ -1070,8 +1085,10 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 		try
 		{
 			result = func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingIntermediateFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{
@@ -1222,8 +1239,10 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		try
 		{
 			result = (TupleResult)func.handleIntermediateResult(result);
-			return FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
+			boolean ret = FutureFunctionality.DROP_INTERMEDIATE_RESULT.equals(result) ? false
 				: DelegatingTupleFuture.super.doAddIntermediateResult(result, func.isUndone(undone));
+			func.handleAfterIntermediateResult(result);
+			return ret;
 		}
 		catch(Exception e)
 		{

@@ -82,7 +82,9 @@ public class ServiceSearchMultiplicityAgent extends TestAgent
 				int num = 0;
 				public void exceptionOccurred(Exception exception)
 				{
-					if(exception instanceof MultiplicityException)
+					tr.setFailed("Exception: "+exception);	
+					
+					/*if(exception instanceof MultiplicityException)
 					{
 						if(num==max)
 						{
@@ -96,7 +98,7 @@ public class ServiceSearchMultiplicityAgent extends TestAgent
 					else
 					{
 						tr.setFailed("Wrong exception: "+exception);						
-					}
+					}*/
 					
 					waitfut.setResultIfUndone(null);
 				}
@@ -123,7 +125,16 @@ public class ServiceSearchMultiplicityAgent extends TestAgent
 				
 				public void finished()
 				{
-					tr.setFailed("Wrong listener method called: finished().");
+					if(num==max)
+					{
+						tr.setSucceeded(true);
+					}
+					else
+					{
+						tr.setFailed("Wrong number of results: "+cnt);
+					}
+					
+					//tr.setFailed("Wrong listener method called: finished().");
 					waitfut.setResultIfUndone(null);
 				}
 			});
