@@ -41,6 +41,7 @@ import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Publish;
@@ -66,7 +67,8 @@ public class StatusAgent implements IStatusService
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	protected IFuture<Void>	setup()
 	{
 		IWebPublishService	wps	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IWebPublishService.class));

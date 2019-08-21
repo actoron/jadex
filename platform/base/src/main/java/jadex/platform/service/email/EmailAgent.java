@@ -45,6 +45,7 @@ import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -123,7 +124,8 @@ public class EmailAgent implements IEmailService
 	/**
 	 *  Called on agent start.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> start()
 	{
 //		System.out.println("email agent started");

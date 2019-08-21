@@ -12,6 +12,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -22,7 +23,8 @@ import jadex.micro.annotation.RequiredServices;
 @Plans(@Plan(trigger = @Trigger(goals = StampGoal.class), body = @Body(service = @ServicePlan(name = "stampser"))))
 public class WorkpieceBDI
 {
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body(IInternalAccess agent)
 	{
 		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new StampGoal(agent.getId(), "date: " + System.currentTimeMillis())).get();

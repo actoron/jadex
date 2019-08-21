@@ -65,6 +65,7 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.cron.CronAgent;
@@ -117,7 +118,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	/**
 	 *  Init method.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> init()
 	{
 		this.remcoms = new HashMap<Tuple2<String,IResourceIdentifier>, List<Runnable>>();

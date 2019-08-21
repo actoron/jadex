@@ -39,6 +39,7 @@ import jadex.bridge.service.IService;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -81,7 +82,8 @@ public class CommanderAgent
 	/**
 	 * 
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public void body()
 	{
 		while(true)

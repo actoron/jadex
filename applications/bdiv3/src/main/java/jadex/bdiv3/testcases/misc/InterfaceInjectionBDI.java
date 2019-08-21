@@ -11,6 +11,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -21,7 +22,8 @@ public abstract class InterfaceInjectionBDI implements IBDIAgent
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	body(IInternalAccess ia)
 	{
 		TestReport tr1 = new TestReport("#1", "Test if interface injection works.");

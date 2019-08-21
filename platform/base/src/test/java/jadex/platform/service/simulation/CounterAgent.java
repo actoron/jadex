@@ -9,8 +9,8 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.OnService;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Agent that counts and stores values in static list.
@@ -37,7 +37,8 @@ public class CounterAgent
 	/**
 	 *  Count to ten.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void count(IInternalAccess agent)
 	{
 		long	start	= clock.getTime();

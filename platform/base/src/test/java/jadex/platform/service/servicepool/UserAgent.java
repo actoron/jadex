@@ -20,12 +20,12 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -59,7 +59,8 @@ public class UserAgent
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();

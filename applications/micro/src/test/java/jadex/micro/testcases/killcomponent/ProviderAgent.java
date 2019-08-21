@@ -9,6 +9,8 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
+import jadex.micro.annotation.OnInit;
+import jadex.micro.annotation.OnStart;
 
 
 /**
@@ -20,14 +22,16 @@ public class ProviderAgent
 	@AgentFeature
 	private IArgumentsResultsFeature argResults;
 
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void created(IInternalAccess agent)
 	{
 //		agent.getLogger().severe("Agent created: " + agent.getDescription());
 		argResults.getResults().put("exampleresult", "value");
 	}
 
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	private void body()
 	{
 		// cannot work because this agent is terminated from outside

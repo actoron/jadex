@@ -45,10 +45,10 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -106,7 +106,8 @@ public class UserAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body() throws Exception
 	{
 		// todo: make ITerminable in DefaultServiceFetcher
@@ -124,7 +125,8 @@ public class UserAgent
 		invoke();
 	}
 	
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void cleanup()
 	{
 		if(frame!=null)

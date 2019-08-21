@@ -16,6 +16,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -30,7 +31,8 @@ public class SubResultsTestAgent extends JunitAgentTest
 	/**
 	 * 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		IExternalAccess ea = agent.createComponent(new CreationInfo().setFilename("producer")).get();

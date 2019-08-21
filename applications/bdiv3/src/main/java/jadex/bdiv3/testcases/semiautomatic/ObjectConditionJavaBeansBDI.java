@@ -13,6 +13,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnStart;
 
 @Agent(type=BDIAgentFactory.TYPE)
 @Configurations({@Configuration(name="1"),@Configuration(name="2")})
@@ -24,7 +25,8 @@ public class ObjectConditionJavaBeansBDI
 	@Belief 
 	protected Bean mybean = bean;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 //		this.mybean = bean;

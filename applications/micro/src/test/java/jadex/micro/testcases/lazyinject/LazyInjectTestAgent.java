@@ -32,6 +32,7 @@ import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.OnService;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -71,7 +72,8 @@ public class LazyInjectTestAgent extends JunitAgentTest
 	/**
 	 *
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		intermediateFutureTest();

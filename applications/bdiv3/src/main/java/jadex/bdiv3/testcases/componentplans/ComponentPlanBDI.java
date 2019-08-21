@@ -17,6 +17,7 @@ import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentResult;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  BDI agent that executes a subcomponent as plan
@@ -49,7 +50,8 @@ public abstract class ComponentPlanBDI implements IBDIAgent
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public void	body(IInternalAccess agent)
 	{
 		TestReport	tr	= new TestReport("#1", "Test if goal can be achieved by component plan.");

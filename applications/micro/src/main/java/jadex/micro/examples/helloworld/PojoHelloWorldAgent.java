@@ -8,6 +8,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  The micro version of the hello world agent.
@@ -33,7 +34,8 @@ public class PojoHelloWorldAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 //		System.out.println(agent.getComponentFeature(IArgumentsFeature.class).getArgument("welcome text"));

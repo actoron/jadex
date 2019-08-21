@@ -10,8 +10,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnInit;
 
 /**
  *  Helpline master agent for GUI and starting/stopping subcomponents for specific persons. 
@@ -32,7 +32,8 @@ public class HelplineMasterAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void>	agentCreated()
 	{
 		SwingUtilities.invokeLater(new Runnable()

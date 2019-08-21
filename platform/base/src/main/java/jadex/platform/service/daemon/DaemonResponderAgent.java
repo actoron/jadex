@@ -13,6 +13,7 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Simple agent that sends a message on startup.
@@ -44,7 +45,8 @@ public class DaemonResponderAgent
 	/**
 	 *  Agent behavior.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> start()
 	{
 		agent.getLogger().info("Sending message "+content+" to "+cid);//+", "+SUtil.arrayToString(cid.getAddresses()));

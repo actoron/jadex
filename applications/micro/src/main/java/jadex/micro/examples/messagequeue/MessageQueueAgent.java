@@ -15,6 +15,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -41,7 +42,8 @@ public class MessageQueueAgent implements IMessageQueueService
 	/**
 	 *  Called on agent creation.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void agentCreated()
 	{
 		this.subscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();

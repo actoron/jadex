@@ -15,6 +15,7 @@ import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Properties;
 
 /**
@@ -77,7 +78,8 @@ public class HelloWorld
 	 *  right hand side creates goal and executes it
 	 *  Plan is selected and executed (hello is printed out)
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{		
 		sayhello = "Hello BDI agent V3.";

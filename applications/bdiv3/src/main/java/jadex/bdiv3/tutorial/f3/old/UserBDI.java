@@ -26,8 +26,8 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -59,7 +59,8 @@ public class UserBDI
 	/**
 	 * 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		SwingUtilities.invokeLater(new Runnable()
@@ -107,7 +108,8 @@ public class UserBDI
 	/**
 	 *  Cleanup when agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	cleanup()
 	{
 		SwingUtilities.invokeLater(new Runnable()

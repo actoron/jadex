@@ -19,6 +19,7 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -58,7 +59,8 @@ public class ChatE5Agent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		IFuture<IRegistryServiceE3>	regservice	= agent.getFeature(IRequiredServicesFeature.class).getService("regservice");

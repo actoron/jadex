@@ -4,6 +4,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.OnInit;
+import jadex.micro.annotation.OnStart;
 
 /**
  * 
@@ -18,7 +20,8 @@ public class CreatedBodyAgent
 	/**
 	 *  Init the service.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void agentCreated()
 	{
 		System.out.println("created");
@@ -28,7 +31,8 @@ public class CreatedBodyAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		System.out.println("body");

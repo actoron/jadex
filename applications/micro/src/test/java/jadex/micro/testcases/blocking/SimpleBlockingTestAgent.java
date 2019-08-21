@@ -9,6 +9,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -22,7 +23,8 @@ public class SimpleBlockingTestAgent  extends JunitAgentTest
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	execute(final IInternalAccess agent)
 	{
 		agent.getFeature(IExecutionFeature.class).waitForDelay(500).get();

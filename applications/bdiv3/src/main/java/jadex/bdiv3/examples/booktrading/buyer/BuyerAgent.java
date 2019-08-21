@@ -39,9 +39,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnEnd;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -96,7 +96,8 @@ public class BuyerAgent implements INegotiationAgent
 	/**
 	 *  Called when agent terminates.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void shutdown()
 	{
 		if(gui!=null)

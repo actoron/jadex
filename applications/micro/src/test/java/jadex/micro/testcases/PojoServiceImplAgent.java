@@ -11,6 +11,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
@@ -36,7 +37,8 @@ public class PojoServiceImplAgent extends JunitAgentTest implements IAService
 	/** 
 	 * The body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		IProvidedServicesFeature psf = agent.getFeature(IProvidedServicesFeature.class);

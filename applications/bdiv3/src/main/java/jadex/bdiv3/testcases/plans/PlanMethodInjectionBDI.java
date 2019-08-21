@@ -18,6 +18,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -33,7 +34,8 @@ public abstract class PlanMethodInjectionBDI implements IBDIAgent
 	
 	final TestReport tr = new TestReport("#1", "Test if injection of change event works for plan method.");
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		items.add(2);

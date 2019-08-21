@@ -13,6 +13,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.features.IMicroInjectionFeature;
 import jadex.micro.features.impl.MicroInjectionComponentFeature;
 import jadex.micro.features.impl.MicroLifecycleComponentFeature;
@@ -38,7 +39,8 @@ public class MinimalFeatureAgent
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void hello()
 	{
 		System.out.println("hello: "+agent);

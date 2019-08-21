@@ -82,6 +82,7 @@ import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -256,7 +257,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	/**
 	 *  Initialization.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> start()
 	{
 		long ts = System.currentTimeMillis();

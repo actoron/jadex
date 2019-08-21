@@ -25,6 +25,8 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnInit;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -69,7 +71,8 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	/**
 	 * Called on agent creation.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void agentCreated() 
 	{
 		this.localsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
@@ -78,7 +81,8 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 		this.id = agent.getId().getName();
 	}
 
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void agentBody() 
 	{
 		// Constantly searches for new occurring replication services

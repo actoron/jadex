@@ -17,6 +17,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -40,7 +41,8 @@ public class TagsAgent extends JunitAgentTest implements ITestService2, ITestSer
 	/**
 	 *  The agent body. 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		final List<TestReport> results = new ArrayList<TestReport>();

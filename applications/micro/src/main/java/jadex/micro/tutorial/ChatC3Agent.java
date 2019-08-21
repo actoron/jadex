@@ -7,6 +7,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Chat micro agent that uses the clock service. 
@@ -26,7 +27,8 @@ public class ChatC3Agent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 //		IFuture<IComponentManagementService>	cms	= requiredServicesFeature.getService("cms");

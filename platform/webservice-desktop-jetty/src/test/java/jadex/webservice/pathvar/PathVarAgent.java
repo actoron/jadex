@@ -32,9 +32,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentResult;
-import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Publish;
@@ -75,7 +74,8 @@ public class PathVarAgent extends JunitAgentTest
 	/**
 	 * The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		String baseurl = "http://localhost:7000/myservice";

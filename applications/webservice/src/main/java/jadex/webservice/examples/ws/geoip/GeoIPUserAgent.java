@@ -8,6 +8,7 @@ import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.RestServiceAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.webservice.examples.ws.geoip.gen.GeoIP;
@@ -26,7 +27,8 @@ public class GeoIPUserAgent extends RestServiceAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		IFuture<IGeoIPService> fut = agent.getFeature(IRequiredServicesFeature.class).getService("geoipservice");

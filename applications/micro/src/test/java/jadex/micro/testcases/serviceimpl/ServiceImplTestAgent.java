@@ -14,6 +14,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -31,7 +32,8 @@ public class ServiceImplTestAgent extends JunitAgentTest
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody()
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		TestReport tr1 = test(1, PojoProviderAgent.class.getName()+".class");

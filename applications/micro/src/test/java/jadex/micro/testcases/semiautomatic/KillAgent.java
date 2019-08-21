@@ -11,6 +11,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.OnInit;
 
 /**
  * 
@@ -22,7 +23,8 @@ public class KillAgent
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();

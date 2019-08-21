@@ -6,6 +6,7 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.OnInit;
 
 /**
  *  Simple agent that offers the math service.
@@ -19,7 +20,8 @@ public class MathAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> agentCreated()
 	{
 		//agent.getComponentFeature(IProvidedServicesFeature.class)

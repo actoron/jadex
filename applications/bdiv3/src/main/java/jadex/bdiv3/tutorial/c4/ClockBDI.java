@@ -12,6 +12,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Belief with update rate.
@@ -26,7 +27,8 @@ public class ClockBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body(IInternalAccess agent)
 	{
 		// Stop the agent after 5 seconds.

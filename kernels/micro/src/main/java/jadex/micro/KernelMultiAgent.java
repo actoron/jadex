@@ -64,6 +64,7 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -173,7 +174,8 @@ public class KernelMultiAgent implements IComponentFactory, IMultiKernelNotifier
 	/**
 	 *  Starts the service.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> startService()
 	{
 		if(inited)

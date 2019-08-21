@@ -5,6 +5,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Child agent throwing an exception in body.
@@ -19,7 +20,8 @@ public class ChildAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	protected void body()
 	{
 		System.out.println("Child started");

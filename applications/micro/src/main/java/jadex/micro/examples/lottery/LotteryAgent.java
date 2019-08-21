@@ -18,6 +18,8 @@ import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnStart;
 
 @Agent(autoprovide=Boolean3.TRUE)
 @Service
@@ -30,7 +32,8 @@ public class LotteryAgent implements ILotteryService
 	
 	protected Collection<SubscriptionIntermediateFuture<String>> subscriptions = new ArrayList<SubscriptionIntermediateFuture<String>>();
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		Random r = new Random();
@@ -53,7 +56,8 @@ public class LotteryAgent implements ILotteryService
 		}
 	}
 	
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void killed()
 	{
 		for(TerminableIntermediateFuture<String> sub: subscriptions)

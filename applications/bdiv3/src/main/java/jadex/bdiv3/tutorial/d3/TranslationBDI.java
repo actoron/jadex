@@ -18,6 +18,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Translation agent D3.
@@ -75,7 +76,8 @@ public class TranslationBDI
 	/**
 	 * 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		String eword = "cat";

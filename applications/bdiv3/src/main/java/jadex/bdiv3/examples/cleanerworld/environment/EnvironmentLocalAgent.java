@@ -8,6 +8,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnStart;
 
 /**
  * 
@@ -28,7 +30,8 @@ public class EnvironmentLocalAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public void body()
 	{
 //		System.out.println(EnvironmentLocalBDI.class.getClassLoader());
@@ -42,7 +45,8 @@ public class EnvironmentLocalAgent
 		});
 	}
 	
-	@AgentKilled
+	@OnEnd
+	//@AgentKilled
 	public void	killed()
 	{
 		Environment.clearInstance();

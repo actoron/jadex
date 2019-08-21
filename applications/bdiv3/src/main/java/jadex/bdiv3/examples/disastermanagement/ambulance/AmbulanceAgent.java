@@ -30,6 +30,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnStart;
 
 /**
  * 
@@ -58,7 +59,8 @@ public class AmbulanceAgent implements IEnvAccess
 	/**
 	 * 
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		if("default".equals(agent.getConfiguration()))

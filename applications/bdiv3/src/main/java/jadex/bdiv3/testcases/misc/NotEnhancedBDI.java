@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Agent that tests if bdi agent factory detects non-enhanced bdi classes.
@@ -18,7 +19,8 @@ public class NotEnhancedBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		if(agent==null)

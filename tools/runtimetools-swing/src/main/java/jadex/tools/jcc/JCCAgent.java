@@ -24,11 +24,11 @@ import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.Properties;
 import jadex.tools.chat.ChatPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
@@ -86,7 +86,8 @@ public class JCCAgent implements IComponentStep<Void>
 	/**
 	 *  Open the gui on agent startup.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void>	execute(final IInternalAccess agent)
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -200,7 +201,8 @@ public class JCCAgent implements IComponentStep<Void>
 	/**
 	 *  Close the gui on agent shutdown.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public IFuture<Void> agentKilled(IInternalAccess agent)
 	{
 //		System.out.println("JCC agent killed");

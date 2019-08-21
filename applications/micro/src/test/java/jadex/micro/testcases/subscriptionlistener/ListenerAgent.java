@@ -20,6 +20,7 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -40,7 +41,8 @@ import jadex.micro.annotation.Results;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ListenerAgent
 {
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body(final IInternalAccess agent)
 	{
 		final Future<Void>	ret	= new Future<Void>();

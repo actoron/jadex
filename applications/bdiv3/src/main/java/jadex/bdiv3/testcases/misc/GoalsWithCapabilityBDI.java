@@ -13,6 +13,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -33,7 +34,8 @@ public class GoalsWithCapabilityBDI
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody//(keepalive=false)
+	//@AgentBody//(keepalive=false)
+	@OnStart
 	public void	body(final IInternalAccess agent)
 	{
 		final TestReport tr	= new TestReport("#1", "Test if capability goals work.");

@@ -14,6 +14,7 @@ import jadex.bridge.fipa.FipaMessage;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentMessageArrived;
+import jadex.micro.annotation.OnStart;
 import jadex.quickstart.cleanerworld.environment.ICleaner;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.environment.impl.Cleaner;
@@ -43,7 +44,8 @@ public class SimpleMessagingCleanerAgent
 	 *  The body is executed when the agent is started.
 	 *  @param bdifeature	Provides access to bdi specific methods
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	private void	exampleBehavior(IBDIAgentFeature bdifeature)
 	{
 		// Manage the belief of other cleaners.

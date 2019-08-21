@@ -6,7 +6,7 @@ import jadex.bridge.fipa.FipaMessage;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  An agent that sends a FIPA message.
@@ -21,7 +21,8 @@ public class FipaSenderAgent
 	/**
 	 *  Send the message and wait for the result.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	protected IFuture<Void>	run(IMessageFeature mf)
 	{
 		FipaMessage	request	= new FipaMessage(FipaMessage.Performative.REQUEST, "Hello?", receiver);

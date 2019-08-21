@@ -20,8 +20,8 @@ import jadex.examples.presentationtimer.remotecontrol.ui.CDListItem;
 import jadex.examples.presentationtimer.remotecontrol.ui.CDListModel;
 import jadex.examples.presentationtimer.remotecontrol.ui.ClientFrame;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.OnInit;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -36,7 +36,8 @@ public class ClientAgent
 	@Agent
 	private IInternalAccess		access;
 
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void onCreate()
 	{
 		System.out.println("Client Agent created");
@@ -48,7 +49,8 @@ public class ClientAgent
 		System.out.println("Service injected: " + cds);
 	}
 
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		ClientFrame clientFrame = new ClientFrame();

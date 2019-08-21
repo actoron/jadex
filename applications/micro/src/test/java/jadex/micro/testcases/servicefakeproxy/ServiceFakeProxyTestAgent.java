@@ -34,6 +34,7 @@ import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.RemoteTestBaseAgent;
@@ -51,7 +52,8 @@ public class ServiceFakeProxyTestAgent extends RemoteTestBaseAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody()
+	//@AgentBody()
+	@OnStart
 	public IFuture<Void> body()
 	{
 		TestReport tr1 = new TestReport("#1", "Test if local service proxy can be created");

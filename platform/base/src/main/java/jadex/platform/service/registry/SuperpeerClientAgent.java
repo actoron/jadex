@@ -61,6 +61,7 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.AgentServiceSearch;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.OnService;
 import jadex.platform.service.security.SecurityAgent;
 
@@ -113,7 +114,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	/**
 	 *  Find and connect to super peers.
 	 */
-	@AgentCreated
+//	@AgentCreated
+	@OnInit
 	protected IFuture<Void>	init()
 	{
 		Future<Void>	ret	= new Future<>();

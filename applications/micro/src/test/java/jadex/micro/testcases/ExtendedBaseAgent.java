@@ -28,6 +28,7 @@ import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -58,7 +59,8 @@ public class ExtendedBaseAgent extends BaseAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		List<TestReport> results = new ArrayList<TestReport>();

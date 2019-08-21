@@ -10,8 +10,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.RestServiceAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -32,7 +32,8 @@ public class ChartUserAgent extends RestServiceAgent
 	/**
 	 *  The agent init.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> init()
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -59,7 +60,8 @@ public class ChartUserAgent extends RestServiceAgent
 	/**
 	 *  Called when the agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public IFuture<Void>	cleanup()
 	{
 		final Future<Void>	ret	= new Future<Void>();

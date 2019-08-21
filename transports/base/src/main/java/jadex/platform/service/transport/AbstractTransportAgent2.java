@@ -74,11 +74,10 @@ import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
-import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -154,7 +153,8 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	 *  Initialized agent.
 	 *  @return Null, when done.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> start()
 	{
 		platformid = agent.getId().getRoot();
@@ -255,7 +255,8 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		return retbar.waitFor();
 	}
 	
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public IFuture<Void> shutdown()
 	{
 		impl.shutdown();

@@ -28,6 +28,7 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -62,7 +63,8 @@ public class ElizaAgent
 	/**
 	 *  Register to inner chat at startup.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void	start()
 	{
 		this.conversations	= new HashMap<IComponentIdentifier, Tuple2<ElizaParse,Long>>();

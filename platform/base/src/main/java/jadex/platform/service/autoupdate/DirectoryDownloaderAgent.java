@@ -23,13 +23,13 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.OnService;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -92,8 +92,9 @@ public class DirectoryDownloaderAgent
 	/**
 	 *  Start the agent.
 	 */
-	@AgentCreated
-	public void	start()
+//	@AgentCreated
+	@OnInit
+	public void	init()
 	{
 		conman	= new HttpConnectionManager();
 	}
@@ -101,7 +102,8 @@ public class DirectoryDownloaderAgent
 	/**
 	 *  Terminate the agent.
 	 */
-	@AgentKilled
+//	@AgentKilled
+	@OnEnd
 	public void	shutdown()
 	{
 		conman.dispose();
@@ -110,7 +112,8 @@ public class DirectoryDownloaderAgent
 	/**
 	 *  Execute the agent behavior.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	body()
 	{
 		final Future<Void>	updated = new Future<Void>();

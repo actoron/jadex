@@ -15,6 +15,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Agent that opens a component selector dialog and then executes a 
@@ -30,7 +31,8 @@ public class ExternalAccessInvokerAgent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		SwingUtilities.invokeLater(new Runnable()

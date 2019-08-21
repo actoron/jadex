@@ -8,8 +8,8 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -21,7 +21,8 @@ public class NFPropertyTestAgent
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		ICoreDependentService cds = agent.getFeature(IRequiredServicesFeature.class).searchService(new ServiceQuery<>( ICoreDependentService.class)).get();

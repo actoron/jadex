@@ -16,6 +16,7 @@ import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +60,8 @@ public class BlockingSokratesBDI
 	/**
 	 *  Setup the gui and start playing.
 	 */
-	@AgentBody()
+	//@AgentBody()
+	@OnStart
 	public void	body(IInternalAccess agent)
 	{
 		strategy = agent.getConfiguration();

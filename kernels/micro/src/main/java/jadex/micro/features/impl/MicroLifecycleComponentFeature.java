@@ -38,6 +38,9 @@ import jadex.micro.MicroModel;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnInit;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
@@ -66,7 +69,11 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	 */
 	public IFuture<Void> init()
 	{
-		return invokeMethod(getInternalAccess(), AgentCreated.class, null);
+		MicroModel model = (MicroModel)component.getModel().getRawModel();
+		if(model.getAgentMethod(OnInit.class)!=null)
+			return invokeMethod(getInternalAccess(), OnInit.class, null);
+		else
+			return invokeMethod(getInternalAccess(), AgentCreated.class, null);
 	}
 	
 	/**
@@ -79,7 +86,11 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		// Invoke initial service calls.
 		invokeServices();
 		
-		return invokeMethod(getInternalAccess(), AgentBody.class, null);
+		MicroModel model = (MicroModel)component.getModel().getRawModel();
+		if(model.getAgentMethod(OnStart.class)!=null)
+			return invokeMethod(getInternalAccess(), OnStart.class, null);
+		else
+			return invokeMethod(getInternalAccess(), AgentBody.class, null);
 	}
 
 	/**
@@ -92,7 +103,15 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 //			System.out.println("lifecycle feature shutdown start: "+getComponent().getComponentIdentifier());
 			
 		final Future<Void> ret = new Future<Void>();
-		invokeMethod(getInternalAccess(), AgentKilled.class, null).addResultListener(new IResultListener<Void>()
+		
+		MicroModel model = (MicroModel)component.getModel().getRawModel();
+		IFuture<Void> fut;
+		if(model.getAgentMethod(OnEnd.class)!=null)
+			fut = invokeMethod(getInternalAccess(), OnEnd.class, null);
+		else
+			fut = invokeMethod(getInternalAccess(), AgentKilled.class, null);
+		
+		fut.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{

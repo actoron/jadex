@@ -47,6 +47,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.platform.service.security.SecurityAgent;
 
 /**
@@ -86,7 +87,8 @@ public class AutoConfigRegistryAgent implements IAutoConfigRegistryService
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		// todo: do not run periodically

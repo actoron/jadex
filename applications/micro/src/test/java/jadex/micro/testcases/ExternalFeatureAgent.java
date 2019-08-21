@@ -15,6 +15,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnStart;
 
 /**
  * 	Tests external features via external access. 
@@ -29,7 +30,8 @@ public class ExternalFeatureAgent extends JunitAgentTest
 	/**
 	 * The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		TestReport tr1 = new TestReport("#1", "Test if an external feature can be used.");

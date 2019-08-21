@@ -13,6 +13,7 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -46,7 +47,8 @@ public class NewsConsumerAgent
 //		System.out.println("received: "+news);
 //	}
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		while(true)

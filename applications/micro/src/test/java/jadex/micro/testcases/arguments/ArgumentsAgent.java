@@ -11,6 +11,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentResult;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -42,7 +43,8 @@ public class ArgumentsAgent extends JunitAgentTest
 	/**
 	 * The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		TestReport tr1 = new TestReport("#1", "Test if all arguments can be found.");

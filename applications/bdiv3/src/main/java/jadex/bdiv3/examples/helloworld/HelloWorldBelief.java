@@ -13,6 +13,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.OnStart;
 import jadex.rules.eca.annotations.Event;
 
 /**
@@ -56,7 +57,8 @@ public class HelloWorldBelief
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		sayhello = "Hello BDI agent V3.";

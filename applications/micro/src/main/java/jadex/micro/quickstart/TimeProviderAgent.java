@@ -22,6 +22,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -86,7 +87,8 @@ public class TimeProviderAgent	implements ITimeService
 	 *  Due to annotation, called once after agent is initialized.
 	 *  The internal access parameter is optional and is injected automatically.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body(IInternalAccess ia)
 	{
 		// The execution feature provides methods for controlling the execution of the agent.

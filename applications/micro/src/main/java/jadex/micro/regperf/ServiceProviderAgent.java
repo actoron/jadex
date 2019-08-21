@@ -8,6 +8,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Agent that starts a service <n>-times.
@@ -25,7 +26,8 @@ public class ServiceProviderAgent implements IExampleService
 	/**
 	 *  Perform the agents actions.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		long start = System.currentTimeMillis();

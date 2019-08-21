@@ -17,6 +17,7 @@ import jadex.micro.MicroAgentFactory;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Chat micro agent that search the factory for micro agents. 
@@ -33,7 +34,8 @@ public class ChatC4Agent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		IAsyncFilter<IComponentFactory>	filter	= new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT);

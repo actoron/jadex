@@ -6,6 +6,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -21,7 +22,8 @@ public class ProviderAgent implements ITestService
 //	@Agent
 //	protected MicroAgent agent;
 	
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void created(IInternalAccess agent)
 	{
 //		agent.getLogger().severe("Agent created: "+agent.getDescription());

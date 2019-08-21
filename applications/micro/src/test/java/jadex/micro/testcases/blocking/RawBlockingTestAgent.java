@@ -8,7 +8,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -22,7 +22,8 @@ public class RawBlockingTestAgent extends JunitAgentTest
 	/**
 	 *  Execute the agent
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	execute(final IInternalAccess agent)
 	{
 //		IComponentManagementService	cms	= agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(

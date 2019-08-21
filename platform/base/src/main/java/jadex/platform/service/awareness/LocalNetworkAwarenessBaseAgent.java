@@ -44,6 +44,7 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.AgentServiceSearch;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.OnService;
 
 /**
@@ -104,8 +105,9 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	/**
 	 *  At startup create a multicast socket for listening.
 	 */
-	@AgentCreated
-	public void	start() throws Exception
+	//@AgentCreated
+	@OnInit
+	public void	init() throws Exception
 	{
 		platforms = new LinkedHashMap<IComponentIdentifier, List<TransportAddress>>();
 		

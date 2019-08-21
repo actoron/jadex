@@ -18,6 +18,7 @@ import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentServiceSearch;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -49,7 +50,8 @@ public class ClientRuleSystemAgent implements IRuleEngineService
 	/**
 	 *  Init method.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void init()
 	{
 		this.rulesystem = new RuleSystem(agent);

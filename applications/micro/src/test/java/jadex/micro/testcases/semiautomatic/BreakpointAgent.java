@@ -10,6 +10,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  A simple agent showing how to use breakpoints in the micro kernel.
@@ -26,7 +27,8 @@ public class BreakpointAgent
 	/**
 	 *  Execute a series of steps.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 //		step	= "hop";	// first step

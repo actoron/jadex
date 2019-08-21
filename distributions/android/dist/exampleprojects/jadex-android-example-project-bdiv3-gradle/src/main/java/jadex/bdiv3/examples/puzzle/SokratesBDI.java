@@ -24,6 +24,7 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,7 +84,8 @@ public class SokratesBDI
 	/**
 	 *  Setup the gui and start playing.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void>	body(IInternalAccess agent)
 	{
 		gui_proxy = new GuiProxy(board, gui_listener);

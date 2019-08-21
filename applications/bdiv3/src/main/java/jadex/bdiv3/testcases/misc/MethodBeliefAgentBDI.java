@@ -12,6 +12,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.rules.eca.ChangeInfo;
@@ -53,7 +54,8 @@ public class MethodBeliefAgentBDI
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	body(final IInternalAccess agent)
 	{
 		final TestReport	tr	= new TestReport("#1", "Test if method beliefs work.");

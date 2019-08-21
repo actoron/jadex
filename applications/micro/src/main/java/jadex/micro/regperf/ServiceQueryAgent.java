@@ -16,6 +16,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Agent that searches for services.
@@ -30,7 +31,8 @@ public class ServiceQueryAgent
 	/**
 	 *  Perform the agents actions.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		IComponentStep<Void> step = new IComponentStep<Void>()

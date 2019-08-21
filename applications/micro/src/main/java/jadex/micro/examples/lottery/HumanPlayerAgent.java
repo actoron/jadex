@@ -10,6 +10,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -20,7 +21,8 @@ public class HumanPlayerAgent
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 //		final ILotteryService ls = agent.getExternalAccess().searchService( new ServiceQuery<>( ILotteryService.class, ServiceScope.GLOBAL)).get();

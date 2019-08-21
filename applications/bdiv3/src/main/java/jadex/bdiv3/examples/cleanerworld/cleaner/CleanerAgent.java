@@ -47,6 +47,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 
 @Agent(type=BDIAgentFactory.TYPE)
 @Plans(
@@ -809,7 +810,8 @@ public class CleanerAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		SwingUtilities.invokeLater(new Runnable()

@@ -7,6 +7,7 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  An agent that sends messages and prints the roundtrip time.
@@ -25,7 +26,8 @@ public class BenchmarkAgent
 	/**
 	 *  Send the message and wait for the result.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	protected void	run(IMessageFeature mf)
 	{
 		// Dry run.

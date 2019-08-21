@@ -14,6 +14,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentBreakpoint;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  An agent that is counting to infinity.
@@ -34,7 +35,8 @@ public class CountingAgent
 	/**
 	 *  Execute a series of steps.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		cnt	= 1;

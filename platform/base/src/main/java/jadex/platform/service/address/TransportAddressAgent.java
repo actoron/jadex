@@ -37,6 +37,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -99,8 +100,9 @@ public class TransportAddressAgent implements ITransportAddressService
 	/**
 	 *  Initializes the service.
 	 */
-	@AgentCreated
-	public IFuture<Void> start()
+	//@AgentCreated
+	@OnInit
+	public IFuture<Void> init()
 	{
 		localaddresses = new LinkedHashSet<TransportAddress>();
 		addresses = new HashMap<IComponentIdentifier, LinkedHashSet<TransportAddress>>();

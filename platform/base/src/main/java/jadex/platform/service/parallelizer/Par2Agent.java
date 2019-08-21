@@ -20,6 +20,7 @@ import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -52,7 +53,8 @@ public class Par2Agent implements IParallelService
 	/** The sequential service (set in init). */
 	protected ISequentialService	seqser;
 	
-	@AgentCreated 
+	//@AgentCreated 
+	@OnInit
 	public IFuture<Void> init(final IInternalAccess agent)
 	{
 		final Future<Void> ret = new Future<Void>();

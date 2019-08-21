@@ -11,6 +11,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
@@ -34,7 +35,8 @@ public class PojoInjectionAgent extends JunitAgentTest implements IAService
 	@ServiceComponent
 	protected PojoInjectionAgent pojo;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 //		System.out.println("pojo is: "+pojo);

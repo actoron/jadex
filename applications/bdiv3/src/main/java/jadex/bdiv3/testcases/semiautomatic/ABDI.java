@@ -12,6 +12,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 @Agent(type=BDIAgentFactory.TYPE)
 public class ABDI extends AABDI
@@ -48,7 +49,8 @@ public class ABDI extends AABDI
 		}
 	}
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		IFuture<Cnt1Goal> fut1 = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Cnt1Goal());

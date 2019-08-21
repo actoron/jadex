@@ -13,6 +13,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Hello World with goal driven print out.
@@ -54,7 +55,8 @@ public class HelloWorldGoal
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new HelloGoal("Hello BDI agent V3.")).get();

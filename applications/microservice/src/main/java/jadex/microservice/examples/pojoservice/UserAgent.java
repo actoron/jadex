@@ -6,6 +6,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Micro agent that uses the pojo service.
@@ -17,7 +18,8 @@ public class UserAgent
 	/**
 	 *  The agent body is called once on agent startup.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body(IInternalAccess agent)
 	{
 		try

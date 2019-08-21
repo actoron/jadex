@@ -17,6 +17,7 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Garbage collector agent.</H3>
@@ -138,7 +139,8 @@ public class GarbageCollectorAgent extends BaseAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public void body()
 	{
 		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Check());

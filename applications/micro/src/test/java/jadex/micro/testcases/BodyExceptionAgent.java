@@ -3,6 +3,7 @@ package jadex.micro.testcases;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Test what happens if an exception is thrown in body.
@@ -13,7 +14,8 @@ public class BodyExceptionAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 //		System.out.println("execute ExceptionTest ...");

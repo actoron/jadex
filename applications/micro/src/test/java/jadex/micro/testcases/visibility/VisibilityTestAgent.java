@@ -21,6 +21,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
@@ -41,7 +42,8 @@ public class VisibilityTestAgent extends JunitAgentTest
 	/**
 	 *  Init service method.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> test()
 	{
 //		final IExternalAccess plat = Starter.createPlatform(STest.getDefaultTestConfig()).get();

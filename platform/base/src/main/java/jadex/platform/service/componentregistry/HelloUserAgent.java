@@ -6,6 +6,7 @@ import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 @Agent
 public class HelloUserAgent
@@ -13,7 +14,8 @@ public class HelloUserAgent
 	@Agent
 	protected IInternalAccess agent;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		IHelloService hs = agent.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>( IHelloService.class, ServiceScope.PLATFORM));

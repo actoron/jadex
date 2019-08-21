@@ -24,7 +24,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.OnEnd;
 
 /**
  *  Base class for test agents using remote platforms.
@@ -48,7 +48,8 @@ public class RemoteTestBaseAgent  extends JunitAgentTest
 	/**
 	 *  Cleanup created proxies.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public IFuture<Void>	cleanup()
 	{
 		FutureBarrier<Map<String, Object>>	fubar	= new FutureBarrier<Map<String,Object>>();

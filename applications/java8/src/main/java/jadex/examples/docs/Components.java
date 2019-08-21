@@ -9,12 +9,13 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnStart;
 
 /**
- * Created by kalinowski on 01.09.16.
+ * 
  */
-public class Components {
-
+public class Components 
+{
     @Agent
     @Arguments(@Argument(name="myName", description = "Name of this agent", clazz=String.class, defaultvalue = "\"Hugo\""))
     public class MyAgent
@@ -27,13 +28,16 @@ public class Components {
             CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"myName"}, new Object[]{"\"Harald\""}));
         }
 
-        @AgentBody void body() {
+        //@AgentBody 
+        @OnStart
+        public void body() {
             System.out.println("Hello World");
             System.out.println(myName);
         }
     }
 
-    private void scheduleStep() {
+    private void scheduleStep() 
+    {
         IExternalAccess extAcc = null;
 
         extAcc.scheduleStep(iAccess -> {
@@ -41,6 +45,4 @@ public class Components {
             return Future.DONE;
         });
     }
-
-
 }

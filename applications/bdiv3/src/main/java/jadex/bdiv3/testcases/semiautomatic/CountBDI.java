@@ -10,6 +10,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Simple agent with inline count goal.
@@ -34,7 +35,8 @@ public class CountBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		IFuture<CountGoal> fut = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new CountGoal(10, 5));

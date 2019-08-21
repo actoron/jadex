@@ -26,6 +26,7 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.testcases.servicecall.DecoupledServiceAgent;
@@ -55,7 +56,8 @@ public class RemovedServiceAgent extends JunitAgentTest
 	/**
 	 *  Perform the tests and indicate completion in the future.
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public IFuture<Void>	body()
 	{
 		final Future<Collection<TestReport>>	reports	= new Future<Collection<TestReport>>();

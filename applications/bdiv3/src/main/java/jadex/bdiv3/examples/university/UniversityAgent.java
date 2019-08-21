@@ -17,6 +17,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Go to university example taken from  
@@ -70,7 +71,8 @@ public class UniversityAgent
 	 *  The agent body is executed on startup.
 	 *  It creates and dispatches a come to university goal.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		System.out.println("rainy: "+raining);

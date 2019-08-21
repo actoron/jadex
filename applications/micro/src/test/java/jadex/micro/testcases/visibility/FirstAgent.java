@@ -16,6 +16,8 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnInit;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -40,13 +42,15 @@ public class FirstAgent
 	@AgentArgument
 	private boolean selfkill;
 
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void init()
 	{
 		System.out.println("Inited :" + ia.getId());
 	}
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		System.out.println("MY PLATFORM :" + ia.getId().getPlatformName());

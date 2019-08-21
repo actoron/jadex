@@ -3,12 +3,11 @@ package jadex.platform.service.awareness;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnInit;
 
 /**
  *  Implements passive awareness via broadcast.
@@ -24,8 +23,9 @@ public class BroadcastAwarenessAgent extends LocalNetworkAwarenessBaseAgent
 	/**
 	 *  At startup create a multicast socket for listening.
 	 */
-	@AgentCreated
-	public void	start() throws Exception
+	//@AgentCreated
+	@OnInit
+	public void	init() throws Exception
 	{
 		sendsocket = new DatagramSocket(0);
 		sendsocket.setBroadcast(true);
@@ -34,6 +34,6 @@ public class BroadcastAwarenessAgent extends LocalNetworkAwarenessBaseAgent
 		recvsocket.setReuseAddress(true);
 		recvsocket.bind(new InetSocketAddress(port));
 		
-		super.start();
+		super.init();
 	}
 }

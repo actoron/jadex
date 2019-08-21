@@ -9,6 +9,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 @Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 public abstract class HelloWorldBDI implements IBDIAgent, IHelloService
@@ -16,7 +17,8 @@ public abstract class HelloWorldBDI implements IBDIAgent, IHelloService
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		adoptPlan("printHello").get();

@@ -11,6 +11,7 @@ import jadex.bdiv3.quickstart.treasureisland.environment.TreasureHunterEnvironme
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  A treasure hunter that picks up the treasures one by one
@@ -69,7 +70,8 @@ public class TreasureHunterB1BDI
 	 *  Agent body is implemented as a loop that runs until no more treasures available.
 	 *  @param agent	The agent parameter is optional and allows to access bdi agent functionality.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void	body(IBDIAgentFeature agent)
 	{
 		// Continue until no more treasures.

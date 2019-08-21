@@ -20,6 +20,7 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -56,7 +57,8 @@ public class EchoChatAgent
 	/**
 	 *  Register to inner chat at startup.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void	start()
 	{
 		chat.status(IChatService.STATE_IDLE, null, new IComponentIdentifier[0]);	// Change state from away to idle.

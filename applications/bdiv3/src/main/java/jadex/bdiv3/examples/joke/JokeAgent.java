@@ -36,6 +36,8 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
+import jadex.micro.annotation.OnInit;
+import jadex.micro.annotation.OnStart;
 import jadex.rules.eca.ChangeInfo;
 
 /**
@@ -67,7 +69,8 @@ public class JokeAgent
 	@Belief
 	protected List<String> slogans;
 	
-	@AgentCreated
+//	@AgentCreated
+	@OnInit
 	public void init()
 	{
 		slogans = new ArrayList<String>();
@@ -76,7 +79,8 @@ public class JokeAgent
 		slogans.add("The sun makes you smile");
 	}
 	
-	@AgentBody
+//	@AgentBody
+	@OnStart
 	public void body()
 	{
 		AchieveMoodGoal g = new AchieveMoodGoal(Mood.HAPPY);

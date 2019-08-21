@@ -14,6 +14,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -36,7 +37,8 @@ public class CorruptAdderAgent
 	/**
 	 * 
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> agentCreated()
 	{
 		IService addser = (IService)agent.getFeature(IProvidedServicesFeature.class).getProvidedServices(IAddService.class)[0];

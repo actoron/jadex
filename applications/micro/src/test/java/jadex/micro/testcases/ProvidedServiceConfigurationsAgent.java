@@ -16,6 +16,8 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnInit;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
@@ -41,7 +43,8 @@ public class ProvidedServiceConfigurationsAgent extends JunitAgentTest implement
 	/**
 	 *  Agent created.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> agentCreated()
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -70,7 +73,8 @@ public class ProvidedServiceConfigurationsAgent extends JunitAgentTest implement
 	/**
 	 *  The body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		return IFuture.DONE;

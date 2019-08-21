@@ -96,7 +96,10 @@ import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.OnService;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Parent;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -1015,6 +1018,11 @@ public class MicroClassReader
 					checkMethodReturnType(AgentCreated.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentCreated.class, new MethodInfo(methods[i]));
 				}
+				if(isAnnotationPresent(methods[i], OnInit.class, cl))
+				{
+					checkMethodReturnType(OnInit.class, methods[i], cl);
+					micromodel.setAgentMethod(OnInit.class, new MethodInfo(methods[i]));
+				}
 				if(isAnnotationPresent(methods[i], AgentBody.class, cl))
 				{
 					checkMethodReturnType(AgentBody.class, methods[i], cl);
@@ -1038,10 +1046,38 @@ public class MicroClassReader
 					
 					micromodel.setAgentMethod(AgentBody.class, new MethodInfo(methods[i]));
 				}
+				if(isAnnotationPresent(methods[i], OnStart.class, cl))
+				{
+					checkMethodReturnType(OnStart.class, methods[i], cl);
+					
+					// Set default keepalive to false, when not plain void body (i.e., future return value).
+					boolean	isvoid	= methods[i].getReturnType().equals(void.class);
+					if(!isvoid)
+					{
+						if(modelinfo.getKeepalive()==null)
+						{
+							modelinfo.setKeepalive(Boolean.FALSE);
+						}
+						for(ConfigurationInfo ci: modelinfo.getConfigurations())
+						{
+							if(ci.getKeepalive()==null)
+							{
+								ci.setKeepalive(Boolean.FALSE);								
+							}
+						}
+					}
+					
+					micromodel.setAgentMethod(OnStart.class, new MethodInfo(methods[i]));
+				}
 				if(isAnnotationPresent(methods[i], AgentKilled.class, cl))
 				{
 					checkMethodReturnType(AgentKilled.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentKilled.class, new MethodInfo(methods[i]));
+				}
+				if(isAnnotationPresent(methods[i], OnEnd.class, cl))
+				{
+					checkMethodReturnType(OnEnd.class, methods[i], cl);
+					micromodel.setAgentMethod(OnEnd.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentBreakpoint.class, cl))
 				{

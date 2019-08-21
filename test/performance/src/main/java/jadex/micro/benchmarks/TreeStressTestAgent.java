@@ -9,10 +9,10 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Creates a complex tree structure of sub components.
@@ -29,7 +29,8 @@ public class TreeStressTestAgent
 	/**
 	 *  Execute the agent.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 		int	depth	= ((Number)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("depth")).intValue();

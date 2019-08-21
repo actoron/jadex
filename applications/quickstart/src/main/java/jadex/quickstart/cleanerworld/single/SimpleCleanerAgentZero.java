@@ -2,6 +2,7 @@ package jadex.quickstart.cleanerworld.single;
 
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.quickstart.cleanerworld.environment.IChargingstation;
 import jadex.quickstart.cleanerworld.environment.IWaste;
 import jadex.quickstart.cleanerworld.environment.IWastebin;
@@ -19,7 +20,8 @@ public class SimpleCleanerAgentZero
 	/**
 	 *  The body is executed when the agent is started.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	private void	exampleBehavior()
 	{
 		// Create the sensor/actuator interface object.

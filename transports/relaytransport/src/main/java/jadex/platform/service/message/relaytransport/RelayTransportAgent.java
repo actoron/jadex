@@ -59,6 +59,7 @@ import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -181,7 +182,8 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 	/**
 	 *  Agent initialization.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public IFuture<Void> start()
 	{
 		Future<Void>	ret	= new Future<>();

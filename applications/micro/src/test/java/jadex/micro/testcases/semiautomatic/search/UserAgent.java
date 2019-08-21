@@ -13,6 +13,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -23,7 +24,8 @@ public class UserAgent
     @Agent
     protected IInternalAccess agent;
     
-    @AgentCreated
+    //@AgentCreated
+    @OnInit
     public void init() 
     {
         System.out.println("Agent created");

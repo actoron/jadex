@@ -34,6 +34,8 @@ import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnInit;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -64,7 +66,8 @@ public class DependendServicesAgent extends JunitAgentTest
     /**
      *  Init code.
      */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
     public IFuture<Void> agentCreated()
     {
         final Future<Void> ret = new Future<Void>();
@@ -138,7 +141,8 @@ public class DependendServicesAgent extends JunitAgentTest
     /**
      *  The agent body.
      */
-	@AgentBody
+	//@AgentBody
+	@OnStart
     public IFuture<Void> executeBody()
     {
         getChildrenAccesses().addResultListener(agent.getFeature(IExecutionFeature.class).createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()

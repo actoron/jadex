@@ -7,6 +7,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentResult;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -32,7 +33,8 @@ public class InjectedResultsAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 //		System.out.println("myres: "+myres);

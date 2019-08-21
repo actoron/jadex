@@ -7,7 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  *  A method marked with this annotation will be called just before the component is removed from the platform.
+ *
+ *  use: @OnEnd
  */
+@Deprecated
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AgentKilled

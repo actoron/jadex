@@ -19,6 +19,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -41,7 +42,8 @@ public class RichAgent
 	@Belief
 	protected int money;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new BecomeRich()).get();

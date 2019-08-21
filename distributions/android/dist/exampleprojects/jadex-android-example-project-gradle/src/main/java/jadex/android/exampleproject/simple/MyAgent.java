@@ -35,7 +35,8 @@ public class MyAgent
 	/**
 	 *  Called when the agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public IFuture<Void> agentKilled(IInternalAccess agent)
 	{
 		showAndroidMessage("This is Agent <<" + agent.getComponentIdentifier().getLocalName() + ">> saying goodbye!", agent);

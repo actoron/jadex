@@ -43,6 +43,7 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -100,7 +101,8 @@ public class ComponentRegistryAgent implements IComponentRegistryService
     /**
      *  Called once after agent creation.
      */
-    @AgentCreated
+    //@AgentCreated
+    @OnInit
     public IFuture<Void> agentCreated()
     {
 //  	System.out.println(((Map)agent.getFetcher().fetchValue("$args")).size());

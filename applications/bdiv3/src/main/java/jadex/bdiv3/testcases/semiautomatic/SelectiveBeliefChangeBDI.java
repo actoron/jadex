@@ -11,6 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.OnStart;
 import jadex.rules.eca.ChangeInfo;
 
 /**
@@ -47,7 +48,8 @@ public class SelectiveBeliefChangeBDI
 		number = 9.2;
 	}
 
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body(IInternalAccess agent)
 	{
 		number = 9.4;

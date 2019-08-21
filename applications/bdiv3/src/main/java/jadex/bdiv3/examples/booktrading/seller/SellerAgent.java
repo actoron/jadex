@@ -37,10 +37,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -64,7 +64,8 @@ public class SellerAgent implements IBuyBookService, INegotiationAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public void body()
 	{
 		Order[] ios = (Order[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("initial_orders");
@@ -92,7 +93,8 @@ public class SellerAgent implements IBuyBookService, INegotiationAgent
 	/**
 	 *  Called when agent terminates.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void shutdown()
 	{
 		if(gui!=null)

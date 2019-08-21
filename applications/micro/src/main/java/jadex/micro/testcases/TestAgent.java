@@ -26,10 +26,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITuple2Future;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -57,7 +56,8 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	/**
 	 *  Cleanup created platforms.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public IFuture<Void>	cleanup()
 	{
 		FutureBarrier<Void>	outer	= new FutureBarrier<Void>();
@@ -77,7 +77,8 @@ public abstract class TestAgent	extends RemoteTestBaseAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> body()
 	{
 		ISecurityService ss = agent.getLocalService(ISecurityService.class);

@@ -14,6 +14,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -78,7 +79,8 @@ public class PlanParameterMappingBDI
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody//(keepalive=false)
+	//@AgentBody//(keepalive=false)
+	@OnStart
 	public void	body()
 	{
 		String res = (String)agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new AGoal("hello")).get();

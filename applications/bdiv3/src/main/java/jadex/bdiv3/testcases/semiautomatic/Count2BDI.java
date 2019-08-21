@@ -17,6 +17,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.rules.eca.annotations.Event;
 
 /**
@@ -88,7 +89,8 @@ public class Count2BDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		IFuture<Count2Goal> fut = agent.getFeature(IBDIAgentFeature.class).dispatchTopLevelGoal(new Count2Goal(5, 10));

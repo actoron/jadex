@@ -11,6 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 import jadex.rules.eca.annotations.Event;
 
 /**
@@ -82,7 +83,8 @@ public class HelloWorld3BDI
 	 *  right hand side creates goal and executes it
 	 *  Plan is selected and executed (hello is printed out)
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 //		sayhello[0] = "1";

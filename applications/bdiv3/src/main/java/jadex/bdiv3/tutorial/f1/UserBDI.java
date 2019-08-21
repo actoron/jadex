@@ -20,9 +20,9 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnEnd;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  User agent that presents a gui for using the 
@@ -45,7 +45,8 @@ public class UserBDI
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		SwingUtilities.invokeLater(new Runnable()
@@ -100,7 +101,8 @@ public class UserBDI
 	/**
 	 *  Cleanup when agent is killed.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	public void	cleanup()
 	{
 		SwingUtilities.invokeLater(new Runnable()

@@ -9,6 +9,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  An agent used to provoke out-of-memory-errors fur testing
@@ -27,7 +28,8 @@ public class OutOfMemAgent	implements IComponentStep<Void>
 	/**
 	 *  Main behavior just accumulates 1MB-sized objects.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> execute(IInternalAccess ia)
 	{
 		if(objects.size()%100==0)

@@ -8,6 +8,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -25,7 +26,8 @@ public class SimpleTestAgent extends JunitAgentTest
 	/**
 	 *  Just finish the test by setting the result and killing the agent.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		TestReport	tr	= new TestReport("#1", "Simple micro test.");

@@ -23,6 +23,8 @@ import jadex.extension.envsupport.math.Vector2Double;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.OnInit;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  The firefly agent.
@@ -39,7 +41,8 @@ public class FireflyAgent
 	/**
 	 *  Init method.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void agentCreated()
 	{
 //		System.out.println("firefly created: "+agent.getId());
@@ -48,7 +51,8 @@ public class FireflyAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> executeBody()
 	{
 //		System.out.println("firefly body: "+agent.getId());

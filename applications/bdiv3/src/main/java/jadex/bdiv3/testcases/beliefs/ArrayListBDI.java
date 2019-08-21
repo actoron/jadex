@@ -15,6 +15,7 @@ import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 @Agent(type=BDIAgentFactory.TYPE)
 public class ArrayListBDI 
@@ -25,7 +26,8 @@ public class ArrayListBDI
     @Belief
     List<int[]> testArrayList = new ArrayList<int[]>();
 
-    @AgentBody
+    //@AgentBody
+    @OnStart
     public void body()
     {
         System.out.println("BDI Agent started");

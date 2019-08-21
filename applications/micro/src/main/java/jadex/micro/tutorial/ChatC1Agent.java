@@ -9,6 +9,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.OnService;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -25,7 +26,8 @@ public class ChatC1Agent
 	@OnService
 	protected IClockService clockservice;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void executeBody()
 	{
 		System.out.println("Time for a chat, buddy: "+ new Date(clockservice.getTime()));

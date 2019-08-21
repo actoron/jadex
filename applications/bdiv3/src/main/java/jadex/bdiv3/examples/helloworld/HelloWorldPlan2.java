@@ -8,6 +8,7 @@ import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnStart;
 
 @Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 @Description("Hello world agent that creates a hello plan.")
@@ -16,7 +17,8 @@ public abstract class HelloWorldPlan2 implements IBDIAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+//	@AgentBody
+	@OnStart
 	public void body()
 	{
 		adoptPlan("printHello").get();

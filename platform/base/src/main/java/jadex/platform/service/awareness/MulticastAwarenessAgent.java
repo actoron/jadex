@@ -12,6 +12,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnInit;
 
 /**
  *  Implements passive awareness via multicast.
@@ -27,14 +28,15 @@ public class MulticastAwarenessAgent	extends LocalNetworkAwarenessBaseAgent
 	/**
 	 *  At startup create a multicast socket for listening.
 	 */
-	@AgentCreated
+	//@AgentCreated
+	@OnInit
 	public void	start() throws Exception
 	{
 		sendsocket	= new DatagramSocket(0);
 		recvsocket = new MulticastSocket(port);
 		((MulticastSocket)recvsocket).joinGroup(InetAddress.getByName(address));
 		
-		super.start();
+		super.init();
 	}
 
 	/**

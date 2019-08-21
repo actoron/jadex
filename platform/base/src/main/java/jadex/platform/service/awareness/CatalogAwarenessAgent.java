@@ -23,6 +23,7 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.OnInit;
 
 /**
  *  Passive awareness based on a pre-defined catalog of platforms + addresses.
@@ -61,8 +62,9 @@ public class CatalogAwarenessAgent implements IAwarenessService
 	 *  
 	 *  @return Null, when done.
 	 */
-	@AgentCreated
-	public IFuture<Void> start()
+	//@AgentCreated
+	@OnInit
+	public IFuture<Void> init()
 	{
 		if(platformurls==null)
 			platformurls = DEFAULT_URLS;

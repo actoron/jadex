@@ -8,8 +8,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentResult;
+import jadex.micro.annotation.OnStart;
 
 /** Alternative to threaded execution for RestInvocationHelper, useful for simulation. */
 @Agent
@@ -33,7 +33,8 @@ public class RestInvocationAgent
 	
 	/** Performs the call. */
 	@SuppressWarnings("unchecked")
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void> execute()
 	{
 		final Future<Void> done = new Future<Void>();

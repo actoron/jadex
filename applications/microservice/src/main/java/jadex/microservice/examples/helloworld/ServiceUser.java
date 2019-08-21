@@ -5,7 +5,7 @@ import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Simple agent that searches and uses the service.
@@ -20,7 +20,8 @@ public class ServiceUser
 	/**
 	 *  Executed once after init.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		// Search the service.

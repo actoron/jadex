@@ -13,6 +13,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.OnService;
+import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -35,7 +36,8 @@ public class SystemScopeServiceSearchAgent extends JunitAgentTest
 	@OnService
 	protected ILibraryService cms;
 	
-	@AgentBody
+	@OnStart
+	//@AgentBody
 	public void body()
 	{	
 		TestReport tr1 = new TestReport("#1", "Test if system service can be found without scope with SServiceProvider");

@@ -14,7 +14,8 @@ public class StandardClientAgent
 	@Agent
 	protected MicroAgent agent;
 	
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		SwingUtilities.invokeLater(new Runnable()
