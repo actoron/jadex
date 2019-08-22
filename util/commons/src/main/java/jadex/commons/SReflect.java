@@ -1015,7 +1015,7 @@ public class SReflect
 	public static Method[]	getAllMethods(Class clazz)
 	{
 		List<Method>	ret	= new ArrayList<Method>();
-		Class	cls	= clazz;
+		Class<?> cls = clazz;
 
 		while(cls!=null)
 		{

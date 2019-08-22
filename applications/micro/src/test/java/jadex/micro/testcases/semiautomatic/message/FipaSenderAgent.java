@@ -3,10 +3,10 @@ package jadex.micro.testcases.semiautomatic.message;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.FipaMessage;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.OnStart;
 
 /**
  *  An agent that sends a FIPA message.

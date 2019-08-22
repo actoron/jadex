@@ -1,10 +1,10 @@
 package jadex.micro.testcases;
 
+import jadex.bridge.service.annotation.OnInit;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.OnInit;
 
 /**
  *  Agent that produces an exception during init.

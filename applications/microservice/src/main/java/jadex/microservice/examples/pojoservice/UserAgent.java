@@ -2,11 +2,11 @@ package jadex.microservice.examples.pojoservice;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.OnStart;
 
 /**
  *  Micro agent that uses the pojo service.

@@ -13,9 +13,9 @@ import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -54,7 +54,8 @@ public class BasicDependencyService implements IDependencyService
 	/**
 	 *  Start the service.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture<Void> startService()
 	{
 		this.cid	= component.getId().getRoot();

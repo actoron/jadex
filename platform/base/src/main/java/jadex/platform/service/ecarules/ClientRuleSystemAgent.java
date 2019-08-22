@@ -5,6 +5,7 @@ import java.util.List;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.types.ecarules.IRuleEngineService;
 import jadex.bridge.service.types.ecarules.IRulebaseEvent;
 import jadex.bridge.service.types.ecarules.IRulebaseService;
@@ -18,7 +19,6 @@ import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;

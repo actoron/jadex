@@ -1,11 +1,11 @@
 package jadex.micro.testcases.semiautomatic;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.OnInit;
-import jadex.micro.annotation.OnStart;
 
 /**
  * 

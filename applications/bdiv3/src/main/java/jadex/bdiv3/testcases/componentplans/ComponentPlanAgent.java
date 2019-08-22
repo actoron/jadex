@@ -1,10 +1,10 @@
 package jadex.bdiv3.testcases.componentplans;
 
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.Parent;
 
 /**

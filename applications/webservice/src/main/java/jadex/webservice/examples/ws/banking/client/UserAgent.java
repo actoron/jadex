@@ -7,10 +7,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.SUtil;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.OnStart;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.webservice.examples.ws.banking.IBankingService;

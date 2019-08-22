@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.address.TransportAddress;
 import jadex.bridge.service.types.awareness.IAwarenessService;
@@ -23,7 +24,6 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.OnInit;
 
 /**
  *  Passive awareness based on a pre-defined catalog of platforms + addresses.

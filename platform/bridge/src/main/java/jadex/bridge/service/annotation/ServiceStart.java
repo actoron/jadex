@@ -7,7 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  *  Annotation for pojo service start method.
+ *
+ *  use: @OnStart
  */
+@Deprecated
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ServiceStart

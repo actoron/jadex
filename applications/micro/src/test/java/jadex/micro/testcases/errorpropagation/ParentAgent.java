@@ -5,6 +5,8 @@ import jadex.base.test.Testcase;
 import jadex.base.test.impl.JunitAgentTest;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentChildKilled;
@@ -13,8 +15,6 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
-import jadex.micro.annotation.OnEnd;
-import jadex.micro.annotation.OnStart;
 
 /**
  *  Test if child killed notification works.

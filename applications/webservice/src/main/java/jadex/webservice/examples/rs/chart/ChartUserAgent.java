@@ -6,12 +6,12 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.RestServiceAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.OnEnd;
-import jadex.micro.annotation.OnInit;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 

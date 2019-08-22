@@ -8,10 +8,10 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.GuiClass;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.OnInit;
 
 /**
  *  Helpline master agent for GUI and starting/stopping subcomponents for specific persons. 

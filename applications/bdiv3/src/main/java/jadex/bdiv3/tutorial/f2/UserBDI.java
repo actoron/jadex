@@ -13,6 +13,8 @@ import javax.swing.SwingUtilities;
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.IIntermediateResultListener;
@@ -22,8 +24,6 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.OnEnd;
-import jadex.micro.annotation.OnStart;
 
 /**
  *  User agent that presents a gui for using the 

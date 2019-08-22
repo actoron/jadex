@@ -2,11 +2,11 @@ package jadex.micro.testcases.semiautomatic.compositeservice;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
-import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -41,7 +41,8 @@ public class PojoAddService implements IAddService
 	/**
 	 * 
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture start()
 	{
 //		System.out.println("start");
@@ -51,7 +52,8 @@ public class PojoAddService implements IAddService
 	/**
 	 * 
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture shutdown()
 	{
 //		System.out.println("shutdown");

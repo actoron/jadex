@@ -5,12 +5,12 @@ import java.util.List;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.OnService;
-import jadex.micro.annotation.OnStart;
 
 /**
  *  Agent that counts and stores values in static list.

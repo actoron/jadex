@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jadex.base.Starter;
@@ -22,6 +23,8 @@ import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ServiceInfo;
@@ -200,6 +203,42 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	}
 	
 	/**
+	 *  Search an annotation method.
+	 */
+	protected Method searchMethod(Class<?> impl, Class<? extends Annotation>  annotation)
+	{
+		Method[] methods = SReflect.getAllMethods(impl);
+		Method found = null;
+		
+		for(int i=0; found==null && i<methods.length; i++)
+		{
+			if(methods[i].isAnnotationPresent(annotation))
+			{
+				if(found==null)
+				{
+					// todo: why must be public?
+					if((methods[i].getModifiers()&Modifier.PUBLIC)!=0)
+					{
+						found = methods[i];
+					}
+					else
+					{
+						throw new RuntimeException("Annotated method @"+annotation.getSimpleName()+" must be public: "+methods[i]);
+					}
+				}
+				
+				// Fail on duplicate annotation if not from overridden method.
+				/*else if(!Arrays.equals(methods[i].getParameterTypes(), found.getParameterTypes()))
+				{
+					throw new RuntimeException("Duplicate annotation @"+annotation.getSimpleName()+" in methods "+methods[i]+" and "+found);
+				}*/
+			}
+		}
+		
+		return found;
+	}
+	
+	/**
 	 *  Invoke double methods.
 	 *  The boolean 'firstorig' determines if basicservice method is called first.
 	 */
@@ -207,124 +246,132 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		Map<Object, Boolean> inited = (Map<Object, Boolean>)Starter.getPlatformValue(ia.getId(), Starter.DATA_INITEDSERVICEPOJOS);
+		
 		Object obj = ProxyFactory.isProxyClass(si.getDomainService().getClass())? ProxyFactory.getInvocationHandler(si.getDomainService()): si.getDomainService();
 		
-		Method[] methods = SReflect.getAllMethods(obj.getClass());
-		Method found = null;
-		
-		for(int i=0; !ret.isDone() && i<methods.length; i++)
+		// if pojo was already inited (e.g. agent and service impl are in same class) domain init is not invoked again
+		if(inited.containsKey(obj))
 		{
-			if(methods[i].isAnnotationPresent(annotation))
+			sic.invoke().delegate(ret);
+		}
+		// both must be inited
+		else
+		{
+			inited.put(obj, Boolean.TRUE);
+			
+			// todo: refactor when deprecated annotations are phased out
+			Method found = null;
+			try
 			{
-				if(found==null)
+				found = searchMethod(obj.getClass(), annotation);
+			}
+			catch(Exception e)
+			{
+				if(ServiceStart.class.equals(annotation))
+					//annotation = OnStart.class;
+					annotation = OnInit.class;
+				else if(ServiceShutdown.class.equals(annotation))
+					annotation = OnEnd.class;
+				try
 				{
-					if((methods[i].getModifiers()&Modifier.PUBLIC)!=0)
-					{
-						found	= methods[i];
-					}
-					else
-					{
-						ret.setException(new RuntimeException("Annotated method @"+annotation.getSimpleName()+" must be public: "+methods[i]));
-					}
+					found = searchMethod(obj.getClass(), annotation);
 				}
-				
-				// Fail on duplicate annotation if not from overridden method.
-				else if(!Arrays.equals(methods[i].getParameterTypes(), found.getParameterTypes()))
+				catch(Exception e2)
 				{
-					ret.setException(new RuntimeException("Duplicate annotation @"+annotation.getSimpleName()+" in methods "+methods[i]+" and "+found));
 				}
 			}
-		}
-		
-		if(!ret.isDone())
-		{
-			if(found!=null)
+			
+			if(!ret.isDone())
 			{
-				final ServiceInvocationContext domainsic = new ServiceInvocationContext(sic);
-				domainsic.setMethod(found);
-				domainsic.setObject(obj);
-				// Guess parameters for allowing injected value in pojo methods
-				IParameterGuesser guesser = ia.getParameterGuesser();
-				List<Object> args = new ArrayList<Object>();
-				for(int i=0; i<found.getParameterTypes().length; i++)
+				if(found!=null)
 				{
-					args.add(guesser.guessParameter(found.getParameterTypes()[i], false));
-				}
-				domainsic.setArguments(args);
-				
-				sic.setObject(si.getManagementService());
-				
-				if(firstorig)
-				{
-					sic.invoke().addResultListener(new DelegationResultListener<Void>(ret)
+					final ServiceInvocationContext domainsic = new ServiceInvocationContext(sic);
+					domainsic.setMethod(found);
+					domainsic.setObject(obj);
+					// Guess parameters for allowing injected value in pojo methods
+					IParameterGuesser guesser = ia.getParameterGuesser();
+					List<Object> args = new ArrayList<Object>();
+					for(int i=0; i<found.getParameterTypes().length; i++)
 					{
-						public void customResultAvailable(Void result)
-						{
-							// Mgmt method is always future<void>
-							IResultListener<Object>	lis	= new IResultListener<Object>()
-							{
-								public void resultAvailable(Object result)
-								{
-									domainsic.invoke().addResultListener(new DelegationResultListener<Void>(ret)
-									{
-										public void customResultAvailable(Void result)
-										{
-//											if(sic.getObject() instanceof BasicService && ((BasicService)sic.getObject()).getInterfaceType().getName().indexOf("Peer")!=-1)
-//												System.out.println("hhhhhhhhhhhhhhhhhh");
-											
-											// If domain result is future, replace finished mgmt result with potentially not yet finished domain future.
-											if(domainsic.getResult() instanceof IFuture<?> || domainsic.getResult() instanceof Exception)
-												sic.setResult(domainsic.getResult());
-											super.customResultAvailable(result);
-										}
-									});
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									// Invocation finished, exception available in result future. 
-									ret.setResult(null);
-								}
-							};
-							((IFuture)sic.getResult()).addResultListener(lis);
-						}
-					});
-				}
-				else
-				{
-					domainsic.invoke().addResultListener(new DelegationResultListener<Void>(ret)
+						args.add(guesser.guessParameter(found.getParameterTypes()[i], false));
+					}
+					domainsic.setArguments(args);
+					
+					sic.setObject(si.getManagementService());
+					
+					if(firstorig)
 					{
-						public void customResultAvailable(Void result)
+						sic.invoke().addResultListener(new DelegationResultListener<Void>(ret)
 						{
-							// Domain method may be void or future<void>
-							if(domainsic.getResult() instanceof IFuture<?>)
+							public void customResultAvailable(Void result)
 							{
+								// Mgmt method is always future<void>
 								IResultListener<Object>	lis	= new IResultListener<Object>()
 								{
 									public void resultAvailable(Object result)
 									{
-										sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+										domainsic.invoke().addResultListener(new DelegationResultListener<Void>(ret)
+										{
+											public void customResultAvailable(Void result)
+											{
+	//											if(sic.getObject() instanceof BasicService && ((BasicService)sic.getObject()).getInterfaceType().getName().indexOf("Peer")!=-1)
+	//												System.out.println("hhhhhhhhhhhhhhhhhh");
+												
+												// If domain result is future, replace finished mgmt result with potentially not yet finished domain future.
+												if(domainsic.getResult() instanceof IFuture<?> || domainsic.getResult() instanceof Exception)
+													sic.setResult(domainsic.getResult());
+												super.customResultAvailable(result);
+											}
+										});
 									}
 									public void exceptionOccurred(Exception exception)
 									{
-										// Make exception available in result future.
-										sic.setResult(new Future<Void>(exception));
+										// Invocation finished, exception available in result future. 
 										ret.setResult(null);
 									}
 								};
-								((IFuture)domainsic.getResult()).addResultListener(lis);
+								((IFuture)sic.getResult()).addResultListener(lis);
 							}
-							else
+						});
+					}
+					else
+					{
+						domainsic.invoke().addResultListener(new DelegationResultListener<Void>(ret)
+						{
+							public void customResultAvailable(Void result)
 							{
-								sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+								// Domain method may be void or future<void>
+								if(domainsic.getResult() instanceof IFuture<?>)
+								{
+									IResultListener<Object>	lis	= new IResultListener<Object>()
+									{
+										public void resultAvailable(Object result)
+										{
+											sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+										}
+										public void exceptionOccurred(Exception exception)
+										{
+											// Make exception available in result future.
+											sic.setResult(new Future<Void>(exception));
+											ret.setResult(null);
+										}
+									};
+									((IFuture)domainsic.getResult()).addResultListener(lis);
+								}
+								else
+								{
+									sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+								}
 							}
-						}
-					});
+						});
+					}
 				}
-			}
-			else
-			{				
-				sic.setObject(si.getManagementService());
-				sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+				else
+				{				
+					sic.setObject(si.getManagementService());
+					sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+				}
 			}
 		}
 		

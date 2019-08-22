@@ -6,6 +6,8 @@ import java.util.Random;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.Boolean3;
 import jadex.commons.SUtil;
@@ -18,8 +20,6 @@ import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.OnEnd;
-import jadex.micro.annotation.OnStart;
 
 @Agent(autoprovide=Boolean3.TRUE)
 @Service

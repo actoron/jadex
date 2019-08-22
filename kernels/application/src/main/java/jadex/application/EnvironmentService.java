@@ -5,6 +5,7 @@ import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -38,7 +39,8 @@ public class EnvironmentService	implements IEnvironmentService
 	/**
 	 *  Init the spaces.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture<Void>	initSpaces()
 	{
 		Future<Void>	ret	= new Future<Void>();

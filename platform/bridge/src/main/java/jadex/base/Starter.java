@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
+import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 import jadex.bridge.ComponentIdentifier;
@@ -103,6 +104,9 @@ public class Starter
     
     /** The bootstrap component factory. */
     public static String DATA_BOOTSTRAPFACTORY = "$bootstrapfactory";
+    
+    /** The weak set of inited service pojos. */
+    public static String DATA_INITEDSERVICEPOJOS = "initedservicepojos";
     
     
     // todo: cannot be used because registry needs to know when superpeer changes (remap queries)
@@ -516,6 +520,8 @@ public class Starter
 				CmsComponentState compstate = new CmsComponentState();
 				compstate.setAccess(component);
 				((CmsState) getPlatformValue(cid, DATA_CMSSTATE)).getComponentMap().put(cid, compstate);
+				
+				putPlatformValue(cid, DATA_INITEDSERVICEPOJOS, Collections.synchronizedMap(new WeakHashMap<Object, Boolean>()));
 				
 				// does not work as create with subscomponents is recursive
 //					/** The sequentializer to execute getNewFactory() one by one and not interleaved. */

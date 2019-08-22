@@ -14,10 +14,10 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -61,7 +61,8 @@ public class GenerateService implements IGenerateService
 	/**
 	 *  Create a new service.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public void start()
 	{
 //		System.out.println("start: "+agent.getAgentName());

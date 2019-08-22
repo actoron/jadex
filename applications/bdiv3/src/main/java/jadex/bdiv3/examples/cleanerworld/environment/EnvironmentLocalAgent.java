@@ -5,11 +5,11 @@ import javax.swing.SwingUtilities;
 import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.examples.cleanerworld.world.Environment;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.OnEnd;
-import jadex.micro.annotation.OnStart;
 
 /**
  * 

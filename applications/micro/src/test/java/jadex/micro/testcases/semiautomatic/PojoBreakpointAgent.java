@@ -6,6 +6,7 @@ import java.util.HashSet;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -13,7 +14,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentBreakpoint;
 import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.OnStart;
 
 
 /**

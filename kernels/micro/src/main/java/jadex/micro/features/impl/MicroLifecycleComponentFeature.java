@@ -7,7 +7,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCallInfo;
 import jadex.bridge.component.ComponentCreationInfo;
@@ -19,6 +21,9 @@ import jadex.bridge.component.ISubcomponentsFeature;
 import jadex.bridge.component.impl.AbstractComponentFeature;
 import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.FieldInfo;
@@ -38,9 +43,6 @@ import jadex.micro.MicroModel;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.OnEnd;
-import jadex.micro.annotation.OnInit;
-import jadex.micro.annotation.OnStart;
 
 /**
  *  Feature that ensures the agent created(), body() and killed() are called on the pojo. 
@@ -88,9 +90,23 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		
 		MicroModel model = (MicroModel)component.getModel().getRawModel();
 		if(model.getAgentMethod(OnStart.class)!=null)
-			return invokeMethod(getInternalAccess(), OnStart.class, null);
+		{
+			Object pojo = component.getFeature(IPojoComponentFeature.class).getPojoAgent();
+			Map<Object, Boolean> inited = (Map<Object, Boolean>)Starter.getPlatformValue(component.getId(), Starter.DATA_INITEDSERVICEPOJOS);
+			if(inited.containsKey(pojo))
+			{
+				return IFuture.DONE;
+			}
+			else
+			{
+				inited.put(pojo, Boolean.TRUE);
+				return invokeMethod(getInternalAccess(), OnStart.class, null);
+			}
+		}
 		else
+		{
 			return invokeMethod(getInternalAccess(), AgentBody.class, null);
+		}
 	}
 
 	/**

@@ -1,11 +1,11 @@
 package jadex.micro.testcases.semiautomatic.features;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnInit;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
-import jadex.micro.annotation.OnInit;
 
 /**
  *  Agent testing incorporation of an additional feature.

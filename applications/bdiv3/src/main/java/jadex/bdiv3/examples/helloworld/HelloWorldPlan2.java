@@ -4,11 +4,11 @@ import jadex.bdiv3.BDIAgentFactory;
 import jadex.bdiv3.IBDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.OnStart;
 
 @Agent(type=BDIAgentFactory.TYPE, keepalive=Boolean3.FALSE)
 @Description("Hello world agent that creates a hello plan.")

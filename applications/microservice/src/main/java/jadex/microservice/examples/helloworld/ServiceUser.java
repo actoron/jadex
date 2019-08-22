@@ -2,10 +2,10 @@ package jadex.microservice.examples.helloworld;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.OnStart;
 
 /**
  *  Simple agent that searches and uses the service.

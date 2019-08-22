@@ -3,13 +3,13 @@ package jadex.extension.rs.invoke;
 import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentResult;
-import jadex.micro.annotation.OnStart;
 
 /** Alternative to threaded execution for RestInvocationHelper, useful for simulation. */
 @Agent

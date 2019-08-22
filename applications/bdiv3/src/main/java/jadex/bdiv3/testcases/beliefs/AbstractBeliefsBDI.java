@@ -8,8 +8,8 @@ import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Mapping;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.OnEnd;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 

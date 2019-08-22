@@ -3,11 +3,11 @@ package jadex.platform.service.awareness;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
+import jadex.bridge.service.annotation.OnInit;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.OnInit;
 
 /**
  *  Implements passive awareness via broadcast.

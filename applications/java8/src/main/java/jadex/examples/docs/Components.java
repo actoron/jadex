@@ -1,6 +1,7 @@
 package jadex.examples.docs;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -9,7 +10,6 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.OnStart;
 
 /**
  * 
