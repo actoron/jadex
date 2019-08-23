@@ -114,7 +114,6 @@ public class NoPlatformStarter
 		CmsComponentState coms = new CmsComponentState();
 		coms.setAccess(component);
 		cmsstate.getComponentMap().put(cid, coms);
-		//
 		
 		component.create(cci, features);
 		component.init().thenAccept(x ->

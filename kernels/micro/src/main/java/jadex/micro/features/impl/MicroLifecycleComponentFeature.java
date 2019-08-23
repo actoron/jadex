@@ -6,8 +6,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jadex.base.Starter;
 import jadex.bridge.IInternalAccess;
@@ -66,16 +68,52 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 	}
 
 	/**
+	 *  Check if a method using an annotation was already invoked.
+	 *  @param ann The annotation.
+	 *  @return True, if it was already called.
+	 */
+	public boolean wasAnnotationCalled(Class<? extends Annotation> ann)
+	{
+		Object pojo = component.getFeature(IPojoComponentFeature.class).getPojoAgent();
+		Map<Object, Set<String>> invocs = (Map<Object, Set<String>>)Starter.getPlatformValue(component.getId(), Starter.DATA_INVOKEDMETHODS);
+		Set<String> invans = invocs.get(pojo);
+		if(invans!=null && invans.contains(SReflect.getUnqualifiedClassName(ann)))
+		{
+			return true;
+		}
+		else
+		{
+			if(invans==null)
+			{
+				invans = new HashSet<>();
+				invocs.put(pojo, invans);
+			}
+			invans.add(SReflect.getUnqualifiedClassName(ann));
+			return false;
+		}
+	}
+	
+	/**
 	 *  Initialize the feature.
 	 *  Empty implementation that can be overridden.
 	 */
 	public IFuture<Void> init()
 	{
 		MicroModel model = (MicroModel)component.getModel().getRawModel();
-		if(model.getAgentMethod(OnInit.class)!=null)
-			return invokeMethod(getInternalAccess(), OnInit.class, null);
+		
+		Class<? extends Annotation> ann = OnInit.class;
+		if(model.getAgentMethod(ann)!=null)
+		{
+			//return invokeMethod(getInternalAccess(), OnInit.class, null);
+			if(wasAnnotationCalled(ann))
+				return IFuture.DONE;
+			else
+				return invokeMethod(getInternalAccess(), ann, null);
+		}
 		else
+		{
 			return invokeMethod(getInternalAccess(), AgentCreated.class, null);
+		}
 	}
 	
 	/**
@@ -89,19 +127,15 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		invokeServices();
 		
 		MicroModel model = (MicroModel)component.getModel().getRawModel();
-		if(model.getAgentMethod(OnStart.class)!=null)
+		
+		Class<? extends Annotation> ann = OnStart.class;
+		if(model.getAgentMethod(ann)!=null)
 		{
-			Object pojo = component.getFeature(IPojoComponentFeature.class).getPojoAgent();
-			Map<Object, Boolean> inited = (Map<Object, Boolean>)Starter.getPlatformValue(component.getId(), Starter.DATA_INITEDSERVICEPOJOS);
-			if(inited.containsKey(pojo))
-			{
+			//return invokeMethod(getInternalAccess(), OnInit.class, null);
+			if(wasAnnotationCalled(ann))
 				return IFuture.DONE;
-			}
 			else
-			{
-				inited.put(pojo, Boolean.TRUE);
-				return invokeMethod(getInternalAccess(), OnStart.class, null);
-			}
+				return invokeMethod(getInternalAccess(), ann, null);
 		}
 		else
 		{
@@ -121,11 +155,21 @@ public class MicroLifecycleComponentFeature extends	AbstractComponentFeature imp
 		final Future<Void> ret = new Future<Void>();
 		
 		MicroModel model = (MicroModel)component.getModel().getRawModel();
+		
 		IFuture<Void> fut;
-		if(model.getAgentMethod(OnEnd.class)!=null)
-			fut = invokeMethod(getInternalAccess(), OnEnd.class, null);
+		Class<? extends Annotation> ann = OnEnd.class;
+		if(model.getAgentMethod(ann)!=null)
+		{
+			//return invokeMethod(getInternalAccess(), OnInit.class, null);
+			if(wasAnnotationCalled(ann))
+				fut = IFuture.DONE;
+			else
+				fut = invokeMethod(getInternalAccess(), ann, null);
+		}
 		else
+		{
 			fut = invokeMethod(getInternalAccess(), AgentKilled.class, null);
+		}
 		
 		fut.addResultListener(new IResultListener<Void>()
 		{

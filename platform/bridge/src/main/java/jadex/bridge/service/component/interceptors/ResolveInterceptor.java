@@ -24,7 +24,7 @@ import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.OnEnd;
-import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ServiceInfo;
@@ -128,12 +128,25 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			if(START_METHOD.equals(sic.getMethod()))
 			{
 				// invoke 1) basic service start 2) domain service start
-				invokeDoubleMethod(sic, si, START_METHOD, ServiceStart.class, true).addResultListener(new DelegationResultListener<Void>(ret));
+				invokeDoubleMethod(sic, si, START_METHOD, ServiceStart.class, true, false)
+					.thenAccept(x->ret.setResult(null))
+					.exceptionally(x->
+					{
+						invokeDoubleMethod(sic, si, START_METHOD, OnStart.class, true, true).delegate(ret);	
+					});
+				//.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else if(SHUTDOWN_METHOD.equals(sic.getMethod()))
 			{
 				// invoke 1) domain service shutdown 2) basic service shutdown
-				invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, ServiceShutdown.class, false).addResultListener(new DelegationResultListener<Void>(ret));
+				
+				invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, ServiceShutdown.class, true, false)
+					.thenAccept(x->ret.setResult(null))
+					.exceptionally(x->
+					{
+						invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, OnEnd.class, true, true).delegate(ret);	
+					});
+				//invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, ServiceShutdown.class, false).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else if(INVOKE_METHOD.equals(sic.getMethod()))
 			{
@@ -242,24 +255,26 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	 *  Invoke double methods.
 	 *  The boolean 'firstorig' determines if basicservice method is called first.
 	 */
-	protected IFuture<Void> invokeDoubleMethod(final ServiceInvocationContext sic, final ServiceInfo si, Method m, Class<? extends Annotation> annotation, boolean firstorig)
+	protected IFuture<Void> invokeDoubleMethod(final ServiceInvocationContext sic, final ServiceInfo si, Method m, Class<? extends Annotation> annotation, boolean firstorig, boolean ignorenotfound)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		Map<Object, Boolean> inited = (Map<Object, Boolean>)Starter.getPlatformValue(ia.getId(), Starter.DATA_INITEDSERVICEPOJOS);
-		
 		Object obj = ProxyFactory.isProxyClass(si.getDomainService().getClass())? ProxyFactory.getInvocationHandler(si.getDomainService()): si.getDomainService();
+
+		Map<Object, Set<String>> invocs = (Map<Object, Set<String>>)Starter.getPlatformValue(ia.getId(), Starter.DATA_INVOKEDMETHODS);
+		Set<String> invans = invocs.get(obj); 
 		
 		// if pojo was already inited (e.g. agent and service impl are in same class) domain init is not invoked again
-		if(inited.containsKey(obj))
+		String anname = SReflect.getUnqualifiedClassName(annotation);
+		if(invans!=null && invans.contains(anname))
 		{
+			System.out.println("already inited: "+obj);
+			sic.setObject(si.getManagementService());
 			sic.invoke().delegate(ret);
 		}
 		// both must be inited
 		else
-		{
-			inited.put(obj, Boolean.TRUE);
-			
+		{	
 			// todo: refactor when deprecated annotations are phased out
 			Method found = null;
 			try
@@ -268,24 +283,19 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			}
 			catch(Exception e)
 			{
-				if(ServiceStart.class.equals(annotation))
-					//annotation = OnStart.class;
-					annotation = OnInit.class;
-				else if(ServiceShutdown.class.equals(annotation))
-					annotation = OnEnd.class;
-				try
-				{
-					found = searchMethod(obj.getClass(), annotation);
-				}
-				catch(Exception e2)
-				{
-				}
 			}
 			
 			if(!ret.isDone())
 			{
 				if(found!=null)
 				{
+					if(invans==null)
+					{
+						invans = new HashSet<>();
+						invocs.put(obj, invans);
+					}
+					invans.add(anname);
+					
 					final ServiceInvocationContext domainsic = new ServiceInvocationContext(sic);
 					domainsic.setMethod(found);
 					domainsic.setObject(obj);
@@ -367,10 +377,14 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 						});
 					}
 				}
-				else
+				else if(ignorenotfound)
 				{				
 					sic.setObject(si.getManagementService());
 					sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				else
+				{
+					ret.setException(new RuntimeException());
 				}
 			}
 		}

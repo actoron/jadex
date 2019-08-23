@@ -78,7 +78,7 @@ public class ServiceQueryTimeoutAgent extends TestAgent
 						tr.setFailed("Wrong exception: "+exception);						
 					}
 					
-					System.out.println("future terminated");
+					//System.out.println("future terminated");
 					waitfut.setResultIfUndone(null);
 				}
 	

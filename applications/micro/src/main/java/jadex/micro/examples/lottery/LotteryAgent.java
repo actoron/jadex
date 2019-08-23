@@ -32,8 +32,8 @@ public class LotteryAgent implements ILotteryService
 	
 	protected Collection<SubscriptionIntermediateFuture<String>> subscriptions = new ArrayList<SubscriptionIntermediateFuture<String>>();
 	
-	//@AgentBody
-	@OnStart
+	@AgentBody
+	//@OnStart
 	public void body()
 	{
 		Random r = new Random();
@@ -56,8 +56,8 @@ public class LotteryAgent implements ILotteryService
 		}
 	}
 	
-	//@AgentKilled
-	@OnEnd
+	@AgentKilled
+	//@OnEnd
 	public void killed()
 	{
 		for(TerminableIntermediateFuture<String> sub: subscriptions)
