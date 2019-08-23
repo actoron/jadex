@@ -21,8 +21,8 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -101,7 +101,8 @@ public class ServiceHandler implements InvocationHandler
 	/**
 	 *  Init.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture<Void> init()
 	{
 //		System.out.println("called init: "+this);

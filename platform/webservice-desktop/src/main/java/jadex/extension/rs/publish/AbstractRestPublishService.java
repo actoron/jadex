@@ -64,10 +64,10 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.ParameterInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.bridge.service.types.serialization.ISerializationServices;
@@ -167,7 +167,8 @@ public abstract class AbstractRestPublishService implements IWebPublishService
 	/**
 	 * The service init.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture<Void> init()
 	{
 		// Add rs 'Response' converters

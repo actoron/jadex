@@ -25,8 +25,8 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
@@ -72,7 +72,8 @@ public class JettyRestPublishService extends AbstractRestPublishService
 //    	System.out.println("Jetty started");
 //    }
     
-    @ServiceShutdown
+    //@ServiceShutdown
+    @OnEnd
     public void stop()
     {
     	if(portservers != null)

@@ -5,12 +5,11 @@ import java.util.Map;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.CounterResultListener;
@@ -74,7 +73,8 @@ public class EnvironmentService	implements IEnvironmentService
 	/**
 	 *  Shutdown the spaces.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture<Void>	terminateSpaces()
 	{
 		Future<Void>	ret	= new Future<Void>();

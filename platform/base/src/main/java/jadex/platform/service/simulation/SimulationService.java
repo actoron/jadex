@@ -12,10 +12,10 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ImmediateComponentStep;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
@@ -101,7 +101,8 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture<Void>	shutdownService()
 	{
 //		final Future<Void>	deregistered	= new Future<Void>();
@@ -158,7 +159,8 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 	/**
 	 *  Start (and run) the execution. 
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture<Void>	startService()
 	{
 		final Future<Void> ret = new Future<>();

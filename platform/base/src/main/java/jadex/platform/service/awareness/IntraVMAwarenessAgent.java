@@ -11,9 +11,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
@@ -72,7 +72,8 @@ public class IntraVMAwarenessAgent implements IAwarenessService
 	/**
 	 *  At shutdown remove platform from list.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public void shutdown()	throws Exception
 	{
 		disclock.writeLock().lock();

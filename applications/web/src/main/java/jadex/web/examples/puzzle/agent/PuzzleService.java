@@ -12,6 +12,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
@@ -106,7 +107,8 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	/**
 	 *  Termination method called on service shutdown.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	ret	= new Future<Void>();

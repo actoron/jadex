@@ -14,6 +14,8 @@ import java.util.logging.Level;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -83,6 +85,7 @@ public class SettingsAgent	implements ISettingsService
 	 *  @return A future that is done when the service has completed starting.  
 	 */
 	@ServiceStart
+	//@OnStart
 	public IFuture<Void>	startService()
 	{
 		this.providers	= new LinkedHashMap<String, IPropertiesProvider>();
@@ -108,7 +111,8 @@ public class SettingsAgent	implements ISettingsService
 	 *  Shutdown the service.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	ret	= new Future<Void>();

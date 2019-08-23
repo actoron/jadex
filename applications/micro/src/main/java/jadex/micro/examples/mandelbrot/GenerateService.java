@@ -14,10 +14,10 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -177,7 +177,8 @@ public class GenerateService implements IGenerateService
 	/**
 	 *  Stop the service.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture<Void>	shutdown()
 	{
 //		System.out.println("shutdown: "+agent.getAgentName());

@@ -1,9 +1,9 @@
 package jadex.platform.service.parallelizer;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.future.DelegationResultListener;
@@ -31,7 +31,8 @@ public class MappingService implements IParallelService
 	/**
 	 * 
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture<Void> init()
 	{
 		final Future<Void> ret = new Future<Void>();

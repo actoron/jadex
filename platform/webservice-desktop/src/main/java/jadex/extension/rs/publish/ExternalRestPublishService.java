@@ -11,14 +11,13 @@ import javax.servlet.http.HttpServletResponse;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.Tuple2;
-import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -65,7 +64,8 @@ public class ExternalRestPublishService extends AbstractRestPublishService imple
 	/**
      *  The service init.
      */
-    @ServiceStart
+    //@ServiceStart
+    @OnStart
     public IFuture<Void> init()
     {
     	if(!inited)

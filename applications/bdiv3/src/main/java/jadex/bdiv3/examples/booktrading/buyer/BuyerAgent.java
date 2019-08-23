@@ -31,6 +31,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.Tuple2;
@@ -68,7 +69,8 @@ public class BuyerAgent implements INegotiationAgent
 	/**
 	 *  The agent body.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public void body()
 	{
 		Order[] ios = (Order[])agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("initial_orders");

@@ -41,11 +41,11 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.ServiceScope;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceQuery.Multiplicity;
@@ -61,10 +61,10 @@ import jadex.commons.IFilter;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.SClassReader;
+import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.SClassReader.AnnotationInfo;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -1322,7 +1322,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Start the service.
 	 */
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public IFuture<Void>	startService()
 	{
 		try
@@ -1378,7 +1379,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 *  Releases all cached resources and shuts down the library service.
 	 *  @param listener The listener.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture<Void>	shutdownService()
 	{
 //		System.out.println("shut");

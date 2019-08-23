@@ -18,6 +18,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IProvidedServicesFeature;
@@ -35,8 +36,6 @@ import jadex.commons.gui.SGUI;
 import jadex.micro.IntervalBehavior;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
@@ -135,7 +134,8 @@ public class CliAgent implements ICliService, IInternalCliService
 	/**
 	 *  Called when the agent is killed.
 	 */
-	@AgentKilled
+	@OnEnd
+	//@AgentKilled
 	public void	killed()
 	{
 		aborted	= true;

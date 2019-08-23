@@ -25,6 +25,7 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -58,10 +59,6 @@ import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.AgentServiceQuery;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.OnService;
 import jadex.platform.service.security.SecurityAgent;
 
@@ -166,7 +163,8 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	/**
 	 *  Close all connections on shutdown.
 	 */
-	@AgentKilled
+	//@AgentKilled
+	@OnEnd
 	protected void	shutdown()
 	{
 		for(NetworkManager manager: connections.values())

@@ -6,13 +6,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import jadex.base.Starter;
 import jadex.binary.SBinarySerializer;
@@ -21,10 +18,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.address.ITransportAddressService;
@@ -42,9 +38,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.AgentServiceQuery;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.annotation.OnService;
 
 /**
@@ -148,7 +141,8 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 	/**
 	 * Stop the service.
 	 */
-	@ServiceShutdown
+	@OnEnd
+	//@ServiceShutdown
 	public void shutdown() throws Exception
 	{
 //		recvsocket.leaveGroup(InetAddress.getByName(multicastaddress));

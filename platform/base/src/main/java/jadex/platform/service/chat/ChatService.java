@@ -27,11 +27,11 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.chat.ChatEvent;
@@ -194,7 +194,8 @@ public class ChatService implements IChatService, IChatGuiService
 	/**
 	 *  Called on shutdown.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public IFuture<Void> shutdown()
 	{
 		if(!running)

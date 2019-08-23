@@ -19,9 +19,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.OnEnd;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -40,7 +40,8 @@ public class NanoRestPublishService extends ExternalRestPublishService
 	/** The servers per port. */
 	protected Map<Integer, NanoWebsocketServer> portservers2;
 	
-	@ServiceStart
+	//@ServiceStart
+	@OnStart
 	public void start()
 	{
 		if(!inited)
@@ -50,7 +51,8 @@ public class NanoRestPublishService extends ExternalRestPublishService
     	}
 	}
   
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public void stop()
 	{
 		if(portservers2 != null)

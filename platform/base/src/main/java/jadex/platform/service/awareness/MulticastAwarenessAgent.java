@@ -4,13 +4,11 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnInit;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 
@@ -42,7 +40,8 @@ public class MulticastAwarenessAgent	extends LocalNetworkAwarenessBaseAgent
 	/**
 	 * Stop the service.
 	 */
-	@ServiceShutdown
+//	@ServiceShutdown
+	@OnEnd
 	public void shutdown() throws Exception
 	{
 		((MulticastSocket)recvsocket).leaveGroup(InetAddress.getByName(address));

@@ -8,10 +8,10 @@ import javax.swing.SwingUtilities;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
@@ -82,7 +82,8 @@ public class ChatServiceD2 implements IChatService
 	/**
 	 *  Init the service.
 	 */
-	@ServiceShutdown
+	//@ServiceShutdown
+	@OnEnd
 	public void shutdownService()
 	{
 		SwingUtilities.invokeLater(new Runnable()
