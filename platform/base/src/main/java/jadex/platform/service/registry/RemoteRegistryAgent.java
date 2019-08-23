@@ -8,9 +8,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
-import jadex.bridge.service.annotation.OnStart;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.bridge.service.search.ServiceRegistry;
 import jadex.bridge.service.types.registry.IRemoteRegistryService;
@@ -45,8 +45,8 @@ public class RemoteRegistryAgent implements IRemoteRegistryService
 	 *  
 	 *  @return Null, when done.
 	 */
-	//@ServiceStart
-	@OnStart
+	@ServiceStart
+	//@OnStart
 	public IFuture<Void> start()
 	{
 		serviceregistry = (ServiceRegistry) ServiceRegistry.getRegistry(ia);
