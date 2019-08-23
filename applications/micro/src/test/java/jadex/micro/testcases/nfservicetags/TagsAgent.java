@@ -41,8 +41,8 @@ public class TagsAgent extends JunitAgentTest implements ITestService2, ITestSer
 	/**
 	 *  The agent body. 
 	 */
-	//@AgentBody
-	@OnStart
+	@AgentBody
+//	@OnStart
 	public void body()
 	{
 		final List<TestReport> results = new ArrayList<TestReport>();
