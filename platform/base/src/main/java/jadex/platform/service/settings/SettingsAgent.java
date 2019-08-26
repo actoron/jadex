@@ -111,8 +111,8 @@ public class SettingsAgent	implements ISettingsService
 	 *  Shutdown the service.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	//@ServiceShutdown
-	@OnEnd
+	@ServiceShutdown
+	//@OnEnd
 	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -168,7 +168,7 @@ public class SettingsAgent	implements ISettingsService
 	 *  @param id 	A unique id to identify the properties (e.g. component or service name).
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public IFuture<Void>	deregisterPropertiesProvider(final String id)
+	public IFuture<Void> deregisterPropertiesProvider(final String id)
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		if(!providers.containsKey(id))

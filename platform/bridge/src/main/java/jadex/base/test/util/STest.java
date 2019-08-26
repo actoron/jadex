@@ -30,6 +30,9 @@ public class STest
     /**
      *  Get local (no communication) test configuration using a unique platform name derived from the test name.
      *  Attention: The name is unique and the config can not be reused for multiple platforms!
+     *  
+     *  Uses simulation for speed.
+     *  
      *  @param test	The test name.
      *  @return The default configuration with a unique platform name.
      */
@@ -92,6 +95,11 @@ public class STest
         config.getExtendedPlatformConfiguration().setSecurity(true);
 		config.setNetworkNames(new String[] { testnetwork_name });
 		config.setNetworkSecrets(new String[] { testnetwork_pass });
+		
+		// Avoid problems due to old platform config files
+		config.setValue("rescan", true);
+		
+		//config.setLogging(true);
 		
         return config;
     }

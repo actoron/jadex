@@ -99,7 +99,9 @@ import jadex.micro.annotation.Feature;
 import jadex.micro.annotation.Features;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
+import jadex.micro.annotation.OnMessage;
 import jadex.micro.annotation.OnService;
+import jadex.micro.annotation.OnStream;
 import jadex.micro.annotation.Parent;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
@@ -1089,10 +1091,20 @@ public class MicroClassReader
 					checkMethodReturnType(AgentStreamArrived.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentStreamArrived.class, new MethodInfo(methods[i]));
 				}
+				if(isAnnotationPresent(methods[i], OnStream.class, cl))
+				{
+					checkMethodReturnType(OnStream.class, methods[i], cl);
+					micromodel.setAgentMethod(OnStream.class, new MethodInfo(methods[i]));
+				}
 				if(isAnnotationPresent(methods[i], AgentMessageArrived.class, cl))
 				{
 					checkMethodReturnType(AgentMessageArrived.class, methods[i], cl);
 					micromodel.setAgentMethod(AgentMessageArrived.class, new MethodInfo(methods[i]));
+				}
+				if(isAnnotationPresent(methods[i], OnMessage.class, cl))
+				{
+					checkMethodReturnType(OnMessage.class, methods[i], cl);
+					micromodel.setAgentMethod(OnMessage.class, new MethodInfo(methods[i]));
 				}
 				if(isAnnotationPresent(methods[i], AgentChildKilled.class, cl))
 				{

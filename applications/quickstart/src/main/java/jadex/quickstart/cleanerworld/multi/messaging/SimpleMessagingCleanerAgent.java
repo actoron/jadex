@@ -15,6 +15,7 @@ import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentMessageArrived;
+import jadex.micro.annotation.OnMessage;
 import jadex.quickstart.cleanerworld.environment.ICleaner;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.environment.impl.Cleaner;
@@ -95,7 +96,8 @@ public class SimpleMessagingCleanerAgent
 	/**
 	 *  This method gets called whenever the agent receives a message.
 	 */
-	@AgentMessageArrived
+	//@AgentMessageArrived
+	@OnMessage
 	void messageArrived(FipaMessage message)
 	{
 		// The sender is an identifier that can be used to reply to the agent.

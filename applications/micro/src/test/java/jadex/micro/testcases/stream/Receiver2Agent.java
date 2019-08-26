@@ -7,7 +7,7 @@ import jadex.bridge.component.IExecutionFeature;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentStreamArrived;
+import jadex.micro.annotation.OnStream;
 
 @Agent
 public class Receiver2Agent
@@ -24,7 +24,8 @@ public class Receiver2Agent
 	/**
 	 * 
 	 */
-	@AgentStreamArrived
+	//@AgentStreamArrived
+	@OnStream
 	public void streamArrvied(final IOutputConnection con)
 	{
 //		System.out.println("received: "+con+" "+con.hashCode());

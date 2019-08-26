@@ -65,8 +65,7 @@ import jadex.platform.service.security.SecurityAgent;
 /**
  *  The super peer client agent is responsible for managing connections to super peers for each network.
  */
-@Agent(autoprovide=Boolean3.TRUE,
-	autostart=Boolean3.TRUE)
+@Agent(autoprovide=Boolean3.TRUE, autostart=Boolean3.TRUE)
 @Service
 public class SuperpeerClientAgent implements ISearchQueryManagerService
 {
@@ -111,10 +110,12 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	/**
 	 *  Find and connect to super peers.
 	 */
-//	@AgentCreated
+	//@AgentCreated
 	@OnInit
 	protected IFuture<Void>	init()
 	{
+		//System.out.println("superpeerclient agent started: "+agent.getId());
+		
 		Future<Void>	ret	= new Future<>();
 		connections	= new LinkedHashMap<>();
 		
@@ -364,7 +365,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
 		// todo: remember and terminate managed queries on shutdown?
-		QueryManager<T>	qinfo	= new QueryManager<>(query);
+		QueryManager<T>	qinfo = new QueryManager<>(query);
 		return qinfo.getReturnFuture();
 	}
 	

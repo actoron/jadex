@@ -4,6 +4,7 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.FipaMessage;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentMessageArrived;
+import jadex.micro.annotation.OnMessage;
 
 /**
  *  An agent that replies to a FIPA message.
@@ -14,7 +15,8 @@ public class FipaReceiverAgent
 	/**
 	 *  Wait for the message and reply.
 	 */
-	@AgentMessageArrived
+	//@AgentMessageArrived
+	@OnMessage
 	protected void	received(FipaMessage message, IMessageFeature mf)
 	{
 		System.out.println("Receiver received: "+message);

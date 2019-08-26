@@ -8,6 +8,7 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentMessageArrived;
+import jadex.micro.annotation.OnMessage;
 
 /**
  *  Answer ping requests. 
@@ -24,7 +25,8 @@ public class PingAgent
 	 *  @param msg The message.
 	 *  @param mt The message type.
 	 */
-	@AgentMessageArrived
+	//@AgentMessageArrived
+	@OnMessage
 	public void messageArrived(Map<String, Object> msg)
 	{
 		String perf = (String)msg.get(SFipa.PERFORMATIVE);

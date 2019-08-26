@@ -23,6 +23,7 @@ import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.OnMessage;
 
 /**
  *  Agent that pings another and waits for its replies.
@@ -123,7 +124,8 @@ public class PingingAgent
 	/**
 	 *  Called when a message arrives.
 	 */
-	@AgentMessageArrived
+	//@AgentMessageArrived
+	@OnMessage
 	public void messageArrived(Map<String, Object> msg)
 	{
 		String convid = (String)msg.get(SFipa.CONVERSATION_ID);

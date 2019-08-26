@@ -9,8 +9,7 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentMessageArrived;
-import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnMessage;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -31,7 +30,8 @@ public class EchoAgent implements IEchoService
 	 *  @param msg The message.
 	 *  @param mt The message type.
 	 */
-	@AgentMessageArrived
+	//@AgentMessageArrived
+	@OnMessage
 	public void messageArrived(Map<String, Object> msg)
 	{
 		Map<String, Object> reply = new HashMap<String, Object>(msg);

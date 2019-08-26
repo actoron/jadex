@@ -118,6 +118,7 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 
 				public void intermediateResultAvailable(ISearchQueryManagerService result)
 				{
+					//System.out.println("ISearchQueryManagerService "+result);
 					if(sqms == null)
 					{
 						sqms = result;
@@ -136,6 +137,10 @@ public class RequiredServicesComponentFeature extends AbstractComponentFeature i
 				}
 			});
 		}
+		/*else
+		{
+			System.out.println("directly found ISearchQueryManagerService");
+		}*/
 		
 		IModelInfo model = getComponent().getModel();
 		ClassLoader cl = getComponent().getClassLoader();

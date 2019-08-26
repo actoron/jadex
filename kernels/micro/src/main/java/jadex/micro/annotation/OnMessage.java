@@ -9,12 +9,9 @@ import java.lang.annotation.Target;
  *  Marker for agent message arrived.
  *  The received message object can be injected as method parameter, e.g.:
  *  void messageArrived(FipaMessage msg)
- *
- *  Use @OnMessage instead
  */
-@Deprecated
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AgentMessageArrived
+public @interface OnMessage
 {
 }

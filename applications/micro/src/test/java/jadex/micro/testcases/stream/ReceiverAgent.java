@@ -15,9 +15,9 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentServiceSearch;
-import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.OnStream;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -49,7 +49,8 @@ public class ReceiverAgent
 	/**
 	 * 
 	 */
-	@AgentStreamArrived
+	//@AgentStreamArrived
+	@OnStream
 	public void streamArrvied(final IConnection con)
 	{
 		// todo: how to avoid garbage collection of connection?

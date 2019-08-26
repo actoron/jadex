@@ -6,15 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Marker for agent message arrived.
- *  The received message object can be injected as method parameter, e.g.:
- *  void messageArrived(FipaMessage msg)
- *
- *  Use @OnMessage instead
+ *  Marker for agent stream arrived.
  */
-@Deprecated
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AgentMessageArrived
+public @interface OnStream
 {
 }

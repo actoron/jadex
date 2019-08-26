@@ -1,8 +1,11 @@
 package jadex.noplatform;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -74,6 +77,7 @@ public class NoPlatformStarter
 		Starter.putPlatformValue(cid, Starter.DATA_SERIALIZATIONSERVICES, new SerializationServices(cid));
 		CmsState cmsstate = new CmsState();
 		Starter.putPlatformValue(cid, Starter.DATA_CMSSTATE, cmsstate);
+		Starter.putPlatformValue(cid, Starter.DATA_INVOKEDMETHODS, Collections.synchronizedMap(new WeakHashMap<Object, Set<String>>()));
 	
 		// Create necessary platform services
 		

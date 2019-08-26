@@ -268,7 +268,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		String anname = SReflect.getUnqualifiedClassName(annotation);
 		if(invans!=null && invans.contains(anname))
 		{
-			System.out.println("already inited: "+obj);
+			System.out.println("already called: "+obj+" "+anname);
 			sic.setObject(si.getManagementService());
 			sic.invoke().delegate(ret);
 		}

@@ -199,6 +199,8 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
+		System.out.println("addQuery: "+query);
+		
 		final IComponentIdentifier client = ServiceCall.getCurrentInvocation().getCaller();
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<>();
 		

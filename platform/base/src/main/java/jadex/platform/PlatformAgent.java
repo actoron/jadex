@@ -210,11 +210,16 @@ public class PlatformAgent
 //		System.out.println("Start scanning...");
 		long start = System.currentTimeMillis();
 		
-		String file = (String) agent.getArgument("startconfig");
-		if (file==null)
+		String file = (String)agent.getArgument("startconfig");
+		Boolean rescan = (Boolean)agent.getArgument("rescan");
+		if(rescan!=null && rescan)
+		{
+			file = null;
+		}
+		else if(file==null)
 		{
 			File cache = new File(STARTUP_CACHE_FILE);
-			if (cache.exists() && !Boolean.TRUE.equals(agent.getArgument("rescan")))
+			if(cache.exists())
 				file = cache.getAbsolutePath();
 		}
 		
@@ -230,7 +235,7 @@ public class PlatformAgent
 				
 				File codesource=null;
 				
-				for (String line : conflines)
+				for(String line : conflines)
 				{
 					String tok = line.trim();
 					if(tok.startsWith("//"))
@@ -406,6 +411,10 @@ public class PlatformAgent
 				infos.add(info);
 			}
 		}
+		
+		for(CreationInfo ci: infos)
+			System.out.println("creating: "+ci.getFilename());
+		
 		agent.getFeature(ISubcomponentsFeature.class).createComponents(infos.toArray(new CreationInfo[infos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
 		{
 			public void resultAvailable(Collection<IExternalAccess> result)

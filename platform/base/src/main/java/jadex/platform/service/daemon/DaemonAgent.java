@@ -10,9 +10,9 @@ import jadex.bridge.service.component.IProvidedServicesFeature;
 import jadex.bridge.service.types.daemon.IDaemonService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.OnMessage;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -39,7 +39,8 @@ public class DaemonAgent
 	/**
 	 *  Handle messages from responder agents.
 	 */
-	@AgentMessageArrived
+	//@AgentMessageArrived
+	@OnMessage
 	public void messageArrived(Map<String, Object> msg)
 	{
 		DaemonService	ds	= (DaemonService)agent.getFeature(IProvidedServicesFeature.class).getProvidedServiceRawImpl(IDaemonService.class);
