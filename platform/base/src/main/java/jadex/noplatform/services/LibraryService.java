@@ -1,4 +1,4 @@
-package jadex.noplatform;
+package jadex.noplatform.services;
 
 import java.net.URL;
 import java.util.Collection;

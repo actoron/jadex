@@ -132,7 +132,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //			System.out.println("no library listener on: "+this);
 //		}
 		
-		features	= SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
+		//features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
 	}
 	
 	/**
@@ -144,7 +144,18 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new MicroModelLoader();
-		features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
+		//features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
+	}
+	
+	/**
+	 *  Get the standard micro features.
+	 *  @return The standard features for a micro component.
+	 */
+	protected Collection<IComponentFeatureFactory> getStandardFeatures()
+	{
+		if(features==null)
+			features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES, MICRO_FEATURES));
+		return features;
 	}
 	
 	/**
@@ -236,7 +247,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 						{
 							try
 							{
-								IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
+								IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), getStandardFeatures()}).getModelInfo();
 								ret.setResult(mi);
 							}
 							catch(Exception e)
@@ -251,7 +262,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 					try
 					{
 						ClassLoader cl = getClass().getClassLoader();
-						IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), features}).getModelInfo();
+						IModelInfo mi = loader.loadComponentModel(model, imports, rid, cl, new Object[]{rid, getProviderId().getRoot(), getStandardFeatures()}).getModelInfo();
 						ret.setResult(mi);
 					}
 					catch(Exception e)

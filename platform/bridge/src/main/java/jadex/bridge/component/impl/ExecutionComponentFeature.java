@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -34,7 +33,6 @@ import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -67,7 +65,6 @@ import jadex.commons.IResultCommand;
 import jadex.commons.MutableObject;
 import jadex.commons.SReflect;
 import jadex.commons.TimeoutException;
-import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -226,9 +223,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 //		
 		if(parenta!=null)
-		{
 			parenta.removeSubcomponent(ExecutionComponentFeature.this);
-		}
 	}
 	
 	//-------- IComponentFeature interface --------
@@ -312,9 +307,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				if(DEBUG)
 				{
 					if(stepadditions==null)
-					{
 						stepadditions	= new HashMap<IComponentStep<?>, Exception>();
-					}
 					stepadditions.put(step, new DebugException(step.toString()));
 				}
 			}
@@ -437,7 +430,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-	//						System.out.println("step: "+step);
+	//					System.out.println("step: "+step);
 						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
 					}
 					
@@ -512,10 +505,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						{
 							// Ignore outdated timer entries when component is already dead.
 							// propblem this can occur on clock thread
-	//								if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
-	//								{
+	//						if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
 								ret.setExceptionIfUndone(exception);									
-	//								}
 						}
 					});
 				}
@@ -732,7 +723,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			else
 			{
 //				System.err.println(getInternalAccess()+" rescue "+SSimulation.isBisimulating(getInternalAccess())+", "+Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IClockService.BISIMULATION_CLOCK_FLAG));
-				available	= false;
+				available = false;
 				// Happens during platform bootstrapping -> execute on platform rescue thread.
 				if(!bootstrap)
 				{

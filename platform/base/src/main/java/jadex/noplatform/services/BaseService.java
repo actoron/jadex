@@ -1,4 +1,4 @@
-package jadex.noplatform;
+package jadex.noplatform.services;
 
 import java.util.Map;
 

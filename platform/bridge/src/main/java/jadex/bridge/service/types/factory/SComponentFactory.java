@@ -61,7 +61,7 @@ public class SComponentFactory
 	//-------- todo: move somewhere else? --------
 	
 	/** The default component features. */
-	public static final Collection<IComponentFeatureFactory>	DEFAULT_FEATURES;
+	public static final Collection<IComponentFeatureFactory> DEFAULT_FEATURES;
 	
 	static
 	{

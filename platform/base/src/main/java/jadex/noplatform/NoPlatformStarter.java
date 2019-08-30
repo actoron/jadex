@@ -25,11 +25,14 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.JavaThreadPool;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgentFactory;
+import jadex.noplatform.services.ClockService;
+import jadex.noplatform.services.ExecutionService;
 import jadex.platform.service.serialization.SerializationServices;
 
 /**
@@ -42,11 +45,11 @@ public class NoPlatformStarter
 	 */
 	public static void main(String[] args)
 	{
-		IExternalAccess platform = createPlatform().get();
-
+		//IExternalAccess platform = createPlatform().get();
 		//platform.createComponent(new CreationInfo().setFilename("jadex.micro.examples.helloworld.PojoHelloWorldAgent.class")).get();
-
-		platform.createComponent(new CreationInfo().setFilename("jadex.micro.benchmarks.AgentCreationAgent.class")).get();
+		//platform.createComponent(new CreationInfo().setFilename("jadex.micro.benchmarks.AgentCreationAgent.class")).get();
+		
+		createAgent("jadex.micro.examples.helloworld.PojoHelloWorldAgent.class");
 		
 		//for(int i=0; i<10000; i++)
 		//	platform.createComponent(new CreationInfo().setFilenameClass(PojoHelloWorldAgent.class)).get();
@@ -54,6 +57,46 @@ public class NoPlatformStarter
 		//String agentclazz = "jadex.micro.examples.helloworld.PojoHelloWorldAgent";
 		
 		System.out.println("main end");
+		
+		SUtil.sleep(10000000);
+	}
+	
+	public static IFuture<IExternalAccess> createAgent(String filename)
+	{
+		Future<IExternalAccess> ret = new Future<>();
+		long start = System.currentTimeMillis();
+		
+		IComponentIdentifier cid = Starter.createPlatformIdentifier(null);
+		// load model
+		//String modelname = "jadex.micro.MinimalAgent";
+		String modelname = "jadex.micro.KernelMicroAgent";
+		IComponentFactory cfac = new jadex.noplatform.services.MicroAgentFactory("rootid");
+		
+		IModelInfo model = cfac.loadModel(modelname, null, null).get();
+		String ctype = cfac.getComponentType(modelname, null, model.getResourceIdentifier()).get();
+		CMSComponentDescription desc = new CMSComponentDescription(cid).setType(ctype).setModelName(model.getFullName())
+			.setResourceIdentifier(model.getResourceIdentifier()).setCreationTime(System.currentTimeMillis())
+			.setFilename(model.getFilename()).setSystemComponent(SComponentManagementService.isSystemComponent(model, null, null));
+		// create component from model
+		ComponentCreationInfo cci = new ComponentCreationInfo(model, null, null, desc, null, null);
+		Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
+		IPlatformComponentAccess component = SComponentManagementService.createPlatformComponent(NoPlatformStarter.class.getClassLoader());
+		
+		component.create(cci, features);
+		component.init().thenAccept(x ->
+		{
+			//ret.setResult(component.getPlatformComponent().getExternalAccess());
+			long end = System.currentTimeMillis();
+			
+			System.out.println("platform start took "+(end-start)+" ms, thread: "+Thread.currentThread());
+			
+			component.body().get();
+			//System.out.println("platform shutdown");
+			//component.shutdown().get();
+			//System.out.println("platform end");
+		}).exceptionally(ret);
+		
+		return ret;
 	}
 	
 	public static IFuture<IExternalAccess> createPlatform()

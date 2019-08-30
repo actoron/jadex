@@ -28,6 +28,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.OnStart;
 
 /**
  *  Puzzle agent tries to solve a solitair board game
@@ -68,7 +69,8 @@ public class SokratesAgent
 	/**
 	 *  Setup the gui and start playing.
 	 */
-	@AgentBody
+	//@AgentBody
+	@OnStart
 	public IFuture<Void>	body(IInternalAccess agent)
 	{
 		final Future<Void>	ret	= new Future<Void>();
