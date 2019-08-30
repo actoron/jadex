@@ -91,9 +91,9 @@ public class NoPlatformStarter
 		cs.startService().get();
 		reg.addLocalService(cs);
 		
-		LibraryService ls = new LibraryService(cid);
-		ls.startService().get();
-		reg.addLocalService(ls);
+		//LibraryService ls = new LibraryService(cid);
+		//ls.startService().get();
+		//reg.addLocalService(ls);
 		
 		// create platform component 
 		
