@@ -27,8 +27,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.OnStart;
+import jadex.bridge.service.annotation.OnStart;
 
 /**
  *  Puzzle agent tries to solve a solitair board game
