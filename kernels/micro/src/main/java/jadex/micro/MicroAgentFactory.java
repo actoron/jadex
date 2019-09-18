@@ -149,6 +149,10 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	
 	/**
 	 *  Get the standard micro features.
+	 *  
+	 *  NOTE: This is used to give the reader the standard features. It needs them when 
+	 *  a user defines @Features and only wants to add some new.
+	 *  
 	 *  @return The standard features for a micro component.
 	 */
 	protected Collection<IComponentFeatureFactory> getStandardFeatures()

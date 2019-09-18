@@ -51,7 +51,7 @@ public class MicroAgentFactory extends jadex.micro.MicroAgentFactory
 		//def_features.add(PropertiesComponentFeature.FACTORY);	// After args for logging
 		//def_features.add(new ComponentFeatureFactory(IRequiredServicesFeature.class, RequiredServicesComponentFeature.class));
 		//def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
-		def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class, new Class[]{IProvidedServicesFeature.class}, null));
+		//def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class, new Class[]{IProvidedServicesFeature.class}, null));
 		//def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
 		//def_features.add(RemoteExecutionComponentFeature.FACTORY);	// After message for adding handler
 		//def_features.add(NFPropertyComponentFeature.FACTORY);
@@ -85,7 +85,7 @@ public class MicroAgentFactory extends jadex.micro.MicroAgentFactory
 	protected Collection<IComponentFeatureFactory> getStandardFeatures()
 	{
 		if(features==null)
-			features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(SComponentFactory.DEFAULT_FEATURES));
+			features = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(DEFAULT_FEATURES));
 		return features;
 	}
 }

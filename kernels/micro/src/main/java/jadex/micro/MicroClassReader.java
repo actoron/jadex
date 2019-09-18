@@ -168,6 +168,9 @@ public class MicroClassReader
 //		System.out.println("mircor: "+src+File.separatorChar+model);
 		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
 		modelinfo.setStartable(true);
+		
+		// todo: Hack! Sets features to have them available during read :-(
+		// Are deleted again when no custom features are set 
 		if(features!=null)
 			modelinfo.setFeatures((IComponentFeatureFactory[])features.toArray(new IComponentFeatureFactory[features.size()]));
 		
@@ -1202,6 +1205,11 @@ public class MicroClassReader
 			}
 			Collection<IComponentFeatureFactory> facts = SComponentFactory.orderComponentFeatures(SReflect.getUnqualifiedClassName(getClass()), Arrays.asList(fs.values()));
 			modelinfo.setFeatures(facts.toArray(new IComponentFeatureFactory[facts.size()]));
+		}
+		else
+		{
+			// Clear features in case no ones have been used by model itself
+			modelinfo.setFeatures(null);
 		}
 		
 		// Check if there are implemented service interfaces for which the agent
