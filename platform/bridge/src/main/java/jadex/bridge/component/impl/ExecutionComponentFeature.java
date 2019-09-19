@@ -423,10 +423,11 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		if(delay>=0)
 		{
 			// OK to fetch sync even from external access because everything thread safe.
-			IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+			//IClockService cs = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+			IClockService cs = getClockService();
 			if(cs!=null)
 			{
-				ITimedObject	to	= new ITimedObject()
+				ITimedObject to	= new ITimedObject()
 				{
 					public void timeEventOccurred(long currenttime)
 					{
@@ -476,7 +477,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService cs = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		//IClockService cs = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		IClockService cs = getClockService();
 		if(cs!=null)
 		{
 			ITimedObject to	= new ITimedObject()
@@ -570,7 +572,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //		final Future<TimerWrapper> ret = new Future<TimerWrapper>();
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		//IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		IClockService cs = getClockService();
 		final ITimer[] ts = new ITimer[1];
 		ts[0] = cs.createTickTimer(new ITimedObject()
 		{
@@ -602,7 +605,8 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		//IClockService	cs	= ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IClockService.class);
+		IClockService cs = getClockService();
 		final ITimer[] ts = new ITimer[1];
 		ts[0] = cs.createTickTimer(new ITimedObject()
 		{
@@ -688,14 +692,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		}
 		else
 		{
-			IExecutionService exe = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
+			IExecutionService exe = getExecutionService();
+			//IExecutionService exe = ((IInternalRequiredServicesFeature)getComponent().getFeature(IRequiredServicesFeature.class)).getRawService(IExecutionService.class);
 			
 			// Do not use rescue thread for bisimulation of platform init/shutdown/zombie agents to avoid clock running out.
 			if(exe==null && SSimulation.isBisimulating(getInternalAccess()))
 			{
 				try
 				{
-					Field	f	= Class.forName("jadex.platform.service.execution.BisimExecutionService")
+					Field f = Class.forName("jadex.platform.service.execution.BisimExecutionService")
 						.getDeclaredField("instance");
 					f.setAccessible(true);
 					exe	= (IExecutionService)f.get(null);
@@ -2214,6 +2219,42 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					}
 				});
 //			}
+		}
+	}
+	
+	/**
+	 *  Get the clock service.
+	 *  @return The clock service.
+	 */
+	protected IClockService getClockService()
+	{
+		IInternalRequiredServicesFeature rs = ((IInternalRequiredServicesFeature)getComponent().getFeature0(IRequiredServicesFeature.class));
+		if(rs!=null)
+		{
+			return rs.getRawService(IClockService.class);
+		}
+		else
+		{
+			// no platform variant
+			return (IClockService)Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IClockService.class.getName());
+		}
+	}
+	
+	/**
+	 *  Get the execution service.
+	 *  @return The execution service.
+	 */
+	protected IExecutionService getExecutionService()
+	{
+		IInternalRequiredServicesFeature rs = ((IInternalRequiredServicesFeature)getComponent().getFeature0(IRequiredServicesFeature.class));
+		if(rs!=null)
+		{
+			return rs.getRawService(IExecutionService.class);
+		}
+		else
+		{
+			// no platform variant
+			return (IExecutionService)Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IExecutionService.class.getName());
 		}
 	}
 	

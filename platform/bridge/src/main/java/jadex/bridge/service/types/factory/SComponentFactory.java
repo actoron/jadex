@@ -145,12 +145,26 @@ public class SComponentFactory
 					Set<Class<?>> sucs = fac.getSuccessors();
 					for(Class<?> suc: sucs)
 					{
-						dr.addDependency(facsmap.get(suc), facsmap.get(fac.getType()));
+						if(facsmap.get(fac.getType())!=null && facsmap.get(suc)!=null)
+						{
+							dr.addDependency(facsmap.get(suc), facsmap.get(fac.getType()));
+						}
+//						else
+//						{
+//							System.out.println("Declared dependency not found, ignoring: "+suc+" "+fac.getType());
+//						}
 					}
 					Set<Class<?>> pres = fac.getPredecessors();
 					for(Class<?> pre: pres)
 					{
-						dr.addDependency(facsmap.get(fac.getType()), facsmap.get(pre));
+						if(facsmap.get(pre)!=null && facsmap.get(fac.getType())!=null)
+						{
+							dr.addDependency(facsmap.get(fac.getType()), facsmap.get(pre));
+						}
+//						else
+//						{
+//							System.out.println("Declared dependency not found, ignoring: "+pre+" "+fac.getType());
+//						}
 					}
 				}
 				// Save original dependency of the feature

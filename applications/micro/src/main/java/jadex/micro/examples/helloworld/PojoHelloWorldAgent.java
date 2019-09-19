@@ -2,10 +2,10 @@ package jadex.micro.examples.helloworld;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.service.annotation.OnEnd;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
@@ -53,9 +53,15 @@ public class PojoHelloWorldAgent
 //			}
 //		});
 		
-		System.out.println(text);
+		System.out.println(text+" "+agent.getId());
 		agent.getFeature(IExecutionFeature.class).waitForDelay(2000).get();
 		System.out.println("Good bye world.");
 		agent.killComponent();
+	}
+	
+	@OnEnd
+	public void end()
+	{
+		System.out.println("end in pojo: "+agent.getId());
 	}
 }

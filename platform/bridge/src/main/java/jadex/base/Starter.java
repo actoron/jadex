@@ -653,7 +653,7 @@ public class Starter
 								List comps = config.getComponents();
 								if(args!=null && args.containsKey("component"))
 								{
-									comps	= (List<?>)args.get("component");
+									comps = (List<?>)args.get("component");
 									if(config.getComponents()!=null)
 									{
 										comps.addAll((List<?>)config.getComponents());

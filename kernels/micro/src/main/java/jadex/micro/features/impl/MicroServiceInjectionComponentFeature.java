@@ -104,7 +104,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 		final Future<Void> ret = new Future<Void>();
 		
 		// Inject required services
-		if(component.getFeature(IRequiredServicesFeature.class)==null)
+		if(component.getFeature0(IRequiredServicesFeature.class)==null)
 		{
 			ret.setResult(null);
 		}

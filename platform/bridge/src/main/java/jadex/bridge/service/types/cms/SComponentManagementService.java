@@ -1465,8 +1465,8 @@ public class SComponentManagementService
 			// Component terminated from outside: wait for init to complete, will be removed as cleanup future is registered (cfs).
 			else
 			{
-//					if(cid.toString().indexOf("Mandelbrot")!=-1)
-//						System.out.println("Queued component termination during init: "+cid.getName());
+//				if(cid.toString().indexOf("Mandelbrot")!=-1)
+//					System.out.println("Queued component termination during init: "+cid.getName());
 				agent.getLogger().info("Queued component termination during init: "+cid.getName());
 			}
 		}
@@ -1492,20 +1492,20 @@ public class SComponentManagementService
 			{
 				public void run()
 				{
-//						System.out.println("DONE killing: " + agent);
+//					System.out.println("DONE killing: " + agent);
 					InitInfo infos	= state.getInitInfo(cid);
 					IPlatformComponentAccess comp = infos!=null ? infos.getComponent() : state.getAccess(cid);
 					if(comp!=null)
 					{
-//							// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-//							// todo: killcomponent should only be called once for each component?
+//						// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+//						// todo: killcomponent should only be called once for each component?
 						
 						agent.getLogger().info("Terminating component: "+cid.getName());
 						IResultListener<Void> cc = new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
-//									System.out.println("Killed: " + cid);
+//								System.out.println("Killed: " + cid);
 								cleanup(cid, null);
 							}
 							
@@ -1520,7 +1520,7 @@ public class SComponentManagementService
 				}
 			};
 			
-			if (achildren != null && achildren.length > 0)
+			if(achildren != null && achildren.length > 0)
 			{
 				agent.getFeature(ISubcomponentsFeature.class).killComponents(achildren).addResultListener(new IResultListener<Collection<Tuple2<IComponentIdentifier, Map<String,Object>>>>()
 				{
@@ -1530,7 +1530,7 @@ public class SComponentManagementService
 					}
 					public void exceptionOccurred(Exception exception)
 					{
-//							exception.printStackTrace();
+//						exception.printStackTrace();
 						finishkill.run();
 						SComponentManagementService.exitDestroy(cid, desc, exception, null);
 					}
@@ -2211,8 +2211,16 @@ public class SComponentManagementService
 	 */
 	public static IPlatformComponentAccess createPlatformComponent(ClassLoader classloader)
 	{
-		final PlatformComponent comp = new PlatformComponent();
-		
+		return createPlatformComponent(classloader, new PlatformComponent());
+	}
+	
+	/**
+	 *  Create a platform component.
+	 *  It creates a proxy around the platform component to autoimplement the feature methods of internal access.
+	 */
+	// todo: hmm concrete arg type PlatformComponent needed :-(
+	public static IPlatformComponentAccess createPlatformComponent(ClassLoader classloader, final PlatformComponent comp) 
+	{
 		IPlatformComponentAccess ret = (IPlatformComponentAccess)ProxyFactory.newProxyInstance(classloader, new Class[]{IInternalAccess.class, IPlatformComponentAccess.class}, new InvocationHandler()
 		{
 			@Override
@@ -2420,7 +2428,7 @@ public class SComponentManagementService
 	//		System.out.println("CleanupCommand remove called for: "+cid);
 //			assert compstate!=null: "Should be available.";
 			CmsComponentState compstate = state.getComponentMap().get(cid);
-			if (compstate != null)
+			if(compstate != null)
 			{
 				comp = compstate.getAccess();
 				if (comp == null)
@@ -2528,7 +2536,7 @@ public class SComponentManagementService
 		
 		// Release before outbound call destroyComponent()
 		
-		if (notifylis)
+		if(notifylis)
 			SComponentManagementService.notifyListenersRemoved(desc, ex, results);
 		
 		// Terminate rescue threads when platform is killed (hack, starter should use kill listener, but listener isn't registered in cms)
@@ -2547,7 +2555,7 @@ public class SComponentManagementService
 			SComponentManagementService.destroyComponent(pad.getInternalAccess().getId(), (IInternalAccess)comp);
 		}
 		
-		try (IAutoLock l = state.writeLock())
+		try(IAutoLock l = state.writeLock())
 		{
 			state.getComponentMap().remove(cid);
 		}

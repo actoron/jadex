@@ -3,6 +3,7 @@ package jadex.micro;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,7 +13,11 @@ import java.util.logging.Logger;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
+import jadex.bridge.component.IExecutionFeature;
+import jadex.bridge.component.impl.ArgumentsResultsComponentFeature;
+import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -49,6 +54,39 @@ import jadex.micro.features.impl.MicroServiceInjectionComponentFeature;
  */
 public class MicroAgentFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
+	//-------- constants for noplatform variant --------
+	
+	/** The default component features. */
+	public static final Collection<IComponentFeatureFactory> NOPLATFORM_DEFAULT_FEATURES;
+	
+	static
+	{
+		Collection<IComponentFeatureFactory> def_features = new ArrayList<IComponentFeatureFactory>();
+		
+		// exchanged
+		def_features.add(new ComponentFeatureFactory(IExecutionFeature.class, MicroExecutionComponentFeature.class));
+		
+		//def_features.add(new ComponentFeatureFactory(IMonitoringComponentFeature.class, MonitoringComponentFeature.class));
+		def_features.add(new ComponentFeatureFactory(IArgumentsResultsFeature.class, ArgumentsResultsComponentFeature.class));
+		//def_features.add(PropertiesComponentFeature.FACTORY);	// After args for logging
+		//def_features.add(new ComponentFeatureFactory(IRequiredServicesFeature.class, RequiredServicesComponentFeature.class));
+		//def_features.add(new ComponentFeatureFactory(IProvidedServicesFeature.class, ProvidedServicesComponentFeature.class));
+		//def_features.add(new ComponentFeatureFactory(ISubcomponentsFeature.class, SubcomponentsComponentFeature.class, new Class[]{IProvidedServicesFeature.class}, null));
+		//def_features.add(new ComponentFeatureFactory(IMessageFeature.class, MessageComponentFeature.class));
+		//def_features.add(RemoteExecutionComponentFeature.FACTORY);	// After message for adding handler
+		//def_features.add(NFPropertyComponentFeature.FACTORY);
+		
+		// exchanged
+		def_features.add(MicroLifecycleComponentFeature.FACTORY);
+		
+		// added
+		def_features.add(MicroPojoComponentFeature.FACTORY);
+		def_features.add(MicroInjectionComponentFeature.FACTORY);
+		def_features.add(MicroServiceInjectionComponentFeature.FACTORY);
+		
+		NOPLATFORM_DEFAULT_FEATURES = Collections.unmodifiableCollection(def_features);
+	}
+	
 	//-------- constants --------
 	
 	/** The supported component types (file extensions).
@@ -162,6 +200,15 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		return features;
 	}
 	
+	/**
+	 *  Set the features.
+	 *  @param features The features to set.
+	 */
+	public void setFeatures(Collection<IComponentFeatureFactory> features)
+	{
+		this.features = new ArrayList<IComponentFeatureFactory>(features);
+	}
+
 	/**
 	 *  Start the service.
 	 */

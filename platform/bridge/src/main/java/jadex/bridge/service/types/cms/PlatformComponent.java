@@ -119,13 +119,13 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	protected ComponentCreationInfo	info;
 	
 	/** The features. */
-	protected Map<Class<?>, IComponentFeature>	features;
+	protected Map<Class<?>, IComponentFeature> features;
 	
 	/** The feature instances as list (for reverse execution, cached for speed). */
-	protected List<IComponentFeature>	lfeatures;
+	protected List<IComponentFeature> lfeatures;
 	
 	/** The inited feature instances as list (for shutdown after failed init). */
-	protected List<IComponentFeature>	ifeatures;
+	protected List<IComponentFeature> ifeatures;
 	
 	/** The logger. */
 	protected Logger logger;
@@ -153,9 +153,9 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	{
 //		state = ComponentLifecycleState.CREATE;
 		
-		this.info	= info;
-		this.features	= new LinkedHashMap<Class<?>, IComponentFeature>();
-		this.lfeatures	= new ArrayList<IComponentFeature>();
+		this.info = info;
+		this.features = new LinkedHashMap<Class<?>, IComponentFeature>();
+		this.lfeatures = new ArrayList<IComponentFeature>();
 
 		for(IComponentFeatureFactory fac: facs)
 		{
@@ -196,7 +196,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ifeatures	= new ArrayList<IComponentFeature>();
+				ifeatures = new ArrayList<IComponentFeature>();
 				return executeInitOnFeatures(lfeatures.iterator());
 			}
 		});
@@ -233,7 +233,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  
 	 *  @return A future to indicate when the shutdown is done.
 	 */
-	public IFuture<Void>	shutdown()
+	public IFuture<Void> shutdown()
 	{
 		shutdown	= true;
 //		state = ComponentLifecycleState.END;
@@ -310,8 +310,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				});
 				
 				// Add timeout in case cleanup takes too long.
-				Number	ntimeout	= (Number)getModel().getProperty(PROPERTY_TERMINATION_TIMEOUT, getClassLoader());
-				long	timeout	= ntimeout!=null ? ntimeout.longValue() : Starter.getDefaultTimeout(getId());
+				Number ntimeout	= (Number)getModel().getProperty(PROPERTY_TERMINATION_TIMEOUT, getClassLoader());
+				long timeout = ntimeout!=null ? ntimeout.longValue() : Starter.getDefaultTimeout(getId());
 				if(timeout!=Timeout.NONE)
 				{
 					if(getFeature0(IExecutionFeature.class)!=null)
@@ -717,7 +717,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  @return	The component description.
 	 */
 	// Todo: hack??? should be internal to CMS!?
-	public IComponentDescription	getDescription()
+	public IComponentDescription getDescription()
 	{
 		return info.getComponentDescription();
 	}
@@ -748,7 +748,7 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 	 *  @param feature	The type of the feature.
 	 *  @return The feature instance.
 	 */
-	public <T> T	getFeature(Class<? extends T> type)
+	public <T> T getFeature(Class<? extends T> type)
 	{
 		if(!features.containsKey(type))
 		{

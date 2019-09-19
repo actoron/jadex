@@ -131,6 +131,8 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	{
 		super(component, cinfo);
 		
+		// todo: should not use getFeature() in constructor :-( move to init?!
+		
 		Object pojo = getComponent().getFeature(IPojoComponentFeature.class).getPojoAgent();
 		ASMBDIClassGenerator.checkEnhanced(pojo.getClass());
 		this.bdimodel = (BDIModel)getComponent().getModel().getRawModel();

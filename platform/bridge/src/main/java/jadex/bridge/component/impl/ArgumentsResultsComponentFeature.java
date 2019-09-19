@@ -94,7 +94,7 @@ public class ArgumentsResultsComponentFeature extends AbstractComponentFeature	i
 			dotname = getReverseName(dotname);
 		}
 		
-		Map<String, Object>	platformargs = (Map<String, Object>)Starter.getPlatformValue(getComponent().getId().getRoot(),  IPlatformConfiguration.PLATFORMARGS);
+		Map<String, Object>	platformargs = (Map<String, Object>)Starter.getPlatformValue(getComponent().getId().getRoot(), IPlatformConfiguration.PLATFORMARGS);
 		if(platformargs!=null)
 		{
 			IArgument[] margs = component.getModel().getArguments();
