@@ -29,6 +29,7 @@ import jadex.commons.future.FutureBarrier;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;

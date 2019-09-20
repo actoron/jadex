@@ -412,8 +412,8 @@ public class PlatformAgent
 			}
 		}
 		
-		for(CreationInfo ci: infos)
-			System.out.println("creating: "+ci.getFilename());
+		//for(CreationInfo ci: infos)
+		//	System.out.println("creating: "+ci.getFilename());
 		
 		agent.getFeature(ISubcomponentsFeature.class).createComponents(infos.toArray(new CreationInfo[infos.size()])).addResultListener(new IResultListener<Collection<IExternalAccess>>()
 		{

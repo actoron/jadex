@@ -16,6 +16,9 @@ import jadex.micro.annotation.RequiredServices;
 
 /**
  *  Agent that subscribes to the service and kills itself or its platform.
+ *  
+ *  self: kills itselfs
+ *  platform: kills platform
  */
 @Agent
 @Configurations({
@@ -77,7 +80,5 @@ public class SubscriberAgent
 				});
 			}
 		});
-		
-		
 	}
 }

@@ -256,7 +256,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				List<Tuple2<CreationInfo, IModelInfo>> sysinfos = null;
 				List<Tuple2<CreationInfo, IModelInfo>> userinfos = new ArrayList<>();
 				
-				for (int i = 0; i < infos.length; ++i)
+				for(int i = 0; i < infos.length; ++i)
 				{
 					IModelInfo model = tmpmodelmap.get(i).get().getFirstEntity();
 					
@@ -272,15 +272,15 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 					userinfos.add(new Tuple2<CreationInfo, IModelInfo>(infos[i], model));
 				}
 				
-				if (debug)
+				if(debug)
 				{
 					System.out.println(component + " starting system subcomponents: " + (sysinfos == null ? "[]" : Arrays.toString(sysinfos.toArray())));
 					System.out.println(component + " starting user subcomponents: " + Arrays.toString(userinfos.toArray()));
 				}
 				
-				if (sysinfos != null)
+				if(sysinfos != null)
 				{
-					if (!component.getDescription().isSystemComponent())
+					if(!component.getDescription().isSystemComponent())
 					{
 						ret.setException(new IllegalArgumentException(component.toString() + " attempted to start system component without being a system component."));
 						return;
@@ -309,7 +309,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				}
 				else
 				{
-					if (userinfos.size() > 0)
+					if(userinfos.size() > 0)
 						doCreateComponents(userinfos).addResultListener(new IntermediateDelegationResultListener<>(ret));
 					else
 						ret.setFinished();
@@ -327,7 +327,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 	 */
 	public IIntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>> killComponents(IComponentIdentifier... cids)
 	{
-		if (cids == null || cids.length == 0)
+		if(cids == null || cids.length == 0)
 			return new IntermediateFuture<Tuple2<IComponentIdentifier, Map<String, Object>>>(new IllegalArgumentException("Component identifiers must not be null or empty."));
 		
 //		boolean subsonly = true;
@@ -346,7 +346,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		Set<IComponentIdentifier> killset = new HashSet<>(Arrays.asList(cids));
 		Map<IComponentIdentifier, Set<IComponentIdentifier>> killparents = new HashMap<>();
 		idloop:
-		for (IComponentIdentifier cid : cids)
+		for(IComponentIdentifier cid : cids)
 		{
 			IComponentIdentifier parent = cid.getParent();
 			while (parent != null)
@@ -356,14 +356,14 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 				parent = parent.getParent();
 			}
 			
-			if (component.getId().equals(cid))
+			if(component.getId().equals(cid))
 			{
 				suicide = true;
 				continue;
 			}
 			
 			IComponentIdentifier kp = cid.getParent();
-			if (kp == null)
+			if(kp == null)
 				kp = cid;
 			Set<IComponentIdentifier> kpset = killparents.get(kp);
 			if (kpset == null)
@@ -379,9 +379,9 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			locals = null;
 		
 		FutureBarrier<Void> compkillbar = new FutureBarrier<>();
-		for (Map.Entry<IComponentIdentifier, Set<IComponentIdentifier>> entry : killparents.entrySet())
+		for(Map.Entry<IComponentIdentifier, Set<IComponentIdentifier>> entry : killparents.entrySet())
 		{
-			if (entry.getValue().size() > 0)
+			if(entry.getValue().size() > 0)
 			{
 				IExternalAccess exta = component.getExternalAccess(entry.getKey());
 				Future<Void> donefut = new Future<>();
@@ -410,7 +410,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			}
 		}
 		
-		if (locals != null)
+		if(locals != null)
 		{
 			Future<Void> donefut = new Future<>();
 			compkillbar.addFuture(donefut);
@@ -418,7 +418,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					if (exception instanceof MultiException)
+					if(exception instanceof MultiException)
 						exceptions.addAll(Arrays.asList(((MultiException)exception).getCauses()));
 					else
 						exceptions.add(exception);
@@ -437,7 +437,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 			});
 		}
 		
-		if (suicide)
+		if(suicide)
 		{
 			Future<Void> donefut = new Future<>();
 			compkillbar.addFuture(donefut);
@@ -463,7 +463,7 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 		{
 			public void resultAvailable(Void result)
 			{
-				if (exceptions.size() > 0)
+				if(exceptions.size() > 0)
 					ret.setException(new MultiException(exceptions));
 				else
 					ret.setFinished();
@@ -512,11 +512,11 @@ public class SubcomponentsComponentFeature extends AbstractComponentFeature impl
 //		}
 		boolean lineardeps = false;
 		
-		if (debug)
+		if(debug)
 			System.out.println("Starting subcomponent set for " + component + " uses linear dependencies: " + lineardeps);
 		
 //		for (Map.Entry<Integer, IFuture<Tuple3<IModelInfo,ClassLoader,Collection<IComponentFeatureFactory>>>> entry : modelmap.entrySet())
-		for (int i = 0; i < infos.size(); ++i)
+		for(int i = 0; i < infos.size(); ++i)
 		{
 			String[] prevdep = lineardeps && i > 0 ? new String[] { infos.get(i - 1).getSecondEntity().getFullName() } : null;
 			addComponentToLevels(dr, infos.get(i).getFirstEntity(), infos.get(i).getSecondEntity(), instances, prevdep);

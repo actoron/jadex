@@ -132,7 +132,31 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 					.thenAccept(x->ret.setResult(null))
 					.exceptionally(x->
 					{
-						invokeDoubleMethod(sic, si, START_METHOD, OnStart.class, true, true).delegate(ret);	
+						// Hack! Check if impl class has @Agent annotation -> defer method call to agent lifecycle start
+						Object obj = ProxyFactory.isProxyClass(si.getDomainService().getClass())? ProxyFactory.getInvocationHandler(si.getDomainService()): si.getDomainService();
+						boolean isagentimpl = false;
+						Annotation[] ans = obj.getClass().getAnnotations();
+						if(ans!=null)
+						{
+							for(Annotation an: ans)
+							{
+								if(an.annotationType().getName().indexOf("jadex.micro.annotation.Agent")!=-1)
+								{
+									isagentimpl = true;
+									break;
+								}
+							}
+						}
+						
+						if(!isagentimpl)
+							invokeDoubleMethod(sic, si, START_METHOD, OnStart.class, true, true).delegate(ret);	
+						else
+						{
+							// Only invokes start on management service (pojo is agent)
+							//System.out.println("Deferring call on OnStart method as impl is agent class: "+obj.getClass());
+							sic.setObject(si.getManagementService());
+							sic.invoke().delegate(ret);
+						}
 					});
 				//.addResultListener(new DelegationResultListener<Void>(ret));
 			}
