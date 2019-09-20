@@ -61,11 +61,11 @@ public class EventIntermediateMessageActivityHandler extends DefaultActivityHand
 		if(rec instanceof String)
 		{
 			// Special case -> string converted to sibling cid.
-			receiver	= new ComponentIdentifier((String)rec, instance.getId().getParent());
+			receiver = new ComponentIdentifier((String)rec, instance.getId().getParent());
 		}
 		else
 		{
-			receiver	= (IComponentIdentifier)rec;
+			receiver = (IComponentIdentifier)rec;
 		}
 
 		thread.setWaiting(true);

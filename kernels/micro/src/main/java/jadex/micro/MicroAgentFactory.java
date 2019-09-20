@@ -10,7 +10,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.component.IArgumentsResultsFeature;
@@ -22,7 +24,9 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.search.ServiceQuery;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IBootstrapFactory;
+import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -85,6 +89,37 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		def_features.add(MicroServiceInjectionComponentFeature.FACTORY);
 		
 		NOPLATFORM_DEFAULT_FEATURES = Collections.unmodifiableCollection(def_features);
+	}
+	
+	/**
+	 *  Create a micro agent using services.
+	 *  
+	 *  Note: this method automatically creates needed platform services.
+	 *  Using this method frequently is inefficient as they are recreated on each call.
+	 *  
+	 *  @param filename The agent filename.
+	 *  @return The external access of the agent.
+	 * /
+	public static IFuture<IExternalAccess> createAgent(String filename)
+	{
+		Tuple2<IExecutionService, IClockService> tup = BaseService.createServices();
+		MicroAgentFactory cfac = new MicroAgentFactory("rootid");
+		cfac.setFeatures(MicroAgentFactory.NOPLATFORM_DEFAULT_FEATURES);
+		return Starter.createAgent(filename, cfac, tup.getFirstEntity(), tup.getSecondEntity());
+	}*/
+	
+	/**
+	 *  Create a micro agent using services.
+	 *  @param filename The agent filename.
+	 *  @param es The execution service.
+	 *  @param cs The clock service.
+	 *  @return The external access of the agent.
+	 */
+	public static IFuture<IExternalAccess> createAgent(String filename, IExecutionService es, IClockService cs)
+	{
+		MicroAgentFactory cfac = new MicroAgentFactory("rootid");
+		cfac.setFeatures(MicroAgentFactory.NOPLATFORM_DEFAULT_FEATURES);
+		return Starter.createAgent(filename, cfac, es, cs);
 	}
 	
 	//-------- constants --------

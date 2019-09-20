@@ -50,9 +50,7 @@ public abstract class AbstractGatewayActivityHandler
 	{
 		// Notify listeners as gateways are not followed by step handler execution
 		if(instance.getFeature0(IMonitoringComponentFeature.class)!=null && instance.getFeature(IMonitoringComponentFeature.class).hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
-		{
 			instance.getFeature(IMonitoringComponentFeature.class).publishEvent(DefaultActivityHandler.getBpmnFeature(instance).createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
-		}
 		
 		List<MSequenceEdge>	incoming	= activity.getIncomingSequenceEdges();
 		List<MSequenceEdge>	outgoing	= activity.getOutgoingSequenceEdges();
@@ -95,7 +93,7 @@ public abstract class AbstractGatewayActivityHandler
 	/**
 	 *  Generate a unique id.
 	 */
-	protected String	generateId()
+	protected String generateId()
 	{
 		return SReflect.getInnerClassName(getClass()) + (++idcnt);
 	}

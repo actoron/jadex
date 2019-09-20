@@ -53,9 +53,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 				if(val!=null)	// omit null values (also excludes '$event')
 				{
 					if(params==null)
-					{
 						params	= new LinkedHashMap<String, Object>();
-					}
 					params.put(param, thread.getParameterValue(param));
 				}
 			}
@@ -78,7 +76,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 		{
 			public IFuture<Void> execute(final Object event)
 			{
-//						System.out.println("Triggered event matcher: "+cid);
+//				System.out.println("Triggered event matcher: "+cid);
 				
 				return exta.scheduleStep(new IComponentStep<Void>()
 				{
@@ -89,7 +87,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 						MActivity	activity	= ((MBpmnModel)ia.getModel().getRawModel()).getAllActivities().get(actid);
 						StringTokenizer	stok	= new StringTokenizer(procid, ":");
 						ProcessThread	thread	= null;
-//								ThreadContext	context	= instance.getThreadContext();
+//						ThreadContext	context	= instance.getThreadContext();
 						ProcessThread context = getBpmnFeature(ia).getTopLevelThread();
 						String	pid	= null;
 						while(stok.hasMoreTokens() && context!=null)
@@ -132,22 +130,29 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 				{
 					public void customResultAvailable(final String id)
 					{
-						IInternalProcessEngineService ipes = instance.getFeature(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
+						IInternalProcessEngineService ipes = instance.getFeature0(IRequiredServicesFeature.class).searchLocalService(new ServiceQuery<>(IInternalProcessEngineService.class));
 						
 						System.out.println("Cancel event matcher1: "+instance.getId());
 						
-						ipes.removeEventMatcher(id).addResultListener(new IResultListener<Void>()
+						if(ipes!=null)
 						{
-							public void resultAvailable(Void result)
+							ipes.removeEventMatcher(id).addResultListener(new IResultListener<Void>()
 							{
-								// done.
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								instance.getLogger().warning("Event deregistration failed: "+exception);
-							}
-						});
+								public void resultAvailable(Void result)
+								{
+									// done.
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									instance.getLogger().warning("Event deregistration failed: "+exception);
+								}
+							});
+						}
+						else
+						{
+							System.out.println("No process engine service found");
+						}
 					}
 				});
 				return ret;

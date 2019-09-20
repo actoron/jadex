@@ -44,7 +44,7 @@ public class DefaultStepHandler implements IStepHandler
 //		// Hack!!! Should be in interpreter/thread?
 		thread.updateParametersAfterStep(activity, instance);
 		
-		MNamedIdElement	next	= null;
+		MNamedIdElement	next = null;
 		ProcessThread remove = null; // Thread that needs to be removed (if any).
 		Exception ex = thread.getException();
 		
@@ -99,7 +99,7 @@ public class DefaultStepHandler implements IStepHandler
 					List<MSequenceEdge>	outgoing	= activity.getOutgoingSequenceEdges();
 					if(outgoing!=null && outgoing.size()==1)
 					{
-						next	= (MSequenceEdge)outgoing.get(0);
+						next = (MSequenceEdge)outgoing.get(0);
 					}
 					else if(outgoing!=null && outgoing.size()>1)
 					{
@@ -111,7 +111,7 @@ public class DefaultStepHandler implements IStepHandler
 				// Exception flow.
 				else
 				{
-					List<MActivity>	handlers	= activity.getEventHandlers();
+					List<MActivity>	handlers = activity.getEventHandlers();
 					for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
 					{
 						MActivity	handler	= handlers.get(i);

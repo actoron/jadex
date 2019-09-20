@@ -1,37 +1,11 @@
 package jadex.noplatform;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
-
-import jadex.base.Starter;
-import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.component.ComponentCreationInfo;
-import jadex.bridge.component.IArgumentsResultsFeature;
-import jadex.bridge.component.IComponentFeatureFactory;
-import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.cms.CMSComponentDescription;
-import jadex.bridge.service.types.cms.PlatformComponent;
-import jadex.bridge.service.types.cms.SComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
-import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.JavaThreadPool;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgentFactory;
-import jadex.noplatform.services.ClockService;
-import jadex.noplatform.services.ExecutionService;
+import jadex.noplatform.services.BaseService;
 
 /**
  *  Setting up a minimal Jadex to run components of a specific kernel. 
@@ -60,10 +34,10 @@ public class NoPlatformStarter
 //			}
 //		});
 		
-		Tuple2<IExecutionService, IClockService> tup = createServices();
+		Tuple2<IExecutionService, IClockService> tup = BaseService.createServices();
 		
 		for(int i=0; i<1000; i++)
-			createMicroAgent("jadex.micro.examples.helloworld.PojoHelloWorldAgent.class", tup.getFirstEntity(), tup.getSecondEntity());
+			MicroAgentFactory.createAgent("jadex.micro.examples.helloworld.PojoHelloWorldAgent.class", tup.getFirstEntity(), tup.getSecondEntity());
 		
 		SUtil.sleep(50000);
 		System.out.println("main end");
@@ -72,7 +46,7 @@ public class NoPlatformStarter
 	/**
 	 *  Create the necessary platform service replacements.
 	 *  @return The services (execution and clock).
-	 */
+	 * /
 	public static Tuple2<IExecutionService, IClockService> createServices()
 	{
 		IComponentIdentifier pcid = Starter.createPlatformIdentifier(null);
@@ -82,7 +56,7 @@ public class NoPlatformStarter
 		ClockService cs = new ClockService(pcid, null, threadpool);
 		cs.startService().get();
 		return new Tuple2<IExecutionService, IClockService>(es, cs);
-	}
+	}*/
 	
 	/**
 	 *  Create a micro agent using services.
@@ -92,14 +66,14 @@ public class NoPlatformStarter
 	 *  
 	 *  @param filename The agent filename.
 	 *  @return The external access of the agent.
-	 */
+	 * /
 	public static IFuture<IExternalAccess> createMicroAgent(String filename)
 	{
 		Tuple2<IExecutionService, IClockService> tup = createServices();
 		MicroAgentFactory cfac = new MicroAgentFactory("rootid");
 		cfac.setFeatures(MicroAgentFactory.NOPLATFORM_DEFAULT_FEATURES);
 		return createAgent(filename, cfac, tup.getFirstEntity(), tup.getSecondEntity());
-	}
+	}*/
 	
 	/**
 	 *  Create a micro agent using services.
@@ -107,13 +81,13 @@ public class NoPlatformStarter
 	 *  @param es The execution service.
 	 *  @param cs The clock service.
 	 *  @return The external access of the agent.
-	 */
+	 * /
 	public static IFuture<IExternalAccess> createMicroAgent(String filename, IExecutionService es, IClockService cs)
 	{
 		MicroAgentFactory cfac = new MicroAgentFactory("rootid");
 		cfac.setFeatures(MicroAgentFactory.NOPLATFORM_DEFAULT_FEATURES);
 		return createAgent(filename, cfac, es, cs);
-	}
+	}*/
 	
 	/**
 	 *  Create an agent based on filename, agent factory and platform services.
@@ -121,7 +95,7 @@ public class NoPlatformStarter
 	 *  @param es The execution service.
 	 *  @param cs The clock service.
 	 *  @return External access of the created agent.
-	 */
+	 * /
 	public static IFuture<IExternalAccess> createAgent(String filename, IComponentFactory cfac, IExecutionService es, IClockService cs)
 	{
 		Future<IExternalAccess> ret = new Future<>();
@@ -204,7 +178,7 @@ public class NoPlatformStarter
 		}).exceptionally(ret);
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 * 

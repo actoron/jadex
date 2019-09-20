@@ -46,7 +46,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 	{
 //		System.out.println(instance.getComponentIdentifier().getLocalName()+": sub "+activity);
 
-		MSubProcess	proc	= (MSubProcess)activity;
+		MSubProcess	proc = (MSubProcess)activity;
 		final List<MActivity> start = proc.getStartActivities();
 		String tmpfile = (String)thread.getPropertyValue("file");
 		if(tmpfile == null)

@@ -23,9 +23,13 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.component.IInternalRequiredServicesFeature;
+import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.ServiceQuery;
@@ -38,7 +42,9 @@ import jadex.bridge.service.types.cms.CmsState;
 import jadex.bridge.service.types.cms.CmsState.CmsComponentState;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IBootstrapFactory;
+import jadex.bridge.service.types.cms.PlatformComponent;
 import jadex.bridge.service.types.cms.SComponentManagementService;
+import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IPlatformComponentAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -1400,7 +1406,245 @@ public class Starter
 //	{
 //		parseArg(key, val, this);
 //	}
-
+	
+	//-------- Helper methods for no platform mode --------
+	
+	// moved to BaseService
+	/**
+	 *  Create the necessary platform service replacements.
+	 *  @return The services (execution and clock).
+	 * /
+	public static Tuple2<IExecutionService, IClockService> createServices()
+	{
+		IComponentIdentifier pcid = Starter.createPlatformIdentifier(null);
+		IThreadPool threadpool = new JavaThreadPool(true);
+		ExecutionService es = new ExecutionService(pcid, threadpool);
+		es.startService().get();
+		ClockService cs = new ClockService(pcid, null, threadpool);
+		cs.startService().get();
+		return new Tuple2<IExecutionService, IClockService>(es, cs);
+	}*/
+	
+	/**
+	 *  Create an agent based on filename, agent factory and platform services.
+	 *  @param filename The model filename.
+	 *  @param es The execution service.
+	 *  @param cs The clock service.
+	 *  @return External access of the created agent.
+	 */
+	public static IFuture<IExternalAccess> createAgent(String filename, IComponentFactory cfac, IExecutionService es, IClockService cs)
+	{
+		Future<IExternalAccess> ret = new Future<>();
+				
+		IComponentIdentifier pcid = ((IService)es).getServiceId().getProviderId();
+		
+		if(Starter.getPlatformValue(pcid, IExecutionService.class.getName())==null)
+			Starter.putPlatformValue(pcid, IExecutionService.class.getName(), es);
+		if(Starter.getPlatformValue(pcid, IClockService.class.getName())==null)
+			Starter.putPlatformValue(pcid, IClockService.class.getName(), cs);
+		if(Starter.getPlatformValue(pcid, Starter.DATA_INVOKEDMETHODS)==null)
+			Starter.putPlatformValue(pcid, Starter.DATA_INVOKEDMETHODS, Collections.synchronizedMap(new WeakHashMap<Object, Set<String>>()));
+		
+		IModelInfo model = cfac.loadModel(filename, null, null).get();
+		String ctype = cfac.getComponentType(filename, null, model.getResourceIdentifier()).get();
+		
+		ComponentIdentifier cid = new ComponentIdentifier(SUtil.createPlainRandomId(filename, 6)+"@"+pcid);
+		
+		CMSComponentDescription desc = new CMSComponentDescription(cid).setType(ctype).setModelName(model.getFullName())
+			.setResourceIdentifier(model.getResourceIdentifier()).setCreationTime(System.currentTimeMillis())
+			.setFilename(model.getFilename()).setSystemComponent(SComponentManagementService.isSystemComponent(model, null, null));
+		
+		// create component from model
+		ComponentCreationInfo cci = new ComponentCreationInfo(model, null, null, desc, null, null);
+		Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
+		
+		IPlatformComponentAccess component = SComponentManagementService.createPlatformComponent(Starter.class.getClassLoader(),
+			new PlatformComponent() 
+		{
+			public IFuture<Map<String, Object>> killComponent(IComponentIdentifier cid)
+			{
+				Future<Map<String, Object>> ret = new Future<>();
+				
+				//agent.getLogger().info("Terminating component: "+cid.getName());
+				IResultListener<Void> cc = new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						//System.out.println("Killed: " + cid);
+						cont();
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+						ret.setException(exception);
+					}
+					
+					protected void cont()
+					{
+						IArgumentsResultsFeature arf = getFeature0(IArgumentsResultsFeature.class);
+						if(arf!=null)
+						{
+							ret.setResult(arf.getResults());
+						}
+						else
+						{
+							ret.setResult(Collections.EMPTY_MAP);
+						}
+					}
+				};
+				
+				shutdown().addResultListener(cc);
+				return ret;
+			}
+		});
+		
+		component.create(cci, features);
+		component.init().thenAccept(x ->
+		{
+			//long end = System.currentTimeMillis();
+			//System.out.println("init took "+(end-start)+" ms, thread: "+Thread.currentThread());
+			
+			ret.setResult(component.getInternalAccess());
+			
+			component.body().get();
+			
+			// Shutdown is called via killComponent()
+			//component.shutdown().get();
+		}).exceptionally(ret);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Test if agent runs in no platform mode.
+	 *  @param agent The agent.
+	 *  @return True, if runs in no platform mode.
+	 */
+	public static boolean isNoPlatformMode(IInternalAccess agent)
+	{
+		return Starter.getPlatformValue(agent.getId().getRoot(), IExecutionService.class.getName())!=null;
+	}
+	
+	/**
+	 *  Get the clock service.
+	 *  @return The clock service.
+	 */
+	public static IClockService getClockService(IInternalAccess ia)
+	{
+		IInternalRequiredServicesFeature rs = ((IInternalRequiredServicesFeature)ia.getFeature0(IRequiredServicesFeature.class));
+		if(rs!=null)
+		{
+			return rs.getRawService(IClockService.class);
+		}
+		else
+		{
+			// no platform variant
+			return (IClockService)Starter.getPlatformValue(ia.getId().getRoot(), IClockService.class.getName());
+		}
+	}
+	
+	/**
+	 *  Get the execution service.
+	 *  @return The execution service.
+	 */
+	public static IExecutionService getExecutionService(IInternalAccess ia)
+	{
+		IInternalRequiredServicesFeature rs = ((IInternalRequiredServicesFeature)ia.getFeature0(IRequiredServicesFeature.class));
+		if(rs!=null)
+		{
+			return rs.getRawService(IExecutionService.class);
+		}
+		else
+		{
+			// no platform variant
+			return (IExecutionService)Starter.getPlatformValue(ia.getId().getRoot(), IExecutionService.class.getName());
+		}
+	}
+	
+	/**
+	 *  Creating a platform with minimal overhead
+	 */
+	/*public static IFuture<IExternalAccess> createPlatform()
+	{
+		Future<IExternalAccess> ret = new Future<>();
+	
+		Logger rootlogger = LogManager.getLogManager().getLogger("");
+		rootlogger.setLevel(Level.SEVERE);
+		
+		long start = System.currentTimeMillis();
+		
+		IComponentIdentifier cid = Starter.createPlatformIdentifier(null);
+		//System.out.println("platfrom cid: "+cid);
+		
+		// create helper stuff: service registry, serialization 
+		
+		Map<String, Object> argsmap = new HashMap<String, Object>();
+		Starter.putPlatformValue(cid, IPlatformConfiguration.PLATFORMARGS, argsmap);
+		ServiceRegistry reg = new ServiceRegistry();
+		Starter.putPlatformValue(cid, Starter.DATA_SERVICEREGISTRY, reg);
+		Starter.putPlatformValue(cid, Starter.DATA_SERIALIZATIONSERVICES, new SerializationServices(cid));
+		CmsState cmsstate = new CmsState();
+		Starter.putPlatformValue(cid, Starter.DATA_CMSSTATE, cmsstate);
+		Starter.putPlatformValue(cid, Starter.DATA_INVOKEDMETHODS, Collections.synchronizedMap(new WeakHashMap<Object, Set<String>>()));
+	
+		// Create necessary platform services
+		
+		IThreadPool threadpool = new JavaThreadPool(false);
+		
+		ExecutionService es = new ExecutionService(cid, threadpool);
+		es.startService().get();
+		reg.addLocalService(es);
+		
+		ClockService cs = new ClockService(cid, null, threadpool);
+		cs.startService().get();
+		reg.addLocalService(cs);
+		
+		//LibraryService ls = new LibraryService(cid);
+		//ls.startService().get();
+		//reg.addLocalService(ls);
+		
+		// create platform component 
+		
+		// load model
+		//String modelname = "jadex.micro.MinimalAgent";
+		String modelname = "jadex.micro.KernelMicroAgent";
+		IComponentFactory cfac = new MicroAgentFactory("rootid");
+		IModelInfo model = cfac.loadModel(modelname, null, null).get();
+		String ctype = cfac.getComponentType(modelname, null, model.getResourceIdentifier()).get();
+		CMSComponentDescription desc = new CMSComponentDescription(cid).setType(ctype).setModelName(model.getFullName())
+			.setResourceIdentifier(model.getResourceIdentifier()).setCreationTime(System.currentTimeMillis())
+			.setFilename(model.getFilename()).setSystemComponent(SComponentManagementService.isSystemComponent(model, null, null));
+		
+		// create component from model
+		
+		ComponentCreationInfo cci = new ComponentCreationInfo(model, null, null, desc, null, null);
+		Collection<IComponentFeatureFactory> features = cfac.getComponentFeatures(model).get();
+		
+		IPlatformComponentAccess component = SComponentManagementService.createPlatformComponent(NoPlatformStarter.class.getClassLoader());
+		
+		// needed for cms
+		CmsComponentState coms = new CmsComponentState();
+		coms.setAccess(component);
+		cmsstate.getComponentMap().put(cid, coms);
+		
+		component.create(cci, features);
+		component.init().thenAccept(x ->
+		{
+			ret.setResult(component.getPlatformComponent().getExternalAccess());
+			long end = System.currentTimeMillis();
+			
+			System.out.println("platform start took "+(end-start)+" ms, thread: "+Thread.currentThread());
+			
+			component.body().get();
+			//System.out.println("platform shutdown");
+			//component.shutdown().get();
+			//System.out.println("platform end");
+		}).exceptionally(ret);
+		
+		//return 
+		return ret;
+	}*/
 	
 }
 

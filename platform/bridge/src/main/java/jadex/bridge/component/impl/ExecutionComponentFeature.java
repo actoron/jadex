@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -33,6 +34,7 @@ import jadex.bridge.StepAborted;
 import jadex.bridge.StepAbortedException;
 import jadex.bridge.StepInvalidException;
 import jadex.bridge.component.ComponentCreationInfo;
+import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeature;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.component.IMonitoringComponentFeature;
@@ -140,6 +142,9 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	/** Future for signalling that end of agenda execution has been reached. */
 	protected Future<Void> endagenda;
 	
+	/** The termination future (used in noplatform case). */
+	protected Future<Map<String, Object>> termfuture;
+	
 	//-------- constructors --------
 	
 	/**
@@ -178,6 +183,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 		
 		// ensure that agenda is cleaned up
 		wakeup();
+		
+		// notify waitForTermination calls (in noplatform mode)
+		if(termfuture!=null)
+		{
+			IArgumentsResultsFeature arf = getComponent().getFeature0(IArgumentsResultsFeature.class);
+			termfuture.setResult(arf!=null? arf.getResults(): Collections.EMPTY_MAP);
+		}
 		
 		return ret;
 //		return IFuture.DONE;
@@ -629,22 +641,31 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public IFuture<Map<String, Object>> waitForTermination()
 	{
-		final Future<Map<String, Object>> ret = new Future<>();
-		SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
+		if(!Starter.isNoPlatformMode(getInternalAccess()))
 		{
-			public void intermediateResultAvailable(CMSStatusEvent result)
+			final Future<Map<String, Object>> ret = new Future<>();
+			SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
 			{
-				if (result instanceof CMSStatusEvent.CMSTerminatedEvent)
+				public void intermediateResultAvailable(CMSStatusEvent result)
 				{
-					CMSStatusEvent.CMSTerminatedEvent termev = (CMSStatusEvent.CMSTerminatedEvent) result;
-					if (termev.getException() != null)
-						ret.setException(termev.getException());
-					else
-						ret.setResult(termev.getResults());
+					if(result instanceof CMSStatusEvent.CMSTerminatedEvent)
+					{
+						CMSStatusEvent.CMSTerminatedEvent termev = (CMSStatusEvent.CMSTerminatedEvent)result;
+						if(termev.getException() != null)
+							ret.setException(termev.getException());
+						else
+							ret.setResult(termev.getResults());
+					}
 				}
-			}
-		});
-		return ret;
+			});
+			return ret;
+		}
+		else
+		{
+			if(termfuture==null)
+				termfuture = new Future<>();
+			return termfuture;
+		}
 	}
 	
 	// todo:?
@@ -2219,42 +2240,6 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 					}
 				});
 //			}
-		}
-	}
-	
-	/**
-	 *  Get the clock service.
-	 *  @return The clock service.
-	 */
-	protected IClockService getClockService()
-	{
-		IInternalRequiredServicesFeature rs = ((IInternalRequiredServicesFeature)getComponent().getFeature0(IRequiredServicesFeature.class));
-		if(rs!=null)
-		{
-			return rs.getRawService(IClockService.class);
-		}
-		else
-		{
-			// no platform variant
-			return (IClockService)Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IClockService.class.getName());
-		}
-	}
-	
-	/**
-	 *  Get the execution service.
-	 *  @return The execution service.
-	 */
-	protected IExecutionService getExecutionService()
-	{
-		IInternalRequiredServicesFeature rs = ((IInternalRequiredServicesFeature)getComponent().getFeature0(IRequiredServicesFeature.class));
-		if(rs!=null)
-		{
-			return rs.getRawService(IExecutionService.class);
-		}
-		else
-		{
-			// no platform variant
-			return (IExecutionService)Starter.getPlatformValue(getInternalAccess().getId().getRoot(), IExecutionService.class.getName());
 		}
 	}
 	
