@@ -6,7 +6,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.Tuple2;
 import jadex.micro.MicroAgentFactory;
-import jadex.noplatform.services.BaseService;
 
 /**
  *  Shows how a micro agent can be executed without platform.
@@ -19,7 +18,7 @@ public class Main
 	public static void main(String[] args)
 	{
 		// Create necessary platform services (without platform)
-		Tuple2<IExecutionService, IClockService> tup = BaseService.createServices();
+		Tuple2<IExecutionService, IClockService> tup = Starter.createServices();
 		
 		// Create factory for loading micro agent
 		MicroAgentFactory afac = new MicroAgentFactory("rootid");

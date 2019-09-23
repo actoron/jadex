@@ -19,7 +19,7 @@ public class Main
 	public static void main(String[] args)
 	{
 		// Create necessary platform services (without platform)
-		Tuple2<IExecutionService, IClockService> tup = BaseService.createServices();
+		Tuple2<IExecutionService, IClockService> tup = Starter.createServices();
 		
 		// Create factory for loading BDI agent
 		BDIAgentFactory afac = new BDIAgentFactory("rootid");

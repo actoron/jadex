@@ -1,5 +1,6 @@
 package jadex.base;
 
+import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import jadex.bridge.component.IArgumentsResultsFeature;
 import jadex.bridge.component.IComponentFeatureFactory;
 import jadex.bridge.component.impl.ExecutionComponentFeature;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
@@ -61,6 +63,7 @@ import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.RwMapWrapper;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.concurrent.JavaThreadPool;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -1559,6 +1562,36 @@ public class Starter
 		{
 			// no platform variant
 			return (IExecutionService)Starter.getPlatformValue(ia.getId().getRoot(), IExecutionService.class.getName());
+		}
+	}
+	
+	/**
+	 *  Create the necessary platform service replacements.
+	 *  @return The services (execution and clock).
+	 */
+	public static Tuple2<IExecutionService, IClockService> createServices()
+	{
+		try
+		{
+			IComponentIdentifier pcid = Starter.createPlatformIdentifier(null);
+			IThreadPool threadpool = new JavaThreadPool(true);
+			Class<IExecutionService> esc = SReflect.findClass("jadex.noplatform.services.ExecutionService", null, Starter.class.getClassLoader());
+			Constructor<IExecutionService> ces = esc.getConstructor(new Class[]{IComponentIdentifier.class, IThreadPool.class});
+			IExecutionService es = ces.newInstance(new Object[]{pcid, threadpool});
+			((IInternalService)es).startService().get();
+			Class<IClockService> ccs = SReflect.findClass("jadex.noplatform.services.ClockService", null, Starter.class.getClassLoader());
+			Constructor<?>[] cocs = ccs.getConstructors();
+			IClockService cs = (IClockService)cocs[0].newInstance(new Object[]{pcid, null, threadpool});
+			((IInternalService)cs).startService().get();
+			//ExecutionService es = new ExecutionService(pcid, threadpool);
+			//es.startService().get();
+			//ClockService cs = new ClockService(pcid, null, threadpool);
+			//cs.startService().get();
+			return new Tuple2<IExecutionService, IClockService>(es, cs);
+		}
+		catch(Exception e)
+		{
+			throw SUtil.throwUnchecked(e);
 		}
 	}
 	

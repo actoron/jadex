@@ -5,7 +5,9 @@ import java.util.Map;
 import jadex.base.Starter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceScope;
@@ -22,15 +24,15 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  Base implementation for no platform services.
  */
-public class BaseService implements IService
+public abstract class BaseService implements IService, IInternalService
 {
 	protected IComponentIdentifier cid;
 	protected IServiceIdentifier sid;
 	
 	/**
-	 * 
+	 *  Create a new base service.
 	 */
 	public BaseService(IComponentIdentifier cid, Class<?> iface)
 	{
@@ -98,11 +100,32 @@ public class BaseService implements IService
 	{
 		return cid;
 	}
+
+	/*@Override
+	public IFuture<Void> shutdownService() {
+		// TODO Auto-generated method stub
+		return null;
+	}*/
+
+	
+	@Override
+	public IFuture<Void> setComponentAccess(IInternalAccess access) 
+	{
+		// needed for IInternalService
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setServiceIdentifier(IServiceIdentifier sid) 
+	{
+		// needed for IInternalService
+		throw new UnsupportedOperationException();
+	}
 	
 	/**
 	 *  Create the necessary platform service replacements.
 	 *  @return The services (execution and clock).
-	 */
+	 * /
 	public static Tuple2<IExecutionService, IClockService> createServices()
 	{
 		IComponentIdentifier pcid = Starter.createPlatformIdentifier(null);
@@ -112,5 +135,5 @@ public class BaseService implements IService
 		ClockService cs = new ClockService(pcid, null, threadpool);
 		cs.startService().get();
 		return new Tuple2<IExecutionService, IClockService>(es, cs);
-	}
+	}*/
 }

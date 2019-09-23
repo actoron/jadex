@@ -1,11 +1,11 @@
 package jadex.noplatform;
 
+import jadex.base.Starter;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.micro.MicroAgentFactory;
-import jadex.noplatform.services.BaseService;
 
 /**
  *  Setting up a minimal Jadex to run components of a specific kernel. 
@@ -34,7 +34,7 @@ public class NoPlatformStarter
 //			}
 //		});
 		
-		Tuple2<IExecutionService, IClockService> tup = BaseService.createServices();
+		Tuple2<IExecutionService, IClockService> tup = Starter.createServices();
 		
 		for(int i=0; i<1000; i++)
 			MicroAgentFactory.createAgent("jadex.micro.examples.helloworld.PojoHelloWorldAgent.class", tup.getFirstEntity(), tup.getSecondEntity());
