@@ -6,7 +6,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.Tuple2;
-import jadex.noplatform.services.BaseService;
 
 /**
  *  Shows how a BDI agent can be executed without platform.
