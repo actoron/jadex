@@ -14,4 +14,7 @@ dependencies
 //	api project(':platform:webservice-desktop-nano') 
 	
 	api 'org.codehaus.jackson:jackson-mapper-asl:1.9.3'
+	api 'javax.xml.bind:jaxb-api:2.3.1'
+	api 'javax.xml.ws:jaxws-api:2.3.1'
+	api 'jakarta.jws:jakarta.jws-api:1.1.1'
 }
