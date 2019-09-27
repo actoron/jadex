@@ -1705,11 +1705,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (cryptoreset == null)
 				{
 					long resetdelay = (long) (handshaketimeout * resettimeoutscale);
-					cryptoreset = ia.getFeature(IExecutionFeature.class).waitForDelay(resetdelay, new IComponentStep<Void>()
+					final List<String> pfnames = new ArrayList<>();
+					Future<Void> ret = new Future<>();
+					cryptoreset = ret;
+					ia.getFeature(IExecutionFeature.class).waitForDelay(resetdelay, new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							List<String> pfnames = new ArrayList<>();
 							currentcryptosuites.getWriteLock().lock();
 							try
 							{
@@ -1721,17 +1723,25 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							{
 								currentcryptosuites.getWriteLock().unlock();
 							}
-							for(String pfname : pfnames)
-								initializeHandshake(pfname);
 							
-							cryptoreset = null;
-							
-							if(debug)
-								System.out.println("Cryptosuites reset.");
+							if (initializingcryptosuites.size() > 0)
+							{
+								ia.getFeature(IExecutionFeature.class).waitForDelay(resetdelay, this).addResultListener(new DelegationResultListener<Void>(ret));
+							}
+							else
+							{
+								for(String pfname : pfnames)
+									initializeHandshake(pfname);
+								ret.setResult(null);
+								cryptoreset = null;
+								
+								//if(debug)
+									System.out.println("Cryptosuites reset.");
+							}
 							
 							return IFuture.DONE;
 						}
-					}, true);
+					}, true).addResultListener(new DelegationResultListener<>(ret));;
 				}
 				return cryptoreset;
 			}
