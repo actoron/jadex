@@ -56,6 +56,7 @@ import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.collection.BiHashMap;
 import jadex.commons.collection.IRwMap;
 import jadex.commons.collection.LeaseTimeMap;
@@ -113,7 +114,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	protected IRwMap<Con, IComponentIdentifier> restablishedconnections;
 	
 	/** Commands waiting for a connection to be established, subject to timeouts. */
-	protected MultiCollection<IComponentIdentifier, Tuple2<ICommand<Con>, Long>> commandswaitingforcons = new MultiCollection<>();
+	protected MultiCollection<IComponentIdentifier, Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>>> commandswaitingforcons = new MultiCollection<>();
 	
 	/** Connections to be established, subject to timeouts. */
 	protected LeaseTimeMap<Con, IComponentIdentifier> handshakingconnections;
@@ -322,7 +323,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 						
 						boolean[] canceled = new boolean[1];
 						final long timeout = System.currentTimeMillis() + cleanupinterval;
-						Tuple2<ICommand<Con>, Long> cmd = new Tuple2<ICommand<Con>, Long>(new ICommand<Con>()
+						Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>> cmd = new Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>>(new ICommand<Con>()
 						{
 							public void execute(Con con)
 							{
@@ -331,7 +332,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 									impl.sendMessage(con, bheader, body).addResultListener(new DelegationResultListener<>(ret));
 								}
 							}
-						}, timeout);
+						}, timeout, ret);
 						commandswaitingforcons.add(receiverpf, cmd);
 						ret.setTerminationCommand(new TerminationCommand()
 						{
@@ -342,7 +343,18 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 						});
 						
 						if (createcon)
-							createNewConnections(receiverpf);
+						{
+							try
+							{
+								createNewConnections(receiverpf);
+							}
+							catch (Exception e)
+							{
+								Collection<Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>>> cmds = commandswaitingforcons.remove(receiverpf);
+								for (Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>> c : SUtil.notNull(cmds))
+									c.getThirdEntity().setExceptionIfUndone(e);
+							}
+						}
 					}
 					return IFuture.DONE;
 				}
@@ -736,8 +748,8 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		assert execfeat.isComponentThread();
 //		System.out.println("HANDSHAKE DONE FOR " + platformid + " -> " + remotepf + " " + con + " " + canDecide(remotepf));
 		
-		Collection<Tuple2<ICommand<Con>, Long>> waitingcmds = commandswaitingforcons.remove(remotepf);
-		for (Tuple2<ICommand<Con>, Long> cmdtup : SUtil.notNull(waitingcmds))
+		Collection<Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>>> waitingcmds = commandswaitingforcons.remove(remotepf);
+		for (Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>> cmdtup : SUtil.notNull(waitingcmds))
 			cmdtup.getFirstEntity().execute(con);
 		
 		handshakingconnections.remove(con);
@@ -772,8 +784,8 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 						{
 //						for (Map.Entry<IComponentIdentifier, Collection<Tuple2<ICommand<Con>, Long>>> entry : commandswaitingforcons.entrySet())
 //						{
-							List<Tuple2<ICommand<Con>, Long>> coll = new ArrayList<>(commandswaitingforcons.get(key));
-							for (Tuple2<ICommand<Con>, Long> cmd : coll)
+							List<Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>>> coll = new ArrayList<>(commandswaitingforcons.get(key));
+							for (Tuple3<ICommand<Con>, Long, TerminableFuture<Integer>> cmd : coll)
 							{
 								if (cur < cmd.getSecondEntity())
 									commandswaitingforcons.removeObject(key, cmd);
