@@ -1852,7 +1852,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				if (debug)
+				//if (debug)
 				{
 					System.out.println("Failure send message to and removing suite for: "+receiver.getRoot().toString());
 					exception.printStackTrace();
