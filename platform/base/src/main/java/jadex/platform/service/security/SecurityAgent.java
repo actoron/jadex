@@ -1884,6 +1884,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		String[] csuites = allowedcryptosuites.keySet().toArray(new String[allowedcryptosuites.size()]);
 		InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getId(), convid, csuites);
 		ComponentIdentifier rsec = new ComponentIdentifier("security@" + cid);
+		System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + rsec.getRoot() + " Phase: 0 Step: 0");
 		sendSecurityHandshakeMessage(rsec, ihm);
 	}
 	
@@ -2162,6 +2163,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				InitialHandshakeReplyMessage reply = new InitialHandshakeReplyMessage(getComponentIdentifier(), state.getConversationId(), chosensuite, VersionInfo.getInstance().getJadexVersion());
 				
+				System.out.println("Security Handshake " + imsg.getConversationId() + " " + agent.getId().getRoot() + " -> " + rplat.getRoot() + " Phase: 0 Step: 1");
 				sendSecurityHandshakeMessage(imsg.getSender(), reply);
 			}
 			else if (msg instanceof InitialHandshakeReplyMessage)
@@ -2189,6 +2191,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						{
 							state.setCryptoSuite(suite);
 							InitialHandshakeFinalMessage fm = new InitialHandshakeFinalMessage(agent.getId(), rm.getConversationId(), rm.getChosenCryptoSuite(), VersionInfo.getInstance().getJadexVersion());
+							System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + rm.getSender().getRoot() + " Phase: 0 Step: 2, finished Phase 0, entering Phase 1");
 							sendSecurityHandshakeMessage(rm.getSender(), fm);
 						}
 					}
@@ -2202,6 +2205,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (state != null)
 				{
 					String convid = state.getConversationId();
+					System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + fm.getSender().getRoot() + " finished Phase 0, entering Phase 1");
 					if (convid != null && convid.equals(fm.getConversationId()) && !state.isDuplicate(fm))
 					{
 						JadexVersion remoteversion = fm.getJadexVersion();
@@ -2243,9 +2247,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						try
 						{
+							System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + secmsg.getSender().getRoot() + " processing Phase 1 step");
 							if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
 							{
-								if (debug)
+								//if (debug)
 									System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().getRoles().contains(Security.TRUSTED));
 								currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
 								initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
