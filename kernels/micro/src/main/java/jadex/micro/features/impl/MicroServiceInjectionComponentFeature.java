@@ -146,6 +146,7 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 								component.getFeature(IRequiredServicesFeature.class).addQuery(query, to):
 								component.getFeature(IRequiredServicesFeature.class).addQuery(query);
 							
+							// Directly continue with init when service is not required
 							if(infos[j].getRequired()==null || !infos[j].getRequired().booleanValue())
 								lis2.resultAvailable(null);
 							final int fj = j;
@@ -177,10 +178,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 										setDirectFieldValue(f, target, result);
 									}
 									
+									// Continue with agent init when first service is found 
 									if(first)
 									{
 										first = false;
-										lis2.resultAvailable(null);
+										if(infos[fj].getRequired()==null || infos[fj].getRequired().booleanValue())
+											lis2.resultAvailable(null);
 									}
 								}
 								
