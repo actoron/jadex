@@ -78,7 +78,6 @@ import jadex.commons.security.SSecurity;
 import jadex.commons.transformation.traverser.SCloner;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentFeature;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -690,9 +689,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					else
 					{
 						HandshakeState hstate = initializingcryptosuites.get(rplat);
-						if (hstate == null)
+						if(hstate == null)
 						{
-							System.out.println("Handshake state null, starting new handhake.");
+							System.out.println("Handshake state null, starting new handhake: "+agent+" "+rplat);
+							System.out.println(initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
 							initializeHandshake(rplat);
 							hstate = initializingcryptosuites.get(rplat);
 						}
@@ -1649,6 +1649,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			if (time > entry.getValue().getExpirationTime())
 			{
 				entry.getValue().getResultFuture().setException(new TimeoutException("Handshake timed out with platform: " + entry.getKey()));
+				System.out.println("Removing handshake data: "+entry.getKey());
 				it.remove();
 			}
 		}
@@ -1858,6 +1859,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					exception.printStackTrace();
 				}
 				
+				System.out.println("Removing Handshake " + receiver.getRoot().toString());
 				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
 				if(state != null)
 				{
@@ -1885,18 +1887,18 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	protected void initializeHandshake(String cid)
 	{
 		String convid = SUtil.createUniqueId(agent.getId().getRoot().toString());
-		System.out.println("Starting new handhake " + convid);
 		HandshakeState hstate = new HandshakeState();
 		hstate.setExpirationTime(System.currentTimeMillis() + handshaketimeout);
 		hstate.setConversationId(convid);
 		hstate.setResultFuture(new Future<ICryptoSuite>());
+		System.out.println("Init handhake " +agent+" "+convid+" "+handshaketimeout);
 		
 		initializingcryptosuites.put(cid.toString(), hstate);
 		
 		String[] csuites = allowedcryptosuites.keySet().toArray(new String[allowedcryptosuites.size()]);
 		InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getId(), convid, csuites);
 		ComponentIdentifier rsec = new ComponentIdentifier("security@" + cid);
-		System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + rsec.getRoot() + " Phase: 0 Step: 0");
+		System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + rsec.getRoot() + " Phase: 0 Step: 0 "+initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
 		sendSecurityHandshakeMessage(rsec, ihm);
 	}
 	
@@ -2105,10 +2107,10 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				HandshakeState state = initializingcryptosuites.get(rplat.toString());
 				
 				// Check if handshake is already happening. 
-				if (state != null)
+				if(state != null)
 				{
 					// Check if duplicate
-					if (!state.getConversationId().equals(imsg.getConversationId()))
+					if(!state.getConversationId().equals(imsg.getConversationId()))
 					{
 						if (getComponentIdentifier().getRoot().toString().compareTo(rplat.toString()) < 0)
 							fut.addResultListener(new DelegationResultListener<ICryptoSuite>(state.getResultFuture()));
@@ -2176,6 +2178,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				InitialHandshakeReplyMessage reply = new InitialHandshakeReplyMessage(getComponentIdentifier(), state.getConversationId(), chosensuite, VersionInfo.getInstance().getJadexVersion());
 				
 				System.out.println("Security Handshake " + imsg.getConversationId() + " " + agent.getId().getRoot() + " -> " + rplat.getRoot() + " Phase: 0 Step: 1");
+				System.out.println(initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
 				sendSecurityHandshakeMessage(imsg.getSender(), reply);
 			}
 			else if (msg instanceof InitialHandshakeReplyMessage)
@@ -2183,7 +2186,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				InitialHandshakeReplyMessage rm = (InitialHandshakeReplyMessage) msg;
 				HandshakeState state = initializingcryptosuites.get(rm.getSender().getRoot().toString());
 				
-				if (state != null)
+				if(state != null)
 				{
 					String convid = state.getConversationId();
 					if (convid != null && convid.equals(rm.getConversationId()) && !state.isDuplicate(rm))
@@ -2268,6 +2271,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 								//if (debug)
 									System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().getRoles().contains(Security.TRUSTED));
 								currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
+								System.out.println("Removing Handshake " + secmsg.getSender().getRoot().toString());
 								initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 								state.getResultFuture().setResult(state.getCryptoSuite());
 							}
@@ -2276,6 +2280,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						{
 							e.printStackTrace();
 							state.getResultFuture().setException(e);
+							System.out.println("Removing Handshake " + secmsg.getSender().getRoot().toString()+" "+e);
 							initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 						}
 					}
