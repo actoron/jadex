@@ -158,6 +158,9 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	@OnInit
 	public IFuture<Void> start()
 	{
+		//if(tas==null)
+		//	System.out.println("tas is null");
+		
 		platformid = agent.getId().getRoot();
 		cleanupinterval = Starter.getDefaultTimeout(platformid);
 		cleanupinterval = cleanupinterval > 0 ? cleanupinterval : 30000;

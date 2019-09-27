@@ -149,7 +149,9 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 						}
 						
 						if(!isagentimpl)
+						{
 							invokeDoubleMethod(sic, si, START_METHOD, OnStart.class, true, true).delegate(ret);	
+						}
 						else
 						{
 							// Only invokes start on management service (pojo is agent)
