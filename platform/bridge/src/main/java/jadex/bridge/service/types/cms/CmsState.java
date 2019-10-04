@@ -105,7 +105,7 @@ public class CmsState
 	 */
 	public Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> getCmsListeners(IComponentIdentifier cid)
 	{
-		if (cid == null)
+		if(cid == null)
 			return allcomponentslisteners;
 		
 		CmsComponentState state = componentmap.get(cid);

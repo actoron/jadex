@@ -242,10 +242,10 @@ public class SComponentManagementService
     	try(IAutoLock l = cmsstate.writeLock())
     	{
     		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> col = null;
-    		if (cid != null)
+    		if(cid != null)
     		{
 	    		CmsComponentState compstate = cmsstate.getComponent(cid);
-	    		if (compstate == null)
+	    		if(compstate == null)
 	    		{
 	    			ret.setException(new IllegalStateException("Component not found: " + cid));
 	    			return ret;
@@ -262,6 +262,7 @@ public class SComponentManagementService
     			col = cmsstate.getAllListeners();
     		}
 	    	col.add(ret);
+	    	System.out.println("listenToComponent: "+cid+" "+col+" "+System.identityHashCode(col));
     	}
     	
     	ret.setTerminationCommand(new TerminationCommand()
@@ -324,10 +325,18 @@ public class SComponentManagementService
 	 */
 	public static void notifyListenersRemoved(IComponentDescription desc, Exception ex, Map<String, Object> results)
 	{
+		System.out.println("terminated event for: "+desc);
+		
 		// listeners are copied to be threadsafe
 		
-		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	slis = new ArrayList<>(SUtil.notNull(getState(desc.getName()).getCmsListeners(desc.getName())));
-		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>>	alis = new ArrayList<>(SUtil.notNull(getState(desc.getName()).getCmsListeners(null)));
+		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> slis = new ArrayList<>(SUtil.notNull(getState(desc.getName()).getCmsListeners(desc.getName())));
+		Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> alis = new ArrayList<>(SUtil.notNull(getState(desc.getName()).getCmsListeners(null)));
+		
+		if(desc.getName().toString().indexOf("Sokrates")!=-1)
+		{
+			System.out.println("Listener for kill slis: "+slis);
+			System.out.println("Listener for kill alis: "+alis);
+		}
 		
 		for(SubscriptionIntermediateFuture<CMSStatusEvent> sub: alis)
 		{
@@ -1501,16 +1510,21 @@ public class SComponentManagementService
 //						// todo: killcomponent should only be called once for each component?
 						
 						agent.getLogger().info("Terminating component: "+cid.getName());
+						
+						if(cid.toString().indexOf("Sokrates")!=-1)
+							System.out.println("Terminating component: "+cid.getName());
+						
 						IResultListener<Void> cc = new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
-//								System.out.println("Killed: " + cid);
+								System.out.println("Killed: " + cid);
 								cleanup(cid, null);
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
+								System.out.println("Killed ex: " + cid+" "+exception);
 								cleanup(cid, exception);
 							}
 						};
@@ -1554,6 +1568,8 @@ public class SComponentManagementService
 	 */
 	public static IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid, IInternalAccess agent)
 	{
+		if(cid.toString().indexOf("Sokrates")!=-1)
+			System.out.println("destroy: "+cid);
 //		if(cid.getParent()==null)
 //			System.out.println("---- !!!! ----- Killing platform ---- !!!! ----- "+cid.getName());
 //		System.out.println("Terminating component: "+cid.getName());
@@ -1599,6 +1615,22 @@ public class SComponentManagementService
 		if(!contains && !locked && inited)
 			destroyComponent(cid, ret, agent);
 
+		if(cid.toString().indexOf("Sokrates")!=-1)
+		{
+			ret.addResultListener(new IResultListener<Map<String,Object>>()
+			{
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println("destryCompo finished with ex: "+cid+" "+exception);
+				}
+				
+				public void resultAvailable(Map<String, Object> result)
+				{
+					System.out.println("destryCompo finished: "+cid);
+				}
+			});
+		}
+		
 		return ret;
 	}
 	
@@ -2411,6 +2443,9 @@ public class SComponentManagementService
 	// w: initinfos 
 	protected static void cleanup(IComponentIdentifier cid, Exception exception)
 	{
+		if(cid.toString().indexOf("Sokrates")!=-1)
+			System.out.println("Terminating component: "+cid.getName());
+		
 		IPlatformComponentAccess comp = null;
 		IPlatformComponentAccess pad = null;
 		boolean	killparent	= false;

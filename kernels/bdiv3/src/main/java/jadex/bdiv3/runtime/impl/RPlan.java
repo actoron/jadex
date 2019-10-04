@@ -30,6 +30,7 @@ import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3x.runtime.ICandidateInfo;
 import jadex.bdiv3x.runtime.RInternalEvent;
 import jadex.bdiv3x.runtime.RMessageEvent;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -892,9 +893,10 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	/**
 	 * 
 	 */
-	public IFuture<Void>	abort()
+	public IFuture<Void> abort()
 	{
-//		System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get());
+		if(agent.getId().toString().indexOf("Sokrates")!=-1)
+			System.out.println("aborting: "+this+" "+IComponentIdentifier.LOCAL.get()+" "+agent.getId());
 		
 		if(!isFinishing())
 		{
@@ -935,14 +937,14 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							ICommand<ResumeCommandArgs> resc = getResumeCommand();
 							if(resc!=null)
 							{
-//								System.out.println("aborting5: "+this+", "+resc);
+								System.out.println("aborting5: "+this+", "+resc);
 								resc.execute(new ResumeCommandArgs(null, null, ex));
 							}
 							List<ICommand<ResumeCommandArgs>> rescoms = getResumeCommands();
 							if(rescoms!=null)
 							{
 								ICommand<ResumeCommandArgs>[] tmp = (ICommand<ResumeCommandArgs>[])rescoms.toArray(new ICommand[rescoms.size()]);
-//								System.out.println("aborting6: "+this+", "+SUtil.arrayToString(tmp));
+								System.out.println("aborting6: "+this+", "+SUtil.arrayToString(tmp));
 								for(ICommand<ResumeCommandArgs> rescom: tmp)
 								{
 									rescom.execute(new ResumeCommandArgs(null, null, ex));
@@ -950,6 +952,10 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 							}
 	//					}
 	//				});
+				}
+				else
+				{
+					System.out.println("plan abort: not performing abort due to plan state: "+getProcessingState());
 				}
 	//			// Can be currently executing and being abort due to e.g. goal condition triggering
 	//			else if(PlanProcessingState.RUNNING.equals(getProcessingState()))
@@ -1091,6 +1097,8 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 	 */
 	public IFuture<Void> waitFor(long delay)
 	{
+		System.out.println("before wait: "+delay+" "+agent.getId());
+		
 		final Future<Void> ret = new BDIFuture<Void>();
 		
 		final ResumeCommand<Void> rescom = new ResumeCommand<Void>(ret, true);
@@ -1101,6 +1109,7 @@ public class RPlan extends RParameterElement implements IPlan, IInternalPlan
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				System.out.println("after wait: "+delay+" "+agent.getId());
 //				if(rescom.equals(getResumeCommand()))
 				{
 					rescom.execute(null);

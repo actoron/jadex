@@ -152,13 +152,13 @@ public class ComponentTest extends TestCase
 		
 		// Start the component.
 		final IComponentIdentifier[]	cid	= new IComponentIdentifier[1];
-		final Future<Map<String, Object>>	finished	= new Future<Map<String,Object>>();
-		Timer	t	= null;
+		final Future<Map<String, Object>> finished = new Future<Map<String,Object>>();
+		Timer t = null;
 		final boolean[]	triggered	= new boolean[1];	
 		
 		if(timeout!=Timeout.NONE)
 		{
-			t	= new Timer(true);
+			t = new Timer(true);
 			
 //			System.out.println("Using test timeout: "+timeout+" "+System.currentTimeMillis()+" "+filename);
 			
@@ -186,7 +186,8 @@ public class ComponentTest extends TestCase
 			platform = Starter.createPlatform(conf, args).get(timeout, true);
 			ILibraryService	libsrv	= platform.searchService( new ServiceQuery<>(ILibraryService.class)).get(timeout, true);
 			
-			for (int projectIndex=0; projectIndex < dirs.length; projectIndex++) {
+			for(int projectIndex=0; projectIndex < dirs.length; projectIndex++) 
+			{
 				File[] project = dirs[projectIndex];
 				IResourceIdentifier	parentRid	= null;
 				for(int rootIndex=0; rootIndex<project.length; rootIndex++)
@@ -224,27 +225,33 @@ public class ComponentTest extends TestCase
 			public void resultAvailable(IExternalAccess result)
 			{
 				cid[0] = result.getId();
+				
 				result.waitForTermination().addResultListener(new IResultListener<Map<String,Object>>()
 				{
 					public void resultAvailable(Map<String, Object> result)
 					{
+						System.out.println("COMP FINI: "+cid[0]);
 						finished.setResultIfUndone(result);
 					}
 					public void exceptionOccurred(Exception exception)
 					{
+						System.out.println("COMP FINI EX: "+cid[0]);
 						finished.setExceptionIfUndone(exception);
 					}
 				});
 			}
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("COMP EX: "+exception);
 				finished.setExceptionIfUndone(exception);
 			}
 		});
 		Map<String, Object>	res	= null;
 		try
 		{
+			System.out.println("WAIT FOR TESTCASE: "+cid[0]);
 			res	= finished.get();	// Timeout set by timer above -> no get timeout needed.
+			System.out.println("TESTCASE FINISHED: "+cid[0]);
 		}
 		catch(TimeoutException te)
 		{

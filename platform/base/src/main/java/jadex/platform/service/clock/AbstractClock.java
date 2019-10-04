@@ -369,7 +369,7 @@ public abstract class AbstractClock implements IClock
 		synchronized(this)
 		{
 			timers.add(timer);
-//			System.out.println(this+" Added timer: "+timer.getTimedObject());
+			//System.out.println(this+" Added timer: "+timer.getNotificationTime());
 		}
 		
 		notifyListeners(new ChangeEvent(this, EVENT_TYPE_TIMER_ADDED));

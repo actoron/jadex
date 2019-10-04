@@ -67,10 +67,13 @@ public class ComponentStartTest extends ComponentTest
 	 * @param cid The cid, set as soon as known.
 	 */
 	protected void componentStarted(IFuture<IExternalAccess> fut)
-	{
+	{		
+		IComponentIdentifier cid = null;
 		try
 		{
 			final IExternalAccess exta = fut.get();
+			cid = exta.getId();
+			System.out.println("component start test 1: "+cid);
 
 			// Wait some time (simulation and real time) and kill the component
 			// afterwards.
@@ -86,10 +89,13 @@ public class ComponentStartTest extends ComponentTest
 						// System.out.println("destroying1 "+cid);
 						try
 						{
+							System.out.println("component start test 2: "+exta.getId());
 							exta.killComponent().get();
+							System.out.println("component start test 3: "+exta.getId());
 						}
 						catch(ComponentTerminatedException e)
 						{
+							System.out.println("component start test 4: "+exta.getId());
 							// ignore, if agent killed itself already
 						}
 						// if(cid.getName().indexOf("ParentProcess")!=-1)
@@ -136,16 +142,19 @@ public class ComponentStartTest extends ComponentTest
 		}
 		catch(ComponentTerminatedException cte)
 		{
+			System.out.println("component start test 5: "+cid);
 			// Ignore if component already terminated.
 		}
 		catch(RuntimeException e)
 		{
+			System.out.println("component start test 6: "+cid);
 			// Ignore if component already terminated.
 			if(!(e.getCause() instanceof ComponentTerminatedException))
 			{
 				throw e;
 			}
 		}
+		System.out.println("component start test 7: "+cid);
 	}
 
 	/**

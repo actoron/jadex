@@ -43,7 +43,7 @@ public class BlockingSokratesAgent
 	
 	/** The puzzle board. */
 	@Belief
-	protected IBoard	board	= new JackBoard();
+	protected IBoard board = new JackBoard();
 	
 	/** The number of tried moves. */
 	protected int	triescnt;
@@ -174,10 +174,8 @@ public class BlockingSokratesAgent
 			board.move(move);
 					
 			if(delay>0)
-			{
 				plan.waitFor(delay).get();
-			}
-				
+			
 			plan.dispatchSubgoal(new MoveGoal()).get();
 		}
 		
@@ -193,9 +191,7 @@ public class BlockingSokratesAgent
 			print("Failed "+move, depth);
 			board.takeback();
 			if(delay>0)
-			{
 				plan.waitFor(delay).get();
-			}
 		}
 
 		/**

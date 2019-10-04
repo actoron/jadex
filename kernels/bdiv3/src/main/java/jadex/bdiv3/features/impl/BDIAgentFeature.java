@@ -1950,7 +1950,7 @@ public class BDIAgentFeature extends AbstractComponentFeature implements IBDIAge
 	 */
 	public void removeBeliefListener(String name, IBeliefListener listener)
 	{
-		name	= bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
+		name = bdimodel.getCapability().getBeliefReferences().containsKey(name) ? bdimodel.getCapability().getBeliefReferences().get(name) : name;
 		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		getRuleSystem().getRulebase().removeRule(rulename);
 	}

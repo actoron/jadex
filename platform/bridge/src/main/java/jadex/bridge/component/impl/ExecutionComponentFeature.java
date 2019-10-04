@@ -443,8 +443,26 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					public void timeEventOccurred(long currenttime)
 					{
+						if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
+							System.out.println("before scheduleStep: "+getComponent().getId());
 	//					System.out.println("step: "+step);
-						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
+						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)
+						{
+							@Override
+							public void customResultAvailable(T result)
+							{
+								if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
+									System.out.println("after scheduleStep: "+getComponent().getId());
+								super.customResultAvailable(result);
+							}
+							@Override
+							public void exceptionOccurred(Exception exception)
+							{
+								if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
+									System.out.println("after scheduleStep: "+getComponent().getId()+" "+exception);
+								super.exceptionOccurred(exception);
+							}
+						}));
 					}
 					
 					public String toString()
@@ -497,10 +515,15 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 			{
 				public void timeEventOccurred(long currenttime)
 				{
+					//if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
+						System.out.println("before scheduleStep: "+getComponent().getId());
 					scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
+						//	if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
+								System.out.println("after scheduleStep: "+getComponent().getId());
+							
 							ret.setResult(null);
 							return IFuture.DONE;
 						}
@@ -517,6 +540,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						
 						public void exceptionOccurred(Exception exception)
 						{
+							exception.printStackTrace();
 							// Ignore outdated timer entries when component is already dead.
 							// propblem this can occur on clock thread
 	//						if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))
@@ -643,6 +667,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		if(!Starter.isNoPlatformMode(getInternalAccess()))
 		{
+			System.out.println("adding termination listener for: "+component.getId());
 			final Future<Map<String, Object>> ret = new Future<>();
 			SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
 			{
@@ -2071,7 +2096,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public IFuture<Map<String, Object>> killComponent()
 	{
-		if (IComponentDescription.STATE_SUSPENDED.equals(getComponent().getDescription().getState()))
+		if(IComponentDescription.STATE_SUSPENDED.equals(getComponent().getDescription().getState()))
 			getComponent().resumeComponent(component.getId());
 		return getComponent().killComponent();
 	}
@@ -2082,7 +2107,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	 */
 	public IFuture<Map<String, Object>> killComponent(Exception e)
 	{
-		if (IComponentDescription.STATE_SUSPENDED.equals(getComponent().getDescription().getState()))
+		if(IComponentDescription.STATE_SUSPENDED.equals(getComponent().getDescription().getState()))
 			getComponent().resumeComponent(component.getId());
 		return getComponent().killComponent(e);
 	}
