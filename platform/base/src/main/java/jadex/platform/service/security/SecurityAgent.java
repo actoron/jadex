@@ -639,7 +639,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		
 		String rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot().toString();
 		final ICryptoSuite cs = currentcryptosuites.get(rplat);
-		if (cs != null && !isSecurityMessage(header) && !cs.isExpiring())
+		if(cs != null && !isSecurityMessage(header) && !cs.isExpiring())
 			return new Future<byte[]>(cs.encryptAndSign(content));
 		
 		return agent.scheduleStep(new IComponentStep<byte[]>()
@@ -668,9 +668,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						currentcryptosuites.getWriteLock().lock();
 						try
 						{
-							if (cs.equals(currentcryptosuites.get(rplat)))
+							if(cs.equals(currentcryptosuites.get(rplat)))
 							{
-								if (debug)
+								if(debug)
 									System.out.println("Expiring: "+rplat);
 								expireCryptosuite(rplat);
 								cs = null;
@@ -691,8 +691,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						HandshakeState hstate = initializingcryptosuites.get(rplat);
 						if(hstate == null)
 						{
-							System.out.println("Handshake state null, starting new handhake: "+agent+" "+rplat);
-							System.out.println(initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
+							//System.out.println("Handshake state null, starting new handhake: "+agent+" "+rplat);
+							//System.out.println(initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
 							initializeHandshake(rplat);
 							hstate = initializingcryptosuites.get(rplat);
 						}
@@ -705,7 +705,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							{
 								if(!ret.isDone())
 								{
-									System.out.println("Security handshake timeout from "+agent+" to "+rplat);
+									//System.out.println("Security handshake timeout from "+agent+" to "+rplat);
 									checkCleanup();
 									ret.setExceptionIfUndone(new TimeoutException("Security handshake timeout from "+agent+" to "+rplat));
 								}
@@ -1649,7 +1649,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			if (time > entry.getValue().getExpirationTime())
 			{
 				entry.getValue().getResultFuture().setException(new TimeoutException("Handshake timed out with platform: " + entry.getKey()));
-				System.out.println("Removing handshake data: "+entry.getKey());
+				//System.out.println("Removing handshake data: "+entry.getKey());
 				it.remove();
 			}
 		}
@@ -1849,17 +1849,18 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	public void sendSecurityHandshakeMessage(final IComponentIdentifier receiver, BasicSecurityMessage message)
 	{
 		message.setMessageId(SUtil.createUniqueId());
+		//System.out.println("sending handshake message to: "+agent+" "+receiver+" "+message.getMessageId());
 		sendSecurityMessage(receiver, message).addResultListener(new IResultListener<Void>()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				//if (debug)
+				if(debug)
 				{
-					System.out.println("Failure send message to and removing suite for: "+receiver.getRoot().toString());
+					System.out.println("Failure send message to and removing suite for: "+receiver.getRoot().toString()+" "+message.getMessageId());
 					exception.printStackTrace();
 				}
 				
-				System.out.println("Removing Handshake " + receiver.getRoot().toString());
+				//System.out.println("Removing Handshake " + receiver.getRoot().toString()+" "+message.getMessageId());
 				HandshakeState state = initializingcryptosuites.remove(receiver.getRoot().toString());
 				if(state != null)
 				{
@@ -1880,10 +1881,15 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			
 			public void resultAvailable(Void result)
 			{	
+				//System.out.println("sent handshake message to: "+agent+" "+receiver+" "+message.getMessageId());
 			}
 		});
 	}
 	
+	/**
+	 *  Init handshake with other platform.
+	 *  @param cid The platform id.
+	 */
 	protected void initializeHandshake(String cid)
 	{
 		String convid = SUtil.createUniqueId(agent.getId().getRoot().toString());
@@ -1891,14 +1897,14 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		hstate.setExpirationTime(System.currentTimeMillis() + handshaketimeout);
 		hstate.setConversationId(convid);
 		hstate.setResultFuture(new Future<ICryptoSuite>());
-		System.out.println("Init handhake " +agent+" "+convid+" "+handshaketimeout);
+		//System.out.println("Init handhake " +agent+" "+cid+" "+convid+" "+handshaketimeout);
 		
 		initializingcryptosuites.put(cid.toString(), hstate);
 		
 		String[] csuites = allowedcryptosuites.keySet().toArray(new String[allowedcryptosuites.size()]);
 		InitialHandshakeMessage ihm = new InitialHandshakeMessage(agent.getId(), convid, csuites);
 		ComponentIdentifier rsec = new ComponentIdentifier("security@" + cid);
-		System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + rsec.getRoot() + " Phase: 0 Step: 0 "+initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
+		//System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + rsec.getRoot() + " Phase: 0 Step: 0 "+initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
 		sendSecurityHandshakeMessage(rsec, ihm);
 	}
 	
@@ -2013,7 +2019,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 *  @param header The message header.
 	 *  @return True, if security message.
 	 */
-	protected static final boolean isSecurityMessage(IMsgHeader header)
+	public static final boolean isSecurityMessage(IMsgHeader header)
 	{
 		return Boolean.TRUE.equals(header.getProperty(SECURITY_MESSAGE));
 	}
@@ -2027,7 +2033,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	 */
 	protected IFuture<byte[]> requestReencryption(String platformname, byte[] content)
 	{
-		if (debug)
+		if(debug)
 			System.out.println("reencryption: "+platformname+" "+Arrays.hashCode(content) + " " + currentcryptosuites.get(platformname));
 		expireCryptosuite(platformname);
 		
@@ -2097,7 +2103,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 			if (msg instanceof InitialHandshakeMessage)
 			{
 				if(debug)
-					System.out.println(agent+" initial handshake message: "+msg);
+					System.out.println("handleMessage: initial handshake message: "+agent+" "+header.getSender()+" "+msg);
 				
 				final InitialHandshakeMessage imsg = (InitialHandshakeMessage) msg;
 				IComponentIdentifier rplat = imsg.getSender().getRoot();
@@ -2112,19 +2118,31 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					// Check if duplicate
 					if(!state.getConversationId().equals(imsg.getConversationId()))
 					{
-						if (getComponentIdentifier().getRoot().toString().compareTo(rplat.toString()) < 0)
+						if(getComponentIdentifier().getRoot().toString().compareTo(rplat.toString()) < 0)
+						{
 							fut.addResultListener(new DelegationResultListener<ICryptoSuite>(state.getResultFuture()));
+						}
 						else
+						{
+							if(debug)
+								System.out.println("handleMessage exit: tie break");
 							return;
+						}
 					}
 					else
 					{
+						if(debug)
+							System.out.println("handleMessage exit: same convid");
 						return;
 					}
 				}
 				
-				if (imsg.getCryptoSuites() == null || imsg.getCryptoSuites().length < 1)
+				if(imsg.getCryptoSuites() == null || imsg.getCryptoSuites().length < 1)
+				{
+					if(debug)
+						System.out.println("handleMessage exit: no crypto suites1");
 					return;
+				}
 				
 				String[] offeredsuites = imsg.getCryptoSuites();
 				
@@ -2141,8 +2159,12 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					}
 				}
 				
-				if (chosensuite == null)
+				if(chosensuite == null)
+				{
+					if(debug)
+						System.out.println("handleMessage exit: no crypto suites2");
 					return;
+				}
 				state = new HandshakeState();
 				state.setResultFuture(fut);
 				state.setConversationId(imsg.getConversationId());
@@ -2157,9 +2179,13 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						{
 							// Test for duplicate.
 							if (oldcs.getHandshakeId().equals(imsg.getConversationId()))
+							{
+								if(debug)
+									System.out.println("handleMessage exit: dup");
 								return;
+							}
 							
-							//if (debug)
+							if(debug)
 								System.out.println("New handshake, removing existing suite: "+rplat);
 							expireCryptosuite(rplat.toString());
 						}
@@ -2177,8 +2203,9 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				
 				InitialHandshakeReplyMessage reply = new InitialHandshakeReplyMessage(getComponentIdentifier(), state.getConversationId(), chosensuite, VersionInfo.getInstance().getJadexVersion());
 				
-				System.out.println("Security Handshake " + imsg.getConversationId() + " " + agent.getId().getRoot() + " -> " + rplat.getRoot() + " Phase: 0 Step: 1");
-				System.out.println(initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
+				if(debug)
+					System.out.println("Security Handshake " + imsg.getConversationId() + " " + agent.getId().getRoot() + " -> " + rplat.getRoot() + " Phase: 0 Step: 1");
+				//System.out.println(initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
 				sendSecurityHandshakeMessage(imsg.getSender(), reply);
 			}
 			else if (msg instanceof InitialHandshakeReplyMessage)
@@ -2199,7 +2226,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						
 						if (suite == null)
 						{
-							System.out.println("Removing Handshake " + rm.getConversationId() + ", reason: no matching cryptosuites 1.");
+							if(debug)
+								System.out.println("Removing Handshake " + rm.getConversationId() + ", reason: no matching cryptosuites 1.");
 							initializingcryptosuites.remove(rm.getSender().getRoot().toString());
 							state.getResultFuture().setException(new SecurityException("Handshake with remote platform " + rm.getSender().getRoot().toString() + " failed."));
 						}
@@ -2207,7 +2235,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						{
 							state.setCryptoSuite(suite);
 							InitialHandshakeFinalMessage fm = new InitialHandshakeFinalMessage(agent.getId(), rm.getConversationId(), rm.getChosenCryptoSuite(), VersionInfo.getInstance().getJadexVersion());
-							System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + rm.getSender().getRoot() + " Phase: 0 Step: 2, finished Phase 0, entering Phase 1");
+							if(debug)
+								System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + rm.getSender().getRoot() + " Phase: 0 Step: 2, finished Phase 0, entering Phase 1");
 							sendSecurityHandshakeMessage(rm.getSender(), fm);
 						}
 					}
@@ -2221,7 +2250,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 				if (state != null)
 				{
 					String convid = state.getConversationId();
-					System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + fm.getSender().getRoot() + " finished Phase 0, entering Phase 1");
+					if(debug)
+						System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + fm.getSender().getRoot() + " finished Phase 0, entering Phase 1");
 					if (convid != null && convid.equals(fm.getConversationId()) && !state.isDuplicate(fm))
 					{
 						JadexVersion remoteversion = fm.getJadexVersion();
@@ -2233,7 +2263,8 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						
 						if (suite == null)
 						{
-							System.out.println("Removing Handshake " + fm.getConversationId() + ", reason: no matching cryptosuites 2.");
+							if(debug)
+								System.out.println("Removing Handshake " + fm.getConversationId() + ", reason: no matching cryptosuites 2.");
 							initializingcryptosuites.remove(fm.getSender().getRoot().toString());
 							state.getResultFuture().setException(new SecurityException("Handshake with remote platform " + fm.getSender().getRoot().toString() + " failed."));
 						}
@@ -2242,10 +2273,11 @@ public class SecurityAgent implements ISecurityService, IInternalService
 							state.setCryptoSuite(suite);
 							if (!suite.handleHandshake(SecurityAgent.this, fm))
 							{
-								if (debug)
+								if(debug)
 									System.out.println(agent.getId()+" finished handshake: " + fm.getSender());
 								currentcryptosuites.put(fm.getSender().getRoot().toString(), state.getCryptoSuite());
-								System.out.println("Removing Handshake " + fm.getConversationId() + ", reason: finished handshake.");
+								//if(debug)
+								//System.out.println("Removing Handshake " + fm.getConversationId() + ", reason: finished handshake.");
 								initializingcryptosuites.remove(fm.getSender().getRoot().toString());
 								state.getResultFuture().setResult(state.getCryptoSuite());
 								
@@ -2265,13 +2297,14 @@ public class SecurityAgent implements ISecurityService, IInternalService
 					{
 						try
 						{
-							System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + secmsg.getSender().getRoot() + " processing Phase 1 step");
+							if(debug)
+								System.out.println("Security Handshake " + convid + " " + agent.getId().getRoot() + " -> " + secmsg.getSender().getRoot() + " processing Phase 1 step");
 							if (!state.getCryptoSuite().handleHandshake(SecurityAgent.this, secmsg))
 							{
-								//if (debug)
+								if(debug)
 									System.out.println(agent.getId()+" finished handshake: " + secmsg.getSender() + " trusted:" + state.getCryptoSuite().getSecurityInfos().getRoles().contains(Security.TRUSTED));
 								currentcryptosuites.put(secmsg.getSender().getRoot().toString(), state.getCryptoSuite());
-								System.out.println("Removing Handshake " + secmsg.getSender().getRoot().toString());
+								//System.out.println("Removing Handshake " + secmsg.getSender().getRoot().toString());
 								initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 								state.getResultFuture().setResult(state.getCryptoSuite());
 							}
@@ -2280,7 +2313,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						{
 							e.printStackTrace();
 							state.getResultFuture().setException(e);
-							System.out.println("Removing Handshake " + secmsg.getSender().getRoot().toString()+" "+e);
+							//System.out.println("Removing Handshake " + secmsg.getSender().getRoot().toString()+" "+e);
 							initializingcryptosuites.remove(secmsg.getSender().getRoot().toString());
 						}
 					}

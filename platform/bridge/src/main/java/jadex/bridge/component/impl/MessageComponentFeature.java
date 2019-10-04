@@ -45,6 +45,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.TimeoutException;
 import jadex.commons.Tuple2;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -170,7 +171,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	public IFuture<Void> sendMessage(Object message, Map<String, Object> addheaderfields, IComponentIdentifier... receiver)
 	{
 		final MsgHeader header = new MsgHeader();
-		if (addheaderfields != null)
+		if(addheaderfields != null)
 			for (Map.Entry<String, Object> entry : addheaderfields.entrySet())
 				header.addProperty(entry.getKey(), entry.getValue());
 		header.addProperty(IMsgHeader.SENDER, component.getId());
@@ -274,6 +275,11 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		return sendMessage(header, message);
 	}
 	
+	protected boolean isSecurityMessage(IMsgHeader header)
+	{
+		return Boolean.TRUE.equals(header.getProperty("__securitymessage__"));
+	}
+	
 	/**
 	 *  Forwards the prepared message to the transport layer.
 	 *  
@@ -286,12 +292,14 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IComponentIdentifier rplat = ((IComponentIdentifier) header.getProperty(IMsgHeader.RECEIVER)).getRoot();
+		IComponentIdentifier rplat = ((IComponentIdentifier)header.getProperty(IMsgHeader.RECEIVER)).getRoot();
 		
 		// Transport service is platform-level shared / no required proxy: manual decoupling
 		Tuple2<ITransportService, Integer> cachedtransport = getTransportCache(component.getId().getRoot()).get(rplat);
-		if (cachedtransport != null)
+		if(cachedtransport != null)
 		{
+			//if(isSecurityMessage(header))
+			//	System.out.println("sending sec msg with: "+cachedtransport.getFirstEntity());
 			cachedtransport.getFirstEntity().sendMessage(header, encheader, encryptedbody).addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
 			{
 				public void resultAvailable(Integer result)
@@ -318,7 +326,8 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// Check first to avoid creating an exception.
-				if (!ret.isDone())
+				if(!ret.isDone())
+				{
 					ret.setExceptionIfUndone(new TimeoutException("Timeout occured by " + component.getId().toString() + " while sending message to " + header.getProperty(IMsgHeader.RECEIVER))// rplat)
 					{
 						@Override
@@ -327,6 +336,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 							super.printStackTrace();
 						}
 					});
+				}
 				return IFuture.DONE;
 			}
 		}, true);
@@ -456,8 +466,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	}
 	
 	/**
-	 *  Forwards the prepared message to the transport layer using
-	 *  all transports.
+	 *  Forwards the prepared message to the transport layer using all transports.
 	 *  
 	 *  @param rplat The receiving platform.
 	 *  @param header The message header.
@@ -466,29 +475,47 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	 */
 	protected IFuture<Void> sendToAllTransports(IComponentIdentifier rplat, IMsgHeader header, byte[] encheader, byte[] encryptedbody)
 	{
-		
 		Future<Void> ret = new Future<>();
 		Collection<ITransportService> transports = getAllTransports();
-		for (final ITransportService transport : transports)
+		
+		//if(isSecurityMessage(header))
+		//	System.out.println("sending sec msg with all: "+transports);
+		
+		if(transports.size()==0)
 		{
-			transport.sendMessage(header, encheader, encryptedbody).addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
-			{
-				public void resultAvailable(Integer result)
-				{
-					Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> cache = getTransportCache(platformid);
-					if (cache.get(rplat) == null || cache.get(rplat).getSecondEntity() < result)
-					{
-						cache.put(rplat, new Tuple2<ITransportService, Integer>(transport, result));
-					}
-					
-					ret.setResultIfUndone(null);
-				}
-
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			}));
+			ret.setException(new RuntimeException("No message transport available."));
 		}
+		else
+		{
+			for(final ITransportService transport : transports)
+			{
+				transport.sendMessage(header, encheader, encryptedbody).addResultListener(execfeat.createResultListener(new IResultListener<Integer>()
+				{
+					int cnt;
+					public void resultAvailable(Integer result)
+					{
+						// Successful sent, check if transport cache needs to be updated (to speedup further sending)
+						Map<IComponentIdentifier, Tuple2<ITransportService, Integer>> cache = getTransportCache(platformid);
+						if(cache.get(rplat) == null || cache.get(rplat).getSecondEntity() < result)
+						{
+							cache.put(rplat, new Tuple2<ITransportService, Integer>(transport, result));
+						}
+						
+						ret.setResultIfUndone(null);
+					}
+	
+					public void exceptionOccurred(Exception exception)
+					{
+						cnt++;
+						//exception.printStackTrace();
+					
+						if(cnt==transports.size())
+							ret.setExceptionIfUndone(exception);
+					}
+				}));
+			}
+		}
+		
 		return ret;
 	}
 	
@@ -564,21 +591,18 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 	{
 		preprocessMessage(header, message);
 		
-		if(subscriptions!=null && !subscriptions.isEmpty()
-			&& header.getProperty(IMsgHeader.XID)==null)
-		{
+		if(subscriptions!=null && !subscriptions.isEmpty() && header.getProperty(IMsgHeader.XID)==null)
 			header.addProperty(IMsgHeader.XID, SUtil.createUniqueId(null));
-		}
 		
 		Object rec = header.getProperty(IMsgHeader.RECEIVER);
 		
 		if(SReflect.isIterable(rec))
 		{
-			FutureBarrier<Void>	fubar	= new FutureBarrier<Void>();
+			FutureBarrier<Void>	fubar = new FutureBarrier<Void>();
 			for(Object orec: SReflect.getIterable(rec))
 			{
 				// Need to copy header, because receiver isn't exposed in transport interface.
-				MsgHeader	copy	= new MsgHeader();
+				MsgHeader copy = new MsgHeader();
 				copy.setProperties(new LinkedHashMap<String, Object>(header.getProperties()));
 				copy.addProperty(IMsgHeader.RECEIVER, orec);
 				fubar.addFuture(doSendMessage(copy, message));
