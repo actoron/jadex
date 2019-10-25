@@ -23,18 +23,18 @@ test:
 #	- ./gradlew -Pdist=addonjavadoc javadocZip
 # Build all kinds of docs/dist files as parallel as possible
 dist:
-  stage: dist
+  stage: deploy
   script:
     - ./gradlew -Pdist=publishdists checkDists
 
 # todo: move pass to env
 upload:
-  stage: upload
+  stage: deploy
   script: 
     - ./gradlew -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax
 
 quicktest:
-  stage: quicktest
+  stage: test
   only:
     - master
   variables:
