@@ -31,7 +31,7 @@ dist:
 upload:
   stage: upload
   script: 
-    - sh './gradlew -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax'
+    - ./gradlew -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax
 	
 quicktest:
   stage: quicktest
@@ -41,7 +41,7 @@ quicktest:
     GIT_STRATEGY: fetch
     GIT_DEPTH: "1"
   script:
-    - gradlew -Pdist=publishdists clean test -x javadoc -x processSchemas --info --stacktrace --no-daemon --continue
+    - ./gradlew -Pdist=publishdists clean test -x javadoc -x processSchemas --info --stacktrace --no-daemon --continue
   cache:
     paths:
       - binaries/
