@@ -253,6 +253,7 @@ public class SComponentManagementService
 	    		compstate.getCmsListeners();
 	    		if(col==null)
 		    	{
+	    			System.out.println(" ");
 		    		col = new ArrayList<SubscriptionIntermediateFuture<CMSStatusEvent>>();
 		    		compstate.setCmsListeners(col);
 		    	}
