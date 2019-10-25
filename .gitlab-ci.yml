@@ -14,12 +14,11 @@ build:
     - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
   allow_failure: false
 
-
 test:
   stage: test
   script:
     - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
-	  
+
 #	- ./gradlew -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
 #	- ./gradlew -Pdist=addonjavadoc javadocZip
 # Build all kinds of docs/dist files as parallel as possible
