@@ -1,0 +1,75 @@
+image: gradle:alpine
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+before_script:
+  - chmod +x gradlew
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+build:
+  stage: build
+  script:
+    #- ./gradlew -g /cache/.gradle clean build
+	- ./gradlew -g /cache/.gradle -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
+  allow_failure: false
+  script: gradle --build-cache build
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+
+test:
+  stage: test
+  script:
+    - ./gradlew -g /cache/.gradle check
+	# - ./gradlew -g /cache/.gradle -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
+  script: gradle check
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+	  
+# Build all kinds of docs/dist files as parallel as possible
+dist:
+  stage: dist
+  script:
+    - ./gradlew -Pdist=publishdists checkDists
+	- ./gradlew -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
+	- ./gradlew -Pdist=addonjavadoc javadocZip
+
+# todo: move pass to env
+upload:
+  stage: upload
+  script: 
+    - sh './gradlew -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax'	
+	
+quicktest:
+  stage: quicktest
+  only:
+    - master
+  variables:
+    GIT_STRATEGY: fetch
+    GIT_DEPTH: "1"
+  script:
+    - gradlew -Pdist=publishdists clean test -x javadoc -x processSchemas --info --stacktrace --no-daemon --continue
+  cache:
+    paths:
+      - binaries/
+      
+testreport:
+  stage: deploy
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - gradlew testReport
+  artifacts:
+    paths:
+      - testreport
+  only:
+    - master
+  when: always
