@@ -326,14 +326,24 @@ public class CmsState
 		{
 			return cmslisteners;
 		}
+		
+		/**
+		 * 
+		 */
+		public void addCmsListener(SubscriptionIntermediateFuture<CMSStatusEvent> sub)
+		{
+			if(cmslisteners==null)
+				cmslisteners = new ArrayList<SubscriptionIntermediateFuture<CMSStatusEvent>>();
+    		cmslisteners.add(sub);
+		}
 
 		/**
 		 *  Sets the cmslisteners.
 		 *  @param cmslisteners The cmslisteners to set.
-		 */
+		 * /
 		public void setCmsListeners(Collection<SubscriptionIntermediateFuture<CMSStatusEvent>> cmslisteners)
 		{
 			this.cmslisteners = cmslisteners;
-		}
+		}*/
 	}
 }

@@ -250,19 +250,23 @@ public class SComponentManagementService
 	    			ret.setException(new IllegalStateException("Component not found: " + cid));
 	    			return ret;
 	    		}
-	    		compstate.getCmsListeners();
+	    		
+	    		compstate.addCmsListener(ret);
+	    		col = compstate.getCmsListeners();
+	    		/*compstate.getCmsListeners();
 	    		if(col==null)
 		    	{
 	    			System.out.println(" ");
 		    		col = new ArrayList<SubscriptionIntermediateFuture<CMSStatusEvent>>();
 		    		compstate.setCmsListeners(col);
-		    	}
+	    	    	System.out.println("listenToComponent 2: "+cid+" "+col+" "+System.identityHashCode(cmsstate)+" "+System.identityHashCode(col));
+		    	}*/
     		}
     		else
     		{
     			col = cmsstate.getAllListeners();
+    			col.add(ret);
     		}
-	    	col.add(ret);
 	    	System.out.println("listenToComponent: "+cid+" "+col+" "+System.identityHashCode(col));
     	}
     	
