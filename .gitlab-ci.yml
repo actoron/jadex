@@ -10,8 +10,7 @@ before_script:
 build:
   stage: build
   script:
-    #- ./gradlew -g /cache/.gradle clean build
-	- ./gradlew -g /cache/.gradle -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
+    - ./gradlew -g /cache/.gradle -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
   allow_failure: false
   script: gradle --build-cache build
   cache:
@@ -24,8 +23,7 @@ build:
 test:
   stage: test
   script:
-    - ./gradlew -g /cache/.gradle check
-	# - ./gradlew -g /cache/.gradle -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
+    - ./gradlew -g /cache/.gradle -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
   script: gradle check
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -34,13 +32,13 @@ test:
       - build
       - .gradle
 	  
+#	- ./gradlew -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
+#	- ./gradlew -Pdist=addonjavadoc javadocZip
 # Build all kinds of docs/dist files as parallel as possible
 dist:
   stage: dist
   script:
     - ./gradlew -Pdist=publishdists checkDists
-	- ./gradlew -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
-	- ./gradlew -Pdist=addonjavadoc javadocZip
 
 # todo: move pass to env
 upload:
