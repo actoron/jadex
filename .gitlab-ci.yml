@@ -13,23 +13,12 @@ build:
   script:
     - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
   allow_failure: false
-  script: gradle --build-cache build
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: push
-    paths:
-      - build
+
 
 test:
   stage: test
   script:
     - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
-  script: gradle check
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
 	  
 #	- ./gradlew -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
 #	- ./gradlew -Pdist=addonjavadoc javadocZip
