@@ -304,7 +304,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 		cleanup();
 		final TerminableFuture<Integer> ret = new TerminableFuture<>();
 		Con con = establishedconnections.get(header.getReceiver().getRoot());
-		if (con != null)
+		if(con != null)
 		{
 			impl.sendMessage(con, bheader, body).addResultListener(new DelegationResultListener<>(ret));
 		}
@@ -376,7 +376,7 @@ public class AbstractTransportAgent<Con> implements ITransportService, ITranspor
 	{
 		cleanup();
 		IComponentIdentifier remotepf = restablishedconnections.get(con);
-		if (remotepf != null)
+		if(remotepf != null)
 		{
 			deliverRemoteMessage(agent, secser, serser, remotepf, header, body);
 		}
