@@ -90,7 +90,7 @@ import jadex.micro.annotation.RequiredService;
 	@ProvidedService(scope=ServiceScope.PLATFORM, type=ITransportInfoService.class, implementation=@Implementation(expression="$pojoagent")),//, proxytype=Implementation.PROXYTYPE_RAW)),
 //	@ProvidedService(scope=ServiceScope.PLATFORM, type=IMemstatService.class, implementation=@Implementation(expression="$pojoagent", proxytype=Implementation.PROXYTYPE_RAW))
 })
-public class AbstractTransportAgent2<Con> implements ITransportService, ITransportHandler<Con>, ITransportInfoService, IMemstatService, IInternalService
+public class AbstractTransportAgent<Con> implements ITransportService, ITransportHandler<Con>, ITransportInfoService, IMemstatService, IInternalService
 {
 	/** The port, the transport should listen to (&lt;0: don't listen, 0: choose random port, >0: use given port). */
 	@AgentArgument
@@ -158,8 +158,8 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 	@OnInit
 	public IFuture<Void> start()
 	{
-		if(tas==null)
-			System.out.println("tas is null");
+		//if(tas==null)
+		//	System.out.println("tas is null");
 		
 		platformid = agent.getId().getRoot();
 		cleanupinterval = Starter.getDefaultTimeout(platformid);
@@ -269,9 +269,9 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 		try
 		{
 			establishedconnections.getWriteLock().lock();
-			for (Con con : establishedconnections.values())
+			for(Con con : establishedconnections.values())
 			{
-				if (con != null)
+				if(con != null)
 					cons.add(con);
 			}
 			establishedconnections.clear();
@@ -284,7 +284,7 @@ public class AbstractTransportAgent2<Con> implements ITransportService, ITranspo
 			establishedconnections.getWriteLock().unlock();
 		}
 		
-		for (Con con : cons)
+		for(Con con : cons)
 			impl.closeConnection(con);
 		
 		return IFuture.DONE;

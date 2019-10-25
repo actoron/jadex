@@ -6,7 +6,7 @@ import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.platform.service.transport.AbstractTransportAgent2;
+import jadex.platform.service.transport.AbstractTransportAgent;
 import jadex.platform.service.transport.ITransport;
 
 /**
@@ -14,7 +14,7 @@ import jadex.platform.service.transport.ITransport;
  *
  */
 @Agent(name="ws", autostart=Boolean3.TRUE)
-public class WebSocketTransportAgent extends AbstractTransportAgent2<IWebSocketConnection>
+public class WebSocketTransportAgent extends AbstractTransportAgent<IWebSocketConnection>
 {
 	/** Maximum size of websocket frame payloads. */
 	@AgentArgument

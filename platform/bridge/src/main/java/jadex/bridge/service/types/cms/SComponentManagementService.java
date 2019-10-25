@@ -1514,22 +1514,22 @@ public class SComponentManagementService
 //						// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
 //						// todo: killcomponent should only be called once for each component?
 						
-						agent.getLogger().info("Terminating component: "+cid.getName());
+						//agent.getLogger().info("Terminating component: "+cid.getName());
 						
-						if(cid.toString().indexOf("Sokrates")!=-1)
-							System.out.println("Terminating component: "+cid.getName());
+						//if(cid.toString().indexOf("Sokrates")!=-1)
+						//	System.out.println("Terminating component: "+cid.getName());
 						
 						IResultListener<Void> cc = new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
-								System.out.println("Killed: " + cid);
+								//System.out.println("Killed: " + cid);
 								cleanup(cid, null);
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								System.out.println("Killed ex: " + cid+" "+exception);
+								//System.out.println("Killed ex: " + cid+" "+exception);
 								cleanup(cid, exception);
 							}
 						};

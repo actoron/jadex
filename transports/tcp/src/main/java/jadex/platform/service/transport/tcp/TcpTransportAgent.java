@@ -4,14 +4,14 @@ import java.nio.channels.SocketChannel;
 
 import jadex.commons.Boolean3;
 import jadex.micro.annotation.Agent;
-import jadex.platform.service.transport.AbstractTransportAgent2;
+import jadex.platform.service.transport.AbstractTransportAgent;
 import jadex.platform.service.transport.ITransport;
 
 /**
  *  Agent that implements TCP message transport.
  */
 @Agent(name="tcp", autostart=Boolean3.TRUE)
-public class TcpTransportAgent extends AbstractTransportAgent2<SocketChannel>
+public class TcpTransportAgent extends AbstractTransportAgent<SocketChannel>
 {
 	//-------- abstract methods to be provided by concrete transport --------
 	
