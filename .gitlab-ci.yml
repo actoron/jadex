@@ -3,10 +3,6 @@ image: gradle:alpine
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
-before_script:
-  - chmod +x gradlew
-  - export GRADLE_USER_HOME=`pwd`/.gradle
-
 # -g /cache/.gradle
 build:
   stage: build
