@@ -7,10 +7,11 @@ before_script:
   - chmod +x gradlew
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
+# -g /cache/.gradle
 build:
   stage: build
   script:
-    - ./gradlew -g /cache/.gradle -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
+    - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
   allow_failure: false
   script: gradle --build-cache build
   cache:
@@ -18,19 +19,17 @@ build:
     policy: push
     paths:
       - build
-      - .gradle
 
 test:
   stage: test
   script:
-    - ./gradlew -g /cache/.gradle -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
+    - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
   script: gradle check
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
     paths:
       - build
-      - .gradle
 	  
 #	- ./gradlew -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
 #	- ./gradlew -Pdist=addonjavadoc javadocZip
