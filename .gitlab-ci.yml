@@ -31,7 +31,7 @@ dist:
 upload:
   stage: upload
   script: 
-    - sh './gradlew -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax'	
+    - sh './gradlew -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax'
 	
 quicktest:
   stage: quicktest
