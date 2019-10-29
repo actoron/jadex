@@ -1,46 +1,57 @@
 image: gradle:alpine
 
+stages:
+  - build
+  - test
+  - package
+  - deploy
+
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
-# -g /cache/.gradle
 build:
   stage: build
   script:
-    - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
+    - ./gradlew -Pdist=publishdists clean build -x test -x javadoc
   allow_failure: false
 
 test:
   stage: test
   script:
-    - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc --continue
+    - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc
+  cache:
+    paths:
+      - binaries/
 
-#	- ./gradlew -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
-#	- ./gradlew -Pdist=addonjavadoc javadocZip
 # Build all kinds of docs/dist files as parallel as possible
-dist:
-  stage: deploy
+checkDists:
+  stage: package
   script:
     - ./gradlew -Pdist=publishdists checkDists
+    
+buildDocsPdf:
+  stage: package
+  script:
+    - ./gradlew -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
+    
+javadocZip:
+  stage: package
+  script:
+    - ./gradlew -Pdist=addonjavadoc javadocZip
 
 # todo: move pass to env
 upload:
   stage: deploy
   script: 
     - ./gradlew -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax
-
-quicktest:
-  stage: test
-  only:
-    - master
-  variables:
-    GIT_STRATEGY: fetch
-    GIT_DEPTH: "1"
-  script:
-    - ./gradlew -Pdist=publishdists clean test -x javadoc -x processSchemas --info --stacktrace --no-daemon --continue
-  cache:
-    paths:
-      - binaries/
 
 testreport:
   stage: deploy
