@@ -58,7 +58,7 @@ testreport:
   variables:
     GIT_STRATEGY: none
   script:
-    - gradlew testReport
+    - ./gradlew testReport
   artifacts:
     paths:
       - testreport
