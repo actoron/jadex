@@ -24,7 +24,7 @@ build:
   allow_failure: false
   artifacts:
     paths:
-      - "**/build"
+      - "**/build/**"
     expire_in: 1 week
 
 test:
