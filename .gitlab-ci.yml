@@ -17,6 +17,8 @@ cache:
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
+# **/build does not work correctly :-(
+# https://gitlab.com/gitlab-org/gitlab-foss/issues/17850
 build:
   stage: build
   script:
@@ -28,14 +30,23 @@ build:
       - "*/*/build"
       - "*/*/*/build"
       - "*/*/*/*/build"
-      - "*/*/*/*/*/build"
-      - "*/*/*/*/*/*/build"
     expire_in: 1 week
 
 test:
   stage: test
   script:
     - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc
+  artifacts:
+    paths:
+      - "*/build/test-results/test"
+      - "*/*/build/test-results/test"
+      - "*/*/*/build/test-results/test"
+      - "*/*/*/*/build/test-results/test"
+      - "*/build/reports/tests/test"
+      - "*/*/build/reports/tests/test"
+      - "*/*/*/build/reports/tests/test"
+      - "*/*/*/*/build/reports/tests/test"
+    expire_in: 1 week
 
 # Build all kinds of docs/dist files as parallel as possible
 checkDists:
@@ -58,16 +69,3 @@ upload:
   stage: deploy
   script: 
     - ./gradlew -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax
-
-testreport:
-  stage: deploy
-  # variables:
-  #  GIT_STRATEGY: none
-  script:
-    - gradle wrapper; ./gradlew testReport
-  artifacts:
-    paths:
-      - testreport
-  only:
-    - master
-  when: always
