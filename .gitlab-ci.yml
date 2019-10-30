@@ -22,14 +22,15 @@ build:
   script:
     - ./gradlew -Pdist=publishdists clean build -x test -x javadoc
   allow_failure: false
+  artifacts:
+    paths:
+      - build
+    expire_in: 1 week
 
 test:
   stage: test
   script:
     - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc
-  cache:
-    paths:
-      - binaries/
 
 # Build all kinds of docs/dist files as parallel as possible
 checkDists:
@@ -55,8 +56,8 @@ upload:
 
 testreport:
   stage: deploy
-  variables:
-    GIT_STRATEGY: none
+  # variables:
+  #  GIT_STRATEGY: none
   script:
     - gradle wrapper; ./gradlew testReport
   artifacts:
