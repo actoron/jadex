@@ -8,7 +8,7 @@ stages:
 
 # todo: move code from jenkinsutil.groovy to gradle file and make it a task
 before_script:
-  - export GRADLE_USER_HOME=`pwd`/.gradle; def build_util = load "src/main/buildutils/jenkinsutil.groovy"; def buildname = build_util.fetchNextBuildNameFromGitTag(); currentBuild.displayName = buildname.full; env.BUILD_VERSION_SUFFIX = buildname.suffix
+  - export GRADLE_USER_HOME=`pwd`/.gradle;
 
 cache:
   paths:
@@ -38,6 +38,7 @@ test:
   script:
     - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc
   artifacts:
+    when: always
     paths:
       - "*/build/test-results/test"
       - "*/*/build/test-results/test"
