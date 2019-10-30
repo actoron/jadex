@@ -36,7 +36,7 @@ build:
 test:
   stage: test
   script:
-    - ./gradlew -Pdist=publishdists clean :applications:micro:test :platform:base:test test -x javadoc
+    - ./gradlew -Pdist=publishdists :applications:micro:test -x javadoc
   artifacts:
     when: always
     paths:
