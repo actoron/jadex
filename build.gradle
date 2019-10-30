@@ -819,14 +819,14 @@ task testReport(type: TestReport) {
 	reportOn subprojects.collect { it.tasks.withType(Test).collect {it.binResultsDir} }
 }
 
-task printVersion() {
+/*task printVersion() {
 	dependsOn compileJava
 	def buildname = fetchNextBuildNameFromGitTag()
     println "new version is: "+buildname.full
 
     //currentBuild.displayName = buildname.full
     //env.BUILD_VERSION_SUFFIX = buildname.suffix // for jenkins
-}
+}*/
 
 Object fetchNextBuildNameFromGitTag()
 {
