@@ -24,7 +24,12 @@ build:
   allow_failure: false
   artifacts:
     paths:
-      - "**/build/**"
+      - "*/build"
+      - "*/*/build"
+      - "*/*/*/build"
+      - "*/*/*/*/build"
+      - "*/*/*/*/*/build"
+      - "*/*/*/*/*/*/build"
     expire_in: 1 week
 
 test:
