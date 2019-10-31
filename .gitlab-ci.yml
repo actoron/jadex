@@ -48,8 +48,15 @@ test:
       - "*/*/build/reports/tests/test"
       - "*/*/*/build/reports/tests/test"
       - "*/*/*/*/build/reports/tests/test"
-    expire_in: 1 week
-
+    reports:
+      junit: 
+        - build/test-results/test/**/TEST-*.xml
+        - "*/build/test-results/test/**/TEST-*.xml"
+        - "*/*/build/test-results/test/**/TEST-*.xml"
+        - "*/*/*/build/test-results/test/**/TEST-*.xml"
+        - "*/*/*/*/build/test-results/test/**/TEST-*.xml"
+   expire_in: 1 week
+ 
 # Build all kinds of docs/dist files as parallel as possible
 checkDists:
   stage: package
