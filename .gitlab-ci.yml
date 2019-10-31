@@ -39,6 +39,7 @@ test:
     - ./gradlew -Pdist=publishdists :applications:micro:test -x javadoc
   artifacts:
     when: always
+    expire_in: 1 week
     paths:
       - "*/build/test-results/test"
       - "*/*/build/test-results/test"
@@ -55,7 +56,6 @@ test:
         - "*/*/build/test-results/test/**/TEST-*.xml"
         - "*/*/*/build/test-results/test/**/TEST-*.xml"
         - "*/*/*/*/build/test-results/test/**/TEST-*.xml"
-   expire_in: 1 week
  
 # Build all kinds of docs/dist files as parallel as possible
 checkDists:
