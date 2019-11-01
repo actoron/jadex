@@ -12,6 +12,9 @@ stages:
 # todo: move code from jenkinsutil.groovy to gradle file and make it a task
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle;
+  - apt-get update -qq && apt-get install -y -qq xvfb
+  - Xvfb :99 
+  - export DISPLAY=:99
 
 cache:
   paths:
