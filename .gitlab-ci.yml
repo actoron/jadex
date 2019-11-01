@@ -54,11 +54,10 @@ test:
       - "*/*/*/*/build/reports/tests/test"
     reports:
       junit: 
-        - build/test-results/test/**/TEST-*.xml
-        - "*/build/test-results/test/**/TEST-*.xml"
-        - "*/*/build/test-results/test/**/TEST-*.xml"
-        - "*/*/*/build/test-results/test/**/TEST-*.xml"
-        - "*/*/*/*/build/test-results/test/**/TEST-*.xml"
+        - "*/build/test-results/test/**/*.xml"
+        - "*/*/build/test-results/test/**/*.xml"
+        - "*/*/*/build/test-results/test/**/*.xml"
+        - "*/*/*/*/build/test-results/test/**/*.xml"
  
 # Build all kinds of docs/dist files as parallel as possible
 checkDists:
