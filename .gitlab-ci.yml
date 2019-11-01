@@ -13,7 +13,7 @@ stages:
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle;
   - apt-get update -qq && apt-get install -y -qq xvfb
-  - Xvfb :99 
+  - nohup Xvfb :99 &
   - export DISPLAY=:99
 
 cache:
