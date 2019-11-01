@@ -3,6 +3,9 @@ image: gradle:alpine
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
+before_script:
+  - apt-get update -qq && apt-get install -y -qq libc6
+
 # -g /cache/.gradle
 build:
   stage: build
