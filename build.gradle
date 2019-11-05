@@ -6,9 +6,6 @@ import org.gradle.api.artifacts.ProjectDependency
 import org.apache.tools.ant.filters.*
 
 apply plugin: 'java-library' // needed for distsDir on root project level
-apply plugin: 'jacoco'
-apply plugin: 'application'
-apply plugin: 'org.sonarqube'
 
 apply from: "$rootDir/src/main/buildutils/versioning.gradle"
 
@@ -53,8 +50,11 @@ if(timestamp==null) {
 //	println 'timestamp: '+project.ext.timestamp
 }
 
-
 def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
+
+apply plugin: 'jacoco'
+//apply plugin: 'application'
+apply plugin: 'org.sonarqube'
 
 sonarqube {
     properties {
@@ -87,6 +87,7 @@ buildscript
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
 		classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
 		classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0" // for nexus-oss auto-close
+		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
     }
 
     apply from: "$rootDir/src/main/buildutils/util.gradle"
