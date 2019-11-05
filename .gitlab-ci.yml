@@ -5,6 +5,7 @@ variables:
   
 stages:
   - build
+  - quality
   - test
   - package
   - deploy
@@ -35,6 +36,12 @@ build:
       - "*/*/*/build"
       - "*/*/*/*/build"
     expire_in: 1 week
+    
+quality:
+  stage: quality
+  script:
+    - ./gradlew sonarqube
+  expire_in: 1 week
 
 test:
   stage: test

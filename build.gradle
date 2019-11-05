@@ -6,6 +6,9 @@ import org.gradle.api.artifacts.ProjectDependency
 import org.apache.tools.ant.filters.*
 
 apply plugin: 'java-library' // needed for distsDir on root project level
+apply plugin: 'jacoco'
+apply plugin: 'application'
+apply plugin: 'org.sonarqube'
 
 apply from: "$rootDir/src/main/buildutils/versioning.gradle"
 
@@ -52,6 +55,18 @@ if(timestamp==null) {
 
 
 def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
+
+sonarqube {
+    properties {
+        property 'sonar.projectName', 'Jadex'
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
 
 buildscript 
 {
