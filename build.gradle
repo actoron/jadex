@@ -7,8 +7,6 @@ import org.apache.tools.ant.filters.*
 
 apply plugin: 'java-library' // needed for distsDir on root project level
 
-apply from: "$rootDir/src/main/buildutils/versioning.gradle"
-
 def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
 	maindistsuffix += '-' + dname
@@ -28,10 +26,14 @@ project.subprojects.each { sp ->
 
 project.ext.runtimearts = new HashMap<String, Set<String>>();
 
-project.ext.keepplural = new HashSet<String>()
-project.ext.keepplural.add('rules')
-project.ext.keepplural.add('tools')
-project.ext.keepplural.add('applications')
+project.ext.keepplural = new HashSet<String>();
+project.ext.keepplural.add('rules');
+project.ext.keepplural.add('tools');
+project.ext.keepplural.add('applications');
+project.ext.version = fetchNextBuildNameFromGitTag();
+// Legacy variable, needs replacement with version.full...
+project.ext.jadex_build_version = project.ext.version.full;
+println "Jadex Build Version " + project.ext.jadex_build_version 
 
 // unix timestamp from git: git log -1 --pretty=format:%ct
 project.ext.timestamp	= null
@@ -98,7 +100,7 @@ buildscript
 
 allprojects
 {
-	version = rootProject.version
+	version = rootProject.ext.version
 	def gsuffix = ""
 	if (getProjectDepth(project) > 1)
 	{
@@ -165,7 +167,6 @@ allprojects
 		files.addAll(confs.getFiles())
 	}
 }
-
 
 // Create version.properties with new timestamp (i.e. after clean)
 task createVersionInfo(type: Copy) {
@@ -852,6 +853,11 @@ Object fetchNextBuildNameFromGitTag()
 	file("src/main/buildutils/jadexversion.properties").withInputStream { versionprops.load(it) }
 
 	def version = versionprops.jadexversion_major + "." + versionprops.jadexversion_minor
+	
+	// If we are building in dev mode (i.e. Eclipse), just set patch to 9999 and exit.
+	if (!gradle.ext.productionmode)
+		return createBuildname(version, 9999, 1, false)
+		
 	def patch = getLatestPatchVersion(version);
 	def branchpatch = 1; // Start branch subnumbers at 1, because jadex-1.2.3-branch-0 is ugly(?)
 	def buildname	= null;
@@ -894,9 +900,20 @@ boolean includeBranchName(branch)
  */
 Object	createBuildname(version, patch, branchpatch, isnew)
 {
-	def buildname = [:]
+	def buildname = new HashMap() {
+		public String toString()
+		{
+			return "" + this.major + "." + this.minor + "." + this.patch;
+		}
+	};
+	
+	//def buildname = [:]
 	//buildname.suffix = patch + (includeBranchName(env.BRANCH_NAME) ? "-"+env.BRANCH_NAME+"-"+branchpatch : "")
-	buildname.suffix = patch
+	def splitversion = version.split("\\.");
+	buildname.major = Integer.valueOf(splitversion[0]);
+	buildname.minor = Integer.valueOf(splitversion[1]);
+	buildname.patch = patch;
+	buildname.suffix = patch;
 	buildname.full = version + "." +buildname.suffix
 	buildname.isnew	= isnew;
 	return buildname;
@@ -913,7 +930,8 @@ int getLatestPatchVersion(version)
 	//def status = sh (returnStatus: true,
 	//	script: "git log --tags=\"${version}.*\" --no-walk --format=%D >tags.txt")
 	
-	def p1 = "git log --tags=\"${version}.*\" --no-walk --format=%D".execute()
+	//def p1 = "git log --tags=\"${version}.*\" --no-walk --format=%D".execute()
+	def p1 = "git log --tags=${version}.* --no-walk --format=%D".execute()
 	p1.waitFor()
 	//println p1.errorStream.text
 	
@@ -958,14 +976,18 @@ String getLatestTagSuffix(prefix)
 	//	script: "git describe --match \"${prefix}*\" --abbrev=0 > tag.txt")
 	//git log --tags="4.0.*" --no-walk --format=%D >tags.txt
 	
-	def p1 = "git describe --match \"${prefix}*\" --abbrev=0".execute()
-	p1.waitFor()
-	//println p1.errorStream.text
+	//if (project.ext.productionmode)
+	//{
+		def cmd = "git describe --match ${prefix} --abbrev=0";
+		def p1 = cmd.execute();
+		p1.waitFor()
+		
+		def status = p1.exitValue()
+		def text = p1.text.trim();
+		def tag = text.substring(prefix.length())
+		return status==0? tag: null;
+	//}
 	
-	def status = p1.exitValue()
-	def tag = p1.text.trim().substring(prefix.length())
-	
-	return status==0? tag: null;
 }
 
 /**

@@ -28,7 +28,7 @@ cache:
 build:
   stage: build
   script:
-    - ./gradlew -Pdist=publishdists clean build -x test -x javadoc
+    - ./gradlew -Pdist=publishdists -Production clean build -x test -x javadoc
   allow_failure: false
   artifacts:
     paths:
@@ -41,12 +41,12 @@ build:
 quality:
   stage: quality
   script:
-    - ./gradlew sonarqube
+    - ./gradlew -Production sonarqube
 
 test:
   stage: test
   script:
-    - ./gradlew -Pdist=publishdists :applications:micro:test :platform:base:test test -x javadoc
+    - ./gradlew -Pdist=publishdists -Production :applications:micro:test :platform:base:test test -x javadoc
   artifacts:
     when: always
     expire_in: 1 week
@@ -70,20 +70,20 @@ test:
 # checkDists:
 #  stage: package
 #  script:
-#    - ./gradlew -Pdist=publishdists checkDists
+#    - ./gradlew -Pdist=publishdists -Production checkDists
     
 buildDocsPdf:
   stage: package
   script:
-    - ./gradlew -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
+    - ./gradlew -Production -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
     
 javadocZip:
   stage: package
   script:
-    - ./gradlew -Pdist=addonjavadoc javadocZip
+    - ./gradlew -Pdist=addonjavadoc -Production javadocZip
 
 # todo: move pass to env
 upload:
   stage: deploy
   script: 
-    - ./gradlew -Pdist=publishdists publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax
+    - ./gradlew -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax
