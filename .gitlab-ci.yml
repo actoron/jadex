@@ -1,3 +1,16 @@
+# build properties
+# branchToBuild
+# tagToBuild
+# performanceTests
+# publishArtifacts
+# publishToDummy
+# publishCommercial
+# deployDists
+# resetPatchVersion
+# tagBuild
+# deployDevSchema
+# gradlew -Pdist=publishdists publish -x test -PpublishArtifacts -Prepouser=deployment -Prepopassword= -Production -Psigning.secretKeyRingFile=master.key 
+
 image: amd64/gradle
 
 variables:

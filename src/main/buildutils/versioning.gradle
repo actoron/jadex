@@ -14,6 +14,9 @@ Object fetchNextBuildNameFromGitTag()
 		return createBuildname(version, 9999, 1, false)
 		
 	def patch = getLatestPatchVersion(version);
+	
+	//println "patch from git is: "+patch
+	
 	def branchpatch = 1; // Start branch subnumbers at 1, because jadex-1.2.3-branch-0 is ugly(?)
 	def buildname	= null;
 
@@ -85,8 +88,10 @@ int getLatestPatchVersion(version)
 	//def status = sh (returnStatus: true,
 	//	script: "git log --tags=\"${version}.*\" --no-walk --format=%D >tags.txt")
 	
-	//def p1 = "git log --tags=\"${version}.*\" --no-walk --format=%D".execute()
-	def p1 = "git log --tags=${version}.* --no-walk --format=%D".execute()
+	def git = "git log --tags=${version}.* --no-walk --format=%D";
+	//println "git command: "+git
+	
+	def p1 = git.execute()
 	p1.waitFor()
 	//println p1.errorStream.text
 	
