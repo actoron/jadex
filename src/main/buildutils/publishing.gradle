@@ -100,7 +100,7 @@ def gpl() {
 // -------------------------------------
 
 def canPublishToNexus = isCommercial(project) && repo_commercial || !isCommercial(project) && repo_noncommercial
-def canSign = project.hasProperty('signing.secretKeyRingFile')
+def canSign = project.hasProperty('signing.secretKeyRingFile') || findProperty("signingKey")!=null
 
 //// Selects the projects to publish, add a better heuristic here if available
 //def includedproject = getProjectDepth(project) > 1
@@ -348,6 +348,11 @@ if (!isCommercial(project)) {
 
 if (canSign) {
 	signing {
+		// for signing with keys by environment variables https://docs.gradle.org/current/userguide/signing_plugin.html
+		def signingKey = findProperty("signingKey")
+		def signingPassword = findProperty("signingPassword")
+		useInMemoryPgpKeys(signingKey, signingPassword)
+	
 //		sign configurations.archives
 		if (isAndroidProject(project)) { // add manually because somehow, those tasks do not end up in configurations.archives??
 			sign project.tasks.androidsourcesJar
@@ -359,6 +364,8 @@ if (canSign) {
 			sign publishing.publications.ProjectPublication
 		}
 	}
+	
+	
 }
 
 
