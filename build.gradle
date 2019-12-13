@@ -55,6 +55,23 @@ if(timestamp==null) {
 //	println 'timestamp: '+project.ext.timestamp
 }
 
+System.setOut(new PrintStream(new OutputStream() {
+	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+	public void write(int b) {
+		if ('\n' == b) {
+			project.logger.lifecycle(buffer.toString());
+			buffer.reset();
+		}
+		else {
+			buffer.write(b);
+		}
+	}
+}));
+System.setErr(System.out);
+
+System.out.println("TESSST");
+println "TEEEST"
+
 def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
 
 apply plugin: 'jacoco'
@@ -91,8 +108,11 @@ buildscript
         classpath 'com.android.tools.build:gradle:' + android_gradlePluginVersion
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
 		classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
-		classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0" // for nexus-oss auto-close
-		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
+		classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0' // for nexus-oss auto-close
+		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8'
+		classpath "org.bouncycastle:bcprov-jdk15on:1.64" // bouncycastle for ssh
+		classpath "org.bouncycastle:bcpkix-jdk15on:1.64" // bouncycastle for ssh
+		classpath 'com.hierynomus:sshj:0.27.0' // ssh capabilities for docs upload
     }
 
     apply from: "$rootDir/src/main/buildutils/util.gradle"
@@ -848,4 +868,69 @@ task testReport(type: TestReport) {
     //env.BUILD_VERSION_SUFFIX = buildname.suffix // for jenkins
 }*/
 
+task docsDirZip(type: Zip) {
+   from 'docs/'
+   include '*'
+   include '*/*'
+   include '*/*/*'
+   include '*/*/*/*'
+   include '*/*/*/*/*'
+   archiveName 'docs.zip'
+   destinationDir(project.buildDir)
+}
+
+
+task deployDocs() {
+	dependsOn docsDirZip
+	doLast {
+		
+		def hosthash = project.property('docs.hosthash');
+		def host = project.property('docs.host');
+		def portprop = findProperty('docs.port');
+		def port = portprop != null ? Integer.parseInt(portprop) : 22;
+		def user = project.property('docs.user');
+		def password = project.property('docs.password');
+		
+		def dir = "/www/docs/" + project.ext.version.major + "." + project.ext.version.minor;
+		def docszip = "" + project.buildDir + File.separator + 'docs.zip';
+		
+		net.schmizz.sshj.SSHClient ssh = new net.schmizz.sshj.SSHClient();
+		ssh.addHostKeyVerifier(hosthash);
+		ssh.connect(host, port);
+		try {
+			ssh.authPassword(user, password);
+			def session = ssh.startSession();
+			def cmd = session.exec("ls " + dir);
+			cmd.close();
+			
+			
+			if (cmd.getExitStatus() == 0) {
+				// Old deployment exist, remove...
+				session = ssh.startSession();
+				cmd = session.exec("rm -rf " + dir);
+				cmd.close();
+			}
+			
+			session = ssh.startSession();
+			cmd = session.exec("mkdir " + dir);
+			cmd.close();
+			
+			ssh.newSCPFileTransfer().upload(new net.schmizz.sshj.xfer.FileSystemFile(docszip), dir + "/");
+			
+			session = ssh.startSession();
+			cmd = session.exec("unzip -d " + dir + " " + dir + "/docs.zip");
+			cmd.close();
+			
+			session = ssh.startSession();
+			cmd = session.exec("rm " + dir + "/docs.zip");
+			cmd.close();
+        } catch (Exception e) {
+        	throw new RuntimeException(e); 
+        } finally {
+            ssh.disconnect();
+        }
+        (new File(docszip)).delete();
+		println "Docs deployed.";
+	}
+}
 
