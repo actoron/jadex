@@ -85,10 +85,10 @@ test:
 #  script:
 #    - ./gradlew -Pdist=publishdists -Production checkDists
     
-buildDocsPdf:
-  stage: package
-  script:
-    - ./gradlew -Production -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
+# buildDocsPdf:
+#  stage: package
+#  script:
+#    - ./gradlew -Production -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
     
 javadocZip:
   stage: package
