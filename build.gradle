@@ -69,8 +69,8 @@ System.setOut(new PrintStream(new OutputStream() {
 }));
 System.setErr(System.out);
 
-System.out.println("TESSST");
-println "TEEEST"
+//System.out.println("TESSST");
+//println "TEEEST"
 
 def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
 

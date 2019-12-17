@@ -168,13 +168,18 @@ publishing {
                     repo = repo_noncommercial
                 }
                 
+                def myrepouser = project.hasProperty("repouser")? repouser: System.getenv("repouser")
+                def myrepopassword = project.hasProperty("repopassword")? repopassword: System.getenv("repopassword")
+                
                 println "publishing to: "+repo
+                println "repouser: "+myrepouser
+                println "repopassword: "+myrepopassword
                 
                 maven {
                     url repo
                     credentials {
-                        username repouser
-                        password repopassword
+                        username myrepouser
+                        password myrepopassword
                     }
                 }
             }
