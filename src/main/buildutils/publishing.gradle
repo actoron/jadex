@@ -168,8 +168,10 @@ publishing {
                     repo = repo_noncommercial
                 }
                 
-                def myrepouser = project.hasProperty("repouser")? repouser: System.getenv("repouser")
-                def myrepopassword = project.hasProperty("repopassword")? repopassword: System.getenv("repopassword")
+                def myrepouser = getVar("repouser", project)
+                //project.hasProperty("repouser")? repouser: System.getenv("repouser")
+                def myrepopassword = getVar("repopassword", project);
+                //project.hasProperty("repopassword")? repopassword: System.getenv("repopassword")
                 
                 println "publishing to: "+repo
                 println "repouser: "+myrepouser
@@ -354,8 +356,13 @@ if (!isCommercial(project)) {
 if (canSign) {
 	signing {
 		// for signing with keys by environment variables https://docs.gradle.org/current/userguide/signing_plugin.html
-		def signingKey = findProperty("signingKey")
-		def signingPassword = findProperty("signingPassword")
+		def signingKey1 = findProperty("signingKey")
+		def signingPassword1 = findProperty("signingPassword")
+		println("sign key1: "+signingKey1)
+		
+		def signingKey = getVar("signingKey", project)
+		def signingPassword = getVar("signingPassword", project)
+		println("sign key2: "+signingKey)
 		useInMemoryPgpKeys(signingKey, signingPassword)
 	
 //		sign configurations.archives
