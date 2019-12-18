@@ -888,12 +888,12 @@ task deployDocs() {
 	dependsOn docsDirZip
 	doLast {
 		
-		def hosthash = project.property('docs.hosthash');
-		def host = project.property('docs.host');
-		def portprop = findProperty('docs.port');
+		def hosthash = findPropertyWithDotsOrDie('docs.hosthash');
+		def host = findPropertyWithDotsOrDie('docs.host');
+		def portprop = findPropertyWithDots('docs.port');
 		def port = portprop != null ? Integer.parseInt(portprop) : 22;
-		def user = project.property('docs.user');
-		def password = project.property('docs.password');
+		def user = findPropertyWithDotsOrDie('docs.user');
+		def password = findPropertyWithDotsOrDie('docs.password');
 		
 		def dir = "/www/docs/" + project.ext.version.major + "." + project.ext.version.minor;
 		def docszip = "" + project.buildDir + File.separator + 'docs.zip';
@@ -938,3 +938,16 @@ task deployDocs() {
 	}
 }
 
+def findPropertyWithDots(propname) {
+	def ret = findProperty(propname);
+	if (ret == null)
+		ret = findProperty(propname.replace('.', '_'));
+	return ret;
+}
+
+def findPropertyWithDotsOrDie(propname) {
+	def ret = findPropertyWithDots(propname);
+	if (ret == null)
+		throw new Exception('Missing property ' + propname);
+	return ret;
+}
