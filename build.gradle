@@ -17,6 +17,10 @@ project.ext.filterfiles = '*.xml,*.xsd,*.bat,*.sh,*.txt,*.gradle,*.md'
 // resource files that are executable and should be flagged as such in the zip, must be subset of filterfiles
 project.ext.execfiles = '*.bat,*.sh'
 
+def sigkey = findProperty('sigKey');
+if (sigkey != null)
+	project.ext.signingKey=sigkey.replace("\\n", "\n");
+
 project.ext.srcdir = 'src'
 
 project.ext.subprojectmap  = new HashMap()
