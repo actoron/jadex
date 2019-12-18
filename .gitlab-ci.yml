@@ -95,6 +95,11 @@ javadocZip:
   script:
     - ./gradlew -Pdist=addonjavadoc -Production javadocZip
 
+deployDocs:
+  stage: deploy
+  script:
+    - ./gradlew -Production deployDocs
+
 # todo: move pass to env
 upload:
   stage: deploy
