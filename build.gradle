@@ -73,9 +73,6 @@ System.setOut(new PrintStream(new OutputStream() {
 }));
 System.setErr(System.out);
 
-//System.out.println("TESSST");
-//println "TEEEST"
-
 def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
 
 apply plugin: 'jacoco'
@@ -686,7 +683,8 @@ subprojects
 				}
 			
 				println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
-				destinationDir new File(getDistsDir(rootProject), commercial? 'commercial' : 'noncommercial')
+				//destinationDir new File(getDistsDir(rootProject), commercial? 'commercial' : 'noncommercial')
+				destinationDir new File(getDistsDir(rootProject), 'zips')
 			}
 			
 			// Copy generated srcZip
@@ -747,7 +745,8 @@ subprojects
 					
 				// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
 				def distzip = project.distZip.outputs.files.first().canonicalPath
-				def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+				//def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+				def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions/zips/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 				def diff	= diffZips(distzip, distzip2)
 				if(diff.length()!=0)
 					throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
@@ -888,21 +887,16 @@ task deployDocs() {
 	dependsOn docsDirZip
 	doLast {
 		
-		def hosthash = findPropertyWithDotsOrDie('docs.hosthash');
-		def host = findPropertyWithDotsOrDie('docs.host');
-		def portprop = findPropertyWithDots('docs.port');
-		def port = portprop != null ? Integer.parseInt(portprop) : 22;
-		def user = findPropertyWithDotsOrDie('docs.user');
-		def password = findPropertyWithDotsOrDie('docs.password');
+		def acc = getDownloadServerAccess();
 		
 		def dir = "/www/docs/" + project.ext.version.major + "." + project.ext.version.minor;
 		def docszip = "" + project.buildDir + File.separator + 'docs.zip';
 		
 		net.schmizz.sshj.SSHClient ssh = new net.schmizz.sshj.SSHClient();
-		ssh.addHostKeyVerifier(hosthash);
-		ssh.connect(host, port);
+		ssh.addHostKeyVerifier(acc.hosthash);
+		ssh.connect(acc.host, acc.port);
 		try {
-			ssh.authPassword(user, password);
+			ssh.authPassword(acc.user, acc.password);
 			def session = ssh.startSession();
 			def cmd = session.exec("ls " + dir);
 			cmd.close();
@@ -936,6 +930,71 @@ task deployDocs() {
         (new File(docszip)).delete();
 		println "Docs deployed.";
 	}
+}
+
+task deployZips() {
+	dependsOn distZips
+	doLast {
+		if (!gradle.ext.productionmode)
+			throw new IllegalStateException("Can only deploy zips in production mode.");
+		
+		def acc = getDownloadServerAccess();
+		
+		def dir = "/www/releases/" + project.ext.jadex_build_version;
+		def zipsdir = "" + project.buildDir + File.separator + 'distributions' + File.separator + 'zips';
+		def sourcesdir = "" + project.buildDir + File.separator + 'distributions' + File.separator + 'exampleprojects';
+
+		net.schmizz.sshj.SSHClient ssh = new net.schmizz.sshj.SSHClient();
+		ssh.addHostKeyVerifier(acc.hosthash);
+		ssh.connect(acc.host, acc.port);
+		try {
+			ssh.authPassword(acc.user, acc.password);
+			
+			createEmptyDirOnSSH(ssh, dir);
+			
+			def children = new net.schmizz.sshj.xfer.FileSystemFile(zipsdir).getChildren();
+			for (def child : children) {
+				ssh.newSCPFileTransfer().upload(child, dir + "/");
+			}
+			children = new net.schmizz.sshj.xfer.FileSystemFile(sourcesdir).getChildren();
+			for (def child : children) {
+				ssh.newSCPFileTransfer().upload(child, dir + "/");
+			}
+        } catch (Exception e) {
+        	throw new RuntimeException(e); 
+        } finally {
+            ssh.disconnect();
+        }
+		println "Zips deployed.";
+	}
+}
+
+def createEmptyDirOnSSH(net.schmizz.sshj.SSHClient ssh, String dir) {
+	def session = ssh.startSession();
+	def cmd = session.exec("ls " + dir);
+	cmd.close();
+	
+	if (cmd.getExitStatus() == 0) {
+		// Old deployment exist, remove...
+		session = ssh.startSession();
+		cmd = session.exec("rm -rf " + dir);
+		cmd.close();
+	}
+	
+	session = ssh.startSession();
+	cmd = session.exec("mkdir " + dir);
+	cmd.close();
+}
+
+def getDownloadServerAccess() {
+	def ret = [:];
+	ret.hosthash = findPropertyWithDotsOrDie('dl.hosthash');
+	ret.host = findPropertyWithDotsOrDie('dl.host');
+	def portprop = findPropertyWithDots('dl.port');
+	ret.port = portprop != null ? Integer.parseInt(portprop) : 22;
+	ret.user = findPropertyWithDotsOrDie('dl.user');
+	ret.password = findPropertyWithDotsOrDie('dl.password');
+	return ret;
 }
 
 def findPropertyWithDots(propname) {
