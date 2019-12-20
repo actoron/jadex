@@ -15,12 +15,12 @@ image: amd64/gradle
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-  BUILD: true
-  QUALITY: true
-  TEST: true
-  JAVADOCZIP: true
-  DEPLOYZIPS: true
-  UPLOADCENTRAL: true
+  BUILD: "true"
+  QUALITY: "true"
+  TEST: "true"
+  JAVADOCZIP: "true"
+  DEPLOYZIPS: "true"
+  UPLOADCENTRAL: "true"
   
 stages:
   - build
