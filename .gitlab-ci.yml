@@ -21,7 +21,7 @@ variables:
   JAVADOCZIP: "true"
   DEPLOYZIPS: "true"
   DEPLOYDOCS: "true"
-  UPLOADCENTRAL: "true"
+  UPLOAD: "true"
   
 stages:
   - build
@@ -43,7 +43,7 @@ before_script:
   - echo "JAVADOCZIP" $JAVADOCZIP
   - echo "DEPLOYDOCS" $DEPLOYDOCS
   - echo "DEPLOYZIPS" $DEPLOYZIPS
-  - echo "UPLOADCENTRAL" $UPLOADCENTRAL
+  - echo "UPLOAD" $UPLOAD
 
 cache:
   paths:
@@ -144,4 +144,4 @@ upload:
     - ./gradlew -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
   only:
     variables:
-      - $UPLOADCENTRAL == "true"
+      - $UPLOAD == "true"
