@@ -36,6 +36,12 @@ before_script:
   - pip3 install mkdocs
   - nohup Xvfb :99 &
   - export DISPLAY=:99
+  - echo "BUILD:" $BUILD
+  - echo "QUALITY" $QUALITY
+  - echo "TEST" $TEST
+  - echo "JAVADOCZIP" $JAVADOCZIP
+  - echo "DEPLOYZIPS" $DEPLOYZIPS
+  - echo "UPLOADCENTRAL" $UPLOADCENTRAL
 
 cache:
   paths:
