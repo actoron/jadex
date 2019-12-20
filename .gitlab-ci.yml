@@ -53,6 +53,7 @@ cache:
 build:
   stage: build
   script:
+    - echo "BUILD:" $BUILD
     - ./gradlew -Pdist=publishdists -Production clean build -x test -x javadoc
   allow_failure: false
   artifacts:
