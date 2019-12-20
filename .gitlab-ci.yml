@@ -20,6 +20,7 @@ variables:
   TEST: "true"
   JAVADOCZIP: "true"
   DEPLOYZIPS: "true"
+  DEPLOYDOCS: "true"
   UPLOADCENTRAL: "true"
   
 stages:
@@ -40,6 +41,7 @@ before_script:
   - echo "QUALITY" $QUALITY
   - echo "TEST" $TEST
   - echo "JAVADOCZIP" $JAVADOCZIP
+  - echo "DEPLOYDOCS" $DEPLOYDOCS
   - echo "DEPLOYZIPS" $DEPLOYZIPS
   - echo "UPLOADCENTRAL" $UPLOADCENTRAL
 
@@ -53,7 +55,6 @@ cache:
 build:
   stage: build
   script:
-    - echo "BUILD:" $BUILD
     - ./gradlew -Pdist=publishdists -Production clean build -x test -x javadoc
   allow_failure: false
   artifacts:
@@ -65,7 +66,7 @@ build:
     expire_in: 1 week
   only:
     variables:
-      - $BUILD
+      - $BUILD == "true"
     
 quality:
   stage: quality
@@ -73,7 +74,7 @@ quality:
     - ./gradlew -Production sonarqube
   only:
     variables:
-      - $QUALITY
+      - $QUALITY == "true"
 
 test:
   stage: test
@@ -99,7 +100,7 @@ test:
         - "*/*/*/*/build/test-results/test/**/*.xml"
   only:
     variables:
-      - $TEST
+      - $TEST == "true"
  
 # Build all kinds of docs/dist files as parallel as possible
 # checkDists:
@@ -118,7 +119,7 @@ javadocZip:
     - ./gradlew -Pdist=addonjavadoc -Production javadocZip
   only:
     variables:
-      - $JAVADOCZIP
+      - $JAVADOCZIP == "true"
     
 deployZips:
   stage: deploy
@@ -126,12 +127,15 @@ deployZips:
     - ./gradlew -Pdist=publishdists -Production deployZips
   only:
     variables:
-      - $DEPLOYZIPS
+      - $DEPLOYZIPS == "true"
 
 deployDocs:
   stage: deploy
   script:
     - ./gradlew -Production deployDocs
+  only:
+    variables:
+      - $DEPLOYDOCS == "true"
 
 # todo: move pass to env
 upload:
@@ -140,4 +144,4 @@ upload:
     - ./gradlew -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
   only:
     variables:
-      - $UPLOADCENTRAL
+      - $UPLOADCENTRAL == "true"
