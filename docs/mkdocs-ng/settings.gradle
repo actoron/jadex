@@ -1,5 +1,0 @@
-def prodstr = gradle.startParameter.getProjectProperties().get('production');
-if (prodstr == null)
-	prodstr = gradle.startParameter.getProjectProperties().get('roduction');
-gradle.ext.productionmode=prodstr != null;
-println "Build Mode: " + gradle.ext.productionmode ? "production" : "development";

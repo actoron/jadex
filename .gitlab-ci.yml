@@ -121,11 +121,16 @@ deployZips:
     variables:
       - $DEPLOYZIPS
 
+deployDocs:
+  stage: deploy
+  script:
+    - ./gradlew -Production deployDocs
+
 # todo: move pass to env
 upload:
   stage: deploy
   script: 
-    - ./gradlew -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax
+    - ./gradlew -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
   only:
     variables:
       - $UPLOADCENTRAL
