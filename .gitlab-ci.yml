@@ -15,6 +15,12 @@ image: amd64/gradle
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  BUILD: true
+  QUALITY: true
+  TEST: true
+  JAVADOCZIP: true
+  DEPLOYZIPS: true
+  UPLOADCENTRAL: true
   
 stages:
   - build
@@ -50,11 +56,17 @@ build:
       - "*/*/*/build"
       - "*/*/*/*/build"
     expire_in: 1 week
+  only:
+    variables:
+      - $BUILD
     
 quality:
   stage: quality
   script:
     - ./gradlew -Production sonarqube
+  only:
+    variables:
+      - $QUALITY
 
 test:
   stage: test
@@ -78,6 +90,9 @@ test:
         - "*/*/build/test-results/test/**/*.xml"
         - "*/*/*/build/test-results/test/**/*.xml"
         - "*/*/*/*/build/test-results/test/**/*.xml"
+  only:
+    variables:
+      - $TEST
  
 # Build all kinds of docs/dist files as parallel as possible
 # checkDists:
@@ -85,18 +100,32 @@ test:
 #  script:
 #    - ./gradlew -Pdist=publishdists -Production checkDists
     
-buildDocsPdf:
-  stage: package
-  script:
-    - ./gradlew -Production -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
+# buildDocsPdf:
+#  stage: package
+#  script:
+#    - ./gradlew -Production -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
     
 javadocZip:
   stage: package
   script:
     - ./gradlew -Pdist=addonjavadoc -Production javadocZip
+  only:
+    variables:
+      - $JAVADOCZIP
+    
+deployZips:
+  stage: deploy
+  script:
+    - ./gradlew -Pdist=publishdists -Production deployZips
+  only:
+    variables:
+      - $DEPLOYZIPS
 
 # todo: move pass to env
 upload:
   stage: deploy
   script: 
     - ./gradlew -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -P repo_commercial= -Prepouser=Lars -Prepopassword=lax
+  only:
+    variables:
+      - $UPLOADCENTRAL
