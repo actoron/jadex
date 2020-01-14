@@ -426,8 +426,16 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			
 			public void finished()
 			{
-				if (notsent)
-					ret.setExceptionIfUndone(new IllegalStateException("No route to receiver " + fwdest + " found."));
+				if(notsent)
+				{
+					ret.setExceptionIfUndone(new IllegalStateException("No route to receiver " + fwdest + " found.")
+					{
+						public void printStackTrace()
+						{
+							Thread.dumpStack();
+						}
+					});
+				}
 			}
 		});
 		return ret;

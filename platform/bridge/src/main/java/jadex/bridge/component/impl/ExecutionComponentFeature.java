@@ -443,23 +443,23 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
-							System.out.println("before scheduleStep: "+getComponent().getId());
+						//if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
+						//	System.out.println("before scheduleStep: "+getComponent().getId());
 	//					System.out.println("step: "+step);
 						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)
 						{
 							@Override
 							public void customResultAvailable(T result)
 							{
-								if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
-									System.out.println("after scheduleStep: "+getComponent().getId());
+								//if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
+								//	System.out.println("after scheduleStep: "+getComponent().getId());
 								super.customResultAvailable(result);
 							}
 							@Override
 							public void exceptionOccurred(Exception exception)
 							{
-								if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
-									System.out.println("after scheduleStep: "+getComponent().getId()+" "+exception);
+								//if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
+								//	System.out.println("after scheduleStep: "+getComponent().getId()+" "+exception);
 								super.exceptionOccurred(exception);
 							}
 						}));
@@ -516,13 +516,13 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 				public void timeEventOccurred(long currenttime)
 				{
 					//if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
-						System.out.println("before scheduleStep: "+getComponent().getId());
+					//	System.out.println("before scheduleStep: "+getComponent().getId());
 					scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 						//	if(getComponent().getId().toString().indexOf("Sokrates")!=-1)
-								System.out.println("after scheduleStep: "+getComponent().getId());
+						//		System.out.println("after scheduleStep: "+getComponent().getId());
 							
 							ret.setResult(null);
 							return IFuture.DONE;
