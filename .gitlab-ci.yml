@@ -28,7 +28,8 @@ stages:
   - testandquality
   - package
   - deploy
-  - cleanup
+  - failure
+  - success
 
 # todo: move code from jenkinsutil.groovy to gradle file and make it a task
 before_script:
@@ -148,9 +149,18 @@ upload:
       - $UPLOAD == "true"
       
 cleanuprepo:    
-  stage: cleanup
+  stage: failure
   script: 
     - ./gradlew closeRepository
   when: on_failure
   
-      
+releaseStagingRepo:
+  stage: success
+  script:
+    -  ./gradlew closeAndReleaseRepository
+    
+updateTag:
+  stage: success
+  script:
+    -  ./gradlew -Production updateTag
+    
