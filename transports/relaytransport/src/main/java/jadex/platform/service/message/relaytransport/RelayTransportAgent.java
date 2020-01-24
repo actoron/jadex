@@ -426,8 +426,16 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 			
 			public void finished()
 			{
-				if (notsent)
-					ret.setExceptionIfUndone(new IllegalStateException("No route to receiver found."));
+				if(notsent)
+				{
+					ret.setExceptionIfUndone(new IllegalStateException("No route to receiver " + fwdest + " found.")
+					{
+						public void printStackTrace()
+						{
+							Thread.dumpStack();
+						}
+					});
+				}
 			}
 		});
 		return ret;
@@ -864,7 +872,11 @@ public class RelayTransportAgent implements ITransportService, IRoutingService
 				{
 					if (debug)
 						System.out.println(agent + " forwarding: " + header);
-					forwardMessage(header, (byte[]) msg);
+					forwardMessage(header, (byte[]) msg).exceptionally(e ->
+					{
+						// Failed to forward on intermediary node (prob. lost route), nothing can be done to salvage the situation...
+						// TODO: Inform sender transmission has failed if possible.
+					});
 				}
 			}
 		};

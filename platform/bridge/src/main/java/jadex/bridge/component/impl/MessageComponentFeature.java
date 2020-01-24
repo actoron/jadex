@@ -509,10 +509,15 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					public void exceptionOccurred(Exception exception)
 					{
 						cnt++;
-						exception.printStackTrace();
+						
+						System.out.println("Transport failed: "+cnt+"/"+transports.size()+" "+exception);
+						//exception.printStackTrace();
 					
 						if(cnt==transports.size())
+						{
+							System.out.println("Finally failed to send message: "+exception);
 							ret.setExceptionIfUndone(exception);
+						}
 					}
 				}));
 			}
