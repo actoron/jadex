@@ -78,6 +78,12 @@ def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
 apply plugin: 'jacoco'
 //apply plugin: 'application'
 apply plugin: 'org.sonarqube'
+apply plugin: 'io.codearte.nexus-staging'
+
+nexusStaging {
+    //packageGroup = "org.mycompany.myproject" //optional if packageGroup == project.getGroup()
+    //stagingProfileId = "yourStagingProfileId" //when not defined will be got from server using "packageGroup"
+}
 
 sonarqube {
     properties {
@@ -114,8 +120,9 @@ buildscript
 		classpath "org.bouncycastle:bcprov-jdk15on:1.64" // bouncycastle for ssh
 		classpath "org.bouncycastle:bcpkix-jdk15on:1.64" // bouncycastle for ssh
 		classpath 'com.hierynomus:sshj:0.27.0' // ssh capabilities for docs upload
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.21.2"
     }
-
+    
     apply from: "$rootDir/src/main/buildutils/util.gradle"
 }
 
