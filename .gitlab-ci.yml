@@ -25,8 +25,7 @@ variables:
   
 stages:
   - build
-  - quality
-  - test
+  - testandquality
   - package
   - deploy
 
@@ -69,15 +68,16 @@ build:
       - $BUILD == "true"
     
 quality:
-  stage: quality
+  stage: testandquality
   script:
     - ./gradlew -Production sonarqube
+  allow_failure: true
   only:
     variables:
       - $QUALITY == "true"
 
 test:
-  stage: test
+  stage: testandquality
   script:
     - ./gradlew -Pdist=publishdists -Production :applications:micro:test :platform:base:test test -x javadoc
   artifacts:
