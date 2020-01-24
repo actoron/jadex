@@ -121,6 +121,7 @@ buildscript
 		classpath "org.bouncycastle:bcpkix-jdk15on:1.64" // bouncycastle for ssh
 		classpath 'com.hierynomus:sshj:0.27.0' // ssh capabilities for docs upload
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.21.2"
+		classpath 'org.eclipse.jgit:org.eclipse.jgit:5.6.0.201912101111-r' // git capabilities
     }
     
     apply from: "$rootDir/src/main/buildutils/util.gradle"
@@ -973,6 +974,32 @@ task deployZips() {
             ssh.disconnect();
         }
 		println "Zips deployed.";
+	}
+}
+
+task updateTag() {
+	doLast() {
+		if (!gradle.ext.productionmode)
+			throw new IllegalStateException("Can only deploy zips in production mode.");
+		
+		def url = findPropertyWithDotsOrDie('tag.url');
+		def user = findPropertyWithDotsOrDie('tag.user');
+		def pass = findPropertyWithDotsOrDie('tag.password');
+		
+		org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(project.projectDir);
+		//org.eclipse.jgit.lib.Repository repo = new org.eclipse.jgit.storage.file.FileRepositoryBuilder().setMustExist(true).setGitDir(project.projectDir).readEnvironment().findGitDir().build();
+		List tags = git.tagList().call();
+		println Arrays.toString(tags.toArray());
+		println jadex_build_version;
+		def cmd = git.tag();
+		cmd.setName(jadex_build_version);
+		cmd.call();
+		cmd = git.push();
+		cmd.setRemote(tag.url);
+		cmd.setCredentialsProvider(new org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider(user, pass))
+		cmd.setPushTags();
+		cmd.call();
+		
 	}
 }
 
