@@ -943,7 +943,7 @@ task deployDocs() {
 task deployZips() {
 	dependsOn distZips
 	doLast {
-		if (!gradle.ext.productionmode)
+		if(!gradle.ext.productionmode)
 			throw new IllegalStateException("Can only deploy zips in production mode.");
 		
 		def acc = getDownloadServerAccess();
@@ -979,12 +979,20 @@ task deployZips() {
 
 task updateTag() {
 	doLast() {
-		if (!gradle.ext.productionmode)
-			throw new IllegalStateException("Can only deploy zips in production mode.");
+		if(!gradle.ext.productionmode)
+			throw new IllegalStateException("Can only update tag in production mode.");
 		
-		def url = findPropertyWithDotsOrDie('tag.url');
-		def user = findPropertyWithDotsOrDie('tag.user');
-		def pass = findPropertyWithDotsOrDie('tag.password');
+		def url = findProperty('tagUrl');
+		def user = findProperty('tagUser');
+		def pass = findProperty('tagPassword');
+		
+		println "User: "+user
+		println "URL: "+url
+		println "Pass: "+pass
+		
+		//def url = findPropertyWithDotsOrDie('tag.url');
+		//def user = findPropertyWithDotsOrDie('tag.user');
+		//def pass = findPropertyWithDotsOrDie('tag.password');
 		
 		org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(project.projectDir);
 		//org.eclipse.jgit.lib.Repository repo = new org.eclipse.jgit.storage.file.FileRepositoryBuilder().setMustExist(true).setGitDir(project.projectDir).readEnvironment().findGitDir().build();
@@ -999,7 +1007,6 @@ task updateTag() {
 		cmd.setCredentialsProvider(new org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider(user, pass))
 		cmd.setPushTags();
 		cmd.call();
-		
 	}
 }
 
