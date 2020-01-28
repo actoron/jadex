@@ -994,7 +994,7 @@ task updateTag() {
 		//def user = findPropertyWithDotsOrDie('tag.user');
 		//def pass = findPropertyWithDotsOrDie('tag.password');
 		
-		org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(project.projectDir);
+		/*org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(project.projectDir);
 		//org.eclipse.jgit.lib.Repository repo = new org.eclipse.jgit.storage.file.FileRepositoryBuilder().setMustExist(true).setGitDir(project.projectDir).readEnvironment().findGitDir().build();
 		List tags = git.tagList().call();
 		println Arrays.toString(tags.toArray());
@@ -1006,7 +1006,7 @@ task updateTag() {
 		cmd.setRemote(tag.url);
 		cmd.setCredentialsProvider(new org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider(user, pass))
 		cmd.setPushTags();
-		cmd.call();
+		cmd.call();*/
 	}
 }
 
