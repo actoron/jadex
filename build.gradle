@@ -996,11 +996,8 @@ task updateTag() {
 		
 		def git = org.eclipse.jgit.api.Git.open(project.projectDir);
 		//org.eclipse.jgit.lib.Repository repo = new org.eclipse.jgit.storage.file.FileRepositoryBuilder().setMustExist(true).setGitDir(project.projectDir).readEnvironment().findGitDir().build();
-		println "GIT object is: " + git;
 		def tags = git.tagList().call();
-		println "GIT tags are: " + tags;
 		def cmd = git.tag();
-		println "Created git tag cmd: " + cmd;
 		cmd.setName(jadex_build_version);
 		cmd.setForceUpdate(true);
 		cmd.call();
