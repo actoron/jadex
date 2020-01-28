@@ -996,15 +996,18 @@ task updateTag() {
 		
 		def git = org.eclipse.jgit.api.Git.open(project.projectDir);
 		//org.eclipse.jgit.lib.Repository repo = new org.eclipse.jgit.storage.file.FileRepositoryBuilder().setMustExist(true).setGitDir(project.projectDir).readEnvironment().findGitDir().build();
+		println "GIT object is: " + git;
 		List tags = git.tagList().call();
+		println "GIT tags are: " + list;
 		def cmd = git.tag();
-		cmd.setName(jadex_build_version);
+		println "Created git tag cmd: " + cmd;
+		/*cmd.setName(jadex_build_version);
 		cmd.call();
 		cmd = git.push();
 		cmd.setRemote(tag.url);
 		cmd.setCredentialsProvider(new org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider(user, pass))
 		cmd.setPushTags();
-		cmd.call();
+		cmd.call();*/
 	}
 }
 
