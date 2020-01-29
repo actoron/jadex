@@ -1,3 +1,5 @@
+description 'Jadex websocket webservice implementation for Nano'
+
 plugins {
 	id "maven-publish" // PublishToMavenLocal
 	id "java"

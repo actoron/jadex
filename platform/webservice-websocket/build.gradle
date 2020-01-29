@@ -1,3 +1,5 @@
+description 'Jadex websocket webservice implementation'
+
 buildscript {
 
 	repositories {
