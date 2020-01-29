@@ -148,22 +148,23 @@ upload:
     variables:
       - $UPLOAD == "true"
       
-cleanuprepo:    
-  stage: failure
-  script: 
-    - ./gradlew closeRepository
-  when: on_failure
-  only:
-    variables:
-      - $UPLOAD == "true"
-  
-releaseStagingRepo:
-  stage: success
-  script:
-    -  ./gradlew closeAndReleaseRepository
-  only:
-    variables:
-      - $UPLOAD == "true"
+# cleanuprepo:    
+#  stage: failure
+#  script: 
+#    - ./gradlew closeRepository
+#  when: on_failure
+#  only:
+#    variables:
+#      - $UPLOAD == "true"
+
+# has some 401 error :-(  
+#releaseStagingRepo:
+#  stage: success
+#  script:
+#    -  ./gradlew closeAndReleaseRepository
+#  only:
+#    variables:
+#      - $UPLOAD == "true"
     
 updateTag:
   stage: success

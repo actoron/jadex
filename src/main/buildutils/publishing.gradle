@@ -102,6 +102,8 @@ def gpl() {
 def canPublishToNexus = isCommercial(project) && repo_commercial || !isCommercial(project) && repo_noncommercial
 def canSign = project.hasProperty('signing.secretKeyRingFile') || getVar("signingKey", project)!=null
 
+println getVar("signingKey", project)
+
 //// Selects the projects to publish, add a better heuristic here if available
 //def includedproject = getProjectDepth(project) > 1
 //// Empty project
