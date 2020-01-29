@@ -982,31 +982,30 @@ task updateTag() {
 		if(!gradle.ext.productionmode)
 			throw new IllegalStateException("Can only update tag in production mode.");
 		
-		def url = findProperty('tagUrl');
+		/*def url = findProperty('tagUrl');
 		def user = findProperty('tagUser');
 		def pass = findProperty('tagPassword');
 		
 		println "User: "+user
 		println "URL: "+url
-		println "Pass: "+pass
+		println "Pass: "+pass*/
 		
-		//def url = findPropertyWithDotsOrDie('tag.url');
-		//def user = findPropertyWithDotsOrDie('tag.user');
-		//def pass = findPropertyWithDotsOrDie('tag.password');
+		def url = findPropertyWithDotsOrDie('tag.url');
+		def user = findPropertyWithDotsOrDie('tag.user');
+		def pass = findPropertyWithDotsOrDie('tag.password');
 		
-		/*org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(project.projectDir);
+		def git = org.eclipse.jgit.api.Git.open(project.projectDir);
 		//org.eclipse.jgit.lib.Repository repo = new org.eclipse.jgit.storage.file.FileRepositoryBuilder().setMustExist(true).setGitDir(project.projectDir).readEnvironment().findGitDir().build();
-		List tags = git.tagList().call();
-		println Arrays.toString(tags.toArray());
-		println jadex_build_version;
+		def tags = git.tagList().call();
 		def cmd = git.tag();
 		cmd.setName(jadex_build_version);
+		cmd.setForceUpdate(true);
 		cmd.call();
 		cmd = git.push();
-		cmd.setRemote(tag.url);
+		cmd.setRemote(url);
 		cmd.setCredentialsProvider(new org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider(user, pass))
 		cmd.setPushTags();
-		cmd.call();*/
+		cmd.call();
 	}
 }
 
