@@ -156,6 +156,7 @@ def configurePom(pom) {
     }
 }
 
+
 publishing {
 
 	println "can publish: "+canPublishToNexus
@@ -249,7 +250,6 @@ publishing {
 //        return sigFiles
 //    }
 
-
     publications {
 		
         if(canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project)))  // dont publish apks
@@ -272,9 +272,9 @@ publishing {
                 } 
                 else if (!isAndroidProject(project)) 
                 {
-                	mavenJava(MavenPublication) {
+                	//mavenJava(MavenPublication) {
                     	from components.java
-                    }
+                    //}
                 }
 
                 // somehow artifacts are lost when publishing with maven-publish, re-add all jars:
