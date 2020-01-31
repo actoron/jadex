@@ -132,8 +132,6 @@ buildscript
     apply from: "$rootDir/src/main/buildutils/util.gradle"
 }
 
-apply plugin: 'de.marcphilipp.nexus-publish'
-
 //apply plugin: 'eclipse'
 //eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 

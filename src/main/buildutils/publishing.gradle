@@ -5,6 +5,8 @@ apply plugin: 'signing'
 // needs to be applied after android and java plugins:
 apply plugin: 'com.jfrog.bintray' // publish to bintray
 
+apply plugin: 'de.marcphilipp.nexus-publish'
+
 project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
 
 project.rootProject.afterEvaluate {
