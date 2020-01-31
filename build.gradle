@@ -135,6 +135,8 @@ buildscript
 //apply plugin: 'eclipse'
 //eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 
+apply plugin: 'de.marcphilipp.nexus-publish'
+
 allprojects
 {
 	version = rootProject.ext.version

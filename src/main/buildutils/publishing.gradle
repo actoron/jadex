@@ -20,10 +20,9 @@ project.rootProject.afterEvaluate {
 
 nexusPublishing {
     repositories {
-        sonatype {
-            username = "lars"
-            password = "JadexUpload20!"
-        }
+        sonatype()
+        connectTimeout = Duration.ofMinutes(10)
+        clientTimeout = Duration.ofMinutes(10)
     }
 }
 
