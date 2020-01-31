@@ -122,17 +122,16 @@ buildscript
 		classpath 'com.hierynomus:sshj:0.27.0' // ssh capabilities for docs upload
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.21.2"
 		classpath 'org.eclipse.jgit:org.eclipse.jgit:5.6.0.201912101111-r' // git capabilities
+		classpath 'de.marcphilipp.gradle:nexus-publish-plugin:0.4.0'
     }
     
     apply from: "$rootDir/src/main/buildutils/util.gradle"
 }
 
+apply plugin: 'de.marcphilipp.nexus-publish'
+
 //apply plugin: 'eclipse'
 //eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
-
-plugins {
-    id "de.marcphilipp.nexus-publish" version "0.3.0"
-}
 
 allprojects
 {
