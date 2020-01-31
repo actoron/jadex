@@ -5,6 +5,10 @@ import java.util.regex.Matcher
 import org.gradle.api.artifacts.ProjectDependency
 import org.apache.tools.ant.filters.*
 
+plugins {
+    id "de.marcphilipp.nexus-publish" version "0.3.0"
+}
+
 apply plugin: 'java-library' // needed for distsDir on root project level
 
 def maindistsuffix = ''
