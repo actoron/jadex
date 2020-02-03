@@ -1,4 +1,4 @@
-apply plugin: 'maven-publish'
+//apply plugin: 'maven-publish'
 
 apply plugin: 'signing'
 
@@ -254,7 +254,8 @@ publishing {
 		
         if(canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project)))  // dont publish apks
         { 
-            ProjectPublication(MavenPublication) 
+        	mavenJava(MavenPublication) 
+            //ProjectPublication(MavenPublication) 
             {
                 if(isWebApplicationProject(project)) 
                 {
@@ -367,17 +368,17 @@ if (!isCommercial(project)) {
     }
 }
 
-if (canSign) {
+if(canSign) {
 	signing {
 		// for signing with keys by environment variables https://docs.gradle.org/current/userguide/signing_plugin.html
-		def signingKey1 = findProperty("signingKey")
-		def signingPassword1 = findProperty("signingPassword")
-		println("sign key1: "+signingKey1)
+		//def signingKey1 = findProperty("signingKey")
+		//def signingPassword1 = findProperty("signingPassword")
+		//println("sign key1: "+signingKey1)
 		
 		
 		def signingKey = getVar("signingKey", project)
 		def signingPassword = getVar("signingPassword", project)
-		println("sign key2: "+signingKey)
+		//println("sign key2: "+signingKey)
 		useInMemoryPgpKeys(signingKey, signingPassword)
 	
 //		sign configurations.archives
