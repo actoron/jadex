@@ -250,12 +250,18 @@ publishing {
 //        return sigFiles
 //    }
 
-    publications {
+ 	publications {
+ 		mavenJava(MavenPublication) {
+        	from components.java
+        }
+    }
+
+    /*publications {
 		
         if(canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project)))  // dont publish apks
         { 
-        	mavenJava(MavenPublication) 
-            //ProjectPublication(MavenPublication) 
+        	//mavenJava(MavenPublication) 
+            ProjectPublication(MavenPublication) 
             {
                 if(isWebApplicationProject(project)) 
                 {
@@ -273,14 +279,14 @@ publishing {
                 } 
                 else if (!isAndroidProject(project)) 
                 {
-                	//mavenJava(MavenPublication) {
+                	mavenJava(MavenPublication) {
                     	from components.java
-                    //}
+                    }
                 }
 
                 // somehow artifacts are lost when publishing with maven-publish, re-add all jars:
                 project.tasks.withType(Jar) {
-                    def matcher = (it.name =~ /.*(javadoc|sources).*/)
+                    def matcher = (it.name =~ /.*(javadoc|sources).* /)
                     if (matcher.matches()) {
     //                println "adding artifact: $it , classifier: ${matcher[0][1]}"
                         artifact(it) {
@@ -333,7 +339,7 @@ publishing {
 //                }
 	        }
         }
-    }
+    }*/
 }
 
 if (!isCommercial(project)) {
@@ -389,7 +395,8 @@ if(canSign) {
 // uncomment with gradle 4.8
 // signing poms with maven-publish is supported with gradle 4.8, however, 4.8 seems to be incompatible with bintray 1.8 :/
 		if (!isAndroidProject(project) || isAndroidLibraryProject(project)) { // dont publish apks
-			sign publishing.publications.ProjectPublication
+			//sign publishing.publications.ProjectPublication
+			sign publishing.publications.mavenJava
 		}
 	}
 	
