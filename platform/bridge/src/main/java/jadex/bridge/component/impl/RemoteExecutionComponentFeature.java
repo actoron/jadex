@@ -554,6 +554,12 @@ public class RemoteExecutionComponentFeature extends AbstractComponentFeature im
 		{
 			boolean	trusted	= false;
 			
+			if (secinfos == null)
+			{
+				System.err.println("Remote execution command received without security infos (misrouted local message?): From " + header.getSender() + " To: " + header.getReceiver());
+				return false;
+			}
+			
 			// Admin platforms (i.e. in possession  of our platform key) can do anything.
 			if(secinfos.getRoles().contains(Security.ADMIN))
 			{
