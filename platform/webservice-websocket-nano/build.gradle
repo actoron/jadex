@@ -6,6 +6,8 @@ plugins {
 	//id "eclipse-wtp"
 }
 
+description 'Jadex websocket webservice implementation for Nano'
+
 dependencies
 {
 	api project(':distributions:minimal')
