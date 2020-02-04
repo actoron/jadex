@@ -275,7 +275,7 @@ publishing {
                     // so we need the main jar artifact, too
                     project.tasks.withType(Jar) 
                     {
-                        if (it.name.endsWith('jar') && !it.name.contains('sources') && !it.name.contains('javadoc')) 
+                        if(it.name.endsWith('jar') && !it.name.contains('sources') && !it.name.contains('javadoc')) 
                         {
                             artifact(it)
                         }
