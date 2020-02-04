@@ -13,17 +13,20 @@ project.rootProject.afterEvaluate {
     nexusStaging {
         packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
         stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
-        username = getVar('centraluser', project)
-        password = getVar('centralpassword', project)
+        username = getVar("repouser", project)
+        password = getVar("repopassword", project);
     }
-}
-
-nexusPublishing {
-    repositories {
-        sonatype()
-        connectTimeout = Duration.ofMinutes(10)
-        clientTimeout = Duration.ofMinutes(10)
-    }
+    nexusPublishing {
+    	repositories {
+        	sonatype()
+        	{
+        		connectTimeout = Duration.ofMinutes(10)
+        		clientTimeout = Duration.ofMinutes(10)
+        		username = getVar("repouser", project)
+        		password = getVar("repopassword", project);
+        	}
+    	}
+	}
 }
 
 def common() {
