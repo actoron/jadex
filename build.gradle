@@ -1007,6 +1007,7 @@ task updateTag() {
 		def cmd = git.tag();
 		cmd.setName(jadex_build_version);
 		cmd.setForceUpdate(true);
+		cmd.setMessage("New Build Tag [skip ci]");
 		cmd.call();
 		cmd = git.push();
 		cmd.setRemote(url);
