@@ -984,6 +984,7 @@ task deployZips() {
 	}
 }
 
+// Update the tag and commit it to repository.
 task updateTag() {
 	doLast() {
 		if(!gradle.ext.productionmode)
