@@ -68,6 +68,9 @@ build:
   only:
     variables:
       - $BUILD == "true"
+  except:
+    - merge-requests
+  
     
 quality:
   stage: testandquality
