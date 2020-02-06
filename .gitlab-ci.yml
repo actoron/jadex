@@ -69,9 +69,9 @@ build:
     variables:
       - $BUILD == "true"
   rules:
-    - changes:
-      - *
-      - **/*
+    changes:
+      - /*
+      - /**/*
     when: never
   
     
