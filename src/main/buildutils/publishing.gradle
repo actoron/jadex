@@ -264,41 +264,34 @@ publishing {
     publications {
         if(canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project)))  // dont publish apks
         { 
-        	// getProperties() has side effects on publishing
-        	//def iswa = isWebApplicationProject(project);
-        	//def iswa = project.hasProperty("webArchiveProject") && project.property("webArchiveProject") == 'true';
-        	//def iswa = project.findPropertyWithDots("webArchiveProject") != null;// && (findProperty("webArchiveProject") == "true");
-        	
-        	if(!gradle.ext.webprojects.contains(project.getPath()))
-            {
-        		mavenJava(MavenPublication) {
-        			from components.java
-        		}
-        	}
-        	if(1==2)
-            {
-        		ProjectPublication(MavenPublication) 
-        		{
+        	// publish plugin requires each subproject having mavenJava
+        
+        	mavenJava(MavenPublication)
+        	{
+	        	if(gradle.ext.webprojects.contains(project.getPath()))
+	            {
         			from components.web
-                    // publish jar for web projects, too
-                    // (somebody generates signatures, sources,javadoc for them which are uploaded,
-                    // so we need the main jar artifact, too
-                    project.tasks.withType(Jar) 
+        		}
+        		else
+        		{
+        			from components.java
+        			
+        			project.tasks.withType(Jar) 
                     {
                         if(it.name.endsWith('jar') && !it.name.contains('sources') && !it.name.contains('javadoc')) 
                         {
                             artifact(it)
                         }
                     }
-                    
-                    //groupId group
-					groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
-					//artifactId project.name
-					artifactId getArtifactName(project)
-					//println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
-					version project.version
-					configurePom(pom)
         		}
+        		
+        		//groupId group
+				groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
+				//artifactId project.name
+				artifactId getArtifactName(project)
+				//println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
+				version project.version
+				configurePom(pom)
         	}
 		}
 	}
