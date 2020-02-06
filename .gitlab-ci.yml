@@ -68,8 +68,11 @@ build:
   only:
     variables:
       - $BUILD == "true"
-    changes:
-      - LICENSE
+  rules:
+    - changes:
+      - *
+      - **/*
+    when: never
   
     
 quality:
