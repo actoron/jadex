@@ -667,7 +667,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 	{
 		if(!Starter.isNoPlatformMode(getInternalAccess()))
 		{
-			System.out.println("adding termination listener for: "+component.getId());
+			//System.out.println("adding termination listener for: "+component.getId());
 			final Future<Map<String, Object>> ret = new Future<>();
 			SComponentManagementService.listenToComponent(component.getId(), component).addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
 			{

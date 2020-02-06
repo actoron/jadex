@@ -78,6 +78,12 @@ def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
 apply plugin: 'jacoco'
 //apply plugin: 'application'
 apply plugin: 'org.sonarqube'
+apply plugin: 'io.codearte.nexus-staging'
+
+nexusStaging {
+    //packageGroup = "org.mycompany.myproject" //optional if packageGroup == project.getGroup()
+    //stagingProfileId = "yourStagingProfileId" //when not defined will be got from server using "packageGroup"
+}
 
 sonarqube {
     properties {
@@ -102,6 +108,10 @@ buildscript
 		{
 			url "https://maven.google.com"
 		}
+		maven 
+		{
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies
@@ -114,14 +124,18 @@ buildscript
 		classpath "org.bouncycastle:bcprov-jdk15on:1.64" // bouncycastle for ssh
 		classpath "org.bouncycastle:bcpkix-jdk15on:1.64" // bouncycastle for ssh
 		classpath 'com.hierynomus:sshj:0.27.0' // ssh capabilities for docs upload
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.21.2"
 		classpath 'org.eclipse.jgit:org.eclipse.jgit:5.6.0.201912101111-r' // git capabilities
+		classpath 'de.marcphilipp.gradle:nexus-publish-plugin:0.4.0'
     }
-
+    
     apply from: "$rootDir/src/main/buildutils/util.gradle"
 }
 
 //apply plugin: 'eclipse'
 //eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
+
+apply plugin: 'de.marcphilipp.nexus-publish'
 
 allprojects
 {
@@ -936,7 +950,7 @@ task deployDocs() {
 task deployZips() {
 	dependsOn distZips
 	doLast {
-		if (!gradle.ext.productionmode)
+		if(!gradle.ext.productionmode)
 			throw new IllegalStateException("Can only deploy zips in production mode.");
 		
 		def acc = getDownloadServerAccess();
@@ -972,27 +986,33 @@ task deployZips() {
 
 task updateTag() {
 	doLast() {
-		if (!gradle.ext.productionmode)
-			throw new IllegalStateException("Can only deploy zips in production mode.");
+		if(!gradle.ext.productionmode)
+			throw new IllegalStateException("Can only update tag in production mode.");
+		
+		/*def url = findProperty('tagUrl');
+		def user = findProperty('tagUser');
+		def pass = findProperty('tagPassword');
+		
+		println "User: "+user
+		println "URL: "+url
+		println "Pass: "+pass*/
 		
 		def url = findPropertyWithDotsOrDie('tag.url');
 		def user = findPropertyWithDotsOrDie('tag.user');
 		def pass = findPropertyWithDotsOrDie('tag.password');
 		
-		org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(project.projectDir);
+		def git = org.eclipse.jgit.api.Git.open(project.projectDir);
 		//org.eclipse.jgit.lib.Repository repo = new org.eclipse.jgit.storage.file.FileRepositoryBuilder().setMustExist(true).setGitDir(project.projectDir).readEnvironment().findGitDir().build();
-		List tags = git.tagList().call();
-		println Arrays.toString(tags.toArray());
-		println jadex_build_version;
+		def tags = git.tagList().call();
 		def cmd = git.tag();
 		cmd.setName(jadex_build_version);
+		cmd.setForceUpdate(true);
 		cmd.call();
 		cmd = git.push();
-		cmd.setRemote(tag.url);
+		cmd.setRemote(url);
 		cmd.setCredentialsProvider(new org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider(user, pass))
 		cmd.setPushTags();
 		cmd.call();
-		
 	}
 }
 

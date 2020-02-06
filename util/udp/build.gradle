@@ -1,3 +1,5 @@
+description 'Jadex util package for udp'
+
 apply plugin: 'java'
 
 configurations

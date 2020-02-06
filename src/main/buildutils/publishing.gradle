@@ -1,9 +1,11 @@
-apply plugin: 'maven-publish'
+//apply plugin: 'maven-publish'
 
 apply plugin: 'signing'
 
 // needs to be applied after android and java plugins:
 apply plugin: 'com.jfrog.bintray' // publish to bintray
+
+apply plugin: 'de.marcphilipp.nexus-publish'
 
 project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
 
@@ -11,8 +13,20 @@ project.rootProject.afterEvaluate {
     nexusStaging {
         packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
         stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
-        username = getVar('centraluser', project)
-        password = getVar('centralpassword', project)
+        username = getVar("repouser", project)
+        password = getVar("repopassword", project)
+    }
+   
+}
+
+nexusPublishing {
+	repositories {
+    	sonatype() {
+        	connectTimeout = Duration.ofMinutes(10)
+        	clientTimeout = Duration.ofMinutes(10)
+        	username = getVar("repouser", project)
+        	password = getVar("repopassword", project)
+        }
     }
 }
 
@@ -102,6 +116,8 @@ def gpl() {
 def canPublishToNexus = isCommercial(project) && repo_commercial || !isCommercial(project) && repo_noncommercial
 def canSign = project.hasProperty('signing.secretKeyRingFile') || getVar("signingKey", project)!=null
 
+println getVar("signingKey", project)
+
 //// Selects the projects to publish, add a better heuristic here if available
 //def includedproject = getProjectDepth(project) > 1
 //// Empty project
@@ -143,6 +159,7 @@ def configurePom(pom) {
 //        }.each { it.scope*.value = 'compile' }
     }
 }
+
 
 publishing {
 
@@ -237,11 +254,17 @@ publishing {
 //        return sigFiles
 //    }
 
+ 	publications {
+ 		mavenJava(MavenPublication) {
+        	from components.java
+        }
+    }
 
-    publications {
-
+    /*publications {
+		
         if(canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project)))  // dont publish apks
         { 
+        	//mavenJava(MavenPublication) 
             ProjectPublication(MavenPublication) 
             {
                 if(isWebApplicationProject(project)) 
@@ -252,7 +275,7 @@ publishing {
                     // so we need the main jar artifact, too
                     project.tasks.withType(Jar) 
                     {
-                        if (it.name.endsWith('jar') && !it.name.contains('sources') && !it.name.contains('javadoc')) 
+                        if(it.name.endsWith('jar') && !it.name.contains('sources') && !it.name.contains('javadoc')) 
                         {
                             artifact(it)
                         }
@@ -260,12 +283,14 @@ publishing {
                 } 
                 else if (!isAndroidProject(project)) 
                 {
-                    from components.java
+                	mavenJava(MavenPublication) {
+                    	from components.java
+                    }
                 }
 
                 // somehow artifacts are lost when publishing with maven-publish, re-add all jars:
                 project.tasks.withType(Jar) {
-                    def matcher = (it.name =~ /.*(javadoc|sources).*/)
+                    def matcher = (it.name =~ /.*(javadoc|sources).* /)
                     if (matcher.matches()) {
     //                println "adding artifact: $it , classifier: ${matcher[0][1]}"
                         artifact(it) {
@@ -316,9 +341,9 @@ publishing {
 //                        extension  = signature.extension
 //                    }
 //                }
-            }
+	        }
         }
-    }
+    }*/
 }
 
 if (!isCommercial(project)) {
@@ -353,17 +378,17 @@ if (!isCommercial(project)) {
     }
 }
 
-if (canSign) {
+if(canSign) {
 	signing {
 		// for signing with keys by environment variables https://docs.gradle.org/current/userguide/signing_plugin.html
-		def signingKey1 = findProperty("signingKey")
-		def signingPassword1 = findProperty("signingPassword")
-		println("sign key1: "+signingKey1)
+		//def signingKey1 = findProperty("signingKey")
+		//def signingPassword1 = findProperty("signingPassword")
+		//println("sign key1: "+signingKey1)
 		
 		
 		def signingKey = getVar("signingKey", project)
 		def signingPassword = getVar("signingPassword", project)
-		println("sign key2: "+signingKey)
+		//println("sign key2: "+signingKey)
 		useInMemoryPgpKeys(signingKey, signingPassword)
 	
 //		sign configurations.archives
@@ -374,7 +399,8 @@ if (canSign) {
 // uncomment with gradle 4.8
 // signing poms with maven-publish is supported with gradle 4.8, however, 4.8 seems to be incompatible with bintray 1.8 :/
 		if (!isAndroidProject(project) || isAndroidLibraryProject(project)) { // dont publish apks
-			sign publishing.publications.ProjectPublication
+			//sign publishing.publications.ProjectPublication
+			sign publishing.publications.mavenJava
 		}
 	}
 	

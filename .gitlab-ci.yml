@@ -28,6 +28,8 @@ stages:
   - testandquality
   - package
   - deploy
+  - failure
+  - success
 
 # todo: move code from jenkinsutil.groovy to gradle file and make it a task
 before_script:
@@ -141,7 +143,31 @@ deployDocs:
 upload:
   stage: deploy
   script: 
-    - ./gradlew -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
+    - ./gradlew -Dorg.gradle.parallel=false -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
   only:
     variables:
       - $UPLOAD == "true"
+      
+# cleanuprepo:    
+#  stage: failure
+#  script: 
+#    - ./gradlew closeRepository
+#  when: on_failure
+#  only:
+#    variables:
+#      - $UPLOAD == "true"
+
+# has some 401 error :-(  
+#releaseStagingRepo:
+#  stage: success
+#  script:
+#    -  ./gradlew closeAndReleaseRepository
+#  only:
+#    variables:
+#      - $UPLOAD == "true"
+    
+updateTag:
+  stage: success
+  script:
+    -  ./gradlew -Production updateTag
+    

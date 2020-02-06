@@ -301,7 +301,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 			{
 				agent.getLogger().info("sending: "+addresses);
 //				System.out.println("sending: "+addresses);
-				byte[]	data	= SBinarySerializer.writeObjectToByteArray(addresses, agent.getClassLoader());
+				byte[] data = SBinarySerializer.writeObjectToByteArray(addresses, agent.getClassLoader());
 				DatagramPacket p = new DatagramPacket(data, data.length, new InetSocketAddress(address, port));
 				sendsocket.send(p);
 				ret.setResult(null);
@@ -340,7 +340,7 @@ public abstract class LocalNetworkAwarenessBaseAgent	implements IAwarenessServic
 					socket.receive(pack);
 					InputStream	is	= new ByteArrayInputStream(buffer, 0, pack.getLength());
 					@SuppressWarnings("unchecked")
-					List<TransportAddress>	addresses	= (List<TransportAddress>)SBinarySerializer.readObjectFromStream(is, agent.getClassLoader());
+					List<TransportAddress> addresses = (List<TransportAddress>)SBinarySerializer.readObjectFromStream(is, agent.getClassLoader());
 					
 //					System.out.println(agent +" receiving: "+addresses);
 					

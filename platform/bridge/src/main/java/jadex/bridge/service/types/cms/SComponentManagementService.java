@@ -267,7 +267,7 @@ public class SComponentManagementService
     			col = cmsstate.getAllListeners();
     			col.add(ret);
     		}
-	    	System.out.println("listenToComponent: "+cid+" "+col+" "+System.identityHashCode(col));
+	    	//System.out.println("listenToComponent: "+cid+" "+col+" "+System.identityHashCode(col));
     	}
     	
     	ret.setTerminationCommand(new TerminationCommand()
