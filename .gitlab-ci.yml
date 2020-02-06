@@ -68,8 +68,8 @@ build:
   only:
     variables:
       - $BUILD == "true"
-  except:
-    - merge_requests
+    changes:
+      - LICENSE
   
     
 quality:
