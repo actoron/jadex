@@ -69,10 +69,10 @@ build:
 #    variables:
 #      - $BUILD == "true"
   rules:
-    changes:
+    - changes:
       - /*
       - /**/*
-    when: never
+      when: never
   
     
 quality:
