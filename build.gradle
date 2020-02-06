@@ -1007,9 +1007,11 @@ task updateTag() {
 		def cmd = git.tag();
 		cmd.setName(jadex_build_version);
 		cmd.setForceUpdate(true);
-		cmd.setMessage("New Build Tag [skip ci]");
 		cmd.call();
 		cmd = git.push();
+		def pushopts = new ArrayList<String>();
+		pushopts.add("ci.skip"); 
+		cmd.setPushOptions(pushopts);
 		cmd.setRemote(url);
 		cmd.setCredentialsProvider(new org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider(user, pass))
 		cmd.setPushTags();
