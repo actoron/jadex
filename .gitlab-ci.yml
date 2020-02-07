@@ -56,7 +56,6 @@ cache:
 # **/build does not work correctly :-(
 # https://gitlab.com/gitlab-org/gitlab-foss/issues/17850
 build:
-  extends: .basejob
   stage: build
   script:
     - ./gradlew -Pdist=publishdists -Production clean build -x test -x javadoc
