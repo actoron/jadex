@@ -180,6 +180,6 @@ updateTag:
 # Rules for the whole workflow
 workflow:
   rules:
-    - if: $ENABLE_PIPELINE == 'true'
-      when: always
-    - when: never
+    - if: $CI_PIPELINE_SOURCE == 'push'
+      when: never
+    - when: always
