@@ -75,6 +75,7 @@ build:
     expire_in: 1 week
     
 quality:
+  extends: .noautotrig
   stage: testandquality
   script:
     - ./gradlew -Production sonarqube
@@ -84,6 +85,7 @@ quality:
       - $QUALITY == "true"
 
 test:
+  extends: .noautotrig
   stage: testandquality
   script:
     - ./gradlew -Pdist=publishdists -Production :applications:micro:test :platform:base:test test -x javadoc
@@ -121,6 +123,7 @@ test:
 #    - ./gradlew -Production -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
     
 javadocZip:
+  extends: .noautotrig
   stage: package
   script:
     - ./gradlew -Pdist=addonjavadoc -Production javadocZip
@@ -129,6 +132,7 @@ javadocZip:
       - $JAVADOCZIP == "true"
     
 deployZips:
+  extends: .noautotrig
   stage: deploy
   script:
     - ./gradlew -Pdist=publishdists -Production deployZips
@@ -137,6 +141,7 @@ deployZips:
       - $DEPLOYZIPS == "true"
 
 deployDocs:
+  extends: .noautotrig
   stage: deploy
   script:
     - ./gradlew -Production deployDocs
@@ -146,6 +151,7 @@ deployDocs:
 
 # todo: move pass to env
 upload:
+  extends: .noautotrig
   stage: deploy
   script: 
     - ./gradlew -Dorg.gradle.parallel=false -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
@@ -172,6 +178,7 @@ upload:
 #      - $UPLOAD == "true"
     
 updateTag:
+  extends: .noautotrig
   stage: success
   script:
     -  ./gradlew -Production updateTag
