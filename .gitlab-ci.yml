@@ -22,6 +22,7 @@ variables:
   DEPLOYZIPS: "true"
   DEPLOYDOCS: "true"
   UPLOAD: "true"
+  TAG: "true"
   
 stages:
   - build
@@ -45,23 +46,17 @@ before_script:
   - echo "DEPLOYDOCS" $DEPLOYDOCS
   - echo "DEPLOYZIPS" $DEPLOYZIPS
   - echo "UPLOAD" $UPLOAD
+  - EXCLUDEJOBS = ,$EXCLUDEJOBS,
 
 cache:
   paths:
     - .gradle/wrapper
     - .gradle/caches
 
-.noautotrig:
-  rules:
-    - changes:
-      - /*
-      - /**/*
-      when: manual
-
 # **/build does not work correctly :-(
 # https://gitlab.com/gitlab-org/gitlab-foss/issues/17850
 build:
-  extends: .noautotrig
+  extends: .basejob
   stage: build
   script:
     - ./gradlew -Pdist=publishdists -Production clean build -x test -x javadoc
@@ -73,19 +68,21 @@ build:
       - "*/*/*/build"
       - "*/*/*/*/build"
     expire_in: 1 week
+  rules:
+    - if: '$BUILD == "true"'
+      when: always
+    
     
 quality:
-  extends: .noautotrig
   stage: testandquality
   script:
     - ./gradlew -Production sonarqube
   allow_failure: true
-  only:
-    variables:
-      - $QUALITY == "true"
+  rules:
+    - if: '$QUALITY == "true"'
+      when: always
 
 test:
-  extends: .noautotrig
   stage: testandquality
   script:
     - ./gradlew -Pdist=publishdists -Production :applications:micro:test :platform:base:test test -x javadoc
@@ -107,9 +104,9 @@ test:
         - "*/*/build/test-results/test/**/*.xml"
         - "*/*/*/build/test-results/test/**/*.xml"
         - "*/*/*/*/build/test-results/test/**/*.xml"
-  only:
-    variables:
-      - $TEST == "true"
+  rules:
+    - if: '$TEST == "true"'
+      when: always
  
 # Build all kinds of docs/dist files as parallel as possible
 # checkDists:
@@ -123,41 +120,37 @@ test:
 #    - ./gradlew -Production -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
     
 javadocZip:
-  extends: .noautotrig
   stage: package
   script:
     - ./gradlew -Pdist=addonjavadoc -Production javadocZip
-  only:
-    variables:
-      - $JAVADOCZIP == "true"
+  rules:
+    - if: '$JAVADOCZIP == "true"'
+      when: always
     
 deployZips:
-  extends: .noautotrig
   stage: deploy
   script:
     - ./gradlew -Pdist=publishdists -Production deployZips
-  only:
-    variables:
-      - $DEPLOYZIPS == "true"
+  rules:
+    - if: '$DEPLOYZIPS == "true"'
+      when: always
 
 deployDocs:
-  extends: .noautotrig
   stage: deploy
   script:
     - ./gradlew -Production deployDocs
-  only:
-    variables:
-      - $DEPLOYDOCS == "true"
+  rules:
+    - if: '$DEPLOYDOCS == "true"'
+      when: always
 
 # todo: move pass to env
 upload:
-  extends: .noautotrig
   stage: deploy
   script: 
     - ./gradlew -Dorg.gradle.parallel=false -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
-  only:
-    variables:
-      - $UPLOAD == "true"
+  rules:
+    - if: '$UPLOAD == "true"'
+      when: always
       
 # cleanuprepo:    
 #  stage: failure
@@ -178,8 +171,16 @@ upload:
 #      - $UPLOAD == "true"
     
 updateTag:
-  extends: .noautotrig
   stage: success
   script:
     -  ./gradlew -Production updateTag
-    
+  rules:
+    - if: '$TAG == "true"'
+      when: always
+
+# Rules for the whole workflow
+workflow:
+  rules:
+    - if: $ENABLE_PIPELINE == 'true'
+      when: always
+    - when: never
