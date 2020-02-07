@@ -177,7 +177,7 @@ updateTag:
     - if: '$TAG == "true"'
       when: always
 
-# Rules for the whole workflow
+# Rules for the whole workflow / pipeline
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'push'
