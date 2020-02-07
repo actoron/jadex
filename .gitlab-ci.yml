@@ -51,9 +51,17 @@ cache:
     - .gradle/wrapper
     - .gradle/caches
 
+.noautotrig:
+  rules:
+    - changes:
+      - /*
+      - /**/*
+      when: manual
+
 # **/build does not work correctly :-(
 # https://gitlab.com/gitlab-org/gitlab-foss/issues/17850
 build:
+  extends .noautotrig
   stage: build
   script:
     - ./gradlew -Pdist=publishdists -Production clean build -x test -x javadoc
@@ -65,15 +73,6 @@ build:
       - "*/*/*/build"
       - "*/*/*/*/build"
     expire_in: 1 week
-#  only:
-#    variables:
-#      - $BUILD == "true"
-  rules:
-    - changes:
-      - /*
-      - /**/*
-      when: never
-  
     
 quality:
   stage: testandquality
