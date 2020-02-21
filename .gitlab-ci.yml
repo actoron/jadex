@@ -46,7 +46,6 @@ before_script:
   - echo "DEPLOYDOCS" $DEPLOYDOCS
   - echo "DEPLOYZIPS" $DEPLOYZIPS
   - echo "UPLOAD" $UPLOAD
-  - EXCLUDEJOBS = ,$EXCLUDEJOBS,
 
 cache:
   paths:
@@ -69,7 +68,7 @@ build:
     expire_in: 1 week
   rules:
     - if: '$BUILD == "true"'
-      when: always
+      when: on_success
     
     
 quality:
@@ -79,7 +78,7 @@ quality:
   allow_failure: true
   rules:
     - if: '$QUALITY == "true"'
-      when: always
+      when: on_success
 
 test:
   stage: testandquality
@@ -105,7 +104,7 @@ test:
         - "*/*/*/*/build/test-results/test/**/*.xml"
   rules:
     - if: '$TEST == "true"'
-      when: always
+      when: on_success
  
 # Build all kinds of docs/dist files as parallel as possible
 # checkDists:
@@ -124,7 +123,7 @@ javadocZip:
     - ./gradlew -Pdist=addonjavadoc -Production javadocZip
   rules:
     - if: '$JAVADOCZIP == "true"'
-      when: always
+      when: on_success
     
 deployZips:
   stage: deploy
@@ -132,7 +131,7 @@ deployZips:
     - ./gradlew -Pdist=publishdists -Production deployZips
   rules:
     - if: '$DEPLOYZIPS == "true"'
-      when: always
+      when: on_success
 
 deployDocs:
   stage: deploy
@@ -140,7 +139,7 @@ deployDocs:
     - ./gradlew -Production deployDocs
   rules:
     - if: '$DEPLOYDOCS == "true"'
-      when: always
+      when: on_success
 
 # todo: move pass to env
 upload:
@@ -149,7 +148,7 @@ upload:
     - ./gradlew -Dorg.gradle.parallel=false -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
   rules:
     - if: '$UPLOAD == "true"'
-      when: always
+      when: on_success
       
 # cleanuprepo:    
 #  stage: failure
@@ -175,7 +174,7 @@ updateTag:
     -  ./gradlew -Production updateTag
   rules:
     - if: '$TAG == "true"'
-      when: always
+      when: on_success
 
 # Rules for the whole workflow / pipeline
 workflow:

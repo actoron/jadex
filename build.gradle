@@ -588,6 +588,7 @@ subprojects
 		// Create distZip task
 		task distZip(type: Zip) {
 			archiveName 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+			duplicatesStrategy DuplicatesStrategy.EXCLUDE // TODO: Workaround for our broken mechanism
 			gradle.projectsEvaluated() {
 				// Add all included artifact projects and their parents (but exclude root project for addons)
 				def projs = new HashSet();	// keep track of added projects to avoid duplicates
