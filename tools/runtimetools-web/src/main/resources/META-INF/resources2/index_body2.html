@@ -1,0 +1,77 @@
+<jadex-app></jadex-app>
+	
+<script type="text/javascript">
+	console.log("body");
+	
+	// Add a format method for Date 
+	Date.prototype.yyyymmdd = function(sep) {
+		var mm = (this.getMonth() + 1).toString();
+		var dd = this.getDate().toString();
+		return [this.getFullYear(), (mm.length===2 ? '' : '0')+mm, (dd.length===2 ? '' : '0')+dd].join(sep? sep: '');
+	};
+	//var now = new Date();
+	//alert(now.yyyymmdd()+" "+now.yyyymmdd('-'));
+	
+	Array.prototype.equals = function(a, b) {
+		if (a === b) return true;
+		if (a == null || b == null) return false;
+		if (a.length != b.length) return false;
+	
+		for (var i = 0; i < a.length; ++i) {
+	    	if (a[i] !== b[i]) return false;
+	  	}
+	  	return true;
+	};
+	
+	// not using var to set a global variable
+	PROMISE_DOME = Promise.resolve("Dummy response to keep the console quiet");
+	
+	/*var language = "en";
+	var switchLanguage = function() 
+	{
+		if(this.language=="en") {
+	    	this.language="de";
+		} 
+		else {
+	    	this.language="en";
+		}
+		this.trigger('language', this.language);  
+		//console.log(this.language);
+	};	
+		
+	var cnt = 0;*/
+		
+	//var content = document.getElementById("content");
+	//content.innerHTML = "<jadex-app></jadex-app>"
+	
+   	/*var curpage = null;
+   	var target = "div#content";
+   	var routes = ["platforms", "platform", "about", "imprint", "privacy"];
+   	riot.store.language = "en";
+   	
+   	// As subpaths are supplied by separate args, internally arguments are used
+   	route(function changePath(path) 
+   	{
+   		path = path.toLowerCase();
+   		var paths = [];
+   		var params = null;
+   		for(i=0; i<arguments.length; i++)
+   		{
+   			if(arguments[i].indexOf("=")!=-1)
+   				params = arguments[i];
+   			else
+   				paths.push(arguments[i]);
+   		}
+   		//console.log(path);
+   		if(path.length==0)
+   			path="platforms";
+   		if(routes.includes(path)) 
+   		{ 
+   			if(curpage)
+				curpage.unmount(true);
+   	        var tags = riot.mount(target, path, {paths: paths, params: params});
+   	        curpage = tags[0];
+   	        //console.log(tags);
+   		}
+   	});*/
+</script>

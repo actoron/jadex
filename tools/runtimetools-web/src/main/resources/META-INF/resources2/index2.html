@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Web JCC</title>
+		
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="stylesheet" href="css/style.css">
+		
+		<script type="text/javascript" src="libs/axios_0.19.0/axios.js"></script>
+		
+		<link rel="stylesheet" href="libs/bootstrap_4.3.1/bootstrap.min.css">
+		<script src="libs/jquery_3.4.1/jquery.js"></script>
+		<script src="libs/popper_1.15.0/popper.min.js"></script>
+		<script src="libs/bootstrap_4.3.1/bootstrap.min.js"></script>
+		
+		
+		<script defer src="https://unpkg.com/es-module-shims@latest/dist/es-module-shims.js"></script>
+	    <script type="importmap-shim">
+      	{
+        	"imports": {
+        		"lit-html": "https://unpkg.com/lit-html@latest/lit-html.js?module",
+        		"lit-element": "https://unpkg.com/lit-element@latest/lit-element.js?module",
+        		"lit-html/lit-html.js": "https://unpkg.com/lit-html@latest/lit-html.js?module",
+        		"lit-html/lib/shady-render.js": "https://unpkg.com/lit-html@latest/lib/shady-render.js?module"
+      		}
+     	}
+    	</script>
+	    <script type="module-shim" src="webcomponents/app.js"></script>
+	    <script type="module-shim" src="webcomponents/platforms.js"></script>
+		
+		<!-- <link rel="stylesheet" href="libs/fontawesome_5.8.2.css"> -->
+		
+		<script type="text/javascript">
+			$(function(){$("#includedContent").load("index_body2.html");});
+    	</script>
+	</head>
+	
+	<body id="includedContent">
+		<!--  <script>
+		    var link = document.querySelector('link[rel="import"]');
+		    var content = link.import;
+		    var el = content.querySelector('app');
+		    document.body.appendChild(el.cloneNode(true));
+		</script>-->
+	</body>
+</html>
