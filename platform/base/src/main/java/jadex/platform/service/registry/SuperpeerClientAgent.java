@@ -429,7 +429,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 					@Override
 					public void intermediateResultAvailable(final IComponentIdentifier platform)
 					{
-						if(filter.contains(platform.toString()))
+						if(filter.contains(platform.toString()) || agent.getId().getPlatformName().equals(platform.getPlatformName()))
 						{
 							// no increment -> no doFinished()
 							return;
