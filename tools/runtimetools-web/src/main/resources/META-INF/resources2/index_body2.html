@@ -1,4 +1,10 @@
-<jadex-app></jadex-app>
+<!-- 
+	Defines shared web components functionality as global variables :-(
+	
+	language: handling i18n
+	jadex: handling jadex calls
+	loader: dynamically loading resources 
+ -->
 	
 <script type="text/javascript">
 	console.log("body");
@@ -25,6 +31,350 @@
 	
 	// not using var to set a global variable
 	PROMISE_DOME = Promise.resolve("Dummy response to keep the console quiet");
+	
+	var language = {
+		lang: "en",
+		messages: {
+    		en: {
+   				message: {
+   					home: "Home",
+   					privacy: "Privacy", 
+   					imprint: "Imprint",
+   					about: "About"
+    			}
+  			},
+	    	de: {
+				message: {
+					home: "Home",
+					privacy: "Datenschutz",
+   					imprint: "Impressum",
+					about: "Über"
+				}
+  			}
+		}, 
+		translate: function(text) {
+			var msg = this.messages[this.lang];
+			if(msg) 
+			{
+				var toks = text.split('.');
+				var tmp = msg;
+				for(var i=0; tmp!=null && i<toks.length; i++) 
+				{
+					tmp = tmp[toks[i]];
+				}
+				//console.log("text: "+text+" "+tmp);
+				return tmp;
+			}
+			else 
+			{
+				return null;
+			}
+		},
+		$t: function(text) 
+		{
+			return this.translate(text);
+		},
+		getLanguage: function() 
+		{
+			return this.lang=='de'? 0: 1;
+		},
+		switchLanguage: function()
+		{
+			this.lang=='de'? this.lang='en': this.lang='de';
+			console.log("language is: "+this.lang);
+		}
+	};
+	
+	var message = {
+		listeners: [],
+		createErrorMessage: function(text, data) 
+		{
+			var txt = data!=null? data: "No further info";
+			var msg = {type: "error", text: text+txt};
+			this.trigger('message', msg);
+		},
+		createInfoMessage: function(text) 
+		{
+			var msg = {type: "info", text: text};
+			this.trigger('message', msg);
+		},
+		clearMessage: function() 
+		{
+			this.trigger('message', null);
+		},
+		addChangeListener: function(listener)
+		{
+			this.listeners.push(listener);
+		},
+		removeChangeListener: function(listener)
+		{
+			var i=0;
+			for(let l in listeners) {
+				if(l===listener){
+					listeners.remove(i);
+					break;
+				}	
+				i++;
+			}
+		},
+		notifyListeners()
+		{
+			
+		}
+	};
+		
+	var jadex = 
+	{
+		transform: 
+		{
+			// Currently this impl is the same as internal axios 
+			transformResponse: [function(data) 
+			{
+				/*daterev = function reviver(key, value) 
+				{
+					if(typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(value)) 
+					{
+				    	return new Date(value);
+				    }
+				    return value;
+				}*/
+				try
+				{
+					var ret = JSON.parse(data);//, daterev);
+					//console.log("json: "+ret);
+					return ret;
+				}
+				catch(ex)
+				{
+					//console.log("ex: "+ex);
+				}
+				//console.log("data: "+data);
+				return data;
+			}]
+		},	
+			
+		getIntermediate: function(path, handler, error) 
+		{
+			// problem with hanging requests to same URL because of cache
+			// https://stackoverflow.com/questions/27513994/chrome-stalls-when-making-multiple-requests-to-same-resource
+			if(path.indexOf("?")==-1)
+				path = path+'?__random='+Math.random();
+			else 
+				path = path+'&__random='+Math.random();
+			
+			var terminated = false;
+			var call;
+	
+			var erfunc = function(err)
+			{
+				//if(axios.isCancel(err))
+	             //   console.log('request canceled', err.message);
+				
+				if(terminated)
+				{
+					//console.log("call terminated: "+path);
+					return;
+				}
+				
+				error(err);
+			}
+			
+			var	func = function(resp)
+			{
+				if(terminated)
+				{
+					//console.log("call terminated: "+path);
+					return;
+				}
+				
+				if(resp.status!=202)	// ignore updatetimer commands
+					handler(resp);
+
+				call = axios.CancelToken.source();
+				var callid = resp.headers["x-jadex-callid"];
+				if(callid!=null)
+				{
+					//console.log("long-poll request sent: "+path);
+					axios.get(path, {cancelToken: call.token, headers: {'x-jadex-callid': callid, 'cache-control': 'no-store'}}, this.transform).then(func).catch(erfunc); 
+				}
+				
+				return callid;
+			};
+			
+			var prom = new Promise(function(resolve, reject)
+			{
+				//console.log("initial request sent: "+path);
+				call = axios.CancelToken.source();
+				axios.get(path, {cancelToken: call.token, headers: {'cache-control': 'no-cache'}}, this.transform)
+					.then(function(resp) 
+					{
+						var callid = func(resp); 
+						if(callid!=null) 
+						{
+							//console.log("received callid: "+callid);
+							resolve(callid);
+						}
+					})
+					.catch(function(err) 
+					{
+						reject(err); 
+						erfunc(err);
+					});
+			});
+			
+			var termcom = function(reason)
+			{
+				return new Promise(function(resolve, reject)
+				{
+					prom.then(function(callid)
+					{
+						if(call)
+				            call.cancel();
+						
+						terminated = true;
+						var r = reason==null? 'true': reason;
+						
+						//console.log("terminating request sent: "+path);
+						axios.get(path, {headers: {'x-jadex-callid': callid, 'x-jadex-terminate': r, headers: {'x-jadex-callid': callid, 'cache-control': 'no-cache'}}}, this.transform)
+							.then(resolve).catch(reject); 
+					})
+					.catch(function(err)
+					{
+						console.log("error: "+err);
+						reject(err);
+					});
+				});
+			}
+			
+			// return termination command
+			return termcom;
+		},
+		
+		createProxy: function(cid, servicetype)
+		{
+			let ret = new Proxy({cid: cid, type:servicetype, transform:self.transform},
+			{
+				get: function(service, prop)
+				{
+					let callstrprefix = 'webjcc/invokeServiceMethod?cid='+service.cid+'&servicetype='+service.type+'&methodname='+prop;
+					return function(...args)
+					{
+						let callstr = callstrprefix;
+						for (let i = 0; i < args.length; i++)
+							callstr += '&args_'+i+'='+args[i];
+						
+						return axios.get(callstr, service.transform);
+			        }
+				}
+		    });
+			return ret;
+		}
+		
+		/*generateUUID: function() 
+		{ 
+		    var d = new Date().getTime();
+		    if(typeof performance !== 'undefined' && typeof performance.now === 'function')
+		        d += performance.now();
+		    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) 
+		    {
+		        var r = (d + Math.random() * 16) % 16 | 0;
+		        d = Math.floor(d / 16);
+		        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+		    });
+		}*/
+	};
+		
+	var loader = 
+	{
+		loaded: {},
+	    getHead: function()
+	    {
+	    	return document.getElementsByTagName("head")[0];
+	    },
+	    loadStyle: function(i, files, callback)
+        {
+       		var self = this;
+
+       		if(i>=files.length)
+        	{
+        		callback();
+        	}
+        	else if(this.loaded[files[i]]!=null)
+        	{
+        		//console.log("already loaded css: "+files[i]);
+        		self.loadStyle(i+1, files, callback);
+        	}
+        	else
+        	{
+        		this.loaded[files[i]] = files[i];
+        		
+        		var link = document.createElement("link");
+	            link.rel = "stylesheet";
+	            link.type = "text/css";
+	            link.href = files[i];
+	            
+	            link.onload = function ()
+	            {
+	            	//console.log('Loaded style: ' + files[i]);
+	            	self.loadStyle(i+1, files, callback);
+	            };
+	            link.onerror = function ()
+	            {
+	                //console.log('Error loading style: ' + files[i]);
+	                self.loadStyle(i+1, files, callback);
+	            };
+	            
+	            //console.log('Loading style ' + files[i]);
+	           	self.getHead().appendChild(link);
+        	}
+        },
+        loadScript: function(i, files, callback)
+        {
+       		var self = this;
+
+       		if(i>=files.length)
+        	{
+        		callback();
+        	}
+        	else if(this.loaded[files[i]]!=null)
+        	{
+        		//console.log("already loaded script: "+files[i]);
+        		self.loadScript(i+1, files, callback);
+        	}
+        	else
+        	{
+        		this.loaded[files[i]] = files[i];
+        		
+	            var script = document.createElement('script');
+	            script.type = 'text/javascript';
+	            script.src = files[i];
+	            
+	            script.onload = function ()
+	            {
+	                //console.log('Loaded script: ' + files[i]);
+	                self.loadScript(i+1, files, callback);
+	            };
+	            script.onerror = function ()
+	            {
+	                //console.log('Error loading script: ' + files[i]);
+	                self.loadScript(i+1, files, callback);
+	            };
+	            
+	            //console.log('Loading script ' + files[i]);
+	            self.getHead().appendChild(script);
+        	}
+        },
+        loadFiles: function(cssfiles, jsfiles, callback)
+        {
+        	var self = this;
+        	
+        	// loads recursively
+            self.loadStyle(0, cssfiles, function()
+            {
+            	self.loadScript(0, jsfiles, callback);
+            });
+        },
+	};
 	
 	/*var language = "en";
 	var switchLanguage = function() 
@@ -75,3 +425,5 @@
    		}
    	});*/
 </script>
+
+<jadex-app></jadex-app>
