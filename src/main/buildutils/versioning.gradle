@@ -143,9 +143,7 @@ String getLatestTagSuffix(prefix)
 		p1.waitFor()
 		
 		def status = p1.exitValue()
-		def text = p1.text.trim();
-		def tag = text.substring(prefix.length())
-		return status==0? tag: null;
+		return status==0? p1.text.trim().substring(prefix.length()): null;
 	//}
 	
 }
