@@ -288,6 +288,8 @@ public class ClockService extends BasicService implements IClockService
 	{
 		if(clock instanceof ISimulationClock)
 			return ((ISimulationClock)clock).advanceEvent();
+		else if(clock ==null)
+			throw new RuntimeException("Clockservice already shutdowned (clock is null)");
 		else
 			throw new RuntimeException("AdvanceEvent only possible for simulation clocks: "+clock);
 	}

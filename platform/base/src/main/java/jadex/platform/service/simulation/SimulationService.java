@@ -571,54 +571,63 @@ public class SimulationService	implements ISimulationService, IPropertiesProvide
 					public void resultAvailable(Void result)
 					{
 //						System.out.println(access+" advancing clock");
-						if(getClockService().advanceEvent())
+						try
 						{
-//							System.out.println(access+" advanced clock");
-
-							if(idlelistener==null)
-								idlelistener	= new IdleListener();
-							getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
-								
-						}
-						else
-						{
-//							System.out.println(access+" Clock not advanced");
-		
-							// Simulation stopped due to no more entries
-							// -> listen on clock until new entries available.
-							if(MODE_NORMAL.equals(mode))
+							if(getClockService().advanceEvent())
 							{
-								getClockService().addChangeListener(new IChangeListener()
-								{
-									public void changeOccurred(ChangeEvent event)
-									{
-//										System.out.println(access+" Clock changed after not advanced");
-										if(IClock.EVENT_TYPE_TIMER_ADDED.equals(event.getType()))
-										{
-											getClockService().removeChangeListener(this);
-											access.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-											{
-												public IFuture<Void> execute(IInternalAccess ia)
-												{
-													// Resume execution if still executing.
-													if(MODE_NORMAL.equals(mode) && executing)
-													{
-//														System.out.println(access+" Schedule advancing clock");
-														scheduleAdvanceClock();
-													}
-													return IFuture.DONE;
-												}
-											});
-										}
-									}
-								});
+	//							System.out.println(access+" advanced clock");
+	
+								if(idlelistener==null)
+									idlelistener	= new IdleListener();
+								getExecutorService().getNextIdleFuture().addResultListener(access.getFeature(IExecutionFeature.class).createResultListener(idlelistener));
+									
 							}
-							
-							// Step finished.
 							else
 							{
-								setIdle();
+	//							System.out.println(access+" Clock not advanced");
+			
+								// Simulation stopped due to no more entries
+								// -> listen on clock until new entries available.
+								if(MODE_NORMAL.equals(mode))
+								{
+									getClockService().addChangeListener(new IChangeListener()
+									{
+										public void changeOccurred(ChangeEvent event)
+										{
+	//										System.out.println(access+" Clock changed after not advanced");
+											if(IClock.EVENT_TYPE_TIMER_ADDED.equals(event.getType()))
+											{
+												getClockService().removeChangeListener(this);
+												access.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+												{
+													public IFuture<Void> execute(IInternalAccess ia)
+													{
+														// Resume execution if still executing.
+														if(MODE_NORMAL.equals(mode) && executing)
+														{
+	//														System.out.println(access+" Schedule advancing clock");
+															scheduleAdvanceClock();
+														}
+														return IFuture.DONE;
+													}
+												});
+											}
+										}
+									});
+								}
+								
+								// Step finished.
+								else
+								{
+									setIdle();
+								}
 							}
+						}
+						catch(Exception e)
+						{
+							// can happen in two cases
+							// a) shutdown and clock in clockservice is null -> exception
+							// b) clock type is changed during blocker wait -> exception
 						}
 					}
 					

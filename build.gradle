@@ -7,8 +7,6 @@ import org.apache.tools.ant.filters.*
 
 apply plugin: 'java-library' // needed for distsDir on root project level
 
-apply from: "$rootDir/src/main/buildutils/versioning.gradle"
-
 def maindistsuffix = ''
 gradle.ext.selecteddists.each { dname ->
 	maindistsuffix += '-' + dname
@@ -19,6 +17,10 @@ project.ext.filterfiles = '*.xml,*.xsd,*.bat,*.sh,*.txt,*.gradle,*.md'
 // resource files that are executable and should be flagged as such in the zip, must be subset of filterfiles
 project.ext.execfiles = '*.bat,*.sh'
 
+def sigkey = findProperty('sigKey');
+if (sigkey != null)
+	project.ext.signingKey=sigkey.replace("\\n", "\n");
+
 project.ext.srcdir = 'src'
 
 project.ext.subprojectmap  = new HashMap()
@@ -28,10 +30,17 @@ project.subprojects.each { sp ->
 
 project.ext.runtimearts = new HashMap<String, Set<String>>();
 
-project.ext.keepplural = new HashSet<String>()
-project.ext.keepplural.add('rules')
-project.ext.keepplural.add('tools')
-project.ext.keepplural.add('applications')
+project.ext.keepplural = new HashSet<String>();
+project.ext.keepplural.add('rules');
+project.ext.keepplural.add('tools');
+project.ext.keepplural.add('applications');
+
+project.ext.workspaceRootDir = ".";
+apply from: "${workspaceRootDir}/src/main/buildutils/versioning.gradle"
+project.ext.version = fetchNextBuildNameFromGitTag();
+// Legacy variable, needs replacement with version.full...
+project.ext.jadex_build_version = project.ext.version.full;
+println "Jadex Build Version " + project.ext.jadex_build_version 
 
 // unix timestamp from git: git log -1 --pretty=format:%ct
 project.ext.timestamp	= null
@@ -50,8 +59,43 @@ if(timestamp==null) {
 //	println 'timestamp: '+project.ext.timestamp
 }
 
+System.setOut(new PrintStream(new OutputStream() {
+	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+	public void write(int b) {
+		if ('\n' == b) {
+			project.logger.lifecycle(buffer.toString());
+			buffer.reset();
+		}
+		else {
+			buffer.write(b);
+		}
+	}
+}));
+System.setErr(System.out);
 
 def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
+
+apply plugin: 'jacoco'
+//apply plugin: 'application'
+apply plugin: 'org.sonarqube'
+apply plugin: 'io.codearte.nexus-staging'
+
+nexusStaging {
+    //packageGroup = "org.mycompany.myproject" //optional if packageGroup == project.getGroup()
+    //stagingProfileId = "yourStagingProfileId" //when not defined will be got from server using "packageGroup"
+}
+
+sonarqube {
+    properties {
+        property 'sonar.projectName', 'Jadex'
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
 
 buildscript 
 {
@@ -64,6 +108,10 @@ buildscript
 		{
 			url "https://maven.google.com"
 		}
+		maven 
+		{
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies
@@ -71,18 +119,27 @@ buildscript
         classpath 'com.android.tools.build:gradle:' + android_gradlePluginVersion
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
 		classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
-		classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0" // for nexus-oss auto-close
+		classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0' // for nexus-oss auto-close
+		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8'
+		classpath "org.bouncycastle:bcprov-jdk15on:1.64" // bouncycastle for ssh
+		classpath "org.bouncycastle:bcpkix-jdk15on:1.64" // bouncycastle for ssh
+		classpath 'com.hierynomus:sshj:0.27.0' // ssh capabilities for docs upload
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.21.2"
+		classpath 'org.eclipse.jgit:org.eclipse.jgit:5.6.0.201912101111-r' // git capabilities
+		classpath 'de.marcphilipp.gradle:nexus-publish-plugin:0.4.0'
     }
-
+    
     apply from: "$rootDir/src/main/buildutils/util.gradle"
 }
 
 //apply plugin: 'eclipse'
 //eclipse.project.buildCommands.remove('org.eclipse.jdt.core.javabuilder');
 
+apply plugin: 'de.marcphilipp.nexus-publish'
+
 allprojects
 {
-	version = rootProject.version
+	version = rootProject.ext.version
 	def gsuffix = ""
 	if (getProjectDepth(project) > 1)
 	{
@@ -149,7 +206,6 @@ allprojects
 		files.addAll(confs.getFiles())
 	}
 }
-
 
 // Create version.properties with new timestamp (i.e. after clean)
 task createVersionInfo(type: Copy) {
@@ -532,6 +588,7 @@ subprojects
 		// Create distZip task
 		task distZip(type: Zip) {
 			archiveName 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+			duplicatesStrategy DuplicatesStrategy.EXCLUDE // TODO: Workaround for our broken mechanism
 			gradle.projectsEvaluated() {
 				// Add all included artifact projects and their parents (but exclude root project for addons)
 				def projs = new HashSet();	// keep track of added projects to avoid duplicates
@@ -642,7 +699,8 @@ subprojects
 				}
 			
 				println 'Distribution "' + distname + '" is ' + (commercial? 'commercial' : 'non-commercial') + ' and ' + (isaddon? 'an add-on.' : 'standalone.')
-				destinationDir new File(getDistsDir(rootProject), commercial? 'commercial' : 'noncommercial')
+				//destinationDir new File(getDistsDir(rootProject), commercial? 'commercial' : 'noncommercial')
+				destinationDir new File(getDistsDir(rootProject), 'zips')
 			}
 			
 			// Copy generated srcZip
@@ -703,7 +761,8 @@ subprojects
 					
 				// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
 				def distzip = project.distZip.outputs.files.first().canonicalPath
-				def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+				//def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+				def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions/zips/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 				def diff	= diffZips(distzip, distzip2)
 				if(diff.length()!=0)
 					throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
@@ -742,8 +801,6 @@ task copyJavaDocSources(type: Copy) {
 		return line
 	}
 }
-
-
 
 task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	def sourcedir = getDistsDir(project).getCanonicalPath() + '/javadocworkdir'
@@ -819,4 +876,189 @@ task testReport(type: TestReport) {
     // Include the results from the `test` task in all subprojects
     //reportOn subprojects*.test
 	reportOn subprojects.collect { it.tasks.withType(Test).collect {it.binResultsDir} }
+}
+
+/*task printVersion() {
+	dependsOn compileJava
+	def buildname = fetchNextBuildNameFromGitTag()
+    println "new version is: "+buildname.full
+
+    //currentBuild.displayName = buildname.full
+    //env.BUILD_VERSION_SUFFIX = buildname.suffix // for jenkins
+}*/
+
+task docsDirZip(type: Zip) {
+   from 'docs/'
+   include '*'
+   include '*/*'
+   include '*/*/*'
+   include '*/*/*/*'
+   include '*/*/*/*/*'
+   archiveName 'docs.zip'
+   destinationDir(project.buildDir)
+}
+
+
+task deployDocs() {
+	dependsOn docsDirZip
+	doLast {
+		
+		def acc = getDownloadServerAccess();
+		
+		def dir = "/www/docs/" + project.ext.version.major + "." + project.ext.version.minor;
+		def docszip = "" + project.buildDir + File.separator + 'docs.zip';
+		
+		net.schmizz.sshj.SSHClient ssh = new net.schmizz.sshj.SSHClient();
+		ssh.addHostKeyVerifier(acc.hosthash);
+		ssh.connect(acc.host, acc.port);
+		try {
+			ssh.authPassword(acc.user, acc.password);
+			def session = ssh.startSession();
+			def cmd = session.exec("ls " + dir);
+			cmd.close();
+			
+			
+			if (cmd.getExitStatus() == 0) {
+				// Old deployment exist, remove...
+				session = ssh.startSession();
+				cmd = session.exec("rm -rf " + dir);
+				cmd.close();
+			}
+			
+			session = ssh.startSession();
+			cmd = session.exec("mkdir " + dir);
+			cmd.close();
+			
+			ssh.newSCPFileTransfer().upload(new net.schmizz.sshj.xfer.FileSystemFile(docszip), dir + "/");
+			
+			session = ssh.startSession();
+			cmd = session.exec("unzip -d " + dir + " " + dir + "/docs.zip");
+			cmd.close();
+			
+			session = ssh.startSession();
+			cmd = session.exec("rm " + dir + "/docs.zip");
+			cmd.close();
+        } catch (Exception e) {
+        	throw new RuntimeException(e); 
+        } finally {
+            ssh.disconnect();
+        }
+        (new File(docszip)).delete();
+		println "Docs deployed.";
+	}
+}
+
+task deployZips() {
+	dependsOn distZips
+	doLast {
+		if(!gradle.ext.productionmode)
+			throw new IllegalStateException("Can only deploy zips in production mode.");
+		
+		def acc = getDownloadServerAccess();
+		
+		def dir = "/www/releases/" + project.ext.jadex_build_version;
+		def zipsdir = "" + project.buildDir + File.separator + 'distributions' + File.separator + 'zips';
+		def sourcesdir = "" + project.buildDir + File.separator + 'distributions' + File.separator + 'exampleprojects';
+
+		net.schmizz.sshj.SSHClient ssh = new net.schmizz.sshj.SSHClient();
+		ssh.addHostKeyVerifier(acc.hosthash);
+		ssh.connect(acc.host, acc.port);
+		try {
+			ssh.authPassword(acc.user, acc.password);
+			
+			createEmptyDirOnSSH(ssh, dir);
+			
+			def children = new net.schmizz.sshj.xfer.FileSystemFile(zipsdir).getChildren();
+			for (def child : children) {
+				ssh.newSCPFileTransfer().upload(child, dir + "/");
+			}
+			children = new net.schmizz.sshj.xfer.FileSystemFile(sourcesdir).getChildren();
+			for (def child : children) {
+				ssh.newSCPFileTransfer().upload(child, dir + "/");
+			}
+        } catch (Exception e) {
+        	throw new RuntimeException(e); 
+        } finally {
+            ssh.disconnect();
+        }
+		println "Zips deployed.";
+	}
+}
+
+// Update the tag and commit it to repository.
+task updateTag() {
+	doLast() {
+		if(!gradle.ext.productionmode)
+			throw new IllegalStateException("Can only update tag in production mode.");
+		
+		/*def url = findProperty('tagUrl');
+		def user = findProperty('tagUser');
+		def pass = findProperty('tagPassword');
+		
+		println "User: "+user
+		println "URL: "+url
+		println "Pass: "+pass*/
+		
+		def url = findPropertyWithDotsOrDie('tag.url');
+		def user = findPropertyWithDotsOrDie('tag.user');
+		def pass = findPropertyWithDotsOrDie('tag.password');
+		
+		def git = org.eclipse.jgit.api.Git.open(project.projectDir);
+		//org.eclipse.jgit.lib.Repository repo = new org.eclipse.jgit.storage.file.FileRepositoryBuilder().setMustExist(true).setGitDir(project.projectDir).readEnvironment().findGitDir().build();
+		def tags = git.tagList().call();
+		def cmd = git.tag();
+		cmd.setName(jadex_build_version);
+		cmd.setForceUpdate(true);
+		cmd.call();
+		cmd = git.push();
+		def pushopts = new ArrayList<String>();
+		pushopts.add("ci.skip"); 
+		cmd.setPushOptions(pushopts);
+		cmd.setRemote(url);
+		cmd.setCredentialsProvider(new org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider(user, pass))
+		cmd.setPushTags();
+		cmd.call();
+	}
+}
+
+def createEmptyDirOnSSH(net.schmizz.sshj.SSHClient ssh, String dir) {
+	def session = ssh.startSession();
+	def cmd = session.exec("ls " + dir);
+	cmd.close();
+	
+	if (cmd.getExitStatus() == 0) {
+		// Old deployment exist, remove...
+		session = ssh.startSession();
+		cmd = session.exec("rm -rf " + dir);
+		cmd.close();
+	}
+	
+	session = ssh.startSession();
+	cmd = session.exec("mkdir " + dir);
+	cmd.close();
+}
+
+def getDownloadServerAccess() {
+	def ret = [:];
+	ret.hosthash = findPropertyWithDotsOrDie('dl.hosthash');
+	ret.host = findPropertyWithDotsOrDie('dl.host');
+	def portprop = findPropertyWithDots('dl.port');
+	ret.port = portprop != null ? Integer.parseInt(portprop) : 22;
+	ret.user = findPropertyWithDotsOrDie('dl.user');
+	ret.password = findPropertyWithDotsOrDie('dl.password');
+	return ret;
+}
+
+def findPropertyWithDots(propname) {
+	def ret = findProperty(propname);
+	if (ret == null)
+		ret = findProperty(propname.replace('.', '_'));
+	return ret;
+}
+
+def findPropertyWithDotsOrDie(propname) {
+	def ret = findPropertyWithDots(propname);
+	if (ret == null)
+		throw new Exception('Missing property ' + propname);
+	return ret;
 }

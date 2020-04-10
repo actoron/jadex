@@ -17,6 +17,8 @@ plugins {
 //	id "de.richsource.gradle.plugins.typescript" version "1.8.0"
 }
 
+description 'Jadex websocket webservice implementation'
+
 // Does not work well in Eclipse
 //sourceSets.main.resources { srcDirs = ["src/main/java"]; include "**/*.properties"; include "**/*.html" }
 // This seems to work but perhaps not ideal.

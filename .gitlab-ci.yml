@@ -1,0 +1,184 @@
+# build properties
+# branchToBuild
+# tagToBuild
+# performanceTests
+# publishArtifacts
+# publishToDummy
+# publishCommercial
+# deployDists
+# resetPatchVersion
+# tagBuild
+# deployDevSchema
+# gradlew -Pdist=publishdists publish -x test -PpublishArtifacts -Prepouser=deployment -Prepopassword= -Production -Psigning.secretKeyRingFile=master.key 
+
+image: amd64/gradle
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  BUILD: "true"
+  QUALITY: "true"
+  TEST: "true"
+  JAVADOCZIP: "true"
+  DEPLOYZIPS: "true"
+  DEPLOYDOCS: "true"
+  UPLOAD: "true"
+  TAG: "true"
+  
+stages:
+  - build
+  - testandquality
+  - package
+  - deploy
+  - failure
+  - success
+
+# todo: move code from jenkinsutil.groovy to gradle file and make it a task
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle;
+  - apt-get update -qq && apt-get install -y -qq xvfb libxrender1 libxtst6 libxi6 pandoc texlive python3-pip
+  - pip3 install mkdocs
+  - nohup Xvfb :99 &
+  - export DISPLAY=:99
+  - echo "BUILD:" $BUILD
+  - echo "QUALITY" $QUALITY
+  - echo "TEST" $TEST
+  - echo "JAVADOCZIP" $JAVADOCZIP
+  - echo "DEPLOYDOCS" $DEPLOYDOCS
+  - echo "DEPLOYZIPS" $DEPLOYZIPS
+  - echo "UPLOAD" $UPLOAD
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+# **/build does not work correctly :-(
+# https://gitlab.com/gitlab-org/gitlab-foss/issues/17850
+build:
+  stage: build
+  script:
+    - ./gradlew -Pdist=publishdists -Production clean build -x test -x javadoc
+  allow_failure: false
+  artifacts:
+    paths:
+      - "*/build"
+      - "*/*/build"
+      - "*/*/*/build"
+      - "*/*/*/*/build"
+    expire_in: 1 week
+  rules:
+    - if: '$BUILD == "true"'
+      when: on_success
+    
+    
+quality:
+  stage: testandquality
+  script:
+    - ./gradlew -Production sonarqube
+  allow_failure: true
+  rules:
+    - if: '$QUALITY == "true"'
+      when: on_success
+
+test:
+  stage: testandquality
+  script:
+    - ./gradlew -Pdist=publishdists -Production :applications:micro:test :platform:base:test test -x javadoc
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - "*/build/test-results/test"
+      - "*/*/build/test-results/test"
+      - "*/*/*/build/test-results/test"
+      - "*/*/*/*/build/test-results/test"
+      - "*/build/reports/tests/test"
+      - "*/*/build/reports/tests/test"
+      - "*/*/*/build/reports/tests/test"
+      - "*/*/*/*/build/reports/tests/test"
+    reports:
+      junit: 
+        - "*/build/test-results/test/**/*.xml"
+        - "*/*/build/test-results/test/**/*.xml"
+        - "*/*/*/build/test-results/test/**/*.xml"
+        - "*/*/*/*/build/test-results/test/**/*.xml"
+  rules:
+    - if: '$TEST == "true"'
+      when: on_success
+ 
+# Build all kinds of docs/dist files as parallel as possible
+# checkDists:
+#  stage: package
+#  script:
+#    - ./gradlew -Pdist=publishdists -Production checkDists
+    
+# buildDocsPdf:
+#  stage: package
+#  script:
+#    - ./gradlew -Production -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
+    
+javadocZip:
+  stage: package
+  script:
+    - ./gradlew -Pdist=addonjavadoc -Production javadocZip
+  rules:
+    - if: '$JAVADOCZIP == "true"'
+      when: on_success
+    
+deployZips:
+  stage: deploy
+  script:
+    - ./gradlew -Pdist=publishdists -Production deployZips
+  rules:
+    - if: '$DEPLOYZIPS == "true"'
+      when: on_success
+
+deployDocs:
+  stage: deploy
+  script:
+    - ./gradlew -Production deployDocs
+  rules:
+    - if: '$DEPLOYDOCS == "true"'
+      when: on_success
+
+# todo: move pass to env
+upload:
+  stage: deploy
+  script: 
+    - ./gradlew -Dorg.gradle.parallel=false -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
+  rules:
+    - if: '$UPLOAD == "true"'
+      when: on_success
+      
+# cleanuprepo:    
+#  stage: failure
+#  script: 
+#    - ./gradlew closeRepository
+#  when: on_failure
+#  only:
+#    variables:
+#      - $UPLOAD == "true"
+
+# has some 401 error :-(  
+#releaseStagingRepo:
+#  stage: success
+#  script:
+#    -  ./gradlew closeAndReleaseRepository
+#  only:
+#    variables:
+#      - $UPLOAD == "true"
+    
+updateTag:
+  stage: success
+  script:
+    -  ./gradlew -Production updateTag
+  rules:
+    - if: '$TAG == "true"'
+      when: on_success
+
+# Rules for the whole workflow / pipeline
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'push'
+      when: never
+    - when: always

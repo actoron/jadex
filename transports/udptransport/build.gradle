@@ -1,3 +1,5 @@
+description 'Jadex udp transport'
+
 apply plugin: 'java'
 
 dependencies

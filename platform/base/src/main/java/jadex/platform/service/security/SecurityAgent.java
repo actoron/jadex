@@ -691,7 +691,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						HandshakeState hstate = initializingcryptosuites.get(rplat);
 						if(hstate == null)
 						{
-							//System.out.println("Handshake state null, starting new handhake: "+agent+" "+rplat);
+							System.out.println("Handshake state null, starting new handhake: "+agent+" "+rplat+" "+header);
 							//System.out.println(initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
 							initializeHandshake(rplat);
 							hstate = initializingcryptosuites.get(rplat);
@@ -1573,7 +1573,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		Set<String> platformroles = roles.get(secinf.getAuthenticatedPlatformName());
 		if (platformroles != null)
 			siroles.addAll(platformroles);
-		else
+		else if (secinf.getAuthenticatedPlatformName() != null)
 			siroles.add(secinf.getAuthenticatedPlatformName());
 		
 		

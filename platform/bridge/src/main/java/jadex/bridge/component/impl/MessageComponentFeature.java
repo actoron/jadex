@@ -483,7 +483,9 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 		
 		if(transports.size()==0)
 		{
-			ret.setException(new RuntimeException("No message transport available."));
+			RuntimeException re = new RuntimeException("No message transport available: "+component.getId()+" "+header);
+			re.printStackTrace();
+			ret.setException(re);
 		}
 		else
 		{
@@ -507,10 +509,15 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					public void exceptionOccurred(Exception exception)
 					{
 						cnt++;
+						
+						System.out.println("Transport failed: "+cnt+"/"+transports.size()+" "+exception);
 						//exception.printStackTrace();
 					
 						if(cnt==transports.size())
+						{
+							System.out.println("Finally failed to send message: "+exception);
 							ret.setExceptionIfUndone(exception);
+						}
 					}
 				}));
 			}

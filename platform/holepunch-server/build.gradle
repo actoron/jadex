@@ -1,3 +1,5 @@
+description 'Jadex holepunch server'
+
 apply plugin: 'java'
 
 repositories
