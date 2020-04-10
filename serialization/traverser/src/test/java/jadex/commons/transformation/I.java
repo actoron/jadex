@@ -1,6 +1,6 @@
 package jadex.commons.transformation;
 
-import jadex.commons.transformation.annotations.Include;
+import jadex.commons.SUtil;
 import jadex.commons.transformation.annotations.IncludeFields;
 
 @IncludeFields(includePrivate = true)
@@ -9,7 +9,7 @@ public class I
 
 	private String string2;
 
-	private static final String finalStaticString = "finalStaticString";
+	private static final String finalStaticString = SUtil.createUniqueId();
 
 	public I() {
 		super();
@@ -32,10 +32,18 @@ public class I
 		if(obj instanceof I)
 		{
 			I other = (I)obj;
-			ret = string2.equals(other.string2) && finalStaticString.equals(other.finalStaticString);
+			ret = string2.equals(other.string2) && getFinalString().equals(other.getFinalString());
 		}
 		
 		return ret;
 	}
 	
+	/**
+	 *  Use instance getter to maybe find if class was loaded twice!?
+	 *  Not sure why we would need to compare the static string anyways in equals()...
+	 */
+	String	getFinalString()
+	{
+		return finalStaticString;
+	}
 }
