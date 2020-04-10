@@ -18,10 +18,10 @@ variables:
   BUILD: "true"
   QUALITY: "true"
   TEST: "true"
-  JAVADOCZIP: "true"
-  DEPLOYZIPS: "true"
-  DEPLOYDOCS: "true"
-  UPLOAD: "true"
+  JAVADOCZIP: "false"
+  DEPLOYZIPS: "false"
+  DEPLOYDOCS: "false"
+  UPLOAD: "false"
   
 stages:
   - build
