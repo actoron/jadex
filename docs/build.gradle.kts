@@ -11,10 +11,6 @@ import com.appmattus.markdown.rules.*
 
 markdownlint {
 	rules {
-		+ValidRelativeImagesRule {
-			active	= false
-		}
-
 		// Disable some rules by setting active to false
 		+MissingLinkSchemeRule {
 			active	= false
