@@ -14,7 +14,7 @@ a) In Jadex, services are described by POJO Java interfaces.
 
 b) Publishing of services is as simple as adding a *@ProvidedServices* annotation to a Java class.
  
-c) In Jadex discovery is supported by a combination of two mechanisms. First, [platform awareness](../../../remote/remote/#awareness) automatically discovers all available Jadex platforms in local networks and potentially across the whole Internet. Second, the [service search](../../../guides/ac/05 Services/#service-search)) potentially traverses all known platforms looking for the desired service and thus potentially finds any matching service available somewhere on the Internet.
+c) In Jadex discovery is supported by a combination of two mechanisms. First, [platform awareness](../../remote/remote.md#awareness) automatically discovers all available Jadex platforms in local networks and potentially across the whole Internet. Second, the [service search](../../guides/ac/05 Services.md#service-search)) potentially traverses all known platforms looking for the desired service and thus potentially finds any matching service available somewhere on the Internet.
 
 **Challenge 2: Components with internal behavior**
 
@@ -28,7 +28,7 @@ E.g. the time provider component's periodic task for sending out time values is 
 
 *"The communication between time user and time provider needs to be defined including, on the protocol level, the allowed sequences of messages and, on the application level, the data format for the transferred information."*
 
-In Jadex, a set of message transports assures that platforms can communicate in local networks as well as across the Internet. For the protosol level, Jadex comes with ready to use implementations for [commonly used interaction patterns](../../../futures/futures/)) like publish/subscribe.
+In Jadex, a set of message transports assures that platforms can communicate in local networks as well as across the Internet. For the protocol level, Jadex comes with ready to use implementations for [commonly used interaction patterns](../../futures/futures.md)) like publish/subscribe.
 
 On the application level, interaction may use classes and interfaces as needed for the data types. Jadex provides automatic conversion of objects to transer formats like binary, JSON and XML.
 

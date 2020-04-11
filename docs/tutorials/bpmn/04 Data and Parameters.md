@@ -54,7 +54,7 @@ Run the process and observe if the data arrives at the tasks.
 Exercise C3 - Parameter Scopes
 -------------------------------------------
 
-In BPMN, an internal subprocess represents a task that is recursively composed of inner tasks (see [Exercise B5](../03%20Basic%20Processes#exercise-b5-subprocesses) ). 
+In BPMN, an internal subprocess represents a task that is recursively composed of inner tasks (see [Exercise B5](03%20Basic%20Processes#exercise-b5-subprocesses.md) ). 
 The tasks in the subprocess are executed as if they were a separate process, but they have access to the context of the outer process.  
 Therefore subprocesses can be used to define custom scopes for parameters. This lesson shows how the example from the last lesson can be improved by using a subprocess as a parameter scope.
 

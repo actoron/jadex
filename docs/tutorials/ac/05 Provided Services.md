@@ -29,7 +29,7 @@ In this exercise we will create a basic chat service, attach it to the chat comp
 
 -   Add a field of type ```IInternalAccess``` and name it *agent*. Also add a ```@ServiceComponent``` annotation above this field. Jadex will automatically inject the agent API to this field.
 
--   You can also [inject agent features directly into services](../../../services/services/#accessing-the-component)): Add a field of type ```IRequiredServicesFeature``` and name it *requiredServicesFeature*. Also add a ```@ServiceComponent``` annotation above this field. 
+-   You can also [inject agent features directly into services](../../services/services.md#accessing-the-component)): Add a field of type ```IRequiredServicesFeature``` and name it *requiredServicesFeature*. Also add a ```@ServiceComponent``` annotation above this field. 
 
 -   Add a field of type *IClockService* and name it *clock*.
 
@@ -37,10 +37,10 @@ In this exercise we will create a basic chat service, attach it to the chat comp
 
 -   Add the *message* method from the *IChatService* interface. The method will be called to let the chat service know about a new message. In the message body this new message should be printed out to the console. You can access the receiver's component name using ```agent.getComponentIdentifier().getLocalName()```. Concretely the output should look like: ```<receiver component name> received at <time> from: <sender> message: <text>```.
 
--   Add a public method called *startService* with no parameters and an *IFuture&lt;Void&gt;* return value. Place the ```@ServiceStart``` annotation above the method signature (see [service lifecycle](../../../services/services/#service-lifecycle))) 
+-   Add a public method called *startService* with no parameters and an *IFuture&lt;Void&gt;* return value. Place the ```@ServiceStart``` annotation above the method signature (see [service lifecycle](../../services/services.md#service-lifecycle))) 
 In this case the method should assign the *format* with ```new SimpleDateFormat("hh:mm:ss")``` and the *clock* by fetching the clock service in the same way as in earlier lectures.  
 Please note that it is important that the method should return a future indicating when the init has been finished. As fetching the clock service is done asynchronously init has finished when the clock service has been assigned.   
-To ensure that the caller of the start method is notified also in case an error occurs and the service could not be found an ```ExceptionDelegationResultListener``` can be used (read more about it in the [Futures](../../../futures/futures/#special-result-listeners) chapter)) It will forward exceptions to the future that is passed to it.  This init code for the clock should look like this: 
+To ensure that the caller of the start method is notified also in case an error occurs and the service could not be found an ```ExceptionDelegationResultListener``` can be used (read more about it in the [Futures](../../futures/futures.md#special-result-listeners) chapter)) It will forward exceptions to the future that is passed to it.  This init code for the clock should look like this: 
 
 ```java
 format = new SimpleDateFormat("hh:mm:ss");
@@ -60,7 +60,7 @@ return ret;
 ## Defining the chat service component
 
 -   Create a Java class file called *ChatD1Agent.java* by copying the agent from ChatC2Agent.
--   Add a second required service definition to the agent. For that purpose you have to change the required services specification to look like ```@RequiredServices({rs1, rs2})```, with rs1, rs2 representing the respective service definitions (see the [Services](../../../services/services/#using-services) Chapter)).  
+-   Add a second required service definition to the agent. For that purpose you have to change the required services specification to look like ```@RequiredServices({rs1, rs2})```, with rs1, rs2 representing the respective service definitions (see the [Services](../../services/services.md#using-services) Chapter)).  
 The first clock service specification can be kept and the second we will name *chatservices*. The type has to be declared as *IChatService* and as we wish to retrieve all chat services we need to set *multiple* to true. In the binding of the service we use scope *platform* again and additionally define it as *dynamic*. Making it dynamic disables caching former search results and will always deliver the currently available chat services to the caller. 
 
 -   Furthermore, we need to specifiy the provided service. We use the ```@ProvidedServices``` annotation and add one ```@ProvidedService``` annotation inside. For a provided service we have to define its interface using the type attribute and set it to *IChatService.class* in this case. In addition, a provided service should have an implementation which is defined using the ```@Implementation``` annotation. Here, we just directly specify the implementation class to *ChatServiceD1*. It should look like the following:

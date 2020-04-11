@@ -47,7 +47,7 @@ Developing a Jadex ClientApp
 
 **Important:** Currently, it is only possible to develop Jadex ClientApps using maven!
 
-Before you can start developing, please follow steps 1-3 from [here](02%20Installation)  to install Eclipse and the Android SDK.
+Before you can start developing, please follow steps 1-3 from *02 Installation*  to install Eclipse and the Android SDK.
 
 ### Using the ClientApp example
 

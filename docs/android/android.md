@@ -284,7 +284,7 @@ public HelloWorldActivity()
 
 ```
 
-Available platform options are documented [here](platform/platform.md) .
+Available platform options are documented [here](../platform/platform.md) .
 Setting up an activity like this will start a jadex-platform during the *onCreate()* phase and inform the activity about the progress in the two methods 
 ```java
 onPlatformStarting()  

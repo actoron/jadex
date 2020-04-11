@@ -150,7 +150,7 @@ IFuture<String> translated = fut.thenCombine(getTranslator(), (s, translator) ->
 
 There are also variants of *apply* and *accept*: *applyToEither* and *acceptEither* will take a second future and apply the given function to the result that is available first, ignoring the second result. 
 
-For a complete documentation of these methods, please visit the [IFuture API documentation](URLJavaDoc/jadex/commons/future/IFuture.html).
+For a complete documentation of these methods, please visit the [IFuture API documentation](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/future/IFuture.html).
 
 # Future Types
 The following is a short list of commonly used future types. For a more complete guide, visit [Asynchronous Programming](../../guides/ac/03 Asynchronous Programming/#programming-futures-and-listeners).
@@ -294,7 +294,7 @@ This section discusses problems frequently encountered in the Jadex Active Compo
 
 ## No Stack Trace, just a one-liner
 Because exceptions are generally passed through a chain of result listeners, sometimes you may forget to print stack traces and only get a one-line warning message.  
-Enabling future debugging as [configuration example](../../platform/platform/#configuration-examples) suggests will always print useful stack traces when exceptions occur (if some kind of  ```DefaultResultListener``` is attached!).  
+Enabling future debugging as [configuration example](../platform/platform.md#configuration-examples) suggests will always print useful stack traces when exceptions occur (if some kind of  ```DefaultResultListener``` is attached!).  
 Note that enabling this feature will seriously **decrease performance**, as debug information is remembered throughout the application!
  
 ## No error message, calls silently fail
@@ -313,7 +313,7 @@ Calling *get()* on the main thread may result in a hung-up program.
 ## Special Result Listeners
 
 For some generic, re-occuring tasks, Jadex includes special result listeners.
-Some of the most useful types are introduced below, for a complete list check out the ```IResultListener``` [subtypes](URLJavaDoc/jadex/commons/future/IResultListener.html).
+Some of the most useful types are introduced below, for a complete list check out the ```IResultListener``` [subtypes](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/future/IResultListener.html).
 
 ### Delegation
 As Futures, respectively the corresponding asynchronous calls, get nested, we need way to delegate results from one Future to the other.

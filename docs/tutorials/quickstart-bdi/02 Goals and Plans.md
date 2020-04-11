@@ -119,7 +119,7 @@ the `actsense` object from all of these.
 
 Another difference is the `IBDIAgentFeature bdi` parameter of the method. It provides access to the
 BDI features of Jadex. We will use it later, e.g. to add goals to the agent. You can find the corresponding Javadoc
-[here](URLJavaDoc/index.html?jadex/bdiv3/features/IBDIAgentFeature.html).
+[here](https://download.actoron.com/docs/nightlies/latest/javadoc/index.html?jadex/bdiv3/features/IBDIAgentFeature.html).
 
 We added a single `moveTo()` call as a place-holder, so that the agent would move a little, when it is started.
 The following sections show how to add more useful behavior using goals and plans.
@@ -219,7 +219,7 @@ This is, where the  `@Trigger` annotation comes into play for establishing the c
 Any single plan can have not one but many different triggers. Therefore the `@Trigger` annotation allows stating a single goal as in
 `goals=PerformPatrol.class`, but also multiple goals (e.g., `goals={PerformPatrol.class, ...}`) as well as other kinds
 of triggering events. You can find more details about the annotation in its
-[Javadoc documentation](URLJavaDoc/index.html?jadex/bdiv3/annotation/Trigger.html). 
+[Javadoc documentation](https://download.actoron.com/docs/nightlies/latest/javadoc/index.html?jadex/bdiv3/annotation/Trigger.html). 
 
 ### The `IBDIAgentFeature` and the `dispatchTopLevelGoal()` Method
 
@@ -336,7 +336,7 @@ Execute the agent by starting the `Main` class and check that now all three plan
 In the last exercise (which you should now backup as `CleanerBDIAgentA3.java`, btw) we already introduced one
 flag for controlling the means-end reasoning (a.k.a. goal processing, a.k.a. plan selection) behavior of a BDI agent.
 You can find many more flags in the Javadoc of the
-[@Goal annotation](URLJavaDoc/index.html?jadex/bdiv3/annotation/Goal.html).
+[@Goal annotation](https://download.actoron.com/docs/nightlies/latest/javadoc/index.html?jadex/bdiv3/annotation/Goal.html).
 
 Lets say we want the cleaner to stop between patrol rounds. We find two flags that seem to support this functionality:
 `recurdelay` and `retrydelay`. Both represent a waiting time in milliseconds. Add a `retrydelay` of 3000 (i.e. three seconds) to the goal like so:

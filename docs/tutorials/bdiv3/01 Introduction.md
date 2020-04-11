@@ -27,4 +27,4 @@ In this tutorial a simple translation agent for single words will be implemented
 -   Work through the exercises in order, because later exercises require knowledge from the earlier ones.
 -   Create a new package for each solution you build that is named in the same way as the exercise (e.g. a1, b1). This helps not to confuse the files of different exercises.
 -   Help us to make this tutorial better with your feedback. When you find errors or have problems that are directly concerned with the exercise descriptions feel free to let us know.
--   Whenever you encounter problems with Jadex we would be happy to help you. Please use primarily the [Jadex Forum](URLJadexForum}) that can be used for asking questions about Jadex.
+-   Whenever you encounter problems with Jadex we would be happy to help you. Please use primarily the [Jadex Forum](https://sourceforge.net/p/jadex/discussion/274112/) that can be used for asking questions about Jadex.

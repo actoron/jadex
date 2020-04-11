@@ -1,7 +1,7 @@
 ${SorryOutdatedv3}
 
 # Remote Communication
-Applications built with Jadex Active Components can be easily distributed across platforms, meaning that [service discovery](../../services/services/#service-scopes) and [accessing services](../../services/services/#accessing-services) works the same way, no matter if the target service is available at a local or remote platform.
+Applications built with Jadex Active Components can be easily distributed across platforms, meaning that [service discovery](../services/services.md#service-scopes) and [accessing services](../services/services.md#accessing-services) works the same way, no matter if the target service is available at a local or remote platform.
 
 However, one additional aspect has to be addressed in the remote case: How can *platforms* discover each other to share services?
 
@@ -14,7 +14,7 @@ For more details, check out the Active Components User Guide about [Platform Awa
 
 
 ## Configuration
-Please refer to the [Configuration examples](../../platform/platform/#configuration-examples) in the Platform chapter or visit the [Platform Awareness](../../guides/ac/07 Platform Awareness/#configuration) section of the Active Components User Guide for awareness configuration. 
+Please refer to the [Configuration examples](../platform/platform.md#configuration-examples) in the Platform chapter or visit the [Platform Awareness](../../guides/ac/07 Platform Awareness/#configuration) section of the Active Components User Guide for awareness configuration. 
 
 ## Manually Connecting Platforms
 ${SorryNotYetAvailable}
@@ -34,7 +34,7 @@ There are two kinds of passwords:
 ### Platform passwords
 By default, a Jadex platform is secured by a password which is generated at first startup and printed to the console. If a remote platform knows this password, it is able to find and invoke any services available on the local platform.  
 This password-protection may be switched off by setting ```PlatformConfiguration.setUsePass(false)``` (**NOT recommended!**)  
-Remote platforms can set platform passwords to access remote platforms within the [JCC Security Settings](../../tools/05 Security Settings/#remote-platform-password-settings) or by accessing the [ISecurityService](URLJavaDoc/jadex/bridge/service/types/security/ISecurityService.html}) programmatically.
+Remote platforms can set platform passwords to access remote platforms within the [JCC Security Settings](../../tools/05 Security Settings/#remote-platform-password-settings) or by accessing the [ISecurityService](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/types/security/ISecurityService.html) programmatically.
 
 ### Network passwords
 As your application may include several platforms, it is more convenient to set-up a trusted network.
@@ -133,7 +133,7 @@ While the build-in Java serialization works and is quick, it has some serious dr
 
 ## Annotation-based
 
-If you don't want to add bean-conform getters/setters to your classes, you may also use the [@IncludeFields](URLJavaDoc/jadex/commons/transformation/annotations/IncludeFields.html) annotation:
+If you don't want to add bean-conform getters/setters to your classes, you may also use the [@IncludeFields](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/transformation/annotations/IncludeFields.html) annotation:
 
 ```java
 @IncludeFields
@@ -146,7 +146,7 @@ public class Customer {
 	}
 ```
 
-You may also use an explicit [@Include](URLJavaDoc/jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
+You may also use an explicit [@Include](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
 
 ```java
 public class Customer {
@@ -177,7 +177,7 @@ public class Customer {
 }
 ```
 
-As with public fields, you may also use an explicit [@Include](URLJavaDoc/jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
+As with public fields, you may also use an explicit [@Include](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.
 
 ```java
 public class Customer {

@@ -33,10 +33,10 @@ IExternalAccess platform = Starter.createPlatform(platformConfig).get();
 
 The ```IExternalAccess``` object returned by the starter plays an important role for interaction with the platform, so be sure to keep it accessible. 
 
-Now that you know how to start a Jadex Active Components Platform you can proceed to [Components](../../components/components/) to see how to implement your own components and start them.
+Now that you know how to start a Jadex Active Components Platform you can proceed to [Components](../components/components.md) to see how to implement your own components and start them.
 
 # Configuring the Platform
-The PlatformConfiguration provides many ways to configure the platform. Some of them are listed below. For further information, please see the API documentation of [PlatformConfiguration](URLJavaDoc/jadex/base/PlatformConfiguration.html).
+The PlatformConfiguration provides many ways to configure the platform. Some of them are listed below. For further information, please see the API documentation of [PlatformConfiguration](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/base/PlatformConfiguration.html).
 
 The configuration options are also explained in more detail [here](http://www.activecomponents.org/jadex-applications-web/jadexdoc/view?model=/jadex/platform/Platform.component.xml).
 

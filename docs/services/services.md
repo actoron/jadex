@@ -6,7 +6,7 @@ A Jadex Service is generally represented by an arbitrary Java Interface and has 
 The service interface can be implemented as a Java class.
  Inside the component, access to services is then granted via Component Features or Injections.
 
-For services provided for general use by the Jadex Active Components Platform, please refer to [Platform Services](../../platform/platform/#platform-services).
+For services provided for general use by the Jadex Active Components Platform, please refer to [Platform Services](../platform/platform.md#platform-services).
 
 # Implementation
 
@@ -92,7 +92,7 @@ Possible scopes are:
 | *platform* | Visible inside the local platform |
 | *global* | Globally visible |
 
-See the [RequiredServiceInfo](URLJavaDoc/jadex/bridge/service/RequiredServiceInfo.html) class for matching String constants.
+See the [RequiredServiceInfo](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/RequiredServiceInfo.html) class for matching String constants.
 
 Service Scopes are respected in two cases: When providing a service and during service search. This means a *locally* provided service cannot be found by other components, even if the search scope is set to *global*.
 
@@ -132,7 +132,7 @@ The ```@Binding``` annotation defines parameters of the service binding that Jad
 
 |Parameter|Description|
 |---------|-----------|
-|*scope*| The [search scope](#service-scopse) to find the required service. |
+|*scope*| The [search scope](#service-scope) to find the required service. |
 |*dynamic*| If set to true, a new search will be initiated every time the required service is accessed. |
 |*create*| Set to true if the service should be instantiated by the local component |
 |*creationInfo*| ```@CreationInfo``` annotation, see [Advanced Service Topics](#auto-instantiation-of-required-services) |
@@ -201,7 +201,7 @@ IComponentIdentifier cid = id.getProviderId();
 String platformName = cid.getPlatformName();
 ```
 The Component Identifier of the service provider is probably the most interesting information held by the IService interface, as it can be used to check on which component and platform the service is running.
-Check the API documentation for [IService](URLJavaDoc/jadex/bridge/service/IService.html) for more information.
+Check the API documentation for [IService](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/IService.html) for more information.
 
 # Accessing the Component
 
@@ -219,7 +219,7 @@ private IInternalAccess agentAccess;
 private MyAgent agent;
 ```
 
-This annotation will also inject Agent Capabilities (see [BDI Capabilities](../../tutorials/bdiv3/06 Using Capabilities/)) and other instances that can be guessed by the [Parameter Guesser](../../components/components/#parameter-guesser).
+This annotation will also inject Agent Capabilities (see [BDI Capabilities](../../tutorials/bdiv3/06 Using Capabilities/)) and other instances that can be guessed by the [Parameter Guesser](../components/components.md#parameter-guesser).
 
 # Service Lifecycle
 
@@ -236,11 +236,11 @@ This section discusses some of the more advanced topics regarding services.
 
 ## More Annotations
 The most important annotations were already discussed. The following is an uncomplete list of other potentially useful annotations. 
-For a full reference, have a look at the [jadex.bridge.service.annotation](URLJavaDoc/jadex/bridge/service/annotation/package-summary.html) package.
+For a full reference, have a look at the [jadex.bridge.service.annotation](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/annotation/package-summary.html) package.
 
 |Annotation|Description|
 |----------|-----------|
-|**@ServiceIdentifier**| Can be used on fields to inject the [ServiceIdentifier](URLJavaDoc/jadex/bridge/service/annotation)|
+|**@ServiceIdentifier**| Can be used on fields to inject the [ServiceIdentifier](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/annotation)|
 |**@Excluded**| Can be used on methods or classes that should not be available from remote. Will throw an UnsupportedOperationException when called.|
 
 ## Accessing non-declared Services
@@ -260,7 +260,7 @@ Using ```getServices()```, you can also find multiple instances of the service, 
 
 If you want to avoid calling other platforms during search and only want to lookup local components, use the ```getLocalServices()``` instead.
 
- For further information, please have a look into to API documentation of [SServiceProvider](URLJavaDoc/jadex/bridge/service/search/SServiceProvider.html).
+ For further information, please have a look into to API documentation of [SServiceProvider](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/search/SServiceProvider.html).
 
 ## Embedding services
 You can also embed the service logic directly in your component, which might be a better choice in some cases.

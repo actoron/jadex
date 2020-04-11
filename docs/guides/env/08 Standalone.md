@@ -20,7 +20,7 @@ IComponentManagementService cms = SServiceProvider.searchService(platform, new S
 ```
 
 ### Creating Agent and Service
-With the ComponentManagementService, the agents can now be created. As you are trying to create them with Java, you usually want to set values to them. This is done by an Service, which is defined in a separate Service Definition as pure Java Interface (see [Provided Services](../../../services/services#providing-services)):
+With the ComponentManagementService, the agents can now be created. As you are trying to create them with Java, you usually want to set values to them. This is done by an Service, which is defined in a separate Service Definition as pure Java Interface (see [Provided Services](../../services/services.md#providing-services)):
 
 ```java
 public interface IInitialisationService {

@@ -185,13 +185,13 @@ public class TimeProviderAgent	implements ITimeService
 
 Start the Jadex platform and the time provider agent with the provided *main()* method. Afterwards start the time user agent with its *main()* method. The two platforms will connect automatically and the time user will find the time provider and print out its time update messages.
 
-The details of the time provider agent are explained in the following subsections. Furthermore, you can see [Remote Communication](../../../remote/remote/#awareness)) for details on automatic platform discovery.
+The details of the time provider agent are explained in the following subsections. Furthermore, you can see [Remote Communication](../../remote/remote.md#awareness)) for details on automatic platform discovery.
 
 # Service Annotations
 
 The  @ProvidedService annotation tells the Jadex runtime that this agent provides a service of type *ITimeService.class*. The @Service annotation furthermore states, that the agent class implements the service itself instead of having a separate class for the service implementation.
 
-See, e.g.,  [Services.Providing Services](../../../services/services/#providing-services)) for more details on the @ProvidedService annotation.
+See, e.g.,  [Services.Providing Services](../../services/services.md#providing-services)) for more details on the @ProvidedService annotation.
 
 # Object Attributes
 
@@ -209,6 +209,6 @@ Furthermore, a termination command is set on the subscription future. This comma
 
 The notification behavior of the time provider is captured in the *body()* method. It is annotated with *@AgentBody* to state that it should be called once after the agent is started.
 
-The repeated notification is modeled by a so called component step, which is scheduled using the *IExecutionFeature*. Each Jadex component is internally operated by a set of features that handle the different aspects like execution and required or provided services. The features can be accessed using the *IInternalAccess.getComponentFeature(Class<?>)* method. The API of the available features can be found [here](URLJavaDoc/index.html?jadex/bridge/component/package-summary.html).
+The repeated notification is modeled by a so called component step, which is scheduled using the *IExecutionFeature*. Each Jadex component is internally operated by a set of features that handle the different aspects like execution and required or provided services. The features can be accessed using the *IInternalAccess.getComponentFeature(Class<?>)* method. The API of the available features can be found [here](https://download.actoron.com/docs/nightlies/latest/javadoc/index.html?jadex/bridge/component/package-summary.html).
 
 Using the *repeatStep()* method of the execution feature, a step is scheduled every 5 seconds. In this step, the time provider iterates through all current subscriptions and sends the next time message using the *addIntermediateResultIfUndone()* method. The 'IfUndone' part threby states that errors should be ignored, e.g. when the subscription was just cancelled.

@@ -4,7 +4,7 @@ ${SorryOutdated}
 
 The documentation of the predefined capabilities is not yet finished.
 Please also take a look at the [BDIV3 Tutorial](../../../tutorials/bdiv3/06 Using Capabilities/))
-and at the [legacy documentation of Jadex 0.96](URLLegacyDoc/userguide/predef_cap.html).
+and at the [legacy documentation of Jadex 0.96](https://download.actoron.com/docs/releases/jadex-0.96x/userguide/predef_cap.html).
 
 Jadex uses capabilities for the modularization of agents (see [Chapter 5. Capabilities](../05 Capabilities)), whereby capabilities contain ready to use functionalities. The Jadex distribution contains several ready-to-use predefined capabilities for different purposes. Besides the basic management capabilties for using the CMS (component management service, see [CMSCapability](#the-component-management-service-cms-capability) below and the Directory Facilitator (see [DFCapability](../../../tools/A3 Directory Facilitator/)) also a Protocols Capability is available for the efficient usage of some predefined FIPA interaction protocols. The interface of a capability mainly consists of a set of exported goals which is similar to an object-oriented method-based interface description. This chapter aims at depicting their usage by offering the application programmer an overview and explanation of their functionalities and additionally a selection of short code snippets that can directly be used in your applications. 
 
@@ -103,7 +103,7 @@ public void body()
   IComponentManagementService cms = IComponentManagementService)getScope()
     .getServiceContainer().getService(IComponentManagementService.class);
   IComponentIdentifier remote_cms_id = cms.createComponentIdentifier("cms@remoteplatform",
-    false, new String[]{"nio - mtp://134.100.11.232:5678"});
+    false, new String[]{"niomtp://134.100.11.232:5678"});
 
   IGoal cc = createGoal("cms_create_component");
   cc.getParameter("type").setValue("mypackage.MyComponent");
@@ -121,8 +121,8 @@ public void body()
 In the above listing you can see how to create a component on a remote platform
 using its remote CMS. In order to do so, it's of course crucial that you know at least one address of the remote CMS.
 Moreover, the corresponding transport must be available on the local platform. The transport used by the other
-platform can be recognized by the prefix of the address (ending with the :*). In this case the prefix
-is *nio - mtp://*  , which represents the transport *jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport*.
+platform can be recognized by the prefix of the address (ending with the ```:```). In this case the prefix
+is ```nio-mtp://```  , which represents the transport ```jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport```.
 
 
 

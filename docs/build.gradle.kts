@@ -10,18 +10,14 @@ plugins {
 import com.appmattus.markdown.rules.*
 
 markdownlint {
+
+	// Optional - Include files using RegEx for ALL rules, default=".*" (i.e. all files in root project directory)
+    //includes = listOf(".*/quickstart.*/.*")
+    
 	rules {
+
 		// Disable some rules by setting active to false
 		+MissingLinkSchemeRule {
-			active	= false
-		}
-		+ValidRelativeLinksRule {
-			active	= false
-		}
-		+LineLengthRule {
-			active	= false
-		}
-		+NoHardTabsRule {
 			active	= false
 		}
 		+LowerCaseFilenameRule {
@@ -36,13 +32,7 @@ markdownlint {
 		+BlanksAroundFencesRule {
 			active	= false
 		}
-		+NoMultipleBlanksRule {
-			active	= false
-		}
 		+NoEmphasisAsHeaderRule {
-			active	= false
-		}
-		+NoTrailingSpacesRule {
 			active	= false
 		}
 		+ConsistentUlStyleRule {
@@ -114,8 +104,23 @@ markdownlint {
 		+NoMissingSpaceAtxRule {
 			active	= false
 		}
-    }
 
+
+		// Rules we don't want to check? (What is our markdown coding style?)
+		+LineLengthRule {
+			active	= false
+		}
+		+NoHardTabsRule {
+			active	= false
+		}
+		+NoMultipleBlanksRule {
+			active	= false
+		}
+		+NoTrailingSpacesRule {
+			active	= false
+		}
+	}
+	
 	reports {
 		html()
 	}

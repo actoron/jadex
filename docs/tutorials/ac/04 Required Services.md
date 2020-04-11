@@ -45,10 +45,10 @@ In this lecture we will use the clock service to print out the current platform 
 -   Create a Java class called *ChatC2Agent.java* by copying the agent file from the last lecture.
 
 -   Insert a field of type ```IRequiredServicesFeature``` and name it *requiredServicesFeature*. Add an ```@AgentFeature``` annotation above the field declaration. Jadex will notice the annotation and automatically inject the corresponding micro agent feature object to the agent.
- In this case, the injected feature provides access to the declared Required Services. Read more about Component Features [here](../../../components/components/#component-features)).
+ In this case, the injected feature provides access to the declared Required Services. Read more about Component Features [here](../../components/components.md#component-features)).
  
 -   Declare a public void method called *executeBody()* and add a ```@AgentBody``` annotation above the method. 
-This annotation is one of three [lifecycle annotations](../../../components/components/#component-lifecycle)) of a micro agents which will contain the functional agent code. It is called once after the agent is born. 
+This annotation is one of three [lifecycle annotations](../../components/components.md#component-lifecycle)) of a micro agents which will contain the functional agent code. It is called once after the agent is born. 
 
 -   What is still missing is the usage of the declared required service. This will be done in the *executeBody()* method with the following code:
 
@@ -89,7 +89,7 @@ Note, that the call returns a future so that you will have to add a result liste
 
 ## Verify the intended behavior
 
-Start the platform and the agent and check if the component descriptions are printed out. The output should look similar to the console snapshot shown below. Please note that the component management service is one of the central services of the Jadex platform. It can e.g. be used to *create*, *kill*, *suspend* and resume components. Feel free to inspect the [IComponentManagementService interface](URLJavaDoc/jadex/bridge/service/types/cms/IComponentManagementService.html}) to learn more about theses functionalities.
+Start the platform and the agent and check if the component descriptions are printed out. The output should look similar to the console snapshot shown below. Please note that the component management service is one of the central services of the Jadex platform. It can e.g. be used to *create*, *kill*, *suspend* and resume components. Feel free to inspect the [IComponentManagementService interface](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/types/cms/IComponentManagementService.html) to learn more about theses functionalities.
 
 ![04 Required Services@console1.png](console1.png)  
 * Console snaphsot*
