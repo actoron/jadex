@@ -89,7 +89,7 @@ Note, that the call returns a future so that you will have to add a result liste
 
 ## Verify the intended behavior
 
-Start the platform and the agent and check if the component descriptions are printed out. The output should look similar to the console snapshot shown below. Please note that the component management service is one of the central services of the Jadex platform. It can e.g. be used to *create*, *kill*, *suspend* and resume components. Feel free to inspect the [IComponentManagementService interface](${URLJavaDoc/jadex/bridge/service/types/cms/IComponentManagementService.html}) to learn more about theses functionalities.
+Start the platform and the agent and check if the component descriptions are printed out. The output should look similar to the console snapshot shown below. Please note that the component management service is one of the central services of the Jadex platform. It can e.g. be used to *create*, *kill*, *suspend* and resume components. Feel free to inspect the [IComponentManagementService interface](URLJavaDoc/jadex/bridge/service/types/cms/IComponentManagementService.html}) to learn more about theses functionalities.
 
 ![04 Required Services@console1.png](console1.png)  
 * Console snaphsot*

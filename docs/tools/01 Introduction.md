@@ -40,7 +40,7 @@ If you managed to successfully start the Jadex platform, the [Jadex Control Cent
 To execute any applications you need to add the corresponding path to the JCC project. 
 
 ## Adding Model Paths
-If you did not use the example project or want to see some other examples, you have to [download the Jadex Distribution](${URLACDownloadPage}), unpack it and point the JCC to the JAR files containing the applications.
+If you did not use the example project or want to see some other examples, you have to [download the Jadex Distribution](URLACDownloadPage), unpack it and point the JCC to the JAR files containing the applications.
 Right-click in the upper left area (called the model explorer, as it is used to browse for models of e.g. components, agents or processes) and choose 'Add Path'.
 
 ![02 Installation@jccaddpath.png](jccaddpath.png)  

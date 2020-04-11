@@ -38,7 +38,7 @@ public class Main {
     }
 }
 ```
-Note: You ** must not ** reference the TranslationBDI class directly for technical reasons. Just use it's qualified class name as in the example above.
+Note: You **must not** reference the TranslationBDI class directly for technical reasons. Just use it's qualified class name as in the example above.
 
 As you Agent does not do anything, there will be no useful output.
 

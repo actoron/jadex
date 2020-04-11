@@ -92,7 +92,7 @@ Possible scopes are:
 | *platform* | Visible inside the local platform |
 | *global* | Globally visible |
 
-See the [RequiredServiceInfo](${URLJavaDoc}/jadex/bridge/service/RequiredServiceInfo.html) class for matching String constants.
+See the [RequiredServiceInfo](URLJavaDoc/jadex/bridge/service/RequiredServiceInfo.html) class for matching String constants.
 
 Service Scopes are respected in two cases: When providing a service and during service search. This means a *locally* provided service cannot be found by other components, even if the search scope is set to *global*.
 
@@ -201,7 +201,7 @@ IComponentIdentifier cid = id.getProviderId();
 String platformName = cid.getPlatformName();
 ```
 The Component Identifier of the service provider is probably the most interesting information held by the IService interface, as it can be used to check on which component and platform the service is running.
-Check the API documentation for [IService](${URLJavaDoc}/jadex/bridge/service/IService.html) for more information.
+Check the API documentation for [IService](URLJavaDoc/jadex/bridge/service/IService.html) for more information.
 
 # Accessing the Component
 
@@ -236,11 +236,11 @@ This section discusses some of the more advanced topics regarding services.
 
 ## More Annotations
 The most important annotations were already discussed. The following is an uncomplete list of other potentially useful annotations. 
-For a full reference, have a look at the [jadex.bridge.service.annotation](${URLJavaDoc}/jadex/bridge/service/annotation/package-summary.html) package.
+For a full reference, have a look at the [jadex.bridge.service.annotation](URLJavaDoc/jadex/bridge/service/annotation/package-summary.html) package.
 
 |Annotation|Description|
 |----------|-----------|
-|**@ServiceIdentifier**| Can be used on fields to inject the [ServiceIdentifier](${URLJavaDoc}/jadex/bridge/service/annotation)|
+|**@ServiceIdentifier**| Can be used on fields to inject the [ServiceIdentifier](URLJavaDoc/jadex/bridge/service/annotation)|
 |**@Excluded**| Can be used on methods or classes that should not be available from remote. Will throw an UnsupportedOperationException when called.|
 
 ## Accessing non-declared Services
@@ -260,7 +260,7 @@ Using ```getServices()```, you can also find multiple instances of the service, 
 
 If you want to avoid calling other platforms during search and only want to lookup local components, use the ```getLocalServices()``` instead.
 
- For further information, please have a look into to API documentation of [SServiceProvider](${URLJavaDoc}/jadex/bridge/service/search/SServiceProvider.html).
+ For further information, please have a look into to API documentation of [SServiceProvider](URLJavaDoc/jadex/bridge/service/search/SServiceProvider.html).
 
 ## Embedding services
 You can also embed the service logic directly in your component, which might be a better choice in some cases.

@@ -106,7 +106,7 @@ This is a more complete list of currently unsupported modules on Jadex Android:
 
 This document will guide you through the setup that is necessary to develop applications using Jadex-Android.
 
-**Please [report](${URLJadexForum}) ** any difficulties or errors in this document as well as in the provided *jadex-android* libraries.
+**Please [report](https://sourceforge.net/p/jadex/discussion/274112/) ** any difficulties or errors in this document as well as in the provided *jadex-android* libraries.
 
 ## Requirements
 
@@ -146,8 +146,11 @@ Android Studio should now import the project, download all necessary libraries a
 ### Download required SDK Platform
 If you get an error like this:
 
-    Error: Cause: failed to find target with hash string 'android-21' in: [...]
-    *Open Android SDK Manager*  
+```
+Error: Cause: failed to find target with hash string 'android-21' in: [...]
+*Open Android SDK Manager*
+```
+  
 Open the SDK Manager by clicking on the provided link inside the error message, click the checkbox next to the SDK Platform with the API Level given in the error message (e.g. choose **Android 5.0.1** for API Level **21**) and click *OK*.  
 The required SDK platform will be downloaded and the project should build sucessfully.
 
@@ -281,7 +284,7 @@ public HelloWorldActivity()
 
 ```
 
-Available platform options are documented [here](${URLPlatformConfigDoc}) .
+Available platform options are documented [here](platform/platform.md) .
 Setting up an activity like this will start a jadex-platform during the *onCreate()* phase and inform the activity about the progress in the two methods 
 ```java
 onPlatformStarting()  
@@ -318,7 +321,7 @@ The jadex platform will also be automatically terminated during the *onDestroy()
 If you use ```setPlatformAutostart(false)```, the platform can be started manually by calling ```startPlatform()```.
 
 Regardless of which method us beeing used, the platform can always be stopped by calling 
-```stopPlatforms() ```.
+```stopPlatforms()```.
 
 
 ### Use the Jadex Platform in a service

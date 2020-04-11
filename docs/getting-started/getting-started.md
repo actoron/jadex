@@ -99,7 +99,7 @@ This section describes a way of setting up a Jadex project for development in ec
 Since the provided example project also contains a build.gradle, it can also be used with gradle - though the following guide does only cope with maven setups.
 
 #### Prerequisites
-Download the jadex-example-project.zip from [Downloads](${URLACDownloadPage}) and unpack it to a place of your choice.
+Download the jadex-example-project.zip from [Downloads](URLACDownloadPage) and unpack it to a place of your choice.
 
 #### Importing the Jadex example project
 
@@ -122,7 +122,7 @@ Download the jadex-example-project.zip from [Downloads](${URLACDownloadPage}) an
 In this lesson you will set up an initial eclipse environment that can be used to develop applications using Jadex. 
 Please follow the instructions carefully and compare your setup to the screenshots to verify that everything went fine. 
 
-Download the latest Jadex distribution from [Downloads](${URLACDownloadPage}) and unpack it to a place of your choice.  
+Download the latest Jadex distribution from [Downloads](URLACDownloadPage) and unpack it to a place of your choice.  
 Start eclipse. Start the 'New Java Project' wizard, disable the 'Use default location' checkbox and browse to the directory, where you unpacked the Jadex distribution. Note that the name of the directory might slightly differ due to changing Jadex version numbers.
 
 <!--TODO: update screenshots and texts-->

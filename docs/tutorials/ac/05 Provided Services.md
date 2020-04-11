@@ -35,9 +35,7 @@ In this exercise we will create a basic chat service, attach it to the chat comp
 
 -   Add a field of type *DateFormat* and name it *format*.
 
--   Add the *message* method from the *IChatService* interface. The method will be called to let the chat service know about a new message. In the message body this new message should be printed out to the console. You can access the receiver's component name using ```agent.getComponentIdentifier().getLocalName()```. Concretely the output should look like:
-
-		<receiver component name> received at <time> from: <sender> message: <text>.
+-   Add the *message* method from the *IChatService* interface. The method will be called to let the chat service know about a new message. In the message body this new message should be printed out to the console. You can access the receiver's component name using ```agent.getComponentIdentifier().getLocalName()```. Concretely the output should look like: ```<receiver component name> received at <time> from: <sender> message: <text>```.
 
 -   Add a public method called *startService* with no parameters and an *IFuture&lt;Void&gt;* return value. Place the ```@ServiceStart``` annotation above the method signature (see [service lifecycle](../../../services/services/#service-lifecycle))) 
 In this case the method should assign the *format* with ```new SimpleDateFormat("hh:mm:ss")``` and the *clock* by fetching the clock service in the same way as in earlier lectures.  

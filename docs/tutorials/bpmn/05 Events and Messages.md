@@ -85,6 +85,7 @@ After setting the receiver and the content, hit the 'Send' button below the mess
 You may wonder, what all the message properties are about. Jadex allows (in principle) different types of messages.
 The type of the message constrains the available parameters of a message. Currently, the only available type is "fipa" which defines parameter(set)s according to the FIPA message specification (e.g., parameters for the receivers, content, sender, etc. are introduced). Through this message typing Jadex does not require that only FIPA messages are being sent, as other options may be added in future. In the following table, all available parameter(set)s are itemized. For details about the meaning of the FIPA parameters, see the FIPA specifications available at [FIPA ACL Message Structure Specification](http://www.fipa.org/specs/fipa00061/SC00061G.html) . The meanings of all of these parameters are shortly sketched in the following table.
 
+```
   Name                Class                  Meaning
   ------------------- ---------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   performative        String                 Speech act of the message that expresses the senders intention towards the message content.
@@ -100,6 +101,7 @@ The type of the message constrains the available parameters of a message. Curren
   in_reply_to       String                 Used in reply messages and should contain the reply-with content of the answered message.
   conversation_id    String                 The conversation-id is used in interactions for identifying messages that belong to a specific conversation. All messages of one interaction should share the same conversation-id.
   reply_by           Date                   The reply-by field can contain the latest time for a response message.
+```
 
 *Reserved FIPA message event parameters*
 
