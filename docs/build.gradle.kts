@@ -29,10 +29,10 @@ markdownlint {
 		+BlanksAroundFencesRule {
 			active	= false
 		}
-		+NoEmphasisAsHeaderRule {
+/*		+NoEmphasisAsHeaderRule {
 			active	= false
 		}
-		+ConsistentUlStyleRule {
+*/		+ConsistentUlStyleRule {
 			active	= false
 		}
 		+ConsistentHeaderStyleRule {
