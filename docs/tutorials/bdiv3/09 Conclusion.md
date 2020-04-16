@@ -4,7 +4,7 @@ We hope you enjoyed working through the tutorial and now are equipped at least w
 Nevertheless, this tutorial does not cover all important aspects about agent programming in Jadex.  
 Most importantly the following topics have not been discussed:
 
-# Goal Deliberation
+## Goal Deliberation
 
 This tutorial only mentioned the different goal types available in Jadex BDIV3 (perform, achieve, query and maintain). 
 It does not cover aspects of goal deliberation, i.e. how a conflict free pursuit of goals can be ensured.  
@@ -13,7 +13,7 @@ The strategy allows to constrain the *cardinality* of active goals.
 Additionally, it is possible to define *inhibition links* between goals that allow to establish an ordering of goals. 
 Inhibited goals are suspended and can be reactivated when the reason for their inhibition has vanished, e.g. another goal has finished processing. 
 
-# Plan Deliberation
+## Plan Deliberation
 
 If more than one plan is applicable for a given goal or event the Jadex interpreter has to decide which plan actually will be given a chance to handle the goal resp. event. 
 This decision process called plan deliberation can be customized with *meta-level reasoning*.
@@ -22,7 +22,7 @@ Please have a look at the puzzle example (SokratesBDI) to see how it can be used
 
 **If you have any comments or improvement resp. extension proposals don't hesitate to contact us.**
 
-# Example Projects
+## Example Projects
 To learn more about Jadex BDIV3, please take a look at the application projects contained in the Jadex distribution.   
 You can start them by loading the *jadex-application-bdiv3.jar* into the [JCC](../../../tools/01 Introduction/#from-jadex-distribution)).
 

@@ -15,12 +15,9 @@ markdownlint {
     //includes = listOf(".*/quickstart.*/.*")
     
 	rules {
-
+	
 		// Disable some rules by setting active to false
 		+MissingLinkSchemeRule {
-			active	= false
-		}
-		+LowerCaseFilenameRule {
 			active	= false
 		}
 		+ListMarkerSpaceRule {
@@ -98,9 +95,6 @@ markdownlint {
 		+NoMultipleSpaceAtxRule {
 			active	= false
 		}
-		+HeaderIncrementRule {
-			active	= false
-		}
 		+NoMissingSpaceAtxRule {
 			active	= false
 		}
@@ -117,6 +111,9 @@ markdownlint {
 			active	= false
 		}
 		+NoTrailingSpacesRule {
+			active	= false
+		}
+		+LowerCaseFilenameRule {
 			active	= false
 		}
 	}

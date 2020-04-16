@@ -35,7 +35,7 @@ We provide an example project that uses maven/gradle which is described in [the 
 
 Alternatively, add the following code to your build script's dependency section (replace **${jadexversion}** with the desired version):
  
-#### Gradle Project
+### Gradle Project
 ```groovy
 compile 'org.activecomponents.jadex:jadex-distribution-standard:${jadexversion}'
 ```
@@ -66,7 +66,7 @@ repositories {
 }  
 ```
   
-#### Apache Maven Project:
+### Apache Maven Project:
 ```xml
 <repositories>
     <repository>

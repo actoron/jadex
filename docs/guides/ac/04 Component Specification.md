@@ -10,7 +10,7 @@ As can be seen in the figure below an active component specification is composed
 
 
 
-### Imports
+## Imports
 
 The imports can be used in the same way as in Java to specify the classes and packages that should be used for class and resource loading. In addition, these imports are helpful if Java expressions are used because the expressions are evaluated taking into account the defined imports. It has to be noted that normal Java imports cannot be used for expression evaluation as the import statements are not preserved within the class file. For this reason the annotation *@Imports* can be employed. As usual, single classes are defined per name and packages using the \*-notation. 
 
@@ -50,7 +50,7 @@ In the examples below the package *java.util.\** and the class *java.net.URL* ar
 ```
 
 
-### Arguments
+## Arguments
 
 Active components can have arguments and results. The arguments are supplied at startup of the component and the results can be fetched after the component has terminated. This allows to use components in a functional way, i.e. a component can be started and given argument values. The functional component computes something, sets its result values and terminates itself. The component creator is notified that the component has ended and can read the results for further processing. In order to use arguments and results at runtime it is necessary in the component type to declare the allowed argument and result types. For each argument and result type the following details can be specified:
 
@@ -92,7 +92,7 @@ The example code snippets shows how two arguments with the names "number" and "o
 ```
 
 
-### Component Types
+## Component Types
 
 Active components allow for hierarchical decomposition, i.e. an active component may consist of an arbitrary number of subcomponents. The types of potentially created subcomponents should be declared within the component types section.\
 The declaration of a subcomponent type is done using the following parameters:
@@ -127,7 +127,7 @@ As example the declaration of a heatbug as subcomponent type is illustrated. It 
 ```
 
 
-### Services
+## Services
 
 Active components realize component orientation in the same way as traditional component approaches. In order to ensure a high degree of self-containedness of components each component type has explicitly to declare which functionalities it uses and needs. These aspects are defined in terms of *required* and *provided* services.
 
@@ -135,7 +135,7 @@ Active components realize component orientation in the same way as traditional c
 
 
 
-#### Required Services
+### Required Services
 
 ![04 Component Specification@requiredservicetype.png](requiredservicetype.png)  
 *Required service type*
@@ -169,7 +169,7 @@ The optional service *binding* has the following options:
 -   *componenttype*: The component type is currently used for two purposes (will be changed). First, it is used as search type in the same way as the component name. This allows for type level binding to peer or subcomponents. Furthermore, it is currently used as type for component creation if the create property is enabled. 
 -   *interceptors*: The interceptors are used for performing actions before and after service calls. The provider as well as the consumer side may have their own interceptor chains. If custom interceptors are defined they are positioned after the default interceptors, which are the decoupling (turn off via proxytype=direct) and receover (turn on via recover=true) interceptors.
 
-#### Provided Services
+### Provided Services
 
 ![04 Component Specification@providedservicetype.png](providedservicetype.png)  
 *Provided service type*
@@ -191,7 +191,7 @@ In most cases a service definition should include an implementation because othe
 -   *expression*: Can be used if the implementation class cannot have an empty constructor, e.g. because it needs arguments. The creation expression can be an arbitrary Java expression.
 -   *proxytype*: The proxytype of the service. It has the same meaning as in the binding explained above. The possible values are *decoupled*, *direct* and *raw*. The default interceptors are the *DecouplingInterceptor* to execute the service call on the client component, the *ValidationInterceptor* to check if the service is initialized (returns a *ServiceInvalidException* otherwise), the *ResolveInterceptor* to route service calls if it is a Pojo service and the *MethodInvocationInterceptor* to finally perform the call. 
 
-### Properties
+## Properties
 
 ![04 Component Specification@properties.png](properties.png)  
 *Properties*
@@ -208,7 +208,7 @@ A property has the following attributes:
 -   *class*: The property type. Please note the special handling of future properties described above.
 -   *expression*: The property value Java expression.
 
-### Configurations
+## Configurations
 
 ![04 Component Specification@configurations.png](configurations.png)  
 *Configurations*
@@ -227,11 +227,11 @@ The properties of a configuration are as follows:
 -   *daemon*: The daemon setting is used in combination with autoshutdown. If a component is started as daemon it does not prevent the parent from being terminated after the last non-daemon subcomponent has terminated.
 -   *autoshutdown*: In enabled, automatically terminates the component when the last child (non-daemon) has been killed.
 
-#### Arguments
+### Arguments
 
 -   *arguments*: The arguments section allow for defining new values for arguments and results that possibly override the default values specified at the type level. If arguments are passed from the outside to the component these values always have precedence over configuration or type level values. An argument or result type is referenced via its name.
 
-#### Components
+### Components
 
 ![04 Component Specification@configcomponents.png](configcomponents.png)  
 *Configuration components*
@@ -248,7 +248,7 @@ The properties of a configuration are as follows:
     - *arguments*: The arguments for the subcomponent can be defined.
     - *required services*: Using the name of the required services the corresponding binding can be overridden. The is e.g. helpful to statically link subcomponent services with parent or peer services.
 
-#### Services
+### Services
 
 ![04 Component Specification@configservices.png](configservices.png)  
 *Configuration Services*
@@ -259,7 +259,7 @@ The properties of a configuration are as follows:
 
 In the configuration of a component also the service details can be changed. With respect to provided services the implementation and with regard to required services the binding can be changed. The specifications require that a required or provided service is identified via its type name. The implementation or binding details can be redefined for the referenced service.
 
-#### Extensions
+### Extensions
 
 ![04 Component Specification@configextensions.png](configextensions.png)  
 *Extensions*
@@ -274,7 +274,7 @@ Extensions can be used to add extension instance elements to an active component
 
 (Current limitation: extensions cannot be used in annotation based Java components)
 
-#### Steps
+### Steps
 
 ![04 Component Specification@configsteps.png](configsteps.png)  
 *Steps*
@@ -303,11 +303,11 @@ public interface IComponentStep<T>
 (Current difference: Micro agents have lifecycle methods instead of steps to execute behavior at creation and deletion time)
 
 
-### Features
+## Features
 ${SorryNotYetAvailable}
 <!--TODO: Describe IComponentFeature and how to implement custom features -->
 
-### Extension Types
+## Extension Types
 
 ![04 Component Specification@extensiontypes.png](extensiontypes.png)  
 *Extension types*

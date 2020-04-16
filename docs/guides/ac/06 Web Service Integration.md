@@ -2,11 +2,11 @@
 
 In this chapter it will be explained how existing standard web technologies can be used in concert with Jadex active components. Jadex allows for seamless usage of existing web services as well as publishing Jadex services with minimal effort in the web. Classical WSDL-based web services as well as RESTful web services are supported. In order to use the web service support the Jadex module *jadex-platform-extension-webservice* has to be included. Example applications that make use of the presented techniques can be found in the package *jadex-applications-webservices*. In order to publish WSDL or RESTful services the platform has to provide corresponding publish services. The default publish implementations can be automatically started at startup of the platform by using the arguments *-wspublish true* and *-rspublish true* respectively.
 
-### Integration Concept
+## Integration Concept
 
 The integration of Jadex components with web services includes two directions. The first deals with using existing web services with Jadex applications in a transparent manner. The latter considers how Jadex services can be made available as web services also for non-Jadex users.  
 
-#### Integrating Existing Web Services
+### Integrating Existing Web Services
 
 ![06 Web Service Integration@wscall.png](wscall.png)  
 *Web Service Invocation Architecture*
@@ -17,7 +17,7 @@ The integration of Jadex components with web services includes two directions. T
 
 The objective of the web service call integration consists in integrating an external web service as normal Jadex component service within the Jadex platform. This allows for using the web service in the same way as other Jadex services, i.e. it can be used as required service or dynamically searched in other components. The general approach is sketched in the figure above. It can be seen that a Jadex wrapper agent is used to offer the web service as Jadex service. This Jadex service offers an asynchronous variant of the synchronous web service. The wrapper agent forwards service calls to the web service and returns the results to the caller. As the web service call is synchronous and therefore blocking it has to be ensured that the wrapper agents can handle multiple calls concurrently. This is achieved by creating a new invocation component for each call. This invocation component only perform the web service invocation, is blocked during the call, and afterwards returns the results to the wrapper component and terminates.
 
-#### Publishing Jadex Services as Web Services
+### Publishing Jadex Services as Web Services
 
 ![06 Web Service Integration@wspublish.png](wspublish.png)  
 *Web Service Publish Architecture*
@@ -52,9 +52,9 @@ public interface IPublishService
 All these methods are automatically called by Jadex. The *isSupported()* method is used to check whether the publish service is able to publish the given type. If yes, the component interpreter will call the *publishService()* method in order to publish the service on the endpoint. Here the logic has to be filled in which knows the concrete endpoint type and can supply it with the necessary artifacts to make the web service available. The parameters include the current classloader, the Jadex service to which web service requests should be forwarded and a publish info object that represents just a struct with information about the publishing properties (publishtype, publishid and servicetype). The last method is called when the service is terminated, e.g. if the component is killed. Here the service identifier is passed as parameter in order to find the service and instruct the\
 endpoint to stop the web service.
 
-### WSDL Web Services
+## WSDL Web Services
 
-#### Integrating Existing WSDL Web Services
+### Integrating Existing WSDL Web Services
 
 A Jadex wrapper agent needs to be created that provides access to the external web service as a separate Jadex component service. The interfaces of both services differ with respect to the return value of the method signatures. The return value of the Jadex service interface always has to be a *IFuture&lt;originaltype&gt;* that contains the original type as generic part. This has to be done to make the synchroneous web service asynchronous. The input parameters of methods directly correspond to the generated parameter types coming from the Java included *wsimport* tool, which itself relies on *JAXB*. Service calls on the Jadex service will be forwarded from the wrapper agent to the original web service and the result will be returned to the caller. In order to avoid that the wrapper agent is blocked by the synchronous web service call and cannot process any further invocations, internally a subcomponent is created for each call. This subcomponent will be automatically deleted immediately after the call has returned.
 
@@ -125,7 +125,7 @@ public class GeoIPWebServiceAgent extends WebServiceAgent
 ```
 
 
-#### Publishing Jadex Services as Web Services
+### Publishing Jadex Services as Web Services
 
 It is also possible to make a Jadex component service accessible as Web Service. Jadex reuses existing publishing mechanisms for this purpose and encapsulates their functionality in services. For each provided service publishing information can be given by using the *@Publish* annotation (or in XML components the publish tag). This annotation allows for specifying:
 
@@ -204,9 +204,9 @@ public class BankingAgent
 
 A current limitation is that only the Java internal web service endpoint can be used for publishing. Other publishing services that can deploy on other common infrastructures like e.g. Glassfish are not yet available. If a deployment is needed on another kind of endpoint a new publish service has to be created and provided by a component. Custum publish services need to implement the *IPublishService* already mentioned.
 
-### REST Web Services
+## REST Web Services
 
-#### Integrating Existing REST Web Services
+### Integrating Existing REST Web Services
 
 In order to make existing REST web services usable inside of Jadex system, a wrapper agent needs to be defined, which offers a Jadex service that corresponds to the REST service. The wrapper agent uses a new invocation sub-agent for each incoming REST service call. It maps the Jadex service call to a suitable REST call and uses the invocation agent to execute the call. Parameters and the result value are converted if needed.  
 
@@ -315,7 +315,7 @@ public class ChartProviderAgent extends RestServiceAgent
 
 The wrapper component is very simple and specifies the chart service as provided service. The implementation is an expression that takes the interface and mapping as arguments. Please note that the method *createServiceImplementation* is either available via the *RestServiceAgent* if it is extended or via the class *SRest* as static method. In this case the method takes the internal access of the component as further argument. After having started the component, its chart service can be searched and used as any other Jadex component service.
 
-#### Publishing Jadex Services as REST Web Services
+### Publishing Jadex Services as REST Web Services
 
 The publication of a Jadex service as RESTful web service can be used to make Jadex functionality available to external system users. As REST web service interfaces are quite different from object oriented service interfaces the publication can be customized to a high degree. The mapping from the Jadex service interface to the REST service interface can be done in the following ways:
 

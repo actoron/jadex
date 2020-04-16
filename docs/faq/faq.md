@@ -2,7 +2,7 @@ ${SorryOutdatedv3}
 
 # Frequently Asked Questions
 
-# General Questions
+## General Questions
 
 ### How to create new components from within a component?
 Just add the IComponentManagementService to the [required services](../services/services.md#using-services) of your component, inject it into a field and call [**createComponent()**](../components/components.md#starting-the-component) to create a new component..
@@ -36,7 +36,7 @@ Take a look at [Component Arguments](../components/components.md#component-argum
 When scheduling a component step on a remote platform, a NullPointerException is thrown in a method called ```...access$000```.
 This usally occurs when component steps try to access instance methods - please make sure methods called from inside a component step are static.
 
-# BDI Questions
+## BDI Questions
 
 ### IllegalArgumentException: Can not set java.util.ArrayList field
 If you declare collection beliefs, please use the Interface as declared type (e.g. List, Set, Map) instead of the concrete Implementation (ArrayList etc.).

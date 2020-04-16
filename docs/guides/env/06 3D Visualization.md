@@ -123,7 +123,7 @@ List of usable predefined 3D-Primitives
 
 Now we describe the easiest Objects you can use to make an jump-start for you Application possible. These Objects are sphere, box, cylinder, dome, torus and arrow. You can replace them later to use complex 3d-Objects you create or get from external sources.
 
-#### Sphere
+### Sphere
 
 Additional Values: (none)
 
@@ -140,7 +140,7 @@ Example:
 
 ![](sphere_example.PNG)
 
-#### Box
+### Box
 
 Additional Values: (none)
 
@@ -156,7 +156,7 @@ Example:
 
 ![](box_example.PNG)
 
-#### Cylinder
+### Cylinder
 
 Additional Values: **radius**
 
@@ -185,7 +185,7 @@ Example:
 
 ![](cylinder.PNG)
 
-#### Dome
+### Dome
 
 Additional Values: radius, planes, samples
 
@@ -215,7 +215,7 @@ Example:
 
 ![](dome.PNG)
 
-#### Torus
+### Torus
 
 Additional Values: outerRadius, innerRadius, circleSamples, radialSamples
 
@@ -243,7 +243,7 @@ Example:
 
 ![](torus.PNG)
 
-#### Arrow
+### Arrow
 
 Additional Values: (none)
 
