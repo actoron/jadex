@@ -145,7 +145,6 @@ deployDocs:
 # todo: move pass to env
 upload:
   stage: deploy
-  extends: .external
   script: 
     - ./gradlew -Dorg.gradle.parallel=false -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
   rules:
