@@ -1573,7 +1573,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 		Set<String> platformroles = roles.get(secinf.getAuthenticatedPlatformName());
 		if (platformroles != null)
 			siroles.addAll(platformroles);
-		else
+		else if (secinf.getAuthenticatedPlatformName() != null)
 			siroles.add(secinf.getAuthenticatedPlatformName());
 		
 		

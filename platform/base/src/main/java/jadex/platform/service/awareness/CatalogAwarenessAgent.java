@@ -70,7 +70,7 @@ public class CatalogAwarenessAgent implements IAwarenessService
 			platformurls = DEFAULT_URLS;
 		
 		String[] spliturls = platformurls.split(",");
-		for (int i = 0; i < spliturls.length; ++i)
+		for(int i = 0; i < spliturls.length; ++i)
 		{
 			addPlatform(spliturls[i].trim());
 		}
@@ -87,7 +87,7 @@ public class CatalogAwarenessAgent implements IAwarenessService
 	{
 		TransportAddress addr = parseUrl(platformurl);
 		
-		if (addr != null)
+		if(addr != null)
 		{
 			catalog.add(addr.getPlatformId(), addr);
 		}
@@ -105,7 +105,7 @@ public class CatalogAwarenessAgent implements IAwarenessService
 	{
 		IComponentIdentifier id = new ComponentIdentifier(name);
 		Collection<TransportAddress> addrs = catalog.remove(id);
-		if (addrs == null)
+		if(addrs == null)
 		{
 			TransportAddress addr = parseUrl(name);
 			if (addr != null)

@@ -16,12 +16,13 @@ image: amd64/gradle
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   BUILD: "true"
-  QUALITY: "true"
+  QUALITY: "unset"
   TEST: "true"
-  JAVADOCZIP: "false"
-  DEPLOYZIPS: "false"
-  DEPLOYDOCS: "false"
-  UPLOAD: "false"
+  JAVADOCZIP: "unset"
+  DEPLOYZIPS: "unset"
+  DEPLOYDOCS: "unset"
+  UPLOAD: "unset"
+  TAG: "unset"
   
 stages:
   - build
@@ -38,6 +39,7 @@ before_script:
   - pip3 install mkdocs
   - nohup Xvfb :99 &
   - export DISPLAY=:99
+  - QUALITY="false"
   - echo "BUILD:" $BUILD
   - echo "QUALITY" $QUALITY
   - echo "TEST" $TEST
@@ -65,18 +67,19 @@ build:
       - "*/*/*/build"
       - "*/*/*/*/build"
     expire_in: 1 week
-  only:
-    variables:
-      - $BUILD == "true"
+  rules:
+    - if: '$BUILD == "true"'
+      when: on_success
+    
     
 quality:
   stage: testandquality
   script:
     - ./gradlew -Production sonarqube
   allow_failure: true
-  only:
-    variables:
-      - $QUALITY == "true"
+  rules:
+    - if: $QUALITY=="true" || $CI_COMMIT_BRANCH=="master" && $QUALITY=="unset"
+      when: on_success
 
 test:
   stage: testandquality
@@ -100,9 +103,9 @@ test:
         - "*/*/build/test-results/test/**/*.xml"
         - "*/*/*/build/test-results/test/**/*.xml"
         - "*/*/*/*/build/test-results/test/**/*.xml"
-  only:
-    variables:
-      - $TEST == "true"
+  rules:
+    - if: '$TEST == "true"'
+      when: on_success
  
 # Build all kinds of docs/dist files as parallel as possible
 # checkDists:
@@ -119,34 +122,35 @@ javadocZip:
   stage: package
   script:
     - ./gradlew -Pdist=addonjavadoc -Production javadocZip
-  only:
-    variables:
-      - $JAVADOCZIP == "true"
+  rules:
+    - if: $JAVADOCZIP=="true" || $CI_COMMIT_BRANCH=="master" && $JAVADOCZIP=="unset"
+      when: on_success
     
 deployZips:
   stage: deploy
   script:
     - ./gradlew -Pdist=publishdists -Production deployZips
-  only:
-    variables:
-      - $DEPLOYZIPS == "true"
+  rules:
+    - if: $DEPLOYZIPS=="true" || $CI_COMMIT_BRANCH=="master" && $DEPLOYZIPS=="unset"
+      when: on_success
 
 deployDocs:
   stage: deploy
   script:
     - ./gradlew -Production deployDocs
-  only:
-    variables:
-      - $DEPLOYDOCS == "true"
+  rules:
+    - if: $DEPLOYDOCS=="true" || $CI_COMMIT_BRANCH=="master" && $DEPLOYDOCS=="unset"
+      when: on_success
 
 # todo: move pass to env
 upload:
   stage: deploy
+  extends: .external
   script: 
     - ./gradlew -Dorg.gradle.parallel=false -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
-  only:
-    variables:
-      - $UPLOAD == "true"
+  rules:
+    - if: $UPLOAD=="true" || $CI_COMMIT_BRANCH=="master" && $UPLOAD=="unset"
+      when: on_success
       
 # cleanuprepo:    
 #  stage: failure
@@ -170,4 +174,13 @@ updateTag:
   stage: success
   script:
     -  ./gradlew -Production updateTag
-    
+  rules:
+    - if: $TAG=="true" || $CI_COMMIT_BRANCH=="master" && $TAG=="unset"
+      when: on_success
+
+# Rules for the whole workflow / pipeline
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'push'
+      when: never
+    - when: always

@@ -146,7 +146,9 @@ gradle.ext.selecteddists.each { seldist ->
 	}
 }
 
-// Add Dependencies for Apps
+gradle.ext.webprojects = new HashSet();
+
+// Add Dependencies for Apps and mark web projects
 gradle.ext.maindistartifacts.each { art ->
 	// Subprojects unavailable during initialization, manually loading properties.
 	def propfilepath = settingsDir.getCanonicalPath() + art.replace(':','/') + '/gradle.properties'
@@ -159,6 +161,10 @@ gradle.ext.maindistartifacts.each { art ->
   		if (prop.getProperty('distasapp') != null && prop.getProperty('distasapp').toLowerCase().equals('true'))
   		{
   			addDependency(art, projdeps, gradle.ext.includeartifacts)
+  		}
+  		if ("true".equals(prop.getProperty('webArchiveProject')))
+  		{
+  			gradle.ext.webprojects.add(art);
   		}
 	}
 }
