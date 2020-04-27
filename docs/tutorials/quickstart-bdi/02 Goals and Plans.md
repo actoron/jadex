@@ -269,7 +269,7 @@ and *how* it can achieve it (plans). Often, there are many different ways to ach
 In BDI agents this is naturally reflected by the possibility to have many plans that all are suitable candidates
 for pursuing the same goal.
 
-![Route for Patrol Plan 2](patrol-plan2.svg) ![Route for Patrol Plan 3](patrol-plan3.svg)
+![Route for Patrol Plan 2](patrol-plan2.svg "Route for Patrol Plan 2") ![Route for Patrol Plan 3](patrol-plan3.svg "Route for Patrol Plan 3")
 
 
 In this exercise, we want to specify alternative patrol rounds (i.e. sequences of locations), that the agent
