@@ -267,16 +267,14 @@ agent the process is as follows:
 
 Backup you current solution as `CleanerBDIAgentA2.java`.
 
-<div style="float:right;">
-	<img src="patrol-plan2.svg">
-	<br/>
-	<img src="patrol-plan3.svg">
-</div>
-
 One advantage of the BDI model is the clean separation between *what* an agent should achieve (goals)
 and *how* it can achieve it (plans). Often, there are many different ways to achieve the same result.
 In BDI agents this is naturally reflected by the possibility to have many plans that all are suitable candidates
 for pursuing the same goal.
+
+![Patrol Plan 2](patrol-plan2.svg "Figure: Patrol Plan 2")*Caption: Patrol Plan 2*
+
+![Patrol Plan 3](patrol-plan3.svg "Figure: Patrol Plan 3")*Caption: Patrol Plan 3*
 
 In this exercise, we want to specify alternative patrol rounds (i.e. sequences of locations), that the agent
 should choose from for pursuing the `PerformPatrol` goal. We can just add more methods with a corresponding
