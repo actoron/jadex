@@ -79,9 +79,6 @@ public class CleanerBDIAgent
 }
 ```
 
-
-*Figure 1: Starting point for a BDI cleaner agent*
-
 Paste the above code snipped into your Eclipse project (e.g. mark the text, hit ctrl-c,
 right-click the `src/main/java` folder and choose *Paste*). A file `CleanerBDIAgent.java`
 will be created in the package `quickstart.cleanerworld`.
@@ -272,9 +269,8 @@ and *how* it can achieve it (plans). Often, there are many different ways to ach
 In BDI agents this is naturally reflected by the possibility to have many plans that all are suitable candidates
 for pursuing the same goal.
 
-![Patrol Plan 2](patrol-plan2.svg "Figure: Patrol Plan 2")*Caption: Patrol Plan 2*
+![Route for Patrol Plan 2](patrol-plan2.svg) ![Route for Patrol Plan 3](patrol-plan3.svg)
 
-![Patrol Plan 3](patrol-plan3.svg "Figure: Patrol Plan 3")*Caption: Patrol Plan 3*
 
 In this exercise, we want to specify alternative patrol rounds (i.e. sequences of locations), that the agent
 should choose from for pursuing the `PerformPatrol` goal. We can just add more methods with a corresponding
