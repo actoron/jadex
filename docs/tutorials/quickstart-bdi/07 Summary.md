@@ -81,7 +81,7 @@ and a severe bug that the agent will try to pick up waste that no longer exists,
 ### Exercise A3: Additional Patrol Plan Code
 
 <div style="float:right;">
-<img src="../patrol-plan2.svg">
+<img src="patrol-plan2.svg">
 </div>
 
 ```java
@@ -104,7 +104,7 @@ and a severe bug that the agent will try to pick up waste that no longer exists,
 ```
 
 <div style="float:right;">
-<img src="../patrol-plan3.svg">
+<img src="patrol-plan3.svg">
 </div>
 
 ```java	
