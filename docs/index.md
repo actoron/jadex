@@ -24,17 +24,17 @@ For API Documentation of Jadex Active Components ${jadexversiontitle} please vis
   <!--* [Simulation](simulation/simulation.md)-->
 
 # Tutorials
- * [Quickstart Tutorial](tutorials/quickstart/01 Introduction.md)
- * [BDI Quickstart Tutorial](tutorials/quickstart-bdi/01 Introduction.md)
- * [Active Components Tutorial](tutorials/ac/01 Introduction.md)
- * [BDIV3 Tutorial](tutorials/bdiv3/01 Introduction.md)
- * [BPMN Tutorial](tutorials/bpmn/01 Introduction.md)
+ * [Quickstart Tutorial](tutorials/quickstart/01%20Introduction.md)
+ * [BDI Quickstart Tutorial](tutorials/quickstart-bdi/01%20Introduction.md)
+ * [Active Components Tutorial](tutorials/ac/01%20Introduction.md)
+ * [BDIV3 Tutorial](tutorials/bdiv3/01%20Introduction.md)
+ * [BPMN Tutorial](tutorials/bpmn/01%20Introduction.md)
 
 # Advanced Guides
- * [Jadex Active Components User Guide](guides/ac/01 Introduction.md)
- * [BDI User Guide](guides/bdiv3/01 Introduction.md) (currently outdated)  
- * [Environment User Guide](guides/env/01 Introduction.md)
- * [Jadex Tools](tools/01 Introduction.md)
+ * [Jadex Active Components User Guide](guides/ac/01%20Introduction.md)
+ * [BDI User Guide](guides/bdiv3/01%20Introduction.md) (currently outdated)  
+ * [Environment User Guide](guides/env/01%20Introduction.md)
+ * [Jadex Tools](tools/01%20Introduction.md)
  
 # FAQ
  * [FAQ](faq/faq.md)
