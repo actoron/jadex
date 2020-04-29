@@ -12,27 +12,26 @@ Similar to the paradigm shift towards object-orientation agents represent a new 
 
 This tutorial will cover the following topics, which correspond coarsely to the available Jadex language elements:
 
--   [02 Concepts](02 Concepts) describes the basic BDI concepts.
--   [03 Agent Specification](03 Agent Specification) describes how an agent can be programmed.
--   [04 Imports](04 Imports) describes how elements can be imported.
--   [05 Capabilities](05 Capabilities) describes how agents modules (capabilities) can be used.
--   [06 Beliefs](06 Beliefs) describes how agents knowledge can be specified.
--   [07 Goals](07 Goals) treats how goals can be used.
--   [08 Plans](08 Plans) describes how procedural plans are used.
--   [09 Events](09 Events) handles internal as well as message events.
--   [10 Expressions](10 Expressions) treats the usage of Jadex expressions and their underlying language.
--   [11 Conditions](11 Conditions (old)) describes Jadex conditions and their underlying language.
--   [12 Properties](12 Properties) describes how agent and capability properties can be defined.
--   [13 Configurations](13 Configurations) introduces configurations for starting agents with different settings.
--   [14 External Interactions](14 External Interactions) treats the interaction of external processes with BDI agents.
--   [16 Predefined Capabilities](16 Predefined Capabilities) explains the library of ready-to use capabilities.
+-   [02 Concepts](02%20Concepts.md) describes the basic BDI concepts.
+-   [03 Agent Specification](03%20Agent%20Specification.md) describes how an agent can be programmed.
+-   [04 Imports](04%20Imports.md) describes how elements can be imported.
+-   [05 Capabilities](05%20Capabilities.md) describes how agents modules (capabilities) can be used.
+-   [06 Beliefs](06%20Beliefs.md) describes how agents knowledge can be specified.
+-   [07 Goals](07%20Goals.md) treats how goals can be used.
+-   [08 Plans](08%20Plans.md) describes how procedural plans are used.
+-   [09 Events](09%20Events.md) handles internal as well as message events.
+-   [10 Expressions](10%20Expressions.md) treats the usage of Jadex expressions and their underlying language.
+-   [11 Conditions](11%20Conditions%20(old).md) describes Jadex conditions and their underlying language.
+-   [12 Properties](12%20Properties.md) describes how agent and capability properties can be defined.
+-   [13 Configurations](13%20Configurations.md) introduces configurations for starting agents with different settings.
+-   [14 External Interactions](14%20External%20Interactions.md) treats the interaction of external processes with BDI agents.
+-   [16 Predefined Capabilities](16%20Predefined%20Capabilities.md) explains the library of ready-to use capabilities.
 
 
 <br><br>
 
 
-- [FAQ and How-To](D FAQ & HOWTO (old))
-- [Bibliography](F Bibliography (old))
+- [FAQ and How-To](D%20FAQ%20&%20HOWTO%20(old).md)
 
 <!--
 

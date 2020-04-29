@@ -4,7 +4,7 @@ This section shortly recaptures the lessons learned in the previous sections and
 
 ## Challenges Addressed in the Example Application
 
-In the following it will be shortly sketched, how the Jadex Active Components middleware helps coping with the challenges laid out in the [introduction](../01 Introduction/)).
+In the following it will be shortly sketched, how the Jadex Active Components middleware helps coping with the challenges laid out in the [introduction](01%20Introduction.md)).
 
 ### Challenge 1: Discovery of distributed components
 
@@ -14,13 +14,13 @@ a) In Jadex, services are described by POJO Java interfaces.
 
 b) Publishing of services is as simple as adding a *@ProvidedServices* annotation to a Java class.
  
-c) In Jadex discovery is supported by a combination of two mechanisms. First, [platform awareness](../../remote/remote.md#awareness) automatically discovers all available Jadex platforms in local networks and potentially across the whole Internet. Second, the [service search](../../guides/ac/05 Services.md#service-search)) potentially traverses all known platforms looking for the desired service and thus potentially finds any matching service available somewhere on the Internet.
+c) In Jadex discovery is supported by a combination of two mechanisms. First, [platform awareness](../../remote/remote.md#awareness) automatically discovers all available Jadex platforms in local networks and potentially across the whole Internet. Second, the [service search](../../guides/ac/05%20Services.md#service-search)) potentially traverses all known platforms looking for the desired service and thus potentially finds any matching service available somewhere on the Internet.
 
 ### Challenge 2: Components with internal behavior
 
 *"The time providers need to periodically send out time values. Unlike purely passive servers like, e.g., static web applications, the server component requires some active internal behavior. In addition, concurrency between client requests and also with respect to internal behavior needs to be handled to assure consistency of the time provider's internal state."*
 
-In Jadex, components may have internal behavior ranging from [purely reactive components to simple task-oriented](../../../guides/ac/02 Active Components/#active-components) or even [complex intelligent agents](../../../guides/bdiv3/02 Concepts/)). Jadex components are executed using a single-thread cooperative scheduling approach, i.e., each component step is executed until it ends or blocks and no two steps of the same component are ever executed in parallel.
+In Jadex, components may have internal behavior ranging from [purely reactive components to simple task-oriented](../../guides/ac/02%20Active%20Components.md#active-components) or even [complex intelligent agents](../../guides/bdiv3/02%20Concepts.md)). Jadex components are executed using a single-thread cooperative scheduling approach, i.e., each component step is executed until it ends or blocks and no two steps of the same component are ever executed in parallel.
 
 E.g. the time provider component's periodic task for sending out time values is executed as a step and the addition of a new subscriber is another step. No manual synchronization is necessary, e.g. regarding the subscriptions list, because Jadex assures that these two steps will never be interleaved. 
 

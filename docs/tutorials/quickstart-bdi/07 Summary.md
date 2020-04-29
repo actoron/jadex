@@ -10,7 +10,7 @@ Here you can find solutions for code you had to write yourself and the answers t
 
 A possible way of structuring the cleaner behavior is shown in the following flow chart:
 
-![Decision tree for simple cleaner behavior](behavior-simplecleaner.svg)
+![Decision tree for simple cleaner behavior](behavior-simplecleaner.svg "Decision tree for simple cleaner behavior")
 
 Here is a solution with a single loop and nested if-then-else statements for the different tasks and phases of the robot.
 Note that the solution has some problems, e.g., not immediately stopping a move action when finding a needed waste bin

@@ -10,7 +10,7 @@ Fortunately, Jadex and REST/SOAP have one thing in common: they use services in 
 In consequence, Jadex services can be published as REST Services and REST Services can be used just as any other service in Jadex after they are setup.
 
 Full Guide:
-[REST Web Services](/guides/ac/06 Web Service Integration#rest-web-services)
+[REST Web Services](../guides/ac/06%20Web%20Service%20Integration.md#rest-web-services)
 
 ### Providing REST Services
 To publish a [service](/services/services) as REST Service, the ```publish``` property has to be added to the ```@ProvidedService``` annotation:

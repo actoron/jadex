@@ -10,11 +10,11 @@ To solve the platform discovery problem, Jadex introduces a mechanism called *Aw
 The goal is the detection of all available remote platforms in order to seamlessly communicate between each other if required. 
 
 To achieve this, several different kinds of discovery mechanisms are used. In Local Area Networks, *Broadcast* and *Multicast* are used to discover platforms, but the most important method for platforms behind a firewall is the *Relay Discovery*. By default, platforms register at one of our relay servers, so they can see each other.  
-For more details, check out the Active Components User Guide about [Platform Awareness](../../guides/ac/07 Platform Awareness).
+For more details, check out the Active Components User Guide about [Platform Awareness](../guides/ac/07%20Platform%20Awareness.md).
 
 
 ## Configuration
-Please refer to the [Configuration examples](../platform/platform.md#configuration-examples) in the Platform chapter or visit the [Platform Awareness](../../guides/ac/07 Platform Awareness/#configuration) section of the Active Components User Guide for awareness configuration. 
+Please refer to the [Configuration examples](../platform/platform.md#configuration-examples) in the Platform chapter or visit the [Platform Awareness](../guides/ac/07%20Platform%20Awareness.md#configuration) section of the Active Components User Guide for awareness configuration. 
 
 ## Manually Connecting Platforms
 ${SorryNotYetAvailable}
@@ -24,7 +24,7 @@ ${SorryNotYetAvailable}
 
 Thanks to mechanisms for global awareness and connectivity, in principle, any Jadex platform around the world may find and invoke any services of components on any other Jadex platform.  
 Because this is usually undesired, the following security mechanisms exists. 
-A full guide about security is available in the [Security Chapter](../../guides/ac/08 Security/) of the Active Components Guide.
+A full guide about security is available in the [Security Chapter](../guides/ac/08%20Security.md) of the Active Components Guide.
 
 ## Platform-Level Security
 
@@ -34,11 +34,11 @@ There are two kinds of passwords:
 ### Platform passwords
 By default, a Jadex platform is secured by a password which is generated at first startup and printed to the console. If a remote platform knows this password, it is able to find and invoke any services available on the local platform.  
 This password-protection may be switched off by setting ```PlatformConfiguration.setUsePass(false)``` (**NOT recommended!**)  
-Remote platforms can set platform passwords to access remote platforms within the [JCC Security Settings](../../tools/05 Security Settings/#remote-platform-password-settings) or by accessing the [ISecurityService](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/types/security/ISecurityService.html) programmatically.
+Remote platforms can set platform passwords to access remote platforms within the [JCC Security Settings](../tools/05%20Security%20Settings.md#remote-platform-password-settings) or by accessing the [ISecurityService](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/types/security/ISecurityService.html) programmatically.
 
 ### Network passwords
 As your application may include several platforms, it is more convenient to set-up a trusted network.
-You can either configure this in the [JCC Security Settings](../../tools/05 Security Settings/#network-password-settings) or by adding it to the startup configuration of every involved platform:
+You can either configure this in the [JCC Security Settings](../tools/05%20Security%20Settings.md#network-password-settings) or by adding it to the startup configuration of every involved platform:
 
 ```java
 rootConfig.setNetworkName(<myName>);

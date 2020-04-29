@@ -194,7 +194,7 @@ This time, we need a translation agent with an inner plan class to be able to ad
 ## Changing the agent
 
 -   Add a try-catch-block to the ```adoptPlan()``` call and wait for the plan to be finished using get() at the end of the invocation. The get() turns the future based asynchronous call into a synchronous one.  
-For more information about asynchronous programming with futures in Jadex please refer to the [AC User Guide](../../../guides/ac/03 Asynchronous Programming)).  
+For more information about asynchronous programming with futures in Jadex please refer to the [AC User Guide](../../guides/ac/03%20Asynchronous%20Programming.md).  
 The agent body method should look like this:
 
 

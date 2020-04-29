@@ -63,7 +63,7 @@ serviceSQ.setMyColor(Math.abs(random.nextInt() % 254));
 Afterwards, the agent behaviour needs to be started. As the service call can only be executed with an agent who has finished his ```@AgentBody```, the start of the agent behaviour can not be done by in the body. Instead, the ```IInitialisationService``` has the ```start()```-method which should now trigger the normal agent behaviour.
 
 ## Exercise 2 - Creating Space and Space Objects from Java
-In order to get both a spatial representation of the agents and a graphical interface at once with minimal effort, the Jadex Environment Space was created. A detailed description can be found in [Chapter 1](../01 Introduction).
+In order to get both a spatial representation of the agents and a graphical interface at once with minimal effort, the Jadex Environment Space was created. A detailed description can be found in [Chapter 1](01%20Introduction.md).
 
 In order to use the space with standalone started components, the space needs to be created manually. For describing the space, a separate .application.xml should be created. It should define at least the objects in space and the mapping between the agents and their avatars in the space.
 

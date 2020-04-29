@@ -2,7 +2,7 @@
 
 This chapter will deal with aspects of how to implement and provide component services. In general, a component service consists of two aspects: a service interface and a service implementation.
 
-Learning how to build provided services allows building an initial version of the chat application as described in [Application Context](../01 Introduction#application-context). 
+Learning how to build provided services allows building an initial version of the chat application as described in [Application Context](01%20Introduction.md#application-context). 
 The design figure is repeated below for completeness. 
 
 ![AC Tutorial.01 Introduction@chatdesign.png](chatdesign.png)  

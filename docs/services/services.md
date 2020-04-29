@@ -136,7 +136,7 @@ The ```@Binding``` annotation defines parameters of the service binding that Jad
 |*dynamic*| If set to true, a new search will be initiated every time the required service is accessed. |
 |*create*| Set to true if the service should be instantiated by the local component |
 |*creationInfo*| ```@CreationInfo``` annotation, see [Advanced Service Topics](#auto-instantiation-of-required-services) |
-|*proxytype*| To access a service, a proxy is created. By default, this proxy decouples the two component threads involved in a service call. Read more about this in [../guides/ac/05 Services/#interceptor-handling]. |
+|*proxytype*| To access a service, a proxy is created. By default, this proxy decouples the two component threads involved in a service call. Read more about this in [interceptor handling](../guides/ac/05%20Services.md#interceptor-handling). |
 
 <!--|*name*| |-->
 <!--|*componentname*||-->
@@ -219,7 +219,7 @@ private IInternalAccess agentAccess;
 private MyAgent agent;
 ```
 
-This annotation will also inject Agent Capabilities (see [BDI Capabilities](../../tutorials/bdiv3/06 Using Capabilities/)) and other instances that can be guessed by the [Parameter Guesser](../components/components.md#parameter-guesser).
+This annotation will also inject Agent Capabilities (see [BDI Capabilities](../tutorials/bdiv3/06%20Using%20Capabilities.md)) and other instances that can be guessed by the [Parameter Guesser](../components/components.md#parameter-guesser).
 
 # Service Lifecycle
 

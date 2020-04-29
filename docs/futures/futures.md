@@ -17,7 +17,7 @@ The options are:
 - Add a result listener (```addResultListener```) and continue (right)
 
 Futures make it possible to perform asynchronous communication with local and/or remote components and services and are used throughout in Jadex Active Components.
-For more information and motivation, please refer to [Asynchronous Programming](../../guides/ac/03 Asynchronous Programming/).
+For more information and motivation, please refer to [Asynchronous Programming](../guides/ac/03%20Asynchronous%20Programming.md).
 
 # Working with Futures
 
@@ -153,7 +153,7 @@ There are also variants of *apply* and *accept*: *applyToEither* and *acceptEith
 For a complete documentation of these methods, please visit the [IFuture API documentation](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/future/IFuture.html).
 
 # Future Types
-The following is a short list of commonly used future types. For a more complete guide, visit [Asynchronous Programming](../../guides/ac/03 Asynchronous Programming/#programming-futures-and-listeners).
+The following is a short list of commonly used future types. For a more complete guide, visit [Asynchronous Programming](../guides/ac/03%20Asynchronous%20Programming.md#programming-futures-and-listeners).
 
 ## Tuple2 Futures
 The Tuple2 Future can be used if exactly two result values should be returned. 

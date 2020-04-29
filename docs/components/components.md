@@ -6,7 +6,7 @@ With Jadex, the behaviour of a software is defined by the interaction between co
  
 When you create a new component, you have to choose between different component types. For now, we will focus on *Micro Agents*, the most basic type of component. For other component types, please refer to [Component Types](../component-types/component-types.md).
 
-For a more complete guide into Active Components, take a look at the [AC User Guide](../guides/ac/01 Introduction.md).
+For a more complete guide into Active Components, take a look at the [AC User Guide](../guides/ac/01%20Introduction.md).
 
 # Implementation
 Micro Agents are defined by plain java classes. In order for a java class to represent a Micro Agent, two requirements have to be met:
@@ -14,7 +14,7 @@ Micro Agents are defined by plain java classes. In order for a java class to rep
  - The name of the class has to end with "Agent" (e.g. ```MyAgent```, ```ChatAgent```, ...)
  - The class has to be annotated with the ```@Agent``` Annotation
   
-Optionally, it can provide a description using the ```@Description``` Annotation. The value is then shown inside the [JCC](../../tools/02 JCC Overview).
+Optionally, it can provide a description using the ```@Description``` Annotation. The value is then shown inside the [JCC](../tools/02%20JCC%20Overview.md).
 
 This leads to the following code for a basic micro agent:
 
@@ -197,7 +197,7 @@ public class ParentAgent { …
 ```
 
 Any services provided by subcomponents using the scope [ServiceScope.COMPONENT](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/RequiredServiceInfo.html) can then be accessed using the same scope in the parent component or any other subcomponents.
-Please refer to the [AC Tutorial](../../tutorials/ac/06 Composition/) for a more complete example.
+Please refer to the [AC Tutorial](../tutorials/ac/06%20Composition.md) for a more complete example.
 
 ## More Annotations
 The most important annotations common to all components were already discussed.
@@ -232,7 +232,7 @@ When using one of these annotations on methods or fields, fields and method para
 <!-- TODO: for which annotations does the parameter guesser work? -->
 
 ## Scheduling steps
-The [concurrency model](../../guides/ac/05 Services/#concurrency) of Jadex Active Components is based on single-threaded components.
+The [concurrency model](../guides/ac/05%20Services.md#concurrency) of Jadex Active Components is based on single-threaded components.
 If you want to execute your code on a component's thread from outside, you can call [scheduleStep](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/IExternalAccess.html#scheduleStep-jadex.bridge.IComponentStep-) on the IExternalAccess of a component:
 ```java
 extAcc.scheduleStep(iAccess -> {

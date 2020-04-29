@@ -1,5 +1,5 @@
 // Jadex Docs buildfile: nothing to build as docs are purely static
-// But use markdown-lint for quality checking (especially fro finding broken links)
+// But use markdown-lint for quality checking (especially for checking relative links)
 // Cf. https://github.com/appmattus/markdown-lint/ 
 //
 // Run with '..\gradlew markdownlint'
@@ -15,11 +15,13 @@ markdownlint {
     //includes = listOf(".*/quickstart.*/.*")
     
 	rules {
-	
-		// Disable some rules by setting active to false
-		+MissingLinkSchemeRule {
+
+		// Rules to be fixed
+		+NoEmphasisAsHeaderRule {
 			active	= false
 		}
+		
+		// Disable some rules by setting active to false
 		+ListMarkerSpaceRule {
 			active	= false
 		}
@@ -29,16 +31,10 @@ markdownlint {
 		+BlanksAroundFencesRule {
 			active	= false
 		}
-/*		+NoEmphasisAsHeaderRule {
-			active	= false
-		}
-*/		+ConsistentUlStyleRule {
+		+ConsistentUlStyleRule {
 			active	= false
 		}
 		+ConsistentHeaderStyleRule {
-			active	= false
-		}
-		+NoEmptyLinksRule {
 			active	= false
 		}
 		+NoReversedLinksRule {
@@ -54,9 +50,6 @@ markdownlint {
 			active	= false
 		}
 		+NoWhitespaceFilenameRule {
-			active	= false
-		}
-		+NoSpaceInLinksRule {
 			active	= false
 		}
 		+FencedCodeLanguageRule {

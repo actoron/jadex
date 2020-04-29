@@ -34,7 +34,7 @@ public class ChatC1Agent
 
 To understand the code it is necessary to explain the underlying concepts of the component service container. Each active component (regardless of its type) contains a service container that basically fulfills three aspects. 
 It allows for *fetching required services*, *searching services*, and *providing services*.  
-If you're using the JCC, you can [see the service container below your running component](../../../tools/03 Starter/#running-components)). 
+If you're using the JCC, you can [see the service container below your running component](../../tools/03%20Starter.md#running-components)). 
 
 # Exercise C2 - Invoking a Predefined Service
 
@@ -83,9 +83,9 @@ In this execise we will use another service of the platform and invoke a method 
 -   Change the required service specification to look for the *IComponentManagementService.class** and change the name to *cms*. The scope can be kept the same as this service is also made available by the platform component itself. 
 -   Adapt the ```getService()``` call to use the new service name cms and type ```IComponentManagementService```.
 -   Change the parameter type of the ```resultAvailable``` method to ```IComponentManagementService```.
--   Invoke the *getComponentDescriptions()* method on the service to get an array of all components in the platform. 
+-   Invoke the `getComponentDescriptions()` method on the service to get an array of all components in the platform. 
 Note, that the call returns a future so that you will have to add a result listener again for result processing.
--   Iterate through the retrieved *IComponentDescription[]*  array and print out the results one by one.
+-   Iterate through the retrieved `IComponentDescription[]`  array and print out the results one by one.
 
 ## Verify the intended behavior
 

@@ -9,7 +9,7 @@ Active components build on SCA and extend it in the direction of software agents
 ![03 Active Components@ac.png](ac.png)  
 *Active Component Structure*
 
-You can read more about this in the [Active Components User Guide](../../guides/ac/02 Active Components.md)).
+You can read more about this in the [Active Components User Guide](../../guides/ac/02%20Active%20Components.md).
 
 # Exercise B1 - Java Component Definition
 There are various Jadex active component types such as applications, BPMN workflows, micro and BDI agents (learn more about [component types](../../component-types/component-types.md))).
@@ -31,7 +31,7 @@ public class ChatB1Agent
 *Basic chat micro agent definition*
 
 Use your IDE to create a Java class called *ChatB1Agent.java* and add the annotations as shown in the figure above. 
-In this case the component only posses a description that will be displayed in the [JCC](../../../tools/01 Introduction) (if used)) and the marker annotation *@Agent*. 
+In this case the component only posses a description that will be displayed in the [JCC](../../tools/01%20Introduction.md) (if used) and the marker annotation *@Agent*. 
 
 Please further note that it is also required to follow a **naming convention** which requires that all micro agent files end with *Agent.java*. 
 

@@ -3,10 +3,10 @@
 ${SorryOutdated}
 
 The documentation of the predefined capabilities is not yet finished.
-Please also take a look at the [BDIV3 Tutorial](../../../tutorials/bdiv3/06 Using Capabilities/))
+Please also take a look at the [BDIV3 Tutorial](../../tutorials/bdiv3/06%20Using%20Capabilities.md))
 and at the [legacy documentation of Jadex 0.96](https://download.actoron.com/docs/releases/jadex-0.96x/userguide/predef_cap.html).
 
-Jadex uses capabilities for the modularization of agents (see [Chapter 5. Capabilities](../05 Capabilities)), whereby capabilities contain ready to use functionalities. The Jadex distribution contains several ready-to-use predefined capabilities for different purposes. Besides the basic management capabilties for using the CMS (component management service, see [CMSCapability](#the-component-management-service-cms-capability) below and the Directory Facilitator (see [DFCapability](../../../tools/A3 Directory Facilitator/)) also a Protocols Capability is available for the efficient usage of some predefined FIPA interaction protocols. The interface of a capability mainly consists of a set of exported goals which is similar to an object-oriented method-based interface description. This chapter aims at depicting their usage by offering the application programmer an overview and explanation of their functionalities and additionally a selection of short code snippets that can directly be used in your applications. 
+Jadex uses capabilities for the modularization of agents (see [Chapter 5. Capabilities](05%20Capabilities.md)), whereby capabilities contain ready to use functionalities. The Jadex distribution contains several ready-to-use predefined capabilities for different purposes. Besides the basic management capabilties for using the CMS (component management service, see [CMSCapability](#the-component-management-service-cms-capability) below and the Directory Facilitator (see [DFCapability](../../tools/A3%20Directory%20Facilitator.md)) also a Protocols Capability is available for the efficient usage of some predefined FIPA interaction protocols. The interface of a capability mainly consists of a set of exported goals which is similar to an object-oriented method-based interface description. This chapter aims at depicting their usage by offering the application programmer an overview and explanation of their functionalities and additionally a selection of short code snippets that can directly be used in your applications. 
 
 The test capability for writing agent-based unit test is explained in the *Jadex Tool Guide*, which also illustrates the usage of the corresponding Test Center user interface.
 
@@ -42,7 +42,7 @@ This goal has the following parameters:
 | arguments*                | Map                  | The arguments as name-value pairs for the new component. Depending on the platform, Java objects (for Jadex Standalone or local JADE requests) or string expressions (for remote JADE requests) have to be supplied for the argument values.     |
 | cms*                      | IComponentIdentifier | The component identifier of the CMS (only required for remote requests)               |
 | start*                    | boolean              | True, when the component should be directly started after creation (default). Note that some platforms will not support decoupling of component creation and starting (e.g. for remote requests in JADE).                               |
-| componentidentifier [out] | IComponentIdentifier | Output parameter containing the component identifier of the created component.        |
+| componentidentifier `[out]` | IComponentIdentifier | Output parameter containing the component identifier of the created component.        |
 
 *Parameters for cms_create_component goal ( ** denotes optional parameters)
 
@@ -212,7 +212,7 @@ The "cms_suspend_component"-goal has the following parameters:
 |----------------------------|--------------------------|---------------------------------------------------------------------------------------------------------|
 | componentidentifier        | IComponentIdentifier     | Identifier of the component to be suspended.                                                            |
 | cms *                        | IComponentIdentifier     | The component identifier of the CMS (only required for remote requests)                                 |
-| componentdescription [out] | ICMSComponentDescription | This output parameter contains the possibly changed CMSComponentDescription of the suspended component. |
+| componentdescription `[out]` | ICMSComponentDescription | This output parameter contains the possibly changed CMSComponentDescription of the suspended component. |
 
 
 *Parameters for cms_suspend_component* ( ** denotes optional parameters)
@@ -279,7 +279,7 @@ If you want to resume a suspended component you can use the goal "cms_resume_com
 |----------------------------|--------------------------|-------------------------------------------------------------------------------------------------------|
 | componentidentifier        | IComponentIdentifier     | Identifier of the component to be resumed.                                                            |
 | cms*                       | IComponentIdentifier     | The component identifier of the CMS (only required for remote requests)                               |
-| componentdescription [out] | ICMSComponentDescription | This output parameter contains the possibly changed CMSComponentDescription of the resumed component. |
+| componentdescription `[out]` | ICMSComponentDescription | This output parameter contains the possibly changed CMSComponentDescription of the resumed component. |
 
 *Parameters for cms_resume_component* ( ** denotes optional parameters)
 
@@ -351,7 +351,7 @@ The goal has the following parameters:
 | description       | ICMSComponentDescription | The template description to search for matching components.                                     |
 | cms**             | IComponentIdentifier     | The component identifier of the CMS (only required for remote requests)                         |
 | constraints**     | ISearchConstraints       | Representation of a set of constraints to limit the search process. As a default, only one matching result is returned. You can set the max-results setting of the search constraints to -1 for unlimited number of search results. See [FIPA Agent Management Specification](http://www.fipa.org/specs/fipa00023/XC00023H.html#_Toc526742642). |
-| result [set][out] | ICMSComponentDescription | This output parameter set contains the component descriptions that have been found.             |
+| result `[set][out]` | ICMSComponentDescription | This output parameter set contains the component descriptions that have been found.             |
 
 *Parameters for cms_search_components* ( ** denotes optional parameters)
 

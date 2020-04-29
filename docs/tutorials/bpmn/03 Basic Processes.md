@@ -95,7 +95,7 @@ Create a new BPMN diagram with a name of your choice, e.g. 'B2_Sequence'. Create
 
 
 
-To easily observe how the different tasks are executed, change the task implementations to the PrintTask and enter some message in each of the text parameters (see last lesson for details). Execute your process using the JCC and observe the console output. You might have to refresh the model tree (e.g. by right-clicking of the folder and selecting 'Refresh' or by just pressing [F5]) for the new process to show up.
+To easily observe how the different tasks are executed, change the task implementations to the PrintTask and enter some message in each of the text parameters (see last lesson for details). Execute your process using the JCC and observe the console output. You might have to refresh the model tree (e.g. by right-clicking of the folder and selecting 'Refresh' or by just pressing `[F5]`) for the new process to show up.
 
 Exercise B3 - Parallel Activities
 ----------------------------------------------
@@ -152,7 +152,7 @@ Draw a new process diagram as shown below. The 'Print Finished' task should be a
 
 ![03 Basic Processes@10.png](03%20Basic%20Processes/03%20Basic%20Processes-10.png)
 
-It is useful to understand, how the file of the subprocess will be loaded at runtime. The process files are loaded from the classpath in the same way that Java loads Java classes. If you used a package for the processes, it is useful to set the package property as recommended in [Exercise B1](../03 Basic Processes#exercise-b1-creating-a-first-process) . Because the B5 and B2 processes are in the same package, you do not need to fully qualify the name of the subprocess. Otherwise, you will have to write e.g. 'jadex/bpmn/tutorial/B2_Sequence.bpmn' or add a 'jadex.tutorial.bpmn.*' to the imports section of the outer process (in case you used jadex.bpmn.tutorial as package).
+It is useful to understand, how the file of the subprocess will be loaded at runtime. The process files are loaded from the classpath in the same way that Java loads Java classes. If you used a package for the processes, it is useful to set the package property as recommended in [Exercise B1](#exercise-b1-creating-a-first-process) . Because the B5 and B2 processes are in the same package, you do not need to fully qualify the name of the subprocess. Otherwise, you will have to write e.g. 'jadex/bpmn/tutorial/B2_Sequence.bpmn' or add a 'jadex.tutorial.bpmn.*' to the imports section of the outer process (in case you used jadex.bpmn.tutorial as package).
 
 ### Execute the Process
 

@@ -5,9 +5,9 @@ In this chapter, you will learn how to start the Jadex BPMN editor. You will als
 Prerequisites
 --------------------------
 
--   Download and install a recent Java environment from [http://www.oracle.com/technetwork/java/javase/downloads/index.html ](http://www.oracle.com/technetwork/java/javase/downloads/index.html)  (if not already present).
--   Download and install a suitable eclipse distribution from [http://www.eclipse.org/downloads/ ](http://www.eclipse.org/downloads/)  (if not already present). 
--   Download the latest Jadex build .zip from [http://www.activecomponents.org/download/ ](http://www.activecomponents.org/download/)  and unpack it to a place of your choice (only necessary if you don't want to use maven).
+-   Download and install a recent Java environment from [http://www.oracle.com/technetwork/java/javase/downloads/index.html](http://www.oracle.com/technetwork/java/javase/downloads/index.html)  (if not already present).
+-   Download and install a suitable eclipse distribution from [http://www.eclipse.org/downloads/](http://www.eclipse.org/downloads/)  (if not already present). 
+-   Download the latest Jadex build .zip from [http://www.activecomponents.org/download/](http://www.activecomponents.org/download/)  and unpack it to a place of your choice (only necessary if you don't want to use maven).
 
 Exercise A1 - Eclipse Project Setup
 ------------------------------------------------

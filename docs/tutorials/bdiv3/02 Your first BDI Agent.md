@@ -8,7 +8,7 @@ Open a source code editor or an IDE of your choice and create a new package call
 The agent is a normal Java class that uses the ```@Agent``` annotation to state that it is an agent.  
 Also please note that it is currently **required that the Java file ends with "BDI"**.
 Otherwise it will not be recognized as BDI agent.  
-Optionally, the ```@Description``` annotation can be used to specify a documentation text that is displayed when the agent is loaded within the [JCC](../../tools/01 Introduction.md)).
+Optionally, the ```@Description``` annotation can be used to specify a documentation text that is displayed when the agent is loaded within the [JCC](../../tools/01%20Introduction.md)).
 The resulting code should look like this:
 
 ```java

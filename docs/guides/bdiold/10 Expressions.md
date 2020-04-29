@@ -9,7 +9,7 @@ The expression language follows a Java-like syntax. In general, all of the *oper
 
 
 
-In addition to the Java-like syntax, the language has some extensions: Parameters give access to specific elements depending on the context of the expression. OQL-like select statements allow to create complex queries, e.g., for querying the beliefbase. To simplify the Java statements in the expressions, imports can be declared in the ADF (see [Imports](04 Imports)) that allow to use unqualified class names. The imports are defined once, and can be used for all expressions throughout the ADF.
+In addition to the Java-like syntax, the language has some extensions: Parameters give access to specific elements depending on the context of the expression. OQL-like select statements allow to create complex queries, e.g., for querying the beliefbase. To simplify the Java statements in the expressions, imports can be declared in the ADF (see [Imports](04%20Imports.md)) that allow to use unqualified class names. The imports are defined once, and can be used for all expressions throughout the ADF.
   
 
 ## Expression Properties
@@ -76,7 +76,7 @@ The expression language cannot only be used to specify values for beliefs, plans
 
 *The Jadex expressions XML schema part*
 
-Primary usage of predefined expression is to perform queries, when executing plans. The *getExpression(String name)* method creates an expression object based on the predefined expression with the given name. In addition, the *createExpression(String exp [, String[] paramnames, Class[] paramtypes])* method is used to create an expression directly by parsing the expression string (without referring to a predefined expression). Custom parameters can be optionally be defined for such queries by additionally providing the parameter names and classes. Values for these parameters have to be supplied when executing the query. The expression object provides several *execute()* methods to evaluate a query specifying either no parameters, a single parameter as name/value pair, or a set of parameters that are defined as a *String* and an *Object array* containing parameter names and values separately. &lt;!-- You can also pre-set parameters before executing the query using the *setParameter()* method. For example, one can execute the person query with a given surname. --&gt;
+Primary usage of predefined expression is to perform queries, when executing plans. The *getExpression(String name)* method creates an expression object based on the predefined expression with the given name. In addition, the `createExpression(String exp [, String[] paramnames, Class[] paramtypes]` method is used to create an expression directly by parsing the expression string (without referring to a predefined expression). Custom parameters can be optionally be defined for such queries by additionally providing the parameter names and classes. Values for these parameters have to be supplied when executing the query. The expression object provides several *execute()* methods to evaluate a query specifying either no parameters, a single parameter as name/value pair, or a set of parameters that are defined as a *String* and an *Object array* containing parameter names and values separately. &lt;!-- You can also pre-set parameters before executing the query using the *setParameter()* method. For example, one can execute the person query with a given surname. --&gt;
 
 
 ```xml

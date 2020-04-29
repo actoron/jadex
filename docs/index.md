@@ -1,10 +1,10 @@
 # Welcome to the Jadex Active Components ${jadexversiontitle} Documentation
 
 To quickly get an overview about what Jadex Active Components is about you can have a look at the [Getting Started Guide](getting-started/getting-started.md), which explains the core concepts.  
-The [Quickstart Tutorial](tutorials/quickstart/01 Introduction.md) guides you through developing your first application with Jadex Active Components.  
-The [BDIV3 Tutorial](tutorials/bdiv3/01 Introduction.md) introduces you to the Beliefs-Desire-Intention Agents and their concepts.
+The [Quickstart Tutorial](tutorials/quickstart/01%20Introduction.md) guides you through developing your first application with Jadex Active Components.  
+The [BDIV3 Tutorial](tutorials/bdiv3/01%20Introduction.md) introduces you to the Beliefs-Desire-Intention Agents and their concepts.
 
-For more detailed information about how Jadex Active Components work, we recommend to check out the [Jadex Active Components User Guide](guides/ac/01 Introduction.md) in the *Advanced Guides* section.
+For more detailed information about how Jadex Active Components work, we recommend to check out the [Jadex Active Components User Guide](guides/ac/01%20Introduction.md) in the *Advanced Guides* section.
 
 To see some example programs in action, you can try out some of the online [Java Webstart applications](https://www.activecomponents.org/#/docs/examples) or the [web applications](https://www.activecomponents.org/jadex-applications-web/).
 

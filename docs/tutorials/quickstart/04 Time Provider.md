@@ -195,9 +195,9 @@ See, e.g.,  [Services.Providing Services](../../services/services.md#providing-s
 
 # Object Attributes
 
-There are two fields declared in the class. The first just holds a string of the agent's location. The location is computed using an HTTP request to a free GeoIP service in the *determineLocation()* method. The field is accessed in the *getLocation()* method to return the immutable location of the service. Remember that this value is cached as described [before](../02 Time Service Interface/#the-getlocation-method).
+There are two fields declared in the class. The first just holds a string of the agent's location. The location is computed using an HTTP request to a free GeoIP service in the *determineLocation()* method. The field is accessed in the *getLocation()* method to return the immutable location of the service. Remember that this value is cached as described [before](02%20Time%20Service%20Interface.md#the-getlocation-method).
 
-The second field is a set of the current subscriptions to the time service. The object type *SubscriptionIntermediateFuture* represents the server side of the subscription future as described for the [time service interface's *subscribe()* method](../02 Time Service Interface/#the-subscribe-method).
+The second field is a set of the current subscriptions to the time service. The object type *SubscriptionIntermediateFuture* represents the server side of the subscription future as described for the [time service interface's *subscribe()* method](02%20Time%20Service%20Interface.md#the-subscribe-method).
 
 # The Subscribe Method
 
