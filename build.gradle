@@ -1062,3 +1062,11 @@ def findPropertyWithDotsOrDie(propname) {
 		throw new Exception('Missing property ' + propname);
 	return ret;
 }
+
+// Run markdownlint on docs during test phase
+task checkdocs(type: GradleBuild) {
+    dir	= 'docs'
+    buildFile	= 'docs/build.gradle.kts'
+    tasks	= ['markdownlint']
+}
+test.dependsOn	checkdocs
