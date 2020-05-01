@@ -1,19 +1,20 @@
 ${SorryOutdatedv3}
 
 # Jadex Active Components
+
 With Jadex, you can use the *Active Components* approach to develop distributed applications. This approach combines a hierachical service component architecture (SCA) with the possibility of abstract business logic implementation based on [BDI Agents](../tutorials/bdiv3/01%20Introduction.md) or [BPMN Workflows](../tutorials/bpmn/01%20Introduction.md) (see [Component Types](../component-types/component-types.md) for more information).
 
 The communication model is based on [services](../services/services.md#implementation).
-An Active Component is an entity that has defined dependencies with its environment. 
+An Active Component is an entity that has defined dependencies with its environment.
 Similar to other component models these dependencies are described using required and provided services, i.e. services that a component needs to consume from other components for its functioning and services that it provides to others.
 
 The interaction between components is fully network-transparent, so components can be executed on one or different machines without changing their code.
 The figure below summarizes the general concept of an Active Component.
 
-![03 Active Components@ac.png](ac.png)  
+![03 Active Components@ac.png](ac.png)
 *Active Component Structure*
 
-The following chapters introduce concepts with hands-on code examples and help you developing your own Jadex Active Components based applications.  
+The following chapters introduce concepts with hands-on code examples and help you developing your own Jadex Active Components based applications.
 If you do **not want to setup your IDE** now, skip the remainder of this chapter and continue to **[Platform](../platform/platform.md)**.
 
 # IDE Setup
@@ -25,22 +26,25 @@ Note that this tutorial is not a replacement for the existing eclipse documentat
 
 ## Prerequisites
 
--   Download and install a recent **Java** environment from [http://java.sun.com/javase/downloads](http://java.sun.com/javase/downloads) (if not already present).
--   Download and install a suitable **Eclipse** distribution (&gt;= ${EclipseMinVersion}) from [http://www.eclipse.org/downloads](http://www.eclipse.org/downloads/)  (if not already present). The following has been tested with the 'Eclipse IDE for Java EE Developers' package.
--   If you want to use Gradle: Install the **Gradle IDE Pack** from [eclipse marketplace](https://marketplace.eclipse.org/content/gradle-ide-pack).
+- Download and install a recent **Java** environment from [http://java.sun.com/javase/downloads](http://java.sun.com/javase/downloads) (if not already present).
+- Download and install a suitable **Eclipse** distribution (&gt;= ${EclipseMinVersion}) from [http://www.eclipse.org/downloads](http://www.eclipse.org/downloads/)  (if not already present). The following has been tested with the 'Eclipse IDE for Java EE Developers' package.
+- If you want to use Gradle: Install the **Gradle IDE Pack** from [eclipse marketplace](https://marketplace.eclipse.org/content/gradle-ide-pack).
 
 ## Project Setup with Gradle/Maven
+
 Jadex uses *gradle* as build tool. If you want to use Gradle or apache Maven for your project, you do not need to download the whole Jadex distribution. Just add a dependency for the required Jadex artifacts and they will be downloaded automatically.
 We provide an example project that uses maven/gradle which is described in [the next section](#example-project).
 
 Alternatively, add the following code to your build script's dependency section (replace **${jadexversion}** with the desired version):
- 
+
 ### Gradle Project
+
 ```groovy
 compile 'org.activecomponents.jadex:jadex-distribution-standard:${jadexversion}'
 ```
 
 A minimal complete build.gradle could look like this:
+
 ```groovy
 apply plugin: 'java'
 
@@ -63,10 +67,11 @@ repositories {
         name 'jadexsnapshots'
         url 'https://nexus.actoron.com/content/repositories/oss-nightlies/'
     }
-}  
+}
 ```
-  
+
 ### Apache Maven Project:
+
 ```xml
 <repositories>
     <repository>
@@ -98,53 +103,53 @@ If you want to use our nightly builds, you need to add our repository:
 This section describes a way of setting up a Jadex project for development in eclipse using the [Maven](http://maven.apache.org) build tool.
 Since the provided example project also contains a build.gradle, it can also be used with gradle - though the following guide does only cope with maven setups.
 
-#### Prerequisites
 Download the jadex-example-project.zip from [Downloads](https://www.activecomponents.org/#/download) and unpack it to a place of your choice.
 
 #### Importing the Jadex example project
 
--   Use "File -> Import -> Maven / Existing Maven Projects" and choose "Next".
+- Use "File -> Import -> Maven / Existing Maven Projects" and choose "Next".
 
-![mvnimport1.png](mvnimport1.png)  
+![mvnimport1.png](mvnimport1.png)
 *Import maven project (1)*
 
--   "Browse..." to the directory where you unzipped the jadex-example-project.zip. Maven will detect the project, which is described in the 'pom.xml' file.
+- "Browse..." to the directory where you unzipped the jadex-example-project.zip. Maven will detect the project, which is described in the 'pom.xml' file.
 
-![](mvnimport2.png)  
+![](mvnimport2.png)
 *Import maven project (2)*
 
--   Click "Finish". Maven will import the project and start the build process thereby download the necessary Jadex libraries from the web.
+- Click "Finish". Maven will import the project and start the build process thereby download the necessary Jadex libraries from the web.
 
-![](eclipsemavenproject.png)  
+![](eclipsemavenproject.png)
 *Imported example project in eclipse*
 
 ## Project Setup without Maven/Gradle
-In this lesson you will set up an initial eclipse environment that can be used to develop applications using Jadex. 
-Please follow the instructions carefully and compare your setup to the screenshots to verify that everything went fine. 
 
-Download the latest Jadex distribution from [Downloads](https://www.activecomponents.org/#/download) and unpack it to a place of your choice.  
+In this lesson you will set up an initial eclipse environment that can be used to develop applications using Jadex.
+Please follow the instructions carefully and compare your setup to the screenshots to verify that everything went fine.
+
+Download the latest Jadex distribution from [Downloads](https://www.activecomponents.org/#/download) and unpack it to a place of your choice.
 Start eclipse. Start the 'New Java Project' wizard, disable the 'Use default location' checkbox and browse to the directory, where you unpacked the Jadex distribution. Note that the name of the directory might slightly differ due to changing Jadex version numbers.
 
 <!--TODO: update screenshots and texts-->
 
 <!-- TODO: also describe a way where you can use the libs directly (without jadex project in eclipse) -->
 
-![02 Installation@eclipseprojectcreate.png](eclipseprojectcreate.png)  
+![02 Installation@eclipseprojectcreate.png](eclipseprojectcreate.png)
 *Create Java project in eclipse*
 
 Click 'Finish' - the project will be created. Your project should now look like the picture below. 
 
-![02 Installation@eclipseprojectfinal.png](eclipseprojectfinal.png)  
+![02 Installation@eclipseprojectfinal.png](eclipseprojectfinal.png)
 *Final Jadex eclipse project layout*
 
 Note that depending on your eclipse configuration, the 'Referenced Libraries' node might by hidden and instead the jars from the lib folder will be displayed as direct child of the project. If you wish, you can change the appearence in the explorer menu by (de)selecting the "Show 'Referenced Libraries' Node" checkbox.
 
-![02 Installation@eclipseexplorermenu.png](eclipseexplorermenu.png)  
+![02 Installation@eclipseexplorermenu.png](eclipseexplorermenu.png)
 *Show/hide the 'Referenced Libraries' node*
 
 This project will be used as a basis for your own development projects. To make the Jadex libraries accessible to other projects it is necessary in eclipse to export them. Right-click on the project, choose 'Build Path -&gt; Configure Build Path...'. Go to the 'Order and Export' tab, choose 'Select All' and hit 'OK'.
 
-![02 Installation@eclipsebuildpathexport.png](eclipsebuildpathexport.png)  
+![02 Installation@eclipsebuildpathexport.png](eclipsebuildpathexport.png)
 *Export jars from build path*
 
 For further simplifying later development, you should attach the sources to the Jadex jars, as this will enable eclipse to provide better context sensitive help on method signatures, etc. Open the 'Referenced Libraries' node (if shown) and the 'jadex-applications-micro-${jadexversion}.jar'. In the 'jadex.micro.examples.helloworld' package double click on the 'HelloWorldAgent.class' file. The file will be opened, showing the reverse engineered byte code. Click the 'Attach Source...' button, choose 'Workspace...' and select the 'sources.zip' file contained in the Jadex project. Click 'OK'. The Java source of the hello world agent should now be displayed. Repeat these steps for the other Jadex jars. It is recommended for this tutorial to add the sources at least to the 'jadex-bridge', 'jadex-commons', 'jadex-kernel-micro' jars.
@@ -157,10 +162,10 @@ If you still want to use IntelliJ IDEA, just try to import the Jadex Example Pro
 If you want to compile the Jadex source code, import the project included in sources.zip.
 To start Jadex with the JCC, create a new Run Configuration using the following parameters:
 
--   Main class:```jadex.base.Starter```
--   Working directory: leave default
--   Use classpath of module: *jadex-platform-standalone-launch*
--   JRE: Set to a JDK with minimum version ${JavaSdkMinVersion}
+- Main class:```jadex.base.Starter```
+- Working directory: leave default
+- Use classpath of module: *jadex-platform-standalone-launch*
+- JRE: Set to a JDK with minimum version ${JavaSdkMinVersion}
 
 ## Development Project Setup
 
@@ -172,12 +177,12 @@ Create a new Java project in eclipse. Choose a name as you like (e.g. 'tutorial'
 
 Add a reference to the project with the Jadex distribution. To do so, right-click on the tutorial project and select 'Build Path -&gt; Configure Build Path...'. In the 'Projects' tab click 'Add...', check the 'jadex-${jadexversion}' checkbox and hit 'OK'. Close the build path window by hitting 'OK' again.
 
-![02 Installation@eclipsebuildpath.png](eclipsebuildpath.png)  
+![02 Installation@eclipsebuildpath.png](eclipsebuildpath.png)
 *Add project dependency*
 
 Now change the launch configuration to start from the newly created project. Therefore, choose the 'Run -&gt; Run Configurations...' menu. Right-click the 'Starter' configuration and choose 'Duplicate'. Change 'Starter (1)' to a more telling name of your choice (e.g. 'Start Jadex Tutorial Platform'). In the 'Main' tab select 'Browse...' besides the project textfield and choose your 'tutorial' project. Select 'Run' to save the launch configuration and start the platform.
 
-![02 Installation@eclipselaunchconfig.png](eclipselaunchconfig.png)  
+![02 Installation@eclipselaunchconfig.png](eclipselaunchconfig.png)
 *Create Jadex launch configuration in eclipse*
 
 ### Jadex Setup
@@ -191,6 +196,7 @@ When starting the Jadex platform using your tutorial launch configuration, the J
 You are now ready to implement and execute your own components in Jadex.
 
 # Starting your applications
+
 To start your applications developed with Jadex Active Components, you first need to start a [Jadex Platform](../platform/platform.md#starting-a-platform) and then [start your Component(s)](../components/components.md#startup).
 Alternatively, you can pass your component to the PlatformConfiguration object:
 

@@ -19,13 +19,13 @@ The chat user list contains a list of the chat users currently online. Each user
 
 The chat settings panel allow to customize the chat behavior. Currently the following options are available:
 
--   **Nickname: **Can be used to change the user's nickname.
--   **Image: **Can be used to change** **user's image.
--   **Sound files: **Important chat events are underlayed with characteristic sounds that can be changed here. First, the event type should be selected using the choice box. The availble event types are **new msg** (message), **new user**, **msg failed**, **new file**, **file abort**, and **file complete**. Using the '...' button one can bring up a file chooser to select a new sound file. To test the new sound the play button ![08 Chat@arrowright.png](arrowright.png) can be used.
--   **Sound enabled: **Enable or disable to turn on or off all notification sounds.
--   **Users auto refresh: **Enable or disable to turn on or off the auto refresh of the chat user list.
--   **Reset sounds: **Pressing the reset button will reload the default sounds settings.
--   **Reset receivers:** Pressing the reset button will set the chat receivers to 'all'. An alternative to change the receivers to all consists in deselecting one or more selected users by holding down ctrl and clicking the corresponding users in the chat user list.
+- **Nickname: **Can be used to change the user's nickname.
+- **Image: **Can be used to change** **user's image.
+- **Sound files: **Important chat events are underlayed with characteristic sounds that can be changed here. First, the event type should be selected using the choice box. The availble event types are **new msg** (message), **new user**, **msg failed**, **new file**, **file abort**, and **file complete**. Using the '...' button one can bring up a file chooser to select a new sound file. To test the new sound the play button ![08 Chat@arrowright.png](arrowright.png) can be used.
+- **Sound enabled: **Enable or disable to turn on or off all notification sounds.
+- **Users auto refresh: **Enable or disable to turn on or off the auto refresh of the chat user list.
+- **Reset sounds: **Pressing the reset button will reload the default sounds settings.
+- **Reset receivers:** Pressing the reset button will set the chat receivers to 'all'. An alternative to change the receivers to all consists in deselecting one or more selected users by holding down ctrl and clicking the corresponding users in the chat user list.
 
 ### Send Message Area
 
@@ -48,15 +48,15 @@ File transfer is performed via a point to point connection between a sender an a
 
 In the downloads tab a table view of downloaded files is shown. The following columns are displayed:
 
--   **Name:** The filename that is used to save the file on the target.
--   **Path:** The local path for storing the file.
--   **Sender:** The origin of the file. The origin is identified by the component identifier of the source.
--   **Size:** The size of the file.
--   **Done:** The file portion already downloaded (in bytes, kb, MB).
--   **%:** The percentage of the file that already has been downloaded.
--   **State:** The state of the transmission. Is one of the following: waiting, rejected, transferring, cancelling, completed, aborted, error.
--   **Speed:** The current speed of the download.
--   **Remaining time:** The estimated remaining time given that the speed keeps rather constant.
+- **Name:** The filename that is used to save the file on the target.
+- **Path:** The local path for storing the file.
+- **Sender:** The origin of the file. The origin is identified by the component identifier of the source.
+- **Size:** The size of the file.
+- **Done:** The file portion already downloaded (in bytes, kb, MB).
+- **%:** The percentage of the file that already has been downloaded.
+- **State:** The state of the transmission. Is one of the following: waiting, rejected, transferring, cancelling, completed, aborted, error.
+- **Speed:** The current speed of the download.
+- **Remaining time:** The estimated remaining time given that the speed keeps rather constant.
 
 ![08 Chat@downloads.png](downloads.png)
 

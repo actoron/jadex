@@ -6,7 +6,6 @@ Plans represent the agent's means to act in its environment. Therefore, the plan
 
 ## Defining Plan Heads in the ADF
 
-
 ![](jadexplansadf.png)
 
 *Figure 1: The Jadex plans XML schema part*
@@ -19,12 +18,11 @@ In Figure 1 the XML schema part for the plans section is shown. Inside the &lt;p
 | plan  |priority   |no        |0         |integer                    |
 | body  |impl       |no        |          |implementation class name  |
 | body  |class      |no        |          |implementation file name   |
-| body  |type       |no        |standard  |standard, bpmn, ...        |
+| body  |type       |no        |standard  |standard, bpmn, ...       |
 
 *Important attributes of the plan and the body tag*
 
 For each plan the corresponding plan body has to be declared using the &lt;body&gt; element. The "impl" attribute (for backwards compatibility also the "class" attribute) is used for defining the implementation of the plan. In case of standard Java plans the classname is used to identify the implementation. The type attribute determines which kind of plan body is used. Currently, the available options are *standard* and *bpmn* plan bodies as further described in the following sections. To clarify things, a simple example ADF is given below that shows the declaration of a plan reacting on a ping message.
-
 
 ```xml
 
@@ -49,7 +47,6 @@ For each plan the corresponding plan body has to be declared using the &lt;body&
 
 ```
 
-
 *A plan reacting on a ping message*
 
 Plan Triggers
@@ -71,7 +68,6 @@ In addition to the reaction on certain event or goal types, it is also possible 
 
 To find out if the plan is applicable not only with respect to the current event or belief change but also considering the current situation, the pre- and context conditions can be used. The precondition is evaluated before a plan is instantiated and when it is not fulfilled this plan is excluded from the list of applicable plans. In contrast, the context condition is evaluated during the execution of a plan and whenever it is violated the plan execution is aborted and the plan has failed. Both conditions can be specified in the corresponding tags supplying some boolean Jadex term (please note that the precondition must be specified in the expression and the context condition in the condition language). The following example shows how to execute a "repair" plan whenever the belief "out\_of\_order" becomes *true*, and as long as the agent believes to be repairable.
 
-
 ```xml
 
 <plans>
@@ -86,7 +82,6 @@ To find out if the plan is applicable not only with respect to the current event
 
 ```
 
-
 *Example of a plan with context condition*
    
 
@@ -99,15 +94,12 @@ When an event occurs, and triggers an execution step of a plan, it may take a wh
 
 Similar to goals, plans may have parameters and parameter sets, which can store local values, required or produced during the execution of the plan. Plan parameters can be accessed from plan bodies for read and write access depending on the parameter direction attribute: *in* parameters allow only read access, *out* parameters can only be written, while *inout* parameters allow both kinds of access. Default values for any of these parameters and parameter sets can be provided in the ADF. Just like facts for belief sets, initial values for parameter sets can be either specified as a sequence of &lt;value&gt; tags, or as a single &lt;values&gt; tag. The parameter(set)s of a plan can also be accessed from the body tag or the context condition, by referencing the plan via the reserved variable \$plan concatenated with the parameter(set) name, e.g. \$plan.result. The precondition and the trigger condition are evaluated before the plan is instantiated, therefore from these conditions no parameters and parameter sets can be accessed with exception of the binding parameters. As binding parameters are evaluated before plan instantiation the value of a binding parameter can be accessed directly via its name (without prepending $plan).
 
-
-
 ![](jadexplanparameteradf.png)
 
 *Figure 3: The Jadex plan parameters XML schema part*   
 
  
 For (single valued) parameters it is possible to use binding options instead of an initial value. A binding option is an expression, that will be evaluated to a collection of values (supported are arrays or an object implementing *Iterator*, *Enumeration*, *Collection*, or *Map*). The binding options of a parameter therefore represent a set of possible initial values for that parameter. The cartesian product of all binding parameters (if there is more than one parameter with binding otpions) determines the number of candidate plans that is considered in the event dispatching process. (In mathematics, the Cartesian product (or direct product) of two sets X and Y, denoted X x Y, is the set of all possible ordered pairs whose first component is a member of X and whose second component is a member of Y. Example: The cartesian product of {1,2}x{3,4} is {(1,3),(1,4),(2,3),(2,4)}, cf. [Cartesian Product](http://en.wikipedia.org/wiki/Cartesian_product) ). Please note that the calculation of the cartesian product can easily lead to large numbers of applicable plans so that binding options should always be used with care. For example, the code example below shows a plan from the "puzzle" example, where for each possible move a plan instance is created. In addition to accessing the binding values like other parameters by writing *\$plan.paramname*, it is also possible to access the binding value directly via its name via  *paramname*. This allows binding values also to be considered for evaluating the pre- and trigger condition, before the plan instance is created.
-
 
 ```xml
 
@@ -120,7 +112,6 @@ For (single valued) parameters it is possible to use binding options instead of 
 
 ```
 
-
 *Example binding parameter (from the puzzle example)*
 
  
@@ -132,43 +123,39 @@ A plan body represents a part of the agent's functionality and encapsulates a re
 
 As mentioned earlier, currently two types of plan bodies are supported in Jadex, which are both implemented as conventional Java classes. The standard plans inherit from *jadex.bdi.runtime.Plan*. The code of standard plans is placed in the *body()* method.
 
-
 Plans that are ready to run are executed by the main interpreter (cf. [Section 2](02%20Concepts.md) ). The system takes care that only one plan step is running at a time. The length of a plan step depends on the plan itself. The *body()* method of standard plans is called only once for the first step, and runs until the plan explicitly ends its step by calling one of the *waitFor()* methods, or the execution of the plan triggers a condition (e.g., by changing belief values). For subsequent steps the *body()* method is continued, where the plan was interrupted.
-
-
 
 Below is shown a cutout of an example standard Java plan. It is a snippet of a protocol plan, which waits for messages and acts accordingly. Most interestingly are the *waitForXYZ()* calls in the plans, because these are the interruption points in the plan, i.e. the plan is interrupted when these calls are executed. Given that a *waitForMessageEvent()* method is invoked the plan is continued when a fitting message arrives (or a timeout occurs, if specified).
 
-
 ```java
 
-public void body() 
+public void body()
 {
   // Send request.
   ...
-    
+
   // Wait for agree/refuse.
   IMessageEvent e1 = waitForMessageEvent(...);
-  boolean agreed = ...;    
+  boolean agreed = ...;
   ...
-    
+
   // Wait for inform/failure.
-  if(agreed) 
+  if(agreed)
   {
     IMessageEvent e2 = waitForReply(...);
     boolean informed = ...;
-    
+
     ...
-    if(informed) 
+    if(informed)
     {
       ...
     }
-    else 
+    else
     {
       ...
     }
   }
-  else 
+  else
   {
     ...
   }
@@ -176,27 +163,26 @@ public void body()
 
 ```
 
-
 *Example plan body*
        
 
 ## Plan Success or Failure and BDI Exceptions
 
-If a plan completes without producing an exception it is considered as succeeded. Completion means for standard plans that the *body()* method returns. To perform cleanup after the plan has finished, you can override the *passed()*, *failed()*, and *aborted()* methods, which are called when the plan succeeds (runs through without exception), fails (e.g., due to an exception), or was aborted during execution (e.g., because the root goal was dropped or has been achieved before the plan reached its end). 
+If a plan completes without producing an exception it is considered as succeeded. Completion means for standard plans that the *body()* method returns. To perform cleanup after the plan has finished, you can override the *passed()*, *failed()*, and *aborted()* methods, which are called when the plan succeeds (runs through without exception), fails (e.g., due to an exception), or was aborted during execution (e.g., because the root goal was dropped or has been achieved before the plan reached its end).
 
 Below, a plan skeleton of a standard Jadex plan is depicted including all predefined methods. In the *failed()* method, a plan may call the *getException()* method to see which problem occured. To find out whether the plan was aborted, because its root goal was achieved, you can call the *isAbortedOnSuccess()* method inside the *aborted()* method.
-   
+
 ```java
 
-public class MyPlan extends Plan 
+public class MyPlan extends Plan
 {
-  public void body() 
+  public void body()
   {
     // Application code goes here.
     ...
   }
 
-  public void passed() 
+  public void passed()
   {
     // Clean-up code for plan success.
     ...
@@ -209,15 +195,15 @@ public class MyPlan extends Plan
     getException().printStackTrace();
   }
 
-  public void aborted() 
+  public void aborted()
   {
     // Clean-up code for an aborted plan.
     ...
     System.out.println("Goal achieved? "+isAbortedOnSuccess());
   }
 }
+```
 
-```  
 *Standard plan skeleton*
 
 Regardless if standard or mobile plans are used, a plan is considered as failed if it produces an exception. To aid debugging, occurring exceptions are (by default) printed on the console (*logging.level.WARNING*), although the agent continues to execute. Subclasses of *jadex.bdi.runtime.BDIFailureException* are not printed, because they are produced by the system and indicate "normal" plan failure (*logging.level.INFO*). If you want your plan explicitly to fail without printing an exception, you can throw a *PlanFailureException* or, as a shortcut, call the *fail()* method. Other subclasses of the *BDIFailureException are generated automatically by the system, to denote certain failures during plan execution. All of these exceptions can be explicitly handled if desired, or just ignored (causing the plan to fail). The **GoalFailureException*, is thrown, when a subgoal of a plan could not be reached or if the subgoal could not be adopted due to its uniqueness settings (i.e. there exists already a goal that is considered equal to the new one). The *MessageFailureException* indicates that a message could not be sent, e.g., because the receiver is unknown. A *TimeoutException* occurs when calling *waitFor()* with a timout, and the awaited event does not happen. Finally, the *ComponentTerminatedException* is thrown when an operation could not be performed, because the agent has died. This usually does not occur inside plans, but only when accessing an agent from external processes.
@@ -227,27 +213,25 @@ Regardless if standard or mobile plans are used, a plan is considered as failed 
 Standard plans might be interrupted whenever the agent regards it as necessary, e.g., when a belief has been changed leading to the adoption of a new goal. Sometimes it is desireable that a sequence of actions is considered as a single atomic action. For example when you change multiple beliefs at once, which might trigger some conditions, you may want to perform all changes before the conditions are evaluated. In standard plans, this can be achieved by using a pair of *startAtomic()* / *endAtomic()* calls around the code you want to execute as a whole. Note that you are not allowed to end the plan step inside an atomic block (e.g., by calling *waitFor()*).
    
 
-
 ```java
 
-public void body() 
+public void body()
 {
   ...
-  startAtomic();    
+  startAtomic();
   // Atomic code goes here.
-  ...    
+  ...
   endAtomic();
   ...
 }
 
-```  
+```
+
 *How to establish an atomic block*
 
 ## Goal Processing
 
-
 The mechanism to make a plan reacting to a specific goal is for all kinds of goals the same. A trigger matching goal events has to be defined within the plan declaration.
-
 
 ```java
 
@@ -258,6 +242,6 @@ The mechanism to make a plan reacting to a specific goal is for all kinds of goa
   </trigger>
 </plan>
 
-```  
+```
 
 *Plan triggered by a goal*

@@ -16,31 +16,26 @@ markdownlint {
     
 	rules {
 
-		// Rules to be fixed
+		// Allow same subsection name in different super sections (e.g. tutorial exercise "Start the Agent" sections)
+		+NoDuplicateHeaderRule(allowDifferentNesting=true) {
+		}
+
+		// Currently broken by our figure captions layout
 		+NoEmphasisAsHeaderRule {
 			active	= false
 		}
 		
+		// Currently broken by our SorryOutdated-snippets
+		+FirstLineH1Rule {
+			active	= false
+		}
+		
+		
 		// Disable some rules by setting active to false
-		+ListMarkerSpaceRule {
-			active	= false
-		}
-		+BlanksAroundListsRule {
-			active	= false
-		}
-		+BlanksAroundFencesRule {
-			active	= false
-		}
 		+ConsistentUlStyleRule {
 			active	= false
 		}
 		+ConsistentHeaderStyleRule {
-			active	= false
-		}
-		+NoReversedLinksRule {
-			active	= false
-		}
-		+BlanksAroundHeadersRule {
 			active	= false
 		}
 		+UlIndentRule {
@@ -49,19 +44,7 @@ markdownlint {
 		+SingleH1Rule {
 			active	= false
 		}
-		+NoWhitespaceFilenameRule {
-			active	= false
-		}
-		+FencedCodeLanguageRule {
-			active	= false
-		}
 		+OlPrefixRule {
-			active	= false
-		}
-		+SingleTrailingNewlineRule {
-			active	= false
-		}
-		+NoDuplicateHeaderRule {
 			active	= false
 		}
 		+NoInlineHtmlRule {
@@ -79,34 +62,21 @@ markdownlint {
 		+ProperNamesRule {
 			active	= false
 		}
-		+FirstLineH1Rule {
-			active	= false
-		}
-		+NoBareUrlsRule {
-			active	= false
-		}
-		+NoMultipleSpaceAtxRule {
-			active	= false
-		}
-		+NoMissingSpaceAtxRule {
-			active	= false
-		}
-
 
 		// Rules we don't want to check? (What is our markdown coding style?)
+		+NoWhitespaceFilenameRule {
+			active	= false
+		}
 		+LineLengthRule {
 			active	= false
 		}
 		+NoHardTabsRule {
 			active	= false
 		}
-		+NoMultipleBlanksRule {
-			active	= false
-		}
-		+NoTrailingSpacesRule {
-			active	= false
-		}
 		+LowerCaseFilenameRule {
+			active	= false
+		}
+		+NoBareUrlsRule {
 			active	= false
 		}
 	}

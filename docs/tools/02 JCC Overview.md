@@ -1,11 +1,7 @@
 # Jadex Control Center Overview
 
-![02 JCC Overview@jcc.png](jcc.png)  
+![02 JCC Overview@jcc.png](jcc.png)
 *JCC Overview*
-
-
-
-
 
 The Jadex Control Center (JCC) is the heart of most Swing based runtime tools. The JCC itself uses an extensible plugin-based mechanism to offer differnt functionalties to the user. As can be seen in the screenshot above it consists of different areas that are explained in the following:
 

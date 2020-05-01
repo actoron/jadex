@@ -19,7 +19,6 @@ to pick up first?) into procedural plans. Having a separate goal instance for
 each piece of waste allows us to describe the choice using goal deliberation
 and keep our procedural plans simple.
 
-
 ## Exercise D1: A Goal Instance for each Piece of Waste
 
 To keep track of waste objects, first add a corresponding belief set to the agent:
@@ -65,7 +64,7 @@ Execute the agent and observe the console output. Whenever the agent discovers a
 previously unseen piece of waste, it will create a new goal instance as shown
 by the *Created achieve cleanup goal for ...* output:
 
-```
+```txt
 Starting performPatrolPlan2()
 Created achieve cleanup goal for Waste(id=Waste_#3, location=Location(x=0.3, y=0.5))
 ...

@@ -4,8 +4,6 @@ This exercise introduces the BDI model and shows how to generate agent actions b
 goal and plan concepts of Jadex. Specifically, you will learn how to add goals and plans to an agent
 and how to control the plan selection and plan execution processes with goal flags.
 
-
-
 ## Quick Introduction to the BDI Model
 
 The belief-desire-intention (BDI) model of agency is based on Stanford philosopher
@@ -16,7 +14,6 @@ that they don't calculate the utility of every possible course of action in ever
 Instead, it is rational for agents, to stick to a once-chosen plan, without questioning its actions in every step.
 Only when a problem occurs with a chosen plan, the agent will rethink its choice and maybe form another plan.
 
-
 The so called *means-end reasoning* process is at the heart of this model. For every desire,
 the agent will form intentions how to satisfy it. The selection of suitable desires is in turn based
 on the current beliefs of an agent. In concrete software implementations of the BDI model (such as Jadex),
@@ -26,9 +23,7 @@ Plans are procedural recipes of actions (e.g. code to be executed for achieving 
 Instead of abstract desires, a software agent in Jadex has a dynamic set of concrete goals to be pursued.
 Instead of forming arbitrary intentions, a Jadex agent selects existing plans from its so called *plan library*
 in response to the currently active goals. The means-end reasoning process is then the decision logic
-for finding an appropriate plan (*means*) for a given goal (*end*). 
-
-
+for finding an appropriate plan (*means*) for a given goal (*end*).
 
 ## Exercise A0: Structure of a BDI Agent
 
@@ -121,8 +116,6 @@ BDI features of Jadex. We will use it later, e.g. to add goals to the agent. You
 We added a single `moveTo()` call as a place-holder, so that the agent would move a little, when it is started.
 The following sections show how to add more useful behavior using goals and plans.
 
-
-
 ## Exercise A1: A Goal and a Plan
 
 Now we want to make the agent do something useful like performing patrol rounds. But before you continue:
@@ -139,7 +132,7 @@ Now add a goal and a plan specification to the agent (i.e. to `CleanerBDIAgent.j
 	/**
 	 *  A goal to patrol around in the museum.
 	 */
-	@Goal	// The goal annotation allows instances of a Java class to be dispatched as goals of the agent. 
+	@Goal	// The goal annotation allows instances of a Java class to be dispatched as goals of the agent.
 	class PerformPatrol {}
 	
 	//-------- methods that represent plans (i.e. predefined recipes for working on certain goals) --------
@@ -167,19 +160,20 @@ Execute the agent by starting the `Main` class and observe its behavior. OK, the
 The agent still only executes the random `moveTo(...)` from the `exampleBehavior()` method and ignores
 the new goal and plan. Why?
 
-The reason is that the `PerformPatrol` class is only a template for a goal, just like any Java class is only a 
+The reason is that the `PerformPatrol` class is only a template for a goal, just like any Java class is only a
 template for an object. We need to instatiate the goal class and tell the agent to pursue this newly created goal object.
 We can do that in the `exampleBehavior()` method, that is executed directly after the agent is started.
 Find the line
 
-```
+```java
 		//... add more setup code here
-		actsense.moveTo(Math.random(), Math.random());	// Dummy call so that the cleaner moves a little.
+		actsense.moveTo(Math.random(), Math.random());
+		// Dummy call so that the cleaner moves a little.
 ```
 
 and replace it with
 
-```
+```java
 		// Create and dispatch a goal.
 		bdi.dispatchTopLevelGoal(new PerformPatrol());
 ```
@@ -203,7 +197,7 @@ because the Jadex framework cannot use `PerformPatrol` as a goal class.
 ### The `@Plan` Annotation and the `performPatrolPlan()` Method
 
 According to the BDI model as implemented in Jadex, the agent should pursue its goals by selecting appropriate plans
-from its *plan library*.  Plans are procedural recipes that can be naturally specified as simple Java methods.
+from its *plan library*. Plans are procedural recipes that can be naturally specified as simple Java methods.
 To add a method to the plan library you have to tell Jadex to treat this method as a plan. This is done by the `@Plan` annotation.
 
 In addition to marking a method with `@Plan` you also need to tell Jadex the situations, when this plan should be selected.
@@ -216,7 +210,7 @@ This is, where the  `@Trigger` annotation comes into play for establishing the c
 Any single plan can have not one but many different triggers. Therefore the `@Trigger` annotation allows stating a single goal as in
 `goals=PerformPatrol.class`, but also multiple goals (e.g., `goals={PerformPatrol.class, ...}`) as well as other kinds
 of triggering events. You can find more details about the annotation in its
-[Javadoc documentation](https://download.actoron.com/docs/nightlies/latest/javadoc/index.html?jadex/bdiv3/annotation/Trigger.html). 
+[Javadoc documentation](https://download.actoron.com/docs/nightlies/latest/javadoc/index.html?jadex/bdiv3/annotation/Trigger.html).
 
 ### The `IBDIAgentFeature` and the `dispatchTopLevelGoal()` Method
 
@@ -229,8 +223,6 @@ We had an instance of this class automatically fed into our `exampleBehavior()` 
 Like any other Java class, we can create instances of the `PerformPatrol` class with the `new` keyword.
 The result is a Java object that can be used as an agent goal. We just need to tell the agent to pursue
 this object as a goal, like we did in the  `exampleBehavior()` method.
-
-
 
 ## Exercise A2: Execute the Goal Periodically
 
@@ -258,8 +250,6 @@ agent the process is as follows:
 5. In Exercise A1 the goal would now be dropped because processing is finished. Due to the `recur=true` flag,
     in this exercise, the goal processing restarts at step 2.
 
-
-
 ## Exercise A3: Multiple Plans for a Goal
 
 Backup you current solution as `CleanerBDIAgentA2.java`.
@@ -270,7 +260,6 @@ In BDI agents this is naturally reflected by the possibility to have many plans 
 for pursuing the same goal.
 
 ![Route for Patrol Plan 2](patrol-plan2.svg "Route for Patrol Plan 2") ![Route for Patrol Plan 3](patrol-plan3.svg "Route for Patrol Plan 3")
-
 
 In this exercise, we want to specify alternative patrol rounds (i.e. sequences of locations), that the agent
 should choose from for pursuing the `PerformPatrol` goal. We can just add more methods with a corresponding
@@ -294,7 +283,6 @@ should choose from for pursuing the `PerformPatrol` goal. We can just add more m
 	 */
 	// Fill in @Plan annotation and method body for third patrol plan,
 	// e.g. according to the figure
-	
 ```
 
 Add the methods above into your `CleanerBDIAgent.java`. Execute the agent by starting the `Main` class.
@@ -323,8 +311,6 @@ Thus change the `@Goal` annotation of the `PerformPatrol` goal to
 
 Execute the agent by starting the `Main` class and check that now all three plans are executed after each other.
 
-
-
 ## Exercise A4: Means-end Reasoning Flags
 
 In the last exercise (which you should now backup as `CleanerBDIAgentA3.java`, btw) we already introduced one
@@ -339,7 +325,7 @@ Lets say we want the cleaner to stop between patrol rounds. We find two flags th
 	@Goal(recur=true, orsuccess=false, retrydelay=3000)	// Goal flags: variation 1
 ```
 
-Execute the agent by starting the `Main` class and observe the behavior. What happens if you change 
+Execute the agent by starting the `Main` class and observe the behavior. What happens if you change
 `retrydelay` to `recurdelay` (1)? Try experimenting with other flags. Here are some suggestions:
 
 * Replace `orsuccess=false` with `randomselection=true`. What is the difference (2)?

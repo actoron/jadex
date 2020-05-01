@@ -2,11 +2,9 @@
 
 ![](envsupportconceptssmall.png)
 
-
 *Figure 1: Main conceptual building blocks of EnvSupport*
 
 In the figure above the conceptual parts of EnvSupport and their interplay is shown. It consists of the parts *spaces*, *agents*, *observers* and *evaluation*. The environment space mainly contains the *domain model* and the *interaction* specification. 
-
 
 ## Space
 
@@ -14,13 +12,11 @@ In the domain model the constituents of the space are declared. In EnvSupport th
 
 The interaction part serves for the specification of how the interrelationship between agents and space objects is. In EnvSupport space objects which are representatives for agents in the virtual world are called *avatars*. The connection between such avatars and agents are specified in so called *avatar mappings*. It defines what happens when an agent or an avatar is created or destroyed. Both sides of an agent avatar association can be tied together, so that the creation of an agent automatically leads to the creation of its avatar. The same applies for the other direction, which means that the creation of an avatar also can initiate the creation of an associated agent. Such kind of connections can also be set-up for the destruction of agents or avatars. The communication between agents and the environment is organized via *percepts* and *actions*. A percept is a meaningful event created in the environment and directed towards specific kinds of agents. In this way information is passed on a semantic level to the agents. The creation of percepts is performed by *percept generators*, which can react on basic environment events, like the movement of a space object, and transform them to percepts. These percepts are then fed into the fitting *percept processors*, which have the task to interact with the agent and inform it about the new percept. On the other hand agents can influence the environment by executing *actions* on it. These actions are predefined in the environment space and may modify arbitrary environmental properties and objects. The execution can directly be performed by an agent on the space.
 
-
 As described until now, a space represents a passive entity. In order to allow also active environments containing tasks and processes, a *space executor* is used. Such a space executor is typically coupled to the clock of the platform and performs some kind of "execution cycle" at each time step. One aspect of this cycle is the processing of percepts and actions and executing the tasks and processes. Hence, a space executor encapsultes the environment execution semantics and can e.g. implement a round-based or a continuous execution scheme. 
 
 ## Observers
 
 So far the internals of an environment have been considered. Observers represent user interfaces for watching an environment. It typically allows for viewing the current state of the environment and its objects. The definition of observers include two main concepts: *data views* and *perspectives*. A *data view* is a cutout of the environment, which represents the view of a specific entity. One example is the local view of an object, which is e.g. defined by the radius of its sight. Another kind of view is the global data view encompoassing the complete environment data model. Besides the selection of the data that should be presented also the way of its presentation is of importance. 
-
 
 The presentation of the data can be defined using *perspective*. A perspective is composed of *drawables*, which describe the way a space object will be rendered. Typical types of drawables include geometrical shapes like triangle, rectangle, circle and also image icons. The drawables are organized in a simplified version of a *scenegraph*. This means that in a drawable multiple shapes can be combined in arbitrary flavors. In addition to the relative placement and sizes of these drawable parts *drawconditions* can be used to determine if a part is currently visible. This allows to visualize special parts of a drawable depending on its current environmental conditions (e.g. using different icons for different movement directions). A perspective is organized in layers to which drawables can be assigned. The layers determine the order in which the elements are painted, so that earlier painted drawables may be partially or completely hidden by elements of a higher layer. In addition to drawables so called *pre- and post-layers* can be defined. These can be used to e.g. show background or foreground elements that are not necessarily backed by space objects.  
 

@@ -10,7 +10,6 @@ When programming plans, it is also possible to explicitly wait for certain condi
 
 The following example uses the "timer" belief from Section 6.3 to execute some action when the alarmtime has reached (belief not shown here).
 
-
 ```xml
 <agent ...>
     ...
@@ -24,15 +23,12 @@ The following example uses the "timer" belief from Section 6.3 to execute some 
 </agent>
 ```
 
-
-
 ```java
 public void body
 {
     ICondition condition = getCondition("alarmtime_reached");
     ...
-    IEvent event = waitForCondition(condition); 
+    IEvent event = waitForCondition(condition);
     ...
 }
 ```
-

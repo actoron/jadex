@@ -12,19 +12,17 @@ For your Java project please make sure **not** to include the jadex-application-
 
 Create Java file *ITimeService.java* in the package *jadex.micro.quickstart* and paste the contents as shown below. The relevant aspects of this file are explained in the following subsections.
 
-
 ```java
 package jadex.micro.quickstart;
 
 import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
-
 /**
  *  Simple service to publish the local system time.
  *  As the service does not change the local system
  *  and provides no sensitive information, no security
- *  restrictions are required. 
+ *  restrictions are required.
  */
 @Security(Security.UNRESTRICTED)
 public interface ITimeService
@@ -44,6 +42,7 @@ public interface ITimeService
 	public String	getLocation();	
 }
 ```
+
 *Figure 1:* Time service interface in Java
 
 ### The Name and Package of the Interface
@@ -57,11 +56,11 @@ In Jadex, the fully qualified name of a service interface is used for service di
 
 ### The *subscribe()* Method
 
-Service methods are potentially remote calls. Therefore service methods should use [future types](../../futures/futures.md)) as return values. Futures avoid that the caller is blocked during the service processing and add further support e.g. for dealing with timeouts. 
+Service methods are potentially remote calls. Therefore service methods should use [future types](../../futures/futures.md)) as return values. Futures avoid that the caller is blocked during the service processing and add further support e.g. for dealing with timeouts.
 
 The subscribe() method signature captures most of the interaction between time provider and time user. It uses the [subscription intermediate future](../../futures/futures.md)) as a return type, which denotes a subscription semantics for the interaction as shown in the diagram below.
 
-![02 Time Service Interface@subscription.png](subscription.png)  
+![02 Time Service Interface@subscription.png](subscription.png)
 *Figure 2: Interaction diagram of a subscription future*
 
 The interactions starts by the user calling the subscribe() method on the service of the provider. While the interaction is active, the time provider may post time values in arbitrary intervals. These time values are transmitted as intermediate results of the future and immediately become available to the time user. At any point in time, either of both sides may decide to end the interaction. The time provider may do this by setting the future to finished to indicate that no more results will be published. The time user on the other hand may decide that it no longer wants to receive time values from the time provider and thus may call the *cancel()* method on the future.

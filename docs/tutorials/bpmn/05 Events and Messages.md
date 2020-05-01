@@ -18,8 +18,6 @@ Create a process as shown in the figure below. This example represents a reminde
 
 ![05 Events and Messages@1.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-1.png)
 
-
-
 After placing the time event in the diagram, left-click on the event element to edit its properties in the properties view. Edit the *duration* property and enter some value, e.g., '3000'. The event duration specifies the time that the process will wait before continuing. It is specified in milliseconds, i.e. entering '3000' will cause the process to wait for three seconds.
 
 ### Observe the Process Execution
@@ -41,8 +39,6 @@ Consider the following process. It starts with one activity: 'Credit Check'. If 
 
 ![05 Events and Messages@2.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-2.png)
 
-
-
 ### Failed and Successful Tasks
 
 Use a UserInteractionTask for the credit check. When executing the process, a dialog will be opened offering you two buttons 'OK' and 'Cancel' (or similar options based on your locale). Pressing cancel will cause an exception in the task. The process catches this exception and continues with the credit denied task.
@@ -60,8 +56,6 @@ Draw a process as shown below. The process has a preparatory task (e.g. print ou
 
 ![05 Events and Messages@3.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-3.png)
 
-
-
 Per default, the message intermediate event reacts to any received message, so you do not need to edit this element at first. The received message is stored in a parameter called '$event', which can be used in the subsequent activity. E.g. use a print task for the 'Order Received' activity with the text parameter set to '"Received order: "+$event.content' to print out the content of the received message.
 
 ### Using the Conversation Center
@@ -69,8 +63,6 @@ Per default, the message intermediate event reacts to any received message, so y
 To send the process a message, you can use the conversation center. Choose the conversation center from the toolbar in the JCC. It is represented by the envelope icon (![05 Events and Messages@newconversation.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-newconversation.png)).
 
 ![05 Events and Messages@4.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-4.png)
-
-
 
 The tree on the left of the conversation center shows the components that are currently running on the platform. If you have started your process in the starter tool, you should see it in the tree. If you double click on an icon on the tree, the component will be added as a receiver of the current message.
 
@@ -85,23 +77,21 @@ After setting the receiver and the content, hit the 'Send' button below the mess
 You may wonder, what all the message properties are about. Jadex allows (in principle) different types of messages.
 The type of the message constrains the available parameters of a message. Currently, the only available type is "fipa" which defines parameter(set)s according to the FIPA message specification (e.g., parameters for the receivers, content, sender, etc. are introduced). Through this message typing Jadex does not require that only FIPA messages are being sent, as other options may be added in future. In the following table, all available parameter(set)s are itemized. For details about the meaning of the FIPA parameters, see the FIPA specifications available at [FIPA ACL Message Structure Specification](http://www.fipa.org/specs/fipa00061/SC00061G.html) . The meanings of all of these parameters are shortly sketched in the following table.
 
-```
-  Name                Class                  Meaning
-  ------------------- ---------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  performative        String                 Speech act of the message that expresses the senders intention towards the message content.
-  sender              IComponentIdentifier   The senders component identifier, which contains besides other things its globally unique name.
-  reply_to           IComponentIdentifier   The component identifier of the component to which should be replied.
-  receivers [set]   IComponentIdentifier   Arbitrary many (at least one) component identifier of the intended receiver components.
-  content             Object                 The content (string or object) of the message. If the content is an object it has to be specified how the content can be marshalled for transmission. For this puropose codecs are used. Jadex has built in support for marshalling arbitrary Java beans when using one of the available XML languages.
-  language            String                 The language in which the content of the message should be encoded.
-  encoding            String                 The encoding of the message.
-  ontology            String                 The ontology that can be used for understanding the message content. Can also be used for deciding how to marshal the content.
-  protocol            String                 The interaction protocol of the the message if it belongs to a conversation.
-  reply_with         String                 Reply-with is used for assigning a reply to a original message. The receiver of the message should respond to this message by putting the reply-with value in the in-reply-to field of the answer.
-  in_reply_to       String                 Used in reply messages and should contain the reply-with content of the answered message.
-  conversation_id    String                 The conversation-id is used in interactions for identifying messages that belong to a specific conversation. All messages of one interaction should share the same conversation-id.
-  reply_by           Date                   The reply-by field can contain the latest time for a response message.
-```
+| Name | Class | Meaning |
+|------|-------|---------|
+|performative      | String               | Speech act of the message that expresses the senders intention towards the message content.
+| sender            | IComponentIdentifier | The senders component identifier, which contains besides other things its globally unique name.
+| reply_to         | IComponentIdentifier | The component identifier of the component to which should be replied.
+| receivers `[set]` | IComponentIdentifier | Arbitrary many (at least one) component identifier of the intended receiver components.
+| content           | Object               | The content (string or object) of the message. If the content is an object it has to be specified how the content can be marshalled for transmission. For this puropose codecs are used. Jadex has built in support for marshalling arbitrary Java beans when using one of the available XML languages.
+| language          | String               | The language in which the content of the message should be encoded.
+| encoding          | String               | The encoding of the message.
+| ontology          | String               | The ontology that can be used for understanding the message content. Can also be used for deciding how to marshal the content.
+| protocol          | String               | The interaction protocol of the the message if it belongs to a conversation.
+| reply_with       | String               | Reply-with is used for assigning a reply to a original message. The receiver of the message should respond to this message by putting the reply-with value in the in-reply-to field of the answer.
+| in_reply_to     | String               | Used in reply messages and should contain the reply-with content of the answered message.
+| conversation_id  | String               | The conversation-id is used in interactions for identifying messages that belong to a specific conversation. All messages of one interaction should share the same conversation-id.
+| reply_by         | Date                 | The reply-by field can contain the latest time for a response message.
 
 *Reserved FIPA message event parameters*
 
@@ -112,8 +102,6 @@ Sometimes a process should not react to just any message, but only to messages t
 Edit the properties of the message intermediate event in the diagram. Add a parameter 'performative' with the value '"request"'. Use quotes for the value, because the value should be a string in this case.
 
 ![05 Events and Messages@eclipsemessagereceivalparameter.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-eclipsemessagereceivalparameter.png)
-
-
 
 Save and start the process. Send messages to the process using the conversation center. First send some messages with a performative other than 'request'. Verify that the process does not react to these messages. Then send a request message and check that the process reacts to it.
 
@@ -134,8 +122,6 @@ The above mentioned timeout pattern is shown in the following process descriptio
 
 ![05 Events and Messages@eclipsetimeout.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-eclipsetimeout.png)
 
-
-
 Note the use of the multiple event (![05 Events and Messages@bpmnmultipleevent.png](05%20Events%20and%20Messages/05%20Events%20and%20Messages-bpmnmultipleevent.png)). In eclipse, it is available from the *Intermediary Events* section of the palette and is called *Multiple intermediate event*. Set a conveniently long timeout like e.g. 5000 milliseconds in the time event, because you need to send the process a message manually for testing.
 
 ### Testing the Timeout Process
@@ -151,7 +137,7 @@ Exercise D5 - Sending Messages
 
 To send a process a message, we need to know how to address the process. The addressing depends on the message type. The fipa message type that Jadex supports out-of-the-box uses so called component identifiers for addressing. You have seen component identifiers in the previous lessons when using the conversation center.
 
-A component identifier is composed of a unique name, usually of the form <component-name\>'@'<platform\>, e.g. 'MessageReceival@lars'.  
+A component identifier is composed of a unique name, usually of the form <component-name\>'@'<platform\>, e.g. 'MessageReceival@lars'.
 Additionally, a component identifier may hold a number of transport addresses, which tell the platform how to reach the component, when it resides on a remote platform.
 
 ### Sending a Message in a Process
@@ -185,14 +171,13 @@ The communication analyzer is a very powerful and complex tool. When you right-c
 
 ### todo: further topics
 
--   data
+- data
     - parameters in AND-join
     - loops
     - complex Java values (business objects)
     - reserved variables: $interpreter, $thread, $event, $platform, $clock, $args, $results
     - arguments and results
--   tasks
+- tasks
     - predefined tasks (esp. create comp for external subprocess)
     - custom tasks
--   other elements (lanes etc. - discuss only, no lesson?)
-
+- other elements (lanes etc. - discuss only, no lesson?)

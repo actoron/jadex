@@ -4,7 +4,7 @@
 
 In this section the 3D visualization concepts are described. This section only focuses the **use** of existing 3D-objects in the Enviroment. The creation of new 3D Objects for Jadex 3D is a complex topic which will later in a different chapter
 
-![](example.PNG)   
+![](example.PNG)
 *Figure 1 A running 3D Example*
 
 Coordinate System
@@ -12,19 +12,17 @@ Coordinate System
 
 The coordinate system consists of:
 
--   The origin, a single point in space.
+- The origin, a single point in space.
     - This point is always at coordinate (0,0,0)
--   Three coordinate axes that are mutually perpendicular, and meet in the origin.
+- Three coordinate axes that are mutually perpendicular, and meet in the origin.
     - The X axis is "right/left"
     -  The Y axis is "up/down"
     - The Z axis is "towards you/away from you"
 
-![](3dkoord.png)   
+![](3dkoord.png)
 *Figure 2 A 3D Coordinate System*
 
 Every point in 3D space is defined by its (x,y,z) coordinates. The data type for vectors is Vector3Double or Vector3Int.
-
-
 
 **Drawable3d declaration part of XML schema**
 ----------------------------------------------------------
@@ -33,19 +31,13 @@ A **drawable3d **represents the visual counterpart of a space object type. As c
 
 ![](drawable3d_overview01.JPG)
 
-
-
 The primitve mesh-elements are sphere, box, cylinder, dome, torus and object. Complex mesh types are object3d (which loads a complex 3d mesh from a file) and terrain (generator for a 3d-terrain ground). Text3d, sky and sound3d can be considered as special types. We will describe all these types in detail later.
 The drawable3d itself is further specified by associating it to a specific objecttype.
 Additionally, the width, height and rotation can be set. Each geometrical mesh based shape contained in the drawable is of type **drawableelement **and has the attributes described in the list below. 
 
-
-
 For all Elements, the **Drawable3d **and the Visual Objects inside have at least the three Attributes Position, Size and Rotation.
 
 For instance, if you set the Size for the **Drawable3d** all Objects inside are influenced. If you set the Size for just one Visual Object only the Object is influenced relative to the size value of the **Drawable3d**.
-
-
 
 |Name | Default Value | Description | Type|
 |-----|---------------|-------------|-----|
@@ -54,16 +46,12 @@ For instance, if you set the Size for the **Drawable3d** all Objects inside are 
 | y | 0 | The y value of the position | int / double |
 | z | 0 | The zvalue of the position  | int / double |
 
-
-
 |Name | Default Value | Description | Type|
 |-----|---------------|-------------|-----|
-| **size**  | Vector3Double(1,1,1) | An IVector3 or String for the shape size (relative to the drawable size). <br> If it is a String it must be a property name of the drawable the value is bound to. <br> Use this or width, height, depth instead (then you have to set all three).|  String <br> Vector3Int <br>Vector3Double  |                                
+| **size**  | Vector3Double(1,1,1) | An IVector3 or String for the shape size (relative to the drawable size). <br> If it is a String it must be a property name of the drawable the value is bound to. <br> Use this or width, height, depth instead (then you have to set all three).|  String <br> Vector3Int <br>Vector3Double  |
 | width  | 1 | The height value of the size   | int / double |
 | height | 1 | The depth value of the size    | int / double |
 | depth  | 1 | The depth value of the size    | int / double |
-
-
 
 |Name | Default Value | Description | Type|
 |-----|---------------|-------------|-----|
@@ -72,10 +60,7 @@ For instance, if you set the Size for the **Drawable3d** all Objects inside are 
 | rotatey | 0 | The rotation value along the y axis | int / double |
 | rotatez | 0 | The rotation value along the z axis | int / double |
 
-
-
 Beside this very basic Attributes all the Visuals (not the Drawable3d itself) have these three attributes:
-
 
 |Name | Default Value | Description | Type|
 |-----|---------------|-------------|-----|
@@ -83,15 +68,12 @@ Beside this very basic Attributes all the Visuals (not the Drawable3d itself) ha
 |**color**|  "#FFFFFF" | The color of the visual object. Notation is in RGB, # following by the Red, Green and Blue Value in Hex (from 00 to FF). So pure Red is for example: "#FF0000" | String|
 |**texturepath**| "" |  If you want to use a texture instead of just a color for the primitive put the Path to it here. You can combine color and texturepath to juse a coloration for the texture. If you want the texture unchanged dont set a color value | String |
 
-
 Moreover, some elements have certain special properties, which are not applicable to all Drawables. The easiest way to find out about the properties is to use eclipse's auto-complete to gain an overview. We will describe this special Attributes in detail for each visual Object if necessary in the list of predefined visuals below.
 
 ### Rotation in Detail
 
 You can use frequently used predifined rotations for every angle. The predefined values are 45, 90, 135, 180, 235 and 270 degree. To use it just type rotation="$DEG{value}{x|y|z}".
 For example if you want to rotate 180 degree on the y-angle just type rotation="$DEG180y".
-
-
 
 To define the rotation by yourself just remember its defined in radians. To use degree you have to calculate it by Pi/180*value. For example if you want to rotate 40 degree on x, 170 degree on y and 80 degree on z just type:
 rotation="new Vector3Double((Math.PI/180)*40, (Math.PI/180)*170, (Math.PI/180)*80)"
@@ -115,7 +97,6 @@ You can see the result in the rendered Picture.
 </env:drawable3d>
 ```
 
-
 ![](shadowexample.PNG)
 
 List of usable predefined 3D-Primitives
@@ -129,14 +110,12 @@ Additional Values: (none)
 
 Example:
 
-
 ```java
 <env:drawable3d width="1" height="1" depth="1" rotation3d="true">
   <env:sphere width="1" height="1" depth="1" color="#FF0000">
   </env:sphere>
 </env:drawable3d>
 ```
-
 
 ![](sphere_example.PNG)
 
@@ -153,7 +132,6 @@ Example:
 </env:drawable3d>
 ```
 
-
 ![](box_example.PNG)
 
 ### Cylinder
@@ -168,8 +146,6 @@ As you can see from the example, you have to rotate a Cylinder 90 degree on the 
 
 You only need the **height **and the **radius **value to define a Cylinder.
 
-
-
 Example:
 
 ```xml
@@ -182,7 +158,6 @@ Example:
 </env:drawable3d>
 ```
 
-
 ![](cylinder.PNG)
 
 ### Dome
@@ -191,13 +166,11 @@ Additional Values: radius, planes, samples
 
  | Name    | default value  | Description                                                                                 | Type  |
  |---------|----------------|---------------------------------------------------------------------------------------------|-------|
- |radius   | 1              |The Radius of the Dome.                                                                      |Double |
- |planes   | 1              |How rounded the Dome is at the sides.                                                        |Int    |
- |samples  | 4              |The samples. It means how round the Domes Ground is. So it´s more like a pyramid or a dome.  |Int    |
+ |radius   | 1              |The Radius of the Dome.                                                                     |Double |
+ |planes   | 1              |How rounded the Dome is at the sides.                                                       |Int    |
+ |samples  | 4              |The samples. It means how round the Domes Ground is. So it´s more like a pyramid or a dome. |Int    |
 
 Look at the Picture to understand the influence of planes and samples.
-
-
 
 Example:
 
@@ -211,7 +184,6 @@ Example:
  <env:cylinder height="0.01"  radius="200" rotation="$deg90x" x="0" y="-2" z="0" color="#FFFFFF"/>
 </env:drawable3d>
 ```
-
 
 ![](dome.PNG)
 
@@ -240,7 +212,6 @@ Example:
 </env:drawable3d>
 ```
 
-
 ![](torus.PNG)
 
 ### Arrow
@@ -254,7 +225,7 @@ Example:
 ```xml
 <env:property name="rotate45" dynamic="false">new Vector3Double(0, (Math.PI/180)*45, 0)</env:property>
 <env:box  width="100" height="0.1" depth="100" x="-50" y="-1" z="50" rotation="rotate45" color="#F0F0F0FF" shadowtype="Receive"/>
-     
+
 <env:arrow  width="0.01" height="0.2" depth="0" x="0" y="0" z="0" color="#FFFFFFFF"></env:arrow>
 <env:arrow  width="0.2" height="0" depth="0.01" x="0" y="0" z="0" color="#FF00FFFF"></env:arrow>
 <env:arrow  width="0" height="0.01" depth="0.2" x="0" y="0" z="0" color="#FFFF00FF"></env:arrow>
@@ -262,10 +233,7 @@ Example:
 </env:drawable3d>
 ```
 
-
 ![](Arrows.JPG)
-
-
 
 Working with Materials
 -----------------------------------
@@ -277,13 +245,11 @@ If you want to have more influence and want to use complex Materials with Normal
 
 If you just want to change the "basic" look of an surface, just add an Picture (can be JPG or PNG) as Texture. You cant make any additional Settings to the Material like offset or how it is rendered on the Object. This way is only recommended for very basic objects.
 
-
 ```java
 
 <env:box width="0.2" height="0.2" depth="0.2" color="#FFFFFFFF" texturepath="jadex3d/textures/solid/metalfloor.jpg"></env:box>
 
 ```
-
 
 ![](Box_with_texture_simple.JPG)
 
@@ -298,12 +264,9 @@ In the Code you just Link to the Material File you Created.
 <env:box width="0.2" height="0.2" depth="0.2"  materialpath="jadex3d/textures/solid/Iron.j3m"></env:box>
 ```
 
-
 In this small example we use a normal map to add some structure on the object without additional polygons.
 
-
-```
-
+```j3m
 Material Iron : Common/MatDefs/Light/Lighting.j3md {
      MaterialParameters {
         DiffuseMap : jadex3d/textures/solid/metalfloor.jpg
@@ -319,9 +282,7 @@ Material Iron : Common/MatDefs/Light/Lighting.j3md {
       FaceCull Back
     }
 }
-
 ```
-
 
 With this as Result (You can see the NormalMap Effect):
 
@@ -336,12 +297,6 @@ Defining the Material:
 
 Adding it to an Asset:
 ![](chicken_example.JPG)
-
-
-
-
-
-
 
 </div>
 
@@ -403,7 +358,7 @@ If you want to create more complex animation-logics you have to define an animat
 ```xml
 
 <env:drawable3d objecttype="chicken" width="1" height="1" depth="1">							
- <env:object3d width="0.6" height="0.6" depth="0.6" x="0" y="0" z="0" 
+ <env:object3d width="0.6" height="0.6" depth="0.6" x="0" y="0" z="0"
    modelpath="models/creatures/chicken/chicken.j3o"
    materialpath="models/creatures/chicken/chicken-Material.j3m"  >
 
@@ -431,7 +386,6 @@ If you want to create more complex animation-logics you have to define an animat
 </env:drawable3d>
 
 ```
-
 
 The Program sets the "status" Property. For example, if the chicken is moving, it sets the status on "Walk" and the Enviroment Triggers this status with the "Walk" animation because of the animationcondition.
 

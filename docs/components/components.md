@@ -3,17 +3,18 @@ ${SorryOutdatedv3}
 # Components
 
 With Jadex, the behaviour of a software is defined by the interaction between components, each of them providing a clearly defined functionality.
- 
+
 When you create a new component, you have to choose between different component types. For now, we will focus on *Micro Agents*, the most basic type of component. For other component types, please refer to [Component Types](../component-types/component-types.md).
 
 For a more complete guide into Active Components, take a look at the [AC User Guide](../guides/ac/01%20Introduction.md).
 
 # Implementation
+
 Micro Agents are defined by plain java classes. In order for a java class to represent a Micro Agent, two requirements have to be met:
 
  - The name of the class has to end with "Agent" (e.g. ```MyAgent```, ```ChatAgent```, ...)
  - The class has to be annotated with the ```@Agent``` Annotation
-  
+
 Optionally, it can provide a description using the ```@Description``` Annotation. The value is then shown inside the [JCC](../tools/02%20JCC%20Overview.md).
 
 This leads to the following code for a basic micro agent:
@@ -46,10 +47,11 @@ Using a *futurized* return type allows you to perform work asynchronously, which
 
 # Startup
 
-Starting of components is done by the Platform's ```ComponentManagementService``` (CMS). 
+Starting of components is done by the Platform's ```ComponentManagementService``` (CMS).
 Service instances in general can be retrieved using the static methods of the [SServiceProvider](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/search/SServiceProvider.html) class.
 
 ## Obtaining the CMS
+
 Remember the ```IExternalAccess platform``` object that you got when starting a platform? It is now required to retrieve the CMS:
 
 ```java
@@ -69,7 +71,8 @@ In Jadex, Java interfaces are used for the interaction with services, so the imp
 Once you get a reference to the CMS, you can use the ```createComponent()``` methods to start your components (See API documentation of [IComponentManagementService](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/types/cms/IComponentManagementService.html)).
 
 The preferred method to start a component has the following signature:
-```java 
+
+```java
 ITuple2Future<...> createComponent(String name, String model, CreationInfo info);
 ```
 
@@ -91,40 +94,47 @@ Now that you know how to start your own components, you can read more about [Ser
 ## Destroying the component
 
 To destroy a component, the CMS has to be used again. Call ```destroyComponent(cid)``` and pass the Component Identifier returned on component startup:
+
 ```java
 Map<String,Object> results = cms.destroyComponent(cid).get();
 ```
-If the component has any results, they are contained in the returned map. This is the same Map that is provided by the ```ITuple2Future``` received upon starting the component. 
+
+If the component has any results, they are contained in the returned map. This is the same Map that is provided by the ```ITuple2Future``` received upon starting the component.
 
 ## Component Arguments
 
 ### Declaring Arguments
+
 Components can declare arguments that can be passed during creation.
 To declare arguments, use the ```@Arguments``` Annotation:
+
 ```java
 @Arguments(@Argument(name="myName", description = "Name of this agent", clazz=String.class, defaultvalue = "\"Hugo\""))
 public class MyAgent ...
 ```
-Because the defaultvalue is parsed, Strings have to be quoted. You can also use other (Java) expressions that are executed to determine the default value. 
+
+Because the defaultvalue is parsed, Strings have to be quoted. You can also use other (Java) expressions that are executed to determine the default value.
 To access this argument from inside the agent, inject it into a field using the ```@AgentArgument``` annotation:
+
 ```java
 @AgentArgument
 protected String myName;
 ```
 
 <x-hint title="Agent Argument names">
-Note that the field and argument name must match. If you want your field to have another name, specify the argument name as parameter when using the annotation:
-```@AgentArgument("myName")```.
+Note that the field and argument name must match. If you want your field to have another name, specify the argument name as parameter when using the annotation: ```@AgentArgument("myName")```.
 </x-hint>
 Another way to access the arguments of an agent is by using the [IArgumentsResultsFeature](#component-features).
 
 ### Passing Arguments
+
 When you created a component as explained above, the last parameter of```createComponent``` was null.
 Instead, you can create your own [CreationInfo](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/micro/annotation/CreationInfo.html) object containing your component's arguments and pass it in *createComponent*:
+
 ```java
 CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"myName"}, new Object[]{"Harald"}))
 ```
-	
+
 <!--TODO: Component results doc-->
 <!--## Component Results-->
 <!--### Passing Results-->
@@ -134,6 +144,7 @@ CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"myName"}, n
 
 All component functionalities are available via *features*.
 By default, all components have a certain set of features, which can be injected into fields by using an annotation:
+
 ```java
 @AgentFeature
 IExecutionFeature exeFeat;
@@ -163,9 +174,11 @@ For features specific to a component-type, take a look at [component types](/../
 <!--You can even define new component features. Please refer to [TODO](TODO) to see how.-->
 
 # Component Lifecycle
-The Jadex Active Components Platform and the CMS implement a specific lifecycle for components. 
+
+The Jadex Active Components Platform and the CMS implement a specific lifecycle for components.
 For each step in the cycle there is an annotation which can be used on methods to perform actions during the lifecycle step.
 These annotations can be used on methods, like this:
+
 ```java
 @AgentCreated
 public IFuture<Void> agentCreated() {...
@@ -179,7 +192,7 @@ All annotations also allow for methods with parameters, see [Parameter Guesser](
 |-----------|------------|
 | **@AgentCreated** | A method marked with this annotation will be called upon creation of the agent. This means services, injected fields etc. are not initialized at this point. |
 |**@AgentBody** | A method marked with this annotation will be called after creation of the agent is complete. At this point, all fields and required services are available and can be used.|
-|**@AgentKilled** | A method marked with this annotation will be called just before the component is removed from the platform.|  
+|**@AgentKilled** | A method marked with this annotation will be called just before the component is removed from the platform.|
 
 <!-- TODO: keepalive=true, damit agent nach body nicht beendet wird. Agent wird beendet, wenn body ein future returned - nicht bei void. -->
 
@@ -188,8 +201,10 @@ All annotations also allow for methods with parameters, see [Parameter Guesser](
 This section discusses some of the more advanced topics regarding components.
 
 ## Composition
+
 Components can be in a hierarchy to express compositional relationship.
 To declare subcomponents, you may use the ```@ComponentTypes``` annotation and then create a ```@Configuration``` that includes an instance of the desired subcomponent like this:
+
 ```java
 @Configurations(@Configuration(name = "default", components =  {@Component(type = "MyChildAgent")}))
 @ComponentTypes(@ComponentType(name="MyChildAgent", clazz=ChildAgent.class))
@@ -200,6 +215,7 @@ Any services provided by subcomponents using the scope [ServiceScope.COMPONENT](
 Please refer to the [AC Tutorial](../tutorials/ac/06%20Composition.md) for a more complete example.
 
 ## More Annotations
+
 The most important annotations common to all components were already discussed.
 For a full reference, have a look at the [jadex.micro.annotation](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/micro/annotation/package-summary.html) package.
 
@@ -218,22 +234,24 @@ For a full reference, have a look at the [jadex.micro.annotation](https://downlo
 <!--## Composition-->
 <!--TODO: Component Composition!-->
 
-
 ## Parameter Guesser
-Each Jadex Active Component has a *Parameter Guesser* that is used for annotation-based injections, e.g. when using ```@ServiceComponent``` inside Services or ```@AgentFeature``` inside Components.  
+
+Each Jadex Active Component has a *Parameter Guesser* that is used for annotation-based injections, e.g. when using ```@ServiceComponent``` inside Services or ```@AgentFeature``` inside Components.
 When using one of these annotations on methods or fields, fields and method parameters declared with the following types are filled with values, if possible:
 
--  IInternalAccess
--  IExternalAccess
--  Subtypes of IComponentFeature (see [Component Features](#component-features))
--  Subtypes of ICapability (for bdiv3 components)
--  Type of your Component - to inject the Component POJO
+- IInternalAccess
+- IExternalAccess
+- Subtypes of IComponentFeature (see [Component Features](#component-features))
+- Subtypes of ICapability (for bdiv3 components)
+- Type of your Component - to inject the Component POJO
 
 <!-- TODO: for which annotations does the parameter guesser work? -->
 
 ## Scheduling steps
+
 The [concurrency model](../guides/ac/05%20Services.md#concurrency) of Jadex Active Components is based on single-threaded components.
 If you want to execute your code on a component's thread from outside, you can call [scheduleStep](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/IExternalAccess.html#scheduleStep-jadex.bridge.IComponentStep-) on the IExternalAccess of a component:
+
 ```java
 extAcc.scheduleStep(iAccess -> {
     // now you are on the component's thread
@@ -244,5 +262,3 @@ extAcc.scheduleStep(iAccess -> {
 <x-hint title="Component Steps and Instance Methods">
 If you schedule a step on a remote component, Jadex will send the step instance to the remote platform, where they are re-instantiated. While normal inner classes have access to their surrounding instance, component steps **do not**! Be sure to only call static methods from inside a component step.
 </x-hint>
-
-

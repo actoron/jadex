@@ -6,14 +6,14 @@ The term capability is used for different purposes in the agent community. In th
 
 <!--
 Text moved from bdiv3 tutorial:
- 
- A module has to provide an explicit boundary which allows for connecting it with an agent or with another module. 
- In contrast to BDI V2, in which it had to be explicitly declared which beliefs, goals and plans are exported and thus visible to the outside of a module, in BDI V3 these specifications have been pushed to the Java level. 
+
+ A module has to provide an explicit boundary which allows for connecting it with an agent or with another module.
+ In contrast to BDI V2, in which it had to be explicitly declared which beliefs, goals and plans are exported and thus visible to the outside of a module, in BDI V3 these specifications have been pushed to the Java level.
  This means that the visibility modifiers you use in Java determines also if beliefs, goals and plans are visible.
- 
- There is basically one additional feature that goes beyond these rules. 
- In order to allow the specification of abstract beliefs, which should be available in the module but are made concrete and are assigned at the level of the outer, i.e. including module, unimplemented beliefs can be specified. 
- Such unimplemented beliefs are represented as native getter/setter pairs without method body. 
+
+ There is basically one additional feature that goes beyond these rules.
+ In order to allow the specification of abstract beliefs, which should be available in the module but are made concrete and are assigned at the level of the outer, i.e. including module, unimplemented beliefs can be specified.
+ Such unimplemented beliefs are represented as native getter/setter pairs without method body.
  In the outer capability an explicit belief mapping has to be stated which describes the connection of a local and the abstract belief of the submodule. 
  -->
 
@@ -23,12 +23,9 @@ Text moved from bdiv3 tutorial:
 
 # Capability Definition
 
-
 A capability is basically the same as an agent, but without its own reasoning process. On the other hand, an agent can be seen as a collection (i.e. subcapability hierarchy) of capabilities plus a separate reasoning process shared by all its capabilities. Each agent has at least one capability (sometimes called root capability) which is given by the beliefs, goals, plans, etc. contained in the agent's XML file. To create additional capabilities for reuse in different agents, the developer has to write capability definition files. A capability definition file is similar to an agent definition file, but with the &lt;agent&gt; tag replaced by &lt;capability&gt;. The &lt;capability&gt; tag has the same substructure as the &lt;agent&gt; tag.
 
-
 Note that the &lt;capability&gt; tag has *name* and *package* attributes. As there are so many similarities between agent definition files and capability definition files, we commonly use the term ADF to denote both.
-
 
 ```xml
 <capability xmlns="http://jadex.sourceforge.net/jadex-bdi"
@@ -36,7 +33,7 @@ Note that the &lt;capability&gt; tag has *name* and *package* attributes. As the
        xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
                            http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
   name="MyCapability" package="mypackage">
-    
+
   <beliefs> ... </beliefs>
   <goals> ... </goals>
   <plans> ... </plans>
@@ -45,10 +42,10 @@ Note that the &lt;capability&gt; tag has *name* and *package* attributes. As the
 
 ```
 
-
 *Figure 2: Capability XML file header*
 
 # Using Capabilities
+
  
 Agents and capabilities may be composed of any number of subcapabilities which are referenced in a &lt;capabilities&gt; tag. To reference a capability, a local name and the location of the capability definition has to be supplied in the file attribute as absolute or relative file name or capability type name. Type names are resolved using the package and import declarations, and can therefore be unqualified or fully qualified. Capabilities from the jadex.bdi.planlib package, such as the DF capability, which have platform-specific implementations, must always be referenced using a fully qualified type name.   
  
@@ -58,16 +55,14 @@ Agents and capabilities may be composed of any number of subcapabilities which a
   <capabilities>
     <!-- Referencing a capability using a filename. -->
     <capability name="mysubcap" file="mypackage/MyCapability.capability.xml"/>
-        
+
     <!-- Referencing a capability using a fully qualified type name. -->
     <capability name="dfcap" file="jadex.planlib.DF"/>
     ...
   </capabilities>
   ...
 </agent>
-
 ```
- 
 
 # Elements of a Capability
 
@@ -77,10 +72,7 @@ The capability introduces a scoping of the BDI concepts. By default all beliefs,
 
 *Figure 2: The Jadex references XML schema elements (using beliefs as example)*
 
-
-
 # Making an Element Accessible for the Outer Capability
-
 
 For this purpose the element must declare itself as exported (using the exported="true" attribute) in the inner capability. In the outer capability, a reference (e.g., &lt;beliefref&gt;) has to be declared, which directly references the original element (using dot notation "capname.belname") within the concrete tag. An example for an exported belief is shown below.
    
@@ -92,7 +84,6 @@ For this purpose the element must declare itself as exported (using the exported
 
 ```
 
-
 ** Outer Capability B includes A under the name mysubcap **
 
 ```xml
@@ -100,9 +91,7 @@ For this purpose the element must declare itself as exported (using the exported
 <beliefref name="mysubbelief">
     <concrete ref="mysubcap.myexportedbelief"/>
 </beliefref>
-
 ```
-   
 
 # Defining an Abstract Element
 

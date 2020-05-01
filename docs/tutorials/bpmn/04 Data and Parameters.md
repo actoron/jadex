@@ -35,8 +35,6 @@ Create a process as shown in the figure. Use the class 'jadex.bpmn.runtime.task.
 
 ![04 Data and Parameters@3.png](04%20Data%20and%20Parameters/04%20Data%20and%20Parameters-3.png)
 
-
-
 Add a parameter 'address' of type string. Leave the other tasks empty for now (i.e. do not set a task class). Execute the process to see how the user interaction task works.
 
 ![04 Data and Parameters@userinteraction.png](04%20Data%20and%20Parameters/04%20Data%20and%20Parameters-userinteraction.png)
@@ -54,15 +52,15 @@ Run the process and observe if the data arrives at the tasks.
 Exercise C3 - Parameter Scopes
 -------------------------------------------
 
-In BPMN, an internal subprocess represents a task that is recursively composed of inner tasks (see [Exercise B5](03%20Basic%20Processes#exercise-b5-subprocesses.md) ). 
-The tasks in the subprocess are executed as if they were a separate process, but they have access to the context of the outer process.  
+In BPMN, an internal subprocess represents a task that is recursively composed of inner tasks (see [Exercise B5](03%20Basic%20Processes#exercise-b5-subprocesses.md) ).
+The tasks in the subprocess are executed as if they were a separate process, but they have access to the context of the outer process.
 Therefore subprocesses can be used to define custom scopes for parameters. This lesson shows how the example from the last lesson can be improved by using a subprocess as a parameter scope.
 
 ### Create a Subprocess
 
-Create a process similar to the one from C2, but place the shipment activities into a subprocess 'Handle Shipping'. Add a parameter called 'address' of type string to the subprocess.  
+Create a process similar to the one from C2, but place the shipment activities into a subprocess 'Handle Shipping'. Add a parameter called 'address' of type string to the subprocess.
 Edit the two last activities of the subprocess to print out some message that includes the 'address' value, e.g., '"Shipping to: "+address' and '"Arrived at: "+address'.
-In the first activity, which uses the interaction task remove the 'address' parameter. 
+In the first activity, which uses the interaction task remove the 'address' parameter.
 The interaction task will check if its current task has own parameters and if no ones are declared it will search further upwards for parameters.
 Here, the subprocess declares a parameter 'address' which it will show and automatically assign to the user value.
 

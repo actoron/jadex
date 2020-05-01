@@ -13,11 +13,9 @@ For a plan to complete, *all* subgoals of the plan need to be successful (*AND* 
 ![](example-goalplantree.svg)
 
 *Figure C.1: Example Goal Plan Tree (inspired by a [paper of Broekens et al.](https://link.springer.com/chapter/10.1007%2F978-3-642-16178-0_5))*
- 
- 
- 
+
 ## Exercise C0: Managing Known Charging Stations in a Belief Set
- 
+
 Before we start using subgoals, we need to prepare our agent.
 In the `loadBattery()` plan, the agent currently directly accesses the `actsense` object
 to get the location of a known charging station. When no charging station is known,
@@ -30,8 +28,7 @@ The two remaining plans should only move the cleaner in the inner area, where no
 Execute the program and watch what happens. When the battery drops below 20%, the following error should occur,
 because we try to fetch a charging station object from an empty set:
 
-
-```
+```txt
 WARNING: Plan 'loadBattery' threw exception: java.util.NoSuchElementException
 	at java.util.LinkedHashMap$LinkedHashIterator.nextNode(LinkedHashMap.java:721)
 	at java.util.LinkedHashMap$LinkedKeyIterator.next(LinkedHashMap.java:742)
@@ -102,9 +99,7 @@ disappearance of objects: E.g. when the the cleaner is in vision range of a loca
 but the waste object is no longer there, the sensor will remove the waste object from the set that has been provided
 by the `manageWastesIn()` method.
 
-Note that the beliefs are not immediately updated when an object changes that is not currently in vision range of the cleaner. 
-
-
+Note that the beliefs are not immediately updated when an object changes that is not currently in vision range of the cleaner.
 
 ## Exercise C1: A Subgoal for Knowing Charging Stations
 
@@ -160,14 +155,13 @@ We also have to alter our load battery plan to use this new goal:
 
 Execute the program and check what happens. Again, an error occurs, but a different one:
 
-```
+```txt
 WARNING: Plan 'loadBattery' threw exception: jadex.bdiv3.runtime.impl.GoalFailureException: No more candidates: quickstart.cleanerworld.single.CleanerBDIAgent$QueryChargingStation...
 ```
 
 Now the agent has the goal to find a charging station, but there are no plans for this goal.
 Therefore the agent prints the error message: *No more candidates*. We can now fix this error
 by just adding a plan for the goal. Before we do that, lets quickly discuss the new code in this exercise.
- 
 
 ### The `QueryChargingStation` Goal
 
@@ -181,9 +175,8 @@ as implemented in the method `isStationKnown()` depends on our new `stations` be
 whenever our sensor adds a charging station to this belief set. When the set is not empty, we remember the first station.
 Once we remembered a station, the method will return `true` and the goal will be completed.
 
-
 ### The `IPlan` Parameter and the `dispatchSubgoal()` Method
- 
+
 Note, that we have changed the signature of the `loadBattery()` method by adding the `IPlan plan` parameter.
 When present in a plan's method signature, the parameter gives access to the
 [plan API of Jadex](https://download.actoron.com/docs/nightlies/latest/javadoc/index.html?jadex/bdiv3/runtime/IPlan.html),
@@ -200,8 +193,7 @@ synchronously by blocking the plan until the subgoal completes by using the `get
 of the future.
 
 After the subgoal is done, we can just access the field from the goal object (`querygoal.station`)
-and continue with the remainder of the loading plan as before. 
-
+and continue with the remainder of the loading plan as before.
 
 ## Exercise C2: A Plan for Finding a Charging Station
 
@@ -209,13 +201,12 @@ Implement a plan that handles the `QueryChargingStation` goal. Add a method name
 with a corresponding `@Plan` annotation and write code to move around in search for a charging station.
 You should be able to devise such a plan yourself. *Hint: you could just reuse one of the patrol plans...*
 
-
 ### Agent Behavior After Adding the Plan
 
 After adding the plan, the agent should exhibit the following behavior:
 
 * The agent performs patrol rounds as long as there is enough battery.
-* When the battery is below the threshold in the maintain condition (i.e. the `isBatteryLoaded()` method), the agent will stop its patrol plan and 
+* When the battery is below the threshold in the maintain condition (i.e. the `isBatteryLoaded()` method), the agent will stop its patrol plan and
     * move to a charging station if known (as implemented in the `loadBattery()` plan method),
     * execute a plan to find a charging station if not known (in reaction to the subgoal posted in the `loadBattery()` plan method).
 
@@ -224,7 +215,7 @@ because the target condition of the `QueryChargingStation` goal will be immediat
 by letting the cleaner run for a while and observing the output. Note that the `moveAround()` plan
 only appears the first time that the agent runs the `loadBattery()` plan:
 
-```
+```txt
 Starting performPatrolPlan2()
 Starting performPatrolPlan3()
 Starting performPatrolPlan2()

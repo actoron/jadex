@@ -15,7 +15,7 @@ A possible way of structuring the cleaner behavior is shown in the following flo
 Here is a solution with a single loop and nested if-then-else statements for the different tasks and phases of the robot.
 Note that the solution has some problems, e.g., not immediately stopping a move action when finding a needed waste bin
 and a severe bug that the agent will try to pick up waste that no longer exists, when it was removed in the mean time.
- 
+
 ```java
 		// Agent uses one main loop for its behavior
 		while(true)
@@ -120,10 +120,9 @@ and a severe bug that the agent will try to pick up waste that no longer exists,
 	}
 ```
 
-
 ### Exercise A4: Questions about Means-end Reasoning Flags
 
-1. The recur delay only applies after all plans have been executed, the retry delay appears between the plans. 
+1. The recur delay only applies after all plans have been executed, the retry delay appears between the plans.
 2. With the or-success flag removed, only one plan is executed. Due to the random selection flag,
     one of the three plans is chosen randomly for each goal processing cycle.
 3. The retry delay has no meaning without the or-success, because only one plan is executed and no retry happens.

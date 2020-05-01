@@ -1,13 +1,13 @@
-#Chapter 2 - Installation
+# Chapter 2 - Installation
 
 In this chapter, you will learn how to start the Jadex BPMN editor. You will also find some instructions on setting up a proper eclipse working environment for executing Jadex BPMN processes.
 
 Prerequisites
 --------------------------
 
--   Download and install a recent Java environment from [http://www.oracle.com/technetwork/java/javase/downloads/index.html](http://www.oracle.com/technetwork/java/javase/downloads/index.html)  (if not already present).
--   Download and install a suitable eclipse distribution from [http://www.eclipse.org/downloads/](http://www.eclipse.org/downloads/)  (if not already present). 
--   Download the latest Jadex build .zip from [http://www.activecomponents.org/download/](http://www.activecomponents.org/download/)  and unpack it to a place of your choice (only necessary if you don't want to use maven).
+- Download and install a recent Java environment from [http://www.oracle.com/technetwork/java/javase/downloads/index.html](http://www.oracle.com/technetwork/java/javase/downloads/index.html)  (if not already present).
+- Download and install a suitable eclipse distribution from [http://www.eclipse.org/downloads/](http://www.eclipse.org/downloads/)  (if not already present). 
+- Download the latest Jadex build .zip from [http://www.activecomponents.org/download/](http://www.activecomponents.org/download/)  and unpack it to a place of your choice (only necessary if you don't want to use maven).
 
 Exercise A1 - Eclipse Project Setup
 ------------------------------------------------
@@ -26,20 +26,17 @@ Now we need to add the Jadex jars to the build path of our project. For this pur
 
 ![02 Installation@2.png](02%20Installation/02%20Installation-2.png)
 
-
 ### Alternative 2: Using Jadex via Maven
 
 Create a new maven project by right-clicking in the package explorer and selecting 'new' -&gt; 'other'. Choose 'Maven Project' and click 'next'. In the 'New Maven Project' dialog activate the checkbox 'create a simple project' and click 'next'. 
 
 ![02 Installation@3.png](02%20Installation/02%20Installation-3.png)
 
-
 Afterwards enter a group and artifact id, e.g. 'jadex' and 'bpmntutorial' and click 'Finish'.
 
 ![02 Installation@4.png](02%20Installation/02%20Installation-4.png)
 
 Now we have to add a dependency to Jadex in the 'pom.xml'. If you want to use the latest Jadex nighly builds, it is necessary to add the Jadex repository to the pom.xml. Releases can be directly obtained from the Maven central repository. Below, it is shown what has to be added to the pom.xml for using version ${jadexversion} of Jadex.
-
 
 ```xml
 
@@ -48,9 +45,9 @@ Now we have to add a dependency to Jadex in the 'pom.xml'. If you want to use th
     <groupId>org.activecomponents.jadex</groupId>
     <artifactId>jadex-distribution-standard</artifactId>
     <version>${jadexversion}</version>
-  </dependency> 
-</dependencies> 
-  
+  </dependency>
+</dependencies>
+
 <repositories>
   <repository>
     <id>jadex-nightlies</id>
@@ -59,7 +56,6 @@ Now we have to add a dependency to Jadex in the 'pom.xml'. If you want to use th
 </repositories>
 
 ```
-
 
 Please note, that you can also use other Jadex servers (www0, www1, www2, www3) or the generic www address. In the latter case a server is chosen randomly, which might not be helpful because the working builds may differ.
 
@@ -72,12 +68,9 @@ As we develop BPMN process via eclipse in this tutorial we will also add a new r
 
 ![02 Installation@5.png](02%20Installation/02%20Installation-5.png)
 
-
 After starting the run configuration, the BPMN editor gui should pop up. It should look similar to below.
 
 ![02 Installation@6.png](02%20Installation/02%20Installation-6.png)
-
-
 
 Exercise A3 - Running Example Processes
 ----------------------------------------------------
@@ -90,8 +83,6 @@ Enter the 'run configurations' dialog again and create a new configuration for a
 
 ![02 Installation@7.png](02%20Installation/02%20Installation-7.png)
 
-
-
 ### Selecting and Starting a Process
 
 If you managed to successfully start the Jadex platform, the Jadex control center (JCC) window will appear (see below). The JCC is a management and debugging interface for the Jadex platform and the components that run on it. 
@@ -100,13 +91,9 @@ To execute a process you need to add the corresponding resource path to the JCC 
 
 ![02 Installation@8.png](02%20Installation/02%20Installation-8.png)
 
-
-
 A file requester appears that should initially present the directory, where you unpacked the Jadex distribution. Open the *lib* directory and select the file *jadex-applications-bpmn-xyz.jar* (with xyz as placeholder for the current version). You can now unfold the contents of the jar file and browse to the helloworld example. After you selected the *HelloWorld.bpmn2* in the tree, you can start the process by clicking 'Start'.
 
 ![02 Installation@9.png](02%20Installation/02%20Installation-9.png)
-
-
 
 The process will be executed, thereby printing some messages to the (eclipse) console.
 
@@ -120,13 +107,9 @@ Jadex additionally provides a visual debugger for BPMN processes. We will show h
 
 ![02 Installation@10.png](02%20Installation/02%20Installation-10.png)
 
-
-
 Now we are ready to use the BPMN debugger. First we have to switch to the debugger view by activating the corresponding JCC plugin via the toolbar button. In the debugger view you can see the running components on the left and the debugging panel on the right. This panel depends on the concrete type of component, i.e. for BPMN the debugger panel looks different than for BDI or micro agent components. Double-click the helloword component in the left side of the window to activate debugging for that component. On the right hand side, the debugger panel consists of three different areas. On the top-left the breakpoint panel shows the available breakpoints in the process. On the top-right the bpmn diagram is shown and below the currently existing process threads including their state and variables are displayed.
 
 ![02 Installation@11.png](02%20Installation/02%20Installation-11.png)
-
-
 
 To execute a step of the process two options are available. First, you can directly double-click activated elements in the visual process diagram. Such activated elements are displayed in green (in the figure above the start event is the only activated element). As an alternative you can press the 'Step' button at the bottom, which will execute a step of one process thread. If you want to determine which process thread is selected you have to select it in the 'processes table' above.    
 

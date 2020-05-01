@@ -3,13 +3,11 @@
 This exercise introduces beliefs that let an agent automatically perceive and react to changes.
 It also shows how to use goal conditions for controlling goal processing behavior based on belief values and belief changes.
 
-
-
 ## Exercise B1: Using a Belief to Control a Declarative Goal
 
 Up to now, our cleaner only *acted* in the environment, but did not *perceive* anything.
 In this exercise we extend the cleaner to monitor its charge state. The charge state is updated by the environment
-as a result of the cleaner moving around. Capturing this in a belief, causes the Jadex framework to monitor the value 
+as a result of the cleaner moving around. Capturing this in a belief, causes the Jadex framework to monitor the value
 and let the cleaner know, if anything important changes. Add the following code to the agent data fields section.
 (Remember to make a backup of your last solution as `CleanerBDIAgentA4.java` before making any changes).
 
@@ -71,7 +69,6 @@ Try to answer these questions to yourself before starting the program and readin
 Have your executed the agent and observed its behavior? Watch the console output and try to understand what went *wrong*,
 but also what already went *right*. In the following subsections, we will discuss the code somewhat backwards, starting with the plan.
 
-
 ### The `loadBattery()` Plan
 
 This plan is quite straight-forward. The plan handles the new `MaintainBatteryLoaded` goal as stated in the trigger.
@@ -85,17 +82,16 @@ For now, keep that in mind. We will come back to that.
 
 So what went wrong in our current cleaner implementation? When you run the program, you will eventually see an error like the following:
 
-```
+```txt
 Starting loadBattery() plan
 WARNUNG: Plan 'loadBattery' threw exception: java.lang.IllegalStateException: Cannot move to multiple targets simultaneously. Target exists: Location(x=0.7, y=0.7)
 ```
 
-Focus on the bright side: our new plan actually got executed! The cleaner moved around for some time and when the charge state 
+Focus on the bright side: our new plan actually got executed! The cleaner moved around for some time and when the charge state
 droppen below 20%, the cleaner tried to start the battery loading plan. The only problem was, that it was still performing a
 patrol round thus trying to move to two directions at once. This caused the above error. In the next exercise we will fix that.
 
 But first, we want to understand how the cleaner decided, when to start reloading.
-
 
 ### The `@GoalMaintainCondition` and Declarative Goals
 
@@ -115,13 +111,12 @@ E.g. when the condition is `true`, no plan needs to be executed, whereas a proce
 Also, when the condition is `false` and stays `false` even after plan execution, the agent will look for other plans to pursue the goal,
 whereas a procedural goal is always considered to have succeeded after plans (i.e. procedures) are completed.
 
-
 ### The `@Belief` Annotation
 
 So why did we need the `@Belief` annotation? Lets find out: remove just the annotation (i.e. keep the `self` field) and restart the program.
 Uh, oh. Not good. Scrolling down the output finally reveals the following source of error:
 
-```
+```txt
 Found condition without triggering events (will never trigger): maintain_boolean jadex.quickstart.cleanerworld.single.CleanerBDIAgentB1$MaintainBatteryLoaded.isBatteryLoaded()
 ```
 
@@ -142,8 +137,6 @@ If you are interested in more details, e.g. for augmenting your own belief objec
 you can have a look at a simple example from the official
 [Javadoc](https://docs.oracle.com/javase/8/docs/api/index.html?java/beans/PropertyChangeSupport.html).
 
-
-
 ## Exercise B2: Using Deliberation Settings for Managing Conflicting Goals
 
 Lets tackle the remaining problem. Currently the cleaner tries to load its battery but doesn't stop
@@ -158,7 +151,6 @@ annotation of the `MaintainBatteryLoaded` class to the following code:
 	@Goal(recur=true, recurdelay=3000,
 		deliberation=@Deliberation(inhibits=PerformPatrol.class))	// Pause patrol goal while loading battery
 ```
-
 
 ### The `@Deliberation` Annotation and the `inhibits` Setting
 
@@ -184,8 +176,6 @@ anymore:
 
 Execute the program and test the behavior. What do you observe?
 
-
-
 ## Exercise B3: Separate Maintain and Target Conditions
 
 Another improvement but still not quite there. Now the charging plan works in the sense that
@@ -197,7 +187,7 @@ would be a waste of time, right?
 
 Well, in general: yes. But in this case we want the cleaner to load the battery some more before
 resuming the patrol round. We can specify this by adding an explicit *target* condition as another
-method of the `MaintainBatteryLoaded` class:  
+method of the `MaintainBatteryLoaded` class:
 
 ```java
 		@GoalTargetCondition	// Only stop charging, when this condition is true

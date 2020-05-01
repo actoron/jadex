@@ -1,6 +1,6 @@
 # Security Settings
 
-![05 Security Settings @sec.png](sec.png)  
+![05 Security Settings @sec.png](sec.png)
 *Security settings panel*
 
 Platform security in Jadex is based on platform passwords and networks. Please refer to the [security chapter](../guides/ac/08%20Security.md)  in the user guide to read about these concepts. The security settings panel consists of four different areas that are explained in the following sections.
@@ -44,5 +44,3 @@ To be able to test if it works, reset the password settings by deleting the *<pl
 ![05 Security Settings @network\_rem.png](network_rem.png)
 
 In the text fields at the bottom, enter a network name of your choice and click 'Add'. Add the same network name in the second platform. Instead of having separate passwords for each platform, the security network settings allow establishing a group of platforms that allow access to each other. While not strictly necessary, you can also add a password for the network. You can also add multiple networks for platforms that should be present in more than one group. As long as two platforms share a at least one network name with the same password (or no password for both), they will allow restricted communication.
-
-

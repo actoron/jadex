@@ -15,39 +15,33 @@ to use functionalties of the local or some remote CMS. Basically the CMS is resp
 managing the component lifecycle and for interacting with the platform. Concretely this means the CMS
 capability can be used for:
 
-
--   [Creating Components](#creating-components)
--   [Destroying Components](#destroying-components)
--   [Suspending Components](#suspending-components)
--   [Resuming Components](#resuming-components)
--   [Searching Components](#searching-for-components)
--   [Shutting Down the Platform](#shutting-down-the-platform)
+- [Creating Components](#creating-components)
+- [Destroying Components](#destroying-components)
+- [Suspending Components](#suspending-components)
+- [Resuming Components](#resuming-components)
+- [Searching Components](#searching-for-components)
+- [Shutting Down the Platform](#shutting-down-the-platform)
       
 
 ### Creating Components
 
-
 The goal *cms_create_component* creates a new component via the CMS on the platform.
 This goal has the following parameters:
 
-
-
 | Name                      | Type                 | Description                                                                                                                                                                                                                                      |
 |---------------------------|----------------------|---------------------------------------------------------------------------------------|
-| type                      | String               | The component type (name/path of component model).                                    |
+| type                      | String               | The component type (name/path of component model).                                   |
 | name*                     | String               | The name of the instance to create. If no name is specified, a name will be generated |
-| configuration*            | String               | The initial component configuration to use. If no configuration is specified, the default configuration will be used.                                                                                                                        |
-| arguments*                | Map                  | The arguments as name-value pairs for the new component. Depending on the platform, Java objects (for Jadex Standalone or local JADE requests) or string expressions (for remote JADE requests) have to be supplied for the argument values.     |
+| configuration*            | String               | The initial component configuration to use. If no configuration is specified, the default configuration will be used.                                                                                                                       |
+| arguments*                | Map                  | The arguments as name-value pairs for the new component. Depending on the platform, Java objects (for Jadex Standalone or local JADE requests) or string expressions (for remote JADE requests) have to be supplied for the argument values.    |
 | cms*                      | IComponentIdentifier | The component identifier of the CMS (only required for remote requests)               |
-| start*                    | boolean              | True, when the component should be directly started after creation (default). Note that some platforms will not support decoupling of component creation and starting (e.g. for remote requests in JADE).                               |
-| componentidentifier `[out]` | IComponentIdentifier | Output parameter containing the component identifier of the created component.        |
+| start*                    | boolean              | True, when the component should be directly started after creation (default). Note that some platforms will not support decoupling of component creation and starting (e.g. for remote requests in JADE).                              |
+| componentidentifier `[out]` | IComponentIdentifier | Output parameter containing the component identifier of the created component.       |
 
 *Parameters for cms_create_component goal ( ** denotes optional parameters)
 
-
 To use the "cms_create_component"-goal, you must first of all include the CMS-capability in your ADF (if not
 yet done in order to use other goals of the CMS-capability) and set a reference to the goal as described below. The name of the goal reference can be arbitrarily chosen, but it will be assumed here for convenience that the same as the original name will be used.
-
 
 ```xml
 ...
@@ -64,13 +58,10 @@ yet done in order to use other goals of the CMS-capability) and set a reference 
 </goals>
 ...
 ```
+
 *Including the CMS capability and the cms_create_component-goal*
 
-
-
 Now you can use this goal to create a component in your plan:
-
-
 
 ```java
 public void body()
@@ -84,16 +75,12 @@ public void body()
   ...
 }
 ```
-*Creating a component on the local platform*
 
+*Creating a component on the local platform*
 
 In the above listing - in order to create a component - you instantiate a new goal using the *createGoal()*-method with the paramter "cms_create_component". Then you set its parameters to the desired values, dispatch the subgoal and wait. After the goal has succeeded, you can fetch the *IComponentIdentifier* of the created component by calling the *getValue()*-method on the parameter "componentidentifier".
 
-
-
 The same goal is used for remote creation of a component:
-
-
 
 ```java
 public void body()
@@ -112,9 +99,8 @@ public void body()
   ...
 }
 ```
+
 *Creating a component on a remote platform*
-
-
 
 In the above listing you can see how to create a component on a remote platform
 using its remote CMS. In order to do so, it's of course crucial that you know at least one address of the remote CMS.
@@ -122,11 +108,8 @@ Moreover, the corresponding transport must be available on the local platform. T
 platform can be recognized by the prefix of the address (ending with the ```:```). In this case the prefix
 is ```nio-mtp://```  , which represents the transport ```jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport```.
 
-
-
 If you know the address of the remote CMS and you're sure that the local platform supports its transport, you must
 create an *IComponentIdentifier* using the local component management service and set its name and address to that of the CMS that should create the new component.
-
 
 Thereafter you can instantiate a new goal using the *createGoal()*-method with the
 paramter "cms_create_component". Then you set its parameters to the desired values, dispatch the subgoal
@@ -140,17 +123,12 @@ components, both on a local as well as on remote platforms.
 
 The goal has the following parameters:
 
-
 | Name                | Type                 | Description                                                             |
 |---------------------|----------------------|-------------------------------------------------------------------------|
-| componentidentifier | IComponentIdentifier | Identifier of the component to be destroyed.                            |
+| componentidentifier | IComponentIdentifier | Identifier of the component to be destroyed.                           |
 | cms*                 | IComponentIdentifier | The component identifier of the CMS (only required for remote requests) |
 
 *Parameters for cms_destroy_component ( ** denotes optional parameters)
-
-
-
-
 
 To use the *cms_destroy_component*-goal, you must first of all include the CMS-capability in your ADF (if
 not yet done in order to use other goals of the CMS-capability) and set a reference to the goal as described below:
@@ -170,12 +148,10 @@ not yet done in order to use other goals of the CMS-capability) and set a refere
 </goals>
 ...
 ```
+
 *Including the CMS capability and the cms_destroy_component-goal*
 
-
 Thus you can destroy a component in your plan:
-
-
 
 ```java
 public void body()
@@ -187,6 +163,7 @@ public void body()
   ...
 }
 ```
+
 *Destroying a component on a local/remote platform*
 
 In the listing above - in order to destroy a component - you instantiate a
@@ -208,18 +185,14 @@ The "cms_suspend_component"-goal has the following parameters:
 
 | Name                       | Type                     | Description                                                                                             |
 |----------------------------|--------------------------|---------------------------------------------------------------------------------------------------------|
-| componentidentifier        | IComponentIdentifier     | Identifier of the component to be suspended.                                                            |
+| componentidentifier        | IComponentIdentifier     | Identifier of the component to be suspended.                                                           |
 | cms *                        | IComponentIdentifier     | The component identifier of the CMS (only required for remote requests)                                 |
 | componentdescription `[out]` | ICMSComponentDescription | This output parameter contains the possibly changed CMSComponentDescription of the suspended component. |
 
-
 *Parameters for cms_suspend_component* ( ** denotes optional parameters)
-
 
 To use the "cms_suspend_component"-goal, you must first of all include the CMS-capability in your ADF (if
 not yet done in order to use other goals of the CMS-capability) and set a reference to the goal as described below:
-
-
 
 ```xml
 ...
@@ -236,12 +209,10 @@ not yet done in order to use other goals of the CMS-capability) and set a refere
 </goals>
 ...
 ```
+
 *Including the CMS capability and the cms_suspend_component-goal*
 
-
 Thus you can suspend a component in your plan:
-
-
 
 ```java
 public void body()
@@ -255,11 +226,8 @@ public void body()
   ...
 }
 ```
+
 *Suspending a component on a local/remote platform**
-
-
-
-
 
 In the listing above - in order to suspend a component - you instantiate a
 new goal using the *createGoal()*-method with the paramter
@@ -267,26 +235,22 @@ new goal using the *createGoal()*-method with the paramter
 subgoal and wait for success. As result the goal returns a possibly modified CMS component description of
 the suspended component. The same goal is used to suspend a remote component. In this case you only
 have to additionally supply the remote CMS component identifier.
-   
-  
+
 ### Resuming Components
-   
+
 If you want to resume a suspended component you can use the goal "cms_resume_component". It offers the following parameters:
 
 | Name                       | Type                     | Description                                                                                           |
 |----------------------------|--------------------------|-------------------------------------------------------------------------------------------------------|
-| componentidentifier        | IComponentIdentifier     | Identifier of the component to be resumed.                                                            |
+| componentidentifier        | IComponentIdentifier     | Identifier of the component to be resumed.                                                           |
 | cms*                       | IComponentIdentifier     | The component identifier of the CMS (only required for remote requests)                               |
 | componentdescription `[out]` | ICMSComponentDescription | This output parameter contains the possibly changed CMSComponentDescription of the resumed component. |
 
 *Parameters for cms_resume_component* ( ** denotes optional parameters)
 
-
   
 To use the "cms_resume_component"-goal, you must first of all include the CMS-capability in your ADF (if
 not yet done in order to use other goals of the CMS-capability) and set a reference to the goal as described below:
-
-
 
 ```xml
 ...
@@ -303,6 +267,7 @@ not yet done in order to use other goals of the CMS-capability) and set a refere
 </goals>
 ...
 ```
+
 *Including the CMS capability and the cms_resume_component-goal*
    
 
@@ -320,9 +285,8 @@ public void body()
   ...
 }
 ```
+
 *Resuming a component on a local/remote platform**
-
-
 
 In the above listing - in order to resume a component - you instantiate a
 new goal using the *createGoal()*-method with the paramter
@@ -338,27 +302,19 @@ The goal "cms_search_components" allows you to search for components, both on
 the local platform and on remote platforms, thereby determining if the component
 is available at all and learning about its state (e.g. active or suspended).
 
-
-
 The goal has the following parameters:
-
-
 
 | Name              | Type                     | Description                                                                                     |
 |-------------------|--------------------------|-------------------------------------------------------------------------------------------------|
-| description       | ICMSComponentDescription | The template description to search for matching components.                                     |
+| description       | ICMSComponentDescription | The template description to search for matching components.                                    |
 | cms**             | IComponentIdentifier     | The component identifier of the CMS (only required for remote requests)                         |
 | constraints**     | ISearchConstraints       | Representation of a set of constraints to limit the search process. As a default, only one matching result is returned. You can set the max-results setting of the search constraints to -1 for unlimited number of search results. See [FIPA Agent Management Specification](http://www.fipa.org/specs/fipa00023/XC00023H.html#_Toc526742642). |
-| result `[set][out]` | ICMSComponentDescription | This output parameter set contains the component descriptions that have been found.             |
+| result `[set][out]` | ICMSComponentDescription | This output parameter set contains the component descriptions that have been found.            |
 
 *Parameters for cms_search_components* ( ** denotes optional parameters)
 
-
-
 To use the "cms_search_components"-goal, you must first of all include the CMS-capability in your ADF (if
 not yet done in order to use other goals of the CMS-capability) and set a reference to the goal as described below.
-
-
 
 ```xml
 ...
@@ -375,12 +331,10 @@ not yet done in order to use other goals of the CMS-capability) and set a refere
 </goals>
 ...
 ```
+
 *Including the CMS capability and the cms_search_components-goal*
 
-
 To search for components in your plan use the goal in the following manner:
-
-
 
 ```java
 public void body()
@@ -395,9 +349,8 @@ public void body()
   ...
 }
 ```
+
 *Searching a component on a local/remote platform*
-
-
 
 In the listing above - in order to search for a component - you instantiate a
 new goal using the *createGoal()*-method with the paramter
@@ -411,7 +364,6 @@ with component identifier of null allows to perform an unconstrained search, i.e
 returning all components on the platform.
 In case of a remote request you have to set the component identifier
 of the remote CMS well.
-
 
 The same goal is used to search for remote components:
 
@@ -430,8 +382,8 @@ public void body()
   ...
 }
 ```
-*Searching for a component on a remote platform*
 
+*Searching for a component on a remote platform*
 
 In the above listing a component with the name "my_component" is sought-after.
 Assuming that the remote CMS was created as per description in section [Creating Components](#creating-components), you have to

@@ -4,9 +4,9 @@
 
 The test center can be used to execute component unit tests within test suites. Therefore, the tool is very similar to the well known visual [JUnit](http://www.junit.org/)  test environment. The test center mainly consists of three areas (cf. screenshot above). A model tree on the left, a test suite view on the upper right and a test suite report on the lower right. The general scheme the tool is used consists of the following steps:
 
-1.  Select the folders in which your tests reside.
-2.  Select the test cases and add them to the current test suite.
-3.  Execute the test suite and inspect the test report.
+1. Select the folders in which your tests reside.
+2. Select the test cases and add them to the current test suite.
+3. Execute the test suite and inspect the test report.
 
 To include the source folders of the test cases the add folder action ![11 Test Center@add\_folder424.png](add_folder424.png) on the model tree can be used (either via the tool bar or via the popup menu). Given that you have included the folders you can now navigate to the folder or file you want to include as test case(s) by selecting the element and afterwards choosing the add testcases action ![](new_add_package_testable.png). If the component is a testcase (determined by the fact that it declares a specific return value of type *jadex.base.test.Testcase*), it will appear within the Test Suite Settings panel on the right. Please note that each test case can be included in the test suite only once, because this is a sensible default behavior often desired. If an application case demands including a test case more than once, this can be done by first activating the 'Allow including the same test more than once' checkbox and then adding the component as often as needed. The current test suite can be stored on disk by using the Save button in the 'Testsuite Handling' area. It will allow you to choose a filename and save the current settings. Such a stored test suite can be fetched from disk by using the corresponding Load buttun.
 

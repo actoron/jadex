@@ -1,13 +1,15 @@
 # Standalone Platform with EnvSupport
 
 ## Exercise 1 - Starting Components from Java
-In many cases, you may want to configure components via Java directly instead of via an .application.xml, for example if their initial values are manually read from an XML file. In this case, the platform needs to be started on its own, the parametrisation should take place and only after this parametrisation the agents should start their real behaviour. 
-In order to create agents like this, one first needs to start the platform from Java. This can be done calling the Starter from Java with the parameters that may be used from command line as well. 
+
+In many cases, you may want to configure components via Java directly instead of via an .application.xml, for example if their initial values are manually read from an XML file. In this case, the platform needs to be started on its own, the parametrisation should take place and only after this parametrisation the agents should start their real behaviour.
+In order to create agents like this, one first needs to start the platform from Java. This can be done calling the Starter from Java with the parameters that may be used from command line as well.
 Afterwards, the ComponentManagementService, which is capable of creating agents, needs to be retrieved.
 
 ### Platform Startup
+
 Create a class *Startup* containing the following code in it's ```public static void main()``` method:
-		
+
 ```java
 PlatformConfiguration config = PlatformConfiguration.getDefault();
 config.setGui(false);
@@ -20,6 +22,7 @@ IComponentManagementService cms = SServiceProvider.searchService(platform, new S
 ```
 
 ### Creating Agent and Service
+
 With the ComponentManagementService, the agents can now be created. As you are trying to create them with Java, you usually want to set values to them. This is done by an Service, which is defined in a separate Service Definition as pure Java Interface (see [Provided Services](../../services/services.md#providing-services)):
 
 ```java
@@ -41,12 +44,14 @@ public class ExampleAgent implements IInitialisationService {
 ```
 
 Don't forget to implement the Service interface and add a field to inject the agent access:
+
 ```java
     @Agent
     private IInternalAccess agent;
 ```
 
 ### Agent Startup and Configuration
+
 If this preconditions are met, the agent can be created and parameterized in Java. This is done via a call of the service at the newly created agent and would look like this (inside the Startup.main() method):
 
 ```java	
@@ -63,11 +68,13 @@ serviceSQ.setMyColor(Math.abs(random.nextInt() % 254));
 Afterwards, the agent behaviour needs to be started. As the service call can only be executed with an agent who has finished his ```@AgentBody```, the start of the agent behaviour can not be done by in the body. Instead, the ```IInitialisationService``` has the ```start()```-method which should now trigger the normal agent behaviour.
 
 ## Exercise 2 - Creating Space and Space Objects from Java
+
 In order to get both a spatial representation of the agents and a graphical interface at once with minimal effort, the Jadex Environment Space was created. A detailed description can be found in [Chapter 1](01%20Introduction.md).
 
 In order to use the space with standalone started components, the space needs to be created manually. For describing the space, a separate .application.xml should be created. It should define at least the objects in space and the mapping between the agents and their avatars in the space.
 
 ### The Application XML ###
+
 In this Example, the application XML is named *jadex/example/Example.application.xml* and contains the following code:
 
 ```xml
@@ -149,6 +156,7 @@ In this Example, the application XML is named *jadex/example/Example.application
 ```
 
 ### Creating the space ###
+
 This Application XML can be loaded by starting it with the previously acquired ComponentManagementService:
 
 ```java

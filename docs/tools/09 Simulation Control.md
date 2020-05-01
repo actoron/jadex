@@ -15,10 +15,10 @@ The clock settings area shows details of the clock currently used by the platfor
 
 **Execution mode:** The execution mode is determined by the clock type that is used. Please note that the clock time can be changed at runtime. For this purpose, first execution has to be paused by pressing the corresponding button from the execution control panel. Currently, the following clock types are available:
 
--   *System clock:* directly corresponds to the computer clock and delivers a time value that corresponds directly to Java *System.currentTimeMillis()*.
--   *Continuous clock*: similar to the system clock, but allows for pausing the clock and also using a dilation that makes the clock run faster of slower than the system clock.
--   *Event-driven clock: *The event-driven clock uses timing events to advance the clock value, i.e. components that register timing events determine how fast the model time advances. Using event-driven clock as-fast-as-possible simulations are possible, i.e. the whole computation time is used and no unnessary waiting times exist any longer.
--   *Time-driven clock: *The time-driven clock advances the model time by adding a constant (and definable) tick size. In this way the simulation time is advanced regularly which may lead to unnecessary time events, i.e. time points at which no component has something to do. On the other hand this simulation type leads to more realistic observable behavior as no irregular time jumps are produced.
+- *System clock:* directly corresponds to the computer clock and delivers a time value that corresponds directly to Java *System.currentTimeMillis()*.
+- *Continuous clock*: similar to the system clock, but allows for pausing the clock and also using a dilation that makes the clock run faster of slower than the system clock.
+- *Event-driven clock: *The event-driven clock uses timing events to advance the clock value, i.e. components that register timing events determine how fast the model time advances. Using event-driven clock as-fast-as-possible simulations are possible, i.e. the whole computation time is used and no unnessary waiting times exist any longer.
+- *Time-driven clock: *The time-driven clock advances the model time by adding a constant (and definable) tick size. In this way the simulation time is advanced regularly which may lead to unnecessary time events, i.e. time points at which no component has something to do. On the other hand this simulation type leads to more realistic observable behavior as no irregular time jumps are produced.
 
 **Start time:** The init time of the clock.
 
@@ -39,10 +39,10 @@ Execution Control
 
 The execution control field can be directly used to stop, resume, and step the currently used clock. The following buttons can be used:
 
--   ![09 Simulation Control@start.png](start.png): The start button allows for initially starting or resuming a previously paused clock.
--   ![09 Simulation Control@single\_step\_event.png](single_step_event.png): The step event button can be used with simulation clocks only. A paused clock can be forced to advance the clock to the next registered time point by pressing the button. As multiple events may have been registered for the same time point this action may not always cause the model time to advance,
--   ![09 Simulation Control@single\_step\_time.png](single_step_time.png): The step time button is also valid only for simulation clocks. It advances the clock to the next timepoint, i.e. it will activate all timing entries until one timing entry belongs to a time after those of the current clock reading.
--   ![09 Simulation Control@pause.png](pause.png): This button allows for pausing the active clock (the system clock cannot really be paused, but will stop triggering timing events). Having paused the clock applications that rely on timing will not execute further.
+- ![09 Simulation Control@start.png](start.png): The start button allows for initially starting or resuming a previously paused clock.
+- ![09 Simulation Control@single\_step\_event.png](single_step_event.png): The step event button can be used with simulation clocks only. A paused clock can be forced to advance the clock to the next registered time point by pressing the button. As multiple events may have been registered for the same time point this action may not always cause the model time to advance,
+- ![09 Simulation Control@single\_step\_time.png](single_step_time.png): The step time button is also valid only for simulation clocks. It advances the clock to the next timepoint, i.e. it will activate all timing entries until one timing entry belongs to a time after those of the current clock reading.
+- ![09 Simulation Control@pause.png](pause.png): This button allows for pausing the active clock (the system clock cannot really be paused, but will stop triggering timing events). Having paused the clock applications that rely on timing will not execute further.
 
 Active Timers
 --------------------------

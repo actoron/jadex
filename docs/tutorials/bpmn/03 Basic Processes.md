@@ -3,14 +3,14 @@ Chapter 3 - Basic Processes
 
 In this chapter you will learn how to model your own processes. This chapter covers basic issues such as activities and control flow. It is assumed that you have some initial understanding of BPMN and its graphical elements. If you think that you need more background information on BPMN, please refer to documentation available elsewhere. Below is a short list of suggestions, but you will easily find other sources of information on the Web.
 
--   [Official BPMN homepage (www.bpmn.org)](http://www.bpmn.org/)
-    -   [Introduction to BPMN (article, PDF)](http://www.bpmn.org/Documents/Introduction_to_BPMN.pdf)
-    -   [BPMN Tutorial (slides, PDF)](http://www.bpmn.org/Documents/OMG_BPMN_Tutorial.pdf)
-    -   [BPMN Specification (download site)](http://www.omg.org/spec/BPMN/1.2/)
--   [BPMN Corner at Uni Potsdam](http://bpt.hpi.uni-potsdam.de/Public/BPMNCorner)
-    -   [BPMN 2.0 Poster (pdf)](http://www.bpmb.de/images/BPMN2_0_Poster_DE.pdf)
-    -   [BPMN 1.2 Poster (pdf)](http://bpt.hpi.uni-potsdam.de/pub/Public/BPMNCorner/BPMN1_1_Poster_EN.pdf)
--   [Wikipedia entry for BPMN](http://en.wikipedia.org/wiki/BPMN)
+- [Official BPMN homepage (www.bpmn.org)](http://www.bpmn.org/)
+    - [Introduction to BPMN (article, PDF)](http://www.bpmn.org/Documents/Introduction_to_BPMN.pdf)
+    - [BPMN Tutorial (slides, PDF)](http://www.bpmn.org/Documents/OMG_BPMN_Tutorial.pdf)
+    - [BPMN Specification (download site)](http://www.omg.org/spec/BPMN/1.2/)
+- [BPMN Corner at Uni Potsdam](http://bpt.hpi.uni-potsdam.de/Public/BPMNCorner)
+    - [BPMN 2.0 Poster (pdf)](http://www.bpmb.de/images/BPMN2_0_Poster_DE.pdf)
+    - [BPMN 1.2 Poster (pdf)](http://bpt.hpi.uni-potsdam.de/pub/Public/BPMNCorner/BPMN1_1_Poster_EN.pdf)
+- [Wikipedia entry for BPMN](http://en.wikipedia.org/wiki/BPMN)
 
 Exercise B1 - Creating a First Process
 ---------------------------------------------------
@@ -22,7 +22,7 @@ In this lesson, you will create and execute a first process. First, start the Ja
 The just created process can already be executed without further editing. As you have created the BPMN process using the Jadex editor, first you will have to refresh the 'bpmntutorial' project using 'refresh' from the popup menu or by selecting the project and pressing 'F5'. Now, start the Jadex platform using your existing launch configuration (see [Exercise A3](02%20Installation.md#exercise-a3-running-example-processes) ). The JCC window will appear, probably showing the example project that you created in Lesson A3. Right-click in the model explorer and choose 'Add Path'. Browse to your eclipse workspace an select the 'bin' or 'classes' folder from the eclipse project that you created in the beginning of this lesson. When you unfold the contents, you should find the package(s) that you created and the process contained within.
 
 ![03 Basic Processes@1.png](03%20Basic%20Processes/03%20Basic%20Processes-1.png)
- 
+
 Select your process in the tree and click the 'Start' button. You might think that nothing happens, but actually the process is instantiated and executed. The reason that you cannot observe anything is that the process does not contain activities and therefore immediately terminates without producing any output. In the next sections, you will change this and actually see some process output. Before going back to the diagram editor, you should save the JCC project ('Save Settings' in 'File' menu).
 
 ### Process Properties
@@ -31,16 +31,16 @@ The lower area in the BPMN editor allows you to see and edit the details of the 
 
 You can see that a process has the following properties:
 
--   **Name:** The process name - should be the same as the filename.
--   **Description:** A text with documentation about the process.
--   **Package:** The package in which the process is contained (like the package of a Java class file).
--   **Imports:** Import classes and packages that you want to use inside the process.
--   **Configurations:** A configuration allows for starting a process with a specific set of settings.
--   **Start Elements:** For each configuration the elements that should be started can be selected (e.g. if a pool should be active).
--   **Parameters:** Parameters can be used to hold global data. Additionally, parameters can be made to arguments and results as well.
--   **Provided Services:** Services that are offered by the process.
--   **Required Services:** Services that are needed by the process.
--   **Subcomponents:** The subcomponent model definitions.
+- **Name:** The process name - should be the same as the filename.
+- **Description:** A text with documentation about the process.
+- **Package:** The package in which the process is contained (like the package of a Java class file).
+- **Imports:** Import classes and packages that you want to use inside the process.
+- **Configurations:** A configuration allows for starting a process with a specific set of settings.
+- **Start Elements:** For each configuration the elements that should be started can be selected (e.g. if a pool should be active).
+- **Parameters:** Parameters can be used to hold global data. Additionally, parameters can be made to arguments and results as well.
+- **Provided Services:** Services that are offered by the process.
+- **Required Services:** Services that are needed by the process.
+- **Subcomponents:** The subcomponent model definitions.
 
 The description can contain arbitrary text and HTML tags. The description is, e.g., displayed in the JCC, when selecting the process. Enter a description for your process, restart the Jadex platform (or just reload the process) and see how the description is displayed. Please note, that you alays have to refresh the eclipse project, otherwise the changes will not be recognized.
 
@@ -50,35 +50,31 @@ You can also enter a package for your process. The package should always corresp
 
 Finally, you probably want to see that the process is really executed, when you click the start button. This can be achieved by changing the task in the process to print some text to the console. Open the diagram in the BPMN editor (if not already open) and add a 'Task' element. Selecting the task will show its properties in three tabs (Task, Properties, Parameters) in the lower area:
 
--   **Task:** In the task view you can enter the Java class that should be executed when the task is invoked. Below the classname usage information of the task is presented including a description and the used parameters.
--   **Properties:** Properties are settings that are directly related to the BPMN element, e.g. a time duration for a timer event. Thus, all BPMN elements of the same type expose the same properties. 
--   **Parameters:** Input and output parameters for the activity.
+- **Task:** In the task view you can enter the Java class that should be executed when the task is invoked. Below the classname usage information of the task is presented including a description and the used parameters.
+- **Properties:** Properties are settings that are directly related to the BPMN element, e.g. a time duration for a timer event. Thus, all BPMN elements of the same type expose the same properties. 
+- **Parameters:** Input and output parameters for the activity.
 
-Jadex provides some ready-to-use task implementations, which can be choosen from the drop-down list. 
-The available contents of the list is found by scanning the class path of the editor. 
-To include the standard Jadex task implementation we need to add the Jadex jars to the classpath of the editor.   
+Jadex provides some ready-to-use task implementations, which can be choosen from the drop-down list.
+The available contents of the list is found by scanning the class path of the editor.
+To include the standard Jadex task implementation we need to add the Jadex jars to the classpath of the editor.
 To do this, go to the 'File' menu and open the 'Settings' dialog.
-Switch to the 'Class Path' tab and choose 'Add Project'. Here, choose the Jadex distribution directory. 
-The editor will automatically scan the folder structure for jars and add them to the classpath. 
-You should see the Jadex jars in the dialog afterwards.  
+Switch to the 'Class Path' tab and choose 'Add Project'. Here, choose the Jadex distribution directory.
+The editor will automatically scan the folder structure for jars and add them to the classpath.
+You should see the Jadex jars in the dialog afterwards.
 After exiting the settings dialog you will see the editor refreshing its class cache used for the autocompletion.
 You can also manually start rescanning by pressing the refresh button ![03 Basic Processes@2.png](03%20Basic%20Processes/03%20Basic%20Processes-2.png) at the lower left of the editor panel. 
 
 ![03 Basic Processes@3.png](03%20Basic%20Processes/03%20Basic%20Processes-3.png)
 
-
-
 You can also implement your own tasks, by writing corresponding Java classes. The available task implementations as well as how to produce your own tasks will be covered later. For this lesson, just select the 'jadex.bpmn.runtime.task.PrintTask', which allows printing some text to the console.
 
-You will see that some description text about the task is displayed. Among other things, the description tells you that this task implementation expects an input parameter 'text' of type String. To set the text that should be printed we first have to switch to the 'Parameters' tab and afterwards include the default parameters of the selected task class. 
-This is done by clicked this button ![03 Basic Processes@4.png](03%20Basic%20Processes/03%20Basic%20Processes-4.png). 
-Enter "The task has been executed" in the 'Initial Value' column of the parameter table. 
-The value is entered as a Java expression, which is why you have to enclose your text in quotes. 
+You will see that some description text about the task is displayed. Among other things, the description tells you that this task implementation expects an input parameter 'text' of type String. To set the text that should be printed we first have to switch to the 'Parameters' tab and afterwards include the default parameters of the selected task class.
+This is done by clicked this button ![03 Basic Processes@4.png](03%20Basic%20Processes/03%20Basic%20Processes-4.png).
+Enter "The task has been executed" in the 'Initial Value' column of the parameter table.
+The value is entered as a Java expression, which is why you have to enclose your text in quotes.
 To make the process better readable, also draw a start and end event and connect them to the task. It should look like the diagram below.
 
 ![03 Basic Processes@5.png](03%20Basic%20Processes/03%20Basic%20Processes-5.png)
-
-
 
 Save the model, refresh Eclipse and restart the Jadex platform. Observe that your text gets printed to the eclipse console every time that you start your process.
 
@@ -93,8 +89,6 @@ Create a new BPMN diagram with a name of your choice, e.g. 'B2_Sequence'. Create
 
 ![03 Basic Processes@6.png](03%20Basic%20Processes/03%20Basic%20Processes-6.png)
 
-
-
 To easily observe how the different tasks are executed, change the task implementations to the PrintTask and enter some message in each of the text parameters (see last lesson for details). Execute your process using the JCC and observe the console output. You might have to refresh the model tree (e.g. by right-clicking of the folder and selecting 'Refresh' or by just pressing `[F5]`) for the new process to show up.
 
 Exercise B3 - Parallel Activities
@@ -108,8 +102,6 @@ Create a new process called, e.g. 'B3_Parallel'. Add tasks, connectors and gatew
 
 ![03 Basic Processes@7.png](03%20Basic%20Processes/03%20Basic%20Processes-7.png)
 
-
-
 In this process, parallelism is introduced at two places. First, the tasks 'Task 1a' and 'Task 1b' are parallel to each other. A process always starts execution at start events and node(s) without incoming control flow connections. As the process has two start events it has two starting points.
 
 Second, the tasks 'Task 2a I' and 'Task 2a II' are parallel tasks, because of the explicit parallel gateway 'Gateway 1' before the nodes. Parallel gateways are sometimes also called AND gateways. The two control flows of 'Task 2a I' and 'Task 2a II' are merged together by the second AND gateway 'Gateway 2'. The two forms of AND gateways are also called 'split' and 'join' gateways. They are represented by the same symbol, but can be distinguished, because a split has only one *incoming* edge while a join has only one *outgoing* edge. The semantics of the join is that 'Task 3a' may only be executed after both 'Task 2a I' and 'Task 2a II' have been completed.
@@ -119,8 +111,6 @@ Second, the tasks 'Task 2a I' and 'Task 2a II' are parallel tasks, because of th
 To see some results during the execution, you can make use of the PrintTask as in the previous lessons. You can also observe the execution of the process in the debugger. 
 
 ![03 Basic Processes@8.png](03%20Basic%20Processes/03%20Basic%20Processes-8.png)
-
-
 
 In the example screenshot you can see, that there are currently three control flows in the process with numbers 1, 2 and 4. Process thread 1 has proceeded to 'Task 1b', thread 2 is at the parallel join gateway and thread 4 is at 'Task 2aII'. Please note that thread 1 and 4 are ready, i.e. can execute the next step while thread 2 is waiting for the second thread at the gateway and thus cannot immediately proceed. The different states (waiting vs. ready) are also signalled by the color of the corresponding elements in the diagram (red vs. green). Play around with the process in the debugger. Also try out using breakpoints. You will notice, that the process is suspended whenever one of the control flows hits a breakpoint. Because the process is suspended as a whole this means that also the other control flows will stop executing when a breakpoint is hit.
 

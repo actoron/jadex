@@ -201,9 +201,9 @@ The second field is a set of the current subscriptions to the time service. The 
 
 # The Subscribe Method
 
-On each call, the *subscribe()* method creates a new subscription future object for the new subscriber and returns that object. The subcription future object is also added to the subscriptions list, so it can be notified about each new time message.  
+On each call, the *subscribe()* method creates a new subscription future object for the new subscriber and returns that object. The subcription future object is also added to the subscriptions list, so it can be notified about each new time message.
 
-Furthermore, a termination command is set on the subscription future. This command is executed when the subscription ends either due to a network error or when a client explicitly cancels the subscription. In the command, the time provider agent prints out a message and removes the subscription from the list. 
+Furthermore, a termination command is set on the subscription future. This command is executed when the subscription ends either due to a network error or when a client explicitly cancels the subscription. In the command, the time provider agent prints out a message and removes the subscription from the list.
 
 # The Agent Life Cycle
 

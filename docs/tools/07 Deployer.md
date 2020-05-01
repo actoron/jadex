@@ -2,10 +2,10 @@
 
 The deployer tool can be used to transfer files between computers. In this sense it is very similar to a typical ftp tool but it could be convenient to use the Jadex deployer tool for the following reasons:
 
--   Can be used to transfer files between arbitrary hosts within your Jadex network, i.e. given you are on host a you can transfer A to B or vice versa but you can also transfer files between B and C.
--   The deployer tool allows for transferring files between hosts that do not have a direct TCP connection as it relies on the Jadex platform transport mechanisms, i.e. it can use a relay server to bridge differnt unconnected networks.
--   The deployer will automatically try to find the most efficient connection to the target and will also tolerate if one (of several available connections) to the target dimishes.
--   There is no need to install further software on the hosts with the platform, i.e. no server and/or client.
+- Can be used to transfer files between arbitrary hosts within your Jadex network, i.e. given you are on host a you can transfer A to B or vice versa but you can also transfer files between B and C.
+- The deployer tool allows for transferring files between hosts that do not have a direct TCP connection as it relies on the Jadex platform transport mechanisms, i.e. it can use a relay server to bridge differnt unconnected networks.
+- The deployer will automatically try to find the most efficient connection to the target and will also tolerate if one (of several available connections) to the target dimishes.
+- There is no need to install further software on the hosts with the platform, i.e. no server and/or client.
 
 Transferring Files
 -------------------------------

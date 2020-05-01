@@ -2,7 +2,7 @@
 
 The starter plugin is one of the core tools for managing applications. It allows for starting and stopping applications and components and also provides a view of the currently running components. The basic layout of the starter is shown in the screenshot below. It basically consists of three different areas. The left upper part contains a file view of component models. When a user selects a new model it will be loaded and displayed on the right hand side of the tool. Finally, in the lower left part the platform with the currently running components is displayed.
 
-![03 Starter@starter.png](starter.png)  
+![03 Starter@starter.png](starter.png)
 *Starter screenshot*
 
 Component Models
@@ -10,19 +10,19 @@ Component Models
 
 In the component models section a file system view on available active component models is displayed. To be able to view and select your own models here, you will first have to add the root path or jar file of your project. This can be done by clicking the add resource button ![03 Starter@add\_folder424.png](add_folder424.png) from the menu bar or by right clicking within a free space of the panel. This will also give you a popup menu with an add resource option. Activating add resource will give you a file chooser to select the project folder or jar file to add. After having confirmed the choice the folder will be displayed in the panel. You can now browse its contents and select a model to start. Please note that you cannot add any folder to the starter, as it has to be the classpath root of the contained resources, i.e. you should always add a bin or classes folder but not an internal package directly. Jadex will add the new resource automatically as classpath entry and if its not the correct folder you may encounter ClassNotFoundExceptions when selecting models. 
 
-<!-- Text moved from bdiv3 tutorial (maybe extract some useful parts and delete the rest):  
-Start the JCC and use the "Add Path" button explained above to add the root directory of your example package. Then open the folder until you can see your file "TranslationBDI". 
-The effect of selecting the input file is that the agent model is loaded.  
-When it contains no errors, the description of the model, taken from the @Description annotation, is shown in the description view. 
-In case there are errors in the model, correct the errors shown in the description view and restart the platform (class reloading is not supported).  
+<!-- Text moved from bdiv3 tutorial (maybe extract some useful parts and delete the rest):
+Start the JCC and use the "Add Path" button explained above to add the root directory of your example package. Then open the folder until you can see your file "TranslationBDI".
+The effect of selecting the input file is that the agent model is loaded.
+When it contains no errors, the description of the model, taken from the @Description annotation, is shown in the description view.
+In case there are errors in the model, correct the errors shown in the description view and restart the platform (class reloading is not supported).
 Below the file name, the agent name and its default configuration are shown.
-After pressing the start button the new agent should appear in the agent tree (at the bottom left). 
+After pressing the start button the new agent should appear in the agent tree (at the bottom left).
 It is also possible to start an agent simply by double-clicking it in the model tree.
 -->
 
 <!--*Please note that when you use a double-click on the model name in the left tree view to start an agent, the settings on the right will be ignored.*-->
 
-![03 Starter@roots.png](roots.png)  
+![03 Starter@roots.png](roots.png)
 *Root entries are classpath entries*
 
 In order to remove an unwanted entry from the model tree you have to select the topmost entry (e.g. the classes directory) and use the remove resource action ![03 Starter@remove\_folder424.png](remove_folder424.png) from the toolbar or popup menu. For easy navigation in the model tree you can collapse the whole tree by clicking on the corresponding action ![03 Starter@collapse.png](collapse.png) from the toolbar. The add global resource action ![03 Starter@add\_jar2.png](add_jar2.png) can be used to add a maven resource via its artifact id. Clicking the action opens a dialog in which you can browse maven repositories and search for specific artifacts. Having selected an artifact, Jadex will automatically download the resource including all its dependencies and make it available in the model tree.
@@ -44,7 +44,7 @@ The model tree as well as the component instance tree (lower left) use different
 Running Components
 -------------------------------
 
-![03 Starter@comptree.png](comptree.png)  
+![03 Starter@comptree.png](comptree.png)
 *Component instance tree*
 
 In this tree view the platform itself is displayed as root (here the platform has the name Lars-PC\_9ff). The children of a component may consist of two node types: a service container node and further child component nodes. Looking at the 'awa' component you can e.g. see that it has a service container node and four components as direct children named 'BroadcastDiscovery', 'MessageDiscovery', 'MulticastDiscovery' and RelayDiscovery'. By looking at the icon of these child components you can also see that they are mirco agents. The opened service container node of 'awa' reveals that this component has one provided service ![03 Starter@provided\_16.png](provided_16.png) of type *IAwarenessManagementService* and three required services ![03 Starter@required\_16.png](required_16.png) with interfaces *IComponentManagementService*, *IDiscoveryService*, and *ISettingsService*. Please note that the required service *IDiscoveryService* has a multiplicity ![03 Starter@required\_multiple\_16.png](required_multiple_16.png), i.e. this required service binds all service instances of the given type. On the right hand side of the tree panel a details view is provided. Double clicking on a node in the component instance tree will activate the details view and present more information about this node. In the screenshot, details of the provided service *IAwarenessManagementService* are shown, i.e. the signatures of the methods comprising the service interface. If you select a component instead of a service the details view will show more information about the component including such as its current state or the creator.
@@ -66,16 +66,16 @@ Having selected a component model from the model tree, Jadex will attempt to loa
 
 **Flags:**
 
--   **Start suspended: **If selected, the component and all its children will be started in suspended mode, i.e. the component will not start executing unless it is resumed. This option is helpful e.g. for debugging purposes, because it allows for starting suspended, switching to the debugger and executing a component piecewise without having to stop it manually.
--   **Master: **If a component is set to be master, it is a mandatory component for the component it is contained in. If this master component is destroyed  the super component will be destroyed as well.
--   **Daemon: **If a component is set to daemon it will not prevent autoshutdown of the super component (given the super component has autoshutdown turned on).
--   **Auto shutdown: **If enabled, this component is tracked to be autoshutdowned if it has no more child components. In order to allow autoshutdown even if there specific child components still exist, these** **components can be set to be daemons. 
+- **Start suspended: **If selected, the component and all its children will be started in suspended mode, i.e. the component will not start executing unless it is resumed. This option is helpful e.g. for debugging purposes, because it allows for starting suspended, switching to the debugger and executing a component piecewise without having to stop it manually.
+- **Master: **If a component is set to be master, it is a mandatory component for the component it is contained in. If this master component is destroyed  the super component will be destroyed as well.
+- **Daemon: **If a component is set to daemon it will not prevent autoshutdown of the super component (given the super component has autoshutdown turned on).
+- **Auto shutdown: **If enabled, this component is tracked to be autoshutdowned if it has no more child components. In order to allow autoshutdown even if there specific child components still exist, these** **components can be set to be daemons. 
 
 **Buttons:**
 
--   **Start:** Will attempt to start the selected component type.
--   **Reload:** Will reload the currently selected model.
--   **Reset:** Will clear the selection.
+- **Start:** Will attempt to start the selected component type.
+- **Reload:** Will reload the currently selected model.
+- **Reset:** Will clear the selection.
 
 ### Arguments and Results
 

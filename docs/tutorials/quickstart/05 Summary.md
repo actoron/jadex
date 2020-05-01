@@ -13,7 +13,7 @@ In the following it will be shortly sketched, how the Jadex Active Components mi
 a) In Jadex, services are described by POJO Java interfaces.
 
 b) Publishing of services is as simple as adding a *@ProvidedServices* annotation to a Java class.
- 
+
 c) In Jadex discovery is supported by a combination of two mechanisms. First, [platform awareness](../../remote/remote.md#awareness) automatically discovers all available Jadex platforms in local networks and potentially across the whole Internet. Second, the [service search](../../guides/ac/05%20Services.md#service-search)) potentially traverses all known platforms looking for the desired service and thus potentially finds any matching service available somewhere on the Internet.
 
 ### Challenge 2: Components with internal behavior
@@ -22,7 +22,7 @@ c) In Jadex discovery is supported by a combination of two mechanisms. First, [p
 
 In Jadex, components may have internal behavior ranging from [purely reactive components to simple task-oriented](../../guides/ac/02%20Active%20Components.md#active-components) or even [complex intelligent agents](../../guides/bdiv3/02%20Concepts.md)). Jadex components are executed using a single-thread cooperative scheduling approach, i.e., each component step is executed until it ends or blocks and no two steps of the same component are ever executed in parallel.
 
-E.g. the time provider component's periodic task for sending out time values is executed as a step and the addition of a new subscriber is another step. No manual synchronization is necessary, e.g. regarding the subscriptions list, because Jadex assures that these two steps will never be interleaved. 
+E.g. the time provider component's periodic task for sending out time values is executed as a step and the addition of a new subscriber is another step. No manual synchronization is necessary, e.g. regarding the subscriptions list, because Jadex assures that these two steps will never be interleaved.
 
 ### Challenge 3: Designing communication protocols
 
@@ -42,7 +42,7 @@ Using the available interaction pattern for publish/subscribe, Jadex will automa
 
 ### Challenge 5: Security
 
-*"Providing and accessing services across the Internet involves many security issues. E.g. potentially security critical services should by default be shielded from unauthorized access. On the other hand, no complicated security setup should be necessary for uncritical services like the time service."* 
+*"Providing and accessing services across the Internet involves many security issues. E.g. potentially security critical services should by default be shielded from unauthorized access. On the other hand, no complicated security setup should be necessary for uncritical services like the time service."*
 
 In Jadex, by default only trusted platform may invoke services of each other, therefore running a Jadex platform is safe by default. More fine-grained treatment of security issues is supported by security annotations. These annotations can be placed alongside the component code and allows a clean separation between component functionality and non-functional aspects like security. E.g., the *Security.UNRESTRICTED* flag is used on the time service interface to mark the service as being safe to be called from the outside without prior authentication or authorization.
 
