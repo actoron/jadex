@@ -1069,4 +1069,4 @@ task checkdocs(type: GradleBuild) {
     buildFile	= 'docs/build.gradle.kts'
     tasks	= ['markdownlint']
 }
-test.dependsOn	checkdocs
+test.finalizedBy	checkdocs
