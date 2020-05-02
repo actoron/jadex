@@ -82,8 +82,8 @@ platformConfig.setPlatformName("jadexplatform");
 
 ```java
 rootConfig.setKernels(PlatformConfiguration.KERNEL.micro,
-				PlatformConfiguration.KERNEL.component,
-				PlatformConfiguration.KERNEL.v3);
+                PlatformConfiguration.KERNEL.component,
+                PlatformConfiguration.KERNEL.v3);
 ```
 
 **Disable platform awareness:**

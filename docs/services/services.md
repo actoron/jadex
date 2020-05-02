@@ -180,9 +180,9 @@ Instead of injecting the service instance, you can directly inject values of the
 ```java
 @RequiredServices(@RequiredService(name="piService", ...))
 public class PiAgent {
-	@AgentServiceValue(name="piService")
-	private double pi
-	...
+    @AgentServiceValue(name="piService")
+    private double pi
+    ...
 ```
 
 This will look up the value of the field *pi* in the *piService* and inject it into the component field. Note that both field names have to be equal.
@@ -286,7 +286,7 @@ To do so, just add the ```@Service``` Annotation to your component class and let
 @Agent
 @Service
 @ProvidedServices({
-	@ProvidedService(type=ISumService.class)
+    @ProvidedService(type=ISumService.class)
 })
 public class SumAgent implements ISumService {...
 ```

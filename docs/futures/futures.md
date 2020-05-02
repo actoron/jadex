@@ -73,13 +73,13 @@ If an exception rises, you can pass it to listeners of your Future object by cal
 ```java
 IFuture<String> provName = nameProvider.getName();
 provName.addResultListener(new DefaultResultListener<String>() {
-	public void resultAvailable(String name) {
-		...
-	}
-	
-	public void exceptionOccurred(Exception e) {
-		// handle exception
-	}
+    public void resultAvailable(String name) {
+        ...
+    }
+
+    public void exceptionOccurred(Exception e) {
+        // handle exception
+    }
 });
 ```
 
@@ -97,7 +97,7 @@ Using Java 8, adding a listener to a future can look like this:
 ```java
 IFuture<String> fut = ...
 fut.addResultListener(str -> {
-	System.out.println(str); // str is the result from the future
+    System.out.println(str); // str is the result from the future
 });
 ```
 
@@ -106,8 +106,8 @@ You can also handle exceptions (defaults to printing the stack trace) this way b
 ```java
 IFuture<String> fut = ...
 fut.addResultListener(
-	str -> System.out.println(str),
-	ex -> ex.printStackTrace()
+    str -> System.out.println(str),
+    ex -> ex.printStackTrace()
 );
 ```
 
@@ -178,17 +178,17 @@ fut.setSecondResult(2);
 
 ```java
 fut.addResultListener(new DefaultTuple2ResultListener<String, Integer>() {
-		public void firstResultAvailable(String result) {
-			// use first result
-		}
+        public void firstResultAvailable(String result) {
+            // use first result
+        }
 
-		public void secondResultAvailable(Integer result) {
-			// use second result
-		}
-		public void exceptionOccurred(Exception exception) {
-			// handle exception
-		}
-	});
+        public void secondResultAvailable(Integer result) {
+            // use second result
+        }
+        public void exceptionOccurred(Exception exception) {
+            // handle exception
+        }
+    });
 ```
 
 ## Intermediate Futures
@@ -210,14 +210,14 @@ fut.setFinished();
 
 ```java
 fut.addIntermediateResultListener(new IntermediateDefaultResultListener<String>() {
-	public void intermediateResultAvailable(String result) {
-		// each result is passed individually to the listener,
-		// so it can handle the intermediate results before the future is finished.
-	}
+    public void intermediateResultAvailable(String result) {
+        // each result is passed individually to the listener,
+        // so it can handle the intermediate results before the future is finished.
+    }
 
-	public void finished() {
-		// called when the future is finished (all results are available).
-	}
+    public void finished() {
+        // called when the future is finished (all results are available).
+    }
 });
 ```
 
@@ -238,9 +238,9 @@ fut.addIntermediateResult("event3");
 
 ```java
 fut.addIntermediateResultListener(new IntermediateDefaultResultListener<String>() {
-	public void intermediateResultAvailable(String result) {
-		// handle intermediate result
-	}
+    public void intermediateResultAvailable(String result) {
+        // handle intermediate result
+    }
 });
 ```
 
@@ -253,20 +253,20 @@ A terminable future allows the caller to cancel the task at any point in time by
 
 ```java
 public TerminableFuture<String> doTerminableWork() {
-	TerminableFuture<String> fut = new TerminableFuture<String>();
-	ITerminationCommand term = new ITerminationCommand() {
+    TerminableFuture<String> fut = new TerminableFuture<String>();
+    ITerminationCommand term = new ITerminationCommand() {
 
-		public boolean checkTermination(Exception reason) {
-			return true; // termination is accepted at this point
-		}
+        public boolean checkTermination(Exception reason) {
+            return true; // termination is accepted at this point
+        }
 
-		public void terminated(Exception reason) {
-			stopWork(); // stop the asynchronous work that you're doing
-		}
-	};
-	fut.setTerminationCommand(term);
-	// do some asynchronous work that calls fut.setResult() eventually
-	return fut;
+        public void terminated(Exception reason) {
+            stopWork(); // stop the asynchronous work that you're doing
+        }
+    };
+    fut.setTerminationCommand(term);
+    // do some asynchronous work that calls fut.setResult() eventually
+    return fut;
 }
 ```
 
@@ -348,14 +348,14 @@ The ```DelegationResultListener``` forwards results and exceptions to the given 
 
 ```java
 public IFuture<String> addAndToString(int a, int b) {
-	Future<String> res = new Future<String>();
-	addService.add(a,b).addResultListener(new ExceptionDelegationResultListener<Integer, String>(res) {
-		@Override
-		public void customResultAvailable(Integer result) throws Exception {
-			toStringService.toString(result).addResultListener(new DelegationResultListener<String>(res));
-		}
-	});
-	return res;
+    Future<String> res = new Future<String>();
+    addService.add(a,b).addResultListener(new ExceptionDelegationResultListener<Integer, String>(res) {
+        @Override
+        public void customResultAvailable(Integer result) throws Exception {
+            toStringService.toString(result).addResultListener(new DelegationResultListener<String>(res));
+        }
+    });
+    return res;
 }
 ```
 
@@ -363,7 +363,7 @@ Additionally, with Java 8 Lambda Expressions, you can also use ```SResultListene
 
 ```java
 addService.add(a,b).addResultListener(SResultListener.delegateExceptions(res,
-	sum -> toStringService.toString(sum).addResultListener(SResultListener.delegate(res))));
+    sum -> toStringService.toString(sum).addResultListener(SResultListener.delegate(res))));
 ```
 
 ### Counting
@@ -372,17 +372,17 @@ In many cases, one wants to wait for multiple asynchronous calls to be completed
 This can simply be implemented using a ```CounterResultListener```:
 
 ```java
-				final Future<Void> completionFuture = new Future<Void>();
-				Future<String> call1 = new Future<String>();
-				Future<String> call2 = new Future<String>();
-				Future<String> call3 = new Future<String>();
+                final Future<Void> completionFuture = new Future<Void>();
+                Future<String> call1 = new Future<String>();
+                Future<String> call2 = new Future<String>();
+                Future<String> call3 = new Future<String>();
 
-				CounterResultListener<String> res = new CounterResultListener(3, new DelegationResultListener<Void>(completionFuture));
+                CounterResultListener<String> res = new CounterResultListener(3, new DelegationResultListener<Void>(completionFuture));
 
-				call1.addResultListener(res);
-				call2.addResultListener(res);
-				call3.addResultListener(res);
-				completionFuture.get();
+                call1.addResultListener(res);
+                call2.addResultListener(res);
+                call3.addResultListener(res);
+                completionFuture.get();
 ```
 
 This will make completionFuture.get() block until all three Futures/Calls are done.

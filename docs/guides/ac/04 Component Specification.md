@@ -259,7 +259,7 @@ A component factory searches for all component factory extension services and as
 ```java
 public interface IComponentFactoryExtensionService
 {
-  public IFuture getExtension(String componenttype);	
+  public IFuture getExtension(String componenttype);
 }
 ```
 
@@ -268,7 +268,7 @@ The component factory extension service is used by component factories to fetch 
 ```java
 public interface IExtensionInfo
 {
-  public String	getName();
+  public String    getName();
   public IFuture<IExtensionInstance> createInstance(IExternalAccess access, IValueFetcher fetcher);
 }
 ```

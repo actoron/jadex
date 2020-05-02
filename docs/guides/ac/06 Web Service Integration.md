@@ -27,7 +27,7 @@ At the moment of publishing the Jadex interpreter searches for all available *IP
 public interface IPublishService
 {
   public IFuture<Boolean> isSupported(String publishtype);
-	
+
   public IFuture<Void> publishService(ClassLoader cl, IService service, PublishInfo pi);
 
   public IFuture<Void> unpublishService(IServiceIdentifier sid);
@@ -75,9 +75,9 @@ public interface GeoIPServiceSoap
 
 public interface IGeoIPService
 {
-  public IFuture<GeoIP> getGeoIP(String ip);	
+  public IFuture<GeoIP> getGeoIP(String ip);
   public IFuture<GeoIP> GetGeoIPContext();
-}	
+}
 
 ```
 
@@ -191,7 +191,7 @@ public interface IChartService
 
   public @Reference(local=true) IFuture<byte[]> getLineChart(int width, int height,
     double[][] data, String[] labels, @Reference(local=true) Color[] colors);
-	
+
   public @Reference(local=true) IFuture<byte[]> getPieChart(int width, int height,
     double[][] data, String[] labels, @Reference(local=true) Color[] colors);
 }
@@ -209,7 +209,7 @@ public interface IChartService
 ```java
 
 public interface IValueMapper
-{	
+{
   public Object convertValue(Object value) throws Exception;
 }
 
@@ -315,7 +315,7 @@ The service implementation here is very simple and just returns some pseudo stat
 public class BankingService implements IBankingService
 {
   protected List<String> data;
-	
+
   @ServiceStart
   public void start()
   {
@@ -323,7 +323,7 @@ public class BankingService implements IBankingService
     data.add("Statement 1");
     data.add("Statement 2");
   }
-	
+
   public IFuture<AccountStatement> getAccountStatement(Date begin, Date end)
   {
     System.out.println("getAccountStatement(Date begin, Date end)");

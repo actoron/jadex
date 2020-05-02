@@ -357,7 +357,7 @@ If you want to create more complex animation-logics you have to define an animat
 
 ```xml
 
-<env:drawable3d objecttype="chicken" width="1" height="1" depth="1">							
+<env:drawable3d objecttype="chicken" width="1" height="1" depth="1">
  <env:object3d width="0.6" height="0.6" depth="0.6" x="0" y="0" z="0"
    modelpath="models/creatures/chicken/chicken.j3o"
    materialpath="models/creatures/chicken/chicken-Material.j3m"  >
@@ -369,7 +369,7 @@ If you want to create more complex animation-logics you have to define an animat
   <env:animation name="Idle" channel="chanA" loop="true" speed="1.5">
     <env:animationcondition>$object.getProperty("status").equals("Idle")</env:animationcondition>
   </env:animation>
-							
+
   <env:animation name="Paw" channel="chanA" loop="true" speed="1.5">
     <env:animationcondition>$object.getProperty("status").equals("Paw")</env:animationcondition>
   </env:animation>

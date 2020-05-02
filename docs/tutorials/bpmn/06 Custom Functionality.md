@@ -36,7 +36,7 @@ public class Customer
   public boolean isRiskTaking()
   {
     return gender.equals("male") && age < 40 && !married;
-  }	
+  }
 
   public String toString()
   {
@@ -179,7 +179,7 @@ public class AsynchronousOKTask implements ITask
     dialog.pack();
     Point loc = SGUI.calculateMiddlePosition(dialog);
     dialog.setLocation(loc.x, loc.y+offset);
-		
+
     pane.addPropertyChangeListener(new PropertyChangeListener()
     {
       public void propertyChange(PropertyChangeEvent e)

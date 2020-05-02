@@ -24,33 +24,33 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Agent
 @RequiredServices(@RequiredService(name="timeservices", type=ITimeService.class, multiple=true,
-	binding=@Binding(scope=Binding.SCOPE_GLOBAL)))
+    binding=@Binding(scope=Binding.SCOPE_GLOBAL)))
 public class TimeUserAgent
 {
-	/**
-	 *  The time services are searched and added at agent startup.
-	 */
-	@AgentService
-	public void	addTimeService(ITimeService timeservice)
-	{
-		ISubscriptionIntermediateFuture<String>	subscription	= timeservice.subscribe();
-		while(subscription.hasNextIntermediateResult())
-		{
-			String	time	= subscription.getNextIntermediateResult();
-			String	platform	= ((IService)timeservice).getServiceIdentifier().getProviderId().getPlatformName();
-			System.out.println("New time received from "+platform+" at "+timeservice.getLocation()+": "+time);
-		}
-	}
-	
-	/**
-	 *  Start a Jadex platform and the TimeUserAgent.
-	 */
-	public static void	main(String[] args)
-	{
-		PlatformConfiguration	config	= PlatformConfiguration.getMinimalRelayAwareness();
-		config.addComponent(TimeUserAgent.class);
-		Starter.createPlatform(config).get();
-	}
+    /**
+     *  The time services are searched and added at agent startup.
+     */
+    @AgentService
+    public void    addTimeService(ITimeService timeservice)
+    {
+        ISubscriptionIntermediateFuture<String>    subscription    = timeservice.subscribe();
+        while(subscription.hasNextIntermediateResult())
+        {
+            String    time    = subscription.getNextIntermediateResult();
+            String    platform    = ((IService)timeservice).getServiceIdentifier().getProviderId().getPlatformName();
+            System.out.println("New time received from "+platform+" at "+timeservice.getLocation()+": "+time);
+        }
+    }
+
+    /**
+     *  Start a Jadex platform and the TimeUserAgent.
+     */
+    public static void    main(String[] args)
+    {
+        PlatformConfiguration    config    = PlatformConfiguration.getMinimalRelayAwareness();
+        config.addComponent(TimeUserAgent.class);
+        Starter.createPlatform(config).get();
+    }
 }
 ```
 

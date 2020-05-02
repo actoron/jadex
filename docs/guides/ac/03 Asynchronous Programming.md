@@ -38,7 +38,7 @@ The detailed interface of the *jadex.commons.future.IFuture* is also shown in th
 public interface IFuture<E>
 {
   public static final IFuture<Void> DONE = new Future<Void>((Void)null);
-	
+
   public boolean isDone();
   public E get(ISuspendable caller);
   public E get(ISuspendable caller, long timeout);
@@ -150,15 +150,15 @@ fut.addResultListener(new IIntermediateResultListener<IChatService>()
       IChatService cs = it.next();
       intermediateResultAvailable(cs);
     }
-  }					
+  }
   public void exceptionOccurred(Exception exception)
   {
     exception.printStackTrace();
-  }					
+  }
   public void intermediateResultAvailable(IChatService result)
   {
     result.message("Hugo", "Hi chat partner");
-  }				
+  }
   public void finished()
   {
   }
@@ -332,7 +332,7 @@ CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<ICom
     System.out.println("Created all components.");
   }
 });
-		
+
 for(int i=0; i<cmslist.size(); i++)
 {
   cmslist.get(i).createComponent(null, "jadex.micro.examples.helloworld/HelloWorldAgent.class", null, null)
@@ -358,7 +358,7 @@ In many cases, the Jadex framework takes care of executing code on the right com
 ```java
 
 List<IComponentManagementService> cmslist = ...;
-		
+
 CollectionResultListener<IComponentIdentifier> lis = new CollectionResultListener<IComponentIdentifier>(
   cmslist.size(), true, new DefaultResultListener<Collection<IComponentIdentifier>>()
 {
@@ -367,7 +367,7 @@ CollectionResultListener<IComponentIdentifier> lis = new CollectionResultListene
     System.out.println("Created components: "+result);
   }
 });
-		
+
 for(int i=0; i<cmslist.size(); i++)
 {
   cmslist.get(i).createComponent(null, "jadex.micro.examples.helloworld/HelloWorldAgent.class", null, null)

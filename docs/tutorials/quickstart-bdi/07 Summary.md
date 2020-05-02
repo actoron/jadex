@@ -17,63 +17,63 @@ Note that the solution has some problems, e.g., not immediately stopping a move 
 and a severe bug that the agent will try to pick up waste that no longer exists, when it was removed in the mean time.
 
 ```java
-		// Agent uses one main loop for its behavior
-		while(true)
-		{
-			// Need to recharge (less than 20% battery)?
-			if(actsense.getSelf().getChargestate()<0.2)
-			{
-				// Charging station known?
-				if(!actsense.getChargingstations().isEmpty())
-				{
-					// Move to charging station and recharge
-					IChargingstation	station	= actsense.getChargingstations().iterator().next();
-					actsense.moveTo(station.getLocation());
-					actsense.recharge(station, 0.9);
-				}
-				else
-				{
-					// Move around to find charging station
-					actsense.moveTo(Math.random(), Math.random());					
-				}
-			}
-			
-			// Waste picked up?
-			else if(actsense.getSelf().getCarriedWaste()!=null)
-			{
-				// Waste bin known?
-				if(!actsense.getWastebins().isEmpty())
-				{
-					// Move to waste bin and drop waste
-					IWastebin	bin	= actsense.getWastebins().iterator().next();
-					actsense.moveTo(bin.getLocation());
-					actsense.dropWasteInWastebin(actsense.getSelf().getCarriedWaste(), bin);
-				}
-				else
-				{
-					// Move around to find waste bin
-					actsense.moveTo(Math.random(), Math.random());					
-				}
-			}
-			
-			// Not carrying waste
-			else
-			{
-				// Waste known?
-				if(!actsense.getWastes().isEmpty())
-				{
-					// Move to waste and pick it up
-					IWaste	waste	= actsense.getWastes().iterator().next();
-					actsense.moveTo(waste.getLocation());
-					actsense.pickUpWaste(waste);
-				}
-				else
-				{
-					// Move around to find waste
-					actsense.moveTo(Math.random(), Math.random());					
-				}
-			}
-		}
+        // Agent uses one main loop for its behavior
+        while(true)
+        {
+            // Need to recharge (less than 20% battery)?
+            if(actsense.getSelf().getChargestate()<0.2)
+            {
+                // Charging station known?
+                if(!actsense.getChargingstations().isEmpty())
+                {
+                    // Move to charging station and recharge
+                    IChargingstation    station    = actsense.getChargingstations().iterator().next();
+                    actsense.moveTo(station.getLocation());
+                    actsense.recharge(station, 0.9);
+                }
+                else
+                {
+                    // Move around to find charging station
+                    actsense.moveTo(Math.random(), Math.random());
+                }
+            }
+
+            // Waste picked up?
+            else if(actsense.getSelf().getCarriedWaste()!=null)
+            {
+                // Waste bin known?
+                if(!actsense.getWastebins().isEmpty())
+                {
+                    // Move to waste bin and drop waste
+                    IWastebin    bin    = actsense.getWastebins().iterator().next();
+                    actsense.moveTo(bin.getLocation());
+                    actsense.dropWasteInWastebin(actsense.getSelf().getCarriedWaste(), bin);
+                }
+                else
+                {
+                    // Move around to find waste bin
+                    actsense.moveTo(Math.random(), Math.random());
+                }
+            }
+
+            // Not carrying waste
+            else
+            {
+                // Waste known?
+                if(!actsense.getWastes().isEmpty())
+                {
+                    // Move to waste and pick it up
+                    IWaste    waste    = actsense.getWastes().iterator().next();
+                    actsense.moveTo(waste.getLocation());
+                    actsense.pickUpWaste(waste);
+                }
+                else
+                {
+                    // Move around to find waste
+                    actsense.moveTo(Math.random(), Math.random());
+                }
+            }
+        }
 ```
 
 ### Exercise A3: Additional Patrol Plan Code
@@ -81,43 +81,43 @@ and a severe bug that the agent will try to pick up waste that no longer exists,
 ![Route for Patrol Plan 2](patrol-plan2.svg)
 
 ```java
-	/**
-	 *  Declare a second plan for the PerformPatrol goal.
-	 */
-	@Plan(trigger=@Trigger(goals=PerformPatrol.class))
-	private void	performPatrolPlan2()
-	{
-		// Follow another path around the middle of the museum.
-		System.out.println("Starting performPatrolPlan2()");
-		
-		// Fill in moveTo() commands, e.g. according to the figure
-		actsense.moveTo(0.3, 0.3);
-		actsense.moveTo(0.3, 0.7);
-		actsense.moveTo(0.7, 0.7);
-		actsense.moveTo(0.7, 0.3);
-		actsense.moveTo(0.3, 0.3);
-	}
+    /**
+     *  Declare a second plan for the PerformPatrol goal.
+     */
+    @Plan(trigger=@Trigger(goals=PerformPatrol.class))
+    private void    performPatrolPlan2()
+    {
+        // Follow another path around the middle of the museum.
+        System.out.println("Starting performPatrolPlan2()");
+
+        // Fill in moveTo() commands, e.g. according to the figure
+        actsense.moveTo(0.3, 0.3);
+        actsense.moveTo(0.3, 0.7);
+        actsense.moveTo(0.7, 0.7);
+        actsense.moveTo(0.7, 0.3);
+        actsense.moveTo(0.3, 0.3);
+    }
 ```
 
 ![Route for Patrol Plan 3](patrol-plan3.svg)
 
-```java	
-	/**
-	 *  Declare a third plan for the PerformPatrol goal.
-	 */
-	// Fill in @Plan annotation and method body for third patrol plan,
-	// e.g. according to the figure
-	@Plan(trigger=@Trigger(goals=PerformPatrol.class))
-	private void	performPatrolPlan3()
-	{
-		// Follow a zig-zag path in the museum.
-		System.out.println("Starting performPatrolPlan3()");
-		actsense.moveTo(0.3, 0.3);
-		actsense.moveTo(0.7, 0.7);
-		actsense.moveTo(0.3, 0.7);
-		actsense.moveTo(0.7, 0.3);
-		actsense.moveTo(0.3, 0.3);
-	}
+```java
+    /**
+     *  Declare a third plan for the PerformPatrol goal.
+     */
+    // Fill in @Plan annotation and method body for third patrol plan,
+    // e.g. according to the figure
+    @Plan(trigger=@Trigger(goals=PerformPatrol.class))
+    private void    performPatrolPlan3()
+    {
+        // Follow a zig-zag path in the museum.
+        System.out.println("Starting performPatrolPlan3()");
+        actsense.moveTo(0.3, 0.3);
+        actsense.moveTo(0.7, 0.7);
+        actsense.moveTo(0.3, 0.7);
+        actsense.moveTo(0.7, 0.3);
+        actsense.moveTo(0.3, 0.3);
+    }
 ```
 
 ### Exercise A4: Questions about Means-end Reasoning Flags
@@ -144,21 +144,21 @@ and a severe bug that the agent will try to pick up waste that no longer exists,
 Reusing the first patrol plan, you could just add the new goal to the plan trigger:
 
 ```java
-	/**
-	 *  Declare the same plan for the PerformPatrol and QueryChargingStation goals
-	 *  by using a method with @Plan and @Trigger annotation.
-	 */
-	@Plan(trigger=@Trigger(goals={PerformPatrol.class, QueryChargingStation.class}))
-	private void	performPatrolPlan()
-	{
-		// Follow a simple path around the four corners of the museum and back to the first corner.
-		System.out.println("Starting performPatrolPlan()");
-		actsense.moveTo(0.1, 0.1);
-		actsense.moveTo(0.1, 0.9);
-		actsense.moveTo(0.9, 0.9);
-		actsense.moveTo(0.9, 0.1);
-		actsense.moveTo(0.1, 0.1);
-	}
+    /**
+     *  Declare the same plan for the PerformPatrol and QueryChargingStation goals
+     *  by using a method with @Plan and @Trigger annotation.
+     */
+    @Plan(trigger=@Trigger(goals={PerformPatrol.class, QueryChargingStation.class}))
+    private void    performPatrolPlan()
+    {
+        // Follow a simple path around the four corners of the museum and back to the first corner.
+        System.out.println("Starting performPatrolPlan()");
+        actsense.moveTo(0.1, 0.1);
+        actsense.moveTo(0.1, 0.9);
+        actsense.moveTo(0.9, 0.9);
+        actsense.moveTo(0.9, 0.1);
+        actsense.moveTo(0.1, 0.1);
+    }
 ```
 
 #### Alternative 2
@@ -167,20 +167,20 @@ A simple alternative is a plan that does just one random move.
 To allow this plan being executed repeatedly, you can set `ExcludeMode.Never` on the goal.
 
 ```java
-	@Goal(excludemode=ExcludeMode.Never)
-	class QueryChargingStation
-	{
-		...
-	}
-	
-	/**
-	 *  A plan to move randomly in the environment.
-	 */
-	@Plan(trigger=@Trigger(goals=QueryChargingStation.class))
-	private void	moveAround()
-	{
-		// Choose a random location and move there.
-		System.out.println("Starting moveAround() plan");
-		actsense.moveTo(Math.random(), Math.random());
-	}
+    @Goal(excludemode=ExcludeMode.Never)
+    class QueryChargingStation
+    {
+        ...
+    }
+
+    /**
+     *  A plan to move randomly in the environment.
+     */
+    @Plan(trigger=@Trigger(goals=QueryChargingStation.class))
+    private void    moveAround()
+    {
+        // Choose a random location and move there.
+        System.out.println("Starting moveAround() plan");
+        actsense.moveTo(Math.random(), Math.random());
+    }
 ```

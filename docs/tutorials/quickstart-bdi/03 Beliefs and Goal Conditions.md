@@ -12,55 +12,55 @@ and let the cleaner know, if anything important changes. Add the following code 
 (Remember to make a backup of your last solution as `CleanerBDIAgentA4.java` before making any changes).
 
 ```java
-	/** Knowledge of the cleaner about itself (e.g. location and charge state). */
-	@Belief
-	private ICleaner	self	= actsense.getSelf();
+    /** Knowledge of the cleaner about itself (e.g. location and charge state). */
+    @Belief
+    private ICleaner    self    = actsense.getSelf();
 ```
 
 We want the agent to recharge its battery before it gets too low. We can specify this as a goal.
 Using a goal condition, we can directly refer to the charge state value. Add the following code to the goals section:
 
 ```java
-	/**
-	 *  A goal to recharge whenever the battery is low.
-	 */
-	@Goal(recur=true, recurdelay=3000)
-	class MaintainBatteryLoaded
-	{
-		@GoalMaintainCondition	// The cleaner aims to maintain the following expression, i.e. act to restore the condition, whenever it changes to false.
-		boolean isBatteryLoaded()
-		{
-			return self.getChargestate()>=0.2; // Everything is fine as long as the charge state is above 20%, otherwise the cleaner needs to recharge.
-		}
-	}
+    /**
+     *  A goal to recharge whenever the battery is low.
+     */
+    @Goal(recur=true, recurdelay=3000)
+    class MaintainBatteryLoaded
+    {
+        @GoalMaintainCondition    // The cleaner aims to maintain the following expression, i.e. act to restore the condition, whenever it changes to false.
+        boolean isBatteryLoaded()
+        {
+            return self.getChargestate()>=0.2; // Everything is fine as long as the charge state is above 20%, otherwise the cleaner needs to recharge.
+        }
+    }
 ```
 
 Don't forget to instantiate the goal in the agent startup code next to the perform patrol goal like this:
 
 ```java
-		// Create and dispatch agent goals.
-		bdi.dispatchTopLevelGoal(new PerformPatrol());
-		bdi.dispatchTopLevelGoal(new MaintainBatteryLoaded());
+        // Create and dispatch agent goals.
+        bdi.dispatchTopLevelGoal(new PerformPatrol());
+        bdi.dispatchTopLevelGoal(new MaintainBatteryLoaded());
 ```
 
 Now all we need is a plan to handle the new goal. Add it at the end of the agent class:
 
 ```java
-	/**
-	 *  Move to charging station and load battery.
-	 */
-	@Plan(trigger=@Trigger(goals=MaintainBatteryLoaded.class))
-	private void loadBattery()
-	{
-		System.out.println("Starting loadBattery() plan");
-		
-		// Move to first known charging station -> fails when no charging station known.
-		IChargingstation	chargingstation	= actsense.getChargingstations().iterator().next();
-		actsense.moveTo(chargingstation.getLocation());
-		
-		// Load until 100% (never reached, but plan is aborted when goal succeeds).
-		actsense.recharge(chargingstation, 1.0);
-	}
+    /**
+     *  Move to charging station and load battery.
+     */
+    @Plan(trigger=@Trigger(goals=MaintainBatteryLoaded.class))
+    private void loadBattery()
+    {
+        System.out.println("Starting loadBattery() plan");
+
+        // Move to first known charging station -> fails when no charging station known.
+        IChargingstation    chargingstation    = actsense.getChargingstations().iterator().next();
+        actsense.moveTo(chargingstation.getLocation());
+
+        // Load until 100% (never reached, but plan is aborted when goal succeeds).
+        actsense.recharge(chargingstation, 1.0);
+    }
 ```
 
 What do you expect to happen when you start the agent? When will the new code be executed and what will happen then?
@@ -148,8 +148,8 @@ until the battery is loaded again. This is actually quite simple with Jadex. Cha
 annotation of the `MaintainBatteryLoaded` class to the following code:
 
 ```java
-	@Goal(recur=true, recurdelay=3000,
-		deliberation=@Deliberation(inhibits=PerformPatrol.class))	// Pause patrol goal while loading battery
+    @Goal(recur=true, recurdelay=3000,
+        deliberation=@Deliberation(inhibits=PerformPatrol.class))    // Pause patrol goal while loading battery
 ```
 
 ### The `@Deliberation` Annotation and the `inhibits` Setting
@@ -190,11 +190,11 @@ resuming the patrol round. We can specify this by adding an explicit *target* co
 method of the `MaintainBatteryLoaded` class:
 
 ```java
-		@GoalTargetCondition	// Only stop charging, when this condition is true
-		boolean isBatteryFullyLoaded()
-		{
-			return self.getChargestate()>=0.9; // Charge until 90%
-		}
+        @GoalTargetCondition    // Only stop charging, when this condition is true
+        boolean isBatteryFullyLoaded()
+        {
+            return self.getChargestate()>=0.9; // Charge until 90%
+        }
 ```
 
 So now we have `isBatteryLoaded()` to state when the agent should *start* charging (*maintain condition*)

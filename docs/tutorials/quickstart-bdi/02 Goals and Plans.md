@@ -42,35 +42,35 @@ import jadex.quickstart.cleanerworld.gui.*;
 /**
  *  BDI agent template.
  */
-@Agent(type="bdi")	// This annotation makes the java class and agent and enabled BDI features
+@Agent(type="bdi")    // This annotation makes the java class and agent and enabled BDI features
 public class CleanerBDIAgent
 {
-	//-------- fields holding agent data --------
-	
-	/** The sensor/actuator object gives access to the environment of the cleaner robot. */
-	private SensorActuator	actsense	= new SensorActuator();
-	
-	//... add more field here
-	
-	//-------- setup code --------
-	
-	/**
-	 *  The body is executed when the agent is started.
-	 *  @param bdifeature	Provides access to bdi specific methods
-	 */
-	@AgentBody	// This annotation informs the Jadex platform to call this method once the agent is started
-	private void	exampleBehavior(IBDIAgentFeature bdi)
-	{
-		// Open a window showing the agent's perceptions
-		new SensorGui(actsense).setVisible(true);
-		
-		//... add more setup code here
-		actsense.moveTo(Math.random(), Math.random());	// Dummy call so that the cleaner moves a little.
-	}
+    //-------- fields holding agent data --------
 
-	//-------- additional BDI agent code --------
-	
-	//... BDI goals and plans will be added here
+    /** The sensor/actuator object gives access to the environment of the cleaner robot. */
+    private SensorActuator    actsense    = new SensorActuator();
+
+    //... add more field here
+
+    //-------- setup code --------
+
+    /**
+     *  The body is executed when the agent is started.
+     *  @param bdifeature    Provides access to bdi specific methods
+     */
+    @AgentBody    // This annotation informs the Jadex platform to call this method once the agent is started
+    private void    exampleBehavior(IBDIAgentFeature bdi)
+    {
+        // Open a window showing the agent's perceptions
+        new SensorGui(actsense).setVisible(true);
+
+        //... add more setup code here
+        actsense.moveTo(Math.random(), Math.random());    // Dummy call so that the cleaner moves a little.
+    }
+
+    //-------- additional BDI agent code --------
+
+    //... BDI goals and plans will be added here
 }
 ```
 
@@ -127,30 +127,30 @@ such that you can go back to a previous solution in case you messed up. This way
 Now add a goal and a plan specification to the agent (i.e. to `CleanerBDIAgent.java`) as shown below:
 
 ```java
-	//-------- inner classes that represent agent goals --------
-	
-	/**
-	 *  A goal to patrol around in the museum.
-	 */
-	@Goal	// The goal annotation allows instances of a Java class to be dispatched as goals of the agent.
-	class PerformPatrol {}
-	
-	//-------- methods that represent plans (i.e. predefined recipes for working on certain goals) --------
-	
-	/**
-	 *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
-	 */
-	@Plan(trigger=@Trigger(goals=PerformPatrol.class))	// The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
-	private void	performPatrolPlan()
-	{
-		// Follow a simple path around the four corners of the museum and back to the first corner.
-		System.out.println("Starting performPatrolPlan()");
-		actsense.moveTo(0.1, 0.1);
-		actsense.moveTo(0.1, 0.9);
-		actsense.moveTo(0.9, 0.9);
-		actsense.moveTo(0.9, 0.1);
-		actsense.moveTo(0.1, 0.1);
-	}
+    //-------- inner classes that represent agent goals --------
+
+    /**
+     *  A goal to patrol around in the museum.
+     */
+    @Goal    // The goal annotation allows instances of a Java class to be dispatched as goals of the agent.
+    class PerformPatrol {}
+
+    //-------- methods that represent plans (i.e. predefined recipes for working on certain goals) --------
+
+    /**
+     *  Declare a plan for the PerformPatrol goal by using a method with @Plan and @Trigger annotation.
+     */
+    @Plan(trigger=@Trigger(goals=PerformPatrol.class))    // The plan annotation makes a method or class a plan. The trigger states, when the plan should considered for execution.
+    private void    performPatrolPlan()
+    {
+        // Follow a simple path around the four corners of the museum and back to the first corner.
+        System.out.println("Starting performPatrolPlan()");
+        actsense.moveTo(0.1, 0.1);
+        actsense.moveTo(0.1, 0.9);
+        actsense.moveTo(0.9, 0.9);
+        actsense.moveTo(0.9, 0.1);
+        actsense.moveTo(0.1, 0.1);
+    }
 ```
 
 You should add the code *before* the last closing brace (`}`), such that the `PerformPatrol` class
@@ -166,16 +166,16 @@ We can do that in the `exampleBehavior()` method, that is executed directly afte
 Find the line
 
 ```java
-		//... add more setup code here
-		actsense.moveTo(Math.random(), Math.random());
-		// Dummy call so that the cleaner moves a little.
+        //... add more setup code here
+        actsense.moveTo(Math.random(), Math.random());
+        // Dummy call so that the cleaner moves a little.
 ```
 
 and replace it with
 
 ```java
-		// Create and dispatch a goal.
-		bdi.dispatchTopLevelGoal(new PerformPatrol());
+        // Create and dispatch a goal.
+        bdi.dispatchTopLevelGoal(new PerformPatrol());
 ```
 
 Execute the agent again by starting the `Main` class and observe it performing a patrol round as specified in the
@@ -266,23 +266,23 @@ should choose from for pursuing the `PerformPatrol` goal. We can just add more m
 `@Plan` annotation as shown below.
 
 ```java
-	/**
-	 *  Declare a second plan for the PerformPatrol goal.
-	 */
-	@Plan(trigger=@Trigger(goals=PerformPatrol.class))
-	private void	performPatrolPlan2()
-	{
-		// Follow another path around the middle of the museum.
-		System.out.println("Starting performPatrolPlan2()");
-		
-		// Fill in moveTo() commands, e.g. according to the figure
-	}
-	
-	/**
-	 *  Declare a third plan for the PerformPatrol goal.
-	 */
-	// Fill in @Plan annotation and method body for third patrol plan,
-	// e.g. according to the figure
+    /**
+     *  Declare a second plan for the PerformPatrol goal.
+     */
+    @Plan(trigger=@Trigger(goals=PerformPatrol.class))
+    private void    performPatrolPlan2()
+    {
+        // Follow another path around the middle of the museum.
+        System.out.println("Starting performPatrolPlan2()");
+
+        // Fill in moveTo() commands, e.g. according to the figure
+    }
+
+    /**
+     *  Declare a third plan for the PerformPatrol goal.
+     */
+    // Fill in @Plan annotation and method body for third patrol plan,
+    // e.g. according to the figure
 ```
 
 Add the methods above into your `CleanerBDIAgent.java`. Execute the agent by starting the `Main` class.
@@ -306,7 +306,7 @@ and lets the agent execute our additional patrol plans.
 Thus change the `@Goal` annotation of the `PerformPatrol` goal to
 
 ```java
-	@Goal(recur=true, orsuccess=false)
+    @Goal(recur=true, orsuccess=false)
 ```
 
 Execute the agent by starting the `Main` class and check that now all three plans are executed after each other.
@@ -322,7 +322,7 @@ Lets say we want the cleaner to stop between patrol rounds. We find two flags th
 `recurdelay` and `retrydelay`. Both represent a waiting time in milliseconds. Add a `retrydelay` of 3000 (i.e. three seconds) to the goal like so:
 
 ```java
-	@Goal(recur=true, orsuccess=false, retrydelay=3000)	// Goal flags: variation 1
+    @Goal(recur=true, orsuccess=false, retrydelay=3000)    // Goal flags: variation 1
 ```
 
 Execute the agent by starting the `Main` class and observe the behavior. What happens if you change
@@ -334,7 +334,7 @@ Execute the agent by starting the `Main` class and observe the behavior. What ha
    multiple times in the same goal processing cycle. Try the following settings. Can you explain what these flags do (4)?
 
 ```java
-	@Goal(orsuccess=false, excludemode=ExcludeMode.WhenFailed, randomselection=true, retrydelay=3000) // Goal flags variation 3
+    @Goal(orsuccess=false, excludemode=ExcludeMode.WhenFailed, randomselection=true, retrydelay=3000) // Goal flags variation 3
 ```
 
 * What happens if you use the `posttoall` flag for the `PerformPatrol` goal and why (5)?

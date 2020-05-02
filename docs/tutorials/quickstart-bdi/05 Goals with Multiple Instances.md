@@ -24,16 +24,16 @@ and keep our procedural plans simple.
 To keep track of waste objects, first add a corresponding belief set to the agent:
 
 ```java
-	/** Set of the known waste items. Managed by SensorActuator object. */
-	@Belief
-	private Set<IWaste>	wastes	= new LinkedHashSet<>();
+    /** Set of the known waste items. Managed by SensorActuator object. */
+    @Belief
+    private Set<IWaste>    wastes    = new LinkedHashSet<>();
 ```
 
 Don't forget to ask the *SensorActuator* to manage the belief set's contents
 in the `exampleBehavior()` method:
 
 ```java
-		actsense.manageWastesIn(wastes);
+        actsense.manageWastesIn(wastes);
 ```
 
 Now we can make the agent react to changes in the belief set by creating
@@ -41,23 +41,23 @@ corresponding goals. Therefore define a new goal type *AchieveCleanupWaste*
 as follows:
 
 ```java
-	/**
-	 *  A goal to cleanup waste.
-	 */
-	@Goal
-	class AchieveCleanupWaste
-	{
-		// Remember the waste item to clean up
-		IWaste	waste;
-		
-		// Create a new goal instance for each new waste item
-		@GoalCreationCondition(factadded="wastes")
-		public AchieveCleanupWaste(IWaste waste)
-		{
-			System.out.println("Created achieve cleanup goal for "+waste);
-			this.waste = waste;
-		}
-	}
+    /**
+     *  A goal to cleanup waste.
+     */
+    @Goal
+    class AchieveCleanupWaste
+    {
+        // Remember the waste item to clean up
+        IWaste    waste;
+
+        // Create a new goal instance for each new waste item
+        @GoalCreationCondition(factadded="wastes")
+        public AchieveCleanupWaste(IWaste waste)
+        {
+            System.out.println("Created achieve cleanup goal for "+waste);
+            this.waste = waste;
+        }
+    }
 ```
 
 Execute the agent and observe the console output. Whenever the agent discovers a

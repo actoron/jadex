@@ -27,7 +27,7 @@ protected IBDIAgentFeature bdiFeature;
 
 @AgentFeature
 protected IExecutionFeature execFeature;
-	
+
 @Belief
 protected Map<String, String> wordtable;
 ```

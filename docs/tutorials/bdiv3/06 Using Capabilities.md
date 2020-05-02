@@ -117,7 +117,7 @@ In this simple case an alternative solution would have been making the word tabl
 ```java
 @Belief
 public native Map<String, String> getWordtable();
-	
+
 @Belief
 public native void setWordtable(Map<String, String> wordtable);
 ```

@@ -91,7 +91,7 @@ agent.getServiceContainer().getService("regservice")
   {
     final IRegistryServiceE3 rs = (IRegistryServiceE3)result;
     rs.register(agent.getComponentIdentifier(), "my_nick");
-				
+
     agent.waitFor(10000, new IComponentStep()
     {
       public IFuture<Void> execute(IInternalAccess ia)
@@ -128,7 +128,7 @@ agent.getServiceContainer().getService("regservice")
     <argument name="nickname">"Hans"</argument>
   </arguments>
   <requiredservices>
-    <binding name="regservice" componentname="reg" scope="parent"/>	
+    <binding name="regservice" componentname="reg" scope="parent"/>
   </requiredservices>
 </component>
 
@@ -162,7 +162,7 @@ In this small lecture we will create the registry component on demand, i.e. when
 ```xml
 
 <binding name="regservice" componentname="reg" scope="parent" create="true">
-	<creationinfo name="reg" type="registry"/>
+    <creationinfo name="reg" type="registry"/>
 </binding>
 
 ```

@@ -58,7 +58,7 @@ public class UserBDI
 {
     @Agent
     protected IInternalAccess agent;
-	
+
     @AgentBody
     public void body()
     {
@@ -208,11 +208,11 @@ public String internetTranslate(Object[] params)
           String wordb = inline.substring(start, end==-1? inline.length()-1: end);
           wordb = wordb.replaceAll("<b>", "");
           wordb = wordb.replaceAll("</b>", "");
-	  ret = worda;
+      ret = worda;
           System.out.println("Translated with internet dictionary: "+worda+" - "+wordb);
         }
-	catch(Exception e)
-	{
+    catch(Exception e)
+    {
           System.out.println(inline);
         }
       }

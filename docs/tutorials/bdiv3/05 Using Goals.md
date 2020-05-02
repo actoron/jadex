@@ -72,7 +72,7 @@ public class Translate
   protected String eword;
 
   protected String gword;
-		
+
   public Translate(String eword)
   {
     this.eword = eword;
@@ -144,10 +144,10 @@ public class Translate
 {
   @GoalParameter
   protected String eword;
-		
+
   @GoalResult
   protected String gword;
-		
+
   public Translate(String eword)
   {
     this.eword = eword;
@@ -200,7 +200,7 @@ protected String translateA(String eword)
   System.out.println("Plan A");
   throw new PlanFailureException();
 }
-	
+
 @Plan(trigger=@Trigger(goals=Translate.class))
 protected String translateB(String eword)
 {
@@ -336,7 +336,7 @@ public void body()
       return IFuture.DONE;
     }
   });
-		
+
   String eword = "bugger";
   String gword = (String)bdiFeature.dispatchTopLevelGoal(new Translate(eword)).get();
   System.out.println("Translated: "+eword+" "+gword);
@@ -369,7 +369,7 @@ public class MaintainStorageGoal
   {
     return wordtable.size()<=4;
   }
-		
+
   @GoalTargetCondition(beliefs="wordtable")
   protected boolean target()
   {
@@ -414,7 +414,7 @@ public void body()
   wordtable.put("cat", "Katze");
   wordtable.put("dog", "Hund");
 
-		
+
   execFeature.repeatStep(0, 2000, new IComponentStep<Void>()
     {
       int cnt = 0;

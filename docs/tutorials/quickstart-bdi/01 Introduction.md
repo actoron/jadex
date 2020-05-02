@@ -56,7 +56,7 @@ You can use the mouse to place or remove *waste* objects directly in the environ
 In the `Main` class, the agent is started with the line:
 
 ```java
-		conf.addComponent("quickstart/cleanerworld/SimpleCleanerAgent.class");
+        conf.addComponent("quickstart/cleanerworld/SimpleCleanerAgent.class");
 ```
 
 You can change this to start your own agents and/or duplicate the line to start multiple agents at once.
@@ -64,8 +64,8 @@ Further, you can use the `CLOCK_SPEED` setting to change the progress of time in
 make the cleaner move faster or slower:
 
 ```java
-	/** Use higher values (e.g. 2.0) for faster cleaner movement and lower values (e.g. 0.5) for slower movement. */
-	protected static double	CLOCK_SPEED	= 1;
+    /** Use higher values (e.g. 2.0) for faster cleaner movement and lower values (e.g. 0.5) for slower movement. */
+    protected static double    CLOCK_SPEED    = 1;
 ```
 
 ## A Simple Java Cleaner Agent (Exercise Zero)
@@ -88,11 +88,11 @@ More details about the sensor/actuator object can be found in the
 The simple cleaner is just a starting point that does not perceive anything and just moves randomly:
 
 ```java
-		// Agent uses one main loop for its random move behavior
-		while(true)
-		{
-			actsense.moveTo(Math.random(), Math.random());
-		}
+        // Agent uses one main loop for its random move behavior
+        while(true)
+        {
+            actsense.moveTo(Math.random(), Math.random());
+        }
 ```
 
 As a preliminary exercise in this tutorial, you could try to implement a cleaner in Java that:

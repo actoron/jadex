@@ -41,7 +41,7 @@ This is a more complete list of currently unsupported modules on Jadex Android:
 
 ### 3.0.0-RC68
 
--	Better error messages when generating BDIV3 agents at compile time using jadex-gradle-plugin
+- Better error messages when generating BDIV3 agents at compile time using jadex-gradle-plugin
 
 ### 3.0.0-RC42
 
@@ -517,7 +517,7 @@ To use it, add a service declaration to your agent type:
 
 ```java
 @RequiredServices({
-	@RequiredService(name="context", type=IContextService.class, binding=@Binding(scope=ServiceScope.PLATFORM))
+    @RequiredService(name="context", type=IContextService.class, binding=@Binding(scope=ServiceScope.PLATFORM))
 })
 public class...
 ```
@@ -525,21 +525,21 @@ public class...
 Now, the service can be injected into a field:
 
 ```java
-	@AgentService
-	protected IContextService	context;
+    @AgentService
+    protected IContextService    context;
 ```
 
 And used inside the agent's body method (or elesewhere after the instantiation of the agent):
 
 ```java
     @AgentBody
-	public IFuture<Void> executeBody()
-	{
-	    MyEvent myEvent = new MyEvent();
+    public IFuture<Void> executeBody()
+    {
+        MyEvent myEvent = new MyEvent();
         myEvent.setMessage("Hello Service!");
         context.dispatchEvent(myEvent);
-		return new Future<Void>();
-	}
+        return new Future<Void>();
+    }
 ```
 
 The dispatched event will then be passed to the matching event receiver.

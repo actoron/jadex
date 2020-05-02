@@ -25,14 +25,14 @@ The translation plan handles this translation goal and sends back some HTML cont
 public class TranslationBDI
 {
     @AgentFeature
-	protected IExecutionFeature execFeature;
-	
+    protected IExecutionFeature execFeature;
+
     @AgentFeature
     protected IBDIAgentFeature bdiFeature;
-	
-	protected Map<String, String> wordtable;
 
-	protected ServerSocket server;
+    protected Map<String, String> wordtable;
+
+    protected ServerSocket server;
 }
 ```
 
@@ -66,8 +66,8 @@ public class Translate
 
 ```java
 Runnable run = new Runnable()
-{			
-  public void	run()
+{
+  public void    run()
   {
     try
     {
@@ -138,7 +138,7 @@ public void translate(Translate trans)
     String eword = request.substring(slash+1, space);
     String gword = wordtable.get(eword);
     System.out.println(request);
-    PrintStream	out = new PrintStream(client.getOutputStream());
+    PrintStream    out = new PrintStream(client.getOutputStream());
     out.print("HTTP/1.0 200 OK\r\n");
     out.print("Content-type: text/html\r\n");
     out.println("\r\n");

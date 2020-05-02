@@ -30,9 +30,9 @@ because we try to fetch a charging station object from an empty set:
 
 ```txt
 WARNING: Plan 'loadBattery' threw exception: java.util.NoSuchElementException
-	at java.util.LinkedHashMap$LinkedHashIterator.nextNode(LinkedHashMap.java:721)
-	at java.util.LinkedHashMap$LinkedKeyIterator.next(LinkedHashMap.java:742)
-	at quickstart.cleanerworld.single.CleanerBDIAgent.loadBattery(CleanerBDIAgent.java:170)
+    at java.util.LinkedHashMap$LinkedHashIterator.nextNode(LinkedHashMap.java:721)
+    at java.util.LinkedHashMap$LinkedKeyIterator.next(LinkedHashMap.java:742)
+    at quickstart.cleanerworld.single.CleanerBDIAgent.loadBattery(CleanerBDIAgent.java:170)
 ```
 
 We now want to make sure that we always know some charging station by using a subgoal
@@ -40,27 +40,27 @@ in the battery loading plan. This subgoal should be based on the current beliefs
 Thus we want to define a belief for the known charging stations, next to the `self` belief:
 
 ```java
-	/** Set of the known charging stations. Managed by SensorActuator object. */
-	@Belief
-	private Set<IChargingstation>	stations	= new LinkedHashSet<>();
+    /** Set of the known charging stations. Managed by SensorActuator object. */
+    @Belief
+    private Set<IChargingstation>    stations    = new LinkedHashSet<>();
 ```
 
 Also, we need to tell the `SensorActuator` object to keep this belief up to date.
 We can do this in the `exampleBehavior()` method:
 
 ```java
-		// Tell the sensor to update the belief sets
-		actsense.manageChargingstationsIn(stations);
+        // Tell the sensor to update the belief sets
+        actsense.manageChargingstationsIn(stations);
 ```
 
 To test the new belief set, we can change the battery loading plan as follows:
 
 ```java
-//		IChargingstation	chargingstation	= actsense.getChargingstations().iterator().next();	// old
-		IChargingstation	chargingstation	= stations.iterator().next();	// new
-		
-		// Print class of stations object to show that the LinkedHashSet has been wrapped.
-		System.out.println("Class of the belief set is: "+stations.getClass());
+//        IChargingstation    chargingstation    = actsense.getChargingstations().iterator().next();    // old
+        IChargingstation    chargingstation    = stations.iterator().next();    // new
+
+        // Print class of stations object to show that the LinkedHashSet has been wrapped.
+        System.out.println("Class of the belief set is: "+stations.getClass());
 ```
 
 ### The `stations` Belief Set
@@ -75,10 +75,10 @@ so you can see that the `stations` set is wrapped in an object of type `jadex.bd
 Try changing the belief declaration as follows:
 
 ```java
-	/** Set of the known charging stations. Managed by SensorActuator object. */
-	@Belief
-//	private Set<IChargingstation>	stations	= new LinkedHashSet<>();
-	private LinkedHashSet<IChargingstation>	stations	= new LinkedHashSet<>();
+    /** Set of the known charging stations. Managed by SensorActuator object. */
+    @Belief
+//    private Set<IChargingstation>    stations    = new LinkedHashSet<>();
+    private LinkedHashSet<IChargingstation>    stations    = new LinkedHashSet<>();
 ```
 
 Instead of the interface `Set`, now we use the implementation class `LinkedHashSet`.
@@ -106,51 +106,51 @@ Note that the beliefs are not immediately updated when an object changes that is
 Now we can add a goal that checks if a charging station is known:
 
 ```java
-	/**
-	 *  A goal to know a charging station.
-	 */
-	@Goal
-	class QueryChargingStation
-	{
-		// Remember the station when found
-		IChargingstation	station;
-		
-		// Check if there is a station in the beliefs
-		@GoalTargetCondition
-		boolean isStationKnown()
-		{
-			station	= stations.isEmpty() ? null : stations.iterator().next();
-			return station!=null;
-		}
-	}
+    /**
+     *  A goal to know a charging station.
+     */
+    @Goal
+    class QueryChargingStation
+    {
+        // Remember the station when found
+        IChargingstation    station;
+
+        // Check if there is a station in the beliefs
+        @GoalTargetCondition
+        boolean isStationKnown()
+        {
+            station    = stations.isEmpty() ? null : stations.iterator().next();
+            return station!=null;
+        }
+    }
 ```
 
 We also have to alter our load battery plan to use this new goal:
 
 ```java
-	/**
-	 *  Move to charging station and load battery.
-	 */
-	@Plan(trigger=@Trigger(goals=MaintainBatteryLoaded.class))
-	private void loadBattery(IPlan plan)
-	{
-		System.out.println("Starting loadBattery() plan");
-		
-//		// Move to first known charging station -> fails when no charging station known.
-//		IChargingstation	chargingstation	= actsense.getChargingstations().iterator().next();	// from Exercise B1
-//		IChargingstation	chargingstation	= stations.iterator().next();	// from Exercise C0
-		
-		// Dispatch a subgoal to find a charging station (from Exercise C1)
-		QueryChargingStation	querygoal	= new QueryChargingStation();
-		plan.dispatchSubgoal(querygoal).get();
-		IChargingstation	chargingstation	= querygoal.station;
-		
-		// Move to charging station as provided by subgoal
-		actsense.moveTo(chargingstation.getLocation());
-		
-		// Load until 100% (never reached, but plan is aborted when goal succeeds).
-		actsense.recharge(chargingstation, 1.0);
-	}
+    /**
+     *  Move to charging station and load battery.
+     */
+    @Plan(trigger=@Trigger(goals=MaintainBatteryLoaded.class))
+    private void loadBattery(IPlan plan)
+    {
+        System.out.println("Starting loadBattery() plan");
+
+//        // Move to first known charging station -> fails when no charging station known.
+//        IChargingstation    chargingstation    = actsense.getChargingstations().iterator().next();    // from Exercise B1
+//        IChargingstation    chargingstation    = stations.iterator().next();    // from Exercise C0
+
+        // Dispatch a subgoal to find a charging station (from Exercise C1)
+        QueryChargingStation    querygoal    = new QueryChargingStation();
+        plan.dispatchSubgoal(querygoal).get();
+        IChargingstation    chargingstation    = querygoal.station;
+
+        // Move to charging station as provided by subgoal
+        actsense.moveTo(chargingstation.getLocation());
+
+        // Load until 100% (never reached, but plan is aborted when goal succeeds).
+        actsense.recharge(chargingstation, 1.0);
+    }
 ```
 
 Execute the program and check what happens. Again, an error occurs, but a different one:

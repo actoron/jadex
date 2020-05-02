@@ -25,8 +25,8 @@ public static void main(String[] args)
 
 ```java
 
-IFuture<IExternalAccess>	platfut	= Starter.createPlatform(args);
-IExternalAccess	platform	= platfut.get();
+IFuture<IExternalAccess>    platfut    = Starter.createPlatform(args);
+IExternalAccess    platform    = platfut.get();
 System.out.println("Started platform: "+platform.getComponentIdentifier());
 
 ```
@@ -78,7 +78,7 @@ String[] defargs = new String[]
 String[] newargs = new String[defargs.length+args.length];
 System.arraycopy(defargs, 0, newargs, 0, defargs.length);
 System.arraycopy(args, 0, newargs, defargs.length, args.length);
-IFuture<IExternalAccess>	platfut	= Starter.createPlatform(newargs);
+IFuture<IExternalAccess>    platfut    = Starter.createPlatform(newargs);
 IExternalAccess platform = platfut.get();
 System.out.println("Started platform: "+platform.getComponentIdentifier());
 

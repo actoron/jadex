@@ -109,27 +109,27 @@ For example, the following example would conform to this:
 ```java
 public class Customer {
 
-	private int id;
-	private String name;
-	
-	public Customer() {
-	}
-	
-	public int getId() {
-		return id;
-	}
-	
-	public void setId(int id) {
-		this.id = id;
-	}
-	
-	public String getName() {
-		return id;
-	}
-	
-	public void setName(int name) {
-		this.name = name;
-	}
+    private int id;
+    private String name;
+
+    public Customer() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return id;
+    }
+
+    public void setName(int name) {
+        this.name = name;
+    }
 ```
 
 As long as your classes conform to this pattern or are one of the directly supported types, they can be transmitted. You can also nest (use one of them as a field in another class) at will and even include (self-) references to other parts of the object graph and the object will be correctly recreated on the remote computer.
@@ -147,11 +147,11 @@ If you don't want to add bean-conform getters/setters to your classes, you may a
 @IncludeFields
 public class Customer {
 
-	public int id; // included
-	public String name; // included
+    public int id; // included
+    public String name; // included
 
-	public Customer() {
-	}
+    public Customer() {
+    }
 ```
 
 You may also use an explicit [@Include](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/transformation/annotations/Include.html) annotation on every field to include it.

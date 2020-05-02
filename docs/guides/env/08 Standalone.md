@@ -27,9 +27,9 @@ With the ComponentManagementService, the agents can now be created. As you are t
 
 ```java
 public interface IInitialisationService {
-	void start();
-	void setMyColor(int color);
-	void setPosition(Vector2Double position);
+    void start();
+    void setMyColor(int color);
+    void setPosition(Vector2Double position);
 }
 ```
 
@@ -54,7 +54,7 @@ Don't forget to implement the Service interface and add a field to inject the ag
 
 If this preconditions are met, the agent can be created and parameterized in Java. This is done via a call of the service at the newly created agent and would look like this (inside the Startup.main() method):
 
-```java	
+```java
 String exampleModel = ExampleAgent.class.getName() + ".class";
 Random random = new Random();
 final ITuple2Future<IComponentIdentifier, Map<String, Object>> componentFuture = cms.createComponent("ExampleAgent", exampleModel, null);
@@ -81,9 +81,9 @@ In this Example, the application XML is named *jadex/example/Example.application
 <applicationtype xmlns="http://www.activecomponents.org/jadex-application" xmlns:env="http://www.activecomponents.org/jadex-envspace"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://www.activecomponents.org/jadex-application
-	                    http://www.activecomponents.org/jadex-application-3.0.0-RC30.xsd
-	                    http://www.activecomponents.org/jadex-envspace
-	                    http://www.activecomponents.org/jadex-envspace-3.0.0-RC30.xsd"
+                        http://www.activecomponents.org/jadex-application-3.0.0-RC30.xsd
+                        http://www.activecomponents.org/jadex-envspace
+                        http://www.activecomponents.org/jadex-envspace-3.0.0-RC30.xsd"
                  name="Example" package="jadex.example">
 
     <imports>
@@ -170,7 +170,7 @@ The creation of the avatar has do be done manually. Therefore the description of
 
 ```java
 @Override
-	public void start() {
+    public void start() {
         final HashMap<Object, Object> properties = new HashMap<>();
         properties.put(Space2D.PROPERTY_POSITION, position);
         properties.put("myColor", myColor);
@@ -180,7 +180,7 @@ The creation of the avatar has do be done manually. Therefore the description of
         ContinuousSpace2D space = (ContinuousSpace2D) spaceService.getSpace("mygc2dspace").get();
         avatar = space.createSpaceObject("ExampleAvatar", properties, new LinkedList<>());
         avatar.setProperty(Space2D.PROPERTY_POSITION, position);
-	}
+    }
 ```
 
 The last step is calling the start() method from the Startup.main() method, after the space was created:

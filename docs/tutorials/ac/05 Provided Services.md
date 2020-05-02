@@ -50,11 +50,11 @@ final Future<Void> ret = new Future<Void>();
 IFuture<IClockService> fut = requiredServicesFeature.getService("clockservice");
 fut.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 {
-	public void customResultAvailable(IClockService result)
-	{
-		clock = result;
-		ret.setResult(null);
-	}
+    public void customResultAvailable(IClockService result)
+    {
+        clock = result;
+        ret.setResult(null);
+    }
 });
 return ret;
 ```
@@ -104,29 +104,29 @@ In this lecture we will add a small graphical chat user interface. The interface
 ```java
 send.addActionListener(new ActionListener()
 {
-	public void actionPerformed(ActionEvent e)
-	{
-		final String text = message.getText();
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IFuture<Collection<IChatService>>	chatservices	= ia.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
-				chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
-				{
-					public void resultAvailable(Collection<IChatService> result)
-					{
-						for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
-						{
-							IChatService cs = it.next();
-							cs.message(agent.getComponentIdentifier().getName(), text);
-						}
-					}
-				});
-				return IFuture.DONE;
-			}
-		});
-	}
+    public void actionPerformed(ActionEvent e)
+    {
+        final String text = message.getText();
+        agent.scheduleStep(new IComponentStep<Void>()
+        {
+            public IFuture<Void> execute(IInternalAccess ia)
+            {
+                IFuture<Collection<IChatService>>    chatservices    = ia.getComponentFeature(IRequiredServicesFeature.class).getServices("chatservices");
+                chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
+                {
+                    public void resultAvailable(Collection<IChatService> result)
+                    {
+                        for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
+                        {
+                            IChatService cs = it.next();
+                            cs.message(agent.getComponentIdentifier().getName(), text);
+                        }
+                    }
+                });
+                return IFuture.DONE;
+            }
+        });
+    }
 });
 ```
 
@@ -153,15 +153,15 @@ addWindowListener(new WindowAdapter()
 
 ```java
 final IExternalAccess exta = agent.getExternalAccess();
-IFuture<IClockService>	clockservice	= requiredServicesFeature.getService("clockservice");
+IFuture<IClockService>    clockservice    = requiredServicesFeature.getService("clockservice");
 clockservice.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 {
-	public void customResultAvailable(IClockService result)
-	{
-		clock = result;
-		gui = createGui(exta);
-		ret.setResult(null);
-	}
+    public void customResultAvailable(IClockService result)
+    {
+        clock = result;
+        gui = createGui(exta);
+        ret.setResult(null);
+    }
 });
 ```
 

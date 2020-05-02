@@ -120,7 +120,7 @@ So what we need is a possibility to further restrict the search results. This ca
 - Use the following code to search for the factory:
 
 ```java
-IFuture<IComponentFactory>	factory	= SServiceProvider.getService(agent,
+IFuture<IComponentFactory>    factory    = SServiceProvider.getService(agent,
     IComponentFactory.class, ServiceScope.PLATFORM, new FactoryFilter(MicroAgentFactory.FILETYPE_MICROAGENT));
 
 factory.addResultListener(new DefaultResultListener<IComponentFactory>()

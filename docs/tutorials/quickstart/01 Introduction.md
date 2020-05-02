@@ -1,5 +1,3 @@
-${SorryOutdatedv3}
-
 # Introduction
 
 This tutorial uses a small example use case to illustrate some basic features of Jadex without too much technical fuss. It is aimed at programmers with solid Java experience who like to "jump in" and quickly want to get something running. Furthermore the tutorial provides many pointers to other documentation pages that you can follow if you want to learn a bit more about a certain topic.
@@ -9,8 +7,10 @@ This tutorial uses a small example use case to illustrate some basic features of
 In this tutorial, a small distributed system will be built, in which time clients can subscribe to time servers for continuously receiving the current time of the server. Therefore time user components will search for available time provider components and subscribe to all providers they can find (see Fig.1a). The time providers remember the subscribed time user components. They then periodically (e.g. every 5 seconds) send their current time to all subscribed time users components (see Fig.1b).
 
 a) ![01 Introduction@subscribe.png](subscribe.png)
+
 b) ![01 Introduction@publish.png](publish.png)
-*Figure 1: a) Time users subscribing to time providers, b) time providers publishing their current time to time users*
+
+*Figure 1:* *a) Time users subscribing to time providers, b) time providers publishing their current time to time users*
 
 Although this application is quite simple, it contains several common challenges regarding the programming of distributed systems:
 
@@ -41,4 +41,6 @@ In the following three chapters each of the three elements of the architecture w
 
 ![01 Introduction@timearch.png](timearch.png)
 
-*Figure 2: UML class diagram of the time user / time provider system architecture*
+*Figure 2:* *UML class diagram of the time user / time provider system architecture*
+
+[[Next: 02 Time Service Interface]](02%20Time%20Service%20Interface.md)

@@ -34,7 +34,7 @@ As a basis for the subsequent exercises in this chapter a new agent is used: the
 ```java
 
 // Reply if the message contains the keyword.
-ChatBotF1Agent	chatbot	= (ChatBotF1Agent)((IPojoMicroAgent)agent).getPojoAgent();
+ChatBotF1Agent    chatbot    = (ChatBotF1Agent)((IPojoMicroAgent)agent).getPojoAgent();
 if(text.toLowerCase().indexOf(chatbot.getKeyword().toLowerCase())!=-1)
 {
   ...
