@@ -234,3 +234,6 @@ public class HelloAgent {
 
 To start your applications developed with Jadex Active Components, you always need to start a [Jadex Platform](../platform/platform.md#starting-a-platform) and [start your Component(s)](../components/components.md#startup).
 As shown in the example above, you can combine these two steps by adding your agents/components to the config before starting the platform.
+
+---
+[[Up: Document Overview]](../index.md)
