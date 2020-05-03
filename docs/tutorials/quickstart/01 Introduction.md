@@ -45,3 +45,9 @@ In the following three chapters each of the three elements of the architecture w
 
 ---
 [[Up: Document Overview]](../../index.md) [[Next: 02 Time Service Interface]](02%20Time%20Service%20Interface.md)
+
+---
+[ [Up: Document Overview](../../index.md) | [Next: 02 Time Service Interface](02%20Time%20Service%20Interface.md) ]
+
+---
+[[Up: Document Overview](../../index.md) | [Next: 02 Time Service Interface](02%20Time%20Service%20Interface.md)]
