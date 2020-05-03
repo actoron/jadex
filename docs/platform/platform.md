@@ -1,6 +1,6 @@
-${SorryOutdatedv3}
-
 # Jadex Platform
+
+**Outdated Documentation**: This page is yet to be updated to the latest Jadex version. The documentation is still valid and the explanations still apply. Yet, due to some API changes, not all code examples in this document may be used as such. When in doubt, check the example sources in the *applications* modules available on GitHub, e.g. for [Micro](https://github.com/actoron/jadex/tree/master/applications/micro/src/main/java/jadex/micro) and [BDI](https://github.com/actoron/jadex/tree/master/applications/bdiv3/src/main/java/jadex/bdiv3) agents.
 
 For Active Components to be executed, a *Platform* needs to be running.
 The Jadex Platform provides important runtime services such as lifecycle management, remote service invocation and component management. For more information about services provided by the Jadex Platform itself, skip to [Platform services](#platform-services).

@@ -1,6 +1,6 @@
-${SorryOutdatedv3}
-
 # Remote Communication
+
+**Outdated Documentation**: This page is yet to be updated to the latest Jadex version. The documentation is still valid and the explanations still apply. Yet, due to some API changes, not all code examples in this document may be used as such. When in doubt, check the example sources in the *applications* modules available on GitHub, e.g. for [Micro](https://github.com/actoron/jadex/tree/master/applications/micro/src/main/java/jadex/micro) and [BDI](https://github.com/actoron/jadex/tree/master/applications/bdiv3/src/main/java/jadex/bdiv3) agents.
 
 Applications built with Jadex Active Components can be easily distributed across platforms, meaning that [service discovery](../services/services.md#service-scopes) and [accessing services](../services/services.md#accessing-services) works the same way, no matter if the target service is available at a local or remote platform.
 

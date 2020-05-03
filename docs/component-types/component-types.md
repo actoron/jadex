@@ -1,6 +1,6 @@
-${SorryOutdatedv3}
-
 # Component Types
+
+**Outdated Documentation**: This page is yet to be updated to the latest Jadex version. The documentation is still valid and the explanations still apply. Yet, due to some API changes, not all code examples in this document may be used as such. When in doubt, check the example sources in the *applications* modules available on GitHub, e.g. for [Micro](https://github.com/actoron/jadex/tree/master/applications/micro/src/main/java/jadex/micro) and [BDI](https://github.com/actoron/jadex/tree/master/applications/bdiv3/src/main/java/jadex/bdiv3) agents.
 
 While the most basic component type is a *Micro Agent*, Jadex supports much more advanced concepts. This is an overview of the supported component types and their [Features](../components/components.md#component-features).
 
