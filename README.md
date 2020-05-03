@@ -5,22 +5,24 @@ The general idea is to consider systems to be composed of components acting as s
 Hence, it is very similar to the Service Component Architecture (SCA) approach and extends it with agents-oriented concepts. 
 In contrast to SCA, components are always active entities, i.e. they posses autonomy with respect to what they do and when they perform actions making them akin to agents. In contrast to agents, communication is preferably done using service invocations.
 
-Read more about Active Components at www.activecomponents.org and visit our [documentation pages](https://download.actoron.com/docs/releases/latest/jadex-mkdocs/).
+Read more about Active Components at <https://www.activecomponents.org> and visit the [documentation overview](docs/index.md).
 
 # Maven/Gradle dependencies
 
 Gradle:
 
-```compile 'org.activecomponents.jadex:jadex-distribution-standard:${jadex-version}'```
+```implementation 'org.activecomponents.jadex:jadex-distribution-minimal:'+jadex_version```
 
 Maven:
 ```xml
 <dependency>
     <groupId>org.activecomponents.jadex</groupId>
     <artifactId>jadex-distribution-minimal</artifactId>
-    <version>${jadex-version}</version>
+    <version>${jadexversion}</version>
 </dependency>
 ```
+
+For more details on setting up a development project see the [Getting Started Guide](docs/getting-started/getting-started.md).
 
 # Releases
 For the latest release versions, please have a look at our [download page](https://www.activecomponents.org/index.html#/download).
