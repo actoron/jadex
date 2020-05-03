@@ -43,4 +43,5 @@ In the following three chapters each of the three elements of the architecture w
 
 *Figure 2:* *UML class diagram of the time user / time provider system architecture*
 
-[[Next: 02 Time Service Interface]](02%20Time%20Service%20Interface.md)
+---
+[[Up: Document Overview]](../../index.md) [[Next: 02 Time Service Interface]](02%20Time%20Service%20Interface.md)
