@@ -3,7 +3,6 @@ package jadex.quickstart.cleanerworld.single;
 import jadex.bdiv3.features.IBDIAgentFeature;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
 import jadex.quickstart.cleanerworld.gui.SensorGui;
 
@@ -26,8 +25,7 @@ public class CleanerBDIAgentA0
 	 *  The body is executed when the agent is started.
 	 *  @param bdifeature	Provides access to bdi specific methods
 	 */
-	//@AgentBody	// This annotation informs the Jadex platform to call this method once the agent is started
-	@OnStart
+	@OnStart	// This annotation informs the Jadex platform to call this method once the agent is started
 	private void	exampleBehavior(IBDIAgentFeature bdi)
 	{
 		// Open a window showing the agent's perceptions

@@ -21,7 +21,6 @@ import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
-import jadex.micro.annotation.AgentBody;
 import jadex.quickstart.cleanerworld.environment.IChargingstation;
 import jadex.quickstart.cleanerworld.environment.ICleaner;
 import jadex.quickstart.cleanerworld.environment.IWaste;
@@ -76,8 +75,7 @@ public class CleanerBDIAgentFinal
 	 *  The body is executed when the agent is started.
 	 *  @param bdifeature	Provides access to bdi specific methods
 	 */
-//	@AgentBody
-	@OnStart
+	@OnStart	// This annotation informs the Jadex platform to call this method once the agent is started
 	private void	exampleBehavior(IBDIAgentFeature bdifeature)
 	{
 		// Tell the sensor to update the belief sets

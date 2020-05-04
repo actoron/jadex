@@ -37,7 +37,7 @@ We provide an example project that uses Gradle as described in the next section.
 
 This section describes an easy way of setting up a Jadex project for development in eclipse using the [Gradle](https://gradle.org/) build tool.
 
-Download the jadex-example-project.zip from [Downloads](https://www.activecomponents.org/#/download) and unpack it to a place of your choice.
+Download the **jadex-example-project.zip** from [Downloads](https://www.activecomponents.org/#/download) and unpack it to a place of your choice.
 
 - Use "File -> Import -> Gradle / Existing Gradle Project" and choose "Next".
 

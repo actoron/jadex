@@ -13,8 +13,6 @@ import jadex.bridge.component.IMessageFeature;
 import jadex.bridge.fipa.FipaMessage;
 import jadex.bridge.service.annotation.OnStart;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.OnMessage;
 import jadex.quickstart.cleanerworld.environment.ICleaner;
 import jadex.quickstart.cleanerworld.environment.SensorActuator;
