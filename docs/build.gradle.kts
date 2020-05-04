@@ -42,7 +42,6 @@ markdownlint {
 		+SingleH1Rule {
 //			includes	= listOf(".*tutorials.*", ".*guides.*", ".*tools.*")
 			includes	= listOf(".*quickstart.*")
-			active	= false
 		}
 
 		// Currently used for <x-hint> boxes		

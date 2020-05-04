@@ -2,7 +2,7 @@
 
 This chapter shows how to discover and use the time service.
 
-# Agent Implementation
+## Agent Implementation
 
 Create Java file *TimeUserAgent.java* in the package *jadex.micro.quickstart* and paste the contents as shown below.
 
@@ -54,17 +54,17 @@ public class TimeUserAgent
 }
 ```
 
-## Execute the Agent
+### Execute the Agent
 
 Start the Jadex platform and the agent with the provided *main()* method. In case there are any time services online, you should see their time printed to the console in periodic updates. In the next chapter you will learn how to start a local time provider.
 
 The details of the time user agent are explained in the following subsections. Furthermore, you can see [Platform.Starting a Platform](../../platform/platform.md#starting-a-platform) for details on platform configurations and [Tools.JCC Overview](../../tools/02%20JCC%20Overview.md) for details on the Jadex control center window (JCC)).
 
-## Class Name and @Agent Annotation
+### Class Name and @Agent Annotation
 
 To identify the class as an agent that can be started on the platform, the @Agent annotation is used. Furthermore, to speed up the scanning for startable agents, all agent classes must end with 'Agent' by convention. Before the 'Agent' part, any valid Java identifier can be used.
 
-## The Required Service Declaration and Injection
+### The Required Service Declaration and Injection
 
 A Jadex agent may use services provided by other agents. An agent might search for arbitrary services dynamically, but it also can declare required services as part of its public interface. A declaration of a required service is advantageous, because it makes the dependencies of an agent more explicit. Furthermore, the declarative specification of a required service allows separating details, such as service binding, from the agent implementation.
 
@@ -72,7 +72,7 @@ The time user agent declares the usage of the ITimeService by the @RequiredServi
 
 The ```@AgentService``` annotation to the ```addTimeService()``` method states that at startup a service search should be started and the method should be called with every found service as given in the required service declaration. The corresponding required service declaration is found by matching the method name to the name given in the @RequireService annotation.
 
-# The Agent Behavior
+## The Agent Behavior
 
 The *addTimeService()* method is called for each found service. In this method, the agent subscribes to the found time service and receives the client side of the subscription future as described in the [last section](02%20Time%20Service%20Interface.md#the-subscribe-method). In the while loop, *hasNextIntermediateResult()* blocks until the next time notification becomes available and can be fetched by *getNextIntermediateResult()*.
 
