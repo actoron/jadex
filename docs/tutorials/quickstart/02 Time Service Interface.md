@@ -4,13 +4,15 @@ This chapter sketches the Java project setup and explains how to define a Jadex 
 
 ## Prerequisites
 
-This quickstart tutorial assumes that you are familiar with Java and your favourite IDE. Therefore, you should know how to set up a project to start developing Java applications, which use Jadex. If you need additional guidance for this, please have a look at the [getting started guide](../../getting-started/getting-started.md#ide-setup)).
+This quickstart tutorial assumes that you are familiar with Java and your favourite IDE. Therefore, you should know how to set up a project to start developing Java applications, which use Jadex.
 
-For your Java project please make sure **not** to include the jadex-application-xyz jars as they already contain the quickstart tutorial classes. If you include these, Java might ignore your own classes and only use the ones from the jar. If you set up your project using the maven-based Jadex example project, the appropriate jars will be automatically included and excluded as needed.
+For your Java project please make sure **not** to include the jadex-application-xyz jars as they already contain the quickstart tutorial classes. If you include these, Java might ignore your own classes and only use the ones from the jar. If you set up your project using the gradle-based [Jadex example project](../../getting-started/getting-started.md#importing-the-jadex-example-project), the appropriate jars will be automatically included and excluded as needed.
+
+If you need additional guidance for the project setup, please have a look at the [getting started guide](../../getting-started/getting-started.md#ide-setup)).
 
 ## The Time Service Interface
 
-Create Java file *ITimeService.java* in the package *jadex.micro.quickstart* and paste the contents as shown below. The relevant aspects of this file are explained in the following subsections.
+Create Java file *ITimeService.java* in the package *jadex.micro.quickstart* and paste the contents as shown below. In Eclipse you can also copy/paste the code directly into your project and [have Eclipse create the package and file automatically](../../getting-started/getting-started.md#testing-your-project-setup). The relevant aspects of this file are explained in the following subsections.
 
 ```java
 package jadex.micro.quickstart;
@@ -78,4 +80,4 @@ Jadex platforms can potentially detect any other Jadex platforms on the internet
 For our time service example, we consider that the service does not pose any security threats, because the service does not change the local system and provides no sensitive information. Therefore, we want the service to be accessible to outside platforms as well. For example you should be able to test your user agent with one of our time provider components hosted in our infrastructure. To enable unrestricted access to the service, the ```@Security``` annotation is specified. More information about security and restricted and unrestricted services can be found in the [user guide](../../guides/ac/08%20Security.md).
 
 ---
-[[Previous: 01 Introduction]](01%20Introduction.md) [[Next: 03 Time User]](03%20Time%20User.md)
+[[Back: 01 Introduction]](01%20Introduction.md) [[Next: 03 Time User]](03%20Time%20User.md)
