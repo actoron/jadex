@@ -14,7 +14,7 @@ The clock service is already provided by the platform component itself so that i
 
 Create a Java class called *ChatC1Agent.java* and use the following:
 
-- Add the *@Agent* annotation to state that this java file is an agent
+- Add the *@Agent* annotation to state that this Java file is an agent
 - Add a *@Description* annotation with an illustrative example explanation such as @Description("This agent uses the clock service.")
 - Add a required service description that defines the name of the service as *clockservice*, its type as *IClockService* and its scope as *ServiceScope.PLATFORM*. 
 

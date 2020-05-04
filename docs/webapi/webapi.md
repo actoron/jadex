@@ -42,7 +42,7 @@ Additionally, the service interface (*IUserService*) has to declare Metadata of 
 String sayHello();
 ```
 
-This method can than be called by issuing a GET request to url ```http://localhost:8081/userservice/sayHello```.
+This method can than be called by issuing a GET request to URL ```http://localhost:8081/userservice/sayHello```.
 
 To retrieve and parse input, the ```javax.ws.rs.QueryParam``` annotation can be used:
 
@@ -70,6 +70,6 @@ public IFuture<String> getUsers() {
 
 ### Consuming REST Services
 
-## Javascript / HTML5 websockets (commercial license only)
+## JavaScript / HTML5 websockets (commercial license only)
 
 This feature is currently in development stage. Documentation will be available soon.

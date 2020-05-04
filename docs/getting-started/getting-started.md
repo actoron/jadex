@@ -29,9 +29,9 @@ Note that this tutorial is not a replacement for the existing eclipse documentat
 
 ## Eclipse Project Setup with Gradle/Maven
 
-If you want to use Gradle or apache Maven for your project, you do not need to download the whole Jadex distribution.
+If you want to use Gradle or Apache Maven for your project, you do not need to download the whole Jadex distribution.
 Just add a dependency for the required Jadex artifacts and they will be downloaded automatically.
-We provide an example project that uses gradle as described in the next section.
+We provide an example project that uses Gradle as described in the next section.
 
 ### Importing the Jadex example project
 
@@ -41,11 +41,11 @@ Download the jadex-example-project.zip from [Downloads](https://www.activecompon
 
 - Use "File -> Import -> Gradle / Existing Gradle Project" and choose "Next".
 
-![Import gradle project (Step 1)](eclipseimport1.png "Import gradle project (Step 1)")
+![Import Gradle project (Step 1)](eclipseimport1.png "Import Gradle project (Step 1)")
 
 - "Browse..." to the directory where you unzipped the jadex-example-project.zip.
 
-![Import gradle project (Step 2)](eclipseimport2.png "Import gradle project (Step 2)")
+![Import Gradle project (Step 2)](eclipseimport2.png "Import Gradle project (Step 2)")
 
 - Click "Finish". Gradle will import the project and start the build process thereby download the necessary Jadex libraries from the web.
 
@@ -56,7 +56,7 @@ Download the jadex-example-project.zip from [Downloads](https://www.activecompon
 To use Jadex in a new or existing Gradle project, add the following code to your build script's dependency section (set `jadex_version` to the desired version):
 
 ```groovy
-def jadex_version	= "4.0.171"
+def jadex_version = "4.0.171"
 
 dependencies {
     // [...] other dependencies
@@ -69,7 +69,7 @@ A minimal complete `build.gradle` could look like this:
 ```groovy
 apply plugin: 'java'
 
-def jadex_version	= "4.0.171"
+def jadex_version = "4.0.171"
 
 repositories {
     jcenter()
@@ -140,7 +140,7 @@ If you want to use our nightly builds, you need to add our repository:
 <!-- TODO: can someone confirm this IntelliJ setup? -->
 
 Using IntelliJ IDEA for development with Jadex Active Components is not officially supported except for [Android development](../android/android.md).
-If you still want to use IntelliJ IDEA, just try to import the Jadex Example Project - gradle support is provided by IntelliJ.
+If you still want to use IntelliJ IDEA, just try to import the Jadex Example Project - Gradle support is provided by IntelliJ.
 
 If you want to compile the Jadex source code, import the project included in sources.zip.
 To start Jadex with the JCC, create a new Run Configuration using the following parameters:

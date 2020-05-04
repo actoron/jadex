@@ -17,6 +17,7 @@ markdownlint {
 	rules {
 
 		// Allow same subsection name in different super sections (e.g. tutorial exercise "Start the Agent" sections)
+		// Bad, because anchors in headings are numbered and thus hard to refer to, if needed
 		+NoDuplicateHeaderRule(allowDifferentNesting=true) {
 		}
 
@@ -25,13 +26,8 @@ markdownlint {
 			active	= false
 		}
 		
-		// Currently broken by our SorryOutdated-snippets
-		+FirstLineH1Rule {
-			active	= false
-		}
 		
-		
-		// Disable some rules by setting active to false
+		// TODO: fix docs according to these rules?
 		+ConsistentUlStyleRule {
 			active	= false
 		}
@@ -56,12 +52,6 @@ markdownlint {
 		+UlStartLeftRule {
 			active	= false
 		}
-		+NoTrailingPunctuationRule {
-			active	= false
-		}
-		+ProperNamesRule {
-			active	= false
-		}
 
 		// Rules we don't want to check? (What is our markdown coding style?)
 		+NoWhitespaceFilenameRule {
@@ -70,13 +60,10 @@ markdownlint {
 		+LineLengthRule {
 			active	= false
 		}
-		+NoHardTabsRule {
-			active	= false
-		}
 		+LowerCaseFilenameRule {
 			active	= false
 		}
-		+NoBareUrlsRule {
+		+NoTrailingPunctuationRule {	// e.g. questionmark at the end of a heading
 			active	= false
 		}
 	}

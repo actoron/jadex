@@ -45,7 +45,7 @@ This is a more complete list of currently unsupported modules on Jadex Android:
 
 ### 3.0.0-RC42
 
-- Ported the jadex-gradle-plugin to the new Transform API (android build tools 2.0.0 required)
+- Ported the jadex-gradle-plugin to the new Transform API (Android build tools 2.0.0 required)
 
 ### 3.0.0-RC16
 
@@ -68,7 +68,7 @@ This is a more complete list of currently unsupported modules on Jadex Android:
 
 - API Changes! Please refer to the example project on how to start the platform.
 - fixed problems with BDI Agents
-- added REST client api + demo (working since 2012-11-14)
+- added REST client API + demo (working since 2012-11-14)
 - new demo applications project
 - included chat application
 
@@ -81,7 +81,7 @@ This is a more complete list of currently unsupported modules on Jadex Android:
 - provides a simple control center application (see example project)
 - since 2012-05-31: based on modular jadex distribution instead of separate artifacts (NOTE: Your Android applications will require different dependencies now!)
 - adjusted version numbering to Jadex' Version
-- Jadex-Android uses android xml pull parser now instead of woodstox, reduces memory footprint
+- Jadex-Android uses Android xml pull parser now instead of woodstox, reduces memory footprint
 - Jadex-Android stores settings in Android Shared Preferences now. It will, however, prefer properties stored in a default.settings.xml (/data/data/&lt;application package name&gt;/files/default.settings.xml)
 
 ### 0.0.5
@@ -94,7 +94,7 @@ This is a more complete list of currently unsupported modules on Jadex Android:
 - communication between platforms fixed, so remote mobile platform components are visible in JCC
     (This requires the HTTP Relay Transport to be enabled if running in an emulator)
 - added AndroidSettingsService for File Access on Android Devices
-- introduced AndroidContextService to provide access to android files
+- introduced AndroidContextService to provide access to Android files
 - Security Service is active by default. The generated Plattform Password will be written to LogCat and saved in
     */data/data/<packagename\>/files/<platformname\>.settings.xml*.
     To disable the Security Service, just uncomment the Service in your platform.component.xml
@@ -179,14 +179,14 @@ Proceed to the next chapter to learn about how to create your own Jadex Android 
 Once you have installed the necessary tools, the **jadex-android-example-project** can be helpful to get started.
 This guide, however, does **not** assume you are using the example project, but instead introduces the API of Jadex for Android step by step.
 
-To understand the basics of android application development, please take a look at the [Android Developer Guide](http://developer.android.com/guide/)  .
-This guide and all included demo applications are currently using a minimum API Level of ${AndroidMinApiLevel}, which is supported in android ${AndroidMinAndroidVersion} and above.
+To understand the basics of Android application development, please take a look at the [Android Developer Guide](http://developer.android.com/guide/)  .
+This guide and all included demo applications are currently using a minimum API Level of ${AndroidMinApiLevel}, which is supported in Android ${AndroidMinAndroidVersion} and above.
 
 We assume that you created a basic Android Application to start with.
 
 ## Differences to the desktop version of Jadex
 
-While developing Active Components is the same on the standard Jadex distribution and the android version, everything else is different.
+While developing Active Components is the same on the standard Jadex distribution and the Android version, everything else is different.
 We try to list some of the differences here to avoid confusion.
 
 - **No JCC:** First, there is no JCC (Jadex Control Center). This has a simple reason: There are no Java swing components included in the Android runtime libraries. But, when you develop Android Applications, you'll want to have a native UI anyway.
@@ -197,15 +197,15 @@ We try to list some of the differences here to avoid confusion.
 
 - **UI can be paused any time:** Because an Android UI Component can be paused or destroyed at any time, it is recommended to let the Jadex Platform run in an Android Service.
 
-- **BDIV3 compile time generation:** If you want to use BDIV3 components on Android, you need to include a gradle plugin that handles the code generation that is required. As opposed to desktop variants, in Jadex Android, the required code is generated at compile time to save performance.
+- **BDIV3 compile time generation:** If you want to use BDIV3 components on Android, you need to include a Gradle plugin that handles the code generation that is required. As opposed to desktop variants, in Jadex Android, the required code is generated at compile time to save performance.
  This is described in detail [below](#using-bdiv3-on-android).
 
 ## Required Libraries
 
 To use Jadex for Android, first open your project's build.gradle.
-It's usually located in *app/build.gradle* and shown in the *Gradle Scripts* section of android studio:
+It's usually located in *app/build.gradle* and shown in the *Gradle Scripts* section of Android Studio:
 
-![Build gradle](studio_build_gradle.png)
+![Build Gradle](studio_build_gradle.png)
 
 Now add the following lines (or insert them into the right configuration blocks) to include the Jadex dependencies:
 
@@ -331,7 +331,7 @@ Regardless of which method us beeing used, the platform can always be stopped by
 
 ### Use the Jadex Platform in a service
 
-If you need to create a more complex application, which should perform background tasks or should at least keep a jadex platform running in background, you should use the jadex platform in an [android service](http://developer.android.com/guide/components/services.html) .
+If you need to create a more complex application, which should perform background tasks or should at least keep a jadex platform running in background, you should use the jadex platform in an [Android service](http://developer.android.com/guide/components/services.html) .
 
 The Jadex-Android-Example-Project shows how to use this method in the *jadex.android.exampleproject.extended* package.
 
@@ -361,7 +361,7 @@ To adjust Jadex Platform behaviour, implement the constructor like below:
 As with using jadex from an activity, you can override the methods ```onPlatformStarting()``` and ```onPlatformStarted()``` to get access to the platform inside the service.
 
 <!--TODO: Api docs-->
-Take a look at the Api Docs to see available methods for starting and configuring the platform.
+Take a look at the API Docs to see available methods for starting and configuring the platform.
 
 Additionally, it is useful to override ```onBind()``` to return your own Binder object and specifiy your own service interface. See the [Android docs: Bound Services](http://developer.android.com/guide/components/bound-services.html) for more information about this topic.
 
@@ -574,7 +574,7 @@ To use a remote service, just declare the required service like usual in the age
 ```
 
 Be sure to use the same Interface on both the service consuming and the service providing application, e.g. *use the same package and class name* for the service interface.
-If Binding scope is set to global, services running on a desktop platform will be discovered by android devices, too.
+If Binding scope is set to global, services running on a desktop platform will be discovered by Android devices, too.
 
 ## Using the Jadex Android Control Center
 
@@ -601,16 +601,16 @@ This is also part of the example-project.
 
 # Using BDIv3 on Android
 
-The BDI v3 programming model heavily depends on code-generation based on java annotations.
+The BDI v3 programming model heavily depends on code-generation based on Java annotations.
 It's using the ASM Bytecode manipulation framework to generate the code.
 Android not only uses a different virtual machine than any Java SE environment, the Dalvik Virtual Machine (DVM), it also uses a different bytecode representation, which is not supported by Jadex BDIV3.
 
-As runtime bytecode generation is slow on android anyway, the classes are transformed during compile-time for android.
-This is done by the *jadex-gradle-plugin*, which means you **need to use gradle to use BDIv3 components**!
-Since Android Studio uses gradle by default, this is usually not a problem.
+As runtime bytecode generation is slow on Android anyway, the classes are transformed during compile-time for Android.
+This is done by the *jadex-gradle-plugin*, which means you **need to use Gradle to use BDIv3 components**!
+Since Android Studio uses Gradle by default, this is usually not a problem.
 
 To make BDIv3 components work, you need to include the jadex-gradle plugin in your *build.gradle*.
-For compatibility with specific android tools version, please refer to the [compatibility section](#compatibility).
+For compatibility with specific Android tools version, please refer to the [compatibility section](#compatibility).
 
 ## Limitations
 
@@ -618,7 +618,7 @@ Currently, the jadex-gradle-plugin does not work together with *Instant Run*, a 
 
 ## Applying the jadex-gradle BDIPlugin
 
-The simplest way to use the Jadex gradle plugin is to include the jadex repositories as buildscript dependency repositories, like the following extract from build.gradle shows:
+The simplest way to use the Jadex Gradle plugin is to include the jadex repositories as buildscript dependency repositories, like the following extract from build.gradle shows:
 
 ```groovy
 buildscript {
@@ -650,14 +650,14 @@ apply plugin: jadex.gradle.BDIPlugin
 
 ```
 
-If you compile your project with gradle or android studio now (just click on "run"), the plugin will run, detect all BDIV3 Agents and will enhance the classes as needed by the Jadex runtime.
+If you compile your project with Gradle or Android Studio now (just click on "run"), the plugin will run, detect all BDIV3 Agents and will enhance the classes as needed by the Jadex runtime.
 
 ## Compatibility
 
 ### jadex-gradle-plugin 3.0.0-RC42
 
 Starting with RC42, the jadex-gradle-plugin uses the new Android Transform API to enhance BDI classes.
-This means version 2.0.0 of the android build tools is required to use the jadex-gradle-plugin now.
+This means version 2.0.0 of the Android build tools is required to use the jadex-gradle-plugin now.
 
 ```groovy
 dependencies {
@@ -667,7 +667,7 @@ dependencies {
 
 ### jadex-gradle-plugin up to 3.0.0-RC41
 
-Please be aware that versions before 3.0.0-RC41 are only compatible with android build tools version up to 1.3.0.
+Please be aware that versions before 3.0.0-RC41 are only compatible with Android build tools version up to 1.3.0.
 This means you have to make sure version 1.3.0 of the build tools is used:
 
 ```groovy

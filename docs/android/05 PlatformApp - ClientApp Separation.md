@@ -24,7 +24,7 @@ Installation of the Platform App
     2. Install it on your phone or emulator. For emulator, use *adb install jadex-android-platformapp-2.4-SNAPSHOT.apk*.
     For installation on your phone, enable the *unknown sources* setting, located in * settings &gt; security *, download the APK to your phone and execute it.
 
-The Platform App will create a Startup icon just like any other android app.
+The Platform App will create a Startup icon just like any other Android app.
 However, selecting this icon will not start the platform, instead, it is started by launching client applications.
 
 Functionality of separated Platform and Client
@@ -59,11 +59,11 @@ For a quick start, use the example project *jadex-android-clientapp-example-mave
 - select your workspace folder, select the *jadex-android-clientapp-example-maven* directory and click *next* / *finish* until import is completed
 
 - to build the project with maven **which is required as of jadex-android-2.4**, use the included launch config *Build clientapp example* 
-- to run the maven build, use the included launch config *Run clientapp example* which will deploy and run the project on any android devices plugged in or emulators running.
+- to run the maven build, use the included launch config *Run clientapp example* which will deploy and run the project on any Android devices plugged in or emulators running.
 
 ### The ClientApp
 
-In Contrast to a normal android application, each Jadex ClientApp has an entry point (Activity) that **has** to extend *JadexApplication*. This Class only needs to overwrite one Method, *getClassName()*.
+In Contrast to a normal Android application, each Jadex ClientApp has an entry point (Activity) that **has** to extend *JadexApplication*. This Class only needs to overwrite one Method, *getClassName()*.
 The String it returns should be the fully-qualified class name of a ClientAppFragment.
 
 #### ClientApp Fragments
@@ -73,6 +73,6 @@ That means, instead of creating *Activity* classes, you should instead extend fr
 This is the biggest difference to normal application development: **No Activities, use ClientAppFragments**!
 If access to the concrete Activity is needed, call *getActivity()* in your Fragment.
 
-We also added one Lifecycle Phase: *onPrepare()*. This is called **before** any other android lifecycle methods are called, so nothing is initialized. It is needed to perform tasks that have to execute *before* the Fragment enters the view, such as requesting Window Features.
+We also added one Lifecycle Phase: *onPrepare()*. This is called **before** any other Android lifecycle methods are called, so nothing is initialized. It is needed to perform tasks that have to execute *before* the Fragment enters the view, such as requesting Window Features.
 
 Other Features work like before: binding Services, starting other Activities/Fragments.

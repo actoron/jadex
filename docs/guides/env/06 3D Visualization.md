@@ -1,6 +1,4 @@
-
-3D Visualization
-=============================
+# 3D Visualization
 
 In this section the 3D visualization concepts are described. This section only focuses the **use** of existing 3D-objects in the Enviroment. The creation of new 3D Objects for Jadex 3D is a complex topic which will later in a different chapter
 

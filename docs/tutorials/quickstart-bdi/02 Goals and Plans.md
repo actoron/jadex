@@ -42,7 +42,7 @@ import jadex.quickstart.cleanerworld.gui.*;
 /**
  *  BDI agent template.
  */
-@Agent(type="bdi")    // This annotation makes the java class and agent and enabled BDI features
+@Agent(type="bdi")    // This annotation makes the Java class and agent and enabled BDI features
 public class CleanerBDIAgent
 {
     //-------- fields holding agent data --------

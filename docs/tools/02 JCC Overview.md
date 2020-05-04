@@ -30,7 +30,7 @@ Overview of Plugins
 ![02 JCC Overview@chat.png](chat_icon.png): The **chat plugin** can be used to chat with users from other platforms.\
 ![02 JCC Overview@stopwatch.png](stopwatch.png): With the **simulation plugin** the execution mode and time progress can be controlled.\
 ![02 JCC Overview@configure.png](configure.png): The **component viewer** can be used to view components and services that expose user interfaces.\
-![02 JCC Overview@new\_testcenter.png](new_testcenter.png): The **test center** is a front end for executing junit like component based test cases.\
+![02 JCC Overview@new\_testcenter.png](new_testcenter.png): The **test center** is a front end for executing JUnit like component based test cases.\
 ![02 JCC Overview@new\_introspector.png](new_introspector.png): The **debugger** allows for executing components is step mode and inspecting their state.\
 ![02 JCC Overview@new\_conversation.png](new_conversation.png): The **conversation center** can be used to manually send messages to specific components.\
 ![02 JCC Overview@new\_comanalyzer.png](new_comanalyzer.png): The **communication analyzer** is helpful for tracking message based communication between components.\

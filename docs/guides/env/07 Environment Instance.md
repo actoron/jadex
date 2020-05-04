@@ -1,4 +1,4 @@
-1 Environment Instance
+# Environment Instance
 
 This section describes how an environment space instance can be created based on an environment space type definition. Space instance definitions are part of the application instance section in the application descriptor. Basically, in the instance part arbitrary many elements of the defined types can be created. In addition, it is possible to set-up evaluations, which can be used to collect and process data from the environment. In the Figure below the corresponding cutout of the XML schema is shown.
 

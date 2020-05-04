@@ -74,7 +74,7 @@ Additionally, the following parameters can be specified:
 |Parameter|Description|
 |---------|-----------|
 |*value*  |A class implementing the service|
-|*expression*| Java expression to be executed for instantiation of the service. Can be used instead of *value* to pass constructor arguments. <!--TODO: link to (non-existing) java expression guide-->|
+|*expression*| Java expression to be executed for instantiation of the service. Can be used instead of *value* to pass constructor arguments. <!--TODO: link to (non-existing) Java expression guide-->|
 |*proxytype* | The [type](#proxy-types) of the service proxy that is created.|
 
 <!--|*interceptors* | (not documented) |-->

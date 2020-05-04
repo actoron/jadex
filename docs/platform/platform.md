@@ -136,7 +136,7 @@ In the second step as shown below you can specify the way the dependencies of th
 
 ## Alternative 2: Launch Script
 
-If you are a little bit used to Java, you may know that you can start an executable jar as produced in the last section by typing 'java -jar *filename*.jar' in the console. Therefore you can use the same command in a .bat file (on Windows) or an .sh script (on Linux). But it is also quite easy to start your application from the console or a batch script even without producing an executable jar file.
+If you are a little bit used to Java, you may know that you can start an executable jar as produced in the last section by typing `java -jar *filename*.jar` in the console. Therefore you can use the same command in a .bat file (on Windows) or an .sh script (on Linux). But it is also quite easy to start your application from the console or a batch script even without producing an executable jar file.
 
 - Locate the jadex-platform-standalone-launch-${jadexversion}.jar from the Jadex distribution (the version number might differ depending on which Jadex version you use).
 - Create a batch file (.bat or .sh) in your eclipse project using right-click *New -> File*

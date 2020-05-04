@@ -8,7 +8,7 @@ While the most basic component type is a *Micro Agent*, Jadex supports much more
 
 ## Micro Agents
 
-Micro agents are pojo (plain old java object) based Java classes that support the active component properties and their own behavior description via Java annotations and so called component steps. Micro agents are fast, small and easy to develop for developers with Java experience.
+Micro agents are pojo (plain old Java object) based Java classes that support the active component properties and their own behavior description via Java annotations and so called component steps. Micro agents are fast, small and easy to develop for developers with Java experience.
 
 ### Micro Agent Features
 

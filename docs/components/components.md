@@ -10,7 +10,7 @@ For a more complete guide into Active Components, take a look at the [AC User Gu
 
 # Implementation
 
-Micro Agents are defined by plain java classes. In order for a java class to represent a Micro Agent, two requirements have to be met:
+Micro Agents are defined by plain Java classes. In order for a Java class to represent a Micro Agent, two requirements have to be met:
 
  - The name of the class has to end with "Agent" (e.g. ```MyAgent```, ```ChatAgent```, ...)
  - The class has to be annotated with the ```@Agent``` Annotation
