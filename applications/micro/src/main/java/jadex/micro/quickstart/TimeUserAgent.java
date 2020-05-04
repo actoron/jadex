@@ -33,7 +33,7 @@ public class TimeUserAgent
 		{
 			String time = subscription.getNextIntermediateResult();
 			String platform	= ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
-			System.out.println("New time received from "+platform+" at "+location+": "+time);
+			System.out.println("New time received from "+platform+" in "+location+": "+time);
 		}
 	}
 	

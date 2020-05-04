@@ -11,7 +11,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 

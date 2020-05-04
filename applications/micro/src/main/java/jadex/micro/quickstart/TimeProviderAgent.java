@@ -22,7 +22,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -39,7 +38,7 @@ public class TimeProviderAgent	implements ITimeService
 		
 	/** The subscriptions to be informed about the time. */
 	protected Map<SubscriptionIntermediateFuture<String>, DateFormat>	subscriptions	= new LinkedHashMap<>();
-	
+
 	//-------- ITimeService interface --------
 	
 	/**
@@ -87,7 +86,6 @@ public class TimeProviderAgent	implements ITimeService
 	 *  Due to annotation, called once after agent is initialized.
 	 *  The internal access parameter is optional and is injected automatically.
 	 */
-	//@AgentBody
 	@OnStart
 	public void body(IInternalAccess ia)
 	{
@@ -109,7 +107,8 @@ public class TimeProviderAgent	implements ITimeService
 					// Add the current time as intermediate result.
 					// The if-undone part is used to ignore errors,
 					// when subscription was cancelled in the mean time.
-					subscriber.addIntermediateResultIfUndone(time+"; "+new Date().toString());
+					subscriber.addIntermediateResultIfUndone(time);
+//					subscriber.addIntermediateResultIfUndone(time+"; "+new Date().toString());
 				}
 				
 				return IFuture.DONE;
@@ -123,7 +122,7 @@ public class TimeProviderAgent	implements ITimeService
 	public static void	main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
-		config.setPlatformName("timeprovider_*");
+//		config.setPlatformName("timeprovider_*");
 		config.addComponent(TimeProviderAgent.class);
 		config.setLoggingLevel(Level.WARNING);
 		Starter.createPlatform(config, args).get();

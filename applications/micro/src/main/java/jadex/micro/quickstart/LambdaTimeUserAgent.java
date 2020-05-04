@@ -8,7 +8,6 @@ import jadex.base.Starter;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentServiceQuery;
 import jadex.micro.annotation.OnService;
 import jadex.micro.annotation.RequiredService;
 

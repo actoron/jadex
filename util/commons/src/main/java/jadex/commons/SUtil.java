@@ -68,7 +68,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.Vector;
-import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -6144,8 +6143,7 @@ public class SUtil
 			// These free-to-try geoip services have (almost) the same result format.
 //			Scanner scanner	= new Scanner(new URL("http://ipinfo.io/json").openStream(), "UTF-8");
 //			Scanner scanner	= new Scanner(new URL("http://api.petabyet.com/geoip/").openStream(), "UTF-8");
-			Scanner scanner	= new Scanner(new URL("http://freegeoip.net/json/").openStream(), "UTF-8");	// use "country_name"
-//			Scanner scanner	= new Scanner(new URL("http://ip-api.com/json").openStream(), "UTF-8");
+			Scanner scanner	= new Scanner(new URL("http://ip-api.com/json").openStream(), "UTF-8");
 			
 			// Very simple JSON parsing, matches ..."key": "value"... parts to find country and city.
 			String	country	= null;
@@ -6155,8 +6153,8 @@ public class SUtil
 			{
 				String	key	= scanner.match().group(1);
 				String	val	= scanner.match().group(2);
-//				if("country".equals(key))
-				if("country_name".equals(key))
+				if("country".equals(key)
+					|| "country_name".equals(key))
 				{
 					country	= val;
 				}
