@@ -172,12 +172,12 @@ The communication analyzer is a very powerful and complex tool. When you right-c
 ### todo: further topics
 
 - data
-    - parameters in AND-join
-    - loops
-    - complex Java values (business objects)
-    - reserved variables: $interpreter, $thread, $event, $platform, $clock, $args, $results
-    - arguments and results
+  - parameters in AND-join
+  - loops
+  - complex Java values (business objects)
+  - reserved variables: $interpreter, $thread, $event, $platform, $clock, $args, $results
+  - arguments and results
 - tasks
-    - predefined tasks (esp. create comp for external subprocess)
-    - custom tasks
+  - predefined tasks (esp. create comp for external subprocess)
+  - custom tasks
 - other elements (lanes etc. - discuss only, no lesson?)

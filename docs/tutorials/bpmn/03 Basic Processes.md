@@ -4,12 +4,12 @@ Chapter 3 - Basic Processes
 In this chapter you will learn how to model your own processes. This chapter covers basic issues such as activities and control flow. It is assumed that you have some initial understanding of BPMN and its graphical elements. If you think that you need more background information on BPMN, please refer to documentation available elsewhere. Below is a short list of suggestions, but you will easily find other sources of information on the Web.
 
 - [Official BPMN homepage (www.bpmn.org)](http://www.bpmn.org/)
-    - [Introduction to BPMN (article, PDF)](http://www.bpmn.org/Documents/Introduction_to_BPMN.pdf)
-    - [BPMN Tutorial (slides, PDF)](http://www.bpmn.org/Documents/OMG_BPMN_Tutorial.pdf)
-    - [BPMN Specification (download site)](http://www.omg.org/spec/BPMN/1.2/)
+  - [Introduction to BPMN (article, PDF)](http://www.bpmn.org/Documents/Introduction_to_BPMN.pdf)
+  - [BPMN Tutorial (slides, PDF)](http://www.bpmn.org/Documents/OMG_BPMN_Tutorial.pdf)
+  - [BPMN Specification (download site)](http://www.omg.org/spec/BPMN/1.2/)
 - [BPMN Corner at Uni Potsdam](http://bpt.hpi.uni-potsdam.de/Public/BPMNCorner)
-    - [BPMN 2.0 Poster (pdf)](http://www.bpmb.de/images/BPMN2_0_Poster_DE.pdf)
-    - [BPMN 1.2 Poster (pdf)](http://bpt.hpi.uni-potsdam.de/pub/Public/BPMNCorner/BPMN1_1_Poster_EN.pdf)
+  - [BPMN 2.0 Poster (pdf)](http://www.bpmb.de/images/BPMN2_0_Poster_DE.pdf)
+  - [BPMN 1.2 Poster (pdf)](http://bpt.hpi.uni-potsdam.de/pub/Public/BPMNCorner/BPMN1_1_Poster_EN.pdf)
 - [Wikipedia entry for BPMN](http://en.wikipedia.org/wiki/BPMN)
 
 Exercise B1 - Creating a First Process

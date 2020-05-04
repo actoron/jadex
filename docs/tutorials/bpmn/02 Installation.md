@@ -2,15 +2,13 @@
 
 In this chapter, you will learn how to start the Jadex BPMN editor. You will also find some instructions on setting up a proper eclipse working environment for executing Jadex BPMN processes.
 
-Prerequisites
---------------------------
+## Prerequisites
 
 - Download and install a recent Java environment from [http://www.oracle.com/technetwork/java/javase/downloads/index.html](http://www.oracle.com/technetwork/java/javase/downloads/index.html)  (if not already present).
 - Download and install a suitable eclipse distribution from [http://www.eclipse.org/downloads/](http://www.eclipse.org/downloads/)  (if not already present). 
 - Download the latest Jadex build .zip from [http://www.activecomponents.org/download/](http://www.activecomponents.org/download/)  and unpack it to a place of your choice (only necessary if you don't want to use maven).
 
-Exercise A1 - Eclipse Project Setup
-------------------------------------------------
+## Exercise A1 - Eclipse Project Setup
 
 In this lesson you will set up an initial eclipse environment that will be used in the following lessions. Please follow the instructions carefully and compare your setup to the screenshots to verify that everything went fine.
 
@@ -59,8 +57,7 @@ Now we have to add a dependency to Jadex in the 'pom.xml'. If you want to use th
 
 Please note, that you can also use other Jadex servers (www0, www1, www2, www3) or the generic www address. In the latter case a server is chosen randomly, which might not be helpful because the working builds may differ.
 
-Exercise A2 - Starting the BPMN Editor
----------------------------------------------------
+## Exercise A2 - Starting the BPMN Editor
 
 Since version 2.5 Jadex comes with a standalone BPMN editor that is directly bundled in the distributed. It can be either start via the command line by navigating to the Jadex folder and executing 'bpmn_editor.bat/sh' depending on the operating type you are using.
 
@@ -72,8 +69,7 @@ After starting the run configuration, the BPMN editor gui should pop up. It shou
 
 ![02 Installation@6.png](02%20Installation/02%20Installation-6.png)
 
-Exercise A3 - Running Example Processes
-----------------------------------------------------
+## Exercise A3 - Running Example Processes
 
 In this lesson we will create a launch configuration to start the Jadex platform. To see that everything works, we will execute some example processes that are distributed with the Jadex package.
 

@@ -209,5 +209,5 @@ When accessing the GUI remote you may have noticed the following message being p
 
 This warning indicates a potential problem due to the Java language specification not describing a naming scheme for anonymous inner classes. Each Java compiler decides for itself how to name an inner class (typically OuterClass$1, OuterClass$2, ...). This can cause incompatibilities when two platforms communicate that have been compiled using a different compiler (e.g. javac vs. eclipse). To allow proper mapping of inner classes you can specify an additional identifier using the @XMLClassname annotation:
 
-- For each inner class, add an *@XMLClassname("some_identifier")* annotation. Of course you should use different identifiers for each occurrence.
-- Access the GUI remotely and check if the warnings have vanished.
+* For each inner class, add an *@XMLClassname("some_identifier")* annotation. Of course you should use different identifiers for each occurrence.
+* Access the GUI remotely and check if the warnings have vanished.

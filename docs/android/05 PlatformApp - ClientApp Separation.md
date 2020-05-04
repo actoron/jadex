@@ -20,8 +20,8 @@ This document describes how to develop applications using the *ClientApp* model.
 Installation of the Platform App
 ---------------------------------------------
 
-1. Download the Jadex platformApp from [nightly builds](http://www.activecomponents.org/download) .
-    2. Install it on your phone or emulator. For emulator, use *adb install jadex-android-platformapp-2.4-SNAPSHOT.apk*.
+1. Download the Jadex platformApp from [nightly builds](http://www.activecomponents.org/download).
+2. Install it on your phone or emulator. For emulator, use `adb install jadex-android-platformapp-2.4-SNAPSHOT.apk`.
     For installation on your phone, enable the *unknown sources* setting, located in * settings &gt; security *, download the APK to your phone and execute it.
 
 The Platform App will create a Startup icon just like any other Android app.
@@ -35,8 +35,8 @@ When a client application is started, the following steps are performed as illus
 ![](activity-relations-externaluser-en.png)
 
 1. The started user application or rather the included Loader Activity will call the Jadex Platform application by posting an intent.
-    2. The Jadex Platform application parses the intent data, which include the name of the class the User App wants to display on the screen, and loads the user classes.
-    3. The User Fragment will be instanciated and shown on the screen, while all jadex classes are present and can be used by the user application.
+2. The Jadex Platform application parses the intent data, which include the name of the class the User App wants to display on the screen, and loads the user classes.
+3. The User Fragment will be instanciated and shown on the screen, while all jadex classes are present and can be used by the user application.
 
 The next step will explain how to create client applications.
 

@@ -161,27 +161,27 @@ The setup also has some drawbacks:
 a) the source code of the Jadex libraries needs to attached manually, if needed, and
 b) you cannot easily switch/update Jadex versions.)
 
-* If not already done, download the desired Jadex distribution, e.g., from <https://download.actoron.com> and unpack it to a place of your choice.
-* Start eclipse.
-* Use "File -> New -> Project..." and choose 'Java Project':
+- If not already done, download the desired Jadex distribution, e.g., from <https://download.actoron.com> and unpack it to a place of your choice.
+- Start eclipse.
+- Use "File -> New -> Project..." and choose 'Java Project':
 
 ![Creating a new Java project in Eclipse (Step 1)](eclipsenewproject1.png "Creating a new Java project in Eclipse (Step 1)")
 
-* Click "Next" to start the "New Java Project" wizard.
-* Enter a name for your new project and click "Finish":
+- Click "Next" to start the "New Java Project" wizard.
+- Enter a name for your new project and click "Finish":
 
 ![Creating a new Java project in Eclipse (Step 2)](eclipsenewproject2.png "Creating a new Java project in Eclipse (Step 2)")
 
-* (If you're using Java 11 or higher, Eclipse might ask for creating a `module-info.java` file.
+- (If you're using Java 11 or higher, Eclipse might ask for creating a `module-info.java` file.
   If you don't know what that means, you can safely ignore it and click "Don't Create".)
 
 ![Creating a new Java project in Eclipse (Step 3)](eclipsenewproject3.png "Creating a new Java project in Eclipse (Step 3)")
 
-* Now you need to add the downloaded Jadex libraries to the new project. Right-click on the project and select "Build Path -> Add External Archives...":
+- Now you need to add the downloaded Jadex libraries to the new project. Right-click on the project and select "Build Path -> Add External Archives...":
 
 ![Creating a new Java project in Eclipse (Step 4)](eclipsenewproject4.png "Creating a new Java project in Eclipse (Step 4)")
 
-* In the file chooser that appears, browse to the directory, where you unzipped the Jadex distribution, double-click the contained `lib` folder and select all files (e.g., with `CTRL-a`). The referenced jars should now be visible in the project tree:
+- In the file chooser that appears, browse to the directory, where you unzipped the Jadex distribution, double-click the contained `lib` folder and select all files (e.g., with `CTRL-a`). The referenced jars should now be visible in the project tree:
 
 ![Created Java project in Eclipse](eclipsenewproject5.png "Created Java project in Eclipse")
 
@@ -226,11 +226,11 @@ public class HelloAgent {
 
 ![Pasting source code into the project](eclipsetestsetup1.png "Pasting source code into the project")
 
-* Right-click on the new source file and choose "Run As -> Java Application":
+- Right-click on the new source file and choose "Run As -> Java Application":
 
 ![Starting your first Jadex agent](eclipsetestsetup2.png "Starting your first Jadex agent")
 
-* If everything works well, you should see "Hello, Jadex!" printed to the console every five seconds.
+- If everything works well, you should see "Hello, Jadex!" printed to the console every five seconds.
 
 To start your applications developed with Jadex Active Components, you always need to start a [Jadex Platform](../platform/platform.md#starting-a-platform) and [start your Component(s)](../components/components.md#startup).
 As shown in the example above, you can combine these two steps by adding your agents/components to the config before starting the platform.

@@ -10,9 +10,9 @@ This tool guide gives an overview about the Jadex tool suite and explains how th
 
 Choose one of the following sections depending on your situation:
 
-  - Start JCC [from your own project](#from-your-own-project)
-  - Start JCC [from Jadex Distribution](#from-jadex-distribution)
-  - Start JCC [from Jadex Sources](#from-jadex-sources-in-eclipse)
+- Start JCC [from your own project](#from-your-own-project)
+- Start JCC [from Jadex Distribution](#from-jadex-distribution)
+- Start JCC [from Jadex Sources](#from-jadex-sources-in-eclipse)
 
 ## From your own Project
 

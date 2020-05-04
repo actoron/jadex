@@ -14,33 +14,33 @@ For API Documentation of Jadex Active Components please visit the [Javadocs page
 
 # User Guide
 
-  * [Getting Started](getting-started/getting-started.md)
-  * ~~[Platform](platform/platform.md)~~
-  * ~~[Components](components/components.md)~~
-  * ~~[Services](services/services.md)~~
-  * ~~[Futures](futures/futures.md)~~
-  * ~~[Remote Communication](remote/remote.md)~~
-  * ~~[Component Types](component-types/component-types.md)~~
-  * ~~[Android](android/android.md)~~
-  * ~~[Web API](webapi/webapi.md)~~
+* [Getting Started](getting-started/getting-started.md)
+* ~~[Platform](platform/platform.md)~~
+* ~~[Components](components/components.md)~~
+* ~~[Services](services/services.md)~~
+* ~~[Futures](futures/futures.md)~~
+* ~~[Remote Communication](remote/remote.md)~~
+* ~~[Component Types](component-types/component-types.md)~~
+* ~~[Android](android/android.md)~~
+* ~~[Web API](webapi/webapi.md)~~
 
-  <!--* [Simulation](simulation/simulation.md)-->
+<!--* [Simulation](simulation/simulation.md)-->
 
 # Tutorials
 
- * [Quickstart Tutorial](tutorials/quickstart/01%20Introduction.md)
- * [BDI Quickstart Tutorial](tutorials/quickstart-bdi/01%20Introduction.md)
- * ~~[Active Components Tutorial](tutorials/ac/01%20Introduction.md)~~
- * ~~[BDIV3 Tutorial](tutorials/bdiv3/01%20Introduction.md)~~
- * ~~[BPMN Tutorial](tutorials/bpmn/01%20Introduction.md)~~
+* [Quickstart Tutorial](tutorials/quickstart/01%20Introduction.md)
+* [BDI Quickstart Tutorial](tutorials/quickstart-bdi/01%20Introduction.md)
+* ~~[Active Components Tutorial](tutorials/ac/01%20Introduction.md)~~
+* ~~[BDIV3 Tutorial](tutorials/bdiv3/01%20Introduction.md)~~
+* ~~[BPMN Tutorial](tutorials/bpmn/01%20Introduction.md)~~
 
 # Advanced Guides
 
- * ~~[Jadex Active Components User Guide](guides/ac/01%20Introduction.md)~~
- * ~~[BDI User Guide](guides/bdiv3/01%20Introduction.md)~~
- * ~~[Environment User Guide](guides/env/01%20Introduction.md)~~
- * ~~[Jadex Tools](tools/01%20Introduction.md)~~
+* ~~[Jadex Active Components User Guide](guides/ac/01%20Introduction.md)~~
+* ~~[BDI User Guide](guides/bdiv3/01%20Introduction.md)~~
+* ~~[Environment User Guide](guides/env/01%20Introduction.md)~~
+* ~~[Jadex Tools](tools/01%20Introduction.md)~~
 
 # FAQ
 
- * ~~[FAQ](faq/faq.md)~~
+* ~~[FAQ](faq/faq.md)~~

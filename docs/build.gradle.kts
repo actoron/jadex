@@ -8,11 +8,13 @@ plugins {
 }
 
 import com.appmattus.markdown.rules.*
+import com.appmattus.markdown.rules.config.*
 
 markdownlint {
 
-	// Optional - Include files using RegEx for ALL rules, default=".*" (i.e. all files in root project directory)
-    //includes = listOf(".*/quickstart.*/.*")
+	// Optional - Include/exclude files using RegEx for ALL rules
+	// default includes=".*" (i.e. all files in root project directory)
+    // excludes = listOf(".*old.*")
     
 	rules {
 
@@ -26,30 +28,25 @@ markdownlint {
 			active	= false
 		}
 		
+		// Find lists with inconsistent numbering
+		+OlPrefixRule(style = OrderedListStyle.Ordered) {
+		}
 		
-		// TODO: fix docs according to these rules?
-		+ConsistentUlStyleRule {
+		// Which header style do we prefer?
+		+ConsistentHeaderStyleRule(style = HeaderStyle.SetextWithAtx) {
 			active	= false
 		}
-		+ConsistentHeaderStyleRule {
-			active	= false
-		}
-		+UlIndentRule {
-			active	= false
-		}
+		
+		// Multi page documents (i.e. tutorials and guides) should only have one H1 heading per page
+		// so we can combine them into a large document, if we want to.
 		+SingleH1Rule {
+//			includes	= listOf(".*tutorials.*", ".*guides.*", ".*tools.*")
+			includes	= listOf(".*quickstart.*")
 			active	= false
 		}
-		+OlPrefixRule {
-			active	= false
-		}
+
+		// Currently used for <x-hint> boxes		
 		+NoInlineHtmlRule {
-			active	= false
-		}
-		+ListIndentRule {
-			active	= false
-		}
-		+UlStartLeftRule {
 			active	= false
 		}
 
@@ -65,6 +62,10 @@ markdownlint {
 		}
 		+NoTrailingPunctuationRule {	// e.g. questionmark at the end of a heading
 			active	= false
+		}
+		
+		// Don't care for UL style (e.g. dash vs. asterisk), but enforce consistency in each .md 
+		+ConsistentUlStyleRule(style = UnorderedListStyle.Consistent) {
 		}
 	}
 	

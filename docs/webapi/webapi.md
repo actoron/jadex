@@ -31,8 +31,8 @@ public class UserAgent {...
 
 Inside the *@Publish* annotation, we have two parameters:
 
- - the publishtype defines whether to publish as REST (PUBLISH_RS) or SOAP (PUBLISH_WS) Webservice
- - the publishid determines the base location for this service
+- the publishtype defines whether to publish as REST (PUBLISH_RS) or SOAP (PUBLISH_WS) Webservice
+- the publishid determines the base location for this service
 
 Additionally, the service interface (*IUserService*) has to declare Metadata of the methods to publish:
 

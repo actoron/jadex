@@ -95,11 +95,11 @@ In this lecture we will add a small graphical chat user interface. The interface
 - Add a field of type ```JTextArea``` and name it *received*. It will be used to display the received messages.
 - Add a method *addMessage(String)* that adds new chat messages to the content of the text area.
 - Create a constructor with one parameter ```ChatGuiD2(final IExternalAccess agent)```. The external access allows the user interface to work on the agent. In the constructor the following needs to be done:
-    - Set the title of the chat window to the component name by calling ```super(agent.getComponentIdentifier().getName())```
-    - Create the user interface components, the *received* text area, a ```JTextField``` called *message* for the user to enter a message text and a ```JButton``` called *send* for sending messages.
-    - Layout the gui components using some LayoutManager, e.g. using a ```BorderLayout```
-    - Show the gui by calling ```pack()``` and ```setVisible(true)```
-    - Add an ```ActionListener``` to the send button to notify the available chat services of the new message. The code should look like the following:
+  - Set the title of the chat window to the component name by calling ```super(agent.getComponentIdentifier().getName())```
+  - Create the user interface components, the *received* text area, a ```JTextField``` called *message* for the user to enter a message text and a ```JButton``` called *send* for sending messages.
+  - Layout the gui components using some LayoutManager, e.g. using a ```BorderLayout```
+  - Show the gui by calling ```pack()``` and ```setVisible(true)```
+  - Add an ```ActionListener``` to the send button to notify the available chat services of the new message. The code should look like the following:
 
 ```java
 send.addActionListener(new ActionListener()

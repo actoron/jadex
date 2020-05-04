@@ -12,8 +12,8 @@ For a more complete guide into Active Components, take a look at the [AC User Gu
 
 Micro Agents are defined by plain Java classes. In order for a Java class to represent a Micro Agent, two requirements have to be met:
 
- - The name of the class has to end with "Agent" (e.g. ```MyAgent```, ```ChatAgent```, ...)
- - The class has to be annotated with the ```@Agent``` Annotation
+- The name of the class has to end with "Agent" (e.g. ```MyAgent```, ```ChatAgent```, ...)
+- The class has to be annotated with the ```@Agent``` Annotation
 
 Optionally, it can provide a description using the ```@Description``` Annotation. The value is then shown inside the [JCC](../tools/02%20JCC%20Overview.md).
 
@@ -76,7 +76,7 @@ The preferred method to start a component has the following signature:
 ITuple2Future<...> createComponent(String name, String model, CreationInfo info);
 ```
 
-You may provide a [CreationInfo](#creation-info) object (e.g., to pass parameters at startup) or a *name* for the created component instance, but most importantly, you have to provide a *model*, which in this case is simply the **fully qualified name** of the component class (or XML-file for other component types):
+You may provide a [CreationInfo](#passing-arguments) object (e.g., to pass parameters at startup) or a *name* for the created component instance, but most importantly, you have to provide a *model*, which in this case is simply the **fully qualified name** of the component class (or XML-file for other component types):
 
 ```java
 ITuple2Future<...> fut = cms.createComponent("myAgent1", "tutorial.MyAgent.class", null);

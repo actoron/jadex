@@ -207,8 +207,8 @@ After adding the plan, the agent should exhibit the following behavior:
 
 * The agent performs patrol rounds as long as there is enough battery.
 * When the battery is below the threshold in the maintain condition (i.e. the `isBatteryLoaded()` method), the agent will stop its patrol plan and
-    * move to a charging station if known (as implemented in the `loadBattery()` plan method),
-    * execute a plan to find a charging station if not known (in reaction to the subgoal posted in the `loadBattery()` plan method).
+  * move to a charging station if known (as implemented in the `loadBattery()` plan method),
+  * execute a plan to find a charging station if not known (in reaction to the subgoal posted in the `loadBattery()` plan method).
 
 Note, that the plan for finding a charging station will not be executed, when the agent already knows a charging station,
 because the target condition of the `QueryChargingStation` goal will be immediately succeeded. You can test this,

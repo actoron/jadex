@@ -73,8 +73,8 @@ For these so-called *dynamic beliefs* it is required that they are fields with a
 
 - Create a *TranslationBDI* class by copying it from the last exercise. 
 - Change the belief definition in two ways:
-    - First already create the wordtable as part of the declaration.
-    - Second add a new belief named *alarm* of type boolean. The alarm expression should check if the wordtable contains the key 'bugger'. 
+  - First already create the wordtable as part of the declaration.
+  - Second add a new belief named *alarm* of type boolean. The alarm expression should check if the wordtable contains the key 'bugger'. 
 
 ```java
 @Belief

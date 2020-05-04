@@ -397,10 +397,10 @@ protected void removeEntry()
 - Next, we create the wordtable and add four different word pairs.
   To activate the maintain goal we add a new word pair every two seconds.
   This can be achieved by using the ```repeatStep``` method of the execution feature:
-    - As first parameters we use *0,2000* to execute without delay and repeat every two seconds.
-    - As third parameter, we create a component step that declares an integer field *cnt* (as counter).
-      In the execute method of the step we add a new word pair using the *cnt* which is incremented to make it unique each time.
-      Afterwards, we print the contents of the dictionary:
+  - As first parameters we use *0,2000* to execute without delay and repeat every two seconds.
+  - As third parameter, we create a component step that declares an integer field *cnt* (as counter).
+    In the execute method of the step we add a new word pair using the *cnt* which is incremented to make it unique each time.
+    Afterwards, we print the contents of the dictionary:
 
 ```java
 @AgentBody
