@@ -1,8 +1,8 @@
 # Getting Started with Jadex Active Components
 
-With Jadex, you can use the *Active Components* approach to develop distributed applications. This approach combines a hierachical service component architecture (SCA) with the possibility of abstract business logic implementation based on [BDI Agents](../tutorials/bdiv3/01%20Introduction.md) or [BPMN Workflows](../tutorials/bpmn/01%20Introduction.md) (see [Component Types](../component-types/component-types.md) for more information).
+With Jadex, you can use the *Active Components* approach to develop distributed applications. This approach combines a hierachical service component architecture (SCA) with the possibility of abstract business logic implementation based on [BDI Agents] or [BPMN Workflows] (see [Component Types] for more information).
 
-The communication model is based on [services](../services/services.md#implementation).
+The communication model is based on [Services].
 An Active Component is an entity that has defined dependencies with its environment.
 Similar to other component models these dependencies are described using required and provided services, i.e. services that a component needs to consume from other components for its functioning and services that it provides to others.
 
@@ -13,12 +13,12 @@ The figure below summarizes the general concept of an Active Component.
 *Active Component Structure*
 
 The following chapters introduce concepts with hands-on code examples and help you developing your own Jadex Active Components based applications.
-*(If you do not want to setup your IDE now, skip the remainder of this chapter and continue to [Platform](../platform/platform.md).)*
+*(If you do not want to setup your IDE now, skip the remainder of this chapter and continue to [Platform].)*
 
 # IDE Setup
 
 In this chapter, you will learn how to install eclipse for developing desktop applications with Jadex. Therefore, you will find instructions on setting up a proper eclipse working environment for programming and executing Jadex applications. If you use a different IDE the instructions and screenshots below should still be helpful for setting up your IDE accordingly.
-*(If you want to develop Android applications with Jadex, please refer to [Android](../android/android.md).)*
+*(If you want to develop Android applications with Jadex, please refer to [Android].)*
 
 Note that this tutorial is not a replacement for the existing eclipse documentation. If you have questions about using eclipse try also looking for an answer at the <http://www.eclipse.org/documentation/> site.
 
@@ -29,7 +29,7 @@ Note that this tutorial is not a replacement for the existing eclipse documentat
 
 ## Eclipse Project Setup with Gradle/Maven
 
-If you want to use Gradle or Apache Maven for your project, you do not need to download the whole Jadex distribution.
+If you want to use Gradle or apache Maven for your project, you do not need to download the whole Jadex distribution.
 Just add a dependency for the required Jadex artifacts and they will be downloaded automatically.
 We provide an example project that uses Gradle as described in the next section.
 
@@ -95,7 +95,7 @@ repositories {
 }
 ```
 
-### Using Jadex in a new or existing Apache Maven Project:
+### Using Jadex in a new or existing Apache Maven Project
 
 <!-- TODO: confirm Maven setup -->
 
@@ -139,7 +139,7 @@ If you want to use our nightly builds, you need to add our repository:
 
 <!-- TODO: can someone confirm this IntelliJ setup? -->
 
-Using IntelliJ IDEA for development with Jadex Active Components is not officially supported except for [Android development](../android/android.md).
+Using IntelliJ IDEA for development with Jadex Active Components is not officially supported except for [Android].
 If you still want to use IntelliJ IDEA, just try to import the Jadex Example Project - Gradle support is provided by IntelliJ.
 
 If you want to compile the Jadex source code, import the project included in sources.zip.
@@ -232,8 +232,28 @@ public class HelloAgent {
 
 * If everything works well, you should see "Hello, Jadex!" printed to the console every five seconds.
 
-To start your applications developed with Jadex Active Components, you always need to start a [Jadex Platform](../platform/platform.md#starting-a-platform) and [start your Component(s)](../components/components.md#startup).
+To start your applications developed with Jadex Active Components, you always need to [start a Jadex Platform] and [start your Component(s)].
 As shown in the example above, you can combine these two steps by adding your agents/components to the config before starting the platform.
+
+# References
+
+* [BDI Agents]
+* [BPMN Workflows]
+* [Component Types]
+* [Services]
+* [Platform]
+    * [start a Jadex Platform]
+* [start your Component(s)]
+* [Android]
+
+[BDI Agents]: ../tutorials/bdiv3/01%20Introduction.md
+[BPMN Workflows]: ../tutorials/bpmn/01%20Introduction.md
+[Component Types]: ../component-types/component-types.md
+[Services]: ../services/services.md#implementation
+[Platform]: ../platform/platform.md
+[Android]: ../android/android.md
+[start a Jadex Platform]: ../platform/platform.md#starting-a-platform
+[start your Component(s)]: ../components/components.md#startup
 
 ---
 [[Up: Document Overview]](../index.md)
