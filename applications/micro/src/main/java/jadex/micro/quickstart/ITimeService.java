@@ -21,7 +21,7 @@ public interface ITimeService
 	/**
 	 *  Get the location of the platform, where the time service runs.
 	 */
-	// TODO: support for cached methods, yes or no? -> otherwise forbid or support sync?
+// TODO: support for cached methods, yes or no? -> otherwise forbid or support sync?
 	public IFuture<String>	getLocation();
 	
 	/**
