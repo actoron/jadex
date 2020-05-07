@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-	compile 'com.madgag.spongycastle:core:1.54.0.0'
+	api project(':util:security')
 	include 'net.java.dev.jna:jna:4.2.1'
 	include 'net.java.dev.jna:jna-platform:4.2.1'
 }

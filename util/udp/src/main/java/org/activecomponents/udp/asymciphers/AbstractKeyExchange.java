@@ -2,12 +2,12 @@ package org.activecomponents.udp.asymciphers;
 
 import java.io.IOException;
 
-import org.spongycastle.crypto.AsymmetricCipherKeyPair;
-import org.spongycastle.crypto.BasicAgreement;
-import org.spongycastle.crypto.digests.SHA256Digest;
-import org.spongycastle.crypto.params.AsymmetricKeyParameter;
-import org.spongycastle.crypto.util.PublicKeyFactory;
-import org.spongycastle.crypto.util.SubjectPublicKeyInfoFactory;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.BasicAgreement;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.util.PublicKeyFactory;
+import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 
 public abstract class AbstractKeyExchange implements IKeyExchange
 {
