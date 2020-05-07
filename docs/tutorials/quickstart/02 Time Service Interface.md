@@ -24,12 +24,11 @@ import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
-
 /**
  *  Simple service to publish the local system time.
  *  As the service does not change the local system
  *  and provides no sensitive information, no security
- *  restrictions are required. 
+ *  restrictions are required.
  */
 @Security(roles=Security.UNRESTRICTED)
 @Service
@@ -56,10 +55,10 @@ In Jadex, the fully qualified name of a service interface is used for service di
 
 <!--
 TODO:
-* E.g. for testing purposes there should be a time provider running on our infrastructure.
-* infrastructure link?
-* time provider autodeploy from build
+
+* link to web-registry
 * web page listing available time providers (jadex.js)
+
 -->
 
 ### The `subscribe()` Method
