@@ -781,9 +781,9 @@ task copyJavaDocSources(type: Copy) {
 		if (sp == null)
 			println 'SUBPROJECT NOT FOUND:' + ' ' + artname
 		from(sp.projectDir.getCanonicalPath() + '/src/main/java') {
-			include '**/*.java'
 			exclude '**/org/apache/**'
 			exclude '**/impl/**'
+			include '**/*.java'
 		}
 	}
 	def comment = false
@@ -804,16 +804,24 @@ task copyJavaDocSources(type: Copy) {
 
 task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	def sourcedir = getDistsDir(project).getCanonicalPath() + '/javadocworkdir'
+	//classpath = configurations.runtimeClasspath
+	println (gradle.ext.maindistartifacts.collect {project(it).sourceSets.main.compileClasspath})
+	classpath = files(gradle.ext.maindistartifacts.collect {project(it).sourceSets.main.compileClasspath})
 	source(sourcedir)
 	destinationDir = new File(getDistsDir(project).getCanonicalPath() + '/jadex-' + jadex_build_version + '-javadoc')
+	def dfile = destinationDir.getCanonicalPath() + '.zip';
+	outputs.file(dfile)
 
 	options.encoding 'UTF-8'
 	options.docEncoding 'UTF-8'
 	options.charSet 'UTF-8'
 	options.quiet()
 
-	options.docTitle("Jadex Active Component Platform ${project.version} API")
-	options.windowTitle("Jadex Active Component Platform ${project.version} API")
+	options.addBooleanOption("Xdoclint:none", true);
+	/*options.docTitle("Jadex Active Component Platform ${project.version} API")
+	options.windowTitle("Jadex Active Component Platform ${project.version} API")*/
+	options.docTitle("Jadex Active Component Platform ${jadex_build_version} API")
+	options.windowTitle("Jadex Active Component Platform ${jadex_build_version} API")
 	options.group('Core Packages','jadex.commons*:jadex.bridge*')
 	options.group('Micro Agent Packages','jadex.micro*')
 	options.group('BPMN Process Packages','jadex.bpmn*')
@@ -826,7 +834,7 @@ task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 		def ant = new groovy.util.AntBuilder()
 		ant.sequential {
 			ant.delete dir: sourcedir
-			ant.zip destfile: destinationDir.getCanonicalPath() + '.zip', {
+			ant.zip destfile: dfile, {
 				zipfileset dir: destinationDir.getCanonicalPath(), prefix: 'javadoc' + '/', erroronmissingdir: false
 			}
 			ant.delete dir: destinationDir
@@ -899,44 +907,58 @@ task docsDirZip(type: Zip) {
 }
 
 
-task deployDocs() {
-	dependsOn docsDirZip
+task deployJavadocs() {
+	dependsOn javadocZip
 	doLast {
 		
 		def acc = getDownloadServerAccess();
 		
-		def dir = "/www/docs/" + project.ext.version.major + "." + project.ext.version.minor;
-		def docszip = "" + project.buildDir + File.separator + 'docs.zip';
+		//def dir = "/www/docs/javadoc/" + project.ext.version.major + "." + project.ext.version.minor;
+		def basedir = "/www/docs/javadoc";
+		def dir = basedir + "/" + jadex_build_version;
+		// def docszip = "" + project.buildDir + File.separator + 'docs.zip';
+		def docszipfile = 'jadex-' + jadex_build_version + '-javadoc.zip';
+		def docszip = getDistsDir(project).getCanonicalPath() + '/' + docszipfile;
 		
-		net.schmizz.sshj.SSHClient ssh = new net.schmizz.sshj.SSHClient();
+		def ssh = new net.schmizz.sshj.SSHClient();
 		ssh.addHostKeyVerifier(acc.hosthash);
 		ssh.connect(acc.host, acc.port);
 		try {
 			ssh.authPassword(acc.user, acc.password);
 			def session = ssh.startSession();
 			def cmd = session.exec("ls " + dir);
+			waitForSSHCmd(cmd);
 			cmd.close();
 			
 			
-			if (cmd.getExitStatus() == 0) {
+			if (cmd.getExitStatus() != null && cmd.getExitStatus() == 0) {
 				// Old deployment exist, remove...
 				session = ssh.startSession();
 				cmd = session.exec("rm -rf " + dir);
+				waitForSSHCmd(cmd);
 				cmd.close();
 			}
 			
+			/*session = ssh.startSession();
+			cmd = session.exec("mkdir " + basedir);
+			cmd.close();*/
+			
+			ssh.newSCPFileTransfer().upload(new net.schmizz.sshj.xfer.FileSystemFile(docszip),
+											basedir + "/");
+			
 			session = ssh.startSession();
-			cmd = session.exec("mkdir " + dir);
+			cmd = session.exec("unzip -d " + basedir + " " + basedir + "/" + docszipfile);
+			waitForSSHCmd(cmd);
 			cmd.close();
 			
-			ssh.newSCPFileTransfer().upload(new net.schmizz.sshj.xfer.FileSystemFile(docszip), dir + "/");
-			
 			session = ssh.startSession();
-			cmd = session.exec("unzip -d " + dir + " " + dir + "/docs.zip");
+			cmd = session.exec("mv " + basedir + "/javadoc " + dir);
+			waitForSSHCmd(cmd);
 			cmd.close();
 			
 			session = ssh.startSession();
-			cmd = session.exec("rm " + dir + "/docs.zip");
+			cmd = session.exec("rm " + basedir + "/" + docszipfile);
+			waitForSSHCmd(cmd);
 			cmd.close();
         } catch (Exception e) {
         	throw new RuntimeException(e); 
@@ -1024,17 +1046,20 @@ task updateTag() {
 def createEmptyDirOnSSH(net.schmizz.sshj.SSHClient ssh, String dir) {
 	def session = ssh.startSession();
 	def cmd = session.exec("ls " + dir);
+	waitForSSHCmd(cmd);
 	cmd.close();
 	
 	if (cmd.getExitStatus() == 0) {
 		// Old deployment exist, remove...
 		session = ssh.startSession();
 		cmd = session.exec("rm -rf " + dir);
+		waitForSSHCmd(cmd);
 		cmd.close();
 	}
 	
 	session = ssh.startSession();
 	cmd = session.exec("mkdir " + dir);
+	waitForSSHCmd(cmd);
 	cmd.close();
 }
 
@@ -1061,6 +1086,11 @@ def findPropertyWithDotsOrDie(propname) {
 	if (ret == null)
 		throw new Exception('Missing property ' + propname);
 	return ret;
+}
+
+def waitForSSHCmd(cmd) {
+	BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()));
+	reader.lines().collect(java.util.stream.Collectors.joining("\n"));
 }
 
 // Run markdownlint on docs during test phase

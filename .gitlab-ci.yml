@@ -134,10 +134,10 @@ deployZips:
     - if: $DEPLOYZIPS=="true" || $CI_COMMIT_BRANCH=="master" && $DEPLOYZIPS=="unset"
       when: on_success
 
-deployDocs:
+deployJavadocs:
   stage: deploy
   script:
-    - ./gradlew -Production deployDocs
+    - ./gradlew -Production deployJavadocs
   rules:
     - if: $DEPLOYDOCS=="true" || $CI_COMMIT_BRANCH=="master" && $DEPLOYDOCS=="unset"
       when: on_success
