@@ -270,7 +270,18 @@ public class BDIClassReader extends MicroClassReader
 							bdimodel.getCapability().addBeliefReference(fields[i].getName()+MElement.CAPABILITY_SEPARATOR+target, source);	// Store inverse mapping (inner abstract reference -> outer concrete belief)
 						}
 						
+						// Remember field of inner capability (e.g. agentpojo.mycapa)
 						bdimodel.addSubcapability(new FieldInfo(fields[i]), cap);
+						
+						// Copy subcapability fields of inner capability (e.g. agentpojo.mycapa.mysubcapa)
+						if(cap.getSubcapabilities()!=null)
+						{
+							for(Tuple2<FieldInfo, BDIModel> sub: cap.getSubcapabilities())
+							{
+								// Use nested field info
+								bdimodel.addSubcapability(new FieldInfo(fields[i], sub.getFirstEntity()), sub.getSecondEntity());								
+							}
+						}
 					}
 					catch(Exception e)
 					{
