@@ -73,7 +73,7 @@ build:
 quality:
   stage: testandquality
   script:
-    - ./gradlew -Production sonarqube
+    - ./gradlew -Production sonarqube -x test
   allow_failure: true
   rules:
     - if: $QUALITY=="true" || $CI_COMMIT_BRANCH=="master" && $QUALITY=="unset"
