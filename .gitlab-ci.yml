@@ -11,7 +11,7 @@
 # deployDevSchema
 # gradlew -Pdist=publishdists publish -x test -PpublishArtifacts -Prepouser=deployment -Prepopassword= -Production -Psigning.secretKeyRingFile=master.key 
 
-image: amd64/gradle
+image: openjdk:11-jdk
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -35,10 +35,8 @@ stages:
 # todo: move code from jenkinsutil.groovy to gradle file and make it a task
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle;
-  - apt-get update -qq && apt-get install -y -qq xvfb libxrender1 libxtst6 libxi6 pandoc texlive python3-pip
-  - pip3 install mkdocs
-  - nohup Xvfb :99 &
-  - export DISPLAY=:99
+  - apt-get update -qq && apt-get install -y -qq libxrender1 libxtst6
+  - export DISPLAY=xvfb:1
   - QUALITY="false"
   - echo "BUILD:" $BUILD
   - echo "QUALITY" $QUALITY
@@ -83,8 +81,13 @@ quality:
 
 test:
   stage: testandquality
+  # start xvfb server for running GUI tests
+  services:
+    - name: misoca/xvfb
+      alias: xvfb
   script:
     - ./gradlew -Pdist=publishdists -Production :applications:micro:test :platform:base:test test -x javadoc
+    #- ./gradlew -Pdist=publishdists -Production :tools:runtimetools-swing:test -x javadoc
   artifacts:
     when: always
     expire_in: 1 week
