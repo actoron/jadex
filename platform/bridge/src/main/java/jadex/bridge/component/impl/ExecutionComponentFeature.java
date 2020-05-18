@@ -540,7 +540,7 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							exception.printStackTrace();
+//							exception.printStackTrace();
 							// Ignore outdated timer entries when component is already dead.
 							// propblem this can occur on clock thread
 	//						if(!(exception instanceof ComponentTerminatedException) || !((ComponentTerminatedException)exception).getComponentIdentifier().equals(getComponent().getComponentIdentifier()))

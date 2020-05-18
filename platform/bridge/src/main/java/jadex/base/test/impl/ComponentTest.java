@@ -27,9 +27,6 @@ import jadex.commons.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITuple2Future;
-import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.TupleResult;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
