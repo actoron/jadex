@@ -150,6 +150,8 @@ upload:
   stage: deploy
   script: 
     - ./gradlew -Dorg.gradle.parallel=false -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
+  # Also tag when upload fails as long as deploy zips succeeds
+  allow_failure: true
   rules:
     - if: $UPLOAD=="true" || $CI_COMMIT_BRANCH=="master" && $UPLOAD=="unset"
       when: on_success
