@@ -136,7 +136,8 @@ public class SFuture
 		if(to>0)
 		{
 			final long w = (long)(to*factor);
-			IComponentStep<Void> step = new ImmediateComponentStep<Void>()
+			IComponentStep<Void> step = new IComponentStep<Void>()
+//			IComponentStep<Void> step = new ImmediateComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{

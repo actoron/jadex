@@ -1131,7 +1131,7 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 		{
 			this.query	= query;
 			this.retfut	= new SubscriptionIntermediateFuture<>();
-			SFuture.avoidCallTimeouts(retfut, agent);	// Should be not need for timeouts on local platform???
+			SFuture.avoidCallTimeouts(retfut, agent, true);	// Should be not need for timeouts on local platform???
 			this.networkspersuperpeer	= new MultiCollection<>();
 			this.futures	= new LinkedHashSet<>();
 			
