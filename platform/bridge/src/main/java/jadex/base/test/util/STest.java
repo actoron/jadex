@@ -99,8 +99,6 @@ public class STest
 		// Avoid problems due to old platform config files
 		config.setValue("rescan", true);
 
-		// Localhost Awareness seems to cause problems with other tests -> disable in tests until fixed
-		config.setValue("localhostawareness", false);
 		//config.setLogging(true);
 		
         return config;

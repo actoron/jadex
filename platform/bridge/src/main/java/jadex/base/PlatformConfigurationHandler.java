@@ -849,6 +849,7 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		config.setValue("catalogawareness", false);
 		config.setValue("multicastawareness", false);
 		config.setValue("broadcastawareness", false);
+		config.setValue("localhostawareness", false);
 
 		config.setValue("platformproxies", false);
 
