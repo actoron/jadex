@@ -2,9 +2,6 @@
 
 apply plugin: 'signing'
 
-// needs to be applied after android and java plugins:
-apply plugin: 'com.jfrog.bintray' // publish to bintray
-
 apply plugin: 'de.marcphilipp.nexus-publish'
 
 // Settings for staging when publishing to central repo
@@ -36,7 +33,7 @@ if(project.hasProperty('repo') && "central".equals(repo)) {
 def common() {
 	return {
         scm {
-            url 'http://jadex.svn.sourceforge.net/viewvc/jadex/'
+            url 'https://github.com/actoron/jadex.git'
         }
 
         url 'https://www.activecomponents.org'
@@ -118,7 +115,7 @@ def gpl() {
 
 def canSign = project.hasProperty('signing.secretKeyRingFile') || getVar("signingKey", project)!=null
 
-println getVar("signingKey", project)
+//println getVar("signingKey", project)
 
 //// Selects the projects to publish, add a better heuristic here if available
 //def includedproject = getProjectDepth(project) > 1
@@ -152,13 +149,6 @@ def configurePom(pom) {
         }
         root.children().last() + common()
         root.children().last() + gpl()
-
-//        // workaround for compile-time scope in POMs: (remove with gradle 4.7 or something)
-//        asNode().dependencies.'*'.findAll() {
-//        it.scope.text() == 'runtime' && project.configurations.compile.allDependencies.find { dep ->
-//            dep.name == it.artifactId.text()
-//        }
-//        }.each { it.scope*.value = 'compile' }
     }
 }
 
@@ -178,9 +168,9 @@ publishing {
             def myrepouser = getVar('repo' + repo + 'user', project)
             def myrepopassword = getVar('repo' + repo + 'password', project);
             
-            println "publishing to: "+myrepourl
-            println "repouser: "+myrepouser
-            println "repopassword: "+myrepopassword
+//            println "publishing to: "+myrepourl
+//            println "repouser: "+myrepouser
+//            println "repopassword: "+myrepopassword
             
             maven {
                 url myrepourl
@@ -191,54 +181,6 @@ publishing {
             }
         }
     }
-
-    // This is also a hack that maybe can be removed with gradle 4.8:
-    // extract signature file and give them proper name
-//    def getSignatureFiles = {
-//        def allFiles = project.tasks.signArchives.signatureFiles.collect { it }
-//        if (isAndroidProject(project)) {
-//            allFiles += project.tasks.signAndroidsourcesJar.signatureFiles.collect { it }
-//            allFiles +=  project.tasks.signAndroidjavadocsJar.signatureFiles.collect { it }
-//        }
-//        def signedSources = allFiles.find { it.name.contains('-sources') }
-//        def signedJavadoc = allFiles.find { it.name.contains('-javadoc') }
-//        def signedWar = allFiles.find {it.name.endsWith('war.asc')}
-//        def signedAar = allFiles.find {it.name.endsWith('aar.asc')}
-//        def signedApk = allFiles.find {it.name.endsWith('apk.asc')} // dont need apk signature as apk is not published
-//        def signedJar = (allFiles - [signedSources, signedJavadoc, signedWar, signedAar, signedApk])[0]
-//        def sigFiles = []
-//        if (signedWar != null) {
-//            sigFiles += [archive: signedWar,     classifier: null,      extension: 'war.asc']
-//        }
-//        if (signedJar != null) {
-//            sigFiles += [archive: signedJar,     classifier: null,      extension: 'jar.asc']
-//        }
-//        if (signedAar != null) {
-//            // the aar name is modified in build.gradle to strip out the "-release" part. Do the same for it's sig:
-//            if (signedAar.name.contains("release")) {
-//                String baseName = signedAar.name.replaceAll(signedAar.getParent(), "")
-//                signedAar = file("${signedAar.getParent()}${File.separator}${project.name}-${project.version}.aar.asc")
-//            }
-//            sigFiles += [archive: signedAar,     classifier: null,      extension: 'aar.asc']
-//        }
-//
-//        if (signedSources != null) {
-//            sigFiles += [archive: signedSources, classifier: 'sources', extension: 'jar.asc']
-//        }
-//
-//        if (signedJavadoc != null) {
-//            sigFiles +=  [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc']
-//        }
-//
-//        return sigFiles
-//    }
-
- 	/*publications {
- 		mavenJava(MavenPublication) {
-        	from components.java
-        }
-    }
-    }*/
 
     publications {
         if(canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project)))  // dont publish apks
@@ -284,120 +226,6 @@ publishing {
         	}
 		}
 	}
-}     
-        	//mavenJava(MavenPublication) 
-     /*       ProjectPublication(MavenPublication) 
-            {
-                if(isWebApplicationProject(project)) 
-                {
-                    from components.web
-                    // publish jar for web projects, too
-                    // (somebody generates signatures, sources,javadoc for them which are uploaded,
-                    // so we need the main jar artifact, too
-                    project.tasks.withType(Jar) 
-                    {
-                        if(it.name.endsWith('jar') && !it.name.contains('sources') && !it.name.contains('javadoc')) 
-                        {
-                            artifact(it)
-                        }
-                    }
-                } 
-                else if (!isAndroidProject(project)) 
-                {
-                	//project.publishing.publications.mavenJava(MavenPublication) {
-                    	from components.java
-                    //}
-                }
-
-                // somehow artifacts are lost when publishing with maven-publish, re-add all jars:
-                project.tasks.withType(Jar) {
-                    def matcher = (it.name =~ /.*(javadoc|sources).* /)
-                    if (matcher.matches()) {
-    //                println "adding artifact: $it , classifier: ${matcher[0][1]}"
-                        artifact(it) {
-                            classifier matcher[0][1]
-                        }
-                    }
-                }
-
-                //groupId group
-                groupId isCommercial(project) ? 'com.actoron.jadex' : 'org.activecomponents.jadex'
-                //artifactId project.name
-                artifactId getArtifactName(project)
-                //println 'ARTIDD!!! ' + artifactId + ' ' + project.getPath()
-                version project.version
-                configurePom(pom)
-              	
-//                pom.withXml() {
-//                    // remove once on gradle 4.8:
-//                    // signing workaround for gradle 4.7:
-//                    def pomFile = file("${project.buildDir}/generated-pom.xml")
-//                    writeTo(pomFile)
-//                    def pomAscFile = signing.sign(pomFile).signatureFiles[0]
-//                    artifact(pomAscFile) {
-//                        classifier = null
-//                        extension = 'pom.asc'
-//                    }
-//                }
-
-//                // remove once on gradle 4.8:
-//                project.tasks.signArchives.signatureFiles.each {
-//    //                println "sign: " + it
-//                    if (it instanceof Artifact) {
-//                        artifact(it) {
-//                            def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
-//                            if (matcher.find()) {
-//                                classifier = matcher.group(1)
-//                            } else {
-//                                classifier = null
-//                            }
-//                            extension = 'jar.asc'
-//                        }
-//                    }
-//                }
-
-//                // add signatures that did not end as artifact (gradle <4.8 bug as well?)
-//                getSignatureFiles().each {signature ->
-//                    artifact (signature.archive) {
-//                        classifier = signature.classifier
-//                        extension  = signature.extension
-//                    }
-//                }
-	        }
-        }
-    }
-}*/
-
-if (!isCommercial(project)) {
-    bintray {
-        user = getVar('BINTRAY_USER', project)
-        key = getVar('BINTRAY_KEY', project)
-        configurations = project.tasks.findByName('install') ? ['archives'] : null
-        publish = true
-        publications = publishing.publications.any {it.name.equals('ProjectPublication')} ? ['ProjectPublication'] : null
-        pkg {
-            repo = 'jadex'
-            name = 'jadex'
-            licenses = ['GPL-3.0']
-            vcsUrl = 'http://jadex.svn.sourceforge.net/viewvc/jadex/'
-            websiteUrl = 'https://www.activecomponents.org'
-            desc = 'Jadex Active Components Platform'
-            version {
-                name = jadex_build_version
-                released = new Date()
-                vcsTag = jadex_build_version
-                if (getVar('centraluser', project) != null) {
-                    mavenCentralSync {
-                        sync = false //[Default: true] Determines whether to sync the version to Maven Central.
-                        user = getVar('centraluser', project) //OSS user token: mandatory
-                        password = getVar('centralpassword', project) //OSS user password: mandatory
-                        close = '0'
-                        //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
-                    }
-                }
-            }
-        }
-    }
 }
 
 if(canSign) {
@@ -425,7 +253,6 @@ if(canSign) {
 			sign publishing.publications.mavenJava
 		}
 	}
-	
 	
 }
 
