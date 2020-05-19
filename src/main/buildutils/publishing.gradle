@@ -191,7 +191,7 @@ publishing {
             }
         }
     }
-*/
+
     // This is also a hack that maybe can be removed with gradle 4.8:
     // extract signature file and give them proper name
 //    def getSignatureFiles = {
