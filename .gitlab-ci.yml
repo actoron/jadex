@@ -173,7 +173,7 @@ deployArtifactsToCentral:
   script: 
     - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=central
   rules:
-    - if: $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="stable"
+    - if: $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
       when: on_success
       
 # cleanuprepo:    
