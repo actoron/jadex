@@ -14,15 +14,21 @@
 image: openjdk:11-jdk
 
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false --info"
+  
+  # default tasks for all branches
   BUILD: "true"
-  QUALITY: "unset"
   TEST: "true"
-  JAVADOCZIP: "unset"
+  
+  # additional default tasks for master and stable
+  QUALITY: "unset"
   DEPLOYZIPS: "unset"
   DEPLOYDOCS: "unset"
-  UPLOAD: "unset"
+  UPLOAD_ACTORON: "unset"
   TAG: "unset"
+  
+  # additional default tasks for stable only
+  UPLOAD_CENTRAL: "unset"
   
 stages:
   - build
@@ -76,7 +82,7 @@ quality:
     - ./gradlew -Production sonarqube -x test
   allow_failure: true
   rules:
-    - if: $QUALITY=="true" || $CI_COMMIT_BRANCH=="master" && $QUALITY=="unset"
+    - if: $QUALITY=="true" || $QUALITY=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
       when: on_success
 
 test:
@@ -126,15 +132,24 @@ javadocZip:
   script:
     - ./gradlew -Pdist=addonjavadoc -Production javadocZip
   rules:
-    - if: $JAVADOCZIP=="true" || $CI_COMMIT_BRANCH=="master" && $JAVADOCZIP=="unset"
+    - if: $DEPLOYDOCS=="true" || $DEPLOYDOCS=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
       when: on_success
-    
+
+# create artifacts to be uploaded to nexus
+artifacts:
+  stage: package
+  script:
+    - ./gradlew -Pdist=publishdists -Production jar sourcesJar javadocJar
+  rules:
+    - if: $UPLOAD_ACTORON=="true" || $UPLOAD_ACTORON=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable") || $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="stable"
+      when: on_success
+      
 deployZips:
   stage: deploy
   script:
     - ./gradlew -Pdist=publishdists -Production deployZips
   rules:
-    - if: $DEPLOYZIPS=="true" || $CI_COMMIT_BRANCH=="master" && $DEPLOYZIPS=="unset"
+    - if: $DEPLOYZIPS=="true" || $DEPLOYZIPS=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
       when: on_success
 
 deployJavadocs:
@@ -142,18 +157,23 @@ deployJavadocs:
   script:
     - ./gradlew -Production deployJavadocs
   rules:
-    - if: $DEPLOYDOCS=="true" || $CI_COMMIT_BRANCH=="master" && $DEPLOYDOCS=="unset"
+    - if: $DEPLOYDOCS=="true" || $DEPLOYDOCS=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
       when: on_success
 
-# todo: move pass to env
-upload:
+deployArtifactsToActoron:
   stage: deploy
   script: 
-    - ./gradlew -Dorg.gradle.parallel=false -Pdist=publishdists -Production publish -x test -P repo_noncommercial=https://oss.sonatype.org/service/local/staging/deploy/maven2 -Prepo_commercial= 
-  # Also tag when upload fails as long as deploy zips succeeds
-  allow_failure: true
+    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=actoron
   rules:
-    - if: $UPLOAD=="true" || $CI_COMMIT_BRANCH=="master" && $UPLOAD=="unset"
+    - if: $UPLOAD_ACTORON=="true" || $UPLOAD_ACTORON=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
+      when: on_success
+      
+deployArtifactsToCentral:
+  stage: deploy
+  script: 
+    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=central
+  rules:
+    - if: $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
       when: on_success
       
 # cleanuprepo:    

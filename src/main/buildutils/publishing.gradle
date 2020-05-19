@@ -7,27 +7,30 @@ apply plugin: 'com.jfrog.bintray' // publish to bintray
 
 apply plugin: 'de.marcphilipp.nexus-publish'
 
-project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
-
-project.rootProject.afterEvaluate {
-    nexusStaging {
-        packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
-        stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
-        username = getVar("repouser", project)
-        password = getVar("repopassword", project)
-    }
-   
-}
-
-nexusPublishing {
-	repositories {
-    	sonatype() {
-        	connectTimeout = Duration.ofMinutes(10)
-        	clientTimeout = Duration.ofMinutes(10)
-        	username = getVar("repouser", project)
-        	password = getVar("repopassword", project)
-        }
-    }
+// Settings for staging when publishing to central repo
+if(project.hasProperty('repo') && "central".equals(repo)) {
+	project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
+	
+	project.rootProject.afterEvaluate {
+	    nexusStaging {
+	        packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
+	        stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
+	        username = getVar("repouser", project)
+	        password = getVar("repopassword", project)
+	    }
+	   
+	}
+	
+	nexusPublishing {
+		repositories {
+	    	sonatype() {
+	        	connectTimeout = Duration.ofMinutes(10)
+	        	clientTimeout = Duration.ofMinutes(10)
+	        	username = getVar("repouser", project)
+	        	password = getVar("repopassword", project)
+	        }
+	    }
+	}
 }
 
 def common() {
@@ -113,7 +116,6 @@ def gpl() {
 // ------------ PUBLISH ----------------
 // -------------------------------------
 
-def canPublishToNexus = isCommercial(project) && repo_commercial || !isCommercial(project) && repo_noncommercial
 def canSign = project.hasProperty('signing.secretKeyRingFile') || getVar("signingKey", project)!=null
 
 println getVar("signingKey", project)
@@ -166,51 +168,28 @@ publishing {
 	println "can publish: "+canPublishToNexus
 	println "commercial: "+isCommercial(project)+" repo comm: "+repo_commercial+" repo noncomm:"+repo_noncommercial
 	println "can sign:"+canSign
-	
-    if(project.hasProperty('repouser')) 
-    {
-        if(canPublishToNexus) 
+*/	
+	// Settings for non-staging publications like nexus.actoron.com
+	if(project.hasProperty('repo') && !"central".equals(repo))
+	{
+        repositories 
         {
-            repositories 
-            {
-                def repo
-
-                if(isCommercial(project) && repo_commercial) 
-                {
-                    repo = repo_commercial
-                   
-                } 
-                else if(!isCommercial(project) && repo_noncommercial) 
-                {
-                    repo = repo_noncommercial
-                }
-                
-                def myrepouser = getVar("repouser", project)
-                //project.hasProperty("repouser")? repouser: System.getenv("repouser")
-                def myrepopassword = getVar("repopassword", project);
-                //project.hasProperty("repopassword")? repopassword: System.getenv("repopassword")
-                
-                println "publishing to: "+repo
-                println "repouser: "+myrepouser
-                println "repopassword: "+myrepopassword
-                
-                maven {
-                    url repo
-                    credentials {
-                        username myrepouser
-                        password myrepopassword
-                    }
+            def myrepourl = getVar('repo' + repo + 'url', project)
+            def myrepouser = getVar('repo' + repo + 'user', project)
+            def myrepopassword = getVar('repo' + repo + 'password', project);
+            
+            println "publishing to: "+myrepourl
+            println "repouser: "+myrepouser
+            println "repopassword: "+myrepopassword
+            
+            maven {
+                url myrepourl
+                credentials {
+                    username myrepouser
+                    password myrepopassword
                 }
             }
         }
-        else
-        {
-        	println "cannot publish, has no nexus"
-        }
-    }
-    else
-    {
-    	println "cannot publish, has no repo user"
     }
 */
     // This is also a hack that maybe can be removed with gradle 4.8:
