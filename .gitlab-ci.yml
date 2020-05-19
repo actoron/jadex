@@ -82,7 +82,7 @@ quality:
     - ./gradlew -Production sonarqube -x test
   allow_failure: true
   rules:
-    - if: $QUALITY=="true" || $QUALITY=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
+    - if: $QUALITY=="true" || $QUALITY=="unset" && $CI_COMMIT_BRANCH=="master" || $QUALITY=="unset" &&  $CI_COMMIT_BRANCH=="stable"
       when: on_success
 
 test:
@@ -132,7 +132,7 @@ javadocZip:
   script:
     - ./gradlew -Pdist=addonjavadoc -Production javadocZip
   rules:
-    - if: $DEPLOYDOCS=="true" || $DEPLOYDOCS=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
+    - if: $DEPLOYDOCS=="true" || $DEPLOYDOCS=="unset" && $CI_COMMIT_BRANCH=="master" ||  $DEPLOYDOCS=="unset" && $CI_COMMIT_BRANCH=="stable"
       when: on_success
 
 # create artifacts to be uploaded to nexus
@@ -141,7 +141,7 @@ artifacts:
   script:
     - ./gradlew -Pdist=publishdists -Production jar sourcesJar javadocJar
   rules:
-    - if: $UPLOAD_ACTORON=="true" || $UPLOAD_ACTORON=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable") || $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="stable"
+    - if: $UPLOAD_ACTORON=="true" || $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="master" ||  $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="stable" || $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="master" ||  $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="stable"
       when: on_success
       
 deployZips:
@@ -149,7 +149,7 @@ deployZips:
   script:
     - ./gradlew -Pdist=publishdists -Production deployZips
   rules:
-    - if: $DEPLOYZIPS=="true" || $DEPLOYZIPS=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
+    - if: $DEPLOYZIPS=="true" || $DEPLOYZIPS=="unset" && $CI_COMMIT_BRANCH=="master" ||  $DEPLOYZIPS=="unset" && $CI_COMMIT_BRANCH=="stable"
       when: on_success
 
 deployJavadocs:
@@ -157,7 +157,7 @@ deployJavadocs:
   script:
     - ./gradlew -Production deployJavadocs
   rules:
-    - if: $DEPLOYDOCS=="true" || $DEPLOYDOCS=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
+    - if: $DEPLOYDOCS=="true" || $DEPLOYDOCS=="unset" && $CI_COMMIT_BRANCH=="master" ||  $DEPLOYDOCS=="unset" && $CI_COMMIT_BRANCH=="stable"
       when: on_success
 
 deployArtifactsToActoron:
@@ -165,7 +165,7 @@ deployArtifactsToActoron:
   script: 
     - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=actoron
   rules:
-    - if: $UPLOAD_ACTORON=="true" || $UPLOAD_ACTORON=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
+    - if: $UPLOAD_ACTORON=="true" || $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="master" ||  $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="stable"
       when: on_success
       
 deployArtifactsToCentral:
@@ -173,7 +173,7 @@ deployArtifactsToCentral:
   script: 
     - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=central
   rules:
-    - if: $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && ($CI_COMMIT_BRANCH=="master" ||  $CI_COMMIT_BRANCH=="stable")
+    - if: $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="master" || $UPLOAD_CENTRAL=="unset" &&  $CI_COMMIT_BRANCH=="stable"
       when: on_success
       
 # cleanuprepo:    
