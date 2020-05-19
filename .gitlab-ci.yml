@@ -14,7 +14,7 @@
 image: openjdk:11-jdk
 
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false --info"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   
   # default tasks for all branches
   BUILD: "true"
