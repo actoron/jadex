@@ -98,10 +98,10 @@ test:
     when: always
     expire_in: 1 week
     paths:
-      - "*/build/reports/"
-      - "*/*/build/reports/"
-      - "*/*/*/build/reports/"
-      - "*/*/*/*/build/reports/"
+      - "*/build/reports/tests/test"
+      - "*/*/build/reports/tests/test"
+      - "*/*/*/build/reports/tests/test"
+      - "*/*/*/*/build/reports/tests/test"
     reports:
       junit: 
         - "*/build/test-results/test/*.xml"
