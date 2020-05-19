@@ -162,7 +162,7 @@ def configurePom(pom) {
 
 
 publishing {
-
+/*
 	println "can publish: "+canPublishToNexus
 	println "commercial: "+isCommercial(project)+" repo comm: "+repo_commercial+" repo noncomm:"+repo_noncommercial
 	println "can sign:"+canSign
@@ -212,7 +212,7 @@ publishing {
     {
     	println "cannot publish, has no repo user"
     }
-
+*/
     // This is also a hack that maybe can be removed with gradle 4.8:
     // extract signature file and give them proper name
 //    def getSignatureFiles = {
@@ -271,14 +271,24 @@ publishing {
 	        	if(gradle.ext.webprojects.contains(project.getPath()))
 	            {
         			from components.web
+        			
+                  	// default artifact is xyz.war so add xyz.jar xyz-sources.jar and xyz-javadoc.jar for maven central to be happy
+        			project.tasks.withType(Jar) 
+                    {
+                        if(it.name.equals('jar') || it.name.equals('sourcesJar') || it.name.equals('javadocJar')) 
+                        {
+                            artifact(it)
+                        }
+                    }
         		}
         		else
         		{
         			from components.java
         			
+                   	// add xyz-sources.jar and xyz-javadoc.jar for maven central to be happy
         			project.tasks.withType(Jar) 
                     {
-                        if(it.name.endsWith('jar') && !it.name.contains('sources') && !it.name.contains('javadoc')) 
+                        if(it.name.equals('sourcesJar') || it.name.equals('javadocJar')) 
                         {
                             artifact(it)
                         }
