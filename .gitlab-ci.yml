@@ -142,14 +142,14 @@ artifacts:
     - ./gradlew -Pdist=publishdists -Production jar sourcesJar javadocJar
   artifacts:
     paths:
-      - "*/build/*.jar"
-      - "*/build/*.jar.asc"
-      - "*/*/build/*.jar"
-      - "*/*/build/*.jar.asc"
-      - "*/*/*/build/*.jar"
-      - "*/*/*/build/*.jar.asc"
-      - "*/*/*/*/build/*.jar"
-      - "*/*/*/*/build/*.jar.asc"
+      - "*/build/libs/*.jar"
+      - "*/build/libs/*.jar.asc"
+      - "*/*/build/libs/*.jar"
+      - "*/*/build/libs/*.jar.asc"
+      - "*/*/*/build/libs/*.jar"
+      - "*/*/*/build/libs/*.jar.asc"
+      - "*/*/*/*/build/libs/*.jar"
+      - "*/*/*/*/build/libs/*.jar.asc"
     expire_in: 1 week
   rules:
     - if: $UPLOAD_ACTORON=="true" || $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="master" ||  $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="stable" || $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="master" ||  $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="stable"
