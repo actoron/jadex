@@ -51,6 +51,7 @@ before_script:
   - echo "DEPLOYDOCS" $DEPLOYDOCS
   - echo "DEPLOYZIPS" $DEPLOYZIPS
   - echo "UPLOAD" $UPLOAD
+  - export
 
 cache:
   paths:
