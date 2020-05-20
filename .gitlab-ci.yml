@@ -170,7 +170,7 @@ deployJavadocs:
 deployArtifactsToActoron:
   stage: deploy
   script: 
-    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=actoron
+    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=actoron --info
   rules:
     - if: $UPLOAD_ACTORON=="true" || $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="master" ||  $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="stable"
       when: on_success
@@ -178,7 +178,7 @@ deployArtifactsToActoron:
 deployArtifactsToCentral:
   stage: deploy
   script: 
-    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=central
+    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=central --info
   rules:
     - if: $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="master" || $UPLOAD_CENTRAL=="unset" &&  $CI_COMMIT_BRANCH=="stable"
       when: on_success
