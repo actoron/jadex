@@ -14,76 +14,55 @@
 image: openjdk:11-jdk
 
 variables:
+  # Gradle JVM options!
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   
+  # Additional options/tasks for gradlew executions (allows e.g. '-x deployJavadocs')
+  GRADLE_EXTRA: "--info"   
+  
   # default tasks for all branches
-  BUILD: "true"
-  TEST: "true"
+  BUILD_BRANCHES: '.*'
+  TEST_BRANCHES: '.*'
   
-  # additional default tasks for master and stable
-  QUALITY: "unset"
-  DEPLOYZIPS: "unset"
-  DEPLOYDOCS: "unset"
-  UPLOAD_ACTORON: "unset"
-  TAG: "unset"
-  
-  # additional default tasks for stable only
-  UPLOAD_CENTRAL: "unset"
+  # default tasks for master and stable
+  QUALITY_BRANCHES: 'master|stable'
+  DEPLOY_BRANCHES: 'master|stable'
+  PUBLISH_BRANCHES: 'master|stable'
+  TAG_BRANCHES: 'master|stable'
   
 stages:
   - build
   - testandquality
-  - package
-  - deploy
+  - deployandpublish
   - failure
   - success
 
 # todo: move code from jenkinsutil.groovy to gradle file and make it a task
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle;
-  - apt-get update -qq && apt-get install -y -qq libxrender1 libxtst6
-  - export DISPLAY=xvfb:1
-  - QUALITY="false"
-  - echo "BUILD:" $BUILD
-  - echo "QUALITY" $QUALITY
-  - echo "TEST" $TEST
-  - echo "JAVADOCZIP" $JAVADOCZIP
-  - echo "DEPLOYDOCS" $DEPLOYDOCS
-  - echo "DEPLOYZIPS" $DEPLOYZIPS
-  - echo "UPLOAD" $UPLOAD
-  - export
 
 cache:
   paths:
     - .gradle/wrapper
     - .gradle/caches
 
-# **/build does not work correctly :-(
-# https://gitlab.com/gitlab-org/gitlab-foss/issues/17850
+    
 build:
   stage: build
   script:
-    - ./gradlew -Pdist=publishdists -Production clean build -x test -x javadoc
-  allow_failure: false
-  artifacts:
-    paths:
-      - "*/build"
-      - "*/*/build"
-      - "*/*/*/build"
-      - "*/*/*/*/build"
-    expire_in: 1 week
+    - ./gradlew -Pdist=publishdists -Production clean build testClasses -x test -x javadoc $GRADLE_EXTRA
   rules:
-    - if: '$BUILD == "true"'
+    - if: '$BUILD=="true" || $BUILD!="false" && $CI_COMMIT_REF_SLUG=~$BUILD_BRANCHES'
       when: on_success
     
     
 quality:
   stage: testandquality
   script:
-    - ./gradlew -Production sonarqube -x test
+    - ./gradlew -Production sonarqube -x test $GRADLE_EXTRA
   allow_failure: true
   rules:
-    - if: $QUALITY=="true" || $QUALITY=="unset" && $CI_COMMIT_BRANCH=="master" || $QUALITY=="unset" &&  $CI_COMMIT_BRANCH=="stable"
+    - if: $QUALITY=="true" || $QUALITY!="false" && $CI_COMMIT_REF_SLUG=~$QUALITY_BRANCHES
       when: on_success
 
 test:
@@ -93,8 +72,10 @@ test:
     - name: misoca/xvfb
       alias: xvfb
   script:
-    - ./gradlew -Pdist=publishdists -Production :applications:micro:test :platform:base:test test -x javadoc
-    #- ./gradlew -Pdist=publishdists -Production :tools:runtimetools-swing:test -x javadoc
+    # X libs not included in oppenjdk container, grrr...
+    - apt-get update -qq && apt-get install -y -qq libxrender1 libxtst6
+    - export DISPLAY=xvfb:1
+    - ./gradlew -Pdist=publishdists -Production :applications:micro:test :platform:base:test test $GRADLE_EXTRA
   artifacts:
     when: always
     expire_in: 1 week
@@ -110,7 +91,7 @@ test:
         - "*/*/*/build/test-results/test/*.xml"
         - "*/*/*/*/build/test-results/test/*.xml"
   rules:
-    - if: '$TEST == "true"'
+    - if: $TEST=="true" || $TEST!="false" && $CI_COMMIT_REF_SLUG=~$TEST_BRANCHES
       when: on_success
  
 # Build all kinds of docs/dist files as parallel as possible
@@ -119,71 +100,22 @@ test:
 #  script:
 #    - ./gradlew -Pdist=publishdists -Production checkDists
     
-# buildDocsPdf:
-#  stage: package
-#  script:
-#    - ./gradlew -Production -b docs/mkdocs-ng/build.gradle buildDocsZip buildDocsPdf
-    
-javadocZip:
-  stage: package
+deploy:
+  stage: deployandpublish
   script:
-    - ./gradlew -Pdist=addonjavadoc -Production javadocZip
+    - ./gradlew -Pdist=publishdists -Production deployZips deployJavadocs $GRADLE_EXTRA
   rules:
-    - if: $DEPLOYDOCS=="true" || $DEPLOYDOCS=="unset" && $CI_COMMIT_BRANCH=="master" ||  $DEPLOYDOCS=="unset" && $CI_COMMIT_BRANCH=="stable"
+    - if: $DEPLOY=="true" || $DEPLOY!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOY_BRANCHES
       when: on_success
 
-# create artifacts to be uploaded to nexus
-artifacts:
-  stage: package
-  script:
-    - ./gradlew -Pdist=publishdists -Production jar sourcesJar javadocJar
-  artifacts:
-    paths:
-      - "*/build/libs/*.jar"
-      - "*/build/libs/*.jar.asc"
-      - "*/*/build/libs/*.jar"
-      - "*/*/build/libs/*.jar.asc"
-      - "*/*/*/build/libs/*.jar"
-      - "*/*/*/build/libs/*.jar.asc"
-      - "*/*/*/*/build/libs/*.jar"
-      - "*/*/*/*/build/libs/*.jar.asc"
-    expire_in: 1 week
-  rules:
-    - if: $UPLOAD_ACTORON=="true" || $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="master" ||  $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="stable" || $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="master" ||  $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="stable"
-      when: on_success
-      
-deployZips:
-  stage: deploy
-  script:
-    - ./gradlew -Pdist=publishdists -Production deployZips
-  rules:
-    - if: $DEPLOYZIPS=="true" || $DEPLOYZIPS=="unset" && $CI_COMMIT_BRANCH=="master" ||  $DEPLOYZIPS=="unset" && $CI_COMMIT_BRANCH=="stable"
-      when: on_success
-
-deployJavadocs:
-  stage: deploy
-  script:
-    - ./gradlew -Production deployJavadocs
-  rules:
-    - if: $DEPLOYDOCS=="true" || $DEPLOYDOCS=="unset" && $CI_COMMIT_BRANCH=="master" ||  $DEPLOYDOCS=="unset" && $CI_COMMIT_BRANCH=="stable"
-      when: on_success
-
-deployArtifactsToActoron:
-  stage: deploy
+publish:
+  stage: deployandpublish
   script: 
-    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=actoron --info
+    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=actoron $GRADLE_EXTRA
   rules:
-    - if: $UPLOAD_ACTORON=="true" || $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="master" ||  $UPLOAD_ACTORON=="unset" && $CI_COMMIT_BRANCH=="stable"
+    - if: $PUBLISH=="true" || $PUBLISH!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISH_BRANCHES
       when: on_success
-      
-deployArtifactsToCentral:
-  stage: deploy
-  script: 
-    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=central --info
-  rules:
-    - if: $UPLOAD_CENTRAL=="true" || $UPLOAD_CENTRAL=="unset" && $CI_COMMIT_BRANCH=="master" || $UPLOAD_CENTRAL=="unset" &&  $CI_COMMIT_BRANCH=="stable"
-      when: on_success
-      
+
 # cleanuprepo:    
 #  stage: failure
 #  script: 
@@ -202,12 +134,12 @@ deployArtifactsToCentral:
 #    variables:
 #      - $UPLOAD == "true"
     
-updateTag:
+tag:
   stage: success
   script:
-    -  ./gradlew -Production updateTag
+    -  ./gradlew -Production updateTag $GRADLE_EXTRA
   rules:
-    - if: $TAG=="true" || $CI_COMMIT_BRANCH=="master" && $TAG=="unset"
+    - if: $TAG=="true" || $TAG!="false" && $CI_COMMIT_REF_SLUG=~$TAG_BRANCHES
       when: on_success
 
 # Rules for the whole workflow / pipeline
