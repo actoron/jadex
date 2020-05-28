@@ -6,7 +6,7 @@
 @FOR /L %%i IN (1, 1, 10) DO @(
 	@FOR /F "tokens=2 delims==" %%T IN ('set TASKS[') DO (
 		gradlew clean
-		powershell -command "(Measure-Command {Invoke-Expression '.\gradlew.bat -Production -Pdist=%%T' | Out-Default}).TotalSeconds | Add-Content -NoNewLine buildtimer.csv"
+		powershell -command "(Measure-Command {Invoke-Expression '.\gradlew.bat --max-workers 16 -Production -Pdist=%%T' | Out-Default}).TotalSeconds | Add-Content -NoNewLine buildtimer.csv"
 		@echo | set /p dummy=";" >>buildtimer.csv
 	)
 	@echo .>>buildtimer.csv
