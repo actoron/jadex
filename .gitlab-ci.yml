@@ -145,6 +145,10 @@ tag:
 # Rules for the whole workflow / pipeline
 workflow:
   rules:
+    # always run pipeline when pushing *pipeline* build
+    - if: $CI_COMMIT_REF_SLUG=~".*pipeline.*
+      when: always
+    # never run pipeline on other pushes
     - if: $CI_PIPELINE_SOURCE == 'push'
       when: never
     - when: always
