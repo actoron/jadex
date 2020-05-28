@@ -40,6 +40,7 @@ stages:
 # for caching downloaded gradle dependencies
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle;
+  - echo $CI_COMMIT_REF_SLUG
 
 cache:
   paths:
