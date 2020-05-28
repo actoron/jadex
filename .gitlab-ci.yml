@@ -21,8 +21,8 @@ variables:
   GRADLE_EXTRA: "--info"   
   
   # default tasks for all branches
-  BUILD_BRANCHES: '.*'
-  TEST_BRANCHES: '.*'
+  BUILD_BRANCHES: .*
+  TEST_BRANCHES: .*
   
   # default tasks for master and stable
   QUALITY_BRANCHES: 'master|stable'
