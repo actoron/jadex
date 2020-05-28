@@ -1,12 +1,19 @@
-# TODO
-# * speedup by caching build artifacts?
-# * performanceTests
+# TODO: Severe
+# * fix upload javadocs!?
+# * fix checkDist
 # * upload schemas
 # * upload schemadocs
 # * multi-repository publish?
 # * per branch nexus urls (nightly vs oss)?
+
+# TODO: Minor
+# * performanceTests (publish results?)
 # * fix sonarqube and upload result?
-# * fix checkDist
+# * deploy web examples
+# * deploy infrastructure applications or use other update mechanism? (ssp1, timeprovider, anything else...?)
+
+# TODO: Contingeny
+# * speedup by caching build artifacts?
 # * avoid xlib install for test job
 # * enable junit view in gitlab
 # * fix runtime of GlobalSuperpeerTest (>2 min, really?)
@@ -96,6 +103,14 @@ checkDists:
   allow_failure: true
   rules:
     - if: $CHECKDISTS=="true" || $CHECKDISTS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDISTS_BRANCHES
+
+publish:
+  stage: deployandpublish
+  script: 
+    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=actoron $GRADLE_EXTRA
+  rules:
+    - if: $PUBLISH=="true" || $PUBLISH!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISH_BRANCHES
+      when: on_success
     
 deployZips:
   stage: deployandpublish
@@ -111,14 +126,6 @@ deployJavadocs:
     - ./gradlew -Pdist=addonjavadoc -Production deployJavadocs $GRADLE_EXTRA
   rules:
     - if: $DEPLOYJAVADOCS=="true" || $DEPLOYJAVADOCS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYJAVADOCS_BRANCHES
-      when: on_success
-
-publish:
-  stage: deployandpublish
-  script: 
-    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=actoron $GRADLE_EXTRA
-  rules:
-    - if: $PUBLISH=="true" || $PUBLISH!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISH_BRANCHES
       when: on_success
 
 # cleanuprepo:    
