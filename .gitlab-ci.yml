@@ -14,7 +14,7 @@
 image: openjdk:11-jdk
 
 variables:
-  # Gradle JVM options!
+  # Gradle JVM(!) options
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   
   # Additional options/tasks for gradlew executions (allows e.g. '-x deployJavadocs')
@@ -37,7 +37,7 @@ stages:
   - failure
   - success
 
-# todo: move code from jenkinsutil.groovy to gradle file and make it a task
+# for caching downloaded gradle dependencies
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle;
 
@@ -46,7 +46,8 @@ cache:
     - .gradle/wrapper
     - .gradle/caches
 
-    
+### Compile all sources
+# TODO: make built files available to subsequent stages (currently other jobs also compile -> wastes about 15 sec each).
 build:
   stage: build
   script:
@@ -55,7 +56,7 @@ build:
     - if: '$BUILD=="true" || $BUILD!="false" && $CI_COMMIT_REF_SLUG=~$BUILD_BRANCHES'
       when: on_success
     
-    
+### Run sonarqube 
 quality:
   stage: testandquality
   script:
@@ -146,7 +147,7 @@ tag:
 workflow:
   rules:
     # always run pipeline when pushing *pipeline* build
-    - if: $CI_COMMIT_REF_SLUG=~".*pipeline.*
+    - if: $CI_COMMIT_REF_SLUG=~".*pipeline.*"
       when: always
     # never run pipeline on other pushes
     - if: $CI_PIPELINE_SOURCE == 'push'
