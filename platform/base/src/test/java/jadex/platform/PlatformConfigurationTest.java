@@ -25,7 +25,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
 
-@Ignore // Broken by configuration changes. Lars, please fix! 
+//@Ignore // Broken by configuration changes. Lars, please fix! 
 public class PlatformConfigurationTest
 {
 	@Test
