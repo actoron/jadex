@@ -21,7 +21,7 @@ variables:
   GRADLE_EXTRA: "--info"   
   
   # default tasks for all branches
-  BUILD_BRANCHES: '/pipeline-test/'
+  BUILD_BRANCHES: '/.ipeline-test/'
   TEST_BRANCHES: .*
   
   # default tasks for master and stable
