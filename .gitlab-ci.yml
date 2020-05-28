@@ -54,7 +54,8 @@ build:
   script:
     - ./gradlew -Pdist=publishdists -Production clean build testClasses -x test -x javadoc $GRADLE_EXTRA
   rules:
-    - if: '$BUILD=="true" || $BUILD!="false" && $CI_COMMIT_REF_SLUG=~$BUILD_BRANCHES'
+    - if: '$BUILD=="true" || $BUILD!="false"
+      #&& $CI_COMMIT_REF_SLUG=~$BUILD_BRANCHES'
       when: on_success
     
 ### Run sonarqube 
