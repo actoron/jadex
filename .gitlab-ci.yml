@@ -3,7 +3,8 @@
 # * performanceTests
 # * upload schemas
 # * upload schemadocs
-# * per branch nexus urls?
+# * multi-repository publish?
+# * per branch nexus urls (nightly vs oss)?
 # * fix sonarqube and upload result?
 # * fix checkDist
 # * avoid xlib install for test job
@@ -22,7 +23,8 @@ variables:
   # Optional jobs (default for ,e.g., master and stable)
   QUALITY_BRANCHES: 'pipeline-test|master|stable'
   CHECKDISTS_BRANCHES: 'pipeline-test|master|stable'
-  DEPLOY_BRANCHES: 'pipeline-test|master|stable'
+  DEPLOYZIPS_BRANCHES: 'pipeline-test|master|stable'
+  DEPLOYJAVADOCS_BRANCHES: 'pipeline-test|master|stable'
   PUBLISH_BRANCHES: 'pipeline-test|master|stable'
   TAG_BRANCHES: 'pipeline-test|master|stable'
   
@@ -95,12 +97,20 @@ checkDists:
   rules:
     - if: $CHECKDISTS=="true" || $CHECKDISTS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDISTS_BRANCHES
     
-deploy:
+deployZips:
   stage: deployandpublish
   script:
-    - ./gradlew -Pdist=publishdists -Production deployZips deployJavadocs $GRADLE_EXTRA
+    - ./gradlew -Pdist=publishdists -Production deployZips $GRADLE_EXTRA
   rules:
-    - if: $DEPLOY=="true" || $DEPLOY!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOY_BRANCHES
+    - if: $DEPLOYZIPS=="true" || $DEPLOYZIPS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYZIPS_BRANCHES
+      when: on_success
+
+deployJavadocs:
+  stage: deployandpublish
+  script:
+    - ./gradlew -Pdist=addonjavadoc -Production deployJavadocs $GRADLE_EXTRA
+  rules:
+    - if: $DEPLOYJAVADOCS=="true" || $DEPLOYJAVADOCS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYJAVADOCS_BRANCHES
       when: on_success
 
 publish:
