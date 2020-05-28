@@ -20,11 +20,7 @@ variables:
   # Additional options/tasks for gradlew executions (allows e.g. '-x deployJavadocs')
   GRADLE_EXTRA: "--info"   
   
-  # default tasks for all branches
-  BUILD_BRANCHES: /master|.ipeline-test|stable/
-  TEST_BRANCHES: .*
-  
-  # default tasks for master and stable
+  # Optional jobs (default for ,e.g., master and stable)
   QUALITY_BRANCHES: 'master|stable'
   DEPLOY_BRANCHES: 'master|stable'
   PUBLISH_BRANCHES: 'master|stable'
@@ -53,7 +49,7 @@ build:
   script:
     - ./gradlew -Pdist=publishdists -Production clean build testClasses -x test -x javadoc $GRADLE_EXTRA
   rules:
-    - if: '$BUILD=="true" || $BUILD!="false" && $CI_COMMIT_REF_SLUG =~ $BUILD_BRANCHES'
+    - if: '$BUILD!="false"'
       when: on_success
     
 ### Run sonarqube 
@@ -92,7 +88,7 @@ test:
         - "*/*/*/build/test-results/test/*.xml"
         - "*/*/*/*/build/test-results/test/*.xml"
   rules:
-    - if: $TEST=="true" || $TEST!="false" && $CI_COMMIT_REF_SLUG=~$TEST_BRANCHES
+    - if: $TEST!="false"
       when: on_success
  
 # Build all kinds of docs/dist files as parallel as possible
