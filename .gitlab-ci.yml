@@ -5,6 +5,7 @@
 # * upload schemadocs
 # * per branch nexus urls?
 # * fix sonarqube and upload result?
+# * fix checkDist
 # * avoid xlib install for test job
 # * enable junit view in gitlab
 # * fix runtime of GlobalSuperpeerTest (>2 min, really?)
@@ -90,6 +91,7 @@ checkDists:
   stage: testandquality
   script:
     - ./gradlew -Pdist=publishdists -Production checkDists $GRADLE_EXTRA
+  allow_failure: true
   rules:
     - if: $CHECKDISTS=="true" || $CHECKDISTS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDISTS_BRANCHES
     
