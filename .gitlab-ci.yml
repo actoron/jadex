@@ -75,15 +75,12 @@ test:
     # X libs not included in oppenjdk container, grrr...
     - apt-get update -qq && apt-get install -y -qq libxrender1 libxtst6
     - export DISPLAY=xvfb:1
-    - ./gradlew -Pdist=publishdists -Production :applications:micro:test :platform:base:test test $GRADLE_EXTRA
+    - ./gradlew -Pdist=publishdists -Production --continue test testReport $GRADLE_EXTRA
   artifacts:
     when: always
     expire_in: 1 week
     paths:
-      - "*/build/reports/tests/test"
-      - "*/*/build/reports/tests/test"
-      - "*/*/*/build/reports/tests/test"
-      - "*/*/*/*/build/reports/tests/test"
+      - "build/testreport/"
     reports:
       junit: 
         - "*/build/test-results/test/*.xml"

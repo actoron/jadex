@@ -880,10 +880,11 @@ task copyJars(type: Copy) {
 }
 
 task testReport(type: TestReport) {
-    destinationDir = file("testreport")
+    destinationDir = file("build/testreport")
     // Include the results from the `test` task in all subprojects
     //reportOn subprojects*.test
 	reportOn subprojects.collect { it.tasks.withType(Test).collect {it.binResultsDir} }
+	dependsOn subprojects.collect { it.tasks.withType(Test) }
 }
 
 /*task printVersion() {
