@@ -547,16 +547,19 @@ subprojects
 		// https://discuss.gradle.org/t/replacement-for-task-execute/27545
 		task checkDist(type: GradleBuild) {
 			dependsOn unzipSources, distZip
-			def rebuilddirfile	= project.unzipSources.outputs.files.files.first()
-			buildFile = new File(rebuilddirfile, 'sources/build.gradle')
+			def rebuilddirfile	= new File(project.unzipSources.outputs.files.files.first(), 'sources')
+//			println 'rebuilddirfile: '+rebuilddirfile
+			dir	= rebuilddirfile
+			buildFile = new File(rebuilddirfile, 'build.gradle')
+			buildName = 'rebuild-'+distname	// required to avoid name clashes in newer gradle versions, grrr.
 			tasks = ["distZip"]
 			startParameter.projectProperties << ["dist": distname]
 			
 			doLast {					
 				// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
 				def distzip = project.distZip.outputs.files.first().canonicalPath
-				//def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-				def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions/zips/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+				//def distzip2 = rebuilddirfile.getCanonicalPath() + '/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+				def distzip2 = rebuilddirfile.getCanonicalPath() + '/build/distributions/zips/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 				def diff	= diffZips(distzip, distzip2)
 				if(diff.length()!=0)
 					throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
