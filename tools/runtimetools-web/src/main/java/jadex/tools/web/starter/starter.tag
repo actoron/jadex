@@ -341,7 +341,7 @@
 		// createNode(parent, id, text, position), position 'first' or 'last'
 		function createNode(treeid, parent_node_id, new_node_id, new_node_text, position)//, donefunc) 
 		{
-			//console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
+			console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
 			$('#'+treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
 		}
 		

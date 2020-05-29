@@ -1,11 +1,77 @@
 import { LitElement, html, css } from 'lit-element';
 
+// Defined as <jadex-app> tag
 class AppElement extends LitElement {
 
 	messsage = null;
 	
 	constructor() {
 		super();
+		
+		var self = this;
+		
+		console.log("app element");
+		
+		page.base('/#');
+		page('/index2.html', () => {
+			page.redirect("/platforms");
+	    });
+	    page('/', () => {
+	    	page.redirect("/platforms");
+	    });
+	    page('/platforms', () => {
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platforms></jadex-platforms>";
+	    });
+	    page('/platform', () => {
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform></jadex-platform>";
+	    });
+	    page('/about', () => {
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-about></jadex-about>";
+	    });
+	    page('/imprint', () => {
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-imprint></jadex-imprint>";
+	    });
+	    page('/privacy', () => {
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-privacy></jadex-privacy>";
+	    });
+	    page('*', (ctx, next) => {
+	    	console.log("not found: "+ctx);
+	    });
+	    
+		/*var curpage = null;
+	   	var target = "div#content";
+	   	var routes = ["platforms", "platform", "about", "imprint", "privacy"];
+	   	riot.store.language = "en";
+	   	
+	   	// As subpaths are supplied by separate args, internally arguments are used
+	   	route(function changePath(path) 
+	   	{
+	   		path = path.toLowerCase();
+	   		var paths = [];
+	   		var params = null;
+	   		for(i=0; i<arguments.length; i++)
+	   		{
+	   			if(arguments[i].indexOf("=")!=-1)
+	   				params = arguments[i];
+	   			else
+	   				paths.push(arguments[i]);
+	   		}
+	   		//console.log(path);
+	   		if(path.length==0)
+	   			path="platforms";
+	   		if(routes.includes(path)) 
+	   		{ 
+	   			if(curpage)
+					curpage.unmount(true);
+	   	        var tags = riot.mount(target, path, {paths: paths, params: params});
+	   	        curpage = tags[0];
+	   	        //console.log(tags);
+	   		}
+	   	});*/
+	}
+	
+	firstUpdated(changedProperties) {
+		page();
 	}
 	
 	static get styles() {
@@ -39,52 +105,52 @@ class AppElement extends LitElement {
 			<link rel="stylesheet" href="libs/bootstrap_4.3.1/bootstrap.min.css">
 
 			<nav class="navbar navbar-expand-lg navbar-custom navbar-fixed-top">
-			<div class="navbar-brand mr-auto">
-	 			<img src="images/jadex_logo_ac.png" width="200px"/>
-				<a class="navbar-brand pl-2" href="#">WebJCC</a>
-			</div>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarSupportedContent" ref="navcol">
-				<ul class="navbar-nav mr-auto">
-	   				<li class="nav-item">
-	      				<a class="nav-link" href="">${language.$t("message.home")}</a>
-	    			</li>
-	    			<li class="nav-item">
-	      				<a class="nav-link" href="#about">${language.$t("message.about")}</a>
-	    			</li>
-	 			</ul>
-	 			<form class="form-inline my-2 my-lg-0"></form>
-			</div>
-	        
-	        <form class="form-inline my-2 my-lg-0 ml-2">
-				<img class="navbar-nav ml-auto" @click="${this.switchLanguage}" src="${language.lang=='de'? 'images/language_de.png': 'images/language_en.png'}" />
-			</form>
-		</nav>
+				<div class="navbar-brand mr-auto">
+		 			<img src="images/jadex_logo_ac.png" width="200px"/>
+					<a class="navbar-brand pl-2" href="#">WebJCC</a>
+				</div>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarSupportedContent" ref="navcol">
+					<ul class="navbar-nav mr-auto">
+		   				<li class="nav-item">
+		      				<a class="nav-link" href="">${language.$t("message.home")}</a>
+		    			</li>
+		    			<li class="nav-item">
+		      				<a class="nav-link" href="#about">${language.$t("message.about")}</a>
+		    			</li>
+		 			</ul>
+		 			<form class="form-inline my-2 my-lg-0"></form>
+				</div>
+		        
+		        <form class="form-inline my-2 my-lg-0 ml-2">
+					<img class="navbar-nav ml-auto" @click="${this.switchLanguage}" src="${language.lang=='de'? 'images/language_de.png': 'images/language_en.png'}" />
+				</form>
+			</nav>
 		
-		<div id="content"></div>
+			<div id="content"></div>
 		
-		${this.message!=null? html`
-		<div class="container-fluid pt-0 pl-3 pr-3 pb-3">
-			<div class="row">
-				<div class="col">
-					<div class="{'alert-danger': message.type=='error', 'alert-info': message.type=='info'}" class="alert m-0 p-3" role="alert">
-						${this.message.text}
-						<button type="button" class="btn btn-primary mr-1" align="right" style="width: 100px" onclick="clearMessage()">Close</button>
+			${this.message!=null? html`
+			<div class="container-fluid pt-0 pl-3 pr-3 pb-3">
+				<div class="row">
+					<div class="col">
+						<div class="{'alert-danger': message.type=='error', 'alert-info': message.type=='info'}" class="alert m-0 p-3" role="alert">
+							${this.message.text}
+							<button type="button" class="btn btn-primary mr-1" align="right" style="width: 100px" onclick="clearMessage()">Close</button>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		`: ''}
+			`: ''}
 		
-		<footer class="container-fluid footer navbar-light bg-light">
-	        <span class="text-muted">Copyright by <a href="http://www.actoron.com">Actoron GmbH</a> 2017-${new Date().getFullYear()}</span>
-	    	<div class="pull-right">
-	    		<a href="#/privacy">${language.$t("message.privacy")}</a>
-	    		<a href="#/imprint">${language.$t("message.imprint")}</a>
-	    	</div>
-	    </footer>
+			<footer class="container-fluid footer navbar-light bg-light">
+		        <span class="text-muted">Copyright by <a href="http://www.actoron.com">Actoron GmbH</a> 2017-${new Date().getFullYear()}</span>
+		    	<div class="pull-right">
+		    		<a href="#/privacy">${language.$t("message.privacy")}</a>
+		    		<a href="#/imprint">${language.$t("message.imprint")}</a>
+		    	</div>
+		    </footer>
 		`;
 	}
 	
