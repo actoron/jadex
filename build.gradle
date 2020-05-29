@@ -717,10 +717,13 @@ task deployJavadocs() {
 		
 		def ssh = new net.schmizz.sshj.SSHClient();
 		ssh.addHostKeyVerifier(acc.hosthash);
+		println "Connecting to SSH..."
 		ssh.connect(acc.host, acc.port);
+		println "Connected to SSH."
 		try {
 			ssh.authPassword(acc.user, acc.password);
 			def session = ssh.startSession();
+			println "Check for dir..."
 			def cmd = session.exec("ls " + dir);
 			waitForSSHCmd(cmd);
 			cmd.close();
@@ -729,22 +732,36 @@ task deployJavadocs() {
 			if (cmd.getExitStatus() != null && cmd.getExitStatus() == 0) {
 				// Old deployment exist, remove...
 				session = ssh.startSession();
+				println "Remove dir..."
 				cmd = session.exec("rm -rf " + dir);
 				waitForSSHCmd(cmd);
 				cmd.close();
 			}
 			
-			/*session = ssh.startSession();
-			cmd = session.exec("mkdir " + basedir);
-			cmd.close();*/
-			
-			ssh.newSCPFileTransfer().upload(new net.schmizz.sshj.xfer.FileSystemFile(docszip),
-											basedir + "/");
-			
 			session = ssh.startSession();
-			cmd = session.exec("unzip -d " + basedir + " " + basedir + "/" + docszipfile);
+			cmd = session.exec("ls " +  basedir + "/" + docszipfile);
 			waitForSSHCmd(cmd);
 			cmd.close();
+			
+			if (cmd.getExitStatus() != null && cmd.getExitStatus() == 0) {
+				session = ssh.startSession();
+				println "Remove zip..."
+				cmd = session.exec("rm -rf " + basedir + "/" + docszipfile);
+				waitForSSHCmd(cmd);
+				cmd.close();
+			}
+			
+			println "Uploading..."
+			ssh.newSCPFileTransfer().upload(new net.schmizz.sshj.xfer.FileSystemFile(docszip),
+											basedir + "/");
+			println "Uploaded."
+			
+			println "Unzipping..."
+			session = ssh.startSession();
+			cmd = session.exec("unzip -o -d " + basedir + " " + basedir + "/" + docszipfile);
+			waitForSSHCmd(cmd);
+			cmd.close();
+			println "Unzipped"
 			
 			session = ssh.startSession();
 			cmd = session.exec("mv " + basedir + "/javadoc " + dir);
@@ -884,8 +901,15 @@ def findPropertyWithDotsOrDie(propname) {
 }
 
 def waitForSSHCmd(cmd) {
-	BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()));
-	reader.lines().collect(java.util.stream.Collectors.joining("\n"));
+	// BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()));
+	// reader.lines().collect(java.util.stream.Collectors.joining("\n"));
+	def is = cmd.getInputStream();
+	def data = new byte[4096];
+	int cnt;
+	while((cnt = is.read(data, 0, data.length))!=-1) {
+		//System.out.write(data, 0, cnt);
+		//System.out.flush();
+	}
 }
 
 // Run markdownlint on docs during test phase
