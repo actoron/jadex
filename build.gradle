@@ -73,8 +73,6 @@ System.setOut(new PrintStream(new OutputStream() {
 }));
 System.setErr(System.out);
 
-def ENABLE_ECLIPSE_ANDROID_WORKAROUNDS = false
-
 apply plugin: 'jacoco'
 //apply plugin: 'application'
 apply plugin: 'org.sonarqube'
@@ -116,9 +114,7 @@ buildscript
 
     dependencies
     {
-        classpath 'com.android.tools.build:gradle:' + android_gradlePluginVersion
 		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-		classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
 		classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0' // for nexus-oss auto-close
 		classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8'
 		classpath "org.bouncycastle:bcprov-jdk15on:1.64" // bouncycastle for ssh
@@ -195,7 +191,7 @@ allprojects
 			preserveFileTimestamps = false
 			reproducibleFileOrder = true
 		}
-		def confs = isAndroidProject(project) ? project.configurations.runtimeAndroid : project.configurations.runtimeClasspath
+		def confs = project.configurations.runtimeClasspath
 		def files = rootProject.ext.runtimearts.get(project.getPath())
 		if (files == null)
 		{
@@ -245,182 +241,11 @@ subprojects
 	//}
 	
     ext.libraries = [
-            android_support: "com.android.support:support-v4:26.1.0",
-            android_compat: "com.android.support:appcompat-v7:26.1.0",
-			// this is only useful if android plugin is NOT used by a project (lib):
-            android: 'com.google.android:android:4.1.1.4',
-			android_test: "com.android.support.test:runner:1.0.2",
-//            android_test: "com.google.android:android-test:2.2.1",
             protobuf: "com.google.protobuf:protobuf-java:2.4.1",
             junit: junit,
-            robotium: 'com.jayway.android.robotium:robotium-solo:5.6.3',
-            robolectric: 'org.robolectric:robolectric:3.6.1'
     ]
 
-	configurations {
-		// apiNoAndroidRuntime will exclude the artifact in Android APKs
-		runtimeAndroid.extendsFrom runtimeElements
-		apiNoAndroidRuntime {
-			dependencies.all { dep ->
-				configurations.runtimeAndroid.exclude group: dep.group, module: dep.name
-			}
-		}
-		api.extendsFrom apiNoAndroidRuntime
-	}
 
-
-
-    if(isAndroidProject(project))
-    {
-
-		buildscript {
-			dependencies {
-//				classpath group: 'org.activecomponents.jadex', name: 'jadex-gradle-plugin',
-//						version: "$project.version.major.$project.version.minor.+"
-				classpath group: 'org.activecomponents.jadex', name: 'jadex-android-gradle-plugin',
-						version: "4.0.140"
-			}
-		}
-
-		repositories {
-			mavenCentral()
-			maven
-			{
-				url "https://maven.google.com"
-			}
-		}
-
-		// Disable Android lint nonsense.
-		tasks.whenTaskAdded {task ->
-		    if(task.name.contains("lint")) {
-		        task.enabled = false
-		    }
-		}
-
-	 	if (isAndroidLibraryProject(project))
-        {
-            apply plugin: 'com.android.library'
-        }
-        else
-        {
-            apply plugin: 'com.android.application'
-        }
-
-
-        if (ENABLE_ECLIPSE_ANDROID_WORKAROUNDS) addEclipseWorkarounds(project)
-
-    	android {
-            compileSdkVersion android_compileSdkVersion
-            buildToolsVersion android_buildToolsVersion
-
-            defaultConfig {
-                minSdkVersion android_minSdkVersion
-                targetSdkVersion android_targetSdkVersion
-                versionCode 1
-				versionName jadex_build_version
-				multiDexEnabled true
-            }
-
-            sourceSets {
-                main {
-                    manifest.srcFile 'src/main/AndroidManifest.xml'
-                    resources.srcDirs = [mainSrcDir]
-                    aidl.srcDirs = [mainSrcDir]
-                    res.srcDirs = ['src/main/res']
-                }
-            }
-
-            buildTypes {
-                release {
-                    // runProguard true
-                    // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-                }
-            }
-
-            packagingOptions {
-                exclude 'LICENSE.txt'
-                exclude 'META-INF/license.txt'
-                exclude 'META-INF/notice.txt'
-            }
-
-            lintOptions {
-                abortOnError false
-            }
-
-			dexOptions {
-				jumboMode = true
-				javaMaxHeapSize "4g"
-			}
-        }
-
-		android.variantFilter { variant ->
-			def build = variant.buildType.name
-			if(build.equals(com.android.builder.core.BuilderConstants.DEBUG)) {
-				variant.setIgnore(true);
-			}		
-		}
-		
-//		if(project.parent!=null && project.parent.parent!=null && project.parent.parent.parent!=null)
-//			println 'Deep android project: '+project
-
-		//		if(project.parent!=null && project.parent.parent!=null && project.parent.parent.parent!=null)
-		//			println 'Deep android project: '+project
-
-		project.afterEvaluate() {
-			// Android jars/aars are not produced by gradle archive task -> no reproducibleFileOrder=true setting possible, grrr
-			if(isAndroidLibraryProject(project)) {
-				project.tasks.toArray().each { task ->	// Avoid concurrent modification when adding rezip tasks
-					task.outputs.files.filter({it.canonicalPath.endsWith('packaged-classes'+File.separator+'release'+File.separator+'classes.jar')}).each { file ->
-						createRezipTask(task, file)
-					}
-				}
-			}
-			// strip "-debug" from .aar and .apks to include them in dist
-			else {
-				project.android.applicationVariants.all {variant ->
-       				variant.outputs.each {output ->
-						if(output.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
-							def fileName = output.outputFileName
-							output.outputFileName = archivesBaseName + '-' + version + fileName.substring(fileName.lastIndexOf('.'))
-//							println 'output file name: ' + fileName + ' converted to: ' + output.outputFileName
-						}
-       				} 
-				}
-			}
-		}
-
-        // include all resources that are placed inside src dirs
-//        android.sourceSets.main.resources.srcDirs mainSrcDir
-//        android.sourceSets.test.resources.srcDirs testSrcDir
-
-		repositories {
-			maven
-			{
-				url "https://maven.google.com"
-			}
-			jcenter()
-		}
-        dependencies
-        {
-            testImplementation junit
-        }
-
-		println '### Todo ###: Fix Android APK building with newer Gradle(?)'
-		// see https://docs.gradle.org/current/userguide/customizing_dependency_resolution_behavior.html
-		// E.g. try https://docs.gradle.org/current/javadoc/or/gradle/api/artifacts/Configuration.html#withDependencies-org.gradle.api.Action-
-		// or https://docs.gradle.org/current/javadoc/org/gradle/api/artifacts/DependencySubstitutions.html#all-org.gradle.api.Action-
-//		configurations {
-//			all {
-//				dependencies.all {
-//					dep -> excludeNonAndroidRuntimeFromApk(project, dep)
-//				}
-//			}
-//		}
-
-
-    }
-    else
-    {
 		apply plugin: 'java-library'
 		if (isWebApplicationProject(project)) {
 			apply plugin: 'war'
@@ -477,11 +302,10 @@ subprojects
 //			}
 //		}
 
-    }
 	addJavaDocJarTask(project)
 	addSourcesJarTask(project)
 
-	// needs to be applied after android + java plugins:
+	// needs to be applied after java plugins:
 	if(project.getChildProjects().isEmpty()) {
 //		println 'publishing leaf project ' + project
 		apply from: "$rootDir/src/main/buildutils/publishing.gradle"
@@ -601,24 +425,8 @@ subprojects
 					while((isaddon?sp!=rootProject:sp!=null) && !projs.contains(sp)) {
 						projs.add(sp);
 
-						if (isAndroidProject(sp)) {
-							// apps as debug version, because unsigned releases do not run on android
-							def assembletask	= sp.tasks.find {isAndroidLibraryProject(sp) ? it.name.equals('bundleReleaseAar') : it.name.equals('packageRelease')} // apk debug???
-							if(assembletask!=null) {
-								from(assembletask.outputs) {
-									into 'jadex-'  + jadex_build_version + (isAndroidLibraryProject(sp) ? '/lib' : '/apps')
-									exclude '/tmp/**', '/release/**', 'output.json'
-								}
-							}
-							else {
-								println 'No output task found for project: ' + sp
-//								sp.tasks.each { task ->
-//									println 'Task ' + task + ': ' + task.outputs.files.files
-//								}
-							}
-						}
 						// Only collect artifacts from leaf projects
-						else if(sp.getChildProjects().isEmpty()) {
+						if(sp.getChildProjects().isEmpty()) {
 							if (isApp(sp)) {
 								// Legacy mode: include war and jar in apps!?
 								def mytasks	= sp.tasks.matching {
@@ -739,30 +547,19 @@ subprojects
 		// https://discuss.gradle.org/t/replacement-for-task-execute/27545
 		task checkDist(type: GradleBuild) {
 			dependsOn unzipSources, distZip
-			def rebuilddirfile	= project.unzipSources.outputs.files.files.first()
-			buildFile = new File(rebuilddirfile, 'sources/build.gradle')
+			def rebuilddirfile	= new File(project.unzipSources.outputs.files.files.first(), 'sources')
+//			println 'rebuilddirfile: '+rebuilddirfile
+			dir	= rebuilddirfile
+			buildFile = new File(rebuilddirfile, 'build.gradle')
+			buildName = 'rebuild-'+distname	// required to avoid name clashes in newer gradle versions, grrr.
 			tasks = ["distZip"]
 			startParameter.projectProperties << ["dist": distname]
 			
-			doLast {
-				//	// For debugging bluetooth aar
-				//	if(subprojectmap.get(":android:bluetooth")!=null) {
-				//		def zip1	= new File(project.projectDir, 'android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
-				//		def zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/intermediates/packaged-classes/release/classes.jar')
-				//		def diff	= diffZips(zip1, zip2)
-				//		if(diff.length()!=0)
-				//			throw new RuntimeException("Rebuilt bluetooth classes.jar does not match original: "+diff);
-				//		zip1	= new File(project.projectDir, 'android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
-				//		zip2	= new File(rebuilddirfile, 'sources/android/bluetooth/build/outputs/aar/bluetooth-' + jadex_build_version + '.aar')
-				//		diff	= diffZips(zip1, zip2)
-				//		if(diff.length()!=0)
-				//			throw new RuntimeException("Rebuilt bluetooth-" + jadex_build_version + ".aar does not match original: "+diff);
-				//	}
-					
+			doLast {					
 				// Check original and rebuilt dist for equality based on zip contents (<name> only as <size> and <crc> depends on random file order on disk when building zip)
 				def distzip = project.distZip.outputs.files.first().canonicalPath
-				//def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
-				def distzip2 = rebuilddirfile.getCanonicalPath() + '/sources/build/distributions/zips/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+				//def distzip2 = rebuilddirfile.getCanonicalPath() + '/build/distributions' + (commercial? '/commercial' : '/noncommercial') + '/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
+				def distzip2 = rebuilddirfile.getCanonicalPath() + '/build/distributions/zips/' + 'jadex-'  + distname  + '-' + jadex_build_version + '.zip'
 				def diff	= diffZips(distzip, distzip2)
 				if(diff.length()!=0)
 					throw new RuntimeException("Rebuilt jadex-" + distname + "-" + jadex_build_version + ".zip does not match original: "+diff);
@@ -923,10 +720,13 @@ task deployJavadocs() {
 		
 		def ssh = new net.schmizz.sshj.SSHClient();
 		ssh.addHostKeyVerifier(acc.hosthash);
+		println "Connecting to SSH..."
 		ssh.connect(acc.host, acc.port);
+		println "Connected to SSH."
 		try {
 			ssh.authPassword(acc.user, acc.password);
 			def session = ssh.startSession();
+			println "Check for dir..."
 			def cmd = session.exec("ls " + dir);
 			waitForSSHCmd(cmd);
 			cmd.close();
@@ -935,22 +735,36 @@ task deployJavadocs() {
 			if (cmd.getExitStatus() != null && cmd.getExitStatus() == 0) {
 				// Old deployment exist, remove...
 				session = ssh.startSession();
+				println "Remove dir..."
 				cmd = session.exec("rm -rf " + dir);
 				waitForSSHCmd(cmd);
 				cmd.close();
 			}
 			
-			/*session = ssh.startSession();
-			cmd = session.exec("mkdir " + basedir);
-			cmd.close();*/
-			
-			ssh.newSCPFileTransfer().upload(new net.schmizz.sshj.xfer.FileSystemFile(docszip),
-											basedir + "/");
-			
 			session = ssh.startSession();
-			cmd = session.exec("unzip -d " + basedir + " " + basedir + "/" + docszipfile);
+			cmd = session.exec("ls " +  basedir + "/" + docszipfile);
 			waitForSSHCmd(cmd);
 			cmd.close();
+			
+			if (cmd.getExitStatus() != null && cmd.getExitStatus() == 0) {
+				session = ssh.startSession();
+				println "Remove zip..."
+				cmd = session.exec("rm -rf " + basedir + "/" + docszipfile);
+				waitForSSHCmd(cmd);
+				cmd.close();
+			}
+			
+			println "Uploading..."
+			ssh.newSCPFileTransfer().upload(new net.schmizz.sshj.xfer.FileSystemFile(docszip),
+											basedir + "/");
+			println "Uploaded."
+			
+			println "Unzipping..."
+			session = ssh.startSession();
+			cmd = session.exec("unzip -o -d " + basedir + " " + basedir + "/" + docszipfile);
+			waitForSSHCmd(cmd);
+			cmd.close();
+			println "Unzipped"
 			
 			session = ssh.startSession();
 			cmd = session.exec("mv " + basedir + "/javadoc " + dir);
@@ -1090,8 +904,15 @@ def findPropertyWithDotsOrDie(propname) {
 }
 
 def waitForSSHCmd(cmd) {
-	BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()));
-	reader.lines().collect(java.util.stream.Collectors.joining("\n"));
+	// BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()));
+	// reader.lines().collect(java.util.stream.Collectors.joining("\n"));
+	def is = cmd.getInputStream();
+	def data = new byte[4096];
+	int cnt;
+	while((cnt = is.read(data, 0, data.length))!=-1) {
+		//System.out.write(data, 0, cnt);
+		//System.out.flush();
+	}
 }
 
 // Run markdownlint on docs during test phase

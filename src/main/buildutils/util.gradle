@@ -19,70 +19,12 @@ def isAddon(selecteddists) {
 	return isaddon
 }
 
-def isAndroidProject(project) {
-    project.hasProperty("androidProject") && project.property("androidProject") == 'true'
-}
-
-def isAndroidLibraryProject(project) {
-    project.hasProperty("androidLibraryProject") && project.property("androidLibraryProject") == 'true'
-}
-
 def isWebApplicationProject(project) {
     project.hasProperty("webArchiveProject") && project.property("webArchiveProject") == 'true'
 }
 
 def isTestParallel(project) {
     project.hasProperty("testParallel") && project.property("testParallel") == 'true'
-}
-
-def onVariant(Project project, String variantName, Closure c) {
-    onAllVariants(project) {variant ->
-        if (variant.buildType.name.equals(variantName)) {
-            c(variant)
-        }
-    }
-}
-
-def onAllVariants(Project project, Closure c) {
-    if (isAndroidLibraryProject(project)) {
-        project.android.libraryVariants.all {variant ->
-            c(variant)
-        }
-    } else {
-        project.android.applicationVariants.all {variant ->
-            c(variant)
-        }
-    }
-}
-
-/**
- * Calls given closure with the output object of the given project.
- * This ensures that the output is already configured when the callback is called.
- * @param project
- * @param c callback
- * @return void
- */
-def onVariantOutput(Project project, String variantName, Closure c) {
-    onVariant(project, variantName) { variant ->
-        def output = variant.outputs.find({ o -> o.name.contains(variantName)})
-        c(output)
-    }
-}
-
-def getReleaseVariant(project) {
-    if (isAndroidLibraryProject(project)) {
-        project.android.libraryVariants.all {variant ->
-            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
-                return variant
-            }
-        }
-    } else {
-        project.android.applicationVariants.all {variant ->
-            if (variant.buildType.name.equals(com.android.builder.core.BuilderConstants.RELEASE)) {
-                return variant
-            }
-        }
-    }
 }
 
 /**
@@ -93,52 +35,6 @@ def getProjectDepth(proj) {
 		return 0;
 	return proj.path.split(':').length - 1
 }
-
-/**
- * Recursively check for dependencies with apiNoAndroidRuntime scope and exclude them from the project
- * @param project
- * @param dep
- * @param alreadyChecked
- * @return
- */
-def excludeNonAndroidRuntimeFromApk(Project project, Dependency dep, List alreadyChecked = [], parentDep = null) {
-//    configurations.'default'.exclude group: 'org.ow2.asm', module: 'asm-all'
-    if (parentDep == null) {
-        parentDep = dep;
-    }
-    if (!(dep instanceof DefaultProjectDependency) || alreadyChecked.contains(dep)) {
-        // terminate
-    } else {
-//        println "excludeNonAndroidRuntimeFromApk: project=$project, dep=$dep"
-        alreadyChecked.add(dep)
-        // recurse to children
-        dep.dependencyProject.configurations.all {conf ->
-            conf.dependencies.all {
-                childDep ->
-                    excludeNonAndroidRuntimeFromApk(project, childDep, alreadyChecked, parentDep)
-            }
-        }
-
-//        println "recursed to: $dep.name"
-//        println "android deps: $dep.dependencyProject.configurations.apiNoAndroidRuntime.dependencies"
-        // exclude direct children
-        dep.dependencyProject.configurations.apiNoAndroidRuntime.dependencies.all {
-            exDep ->
-//                println "excluding $exDep.group:$exDep.name"
-                project.configurations.all { conf ->
-                    def relevantName = conf.name.toLowerCase()
-                    if (relevantName.contains('apk') || relevantName.contains('runtime')) {
-//		                println "excluding $exDep.group:$exDep.name from $conf for $project"
-                        conf.exclude(group: exDep.group, module: exDep.name)
-                    }
-                }
-//                project.configurations.'default'.exclude(group: exDep.group, module: exDep.name)
-//                project.configurations.'runtime'.exclude(group: exDep.group, module: exDep.name)
-        }
-    }
-
-}
-
 
 /**
  * Add scope mapping for parent configurations of given configuration.
@@ -285,41 +181,21 @@ def getDetachedConfiguration(Project p, Configuration c) {
 }
 
 //def getSourceDir(project) {
-//    if (isAndroidProject(project)) {
-//        project.android.sourceSets.main.java.srcDirs
-//    } else {
 //        project.sourceSets.main.allJava
-//    }
 //}
 //
 //// only return java sources
 //// (getSourceDir includes xml, bpmn, aidl, ... which is wrong for javadoc generation)
 //def getOnlyJavaSources(project) {
-//    if (isAndroidProject(project)) {
-//    	getReleaseVariant(project).javaCompile.source
-//    } else {
 //        project.sourceSets.main.allJava
-//    }
 //}
 //
 //def getResourcesDir(project) {
-//    if (isAndroidProject(project)) {
-//        project.android.sourceSets.main.res.srcDirs
-//    } else {
 //        project.sourceSets.main.resources
-//    }
 //}
 //
 //def getCompileClassPath(project) {
-//    if (isAndroidProject(project)) {
-//        if (isAndroidLibraryProject(project)) {
-//            project.android.libraryVariants.javaCompile.classpath
-//        } else {
-//            project.android.applicationVariants.javaCompile.classpath
-//        }
-//    } else {
 //        project.sourceSets.main.compileClasspath
-//    }
 //}
 
 //def calledWithTask(fulltaskname)
@@ -328,15 +204,6 @@ def getDetachedConfiguration(Project p, Configuration c) {
 //    return result
 //}
 
-def androidSdkExists() {
-    def androidHome = System.env.'ANDROID_HOME'
-    if (androidHome != null && !androidHome.isEmpty()) {
-        def adb = new File(androidHome + File.separator + "platform-tools")
-        return adb.exists() && adb.isDirectory();
-    }
-    return false;
-}
-
 /**
  * Add a javadoc task to the given project.
  * The output of the javadoc jar will be included in the project artifacts list.
@@ -344,30 +211,12 @@ def androidSdkExists() {
  * @return
  */
 def addJavaDocJarTask(Project p) {
-    if (isAndroidProject(p)) {
-        def javadocsTask = p.tasks.create ('androidjavadocs', Javadoc) {
-            source = p.android.sourceSets.main.java.srcDirs
-            include( "**/*.java" )
-            classpath += p.files(p.android.getBootClasspath().join(File.pathSeparator))
-            ext.androidJar = "${p.android.sdkDirectory}/platforms/${p.android.compileSdkVersion}/android.jar"
-            classpath += files(ext.androidJar)
-        }
-
-        p.tasks.create('androidjavadocsJar', Jar) {
-        	baseName = getArtifactName(p)
-            classifier = 'javadoc'
-            dependsOn javadocsTask
-            from javadocsTask.destinationDir
-        }
-
-    } else {
         def javadocJar = p.tasks.create('javadocJar', Jar) {
         	baseName = getArtifactName(p)
             classifier = 'javadoc'
             from p.javadoc
         }
         p.artifacts {archives javadocJar}
-    }
 }
 
 /**
@@ -377,21 +226,12 @@ def addJavaDocJarTask(Project p) {
  * @return
  */
 def addSourcesJarTask(Project p) {
-    if (isAndroidProject(p)) {
-        p.tasks.create('androidsourcesJar', Jar) {
-        	baseName = getArtifactName(p)
-            classifier = 'sources'
-            from p.android.sourceSets.main.java.srcDirs
-        }
-
-    } else {
         def sourcesJar = p.tasks.create('sourcesJar', Jar) {
         	baseName = getArtifactName(p)
             classifier = 'sources'
             from p.sourceSets.main.allSource
         }
         p.artifacts {archives sourcesJar}
-    }
 }
 
 def addEclipseWorkarounds(project) {
@@ -400,11 +240,6 @@ def addEclipseWorkarounds(project) {
 	
 	def dep = project.dependencies.create(fileTree(dir: new File(project.projectDir, '/libs') , include: '*.jar'))
 	conf.dependencies.add(dep)
-	
-	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android))				
-	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android_test))
-	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android_support))
-	conf.dependencies.add(project.dependencies.create(project.ext.libraries.android_compat))
 	
 	project.apply plugin: 'eclipse'
 //	project.apply plugin: 'com.github.ksoichiro.eclipse.aar'
@@ -433,17 +268,7 @@ def addEclipseWorkarounds(project) {
 				srcDir 'src/test/java'
 			}
 		}
-	}
-	
-	
-	// Configure eclipse-aar plugin
-//	project.eclipseAar {
-//	    // See "Configurations" for details
-//	    androidTarget = 'android-21'
-//	    aarDependenciesDir = 'aarDependencies'
-//	    // Set to true if you use Andmore. Default is false
-//	    andmore = true
-//	}
+	}	
 }
 
 
@@ -534,17 +359,11 @@ ext {
 	isApp = this.&isApp
 	isCommercial = this.&isCommercial
 	isAddon = this.&isAddon
-    isAndroidProject = this.&isAndroidProject
-    isAndroidLibraryProject = this.&isAndroidLibraryProject
     isWebApplicationProject = this.&isWebApplicationProject
     getProjectDepth = this.&getProjectDepth
     isTestParallel = this.&isTestParallel
-    androidSdkExists = this.&androidSdkExists
-    onVariant = this.&onVariant
-    onVariantOutput = this.&onVariantOutput
     addSchemaTasks = this.&addSchemaTasks
     setBootClassPath = this.&setBootClassPath
-    excludeNonAndroidRuntimeFromApk = this.&excludeNonAndroidRuntimeFromApk
 //    addParentScopeMappings = this.&addParentScopeMappings
     getDetachedConfiguration = this.&getDetachedConfiguration
     addJavaDocJarTask = this.&addJavaDocJarTask

@@ -119,31 +119,13 @@ def canSign = project.hasProperty('signing.secretKeyRingFile') || getVar("signin
 
 //// Selects the projects to publish, add a better heuristic here if available
 //def includedproject = getProjectDepth(project) > 1
-//// Empty project
-//includedproject &= !project.path.equals(':android:applications')
 
 def configurePom(pom) {
     pom.withXml {
         def root = asNode()
         root.appendNode('description', project.description)
         root.appendNode('name', project.name)
-        if (isAndroidProject(project)) 
-        {
-            root.get('packaging').get(0).setValue('aar')
-            def dependenciesNode = asNode().appendNode('dependencies')
-            project.configurations.implementation.allDependencies.each 
-            {
-                // Ensure dependencies such as fileTree are not included.
-                if (it.name != 'unspecified') 
-                {
-                    def dependencyNode = dependenciesNode.appendNode('dependency')
-                    dependencyNode.appendNode('groupId', it.group)
-                    dependencyNode.appendNode('artifactId', it.name)
-                    dependencyNode.appendNode('version', it.version)
-                }
-            }
-        } 
-        else if (!root.get('packaging').isEmpty()) 
+        if (!root.get('packaging').isEmpty()) 
         {
             root.remove(root.get('packaging'))
         }
@@ -183,7 +165,7 @@ publishing {
     }
 
     publications {
-        if(canSign && (!isAndroidProject(project) || isAndroidLibraryProject(project)))  // dont publish apks
+        if(canSign)
         { 
         	// publish plugin requires each subproject having mavenJava
         
@@ -241,17 +223,8 @@ if(canSign) {
 		//println("sign key2: "+signingKey)
 		useInMemoryPgpKeys(signingKey, signingPassword)
 	
-//		sign configurations.archives
-		if (isAndroidProject(project)) { // add manually because somehow, those tasks do not end up in configurations.archives??
-			sign project.tasks.androidsourcesJar
-			sign project.tasks.androidjavadocsJar
-		}
-// uncomment with gradle 4.8
 // signing poms with maven-publish is supported with gradle 4.8, however, 4.8 seems to be incompatible with bintray 1.8 :/
-		if (!isAndroidProject(project) || isAndroidLibraryProject(project)) { // dont publish apks
-			//sign publishing.publications.ProjectPublication
-			sign publishing.publications.mavenJava
-		}
+		sign publishing.publications.mavenJava
 	}
 	
 }
