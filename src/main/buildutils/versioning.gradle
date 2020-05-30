@@ -11,7 +11,7 @@ Object fetchNextBuildNameFromGitTag()
 	//println "version from props is: "+version+ ", " + versionprops
 	
 	// If we are rebuilding from unzipped distribution sources, get patch from properties.
-	if(versionprops.containsKey("jadexversion_patch"))
+	if(versionprops.containsKey("jadexversion_patch") && versionprops.jadexversion_patch.isInteger())
 		return createBuildname(version, versionprops.jadexversion_patch, 1, false)
 
 	// If we are building in dev mode (i.e. Eclipse), just set patch to 9999 and exit.
