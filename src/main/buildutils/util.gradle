@@ -354,32 +354,44 @@ def getDistsDir(proj) {
 }
 
 /**
- * Parse a URL into its (default) parts.
+ * Parse a URI into its components.
  * see, e.g., https://tools.ietf.org/html/draft-ietf-secsh-scp-sftp-ssh-uri-04
  * Examples:
- * https://myserver.com/path -> {host: "myserver.com", port: 443, user: "", password: "", fingerprint: "", url: "https://myserver.com/path"}
- * https://a@myserver.com/path -> {host: "myserver.com", port: 443, user: "a", password: "", fingerprint: "", url: "https://myserver.com/path"}
+ * https://myserver.com/path -> {host: "myserver.com", port: -1, user: "", password: "", fingerprint: "", url: "https://myserver.com/path"}
+ * https://a@myserver.com/path -> {host: "myserver.com", port: -1, user: "a", password: "", fingerprint: "", url: "https://myserver.com/path"}
  * ssh://a:b;fingerprint=SHA256-ABC@myserver.com:22000  -> {host: "myserver.com", port: 22000, user: "a", password: "b", fingerprint: "SHA256:ABC", url: "ssh://myserver.com:22000"}
  */
 def parseURLWithCredentials(urlstring) {
 	def ret = [:];
-	def url	= new URL(urlstring)
-	ret.host = url.host;
-	ret.port = url.port==-1 ? url.defaultPort : url.port
+	def uri	= new URI(urlstring)
+	ret.host = uri.host;
+	ret.port = uri.port
     ret.user = ''
     ret.password = ''
-    def String userinfo = url.userInfo
+    ret.fingerprint = ''
+    def String userinfo = uri.userInfo
     if(userinfo!=null)
     {
-		def String[] split = userinfo.split(":")
+		def String[] split = userinfo.split(":|;")
+		//println 'userinfo: ' + split
         ret.user = split.length>0 ? split[0] : ''
         ret.password = split.length>1 ? split[1] : ''
+        
+        for(int i=2; i<split.length; i++)
+        {
+        	if(split[i].startsWith('fingerprint='))
+        	{
+        		// Fingerprint info according to https://tools.ietf.org/html/draft-ietf-secsh-scp-sftp-ssh-uri-04
+        		ret.fingerprint	= split[i].substring('fingerprint='.length()).replace('-', ':')
+        		//println 'fingerprint: ' + ret.fingerprint
+        	}
+        }
 	}
 
 	// URL without extra info (e.g. no password for security reasons)
-	ret.url	= url.protocol + '://' + url.host + (url.port!=-1 ? ':' + url.port : '') + url.file + (url.ref!=null ? '#' + url.ref : '')
+	ret.url	= uri.scheme + '://' + uri.host + (uri.port!=-1 ? ':' + uri.port : '') + (uri.rawPath!=null ? uri.rawPath : '') + (uri.rawQuery!=null ? '?' + uri.rawQuery : '') + (uri.rawFragment!=null ? '#' + uri.rawFragment : '')
+	//println 'url: ' + ret.url
 		
-	//ret.hosthash = findPropertyWithDotsOrDie('dl.hosthash');
 	return ret;
 }
 

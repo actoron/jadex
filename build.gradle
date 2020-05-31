@@ -719,7 +719,7 @@ task deployJavadocs() {
 		def docszip = getDistsDir(project).getCanonicalPath() + '/' + docszipfile;
 		
 		def ssh = new net.schmizz.sshj.SSHClient();
-		ssh.addHostKeyVerifier(acc.hosthash);
+		ssh.addHostKeyVerifier(acc.fingerprint);
 		println "Connecting to SSH..."
 		ssh.connect(acc.host, acc.port);
 		println "Connected to SSH."
@@ -798,7 +798,7 @@ task deployZips() {
 		def sourcesdir = "" + project.buildDir + File.separator + 'distributions' + File.separator + 'exampleprojects';
 
 		net.schmizz.sshj.SSHClient ssh = new net.schmizz.sshj.SSHClient();
-		ssh.addHostKeyVerifier(acc.hosthash);
+		ssh.addHostKeyVerifier(acc.fingerprint);
 		ssh.connect(acc.host, acc.port);
 		try {
 			ssh.authPassword(acc.user, acc.password);
@@ -828,18 +828,9 @@ task updateTag() {
 		if(!gradle.ext.productionmode)
 			throw new IllegalStateException("Can only update tag in production mode.");
 		
-		/*def url = findProperty('tagUrl');
-		def user = findProperty('tagUser');
-		def pass = findProperty('tagPassword');
-		
-		println "User: "+user
-		println "URL: "+url
-		println "Pass: "+pass*/
-		
-		def url = findPropertyWithDotsOrDie('tag.url');
-		def user = findPropertyWithDotsOrDie('tag.user');
-		def pass = findPropertyWithDotsOrDie('tag.password');
-		
+		def tag_url = getVar('tag_url', project)
+    	def acc = parseURLWithCredentials(tag_url)
+				
 		def git = org.eclipse.jgit.api.Git.open(project.projectDir);
 		//org.eclipse.jgit.lib.Repository repo = new org.eclipse.jgit.storage.file.FileRepositoryBuilder().setMustExist(true).setGitDir(project.projectDir).readEnvironment().findGitDir().build();
 		def tags = git.tagList().call();
@@ -851,11 +842,16 @@ task updateTag() {
 		def pushopts = new ArrayList<String>();
 		pushopts.add("ci.skip"); 
 		cmd.setPushOptions(pushopts);
-		cmd.setRemote(url);
-		cmd.setCredentialsProvider(new org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider(user, pass))
+		cmd.setRemote(acc.url);
+		cmd.setCredentialsProvider(new org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider(acc.user, acc.password))
 		cmd.setPushTags();
 		cmd.call();
 	}
+}
+
+def getDownloadServerAccess() {
+	def downloadserver_url = getVar('dl_host', project)
+    return parseURLWithCredentials(downloadserver_url)
 }
 
 def createEmptyDirOnSSH(net.schmizz.sshj.SSHClient ssh, String dir) {
@@ -876,20 +872,6 @@ def createEmptyDirOnSSH(net.schmizz.sshj.SSHClient ssh, String dir) {
 	cmd = session.exec("mkdir " + dir);
 	waitForSSHCmd(cmd);
 	cmd.close();
-}
-
-def findPropertyWithDots(propname) {
-	def ret = findProperty(propname);
-	if (ret == null)
-		ret = findProperty(propname.replace('.', '_'));
-	return ret;
-}
-
-def findPropertyWithDotsOrDie(propname) {
-	def ret = findPropertyWithDots(propname);
-	if (ret == null)
-		throw new Exception('Missing property ' + propname);
-	return ret;
 }
 
 def waitForSSHCmd(cmd) {

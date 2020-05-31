@@ -16,6 +16,7 @@
 # * fix runtime of GlobalSuperpeerTest (>2 min, really?)
 # * 15 sec. time delay after gradle configure when executing publish task
 # * auto-close staging repository
+# * allow combining deployJavadocs and deployZips (currently different distributions)
 
 image: openjdk:11-jdk
 
