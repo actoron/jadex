@@ -1,6 +1,5 @@
 # TODO: Severe
-# * fix upload javadocs!?
-# * fix checkDist
+# * append -SNAPSHOT to non -Production builds
 # * upload schemas
 # * upload schemadocs
 # * multi-repository publish?

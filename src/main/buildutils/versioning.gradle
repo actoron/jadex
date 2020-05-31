@@ -78,7 +78,7 @@ Object	createBuildname(version, patch, branchpatch, isnew)
 	buildname.patch = patch;
 	buildname.suffix = patch;
 	buildname.full = version + "." +buildname.suffix
-	buildname.isnew	= isnew;
+	buildname.isnew	= isnew;	// isnew -> no tag for this version exists, yet
 	return buildname;
 }
 

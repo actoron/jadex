@@ -146,16 +146,22 @@ publishing {
 	{
         repositories 
         {
-            def myrepourl = getVar('repo' + repo + 'url', project)
-            def myrepouser = getVar('repo' + repo + 'user', project)
-            def myrepopassword = getVar('repo' + repo + 'password', project);
-            
-//            println "publishing to: "+myrepourl
-//            println "repouser: "+myrepouser
-//            println "repopassword: "+myrepopassword
+            def myrepourl = getVar('repo' + repo, project)
+            def myrepouser = ''
+            def myrepopassword = ''
+            def String userpass = new URL(myrepourl).getUserInfo()
+            if(userpass!=null)
+            {
+	    		def String[] userpasssplit = userpass.split(":")
+	            myrepouser = userpasssplit.length>0 ? userpasssplit[0] : ''
+	            myrepopassword = userpasssplit.length>1 ? userpasssplit[1] : ''
+			}
+        	println "publishing to: "+myrepourl
+ 	        println "repouser: "+myrepouser
+     	    println "repopassword: "+myrepopassword
             
             maven {
-                url myrepourl
+                url getVar('repo' + repo, project)
                 credentials {
                     username myrepouser
                     password myrepopassword
