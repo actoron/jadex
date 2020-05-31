@@ -878,17 +878,6 @@ def createEmptyDirOnSSH(net.schmizz.sshj.SSHClient ssh, String dir) {
 	cmd.close();
 }
 
-def getDownloadServerAccess() {
-	def ret = [:];
-	ret.hosthash = findPropertyWithDotsOrDie('dl.hosthash');
-	ret.host = findPropertyWithDotsOrDie('dl.host');
-	def portprop = findPropertyWithDots('dl.port');
-	ret.port = portprop != null ? Integer.parseInt(portprop) : 22;
-	ret.user = findPropertyWithDotsOrDie('dl.user');
-	ret.password = findPropertyWithDotsOrDie('dl.password');
-	return ret;
-}
-
 def findPropertyWithDots(propname) {
 	def ret = findProperty(propname);
 	if (ret == null)

@@ -353,6 +353,36 @@ def getDistsDir(proj) {
 	return new File(proj.buildDir, proj.distsDirName)
 }
 
+/**
+ * Parse a URL into its (default) parts.
+ * see, e.g., https://tools.ietf.org/html/draft-ietf-secsh-scp-sftp-ssh-uri-04
+ * Examples:
+ * https://myserver.com/path -> {host: "myserver.com", port: 443, user: "", password: "", fingerprint: "", url: "https://myserver.com/path"}
+ * https://a@myserver.com/path -> {host: "myserver.com", port: 443, user: "a", password: "", fingerprint: "", url: "https://myserver.com/path"}
+ * ssh://a:b;fingerprint=SHA256-ABC@myserver.com:22000  -> {host: "myserver.com", port: 22000, user: "a", password: "b", fingerprint: "SHA256:ABC", url: "ssh://myserver.com:22000"}
+ */
+def parseURLWithCredentials(urlstring) {
+	def ret = [:];
+	def url	= new URL(urlstring)
+	ret.host = url.host;
+	ret.port = url.port==-1 ? url.defaultPort : url.port
+    ret.user = ''
+    ret.password = ''
+    def String userinfo = url.userInfo
+    if(userinfo!=null)
+    {
+		def String[] split = userinfo.split(":")
+        ret.user = split.length>0 ? split[0] : ''
+        ret.password = split.length>1 ? split[1] : ''
+	}
+
+	// URL without extra info (e.g. no password for security reasons)
+	ret.url	= url.protocol + '://' + url.host + (url.port!=-1 ? ':' + url.port : '') + url.file + (url.ref!=null ? '#' + url.ref : '')
+		
+	//ret.hosthash = findPropertyWithDotsOrDie('dl.hosthash');
+	return ret;
+}
+
 // make functions externally visible
 
 ext {
@@ -375,4 +405,5 @@ ext {
     diffZips = this.&diffZips
 	createRezipTask	= this.&createRezipTask
 	getDistsDir = this.&getDistsDir
+	parseURLWithCredentials = this.&parseURLWithCredentials
 }

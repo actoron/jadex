@@ -10,29 +10,25 @@ if(project.hasProperty('repos'))
 {
 	for(String repo: repos.split(","))
 	{
+		// Parse credentials from environment
+        def repourl = getVar('repo' + repo, project)
+        def repoaccess = parseURLWithCredentials(repourl)
+    	//println 'publishing to: ' + repoaccess.url
+        //println 'repouser: ' + repoaccess.user
+ 	    //println 'repopassword: ' + repoaccess.password
+		            
+	
 		// Settings for staging when publishing to central repo
 		if("central".equals(repo))
 		{
-			def userpass = getVar('repo' + repo, project)
-            def myrepouser = ''
-            def myrepopassword = ''
-            if(userpass!=null)
-            {
-	    		def String[] userpasssplit = userpass.split(":")
-	            myrepouser = userpasssplit.length>0 ? userpasssplit[0] : ''
-	            myrepopassword = userpasssplit.length>1 ? userpasssplit[1] : ''
-			}
- 	        //println "repouser: "+myrepouser
-     	    //println "repopassword: "+myrepopassword
-		
 			project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
 			
 			project.rootProject.afterEvaluate {
 			    nexusStaging {
 			        packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
 			        stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
-			        username = myrepouser
-			        password = myrepopassword
+			        username = repoaccess.user
+			        password = repoaccess.password
 			    }	   
 			}
 			
@@ -41,8 +37,8 @@ if(project.hasProperty('repos'))
 			    	sonatype() {
 			        	connectTimeout = Duration.ofMinutes(10)
 			        	clientTimeout = Duration.ofMinutes(10)
-			        	username = myrepouser
-			        	password = myrepopassword
+			        	username = repoaccess.user
+			        	password = repoaccess.password
 			        }
 			    }
 			}
@@ -55,25 +51,11 @@ if(project.hasProperty('repos'))
 			{
 		        repositories 
 		        {
-		            def myrepourl = getVar('repo' + repo, project)
-		            def myrepouser = ''
-		            def myrepopassword = ''
-		            def String userpass = new URL(myrepourl).getUserInfo()
-		            if(userpass!=null)
-		            {
-			    		def String[] userpasssplit = userpass.split(":")
-			            myrepouser = userpasssplit.length>0 ? userpasssplit[0] : ''
-			            myrepopassword = userpasssplit.length>1 ? userpasssplit[1] : ''
-					}
-		        	//println "publishing to: "+myrepourl
-		 	        //println "repouser: "+myrepouser
-		     	    //println "repopassword: "+myrepopassword
-		            
 		            maven {
-		                url getVar('repo' + repo, project)
+		                url repoaccess.url
 		                credentials {
-		                    username myrepouser
-		                    password myrepopassword
+		                    username repoaccess.user
+		                    password repoaccess.password
 		                }
 		            }
 		        }
