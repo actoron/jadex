@@ -2,8 +2,6 @@
 # * append -SNAPSHOT to non -Production builds
 # * upload schemas
 # * upload schemadocs
-# * multi-repository publish?
-# * per branch nexus urls (nightly vs oss)?
 
 # TODO: Minor
 # * performanceTests (publish results?)
@@ -16,6 +14,8 @@
 # * avoid xlib install for test job
 # * enable junit view in gitlab
 # * fix runtime of GlobalSuperpeerTest (>2 min, really?)
+# * 15 sec. time delay after gradle configure when executing publish task
+# * auto-close staging repository
 
 image: openjdk:11-jdk
 
@@ -31,7 +31,8 @@ variables:
   CHECKDISTS_BRANCHES: 'pipeline-test|master|stable'
   DEPLOYZIPS_BRANCHES: 'pipeline-test|master|stable'
   DEPLOYJAVADOCS_BRANCHES: 'pipeline-test|master|stable'
-  PUBLISH_BRANCHES: 'pipeline-test|master|stable'
+  PUBLISHCENTRAL_BRANCHES: 'pipeline-test|master|stable'
+  PUBLISHACTORON_BRANCHES: 'pipeline-test|master|stable'
   TAG_BRANCHES: 'pipeline-test|master|stable'
   
 stages:
@@ -103,12 +104,20 @@ checkDists:
   rules:
     - if: $CHECKDISTS=="true" || $CHECKDISTS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDISTS_BRANCHES
 
-publish:
+publishCentral:
   stage: deployandpublish
   script: 
-    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -x test -P repo=actoron $GRADLE_EXTRA
+    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -P repos=central $GRADLE_EXTRA
   rules:
-    - if: $PUBLISH=="true" || $PUBLISH!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISH_BRANCHES
+    - if: $PUBLISHCENTRAL=="true" || $PUBLISHCENTRAL!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHCENTRAL_BRANCHES
+      when: on_success
+    
+publishActoron:
+  stage: deployandpublish
+  script: 
+    - ./gradlew -Pdist=publishdists -Production :environments:envsupport-jmonkey:publish publish -P repos=actoron $GRADLE_EXTRA
+  rules:
+    - if: $PUBLISHACTORON=="true" || $PUBLISHACTORON!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHACTORON_BRANCHES
       when: on_success
     
 deployZips:
