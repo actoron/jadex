@@ -58,15 +58,15 @@ def getProjectDepth(proj) {
 
 /**
  * Adds schema processing tasks for generating files to be uploaded
- * 1. Generate schemadocs using XSLT
+ * 1. Generate schemadoc using XSLT
  * 2. Copy and filter release XSDs to build dir, putting the current $jadex_build_version value in content and name
  * 3. Copy and filter dev XSDs to build dir, puting the '${jadex_build_version}' (literally) in the name
  */
 def addSchemaTasks(Project project) {
-    project.tasks.create('schemadocs').doLast {
+    project.tasks.create('schemadoc').doLast {
         ant.xslt(
                 basedir: "${project.projectDir}/src/main/schema/",
-                destdir: "${project.buildDir}/schemadocs/",
+                destdir: "${project.buildDir}/schemadoc/",
 //                extension: "-${project.version}.html",
                 extension: ".html",
                 force: "true",
@@ -74,8 +74,8 @@ def addSchemaTasks(Project project) {
                 includes: "*.xsd"
         )
     }
-	project.schemadocs.inputs.files(project.fileTree(dir: "src/main/schema/", include: '*.xsd'))
-	project.schemadocs.outputs.dir("${project.buildDir}/schemadocs/")
+	project.schemadoc.inputs.files(project.fileTree(dir: "src/main/schema/", include: '*.xsd'))
+	project.schemadoc.outputs.dir("${project.buildDir}/schemadoc/")
 	
     project.tasks.create('processSchemas').doLast {
 		// rename and filter files to x-3.0-SNAPSHOT
@@ -119,11 +119,9 @@ def addSchemaTasks(Project project) {
 	project.processDevSchemas.inputs.files(project.fileTree(dir: "src/main/schema/", include: '*.xsd'))
 	project.processDevSchemas.outputs.dir("${project.buildDir}/devschemas/")
 
-//    project.processSchemas.dependsOn += project.schemadocs 
-//    project.processResources.dependsOn += project.processSchemas
-    project.assemble.dependsOn += project.schemadocs	// ouputs only required for publishing
-    project.assemble.dependsOn += project.processSchemas	// ouputs only required for publishing
-    project.assemble.dependsOn += project.processDevSchemas	// ouputs only required for publishing
+    //project.assemble.dependsOn += project.schemadoc	// outputs only required for publishing
+    //project.assemble.dependsOn += project.processSchemas	// outputs only required for publishing
+    //project.assemble.dependsOn += project.processDevSchemas	// outputs only required for publishing
 }
 
 ext.classPathWarningsShownFor = [:]

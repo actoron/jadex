@@ -640,6 +640,24 @@ task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	outputs.upToDateWhen {false}
 }
 
+// Collect and zip outputs of 'schemadoc' tasks
+task schemadocZip(type: Zip) {
+	def schemadoctasks	= subprojects.collect({p -> p.tasks.matching{it.name.equals('schemadoc')}}).flatten()
+	from schemadoctasks.collect({t -> t.outputs})
+	into 'schemadoc'
+	archiveName 'jadex-' + jadex_build_version + '-schemadoc.zip'
+    destinationDirectory = file("$buildDir/distributions")	
+}
+
+// Collect and zip processed (i.e. replaced and renamed) XSD schemas
+task schemasZip(type: Zip) {
+	def schematasks	= subprojects.collect({p -> p.tasks.matching{it.name.equals('processSchemas') || it.name.equals('processDevSchemas')}}).flatten()
+	from schematasks.collect({t -> t.outputs})
+	into 'schemas'
+	archiveName 'jadex-' + jadex_build_version + '-schemas.zip'
+    destinationDirectory = file("$buildDir/distributions")	
+}
+
 // for shared stable/master jenkinsfile in buildscripts
 task distZips()  {
 	description	= "Build separate zips for all selected distributions. Use '-P dist=<distnames>' to specify distributions (default 'everything'). Available distibutions can be found in the first row of src/main/buildutils/buildconfigs.csv."
