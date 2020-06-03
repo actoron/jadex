@@ -24,6 +24,9 @@ public class BrokenInitAgent
 		throw new RuntimeException("Exception in init.");
 	}
 
+	/**
+	 *  Start a platform and run the agent.
+	 */
 	public static void main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();

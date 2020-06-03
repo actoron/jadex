@@ -24,6 +24,9 @@ public class BodyExceptionAgent
 //		System.out.println("... finished");
 	}
 	
+	/**
+	 *  Start a platform and run the agent.
+	 */
 	public static void main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
