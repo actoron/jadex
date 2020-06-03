@@ -1,5 +1,4 @@
 # TODO: Severe
-# * append -SNAPSHOT to non -Production builds
 # * fix start scripts not working from dist zips (jadex.bat etc...)
 
 # TODO: Minor
