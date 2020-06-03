@@ -185,20 +185,23 @@ allprojects
         }
 	}
 
-	// Make builds reproducible, cf. https://dzone.com/articles/reproducible-builds-in-java
+	// Make distributions reproducible
+	tasks.withType(AbstractArchiveTask) {
+		reproducibleFileOrder = true
+	}
+	tasks.withType(Jar) {
+		preserveFileTimestamps = false
+	}
+	
+	// Collect runtime dependencies for inclusion in distributions
 	project.afterEvaluate {
-		tasks.withType(AbstractArchiveTask) {
-			preserveFileTimestamps = false
-			reproducibleFileOrder = true
-		}
 		def confs = project.configurations.runtimeClasspath
 		def files = rootProject.ext.runtimearts.get(project.getPath())
 		if (files == null)
 		{
 			files = new HashSet<>()
 			rootProject.ext.runtimearts.put(project.getPath(), files)
-		}
-		
+		}		
 		files.addAll(confs.getFiles())
 	}
 }
@@ -352,6 +355,7 @@ subprojects
 		task srcZip(type: Zip, dependsOn: rootProject.createVersionInfo) {
 			destinationDir new File(getDistsDir(rootProject), "sources")
 			archiveName 'jadex-'  + distname + '-' + jadex_build_version + '-sources.zip'
+			preserveFileTimestamps = false
 			
 			// Add all included artifact projects and their parents (but exclude root project for addons)
 			def projs = new HashSet();	// keep track of added projects to avoid duplicates
@@ -395,6 +399,8 @@ subprojects
 				def task	= project.tasks.create([name: examples.size()==1 ? "exampleZip" : "exampleZip-" + example.getName(), type: Zip]) {
 					destinationDir new File(getDistsDir(rootProject), 'exampleprojects')
 					archiveName example.getName() + '.zip'
+					preserveFileTimestamps = false
+					
 					from (example) {
 						into example.getName()
 						include '**/*'
@@ -571,7 +577,7 @@ subprojects
 	}
 }
 
-task copyJavaDocSources(type: Copy) {
+task copyJavadocSources(type: Copy) {
 	destinationDir = new File(getDistsDir(project).getCanonicalPath() + '/javadocworkdir')
 	gradle.ext.maindistartifacts.each { artname ->
 		def sp = project.ext.subprojectmap.get(artname)
@@ -599,15 +605,14 @@ task copyJavaDocSources(type: Copy) {
 	}
 }
 
-task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
+// Javadoc on custom collection of source files for upload to docs
+task publicJavadoc(type: Javadoc, dependsOn: [copyJavadocSources]) {
 	def sourcedir = getDistsDir(project).getCanonicalPath() + '/javadocworkdir'
 	//classpath = configurations.runtimeClasspath
 	println (gradle.ext.maindistartifacts.collect {project(it).sourceSets.main.compileClasspath})
 	classpath = files(gradle.ext.maindistartifacts.collect {project(it).sourceSets.main.compileClasspath})
 	source(sourcedir)
-	destinationDir = new File(getDistsDir(project).getCanonicalPath() + '/jadex-' + jadex_build_version + '-javadoc')
-	def dfile = destinationDir.getCanonicalPath() + '.zip';
-	outputs.file(dfile)
+	destinationDir = new File(getDistsDir(project).getCanonicalPath() + '/docs/jadex-' + jadex_build_version + '-javadoc')
 
 	options.encoding 'UTF-8'
 	options.docEncoding 'UTF-8'
@@ -626,36 +631,30 @@ task javadocZip(type: Javadoc, dependsOn: [copyJavaDocSources]) {
 	options.group('Web Service Extension Packages','jadex.extension.ws*:jadex.extension.rs*')
 	options.group('2D/3D Environment Extension Packages','')
 	options.group('Agent-Group-Role (AGR) Extension Packages','jadex.extension.agr*')
+}
 
-	doLast {
-		def ant = new groovy.util.AntBuilder()
-		ant.sequential {
-			ant.delete dir: sourcedir
-			ant.zip destfile: dfile, {
-				zipfileset dir: destinationDir.getCanonicalPath(), prefix: 'javadoc' + '/', erroronmissingdir: false
-			}
-			ant.delete dir: destinationDir
-		}
-	}
-	outputs.upToDateWhen {false}
+task javadocZip(type: Zip) {
+	println 'public javadocs: ' + publicJavadoc.outputs.files
+	from publicJavadoc.outputs.files
+	archiveName 'jadex-' + jadex_build_version + '-javadoc.zip'
+    destinationDirectory = new File(getDistsDir(project), 'docs')
 }
 
 // Collect and zip outputs of 'schemadoc' tasks
 task schemadocZip(type: Zip) {
 	def schemadoctasks	= subprojects.collect({p -> p.tasks.matching{it.name.equals('schemadoc')}}).flatten()
 	from schemadoctasks.collect({t -> t.outputs})
-	into 'schemadoc'
 	archiveName 'jadex-' + jadex_build_version + '-schemadoc.zip'
-    destinationDirectory = file("$buildDir/distributions")	
+    destinationDirectory = new File(getDistsDir(project), 'docs')
 }
 
 // Collect and zip processed (i.e. replaced and renamed) XSD schemas
 task schemasZip(type: Zip) {
 	def schematasks	= subprojects.collect({p -> p.tasks.matching{it.name.equals('processSchemas') || it.name.equals('processDevSchemas')}}).flatten()
 	from schematasks.collect({t -> t.outputs})
-	into 'schemas'
 	archiveName 'jadex-' + jadex_build_version + '-schemas.zip'
-    destinationDirectory = file("$buildDir/distributions")	
+    destinationDirectory = new File(getDistsDir(project), 'schemas')
+	preserveFileTimestamps	true
 }
 
 // for shared stable/master jenkinsfile in buildscripts
@@ -724,82 +723,29 @@ task docsDirZip(type: Zip) {
 
 
 task deployJavadocs() {
-	dependsOn javadocZip
+	inputs.files project.javadocZip.outputs.files
 	doLast {
-		
-		def acc = getDownloadServerAccess();
-		
-		//def dir = "/www/docs/javadoc/" + project.ext.version.major + "." + project.ext.version.minor;
-		def basedir = "/www/docs/javadoc";
-		def dir = basedir + "/" + jadex_build_version;
-		// def docszip = "" + project.buildDir + File.separator + 'docs.zip';
-		def docszipfile = 'jadex-' + jadex_build_version + '-javadoc.zip';
-		def docszip = getDistsDir(project).getCanonicalPath() + '/' + docszipfile;
-		
-		def ssh = new net.schmizz.sshj.SSHClient();
-		ssh.addHostKeyVerifier(acc.fingerprint);
-		println "Connecting to SSH..."
-		ssh.connect(acc.host, acc.port);
-		println "Connected to SSH."
-		try {
-			ssh.authPassword(acc.user, acc.password);
-			def session = ssh.startSession();
-			println "Check for dir..."
-			def cmd = session.exec("ls " + dir);
-			waitForSSHCmd(cmd);
-			cmd.close();
-			
-			
-			if (cmd.getExitStatus() != null && cmd.getExitStatus() == 0) {
-				// Old deployment exist, remove...
-				session = ssh.startSession();
-				println "Remove dir..."
-				cmd = session.exec("rm -rf " + dir);
-				waitForSSHCmd(cmd);
-				cmd.close();
-			}
-			
-			session = ssh.startSession();
-			cmd = session.exec("ls " +  basedir + "/" + docszipfile);
-			waitForSSHCmd(cmd);
-			cmd.close();
-			
-			if (cmd.getExitStatus() != null && cmd.getExitStatus() == 0) {
-				session = ssh.startSession();
-				println "Remove zip..."
-				cmd = session.exec("rm -rf " + basedir + "/" + docszipfile);
-				waitForSSHCmd(cmd);
-				cmd.close();
-			}
-			
-			println "Uploading..."
-			ssh.newSCPFileTransfer().upload(new net.schmizz.sshj.xfer.FileSystemFile(docszip),
-											basedir + "/");
-			println "Uploaded."
-			
-			println "Unzipping..."
-			session = ssh.startSession();
-			cmd = session.exec("unzip -o -d " + basedir + " " + basedir + "/" + docszipfile);
-			waitForSSHCmd(cmd);
-			cmd.close();
-			println "Unzipped"
-			
-			session = ssh.startSession();
-			cmd = session.exec("mv " + basedir + "/javadoc " + dir);
-			waitForSSHCmd(cmd);
-			cmd.close();
-			
-			session = ssh.startSession();
-			cmd = session.exec("rm " + basedir + "/" + docszipfile);
-			waitForSSHCmd(cmd);
-			cmd.close();
-        } catch (Exception e) {
-        	throw new RuntimeException(e); 
-        } finally {
-            ssh.disconnect();
-        }
-        (new File(docszip)).delete();
-		println "Docs deployed.";
+		project.javadocZip.outputs.files.each { zipfile ->
+			uploadAndUnzip(zipfile, '/www/docs/javadoc/jadex-' + jadex_build_version)
+		}
+	}
+}
+
+task deploySchemadocs() {
+	inputs.files project.schemadocZip.outputs.files
+	doLast {
+		project.schemadocZip.outputs.files.each { zipfile ->
+			uploadAndUnzip(zipfile, '/www/docs/schemadoc/jadex-' + jadex_build_version)
+		}
+	}
+}
+
+task deploySchemas() {
+	inputs.files project.schemasZip.outputs.files
+	doLast {
+		project.schemasZip.outputs.files.each { zipfile ->
+			uploadAndUnzip(zipfile, '/www/schemas')
+		}
 	}
 }
 
@@ -867,10 +813,57 @@ task updateTag() {
 	}
 }
 
-def getDownloadServerAccess() {
+// Upload and unzip via ssh.
+project.ext.random	= new java.util.Random()
+def uploadAndUnzip(File zipfile, String targetdir) {
+
+	// Fetch host/credentials from env.
 	def downloadserver_url = getVar('dl_host', project)
-    return parseURLWithCredentials(downloadserver_url)
+    def acc = parseURLWithCredentials(downloadserver_url)
+
+	def ssh = new net.schmizz.sshj.SSHClient();
+	ssh.addHostKeyVerifier(acc.fingerprint);
+	println 'Connecting to SSH...'
+	ssh.connect(acc.host, acc.port);
+	
+	try {
+		ssh.authPassword(acc.user, acc.password);
+		
+		def tmpdir	= '/tmp/upload' + random.nextInt();
+		println 'Creating temp dir: ' + tmpdir
+		def session = ssh.startSession();
+		def cmd = session.exec('mkdir -p ' + tmpdir);
+		waitForSSHCmd(cmd);
+		cmd.close();
+		
+		println 'Creating target dir: ' + targetdir
+		session = ssh.startSession();
+		cmd = session.exec('mkdir -p ' + targetdir);
+		waitForSSHCmd(cmd);
+		cmd.close();
+		
+		println 'Uploading...'
+		ssh.newSCPFileTransfer().upload(new net.schmizz.sshj.xfer.FileSystemFile(zipfile), tmpdir + '/');
+		
+		def unzip = 'unzip -o -d ' + targetdir + ' ' + tmpdir + '/' + zipfile.name
+		println 'Unzipping: ' + unzip
+		session = ssh.startSession();
+		cmd = session.exec(unzip);
+		waitForSSHCmd(cmd);
+		cmd.close();
+		
+		println 'Cleaning up...'
+		session = ssh.startSession();
+		cmd = session.exec('rm -rf ' + tmpdir);
+		waitForSSHCmd(cmd);
+		cmd.close();		
+    } catch (Exception e) {
+    	throw new RuntimeException(e); 
+    } finally {
+        ssh.disconnect();
+    }
 }
+
 
 def createEmptyDirOnSSH(net.schmizz.sshj.SSHClient ssh, String dir) {
 	def session = ssh.startSession();

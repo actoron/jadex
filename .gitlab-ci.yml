@@ -31,6 +31,8 @@ variables:
   QUALITY_BRANCHES: 'pipeline-test|master|stable'
   CHECKDISTS_BRANCHES: 'pipeline-test|master|stable'
   DEPLOYZIPS_BRANCHES: 'pipeline-test|master|stable'
+  DEPLOYSCHEMAS_BRANCHES: 'pipeline-test|master|stable'
+  DEPLOYSCHEMADOCS_BRANCHES: 'pipeline-test|master|stable'
   DEPLOYJAVADOCS_BRANCHES: 'pipeline-test|master|stable'
   PUBLISHCENTRAL_BRANCHES: 'pipeline-test|master|stable'
   PUBLISHACTORON_BRANCHES: 'pipeline-test|master|stable'
@@ -135,6 +137,22 @@ deployJavadocs:
     - ./gradlew -Pdist=addonjavadoc -Production deployJavadocs $GRADLE_EXTRA
   rules:
     - if: $DEPLOYJAVADOCS=="true" || $DEPLOYJAVADOCS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYJAVADOCS_BRANCHES
+      when: on_success
+
+deploySchemas:
+  stage: deployandpublish
+  script:
+    - ./gradlew -Pdist=publishdists -Production deploySchemas $GRADLE_EXTRA
+  rules:
+    - if: $DEPLOYSCHEMAS=="true" || $DEPLOYSCHEMAS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYSCHEMAS_BRANCHES
+      when: on_success
+
+deploySchemadocs:
+  stage: deployandpublish
+  script:
+    - ./gradlew -Pdist=publishdists -Production deploySchemadocs $GRADLE_EXTRA
+  rules:
+    - if: $DEPLOYSCHEMADOCS=="true" || $DEPLOYSCHEMADOCS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYSCHEMADOCS_BRANCHES
       when: on_success
 
 # cleanuprepo:    
