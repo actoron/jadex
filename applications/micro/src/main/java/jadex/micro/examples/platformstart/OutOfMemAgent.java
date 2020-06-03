@@ -1,4 +1,4 @@
-package jadex.micro.testcases;
+package jadex.micro.examples.platformstart;
 
 import java.util.ArrayList;
 import java.util.List;
