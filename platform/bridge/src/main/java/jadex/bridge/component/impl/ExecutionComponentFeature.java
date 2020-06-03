@@ -1439,15 +1439,14 @@ public class ExecutionComponentFeature	extends	AbstractComponentFeature implemen
 //							if(!step.getSecondEntity().hasResultListener())
 //							{
 								// Todo: fail fast vs robust components.
-								killComponent(fex instanceof Exception ? (Exception)fex : new RuntimeException(fex));
-//								StringWriter	sw	= new StringWriter();
-//								fex.printStackTrace(new PrintWriter(sw));
-//								getComponent().getLogger().severe("Component step failed: "+step.getStep()+"\n"+sw);
-//								
-//								if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getStep()))
-//								{
-//									stepadditions.get(step.getStep()).printStackTrace();
-//								}
+								StringWriter	sw	= new StringWriter();
+								fex.printStackTrace(new PrintWriter(sw));
+								getComponent().getLogger().severe("Component step failed: "+step.getStep()+"\n"+sw);
+								
+								if(DEBUG && stepadditions!=null && stepadditions.containsKey(step.getStep()))
+								{
+									stepadditions.get(step.getStep()).printStackTrace();
+								}
 //							}
 //						}
 //						
