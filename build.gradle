@@ -813,13 +813,17 @@ task updateTag() {
 	}
 }
 
+// Fetch download server host/credentials from env.
+def getDownloadServerAccess() {
+	def downloadserver_url = getVar('dl_host', project)
+    return parseURLWithCredentials(downloadserver_url)
+}
+
 // Upload and unzip via ssh.
 project.ext.random	= new java.util.Random()
 def uploadAndUnzip(File zipfile, String targetdir) {
 
-	// Fetch host/credentials from env.
-	def downloadserver_url = getVar('dl_host', project)
-    def acc = parseURLWithCredentials(downloadserver_url)
+    def acc = getDownloadServerAccess()
 
 	def ssh = new net.schmizz.sshj.SSHClient();
 	ssh.addHostKeyVerifier(acc.fingerprint);
@@ -836,6 +840,7 @@ def uploadAndUnzip(File zipfile, String targetdir) {
 		waitForSSHCmd(cmd);
 		cmd.close();
 		
+		// No delete, just overwrite if exists -> avoids "accidents" when specifying too generic target dir 
 		println 'Creating target dir: ' + targetdir
 		session = ssh.startSession();
 		cmd = session.exec('mkdir -p ' + targetdir);

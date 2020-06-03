@@ -1,7 +1,5 @@
 # TODO: Severe
 # * append -SNAPSHOT to non -Production builds
-# * upload schemas
-# * upload schemadocs
 
 # TODO: Minor
 # * performanceTests (publish results?)
