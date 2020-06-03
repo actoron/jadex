@@ -16,7 +16,7 @@ Object fetchNextBuildNameFromGitTag()
 
 	// If we are building in dev mode (i.e. Eclipse), just set patch to 9999 and exit.
 	if (!gradle.ext.productionmode)
-		return createBuildname(version, 9999, 1, false)
+		return createBuildname(version, '9999-SNAPSHOT', 1, false)
 		
 	def patch = getLatestPatchVersion(version, versionprops);
 	
@@ -78,7 +78,7 @@ Object	createBuildname(version, patch, branchpatch, isnew)
 	buildname.patch = patch;
 	buildname.suffix = patch;
 	buildname.full = version + "." +buildname.suffix
-	buildname.isnew	= isnew;	// isnew -> no tag for this version exists, yet
+	buildname.isnew	= isnew;	// isnew -> no tag for this version exists, yet -> enable updateTag task 
 	return buildname;
 }
 
