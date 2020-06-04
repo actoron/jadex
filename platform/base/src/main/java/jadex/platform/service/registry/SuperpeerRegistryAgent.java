@@ -146,6 +146,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			@SuppressWarnings("unchecked")
 			public void execute(Object obj)
 			{
+				System.out.println("Superpeer registry received client event: "+obj);
 				ServiceEvent<IServiceIdentifier> event = (ServiceEvent<IServiceIdentifier>) obj;
 				dispatchEventToRegistry(serviceregistry, event);
 			}

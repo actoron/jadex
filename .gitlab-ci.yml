@@ -101,7 +101,6 @@ checkDists:
   stage: testandquality
   script:
     - ./gradlew -Pdist=publishdists -Production checkDists $GRADLE_EXTRA
-  allow_failure: true
   rules:
     - if: $CHECKDISTS=="true" || $CHECKDISTS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDISTS_BRANCHES
 

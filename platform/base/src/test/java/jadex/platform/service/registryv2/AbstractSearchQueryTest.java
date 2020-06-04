@@ -299,15 +299,9 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	
 	@Agent
 	@ProvidedServices(@ProvidedService(type=IMarkerService.class, scope=ServiceScope.GLOBAL))
-	public static class GlobalMarkerAgent	implements IMarkerService
-	{
-
-	}
+	public static class GlobalMarkerAgent	implements IMarkerService {}
 	
 	@Agent
 	@ProvidedServices(@ProvidedService(type=IMarkerService.class, scope=ServiceScope.NETWORK))
-	public static class NetworkMarkerAgent	implements IMarkerService
-	{
-
-	}
+	public static class NetworkMarkerAgent	implements IMarkerService {}
 }
