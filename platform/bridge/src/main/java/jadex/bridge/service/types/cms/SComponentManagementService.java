@@ -330,7 +330,7 @@ public class SComponentManagementService
 	 */
 	public static void notifyListenersRemoved(IComponentDescription desc, Exception ex, Map<String, Object> results)
 	{
-		System.out.println("terminated event for: "+desc);
+//		System.out.println("terminated event for: "+desc);
 		
 		// listeners are copied to be threadsafe
 		
