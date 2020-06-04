@@ -10,12 +10,17 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import jadex.base.IPlatformConfiguration;
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceScope;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.ServiceQuery;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
 /**
  *  Test basic search and query managing functionality with a client and some providers.
@@ -73,7 +78,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		System.out.println("1) start client platform and add query");
 		IExternalAccess	client	= createPlatform(clientconf);
 		ISubscriptionIntermediateFuture<ITestService>	results	= client.addQuery(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
-		waitALittle(client);
+		waitForRegistry(client);
 		Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		
 		//-------- Tests with awareness fallback only (no SP) --------
@@ -99,7 +104,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("2/3) start provider platforms, wait for services");
 			pro1	= createPlatform(proconf);
 			pro2	= createPlatform(proconf);
-			waitALittle(client);
+			waitForRegistry(client);
 			Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		}
 
@@ -111,7 +116,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("4) start SP, wait for connection from provider platforms and client platform");
 			IExternalAccess	sp	= createPlatform(spconf);
 			waitForSuperpeerConnections(sp, client, pro1, pro2);
-			waitALittle(client);
+			waitForRegistry(client);
 			if(awa)
 			{
 				// -> should get no service; test if duplicate removal works with SP
@@ -143,7 +148,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			Set<IComponentIdentifier>	providers2	= new LinkedHashSet<>();
 			providers2.add(pro1.getId());
 			providers2.add(pro2.getId());
-			waitALittle(client);
+			waitForRegistry(client);
 			Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
 			Assert.assertEquals(providers1, providers2);
 			
@@ -170,7 +175,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			else
 			{
 				// -> test if disconnection from SP works (new services not found)
-				waitALittle(client);
+				waitForRegistry(client);
 				Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 				Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results2.getIntermediateResults()));
 			}
@@ -194,7 +199,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		// 1) start client platform and search for service -> not found (test if works with no super peers and no other platforms)
 		System.out.println("1) start client platform and search for service");
 		IExternalAccess	client	= createPlatform(clientconf);
-		waitALittle(client);
+		waitForRegistry(client);
 		Collection<ITestService>	result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 		Assert.assertTrue(""+result, result.isEmpty());
 		
@@ -240,7 +245,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("5) start SP, wait for connection from provider platforms and client platform, search for service");
 			IExternalAccess	sp	= createPlatform(spconf);
 			waitForSuperpeerConnections(sp, client, pro2);
-			waitALittle(client);
+			waitForRegistry(client);
 //			waitLonger(client);	// Hack for timeout in CI Pipeline!?
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(client.toString()+": "+result, 1, result.size());
@@ -249,14 +254,14 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("6) start provider platform, search for service");
 			pro1	= createPlatform(proconf);
 			waitForSuperpeerConnections(sp, pro1);
-			waitALittle(client);
+			waitForRegistry(client);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(""+result, 2, result.size());
 			
 			// 7) kill one provider platform, search for service -> test if remote disconnection and service removal works
 			System.out.println("7) kill one provider platform, search for service");
 			removePlatform(pro1);
-			waitALittle(client);
+			waitForRegistry(client);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(""+result, 1, result.size());
 	
@@ -268,5 +273,34 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(""+result, awa?1:0, result.size());
 		}
+	}
+
+	IExternalAccess	marker;
+	
+	/**
+	 *  Wait to allow remote platform/registry interaction.
+	 *  The idea is that the registry is roughly FCFS so
+	 *  when we start another service and that service appears in the registry
+	 *  all previous activity should also be completed.
+	 */
+	protected void waitForRegistry(IExternalAccess platform)
+	{
+		if(marker==null)
+		{
+			marker	= Starter.createPlatform(clientconf).get();
+		}
+		IExternalAccess	agent	= marker.addComponent(new GlobalMarkerAgent()).get();
+		platform.addQuery(new ServiceQuery<>(IMarkerService.class, ServiceScope.GLOBAL)).getNextIntermediateResult();
+		agent.killComponent().get();
+	}
+	
+	@Service
+	public static interface IMarkerService {}
+	
+	@Agent
+	@ProvidedServices(@ProvidedService(type=IMarkerService.class, scope=ServiceScope.GLOBAL))
+	public static class GlobalMarkerAgent	implements IMarkerService
+	{
+
 	}
 }
