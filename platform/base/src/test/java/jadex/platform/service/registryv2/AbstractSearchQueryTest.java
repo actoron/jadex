@@ -209,6 +209,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			// 2) start provider platform, search for service -> test if awa fallback works with one platform 
 			System.out.println("2) start provider platform, search for service");
 			pro1	= createPlatform(proconf);
+			waitForRegistry(pro1, true);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(""+result, 1, result.size());
 			
