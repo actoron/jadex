@@ -287,12 +287,15 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 	 */
 	protected void waitForRegistry(IExternalAccess platform, boolean global)
 	{
+		// Can only use global when ssp available. Otherwise uses awa fallback via network.
+		global	= global && sspconf!=null;
+		
 		if(marker==null)
 		{
 			marker	= Starter.createPlatform(clientconf).get();
 		}
 		IExternalAccess	agent	= marker.addComponent(global ? new GlobalMarkerAgent() : new NetworkMarkerAgent()).get();
-		platform.addQuery(new ServiceQuery<>(IMarkerService.class, global ? ServiceScope.GLOBAL : ServiceScope.NETWORK)).getNextIntermediateResult(Starter.getDefaultTimeout(platform.getId()), true);
+		platform.addQuery(new ServiceQuery<>(IMarkerService.class, global ? ServiceScope.GLOBAL : ServiceScope.NETWORK)).getNextIntermediateResult();
 		agent.killComponent().get();
 	}
 	
