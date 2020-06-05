@@ -22,8 +22,9 @@ class AppElement extends LitElement {
 	    page('/platforms', () => {
 	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platforms></jadex-platforms>";
 	    });
-	    page('/platform', () => {
-	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform></jadex-platform>";
+	    page('/platform/:cid', (ctx, next) => {
+	    	console.log("router, cid: "+ctx.params.cid);
+	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-platform cid='"+ctx.params.cid+"'></jadex-platform>";
 	    });
 	    page('/about', () => {
 	    	self.shadowRoot.getElementById("content").innerHTML = "<jadex-about></jadex-about>";

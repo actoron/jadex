@@ -1,46 +1,63 @@
-import { LitElement, html, css } from 'lit-element';
+import { LitElement, html, css} from 'lit-element';
 
-// Defined as <jadex-platform> tag
+// Tag name 'jadex-platform'
 class PlatformElement extends LitElement {
 
+	static get properties() { 
+		return { cid: { type: String }};
+	}
+	
+	attributeChangedCallback(name, oldVal, newVal) {
+	    console.log('attribute change: ', name, newVal, oldVal);
+	    super.attributeChangedCallback(name, oldVal, newVal);
+	    
+	    if("cid"==name) {
+	    	this.loadPlugins();
+	    }
+	}
+	
 	constructor() {
 		super();
-		
+
 		console.log("platform");
 		
-		var self = this;
-		self.plugins = [];
-		self.cid = opts!=null && opts.paths!=null && opts.paths.length>1? opts.paths[1]: "";
+		this.cid = null;
 		
-		var curplugin = null;
+		this.plugins = [];
 		
-		showPlugin(event)
-		{
-			// Logic for setting the active link in the navbar
-			var el = $('#plugins .navbar-nav').find('li.active');
-			for(var i=0; i<el.length; i++)
-				el[i].classList.remove('active');
-			event.target.parentElement.parentElement.classList.add("active");
-			
-			self.showPlugin2(event.item.p);
-		}
+		this.curplugin = null;
 		
-		showPlugin2(p)
-		{
-			if(curplugin!=null)
-				curplugin.unmount(true);
+		this.requestUpdate();
+		//console.log(opts.paths);
+	}
+	
+	showPlugin(event)
+	{
+		// Logic for setting the active link in the navbar
+		var el = $('#plugins .navbar-nav').find('li.active');
+		for(var i=0; i<el.length; i++)
+			el[i].classList.remove('active');
+		event.target.parentElement.parentElement.classList.add("active");
+		
+		this.showPlugin2(event.item.p);
+	}
+	
+	showPlugin2(p)
+	{
+		console.log("tag: "+p.name+" "+this.cid+" "+p.html);
+		
+		loader.loadFiles([], [p.html], () => {
+			this.shadowRoot.getElementById("plugin").innerHTML = "<jadex-"+p.name+"> pid='"+this.pid+"'></jadex-"+p.name+">";
 			
-			//console.log("tag and mount: "+p.name+" "+self.cid+" "+p.html);
-			riot.compile(p.html);
-			//riot.tag(p.name, p.html);
-			
-			var tags = riot.mount("div#plugin", p.name, {cid: self.cid});
 			curplugin = tags[0];
 			
-			self.update();
-		}
-		
-		axios.get('webjcc/getPluginFragments?cid='+self.cid, self.transform).then(function(resp)
+			this.requestUpdate();
+		});
+	}
+	
+	loadPlugins() {
+		var self = this;
+		axios.get('webjcc/getPluginFragments?cid='+this.cid, this.transform).then(function(resp)
 		{
 			//console.log("received: "+resp);	
 			
@@ -69,9 +86,6 @@ class PlatformElement extends LitElement {
 			console.log("err: "+err);	
 			//return this.PROMISE_DONE;
 		});
-		
-		this.requestUpdate();
-		//console.log(opts.paths);
 	}
 	
 	static get styles() {
@@ -106,7 +120,7 @@ class PlatformElement extends LitElement {
 			<nav id="plugins" class="navbar navbar-expand-sm navbar-light bg-light">
 				<ul class="navbar-nav mr-auto">
 					<li each="{p in plugins}" class="nav-item active">
-			    		<div class="nav-link" onclick="{parent.showPlugin}"><h2>{p.name.toUpperCase()}</h2></div>
+			    		<div class="nav-link" @click="${(e) => showPlugin(e)}"><h2>{p.name.toUpperCase()}</h2></div>
 			  		</li>
 				</ul>
 			</nav>
