@@ -60,7 +60,6 @@ build:
   rules:
     - if: '$BUILD!="false"'
       when: on_success
-    - when: manual
     
 ### Run sonarqube 
 quality:
@@ -71,7 +70,6 @@ quality:
   rules:
     - if: $QUALITY=="true" || $QUALITY!="false" && $CI_COMMIT_REF_SLUG=~$QUALITY_BRANCHES
       when: on_success
-    - when: manual
 
 test:
   stage: testandquality
@@ -98,7 +96,6 @@ test:
   rules:
     - if: $TEST!="false"
       when: on_success
-    - when: manual
  
 checkDists:
   stage: testandquality
@@ -106,8 +103,6 @@ checkDists:
     - ./gradlew -Pdist=publishdists -Production checkDists $GRADLE_EXTRA
   rules:
     - if: $CHECKDISTS=="true" || $CHECKDISTS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDISTS_BRANCHES
-      when: on_success
-    - when: manual
 
 publishCentral:
   stage: deployandpublish
@@ -116,7 +111,6 @@ publishCentral:
   rules:
     - if: $PUBLISHCENTRAL=="true" || $PUBLISHCENTRAL!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHCENTRAL_BRANCHES
       when: on_success
-    - when: manual
     
 publishActoron:
   stage: deployandpublish
@@ -125,7 +119,6 @@ publishActoron:
   rules:
     - if: $PUBLISHACTORON=="true" || $PUBLISHACTORON!="false" && $CI_COMMIT_REF_SLUG=~$PUBLISHACTORON_BRANCHES
       when: on_success
-    - when: manual
     
 deployZips:
   stage: deployandpublish
@@ -134,7 +127,6 @@ deployZips:
   rules:
     - if: $DEPLOYZIPS=="true" || $DEPLOYZIPS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYZIPS_BRANCHES
       when: on_success
-    - when: manual
 
 deployJavadocs:
   stage: deployandpublish
@@ -143,7 +135,6 @@ deployJavadocs:
   rules:
     - if: $DEPLOYJAVADOCS=="true" || $DEPLOYJAVADOCS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYJAVADOCS_BRANCHES
       when: on_success
-    - when: manual
 
 deploySchemas:
   stage: deployandpublish
@@ -152,7 +143,6 @@ deploySchemas:
   rules:
     - if: $DEPLOYSCHEMAS=="true" || $DEPLOYSCHEMAS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYSCHEMAS_BRANCHES
       when: on_success
-    - when: manual
 
 deploySchemadocs:
   stage: deployandpublish
@@ -161,7 +151,6 @@ deploySchemadocs:
   rules:
     - if: $DEPLOYSCHEMADOCS=="true" || $DEPLOYSCHEMADOCS!="false" && $CI_COMMIT_REF_SLUG=~$DEPLOYSCHEMADOCS_BRANCHES
       when: on_success
-    - when: manual
 
 # cleanuprepo:    
 #  stage: failure
@@ -188,7 +177,6 @@ tag:
   rules:
     - if: $TAG=="true" || $TAG!="false" && $CI_COMMIT_REF_SLUG=~$TAG_BRANCHES
       when: on_success
-    - when: manual
 
 # Rules for the whole workflow / pipeline
 workflow:
