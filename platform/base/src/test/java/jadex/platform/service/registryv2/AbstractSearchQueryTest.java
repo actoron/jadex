@@ -292,7 +292,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			marker	= Starter.createPlatform(clientconf).get();
 		}
 		IExternalAccess	agent	= marker.addComponent(global ? new GlobalMarkerAgent() : new NetworkMarkerAgent()).get();
-		platform.addQuery(new ServiceQuery<>(IMarkerService.class, global ? ServiceScope.GLOBAL : ServiceScope.NETWORK)).getNextIntermediateResult(Starter.getDefaultTimeout(platform.getId()), true);
+		platform.addQuery(new ServiceQuery<>(IMarkerService.class, global ? ServiceScope.GLOBAL : ServiceScope.NETWORK)).getNextIntermediateResult(Starter.getScaledDefaultTimeout(platform.getId(), 1/WAITFACTOR), true);
 		agent.killComponent().get();
 	}
 	
