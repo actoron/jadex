@@ -78,7 +78,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 		System.out.println("1) start client platform and add query");
 		IExternalAccess	client	= createPlatform(clientconf);
 		ISubscriptionIntermediateFuture<ITestService>	results	= client.addQuery(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL));
-		waitForRegistry(client, true);
+		waitALittle(client);
 		Assert.assertEquals(Collections.emptySet(), new LinkedHashSet<>(results.getIntermediateResults()));
 		
 		//-------- Tests with awareness fallback only (no SP) --------
@@ -295,7 +295,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			marker	= Starter.createPlatform(clientconf).get();
 		}
 		IExternalAccess	agent	= marker.addComponent(global ? new GlobalMarkerAgent() : new NetworkMarkerAgent()).get();
-		platform.addQuery(new ServiceQuery<>(IMarkerService.class, global ? ServiceScope.GLOBAL : ServiceScope.NETWORK)).getNextIntermediateResult(Starter.getDefaultTimeout(platform.getId()), true);
+		platform.addQuery(new ServiceQuery<>(IMarkerService.class, global ? ServiceScope.GLOBAL : ServiceScope.NETWORK)).getNextIntermediateResult();
 		agent.killComponent().get();
 	}
 	
