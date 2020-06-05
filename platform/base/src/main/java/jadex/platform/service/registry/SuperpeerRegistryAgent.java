@@ -113,10 +113,9 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			@Override
 			public void terminated(Exception reason)
 			{
-//				System.out.println(agent+": Super peer connection with client "+client+" for network "+networkname+" terminated due to "+reason);
+				System.out.println(agent+": Super peer connection with client "+client+" for network "+networkname+" terminated due to "+reason);
 				// TODO: when connection is lost, remove all services and queries from client.
 				// FIXME: Terminate on error/timeout?
-				System.out.println("Client removed: "+client+" "+networkname);
 				clients.remove(client);
 				clientqueries.remove(client);
 				serviceregistry.removeQueriesOfPlatform(client.getRoot());

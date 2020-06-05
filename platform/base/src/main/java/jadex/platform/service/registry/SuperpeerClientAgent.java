@@ -804,9 +804,16 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 				@Override
 				public void intermediateResultAvailable(ISuperpeerService sp)
 				{
+					if(!((IService)sp).getServiceId().getNetworkNames().contains(networkname))
+					{
+						System.out.println("Found wrong superpeer for network "+networkname+": "+((IService)sp).getServiceId());
+						return;
+					}
+					
 					if(running && superpeer==null)	// Hack!!! Bug in query deduplication -> receiving same ssp over and over !?
 					{
-//						System.out.println(agent+" query result: "+sq.getId()+", "+sp);
+						System.out.println("Found superpeer for network "+networkname+": "+((IService)sp).getServiceId());
+						System.out.println(agent+" query result: "+sq.getId()+", "+sp);
 						
 						adjustConnectionTimeout();
 						agent.getLogger().info(agent.getId()+" requesting super peer connection for network "+networkname+" from super peer: "+sp);
