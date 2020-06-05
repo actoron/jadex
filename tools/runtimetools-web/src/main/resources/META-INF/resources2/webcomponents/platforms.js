@@ -3,8 +3,32 @@ import { LitElement, html, css } from 'lit-element';
 class PlatformsElement extends LitElement {
 
 	reversed = false;
-	platforms = ["C", "B", "Z", "A"];
+	platforms = [];
 	serverdown = false;
+	
+	constructor() {
+		super();
+		
+		console.log("platforms");
+		
+		var self = this;
+		
+		jadex.getIntermediate('webjcc/subscribeToPlatforms',
+			function(resp)
+			{
+				console.log(resp.data.service);
+				self.updatePlatform(resp.data.service.name, resp.data.service.type);
+				//return this.PROMISE_DONE;
+			},
+			function(err)
+			{
+				console.log("Err: "+JSON.stringify(err));
+				self.serverdown = true;
+				self.requestUpdate();
+				//return this.PROMISE_DONE;
+			}
+		);
+	}
 	
 	/*static get styles() {
 	    return css`
@@ -30,7 +54,7 @@ class PlatformsElement extends LitElement {
 							<th>Protocol</th>-->
 						</tr>
 						
-						${this.platforms.map((p) => html`<td><a href="#/platform/${p}">${p}</a></td>`)}
+						${this.platforms.map((p) => html`<tr><td><a href="#/platform/${p}">${p}</a></td></tr>`)}
 					</tbody>
 				</table>
 			</div>
@@ -56,14 +80,14 @@ class PlatformsElement extends LitElement {
 	
 	updatePlatform(platform, rem)
 	{
-		//console.log("updatePlatform: "+platform+" "+rem);
+		console.log("updatePlatform: "+platform+" "+rem);
 		
 		var	found = false;
 		
 		var i;
-		for(i=0; i<self.platforms.length; i++)
+		for(i=0; i<this.platforms.length; i++)
 		{
-			found = self.platforms[i]===platform;
+			found = this.platforms[i]===platform;
 			if(found)
 			{
 				if(rem)
@@ -75,23 +99,9 @@ class PlatformsElement extends LitElement {
 		if(!found && !rem)
 			this.platforms.push(platform);
 		
-		//this.update();
+		this.requestUpdate();
 	}
 	
-	/*jadex.getIntermediate('webjcc/subscribeToPlatforms',
-		function(resp)
-		{
-			updatePlatform(resp.data.service.name, resp.data.service.type);
-			//return this.PROMISE_DONE;
-		},
-		function(err)
-		{
-			console.log("Err: "+JSON.stringify(err));
-			self.serverdown = true;
-			self.update();
-			//return this.PROMISE_DONE;
-		});
-	*/
 }
 
 customElements.define('jadex-platforms', PlatformsElement);
