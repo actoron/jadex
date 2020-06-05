@@ -91,7 +91,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	{
 		final IComponentIdentifier client = ServiceCall.getCurrentInvocation().getCaller();
 		clients.add(client);
-		System.out.println("Client added: "+client+" "+networkname);
+		agent.getLogger().info("Client added: "+client+" "+networkname);
 		
 		// Listener notification as step to improve test behavior (e.g. AbstractSearchQueryTest)
 		agent.scheduleStep(new IComponentStep<Void>()
@@ -113,7 +113,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			@Override
 			public void terminated(Exception reason)
 			{
-				System.out.println(agent+": Super peer connection with client "+client+" for network "+networkname+" terminated due to "+reason);
+				agent.getLogger().info(agent+": Super peer connection with client "+client+" for network "+networkname+" terminated due to "+reason);
 				// TODO: when connection is lost, remove all services and queries from client.
 				// FIXME: Terminate on error/timeout?
 				clients.remove(client);
@@ -145,7 +145,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 			@SuppressWarnings("unchecked")
 			public void execute(Object obj)
 			{
-				System.out.println("Superpeer registry received client event: "+obj);
+				agent.getLogger().info("Superpeer registry received client event: "+obj);
 				ServiceEvent<IServiceIdentifier> event = (ServiceEvent<IServiceIdentifier>) obj;
 				dispatchEventToRegistry(serviceregistry, event);
 			}
@@ -199,7 +199,7 @@ public class SuperpeerRegistryAgent implements ISuperpeerService, ISuperpeerColl
 	 */
 	public <T> ISubscriptionIntermediateFuture<T> addQuery(ServiceQuery<T> query)
 	{
-		System.out.println("addQuery: "+query);
+		agent.getLogger().info("addQuery: "+query);
 		
 		final IComponentIdentifier client = ServiceCall.getCurrentInvocation().getCaller();
 		final SubscriptionIntermediateFuture<T> ret = new SubscriptionIntermediateFuture<>();

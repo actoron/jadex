@@ -260,7 +260,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 	@OnInit
 	public IFuture<Void> start()
 	{
-		long ts = System.currentTimeMillis();
+//		long ts = System.currentTimeMillis();
 		if (handshaketimeout < 0)
 			handshaketimeout = (long) (Starter.getDefaultTimeout(agent.getId().getRoot()) * handshaketimeoutscale);
 		if (handshaketimeout <= 0)
@@ -691,7 +691,7 @@ public class SecurityAgent implements ISecurityService, IInternalService
 						HandshakeState hstate = initializingcryptosuites.get(rplat);
 						if(hstate == null)
 						{
-							System.out.println("Handshake state null, starting new handhake: "+agent+" "+rplat+" "+header);
+							agent.getLogger().info("Handshake state null, starting new handhake: "+agent+" "+rplat+" "+header);
 							//System.out.println(initializingcryptosuites+" "+System.identityHashCode(initializingcryptosuites));
 							initializeHandshake(rplat);
 							hstate = initializingcryptosuites.get(rplat);
