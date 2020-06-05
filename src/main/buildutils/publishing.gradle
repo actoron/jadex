@@ -1,34 +1,72 @@
 //apply plugin: 'maven-publish'
-
 apply plugin: 'signing'
-
 apply plugin: 'de.marcphilipp.nexus-publish'
 
-// Settings for staging when publishing to central repo
-if(project.hasProperty('repo') && "central".equals(repo)) {
-	project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
+// -------------------------------------
+// ---------- Repositories -------------
+// -------------------------------------
+
+if(project.hasProperty('repos'))
+{
+	for(String repo: repos.split(","))
+	{
+		// Parse credentials from environment
+        def repourl = getVar('repo' + repo, project)
+        def repoaccess = parseURLWithCredentials(repourl)
+    	//println 'publishing to: ' + repoaccess.url
+        //println 'repouser: ' + repoaccess.user
+ 	    //println 'repopassword: ' + repoaccess.password
+		            
 	
-	project.rootProject.afterEvaluate {
-	    nexusStaging {
-	        packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
-	        stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
-	        username = getVar("repouser", project)
-	        password = getVar("repopassword", project)
+		// Settings for staging when publishing to central repo
+		if("central".equals(repo))
+		{
+			project.rootProject.plugins.apply('io.codearte.nexus-staging') // auto-close nexus-oss staging
+			
+			project.rootProject.afterEvaluate {
+			    nexusStaging {
+			        packageGroup = "org.activecomponents" //optional if packageGroup == project.getGroup()
+			        stagingProfileId = "5bcba2b9075ec8" //when not defined will be got from server using "packageGroup"
+			        username = repoaccess.user
+			        password = repoaccess.password
+			    }	   
+			}
+			
+			nexusPublishing {
+				repositories {
+			    	sonatype() {
+			        	connectTimeout = Duration.ofMinutes(10)
+			        	clientTimeout = Duration.ofMinutes(10)
+			        	username = repoaccess.user
+			        	password = repoaccess.password
+			        }
+			    }
+			}
 	    }
-	   
-	}
-	
-	nexusPublishing {
-		repositories {
-	    	sonatype() {
-	        	connectTimeout = Duration.ofMinutes(10)
-	        	clientTimeout = Duration.ofMinutes(10)
-	        	username = getVar("repouser", project)
-	        	password = getVar("repopassword", project)
-	        }
-	    }
+	    
+		// Settings for non-staging publications like nexus.actoron.com
+		else
+		{
+			publishing
+			{
+		        repositories 
+		        {
+		            maven {
+		                url repoaccess.url
+		                credentials {
+		                    username repoaccess.user
+		                    password repoaccess.password
+		                }
+		            }
+		        }
+		    }
+		}
 	}
 }
+
+// -------------------------------------
+// ---------- POM contents -------------
+// -------------------------------------
 
 def common() {
 	return {
@@ -136,33 +174,6 @@ def configurePom(pom) {
 
 
 publishing {
-/*
-	println "can publish: "+canPublishToNexus
-	println "commercial: "+isCommercial(project)+" repo comm: "+repo_commercial+" repo noncomm:"+repo_noncommercial
-	println "can sign:"+canSign
-*/	
-	// Settings for non-staging publications like nexus.actoron.com
-	if(project.hasProperty('repo') && !"central".equals(repo))
-	{
-        repositories 
-        {
-            def myrepourl = getVar('repo' + repo + 'url', project)
-            def myrepouser = getVar('repo' + repo + 'user', project)
-            def myrepopassword = getVar('repo' + repo + 'password', project);
-            
-//            println "publishing to: "+myrepourl
-//            println "repouser: "+myrepouser
-//            println "repopassword: "+myrepopassword
-            
-            maven {
-                url myrepourl
-                credentials {
-                    username myrepouser
-                    password myrepopassword
-                }
-            }
-        }
-    }
 
     publications {
         if(canSign)

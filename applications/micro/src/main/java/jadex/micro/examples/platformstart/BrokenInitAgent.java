@@ -1,4 +1,4 @@
-package jadex.micro.testcases;
+package jadex.micro.examples.platformstart;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;

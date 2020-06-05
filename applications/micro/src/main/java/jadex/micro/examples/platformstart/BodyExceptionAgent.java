@@ -1,36 +1,36 @@
-package jadex.micro.testcases;
+package jadex.micro.examples.platformstart;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
 import jadex.base.Starter;
-import jadex.bridge.service.annotation.OnInit;
+import jadex.bridge.service.annotation.OnStart;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Description;
 
 /**
- *  Agent that produces an exception during init.
+ *  Test what happens if an exception is thrown in body.
  */
-@Description("Agent that produces an exception during init.")
 @Agent
-public class BrokenInitAgent 
+public class BodyExceptionAgent
 {
 	/**
-	 *  Init the agent.
+	 *  The agent body.
 	 */
-	@OnInit
-	public IFuture<Void> agentCreated()
+	@OnStart
+	public IFuture<Void> executeBody()
 	{
-		throw new RuntimeException("Exception in init.");
+//		System.out.println("execute ExceptionTest ...");
+		throw new RuntimeException("Exception in agent body");
+//		System.out.println("... finished");
 	}
-
+	
 	/**
 	 *  Start a platform and run the agent.
 	 */
 	public static void main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
-		config.addComponent(BrokenInitAgent.class);
+		config.addComponent(BodyExceptionAgent.class);
 		Starter.createPlatform(config, args).get();
 	}
 }

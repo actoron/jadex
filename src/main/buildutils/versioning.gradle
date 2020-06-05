@@ -8,12 +8,17 @@ Object fetchNextBuildNameFromGitTag()
 	file("${workspaceRootDir}/src/main/buildutils/jadexversion.properties").withInputStream { versionprops.load(it) }
 
 	def version = versionprops.jadexversion_major + "." + versionprops.jadexversion_minor
+	//println "version from props is: "+version+ ", " + versionprops
 	
+	// If we are rebuilding from unzipped distribution sources, get patch from properties.
+	if(versionprops.containsKey("jadexversion_patch") && versionprops.jadexversion_patch.isInteger())
+		return createBuildname(version, versionprops.jadexversion_patch, 1, false)
+
 	// If we are building in dev mode (i.e. Eclipse), just set patch to 9999 and exit.
 	if (!gradle.ext.productionmode)
-		return createBuildname(version, 9999, 1, false)
+		return createBuildname(version, '9999-SNAPSHOT', 1, false)
 		
-	def patch = getLatestPatchVersion(version);
+	def patch = getLatestPatchVersion(version, versionprops);
 	
 	//println "patch from git is: "+patch
 	
@@ -73,7 +78,7 @@ Object	createBuildname(version, patch, branchpatch, isnew)
 	buildname.patch = patch;
 	buildname.suffix = patch;
 	buildname.full = version + "." +buildname.suffix
-	buildname.isnew	= isnew;
+	buildname.isnew	= isnew;	// isnew -> no tag for this version exists, yet -> enable updateTag task 
 	return buildname;
 }
 
@@ -82,7 +87,7 @@ Object	createBuildname(version, patch, branchpatch, isnew)
  *  return the latest patch version.
  *  @return The found patch version or 0 if not found.
  */
-int getLatestPatchVersion(version)
+int getLatestPatchVersion(version, versionprops)
 {
 	def	patch = 0
 	//def status = sh (returnStatus: true,

@@ -58,15 +58,15 @@ def getProjectDepth(proj) {
 
 /**
  * Adds schema processing tasks for generating files to be uploaded
- * 1. Generate schemadocs using XSLT
+ * 1. Generate schemadoc using XSLT
  * 2. Copy and filter release XSDs to build dir, putting the current $jadex_build_version value in content and name
  * 3. Copy and filter dev XSDs to build dir, puting the '${jadex_build_version}' (literally) in the name
  */
 def addSchemaTasks(Project project) {
-    project.tasks.create('schemadocs').doLast {
+    project.tasks.create('schemadoc').doLast {
         ant.xslt(
                 basedir: "${project.projectDir}/src/main/schema/",
-                destdir: "${project.buildDir}/schemadocs/",
+                destdir: "${project.buildDir}/schemadoc/",
 //                extension: "-${project.version}.html",
                 extension: ".html",
                 force: "true",
@@ -74,8 +74,8 @@ def addSchemaTasks(Project project) {
                 includes: "*.xsd"
         )
     }
-	project.schemadocs.inputs.files(project.fileTree(dir: "src/main/schema/", include: '*.xsd'))
-	project.schemadocs.outputs.dir("${project.buildDir}/schemadocs/")
+	project.schemadoc.inputs.files(project.fileTree(dir: "src/main/schema/", include: '*.xsd'))
+	project.schemadoc.outputs.dir("${project.buildDir}/schemadoc/")
 	
     project.tasks.create('processSchemas').doLast {
 		// rename and filter files to x-3.0-SNAPSHOT
@@ -119,11 +119,9 @@ def addSchemaTasks(Project project) {
 	project.processDevSchemas.inputs.files(project.fileTree(dir: "src/main/schema/", include: '*.xsd'))
 	project.processDevSchemas.outputs.dir("${project.buildDir}/devschemas/")
 
-//    project.processSchemas.dependsOn += project.schemadocs 
-//    project.processResources.dependsOn += project.processSchemas
-    project.assemble.dependsOn += project.schemadocs	// ouputs only required for publishing
-    project.assemble.dependsOn += project.processSchemas	// ouputs only required for publishing
-    project.assemble.dependsOn += project.processDevSchemas	// ouputs only required for publishing
+    //project.assemble.dependsOn += project.schemadoc	// outputs only required for publishing
+    //project.assemble.dependsOn += project.processSchemas	// outputs only required for publishing
+    //project.assemble.dependsOn += project.processDevSchemas	// outputs only required for publishing
 }
 
 ext.classPathWarningsShownFor = [:]
@@ -353,6 +351,48 @@ def getDistsDir(proj) {
 	return new File(proj.buildDir, proj.distsDirName)
 }
 
+/**
+ * Parse a URI into its components.
+ * see, e.g., https://tools.ietf.org/html/draft-ietf-secsh-scp-sftp-ssh-uri-04
+ * Examples:
+ * https://myserver.com/path -> {host: "myserver.com", port: -1, user: "", password: "", fingerprint: "", url: "https://myserver.com/path"}
+ * https://a@myserver.com/path -> {host: "myserver.com", port: -1, user: "a", password: "", fingerprint: "", url: "https://myserver.com/path"}
+ * ssh://a:b;fingerprint=SHA256-ABC@myserver.com:22000  -> {host: "myserver.com", port: 22000, user: "a", password: "b", fingerprint: "SHA256:ABC", url: "ssh://myserver.com:22000"}
+ */
+def parseURLWithCredentials(urlstring) {
+	def ret = [:];
+	def uri	= new URI(urlstring)
+	ret.host = uri.host;
+	ret.port = uri.port
+    ret.user = ''
+    ret.password = ''
+    ret.fingerprint = ''
+    def String userinfo = uri.userInfo
+    if(userinfo!=null)
+    {
+		def String[] split = userinfo.split(":|;")
+		//println 'userinfo: ' + split
+        ret.user = split.length>0 ? split[0] : ''
+        ret.password = split.length>1 ? split[1] : ''
+        
+        for(int i=2; i<split.length; i++)
+        {
+        	if(split[i].startsWith('fingerprint='))
+        	{
+        		// Fingerprint info according to https://tools.ietf.org/html/draft-ietf-secsh-scp-sftp-ssh-uri-04
+        		ret.fingerprint	= split[i].substring('fingerprint='.length()).replace('-', ':')
+        		//println 'fingerprint: ' + ret.fingerprint
+        	}
+        }
+	}
+
+	// URL without extra info (e.g. no password for security reasons)
+	ret.url	= uri.scheme + '://' + uri.host + (uri.port!=-1 ? ':' + uri.port : '') + (uri.rawPath!=null ? uri.rawPath : '') + (uri.rawQuery!=null ? '?' + uri.rawQuery : '') + (uri.rawFragment!=null ? '#' + uri.rawFragment : '')
+	//println 'url: ' + ret.url
+		
+	return ret;
+}
+
 // make functions externally visible
 
 ext {
@@ -375,4 +415,5 @@ ext {
     diffZips = this.&diffZips
 	createRezipTask	= this.&createRezipTask
 	getDistsDir = this.&getDistsDir
+	parseURLWithCredentials = this.&parseURLWithCredentials
 }

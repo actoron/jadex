@@ -510,7 +510,7 @@ public class MessageComponentFeature extends AbstractComponentFeature implements
 					{
 						cnt++;
 						
-						System.out.println("Transport failed: "+cnt+"/"+transports.size()+" "+exception);
+//						System.out.println("Transport failed: "+cnt+"/"+transports.size()+" "+exception);
 						//exception.printStackTrace();
 					
 						if(cnt==transports.size())
