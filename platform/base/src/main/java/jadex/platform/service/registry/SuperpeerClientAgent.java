@@ -1247,6 +1247,17 @@ public class SuperpeerClientAgent implements ISearchQueryManagerService
 									// Just remove from lists and try again
 									futures.remove(fut);
 									Collection<String>	failed_networks	= networkspersuperpeer.remove(superpeer);
+									
+									// Check if manager still thinks it is connected
+									for(String networkname: failed_networks)
+									{
+										NetworkManager	manager	= connections.get(networkname);
+										if(manager!=null && superpeer.equals(manager.superpeer))
+										{
+											manager.startSuperpeerSearch();
+										}
+									}
+									
 									updateQuery(failed_networks.toArray(new String[failed_networks.size()]));
 								}
 							}
