@@ -585,15 +585,21 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 	{
 		try
 		{
-			platform.killComponent().get();
+			System.out.println("SUITE KILLING PLATFORM: "+getName());
+			platform.killComponent().get(Starter.getDefaultTimeout(platform.getId()), true);
+			System.out.println("SUITE KILLED PLATFORM: "+getName());
 		}
 		catch(Exception e)
 		{
+			System.out.println("SUITE FAILED KILLING PLATFORM: "+getName()+", "+e);
+			e.printStackTrace();
 			result.addError(this, e);
 		}
 		platform	= null;
 		
+		System.out.println("SUITE CLEARING AWT: "+getName());
 		clearAWT();
+		System.out.println("SUITE CLEARED AWT: "+getName());
 		
 		stopTimer();
 	}
