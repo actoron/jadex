@@ -225,7 +225,7 @@ workflow:
     # always run pipeline when pushing *pipeline* branches
     - if: $CI_COMMIT_REF_SLUG=~ /.*pipeline.*/
       when: always
-   - if: $CI_COMMIT_REF_SLUG=~ /.*heisenbug.*/
+    - if: $CI_COMMIT_REF_SLUG=~ /.*heisenbug.*/
       when: always
     # never run pipeline on other pushes
     - if: $CI_PIPELINE_SOURCE == 'push'
