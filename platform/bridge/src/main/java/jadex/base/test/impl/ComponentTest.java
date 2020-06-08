@@ -157,19 +157,21 @@ public class ComponentTest extends TestCase
 		{
 			t = new Timer(true);
 			
-//			System.out.println("Using test timeout: "+timeout+" "+System.currentTimeMillis()+" "+filename);
+			System.out.println("Using test timeout: "+timeout+" "+System.currentTimeMillis()+" "+filename);
 			
 			t.schedule(new TimerTask()
 			{
 				public void run()
 				{
-//					System.out.println("TIMEOUT: "+System.currentTimeMillis()+" "+filename);
+					System.out.println("TIMEOUT: "+System.currentTimeMillis()+" "+filename);
 
 					triggered[0] = true;
 					boolean	b = finished.setExceptionIfUndone(new TimeoutException(ComponentTest.this+" did not finish in "+timeout+" ms."));
 					if(b && cid[0]!=null && platform!=null)
 					{
+						System.out.println("KILLING: "+System.currentTimeMillis()+" "+filename);
 						platform.getExternalAccess(cid[0]).killComponent();
+						System.out.println("KILLED: "+System.currentTimeMillis()+" "+filename);
 					}
 				}
 			}, timeout);
@@ -252,6 +254,7 @@ public class ComponentTest extends TestCase
 		}
 		catch(TimeoutException te)
 		{
+			System.out.println("TESTCASE TIMEOUT: "+cid[0]);
 			te.printStackTrace();
 			// Hack!! Allow timeout exception for start tests when not from test execution, e.g. termination timeout in EndStateAbort.
 			if(triggered[0])
@@ -266,12 +269,17 @@ public class ComponentTest extends TestCase
 		
 		// cleanup platform?
 		if(conf!=null)
+		{
+			System.out.println("KILLING PLATFORM: "+System.currentTimeMillis()+" "+filename);
 			platform.killComponent().get(timeout, true);
+			System.out.println("KILLED PLATFORM: "+System.currentTimeMillis()+" "+filename);
+		}
 		
 		// Remove references to Jadex resources to aid GC cleanup.
 		suite = null;
 		
 		checkTestResults(res);	// Do last -> throws exception on failure.
+		System.out.println("FINISHED runBare(): "+System.currentTimeMillis()+" "+filename);
 	}
 
 	/**
@@ -305,18 +313,21 @@ public class ComponentTest extends TestCase
 			TestReport[]	reports	= tc.getReports();
 			if(tc.getTestCount()!=reports.length)
 			{
+				System.out.println("TESTCASE FAILURE RESULT: "+System.currentTimeMillis()+" "+filename+": "+"Number of testcases do not match. Expected "+tc.getTestCount()+" but was "+reports.length+".");
 				throw new AssertionFailedError("Number of testcases do not match. Expected "+tc.getTestCount()+" but was "+reports.length+".");			
 			}
 			for(int i=0; i<reports.length; i++)
 			{
 				if(!reports[i].isSucceeded())
 				{
+					System.out.println("TESTCASE FAILURE RESULT: "+System.currentTimeMillis()+" "+filename+": "+reports[i].getDescription()+" Failed with reason: "+reports[i].getReason());
 					throw new AssertionFailedError(reports[i].getDescription()+" Failed with reason: "+reports[i].getReason());
 				}
 			}
 		}
 		else
 		{
+			System.out.println("TESTCASE FAILURE RESULT: "+System.currentTimeMillis()+" "+filename+": "+"No test results provided by component: "+res);
 			throw new AssertionFailedError("No test results provided by component: "+res);
 		}
 	}
