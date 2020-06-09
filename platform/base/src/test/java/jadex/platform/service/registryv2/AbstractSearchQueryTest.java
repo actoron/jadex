@@ -248,7 +248,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			IExternalAccess	sp	= createPlatform(spconf);
 			waitForSuperpeerConnections(sp, client, pro2);
 			waitForRegistryWithProvider(client, pro2, false);
-//			waitLonger(client);	// Hack for timeout in CI Pipeline!?
+			waitALittle(client);	// Hack for timeout in CI Pipeline!?
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(client.toString()+": "+result, 1, result.size());
 			
