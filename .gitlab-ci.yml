@@ -39,6 +39,8 @@ variables:
 stages:
   - build
   - testandquality
+  - testandquality2
+  - testandquality3
   - deployandpublish
   - failure
   - success
@@ -126,6 +128,126 @@ test3:
   artifacts:
     when: on_failure
     expire_in: 66 week
+    paths:
+      - "build/testreport/"
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "heisenbug"
+      when: on_success
+      
+test1b:
+  stage: testandquality2
+  # start xvfb server for running GUI tests
+  services:
+    - name: misoca/xvfb
+      alias: xvfb
+  script:
+    # X libs not included in oppenjdk container, grrr...
+    - apt-get update -qq && apt-get install -y -qq libxrender1 libxtst6
+    - export DISPLAY=xvfb:1
+    - ./gradlew -Pdist=publishdists -Production --continue :applications:micro:test :platform:base:test test testReport $GRADLE_EXTRA
+  artifacts:
+    when: on_failure
+    expire_in: 66 weeks
+    paths:
+      - "build/testreport/"
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "heisenbug"
+      when: on_success
+ 
+test2b:
+  stage: testandquality2
+  # start xvfb server for running GUI tests
+  services:
+    - name: misoca/xvfb
+      alias: xvfb
+  script:
+    # X libs not included in oppenjdk container, grrr...
+    - apt-get update -qq && apt-get install -y -qq libxrender1 libxtst6
+    - export DISPLAY=xvfb:1
+    - ./gradlew -Pdist=publishdists -Production --continue :applications:micro:test :platform:base:test test testReport $GRADLE_EXTRA
+  artifacts:
+    when: on_failure
+    expire_in: 66 weeks
+    paths:
+      - "build/testreport/"
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "heisenbug"
+      when: on_success
+ 
+test3b:
+  stage: testandquality2
+  # start xvfb server for running GUI tests
+  services:
+    - name: misoca/xvfb
+      alias: xvfb
+  script:
+    # X libs not included in oppenjdk container, grrr...
+    - apt-get update -qq && apt-get install -y -qq libxrender1 libxtst6
+    - export DISPLAY=xvfb:1
+    - ./gradlew -Pdist=publishdists -Production --continue :applications:micro:test :platform:base:test test testReport $GRADLE_EXTRA
+  artifacts:
+    when: on_failure
+    expire_in: 66 weeks
+    paths:
+      - "build/testreport/"
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "heisenbug"
+      when: on_success
+
+test1c:
+  stage: testandquality3
+  # start xvfb server for running GUI tests
+  services:
+    - name: misoca/xvfb
+      alias: xvfb
+  script:
+    # X libs not included in oppenjdk container, grrr...
+    - apt-get update -qq && apt-get install -y -qq libxrender1 libxtst6
+    - export DISPLAY=xvfb:1
+    - ./gradlew -Pdist=publishdists -Production --continue :applications:micro:test :platform:base:test test testReport $GRADLE_EXTRA
+  artifacts:
+    when: on_failure
+    expire_in: 66 weeks
+    paths:
+      - "build/testreport/"
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "heisenbug"
+      when: on_success
+ 
+test2c:
+  stage: testandquality3
+  # start xvfb server for running GUI tests
+  services:
+    - name: misoca/xvfb
+      alias: xvfb
+  script:
+    # X libs not included in oppenjdk container, grrr...
+    - apt-get update -qq && apt-get install -y -qq libxrender1 libxtst6
+    - export DISPLAY=xvfb:1
+    - ./gradlew -Pdist=publishdists -Production --continue :applications:micro:test :platform:base:test test testReport $GRADLE_EXTRA
+  artifacts:
+    when: on_failure
+    expire_in: 66 weeks
+    paths:
+      - "build/testreport/"
+  rules:
+    - if: $CI_COMMIT_REF_SLUG == "heisenbug"
+      when: on_success
+ 
+test3c:
+  stage: testandquality3
+  # start xvfb server for running GUI tests
+  services:
+    - name: misoca/xvfb
+      alias: xvfb
+  script:
+    # X libs not included in oppenjdk container, grrr...
+    - apt-get update -qq && apt-get install -y -qq libxrender1 libxtst6
+    - export DISPLAY=xvfb:1
+    - ./gradlew -Pdist=publishdists -Production --continue :applications:micro:test :platform:base:test test testReport $GRADLE_EXTRA
+  artifacts:
+    when: on_failure
+    expire_in: 66 weeks
     paths:
       - "build/testreport/"
   rules:
