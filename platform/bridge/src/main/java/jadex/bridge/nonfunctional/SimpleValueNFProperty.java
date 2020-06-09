@@ -1,6 +1,7 @@
 package jadex.bridge.nonfunctional;
 
 import jadex.bridge.ClassInfo;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.component.IExecutionFeature;
 import jadex.bridge.sensor.unit.IConvertableUnit;
@@ -40,8 +41,12 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("Exception in nfproperty: "+mi.getName()+" "+exception);
-					//comp.getLogger().warning("Exception in nfproperty: "+mi.getName()+" "+exception);
+					if(!(exception instanceof ComponentTerminatedException)
+						|| !comp.getId().equals(((ComponentTerminatedException) exception).getComponentIdentifier()))
+					{
+						//System.out.println("Exception in nfproperty: "+mi.getName()+" "+exception);
+						comp.getLogger().warning("Exception in nfproperty: "+mi.getName()+" "+exception);
+					}
 				}
 				
 				protected void cont()
