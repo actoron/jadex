@@ -351,9 +351,12 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 						{
 							IResourceIdentifier rid = rids[projectIndex];
 
+							System.out.println("isLoadable: "+abspath);
 							if((SComponentFactory.isLoadable(platform, abspath, rid).get()).booleanValue())
 							{
+								System.out.println("isStartable: "+abspath);
 								boolean startable = SComponentFactory.isStartable(platform, abspath, rid).get().booleanValue();
+								System.out.println("loadModel: "+abspath);
 								IModelInfo model = SComponentFactory.loadModel(platform, abspath, rid).get();
 								boolean istest = false;
 								if(model != null && model.getReport() == null && startable)
