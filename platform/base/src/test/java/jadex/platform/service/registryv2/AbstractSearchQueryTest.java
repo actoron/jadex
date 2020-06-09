@@ -256,7 +256,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("6) start provider platform, search for service");
 			pro1	= createPlatform(proconf);
 			waitForSuperpeerConnections(sp, pro1);
-			waitForRegistryClient(client, false);
+			waitForRegistryWithProvider(client, pro1, false);
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(""+result, 2, result.size());
 			
