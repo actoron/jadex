@@ -97,6 +97,7 @@ public class SellerAgent implements IBuyBookService, INegotiationAgent
 	@OnEnd
 	public void shutdown()
 	{
+		agent.getLogger().info("shutdown() start");
 		if(gui!=null)
 		{
 			gui.addResultListener(thegui ->
@@ -104,6 +105,7 @@ public class SellerAgent implements IBuyBookService, INegotiationAgent
 				SwingUtilities.invokeLater(()->thegui.dispose());
 			});
 		}
+		agent.getLogger().info("shutdown() end");
 	}
 	
 	@Goal(recur=true, recurdelay=10000, unique=true)

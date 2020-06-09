@@ -535,8 +535,8 @@ public class PlatformComponent implements IPlatformComponentAccess //, IInternal
 				getLogger().warning("Exception during component cleanup of "+getId()+": "+fut.getException());
 				getLogger().info(sw.toString());
 			}
-//			if(getId().getName().toLowerCase().indexOf("super")!=-1)
-//				System.out.println("feature shutdown start: "+getId()+" "+features);
+			if(getId().getName().toLowerCase().indexOf("seller")!=-1)
+				System.out.println("feature shutdown start: "+getId()+" "+features);
 			
 			fut	= features.get(features.size()-1).shutdown();
 			sync = fut.isDone();
