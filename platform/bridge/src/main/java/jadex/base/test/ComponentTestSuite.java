@@ -318,7 +318,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 
 		// disable Future debugging during testcase scan for performance reasons.
 		boolean originalDebug = Future.DEBUG;
-		Future.DEBUG = false;
+		Future.DEBUG = true;
 		for(int projectIndex = 0; projectIndex < roots.length; projectIndex++)
 		{
 			File[] project = roots[projectIndex];
@@ -397,7 +397,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 										ComponentStartTest test = new ComponentStartTest(platform, model, this);
 										test.setName(abspath);
 										addTest(test);
-										if(ctimeout == Timeout.NONE)
+										if(ctimeout == Timeout.NONE || test.getTimeout() == Timeout.NONE)
 										{
 											ctimeout = Timeout.NONE;
 										}
