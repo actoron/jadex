@@ -238,8 +238,10 @@ public class ChatService implements IChatService, IChatGuiService
 			{
 				public void resultAvailable(ISettingsService settings)
 				{
-					if(!(agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
-						|| !((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue())
+					// Settings can null during shutdown!? Dependency ordering issue? See https://git.actoron.com/jadex/jadex/-/issues/9
+					if(settings!=null &&
+						(!(agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave") instanceof Boolean)
+						|| !((Boolean)agent.getFeature(IArgumentsResultsFeature.class).getArguments().get("nosave")).booleanValue()))
 					{
 						settings.deregisterPropertiesProvider(getSubname())
 							.addResultListener(new DelegationResultListener<Void>(ret)
