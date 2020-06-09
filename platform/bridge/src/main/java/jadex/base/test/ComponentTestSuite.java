@@ -351,12 +351,12 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 						{
 							IResourceIdentifier rid = rids[projectIndex];
 
-							System.out.println("isLoadable: "+abspath);
+							System.out.println("isLoadable: "+abspath+", "+System.currentTimeMillis());
 							if((SComponentFactory.isLoadable(platform, abspath, rid).get()).booleanValue())
 							{
-								System.out.println("isStartable: "+abspath);
+								System.out.println("isStartable: "+abspath+", "+System.currentTimeMillis());
 								boolean startable = SComponentFactory.isStartable(platform, abspath, rid).get().booleanValue();
-								System.out.println("loadModel: "+abspath);
+								System.out.println("loadModel: "+abspath+", "+System.currentTimeMillis());
 								IModelInfo model = SComponentFactory.loadModel(platform, abspath, rid).get();
 								boolean istest = false;
 								if(model != null && model.getReport() == null && startable)
@@ -423,6 +423,7 @@ public class ComponentTestSuite extends TestSuite implements IAbortableTestSuite
 						{
 							if(e instanceof TimeoutException)
 							{
+								System.out.println("Timeout: "+abspath+", "+System.currentTimeMillis());
 								throw e;
 							}
 							
