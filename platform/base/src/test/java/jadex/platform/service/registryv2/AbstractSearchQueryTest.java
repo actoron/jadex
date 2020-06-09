@@ -264,6 +264,7 @@ public abstract class AbstractSearchQueryTest	extends AbstractInfrastructureTest
 			System.out.println("7) kill one provider platform, search for service");
 			removePlatform(pro1);
 			waitForRegistryClient(client, false);
+			waitALittle(client);	// Hack for timeout in CI Pipeline!?
 			result	= client.searchServices(new ServiceQuery<>(ITestService.class, ServiceScope.GLOBAL)).get();
 			Assert.assertEquals(""+result, 1, result.size());
 	
