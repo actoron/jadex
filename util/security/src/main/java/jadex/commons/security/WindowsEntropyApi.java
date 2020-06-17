@@ -34,7 +34,12 @@ public class WindowsEntropyApi
 		try
 		{
 			ULONGByReference hProv = new WinDef.ULONGByReference();
-			if (CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 0))
+			boolean acquired = CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 0);
+			if (!acquired)
+			{
+				acquired = CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 8);
+			}
+			if (acquired)
 			{
 				Memory buf = new Memory(numbytes);
 				if (CryptGenRandom(hProv.getValue(), numbytes, buf))
