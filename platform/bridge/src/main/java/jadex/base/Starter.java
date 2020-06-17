@@ -392,7 +392,7 @@ public class Starter
 //		if(!Boolean.TRUE.equals(config.getValues().get("bisimulation")))
 //			System.out.println("no bisim");
 		
-		config.setReadOnly(true);
+//		config.setReadOnly(true);	// What the..?
 		
 		if(config.getExtendedPlatformConfiguration().isDropPrivileges())
 			VmHacks.get().tryChangeUser(null);
