@@ -2,6 +2,7 @@ package jadex.commons.security;
 
 import com.sun.jna.Function;
 import com.sun.jna.Memory;
+import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
@@ -79,6 +80,11 @@ public class WindowsEntropyApi
 	private static boolean CryptGenRandom(ULONG hProv, int dwLen, Pointer pbBuffer)
 	{
 		Function f = NativeLibrary.getInstance(WIN_LIB_NAME).getFunction("CryptGenRandom");
-		return f.invokeInt(new Object[] { hProv, dwLen, pbBuffer }) != 0;
+		boolean ret = f.invokeInt(new Object[] { hProv, dwLen, pbBuffer }) != 0;
+		if (!ret)
+		{
+			System.out.println("Last Native Error: " + Native.getLastError());
+		}
+		return ret;
 	}
 }
