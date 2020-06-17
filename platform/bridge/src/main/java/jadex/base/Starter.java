@@ -347,7 +347,7 @@ public class Starter
 	 *  @param config The PlatformConfiguration object.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture<IExternalAccess> createPlatform(final IPlatformConfiguration pconfig, final String[] args)
+	public static IFuture<IExternalAccess> createPlatform(IPlatformConfiguration pconfig, String... args)
 	{
 		return createPlatform(pconfig, parseArgs(args));
 	}
