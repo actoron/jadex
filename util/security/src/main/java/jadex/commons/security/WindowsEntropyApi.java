@@ -35,7 +35,7 @@ public class WindowsEntropyApi
 		try
 		{
 			ULONGByReference hProv = new WinDef.ULONGByReference();
-			System.out.println("Pointer1: " + hProv.getValue().longValue());
+//			System.out.println("Pointer1: " + hProv.getValue().longValue());
 			ULONGByReference hNKProv = new WinDef.ULONGByReference();
 			boolean acquired = CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 0);
 			boolean nkacquired = false;
@@ -46,7 +46,7 @@ public class WindowsEntropyApi
 			}
 			if (acquired)
 			{
-				System.out.println("Pointer2: " + hProv.getValue().longValue());
+//				System.out.println("Pointer2: " + hProv.getValue().longValue());
 				Memory buf = new Memory(numbytes);
 				if (CryptGenRandom(hProv.getValue(), numbytes, buf))
 				{
@@ -83,10 +83,10 @@ public class WindowsEntropyApi
 	{
 		Function f = NativeLibrary.getInstance(WIN_LIB_NAME).getFunction("CryptGenRandom");
 		boolean ret = f.invokeInt(new Object[] { hProv, dwLen, pbBuffer }) != 0;
-		if (!ret)
-		{
-			System.out.println("Last Native Error: " + Native.getLastError());
-		}
+//		if (!ret)
+//		{
+//			System.out.println("Last Native Error: " + Native.getLastError());
+//		}
 		return ret;
 	}
 }
