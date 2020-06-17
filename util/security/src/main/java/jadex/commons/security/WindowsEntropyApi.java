@@ -34,10 +34,13 @@ public class WindowsEntropyApi
 		try
 		{
 			ULONGByReference hProv = new WinDef.ULONGByReference();
+			ULONGByReference hNKProv = new WinDef.ULONGByReference();
 			boolean acquired = CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 0);
+			boolean nkacquired = false;
 			if (!acquired)
 			{
-				acquired = CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 8);
+				nkacquired = CryptAcquireContextW(hNKProv.getPointer(), null, null, PROV_RSA_FULL, 8);
+				acquired = CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 0);
 			}
 			if (acquired)
 			{
@@ -45,6 +48,8 @@ public class WindowsEntropyApi
 				if (CryptGenRandom(hProv.getValue(), numbytes, buf))
 				{
 					CryptReleaseContext(hProv.getValue(), 0);
+					if (nkacquired)
+						CryptReleaseContext(hNKProv.getValue(), 0);
 					ret = buf.getByteArray(0, numbytes);
 				}
 			}
