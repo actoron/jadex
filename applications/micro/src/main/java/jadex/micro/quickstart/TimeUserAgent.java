@@ -1,7 +1,6 @@
 package jadex.micro.quickstart;
 
 import java.text.DateFormat;
-import java.util.logging.Level;
 
 import jadex.base.IPlatformConfiguration;
 import jadex.base.PlatformConfigurationHandler;
@@ -22,7 +21,6 @@ public class TimeUserAgent
 	/**
 	 *  Subscribe to any newly found time service and print the results when they arrive.
 	 */
-	//@AgentServiceQuery(scope=ServiceScope.GLOBAL)
 	@OnService(requiredservice = @RequiredService(scope = ServiceScope.GLOBAL))
 	public void	addTimeService(ITimeService timeservice)
 	{
@@ -50,9 +48,7 @@ public class TimeUserAgent
 	public static void main(String[] args)
 	{
 		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
-		config.setPlatformName("timeuser_*");
 		config.addComponent(TimeUserAgent.class);
-		config.setLoggingLevel(Level.WARNING);
 		Starter.createPlatform(config, args).get();
 	}
 }

@@ -10,10 +10,10 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  Simple service to publish the local system time.
- *  As the service does not change the local system
- *  and provides no sensitive information, no security
- *  restrictions are required. 
  */
+// UNRESTRICTED services are allowed to be called by any(!) other Jadex platform worldwide,
+// even without any shared secret (i.e. no known platform or network password)
+// Our service implementation does not change the local system and provides no sensitive information, so we think UNRESTRICTED is ok.
 @Security(roles=Security.UNRESTRICTED)
 @Service
 public interface ITimeService
@@ -21,7 +21,6 @@ public interface ITimeService
 	/**
 	 *  Get the location of the platform, where the time service runs.
 	 */
-// TODO: support for cached methods, yes or no? -> otherwise forbid or support sync?
 	public IFuture<String>	getLocation();
 	
 	/**
