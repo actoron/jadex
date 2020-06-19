@@ -51,3 +51,6 @@ In Jadex, by default only trusted platform may invoke services of each other, th
 There are several possible paths for further exploring the features of Jadex. For practical experiences, you can continue by looking at examples provided in the *jadex-application-xyz* jars. These can be started after adding the jar to the JCC starter panel. Some examples are also available online as [webstart applications](https://www.activecomponents.org/index.html#docs/examples) or as [web applications](http://www.activecomponents.org/jadex-applications-web/).
 
 If you prefer more reading, the [documentation overview page](https://www.activecomponents.org/index.html#/docs/overview) guides you to the available documentation. In case you would like more hands-on exercises, you can choose from a set of tutorials, which are specifically designed to introduce a specific Jadex component type.
+
+---
+[[Back: 04 Time Provider](04%20Time%20Provider.md) | [Up: Document Overview](../../index.md)]
