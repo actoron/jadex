@@ -61,7 +61,8 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public String getPluginUIPath()
 	{
-		return "jadex/tools/web/starter/starter.tag";
+		//return "jadex/tools/web/starter/starter.tag";
+		return "jadex/tools/web/starter/starter.js";
 	}
 	
 	/**
@@ -115,7 +116,10 @@ public class JCCStarterPluginAgent extends JCCPluginAgent implements IJCCStarter
 	 */
 	public IFuture<IModelInfo> loadComponentModel(String filename, IComponentIdentifier cid)
 	{
-		return SComponentFactory.loadModel(cid!=null? agent.getExternalAccess(cid): agent, filename, null);
+		IFuture<IModelInfo> ret =  SComponentFactory.loadModel(cid!=null? agent.getExternalAccess(cid): agent, filename, null);
+		IModelInfo m = ret.get();
+		System.out.println("Loading: "+filename+" "+m);
+		return ret;
 	}
 	
 	/**

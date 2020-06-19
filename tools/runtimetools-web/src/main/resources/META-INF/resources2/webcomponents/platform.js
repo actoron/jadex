@@ -24,11 +24,6 @@ class PlatformElement extends LitElement {
 		this.cid = null;
 		
 		this.plugins = [];
-		
-		this.curplugin = null;
-		
-		this.requestUpdate();
-		//console.log(opts.paths);
 	}
 	
 	showPlugin(event)
@@ -44,15 +39,11 @@ class PlatformElement extends LitElement {
 	
 	showPlugin2(p)
 	{
-		console.log("tag: "+p.name+" "+this.cid+" "+p.html);
+		console.log("plugin: "+p.name+" "+this.cid);
 		
-		loader.loadFiles([], [p.html], () => {
-			this.shadowRoot.getElementById("plugin").innerHTML = "<jadex-"+p.name+"> pid='"+this.pid+"'></jadex-"+p.name+">";
-			
-			curplugin = tags[0];
-			
-			this.requestUpdate();
-		});
+		var html = "<jadex-"+p.name+" cid='"+this.cid+"'></jadex-"+p.name+">";
+		this.shadowRoot.getElementById("plugin").innerHTML = html;
+		this.requestUpdate();
 	}
 	
 	loadPlugins() {
@@ -72,6 +63,17 @@ class PlatformElement extends LitElement {
 			    self.plugins[i] = {name: tagname, html: taghtml};
 			    
 			    i++;
+			    
+			    //var script = document.createElement('script');
+	            //script.type = 'text/javascript';
+	            //script.src = files[i];
+	            
+			    if(i==1)
+			    {
+			    	var script = "<script type='module'>"+taghtml+"</script>";
+			    	//document.getElementsByTagName("head")[0].append(script);
+			    	$('head').append(script);
+			    }
 			});
 						
 			if(i>0)
@@ -79,7 +81,7 @@ class PlatformElement extends LitElement {
 			else
 				self.requestUpdate();
 			
-			return this.PROMISE_DONE;
+			//return PROMISE_DONE;
 			
 		}).catch(function(err) 
 		{
@@ -115,13 +117,15 @@ class PlatformElement extends LitElement {
 	
 	render() {
 		return html`
-			<h1>Platform {cid}</h1>
+			<h1>Platform ${this.cid}</h1>
 
 			<nav id="plugins" class="navbar navbar-expand-sm navbar-light bg-light">
 				<ul class="navbar-nav mr-auto">
-					<li each="{p in plugins}" class="nav-item active">
-			    		<div class="nav-link" @click="${(e) => showPlugin(e)}"><h2>{p.name.toUpperCase()}</h2></div>
-			  		</li>
+					${this.plugins.map((p) => html`
+					<li class="nav-item active">
+						<div class="nav-link" @click="${(e) => showPlugin(e)}"><h2>${p.name.toUpperCase()}</h2></div>
+					</li>
+					`)}
 				</ul>
 			</nav>
 			

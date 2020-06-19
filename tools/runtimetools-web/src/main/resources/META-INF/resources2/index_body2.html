@@ -30,7 +30,7 @@
 	};
 	
 	// not using var to set a global variable
-	PROMISE_DOME = Promise.resolve("Dummy response to keep the console quiet");
+	var PROMISE_DOME = Promise.resolve("Dummy response to keep the console quiet");
 	
 	var language = {
 		lang: "en",
@@ -315,12 +315,12 @@
 	            
 	            link.onload = function ()
 	            {
-	            	//console.log('Loaded style: ' + files[i]);
+	            	console.log('Loaded style: ' + files[i]);
 	            	self.loadStyle(i+1, files, callback);
 	            };
 	            link.onerror = function ()
 	            {
-	                //console.log('Error loading style: ' + files[i]);
+	                console.log('Error loading style: ' + files[i]);
 	                self.loadStyle(i+1, files, callback);
 	            };
 	            
@@ -345,23 +345,47 @@
         	{
         		this.loaded[files[i]] = files[i];
         		
-	            var script = document.createElement('script');
-	            script.type = 'text/javascript';
-	            script.src = files[i];
-	            
-	            script.onload = function ()
-	            {
-	                //console.log('Loaded script: ' + files[i]);
-	                self.loadScript(i+1, files, callback);
-	            };
-	            script.onerror = function ()
-	            {
-	                //console.log('Error loading script: ' + files[i]);
-	                self.loadScript(i+1, files, callback);
-	            };
+				console.log("loading script content start: "+files[i]);
+        		axios.get(files[i]).then(function(resp)
+    			{
+    				console.log("loaded script content end: "+files[i]);//+" "+resp.data);
+    				
+    				// directly loading via a script src attributes has the
+    				// disadvantage that the type is checked from the response
+    				// throwing check errors :-(
+    						
+    				var js = resp.data;    				
+    	            var script = document.createElement('script');
+    	            script.type = "module";
+    	            script.textContent = js;
+    				
+    				/*script.onload = function ()
+		            {
+		                console.log('Loaded script fini: ' + files[i]);
+		                self.loadScript(i+1, files, callback);
+		            };
+		            script.onerror = function ()
+		            {
+		                console.log('Error loading script: ' + files[i]);
+		                self.loadScript(i+1, files, callback);
+		            };*/
+    				
+		            self.getHead().append(script);
+			    	self.loadScript(i+1, files, callback);
+    			})
+    			.catch(function(err)
+    			{
+    				console.log("Error loading script: "+files[i]);
+    				self.loadScript(i+1, files, callback);
+    			})
+    				
+	            //var script = document.createElement('script');
+	            //script.type = 'text/javascript';
+	            //script.type = 'module';
+	            //script.src = files[i];
 	            
 	            //console.log('Loading script ' + files[i]);
-	            self.getHead().appendChild(script);
+	            //self.getHead().appendChild(script);
         	}
         },
         loadFiles: function(cssfiles, jsfiles, callback)
@@ -376,6 +400,14 @@
         },
 	};
 	
+	/*var litloader = 
+	{
+		loaded: {},
+	    loadLitElement: function()
+	    {
+	    	
+	    }
+	};*/	
 	/*var language = "en";
 	var switchLanguage = function() 
 	{
