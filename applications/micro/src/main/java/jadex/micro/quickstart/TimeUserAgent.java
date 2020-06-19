@@ -18,38 +18,30 @@ import jadex.micro.annotation.RequiredService;
 @Agent
 public class TimeUserAgent
 {
-	/**
-	 *  Subscribe to any newly found time service and print the results when they arrive.
-	 */
-	@OnService(requiredservice = @RequiredService(scope = ServiceScope.GLOBAL))
-	public void	addTimeService(ITimeService timeservice)
-	{
-		try
-		{
-			String	location	= timeservice.getLocation().get();
-			DateFormat	format	= DateFormat.getDateTimeInstance();
-			ISubscriptionIntermediateFuture<String>	subscription = timeservice.subscribe(format);
-			while(subscription.hasNextIntermediateResult())
-			{
-				String time = subscription.getNextIntermediateResult();
-				String platform	= ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
-				System.out.println("New time received from "+platform+" in "+location+": "+time);
-			}
-		}
-		catch(RuntimeException exception)
-		{
-			System.out.println("Disconnected from "+timeservice+" due to "+exception);			
-		}
-	}
-	
-	/**
-	 *  Start a Jadex platform and the TimeUserAgent.
-	 */
-	public static void main(String[] args)
-	{
-		IPlatformConfiguration	config	= PlatformConfigurationHandler.getMinimalComm();
-		config.addComponent(TimeUserAgent.class);
-		Starter.createPlatform(config, args).get();
-	}
-}
+    /**
+     *  Subscribe to any newly found time service and print the results when they arrive.
+     */
+    @OnService(requiredservice = @RequiredService(scope = ServiceScope.GLOBAL))
+    public void    addTimeService(ITimeService timeservice)
+    {
+        String location = timeservice.getLocation().get();
+        DateFormat format = DateFormat.getDateTimeInstance();
+        ISubscriptionIntermediateFuture<String> subscription = timeservice.subscribe(format);
+        while(subscription.hasNextIntermediateResult())
+        {
+            String time = subscription.getNextIntermediateResult();
+            String platform = ((IService)timeservice).getServiceId().getProviderId().getPlatformName();
+            System.out.println("New time received from "+platform+" in "+location+": "+time);
+        }
+    }
 
+    /**
+     *  Start a Jadex platform and the TimeUserAgent.
+     */
+    public static void main(String[] args)
+    {
+        IPlatformConfiguration config = PlatformConfigurationHandler.getMinimalComm();
+        config.addComponent(TimeUserAgent.class);
+        Starter.createPlatform(config, args).get();
+    }
+}

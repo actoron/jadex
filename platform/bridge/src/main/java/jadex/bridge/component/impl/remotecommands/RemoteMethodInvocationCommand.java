@@ -334,6 +334,6 @@ public class RemoteMethodInvocationCommand<T>	extends AbstractInternalRemoteComm
 	 */
 	public String	toString()
 	{
-		return "RemoteMethodInvocationCommand("+method.getClassName()+"."+method.getName()+SUtil.arrayToString(args)+")";
+		return "RemoteMethodInvocationCommand("+method.getClassName()+"."+method.getName()+(args!=null?SUtil.arrayToString(args):"[]")+")";
 	}
 }
