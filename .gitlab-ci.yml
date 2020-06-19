@@ -111,7 +111,7 @@ checkDocs:
   script:
     - ./gradlew -Pdist=publishdists -Production checkDocs $GRADLE_EXTRA
   artifacts:
-    when: always
+    when: on_failure
     expire_in: 1 week
     paths:
       - "*/build/reports/markdownlint/"
