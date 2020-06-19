@@ -69,8 +69,8 @@ quality:
     - ./gradlew -Production sonarqube -x test $GRADLE_EXTRA
   allow_failure: true
   rules:
-    - if: $QUALITY=="true" || $QUALITY!="false" && $CI_COMMIT_REF_SLUG=~$QUALITY_BRANCHES
-      when: on_success
+    #- if: $QUALITY=="true" || $QUALITY!="false" && $CI_COMMIT_REF_SLUG=~$QUALITY_BRANCHES
+    - when: manual
 
 test:
   stage: testandquality
