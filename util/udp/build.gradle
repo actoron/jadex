@@ -21,7 +21,7 @@ dependencies {
 
 jar
 {
-	baseName = project.name
+	archiveBaseName = project.name
 	from
     {
         configurations.include.collect

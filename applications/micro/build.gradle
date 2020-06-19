@@ -28,7 +28,7 @@ dependencies
 	api project(':platform:bridge')
 	api project(':tools:base-swing')
 	api project(':kernels:micro')
-	runtime project(':kernels:component') // Todo: move component tests in own project. -<scope>runtime</scope>
+	runtimeOnly project(':kernels:component') // Todo: move component tests in own project. -<scope>runtime</scope>
 	api project(':kernels:application')
 	api project(':environments:envsupport')
 	testImplementation project(':platform:base')

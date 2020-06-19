@@ -168,10 +168,10 @@ allprojects
 	    {
 			mavenLocal()
 	    	mavenCentral()
-	        maven
-			{
-				url "http://nexus.actoron.com/content/repositories/oss-nightlies/"
-			}
+//	        maven
+//			{
+//				url "http://nexus.actoron.com/content/repositories/oss-nightlies/"
+//			}
 			maven
 			{
 				url "https://maven.google.com"
@@ -255,9 +255,9 @@ subprojects
 			artifacts {
 				archives jar
 			}
-			war.baseName = getArtifactName(project)
+			war.archiveBaseName = getArtifactName(project)
 		}
-		jar.baseName = getArtifactName(project)
+		jar.archiveBaseName = getArtifactName(project)
 //			test {
 //				reports.html.enabled = false
 //			}

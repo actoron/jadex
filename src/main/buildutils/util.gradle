@@ -210,7 +210,7 @@ def getDetachedConfiguration(Project p, Configuration c) {
  */
 def addJavaDocJarTask(Project p) {
         def javadocJar = p.tasks.create('javadocJar', Jar) {
-        	baseName = getArtifactName(p)
+        	archiveBaseName = getArtifactName(p)
             classifier = 'javadoc'
             from p.javadoc
         }
@@ -225,7 +225,7 @@ def addJavaDocJarTask(Project p) {
  */
 def addSourcesJarTask(Project p) {
         def sourcesJar = p.tasks.create('sourcesJar', Jar) {
-        	baseName = getArtifactName(p)
+        	archiveBaseName = getArtifactName(p)
             classifier = 'sources'
             from p.sourceSets.main.allSource
         }
