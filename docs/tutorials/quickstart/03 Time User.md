@@ -79,3 +79,6 @@ In the `addTimeService()`, the agent subscribes to each found time service and r
 [//]: # (*todo: describe IService and service identifier?*)
 
 [//]: # (*todo: describe main method details?*)
+
+---
+[[Back: 02 Time Service Interface](02%20Time%20Service%20Interface.md) | [Next: 04 Time Provider](04%20Time%20Provider.md)]
