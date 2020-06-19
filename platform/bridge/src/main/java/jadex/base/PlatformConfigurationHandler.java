@@ -25,7 +25,7 @@ import jadex.javaparser.SJavaParser;
  */
 public class PlatformConfigurationHandler implements InvocationHandler
 {
-	/** Readonly flag. */
+	/** Readonly flag means that the config has been used to start a platform and is now immutable. */
 	protected boolean readonly;
 	
 	/** The map of values. */
@@ -339,7 +339,15 @@ public class PlatformConfigurationHandler implements InvocationHandler
 		if(readonly)
 			throw new RuntimeException("Config is readonly");
 	}
-	
+
+	/**
+	 *  Check the readonly state.
+	 */
+	protected static void makeImmutable(IPlatformConfiguration config)
+	{
+		((PlatformConfigurationHandler)ProxyFactory.getInvocationHandler(config)).readonly	= true;
+	}	
+
 	/**
 	 *  Get the key for a method name.
 	 *  @param mname The method name.

@@ -86,7 +86,7 @@ public interface IFuture<E>
 	 *  @param realtime Flag, if wait should be realtime (in constrast to simulation time).
 	 *  @return The future result.
 	 */
-	public E get(long timeout, boolean realtimr);
+	public E get(long timeout, boolean realtime);
 
 	/**
 	 *  @deprecated - From 3.0. Use the version without suspendable.

@@ -31,7 +31,7 @@ public class PlatformSettings implements IPlatformSettings
 	public PlatformSettings(IComponentIdentifier id, boolean readonly)
 	{
 		this.readonly = readonly;
-		settingsdir = new File(SUtil.getAppDir(), "settings_" + id.getRoot().getPlatformPrefix());
+		settingsdir = getSettingsDir(id);
 		if (settingsdir.exists() && !settingsdir.isDirectory())
 		{
 			//access.getLogger().log(Level.WARNING, "Invalid settings directory '" + settingsdir.getName() + "', switching to read-only.");
@@ -41,6 +41,14 @@ public class PlatformSettings implements IPlatformSettings
 		{
 			readonly = readonly || !settingsdir.mkdir();
 		}
+	}
+
+	/**
+	 *  Get the settings directory for a platform.
+	 */
+	public static File getSettingsDir(IComponentIdentifier id)
+	{
+		return new File(SUtil.getAppDir(), "settings_" + id.getRoot().getPlatformPrefix());
 	}
 	
 	/**

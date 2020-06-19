@@ -2,6 +2,7 @@ package jadex.commons.security;
 
 import com.sun.jna.Function;
 import com.sun.jna.Memory;
+import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
@@ -34,12 +35,24 @@ public class WindowsEntropyApi
 		try
 		{
 			ULONGByReference hProv = new WinDef.ULONGByReference();
-			if (CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 0))
+//			System.out.println("Pointer1: " + hProv.getValue().longValue());
+			ULONGByReference hNKProv = new WinDef.ULONGByReference();
+			boolean acquired = CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 0);
+			boolean nkacquired = false;
+			if (!acquired)
 			{
+				nkacquired = CryptAcquireContextW(hNKProv.getPointer(), null, null, PROV_RSA_FULL, 8);
+				acquired = CryptAcquireContextW(hProv.getPointer(), null, null, PROV_RSA_FULL, 0);
+			}
+			if (acquired)
+			{
+//				System.out.println("Pointer2: " + hProv.getValue().longValue());
 				Memory buf = new Memory(numbytes);
 				if (CryptGenRandom(hProv.getValue(), numbytes, buf))
 				{
 					CryptReleaseContext(hProv.getValue(), 0);
+					if (nkacquired)
+						CryptReleaseContext(hNKProv.getValue(), 0);
 					ret = buf.getByteArray(0, numbytes);
 				}
 			}
@@ -69,6 +82,11 @@ public class WindowsEntropyApi
 	private static boolean CryptGenRandom(ULONG hProv, int dwLen, Pointer pbBuffer)
 	{
 		Function f = NativeLibrary.getInstance(WIN_LIB_NAME).getFunction("CryptGenRandom");
-		return f.invokeInt(new Object[] { hProv, dwLen, pbBuffer }) != 0;
+		boolean ret = f.invokeInt(new Object[] { hProv, dwLen, pbBuffer }) != 0;
+//		if (!ret)
+//		{
+//			System.out.println("Last Native Error: " + Native.getLastError());
+//		}
+		return ret;
 	}
 }
