@@ -28,6 +28,7 @@ variables:
   # Optional jobs (default for ,e.g., master and stable)
   QUALITY_BRANCHES: 'pipeline-test|master|stable'
   CHECKDISTS_BRANCHES: 'pipeline-test|master|stable'
+  CHECKDOCS_BRANCHES: 'pipeline-test|master|stable'
   DEPLOYZIPS_BRANCHES: 'pipeline-test|master|stable'
   DEPLOYSCHEMAS_BRANCHES: 'pipeline-test|master|stable'
   DEPLOYSCHEMADOCS_BRANCHES: 'pipeline-test|master|stable'
@@ -104,6 +105,18 @@ checkDists:
     - ./gradlew -Pdist=publishdists -Production checkDists $GRADLE_EXTRA
   rules:
     - if: $CHECKDISTS=="true" || $CHECKDISTS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDISTS_BRANCHES
+
+checkDocs:
+  stage: testandquality
+  script:
+    - ./gradlew -Pdist=publishdists -Production checkDocs $GRADLE_EXTRA
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - "*/build/reports/markdownlint/"
+  rules:
+    - if: $CHECKDOCS=="true" || $CHECKDOCS!="false" && $CI_COMMIT_REF_SLUG=~$CHECKDOCS_BRANCHES
 
 publishCentral:
   stage: deployandpublish
