@@ -270,7 +270,7 @@ public class SSecurity
 								// For Windows, use Windows API to gather entropy data
 								try
 								{
-									Class<?> winentropyapi = Class.forName("jadex.commons.security.WindowsEntropyApi");
+									Class<?> winentropyapi = Class.forName("jadex.commons.security.WindowsEntropyApi2");
 									Method getEntropy = winentropyapi.getMethod("getEntropy", int.class);
 									ret = (byte[]) getEntropy.invoke(null, output.length);
 								}
