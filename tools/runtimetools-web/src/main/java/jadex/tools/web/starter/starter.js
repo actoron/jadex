@@ -36,12 +36,10 @@ class StarterElement extends BaseElement {
 		
 		var treeid = "modeltree";
 		
-		var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
-		var res2 = "jadex/tools/web/starter/libs/jstree_3.3.7.js";
-		var res3 = "jadex/tools/web/starter/components.js";
+		var res1 = "jadex/tools/web/starter/modeltree.js";
+		var res2 = "jadex/tools/web/starter/componenttree.js";
 		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
 		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
-		var ures3 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res3+"&argtypes_0=java.lang.String";
 
 		//console.log(ures1);
 		//console.log(ures2);
@@ -52,63 +50,12 @@ class StarterElement extends BaseElement {
 		// load files is only for javascript and css because it is added to dom
 		console.log("starter load files start");
 		
-		axios.get(ures1).then(function(resp)
-		{
-			var css = resp.data;    
-			//console.log(css);
-			var sheet = new CSSStyleSheet();
-			sheet.replaceSync(css);
-			self.shadowRoot.adoptedStyleSheets = self.shadowRoot.adoptedStyleSheets.concat(sheet);
-		});
+		var p1 = this.loadScript(ures1);
+		var p2 = this.loadScript(ures2);
 		
-		loader.loadFiles([], [ures2, ures3], function()
+		Promise.all([p1, p2]).then((values) => 
 		{
 			console.log("starter load files ok");
-	
-			// init tree
-			$(function() { self.getTree(treeid).jstree(
-			{
-				"core" : {"check_callback" : true},
-				"plugins" : ["sort"],
-				'sort': function(a, b) 
-				{
-			        var a1 = this.get_node(a);
-			        var b1 = this.get_node(b);
-			        if(a1.icon == b1.icon)
-			        {
-			            return (a1.text > b1.text) ? 1 : -1;
-			        } 
-			        else 
-			        {
-			            return (a1.icon > b1.icon) ? 1 : -1;
-			        }
-				}
-			})});
-			
-			// no args here
-			console.log("getComponentModels start");
-			axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
-			{
-				//console.log("getComponentModels"+resp.data);
-				
-				self.models = resp.data;
-				
-				self.createModelTree(treeid);
-				//$('#'+treeid).jstree('open_all');
-				var childs = self.getTree(treeid).jstree('get_node', '#').children;
-				for(var i=0; i<childs.length; i++)
-				{
-					self.getTree(treeid).jstree("open_node", childs[i]);
-				}
-				console.log("models loaded");
-				//$("#"+treeid).jstree("open_node", '#');
-				self.requestUpdate();
-				
-				self.getTree(treeid).on('select_node.jstree', function (e, data) 
-				{
-					self.select(data.instance.get_path(data.node, '.'));
-				});
-			});
 		});
 	}
 	
@@ -122,7 +69,8 @@ class StarterElement extends BaseElement {
 	{ 
 		var order = this.reversed ? -1 : 1;
 		
-		var res = data.slice().sort(function(a, b) { 
+		var res = data.slice().sort(function(a, b) 
+		{ 
 			return a===b? 0: a > b? order: -order 
 		});
 		
@@ -150,82 +98,6 @@ class StarterElement extends BaseElement {
 	getArguments()
 	{
 		return this.model!=null && this.model.arguments!=null? this.model.arguments: [];
-	}
-		
-	getModelNames()
-	{
-		var ret = [];
-		if(this.models.length>0)
-		{
-			for(var i=0; i<this.models.length; i++)
-			{
-				ret.push(this.getModelName(this.models[i][1]));
-			}
-		}
-		return ret;
-	}
-	
-	getModelName(name)
-	{
-		var ret = null;
-		var n = name.lastIndexOf(".");
-		if(n>=0)
-		{
-			ret = {name: name.substring(n+1), pck: name.substring(0,n)};
-		}
-		else
-		{
-			ret = {name: name, pck: null};
-		}
-		return ret;
-	}
-		
-	selectModel(filename)
-	{
-		var self = this;
-		
-		console.log("selected: "+filename);
-		
-		axios.get(this.getMethodPrefix()+'&methodname=loadComponentModel&args_0='+filename+"&argtypes_0=java.lang.String", this.transform).then(function(resp)
-		{
-			console.log("model is: "+resp.data);
-			self.model = resp.data;
-			self.requestUpdate();
-		});
-	}
-		
-	select(name)
-	{
-		var sel;
-		// called from input box
-		if(typeof name!="string")
-		{
-			sel = this.shadowRoot.getElementById("model").value;
-		}
-		// called from tree
-		else
-		{
-			var m = this.getModelName(name);
-			sel = m.name+" ["+m.pck+"]";
-		}
-		var opts = this.shadowRoot.getElementById("models").options;
-		var idx = -1;
-
-		for(var i=0; i<opts.length; i++)
-		{
-			if(opts[i].value==sel)
-			{
-				idx = i;
-				break;
-			}
-		}
-		console.log(idx);
-		
-		if(idx>-1)
-		{
-			var filename = this.models[idx][0];
-			this.selectModel(filename);
-		}
 	}
 		
 	start(e)
@@ -269,62 +141,6 @@ class StarterElement extends BaseElement {
 				console.log("started: "+resp.data);
 			});
 		}
-	}
-	
-	getTree(treeid)
-	{
-		return $("#"+treeid, this.shadowRoot);
-	}
-		
-	createModelTree(treeid)
-	{
-		this.empty(treeid);
-		
-		for(var i=0; i<this.models.length; i++)
-		{
-			//console.log(self.models[i]);
-			this.createNodes(treeid, this.models[i][1]);
-		}
-	}
-		
-	empty(treeid)
-	{
-		// $('#'+treeid).empty(); has problem when readding nodes :-(
-		
-		var roots = this.getTree(treeid).jstree().get_node('#').children;
-		for(var i=0; i<roots.length; i++)
-		{
-			this.getTree(treeid).jstree('delete_node', roots[i]);
-		}
-	}
-		
-	createNodes(treeid, model)
-	{
-		var sep = ".";
-		//var sep = "/";
-		//if(model.indexOf("\\")!=-1)
-		//	sep = "\\";
-		var parts = model.split(sep);
-		
-		var lastprefix = '';
-		var prefix = parts[0];
-		
-		for(var i=0; i<parts.length; i++)
-		{
-			prefix = !lastprefix? parts[i]: lastprefix+sep+parts[i];
-			if(!this.getTree(treeid).jstree('get_node', prefix))
-				this.createNode(treeid, lastprefix, prefix, parts[i], 'last');
-			//else
-			//	console.log("not creating: "+prefix);
-			lastprefix = prefix;
-		}
-	}
-		
-	// createNode(parent, id, text, position), position 'first' or 'last'
-	createNode(treeid, parent_node_id, new_node_id, new_node_text, position)//, donefunc) 
-	{
-		//console.log("parent="+parent_node_id+" child="+new_node_id+" childtext="+new_node_text);
-		this.getTree(treeid).jstree('create_node', '#'+parent_node_id, {"text": new_node_text, "id": new_node_id }, 'last');	
 	}
 		
 	static get styles() {
@@ -374,35 +190,16 @@ class StarterElement extends BaseElement {
 				<div class="row m-1">
 					<div class="col-12 m-1">
 						<h3>Components</h3>
-						<jadex-components cid='${this.cid}'></jadex-components>
+						<jadex-componenttree cid='${this.cid}'></jadex-componenttree>
 					</div>
 				</div>
 				
 				<div class="row m-1">
 					<div class="col-12 m-1">
 						<h3>Available Models</h3>
+						<jadex-modeltree cid='${this.cid}'></jadex-modeltree>
 					</div>
 				</div>
-				
-				<div class="row m-1">
-					<div class="col-12 m-1">
-						<input id="model" list="models" class="w100" type="text" @change="${(e) => this.select(e)}"></input>
-						<datalist id="models">
-							${this.getModelNames().map((model) => html`<option class="w100" value="${model.name+' ['+model.pck+']'}"></option>`)}
-						</datalist>
-					</div>
-					<div class="col-12 m-1">
-						<div id="modeltree"></div> <!-- class="scroll" -->
-					</div>
-				</div>
-				
-				${this.models.length==0? html`
-				<div class="row m-1">
-					<div class="col-12 m-1">
-				 		<div class="loader"></div> 
-				 	</div>
-				</div>
-				`: ''}
 				
 				<div class="bgwhitealpha m-2 p-2"> <!-- sticky-top  -->
 					<div class="row m-1">

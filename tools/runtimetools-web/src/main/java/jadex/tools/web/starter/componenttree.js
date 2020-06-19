@@ -4,7 +4,7 @@ import {css} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
 
 //import { LitElement, html, css} from 'lit-element';
 
-// Tag name 'jadex-components'
+// Tag name 'jadex-componenttree'
 class ComponentsElement extends LitElement {
 
 	static get properties() 
@@ -760,13 +760,12 @@ class ComponentsElement extends LitElement {
 	render() {
 		return html`
 			<div class="container-fluid m-0 p-0">
-				${this.components.length!=0? html`
 				<div class="row m-0 p-0">
 					<div class="col-12 m-0 p-0">
 						<div id="componenttree"></div>
 					</div>
 				</div>
-				` : ''}
+				
 				${this.components.length==0? html`
 				<div class="row m-0 p-0">
 					<div class="col-12 m-0 p-0">
@@ -784,5 +783,5 @@ class ComponentsElement extends LitElement {
 	}
 }
 
-customElements.define('jadex-components', ComponentsElement);
+customElements.define('jadex-componenttree', ComponentsElement);
 
