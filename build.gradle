@@ -168,10 +168,13 @@ allprojects
 	    {
 			mavenLocal()
 	    	mavenCentral()
-//	        maven
-//			{
-//				url "http://nexus.actoron.com/content/repositories/oss-nightlies/"
-//			}
+
+	    	// For jme3
+	        maven
+			{
+				url "https://nexus.actoron.com/content/repositories/oss-nightlies/"
+			}
+			
 			maven
 			{
 				url "https://maven.google.com"
