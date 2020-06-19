@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,6 @@ import jadex.bridge.component.impl.ComponentFeatureFactory;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IInternalRequiredServicesFeature;
 import jadex.bridge.service.component.IRequiredServicesFeature;
 import jadex.bridge.service.component.UnresolvedServiceInvocationHandler;
 import jadex.bridge.service.search.ServiceNotFoundException;
@@ -39,14 +37,12 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.micro.MicroModel;
 import jadex.micro.MicroModel.ServiceInjectionInfo;
-import jadex.micro.annotation.AgentServiceSearch;
 import jadex.micro.features.IMicroServiceInjectionFeature;
 
 /**
@@ -550,6 +546,12 @@ public class MicroServiceInjectionComponentFeature extends	AbstractComponentFeat
 						throw SUtil.throwUnchecked(t);
 					}
 					return IFuture.DONE;
+				}
+				
+				@Override
+				public String toString()
+				{
+					return m.getDeclaringClass().getName()+"."+m.getName()+(args!=null?SUtil.arrayToString(args):"[]");
 				}
 			});
 		}
