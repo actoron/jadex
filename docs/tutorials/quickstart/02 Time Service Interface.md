@@ -61,21 +61,21 @@ TODO:
 
 -->
 
-### The `subscribe()` Method
+### The `getLocation()` Method
 
 Service methods are potentially remote calls. Therefore service methods should use [future types](../../futures/futures.md)) as return values. Futures avoid that the caller is blocked during the service processing and add further support e.g. for dealing with timeouts.
 
-The `subscribe()` method signature captures most of the interaction between time provider and time user. It accepts a `DateFormat` object as input and uses the [subscription intermediate future](../../futures/futures.md#subscription-futures)) as a return type, which denotes a subscription semantics for the interaction as shown in the diagram below.
+The result of the `getLocation()` method is not directly a `String` object, but an object of type `jadex.commons.future.IFuture<String>`, that is, a placeholder or promise for the location string that might or might not be available yet.
+
+### The `subscribe()` Method
+
+A method with an basic `IFuture` return type captures a simple request-reply interaction. Jadex provides different future types for realizing more complex interaction schemes. The `subscribe()` method signature captures such a complex interaction between time provider and time user. It accepts a `DateFormat` object as input and uses the [subscription intermediate future](../../futures/futures.md#subscription-futures)) as a return type, which denotes a subscription semantics for the interaction as shown in the diagram below.
 
 ![Interaction diagram of a subscription future](subscription.png "Interaction diagram of a subscription future")
 
-The interactions starts by the user calling the subscribe() method on the service of the provider. While the interaction is active, the time provider may post time values in arbitrary intervals. These time values are transmitted as intermediate results of the future and immediately become available to the time user. At any point in time, either of both sides may decide to end the interaction. The time provider may do this by setting the future to finished to indicate that no more results will be published. The time user on the other hand may decide that it no longer wants to receive time values from the time provider and thus may call the *cancel()* method on the future.
+The interactions starts by the user calling the `subscribe()` method on the service of the provider. While the interaction is active, the time provider may post time values in arbitrary intervals. These time values are transmitted as intermediate results of the future and immediately become available to the time user. At any point in time, either of both sides may decide to end the interaction. The time provider may do this by setting the future to finished to indicate that no more results will be published. The time user on the other hand may decide that it no longer wants to receive time values from the time provider and thus may call the `cancel()` method on the future.
 
-As you can see, using subscription futures allows capturing a complex interaction semantics in a single method signature. Using generics, the shown method signature further demands that the intermediate results must be of type String.
-
-### The *getLocation()* Method
-
-One notable exception to the use of future return types is when service operations only provide constant values. In the time service example, the location is considered a value that does not change during the lifetime of a service instance. This means that each separate instance of the time service may have a different location, but this location is constant with respect to each instance. Therefore the location can be transmitted as part of the service reference and can be provided without an additional remote call. To indicate that the location is constant the getLocation() method is declared with a plain return type (String) instead of a type wrapped in a future.
+As you can see, using subscription futures allows capturing a complex interaction semantics in a single method signature. Using generics, the shown method signature further demands that the intermediate results must be of type `String.
 
 ## Security Issues
 
