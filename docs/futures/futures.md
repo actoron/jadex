@@ -154,7 +154,7 @@ IFuture<String> translated = fut.thenCombine(getTranslator(), (s, translator) ->
 
 There are also variants of *apply* and *accept*: *applyToEither* and *acceptEither* will take a second future and apply the given function to the result that is available first, ignoring the second result.
 
-For a complete documentation of these methods, please visit the [IFuture API documentation](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/future/IFuture.html).
+For a complete documentation of these methods, please visit the [IFuture API documentation](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/commons/future/IFuture.html).
 
 # Future Types
 
@@ -337,7 +337,7 @@ Calling *get()* on the main thread may result in a hung-up program.
 ## Special Result Listeners
 
 For some generic, re-occuring tasks, Jadex includes special result listeners.
-Some of the most useful types are introduced below, for a complete list check out the ```IResultListener``` [subtypes](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/commons/future/IResultListener.html).
+Some of the most useful types are introduced below, for a complete list check out the ```IResultListener``` [subtypes](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/commons/future/IResultListener.html).
 
 ### Delegation
 

@@ -48,7 +48,7 @@ Using a *futurized* return type allows you to perform work asynchronously, which
 # Startup
 
 Starting of components is done by the Platform's ```ComponentManagementService``` (CMS).
-Service instances in general can be retrieved using the static methods of the [SServiceProvider](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/search/SServiceProvider.html) class.
+Service instances in general can be retrieved using the static methods of the [SServiceProvider](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/service/search/SServiceProvider.html) class.
 
 ## Obtaining the CMS
 
@@ -68,7 +68,7 @@ In Jadex, Java interfaces are used for the interaction with services, so the imp
 
 ## Starting the component
 
-Once you get a reference to the CMS, you can use the ```createComponent()``` methods to start your components (See API documentation of [IComponentManagementService](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/types/cms/IComponentManagementService.html)).
+Once you get a reference to the CMS, you can use the ```createComponent()``` methods to start your components (See API documentation of [IComponentManagementService](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/service/types/cms/IComponentManagementService.html)).
 
 The preferred method to start a component has the following signature:
 
@@ -129,7 +129,7 @@ Another way to access the arguments of an agent is by using the [IArgumentsResul
 ### Passing Arguments
 
 When you created a component as explained above, the last parameter of```createComponent``` was null.
-Instead, you can create your own [CreationInfo](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/micro/annotation/CreationInfo.html) object containing your component's arguments and pass it in *createComponent*:
+Instead, you can create your own [CreationInfo](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/micro/annotation/CreationInfo.html) object containing your component's arguments and pass it in *createComponent*:
 
 ```java
 CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"myName"}, new Object[]{"Harald"}))
@@ -211,13 +211,13 @@ To declare subcomponents, you may use the ```@ComponentTypes``` annotation and t
 public class ParentAgent { …
 ```
 
-Any services provided by subcomponents using the scope [ServiceScope.COMPONENT](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/service/RequiredServiceInfo.html) can then be accessed using the same scope in the parent component or any other subcomponents.
+Any services provided by subcomponents using the scope [ServiceScope.COMPONENT](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/service/RequiredServiceInfo.html) can then be accessed using the same scope in the parent component or any other subcomponents.
 Please refer to the [AC Tutorial](../tutorials/ac/06%20Composition.md) for a more complete example.
 
 ## More Annotations
 
 The most important annotations common to all components were already discussed.
-For a full reference, have a look at the [jadex.micro.annotation](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/micro/annotation/package-summary.html) package.
+For a full reference, have a look at the [jadex.micro.annotation](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/micro/annotation/package-summary.html) package.
 
 <!--InternalAccess?-->
 <!--| **@Agent** | fields | Injects the ```IExternalAccess``` of the component.|-->
@@ -250,7 +250,7 @@ When using one of these annotations on methods or fields, fields and method para
 ## Scheduling steps
 
 The [concurrency model](../guides/ac/05%20Services.md#concurrency) of Jadex Active Components is based on single-threaded components.
-If you want to execute your code on a component's thread from outside, you can call [scheduleStep](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/bridge/IExternalAccess.html#scheduleStep-jadex.bridge.IComponentStep-) on the IExternalAccess of a component:
+If you want to execute your code on a component's thread from outside, you can call [scheduleStep](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/IExternalAccess.html#scheduleStep-jadex.bridge.IComponentStep-) on the IExternalAccess of a component:
 
 ```java
 extAcc.scheduleStep(iAccess -> {

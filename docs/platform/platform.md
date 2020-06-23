@@ -38,7 +38,7 @@ Now that you know how to start a Jadex Active Components Platform you can procee
 
 # Configuring the Platform
 
-The PlatformConfiguration provides many ways to configure the platform. Some of them are listed below. For further information, please see the API documentation of [PlatformConfiguration](https://download.actoron.com/docs/nightlies/latest/javadoc/jadex/base/PlatformConfiguration.html).
+The PlatformConfiguration provides many ways to configure the platform. Some of them are listed below. For further information, please see the API documentation of [PlatformConfiguration](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/base/PlatformConfiguration.html).
 
 The configuration options are also explained in more detail [here](http://www.activecomponents.org/jadex-applications-web/jadexdoc/view?model=/jadex/platform/Platform.component.xml).
 
