@@ -20,7 +20,7 @@ image: openjdk:11-jdk
 
 variables:
   # Gradle JVM(!) options
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.caching=true"
   
   # Additional options/tasks for gradlew executions (allows e.g. '-x deployJavadocs')
   GRADLE_EXTRA: "--info"   

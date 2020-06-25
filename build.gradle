@@ -308,7 +308,17 @@ subprojects
 //			}
 //		}
 
-	addJavaDocJarTask(project)
+	javadoc {
+		// No version in title to allow build cache across versions if content doesn't change
+		def	projname	= project.name
+		def parent	= project.parent
+		while(parent!=null)	{
+			projname = parent.name + "-" + projname
+			parent	= parent.parent
+		}
+		title	= "API Documentation for " + projname + "."
+	}
+	addJavadocJarTask(project)
 	addSourcesJarTask(project)
 
 	// needs to be applied after java plugins:
