@@ -160,7 +160,7 @@ The setup also has some drawbacks:
 a) the source code of the Jadex libraries needs to attached manually, if needed, and
 b) you cannot easily switch/update Jadex versions.)
 
-- If not already done, download the desired Jadex distribution, e.g., from <https://download.actoron.com> and unpack it to a place of your choice.
+- If not already done, download the desired Jadex distribution, e.g. jadex-standard-x.y.z.zip, from [https://download.actoron.com](https://www.activecomponents.org/forward.html?type=distribution) and unpack it to a place of your choice.
 - Start eclipse.
 - Use "File -> New -> Project..." and choose 'Java Project':
 

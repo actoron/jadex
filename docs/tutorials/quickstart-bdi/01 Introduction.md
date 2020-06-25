@@ -8,7 +8,7 @@ The easiest way to start with the Cleanerworld scenario is to import the Jadex e
 
 ### Fetching the Project Files
 
-Download the [jadex-example-project.zip](https://download.actoron.com/nightlies/oss/jadex-example-project.zip) and extract the contents to a directory of your choice.
+Download the [jadex-example-project.zip](https://www.activecomponents.org/forward.html?type=distribution&path=jadex-example-project.zip) and extract the contents to a directory of your choice.
 
 ### Importing the Project
 
