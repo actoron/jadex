@@ -16,9 +16,11 @@ class ModelTree extends BaseElement {
 	    super.attributeChangedCallback(name, oldVal, newVal);
 	    
 		console.log("modeltree: "+this.cid);
+		this.init();
 	}
 	
-	constructor() {
+	constructor() 
+	{
 		super();
 
 		console.log("modeltree");
@@ -26,76 +28,102 @@ class ModelTree extends BaseElement {
 		this.cid = null;
 		this.models = []; // available component models [filename, classname]
 		this.reversed = false;
-		this.myservice = "jadex.tools.web.starter.IJCCStarterService";
-		
+		//this.myservice = "jadex.tools.web.starter.IJCCStarterService";
+		this.treeid = "modeltree";
+	}
+	
+	init()
+	{
 		var self = this;
 		
-		var treeid = "modeltree";
-		
-		var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
-		var res2 = "jadex/tools/web/starter/libs/jstree_3.3.7.js";
-		var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
-		var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
-
-		console.log("model tree load files start");
-		
-		var p1 = this.loadStyle(ures1);
-		var p2 = this.loadScript(ures2);
-		
-		Promise.all([p1, p2]).then((values) => 
+		this.loadJSTree().then(function()
 		{
-			console.log("model tree load files ok");
-	
-			// init tree
-			$(function() { self.getTree(treeid).jstree(
-			{
-				"core" : {"check_callback" : true},
-				"plugins" : ["sort"],
-				'sort': function(a, b) 
-				{
-			        var a1 = this.get_node(a);
-			        var b1 = this.get_node(b);
-			        if(a1.icon == b1.icon)
-			        {
-			            return (a1.text > b1.text) ? 1 : -1;
-			        } 
-			        else 
-			        {
-			            return (a1.icon > b1.icon) ? 1 : -1;
-			        }
-				}
-			})});
+			//console.log("jstree");
 			
-			// no args here
-			console.log("getComponentModels start");
-			axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
-			{
-				//console.log("getComponentModels"+resp.data);
-				
-				self.models = resp.data;
-				
-				self.createModelTree(treeid);
-				//$('#'+treeid).jstree('open_all');
-				var childs = self.getTree(treeid).jstree('get_node', '#').children;
-				for(var i=0; i<childs.length; i++)
+			// init tree
+			$(function() 
+			{ 
+				self.getTree(self.treeid).jstree(
 				{
-					self.getTree(treeid).jstree("open_node", childs[i]);
-				}
-				console.log("models loaded");
-				//$("#"+treeid).jstree("open_node", '#');
-				self.requestUpdate();
-				
-				self.getTree(treeid).on('select_node.jstree', function (e, data) 
-				{
-					self.select(data.instance.get_path(data.node, '.'));
+					"core" : {"check_callback" : true},
+					"plugins" : ["sort"],
+					'sort': function(a, b) 
+					{
+				        var a1 = this.get_node(a);
+				        var b1 = this.get_node(b);
+				        if(a1.icon == b1.icon)
+				        {
+				            return (a1.text > b1.text) ? 1 : -1;
+				        } 
+				        else 
+				        {
+				            return (a1.icon > b1.icon) ? 1 : -1;
+				        }
+					}
 				});
+				
+				// no args here
+				console.log("getComponentModels start");
+				axios.get(self.getMethodPrefix()+'&methodname=getComponentModels', self.transform).then(function(resp)
+				{
+					//console.log("getComponentModels"+resp.data);
+					
+					self.models = resp.data;
+					
+					self.createModelTree(self.treeid);
+					//$('#'+treeid).jstree('open_all');
+					var childs = self.getTree(self.treeid).jstree('get_node', '#').children;
+					for(var i=0; i<childs.length; i++)
+					{
+						self.getTree(self.treeid).jstree("open_node", childs[i]);
+					}
+					
+					//console.log("models loaded");
+					
+					//$("#"+treeid).jstree("open_node", '#');
+					self.requestUpdate();
+					
+					self.getTree(self.treeid).on('select_node.jstree', function (e, data) 
+					{
+						self.select(data.instance.get_path(data.node, '.'));
+					});
+				});
+			});
+		});
+	}
+	
+	loadJSTree()
+	{
+		var self = this;
+		
+		return new Promise(function(resolve, reject) 
+		{
+			var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
+			var res2 = "jadex/tools/web/starter/libs/jstree_3.3.7.js";
+			var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+			var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+	
+			console.log("jstree load files start");
+			
+			var p1 = self.loadStyle(ures1);
+			var p2 = self.loadScript(ures2);
+			
+			Promise.all([p1, p2]).then((values) => 
+			{
+				console.log("js tree load files ok");
+				resolve();
+			})
+			.catch(err => 
+			{
+				console.log("js tree load files err: "+err);
+				reject(err);
 			});
 		});
 	}
 	
 	getMethodPrefix() 
 	{
-		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype='+this.myservice;
+		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype=jadex.tools.web.starter.IJCCStarterService';
 	}
 		
 	getModelNames()
