@@ -255,7 +255,7 @@ For a full reference, have a look at the [jadex.bridge.service.annotation](https
 
 |Annotation|Description|
 |----------|-----------|
-|**@ServiceIdentifier**| Can be used on fields to inject the [ServiceIdentifier](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/service/annotation)|
+|**@ServiceIdentifier**| Can be used on fields to inject the [ServiceIdentifier](https://www.activecomponents.org/forward.html?type=javadoc&path=jadex/bridge/service/IServiceIdentifier.html)|
 |**@Excluded**| Can be used on methods or classes that should not be available from remote. Will throw an UnsupportedOperationException when called.|
 
 ## Accessing non-declared Services

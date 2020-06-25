@@ -46,4 +46,4 @@ Time user and time provider do not know each other directly and only communicate
 In the following three chapters each of the three elements of the architecture will be explained in detail.
 
 ---
-[[Up: Document Overview](../../index.md) | [Next: 02 Time Service Interface](02%20Time%20Service%20Interface.md)]
+[[Up: Documentation Overview](../../index.md) | [Next: 02 Time Service Interface](02%20Time%20Service%20Interface.md)]

@@ -57,6 +57,7 @@ In Jadex, the fully qualified name of a service interface is used for service di
 TODO:
 
 * link to web-registry
+* explanation of discovery mechanisms (local/global registry vs. awareness)
 * web page listing available time providers (jadex.js)
 
 -->
