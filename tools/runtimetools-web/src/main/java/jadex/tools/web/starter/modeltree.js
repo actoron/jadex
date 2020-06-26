@@ -16,7 +16,8 @@ class ModelTree extends BaseElement {
 	    super.attributeChangedCallback(name, oldVal, newVal);
 	    
 		console.log("modeltree: "+this.cid);
-		this.init();
+		if(name=="cid")
+			this.init();
 	}
 	
 	constructor() 
