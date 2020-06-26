@@ -172,6 +172,24 @@ def configurePom(pom) {
     }
 }
 
+/**
+ * Sign the (single) output of another task.
+ */
+def createSignTask(origtask, classi, exten) {
+    def signtask = project.tasks.create('sign' + origtask.name.capitalize(), Sign) {
+    	outputs.cacheIf { true }
+   		dependsOn origtask
+    }
+    signtask.sign(classi, origtask.outputs.files.singleFile)
+	signtask.signatureFiles.each { sigfile ->
+		publishing.publications.mavenJava.artifact(sigfile) {
+			builtBy signtask
+			classifier classi
+			extension exten + sigfile.name.substring(sigfile.name.lastIndexOf('.'))
+		}
+	}
+	//println "created " +signtask
+}
 
 publishing {
 
@@ -182,29 +200,42 @@ publishing {
         
         	mavenJava(MavenPublication)
         	{
+        		// Sign archives and pom in separate tasks as archive signing can be cached while pom signing cannot, when jadex version changes.
+        		createSignTask(generatePomFileForMavenJavaPublication, null, 'pom')
+        		
+        		// Disable generation of module.json
+        		tasks.matching { it.name == "generateMetadataFileFor${name.capitalize()}Publication" }.all {
+        			onlyIf { false }
+        		}
+        		
 	        	if(gradle.ext.webprojects.contains(project.getPath()))
 	            {
         			from components.web
+        			createSignTask(war, null, 'war')
+        			
         			
                   	// default artifact is xyz.war so add xyz.jar xyz-sources.jar and xyz-javadoc.jar for maven central to be happy
         			project.tasks.withType(Jar) 
                     {
                         if(it.name.equals('jar') || it.name.equals('sourcesJar') || it.name.equals('javadocJar')) 
                         {
-                            artifact(it)
+                            def arti 	= artifact(it)
+                            createSignTask(it, arti.classifier, arti.extension)
                         }
                     }
         		}
         		else
         		{
         			from components.java
+        			createSignTask(jar, null, 'jar')
         			
                    	// add xyz-sources.jar and xyz-javadoc.jar for maven central to be happy
         			project.tasks.withType(Jar) 
                     {
                         if(it.name.equals('sourcesJar') || it.name.equals('javadocJar')) 
                         {
-                            artifact(it)
+                            def arti 	= artifact(it)
+                            createSignTask(it, arti.classifier, arti.extension)
                         }
                     }
         		}
@@ -233,11 +264,8 @@ if(canSign) {
 		def signingPassword = getVar("signingPassword", project)
 		//println("sign key2: "+signingKey)
 		useInMemoryPgpKeys(signingKey, signingPassword)
-	
-// signing poms with maven-publish is supported with gradle 4.8, however, 4.8 seems to be incompatible with bintray 1.8 :/
-		sign publishing.publications.mavenJava
+
+		// Sign archives and pom in separate tasks as archive signing can be cached while pom signing cannot, when jadex version changes.
+		//sign publishing.publications.mavenJava
 	}
-	
 }
-
-
