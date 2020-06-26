@@ -1,12 +1,12 @@
-import {LitElement} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
 import {html} from 'https://unpkg.com/lit-html@latest/lit-html.js?module';
 import {css} from 'https://unpkg.com/lit-element@latest/lit-element.js?module';
+import {BaseElement} from '/webcomponents/baseelement.js'
 
 //import { LitElement, html, css} from 'lit-element';
 
 // Tag name 'jadex-componenttree'
-class ComponentsElement extends LitElement {
-
+class ComponentTree extends BaseElement 
+{
 	static get properties() 
 	{ 
 		return { cid: { type: String }};
@@ -29,42 +29,22 @@ class ComponentsElement extends LitElement {
 		this.components = []; // component descriptions
 		this.typemap = null;
 		this.treedata = {};
-		
-		console.log("components");
-	}
-	
-	init() 
-	{
-		console.log("components init: "+this.cid);
-		
-		var self = this;
-		var treeid = "componenttree";
-		
-		var myservice = "jadex.tools.web.starter.IJCCStarterService";
-		//var extservice = "jadex.jadex.bridge.IExternalAccess";
-		
-		/*getMethodPrefix()
-		{
-			return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
-		}*/
-		
-		var prefix = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
-		//self.prefix_ext = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+extservice;
+		this.treeid = "componenttree";
 		
 		// fixed types
-		var cloud = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/cloud.png';
-		var applications = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/applications.png';
-		var platform = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/platform.png';
-		var system = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/system.png';
-		var services = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/services.png';
-		var provided = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/provided.png';
-		var required = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required.png';
-		var required_mult = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required_multiple.png';
-		var nonfunc = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nonfunc.png';
-		var nfprop = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nfprop.png';
-		var nfprop_dynamic = self.prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nfprop_dynamic.png';
+		var cloud = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/cloud.png';
+		var applications = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/applications.png';
+		var platform = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/platform.png';
+		var system = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/system.png';
+		var services = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/services.png';
+		var provided = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/provided.png';
+		var required = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required.png';
+		var required_mult = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/required_multiple.png';
+		var nonfunc = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nonfunc.png';
+		var nfprop = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nfprop.png';
+		var nfprop_dynamic = this.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/nfprop_dynamic.png';
 		
-		var types =
+		this.types =
 		{
 			//"default" : {"icon": b},
 		    "cloud" : {"icon": cloud},
@@ -80,18 +60,33 @@ class ComponentsElement extends LitElement {
 		    "nfproperty_dynamic" : {"icon": nfprop_dynamic}
 		}
 		
-		var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
-		var res2 = "jadex/tools/web/starter/libs/jstree_3.3.7.js";
-		var ures1 = prefix+'&methodname=loadResource&args_0='+res1;
-		var ures2 = prefix+'&methodname=loadResource&args_0='+res2;
+		console.log("components");
+	}
+	
+	init() 
+	{
+		console.log("components init: "+this.cid);
 
-		loader.loadFiles([ures1], [ures2], function()
+		var self = this;
+		
+		this.loadJSTree().then(function()
 		{
-			console.log("loaded jtree libs");
-			//self.refresh();
+			//console.log("jstree");
+	
+			//var myservice = "jadex.tools.web.starter.IJCCStarterService";
+			//var extservice = "jadex.jadex.bridge.IExternalAccess";
+			
+			/*getMethodPrefix()
+			{
+				return 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
+			}*/
+			
+			//var prefix = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+myservice;
+			//self.prefix_ext = 'webjcc/invokeServiceMethod?cid='+self.cid+'&servicetype='+extservice;
 			
 			// init tree
-			$(function() { $('#'+treeid).jstree(
+			var types = self.types;
+			$(function() { self.getTree(self.treeid).jstree(
 			{
 				"plugins": ["sort", "types", "contextmenu"],
 				"core": 
@@ -119,7 +114,7 @@ class ComponentsElement extends LitElement {
 						// load initial state via component descriptions
 						if("#"===node.id)
 						{
-							axios.get(prefix+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
+							axios.get(self.getMethodPrefix()+'&methodname=getComponentDescriptions', self.transform).then(function(resp)
 							{
 								//console.log("descs are: "+resp.data);
 								self.components = resp.data;
@@ -128,9 +123,9 @@ class ComponentsElement extends LitElement {
 								for(var i=0; i<self.components.length; i++)
 									self.typemap[self.components[i].name.name] = self.components[i].type;
 
-								self.createTree(treeid);
+								self.createTree(self.treeid);
 								self.refreshCMSSubscription();
-								self.updateRequest();
+								self.requestUpdate();
 								
 								var data = getChildData(node.id);
 								cb.call(this, data);
@@ -158,7 +153,7 @@ class ComponentsElement extends LitElement {
 									var nfid = node.id+"_nfprops";
 									var ch = [];
 									
-									for(nfname in res)
+									for(var nfname in res)
 									{
 										var nfprop = res[nfname];
 										var val = vals!=null? vals[nfname]: null;
@@ -189,7 +184,9 @@ class ComponentsElement extends LitElement {
 								// sid is saved in node data 
 								
 								// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
-								axios.get(prefix+'&methodname=getNFPropertyMetaInfos&args_0=null&args_1='+JSON.stringify(node.original.sid), self.transform)
+								var sid = encodeURIComponent(JSON.stringify(node.original.sid));
+								console.log("SID: "+sid);
+								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0=null&args_1='+sid, self.transform)
 								.then(function(resp)
 								{
 									console.log("nf prov props:"+resp.data);		
@@ -198,12 +195,12 @@ class ComponentsElement extends LitElement {
 									
 									if(res!=null && Object.keys(res).length>0)
 									{
-										axios.get(prefix+'&methodname=getNFPropertyValues&args_0=null&args_1='+JSON.stringify(node.original.sid), self.transform)
+										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null&args_1='+JSON.stringify(node.original.sid), self.transform)
 										.then(function(resp)
 										{
 											function refresh(node) 
 											{
-												axios.get(prefix+'&methodname=getNFPropertyValues&args_0=null'
+												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0=null'
 													+"&args_1="+JSON.stringify(node.original.sid)+"&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
 												.then(function(resp)
 												{
@@ -211,7 +208,7 @@ class ComponentsElement extends LitElement {
 													var res = resp.data;
 													var val = res[node.original.propname];
 													var txt = node.original.propname+": "+val;
-													$('#'+treeid).jstree('rename_node', node, txt);
+													self.getTree(self.treeid).jstree('rename_node', node, txt);
 												})
 												.catch(function(e)
 												{
@@ -247,7 +244,7 @@ class ComponentsElement extends LitElement {
 								// cid is saved in node data 
 								
 								// args IComponentIdentifier cid, IServiceIdentifier sid, MethodInfo mi, Boolean req
-								axios.get(prefix+'&methodname=getNFPropertyMetaInfos&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
+								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
 								.then(function(resp)
 								{
 									console.log("nf req props:"+resp.data);		
@@ -256,12 +253,12 @@ class ComponentsElement extends LitElement {
 									
 									if(res!=null && Object.keys(res).length>0)
 									{
-										axios.get(prefix+'&methodname=getNFPropertyValues&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
+										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid+'&args_1=null&args_2=null&args_3=true', self.transform)
 										.then(function(resp)
 										{
 											function refresh(node) 
 											{
-												axios.get(prefix+'&methodname=getNFPropertyValues&args_0='+node.original.cid
+												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.original.cid
 													+"&args_1=null&args_2=null&args_3=true&args_4="+node.original.propname, self.transform)
 												.then(function(resp)
 												{
@@ -269,7 +266,7 @@ class ComponentsElement extends LitElement {
 													var res = resp.data;
 													var val = res[node.original.propname];
 													var txt = node.original.propname+": "+val;
-													$('#'+treeid).jstree('rename_node', node, txt);
+													self.getTree(self.treeid).jstree('rename_node', node, txt);
 												})
 												.catch(function(e)
 												{
@@ -324,7 +321,7 @@ class ComponentsElement extends LitElement {
 									cont();
 								});
 								
-								axios.get(prefix+'&methodname=getNFPropertyMetaInfos&args_0='+node.id, self.transform)
+								axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyMetaInfos&args_0='+node.id, self.transform)
 								.then(function(resp)
 								{
 									console.log("nf props:"+resp.data);	
@@ -334,14 +331,14 @@ class ComponentsElement extends LitElement {
 									if(res!=null && Object.keys(res).length>0)
 									{
 										var cid = node.id;
-										axios.get(prefix+'&methodname=getNFPropertyValues&args_0='+node.id, self.transform)
+										axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+node.id, self.transform)
 										.then(function(resp)
 										{
 											var vals = resp.data;
 											
 											function refresh(node) 
 											{
-												axios.get(prefix+'&methodname=getNFPropertyValues&args_0='+cid
+												axios.get(self.getMethodPrefix()+'&methodname=getNFPropertyValues&args_0='+cid
 													+"&args_1=null&args_2=null&args_3=null&args_4="+node.original.propname, self.transform)
 												.then(function(resp)
 												{
@@ -349,7 +346,7 @@ class ComponentsElement extends LitElement {
 													var res = resp.data;
 													var val = res[node.original.propname];
 													var txt = node.original.propname+": "+val;
-													$('#'+treeid).jstree('rename_node', node, txt);
+													self.getTree(self.treeid).jstree('rename_node', node, txt);
 												})
 												.catch(function(e)
 												{
@@ -378,7 +375,7 @@ class ComponentsElement extends LitElement {
 									nfresolve(null);
 								});
 								
-								axios.get(prefix+'&methodname=getServiceInfos&args_0='+node.id, self.transform)
+								axios.get(self.getMethodPrefix()+'&methodname=getServiceInfos&args_0='+node.id, self.transform)
 								.then(function(resp)
 								{
 									//console.log("service infos: "+resp.data);
@@ -397,6 +394,7 @@ class ComponentsElement extends LitElement {
 											var psid = serid+"_"+res[0][i].name;
 											var txt = res[0][i].type.value.split(".");
 											txt = txt[txt.length-1];
+											console.log("sid: "+res[2][i]);
 											var psnode = {"id": psid, "text": txt, "type": "provided", "children": true, "sid": res[2][i]};
 											ch.push(psnode);
 										}
@@ -443,8 +441,8 @@ class ComponentsElement extends LitElement {
 				},
 				'sort': function(a, b) 
 				{
-			        a1 = this.get_node(a);
-			        b1 = this.get_node(b);
+			        var a1 = this.get_node(a);
+			        var b1 = this.get_node(b);
 			        if(a1.icon == b1.icon)
 			        {
 			            return (a1.text > b1.text) ? 1 : -1;
@@ -475,7 +473,7 @@ class ComponentsElement extends LitElement {
 	                                		node.original.refreshcmd(node);
 	                                	}
 	                                },
-	                                'icon': prefix+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
+	                                'icon': self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/refresh.png'
 			        			} 
 			        		};
 			        	}
@@ -515,12 +513,53 @@ class ComponentsElement extends LitElement {
 			//self.refresh();
 		});
 	}
+		
+	loadJSTree()
+	{
+		var self = this;
+		
+		return new Promise(function(resolve, reject) 
+		{
+			var res1 ="jadex/tools/web/starter/libs/jstree_3.3.7.css";
+			var res2 = "jadex/tools/web/starter/libs/jstree_3.3.7.js";
+			var ures1 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res1+"&argtypes_0=java.lang.String";
+			var ures2 = self.getMethodPrefix()+'&methodname=loadResource&args_0='+res2+"&argtypes_0=java.lang.String";
+	
+			console.log("jstree load files start");
+			
+			var p1 = self.loadStyle(ures1);
+			var p2 = self.loadScript(ures2);
+			
+			Promise.all([p1, p2]).then((values) => 
+			{
+				console.log("js tree load files ok");
+				resolve();
+			})
+			.catch(err => 
+			{
+				console.log("js tree load files err: "+err);
+				reject(err);
+			});
+		});
+	}
+	
+	getMethodPrefix() 
+	{
+		return 'webjcc/invokeServiceMethod?cid='+this.cid+'&servicetype=jadex.tools.web.starter.IJCCStarterService';
+	}
+	
+	getTree(treeid)
+	{
+		return $("#"+treeid, this.shadowRoot);
+	}
 	
 	refreshCMSSubscription()
 	{
 		//console.log("refreshCMSSubscription");
 		
-		var path = self.prefix+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
+		var self = this;
+		
+		var path = self.getMethodPrefix()+'&methodname=subscribeToComponentChanges&returntype=jadex.commons.future.ISubscriptionIntermediateFuture';
 
 		if(self.termcom!=null)
 			self.termcom().then(done).catch(err);
@@ -536,7 +575,7 @@ class ComponentsElement extends LitElement {
 		
 		function done()
 		{
-			self.termcom = self.getIntermediate(path,
+			self.termcom = jadex.getIntermediate(path,
 				function(resp)
 				{
 					var event = resp.data;
@@ -544,13 +583,13 @@ class ComponentsElement extends LitElement {
 					if(event.type.toLowerCase().indexOf("created")!=-1)
 					{
 						self.typemap[event.componentDescription.name.name] = event.componentDescription.type;
-						self.createNodes(treeid, event.componentDescription, true);
+						self.createNodes(self.treeid, event.componentDescription, true);
 					}
 					else if(event.type.toLowerCase().indexOf("terminated")!=-1)
 					{
 						try
 						{
-							self.deleteNode(treeid, event.componentDescription.name.name);
+							self.deleteNode(self.treeid, event.componentDescription.name.name);
 						}
 						catch(ex)
 						{
@@ -568,12 +607,12 @@ class ComponentsElement extends LitElement {
 	
 	createTree(treeid)
 	{
-		self.empty(treeid);
+		this.empty(treeid);
 					
-		for(var i=0; i<self.components.length; i++)
+		for(var i=0; i<this.components.length; i++)
 		{
 			//console.log(self.models[i]);
-			self.createNodes(treeid, self.components[i], false);
+			this.createNodes(treeid, this.components[i], false);
 		}
 	}
 	
@@ -581,10 +620,10 @@ class ComponentsElement extends LitElement {
 	{
 		// $('#'+treeid).empty(); has problem when reading nodes :-(
 
-		var roots = $('#'+treeid).jstree().get_node('#').children;
+		var roots = this.getTree(treeid).jstree().get_node('#').children;
 		for(var i=0; i<roots.length; i++)
 		{
-			$('#'+treeid).jstree('delete_node', roots[i]);
+			this.getTree(self.treeid).jstree('delete_node', roots[i]);
 		}
 	}
 	
@@ -663,8 +702,8 @@ class ComponentsElement extends LitElement {
 						type = "system";
 				}
 				
-				if(types[type]==null)
-					icon = self.prefix+'&methodname=loadComponentIcon&args_0='+type;
+				if(self.types[type]==null)
+					icon = self.getMethodPrefix()+'&methodname=loadComponentIcon&args_0='+type;
 				//types[type] = self.getMethodPrefix()+'&methodname=loadResource&args_0=jadex/tools/web/starter/images/language_de.png';
 
 				//console.log(cid+" "+type+" "+icon);
@@ -691,18 +730,18 @@ class ComponentsElement extends LitElement {
 			n.type = type;
 		if(icon!=null)
 			n.icon = icon;
-		$('#'+treeid).jstree('create_node', '#'+parent_node_id, n, 'last');	
+		this.getTree(self.treeid).jstree('create_node', '#'+parent_node_id, n, 'last');	
 	}
 		
 	createNodeData(id, name, type, icon, parent)
 	{
-		self.treedata[id] = {"id": id, "text": name, "type": type, "icon": icon, "children": true};
+		this.treedata[id] = {"id": id, "text": name, "type": type, "icon": icon, "children": true};
 		var key = parent==null || parent.length==0? "#_children": parent+"_children";
-		var children = self.treedata[key];
+		var children = this.treedata[key];
 		if(children==null)
 		{
 			children = [];
-			self.treedata[key] = children;
+			this.treedata[key] = children;
 		}
 		children.push(id);
 	}
@@ -710,10 +749,10 @@ class ComponentsElement extends LitElement {
 	deleteNode(treeid, nodeid)
 	{
 		//console.log("remove node: "+nodeid);
-		$("#"+treeid).jstree("delete_node", nodeid);
-		var apps = $('#'+treeid).jstree().get_node('Applications');
+		this.getTree(self.treeid).jstree("delete_node", nodeid);
+		var apps = this.getTree(self.treeid).jstree().get_node('Applications');
 		if(apps!=null && apps.children.length==0)
-			$("#"+treeid).jstree("delete_node", "Applications");
+			this.getTree(self.treeid).jstree("delete_node", "Applications");
 	}
 
 	static get styles() {
@@ -783,5 +822,5 @@ class ComponentsElement extends LitElement {
 	}
 }
 
-customElements.define('jadex-componenttree', ComponentsElement);
+customElements.define('jadex-componenttree', ComponentTree);
 
