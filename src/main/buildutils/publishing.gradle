@@ -190,17 +190,14 @@ def createSignTask(origtask, classi, exten) {
 		}
 	}
 	// Signatory getting created for each task takes a long time -> reuse one signatory for all tasks
-	def signat	= rootProject.ext.signatory
-	if(signat==null) {
-		signat	= signtask.signatory
-		rootProject.ext.signatory	= signat
-	} else {
-		signtask.setSignatory(signat)
-	}
-	signtask.signatures.each { sig ->
-		println "created " +signtask + ", " + signtask.signatory + ", " + sig.signatory + ", "+ sig.signatureSpec.signatory
-	}
 	project.afterEvaluate {
+		def signat	= rootProject.ext.signatory
+		if(signat==null) {
+			signat	= signtask.signatory
+			rootProject.ext.signatory	= signat
+		} else {
+			signtask.setSignatory(signat)
+		}
 		signtask.signatures.each { sig ->
 			println "created1 " +signtask + ", " + signtask.signatory + ", " + sig.signatory + ", "+ sig.signatureSpec.signatory
 		}
