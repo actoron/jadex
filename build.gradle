@@ -20,6 +20,7 @@ project.ext.execfiles = '*.bat,*.sh'
 def sigkey = findProperty('sigKey');
 if (sigkey != null)
 	project.ext.signingKey=sigkey.replace("\\n", "\n");
+project.ext.signatory	= null	// ext property to cache signatory across all sign tasks (set by first task)
 
 project.ext.srcdir = 'src'
 
@@ -923,3 +924,7 @@ task checkdocs(type: GradleBuild) {
     tasks	= ['markdownlint']
 }
 test.finalizedBy	checkdocs
+
+task signAll {
+	dependsOn subprojects.collect { it.tasks.withType(Sign) }
+}

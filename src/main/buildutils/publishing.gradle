@@ -182,13 +182,22 @@ def createSignTask(origtask, classi, exten) {
     }
     signtask.sign(classi, origtask.outputs.files.singleFile)
 	signtask.signatureFiles.each { sigfile ->
-		publishing.publications.mavenJava.artifact(sigfile) {
+		publishing.publications.mavenJava.artifact(sigfile)
+		{
 			builtBy signtask
 			classifier classi
 			extension exten + sigfile.name.substring(sigfile.name.lastIndexOf('.'))
 		}
 	}
-	//println "created " +signtask
+	// Signatory getting created for each task takes a long time -> reuse one signatory for all tasks
+	def signat	= rootProject.ext.signatory
+	if(signat==null) {
+		signat	= signtask.signatory
+		rootProject.ext.signatory	= signat
+	} else {
+		signtask.setSignatory(signat)
+	}
+	//println "created " +signtask + ", " + signtask.signatory
 }
 
 publishing {
