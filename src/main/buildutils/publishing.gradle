@@ -197,7 +197,7 @@ def createSignTask(origtask, classi, exten) {
 	} else {
 		signtask.setSignatory(signat)
 	}
-	//println "created " +signtask + ", " + signtask.signatory
+	println "created " +signtask + ", " + signtask.signatory
 }
 
 publishing {
