@@ -198,9 +198,6 @@ def createSignTask(origtask, classi, exten) {
 		} else {
 			signtask.setSignatory(signat)
 		}
-		signtask.signatures.each { sig ->
-			println "created1 " +signtask + ", " + signtask.signatory + ", " + sig.signatory + ", "+ sig.signatureSpec.signatory
-		}
 	}
 }
 
