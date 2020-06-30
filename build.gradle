@@ -261,8 +261,7 @@ subprojects
 			}
 			war.archiveBaseName = getArtifactName(project)
 		}
-		//jar.archiveBaseName = getArtifactName(project)
-       	jar.archiveName = getArtifactName(project) + '.jar' 
+		jar.archiveBaseName = getArtifactName(project)
 //			test {
 //				reports.html.enabled = false
 //			}
